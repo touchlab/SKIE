@@ -1,0 +1,21 @@
+use_frameworks!
+
+platform :ios, '12.4'
+
+install! 'cocoapods', :deterministic_uuids => false
+
+target 'SwiktExample_iOS_Dynamic' do
+    pod 'example_dynamic', :path => '../dynamic'
+end
+
+target 'SwiktExample_macOS_Dynamic' do
+    pod 'example_dynamic', :path => '../dynamic'
+end
+
+target 'SwiktExample_iOS_Static' do
+    pod 'example_static', :path => '../static'
+end
+
+target 'SwiktExample_macOS_Static' do
+    pod 'example_static', :path => '../static'
+end

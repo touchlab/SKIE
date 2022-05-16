@@ -1,0 +1,871 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0F60888FF98738C2E0C4EF75 /* Pods_SwiktExample_macOS_Dynamic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA2EF8F969FA42BC549ED81 /* Pods_SwiktExample_macOS_Dynamic.framework */; };
+		185664B3282EE11E00B48A82 /* SwiktExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A3282EE11C00B48A82 /* SwiktExampleApp.swift */; };
+		185664B4282EE11E00B48A82 /* SwiktExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A3282EE11C00B48A82 /* SwiktExampleApp.swift */; };
+		185664B5282EE11E00B48A82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A4282EE11C00B48A82 /* ContentView.swift */; };
+		185664B6282EE11E00B48A82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A4282EE11C00B48A82 /* ContentView.swift */; };
+		185664B7282EE11E00B48A82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 185664A5282EE11E00B48A82 /* Assets.xcassets */; };
+		185664B8282EE11E00B48A82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 185664A5282EE11E00B48A82 /* Assets.xcassets */; };
+		185664C3282EE43500B48A82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A4282EE11C00B48A82 /* ContentView.swift */; };
+		185664C4282EE43500B48A82 /* SwiktExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A3282EE11C00B48A82 /* SwiktExampleApp.swift */; };
+		185664C7282EE43500B48A82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 185664A5282EE11E00B48A82 /* Assets.xcassets */; };
+		185664CE282EE44500B48A82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A4282EE11C00B48A82 /* ContentView.swift */; };
+		185664CF282EE44500B48A82 /* SwiktExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185664A3282EE11C00B48A82 /* SwiktExampleApp.swift */; };
+		185664D2282EE44500B48A82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 185664A5282EE11E00B48A82 /* Assets.xcassets */; };
+		19A8E166051B4CA3766DCE1E /* Pods_SwiktExample_iOS_Static.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E385B6769B233238DB18FDCC /* Pods_SwiktExample_iOS_Static.framework */; };
+		2366D35EEE882654AD8F7B1C /* Pods_SwiktExample_iOS_Dynamic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC89F16316B556BD03EC467E /* Pods_SwiktExample_iOS_Dynamic.framework */; };
+		46370EC99746869736622306 /* Pods_SwiktExample_macOS_Static.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5561573FC3521B40F9CB6984 /* Pods_SwiktExample_macOS_Static.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		185664A3282EE11C00B48A82 /* SwiktExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiktExampleApp.swift; sourceTree = "<group>"; };
+		185664A4282EE11C00B48A82 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		185664A5282EE11E00B48A82 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		185664AA282EE11E00B48A82 /* SwiktExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiktExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		185664B0282EE11E00B48A82 /* SwiktExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiktExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		185664B2282EE11E00B48A82 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+		185664CB282EE43500B48A82 /* SwiktExample_macOS_Static.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiktExample_macOS_Static.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		185664D6282EE44500B48A82 /* SwiktExample_iOS_Static.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiktExample_iOS_Static.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2945504613A036B5F6652C79 /* Pods-SwiktExample_iOS_Dynamic.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_iOS_Dynamic.debug.xcconfig"; path = "Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic.debug.xcconfig"; sourceTree = "<group>"; };
+		348A9F9F3F59DF080B8DAC3F /* Pods-SwiktExample_macOS_Static.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_macOS_Static.debug.xcconfig"; path = "Target Support Files/Pods-SwiktExample_macOS_Static/Pods-SwiktExample_macOS_Static.debug.xcconfig"; sourceTree = "<group>"; };
+		3DA2EF8F969FA42BC549ED81 /* Pods_SwiktExample_macOS_Dynamic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiktExample_macOS_Dynamic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3E8844196DA0D595DFB43188 /* Pods-SwiktExample_macOS_Static.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_macOS_Static.release.xcconfig"; path = "Target Support Files/Pods-SwiktExample_macOS_Static/Pods-SwiktExample_macOS_Static.release.xcconfig"; sourceTree = "<group>"; };
+		47A64FA92403293E416329D1 /* Pods-SwiktExample_iOS_Static.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_iOS_Static.release.xcconfig"; path = "Target Support Files/Pods-SwiktExample_iOS_Static/Pods-SwiktExample_iOS_Static.release.xcconfig"; sourceTree = "<group>"; };
+		5561573FC3521B40F9CB6984 /* Pods_SwiktExample_macOS_Static.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiktExample_macOS_Static.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8CCBF120E71A3B28F2072DFC /* Pods-SwiktExample_iOS_Static.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_iOS_Static.debug.xcconfig"; path = "Target Support Files/Pods-SwiktExample_iOS_Static/Pods-SwiktExample_iOS_Static.debug.xcconfig"; sourceTree = "<group>"; };
+		B197E2A4FB16BA19A04E4118 /* Pods-SwiktExample_iOS_Dynamic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_iOS_Dynamic.release.xcconfig"; path = "Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic.release.xcconfig"; sourceTree = "<group>"; };
+		C4977BDDB020FF7697E1F45B /* Pods-SwiktExample_macOS_Dynamic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_macOS_Dynamic.release.xcconfig"; path = "Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic.release.xcconfig"; sourceTree = "<group>"; };
+		CC89F16316B556BD03EC467E /* Pods_SwiktExample_iOS_Dynamic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiktExample_iOS_Dynamic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9C3E677D03BA6662B1EF37C /* Pods-SwiktExample_macOS_Dynamic.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiktExample_macOS_Dynamic.debug.xcconfig"; path = "Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic.debug.xcconfig"; sourceTree = "<group>"; };
+		E385B6769B233238DB18FDCC /* Pods_SwiktExample_iOS_Static.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiktExample_iOS_Static.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		185664A7282EE11E00B48A82 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2366D35EEE882654AD8F7B1C /* Pods_SwiktExample_iOS_Dynamic.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664AD282EE11E00B48A82 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F60888FF98738C2E0C4EF75 /* Pods_SwiktExample_macOS_Dynamic.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664C5282EE43500B48A82 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46370EC99746869736622306 /* Pods_SwiktExample_macOS_Static.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664D0282EE44500B48A82 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19A8E166051B4CA3766DCE1E /* Pods_SwiktExample_iOS_Static.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0AD405A8A54DE427CD84D12E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2945504613A036B5F6652C79 /* Pods-SwiktExample_iOS_Dynamic.debug.xcconfig */,
+				B197E2A4FB16BA19A04E4118 /* Pods-SwiktExample_iOS_Dynamic.release.xcconfig */,
+				8CCBF120E71A3B28F2072DFC /* Pods-SwiktExample_iOS_Static.debug.xcconfig */,
+				47A64FA92403293E416329D1 /* Pods-SwiktExample_iOS_Static.release.xcconfig */,
+				D9C3E677D03BA6662B1EF37C /* Pods-SwiktExample_macOS_Dynamic.debug.xcconfig */,
+				C4977BDDB020FF7697E1F45B /* Pods-SwiktExample_macOS_Dynamic.release.xcconfig */,
+				348A9F9F3F59DF080B8DAC3F /* Pods-SwiktExample_macOS_Static.debug.xcconfig */,
+				3E8844196DA0D595DFB43188 /* Pods-SwiktExample_macOS_Static.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		1856649D282EE11C00B48A82 = {
+			isa = PBXGroup;
+			children = (
+				185664A2282EE11C00B48A82 /* Shared */,
+				185664B1282EE11E00B48A82 /* macOS */,
+				185664AB282EE11E00B48A82 /* Products */,
+				0AD405A8A54DE427CD84D12E /* Pods */,
+				81518326C9947FF3B994C3DD /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		185664A2282EE11C00B48A82 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				185664A3282EE11C00B48A82 /* SwiktExampleApp.swift */,
+				185664A4282EE11C00B48A82 /* ContentView.swift */,
+				185664A5282EE11E00B48A82 /* Assets.xcassets */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		185664AB282EE11E00B48A82 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				185664AA282EE11E00B48A82 /* SwiktExample.app */,
+				185664B0282EE11E00B48A82 /* SwiktExample.app */,
+				185664CB282EE43500B48A82 /* SwiktExample_macOS_Static.app */,
+				185664D6282EE44500B48A82 /* SwiktExample_iOS_Static.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		185664B1282EE11E00B48A82 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				185664B2282EE11E00B48A82 /* macOS.entitlements */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		81518326C9947FF3B994C3DD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CC89F16316B556BD03EC467E /* Pods_SwiktExample_iOS_Dynamic.framework */,
+				E385B6769B233238DB18FDCC /* Pods_SwiktExample_iOS_Static.framework */,
+				3DA2EF8F969FA42BC549ED81 /* Pods_SwiktExample_macOS_Dynamic.framework */,
+				5561573FC3521B40F9CB6984 /* Pods_SwiktExample_macOS_Static.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		185664A9282EE11E00B48A82 /* SwiktExample_iOS_Dynamic */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 185664BB282EE11E00B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_iOS_Dynamic" */;
+			buildPhases = (
+				2299B11A8323E182404CC695 /* [CP] Check Pods Manifest.lock */,
+				185664A6282EE11E00B48A82 /* Sources */,
+				185664A7282EE11E00B48A82 /* Frameworks */,
+				185664A8282EE11E00B48A82 /* Resources */,
+				8A7C3BF1F40FC7A8F9D14994 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiktExample_iOS_Dynamic;
+			productName = "SwiktExample (iOS)";
+			productReference = 185664AA282EE11E00B48A82 /* SwiktExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		185664AF282EE11E00B48A82 /* SwiktExample_macOS_Dynamic */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 185664BE282EE11E00B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_macOS_Dynamic" */;
+			buildPhases = (
+				CB277B1A53166DDDE4D83667 /* [CP] Check Pods Manifest.lock */,
+				185664AC282EE11E00B48A82 /* Sources */,
+				185664AD282EE11E00B48A82 /* Frameworks */,
+				185664AE282EE11E00B48A82 /* Resources */,
+				ECBFD3A2509BFAE393797ED8 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiktExample_macOS_Dynamic;
+			productName = "SwiktExample (macOS)";
+			productReference = 185664B0282EE11E00B48A82 /* SwiktExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		185664C1282EE43500B48A82 /* SwiktExample_macOS_Static */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 185664C8282EE43500B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_macOS_Static" */;
+			buildPhases = (
+				365418EC08DA3D7F007B3003 /* [CP] Check Pods Manifest.lock */,
+				185664C2282EE43500B48A82 /* Sources */,
+				185664C5282EE43500B48A82 /* Frameworks */,
+				185664C6282EE43500B48A82 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiktExample_macOS_Static;
+			productName = "SwiktExample (macOS)";
+			productReference = 185664CB282EE43500B48A82 /* SwiktExample_macOS_Static.app */;
+			productType = "com.apple.product-type.application";
+		};
+		185664CC282EE44500B48A82 /* SwiktExample_iOS_Static */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 185664D3282EE44500B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_iOS_Static" */;
+			buildPhases = (
+				F17F5F757D1B1D743242C98E /* [CP] Check Pods Manifest.lock */,
+				185664CD282EE44500B48A82 /* Sources */,
+				185664D0282EE44500B48A82 /* Frameworks */,
+				185664D1282EE44500B48A82 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiktExample_iOS_Static;
+			productName = "SwiktExample (iOS)";
+			productReference = 185664D6282EE44500B48A82 /* SwiktExample_iOS_Static.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1856649E282EE11C00B48A82 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1330;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					185664A9282EE11E00B48A82 = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
+					185664AF282EE11E00B48A82 = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 185664A1282EE11C00B48A82 /* Build configuration list for PBXProject "SwiktExample" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1856649D282EE11C00B48A82;
+			productRefGroup = 185664AB282EE11E00B48A82 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				185664A9282EE11E00B48A82 /* SwiktExample_iOS_Dynamic */,
+				185664CC282EE44500B48A82 /* SwiktExample_iOS_Static */,
+				185664AF282EE11E00B48A82 /* SwiktExample_macOS_Dynamic */,
+				185664C1282EE43500B48A82 /* SwiktExample_macOS_Static */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		185664A8282EE11E00B48A82 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664B7282EE11E00B48A82 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664AE282EE11E00B48A82 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664B8282EE11E00B48A82 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664C6282EE43500B48A82 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664C7282EE43500B48A82 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664D1282EE44500B48A82 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664D2282EE44500B48A82 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2299B11A8323E182404CC695 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SwiktExample_iOS_Dynamic-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		365418EC08DA3D7F007B3003 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SwiktExample_macOS_Static-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8A7C3BF1F40FC7A8F9D14994 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CB277B1A53166DDDE4D83667 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SwiktExample_macOS_Dynamic-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ECBFD3A2509BFAE393797ED8 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F17F5F757D1B1D743242C98E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SwiktExample_iOS_Static-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		185664A6282EE11E00B48A82 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664B5282EE11E00B48A82 /* ContentView.swift in Sources */,
+				185664B3282EE11E00B48A82 /* SwiktExampleApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664AC282EE11E00B48A82 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664B6282EE11E00B48A82 /* ContentView.swift in Sources */,
+				185664B4282EE11E00B48A82 /* SwiktExampleApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664C2282EE43500B48A82 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664C3282EE43500B48A82 /* ContentView.swift in Sources */,
+				185664C4282EE43500B48A82 /* SwiktExampleApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		185664CD282EE44500B48A82 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				185664CE282EE44500B48A82 /* ContentView.swift in Sources */,
+				185664CF282EE44500B48A82 /* SwiktExampleApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		185664B9282EE11E00B48A82 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		185664BA282EE11E00B48A82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		185664BC282EE11E00B48A82 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2945504613A036B5F6652C79 /* Pods-SwiktExample_iOS_Dynamic.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = SwiktExample;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		185664BD282EE11E00B48A82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B197E2A4FB16BA19A04E4118 /* Pods-SwiktExample_iOS_Dynamic.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = SwiktExample;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		185664BF282EE11E00B48A82 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D9C3E677D03BA6662B1EF37C /* Pods-SwiktExample_macOS_Dynamic.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = SwiktExample;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		185664C0282EE11E00B48A82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C4977BDDB020FF7697E1F45B /* Pods-SwiktExample_macOS_Dynamic.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = SwiktExample;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		185664C9282EE43500B48A82 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 348A9F9F3F59DF080B8DAC3F /* Pods-SwiktExample_macOS_Static.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		185664CA282EE43500B48A82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3E8844196DA0D595DFB43188 /* Pods-SwiktExample_macOS_Static.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		185664D4282EE44500B48A82 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8CCBF120E71A3B28F2072DFC /* Pods-SwiktExample_iOS_Static.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		185664D5282EE44500B48A82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 47A64FA92403293E416329D1 /* Pods-SwiktExample_iOS_Static.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.SwiktExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		185664A1282EE11C00B48A82 /* Build configuration list for PBXProject "SwiktExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				185664B9282EE11E00B48A82 /* Debug */,
+				185664BA282EE11E00B48A82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		185664BB282EE11E00B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_iOS_Dynamic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				185664BC282EE11E00B48A82 /* Debug */,
+				185664BD282EE11E00B48A82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		185664BE282EE11E00B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_macOS_Dynamic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				185664BF282EE11E00B48A82 /* Debug */,
+				185664C0282EE11E00B48A82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		185664C8282EE43500B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_macOS_Static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				185664C9282EE43500B48A82 /* Debug */,
+				185664CA282EE43500B48A82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		185664D3282EE44500B48A82 /* Build configuration list for PBXNativeTarget "SwiktExample_iOS_Static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				185664D4282EE44500B48A82 /* Debug */,
+				185664D5282EE44500B48A82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1856649E282EE11C00B48A82 /* Project object */;
+}

@@ -7,6 +7,9 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib-jdk7"))
     implementation(gradleApi())
+    compileOnly(gradleKotlinDsl())
+    compileOnly(kotlin("gradle-plugin"))
+    compileOnly(kotlin("gradle-plugin-api"))
 
     testImplementation(libs.junit)
 }

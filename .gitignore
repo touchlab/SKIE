@@ -9,3 +9,5 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 build
+example/app/Pods
+example/app/SwiktExample.xcworkspace

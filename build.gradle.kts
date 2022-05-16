@@ -13,6 +13,7 @@ subprojects {
         plugin("io.gitlab.arturbosch.detekt")
         plugin("org.jlleitschuh.gradle.ktlint")
     }
+    version = "1.0"
 
     ktlint {
         debug.set(false)
