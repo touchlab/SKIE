@@ -10,9 +10,12 @@ import SwiftUI
 
 @main
 struct SwiktExampleApp: App {
+    @SceneBuilder
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                ContentView()
+            }
         }
     }
 }

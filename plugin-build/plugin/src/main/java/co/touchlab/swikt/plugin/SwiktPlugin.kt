@@ -1,7 +1,9 @@
 package co.touchlab.swikt.plugin
 
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -24,13 +26,20 @@ abstract class SwiktPlugin : Plugin<Project> {
             appleTargets.forEach { target ->
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
                 frameworks.forEach { framework ->
+                    // We need to use an anonymous class instead of lambda to keep execution optimizations.
+                    // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
+                    @Suppress("ObjectLiteralToLambda")
                     if (!framework.isStatic) {
-                        framework.linkTask.doFirst {
-                            framework.isStatic = true
-                        }
-                        framework.linkTask.doLast {
-                            framework.isStatic = false
-                        }
+                        framework.linkTask.doFirst(object: Action<Task> {
+                            override fun execute(t: Task) {
+                                framework.isStatic = true
+                            }
+                        })
+                        framework.linkTask.doLast(object: Action<Task> {
+                            override fun execute(t: Task) {
+                                framework.isStatic = false
+                            }
+                        })
                     }
 
                     val swiftCompileTaskProvider = tasks.register(framework.swiftCompileTaskName, SwiftCompileTask::class.java, framework)

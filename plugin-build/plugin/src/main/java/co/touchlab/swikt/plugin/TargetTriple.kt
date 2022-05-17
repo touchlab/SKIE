@@ -73,7 +73,11 @@ fun TargetTriple.withOSVersion(osVersion: String): TargetTriple =
  *  but this class is not that flexible yet.
  */
 fun TargetTriple.withoutVendor(): String {
+    return "$architecture-${withoutVendorAndArch()}"
+}
+
+fun TargetTriple.withoutVendorAndArch(): String {
     val envSuffix = environment?.let { "-$environment" }
         ?: ""
-    return "$architecture-$os$envSuffix"
+    return "$os$envSuffix"
 }

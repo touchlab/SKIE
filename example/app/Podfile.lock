@@ -13,9 +13,9 @@ EXTERNAL SOURCES:
     :path: "../static"
 
 SPEC CHECKSUMS:
-  example_dynamic: 03144d616be546941f55495229ff733cf64ed205
-  example_static: 07adc2184ef728ac85ee17af74924ee7f5c1e933
+  example_dynamic: bd276068e00b249832e85621dd2a930fed9c97e7
+  example_static: 6f118732decfb0ff24fca05ba79586322b48d660
 
-PODFILE CHECKSUM: 8b8e4ca9603a8171ee2725fb35afd0afbb0af476
+PODFILE CHECKSUM: f406feca7ca8387e32ded2f04c74cefaf41d491f
 
 COCOAPODS: 1.11.3

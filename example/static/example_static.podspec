@@ -9,6 +9,9 @@ Pod::Spec.new do |spec|
     spec.vendored_frameworks      = 'build/cocoapods/framework/ExampleKit.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '12.4'
+    spec.osx.deployment_target = '11.0'
+    spec.tvos.deployment_target = '12.4'
+    spec.watchos.deployment_target = '8.0'
                 
                 
     spec.pod_target_xcconfig = {
