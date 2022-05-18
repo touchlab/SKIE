@@ -67,12 +67,12 @@ abstract class SwiftCompileTask
         }
         val executableFile = File(frameworkFile, relativeExecutablePath)
 
-        File(frameworkFile, "Modules/${baseName}.swiftmodule").mkdirs()
+        File(frameworkFile, "Modules/$baseName.swiftmodule").mkdirs()
         copy {
-            it.from(File(frameworkFile, "Headers/${baseName}.h"))
+            it.from(File(frameworkFile, "Headers/$baseName.h"))
             it.from(File(frameworkFile, "Modules/module.modulemap")) {
                 it.filter { originalLine ->
-                    originalLine.replace("\"${baseName}.h\"", "\"../${baseName}.h\"")
+                    originalLine.replace("\"$baseName.h\"", "\"../$baseName.h\"")
                 }
             }
             it.into(outputDir)
@@ -92,7 +92,8 @@ abstract class SwiftCompileTask
             Family.TVOS -> loadCommands.firstOrNull { it.cmd == "LC_VERSION_MIN_TVOS" }?.get("version")
                 ?: loadCommands.firstOrNull { it.cmd == "LC_BUILD_VERSION" }?.get("minos")
             Family.WATCHOS -> loadCommands.firstOrNull { it.cmd == "LC_BUILD_VERSION" }?.get("minos")
-            Family.LINUX, Family.MINGW, Family.ANDROID, Family.WASM, Family.ZEPHYR -> error("Unsupported target: ${kotlinFramework.target.konanTarget}")
+            Family.LINUX, Family.MINGW, Family.ANDROID, Family.WASM, Family.ZEPHYR ->
+                error("Unsupported target: ${kotlinFramework.target.konanTarget}")
         } ?: error("Couldn't determine target version using otool! otool output: $otoolOutput")
         // TODO[TK]: SDK version from otool is not available on my mac (it returns 15.0, but my xcrun can't find it). Unsure what's correct.
         // val sdkVersion = sdkRegex.find(otoolOutput)?.groupValues?.getOrNull(1) ?: error("Couldn't determine sdk version using otool!")
@@ -117,11 +118,11 @@ abstract class SwiftCompileTask
             "-I",
             ".",
             "-emit-module-interface-path",
-            "$frameworkPath/Modules/${baseName}.swiftmodule/$targetTriple.swiftinterface",
+            "$frameworkPath/Modules/$baseName.swiftmodule/$targetTriple.swiftinterface",
             "-emit-module-path",
-            "$frameworkPath/Modules/${baseName}.swiftmodule/$targetTriple.swiftmodule",
+            "$frameworkPath/Modules/$baseName.swiftmodule/$targetTriple.swiftmodule",
             "-emit-objc-header-path",
-            "$frameworkPath/Headers/${baseName}-Swift.h",
+            "$frameworkPath/Headers/$baseName-Swift.h",
             "-emit-library",
             "-static",
             "-enable-library-evolution",
@@ -140,9 +141,9 @@ abstract class SwiftCompileTask
                 "-v",
                 "-static",
                 "-syslibroot", sdkPath,
-                "-o", "${frameworkPath}/${baseName}_merged",
+                "-o", "$frameworkPath/${baseName}_merged",
                 executableFile,
-                outputDir.get().file("lib${baseName}.a").asFile.absolutePath,
+                outputDir.get().file("lib$baseName.a").asFile.absolutePath,
             )
         } else {
             xcrun(
@@ -155,25 +156,27 @@ abstract class SwiftCompileTask
                 "-syslibroot", sdkPath,
                 "-undefined", "dynamic_lookup",
                 "-install_name", "@rpath/$baseName.framework/$relativeExecutablePath",
-                "-o", "${frameworkPath}/${baseName}_merged",
+                "-o", "$frameworkPath/${baseName}_merged",
                 executableFile,
                 darwinTarget.compilerRtLibrary(),
-                outputDir.get().file("lib${baseName}.a").asFile.absolutePath,
+                outputDir.get().file("lib$baseName.a").asFile.absolutePath,
             )
         }
         executableFile.delete()
-        File("${frameworkPath}/${baseName}_merged").renameTo(executableFile)
-        File("${frameworkPath}/Headers/${baseName}.h").appendText("\n#import \"${baseName}-Swift.h\"")
+        File("$frameworkPath/${baseName}_merged").renameTo(executableFile)
+        File("$frameworkPath/Headers/$baseName.h").appendText("\n#import \"$baseName-Swift.h\"")
 
-        val allFamilyTripletsButActive = darwinTargets.values.filter { it.konanTarget.family == kotlinFramework.target.konanTarget.family }.map { it.targetTriple } - targetTriple
+        val allFamilyTripletsButActive = darwinTargets.values.filter {
+            it.konanTarget.family == kotlinFramework.target.konanTarget.family
+        }.map { it.targetTriple } - targetTriple
         for (tripletToFake in allFamilyTripletsButActive) {
             println("Faking triplet: $tripletToFake")
             copy {
-                it.from("${frameworkPath}/Modules/${baseName}.swiftmodule/") {
-                    it.include("${targetTriple}.*")
+                it.from("$frameworkPath/Modules/$baseName.swiftmodule/") {
+                    it.include("$targetTriple.*")
                 }
                 it.rename { it.replace(targetTriple.toString(), tripletToFake.toString()) }
-                it.into("${frameworkPath}/Modules/${baseName}.swiftmodule")
+                it.into("$frameworkPath/Modules/$baseName.swiftmodule")
             }
         }
     }
@@ -268,7 +271,8 @@ data class LoadCommand(
             return loadCommand.findAll(otoolOutput).map { loadCommandMatch ->
                 LoadCommand(
                     index = loadCommandMatch.groupValues[1].toInt(),
-                    attributes = loadCommandAttribute.findAll(loadCommandMatch.groupValues[2]).map { it.groupValues[1] to it.groupValues[2] }.toMap()
+                    attributes = loadCommandAttribute.findAll(loadCommandMatch.groupValues[2])
+                        .map { it.groupValues[1] to it.groupValues[2] }.toMap()
                 )
             }.toList()
         }

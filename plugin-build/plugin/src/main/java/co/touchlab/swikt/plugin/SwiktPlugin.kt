@@ -30,12 +30,12 @@ abstract class SwiktPlugin : Plugin<Project> {
                     // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
                     @Suppress("ObjectLiteralToLambda")
                     if (!framework.isStatic) {
-                        framework.linkTask.doFirst(object: Action<Task> {
+                        framework.linkTask.doFirst(object : Action<Task> {
                             override fun execute(t: Task) {
                                 framework.isStatic = true
                             }
                         })
-                        framework.linkTask.doLast(object: Action<Task> {
+                        framework.linkTask.doLast(object : Action<Task> {
                             override fun execute(t: Task) {
                                 framework.isStatic = false
                             }
@@ -71,5 +71,4 @@ abstract class SwiktPlugin : Plugin<Project> {
 
     private val Framework.swiftCompileTaskName: String
         get() = listOf("swiftCompile", name.capitalized(), target.targetName.capitalized()).joinToString("")
-
 }

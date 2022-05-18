@@ -511,7 +511,7 @@
 				183DE2E428342B01006B8798 /* Sources */,
 				183DE2E528342B01006B8798 /* Frameworks */,
 				183DE2E628342B01006B8798 /* Resources */,
-				10937F163CCDB2FA4AA855C9 /* [CP] Embed Pods Frameworks */,
+				9E4F6FDA3781903B4D05E846 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -586,7 +586,7 @@
 				183DE33A28342B5D006B8798 /* Sources */,
 				183DE33B28342B5D006B8798 /* Frameworks */,
 				183DE33C28342B5D006B8798 /* Resources */,
-				ACE0E940782982D9CC4F2421 /* [CP] Embed Pods Frameworks */,
+				3F9BC47C645A958AB886A856 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -623,7 +623,7 @@
 				185664A6282EE11E00B48A82 /* Sources */,
 				185664A7282EE11E00B48A82 /* Frameworks */,
 				185664A8282EE11E00B48A82 /* Resources */,
-				1D16706DB800473C0B08E862 /* [CP] Embed Pods Frameworks */,
+				2FFF6CD5C1ECA4CF85A5FA35 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -642,7 +642,7 @@
 				185664AC282EE11E00B48A82 /* Sources */,
 				185664AD282EE11E00B48A82 /* Frameworks */,
 				185664AE282EE11E00B48A82 /* Resources */,
-				873AA14E7600E98472ED477C /* [CP] Embed Pods Frameworks */,
+				0561FC64049A54E43C73CD74 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -864,38 +864,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		10937F163CCDB2FA4AA855C9 /* [CP] Embed Pods Frameworks */ = {
+		0561FC64049A54E43C73CD74 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		1D16706DB800473C0B08E862 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		2C32D26674A15D5B72307043 /* [CP] Check Pods Manifest.lock */ = {
@@ -942,6 +925,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		2FFF6CD5C1ECA4CF85A5FA35 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_iOS_Dynamic/Pods-SwiktExample_iOS_Dynamic-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		320F6F43F4760A0D5EE82B27 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -962,6 +962,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3F9BC47C645A958AB886A856 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_tvOS_Dynamic/Pods-SwiktExample_tvOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_tvOS_Dynamic/Pods-SwiktExample_tvOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_tvOS_Dynamic/Pods-SwiktExample_tvOS_Dynamic-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		45DBCDE096EE5410D7AEBCE8 /* [CP] Check Pods Manifest.lock */ = {
@@ -1028,23 +1045,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		873AA14E7600E98472ED477C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_macOS_Dynamic/Pods-SwiktExample_macOS_Dynamic-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8C44BB25622E7BBD43480AC2 /* [CP] Check Pods Manifest.lock */ = {
@@ -1135,21 +1135,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		ACE0E940782982D9CC4F2421 /* [CP] Embed Pods Frameworks */ = {
+		9E4F6FDA3781903B4D05E846 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_tvOS_Dynamic/Pods-SwiktExample_tvOS_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_tvOS_Dynamic/Pods-SwiktExample_tvOS_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_tvOS_Dynamic/Pods-SwiktExample_tvOS_Dynamic-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic/Pods-SwiktExample_watchOS_WatchKit_Extension_Dynamic-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		EE4DA72049DDB59911DFD088 /* [CP] Check Pods Manifest.lock */ = {

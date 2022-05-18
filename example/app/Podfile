@@ -12,7 +12,6 @@ targets = {
   "tvOS" => { "platform" => :tvos, "version" => "12.4" },
 }
 
-
 types = {
   "dynamic" => "Dynamic",
   "static" => "Static",

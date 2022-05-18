@@ -1,9 +1,7 @@
 package co.touchlab.swikt.plugin
 
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Assert
 import org.junit.Test
-import java.io.File
 
 class SwiktPluginTest {
 

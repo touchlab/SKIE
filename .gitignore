@@ -11,3 +11,4 @@
 build
 example/app/Pods
 example/app/SwiktExample.xcworkspace
+example/app/SwiktExample.xcodeproj/xcuserdata/*.xcuserdatad
