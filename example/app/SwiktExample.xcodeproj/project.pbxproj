@@ -396,9 +396,9 @@
 		1856649D282EE11C00B48A82 = {
 			isa = PBXGroup;
 			children = (
-				183DE370283440F0006B8798 /* tvOS */,
 				185664A2282EE11C00B48A82 /* Shared */,
 				185664B1282EE11E00B48A82 /* macOS */,
+				183DE370283440F0006B8798 /* tvOS */,
 				183DE36628343F3B006B8798 /* watchOS */,
 				185664AB282EE11E00B48A82 /* Products */,
 				0AD405A8A54DE427CD84D12E /* Pods */,
@@ -748,14 +748,14 @@
 				185664CC282EE44500B48A82 /* SwiktExample_iOS_Static */,
 				185664AF282EE11E00B48A82 /* SwiktExample_macOS_Dynamic */,
 				185664C1282EE43500B48A82 /* SwiktExample_macOS_Static */,
+				183DE33D28342B5D006B8798 /* SwiktExample_tvOS_Dynamic */,
+				183DE34F28343941006B8798 /* SwiktExample_tvOS_Static */,
 				183DE2D928342AFF006B8798 /* SwiktExample_watchOS_Dynamic */,
 				183DE2DC28342AFF006B8798 /* SwiktExample_watchOS_WatchKit_App_Dynamic */,
 				183DE2E728342B01006B8798 /* SwiktExample_watchOS_WatchKit_Extension_Dynamic */,
 				183DE30A28342B29006B8798 /* SwiktExample_watchOS_Static */,
 				183DE30D28342B29006B8798 /* SwiktExample_watchOS_WatchKit_App_Static */,
 				183DE31828342B2B006B8798 /* SwiktExample_watchOS_WatchKit_Extension_Static */,
-				183DE33D28342B5D006B8798 /* SwiktExample_tvOS_Dynamic */,
-				183DE34F28343941006B8798 /* SwiktExample_tvOS_Static */,
 			);
 		};
 /* End PBXProject section */

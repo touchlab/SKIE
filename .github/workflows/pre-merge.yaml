@@ -12,7 +12,7 @@ jobs:
   gradle:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ macos-latest ]
     runs-on: ${{ matrix.os }}
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
