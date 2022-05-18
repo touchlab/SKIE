@@ -28,11 +28,11 @@ jobs:
 
         # We do a run of the new task `templateExample` created by the plugin
       - name: Run the plugin
-        run: ./gradlew templateExample --message="Test Run" --tag=CI
+        run: ./gradlew swiftCompilePodDebugFrameworkIosX64
         if: success()
         # And we verify that the output of the file is correct.
       - name: Verify the plugin output
-        run: grep -Fxq "[CI] Test Run" ./example/build/template-example.txt
+        run: test -f ./example/dynamic/build/swikt/podDebugFramework/iosX64/libExampleKit.a && test -f example/static/build/swikt/podDebugFramework/iosX64/libExampleKit.a
         if: success()
 
       - name: Stop Gradle

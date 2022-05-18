@@ -44,6 +44,8 @@ abstract class SwiktPlugin : Plugin<Project> {
 
                     val swiftCompileTaskProvider = tasks.register(framework.swiftCompileTaskName, SwiftCompileTask::class.java, framework)
                     swiftCompileTaskProvider.configure {
+                        it.dependsOn(framework.linkTask)
+
                         val target = framework.target
                         it.description = "Compiles Swift code for ${framework.outputKind.description} '${framework.name}' for a target '${target.name}'."
                         it.enabled = framework.linkTask.enabled
