@@ -56,9 +56,18 @@ publishing {
         maven {
             name = "gitHub"
             uri("https://maven.pkg.github.com/Touchlab/swikt")
+
+            val actor = System.getenv("GITHUB_ACTOR") ?: run {
+                logger.warn("GITHUB_ACTOR not set")
+                return@maven
+            }
+            val password = System.getenv("GITHUB_TOKEN") ?: run {
+                logger.warn("GITHUB_TOKEN not set")
+                return@maven
+            }
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                this.username = actor
+                this.password = password
             }
         }
     }
