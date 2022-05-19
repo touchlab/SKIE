@@ -53,9 +53,8 @@ pluginBundle {
 
 publishing {
     repositories {
-        maven {
+        maven("https://maven.pkg.github.com/Touchlab/swikt") {
             name = "gitHub"
-            uri("https://maven.pkg.github.com/Touchlab/swikt")
 
             val actor = System.getenv("GITHUB_ACTOR") ?: run {
                 logger.warn("GITHUB_ACTOR not set")
