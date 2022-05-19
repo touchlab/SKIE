@@ -1,8 +1,9 @@
 name: Publish Plugin
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   gradle:
@@ -11,7 +12,7 @@ jobs:
       contents: read
       packages: write
     env:
-      RELEASE_VERSION: ${{ github.event.release.tag_name }}
+      RELEASE_VERSION: ${{ github.ref_name }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -37,9 +38,3 @@ jobs:
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
       - name: Stop Gradle
         run: ./gradlew --stop
-      - uses: eregon/publish-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ github.event.release.id }}
-        if: ${{ success() }}
