@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish")
+    `maven-publish`
 }
 
 dependencies {
@@ -47,6 +48,19 @@ pluginBundle {
         groupId = PluginCoordinates.GROUP
         artifactId = PluginCoordinates.ID.removePrefix("$groupId.")
         version = PluginCoordinates.VERSION
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "gitHub"
+            uri("https://maven.pkg.github.com/Touchlab/swikt")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 

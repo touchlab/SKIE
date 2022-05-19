@@ -1,8 +1,11 @@
 object PluginCoordinates {
     const val ID = "co.touchlab.swikt"
     const val GROUP = "co.touchlab.swikt"
-    const val VERSION = "1.0.0"
+    const val DEFAULT_VERSION = "1.0.0"
     const val IMPLEMENTATION_CLASS = "co.touchlab.swikt.plugin.SwiktPlugin"
+
+    val VERSION: String
+        get() = System.getenv("RELEASE_VERSION") ?: DEFAULT_VERSION
 }
 
 object PluginBundle {
