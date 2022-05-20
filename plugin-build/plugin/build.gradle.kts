@@ -12,6 +12,9 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))
 
+    implementation("io.outfoxx:swiftpoet:1.4.0")
+    implementation("com.squareup:kotlinpoet:1.11.0")
+
     testImplementation(libs.junit)
     testImplementation(kotlin("gradle-plugin"))
 }

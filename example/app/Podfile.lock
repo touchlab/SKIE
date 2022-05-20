@@ -13,8 +13,8 @@ EXTERNAL SOURCES:
     :path: "../static"
 
 SPEC CHECKSUMS:
-  example_dynamic: bd276068e00b249832e85621dd2a930fed9c97e7
-  example_static: 6f118732decfb0ff24fca05ba79586322b48d660
+  example_dynamic: a897f09ac50ac1341ba7ff813f580e4c10056b4e
+  example_static: 570203e4d3910676e3215b569ec676c2a0c33c0e
 
 PODFILE CHECKSUM: 40e6e82b2e64014caaf011a573c80900921d535d
 

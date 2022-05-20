@@ -7,6 +7,7 @@ import org.gradle.api.Task
 import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import java.io.File
@@ -22,6 +23,24 @@ abstract class SwiktPlugin : Plugin<Project> {
             val appleTargets = kotlin.targets
                 .mapNotNull { it as? KotlinNativeTarget }
                 .filter { it.konanTarget.family.isAppleFamily }
+
+            val appleSourceSets = appleTargets
+                .flatMap { it.compilations } // TODO should we filter out test sources?
+                .flatMap { it.allKotlinSourceSets }
+                .toSet()
+
+            appleSourceSets.forEach { sourceSet ->
+                val generateKotlinTask =
+                    tasks.register(sourceSet.generateKotlinTaskName, KotlinGenerateTask::class.java, sourceSet)
+                generateKotlinTask.configure {
+                    it.generatedSourceDir.set(file(sourceSet.generatedKotlinDirectory))
+                }
+                val generateSwiftTask =
+                    tasks.register(sourceSet.generateSwiftTaskName, SwiftGenerateTask::class.java, sourceSet)
+                generateSwiftTask.configure {
+                    it.generatedSourceDir.set(file(sourceSet.generatedSwiftDirectory))
+                }
+            }
 
             appleTargets.forEach { target ->
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
@@ -45,9 +64,15 @@ abstract class SwiktPlugin : Plugin<Project> {
                     val swiftCompileTaskProvider = tasks.register(framework.swiftCompileTaskName, SwiftCompileTask::class.java, framework)
                     swiftCompileTaskProvider.configure {
                         it.dependsOn(framework.linkTask)
+                        it.dependsOn(
+                            *framework.compilation.allKotlinSourceSets
+                                .flatMap { listOf(it.generateKotlinTaskName, it.generateSwiftTaskName) }
+                                .toTypedArray()
+                        )
 
                         val target = framework.target
-                        it.description = "Compiles Swift code for ${framework.outputKind.description} '${framework.name}' for a target '${target.name}'."
+                        it.description =
+                            "Compiles Swift code for ${framework.outputKind.description} '${framework.name}' for a target '${target.name}'."
                         it.enabled = framework.linkTask.enabled
                         it.outputs.upToDateWhen { framework.linkTask.state.upToDate }
 
@@ -55,9 +80,13 @@ abstract class SwiktPlugin : Plugin<Project> {
                             "${kotlinSourceSet.name} Swift source".let {
                                 project.objects.sourceDirectorySet(it, it).apply {
                                     filter.include("**/*.swift")
-                                    srcDirs("src/${kotlinSourceSet.name}/swift")
+                                    srcDirs(kotlinSourceSet.generatedSwiftDirectory)
+                                    srcDirs(kotlinSourceSet.swiftSourceDirectory)
                                 }
                             }
+                        }
+                        framework.compilation.allKotlinSourceSets.forEach {
+                            it.kotlin.srcDirs(it.generatedKotlinDirectory)
                         }
 
                         it.sourceFiles.set(project.objects.fileCollection().from(swiftSourceSets))
@@ -69,6 +98,17 @@ abstract class SwiktPlugin : Plugin<Project> {
         }
     }
 
+    private val KotlinSourceSet.generatedKotlinDirectory: String
+        get() = "build/generated/swikt/$name/kotlin"
+    private val KotlinSourceSet.generatedSwiftDirectory: String
+        get() = "build/generated/swikt/$name/swift"
+    private val KotlinSourceSet.swiftSourceDirectory: String
+        get() = "src/$name/swift"
+
+    private val KotlinSourceSet.generateKotlinTaskName: String
+        get() = "generate${name.capitalized()}Kotlin"
+    private val KotlinSourceSet.generateSwiftTaskName: String
+        get() = "generate${name.capitalized()}Swift"
     private val Framework.swiftCompileTaskName: String
         get() = listOf("swiftCompile", name.capitalized(), target.targetName.capitalized()).joinToString("")
 }
