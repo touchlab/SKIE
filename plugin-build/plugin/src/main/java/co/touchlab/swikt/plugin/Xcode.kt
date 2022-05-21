@@ -32,6 +32,8 @@ interface Xcode {
     // Xcode.app/Contents/Developer/usr
     val additionalTools: String
 
+    fun swiftLibraryPaths(platformName: String): List<String>
+
     /**
      * TODO: `toLowerCase` is deprecated and should be replaced with `lowercase`, but
      * this code used in buildSrc which depends on bootstrap version of stdlib, so right version
@@ -77,6 +79,12 @@ private object CurrentXcode : Xcode {
     override val watchosSdk: String by lazy { getSdkPath("watchos") }
     override val watchsimulatorSdk: String by lazy { getSdkPath("watchsimulator") }
 
+    override fun swiftLibraryPaths(platformName: String): List<String> {
+       return listOf(
+           File(toolchain, "usr/lib/swift/$platformName").absolutePath,
+           File(pathToPlatformSdk(platformName), "usr/lib/swift").absolutePath
+       )
+    }
 
     override val version by lazy {
         xcrun("xcodebuild", "-version")
@@ -84,7 +92,7 @@ private object CurrentXcode : Xcode {
     }
 
     private fun xcrun(vararg args: String): String {
-        return ("/usr/bin/xcrun " + args.joinToString(" ")).let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText)
+        return ("/usr/bin/xcrun " + args.joinToString(" ")).let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
     }
 
     private fun getSdkPath(sdk: String) = xcrun("--sdk", sdk, "--show-sdk-path")

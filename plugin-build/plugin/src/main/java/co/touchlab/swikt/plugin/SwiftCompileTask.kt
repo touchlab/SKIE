@@ -12,7 +12,9 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -66,6 +68,17 @@ abstract class SwiftCompileTask
             else -> baseName
         }
         val executableFile = File(frameworkFile, relativeExecutablePath)
+        val mergedFile = File(frameworkPath, "${baseName}_merged")
+
+        val (swiftcBitcodeArg, ldBitcodeArgs) = when (kotlinFramework.embedBitcode) {
+            BitcodeEmbeddingMode.DISABLE -> null to emptyList()
+            BitcodeEmbeddingMode.BITCODE -> "-embed-bitcode" to listOf("-bitcode_bundle")
+            BitcodeEmbeddingMode.MARKER -> "-embed-bitcode-marker" to listOf("-bitcode_bundle", "-bitcode_process_mode", "marker")
+        }
+        val swiftcBuildTypeArgs = when (kotlinFramework.buildType) {
+            NativeBuildType.DEBUG -> emptyList()
+            NativeBuildType.RELEASE -> listOf("-O", "-whole-module-optimization")
+        }
 
         File(frameworkFile, "Modules/$baseName.swiftmodule").mkdirs()
         copy {
@@ -123,15 +136,18 @@ abstract class SwiftCompileTask
             "$frameworkPath/Modules/$baseName.swiftmodule/$targetTriple.swiftmodule",
             "-emit-objc-header-path",
             "$frameworkPath/Headers/$baseName-Swift.h",
+            swiftcBitcodeArg,
+            swiftcBuildTypeArgs,
             "-emit-library",
             "-static",
             "-enable-library-evolution",
+            "-g",
+            "-gdwarf-types",
             "-sdk",
             sdkPath,
             "-target",
             targetTriple.withOSVersion(targetVersion),
-            "-embed-bitcode-marker",
-            *sourceFiles.get().files.map { it.absolutePath }.toTypedArray(),
+            sourceFiles.get().files.map { it.absolutePath },
         )
 
         if (kotlinFramework.isStatic) {
@@ -141,7 +157,7 @@ abstract class SwiftCompileTask
                 "-v",
                 "-static",
                 "-syslibroot", sdkPath,
-                "-o", "$frameworkPath/${baseName}_merged",
+                "-o", mergedFile,
                 executableFile,
                 outputDir.get().file("lib$baseName.a").asFile.absolutePath,
             )
@@ -149,22 +165,46 @@ abstract class SwiftCompileTask
             xcrun(
                 "--sdk", versionedSdk,
                 "ld",
+                "-demangle",
                 "-dylib",
                 "-arch", targetTriple.architecture,
                 "-platform_version", targetTriple.withoutVendorAndArch(), targetVersion, sdkVersion,
+                // TODO: Is needed?
                 "-ObjC",
+                "-lSystem", "-lobjc", "-lc++", "-framework", "Foundation",
+                Xcode.current.swiftLibraryPaths(darwinTarget.sdk).flatMap { listOf("-L", it) },
                 "-syslibroot", sdkPath,
-                "-undefined", "dynamic_lookup",
                 "-install_name", "@rpath/$baseName.framework/$relativeExecutablePath",
-                "-o", "$frameworkPath/${baseName}_merged",
+                "-dead_strip".takeIf { kotlinFramework.optimized },
+                ldBitcodeArgs,
+                "-o", mergedFile,
                 executableFile,
                 darwinTarget.compilerRtLibrary(),
                 outputDir.get().file("lib$baseName.a").asFile.absolutePath,
             )
         }
+        // TODO: If this task succeeded before and is being run again without the link phase being run too, this task won't be successful.
         executableFile.delete()
-        File("$frameworkPath/${baseName}_merged").renameTo(executableFile)
+        mergedFile.renameTo(executableFile)
         File("$frameworkPath/Headers/$baseName.h").appendText("\n#import \"$baseName-Swift.h\"")
+
+        // This has to be done after we rename the merged file otherwise we'd have to rename the contents of dSYM as well.
+        if (!kotlinFramework.isStatic && !kotlinFramework.debuggable) {
+            xcrun(
+                "--sdk", versionedSdk,
+                "dsymutil",
+                "-o", File(frameworkFile.parentFile, "${frameworkFile.name}.dSYM"),
+                executableFile,
+            )
+            if (kotlinFramework.optimized) {
+                xcrun(
+                    "--sdk", versionedSdk,
+                    "strip",
+                    "-S",
+                    executableFile,
+                )
+            }
+        }
 
         val allFamilyTripletsButActive = darwinTargets.values.filter {
             it.konanTarget.family == kotlinFramework.target.konanTarget.family
@@ -184,7 +224,13 @@ abstract class SwiftCompileTask
     private fun Project.xcrun(vararg args: Any?) = exec {
         it.workingDir(outputDir)
         it.executable = "/usr/bin/xcrun"
-        it.args(args.mapNotNull { it })
+        it.args(args.flatMap {
+            when (it) {
+                is Iterable<*> -> it
+                null -> emptyList()
+                else -> listOf(it)
+            }
+        })
     }
 
     private val compilerRtDir: String? by lazy {
