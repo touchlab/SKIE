@@ -5,6 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.internal.tasks.TaskExecutionOutcome
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -33,18 +34,6 @@ abstract class SwiftCompileTask
         group = BasePlugin.BUILD_GROUP
     }
 
-    @get:Internal
-    val linkTaskName: String
-        get() = kotlinFramework.linkTaskName
-
-    @get:Internal
-    val linkTask: KotlinNativeLink
-        get() = kotlinFramework.linkTask
-
-    @get:Internal
-    val linkTaskProvider: Provider<out KotlinNativeLink>
-        get() = kotlinFramework.linkTaskProvider
-
     // TODO: @get:Incremental ?
     // TODO: @get:PathSensitive(PathSensitivity.NAME_ONLY) ?
     @get:InputFiles
@@ -53,22 +42,48 @@ abstract class SwiftCompileTask
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
+    private val workDir by lazy { outputDir.dir("work") }
+    private val backupDir by lazy { outputDir.dir("backup") }
+
     @TaskAction
     fun sampleAction(): Unit = with(project) {
         logger.info("Compiling Swift sources")
+
+        // Delete work dir
+        workDir.get().asFile.apply {
+            deleteRecursively()
+            mkdirs()
+        }
 
         val darwinTarget = darwinTargets[kotlinFramework.target.konanTarget] ?: return@with
         val baseName = kotlinFramework.baseName
         val sdk = darwinTarget.sdk
         val targetTriple = darwinTarget.targetTriple
-        val frameworkFile = kotlinFramework.outputFile
-        val frameworkPath = frameworkFile.absolutePath
+        val sourceFramework = backupDir.get().dir(kotlinFramework.outputFile.name).asFile
+        val targetFramework = kotlinFramework.outputFile
         val relativeExecutablePath = when (darwinTarget.konanTarget.family) {
             Family.OSX -> "Versions/A/$baseName"
             else -> baseName
         }
-        val executableFile = File(frameworkFile, relativeExecutablePath)
-        val mergedFile = File(frameworkPath, "${baseName}_merged")
+        val sourceExecutable = File(sourceFramework, relativeExecutablePath)
+        val targetExecutable = File(targetFramework, relativeExecutablePath)
+
+        when (kotlinFramework.linkTask.state.outcome) {
+            TaskExecutionOutcome.EXECUTED -> {
+                sourceFramework.deleteRecursively()
+                kotlinFramework.outputFile.copyRecursively(sourceFramework)
+                targetExecutable.delete()
+                File(targetFramework, "/Headers/$baseName.h").appendText("\n#import \"$baseName-Swift.h\"")
+            }
+            TaskExecutionOutcome.UP_TO_DATE, TaskExecutionOutcome.SKIPPED -> {
+                check(sourceFramework.exists()) {
+                    "Framework backup doesn't exist and can't be created. Clean the build directory and try running again."
+                }
+            }
+            TaskExecutionOutcome.FROM_CACHE -> TODO("Cached link phase not supported!")
+            TaskExecutionOutcome.NO_SOURCE -> TODO("Link phase without sources is not supported!")
+            null -> error("Swikt task can't run before link task has completed!")
+        }
 
         val (swiftcBitcodeArg, ldBitcodeArgs) = when (kotlinFramework.embedBitcode) {
             BitcodeEmbeddingMode.DISABLE -> null to emptyList()
@@ -80,18 +95,18 @@ abstract class SwiftCompileTask
             NativeBuildType.RELEASE -> listOf("-O", "-whole-module-optimization")
         }
 
-        File(frameworkFile, "Modules/$baseName.swiftmodule").mkdirs()
+        File(targetFramework, "Modules/$baseName.swiftmodule").mkdirs()
         copy {
-            it.from(File(frameworkFile, "Headers/$baseName.h"))
-            it.from(File(frameworkFile, "Modules/module.modulemap")) {
+            it.from(File(sourceFramework, "Headers/$baseName.h"))
+            it.from(File(sourceFramework, "Modules/module.modulemap")) {
                 it.filter { originalLine ->
                     originalLine.replace("\"$baseName.h\"", "\"../$baseName.h\"")
                 }
             }
-            it.into(outputDir)
+            it.into(workDir)
         }
 
-        val otoolOutput = "/usr/bin/xcrun --sdk $sdk otool -l $executableFile"
+        val otoolOutput = "/usr/bin/xcrun --sdk $sdk otool -l $sourceExecutable"
             .let(ProcessGroovyMethods::execute)
             .let(ProcessGroovyMethods::getText)
             .trim()
@@ -131,11 +146,11 @@ abstract class SwiftCompileTask
             "-I",
             ".",
             "-emit-module-interface-path",
-            "$frameworkPath/Modules/$baseName.swiftmodule/$targetTriple.swiftinterface",
+            "$targetFramework/Modules/$baseName.swiftmodule/$targetTriple.swiftinterface",
             "-emit-module-path",
-            "$frameworkPath/Modules/$baseName.swiftmodule/$targetTriple.swiftmodule",
+            "$targetFramework/Modules/$baseName.swiftmodule/$targetTriple.swiftmodule",
             "-emit-objc-header-path",
-            "$frameworkPath/Headers/$baseName-Swift.h",
+            "$targetFramework/Headers/$baseName-Swift.h",
             swiftcBitcodeArg,
             swiftcBuildTypeArgs,
             "-emit-library",
@@ -157,9 +172,9 @@ abstract class SwiftCompileTask
                 "-v",
                 "-static",
                 "-syslibroot", sdkPath,
-                "-o", mergedFile,
-                executableFile,
-                outputDir.get().file("lib$baseName.a").asFile.absolutePath,
+                "-o", targetExecutable,
+                sourceExecutable,
+                workDir.get().file("lib$baseName.a").asFile.absolutePath,
             )
         } else {
             xcrun(
@@ -177,32 +192,27 @@ abstract class SwiftCompileTask
                 "-install_name", "@rpath/$baseName.framework/$relativeExecutablePath",
                 "-dead_strip".takeIf { kotlinFramework.optimized },
                 ldBitcodeArgs,
-                "-o", mergedFile,
-                executableFile,
+                "-o", targetExecutable,
+                sourceExecutable,
                 darwinTarget.compilerRtLibrary(),
-                outputDir.get().file("lib$baseName.a").asFile.absolutePath,
+                workDir.get().file("lib$baseName.a").asFile.absolutePath,
             )
-        }
-        // TODO: If this task succeeded before and is being run again without the link phase being run too, this task won't be successful.
-        executableFile.delete()
-        mergedFile.renameTo(executableFile)
-        File("$frameworkPath/Headers/$baseName.h").appendText("\n#import \"$baseName-Swift.h\"")
 
-        // This has to be done after we rename the merged file otherwise we'd have to rename the contents of dSYM as well.
-        if (!kotlinFramework.isStatic && !kotlinFramework.debuggable) {
-            xcrun(
-                "--sdk", versionedSdk,
-                "dsymutil",
-                "-o", File(frameworkFile.parentFile, "${frameworkFile.name}.dSYM"),
-                executableFile,
-            )
-            if (kotlinFramework.optimized) {
+            if (!kotlinFramework.debuggable) {
                 xcrun(
                     "--sdk", versionedSdk,
-                    "strip",
-                    "-S",
-                    executableFile,
+                    "dsymutil",
+                    "-o", File(targetFramework.parentFile, "${targetFramework.name}.dSYM"),
+                    targetExecutable,
                 )
+                if (kotlinFramework.optimized) {
+                    xcrun(
+                        "--sdk", versionedSdk,
+                        "strip",
+                        "-S",
+                        targetExecutable,
+                    )
+                }
             }
         }
 
@@ -210,19 +220,19 @@ abstract class SwiftCompileTask
             it.konanTarget.family == kotlinFramework.target.konanTarget.family
         }.map { it.targetTriple } - targetTriple
         for (tripletToFake in allFamilyTripletsButActive) {
-            println("Faking triplet: $tripletToFake")
+            logger.info("Faking triplet: $tripletToFake")
             copy {
-                it.from("$frameworkPath/Modules/$baseName.swiftmodule/") {
+                it.from("$targetFramework/Modules/$baseName.swiftmodule/") {
                     it.include("$targetTriple.*")
                 }
                 it.rename { it.replace(targetTriple.toString(), tripletToFake.toString()) }
-                it.into("$frameworkPath/Modules/$baseName.swiftmodule")
+                it.into("$targetFramework/Modules/$baseName.swiftmodule")
             }
         }
     }
 
     private fun Project.xcrun(vararg args: Any?) = exec {
-        it.workingDir(outputDir)
+        it.workingDir(workDir)
         it.executable = "/usr/bin/xcrun"
         it.args(args.flatMap {
             when (it) {
