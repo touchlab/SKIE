@@ -17,6 +17,9 @@ const val EXTENSION_NAME = "swikt"
 abstract class SwiktPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         val extension = extensions.create(EXTENSION_NAME, SwiktExtension::class.java, this)
+        tasks.register("swiktTestScenarios", TestScenariosTask::class.java).configure {
+            it.outputs.upToDateWhen { false }
+        }
 
         afterEvaluate {
             val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
