@@ -1,93 +1,103 @@
-plugins {
-    id("co.touchlab.swikt")
-    kotlin("multiplatform")
-    kotlin("native.cocoapods")
-}
+// plugins {
+//     id("co.touchlab.swikt")
+//     kotlin("multiplatform")
+//     kotlin("native.cocoapods")
+// }
+//
+// kotlin {
+//     ios()
+//     iosSimulatorArm64()
+//     macosArm64()
+//     macosX64()
+//     tvos()
+//     tvosSimulatorArm64()
+//     watchos()
+//     watchosSimulatorArm64()
+//
+//     sourceSets {
+//         val darwinMain by creating
+//         val darwinTest by creating
+//
+//         val iosMain by getting {
+//             dependsOn(darwinMain)
+//         }
+//         val iosTest by getting {
+//             dependsOn(darwinTest)
+//         }
+//         val iosSimulatorArm64Main by getting {
+//             dependsOn(iosMain)
+//         }
+//         val iosSimulatorArm64Test by getting {
+//             dependsOn(iosTest)
+//         }
+//
+//         val macosMain by creating {
+//             dependsOn(darwinMain)
+//         }
+//         val macosTest by creating {
+//             dependsOn(darwinTest)
+//         }
+//         val macosArm64Main by getting {
+//             dependsOn(macosMain)
+//         }
+//         val macosArm64Test by getting {
+//             dependsOn(macosTest)
+//         }
+//         val macosX64Main by getting {
+//             dependsOn(macosMain)
+//         }
+//         val macosX64Test by getting {
+//             dependsOn(macosTest)
+//         }
+//
+//         val tvosMain by getting {
+//             dependsOn(darwinMain)
+//         }
+//         val tvosTest by getting {
+//             dependsOn(darwinTest)
+//         }
+//         val tvosSimulatorArm64Main by getting {
+//             dependsOn(tvosMain)
+//         }
+//         val tvosSimulatorArm64Test by getting {
+//             dependsOn(tvosTest)
+//         }
+//
+//         val watchosMain by getting {
+//             dependsOn(darwinMain)
+//         }
+//         val watchosTest by getting {
+//             dependsOn(darwinTest)
+//         }
+//         val watchosSimulatorArm64Main by getting {
+//             dependsOn(watchosMain)
+//         }
+//         val watchosSimulatorArm64Test by getting {
+//             dependsOn(watchosTest)
+//         }
+//     }
+//
+//     cocoapods {
+//         summary = "Example library for swikt"
+//         homepage = "https://github.com/touchlab/swikt"
+//         framework {
+//             isStatic = false
+//             baseName = "ExampleKit"
+//         }
+//         ios.deploymentTarget = "12.4"
+//         tvos.deploymentTarget = "12.4"
+//         watchos.deploymentTarget = "8.0"
+//         osx.deploymentTarget = "11.0"
+//         podfile = project.file("../app/Podfile")
+//     }
+// }
 
-kotlin {
-    ios()
-    iosSimulatorArm64()
-    macosArm64()
-    macosX64()
-    tvos()
-    tvosSimulatorArm64()
-    watchos()
-    watchosSimulatorArm64()
+// apply(from = "../common/build.gradle.kts")
 
-    sourceSets {
-        val darwinMain by creating
-        val darwinTest by creating
-
-        val iosMain by getting {
-            dependsOn(darwinMain)
-        }
-        val iosTest by getting {
-            dependsOn(darwinTest)
-        }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
-        }
-
-        val macosMain by creating {
-            dependsOn(darwinMain)
-        }
-        val macosTest by creating {
-            dependsOn(darwinTest)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Test by getting {
-            dependsOn(macosTest)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosX64Test by getting {
-            dependsOn(macosTest)
-        }
-
-        val tvosMain by getting {
-            dependsOn(darwinMain)
-        }
-        val tvosTest by getting {
-            dependsOn(darwinTest)
-        }
-        val tvosSimulatorArm64Main by getting {
-            dependsOn(tvosMain)
-        }
-        val tvosSimulatorArm64Test by getting {
-            dependsOn(tvosTest)
-        }
-
-        val watchosMain by getting {
-            dependsOn(darwinMain)
-        }
-        val watchosTest by getting {
-            dependsOn(darwinTest)
-        }
-        val watchosSimulatorArm64Main by getting {
-            dependsOn(watchosMain)
-        }
-        val watchosSimulatorArm64Test by getting {
-            dependsOn(watchosTest)
-        }
-    }
-
-    cocoapods {
-        summary = "Example library for swikt"
-        homepage = "https://github.com/touchlab/swikt"
-        framework {
-            isStatic = false
-            baseName = "ExampleKit"
-        }
-        ios.deploymentTarget = "12.4"
-        tvos.deploymentTarget = "12.4"
-        watchos.deploymentTarget = "8.0"
-        osx.deploymentTarget = "11.0"
-        podfile = project.file("../app/Podfile")
-    }
-}
+// kotlin {
+//     cocoapods {
+//         framework {
+//             isStatic = false
+//         }
+//     }
+// }

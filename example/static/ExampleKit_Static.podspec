@@ -1,5 +1,5 @@
 Pod::Spec.new do |spec|
-    spec.name                     = 'example_static'
+    spec.name                     = 'ExampleKit_Static'
     spec.version                  = '1.0'
     spec.homepage                 = 'https://github.com/touchlab/swikt'
     spec.source                   = { :http=> ''}
@@ -15,13 +15,13 @@ Pod::Spec.new do |spec|
                 
                 
     spec.pod_target_xcconfig = {
-        'KOTLIN_PROJECT_PATH' => ':example-static',
+        'KOTLIN_PROJECT_PATH' => ':example:static',
         'PRODUCT_MODULE_NAME' => 'ExampleKit',
     }
                 
     spec.script_phases = [
         {
-            :name => 'Build example_static',
+            :name => 'Build ExampleKit_Static',
             :execution_position => :before_compile,
             :shell_path => '/bin/sh',
             :script => <<-SCRIPT

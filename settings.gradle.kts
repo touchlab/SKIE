@@ -14,8 +14,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "kotlin-gradle-plugin-template"
 
-include(":example-static")
-project(":example-static").projectDir = File("example/static")
-include(":example-dynamic")
-project(":example-dynamic").projectDir = File("example/dynamic")
+include(":example")
+include(":example:static")
+include(":example:dynamic")
+
 includeBuild("plugin-build")

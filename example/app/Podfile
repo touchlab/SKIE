@@ -22,7 +22,7 @@ targets.each do |key, value|
     target "SwiktExample_#{key}_#{suffix}" do
       platform value["platform"], value["version"]
 
-      pod "example_#{type}", :path => "../#{type}"
+      pod "ExampleKit_#{suffix}", :path => "../#{type}"
     end
   end
 end

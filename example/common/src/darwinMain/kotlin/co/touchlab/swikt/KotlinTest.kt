@@ -1,4 +1,4 @@
-package co.touchlab.swikt.dynamic
+package co.touchlab.swikt
 
 class KotlinTest {
     val hello = "World"
