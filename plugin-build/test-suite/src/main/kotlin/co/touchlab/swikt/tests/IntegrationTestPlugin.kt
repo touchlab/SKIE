@@ -7,11 +7,13 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.the
+import org.gradle.kotlin.dsl.withType
 import org.gradle.process.internal.ExecHandleFactory
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.targets.native.tasks.PodInstallTask
 import org.jetbrains.kotlin.konan.target.Architecture
 import org.jetbrains.kotlin.konan.target.Family
 import java.io.File
@@ -38,12 +40,12 @@ abstract class IntegrationTestTask @Inject constructor(
 
     init {
         group = "verification"
-
-
     }
 
     fun configure() {
         outputs.upToDateWhen { false }
+
+        dependsOn(*project.subprojects.map { it.tasks.withType<PodInstallTask>() }.toTypedArray())
 
         project.the<KotlinMultiplatformExtension>().apply {
 
