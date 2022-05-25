@@ -7,6 +7,8 @@ plugins {
     kotlin("multiplatform") apply false
     kotlin("native.cocoapods") apply false
     idea
+
+    id("co.touchlab.swikt.test-suite")
 }
 
 allprojects {

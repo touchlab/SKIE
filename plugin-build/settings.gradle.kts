@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = ("swikt-plugin")
 
 include(":plugin")
+include(":test-suite")
