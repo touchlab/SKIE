@@ -32,7 +32,7 @@ jobs:
         if: success()
         # And we verify that the output of the file is correct.
       - name: Verify the plugin output
-        run: test -f ./example/dynamic/build/swikt/podDebugFramework/iosX64/libExampleKit.a && test -f example/static/build/swikt/podDebugFramework/iosX64/libExampleKit.a
+        run: test -f ./example/dynamic/build/swikt/podDebugFramework/iosX64/work/libExampleKit.a && test -f example/static/build/swikt/podDebugFramework/iosX64/work/libExampleKit.a
         if: success()
 
       - name: Stop Gradle
