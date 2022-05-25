@@ -1,12 +1,13 @@
 package co.touchlab.swikt.tests
 
 import co.touchlab.swikt.plugin.SwiftCompileTask
-import co.touchlab.swikt.plugin.Xcode
+import org.apache.tools.ant.util.TeeOutputStream
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.the
+import org.gradle.process.internal.ExecHandleFactory
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -15,6 +16,8 @@ import org.jetbrains.kotlin.konan.target.Architecture
 import org.jetbrains.kotlin.konan.target.Family
 import java.io.File
 import java.io.OutputStream
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 import javax.inject.Inject
 
 abstract class TestSuitePlugin: Plugin<Project> {
@@ -30,6 +33,7 @@ abstract class TestSuitePlugin: Plugin<Project> {
 }
 
 abstract class IntegrationTestTask @Inject constructor(
+    private val execHandleFactory: ExecHandleFactory,
 ): DefaultTask() {
 
     init {
@@ -89,11 +93,29 @@ abstract class IntegrationTestTask @Inject constructor(
             val logDir = File(workDir, "${schemeBuildType.toLowerCase()}/${framework.target.targetName}/${configuration.toLowerCase()}")
                 .also { it.mkdirs() }
             val logFile = File(logDir, "xcodebuild.log")
-
             logger.lifecycle("Archiving: scheme=$scheme, sdk=${darwinTarget.sdk}, configuration=$configuration, arch=$arch")
+
+            val xcbeautifyExecutable = File(projectDir, "bin/xcbeautify")
+            val (xcbeautify, outputStream) = if (xcbeautifyExecutable.exists()) {
+                val pipedInputStream = PipedInputStream()
+                val pipedOutputStream = PipedOutputStream(pipedInputStream)
+
+                val xcbeautify = execHandleFactory.newExec().apply {
+                    executable = xcbeautifyExecutable.absolutePath
+                    standardInput = pipedInputStream
+                    standardOutput = System.out
+                    errorOutput = System.err
+                }.build().start()
+
+                val outputStream = TeeOutputStream(logFile.outputStream(), pipedOutputStream)
+                xcbeautify to outputStream
+            } else {
+                null to logFile.outputStream()
+            }
+
             try {
                 xcrun(
-                    logFile.outputStream(),
+                    outputStream,
                     "-sdk", darwinTarget.sdk,
                     "xcodebuild", "-workspace", "SwiktExample.xcworkspace/",
                     "-scheme", scheme,
@@ -107,6 +129,9 @@ abstract class IntegrationTestTask @Inject constructor(
                 logger.error("Archiving failed. See the log at $logFile.")
                 // TODO: Do we want to throw right away or run the rest first?
                 return@map TestResult.Failure.ArchiveFailed(t)
+            } finally {
+                outputStream.close()
+                xcbeautify?.waitForFinish()
             }
 
             TestResult.Success()
