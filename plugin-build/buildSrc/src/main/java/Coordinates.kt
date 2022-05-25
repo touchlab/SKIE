@@ -1,6 +1,7 @@
 object PluginCoordinates {
     const val ID = "co.touchlab.swikt"
     const val GROUP = "co.touchlab.swikt"
+    const val ARTIFACT_ID = "swikt-plugin"
     const val DEFAULT_VERSION = "1.0.0"
     const val IMPLEMENTATION_CLASS = "co.touchlab.swikt.plugin.SwiktPlugin"
 

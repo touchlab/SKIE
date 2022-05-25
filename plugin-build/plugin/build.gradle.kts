@@ -28,6 +28,7 @@ gradlePlugin {
     plugins {
         create(PluginCoordinates.ID) {
             id = PluginCoordinates.ID
+            displayName = PluginBundle.DISPLAY_NAME
             implementationClass = PluginCoordinates.IMPLEMENTATION_CLASS
             version = PluginCoordinates.VERSION
         }
@@ -41,15 +42,9 @@ pluginBundle {
     description = PluginBundle.DESCRIPTION
     tags = PluginBundle.TAGS
 
-    plugins {
-        getByName(PluginCoordinates.ID) {
-            displayName = PluginBundle.DISPLAY_NAME
-        }
-    }
-
     mavenCoordinates {
         groupId = PluginCoordinates.GROUP
-        artifactId = PluginCoordinates.ID.removePrefix("$groupId.")
+        artifactId = PluginCoordinates.ARTIFACT_ID
         version = PluginCoordinates.VERSION
     }
 }

@@ -12,7 +12,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "kotlin-gradle-plugin-template"
+rootProject.name = "swikt"
 
 include(":example")
 include(":example:static")
