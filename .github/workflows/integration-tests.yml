@@ -18,3 +18,8 @@ jobs:
         run: './gradlew :example:integrationTests'
       - name: Stop Gradle
         run: ./gradlew --stop
+      - name: Archive xcodebuild logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: xcodebuild-logs
+          path: example/build/test-suite/**/xcodebuild.log
