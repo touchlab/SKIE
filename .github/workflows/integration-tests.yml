@@ -17,9 +17,11 @@ jobs:
       - name: Run Gradle tasks
         run: './gradlew :example:integrationTests'
       - name: Stop Gradle
+        if: always()
         run: ./gradlew --stop
       - name: Archive xcodebuild logs
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: xcodebuild-logs
           path: example/build/test-suite/**/xcodebuild.log
