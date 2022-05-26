@@ -34,26 +34,26 @@ jobs:
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
           IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
           TVOS_PROVISION_PROFILE_BASE64: ${{ secrets.TVOS_PROVISION_PROFILE_BASE64 }}
-          MACOS_PROVISION_PROFILE_BASE64: ${{ secrets.MACOS_PROVISION_PROFILE_BASE64 }}
           WATCHOS_APP_PROVISION_PROFILE_BASE64: ${{ secrets.WATCHOS_APP_PROVISION_PROFILE_BASE64 }}
           WATCHOS_EXT_PROVISION_PROFILE_BASE64: ${{ secrets.WATCHOS_EXT_PROVISION_PROFILE_BASE64 }}
+          MACOS_PROVISION_PROFILE_BASE64: ${{ secrets.MACOS_PROVISION_PROFILE_BASE64 }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           PP_IOS_PATH=$RUNNER_TEMP/build_ios_pp.mobileprovision
           PP_TVOS_PATH=$RUNNER_TEMP/build_tvos_pp.mobileprovision
-          PP_MACOS_PATH=$RUNNER_TEMP/build_macos_pp.mobileprovision
           PP_WATCHOS_APP_PATH=$RUNNER_TEMP/build_watchos_app_pp.mobileprovision
           PP_WATCHOS_EXT_PATH=$RUNNER_TEMP/build_watchos_ext_pp.mobileprovision
+          PP_MACOS_PATH=$RUNNER_TEMP/build_macos_pp.provisionprofile
 
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
           echo -n "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_IOS_PATH
           echo -n "$TVOS_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_TVOS_PATH
-          echo -n "$MACOS_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_MACOS_PATH
           echo -n "$WATCHOS_APP_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_WATCHOS_APP_PATH
           echo -n "$WATCHOS_EXT_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_WATCHOS_EXT_PATH
+          echo -n "$MACOS_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_MACOS_PATH
 
           # create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -68,9 +68,9 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_IOS_PATH ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_TVOS_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_MACOS_PATH ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_WATCHOS_APP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_WATCHOS_EXT_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_MACOS_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Run Gradle tasks
         run: "./gradlew :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildType=${{ github.event.inputs.onlyBuildType }} -PonlyLinkType=${{ github.event.inputs.onlyLinkType }}"
