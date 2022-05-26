@@ -9,10 +9,10 @@ on:
       onlyArchs:
         description: 'Only Archs (ARM64, ARM32, X64)'
         required: false
-      onlyBuildType:
+      onlyBuildTypes:
         description: 'Only Build types (DEBUG, RELEASE)'
         required: false
-      onlyLinkType:
+      onlyLinkTypes:
         description: 'Only Link types (Dynamic, Static)'
         required: false
 
@@ -73,7 +73,7 @@ jobs:
           cp $PP_MACOS_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Run Gradle tasks
-        run: "./gradlew :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildType=${{ github.event.inputs.onlyBuildType }} -PonlyLinkType=${{ github.event.inputs.onlyLinkType }}"
+        run: "./gradlew :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildTypes=${{ github.event.inputs.onlyBuildTypes }} -PonlyLinkTypes=${{ github.event.inputs.onlyLinkTypes }}"
       - name: Stop Gradle
         if: always()
         run: ./gradlew --stop

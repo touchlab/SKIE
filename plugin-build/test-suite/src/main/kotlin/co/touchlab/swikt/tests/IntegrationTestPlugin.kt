@@ -9,11 +9,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.configurationcache.extensions.get
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
+import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.setProperty
 import org.gradle.kotlin.dsl.the
@@ -55,10 +58,18 @@ abstract class IntegrationTestTask @Inject constructor(
     val onlyArchs = project.objects.setProperty<Architecture>()
 
     @get:Input
-    val onlyBuildType = project.objects.setProperty<NativeBuildType>()
+    val onlyBuildTypes = project.objects.setProperty<NativeBuildType>()
 
     @get:Input
-    val onlyLinkType = project.objects.setProperty<String>()
+    val onlyLinkTypes = project.objects.setProperty<String>()
+
+    @get:Input
+    @get:Optional
+    val apiKey = project.objects.property<String?>()
+
+    @get:Input
+    @get:Optional
+    val apiIssuer = project.objects.property<String?>()
 
     init {
         group = "verification"
@@ -75,13 +86,27 @@ abstract class IntegrationTestTask @Inject constructor(
 
         val onlySdks: String? by project
         val onlyArchs: String? by project
-        val onlyBuildType: String? by project
-        val onlyLinkType: String? by project
+        val onlyBuildTypes: String? by project
+        val onlyLinkTypes: String? by project
+        val apiKey: String? by project
+        val apiIssuer: String? by project
 
-        onlySdks?.split(',')?.map { it.trim() }?.let(this.onlySdks::set)
-        onlyArchs?.split(',')?.map { Architecture.valueOf(it.trim()) }?.let(this.onlyArchs::set)
-        onlyBuildType?.split(',')?.map { NativeBuildType.valueOf(it.trim()) }?.let(this.onlyBuildType::set)
-        onlyLinkType?.split(',')?.map { it.trim() }?.let(this.onlyLinkType::set)
+        fun <T> assignSet(input: String?, output: SetProperty<T>, transform: (String) -> T) {
+            input
+                ?.split(',')
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() }
+                ?.map(transform)
+                ?.let(output::set)
+        }
+
+        assignSet(onlySdks, this.onlySdks) { it }
+        assignSet(onlyArchs, this.onlyArchs) { Architecture.valueOf(it) }
+        assignSet(onlyBuildTypes, this.onlyBuildTypes) { NativeBuildType.valueOf(it) }
+        assignSet(onlyLinkTypes, this.onlyLinkTypes) { it }
+
+        this.apiKey.set(apiKey)
+        this.apiIssuer.set(apiIssuer)
     }
 
     @TaskAction
@@ -121,13 +146,13 @@ abstract class IntegrationTestTask @Inject constructor(
                 }
             }
 
-            onlyBuildType.get().apply {
+            onlyBuildTypes.get().apply {
                 if (isNotEmpty() && !contains(framework.buildType)) {
                     return@map exec(TestResult.Skipped("BuildType ${framework.buildType} skipped."))
                 }
             }
 
-            onlyLinkType.get().apply {
+            onlyLinkTypes.get().apply {
                 if (isNotEmpty() && !contains(schemeLinkType)) {
                     return@map exec(TestResult.Skipped("LinkType $schemeLinkType skipped."))
                 }
@@ -242,9 +267,52 @@ abstract class IntegrationTestTask @Inject constructor(
                     }
                 }
 
-                logger.lifecycle("Archiving succeeded. Now validating archive at $archiveFile")
+                logger.lifecycle("Archiving succeeded. Now exporting archive at $archiveFile")
+                val exportLogFile = platformWorkDir.resolve("xcodebuild_archive.log")
+                val exportDir = platformWorkDir.resolve("export")
+                val exportIpaFile = exportDir.resolve("$archiveScheme.ipa")
+                val exportOptionsPlistFile = platformWorkDir.resolve("export_options.plist").apply {
+                    writeText(exportOptions(framework.target.konanTarget.family))
+                }
+                xcbeautify(exportLogFile) { outputStream ->
+                    try {
+                        xcrun(
+                            outputStream,
+                            "-sdk", darwinTarget.sdk,
+                            "xcodebuild", "-exportArchive",
+                            "-archivePath", archiveFile,
+                            "-exportPath", exportDir,
+                            "-exportOptionsPlist", exportOptionsPlistFile,
+                        )
+                    } catch (t: Throwable) {
+                        logger.error("Exporting failed. See the log at $exportLogFile")
+                        return@map exec(TestResult.Failure.ExportFailed(t))
+                    }
+                }
 
-                // xcrun altool --validate-app -f archiveFile
+                val apiKey = this@IntegrationTestTask.apiKey
+                val apiIssuer = this@IntegrationTestTask.apiIssuer
+
+                if (apiKey != null && apiIssuer != null) {
+                    logger.lifecycle("Export succeeded. Now validating IPA at $exportDir")
+                    val validationLogFile = platformWorkDir.resolve("xcodebuild_archive.log")
+                    try {
+                        xcrun(
+                            validationLogFile.outputStream(),
+                            "-sdk", darwinTarget.sdk,
+                            "altool", "--validate-app",
+                            "-t", darwinTarget.sdk,
+                            "-f", exportIpaFile,
+                            "--apiKey", apiKey,
+                            "--apiIssuer", apiIssuer,
+                        )
+                    } catch (t: Throwable) {
+                        logger.error("Exporting failed. See the log at $validationLogFile")
+                        return@map exec(TestResult.Failure.ValidationFailed(t))
+                    }
+                } else {
+                    logger.lifecycle("Export succeeded, but apiKey or apiIssuer is missing. Validation skipped.")
+                }
             }
 
             exec(TestResult.Success())
@@ -385,6 +453,37 @@ abstract class IntegrationTestTask @Inject constructor(
         })
     }
 
+    private fun exportOptions(family: Family): String {
+        val provisioningProfileUuid = when (family) {
+            Family.IOS, Family.WATCHOS -> "08e57f6c-898d-461f-85e2-591f17811e07"
+            Family.TVOS -> "89432788-aa1b-4aa3-8449-1062bc27a0af"
+            Family.OSX -> "11f49635-4561-473d-974c-664512897bcf"
+            Family.LINUX, Family.MINGW, Family.ANDROID, Family.WASM, Family.ZEPHYR ->
+                error("Unsupported family: $family")
+        }
+        return """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            <plist version="1.0">
+            <dict>
+                <key>method</key>
+                <string>app-store</string>
+                <key>compileBitcode</key>
+                <true/>
+                <key>provisioningProfiles</key>
+                <dict>
+                    <key>co.touchlab.swiftkt.example</key>
+                    <string>$provisioningProfileUuid</string>
+                    <key>co.touchlab.swiftkt.example.watchkitapp</key>
+                    <string>48dfa167-60bb-4456-97fc-6ab1afda75a7</string>
+                    <key>co.touchlab.swiftkt.example.watchkitextension</key>
+                    <string>90c81b54-6c45-41ff-b42a-d80b95cc756d</string>
+                </dict>
+            </dict>
+            </plist>
+        """.trimIndent()
+    }
+
     data class TestExecution(
         val linkType: String,
         val sdk: String,
@@ -403,6 +502,10 @@ abstract class IntegrationTestTask @Inject constructor(
             class TestsFailed(override val cause: Throwable): Failure()
 
             class ArchiveFailed(override val cause: Throwable): Failure()
+
+            class ExportFailed(override val cause: Throwable): Failure()
+
+            class ValidationFailed(override val cause: Throwable): Failure()
         }
     }
 }
