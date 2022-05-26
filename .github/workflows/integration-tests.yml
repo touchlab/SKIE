@@ -69,4 +69,4 @@ jobs:
         if: always()
         with:
           name: xcodebuild-logs
-          path: example/build/test-suite/**/xcodebuild.log
+          path: example/build/test-suite/**/xcodebuild_*.log
