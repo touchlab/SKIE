@@ -16,6 +16,7 @@ import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.tasks.FrameworkDescriptor
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -55,7 +56,7 @@ abstract class SwiftCompileTask
             mkdirs()
         }
 
-        val darwinTarget = darwinTargets[kotlinFramework.target.konanTarget] ?: return@with
+        val darwinTarget = kotlinFramework.darwinTarget
         val baseName = kotlinFramework.baseName
         val sdk = darwinTarget.sdk
         val targetTriple = darwinTarget.targetTriple
@@ -216,7 +217,7 @@ abstract class SwiftCompileTask
             }
         }
 
-        val allFamilyTripletsButActive = darwinTargets.values.filter {
+        val allFamilyTripletsButActive = DarwinTarget.allTargets.values.filter {
             it.konanTarget.family == kotlinFramework.target.konanTarget.family
         }.map { it.targetTriple } - targetTriple
         for (tripletToFake in allFamilyTripletsButActive) {
@@ -277,7 +278,23 @@ abstract class SwiftCompileTask
     }
 
     companion object {
-        val darwinTargets = listOf(
+
+    }
+}
+
+data class DarwinTarget(
+    val konanTarget: KonanTarget,
+    val targetTriple: TargetTriple,
+    val sdk: String,
+) {
+    constructor(
+        konanTarget: KonanTarget,
+        targetTripleString: String,
+        sdk: String,
+    ): this(konanTarget, TargetTriple.fromString(targetTripleString), sdk)
+
+    companion object {
+        val allTargets = listOf(
             DarwinTarget(KonanTarget.IOS_ARM32, "armv7-apple-ios", "iphoneos"),
             DarwinTarget(KonanTarget.IOS_ARM64, "arm64-apple-ios", "iphoneos"),
             DarwinTarget(KonanTarget.IOS_X64, "x86_64-apple-ios-simulator", "iphonesimulator"),
@@ -296,17 +313,14 @@ abstract class SwiftCompileTask
     }
 }
 
-data class DarwinTarget(
-    val konanTarget: KonanTarget,
-    val targetTriple: TargetTriple,
-    val sdk: String,
-) {
-    constructor(
-        konanTarget: KonanTarget,
-        targetTripleString: String,
-        sdk: String,
-    ): this(konanTarget, TargetTriple.fromString(targetTripleString), sdk)
-}
+val Framework.darwinTarget: DarwinTarget
+    get() = target.konanTarget.darwinTarget
+
+val FrameworkDescriptor.darwinTarget: DarwinTarget
+    get() = target.darwinTarget
+
+val KonanTarget.darwinTarget: DarwinTarget
+    get() = DarwinTarget.allTargets[this] ?: error("Unknown konan target: $this")
 
 data class LoadCommand(
     val index: Int,

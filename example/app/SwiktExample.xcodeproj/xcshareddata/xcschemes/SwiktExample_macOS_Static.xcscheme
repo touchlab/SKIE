@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "185664A9282EE11E00B48A82"
-               BuildableName = "SwiktExample_iOS_Dynamic.app"
-               BlueprintName = "SwiktExample_iOS_Dynamic"
+               BlueprintIdentifier = "185664C1282EE43500B48A82"
+               BuildableName = "SwiktExample_macOS_Static.app"
+               BlueprintName = "SwiktExample_macOS_Static"
                ReferencedContainer = "container:SwiktExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "18E89B4D283EEE5A00C08C9B"
-               BuildableName = "SwiktExample_iOS_Dynamic_Tests.xctest"
-               BlueprintName = "SwiktExample_iOS_Dynamic_Tests"
+               BlueprintIdentifier = "18E89B8B283EF94200C08C9B"
+               BuildableName = "SwiktExample_macOS_Static_Tests.xctest"
+               BlueprintName = "SwiktExample_macOS_Static_Tests"
                ReferencedContainer = "container:SwiktExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -54,9 +54,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "185664A9282EE11E00B48A82"
-            BuildableName = "SwiktExample_iOS_Dynamic.app"
-            BlueprintName = "SwiktExample_iOS_Dynamic"
+            BlueprintIdentifier = "185664C1282EE43500B48A82"
+            BuildableName = "SwiktExample_macOS_Static.app"
+            BlueprintName = "SwiktExample_macOS_Static"
             ReferencedContainer = "container:SwiktExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -71,9 +71,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "185664A9282EE11E00B48A82"
-            BuildableName = "SwiktExample_iOS_Dynamic.app"
-            BlueprintName = "SwiktExample_iOS_Dynamic"
+            BlueprintIdentifier = "185664C1282EE43500B48A82"
+            BuildableName = "SwiktExample_macOS_Static.app"
+            BlueprintName = "SwiktExample_macOS_Static"
             ReferencedContainer = "container:SwiktExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

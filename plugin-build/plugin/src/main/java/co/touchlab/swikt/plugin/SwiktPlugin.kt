@@ -6,10 +6,15 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.targets.native.tasks.PodInstallTask
+import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
+import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
+import org.jetbrains.kotlin.konan.target.Architecture
 import java.io.File
 
 const val EXTENSION_NAME = "swikt"
@@ -18,6 +23,20 @@ abstract class SwiktPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         val extension = extensions.create(EXTENSION_NAME, SwiktExtension::class.java, this)
 
+        // WORKAROUND: Fix fat framework name for CocoaPods plugin.
+        pluginManager.withPlugin("kotlin-native-cocoapods") {
+            tasks.withType<FatFrameworkTask>().matching { it.name == "fatFramework" }.configureEach { task ->
+                // Unfortunately has to be done in `doFirst` to make sure the task is already configured by the plugin when we run our code
+                task.doFirst(object: Action<Task> {
+                    override fun execute(p0: Task) {
+                        val commonFrameworkName = task.frameworks.map { it.name }.distinct().singleOrNull() ?: return
+                        task.baseName = commonFrameworkName
+                    }
+                })
+
+            }
+        }
+        
         afterEvaluate {
             val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
             val appleTargets = kotlin.targets
@@ -95,6 +114,53 @@ abstract class SwiktPlugin : Plugin<Project> {
                     framework.linkTask.finalizedBy(swiftCompileTaskProvider)
                 }
             }
+
+            tasks.withType<FatFrameworkTask>().configureEach { task ->
+                task.doLast(object: Action<Task> {
+                    override fun execute(p0: Task) {
+                        val target = FrameworkLayout(task.fatFramework)
+
+                        val frameworksByArchs = task.frameworks.associateBy { it.target.architecture }
+                        target.swiftHeader.writer().use { writer ->
+                            val swiftHeaderContents = frameworksByArchs.mapValues { (_, framework) ->
+                                framework.files.swiftHeader.readText()
+                            }
+
+                            if (swiftHeaderContents.values.distinct().size == 1) {
+                                writer.write(swiftHeaderContents.values.first())
+                            } else {
+                                swiftHeaderContents.toList().forEachIndexed { i, (arch, content) ->
+                                    val macro = arch.clangMacro
+                                    if (i == 0) {
+                                        writer.appendLine("#if defined($macro)\n")
+                                    } else {
+                                        writer.appendLine("#elif defined($macro)\n")
+                                    }
+                                    writer.appendLine(content)
+                                }
+                                writer.appendLine(
+                                    """
+                                    #else
+                                    #error Unsupported platform
+                                    #endif
+                                    """.trimIndent()
+                                )
+                            }
+                        }
+
+                        target.swiftModuleDir.mkdirs()
+
+                        frameworksByArchs.toList().forEach { (arch, framework) ->
+                            framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
+                                it.copy {
+                                    it.from(swiftmoduleFile)
+                                    it.into(target.swiftModuleDir)
+                                }
+                            }
+                        }
+                    }
+                })
+            }
         }
     }
 
@@ -112,3 +178,27 @@ abstract class SwiktPlugin : Plugin<Project> {
     private val Framework.swiftCompileTaskName: String
         get() = listOf("swiftCompile", name.capitalized(), target.targetName.capitalized()).joinToString("")
 }
+
+private val FrameworkLayout.frameworkName: String
+    get() = rootDir.nameWithoutExtension
+
+val FrameworkLayout.swiftHeader: File
+    get() = headerDir.resolve("$frameworkName-Swift.h")
+
+val FrameworkLayout.swiftModuleDir: File
+    get() = modulesDir.resolve("$frameworkName.swiftmodule")
+
+fun FrameworkLayout.swiftModuleFiles(triple: TargetTriple): List<File> {
+    return listOf("abi.json", "swiftdoc", "swiftinterface", "swiftmodule", "swiftsourceinfo").map { ext ->
+        swiftModuleDir.resolve("$triple.$ext")
+    }
+}
+
+val Architecture.clangMacro: String
+    get() = when (this) {
+        Architecture.X86 -> "__i386__"
+        Architecture.X64 -> "__x86_64__"
+        Architecture.ARM32 -> "__arm__"
+        Architecture.ARM64 -> "__aarch64__"
+        else -> error("Fat frameworks are not supported for architecture `$name`")
+    }

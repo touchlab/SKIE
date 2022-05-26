@@ -3,13 +3,13 @@ use_frameworks!
 install! 'cocoapods', :deterministic_uuids => false
 
 targets = {
-  "iOS" => { "platform" => :ios, "version" => "12.4" },
+  "iOS" => { "platform" => :ios, "version" => "12.4", "tests" => true },
   # This is the iOS app for the watchOS one. WatchOS is configured separately
-  "watchOS" => { "platform" => :ios, "version" => "12.4" },
-  "watchOS_WatchKit_App" => { "platform" => :watchos, "version" => "8.0" },
-  "watchOS_WatchKit_Extension" => { "platform" => :watchos, "version" => "8.0" },
-  "macOS" => { "platform" => :osx, "version" => "11.0" },
-  "tvOS" => { "platform" => :tvos, "version" => "12.4" },
+  "watchOS" => { "platform" => :ios, "version" => "12.4", "tests" => false },
+  "watchOS_WatchKit_App" => { "platform" => :watchos, "version" => "8.0", "tests" => false },
+  "watchOS_WatchKit_Extension" => { "platform" => :watchos, "version" => "8.0", "tests" => false },
+  "macOS" => { "platform" => :osx, "version" => "11.0", "tests" => true },
+  "tvOS" => { "platform" => :tvos, "version" => "12.4", "tests" => true },
 }
 
 types = {
@@ -23,6 +23,12 @@ targets.each do |key, value|
       platform value["platform"], value["version"]
 
       pod "ExampleKit_#{suffix}", :path => "../#{type}"
+
+      if value["tests"]
+        target "SwiktExample_#{key}_#{suffix}_Tests" do
+          inherit! :search_paths
+        end
+      end
     end
   end
 end
