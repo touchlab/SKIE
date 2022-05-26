@@ -2851,7 +2851,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.swiftkt.example.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2872,7 +2871,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.swiftkt.example.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2894,7 +2892,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.touchlab.SwiktExample-iOS-Static-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2915,7 +2912,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.touchlab.SwiktExample-iOS-Static-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2937,7 +2933,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.touchlab.SwiktExample-macOS-Dynamic-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2957,7 +2952,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.touchlab.SwiktExample-macOS-Dynamic-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2977,7 +2971,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.touchlab.SwiktExample-macOS-Static-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2997,7 +2990,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UD86646U9;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.touchlab.SwiktExample-macOS-Static-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3025,7 +3017,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_tvOS_Dynamic.app/SwiktExample_tvOS_Dynamic";
-				TVOS_DEPLOYMENT_TARGET = 15.4;
 			};
 			name = Debug;
 		};
@@ -3046,7 +3037,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_tvOS_Dynamic.app/SwiktExample_tvOS_Dynamic";
-				TVOS_DEPLOYMENT_TARGET = 15.4;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -3068,7 +3058,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_tvOS_Static.app/SwiktExample_tvOS_Static";
-				TVOS_DEPLOYMENT_TARGET = 15.4;
 			};
 			name = Debug;
 		};
@@ -3089,7 +3078,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_tvOS_Static.app/SwiktExample_tvOS_Static";
-				TVOS_DEPLOYMENT_TARGET = 15.4;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -3110,7 +3098,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_watchOS_WatchKit_Extension_Dynamic.appex/SwiktExample_watchOS_WatchKit_Extension_Dynamic";
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
 			};
 			name = Debug;
 		};
@@ -3131,7 +3118,6 @@
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_watchOS_WatchKit_Extension_Dynamic.appex/SwiktExample_watchOS_WatchKit_Extension_Dynamic";
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
 			};
 			name = Release;
 		};
@@ -3151,7 +3137,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_watchOS_WatchKit_Extension_Static.appex/SwiktExample_watchOS_WatchKit_Extension_Static";
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
 			};
 			name = Debug;
 		};
@@ -3172,7 +3157,6 @@
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiktExample_watchOS_WatchKit_Extension_Static.appex/SwiktExample_watchOS_WatchKit_Extension_Static";
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
 			};
 			name = Release;
 		};
