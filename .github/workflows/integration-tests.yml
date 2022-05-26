@@ -4,39 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       onlySdks:
-        description: 'Only SDKs'
+        description: 'Only SDKs (iphoneos, iphonesimulator, appletvos, appletvsimulator, macosx, watchos, watchsimulator)'
         required: false
-        type: choice
-        options:
-        - iphoneos
-        - iphonesimulator
-        - appletvos
-        - appletvsimulator
-        - macosx
-        - watchos
-        - watchsimulator
       onlyArchs:
-        description: 'Only Archs'
+        description: 'Only Archs (ARM64, ARM32, X64)'
         required: false
-        type: choice
-        options:
-        - ARM64
-        - ARM32
-        - X64
       onlyBuildType:
-        description: 'Only Build types'
+        description: 'Only Build types (DEBUG, RELEASE)'
         required: false
-        type: choice
-        options:
-        - DEBUG
-        - RELEASE
       onlyLinkType:
-        description: 'Only Link types'
+        description: 'Only Link types (Dynamic, Static)'
         required: false
-        type: choice
-        options:
-        - Dynamic
-        - Static
 
 jobs:
   tests:
