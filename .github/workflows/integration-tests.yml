@@ -2,6 +2,41 @@ name: Integration Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      onlySdks:
+        description: 'Only SDKs'
+        required: false
+        type: choice
+        options:
+        - iphoneos
+        - iphonesimulator
+        - appletvos
+        - appletvsimulator
+        - macosx
+        - watchos
+        - watchsimulator
+      onlyArchs:
+        description: 'Only Archs'
+        required: false
+        type: choice
+        options:
+        - ARM64
+        - ARM32
+        - X64
+      onlyBuildType:
+        description: 'Only Build types'
+        required: false
+        type: choice
+        options:
+        - DEBUG
+        - RELEASE
+      onlyLinkType:
+        description: 'Only Link types'
+        required: false
+        type: choice
+        options:
+        - Dynamic
+        - Static
 
 jobs:
   tests:
@@ -60,7 +95,7 @@ jobs:
           cp $PP_WATCHOS_EXT_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Run Gradle tasks
-        run: './gradlew :example:integrationTests'
+        run: "./gradlew :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildType=${{ github.event.inputs.onlyBuildType }} -PonlyLinkType=${{ github.event.inputs.onlyLinkType }}"
       - name: Stop Gradle
         if: always()
         run: ./gradlew --stop
