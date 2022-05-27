@@ -11,6 +11,7 @@ import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.configurationcache.extensions.get
@@ -70,6 +71,18 @@ abstract class IntegrationTestTask @Inject constructor(
     @get:Input
     @get:Optional
     val apiIssuer = project.objects.property<String?>()
+
+    @get:Internal
+    val platformSupportsRunningArm64: Boolean by lazy {
+        val runtimeArch = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
+        if (runtimeArch == "arm64") {
+            true
+        } else {
+            val translated ="sysctl -in sysctl.proc_translated".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
+            // Translated == 1 means it's running x86_64 using Rosetta 2.
+            translated == "1"
+        }
+    }
 
     init {
         group = "verification"
@@ -192,7 +205,7 @@ abstract class IntegrationTestTask @Inject constructor(
                 Family.WATCHOS -> darwinTarget.targetTriple.isSimulator
                 Family.LINUX, Family.MINGW, Family.ANDROID, Family.WASM, Family.ZEPHYR ->
                     error("Unsupported family: ${framework.target.konanTarget.family}")
-            }
+            } && (platformSupportsRunningArm64 || setOf(Architecture.X64, Architecture.X86).contains(framework.target.konanTarget.architecture))
             val shouldRunArchive = !darwinTarget.targetTriple.isSimulator && framework.buildType == NativeBuildType.RELEASE
             val platformWorkDir = File(workDir, "${schemeLinkType.toLowerCase()}/${framework.target.targetName}/${configuration.toLowerCase()}")
                 .also { it.mkdirs() }
@@ -290,15 +303,15 @@ abstract class IntegrationTestTask @Inject constructor(
                     }
                 }
 
-                val apiKey = this@IntegrationTestTask.apiKey
-                val apiIssuer = this@IntegrationTestTask.apiIssuer
+                val apiKey = this@IntegrationTestTask.apiKey.orNull
+                val apiIssuer = this@IntegrationTestTask.apiIssuer.orNull
 
                 if (apiKey != null && apiIssuer != null) {
                     logger.lifecycle("Export succeeded. Now validating IPA at $exportDir")
-                    val validationLogFile = platformWorkDir.resolve("xcodebuild_archive.log")
+                    val validationLogFile = platformWorkDir.resolve("xcodebuild_validation.log")
                     try {
                         xcrun(
-                            validationLogFile.outputStream(),
+                            TeeOutputStream(validationLogFile.outputStream(), System.out),
                             "-sdk", darwinTarget.sdk,
                             "altool", "--validate-app",
                             "-t", darwinTarget.sdk,
@@ -307,7 +320,7 @@ abstract class IntegrationTestTask @Inject constructor(
                             "--apiIssuer", apiIssuer,
                         )
                     } catch (t: Throwable) {
-                        logger.error("Exporting failed. See the log at $validationLogFile")
+                        logger.error("Validation failed. See the log at $validationLogFile")
                         return@map exec(TestResult.Failure.ValidationFailed(t))
                     }
                 } else {
@@ -338,7 +351,7 @@ abstract class IntegrationTestTask @Inject constructor(
             testStatus.style(StyledTextOutput.Style.Header).text("$skippedCount skipped, ")
         }
 
-        testStatus.style(StyledTextOutput.Style.SuccessHeader).text("$successCount succeeded.").println()
+        testStatus.style(StyledTextOutput.Style.SuccessHeader).text("$successCount passed.").println()
         val sortedExecutions = executions.sortedWith(
             compareBy(
                 {
@@ -355,9 +368,9 @@ abstract class IntegrationTestTask @Inject constructor(
 
         sortedExecutions.forEach { execution ->
             val (state, style, headerStyle) = when (execution.result) {
-                is TestResult.Success -> Triple("SUCCESS", StyledTextOutput.Style.Success, StyledTextOutput.Style.SuccessHeader)
-                is TestResult.Skipped -> Triple("SKIPPED", StyledTextOutput.Style.Normal, StyledTextOutput.Style.Header)
-                is TestResult.Failure -> Triple("FAILURE", StyledTextOutput.Style.Failure, StyledTextOutput.Style.FailureHeader)
+                is TestResult.Success -> Triple("PASS", StyledTextOutput.Style.Success, StyledTextOutput.Style.SuccessHeader)
+                is TestResult.Failure -> Triple("FAIL", StyledTextOutput.Style.Failure, StyledTextOutput.Style.FailureHeader)
+                is TestResult.Skipped -> Triple("SKIP", StyledTextOutput.Style.Normal, StyledTextOutput.Style.Header)
             }
             testStatus
                 .style(headerStyle).text("[$state] ")

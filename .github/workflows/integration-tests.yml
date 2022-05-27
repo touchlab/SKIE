@@ -37,6 +37,9 @@ jobs:
           WATCHOS_APP_PROVISION_PROFILE_BASE64: ${{ secrets.WATCHOS_APP_PROVISION_PROFILE_BASE64 }}
           WATCHOS_EXT_PROVISION_PROFILE_BASE64: ${{ secrets.WATCHOS_EXT_PROVISION_PROFILE_BASE64 }}
           MACOS_PROVISION_PROFILE_BASE64: ${{ secrets.MACOS_PROVISION_PROFILE_BASE64 }}
+          APPSTORECONNECT_API_KEY_NAME: ${{ secrets.APPSTORECONNECT_API_KEY_NAME }}
+          APPSTORECONNECT_API_KEY_BASE64: ${{ secrets.APPSTORECONNECT_API_KEY_BASE64 }}
+          APPSTORECONNECT_API_KEY_ISSUER: ${{ secrets.APPSTORECONNECT_API_KEY_ISSUER }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
@@ -46,6 +49,7 @@ jobs:
           PP_WATCHOS_APP_PATH=$RUNNER_TEMP/build_watchos_app_pp.mobileprovision
           PP_WATCHOS_EXT_PATH=$RUNNER_TEMP/build_watchos_ext_pp.mobileprovision
           PP_MACOS_PATH=$RUNNER_TEMP/build_macos_pp.provisionprofile
+          API_KEY_PATH=$RUNNER_TEMP/appstoreconnect_key.p8
 
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
@@ -54,6 +58,11 @@ jobs:
           echo -n "$WATCHOS_APP_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_WATCHOS_APP_PATH
           echo -n "$WATCHOS_EXT_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_WATCHOS_EXT_PATH
           echo -n "$MACOS_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_MACOS_PATH
+          echo -n "$APPSTORECONNECT_API_KEY_BASE64" | base64 --decode --output $API_KEY_PATH
+
+          # copy AppStore Connect key
+          mkdir -p ~/private_keys
+          cp $API_KEY_PATH ~/private_keys/AuthKey_$APPSTORECONNECT_API_KEY_NAME.p8
 
           # create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -73,7 +82,7 @@ jobs:
           cp $PP_MACOS_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Run Gradle tasks
-        run: "./gradlew :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildTypes=${{ github.event.inputs.onlyBuildTypes }} -PonlyLinkTypes=${{ github.event.inputs.onlyLinkTypes }}"
+        run: "./gradlew --console=rich :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildTypes=${{ github.event.inputs.onlyBuildTypes }} -PonlyLinkTypes=${{ github.event.inputs.onlyLinkTypes }} -PapiKey=$APPSTORECONNECT_API_KEY_NAME -PapiIssuer=$APPSTORECONNECT_API_KEY_ISSUER"
       - name: Stop Gradle
         if: always()
         run: ./gradlew --stop

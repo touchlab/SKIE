@@ -1,10 +1,12 @@
 {
   "images" : [
     {
+      "filename" : "slice1.png",
       "idiom" : "tv",
       "scale" : "1x"
     },
     {
+      "filename" : "slice1@2x.png",
       "idiom" : "tv",
       "scale" : "2x"
     },
