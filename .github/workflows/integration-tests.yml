@@ -82,7 +82,7 @@ jobs:
           cp $PP_MACOS_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Run Gradle tasks
-        run: "./gradlew --console=rich :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildTypes=${{ github.event.inputs.onlyBuildTypes }} -PonlyLinkTypes=${{ github.event.inputs.onlyLinkTypes }} -PapiKey=$APPSTORECONNECT_API_KEY_NAME -PapiIssuer=$APPSTORECONNECT_API_KEY_ISSUER"
+        run: "./gradlew --console=verbose :example:integrationTests -PonlySdks=${{ github.event.inputs.onlySdks }} -PonlyArchs=${{ github.event.inputs.onlyArchs }} -PonlyBuildTypes=${{ github.event.inputs.onlyBuildTypes }} -PonlyLinkTypes=${{ github.event.inputs.onlyLinkTypes }} -PapiKey=${{ secrets.APPSTORECONNECT_API_KEY_NAME }} -PapiIssuer=${{ secrets.APPSTORECONNECT_API_KEY_ISSUER }}"
       - name: Stop Gradle
         if: always()
         run: ./gradlew --stop
