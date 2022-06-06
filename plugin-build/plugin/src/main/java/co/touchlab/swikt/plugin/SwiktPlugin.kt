@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.targets.native.tasks.PodInstallTask
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
 import org.jetbrains.kotlin.konan.target.Architecture
@@ -36,7 +35,7 @@ abstract class SwiktPlugin : Plugin<Project> {
 
             }
         }
-        
+
         afterEvaluate {
             val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
             val appleTargets = kotlin.targets
@@ -100,6 +99,7 @@ abstract class SwiktPlugin : Plugin<Project> {
                                 project.objects.sourceDirectorySet(it, it).apply {
                                     filter.include("**/*.swift")
                                     srcDirs(kotlinSourceSet.generatedSwiftDirectory)
+                                    srcDirs(kotlinSourceSet.kspSwiftDirectory, kspCommonSwiftDirectory)
                                     srcDirs(kotlinSourceSet.swiftSourceDirectory)
                                 }
                             }
@@ -173,8 +173,11 @@ abstract class SwiktPlugin : Plugin<Project> {
         get() = "build/generated/swikt/$name/kotlin"
     private val KotlinSourceSet.generatedSwiftDirectory: String
         get() = "build/generated/swikt/$name/swift"
+    private val KotlinSourceSet.kspSwiftDirectory: String
+        get() = "build/generated/ksp/${name.dropLast(4)}/$name/resources"
     private val KotlinSourceSet.swiftSourceDirectory: String
         get() = "src/$name/swift"
+    private val kspCommonSwiftDirectory = "build/generated/ksp/metadata/commonMain/resources"
 
     private val KotlinSourceSet.generateKotlinTaskName: String
         get() = "generate${name.capitalized()}Kotlin"
