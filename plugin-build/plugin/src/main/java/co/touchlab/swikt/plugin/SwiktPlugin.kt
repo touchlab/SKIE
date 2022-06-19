@@ -112,6 +112,11 @@ abstract class SwiktPlugin : Plugin<Project> {
                         it.outputDir.set(extension.outputDir.dir(framework.name + File.separator + target.targetName))
                     }
                     framework.linkTask.finalizedBy(swiftCompileTaskProvider)
+                    project.tasks.configureEach {
+                        if (it.dependsOn.contains(framework.linkTask) && it !is SwiftCompileTask) {
+                            it.dependsOn(swiftCompileTaskProvider)
+                        }
+                    }
                 }
             }
 
