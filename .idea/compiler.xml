@@ -5,6 +5,12 @@
       <module name="com.ncorti.kotlin.gradle.template.plugin" target="1.8" />
       <module name="com.ncorti.kotlin.gradle.template.plugin.main" target="1.8" />
       <module name="com.ncorti.kotlin.gradle.template.plugin.test" target="1.8" />
+      <module name="swikt-plugin.plugin" target="1.8" />
+      <module name="swikt-plugin.plugin.main" target="1.8" />
+      <module name="swikt-plugin.plugin.test" target="1.8" />
+      <module name="swikt-plugin.test-suite" target="1.8" />
+      <module name="swikt-plugin.test-suite.main" target="1.8" />
+      <module name="swikt-plugin.test-suite.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

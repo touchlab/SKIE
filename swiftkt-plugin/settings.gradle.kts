@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = ("swikt-plugin")
+rootProject.name = ("swiftkt-plugin")
 
 include(":plugin")
 include(":test-suite")

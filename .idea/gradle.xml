@@ -7,16 +7,18 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/plugin-build" name="swikt-plugin">
+              <build path="$PROJECT_DIR$/swiftkt-plugin" name="swiftkt-plugin">
                 <projects>
-                  <project path="$PROJECT_DIR$/plugin-build" />
-                  <project path="$PROJECT_DIR$/plugin-build/plugin" />
-                  <project path="$PROJECT_DIR$/plugin-build/test-suite" />
+                  <project path="$PROJECT_DIR$/swiftkt-plugin" />
+                  <project path="$PROJECT_DIR$/swiftkt-plugin/plugin" />
+                  <project path="$PROJECT_DIR$/swiftkt-plugin/test-suite" />
                 </projects>
               </build>
             </builds>
           </compositeBuild>
         </compositeConfiguration>
+        <option name="delegatedBuild" value="true" />
+        <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="#JAVA_HOME" />
@@ -26,10 +28,10 @@
             <option value="$PROJECT_DIR$/example" />
             <option value="$PROJECT_DIR$/example/dynamic" />
             <option value="$PROJECT_DIR$/example/static" />
-            <option value="$PROJECT_DIR$/plugin-build" />
-            <option value="$PROJECT_DIR$/plugin-build/buildSrc" />
-            <option value="$PROJECT_DIR$/plugin-build/plugin" />
-            <option value="$PROJECT_DIR$/plugin-build/test-suite" />
+            <option value="$PROJECT_DIR$/swiftkt-plugin" />
+            <option value="$PROJECT_DIR$/swiftkt-plugin/buildSrc" />
+            <option value="$PROJECT_DIR$/swiftkt-plugin/plugin" />
+            <option value="$PROJECT_DIR$/swiftkt-plugin/test-suite" />
           </set>
         </option>
       </GradleProjectSettings>

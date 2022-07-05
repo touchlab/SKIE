@@ -12,10 +12,10 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "swikt"
+rootProject.name = "swiftkt"
 
 include(":example")
 include(":example:static")
 include(":example:dynamic")
 
-includeBuild("plugin-build")
+includeBuild("swiftkt-plugin")
