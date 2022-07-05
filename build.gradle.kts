@@ -68,7 +68,7 @@ tasks.register("reformatAll") {
     description = "Reformat all the Kotlin Code"
 
     dependsOn("ktlintFormat")
-    dependsOn(gradle.includedBuild("swiftpack-plugin").task(":plugin:ktlintFormat"))
+    dependsOn(gradle.includedBuild("swiftpack-plugin").task(":swiftpack-gradle-plugin:ktlintFormat"))
 }
 
 tasks.register("preMerge") {
@@ -76,8 +76,8 @@ tasks.register("preMerge") {
     //
     // dependsOn(":example:dynamic:check")
     // dependsOn(":example:static:check")
-    dependsOn(gradle.includedBuild("swiftpack-plugin").task(":plugin:check"))
-    dependsOn(gradle.includedBuild("swiftpack-plugin").task(":plugin:validatePlugins"))
+    dependsOn(gradle.includedBuild("swiftpack-plugin").task(":swiftpack-gradle-plugin:check"))
+    dependsOn(gradle.includedBuild("swiftpack-plugin").task(":swiftpack-gradle-plugin:validatePlugins"))
 }
 
 tasks.wrapper {
