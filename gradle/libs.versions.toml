@@ -4,6 +4,7 @@ kotlin = "1.7.0"
 ktlintGradle = "10.3.0"
 pluginPublish = "0.21.0"
 versionCheck = "0.42.0"
+swiftpack = "0.0.3"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
@@ -15,3 +16,5 @@ dataStruct = { id = "co.touchlab.kotlin.datastruct", version = "0.0.1" }
 
 [libraries]
 junit = "junit:junit:4.13.2"
+swiftpack-spec = { module = "co.touchlab.swiftpack:swiftpack-spec", version.ref = "swiftpack" }
+swiftpack-gradle-plugin = { module = "co.touchlab.swiftpack:swiftpack-gradle-plugin", version.ref = "swiftpack" }

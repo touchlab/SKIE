@@ -27,13 +27,15 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/**.gradle*', '**/gradle/wrapper/gradle-wrapper.properties', '**/libs.versions.toml') }}
       - name: Run Gradle tasks
         run: ./gradlew preMerge --continue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish on GitHub packages
-        run: ./gradlew --project-dir plugin-build publishAllPublicationsToGitHubRepository
+        run: ./gradlew --project-dir swiftkt-plugin publishAllPublicationsToGitHubRepository
         if: ${{ success() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish on Plugin Portal
-        run: ./gradlew --project-dir plugin-build setupPluginUploadFromEnvironment publishPlugins
+        run: ./gradlew --project-dir swiftkt-plugin setupPluginUploadFromEnvironment publishPlugins
         if: ${{ false }} #success()
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}

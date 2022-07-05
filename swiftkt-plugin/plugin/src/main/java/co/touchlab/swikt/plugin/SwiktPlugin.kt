@@ -1,10 +1,16 @@
 package co.touchlab.swikt.plugin
 
+import co.touchlab.swiftpack.plugin.SwiftPack
+import co.touchlab.swiftpack.plugin.SwiftPack.unpackSwiftPack
+import co.touchlab.swiftpack.plugin.SwiftPackPlugin
+import co.touchlab.swiftpack.spec.NameMangling.demangledClassName
+import co.touchlab.swiftpack.spec.SwiftPackModule
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.configurationcache.extensions.capitalized
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -32,11 +38,15 @@ abstract class SwiktPlugin : Plugin<Project> {
                         task.baseName = commonFrameworkName
                     }
                 })
-
             }
         }
 
         afterEvaluate {
+            extension.isSwiftPackEnabled.finalizeValue()
+            if (extension.isSwiftPackEnabled.get()) {
+                apply<SwiftPackPlugin>()
+            }
+
             val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
             val appleTargets = kotlin.targets
                 .mapNotNull { it as? KotlinNativeTarget }
@@ -87,6 +97,24 @@ abstract class SwiktPlugin : Plugin<Project> {
                                 .flatMap { listOf(it.generateKotlinTaskName, it.generateSwiftTaskName) }
                                 .toTypedArray()
                         )
+
+                        if (extension.isSwiftPackEnabled.get()) {
+                            it.dependsOn(framework.unpackSwiftPack)
+                            it.doFirst {
+                                framework.unpackSwiftPack.get().destinationDir.listFiles()?.map { file ->
+                                    val module = SwiftPackModule.read(file)
+                                    module.files.forEach { swiftFileContents ->
+                                        val replacedContents = swiftFileContents.replace("KotlinSwiftGen\\.([a-zA-Z0-9_]+)".toRegex()) { match ->
+                                            match.groupValues[1].demangledClassName.split(".").last()
+                                        }
+                                        val targetSwiftFile = projectDir
+                                            .resolve(framework.compilation.defaultSourceSet.generatedSwiftDirectory)
+                                            .resolve(file.nameWithoutExtension)
+                                        targetSwiftFile.writeText(replacedContents)
+                                    }
+                                }
+                            }
+                        }
 
                         val target = framework.target
                         it.description =

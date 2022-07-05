@@ -26,5 +26,10 @@
       <option name="name" value="MavenLocal" />
       <option name="url" value="file:$MAVEN_REPOSITORY$/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="gitHub-swiftpack" />
+      <option name="name" value="gitHub-swiftpack" />
+      <option name="url" value="https://maven.pkg.github.com/Touchlab/SwiftPack" />
+    </remote-repository>
   </component>
 </project>

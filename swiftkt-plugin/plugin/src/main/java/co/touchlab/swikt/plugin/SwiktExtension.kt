@@ -19,4 +19,6 @@ abstract class SwiktExtension @Inject constructor(project: Project) {
     val outputDir: DirectoryProperty = objects.directoryProperty().convention(
         project.layout.buildDirectory.dir(DEFAULT_OUTPUT_DIR)
     )
+
+    val isSwiftPackEnabled: Property<Boolean> = objects.property<Boolean>().convention(true)
 }

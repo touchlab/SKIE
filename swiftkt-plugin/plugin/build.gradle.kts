@@ -15,13 +15,16 @@ dependencies {
     implementation("io.outfoxx:swiftpoet:1.4.0")
     implementation("com.squareup:kotlinpoet:1.11.0")
 
+    implementation(libs.swiftpack.gradle.plugin)
+    implementation(libs.swiftpack.spec)
+
     testImplementation(libs.junit)
     testImplementation(kotlin("gradle-plugin"))
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 gradlePlugin {
@@ -51,7 +54,7 @@ pluginBundle {
 
 publishing {
     repositories {
-        maven("https://maven.pkg.github.com/Touchlab/swikt") {
+        maven("https://maven.pkg.github.com/Touchlab/SwiftKt") {
             name = "gitHub"
 
             val actor = System.getenv("GITHUB_ACTOR") ?: run {

@@ -15,6 +15,15 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.pkg.github.com/Touchlab/SwiftPack") {
+            name = "gitHub-swiftpack"
+            credentials {
+                val githubActor: String? by project
+                val githubToken: String? by project
+                username = System.getenv("GITHUB_ACTOR") ?: githubActor
+                password = System.getenv("GITHUB_TOKEN") ?: githubToken
+            }
+        }
     }
 
     apply {
