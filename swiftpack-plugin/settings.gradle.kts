@@ -18,8 +18,6 @@ rootProject.name = ("swiftpack-plugin")
 include(":api")
 include(":spec")
 include(":config-plugin")
-include(":config-plugin-full")
-project(":config-plugin-full").projectDir = rootDir.resolve("config-plugin/full")
 include(":gradle-plugin")
 // include(":test-suite")
 
