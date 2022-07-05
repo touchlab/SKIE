@@ -23,6 +23,10 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/**.gradle*', '**/gradle/wrapper/gradle-wrapper.properties', '**/libs.versions.toml') }}
+      - uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: 11
       - name: Run Gradle tasks
         run: ./gradlew preMerge --continue
       - name: Publish on GitHub packages
