@@ -1,5 +1,6 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.Detekt
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformJvmPlugin
 
 plugins {
     alias(libs.plugins.kotlin) apply false
@@ -34,6 +35,13 @@ subprojects {
 
     detekt {
         config = rootProject.files("config/detekt/detekt.yml")
+    }
+
+    plugins.withType<KotlinPlatformJvmPlugin>() {
+        the<JavaPluginExtension>().apply {
+            sourceCompatibility = JavaVersion.VERSION_11
+            targetCompatibility = JavaVersion.VERSION_11
+        }
     }
 }
 
