@@ -96,8 +96,8 @@ kotlin {
         framework {
             this.isStatic = false
             baseName = "ExampleKit"
-            export("co.touchlab.swiftpack.example:example-producer")
-            export("co.touchlab.swiftpack.example:example-nonproducer")
+            export("co.touchlab.swiftpack.example:example-producer:1.0")
+            export("co.touchlab.swiftpack.example:example-nonproducer:1.0")
         }
         ios.deploymentTarget = "12.4"
         tvos.deploymentTarget = "12.4"

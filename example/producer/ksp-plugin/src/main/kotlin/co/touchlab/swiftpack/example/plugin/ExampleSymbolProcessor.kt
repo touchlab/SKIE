@@ -8,6 +8,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
+import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.parameterizedBy
 
@@ -16,7 +17,7 @@ class ExampleSymbolProcessor: SymbolProcessor {
         buildSwiftPackModule {
             file("AnnotatedList") {
                 addProperty(
-                    PropertySpec.builder("annotatedKotlinInstances", DeclaredTypeName.typeName("Swift.Array").parameterizedBy(DeclaredTypeName.typeName("Swift.Any")))
+                    PropertySpec.builder("annotatedKotlinInstances", DeclaredTypeName.typeName("Swift.Array").parameterizedBy(DeclaredTypeName.typeName("Swift.Any")), Modifier.PUBLIC)
                         .initializer(
                             CodeBlock.builder().apply {
                                 add("[")

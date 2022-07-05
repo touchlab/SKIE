@@ -1,4 +1,5 @@
 import io.gitlab.arturbosch.detekt.Detekt
+import org.gradle.api.publish.PublishingExtension
 
 plugins {
     alias(libs.plugins.kotlin) apply false
@@ -22,6 +23,7 @@ allprojects {
         // plugin("io.gitlab.arturbosch.detekt")
         // plugin("org.jlleitschuh.gradle.ktlint")
     }
+    apply(plugin = "maven-publish")
 
     // ktlint {
     //     debug.set(false)
@@ -39,6 +41,40 @@ allprojects {
     // detekt {
     //     config = rootProject.files("../config/detekt/detekt.yml")
     // }
+
+}
+
+subprojects {
+    afterEvaluate {
+        the<PublishingExtension>().apply {
+            if (this@subprojects.name != "swiftpack-gradle-plugin") {
+                publications {
+                    create<MavenPublication>("maven") {
+                        from(components["java"])
+                    }
+                }
+            }
+
+            repositories {
+                maven("https://maven.pkg.github.com/Touchlab/SwiftPack") {
+                    name = "gitHub"
+
+                    val actor = System.getenv("GITHUB_ACTOR") ?: run {
+                        logger.warn("GITHUB_ACTOR not set")
+                        return@maven
+                    }
+                    val password = System.getenv("GITHUB_TOKEN") ?: run {
+                        logger.warn("GITHUB_TOKEN not set")
+                        return@maven
+                    }
+                    credentials {
+                        this.username = actor
+                        this.password = password
+                    }
+                }
+            }
+        }
+    }
 }
 
 tasks.withType<Detekt>().configureEach {
