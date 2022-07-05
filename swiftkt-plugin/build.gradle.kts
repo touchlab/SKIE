@@ -20,8 +20,8 @@ allprojects {
             credentials {
                 val githubActor: String? by project
                 val githubToken: String? by project
-                username = System.getenv("GITHUB_ACTOR") ?: githubActor
-                password = System.getenv("GITHUB_TOKEN") ?: githubToken
+                username = System.getenv("TL_READ_ACTOR") ?: githubActor
+                password = System.getenv("TL_READ_TOKEN") ?: githubToken
             }
         }
     }

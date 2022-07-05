@@ -33,11 +33,15 @@ jobs:
         run: ./gradlew preMerge --continue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TL_READ_ACTOR: ${{ secrets.TK_ACTOR }}
+          TL_READ_TOKEN: ${{ secrets.TK_TOKEN }}
       - name: Publish on GitHub packages
         run: ./gradlew --project-dir swiftkt-plugin publishAllPublicationsToGitHubRepository
         if: ${{ success() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TL_READ_ACTOR: ${{ secrets.TK_ACTOR }}
+          TL_READ_TOKEN: ${{ secrets.TK_TOKEN }}
       - name: Publish on Plugin Portal
         run: ./gradlew --project-dir swiftkt-plugin setupPluginUploadFromEnvironment publishPlugins
         if: ${{ false }} #success()

@@ -10,8 +10,8 @@ pluginManagement {
                 credentials {
                     val githubActor: String? by settings
                     val githubToken: String? by settings
-                    username = System.getenv("GITHUB_ACTOR") ?: githubActor
-                    password = System.getenv("GITHUB_TOKEN") ?: githubToken
+                    username = System.getenv("TL_READ_ACTOR") ?: githubActor
+                    password = System.getenv("TL_READ_TOKEN") ?: githubToken
                 }
             }
         }
@@ -30,8 +30,8 @@ dependencyResolutionManagement {
                 credentials {
                     val githubActor: String? by settings
                     val githubToken: String? by settings
-                    username = System.getenv("GITHUB_ACTOR") ?: githubActor
-                    password = System.getenv("GITHUB_TOKEN") ?: githubToken
+                    username = System.getenv("TL_READ_ACTOR") ?: githubActor
+                    password = System.getenv("TL_READ_TOKEN") ?: githubToken
                 }
             }
         }
