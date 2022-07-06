@@ -11,9 +11,12 @@ import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.file.Directory
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.internal.publication.MavenPublicationInternal
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Zip
@@ -21,6 +24,7 @@ import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
@@ -32,13 +36,22 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import javax.inject.Inject
 
+abstract class SwiftPackExtension @Inject constructor(
+    private val objectFactory: ObjectFactory,
+) {
+
+    val isPublishingEnabled: Property<Boolean> = objectFactory.property<Boolean>().convention(true)
+}
+
 class SwiftPackPlugin @Inject constructor(
     private val softwareComponentFactory: SoftwareComponentFactory,
 ): Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
+        val extension = extensions.create<SwiftPackExtension>("swiftPack")
         apply<SpecConfigGradleSubplugin>()
 
         afterEvaluate {
+            extension.isPublishingEnabled.finalizeValue()
             the<KotlinMultiplatformExtension>().apply {
                 val nativeAppleTargets = targets.mapNotNull { it as? KotlinNativeTarget }.filter { it.konanTarget.family.isAppleFamily }
                 nativeAppleTargets.forEach { target ->
@@ -67,6 +80,7 @@ class SwiftPackPlugin @Inject constructor(
         val outgoingConfiguration = configurations.register("swiftPack$capitalizedTargetName") { configuration ->
             configuration.isCanBeConsumed = true
             configuration.isCanBeResolved = false
+            configuration.isVisible = false
 
             configuration.attributes {
                 it.attribute(Category.CATEGORY_ATTRIBUTE, namedAttribute(Category.LIBRARY))
@@ -80,6 +94,7 @@ class SwiftPackPlugin @Inject constructor(
             }
         }
 
+
         val adhocComponent = softwareComponentFactory.adhoc("swiftPack${capitalizedTargetName}Component")
         components.add(adhocComponent)
 
@@ -87,12 +102,16 @@ class SwiftPackPlugin @Inject constructor(
             it.mapToOptional()
         }
 
-        plugins.withType<MavenPublishPlugin>() {
-            the<PublishingExtension>().apply {
-                publications {
-                    it.create<MavenPublication>("swiftPack$capitalizedTargetName") {
-                        from(adhocComponent)
-                        artifactId += "-${targetName.lowercase()}-swiftpack"
+        val extension = the<SwiftPackExtension>()
+        if (extension.isPublishingEnabled.get()) {
+            plugins.withType<MavenPublishPlugin>() {
+                the<PublishingExtension>().apply {
+                    publications {
+                        it.create<MavenPublication>("swiftPack$capitalizedTargetName") {
+                            from(adhocComponent)
+                            artifactId += "-${targetName.lowercase()}-swiftpack"
+                            (this as MavenPublicationInternal).isAlias = true
+                        }
                     }
                 }
             }
@@ -107,6 +126,7 @@ class SwiftPackPlugin @Inject constructor(
         val exportConfiguration = configurations.register(configurationName) { configuration ->
             configuration.isCanBeConsumed = false
             configuration.isCanBeResolved = true
+            configuration.isVisible = false
 
             configuration.extendsFrom(configurations.getByName(compilation.apiConfigurationName))
             configuration.attributes {

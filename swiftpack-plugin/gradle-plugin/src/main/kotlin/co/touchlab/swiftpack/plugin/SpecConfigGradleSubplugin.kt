@@ -50,4 +50,10 @@ class SpecConfigGradleSubplugin: KotlinCompilerPluginSupportPlugin {
         artifactId = BuildConfig.KOTLIN_PLUGIN_NAME,
         version = BuildConfig.KOTLIN_PLUGIN_VERSION,
     )
+
+    override fun getPluginArtifactForNative(): SubpluginArtifact? = SubpluginArtifact(
+        groupId = BuildConfig.KOTLIN_PLUGIN_GROUP,
+        artifactId = BuildConfig.KOTLIN_PLUGIN_NAME,
+        version = BuildConfig.KOTLIN_PLUGIN_VERSION,
+    )
 }

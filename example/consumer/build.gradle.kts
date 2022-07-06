@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("co.touchlab.swiftpack")
+    `maven-publish`
 }
 
 kotlin {
@@ -105,4 +106,8 @@ kotlin {
         osx.deploymentTarget = "11.0"
         // podfile = project.file("../app/Podfile")
     }
+}
+
+swiftPack {
+    isPublishingEnabled.set(false)
 }
