@@ -18,6 +18,7 @@ rootProject.name = ("swiftpack-plugin")
 include(":api")
 include(":spec")
 include(":config-plugin")
+include(":config-plugin-native")
 include(":gradle-plugin")
 // include(":test-suite")
 

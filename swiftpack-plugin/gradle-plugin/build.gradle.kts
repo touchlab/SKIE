@@ -13,7 +13,7 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":swiftpack-config-plugin").name}\"")
-    buildConfigField("String", "KOTLIN_NATIVE_PLUGIN_NAME", "\"${project(":swiftpack-config-plugin").name}\"")
+    buildConfigField("String", "KOTLIN_NATIVE_PLUGIN_NAME", "\"${project(":swiftpack-config-plugin-native").name}\"")
 }
 
 dependencies {

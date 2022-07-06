@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -11,7 +12,6 @@
                   <project path="$PROJECT_DIR$/swiftpack-plugin" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/api" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
-                  <project path="$PROJECT_DIR$/swiftpack-plugin/config-plugin/full" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/spec" />
                 </projects>
@@ -32,7 +32,6 @@
             <option value="$PROJECT_DIR$/swiftpack-plugin" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/api" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
-            <option value="$PROJECT_DIR$/swiftpack-plugin/config-plugin/full" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/spec" />
           </set>
