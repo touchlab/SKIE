@@ -12,6 +12,7 @@
                   <project path="$PROJECT_DIR$/swiftpack-plugin" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/api" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/config-plugin-native" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/spec" />
                 </projects>
@@ -32,6 +33,7 @@
             <option value="$PROJECT_DIR$/swiftpack-plugin" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/api" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/config-plugin-native" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/spec" />
           </set>

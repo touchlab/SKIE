@@ -1,5 +1,6 @@
 package co.touchlab.swiftpack.spec
 
+import co.touchlab.swiftpack.spec.NameMangling.demangledClassName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -8,7 +9,8 @@ import java.io.File
 
 @Serializable
 data class SwiftPackModule(
-    val files: List<String>,
+    val name: String,
+    val files: List<TemplateFile>,
     val kobjcTransforms: Set<KobjcTransform>,
 ) {
     companion object {
@@ -26,4 +28,11 @@ data class SwiftPackModule(
             }
         }
     }
+
+    @Serializable
+    data class TemplateFile(
+        val name: String,
+        val contents: String,
+    )
 }
+

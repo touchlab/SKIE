@@ -12,7 +12,9 @@ import io.outfoxx.swiftpoet.SelfTypeName
 import java.io.File
 
 @Suppress("FunctionName")
-class SwiftPackModuleBuilder {
+class SwiftPackModuleBuilder(
+    private val moduleName: String,
+) {
     private val files = mutableListOf<FileSpec>()
     private val kobjcTransforms = mutableSetOf<KobjcTransform>()
 
@@ -44,7 +46,16 @@ class SwiftPackModuleBuilder {
     }
 
     fun build(): SwiftPackModule {
-        return SwiftPackModule(files.map { it.toString() }, kobjcTransforms)
+        return SwiftPackModule(
+            moduleName,
+            files.map {
+                SwiftPackModule.TemplateFile(
+                    name = it.name,
+                    contents = it.toString()
+                )
+            },
+            kobjcTransforms
+        )
     }
 
     inner class KobjcTransformScope {
@@ -63,7 +74,7 @@ class SwiftPackModuleBuilder {
 }
 
 fun buildSwiftPackModule(moduleName: String = "main", writeToOutputDir: Boolean = true, block: SwiftPackModuleBuilder.() -> Unit): SwiftPackModule {
-    val context = SwiftPackModuleBuilder()
+    val context = SwiftPackModuleBuilder(moduleName)
     context.block()
     val template = context.build()
     if (writeToOutputDir) {
@@ -71,7 +82,7 @@ fun buildSwiftPackModule(moduleName: String = "main", writeToOutputDir: Boolean 
             "Output directory not configured! Either apply the SwiftPack Gradle plugin, set the SwiftTemplateBuilder.Config.outputDir, or pass false as the first parameter of buildSwiftTemplate."
         }
         outputDir.mkdirs()
-        template.write(outputDir.resolve("$moduleName.swift.json"))
+        template.write(outputDir.resolve("$moduleName.swiftpack"))
     }
     return template
 }
