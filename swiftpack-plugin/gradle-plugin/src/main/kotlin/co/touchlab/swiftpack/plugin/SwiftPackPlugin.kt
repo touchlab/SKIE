@@ -128,10 +128,6 @@ class SwiftPackPlugin @Inject constructor(
                     sub.useTarget("${requestedModule.module}-${target.targetName.lowercase()}-swiftpack:${requestedModule.version}")
                 }
             }
-
-            configuration.incoming.beforeResolve {
-                println("Resolving $configurationName")
-            }
         }
 
         tasks.register<Sync>("unpackSwiftPack$capitalizedTargetName") {
