@@ -19,13 +19,13 @@ types = {
 
 targets.each do |key, value|
   types.each do |type, suffix|
-    target "SwiktExample_#{key}_#{suffix}" do
+    target "SwiftKtExample_#{key}_#{suffix}" do
       platform value["platform"], value["version"]
 
       pod "ExampleKit_#{suffix}", :path => "../#{type}"
 
       if value["tests"]
-        target "SwiktExample_#{key}_#{suffix}_Tests" do
+        target "SwiftKtExample_#{key}_#{suffix}_Tests" do
           inherit! :search_paths
         end
       end

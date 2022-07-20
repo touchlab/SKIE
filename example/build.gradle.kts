@@ -4,12 +4,12 @@ import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
-    id("co.touchlab.swikt") apply false
+    id("co.touchlab.swiftkt") apply false
     kotlin("multiplatform") apply false
     kotlin("native.cocoapods") apply false
     idea
 
-    id("co.touchlab.swikt.test-suite")
+    id("co.touchlab.swiftkt.test-suite")
 }
 
 allprojects {
@@ -98,15 +98,15 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "co.touchlab.swikt")
+    apply(plugin = "co.touchlab.swiftkt")
     apply(plugin = "org.jetbrains.kotlin.native.cocoapods")
 
     val isStatic = this.name.endsWith("static")
 
     (the<KotlinMultiplatformExtension>() as ExtensionAware).the<CocoapodsExtension>().apply {
         name = "ExampleKit_${this@subprojects.name.capitalized()}"
-        summary = "Example library for swikt"
-        homepage = "https://github.com/touchlab/swikt"
+        summary = "Example library for SwiftKt"
+        homepage = "https://github.com/touchlab/SwiftKt"
         framework {
             this.isStatic = isStatic
             baseName = "ExampleKit"

@@ -4,7 +4,7 @@ kotlin = "1.7.0"
 ktlintGradle = "10.3.0"
 pluginPublish = "0.21.0"
 versionCheck = "0.42.0"
-swiftpack = "0.0.5"
+swiftpack = "0.0.7"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}

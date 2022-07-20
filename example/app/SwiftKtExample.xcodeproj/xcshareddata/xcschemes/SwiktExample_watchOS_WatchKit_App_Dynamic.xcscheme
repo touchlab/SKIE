@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "1330"
+   version = "1.3">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "183DE2DC28342AFF006B8798"
+               BuildableName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic.app"
+               BlueprintName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic"
+               ReferencedContainer = "container:SwiftKtExample.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "183DE2D928342AFF006B8798"
+               BuildableName = "SwiftKtExample_watchOS_Dynamic.app"
+               BlueprintName = "SwiftKtExample_watchOS_Dynamic"
+               ReferencedContainer = "container:SwiftKtExample.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "18E89BB5283EFD4800C08C9B"
+               BuildableName = "SwiftKtExample_watchOS_WatchKit_Extension_Dynamic_Tests.xctest"
+               BlueprintName = "SwiftKtExample_watchOS_WatchKit_Extension_Dynamic_Tests"
+               ReferencedContainer = "container:SwiftKtExample.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES"
+      notificationPayloadFile = "watchOS/Extension/PushNotificationPayload.apns">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/SwiktExample_watchOS_Dynamic WatchKit App">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "183DE2DC28342AFF006B8798"
+            BuildableName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic.app"
+            BlueprintName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic"
+            ReferencedContainer = "container:SwiftKtExample.xcodeproj">
+         </BuildableReference>
+      </RemoteRunnable>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/SwiktExample_watchOS_Dynamic WatchKit App">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "183DE2DC28342AFF006B8798"
+            BuildableName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic.app"
+            BlueprintName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic"
+            ReferencedContainer = "container:SwiftKtExample.xcodeproj">
+         </BuildableReference>
+      </RemoteRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "183DE2DC28342AFF006B8798"
+            BuildableName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic.app"
+            BlueprintName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic"
+            ReferencedContainer = "container:SwiftKtExample.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>

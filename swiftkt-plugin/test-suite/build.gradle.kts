@@ -23,9 +23,9 @@ java {
 
 gradlePlugin {
     plugins {
-        create("co.touchlab.swikt.test-suite") {
-            id = "co.touchlab.swikt.test-suite"
-            implementationClass = "co.touchlab.swikt.tests.TestSuitePlugin"
+        create("co.touchlab.swiftkt.test-suite") {
+            id = "co.touchlab.swiftkt.test-suite"
+            implementationClass = "co.touchlab.swiftkt.tests.TestSuitePlugin"
         }
     }
 }
