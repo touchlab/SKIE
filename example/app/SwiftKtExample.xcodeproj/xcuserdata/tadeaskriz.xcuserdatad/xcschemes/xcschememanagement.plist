@@ -7,12 +7,12 @@
 		<key>SwiftKtExample_macOS_Dynamic.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>34</integer>
+			<integer>33</integer>
 		</dict>
 		<key>SwiftKtExample_tvOS_Dynamic.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>33</integer>
+			<integer>35</integer>
 		</dict>
 		<key>SwiftKtExample_watchOS_WatchKit_App_Static (Complication).xcscheme_^#shared#^_</key>
 		<dict>
@@ -27,7 +27,7 @@
 		<key>SwiftKtExample_watchOS_WatchKit_App_Static.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>35</integer>
+			<integer>34</integer>
 		</dict>
 		<key>SwiktExample_iOS_Dynamic.xcscheme_^#shared#^_</key>
 		<dict>

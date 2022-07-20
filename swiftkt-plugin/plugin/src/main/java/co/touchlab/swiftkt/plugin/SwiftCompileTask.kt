@@ -8,7 +8,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.internal.tasks.TaskExecutionOutcome
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -17,7 +16,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.tasks.FrameworkDescriptor
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
@@ -282,37 +280,6 @@ abstract class SwiftCompileTask
     }
 }
 
-data class DarwinTarget(
-    val konanTarget: KonanTarget,
-    val targetTriple: TargetTriple,
-    val sdk: String,
-) {
-    constructor(
-        konanTarget: KonanTarget,
-        targetTripleString: String,
-        sdk: String,
-    ): this(konanTarget, TargetTriple.fromString(targetTripleString), sdk)
-
-    companion object {
-        val allTargets = listOf(
-            DarwinTarget(KonanTarget.IOS_ARM32, "armv7-apple-ios", "iphoneos"),
-            DarwinTarget(KonanTarget.IOS_ARM64, "arm64-apple-ios", "iphoneos"),
-            DarwinTarget(KonanTarget.IOS_X64, "x86_64-apple-ios-simulator", "iphonesimulator"),
-            DarwinTarget(KonanTarget.IOS_SIMULATOR_ARM64, "arm64-apple-ios-simulator", "iphonesimulator"),
-            DarwinTarget(KonanTarget.WATCHOS_ARM32, "armv7k-apple-watchos", "watchos"),
-            DarwinTarget(KonanTarget.WATCHOS_ARM64, "arm64_32-apple-watchos", "watchos"),
-            DarwinTarget(KonanTarget.WATCHOS_X86, "i386-apple-watchos-simulator", "watchsimulator"),
-            DarwinTarget(KonanTarget.WATCHOS_X64, "x86_64-apple-watchos-simulator", "watchsimulator"),
-            DarwinTarget(KonanTarget.WATCHOS_SIMULATOR_ARM64, "arm64-apple-watchos-simulator", "watchsimulator"),
-            DarwinTarget(KonanTarget.TVOS_ARM64, "arm64-apple-tvos", "appletvos"),
-            DarwinTarget(KonanTarget.TVOS_X64, "x86_64-apple-tvos-simulator", "appletvsimulator"),
-            DarwinTarget(KonanTarget.TVOS_SIMULATOR_ARM64, "arm64-apple-tvos-simulator", "appletvsimulator"),
-            DarwinTarget(KonanTarget.MACOS_X64, "x86_64-apple-macos", "macosx"),
-            DarwinTarget(KonanTarget.MACOS_ARM64, "arm64-apple-macos", "macosx"),
-        ).associateBy { it.konanTarget }
-    }
-}
-
 val Framework.darwinTarget: DarwinTarget
     get() = target.konanTarget.darwinTarget
 
@@ -321,30 +288,3 @@ val FrameworkDescriptor.darwinTarget: DarwinTarget
 
 val KonanTarget.darwinTarget: DarwinTarget
     get() = DarwinTarget.allTargets[this] ?: error("Unknown konan target: $this")
-
-data class LoadCommand(
-    val index: Int,
-    val attributes: Map<String, String>,
-) {
-
-    val cmd: String?
-        get() = attributes["cmd"]
-
-    operator fun get(name: String): String? {
-        return attributes[name]
-    }
-    companion object {
-        private val loadCommand = "Load command (\\d+)((?:\\s\\s+(?:\\w+)\\s(?:.*))+)".toRegex()
-        private val loadCommandAttribute = "(\\w+)\\s(.*)".toRegex()
-
-        fun parseOtoolOutput(otoolOutput: String): List<LoadCommand> {
-            return loadCommand.findAll(otoolOutput).map { loadCommandMatch ->
-                LoadCommand(
-                    index = loadCommandMatch.groupValues[1].toInt(),
-                    attributes = loadCommandAttribute.findAll(loadCommandMatch.groupValues[2])
-                        .map { it.groupValues[1] to it.groupValues[2] }.toMap()
-                )
-            }.toList()
-        }
-    }
-}
