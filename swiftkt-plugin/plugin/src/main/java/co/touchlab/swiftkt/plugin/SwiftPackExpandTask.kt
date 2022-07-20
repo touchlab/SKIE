@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import javax.inject.Inject
 
 abstract class SwiftPackExpandTask @Inject constructor(
-    objectFactory: ObjectFactory,
     private val framework: Framework,
 ): DefaultTask() {
 
@@ -27,12 +26,9 @@ abstract class SwiftPackExpandTask @Inject constructor(
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
-    @get:Input
-    val swiftNameProvider: Property<SwiftNameProvider> = objectFactory.property<SwiftNameProvider>().convention(SimpleSwiftNameProvider())
-
     @TaskAction
     fun expandTemplates() {
-        val swiftNameProvider = swiftNameProvider.get()
+        val swiftNameProvider = SimpleSwiftNameProvider()
         outputDir.asFile.get().deleteRecursively()
         val modules = framework.swiftPackModules.get()
         modules.forEach { (namespace, module) ->
