@@ -18,20 +18,6 @@ class SwiftPackModuleBuilder(
     private val files = mutableListOf<FileSpec>()
     private val kobjcTransforms = mutableSetOf<KobjcTransform>()
 
-    fun DeclaredTypeName.Companion.kotlin(qualifiedClassName: String): DeclaredTypeName {
-        return qualifiedTypeName(
-            "KotlinSwiftGen.${qualifiedClassName.mangledClassName}"
-        )
-    }
-
-    fun PropertySpec.Companion.kotlin(propName: String): PropertySpec {
-        return builder("KotlinSwiftGen_$propName", SelfTypeName.INSTANCE).build()
-    }
-
-    fun FunctionSpec.Companion.kotlin(funName: String): FunctionSpec {
-        return builder("KotlinSwiftGen_$funName").build()
-    }
-
     fun file(name: String, contents: FileSpec.Builder.() -> Unit): FileSpec {
         val builder = FileSpec.builder(name)
         builder.contents()
@@ -71,6 +57,22 @@ class SwiftPackModuleBuilder(
     object Config {
         var outputDir: File? = null
     }
+}
+
+val SWIFTPACK_KOTLIN_TYPE_PREFIX = "KotlinSwiftGen"
+
+fun DeclaredTypeName.Companion.kotlin(qualifiedClassName: String): DeclaredTypeName {
+    return qualifiedTypeName(
+        "$SWIFTPACK_KOTLIN_TYPE_PREFIX.${qualifiedClassName.mangledClassName}"
+    )
+}
+
+fun PropertySpec.Companion.kotlin(propName: String): PropertySpec {
+    return builder("${SWIFTPACK_KOTLIN_TYPE_PREFIX}_$propName", SelfTypeName.INSTANCE).build()
+}
+
+fun FunctionSpec.Companion.kotlin(funName: String): FunctionSpec {
+    return builder("${SWIFTPACK_KOTLIN_TYPE_PREFIX}_$funName").build()
 }
 
 fun buildSwiftPackModule(moduleName: String = "main", writeToOutputDir: Boolean = true, block: SwiftPackModuleBuilder.() -> Unit): SwiftPackModule {
