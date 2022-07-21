@@ -24,16 +24,18 @@ object SwiftPack {
     val Framework.swiftPackModules: Provider<List<NamespacedSwiftPackModule>>
         get() = unpackSwiftPack.map { it.destinationDir }.zip(project.swiftTemplateDirectory(target)) { dependenciesDir, localDir ->
             fun isSwiftPackModule(file: File): Boolean = file.isFile && file.extension == "swiftpack"
-            val dependencyModules = dependenciesDir.listFiles(::isSwiftPackModule)?.map { file ->
-                val module = SwiftPackModule.read(file)
-                NamespacedSwiftPackModule(
-                    file.parent,
-                    module,
-                )
-            }
+            val dependencyModules = dependenciesDir.listFiles()?.mapNotNull {
+                it.listFiles(::isSwiftPackModule)?.map { file ->
+                    val module = SwiftPackModule.read(file)
+                    NamespacedSwiftPackModule(
+                        file.parentFile.name,
+                        module,
+                    )
+                }
+            }?.flatten()
             val localModules = localDir.asFile.listFiles(::isSwiftPackModule)?.map { file ->
                 NamespacedSwiftPackModule(
-                    file.parent,
+                    file.parentFile.name,
                     SwiftPackModule.read(file),
                 )
             }

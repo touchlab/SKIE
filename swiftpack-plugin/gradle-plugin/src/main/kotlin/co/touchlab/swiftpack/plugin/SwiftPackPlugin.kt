@@ -125,7 +125,7 @@ class SwiftPackPlugin @Inject constructor(
             configuration.resolutionStrategy { strategy ->
                 strategy.dependencySubstitution.all { sub ->
                     val requestedModule = sub.requested as? ModuleComponentSelector ?: return@all
-                    sub.useTarget("${requestedModule.module}-${target.targetName.lowercase()}-swiftpack:${requestedModule.version}")
+                    sub.useTarget("${requestedModule.group}:${requestedModule.module}-${target.targetName.lowercase()}-swiftpack:${requestedModule.version}")
                 }
             }
         }
@@ -141,7 +141,10 @@ class SwiftPackPlugin @Inject constructor(
             dependsOn(artifacts)
             artifacts.forEach { artifact ->
                 from(zipTree(artifact.file)) { spec ->
-                    spec.into(artifact.name.removeSuffixIfPresent("-swiftTemplates$capitalizedTargetName"))
+                    spec.into(artifact.name
+                        .removeSuffixIfPresent("-swiftTemplates$capitalizedTargetName")
+                        .removeSuffixIfPresent("-${target.targetName.lowercase()}-swiftpack")
+                    )
                 }
             }
             into(layout.buildDirectory.dir("swiftpack/${compilation.defaultSourceSetName}"))
