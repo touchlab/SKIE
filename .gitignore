@@ -1,0 +1,20 @@
+# Sensitive or high-churn files
+.idea
+
+!.idea/codeStyles
+!.idea/copyright
+
+*.iml
+*.ipr
+
+ # Generated files
+bin/
+gen/
+
+ # Gradle files
+.gradle
+build/
+
+local.properties
+
+Pods
