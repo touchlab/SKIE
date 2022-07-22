@@ -15,15 +15,23 @@ import java.io.File
 class SwiftPackModuleBuilder(
     private val moduleName: String,
 ) {
-    private val files = mutableListOf<FileSpec>()
-    private val kobjcTransforms = mutableSetOf<KobjcTransform>()
+    private val mutableFiles = mutableSetOf<FileSpec>()
+    private val mutableKobjcTransforms = mutableSetOf<KobjcTransform>()
+
+    val files: Set<FileSpec> get() = mutableFiles
+    val kobjcTransforms: Set<KobjcTransform> get() = mutableKobjcTransforms
 
     fun file(name: String, contents: FileSpec.Builder.() -> Unit): FileSpec {
         val builder = FileSpec.builder(name)
         builder.contents()
         val file = builder.build()
-        files.add(file)
+        mutableFiles.add(file)
         return file
+    }
+
+    fun addFile(file: FileSpec): SwiftPackModuleBuilder {
+        mutableFiles.add(file)
+        return this
     }
 
     fun kobjcTransforms(block: KobjcTransformScope.() -> Unit) {
@@ -34,23 +42,23 @@ class SwiftPackModuleBuilder(
     fun build(): SwiftPackModule {
         return SwiftPackModule(
             moduleName,
-            files.map {
+            mutableFiles.map {
                 SwiftPackModule.TemplateFile(
                     name = it.name,
                     contents = it.toString()
                 )
-            },
-            kobjcTransforms
+            }.sortedBy { it.name },
+            mutableKobjcTransforms
         )
     }
 
     inner class KobjcTransformScope {
         fun hide(typeName: DeclaredTypeName) {
-            kobjcTransforms.add(KobjcTransform.HideType(typeName.name))
+            mutableKobjcTransforms.add(KobjcTransform.HideType(typeName.name))
         }
 
         fun rename(typeName: DeclaredTypeName, newName: String) {
-            kobjcTransforms.add(KobjcTransform.RenameType(typeName.name, newName))
+            mutableKobjcTransforms.add(KobjcTransform.RenameType(typeName.name, newName))
         }
     }
 
