@@ -73,6 +73,7 @@ abstract class SwiftKtPlugin : Plugin<Project> {
 
                     val swiftPackExpandTask = if (extension.isSwiftPackEnabled.get()) {
                         tasks.register<SwiftPackExpandTask>(framework.swiftPackExpandTaskName, framework).configuring {
+                            dependsOn(framework.compilation.compileKotlinTask)
                             dependsOn(framework.unpackSwiftPack)
                         }
                     } else {
