@@ -156,7 +156,6 @@ abstract class SwiftCompileTask
             "-static",
             "-enable-library-evolution",
             "-g",
-            "-gdwarf-types",
             "-sdk",
             sdkPath,
             "-target",
