@@ -2,7 +2,6 @@ rootProject.name = "SwiftGen-Sealed-plugin"
 
 include(
     ":compiler-plugin",
-    ":compiler-plugin-native",
     ":gradle-plugin",
 )
 

@@ -19,4 +19,19 @@ kotlin {
             }
         }
     }
+
+    val commonMain by sourceSets.getting {
+    }
+
+    val macosMain by sourceSets.creating {
+        dependsOn(commonMain)
+    }
+
+    val macosArm64Main by sourceSets.getting {
+        dependsOn(macosMain)
+    }
+
+    val macosX64Main by sourceSets.getting {
+        dependsOn(macosMain)
+    }
 }

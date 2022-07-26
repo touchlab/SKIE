@@ -11,7 +11,6 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":compiler-plugin").name}\"")
-    buildConfigField("String", "KOTLIN_NATIVE_PLUGIN_NAME", "\"${project(":compiler-plugin-native").name}\"")
 }
 
 dependencies {
@@ -21,7 +20,6 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(project(":compiler-plugin"))
-    compileOnly(project(":compiler-plugin-native"))
 }
 
 java {
