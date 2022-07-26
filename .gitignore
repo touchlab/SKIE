@@ -18,3 +18,5 @@ build/
 local.properties
 
 Pods
+
+.DS_Store

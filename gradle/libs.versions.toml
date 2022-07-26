@@ -1,0 +1,14 @@
+[versions]
+kotlin = "1.7.0"
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+shadow = { id = "com.github.johnrengelman.shadow", version = "7.1.2" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.0.3" }
+swiftpack = { id = "co.touchlab.swiftpack", version = "0.0.5" }
+swiftkt = { id = "co.touchlab.swiftkt", version = "0.0.11" }
+
+[libraries]
+
+swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version = "0.0.5" }
