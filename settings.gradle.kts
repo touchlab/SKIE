@@ -1,6 +1,7 @@
 rootProject.name = "SwiftGen-Sealed"
 
 include(
+    ":playground:irinspector",
     ":playground:kotlin",
     ":playground:swift",
 )

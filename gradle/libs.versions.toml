@@ -1,6 +1,7 @@
 [versions]
 kotlin = "1.7.0"
 swiftpack = "0.0.5"
+kotest = "5.4.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -12,3 +13,16 @@ swiftkt = { id = "co.touchlab.swiftkt", version = "0.0.11" }
 [libraries]
 
 swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
+compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.9" }
+
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
+
+[bundles]
+testing-jvm = [
+    "kotest-runner-junit5",
+    "kotest-assertions-core",
+    "kotest-framework-datatest",
+]
