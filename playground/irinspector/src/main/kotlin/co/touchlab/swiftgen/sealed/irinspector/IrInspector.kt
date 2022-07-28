@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.sealed.irinspector
 
-import co.touchlab.swiftgen.playground.BuildConfig
+import co.touchlab.swiftgen.BuildConfig
 import co.touchlab.swiftgen.sealed.irinspector.plugin.IrInspectorPluginCommandLineProcessor
 import co.touchlab.swiftgen.sealed.irinspector.plugin.IrInspectorPluginComponentRegistrar
 import co.touchlab.swiftgen.sealed.irinspector.plugin.IrInspectorPluginOption

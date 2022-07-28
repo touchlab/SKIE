@@ -12,6 +12,8 @@ swiftkt = { id = "co.touchlab.swiftkt", version = "0.0.11" }
 
 [libraries]
 
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
+
 swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
 compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.9" }
@@ -19,10 +21,12 @@ compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing",
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
+mockk = { module = "io.mockk:mockk", version = "1.12.5" }
 
 [bundles]
 testing-jvm = [
     "kotest-runner-junit5",
     "kotest-assertions-core",
     "kotest-framework-datatest",
+    "mockk"
 ]

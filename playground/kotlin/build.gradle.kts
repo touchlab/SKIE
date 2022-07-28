@@ -16,6 +16,7 @@ kotlin {
         binaries {
             framework {
                 isStatic = true
+                baseName = "Kotlin"
             }
         }
     }
