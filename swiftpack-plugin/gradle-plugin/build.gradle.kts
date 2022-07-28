@@ -25,7 +25,7 @@ dependencies {
 
     implementation("io.outfoxx:swiftpoet:1.4.0")
     implementation("com.squareup:kotlinpoet:1.11.0")
-    implementation(project(":swiftpack-spec"))
+    implementation(project(":swiftpack-spi"))
     implementation(project(":swiftpack-config-plugin"))
 
     testImplementation(libs.junit)

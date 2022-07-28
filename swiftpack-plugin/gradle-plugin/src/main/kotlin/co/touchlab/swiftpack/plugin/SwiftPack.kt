@@ -1,7 +1,7 @@
 package co.touchlab.swiftpack.plugin
 
-import co.touchlab.swiftpack.spec.NameMangling.demangledClassName
 import co.touchlab.swiftpack.spec.SwiftPackModule
+import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
@@ -20,6 +20,20 @@ object SwiftPack {
 
     val Framework.unpackSwiftPack: Provider<Sync>
         get() = target.project.tasks.named<Sync>("unpackSwiftPack$capitalizedTargetName")
+
+    val Framework.swiftPackModuleReferences: Provider<List<NamespacedSwiftPackModule.Reference>>
+        get() = unpackSwiftPack.map { it.destinationDir }.zip(project.swiftTemplateDirectory(target)) { dependenciesDir, localDir ->
+            fun isSwiftPackModule(file: File): Boolean = file.isFile && file.extension == "swiftpack"
+            val dependencyModules = dependenciesDir.listFiles()?.mapNotNull {
+                it.listFiles(::isSwiftPackModule)?.map { file ->
+                    NamespacedSwiftPackModule.Reference(file.parentFile.name, file)
+                }
+            }?.flatten()
+            val localModules = localDir.asFile.listFiles(::isSwiftPackModule)?.map { file ->
+                NamespacedSwiftPackModule.Reference("local", file)
+            }
+            listOfNotNull(dependencyModules, localModules).flatten()
+        }
 
     val Framework.swiftPackModules: Provider<List<NamespacedSwiftPackModule>>
         get() = unpackSwiftPack.map { it.destinationDir }.zip(project.swiftTemplateDirectory(target)) { dependenciesDir, localDir ->
@@ -55,10 +69,4 @@ object SwiftPack {
                 if (index == 0) value else value.capitalized()
             }
 
-
-    fun SwiftPackModule.TemplateFile.produceSwiftFile(swiftNameProvider: SwiftNameProvider): String {
-        return contents.replace("KotlinSwiftGen\\.([a-zA-Z0-9_]+)".toRegex()) { match ->
-            swiftNameProvider.getSwiftName(match.groupValues[1].demangledClassName)
-        }
-    }
 }

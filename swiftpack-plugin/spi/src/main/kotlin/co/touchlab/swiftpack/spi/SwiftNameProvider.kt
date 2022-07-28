@@ -1,4 +1,4 @@
-package co.touchlab.swiftpack.plugin
+package co.touchlab.swiftpack.spi
 
 interface SwiftNameProvider {
     fun getSwiftName(kotlinClassName: String): String
