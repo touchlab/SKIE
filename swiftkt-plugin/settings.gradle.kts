@@ -16,4 +16,5 @@ dependencyResolutionManagement {
 rootProject.name = ("swiftkt-plugin")
 
 include(":plugin")
+include(":kotlin-plugin")
 include(":test-suite")

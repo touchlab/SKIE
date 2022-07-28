@@ -3,6 +3,14 @@ plugins {
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish")
     `maven-publish`
+    alias(libs.plugins.buildconfig)
+}
+
+buildConfig {
+    packageName(project.group.toString())
+    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":kotlin-plugin").name}\"")
 }
 
 dependencies {
@@ -15,8 +23,9 @@ dependencies {
     implementation("io.outfoxx:swiftpoet:1.4.0")
     implementation("com.squareup:kotlinpoet:1.11.0")
 
+    implementation(project(":kotlin-plugin"))
     implementation(libs.swiftpack.gradle.plugin)
-    implementation(libs.swiftpack.spec)
+    implementation(libs.swiftpack.spi)
 
     testImplementation(libs.junit)
     testImplementation(kotlin("gradle-plugin"))

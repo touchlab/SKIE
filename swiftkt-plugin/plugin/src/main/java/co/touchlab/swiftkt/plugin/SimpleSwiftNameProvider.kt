@@ -1,6 +1,6 @@
 package co.touchlab.swiftkt.plugin
 
-import co.touchlab.swiftpack.plugin.SwiftNameProvider
+import co.touchlab.swiftpack.spi.SwiftNameProvider
 
 class SimpleSwiftNameProvider: SwiftNameProvider {
     override fun getSwiftName(kotlinClassName: String): String {

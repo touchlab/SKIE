@@ -7,6 +7,11 @@ object PluginCoordinates {
 
     val VERSION: String
         get() = System.getenv("RELEASE_VERSION") ?: DEFAULT_VERSION
+
+    object Native {
+        const val ID = "co.touchlab.swikt.native"
+        const val IMPLEMENTATION_CLASS = "co.touchlab.swikt.plugin.SwiftKtNativePlugin"
+    }
 }
 
 object PluginBundle {

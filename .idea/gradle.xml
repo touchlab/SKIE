@@ -10,6 +10,7 @@
               <build path="$PROJECT_DIR$/swiftkt-plugin" name="swiftkt-plugin">
                 <projects>
                   <project path="$PROJECT_DIR$/swiftkt-plugin" />
+                  <project path="$PROJECT_DIR$/swiftkt-plugin/kotlin-plugin" />
                   <project path="$PROJECT_DIR$/swiftkt-plugin/plugin" />
                   <project path="$PROJECT_DIR$/swiftkt-plugin/test-suite" />
                 </projects>
@@ -30,6 +31,7 @@
             <option value="$PROJECT_DIR$/example/static" />
             <option value="$PROJECT_DIR$/swiftkt-plugin" />
             <option value="$PROJECT_DIR$/swiftkt-plugin/buildSrc" />
+            <option value="$PROJECT_DIR$/swiftkt-plugin/kotlin-plugin" />
             <option value="$PROJECT_DIR$/swiftkt-plugin/plugin" />
             <option value="$PROJECT_DIR$/swiftkt-plugin/test-suite" />
           </set>

@@ -5,16 +5,21 @@ ktlintGradle = "10.3.0"
 pluginPublish = "0.21.0"
 versionCheck = "0.42.0"
 swiftpack = "0.0.8"
+auto-service = "1.0"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
-kotlin = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin"}
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle"}
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish"}
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck"}
 dataStruct = { id = "co.touchlab.kotlin.datastruct", version = "0.0.1" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.0.3" }
 
 [libraries]
 junit = "junit:junit:4.13.2"
 swiftpack-spec = { module = "co.touchlab.swiftpack:swiftpack-spec", version.ref = "swiftpack" }
+swiftpack-spi = { module = "co.touchlab.swiftpack:swiftpack-spi", version.ref = "swiftpack" }
 swiftpack-gradle-plugin = { module = "co.touchlab.swiftpack:swiftpack-gradle-plugin", version.ref = "swiftpack" }
+auto-service = { module = "com.google.auto.service:auto-service", version.ref = "auto-service" }
