@@ -18,8 +18,11 @@ object SwiftPack {
     val Framework.capitalizedTargetName: String
         get() = target.targetName.capitalized()
 
+    val Framework.unpackSwiftPackName: String
+        get() = "unpackSwiftPack$capitalizedTargetName"
+
     val Framework.unpackSwiftPack: Provider<Sync>
-        get() = target.project.tasks.named<Sync>("unpackSwiftPack$capitalizedTargetName")
+        get() = target.project.tasks.named<Sync>(unpackSwiftPackName)
 
     val Framework.swiftPackModuleReferences: Provider<List<NamespacedSwiftPackModule.Reference>>
         get() = unpackSwiftPack.map { it.destinationDir }.zip(project.swiftTemplateDirectory(target)) { dependenciesDir, localDir ->
