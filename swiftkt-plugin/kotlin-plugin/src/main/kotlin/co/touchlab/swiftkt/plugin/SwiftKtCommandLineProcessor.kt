@@ -4,10 +4,8 @@ import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
-import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import java.io.File
 
 @AutoService(CommandLineProcessor::class)
@@ -20,9 +18,10 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
 
     private val options = listOf(
         Options.swiftPackModule,
+        Options.swiftSourceFile,
         Options.expandedSwiftDir,
     )
-    private val optionsMap = options.map { it.optionName to it }.toMap()
+    private val optionsMap = options.associateBy { it.optionName }
     override val pluginOptions: Collection<AbstractCliOption> = options.map { it.toCliOption() }
 
     object Options {
@@ -40,11 +39,19 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
             },
         )
 
+        val swiftSourceFile = PluginOption(
+            optionName = "swiftSourceFile",
+            valueDescription = "<absolute path>",
+            description = "",
+            allowMultipleOccurrences = true,
+            serialize = File::getAbsolutePath,
+            deserialize = ::File,
+        )
+
         val expandedSwiftDir = PluginOption(
             optionName = "expandedSwiftDir",
             valueDescription = "<absolute path>",
             description = "",
-            allowMultipleOccurrences = true,
             isRequired = true,
             serialize = File::getAbsolutePath,
             deserialize = ::File,
@@ -60,6 +67,9 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
                 val namespacedModule = NamespacedSwiftPackModule(namespace, SwiftPackModule.read(moduleFile))
                 configuration.add(ConfigurationKeys.swiftPackModules, namespacedModule)
             }
+            Options.swiftSourceFile -> {
+                configuration.add(ConfigurationKeys.swiftSourceFiles, Options.swiftSourceFile.deserialize(value))
+            }
             Options.expandedSwiftDir -> {
                 configuration.putIfNotNull(ConfigurationKeys.expandedSwiftDir, Options.expandedSwiftDir.deserialize(value))
             }
@@ -67,25 +77,3 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
     }
 }
 
-object ConfigurationKeys {
-    val swiftPackModules = CompilerConfigurationKey<List<NamespacedSwiftPackModule>>("SwiftPack modules")
-    val expandedSwiftDir = CompilerConfigurationKey<File>("expanded Swift directory")
-}
-
-data class PluginOption<T>(
-    val optionName: String,
-    val valueDescription: String,
-    val description: String,
-    val isRequired: Boolean = false,
-    val allowMultipleOccurrences: Boolean = false,
-    val serialize: (T) -> String,
-    val deserialize: (String) -> T
-) {
-    fun toCliOption() = CliOption(
-        optionName,
-        valueDescription,
-        description,
-        isRequired,
-        allowMultipleOccurrences
-    )
-}

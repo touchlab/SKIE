@@ -4,7 +4,7 @@ kotlin = "1.7.0"
 ktlintGradle = "10.3.0"
 pluginPublish = "0.21.0"
 versionCheck = "0.42.0"
-swiftpack = "0.0.8"
+swiftpack = "0.0.12"
 auto-service = "1.0"
 
 [plugins]

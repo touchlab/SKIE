@@ -1,5 +1,7 @@
 package co.touchlab.swiftkt.plugin
 
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.gradle.tasks.FrameworkDescriptor
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 data class DarwinTarget(
@@ -32,3 +34,12 @@ data class DarwinTarget(
         ).associateBy { it.konanTarget }
     }
 }
+
+val Framework.darwinTarget: DarwinTarget
+    get() = target.konanTarget.darwinTarget
+
+val FrameworkDescriptor.darwinTarget: DarwinTarget
+    get() = target.darwinTarget
+
+val KonanTarget.darwinTarget: DarwinTarget
+    get() = DarwinTarget.allTargets[this] ?: error("Unknown konan target: $this")

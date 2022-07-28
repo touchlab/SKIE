@@ -2,25 +2,22 @@ package co.touchlab.swiftkt.plugin
 
 import co.touchlab.swiftkt.BuildConfig
 import co.touchlab.swiftpack.plugin.SwiftPack.swiftPackModuleReferences
-import co.touchlab.swiftpack.plugin.SwiftPack.swiftPackModules
 import co.touchlab.swiftpack.plugin.SwiftPack.unpackSwiftPack
+import co.touchlab.swiftpack.plugin.SwiftPack.unpackSwiftPackName
 import co.touchlab.swiftpack.plugin.SwiftPackPlugin
-import co.touchlab.swikt.plugin.SwiftKtNativeSubplugin
-import co.touchlab.swikt.plugin.subpluginOption
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
@@ -36,8 +33,6 @@ const val EXTENSION_NAME = "swiftkt"
 abstract class SwiftKtPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         val extension = extensions.create(EXTENSION_NAME, SwiftKtExtension::class.java, this)
-
-        apply<SwiftKtNativeSubplugin>()
 
         // WORKAROUND: Fix fat framework name for CocoaPods plugin.
         pluginManager.withPlugin("kotlin-native-cocoapods") {
@@ -79,21 +74,14 @@ abstract class SwiftKtPlugin : Plugin<Project> {
             appleTargets.forEach { target ->
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
                 frameworks.forEach { framework ->
-                    // if (!framework.isStatic) {
-                    //     framework.linkTask.doFirst(object : Action<Task> {
-                    //         override fun execute(t: Task) {
-                    //             framework.isStatic = true
-                    //         }
-                    //     })
-                    //     framework.linkTask.doLast(object : Action<Task> {
-                    //         override fun execute(t: Task) {
-                    //             framework.isStatic = false
-                    //         }
-                    //     })
-                    // }
-
                     framework.linkTaskProvider.configure { linkTask ->
-                        linkTask.dependsOn(framework.unpackSwiftPack)
+                        val defaultSwiftSourceSet = configureSwiftSourceSet(framework.compilation.defaultSourceSet)
+                        val allSwiftSourceSets = (framework.compilation.allKotlinSourceSets - framework.compilation.defaultSourceSet)
+                            .map { configureSwiftSourceSet(it) } + listOf(defaultSwiftSourceSet)
+
+                        // TODO: linkTask.inputs
+
+                        val swiftSources = project.objects.fileCollection().from(allSwiftSourceSets)
 
                         linkTask.compilerPluginClasspath = linkTask.compilerPluginClasspath?.let { it + swiftKtCompilerPluginConfiguration } ?: swiftKtCompilerPluginConfiguration
                         linkTask.compilerPluginOptions.addPluginArgument(
@@ -101,77 +89,33 @@ abstract class SwiftKtPlugin : Plugin<Project> {
                                 layout.buildDirectory.dir("generated/swiftpack-expanded/${framework.name}/${framework.target.targetName}").get().asFile
                             )
                         )
-                        linkTask.doFirst(object: Action<Task> {
-                            override fun execute(t: Task) {
-                                framework.swiftPackModuleReferences.get().forEach { reference ->
-                                    framework.linkTask.compilerPluginOptions.addPluginArgument(
-                                        SwiftKtCommandLineProcessor.pluginId, SwiftKtCommandLineProcessor.Options.swiftPackModule.subpluginOption(
-                                            reference
+
+                        swiftSources.forEach { swiftFile ->
+                            framework.linkTask.compilerPluginOptions.addPluginArgument(
+                                SwiftKtCommandLineProcessor.pluginId,
+                                SwiftKtCommandLineProcessor.Options.swiftSourceFile.subpluginOption(swiftFile)
+                            )
+                        }
+
+                        if (extension.isSwiftPackEnabled.get()) {
+                            linkTask.dependsOn(framework.unpackSwiftPackName)
+
+                            linkTask.doFirst(object: Action<Task> {
+                                override fun execute(t: Task) {
+                                    framework.swiftPackModuleReferences.get().forEach { reference ->
+                                        framework.linkTask.compilerPluginOptions.addPluginArgument(
+                                            SwiftKtCommandLineProcessor.pluginId,
+                                            SwiftKtCommandLineProcessor.Options.swiftPackModule.subpluginOption(
+                                                reference
+                                            )
                                         )
-                                    )
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
                 }
             }
-
-            // appleTargets.forEach { target ->
-            //     val frameworks = target.binaries.mapNotNull { it as? Framework }
-            //     frameworks.forEach { framework ->
-            //         if (!framework.isStatic) {
-            //             framework.linkTask.doFirst(object : Action<Task> {
-            //                 override fun execute(t: Task) {
-            //                     framework.isStatic = true
-            //                 }
-            //             })
-            //             framework.linkTask.doLast(object : Action<Task> {
-            //                 override fun execute(t: Task) {
-            //                     framework.isStatic = false
-            //                 }
-            //             })
-            //         }
-            //
-            //         val swiftPackExpandTask = if (extension.isSwiftPackEnabled.get()) {
-            //             tasks.register<SwiftPackExpandTask>(framework.swiftPackExpandTaskName, framework).configuring {
-            //                 dependsOn(framework.compilation.compileKotlinTask)
-            //                 dependsOn(framework.unpackSwiftPack)
-            //             }
-            //         } else {
-            //             null
-            //         }
-            //
-            //         val swiftCompileTaskProvider = tasks.register<SwiftCompileTask>(framework.swiftCompileTaskName, framework).configuring {
-            //             dependsOn(framework.linkTask)
-            //
-            //             val target = framework.target
-            //             description =
-            //                 "Compiles Swift code for ${framework.outputKind.description} '${framework.name}' for a target '${target.name}'."
-            //             enabled = framework.linkTask.enabled
-            //             outputs.upToDateWhen { framework.linkTask.state.upToDate }
-            //
-            //             val defaultSwiftSourceSet = configureSwiftSourceSet(framework.compilation.defaultSourceSet)
-            //             val allSwiftSourceSets = (framework.compilation.allKotlinSourceSets - framework.compilation.defaultSourceSet)
-            //                 .map { configureSwiftSourceSet(it) } + listOf(defaultSwiftSourceSet)
-            //
-            //             if (swiftPackExpandTask != null) {
-            //                 dependsOn(swiftPackExpandTask)
-            //                 defaultSwiftSourceSet.srcDir(swiftPackExpandTask.map { it.outputDir })
-            //             }
-            //
-            //             sourceFiles.set(project.objects.fileCollection().from(allSwiftSourceSets))
-            //             outputDir.set(extension.outputDir.dir(framework.name + File.separator + target.targetName))
-            //         }
-            //         framework.linkTask.finalizedBy(swiftCompileTaskProvider)
-            //
-            //         // Make sure linkTask dependencies are executed after swiftCompileTask.
-            //         project.tasks.configureEach {
-            //             if (it.dependsOn.contains(framework.linkTask) && it !is SwiftCompileTask) {
-            //                 it.dependsOn(swiftCompileTaskProvider)
-            //             }
-            //         }
-            //     }
-            // }
 
             tasks.withType<FatFrameworkTask>().configureEach { task ->
                 task.doLast(object: Action<Task> {
@@ -234,12 +178,6 @@ abstract class SwiftKtPlugin : Plugin<Project> {
     private val KotlinSourceSet.swiftSourceDirectory: String
         get() = "src/$name/swift"
 
-    private val Framework.swiftCompileTaskName: String
-        get() = listOf("swiftCompile", name.capitalized(), target.targetName.capitalized()).joinToString("")
-
-    private val Framework.swiftPackExpandTaskName: String
-        get() = listOf("swiftPackExpand", name.capitalized(), target.targetName.capitalized()).joinToString("")
-
     private inline fun <T: Task> TaskProvider<T>.configuring(crossinline configuration: T.() -> Unit): TaskProvider<T> {
         configure {
             configuration(it)
@@ -272,7 +210,6 @@ val Architecture.clangMacro: String
         else -> error("Fat frameworks are not supported for architecture `$name`")
     }
 
-
-
+fun <T> PluginOption<T>.subpluginOption(value: T): SubpluginOption = SubpluginOption(optionName, serialize(value))
 
 

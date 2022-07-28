@@ -27,8 +27,10 @@ class SwiftKtComponentRegistrar: ComponentRegistrar {
 
         val originalPhase = field.get(phase) as CompilerPhase<CommonBackendContext, Unit, Unit>
         val modules = configuration.getList(ConfigurationKeys.swiftPackModules)
+        val swiftSources = configuration.getList(ConfigurationKeys.swiftSourceFiles)
         val expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.expandedSwiftDir)
-        val swiftKtObjectFilesPhase = SwiftKtObjectFilesPhase(originalPhase, SwiftKtCompilePhase(modules, expandedSwiftDir)) {
+        val compilePhase = SwiftKtCompilePhase(modules, swiftSources, expandedSwiftDir)
+        val swiftKtObjectFilesPhase = SwiftKtObjectFilesPhase(originalPhase, compilePhase) {
             field.set(phase, originalPhase)
         }
         field.set(phase, swiftKtObjectFilesPhase)

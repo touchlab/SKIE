@@ -1,74 +1,30 @@
 package co.touchlab.swiftkt.plugin
 
-import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
-import co.touchlab.swiftpack.spi.SwiftNameProvider
 import co.touchlab.swiftpack.spi.produceSwiftFile
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.backend.common.phaser.Checker
-import org.jetbrains.kotlin.backend.common.phaser.CompilerPhase
-import org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase
-import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
-import org.jetbrains.kotlin.backend.common.phaser.PhaserState
-import org.jetbrains.kotlin.backend.common.phaser.SameTypeCompilerPhase
-import java.io.File
-import org.jetbrains.kotlin.library.impl.javaFile
-import org.jetbrains.kotlin.backend.konan.*
-import org.jetbrains.kotlin.konan.target.CompilerOutputKind
-import org.jetbrains.kotlin.konan.target.AppleConfigurables
-import org.jetbrains.kotlin.konan.target.withOSVersion
-import org.jetbrains.kotlin.konan.target.platformName
+import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
+import org.jetbrains.kotlin.backend.konan.KonanConfig
+import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
+import org.jetbrains.kotlin.backend.konan.ObjectFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.descriptors.resolveClassByFqName
-import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.name.FqName
-
-class SwiftKtObjectFilesPhase(
-    private val originalPhase: CompilerPhase<CommonBackendContext, Unit, Unit>,
-    private val swiftKtCompilePhase: SwiftKtCompilePhase,
-    private val onInvokeCompleted: () -> Unit
-): SameTypeCompilerPhase<CommonBackendContext, Unit> {
-    override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext, input: Unit) {
-        originalPhase.invoke(phaseConfig, phaserState, context, input)
-        val config = context.javaClass.getMethod("getConfig").invoke(context) as KonanConfig
-        val objCExport = context.javaClass.getMethod("getObjCExport").invoke(context)
-        val namer = objCExport.javaClass.getField("namer").get(objCExport) as ObjCExportNamer?
-        swiftKtCompilePhase.process(config, context, namer ?: error("namer is null"))
-        onInvokeCompleted()
-    }
-
-    override val stickyPostconditions: Set<Checker<Unit>>
-        get() = originalPhase.stickyPostconditions
-
-    override fun getNamedSubphases(startDepth: Int): List<Pair<Int, NamedCompilerPhase<CommonBackendContext, *>>> {
-        return originalPhase.getNamedSubphases(startDepth)
-    }
-}
-
-class ObjCExportNamerSwiftNameProvider(
-    private val namer: ObjCExportNamer,
-    private val context: CommonBackendContext,
-): SwiftNameProvider {
-    override fun getSwiftName(kotlinClassName: String): String {
-        val descriptor = checkNotNull(context.ir.irModule.descriptor.resolveClassByFqName(FqName(kotlinClassName), NoLookupLocation.FROM_BACKEND)) {
-            "Couldn't resolve class descriptor for $kotlinClassName"
-        }
-
-        val swiftName = namer.getClassOrProtocolName(descriptor)
-
-        return swiftName.swiftName
-    }
-}
+import org.jetbrains.kotlin.konan.target.AppleConfigurables
+import org.jetbrains.kotlin.konan.target.CompilerOutputKind
+import org.jetbrains.kotlin.konan.target.platformName
+import org.jetbrains.kotlin.konan.target.withOSVersion
+import org.jetbrains.kotlin.library.impl.javaFile
+import java.io.File
 
 class SwiftKtCompilePhase(
     val swiftPackModules: List<NamespacedSwiftPackModule>,
+    val swiftSourceFiles: List<File>,
     val expandedSwiftDir: File,
 ) {
-    fun process(config: KonanConfig, context: CommonBackendContext, namer: ObjCExportNamer) {
+    fun process(config: KonanConfig, context: CommonBackendContext, namer: ObjCExportNamer): List<ObjectFile> {
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
-            return
+            return emptyList()
         }
-        val configurables = config.platform.configurables as? AppleConfigurables ?: return
+        val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
 
         val swiftNameProvider = ObjCExportNamerSwiftNameProvider(namer, context)
         val swiftSourcesDir = expandedSwiftDir.also {
@@ -82,7 +38,7 @@ class SwiftKtCompilePhase(
                 targetSwiftFile.writeText(finalContents)
                 targetSwiftFile
             }
-        }
+        } + swiftSourceFiles
 
         val (swiftcBitcodeArg, _) = when (config.configuration.get(KonanConfigKeys.BITCODE_EMBEDDING_MODE)) {
             BitcodeEmbedding.Mode.NONE, null -> null to emptyList()
@@ -104,6 +60,7 @@ class SwiftKtCompilePhase(
 
         val targetTriple = configurables.targetTriple
 
+        println("running swiftc")
         Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
             +"-v"
             +listOf("-module-name", moduleName)
@@ -121,6 +78,7 @@ class SwiftKtCompilePhase(
             +swiftcBuildTypeArgs
             +"-emit-object"
             +"-enable-library-evolution"
+            +"-parse-as-library"
             +"-g"
             +"-sdk"
             +configurables.absoluteTargetSysRoot
@@ -136,13 +94,19 @@ class SwiftKtCompilePhase(
             execute()
         }
 
+        // TODO: Generate .swiftmodule and .swiftinterface for other architectures of the platform to fix missing Xcode code completion
+
         val swiftLibSearchPaths = listOf(
             File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),
             File(configurables.absoluteTargetSysRoot, "usr/lib/swift"),
         ).flatMap { listOf("-L", it.absolutePath) }
+        val otherLinkerFlags = listOf(
+            "-rpath", "/usr/lib/swift"
+        )
 
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
-        config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftObjectsDir.listFiles.map { it.absolutePath })
+        config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
+        return swiftObjectsDir.listFiles.map { it.absolutePath }
 
         // return PreLinkResult(
         //     additionalObjectFiles = swiftObjectsDir.listFiles.map { it.absolutePath },

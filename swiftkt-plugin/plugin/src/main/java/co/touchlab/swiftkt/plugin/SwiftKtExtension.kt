@@ -13,9 +13,5 @@ abstract class SwiftKtExtension @Inject constructor(project: Project) {
 
     private val objects = project.objects
 
-    val outputDir: DirectoryProperty = objects.directoryProperty().convention(
-        project.layout.buildDirectory.dir(DEFAULT_OUTPUT_DIR)
-    )
-
     val isSwiftPackEnabled: Property<Boolean> = objects.property<Boolean>().convention(true)
 }
