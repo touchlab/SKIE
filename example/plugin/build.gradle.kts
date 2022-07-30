@@ -3,10 +3,6 @@ plugins {
     kotlin("kapt")
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compileOnly(kotlin("compiler-embeddable"))
     compileOnly(kotlin("stdlib"))

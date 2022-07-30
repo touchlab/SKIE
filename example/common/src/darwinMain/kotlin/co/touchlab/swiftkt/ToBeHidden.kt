@@ -1,4 +1,3 @@
 package co.touchlab.swiftkt
 
-class ToBeHidden {
-}
+class ToBeHidden
