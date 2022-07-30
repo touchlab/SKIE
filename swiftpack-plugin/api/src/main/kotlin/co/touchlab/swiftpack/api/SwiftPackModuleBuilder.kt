@@ -53,12 +53,12 @@ class SwiftPackModuleBuilder(
     }
 
     inner class KobjcTransformScope {
-        fun hide(typeName: DeclaredTypeName) {
-            mutableKobjcTransforms.add(KobjcTransform.HideType(typeName.name))
+        fun hide(typeName: String) {
+            mutableKobjcTransforms.add(KobjcTransform.HideType(typeName))
         }
 
-        fun rename(typeName: DeclaredTypeName, newName: String) {
-            mutableKobjcTransforms.add(KobjcTransform.RenameType(typeName.name, newName))
+        fun rename(typeName: String, newName: String) {
+            mutableKobjcTransforms.add(KobjcTransform.RenameType(typeName, newName))
         }
     }
 

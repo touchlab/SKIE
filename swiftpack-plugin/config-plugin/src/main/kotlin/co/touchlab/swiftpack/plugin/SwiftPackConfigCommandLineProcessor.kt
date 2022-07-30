@@ -1,14 +1,12 @@
 package co.touchlab.swiftpack.plugin
 
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import com.google.auto.service.AutoService
-import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
-import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import java.io.File
+import kotlin.reflect.KClass
 
 @AutoService(CommandLineProcessor::class)
 class SwiftPackConfigCommandLineProcessor: CommandLineProcessor {
@@ -23,7 +21,7 @@ class SwiftPackConfigCommandLineProcessor: CommandLineProcessor {
             optionName = Options.outputDir,
             valueDescription = "path",
             description = "Path to store the Swift template files in.",
-        )
+        ),
     )
     override val pluginOptions: Collection<AbstractCliOption> = options
 
@@ -40,10 +38,3 @@ class SwiftPackConfigCommandLineProcessor: CommandLineProcessor {
     }
 }
 
-@AutoService(ComponentRegistrar::class)
-class SwiftPackConfigComponentRegistrar: ComponentRegistrar {
-    override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-        val outputDir = configuration.get(SwiftPackConfigurationKeys.outputDir)
-        SwiftPackModuleBuilder.Config.outputDir = outputDir
-    }
-}

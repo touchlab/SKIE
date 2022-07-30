@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     compileOnly(kotlin("compiler-embeddable"))
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.7.10-1.0.6")
+    compileOnly(kotlin("stdlib"))
     implementation("co.touchlab.swiftpack:swiftpack-api")
     implementation("co.touchlab.swiftpack:swiftpack-plugin-api")
 

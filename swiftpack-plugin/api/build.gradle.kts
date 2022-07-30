@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api("io.outfoxx:swiftpoet:1.4.2")
-    api(project(":swiftpack-spec"))
+    api(projects.swiftpackSpec)
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))

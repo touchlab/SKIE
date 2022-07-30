@@ -18,8 +18,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":example-producer"))
-                api(project(":example-nonproducer"))
+                api(projects.exampleProducer)
+                api(projects.exampleNonproducer)
             }
         }
         val commonTest by getting
@@ -97,8 +97,8 @@ kotlin {
         framework {
             this.isStatic = false
             baseName = "ExampleKit"
-            export(project(":example-producer"))
-            export(project(":example-nonproducer"))
+            export(projects.exampleProducer)
+            export(projects.exampleNonproducer)
         }
         ios.deploymentTarget = "12.4"
         tvos.deploymentTarget = "12.4"

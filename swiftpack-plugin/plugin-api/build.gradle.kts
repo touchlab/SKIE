@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api(projects.swiftpackSpec)
+    compileOnly(kotlin("compiler-embeddable"))
 }

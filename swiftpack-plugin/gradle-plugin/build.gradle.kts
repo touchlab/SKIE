@@ -12,8 +12,7 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"co.touchlab.swiftpack\"")
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":swiftpack-config-plugin").name}\"")
-    buildConfigField("String", "KOTLIN_NATIVE_PLUGIN_NAME", "\"${project(":swiftpack-config-plugin-native").name}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${projects.swiftpackConfigPlugin.name}\"")
 }
 
 dependencies {
@@ -25,8 +24,9 @@ dependencies {
 
     implementation("io.outfoxx:swiftpoet:1.4.0")
     implementation("com.squareup:kotlinpoet:1.11.0")
-    implementation(project(":swiftpack-spi"))
-    implementation(project(":swiftpack-config-plugin"))
+    implementation(projects.swiftpackSpi)
+    api(projects.swiftpackPluginApi)
+    implementation(projects.swiftpackConfigPlugin)
 
     testImplementation(libs.junit)
     testImplementation(kotlin("gradle-plugin"))

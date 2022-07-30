@@ -1,14 +1,21 @@
+import co.touchlab.swiftpack.plugin.SwiftPackGenerationExtension
 import com.google.devtools.ksp.gradle.KspTask
 import com.google.devtools.ksp.gradle.KspTaskNative
 import org.gradle.configurationcache.extensions.capitalized
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 plugins {
     kotlin("multiplatform")
     id("co.touchlab.swiftpack")
     `maven-publish`
 
-    id("com.google.devtools.ksp") version "1.7.0-1.0.6"
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+}
+
+dependencies {
+    swiftPackPlugin(projects.exampleProducer.simplePlugin)
 }
 
 kotlin {
@@ -94,7 +101,7 @@ kotlin {
     targets.forEach { target ->
         if (target.name == "metadata") { return@forEach }
         project.dependencies {
-            add("ksp${target.name.capitalized()}", project(":example-producer:ksp-plugin"))
+            add("ksp${target.name.capitalized()}", projects.exampleProducer.kspPlugin)
         }
     }
 }

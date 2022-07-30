@@ -1,6 +1,7 @@
 package co.touchlab.swiftpack.example.plugin
 
 import co.touchlab.swiftpack.api.buildSwiftPackModule
+import co.touchlab.swiftpack.api.kotlin
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated

@@ -3,6 +3,7 @@ package co.touchlab.swiftpack.spec
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 sealed interface KobjcTransform {
     @Serializable

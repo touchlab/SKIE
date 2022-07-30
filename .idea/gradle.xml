@@ -12,9 +12,10 @@
                   <project path="$PROJECT_DIR$/swiftpack-plugin" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/api" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
-                  <project path="$PROJECT_DIR$/swiftpack-plugin/config-plugin-native" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/plugin-api" />
                   <project path="$PROJECT_DIR$/swiftpack-plugin/spec" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/spi" />
                 </projects>
               </build>
             </builds>
@@ -30,12 +31,14 @@
             <option value="$PROJECT_DIR$/example/nonproducer" />
             <option value="$PROJECT_DIR$/example/producer" />
             <option value="$PROJECT_DIR$/example/producer/ksp-plugin" />
+            <option value="$PROJECT_DIR$/example/producer/simple-plugin" />
             <option value="$PROJECT_DIR$/swiftpack-plugin" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/api" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
-            <option value="$PROJECT_DIR$/swiftpack-plugin/config-plugin-native" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/plugin-api" />
             <option value="$PROJECT_DIR$/swiftpack-plugin/spec" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/spi" />
           </set>
         </option>
       </GradleProjectSettings>
