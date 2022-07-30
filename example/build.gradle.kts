@@ -1,3 +1,5 @@
+import co.touchlab.swiftpack.plugin.SWIFT_PACK_PLUGIN_CONFIGURATION_NAME
+import co.touchlab.swiftpack.plugin.SwiftPackExtension
 import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
@@ -12,7 +14,8 @@ plugins {
     id("co.touchlab.swiftkt.test-suite")
 }
 
-allprojects {
+val examples = listOf(project(":example:dynamic"), project(":example:static"))
+(examples + listOf(project)).applyEach {
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
 
     the<KotlinMultiplatformExtension>().apply {
@@ -97,14 +100,15 @@ allprojects {
     }
 }
 
-subprojects {
+examples.applyEach {
+    apply(plugin = "co.touchlab.swiftpack")
     apply(plugin = "co.touchlab.swiftkt")
     apply(plugin = "org.jetbrains.kotlin.native.cocoapods")
 
     val isStatic = this.name.endsWith("static")
 
     (the<KotlinMultiplatformExtension>() as ExtensionAware).the<CocoapodsExtension>().apply {
-        name = "ExampleKit_${this@subprojects.name.capitalized()}"
+        name = "ExampleKit_${this@applyEach.name.capitalized()}"
         summary = "Example library for SwiftKt"
         homepage = "https://github.com/touchlab/SwiftKt"
         framework {
@@ -116,6 +120,10 @@ subprojects {
         watchos.deploymentTarget = "8.0"
         osx.deploymentTarget = "11.0"
         podfile = project.file("../app/Podfile")
+    }
+
+    dependencies {
+        SWIFT_PACK_PLUGIN_CONFIGURATION_NAME(project(":example:plugin"))
     }
 }
 
@@ -129,4 +137,8 @@ afterEvaluate {
             )
         }
     )
+}
+
+fun <T> List<T>.applyEach(action: T.() -> Unit) {
+    forEach { it.action() }
 }

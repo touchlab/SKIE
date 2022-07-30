@@ -4,7 +4,7 @@ kotlin = "1.7.0"
 ktlintGradle = "10.3.0"
 pluginPublish = "0.21.0"
 versionCheck = "0.42.0"
-swiftpack = "0.0.12"
+swiftpack = "0.0.13"
 auto-service = "1.0"
 
 [plugins]
@@ -20,6 +20,8 @@ buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.0.3" }
 [libraries]
 junit = "junit:junit:4.13.2"
 swiftpack-spec = { module = "co.touchlab.swiftpack:swiftpack-spec", version.ref = "swiftpack" }
+swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
+swiftpack-plugin-api = { module = "co.touchlab.swiftpack:swiftpack-plugin-api", version.ref = "swiftpack" }
 swiftpack-spi = { module = "co.touchlab.swiftpack:swiftpack-spi", version.ref = "swiftpack" }
 swiftpack-gradle-plugin = { module = "co.touchlab.swiftpack:swiftpack-gradle-plugin", version.ref = "swiftpack" }
 auto-service = { module = "com.google.auto.service:auto-service", version.ref = "auto-service" }

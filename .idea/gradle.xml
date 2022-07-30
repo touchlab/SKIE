@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/example" />
             <option value="$PROJECT_DIR$/example/dynamic" />
+            <option value="$PROJECT_DIR$/example/plugin" />
             <option value="$PROJECT_DIR$/example/static" />
             <option value="$PROJECT_DIR$/swiftkt-plugin" />
             <option value="$PROJECT_DIR$/swiftkt-plugin/buildSrc" />

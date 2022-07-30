@@ -33,11 +33,14 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "swiftkt"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+rootProject.name = "SwiftKt"
 
 include(":example")
 include(":example:static")
 include(":example:dynamic")
+include(":example:plugin")
 
 includeBuild("swiftkt-plugin")
 

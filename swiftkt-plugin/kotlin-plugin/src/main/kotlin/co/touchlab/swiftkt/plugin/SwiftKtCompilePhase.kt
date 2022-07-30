@@ -1,6 +1,8 @@
 package co.touchlab.swiftkt.plugin
 
+import co.touchlab.swiftpack.spec.KobjcTransform
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
+import co.touchlab.swiftpack.spi.SwiftNameProvider
 import co.touchlab.swiftpack.spi.produceSwiftFile
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
@@ -15,6 +17,7 @@ import org.jetbrains.kotlin.konan.target.withOSVersion
 import org.jetbrains.kotlin.library.impl.javaFile
 import java.io.File
 
+
 class SwiftKtCompilePhase(
     val swiftPackModules: List<NamespacedSwiftPackModule>,
     val swiftSourceFiles: List<File>,
@@ -24,13 +27,14 @@ class SwiftKtCompilePhase(
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
             return emptyList()
         }
+        val transforms = swiftPackModules.flatMap { it.module.kobjcTransforms }
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
-
-        val swiftNameProvider = ObjCExportNamerSwiftNameProvider(namer, context)
+        val swiftNameProvider = ObjCExportNamerSwiftNameProvider(namer, context, transforms)
         val swiftSourcesDir = expandedSwiftDir.also {
             it.deleteRecursively()
             it.mkdirs()
         }
+
         val sourceFiles = swiftPackModules.flatMap { (namespace, module) ->
             module.files.map { file ->
                 val finalContents = file.produceSwiftFile(swiftNameProvider)
@@ -53,8 +57,11 @@ class SwiftKtCompilePhase(
 
         val framework = File(config.outputFile)
         val moduleName = framework.name.removeSuffix(".framework")
+        val headersDir = framework.resolve("Headers")
         val swiftModule = framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() }
         val modulemapFile = framework.resolve("Modules/module.modulemap")
+        val apiNotes = ApiNotes(moduleName, transforms, swiftNameProvider)
+        apiNotes.save(headersDir)
 
         val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
 
@@ -71,7 +78,7 @@ class SwiftKtCompilePhase(
             +"-emit-module-path"
             +swiftModule.resolve("$targetTriple.swiftmodule").absolutePath
             +"-emit-objc-header-path"
-            +framework.resolve("Headers").resolve("$moduleName-Swift.h").absolutePath
+            +headersDir.resolve("$moduleName-Swift.h").absolutePath
             if (swiftcBitcodeArg != null) {
                 +swiftcBitcodeArg
             }

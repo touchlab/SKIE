@@ -10,8 +10,14 @@ import ExampleKit
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, world! - \(KotlinTest()) - \(String(describing: SwiftTest()))")
-            .padding()
+        VStack(spacing: 16) {
+            Text("Hello, world! - \(KotlinTest()) - \(String(describing: SwiftTest()))")
+
+            Text("Renamed: \(Renamed())")
+
+            Text("Hidden: \(ToBeHidden())")
+        }
+        .padding()
     }
 }
 
