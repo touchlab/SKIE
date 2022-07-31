@@ -34,7 +34,7 @@ jobs:
         if: ${{ success() }}
         env:
           AWS_TOUCHLAB_DEPLOY_ACCESS: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
-          AWS_TOUCHLAB_DEPLOY_SECRET: ${{ secrets.AWS_TOUCHLAB_DEPLOY_SECRET }}
+          AWS_TOUCHLAB_DEPLOY_SECRET: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
       - name: Publish on Plugin Portal
         run: ./gradlew --project-dir swiftpack-plugin setupPluginUploadFromEnvironment publishPlugins
         if: ${{ false }} #success()
