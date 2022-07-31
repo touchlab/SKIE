@@ -31,5 +31,10 @@
       <option name="name" value="gitHub-swiftpack" />
       <option name="url" value="https://maven.pkg.github.com/Touchlab/SwiftPack" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://api.touchlab.dev/public" />
+    </remote-repository>
   </component>
 </project>

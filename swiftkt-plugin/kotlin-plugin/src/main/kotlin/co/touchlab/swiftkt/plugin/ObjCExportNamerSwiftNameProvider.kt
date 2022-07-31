@@ -17,12 +17,6 @@ class ObjCExportNamerSwiftNameProvider(
 
     val renamedClasses: Map<String, ObjCExportNamer.ClassOrProtocolName>
 
-    /*
-    Name: PlaygroundExampleKit
-Classes:
-  - Name: PEKTestDataStruct
-    SwiftName: ThisCantWork
-     */
     init {
         val renamedClasses = mutableMapOf<String, ObjCExportNamer.ClassOrProtocolName>()
         transforms.forEach { transform ->

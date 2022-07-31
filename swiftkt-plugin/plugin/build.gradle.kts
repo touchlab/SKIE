@@ -61,27 +61,6 @@ pluginBundle {
     }
 }
 
-publishing {
-    repositories {
-        maven("https://maven.pkg.github.com/Touchlab/SwiftKt") {
-            name = "gitHub"
-
-            val actor = System.getenv("GITHUB_ACTOR") ?: run {
-                logger.warn("GITHUB_ACTOR not set")
-                return@maven
-            }
-            val password = System.getenv("GITHUB_TOKEN") ?: run {
-                logger.warn("GITHUB_TOKEN not set")
-                return@maven
-            }
-            credentials {
-                this.username = actor
-                this.password = password
-            }
-        }
-    }
-}
-
 tasks.create("setupPluginUploadFromEnvironment") {
     doLast {
         val key = System.getenv("GRADLE_PUBLISH_KEY")

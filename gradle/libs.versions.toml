@@ -4,7 +4,7 @@ kotlin = "1.7.0"
 ktlintGradle = "10.3.0"
 pluginPublish = "0.21.0"
 versionCheck = "0.42.0"
-swiftpack = "0.0.14"
+swiftpack = "0.0.15"
 auto-service = "1.0"
 
 [plugins]
@@ -14,7 +14,6 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle"}
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish"}
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck"}
-dataStruct = { id = "co.touchlab.kotlin.datastruct", version = "0.0.1" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.0.3" }
 
 [libraries]

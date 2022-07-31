@@ -1,10 +1,9 @@
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
-import java.util.zip.ZipOutputStream
-import java.util.zip.ZipEntry
 
 plugins {
     kotlin("jvm")
     kotlin("kapt")
+    `maven-publish`
 }
 
 dependencies {
