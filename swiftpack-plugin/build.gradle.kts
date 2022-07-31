@@ -56,20 +56,26 @@ subprojects {
             }
 
             repositories {
-                maven("https://maven.pkg.github.com/Touchlab/SwiftPack") {
-                    name = "gitHub"
+                val isReleaseBuild = !version.toString().contains("-SNAPSHOT")
+                val awsUrl = if (isReleaseBuild) {
+                    "s3://touchlab-repo/release"
+                } else {
+                    "s3://touchlab-repo/snapshot"
+                }
+                maven(awsUrl) {
+                    name = "aws"
 
-                    val actor = System.getenv("GITHUB_ACTOR") ?: run {
-                        logger.warn("GITHUB_ACTOR not set")
+                    val awsAccessKey = System.getenv("AWS_TOUCHLAB_DEPLOY_ACCESS") ?: run {
+                        logger.warn("AWS_TOUCHLAB_DEPLOY_ACCESS not set")
                         return@maven
                     }
-                    val password = System.getenv("GITHUB_TOKEN") ?: run {
-                        logger.warn("GITHUB_TOKEN not set")
+                    val awsSecretKey = System.getenv("AWS_TOUCHLAB_DEPLOY_SECRET") ?: run {
+                        logger.warn("AWS_TOUCHLAB_DEPLOY_SECRET not set")
                         return@maven
                     }
-                    credentials {
-                        this.username = actor
-                        this.password = password
+                    credentials(AwsCredentials::class) {
+                        accessKey = awsAccessKey
+                        secretKey = awsSecretKey
                     }
                 }
             }
@@ -91,3 +97,4 @@ tasks.register("clean", Delete::class.java) {
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
+
