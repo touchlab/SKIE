@@ -63,9 +63,7 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
 
         when (optionsMap[option.optionName]) {
             Options.swiftPackModule -> {
-                val (namespace, moduleFile) = Options.swiftPackModule.deserialize(value)
-                val namespacedModule = NamespacedSwiftPackModule(namespace, SwiftPackModule.read(moduleFile))
-                configuration.add(ConfigurationKeys.swiftPackModules, namespacedModule)
+                configuration.add(ConfigurationKeys.swiftPackModules, Options.swiftPackModule.deserialize(value))
             }
             Options.swiftSourceFile -> {
                 configuration.add(ConfigurationKeys.swiftSourceFiles, Options.swiftSourceFile.deserialize(value))

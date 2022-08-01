@@ -1,6 +1,7 @@
 package co.touchlab.swiftkt.plugin
 
 import co.touchlab.swiftpack.spec.KobjcTransform
+import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import co.touchlab.swiftpack.spi.SwiftNameProvider
 import co.touchlab.swiftpack.spi.produceSwiftFile
@@ -19,13 +20,22 @@ import java.io.File
 
 
 class SwiftKtCompilePhase(
-    val swiftPackModules: List<NamespacedSwiftPackModule>,
+    val swiftPackModuleReferences: List<NamespacedSwiftPackModule.Reference>,
     val swiftSourceFiles: List<File>,
     val expandedSwiftDir: File,
 ) {
     fun process(config: KonanConfig, context: CommonBackendContext, namer: ObjCExportNamer): List<ObjectFile> {
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
             return emptyList()
+        }
+        val swiftPackModules = swiftPackModuleReferences.flatMap { (namespace, moduleFile) ->
+            if (moduleFile.isDirectory) {
+                moduleFile.listFiles()?.map {
+                    NamespacedSwiftPackModule(namespace, SwiftPackModule.read(it))
+                } ?: emptyList()
+            } else {
+                listOf(NamespacedSwiftPackModule(namespace, SwiftPackModule.read(moduleFile)))
+            }
         }
         val transforms = swiftPackModules.flatMap { it.module.kobjcTransforms }
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
