@@ -13,10 +13,10 @@ internal class SwiftProgramRunner(private val logger: Logger) {
 
         logger.write("Program output", result.stdOut)
 
-        return interpretRunSwiftResult(result, logger)
+        return interpretResult(result, logger)
     }
 
-    private fun interpretRunSwiftResult(result: CommandResult, logger: Logger): TestResult =
+    private fun interpretResult(result: CommandResult, logger: Logger): TestResult =
         if (result.exitCode == 0) {
             TestResult.Success(logger.toString())
         } else if (result.stdErr.isEmpty()) {

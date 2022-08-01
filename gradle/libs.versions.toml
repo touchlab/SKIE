@@ -1,6 +1,7 @@
 [versions]
 kotlin = "1.7.0"
-swiftpack = "0.0.5"
+swiftpack = "0.0.15"
+swiftkt = "0.0.15"
 kotest = "5.4.0"
 
 [plugins]
@@ -8,13 +9,15 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.0.3" }
 swiftpack = { id = "co.touchlab.swiftpack", version.ref = "swiftpack" }
-swiftkt = { id = "co.touchlab.swiftkt", version = "0.0.11" }
+swiftkt = { id = "co.touchlab.swiftkt", version.ref = "swiftkt" }
 
 [libraries]
 
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
 
+swiftkt-kotlin-plugin = { module = "co.touchlab.swiftkt:kotlin-plugin", version.ref = "swiftkt" }
 swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
+swiftpack-spi = { module = "co.touchlab.swiftpack:swiftpack-spi", version.ref = "swiftpack" }
 compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.9" }
 

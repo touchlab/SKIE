@@ -16,7 +16,7 @@ internal class SwiftTestCompiler(private val tempFileSystem: TempFileSystem, pri
 
         logger.write("Swift compilation", result.stdOut)
 
-        return interpretCompileSwiftResult(result, output)
+        return interpretResult(result, output)
     }
 
     private fun createCompileSwiftCommand(
@@ -32,7 +32,7 @@ internal class SwiftTestCompiler(private val tempFileSystem: TempFileSystem, pri
         output.absolutePathString(),
     ).joinToString(" ")
 
-    private fun interpretCompileSwiftResult(result: CommandResult, output: Path): IntermediateResult<Path> =
+    private fun interpretResult(result: CommandResult, output: Path): IntermediateResult<Path> =
         if (result.exitCode == 0) {
             IntermediateResult.Value(output)
         } else {

@@ -13,7 +13,7 @@ val compileSwift = tasks.register<Exec>("compileSwift") {
     val mainFile = layout.buildDirectory.file("main").get().asFile
 
     group = "build"
-    dependsOn(":playground:kotlin:swiftCompileReleaseFramework${architecture.capitalized()}")
+    dependsOn(":playground:kotlin:linkReleaseFramework${architecture.capitalized()}")
 
     inputs.dir(frameworkDirectory)
     outputs.file(mainFile)

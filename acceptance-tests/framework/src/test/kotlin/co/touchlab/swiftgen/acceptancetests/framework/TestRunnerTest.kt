@@ -8,8 +8,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
-import org.intellij.lang.annotations.Language
-import org.jetbrains.kotlin.fir.resolve.dfa.stackOf
 
 class TestRunnerTest : ShouldSpec({
 
@@ -28,7 +26,8 @@ class TestRunnerTest : ShouldSpec({
             
         """.trimIndent()
 
-    test("success",
+    test(
+        name = "success",
         kotlin = helloWorldKotlin,
         swift = """
             import Foundation
@@ -41,72 +40,82 @@ class TestRunnerTest : ShouldSpec({
         expectedResult = TestResult.Success(helloWorldOutput)
     )
 
-    test("missing exit",
+    test(
+        name = "missing exit",
         kotlin = helloWorldKotlin,
         swift = """
             import Foundation
             import Kotlin
-            
+
             KotlinKt.shared.printHelloWorld()
         """.trimIndent(),
         expectedResult = TestResult.MissingExit(helloWorldOutput)
     )
 
-    test("Incorrect output",
+    test(
+        name = "Incorrect output",
         kotlin = helloWorldKotlin,
         swift = """
             import Foundation
             import Kotlin
-            
+
             KotlinKt.shared.printHelloWorld()
-            
+
             exit(1)
         """.trimIndent(),
         expectedResult = TestResult.IncorrectOutput(helloWorldOutput, 1)
     )
 
-    test("runtime error",
+    test(
+        name = "runtime error",
         kotlin = helloWorldKotlin,
         swift = """
             import Foundation
             import Kotlin
-            
+
             KotlinKt.shared.printHelloWorld()
-            
+
             func divide(lhs: Int, rhs: Int) -> Int {
                 return lhs / rhs
             }
-            
+
             divide(lhs: 1, rhs: 0)
         """.trimIndent(),
         expectedResult = TestResult.RuntimeError(
             helloWorldOutput, error = """
             Fatal error: Division by zero
-        """.trimIndent())
+        """.trimIndent()
+        )
     )
 
-    test("Swift compilation error",
+    test(
+        name = "Swift compilation error",
         kotlin = helloWorldKotlin,
         swift = """
             KotlinKt.shared.printHelloWorld()
         """.trimIndent(),
-        expectedResult = TestResult.SwiftCompilationError("""
+        expectedResult = TestResult.SwiftCompilationError(
+            """
         """.trimIndent(), error = """
             error: cannot find 'KotlinKt'
-        """.trimIndent())
+        """.trimIndent()
+        )
     )
 
-    test("Kotlin compilation error",
+    test(
+        name = "Kotlin compilation error",
         kotlin = """
             fun printHelloWorld() {
                 x()
             }
         """.trimIndent(),
         swift = "",
-        expectedResult = TestResult.KotlinCompilationError("""
+        expectedResult = TestResult.KotlinCompilationError(
+            """
         """.trimIndent(), error = """
             Unresolved reference: x
-        """.trimIndent())
+        """.trimIndent()
+        )
     )
 })
 
@@ -114,7 +123,7 @@ private fun ShouldSpec.test(
     name: String,
     kotlin: String,
     swift: String,
-    expectedResult: TestResult
+    expectedResult: TestResult,
 ) {
     val tempFileSystem = TempFileSystem(this)
 

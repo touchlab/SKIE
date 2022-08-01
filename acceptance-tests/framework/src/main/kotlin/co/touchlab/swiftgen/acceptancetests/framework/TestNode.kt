@@ -1,7 +1,10 @@
 package co.touchlab.swiftgen.acceptancetests.framework
 
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 
 sealed class TestNode {
 
