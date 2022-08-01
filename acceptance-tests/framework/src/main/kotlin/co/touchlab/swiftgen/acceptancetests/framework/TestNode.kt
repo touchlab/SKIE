@@ -1,10 +1,7 @@
 package co.touchlab.swiftgen.acceptancetests.framework
 
 import java.nio.file.Path
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
+import kotlin.io.path.*
 
 sealed class TestNode {
 
@@ -45,7 +42,7 @@ sealed class TestNode {
             get() = path
 
         init {
-            require(path.isRegularFile() && path.endsWith(".swift")) { "Test $path is not a swift file." }
+            require(path.isRegularFile() && path.extension == "swift") { "Test $path is not a swift file." }
         }
     }
 
@@ -54,18 +51,20 @@ sealed class TestNode {
         override val parent: Container?,
     ) : TestNode() {
 
-        override val directChildren: List<TestNode> =
+        override val directChildren: List<TestNode> by lazy {
             path.listDirectoryEntries()
                 .filterNot { it.isKotlinFile }
-                .map { TestNode(it) }
+                .map { TestNode(it, this) }
+        }
 
-        val kotlinFiles: List<Path> =
+        val kotlinFiles: List<Path> by lazy {
             path.listDirectoryEntries()
                 .filter { it.isKotlinFile } +
                     (parent?.kotlinFiles ?: emptyList())
+        }
 
         private val Path.isKotlinFile: Boolean
-            get() = name.endsWith(".kt")
+            get() = extension == "kt"
 
         init {
             require(path.isDirectory()) { "Container $path is not a directory." }

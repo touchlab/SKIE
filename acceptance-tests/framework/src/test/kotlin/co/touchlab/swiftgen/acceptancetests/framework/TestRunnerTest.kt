@@ -23,16 +23,12 @@ class TestRunnerTest : ShouldSpec({
             ---------------- Program output ----------------
             Hello world
             
-            
         """.trimIndent()
 
     test(
         name = "success",
         kotlin = helloWorldKotlin,
         swift = """
-            import Foundation
-            import Kotlin
-            
             KotlinKt.shared.printHelloWorld()
             
             exit(0)
@@ -44,21 +40,15 @@ class TestRunnerTest : ShouldSpec({
         name = "missing exit",
         kotlin = helloWorldKotlin,
         swift = """
-            import Foundation
-            import Kotlin
-
             KotlinKt.shared.printHelloWorld()
         """.trimIndent(),
         expectedResult = TestResult.MissingExit(helloWorldOutput)
     )
 
     test(
-        name = "Incorrect output",
+        name = "incorrect output",
         kotlin = helloWorldKotlin,
         swift = """
-            import Foundation
-            import Kotlin
-
             KotlinKt.shared.printHelloWorld()
 
             exit(1)
@@ -70,9 +60,6 @@ class TestRunnerTest : ShouldSpec({
         name = "runtime error",
         kotlin = helloWorldKotlin,
         swift = """
-            import Foundation
-            import Kotlin
-
             KotlinKt.shared.printHelloWorld()
 
             func divide(lhs: Int, rhs: Int) -> Int {
@@ -92,12 +79,12 @@ class TestRunnerTest : ShouldSpec({
         name = "Swift compilation error",
         kotlin = helloWorldKotlin,
         swift = """
-            KotlinKt.shared.printHelloWorld()
+            x()
         """.trimIndent(),
         expectedResult = TestResult.SwiftCompilationError(
             """
         """.trimIndent(), error = """
-            error: cannot find 'KotlinKt'
+            error: cannot find 'x' in scope
         """.trimIndent()
         )
     )

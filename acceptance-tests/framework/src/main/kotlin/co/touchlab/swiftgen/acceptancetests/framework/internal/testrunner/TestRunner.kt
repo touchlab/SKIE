@@ -13,7 +13,7 @@ internal class TestRunner(private val tempFileSystem: TempFileSystem) {
         val logger = Logger()
 
         return compileKotlin(test.kotlinFiles, logger)
-            .map { appendExitCallCheck(test.swiftFile) to it }
+            .map { enhanceSwiftCode(test.swiftFile) to it }
             .flatMap { compileSwift(it.first, it.second, logger) }
             .finalize { runSwift(it, logger) }
     }
@@ -21,17 +21,8 @@ internal class TestRunner(private val tempFileSystem: TempFileSystem) {
     private fun compileKotlin(kotlinFiles: List<Path>, logger: Logger): IntermediateResult<Path> =
         KotlinTestCompiler(tempFileSystem, logger).compile(kotlinFiles)
 
-    private fun appendExitCallCheck(swiftFile: Path): Path {
-        val swiftCopy = tempFileSystem.createFile(".swift")
-
-        val swiftCode = swiftFile.readText()
-
-        val modifiedSwiftCode = "$swiftCode\n\nfatalError(\"${TestResult.MissingExit.ERROR_MESSAGE}\")"
-
-        swiftCopy.writeText(modifiedSwiftCode)
-
-        return swiftCopy
-    }
+    private fun enhanceSwiftCode(swiftFile: Path): Path =
+        SwiftCodeEnhancer(tempFileSystem).enhance(swiftFile)
 
     private fun compileSwift(
         swiftFile: Path,

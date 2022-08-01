@@ -13,8 +13,6 @@ swiftkt = { id = "co.touchlab.swiftkt", version.ref = "swiftkt" }
 
 [libraries]
 
-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
-
 swiftkt-kotlin-plugin = { module = "co.touchlab.swiftkt:kotlin-plugin", version.ref = "swiftkt" }
 swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
 swiftpack-spi = { module = "co.touchlab.swiftpack:swiftpack-spi", version.ref = "swiftpack" }

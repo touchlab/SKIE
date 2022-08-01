@@ -7,7 +7,11 @@ internal class Logger {
     fun write(header: String, text: String) {
         if (text.isNotBlank()) {
             builder.appendLine("---------------- $header ----------------")
-            builder.appendLine(text)
+            builder.append(text)
+
+            if (!text.endsWith(System.lineSeparator())) {
+                builder.appendLine()
+            }
         }
     }
 

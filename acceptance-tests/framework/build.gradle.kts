@@ -18,8 +18,6 @@ buildConfig {
 dependencies {
     api(libs.bundles.testing.jvm)
 
-    implementation(libs.coroutines)
-
     compileOnly(kotlinNativeCompilerEmbeddable())
     runtimeOnly(
         files(

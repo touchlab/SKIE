@@ -12,7 +12,7 @@ class AcceptanceTests : FunSpec({
     val tempFileSystem = TempFileSystem(this)
 
     context("acceptance tests") {
-        val runner = AcceptanceTestsRunner(tempFileSystem, System.getProperty("acceptanceTest"))
+        val runner = AcceptanceTestsRunner(tempFileSystem, System.getenv("acceptanceTest"))
 
         val tests = TestNode(Path(BuildConfig.RESOURCES + "/tests"))
 

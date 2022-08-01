@@ -3,10 +3,7 @@ package co.touchlab.swiftgen.acceptancetests.framework.internal
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.TestNode
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRunner
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 internal class TestNodeRunner(
     tempFileSystem: TempFileSystem,
@@ -15,9 +12,7 @@ internal class TestNodeRunner(
 
     private val testRunner = TestRunner(tempFileSystem)
 
-    private val parallelismChunkSize: Int = Runtime.getRuntime().availableProcessors() * 4
-
-    suspend fun runTests(testNode: TestNode): EvaluatedTestNode {
+    fun runTests(testNode: TestNode): EvaluatedTestNode {
         val tests = testNode.flatten()
 
         val testsWithResults = runTests(tests)
@@ -36,16 +31,11 @@ internal class TestNodeRunner(
     private val TestNode.shouldBeEvaluated: Boolean
         get() = selectedAcceptanceTest?.let { this.fullName.startsWith(it) } ?: true
 
-    private suspend fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResult> =
+    private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResult> =
         tests
-            .chunked(parallelismChunkSize)
-            .flatMap { chunkedTests ->
-                withContext(Dispatchers.Default) {
-                    chunkedTests
-                        .map { async { it to testRunner.runTest(it) } }
-                        .awaitAll()
-                }
-            }
+            .parallelStream()
+            .map { it to testRunner.runTest(it) }
+            .toList()
             .toMap()
 
     private fun mapEvaluatedTests(

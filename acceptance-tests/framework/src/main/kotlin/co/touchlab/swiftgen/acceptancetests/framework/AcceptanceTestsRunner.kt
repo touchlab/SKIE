@@ -38,6 +38,8 @@ class AcceptanceTestsRunner(
         test(evaluatedTest.name) {
             println(evaluatedTest.path.toAbsolutePath())
             println(evaluatedTest.fullName)
+            println("To run only this test add env variable: acceptanceTest=${evaluatedTest.fullName}")
+            println()
 
             val result = evaluatedTest.result
 
@@ -46,7 +48,7 @@ class AcceptanceTestsRunner(
     }
 
     private fun outputTestResult(result: TestResult) {
-        println(result.logs)
+        print(result.logs)
 
         when (result) {
             is TestResult.Success -> {}
