@@ -1,4 +1,4 @@
-rootProject.name = "SwiftGen-Sealed-plugin"
+rootProject.name = "SwiftGen-plugin"
 
 include(
     ":compiler-plugin",

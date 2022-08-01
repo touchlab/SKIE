@@ -7,7 +7,7 @@ plugins {
 
 buildConfig {
     packageName(project.group.toString())
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"swiftgen-sealed\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"swiftgen\"")
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":compiler-plugin").name}\"")
@@ -29,10 +29,10 @@ java {
 
 gradlePlugin {
     plugins {
-        create("swiftgen-sealed") {
-            id = "co.touchlab.swiftgen.sealed"
-            displayName = "SwiftGen-Sealed plugin"
-            implementationClass = "co.touchlab.swiftgen.sealed.gradle.SwiftGenSealedSubplugin"
+        create("swiftgen") {
+            id = "co.touchlab.swiftgen"
+            displayName = "SwiftGen plugin"
+            implementationClass = "co.touchlab.swiftgen.gradle.SwiftGenSubplugin"
             version = project.version
         }
     }

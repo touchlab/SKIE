@@ -5,7 +5,7 @@ plugins {
 
     alias(libs.plugins.swiftpack)
     alias(libs.plugins.swiftkt)
-    id("co.touchlab.swiftgen.sealed")
+    id("co.touchlab.swiftgen")
 }
 
 kotlin {

@@ -1,4 +1,4 @@
-rootProject.name = "SwiftGen-Sealed"
+rootProject.name = "SwiftGen"
 
 include(
     ":acceptance-tests:framework",
