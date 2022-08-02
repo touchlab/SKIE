@@ -36,8 +36,13 @@ class ExampleSymbolProcessor: SymbolProcessor {
             }
 
             kobjcTransforms {
-                hide(DeclaredTypeName.kotlin("co.touchlab.swiftpack.example.SecondTest"))
-                rename(DeclaredTypeName.kotlin("co.touchlab.swiftpack.example.NotAnnotatedTest"), "SwiftableName")
+                type("co.touchlab.swiftpack.example.SecondTest") {
+                    hide()
+                }
+
+                type("co.touchlab.swiftpack.example.NotAnnotatedTest") {
+                    rename("SwiftableName")
+                }
             }
         }
 

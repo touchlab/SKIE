@@ -1,10 +1,6 @@
-import co.touchlab.swiftpack.plugin.SwiftPackGenerationExtension
-import com.google.devtools.ksp.gradle.KspTask
 import com.google.devtools.ksp.gradle.KspTaskNative
 import org.gradle.configurationcache.extensions.capitalized
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 plugins {
     kotlin("multiplatform")
@@ -106,17 +102,14 @@ kotlin {
     }
 }
 
-tasks.withType<KspTask>().configureEach {
-    when (this) {
-        is KspTaskNative -> {
-            doFirst {
-                val kotlinCompile = tasks.named<KotlinNativeCompile>(compilation.compileKotlinTaskName).get()
-                compilerPluginOptions.addPluginArgument(
-                    kotlinCompile.compilerPluginOptions
-                )
-            }
+tasks.withType<KspTaskNative>().configureEach {
+    @Suppress("ObjectLiteralToLambda")
+    doFirst(object: Action<Task> {
+        override fun execute(t: Task) {
+            val kotlinCompile = tasks.named<KotlinNativeCompile>(compilation.compileKotlinTaskName).get()
+            compilerPluginOptions.addPluginArgument(
+                kotlinCompile.compilerPluginOptions
+            )
         }
-    }
+    })
 }
-
-

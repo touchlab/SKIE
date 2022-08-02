@@ -1,6 +1,6 @@
 package co.touchlab.swiftpack.api
 
-import co.touchlab.swiftpack.spec.KobjcTransform
+import co.touchlab.swiftpack.spec.KobjcTransforms
 import co.touchlab.swiftpack.spec.NameMangling.mangledClassName
 import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spec.SwiftPackModule.Companion.write
@@ -16,10 +16,9 @@ class SwiftPackModuleBuilder(
     private val moduleName: String,
 ) {
     private val mutableFiles = mutableSetOf<FileSpec>()
-    private val mutableKobjcTransforms = mutableSetOf<KobjcTransform>()
+    private val kobjcTransformsScope = KobjcTransformScope()
 
     val files: Set<FileSpec> get() = mutableFiles
-    val kobjcTransforms: Set<KobjcTransform> get() = mutableKobjcTransforms
 
     fun file(name: String, contents: FileSpec.Builder.() -> Unit): FileSpec {
         val builder = FileSpec.builder(name)
@@ -35,8 +34,7 @@ class SwiftPackModuleBuilder(
     }
 
     fun kobjcTransforms(block: KobjcTransformScope.() -> Unit) {
-        val scope = KobjcTransformScope()
-        scope.block()
+        kobjcTransformsScope.block()
     }
 
     fun build(): SwiftPackModule {
@@ -48,17 +46,147 @@ class SwiftPackModuleBuilder(
                     contents = it.toString()
                 )
             }.sortedBy { it.name },
-            mutableKobjcTransforms
+            kobjcTransformsScope.build(),
         )
     }
 
-    inner class KobjcTransformScope {
-        fun hide(typeName: String) {
-            mutableKobjcTransforms.add(KobjcTransform.HideType(typeName))
+    @DslMarker
+    annotation class KobjcScopeMarker
+
+    @KobjcScopeMarker
+    class KobjcTransformScope(
+        private val types: MutableMap<String, TypeTransformScope> = mutableMapOf(),
+        private val properties: MutableMap<String, PropertyTransformScope> = mutableMapOf(),
+        private val functions: MutableMap<String, FunctionTransformScope> = mutableMapOf(),
+    ) {
+        fun type(name: String, builder: TypeTransformScope.() -> Unit) {
+            val scope = types.getOrPut(name) { TypeTransformScope(name) }
+            scope.builder()
         }
 
-        fun rename(typeName: String, newName: String) {
-            mutableKobjcTransforms.add(KobjcTransform.RenameType(typeName, newName))
+        fun property(name: String, builder: PropertyTransformScope.() -> Unit) {
+            val scope = properties.getOrPut(name) { PropertyTransformScope(name) }
+            scope.builder()
+        }
+
+        fun function(name: String, builder: FunctionTransformScope.() -> Unit) {
+            val scope = functions.getOrPut(name) { FunctionTransformScope(name) }
+            scope.builder()
+        }
+
+        internal fun build(): KobjcTransforms {
+            return KobjcTransforms(
+                types = types.mapValues { it.value.build() },
+                properties = properties.mapValues { it.value.build() },
+                functions = functions.mapValues { it.value.build() },
+            )
+        }
+
+        @KobjcScopeMarker
+        class TypeTransformScope(
+            private val name: String,
+            private var hide: Boolean = false,
+            private var remove: Boolean = false,
+            private var rename: String? = null,
+            private var bridge: String? = null,
+            private val properties: MutableMap<String, PropertyTransformScope> = mutableMapOf(),
+            private val functions: MutableMap<String, FunctionTransformScope> = mutableMapOf(),
+        ) {
+            fun remove() {
+                remove = true
+            }
+
+            fun hide() {
+                hide = true
+            }
+
+            fun rename(newSwiftName: String) {
+                rename = newSwiftName
+            }
+
+            fun bridge(swiftType: String) {
+                bridge = swiftType
+            }
+
+            fun property(name: String, builder: PropertyTransformScope.() -> Unit) {
+                val scope = properties.getOrPut(name) { PropertyTransformScope(name) }
+                scope.builder()
+            }
+
+            fun method(name: String, builder: FunctionTransformScope.() -> Unit) {
+                val scope = functions.getOrPut(name) { FunctionTransformScope(name) }
+                scope.builder()
+            }
+
+            internal fun build(): KobjcTransforms.TypeTransform {
+                return KobjcTransforms.TypeTransform(
+                    type = name,
+                    hide = hide,
+                    remove = remove,
+                    rename = rename,
+                    bridge = bridge,
+                    properties = properties.mapValues { it.value.build() },
+                    methods = functions.mapValues { it.value.build() },
+                )
+            }
+        }
+
+        @KobjcScopeMarker
+        class PropertyTransformScope(
+            private val name: String,
+            private var hide: Boolean = false,
+            private var remove: Boolean = false,
+            private var rename: String? = null,
+        ) {
+            fun remove() {
+                remove = true
+            }
+
+            fun hide() {
+                hide = true
+            }
+
+            fun rename(newSwiftName: String) {
+                rename = newSwiftName
+            }
+
+            internal fun build(): KobjcTransforms.PropertyTransform {
+                return KobjcTransforms.PropertyTransform(
+                    name = name,
+                    hide = hide,
+                    remove = remove,
+                    rename = rename,
+                )
+            }
+        }
+
+        @KobjcScopeMarker
+        class FunctionTransformScope(
+            private val name: String,
+            private var hide: Boolean = false,
+            private var remove: Boolean = false,
+            private var rename: String? = null,
+        ) {
+            fun remove() {
+                remove = true
+            }
+
+            fun hide() {
+                hide = true
+            }
+
+            fun rename(newSwiftName: String) {
+                rename = newSwiftName
+            }
+
+            internal fun build(): KobjcTransforms.FunctionTransform {
+                return KobjcTransforms.FunctionTransform(
+                    name = name,
+                    hide = hide,
+                    remove = remove,
+                    rename = rename,
+                )
+            }
         }
     }
 

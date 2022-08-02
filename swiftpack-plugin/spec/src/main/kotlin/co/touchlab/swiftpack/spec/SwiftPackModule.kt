@@ -11,7 +11,7 @@ import java.io.File
 data class SwiftPackModule(
     val name: String,
     val files: List<TemplateFile>,
-    val kobjcTransforms: Set<KobjcTransform>,
+    val kobjcTransforms: KobjcTransforms,
 ) {
     companion object {
         private val json = Json
