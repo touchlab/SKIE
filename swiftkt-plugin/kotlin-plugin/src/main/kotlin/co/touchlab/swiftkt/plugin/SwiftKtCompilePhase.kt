@@ -35,7 +35,7 @@ fun List<KobjcTransforms.TypeTransform>.merge(name: String): KobjcTransforms.Typ
         hide = any { it.hide },
         remove = any { it.remove },
         rename = mapNotNull { it.rename }.singleOrNull(),
-        bridge = mapNotNull { it.rename }.singleOrNull(),
+        bridge = mapNotNull { it.bridge }.singleOrNull(),
         properties = properties,
         methods = functions,
     )

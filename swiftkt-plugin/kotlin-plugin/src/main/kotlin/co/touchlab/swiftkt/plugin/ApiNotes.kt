@@ -15,7 +15,7 @@ class ApiNotes(
             val config = when {
                 transform.bridge != null -> "SwiftBridge: ${transform.bridge}"
                 transform.hide -> "SwiftPrivate: true"
-                transform.rename != null -> "SwiftRename: ${name.swiftName}"
+                transform.rename != null -> "SwiftName: ${name.swiftName}"
                 transform.remove -> "Availability: nonswift"
                 else -> ""
             }
