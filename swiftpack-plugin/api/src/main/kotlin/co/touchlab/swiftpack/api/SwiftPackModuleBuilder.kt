@@ -191,7 +191,13 @@ class SwiftPackModuleBuilder(
     }
 
     object Config {
-        var outputDir: File? = null
+        private val storage = ThreadLocal<File?>()
+
+        var outputDir: File?
+            get() = storage.get()
+            set(value) {
+                storage.set(value)
+            }
     }
 }
 
