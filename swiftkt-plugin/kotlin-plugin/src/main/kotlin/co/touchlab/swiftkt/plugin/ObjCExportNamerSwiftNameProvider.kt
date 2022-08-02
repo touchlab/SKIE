@@ -1,6 +1,6 @@
 package co.touchlab.swiftkt.plugin
 
-import co.touchlab.swiftpack.spec.KobjcTransform
+import co.touchlab.swiftpack.spec.KobjcTransforms
 import co.touchlab.swiftpack.spi.SwiftNameProvider
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -12,22 +12,21 @@ import org.jetbrains.kotlin.name.FqName
 class ObjCExportNamerSwiftNameProvider(
     private val namer: ObjCExportNamer,
     private val context: CommonBackendContext,
-    private val transforms: List<KobjcTransform>,
+    private val transforms: KobjcTransforms,
 ): SwiftNameProvider {
 
     val renamedClasses: Map<String, ObjCExportNamer.ClassOrProtocolName>
 
     init {
         val renamedClasses = mutableMapOf<String, ObjCExportNamer.ClassOrProtocolName>()
-        transforms.forEach { transform ->
-            when (transform) {
-                is KobjcTransform.HideType -> {
-                    val name = namer.getClassOrProtocolName(resolveClass(transform.typeName))
-                    renamedClasses[transform.typeName] = name.copy(swiftName = "__${name.swiftName}")
+        transforms.types.values.forEach { transform ->
+            val name = namer.getClassOrProtocolName(resolveClass(transform.type))
+            when {
+                transform.hide -> {
+                    renamedClasses[transform.type] = name.copy(swiftName = "__${name.swiftName}")
                 }
-                is KobjcTransform.RenameType -> {
-                    val name = namer.getClassOrProtocolName(resolveClass(transform.typeName))
-                    renamedClasses[transform.typeName] = name.copy(swiftName = transform.newName)
+                transform.rename != null -> {
+                    renamedClasses[transform.type] = name.copy(swiftName = transform.rename!!)
                 }
             }
         }

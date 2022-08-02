@@ -13,8 +13,12 @@ class ExampleSwiftPackGenerationExtension: SwiftPackGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         buildSwiftPackModule("swiftkt-example") {
             kobjcTransforms {
-                hide("co.touchlab.swiftkt.ToBeHidden")
-                rename("co.touchlab.swiftkt.ToBeRenamed", "Renamed")
+                type("co.touchlab.swiftkt.ToBeHidden") {
+                    hide()
+                }
+                type("co.touchlab.swiftkt.ToBeRenamed") {
+                    rename("Renamed")
+                }
             }
         }
     }

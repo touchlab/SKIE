@@ -1,6 +1,6 @@
 package co.touchlab.swiftkt.plugin
 
-import co.touchlab.swiftpack.spec.KobjcTransform
+import co.touchlab.swiftpack.spec.KobjcTransforms
 import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import co.touchlab.swiftpack.spi.SwiftNameProvider
@@ -18,6 +18,46 @@ import org.jetbrains.kotlin.konan.target.withOSVersion
 import org.jetbrains.kotlin.library.impl.javaFile
 import java.io.File
 
+fun List<KobjcTransforms>.merge(): KobjcTransforms {
+    val types = this.flatMap { it.types.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
+    val properties = this.flatMap { it.properties.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
+    val functions = this.flatMap { it.functions.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
+
+    return KobjcTransforms(types, properties, functions)
+}
+
+fun List<KobjcTransforms.TypeTransform>.merge(name: String): KobjcTransforms.TypeTransform {
+    val properties = this.flatMap { it.properties.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
+    val functions = this.flatMap { it.methods.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
+
+    return KobjcTransforms.TypeTransform(
+        type = name,
+        hide = any { it.hide },
+        remove = any { it.remove },
+        rename = mapNotNull { it.rename }.singleOrNull(),
+        bridge = mapNotNull { it.rename }.singleOrNull(),
+        properties = properties,
+        methods = functions,
+    )
+}
+
+fun List<KobjcTransforms.PropertyTransform>.merge(name: String): KobjcTransforms.PropertyTransform {
+    return KobjcTransforms.PropertyTransform(
+        name = name,
+        hide = any { it.hide },
+        remove = any { it.remove },
+        rename = mapNotNull { it.rename }.singleOrNull(),
+    )
+}
+
+fun List<KobjcTransforms.FunctionTransform>.merge(name: String): KobjcTransforms.FunctionTransform {
+    return KobjcTransforms.FunctionTransform(
+        name = name,
+        hide = any { it.hide },
+        remove = any { it.remove },
+        rename = mapNotNull { it.rename }.singleOrNull(),
+    )
+}
 
 class SwiftKtCompilePhase(
     val swiftPackModuleReferences: List<NamespacedSwiftPackModule.Reference>,
@@ -37,7 +77,7 @@ class SwiftKtCompilePhase(
                 listOf(NamespacedSwiftPackModule(namespace, SwiftPackModule.read(moduleFile)))
             }
         }
-        val transforms = swiftPackModules.flatMap { it.module.kobjcTransforms }
+        val transforms = swiftPackModules.map { it.module.kobjcTransforms }.merge()
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
         val swiftNameProvider = ObjCExportNamerSwiftNameProvider(namer, context, transforms)
         val swiftSourcesDir = expandedSwiftDir.also {
