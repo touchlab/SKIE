@@ -2,7 +2,6 @@ package co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner
 
 import co.touchlab.swiftgen.BuildConfig
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
 import co.touchlab.swiftgen.plugin.SwiftGenComponentRegistrar
 import co.touchlab.swiftkt.plugin.ConfigurationKeys
 import co.touchlab.swiftkt.plugin.SwiftKtComponentRegistrar
@@ -19,13 +18,19 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
+import kotlin.io.path.readText
 
-internal class KotlinTestCompiler(private val tempFileSystem: TempFileSystem, private val logger: Logger) {
+internal class KotlinTestCompiler(
+    private val tempFileSystem: TempFileSystem,
+    private val testResultBuilder: TestResultBuilder,
+) {
 
     fun compile(kotlinFiles: List<Path>): IntermediateResult<Path> {
         val outputDirectory = tempFileSystem.createDirectory()
 
-        configureSwiftKt()
+        val generatedSwiftDirectory = configureSwiftKt()
 
         val (messageCollector, outputStream) = createCompilerOutputStream()
 
@@ -33,17 +38,20 @@ internal class KotlinTestCompiler(private val tempFileSystem: TempFileSystem, pr
 
         val result = K2Native().exec(messageCollector, Services.EMPTY, arguments)
 
-        return interpretResult(result, outputDirectory, outputStream)
+        return interpretResult(result, outputDirectory, outputStream, generatedSwiftDirectory)
     }
 
-    private fun configureSwiftKt() {
-        val outputDir = tempFileSystem.createDirectory().toFile()
+    private fun configureSwiftKt(): Path {
+        val outputDirectory = tempFileSystem.createDirectory()
+        val expandedSwiftDirectory = tempFileSystem.createDirectory()
 
-        SwiftPackModuleBuilder.Config.outputDir = outputDir
+        SwiftPackModuleBuilder.Config.outputDir = outputDirectory.toFile()
 
         PluginRegistrar.configure.set {
-            add(ConfigurationKeys.swiftPackModules, NamespacedSwiftPackModule.Reference("Kotlin", outputDir))
-            put(ConfigurationKeys.expandedSwiftDir, tempFileSystem.createDirectory().toFile())
+            val swiftPackModule = NamespacedSwiftPackModule.Reference("Kotlin", outputDirectory.toFile())
+
+            add(ConfigurationKeys.swiftPackModules, swiftPackModule)
+            put(ConfigurationKeys.expandedSwiftDir, expandedSwiftDirectory.toFile())
         }
 
         PluginRegistrar.plugins.set(
@@ -52,6 +60,8 @@ internal class KotlinTestCompiler(private val tempFileSystem: TempFileSystem, pr
                 SwiftGenComponentRegistrar(),
             )
         )
+
+        return expandedSwiftDirectory
     }
 
     private fun createCompilerOutputStream(): Pair<PrintingMessageCollector, OutputStream> {
@@ -84,14 +94,20 @@ internal class KotlinTestCompiler(private val tempFileSystem: TempFileSystem, pr
         result: ExitCode,
         outputDirectory: Path,
         outputStream: OutputStream,
+        generatedSwiftDirectory: Path,
     ): IntermediateResult<Path> = when (result) {
         ExitCode.OK -> {
-            logger.write("Kotlin compilation", outputStream.toString())
+            testResultBuilder.appendLog("Kotlin compilation", outputStream.toString())
+
+            val generatedSwift = generatedSwiftDirectory.listDirectoryEntries().joinToString("\n") {
+                "------ ${it.name} ------\n" + it.readText()
+            }
+            testResultBuilder.appendLog("Generated Swift", generatedSwift)
 
             IntermediateResult.Value(outputDirectory)
         }
         else -> {
-            val testResult = TestResult.KotlinCompilationError(logger.toString(), outputStream.toString())
+            val testResult = testResultBuilder.buildKotlinCompilationError(outputStream.toString())
 
             IntermediateResult.Error(testResult)
         }

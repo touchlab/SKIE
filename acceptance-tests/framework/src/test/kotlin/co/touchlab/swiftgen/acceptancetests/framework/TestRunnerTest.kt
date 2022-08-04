@@ -1,6 +1,5 @@
 package co.touchlab.swiftgen.acceptancetests.framework
 
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRunner
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.engine.spec.tempfile
@@ -118,12 +117,9 @@ private fun ShouldSpec.test(
         val kotlinFile = tempfile(suffix = ".kt")
         kotlinFile.writeText(kotlin)
 
-        val swiftFile = tempfile(suffix = ".swift")
-        swiftFile.writeText(swift)
-
         val test = mockk<TestNode.Test>()
         every { test.kotlinFiles } returns listOf(kotlinFile.toPath())
-        every { test.swiftFile } returns swiftFile.toPath()
+        every { test.swiftCode } returns swift
 
         val result = TestRunner(tempFileSystem).runTest(test)
 

@@ -2,35 +2,33 @@ package co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner
 
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.TestNode
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
+import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import java.nio.file.Path
-import kotlin.io.path.readText
-import kotlin.io.path.writeText
 
 internal class TestRunner(private val tempFileSystem: TempFileSystem) {
 
     fun runTest(test: TestNode.Test): TestResult {
-        val logger = Logger()
+        val testResultBuilder = TestResultBuilder()
 
-        return compileKotlin(test.kotlinFiles, logger)
-            .map { enhanceSwiftCode(test.swiftFile) to it }
-            .flatMap { compileSwift(it.first, it.second, logger) }
-            .finalize { runSwift(it, logger) }
+        return compileKotlin(test.kotlinFiles, testResultBuilder)
+            .map { enhanceSwiftCode(test.swiftCode) to it }
+            .flatMap { compileSwift(it.first, it.second, testResultBuilder) }
+            .finalize { runSwift(it, testResultBuilder) }
     }
 
-    private fun compileKotlin(kotlinFiles: List<Path>, logger: Logger): IntermediateResult<Path> =
-        KotlinTestCompiler(tempFileSystem, logger).compile(kotlinFiles)
+    private fun compileKotlin(kotlinFiles: List<Path>, testResultBuilder: TestResultBuilder): IntermediateResult<Path> =
+        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles)
 
-    private fun enhanceSwiftCode(swiftFile: Path): Path =
-        SwiftCodeEnhancer(tempFileSystem).enhance(swiftFile)
+    private fun enhanceSwiftCode(swiftCode: String): Path =
+        SwiftCodeEnhancer(tempFileSystem).enhance(swiftCode)
 
     private fun compileSwift(
         swiftFile: Path,
         kotlinFrameworkDirectory: Path,
-        logger: Logger
+        testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        SwiftTestCompiler(tempFileSystem, logger).compile(swiftFile, kotlinFrameworkDirectory)
+        SwiftTestCompiler(tempFileSystem, testResultBuilder).compile(swiftFile, kotlinFrameworkDirectory)
 
-    private fun runSwift(binary: Path, logger: Logger): TestResult =
-        SwiftProgramRunner(logger).runProgram(binary)
+    private fun runSwift(binary: Path, testResultBuilder: TestResultBuilder): TestResult =
+        SwiftProgramRunner(testResultBuilder).runProgram(binary)
 }

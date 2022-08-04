@@ -1,17 +1,14 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner
 
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
+import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import java.nio.file.Path
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 internal class SwiftCodeEnhancer(private val tempFileSystem: TempFileSystem) {
 
-    fun enhance(swiftFile: Path): Path {
+    fun enhance(swiftCode: String): Path {
         val swiftCopy = tempFileSystem.createFile(".swift")
-
-        val swiftCode = swiftFile.readText()
 
         val modifiedSwiftCode = swiftCode
             .let(::addImports)

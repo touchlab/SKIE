@@ -1,29 +1,29 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner
 
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
+import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
-internal class SwiftProgramRunner(private val logger: Logger) {
+internal class SwiftProgramRunner(private val testResultBuilder: TestResultBuilder) {
 
     fun runProgram(binary: Path): TestResult {
         val command = binary.absolutePathString()
 
         val result = command.execute()
 
-        logger.write("Program output", result.stdOut)
+        testResultBuilder.appendLog("Program output", result.stdOut)
 
-        return interpretResult(result, logger)
+        return interpretResult(result)
     }
 
-    private fun interpretResult(result: CommandResult, logger: Logger): TestResult =
+    private fun interpretResult(result: CommandResult): TestResult =
         if (result.exitCode == 0) {
-            TestResult.Success(logger.toString())
+            testResultBuilder.buildSuccess()
         } else if (result.stdErr.isEmpty()) {
-            TestResult.IncorrectOutput(logger.toString(), result.exitCode)
+            testResultBuilder.buildIncorrectOutput(result.exitCode)
         } else if (result.stdErr.contains(TestResult.MissingExit.ERROR_MESSAGE)) {
-            TestResult.MissingExit(logger.toString())
+            testResultBuilder.buildMissingExit()
         } else {
-            TestResult.RuntimeError(logger.toString(), result.stdErr)
+            testResultBuilder.buildRuntimeError(result.stdErr)
         }
 }

@@ -1,5 +1,7 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal
 
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult
+import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import java.nio.file.Path
 
 internal sealed interface EvaluatedTestNode {
@@ -10,7 +12,8 @@ internal sealed interface EvaluatedTestNode {
         override val name: String,
         val fullName: String,
         val path: Path,
-        val result: TestResult,
+        val expectedResult: ExpectedTestResult,
+        val actualResult: TestResult,
     ) : EvaluatedTestNode
 
     data class Container(

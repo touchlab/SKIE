@@ -2,8 +2,6 @@ package co.touchlab.swiftgen.acceptancetests.framework
 
 import co.touchlab.swiftgen.acceptancetests.framework.internal.EvaluatedTestNode
 import co.touchlab.swiftgen.acceptancetests.framework.internal.TestNodeRunner
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
-import io.kotest.assertions.fail
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 
 class AcceptanceTestsRunner(
@@ -41,43 +39,15 @@ class AcceptanceTestsRunner(
             println("To run only this test add env variable: acceptanceTest=${evaluatedTest.fullName}")
             println()
 
-            val result = evaluatedTest.result
-
-            outputTestResult(result)
+            outputTestResult(evaluatedTest)
         }
     }
 
-    private fun outputTestResult(result: TestResult) {
+    private fun outputTestResult(evaluatedTest: EvaluatedTestNode.Test) {
+        val result = evaluatedTest.actualResult
+
         print(result.logs)
 
-        when (result) {
-            is TestResult.Success -> {}
-            is TestResult.MissingExit -> fail(TestResult.MissingExit.ERROR_MESSAGE)
-            is TestResult.IncorrectOutput -> fail(
-                """
-                Program execution ended with an incorrect exit code.
-                Expected: 0
-                Actual: ${result.code}
-            """.trimIndent()
-            )
-            is TestResult.RuntimeError -> fail(
-                """
-                Program execution ended with an error: 
-                ${result.error}
-            """.trimIndent()
-            )
-            is TestResult.SwiftCompilationError -> fail(
-                """
-                Error during Swift compilation:
-                ${result.error}
-            """.trimIndent()
-            )
-            is TestResult.KotlinCompilationError -> fail(
-                """
-                Error during Kotlin compilation:
-                ${result.error}
-            """.trimIndent()
-            )
-        }
+        evaluatedTest.expectedResult.evaluate(evaluatedTest.actualResult)
     }
 }

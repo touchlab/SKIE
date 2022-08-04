@@ -18,14 +18,8 @@ buildConfig {
 dependencies {
     api(libs.bundles.testing.jvm)
 
-    compileOnly(kotlinNativeCompilerEmbeddable())
-    runtimeOnly(
-        files(
-            NativeCompilerDownloader(project).also {
-                it.downloadIfNeeded()
-            }.compilerDirectory.resolve("konan/lib/kotlin-native-compiler-embeddable.jar").absolutePath
-        )
-    )
+    compileOnly(extractedKotlinNativeCompilerEmbeddable())
+    runtimeOnly(files(kotlinNativeCompilerEmbeddable().absolutePath))
 
     implementation("co.touchlab.swiftgen:compiler-plugin")
     implementation(libs.swiftpack.api)
@@ -37,15 +31,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
-fun kotlinNativeCompilerEmbeddable(): FileCollection {
+fun extractedKotlinNativeCompilerEmbeddable(): FileCollection {
     val targetFile = layout.buildDirectory.file("tmp/kotlin-native").map {
         val file = it.asFile
         if (!file.exists()) {
-            val tree = zipTree(
-                NativeCompilerDownloader(project).also {
-                    it.downloadIfNeeded()
-                }.compilerDirectory.resolve("konan/lib/kotlin-native-compiler-embeddable.jar")
-            )
+            val tree = zipTree(kotlinNativeCompilerEmbeddable())
 
             copy {
                 from(tree)
@@ -58,3 +48,9 @@ fun kotlinNativeCompilerEmbeddable(): FileCollection {
 
     return files(targetFile)
 }
+
+fun kotlinNativeCompilerEmbeddable(): File =
+    NativeCompilerDownloader(project)
+        .also { it.downloadIfNeeded() }
+        .compilerDirectory
+        .resolve("konan/lib/kotlin-native-compiler-embeddable.jar")

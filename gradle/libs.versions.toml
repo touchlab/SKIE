@@ -1,7 +1,7 @@
 [versions]
-kotlin = "1.7.0"
-swiftpack = "0.0.15"
-swiftkt = "0.0.15"
+kotlin = "1.7.10"
+swiftpack = "0.0.17"
+swiftkt = "0.0.16"
 kotest = "5.4.0"
 
 [plugins]

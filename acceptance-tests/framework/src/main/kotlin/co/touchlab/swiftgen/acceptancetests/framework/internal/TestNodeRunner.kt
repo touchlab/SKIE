@@ -2,8 +2,8 @@ package co.touchlab.swiftgen.acceptancetests.framework.internal
 
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.TestNode
+import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRunner
-import kotlin.streams.toList
 
 internal class TestNodeRunner(
     tempFileSystem: TempFileSystem,
@@ -40,7 +40,7 @@ internal class TestNodeRunner(
 
     private fun mapEvaluatedTests(
         evaluatedTests: Map<TestNode.Test, TestResult>,
-        testNode: TestNode
+        testNode: TestNode,
     ): EvaluatedTestNode? = when (testNode) {
         is TestNode.Container -> mapEvaluatedTests(evaluatedTests, testNode)
         is TestNode.Test -> mapEvaluatedTests(evaluatedTests, testNode)
@@ -63,5 +63,7 @@ internal class TestNodeRunner(
         evaluatedTests: Map<TestNode.Test, TestResult>,
         test: TestNode.Test,
     ): EvaluatedTestNode.Test? =
-        evaluatedTests[test]?.let { EvaluatedTestNode.Test(test.name, test.fullName, test.path, it) }
+        evaluatedTests[test]?.let {
+            EvaluatedTestNode.Test(test.name, test.fullName, test.path, test.expectedResult, it)
+        }
 }

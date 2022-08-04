@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner
 
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
+import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 
 internal sealed interface IntermediateResult<out T> {
 

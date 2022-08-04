@@ -38,12 +38,20 @@ sealed class TestNode {
         val kotlinFiles: List<Path>
             get() = parent.kotlinFiles
 
-        val swiftFile: Path
-            get() = path
-
         init {
             require(path.isRegularFile() && path.extension == "swift") { "Test $path is not a swift file." }
         }
+
+        private val rawCode: List<String> = path.readLines()
+
+        private val hasExplicitExpectedResult: Boolean = rawCode.firstOrNull()?.startsWith("#") ?: false
+
+        val expectedResult: ExpectedTestResult =
+            if (hasExplicitExpectedResult) ExpectedTestResult(rawCode.first().drop(1)) else ExpectedTestResult.Success
+
+        val swiftCode: String =
+            (if (hasExplicitExpectedResult) rawCode.drop(1) else rawCode)
+                .joinToString(System.lineSeparator())
     }
 
     data class Container constructor(

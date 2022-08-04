@@ -1,11 +1,13 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner
 
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
-import co.touchlab.swiftgen.acceptancetests.framework.internal.TestResult
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
-internal class SwiftTestCompiler(private val tempFileSystem: TempFileSystem, private val logger: Logger) {
+internal class SwiftTestCompiler(
+    private val tempFileSystem: TempFileSystem,
+    private val testResultBuilder: TestResultBuilder,
+) {
 
     fun compile(swiftFile: Path, kotlinFrameworkDirectory: Path): IntermediateResult<Path> {
         val output = tempFileSystem.createFile()
@@ -14,7 +16,7 @@ internal class SwiftTestCompiler(private val tempFileSystem: TempFileSystem, pri
 
         val result = command.execute()
 
-        logger.write("Swift compilation", result.stdOut)
+        testResultBuilder.appendLog("Swift compilation", result.stdOut)
 
         return interpretResult(result, output)
     }
@@ -22,7 +24,7 @@ internal class SwiftTestCompiler(private val tempFileSystem: TempFileSystem, pri
     private fun createCompileSwiftCommand(
         swiftFile: Path,
         kotlinFrameworkDirectory: Path,
-        output: Path
+        output: Path,
     ): String = listOf(
         "swiftc",
         swiftFile.absolutePathString(),
@@ -36,7 +38,7 @@ internal class SwiftTestCompiler(private val tempFileSystem: TempFileSystem, pri
         if (result.exitCode == 0) {
             IntermediateResult.Value(output)
         } else {
-            val testResult = TestResult.SwiftCompilationError(logger.toString(), result.stdErr)
+            val testResult = testResultBuilder.buildSwiftCompilationError(result.stdErr)
 
             IntermediateResult.Error(testResult)
         }
