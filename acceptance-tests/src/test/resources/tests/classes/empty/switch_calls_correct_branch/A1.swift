@@ -1,6 +1,3 @@
-import Foundation
-import Kotlin
-
 let a: A = A1()
 
 switch a.exhaustively() {
@@ -9,4 +6,3 @@ switch a.exhaustively() {
     case .A2(_):
         exit(1)
 }
-
