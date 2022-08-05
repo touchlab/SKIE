@@ -2,19 +2,34 @@ package co.touchlab.swiftgen.acceptancetests.framework
 
 import co.touchlab.swiftgen.acceptancetests.framework.internal.EvaluatedTestNode
 import co.touchlab.swiftgen.acceptancetests.framework.internal.TestNodeRunner
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
+import kotlinx.coroutines.channels.Channel
 
 class AcceptanceTestsRunner(
     private val tempFileSystem: TempFileSystem,
     private val selectedAcceptanceTest: String?,
 ) {
 
-    suspend fun runTests(scope: FunSpecContainerScope, testNode: TestNode) {
-        val testNodeRunner = TestNodeRunner(tempFileSystem, selectedAcceptanceTest)
+    fun runTests(scope: FunSpec, testNode: TestNode) {
+        val channel = Channel<EvaluatedTestNode>()
 
-        val evaluatedTests = testNodeRunner.runTests(testNode)
+        scope.concurrency = 2
 
-        scope.outputEvaluatedTest(evaluatedTests)
+        scope.test("Evaluation") {
+            val testNodeRunner = TestNodeRunner(tempFileSystem, selectedAcceptanceTest)
+
+            val evaluatedTests = testNodeRunner.runTests(testNode)
+
+            channel.send(evaluatedTests)
+            channel.close()
+        }
+
+        scope.context("Results") {
+            val evaluatedTests = channel.receive()
+
+            outputEvaluatedTest(evaluatedTests)
+        }
     }
 
     private suspend fun FunSpecContainerScope.outputEvaluatedTest(evaluatedTest: EvaluatedTestNode) {

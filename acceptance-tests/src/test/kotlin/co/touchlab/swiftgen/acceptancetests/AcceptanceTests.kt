@@ -11,13 +11,11 @@ import kotlin.io.path.Path
 class AcceptanceTests : FunSpec({
     val tempFileSystem = TempFileSystem(this)
 
-    context("acceptance tests") {
-        val runner = AcceptanceTestsRunner(tempFileSystem, System.getenv("acceptanceTest"))
+    val runner = AcceptanceTestsRunner(tempFileSystem, System.getenv("acceptanceTest"))
 
-        val tests = TestNode(Path(BuildConfig.RESOURCES + "/tests"))
+    val tests = TestNode(Path(BuildConfig.RESOURCES + "/tests"))
 
-        runner.runTests(this, tests)
-    }
+    runner.runTests(this, tests)
 }) {
 
     override fun isolationMode(): IsolationMode = IsolationMode.SingleInstance
