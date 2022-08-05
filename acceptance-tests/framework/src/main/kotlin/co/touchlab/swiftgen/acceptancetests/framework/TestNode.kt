@@ -52,6 +52,8 @@ sealed class TestNode {
         val swiftCode: String =
             (if (hasExplicitExpectedResult) rawCode.drop(1) else rawCode)
                 .joinToString(System.lineSeparator())
+
+        override fun toString(): String = fullName
     }
 
     data class Container constructor(
@@ -77,5 +79,7 @@ sealed class TestNode {
         init {
             require(path.isDirectory()) { "Container $path is not a directory." }
         }
+
+        override fun toString(): String = fullName
     }
 }

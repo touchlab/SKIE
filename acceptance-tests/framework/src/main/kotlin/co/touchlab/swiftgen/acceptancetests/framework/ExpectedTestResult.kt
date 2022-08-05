@@ -147,7 +147,9 @@ sealed interface ExpectedTestResult {
 }
 
 private fun failTest(result: TestResult, expected: String) {
-    val errorMessage = """
+    val errorMessage =
+        """
+        Test failed:
             Expected: $expected
             Actual: ${result.actualErrorMessage}
         """.trimIndent()

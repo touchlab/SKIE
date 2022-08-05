@@ -10,7 +10,7 @@ internal class SwiftTestCompiler(
 ) {
 
     fun compile(swiftFile: Path, kotlinFrameworkDirectory: Path): IntermediateResult<Path> {
-        val output = tempFileSystem.createFile()
+        val output = tempFileSystem.createFile("swift-binary")
 
         val command = createCompileSwiftCommand(swiftFile, kotlinFrameworkDirectory, output)
 

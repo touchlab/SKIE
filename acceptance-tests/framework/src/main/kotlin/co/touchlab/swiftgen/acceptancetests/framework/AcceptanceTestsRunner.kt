@@ -7,7 +7,7 @@ import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import kotlinx.coroutines.channels.Channel
 
 class AcceptanceTestsRunner(
-    private val tempFileSystem: TempFileSystem,
+    private val tempFileSystemFactory: TempFileSystemFactory,
     private val selectedAcceptanceTest: String?,
 ) {
 
@@ -17,7 +17,7 @@ class AcceptanceTestsRunner(
         scope.concurrency = 2
 
         scope.test("Evaluation") {
-            val testNodeRunner = TestNodeRunner(tempFileSystem, selectedAcceptanceTest)
+            val testNodeRunner = TestNodeRunner(tempFileSystemFactory, selectedAcceptanceTest)
 
             val evaluatedTests = testNodeRunner.runTests(testNode)
 

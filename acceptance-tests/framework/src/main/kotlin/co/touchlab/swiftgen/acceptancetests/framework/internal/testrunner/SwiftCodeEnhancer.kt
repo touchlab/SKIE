@@ -8,7 +8,7 @@ import kotlin.io.path.writeText
 internal class SwiftCodeEnhancer(private val tempFileSystem: TempFileSystem) {
 
     fun enhance(swiftCode: String): Path {
-        val swiftCopy = tempFileSystem.createFile(".swift")
+        val swiftCopy = tempFileSystem.createFile("swift-source", ".swift")
 
         val modifiedSwiftCode = swiftCode
             .let(::addImports)

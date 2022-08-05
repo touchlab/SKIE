@@ -1,16 +1,16 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal
 
-import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
+import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.swiftgen.acceptancetests.framework.TestNode
 import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRunner
 
 internal class TestNodeRunner(
-    tempFileSystem: TempFileSystem,
+    tempFileSystemFactory: TempFileSystemFactory,
     private val selectedAcceptanceTest: String?,
 ) {
 
-    private val testRunner = TestRunner(tempFileSystem)
+    private val testRunner = TestRunner(tempFileSystemFactory)
 
     fun runTests(testNode: TestNode): EvaluatedTestNode {
         val tests = testNode.flatten()

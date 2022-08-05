@@ -7,7 +7,13 @@ import java.nio.file.Path
 
 class TempFileSystem(private val testConfiguration: TestConfiguration) {
 
-    fun createFile(suffix: String? = null): Path = testConfiguration.tempfile(suffix = suffix).toPath()
+    private val files = mutableMapOf<String, Path>()
+    private val directories = mutableMapOf<String, Path>()
 
-    fun createDirectory(): Path = testConfiguration.tempdir().toPath()
+    fun createFile(debugName: String, suffix: String? = null): Path =
+        testConfiguration.tempfile(suffix = suffix).toPath()
+            .also { files[debugName] = it }
+
+    fun createDirectory(debugName: String): Path = testConfiguration.tempdir().toPath()
+        .also { directories[debugName] = it }
 }

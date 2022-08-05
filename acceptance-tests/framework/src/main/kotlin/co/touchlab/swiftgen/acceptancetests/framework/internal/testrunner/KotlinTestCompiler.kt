@@ -28,7 +28,7 @@ internal class KotlinTestCompiler(
 ) {
 
     fun compile(kotlinFiles: List<Path>): IntermediateResult<Path> {
-        val outputDirectory = tempFileSystem.createDirectory()
+        val outputDirectory = tempFileSystem.createDirectory("kotlin-build")
 
         val generatedSwiftDirectory = configureSwiftKt()
 
@@ -42,8 +42,8 @@ internal class KotlinTestCompiler(
     }
 
     private fun configureSwiftKt(): Path {
-        val outputDirectory = tempFileSystem.createDirectory()
-        val expandedSwiftDirectory = tempFileSystem.createDirectory()
+        val outputDirectory = tempFileSystem.createDirectory("swiftpack")
+        val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
 
         SwiftPackModuleBuilder.Config.outputDir = outputDirectory.toFile()
 
