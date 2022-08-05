@@ -9,4 +9,3 @@ switch a.exhaustively() {
     case .A2(_):
         exit(1)
 }
-

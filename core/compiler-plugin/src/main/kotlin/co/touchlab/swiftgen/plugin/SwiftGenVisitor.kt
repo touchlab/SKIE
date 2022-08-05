@@ -46,14 +46,17 @@ class SwiftGenVisitor(private val output: SwiftPackModuleBuilder) : IrElementVis
                         ExtensionSpec.builder(swiftName)
                             .addModifiers(Modifier.PUBLIC)
                             .addType(enum)
-                            .addFunction(
-                                FunctionSpec.builder("exhaustively")
-                                    .returns(DeclaredTypeName.qualifiedTypeName(enumName))
-                                    .addCode(
-                                        CodeBlock.builder()
-                                            .appendExhaustivelyFunctionBody(enumName, sealedSubclasses)
-                                            .build()
-                                    )
+                            .build()
+                    )
+
+                    addFunction(
+                        FunctionSpec.builder("exhaustively")
+                            .addModifiers(Modifier.PUBLIC)
+                            .addParameter("_", "self", swiftName)
+                            .returns(DeclaredTypeName.qualifiedTypeName(enumName))
+                            .addCode(
+                                CodeBlock.builder()
+                                    .appendExhaustivelyFunctionBody(enumName, sealedSubclasses)
                                     .build()
                             )
                             .build()
@@ -75,7 +78,7 @@ class SwiftGenVisitor(private val output: SwiftPackModuleBuilder) : IrElementVis
 
             if (isFirst) {
                 isFirst = false
-                
+
                 beginControlFlow("if", condition)
             } else {
                 nextControlFlow("else if", condition)

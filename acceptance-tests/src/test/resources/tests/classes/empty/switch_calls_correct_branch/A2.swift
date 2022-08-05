@@ -1,6 +1,6 @@
 let a: A = A2()
 
-switch a.exhaustively() {
+switch exhaustively(a) {
     case .A1(_):
         exit(1)
     case .A2(_):
