@@ -1,14 +1,19 @@
 import org.codehaus.groovy.runtime.ProcessGroovyMethods
 import org.gradle.configurationcache.extensions.capitalized
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
+import kotlin.io.path.readText
+import kotlin.io.path.listDirectoryEntries
+
+val architecture = when (
+    val arch = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
+) {
+    "arm64" -> "macosArm64"
+    "x86_64" -> "macosX64"
+    else -> error("Unsupported architecture: $arch")
+}
 
 val compileSwift = tasks.register<Exec>("compileSwift") {
-    val architecture = when (
-        val arch = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
-    ) {
-        "arm64" -> "macosArm64"
-        "x86_64" -> "macosX64"
-        else -> error("Unsupported architecture: $arch")
-    }
     val frameworkDirectory = layout.projectDirectory.dir("../kotlin/build/bin/$architecture/releaseFramework")
     val mainFile = layout.buildDirectory.file("main").get().asFile
 
@@ -20,6 +25,18 @@ val compileSwift = tasks.register<Exec>("compileSwift") {
 
     doFirst {
         mkdir(layout.buildDirectory)
+    }
+    doFirst {
+        val generatedSwiftDirectory = layout.projectDirectory.dir("../kotlin/build/generated/swiftpack-expanded/releaseFramework/$architecture").asFile
+
+        val generatedSwift = generatedSwiftDirectory.listFiles()!!.joinToString("\n") {
+            "------ ${it.name} ------\n" + it.readText()
+        }
+
+        println("---------------- Generated Swift ----------------")
+        print(generatedSwift)
+
+        println("---------------- Swift compilation ----------------")
     }
     commandLine(
         "swiftc",
@@ -41,5 +58,8 @@ tasks.register<Exec>("runSwift") {
     group = "build"
     dependsOn(clean)
     dependsOn(compileSwift).mustRunAfter(clean)
+    doFirst {
+        println("---------------- Program output ----------------")
+    }
     commandLine("build/main")
 }
