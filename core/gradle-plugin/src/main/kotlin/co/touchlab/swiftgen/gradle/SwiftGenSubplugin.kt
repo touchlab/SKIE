@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 abstract class SwiftGenSubplugin @Inject constructor(
     private val project: Project,
-): KotlinCompilerPluginSupportPlugin {
+) : KotlinCompilerPluginSupportPlugin {
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
         val target = kotlinCompilation.target

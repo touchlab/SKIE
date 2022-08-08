@@ -1,9 +1,5 @@
 import org.codehaus.groovy.runtime.ProcessGroovyMethods
 import org.gradle.configurationcache.extensions.capitalized
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
-import kotlin.io.path.readText
-import kotlin.io.path.listDirectoryEntries
 
 val architecture = when (
     val arch = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
@@ -27,15 +23,6 @@ val compileSwift = tasks.register<Exec>("compileSwift") {
         mkdir(layout.buildDirectory)
     }
     doFirst {
-        val generatedSwiftDirectory = layout.projectDirectory.dir("../kotlin/build/generated/swiftpack-expanded/releaseFramework/$architecture").asFile
-
-        val generatedSwift = generatedSwiftDirectory.listFiles()!!.joinToString("\n") {
-            "------ ${it.name} ------\n" + it.readText()
-        }
-
-        println("---------------- Generated Swift ----------------")
-        print(generatedSwift)
-
         println("---------------- Swift compilation ----------------")
     }
     commandLine(

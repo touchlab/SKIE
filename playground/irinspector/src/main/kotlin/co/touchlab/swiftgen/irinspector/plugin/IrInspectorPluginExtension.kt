@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.ir.util.dump
 import java.nio.file.Path
 import kotlin.io.path.writeText
 
-class IrInspectorPluginExtension(private val outputPath: String): IrGenerationExtension {
+class IrInspectorPluginExtension(private val outputPath: String) : IrGenerationExtension {
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         val irDump = moduleFragment.dump()

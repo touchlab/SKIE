@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
 

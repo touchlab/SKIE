@@ -5,14 +5,16 @@ import io.kotest.engine.spec.tempfile
 import io.kotest.matchers.string.shouldContain
 import java.io.ByteArrayOutputStream
 
-class IrInspectorTest: BehaviorSpec({
+class IrInspectorTest : BehaviorSpec({
 
     Given("File with code") {
         val file = tempfile(suffix = ".kt")
-        file.writeText("""
+        file.writeText(
+            """
             fun test() {
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         When("I run the ir inspector") {
             val outputStream = ByteArrayOutputStream()

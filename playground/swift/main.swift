@@ -3,7 +3,7 @@ import Kotlin
 
 let a: A = A1()
 
-switch a.exhaustively() {
+switch exhaustively(a) {
     case .A1(_):
         exit(0)
     case .A2(_):

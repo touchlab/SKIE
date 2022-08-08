@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-class IrInspectorPluginCommandLineProcessor: CommandLineProcessor {
+class IrInspectorPluginCommandLineProcessor : CommandLineProcessor {
 
     override val pluginId: String = Companion.pluginId
 

@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.extensions.LoadingOrder
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-class IrInspectorPluginComponentRegistrar: ComponentRegistrar {
+class IrInspectorPluginComponentRegistrar : ComponentRegistrar {
 
     override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
         val extension = createExtension(configuration)
