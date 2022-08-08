@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     `java-gradle-plugin`
+    alias(libs.plugins.pluginPublish)
+    `maven-publish`
 
     alias(libs.plugins.buildconfig)
 }

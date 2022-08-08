@@ -1,0 +1,37 @@
+name: Publish Plugin
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-[a-zA-Z0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-[a-zA-Z0-9]+.[a-zA-Z0-9]+'
+
+jobs:
+  gradle:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Cache Gradle Caches
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/**.gradle*', '**/gradle/wrapper/gradle-wrapper.properties', '**/libs.versions.toml') }}
+      - uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: 11
+      # TODO Ensure all tests pass
+      - name: Publish on AWS
+        run: ./gradlew --project-dir core publishAllPublicationsToAwsRepository
+        env:
+          AWS_TOUCHLAB_DEPLOY_ACCESS: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
+          AWS_TOUCHLAB_DEPLOY_SECRET: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
