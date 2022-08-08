@@ -11,10 +11,13 @@ import org.jetbrains.kotlin.backend.common.phaser.SameTypeCompilerPhase
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.jvmName
 
 @AutoService(ComponentRegistrar::class)
 class SwiftKtComponentRegistrar: ComponentRegistrar {
     override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
+        configuration.put(ConfigurationKeys.isEnabled, true)
         val phase = this::class.java.classLoader
             .loadClass("org.jetbrains.kotlin.backend.konan.ToplevelPhasesKt")
             .getDeclaredMethod("getObjectFilesPhase")
@@ -25,14 +28,16 @@ class SwiftKtComponentRegistrar: ComponentRegistrar {
 
         check(field.trySetAccessible()) { "Failed to make field `lower` accessible" }
 
-        val originalPhase = field.get(phase) as CompilerPhase<CommonBackendContext, Unit, Unit>
-        val modules = configuration.getList(ConfigurationKeys.swiftPackModules)
-        val swiftSources = configuration.getList(ConfigurationKeys.swiftSourceFiles)
-        val expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.expandedSwiftDir)
-        val compilePhase = SwiftKtCompilePhase(modules, swiftSources, expandedSwiftDir)
-        val swiftKtObjectFilesPhase = SwiftKtObjectFilesPhase(originalPhase, compilePhase) {
-            field.set(phase, originalPhase)
+        val currentPhase = field.get(phase) as CompilerPhase<CommonBackendContext, Unit, Unit>
+        val originalPhase = if (currentPhase.javaClass.name == SwiftKtObjectFilesPhase::class.jvmName) {
+            currentPhase.javaClass.getDeclaredField("originalPhase").let { field ->
+                check(field.trySetAccessible()) { "Failed to make field `originalPhase` accessible" }
+                field.get(currentPhase) as CompilerPhase<CommonBackendContext, Unit, Unit>
+            }
+        } else {
+            currentPhase
         }
+        val swiftKtObjectFilesPhase = SwiftKtObjectFilesPhase(originalPhase)
         field.set(phase, swiftKtObjectFilesPhase)
     }
 }

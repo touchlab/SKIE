@@ -117,7 +117,6 @@ class SwiftKtCompilePhase(
 
         val targetTriple = configurables.targetTriple
 
-        println("running swiftc")
         Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
             +"-v"
             +listOf("-module-name", moduleName)

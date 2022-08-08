@@ -12,22 +12,29 @@ import org.jetbrains.kotlin.backend.konan.ObjectFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
 class SwiftKtObjectFilesPhase(
-    private val originalPhase: CompilerPhase<CommonBackendContext, Unit, Unit>,
-    private val swiftKtCompilePhase: SwiftKtCompilePhase,
-    private val onInvokeCompleted: () -> Unit
+    private val originalPhase: CompilerPhase<CommonBackendContext, Unit, Unit>
 ): SameTypeCompilerPhase<CommonBackendContext, Unit> {
-    override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext, input: Unit) = try {
+    override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext, input: Unit) {
         originalPhase.invoke(phaseConfig, phaserState, context, input)
+
+        if (!context.configuration.getBoolean(ConfigurationKeys.isEnabled)) {
+            return
+        }
+
+        val modules = context.configuration.getList(ConfigurationKeys.swiftPackModules)
+        val swiftSources = context.configuration.getList(ConfigurationKeys.swiftSourceFiles)
+        val expandedSwiftDir = context.configuration.getNotNull(ConfigurationKeys.expandedSwiftDir)
+        val compilePhase = SwiftKtCompilePhase(modules, swiftSources, expandedSwiftDir)
+
         val config = context.javaClass.getMethod("getConfig").invoke(context) as KonanConfig
         val objCExport = context.javaClass.getMethod("getObjCExport").invoke(context)
         val namer = objCExport.javaClass.getField("namer").get(objCExport) as ObjCExportNamer?
-        val swiftObjectFiles = swiftKtCompilePhase.process(config, context, namer ?: error("namer is null"))
+
+        val swiftObjectFiles = compilePhase.process(config, context, namer ?: error("namer is null"))
 
         val compilerOutputField = context.javaClass.getField("compilerOutput")
         val originalCompilerOutput = compilerOutputField.get(context) as? List<ObjectFile>? ?: emptyList()
         compilerOutputField.set(context, originalCompilerOutput + swiftObjectFiles)
-    } finally {
-        onInvokeCompleted()
     }
 
     override val stickyPostconditions: Set<Checker<Unit>>
