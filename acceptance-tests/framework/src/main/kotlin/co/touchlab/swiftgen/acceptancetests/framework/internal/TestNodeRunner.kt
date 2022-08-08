@@ -4,6 +4,7 @@ import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.swiftgen.acceptancetests.framework.TestNode
 import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRunner
+import kotlin.streams.toList
 
 internal class TestNodeRunner(
     tempFileSystemFactory: TempFileSystemFactory,
