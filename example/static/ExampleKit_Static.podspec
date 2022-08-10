@@ -1,11 +1,11 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'ExampleKit_Static'
     spec.version                  = '1.0'
-    spec.homepage                 = 'https://github.com/touchlab/SwiftKt'
+    spec.homepage                 = 'https://github.com/touchlab/SwiftLink'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Example library for SwiftKt'
+    spec.summary                  = 'Example library for SwiftLink'
     spec.vendored_frameworks      = 'build/cocoapods/framework/ExampleKit.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '12.4'
