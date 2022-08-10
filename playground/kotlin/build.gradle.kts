@@ -56,7 +56,7 @@ val linkReleaseFrameworkMacosX64 by tasks.getting {
 }
 
 fun printGeneratedSwift(path: File) {
-    val generatedSwift = path.listFiles()!!.joinToString("\n") {
+    val generatedSwift = path.listFiles()?.joinToString("\n") {
         "------ ${it.name} ------\n" + it.readText()
     }
 

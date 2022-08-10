@@ -1,5 +1,7 @@
 package co.touchlab.swiftgen.plugin
 
+import co.touchlab.swiftgen.plugin.internal.FileBuilderFactory
+import co.touchlab.swiftgen.plugin.internal.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.SwiftGenVisitor
 import co.touchlab.swiftpack.api.buildSwiftPackModule
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -10,7 +12,13 @@ class SwiftGenExtension : IrGenerationExtension {
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         buildSwiftPackModule("SwiftGen") {
-            SwiftGenVisitor(this, moduleFragment).visitElement(moduleFragment, Unit)
+            val fileBuilderFactory = FileBuilderFactory()
+            val namespaceProvider = NamespaceProvider(fileBuilderFactory, moduleFragment)
+
+            SwiftGenVisitor(fileBuilderFactory, namespaceProvider).visitElement(moduleFragment, Unit)
+
+            fileBuilderFactory.buildAll()
+                .forEach { addFile(it) }
         }
     }
 }

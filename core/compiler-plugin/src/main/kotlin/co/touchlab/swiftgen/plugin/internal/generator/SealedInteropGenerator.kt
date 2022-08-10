@@ -1,17 +1,17 @@
 package co.touchlab.swiftgen.plugin.internal.generator
 
+import co.touchlab.swiftgen.plugin.internal.FileBuilderFactory
+import co.touchlab.swiftgen.plugin.internal.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.kotlinName
 import co.touchlab.swiftgen.plugin.internal.swiftName
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 
 internal class SealedInteropGenerator(
-    output: SwiftPackModuleBuilder,
-    moduleFragment: IrModuleFragment,
-) : BaseGenerator<IrClass>(output, moduleFragment) {
+    fileBuilderFactory: FileBuilderFactory,
+    namespaceProvider: NamespaceProvider,
+) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider) {
 
     override fun generate(declaration: IrClass) {
         if (declaration.sealedSubclasses.isEmpty()) {
@@ -94,8 +94,11 @@ internal class SealedInteropGenerator(
 
                 nextControlFlow("else")
                 add(
-                    "fatalError(\"Unknown subtype. " +
-                            "This error should not happen under normal circumstances since Self is sealed.\")\n"
+                    "fatalError(" +
+                            "\"Unknown subtype. " +
+                            "This error should not happen under normal circumstances " +
+                            "since ${declaration.swiftName.canonicalName} is sealed." +
+                            "\")\n"
                 )
                 endControlFlow("else")
             }
