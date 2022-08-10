@@ -1,9 +1,6 @@
 package co.touchlab.swiftkt
 
-@ThisTest
+@Test
 class KotlinTest {
     val hello = "World"
 }
-
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ThisTest

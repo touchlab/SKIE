@@ -55,8 +55,10 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "32">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/SwiktExample_watchOS_Dynamic WatchKit App">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "183DE2DC28342AFF006B8798"
@@ -64,7 +66,7 @@
             BlueprintName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic"
             ReferencedContainer = "container:SwiftKtExample.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -73,8 +75,10 @@
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES"
       launchAutomaticallySubstyle = "32">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/SwiktExample_watchOS_Dynamic WatchKit App">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "183DE2DC28342AFF006B8798"
@@ -82,7 +86,16 @@
             BlueprintName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic"
             ReferencedContainer = "container:SwiftKtExample.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "183DE2DC28342AFF006B8798"
+            BuildableName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic.app"
+            BlueprintName = "SwiftKtExample_watchOS_WatchKit_App_Dynamic"
+            ReferencedContainer = "container:SwiftKtExample.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

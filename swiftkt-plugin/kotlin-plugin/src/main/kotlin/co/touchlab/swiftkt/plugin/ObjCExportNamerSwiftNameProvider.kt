@@ -1,52 +1,56 @@
 package co.touchlab.swiftkt.plugin
 
-import co.touchlab.swiftpack.spec.KobjcTransforms
+import co.touchlab.swiftpack.spec.CallableMemberReference
+import co.touchlab.swiftpack.spec.KotlinPackageReference
+import co.touchlab.swiftpack.spec.KotlinTypeReference
+import co.touchlab.swiftpack.spec.SwiftPackReference
 import co.touchlab.swiftpack.spi.SwiftNameProvider
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.resolveClassByFqName
-import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 
 class ObjCExportNamerSwiftNameProvider(
     private val namer: ObjCExportNamer,
-    private val context: CommonBackendContext,
-    private val transforms: KobjcTransforms,
+    private val kotlinNameResolver: KotlinNameResolver,
+    private val transformResolver: TransformResolver,
+    private val referenceResolver: SwiftReferenceResolver,
 ): SwiftNameProvider {
 
-    val renamedClasses: Map<String, ObjCExportNamer.ClassOrProtocolName>
-
-    init {
-        val renamedClasses = mutableMapOf<String, ObjCExportNamer.ClassOrProtocolName>()
-        transforms.types.values.forEach { transform ->
-            val name = namer.getClassOrProtocolName(resolveClass(transform.type))
-            when {
-                transform.hide -> {
-                    renamedClasses[transform.type] = name.copy(swiftName = "__${name.swiftName}")
-                }
-                transform.rename != null -> {
-                    renamedClasses[transform.type] = name.copy(swiftName = transform.rename!!)
-                }
-            }
+    override fun getSwiftTypeName(kotlinTypeReference: SwiftPackReference): String {
+        return referenceResolver.resolveTypeReference(kotlinTypeReference).let { reference ->
+            transformResolver.findTypeTransform(reference)?.newSwiftName ?: namer.getClassOrProtocolName(kotlinNameResolver.resolveClass(reference)).swiftName
         }
-        this.renamedClasses = renamedClasses
     }
 
-    override fun getSwiftName(kotlinClassName: String): String = getClassOrProtocolName(kotlinClassName).swiftName
-
-    fun getObjCName(kotlinClassName: String): String = getClassOrProtocolName(kotlinClassName).objCName
-
-    fun getClassOrProtocolName(kotlinClassName: String): ObjCExportNamer.ClassOrProtocolName {
-        return renamedClasses.getOrElse(kotlinClassName) { namer.getClassOrProtocolName(resolveClass(kotlinClassName)) }
+    override fun getSwiftPropertyName(kotlinPropertyReference: SwiftPackReference): String {
+        return referenceResolver.resolvePropertyReference(kotlinPropertyReference).let { reference ->
+            val propertyDescriptor = lazy { kotlinNameResolver.resolveProperty(reference) }
+            val parentPrefix = getParentPrefix(reference, propertyDescriptor)
+            val propertyName = transformResolver.findPropertyTransform(reference)?.newSwiftName ?: namer.getPropertyName(propertyDescriptor.value)
+            parentPrefix + propertyName
+        }
     }
 
-    private fun resolveClass(kotlinClassName: String): ClassDescriptor {
-        return checkNotNull(context.ir.irModule.descriptor.resolveClassByFqName(
-            FqName(kotlinClassName),
-            NoLookupLocation.FROM_BACKEND
-        )) {
-            "Couldn't resolve class descriptor for $kotlinClassName"
+    override fun getSwiftFunctionSelector(kotlinFunctionReference: SwiftPackReference): String {
+        return referenceResolver.resolveFunctionReference(kotlinFunctionReference).let { reference ->
+            val functionDescriptor = lazy { kotlinNameResolver.resolveFunction(reference) }
+            val parentPrefix = getParentPrefix(reference, functionDescriptor)
+            val functionSelector = transformResolver.findFunctionTransform(reference)?.newSwiftSelector
+                ?: namer.getSwiftName(functionDescriptor.value)
+            val swiftFunctionReference = if (reference.parameterTypes.isEmpty()) {
+                functionSelector.dropLast(2)
+            } else {
+                functionSelector
+            }
+            parentPrefix + swiftFunctionReference
+        }
+    }
+
+    private fun getParentPrefix(reference: CallableMemberReference, descriptor: Lazy<CallableMemberDescriptor>): String {
+        return when (reference.parent) {
+            is KotlinPackageReference -> descriptor.value.findSourceFileInPackage().let { file ->
+                transformResolver.findFileTransform(file)?.newSwiftName ?: namer.getFileClassName(file.file).swiftName
+            } + "."
+            is KotlinTypeReference -> ""
         }
     }
 }

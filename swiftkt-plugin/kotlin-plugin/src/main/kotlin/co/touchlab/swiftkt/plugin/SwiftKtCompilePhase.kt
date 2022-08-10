@@ -1,6 +1,10 @@
 package co.touchlab.swiftkt.plugin
 
 import co.touchlab.swiftpack.spec.KobjcTransforms
+import co.touchlab.swiftpack.spec.KotlinFileReference
+import co.touchlab.swiftpack.spec.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.KotlinTypeReference
 import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import co.touchlab.swiftpack.spi.SwiftNameProvider
@@ -20,18 +24,19 @@ import java.io.File
 
 fun List<KobjcTransforms>.merge(): KobjcTransforms {
     val types = this.flatMap { it.types.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
+    val files = this.flatMap { it.files.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
     val properties = this.flatMap { it.properties.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
     val functions = this.flatMap { it.functions.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
 
-    return KobjcTransforms(types, properties, functions)
+    return KobjcTransforms(types, files, properties, functions)
 }
 
-fun List<KobjcTransforms.TypeTransform>.merge(name: String): KobjcTransforms.TypeTransform {
+fun List<KobjcTransforms.TypeTransform>.merge(reference: KotlinTypeReference): KobjcTransforms.TypeTransform {
     val properties = this.flatMap { it.properties.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
     val functions = this.flatMap { it.methods.entries }.groupBy({ it.key }, { it.value }).mapValues { it.value.merge(it.key) }
 
     return KobjcTransforms.TypeTransform(
-        type = name,
+        reference = reference,
         hide = any { it.hide },
         remove = any { it.remove },
         rename = mapNotNull { it.rename }.singleOrNull(),
@@ -41,18 +46,28 @@ fun List<KobjcTransforms.TypeTransform>.merge(name: String): KobjcTransforms.Typ
     )
 }
 
-fun List<KobjcTransforms.PropertyTransform>.merge(name: String): KobjcTransforms.PropertyTransform {
+fun List<KobjcTransforms.FileTransform>.merge(reference: KotlinFileReference): KobjcTransforms.FileTransform {
+    return KobjcTransforms.FileTransform(
+        reference = reference,
+        hide = any { it.hide },
+        remove = any { it.remove },
+        rename = mapNotNull { it.rename }.singleOrNull(),
+        bridge = mapNotNull { it.bridge }.singleOrNull(),
+    )
+}
+
+fun List<KobjcTransforms.PropertyTransform>.merge(reference: KotlinPropertyReference): KobjcTransforms.PropertyTransform {
     return KobjcTransforms.PropertyTransform(
-        name = name,
+        reference = reference,
         hide = any { it.hide },
         remove = any { it.remove },
         rename = mapNotNull { it.rename }.singleOrNull(),
     )
 }
 
-fun List<KobjcTransforms.FunctionTransform>.merge(name: String): KobjcTransforms.FunctionTransform {
+fun List<KobjcTransforms.FunctionTransform>.merge(reference: KotlinFunctionReference): KobjcTransforms.FunctionTransform {
     return KobjcTransforms.FunctionTransform(
-        name = name,
+        reference = reference,
         hide = any { it.hide },
         remove = any { it.remove },
         rename = mapNotNull { it.rename }.singleOrNull(),
@@ -77,15 +92,21 @@ class SwiftKtCompilePhase(
                 listOf(NamespacedSwiftPackModule(namespace, SwiftPackModule.read(moduleFile)))
             }
         }
-        val transforms = swiftPackModules.map { it.module.kobjcTransforms }.merge()
+        val kotlinNameResolver = KotlinNameResolver(context)
+        val transformResolver = TransformResolver(
+            namer,
+            kotlinNameResolver,
+            swiftPackModules,
+        )
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
-        val swiftNameProvider = ObjCExportNamerSwiftNameProvider(namer, context, transforms)
         val swiftSourcesDir = expandedSwiftDir.also {
             it.deleteRecursively()
             it.mkdirs()
         }
 
         val sourceFiles = swiftPackModules.flatMap { (namespace, module) ->
+            val referenceResolver = SwiftReferenceResolver(module.references)
+            val swiftNameProvider = ObjCExportNamerSwiftNameProvider(namer, kotlinNameResolver, transformResolver, referenceResolver)
             module.files.map { file ->
                 val finalContents = file.produceSwiftFile(swiftNameProvider)
                 val targetSwiftFile = swiftSourcesDir.resolve("${namespace}_${module.name}_${file.name}.swift")
@@ -110,7 +131,7 @@ class SwiftKtCompilePhase(
         val headersDir = framework.resolve("Headers")
         val swiftModule = framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() }
         val modulemapFile = framework.resolve("Modules/module.modulemap")
-        val apiNotes = ApiNotes(moduleName, transforms, swiftNameProvider)
+        val apiNotes = ApiNotes(moduleName, transformResolver)
         apiNotes.save(headersDir)
 
         val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
@@ -162,11 +183,7 @@ class SwiftKtCompilePhase(
 
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
-        return swiftObjectsDir.listFiles.map { it.absolutePath }
 
-        // return PreLinkResult(
-        //     additionalObjectFiles = swiftObjectsDir.listFiles.map { it.absolutePath },
-        //     additionalLinkerFlags = swiftLibSearchPaths,
-        // )
+        return swiftObjectsDir.listFiles.map { it.absolutePath }
     }
 }
