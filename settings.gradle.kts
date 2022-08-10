@@ -19,12 +19,11 @@ dependencyResolutionManagement {
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-rootProject.name = "SwiftKt"
+rootProject.name = "SwiftLink"
 
 include(":example")
 include(":example:static")
 include(":example:dynamic")
 include(":example:plugin")
 
-includeBuild("swiftkt-plugin")
-
+includeBuild("swiftlink-plugin")

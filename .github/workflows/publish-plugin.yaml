@@ -36,13 +36,13 @@ jobs:
           TL_READ_ACTOR: ${{ secrets.TK_ACTOR }}
           TL_READ_TOKEN: ${{ secrets.TK_TOKEN }}
       - name: Publish on AWS
-        run: ./gradlew --project-dir swiftkt-plugin publishAllPublicationsToAwsRepository
+        run: ./gradlew --project-dir swiftlink-plugin publishAllPublicationsToAwsRepository
         if: ${{ success() }}
         env:
           AWS_TOUCHLAB_DEPLOY_ACCESS: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
           AWS_TOUCHLAB_DEPLOY_SECRET: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
       - name: Publish on Plugin Portal
-        run: ./gradlew --project-dir swiftkt-plugin setupPluginUploadFromEnvironment publishPlugins
+        run: ./gradlew --project-dir swiftlink-plugin setupPluginUploadFromEnvironment publishPlugins
         if: ${{ false }} #success()
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}

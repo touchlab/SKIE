@@ -3,7 +3,7 @@ name: Pre Merge Checks
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
       - '*'
@@ -28,11 +28,11 @@ jobs:
 
         # We do a run of the new task `templateExample` created by the plugin
       - name: Run the plugin
-        run: ./gradlew swiftCompilePodDebugFrameworkIosX64
+        run: ./gradlew linkPodDebugFrameworkIosX64
         if: success()
         # And we verify that the output of the file is correct.
       - name: Verify the plugin output
-        run: test -f ./example/dynamic/build/swikt/podDebugFramework/iosX64/work/libExampleKit.a && test -f example/static/build/swikt/podDebugFramework/iosX64/work/libExampleKit.a
+        run: test -f ./example/dynamic/build/bin/iosX64/podDebugFramework/ExampleKit.framework/Headers/ExampleKit.apinotes && test -f ./example/static/build/bin/iosX64/podDebugFramework/ExampleKit.framework/Headers/ExampleKit.apinotes
         if: success()
 
       - name: Stop Gradle

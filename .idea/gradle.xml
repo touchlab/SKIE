@@ -7,12 +7,12 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/swiftkt-plugin" name="swiftkt-plugin">
+              <build path="$PROJECT_DIR$/swiftlink-plugin" name="swiftlink-plugin">
                 <projects>
-                  <project path="$PROJECT_DIR$/swiftkt-plugin" />
-                  <project path="$PROJECT_DIR$/swiftkt-plugin/kotlin-plugin" />
-                  <project path="$PROJECT_DIR$/swiftkt-plugin/plugin" />
-                  <project path="$PROJECT_DIR$/swiftkt-plugin/test-suite" />
+                  <project path="$PROJECT_DIR$/swiftlink-plugin" />
+                  <project path="$PROJECT_DIR$/swiftlink-plugin/kotlin-plugin" />
+                  <project path="$PROJECT_DIR$/swiftlink-plugin/plugin" />
+                  <project path="$PROJECT_DIR$/swiftlink-plugin/test-suite" />
                 </projects>
               </build>
             </builds>
@@ -30,11 +30,11 @@
             <option value="$PROJECT_DIR$/example/dynamic" />
             <option value="$PROJECT_DIR$/example/plugin" />
             <option value="$PROJECT_DIR$/example/static" />
-            <option value="$PROJECT_DIR$/swiftkt-plugin" />
-            <option value="$PROJECT_DIR$/swiftkt-plugin/buildSrc" />
-            <option value="$PROJECT_DIR$/swiftkt-plugin/kotlin-plugin" />
-            <option value="$PROJECT_DIR$/swiftkt-plugin/plugin" />
-            <option value="$PROJECT_DIR$/swiftkt-plugin/test-suite" />
+            <option value="$PROJECT_DIR$/swiftlink-plugin" />
+            <option value="$PROJECT_DIR$/swiftlink-plugin/buildSrc" />
+            <option value="$PROJECT_DIR$/swiftlink-plugin/kotlin-plugin" />
+            <option value="$PROJECT_DIR$/swiftlink-plugin/plugin" />
+            <option value="$PROJECT_DIR$/swiftlink-plugin/test-suite" />
           </set>
         </option>
       </GradleProjectSettings>
