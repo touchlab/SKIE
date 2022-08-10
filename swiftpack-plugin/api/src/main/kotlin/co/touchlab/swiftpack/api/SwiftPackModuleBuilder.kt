@@ -1,7 +1,15 @@
 package co.touchlab.swiftpack.api
 
 import co.touchlab.swiftpack.spec.KobjcTransforms
-import co.touchlab.swiftpack.spec.NameMangling.mangledClassName
+import co.touchlab.swiftpack.spec.KotlinFileReference
+import co.touchlab.swiftpack.spec.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.KotlinPackageReference
+import co.touchlab.swiftpack.spec.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.KotlinTypeReference
+import co.touchlab.swiftpack.spec.MemberParentReference
+import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_FUNCTION_PREFIX
+import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_PROPERTY_PREFIX
+import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_TYPE_PREFIX
 import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spec.SwiftPackModule.Companion.write
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -9,9 +17,24 @@ import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.SelfTypeName
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
+import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
+import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
+import org.jetbrains.kotlin.ir.util.isFileClass
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 
-@Suppress("FunctionName")
+
 class SwiftPackModuleBuilder(
     private val moduleName: String,
 ) {
@@ -19,6 +42,96 @@ class SwiftPackModuleBuilder(
     private val kobjcTransformsScope = KobjcTransformScope()
 
     val files: Set<FileSpec> get() = mutableFiles
+
+    private val referenceCounter = AtomicInteger(-1)
+    private val typeReferences = ReferenceMap<KotlinTypeReference>(SWIFTPACK_KOTLIN_TYPE_PREFIX, referenceCounter)
+    private val propertyReferences = ReferenceMap<KotlinPropertyReference>(SWIFTPACK_KOTLIN_PROPERTY_PREFIX, referenceCounter)
+    private val functionReferences = ReferenceMap<KotlinFunctionReference>(SWIFTPACK_KOTLIN_FUNCTION_PREFIX, referenceCounter)
+
+    fun KotlinTypeReference.swiftReference(): DeclaredTypeName {
+        val ref = typeReferences.getReference(this)
+        return DeclaredTypeName.typeName(".$ref")
+    }
+
+    fun KotlinTypeReference.applyTransform(transform: KobjcTransformScope.TypeTransformScope.() -> Unit): KotlinTypeReference {
+        kobjcTransformsScope.type(this, transform)
+        return this
+    }
+
+    fun KotlinPropertyReference.swiftReference(): PropertySpec {
+        val ref = propertyReferences.getReference(this)
+        return PropertySpec.builder(ref, SelfTypeName.INSTANCE).build()
+    }
+
+    fun KotlinPropertyReference.applyTransform(transform: KobjcTransformScope.PropertyTransformScope.() -> Unit): KotlinPropertyReference {
+        kobjcTransformsScope.property(this, transform)
+        return this
+    }
+
+    fun KotlinFunctionReference.swiftReference(): FunctionSpec {
+        val ref = functionReferences.getReference(this)
+        return FunctionSpec.builder(ref).build()
+    }
+
+    fun KotlinFunctionReference.applyTransform(transform: KobjcTransformScope.FunctionTransformScope.() -> Unit): KotlinFunctionReference {
+        kobjcTransformsScope.function(this, transform)
+        return this
+    }
+
+    fun ClassDescriptor.reference(): KotlinTypeReference {
+        return KotlinTypeReference(containingDeclaration.reference(), name.asString())
+    }
+
+    fun IrClass.reference(): KotlinTypeReference {
+        return KotlinTypeReference(parent.reference(), name.asString())
+    }
+
+    fun PropertyDescriptor.reference(): KotlinPropertyReference {
+        return KotlinPropertyReference(containingDeclaration.reference(), name.asString())
+    }
+
+    fun IrProperty.reference(): KotlinPropertyReference {
+        return KotlinPropertyReference(parent.reference(), name.asString())
+    }
+
+    fun FunctionDescriptor.reference(): KotlinFunctionReference {
+        return KotlinFunctionReference(containingDeclaration.reference(), name.asString(), valueParameters.map { param ->
+            requireNotNull(param.type.constructor.declarationDescriptor?.reference()) {
+                "Function reference parameter type has no declaration descriptor"
+            }
+        })
+    }
+
+    fun IrFunction.reference(): KotlinFunctionReference {
+        return KotlinFunctionReference(parent.reference(), name.asString(), valueParameters.map { param ->
+            requireNotNull(param.type.originalKotlinType?.constructor?.declarationDescriptor?.reference()) {
+                "Function reference parameter type has no originalKotlinType"
+            }
+        })
+    }
+
+    private fun ClassifierDescriptor.reference(): KotlinTypeReference = when (this) {
+        is ClassDescriptor -> reference()
+        else -> error("Unsupported classifier descriptor: $this")
+    }
+
+    private fun DeclarationDescriptor.reference(): MemberParentReference = when (this) {
+        is PackageFragmentDescriptor -> KotlinPackageReference(fqNameSafe.asString())
+        is ClassDescriptor -> reference()
+        else -> error("Unsupported declaration descriptor: $this")
+    }
+
+    private fun IrDeclarationParent.reference(): MemberParentReference = when (this) {
+        is IrPackageFragment -> KotlinPackageReference(fqName.asString())
+        is IrClass -> {
+            if (isFileClass) {
+                parent.reference()
+            } else {
+                KotlinTypeReference(parent.reference(), name.asString())
+            }
+        }
+        else -> error("Unsupported declaration parent: $this")
+    }
 
     fun file(name: String, contents: FileSpec.Builder.() -> Unit): FileSpec {
         val builder = FileSpec.builder(name)
@@ -40,6 +153,11 @@ class SwiftPackModuleBuilder(
     fun build(): SwiftPackModule {
         return SwiftPackModule(
             moduleName,
+            SwiftPackModule.References(
+                types = typeReferences.reverseReferences,
+                properties = propertyReferences.reverseReferences,
+                functions = functionReferences.reverseReferences,
+            ),
             mutableFiles.map {
                 SwiftPackModule.TemplateFile(
                     name = it.name,
@@ -55,42 +173,132 @@ class SwiftPackModuleBuilder(
 
     @KobjcScopeMarker
     class KobjcTransformScope(
-        private val types: MutableMap<String, TypeTransformScope> = mutableMapOf(),
-        private val properties: MutableMap<String, PropertyTransformScope> = mutableMapOf(),
-        private val functions: MutableMap<String, FunctionTransformScope> = mutableMapOf(),
+        private val packageReference: KotlinPackageReference = KotlinPackageReference.ROOT,
+        private val types: MutableMap<KotlinTypeReference, TypeTransformScope> = mutableMapOf(),
+        private val files: MutableMap<KotlinFileReference, FileTransformScope> = mutableMapOf(),
+        private val properties: MutableMap<KotlinPropertyReference, PropertyTransformScope> = mutableMapOf(),
+        private val functions: MutableMap<KotlinFunctionReference, FunctionTransformScope> = mutableMapOf(),
     ) {
         fun type(name: String, builder: TypeTransformScope.() -> Unit) {
-            val scope = types.getOrPut(name) { TypeTransformScope(name) }
+            val reference = KotlinTypeReference(packageReference, name)
+            type(reference, builder)
+        }
+
+        fun type(reference: KotlinTypeReference, builder: TypeTransformScope.() -> Unit) {
+            val scope = types.getOrPut(reference) { TypeTransformScope(reference) }
+            scope.builder()
+        }
+
+        fun file(path: String, builder: FileTransformScope.() -> Unit) {
+            val reference = KotlinFileReference(packageReference, path)
+            file(reference, builder)
+        }
+
+        fun file(reference: KotlinFileReference, builder: FileTransformScope.() -> Unit) {
+            val scope = files.getOrPut(reference) { FileTransformScope(reference) }
             scope.builder()
         }
 
         fun property(name: String, builder: PropertyTransformScope.() -> Unit) {
-            val scope = properties.getOrPut(name) { PropertyTransformScope(name) }
-            scope.builder()
+            val reference = KotlinPropertyReference(packageReference, name)
+            property(reference, builder)
+        }
+
+        fun property(reference: KotlinPropertyReference, builder: PropertyTransformScope.() -> Unit) {
+            when (val parent = reference.parent) {
+                is KotlinPackageReference -> {
+                    val scope = properties.getOrPut(reference) { PropertyTransformScope(reference) }
+                    scope.builder()
+                }
+                is KotlinTypeReference -> type(parent) {
+                    property(reference, builder)
+                }
+            }
+
         }
 
         fun function(name: String, builder: FunctionTransformScope.() -> Unit) {
-            val scope = functions.getOrPut(name) { FunctionTransformScope(name) }
+            val reference = KotlinFunctionReference(packageReference, name, emptyList())
+            function(reference, builder)
+        }
+
+        fun function(reference: KotlinFunctionReference, builder: FunctionTransformScope.() -> Unit) {
+            when (val parent = reference.parent) {
+                is KotlinPackageReference -> {
+                    val scope = functions.getOrPut(reference) { FunctionTransformScope(reference) }
+                    scope.builder()
+                }
+                is KotlinTypeReference -> type(parent) {
+                    method(reference, builder)
+                }
+            }
+
+        }
+
+        fun inPackage(packageName: String, builder: KobjcTransformScope.() -> Unit) {
+            val scope = KobjcTransformScope(
+                packageReference = packageReference.child(packageName),
+                types = types,
+                files = files,
+                properties = properties,
+                functions = functions,
+            )
             scope.builder()
         }
 
         internal fun build(): KobjcTransforms {
             return KobjcTransforms(
                 types = types.mapValues { it.value.build() },
+                files = files.mapValues { it.value.build() },
                 properties = properties.mapValues { it.value.build() },
                 functions = functions.mapValues { it.value.build() },
             )
         }
 
         @KobjcScopeMarker
-        class TypeTransformScope(
-            private val name: String,
+        class FileTransformScope(
+            private val reference: KotlinFileReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
             private var rename: String? = null,
             private var bridge: String? = null,
-            private val properties: MutableMap<String, PropertyTransformScope> = mutableMapOf(),
-            private val functions: MutableMap<String, FunctionTransformScope> = mutableMapOf(),
+        ) {
+            fun remove() {
+                remove = true
+            }
+
+            fun hide() {
+                hide = true
+            }
+
+            fun rename(newSwiftName: String) {
+                rename = newSwiftName
+            }
+
+            fun bridge(swiftType: String) {
+                bridge = swiftType
+            }
+
+            internal fun build(): KobjcTransforms.FileTransform {
+                return KobjcTransforms.FileTransform(
+                    reference = reference,
+                    hide = hide,
+                    remove = remove,
+                    rename = rename,
+                    bridge = bridge,
+                )
+            }
+        }
+
+        @KobjcScopeMarker
+        class TypeTransformScope(
+            private val reference: KotlinTypeReference,
+            private var hide: Boolean = false,
+            private var remove: Boolean = false,
+            private var rename: String? = null,
+            private var bridge: String? = null,
+            private val properties: MutableMap<KotlinPropertyReference, PropertyTransformScope> = mutableMapOf(),
+            private val methods: MutableMap<KotlinFunctionReference, FunctionTransformScope> = mutableMapOf(),
         ) {
             fun remove() {
                 remove = true
@@ -109,31 +317,41 @@ class SwiftPackModuleBuilder(
             }
 
             fun property(name: String, builder: PropertyTransformScope.() -> Unit) {
-                val scope = properties.getOrPut(name) { PropertyTransformScope(name) }
+                val reference = KotlinPropertyReference(reference, name)
+                property(reference, builder)
+            }
+
+            fun property(reference: KotlinPropertyReference, builder: PropertyTransformScope.() -> Unit) {
+                val scope = properties.getOrPut(reference) { PropertyTransformScope(reference) }
                 scope.builder()
             }
 
             fun method(name: String, builder: FunctionTransformScope.() -> Unit) {
-                val scope = functions.getOrPut(name) { FunctionTransformScope(name) }
+                val reference = KotlinFunctionReference(reference, name, emptyList())
+                method(reference, builder)
+            }
+
+            fun method(reference: KotlinFunctionReference, builder: FunctionTransformScope.() -> Unit) {
+                val scope = methods.getOrPut(reference) { FunctionTransformScope(reference) }
                 scope.builder()
             }
 
             internal fun build(): KobjcTransforms.TypeTransform {
                 return KobjcTransforms.TypeTransform(
-                    type = name,
+                    reference = reference,
                     hide = hide,
                     remove = remove,
                     rename = rename,
                     bridge = bridge,
                     properties = properties.mapValues { it.value.build() },
-                    methods = functions.mapValues { it.value.build() },
+                    methods = methods.mapValues { it.value.build() },
                 )
             }
         }
 
         @KobjcScopeMarker
         class PropertyTransformScope(
-            private val name: String,
+            private val reference: KotlinPropertyReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
             private var rename: String? = null,
@@ -152,7 +370,7 @@ class SwiftPackModuleBuilder(
 
             internal fun build(): KobjcTransforms.PropertyTransform {
                 return KobjcTransforms.PropertyTransform(
-                    name = name,
+                    reference = reference,
                     hide = hide,
                     remove = remove,
                     rename = rename,
@@ -162,7 +380,7 @@ class SwiftPackModuleBuilder(
 
         @KobjcScopeMarker
         class FunctionTransformScope(
-            private val name: String,
+            private val reference: KotlinFunctionReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
             private var rename: String? = null,
@@ -181,7 +399,7 @@ class SwiftPackModuleBuilder(
 
             internal fun build(): KobjcTransforms.FunctionTransform {
                 return KobjcTransforms.FunctionTransform(
-                    name = name,
+                    reference = reference,
                     hide = hide,
                     remove = remove,
                     rename = rename,
@@ -199,22 +417,6 @@ class SwiftPackModuleBuilder(
                 storage.set(value)
             }
     }
-}
-
-val SWIFTPACK_KOTLIN_TYPE_PREFIX = "KotlinSwiftGen"
-
-fun DeclaredTypeName.Companion.kotlin(qualifiedClassName: String): DeclaredTypeName {
-    return qualifiedTypeName(
-        "$SWIFTPACK_KOTLIN_TYPE_PREFIX.${qualifiedClassName.mangledClassName}"
-    )
-}
-
-fun PropertySpec.Companion.kotlin(propName: String): PropertySpec {
-    return builder("${SWIFTPACK_KOTLIN_TYPE_PREFIX}_$propName", SelfTypeName.INSTANCE).build()
-}
-
-fun FunctionSpec.Companion.kotlin(funName: String): FunctionSpec {
-    return builder("${SWIFTPACK_KOTLIN_TYPE_PREFIX}_$funName").build()
 }
 
 fun buildSwiftPackModule(moduleName: String = "main", writeToOutputDir: Boolean = true, block: SwiftPackModuleBuilder.() -> Unit): SwiftPackModule {

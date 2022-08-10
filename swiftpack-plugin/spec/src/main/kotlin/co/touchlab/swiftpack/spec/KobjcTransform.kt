@@ -5,24 +5,34 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class KobjcTransforms(
-    val types: Map<String, TypeTransform> = emptyMap(),
-    val properties: Map<String, PropertyTransform> = emptyMap(),
-    val functions: Map<String, FunctionTransform> = emptyMap(),
+    val types: Map<KotlinTypeReference, TypeTransform> = emptyMap(),
+    val files: Map<KotlinFileReference, FileTransform> = emptyMap(),
+    val properties: Map<KotlinPropertyReference, PropertyTransform> = emptyMap(),
+    val functions: Map<KotlinFunctionReference, FunctionTransform> = emptyMap(),
 ) {
     @Serializable
-    data class TypeTransform(
-        val type: String,
+    data class FileTransform(
+        val reference: KotlinFileReference,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
         val bridge: String? = null,
-        val properties: Map<String, PropertyTransform> = emptyMap(),
-        val methods: Map<String, FunctionTransform> = emptyMap(),
+    )
+
+    @Serializable
+    data class TypeTransform(
+        val reference: KotlinTypeReference,
+        val hide: Boolean = false,
+        val remove: Boolean = false,
+        val rename: String? = null,
+        val bridge: String? = null,
+        val properties: Map<KotlinPropertyReference, PropertyTransform> = emptyMap(),
+        val methods: Map<KotlinFunctionReference, FunctionTransform> = emptyMap(),
     )
 
     @Serializable
     class PropertyTransform(
-        val name: String,
+        val reference: KotlinPropertyReference,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
@@ -30,7 +40,7 @@ data class KobjcTransforms(
 
     @Serializable
     class FunctionTransform(
-        val name: String,
+        val reference: KotlinFunctionReference,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,

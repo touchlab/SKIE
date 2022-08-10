@@ -1,7 +1,7 @@
 package co.touchlab.swiftpack.example.plugin
 
 import co.touchlab.swiftpack.api.buildSwiftPackModule
-import co.touchlab.swiftpack.api.kotlin
+import co.touchlab.swiftpack.spec.KotlinTypeReference
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
@@ -25,7 +25,7 @@ class ExampleSymbolProcessor: SymbolProcessor {
                                 resolver.getSymbolsWithAnnotation("co.touchlab.swiftpack.example.ExampleAnnotation")
                                     .mapNotNull { it as? KSClassDeclaration }
                                     .forEach {
-                                        add("%T(),", DeclaredTypeName.kotlin(it.qualifiedName!!.asString()))
+                                        add("%T(),", KotlinTypeReference(it.qualifiedName!!.asString()).swiftReference())
                                     }
                                 add("")
                                 add("]")
@@ -49,4 +49,3 @@ class ExampleSymbolProcessor: SymbolProcessor {
         return emptyList()
     }
 }
-

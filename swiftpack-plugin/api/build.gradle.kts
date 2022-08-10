@@ -6,6 +6,8 @@ dependencies {
     api("io.outfoxx:swiftpoet:1.4.2")
     api(projects.swiftpackSpec)
 
+    compileOnly(kotlin("compiler-embeddable"))
+
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
@@ -18,4 +20,3 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-
