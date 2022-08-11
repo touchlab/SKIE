@@ -50,3 +50,127 @@ tasks.register<Exec>("runSwift") {
     }
     commandLine("build/main")
 }
+
+tasks.register<SetupPlaygroundTask>("setupPlayground") {
+    dependsOn(clean)
+
+    testsDirectory = layout.projectDirectory.dir("../../acceptance-tests/src/test/resources").asFile
+    kotlinPlaygroundDirectory = layout.projectDirectory.dir("../kotlin/src").asFile
+    swiftPlaygroundFile = layout.projectDirectory.file("main.swift").asFile
+}
+
+abstract class SetupPlaygroundTask : DefaultTask() {
+
+    @get:Input
+    @set:Option(option = "test", description = "the test to be copied to the playground")
+    var test: String? = null
+
+    @InputDirectory
+    lateinit var testsDirectory: File
+
+    @InputDirectory
+    lateinit var kotlinPlaygroundDirectory: File
+
+    @InputFile
+    lateinit var swiftPlaygroundFile: File
+
+    @TaskAction
+    fun execute() {
+        checkInputs()
+
+        val swiftTestFile = getSwiftTestFile()
+
+        val kotlinPlaygroundSourcesDirectory = prepareKotlinPlaygroundSourcesDirectory()
+
+        copySwiftTestFile(swiftTestFile)
+        copyKotlinTestFiles(swiftTestFile, kotlinPlaygroundSourcesDirectory)
+    }
+
+    private fun checkInputs() {
+        check(testsDirectory.exists()) { "Cannot find acceptance tests directory." }
+        check(kotlinPlaygroundDirectory.exists()) { "Cannot find kotlin playground directory." }
+        check(swiftPlaygroundFile.exists()) { "Cannot find swift playground file." }
+    }
+
+    private fun getSwiftTestFile(): File {
+        requireNotNull(test) {
+            "Missing property \"test\" that specifies which test should be copied to the playground. " +
+                    "Pass the argument using \"-Ptest=...\""
+        }
+
+        val swiftTestFile = testsDirectory.resolve(test!!)
+
+        require(swiftTestFile.extension == "swift") { "Test file \"$swiftTestFile\" must be a swift file." }
+        require(swiftTestFile.exists()) { "Test file \"$swiftTestFile\" does not exist." }
+        require(swiftTestFile.startsWith(testsDirectory)) {
+            "Test file \"$swiftTestFile\" must be located in the acceptance tests directory."
+        }
+
+        return swiftTestFile
+    }
+
+    private fun prepareKotlinPlaygroundSourcesDirectory(): File {
+        val kotlinPlaygroundSourcesDirectory = kotlinPlaygroundDirectory.resolve("commonMain/kotlin")
+
+        check(kotlinPlaygroundDirectory.exists()) { "Cannot find Kotlin playground module directory." }
+
+        kotlinPlaygroundDirectory.deleteRecursively()
+        kotlinPlaygroundSourcesDirectory.mkdirs()
+
+        return kotlinPlaygroundSourcesDirectory
+    }
+
+    private fun copySwiftTestFile(swiftTestFile: File) {
+        swiftPlaygroundFile.writeText(
+            """
+                import Foundation
+                import Kotlin
+                
+                
+            """.trimIndent() + swiftTestFile.readText() + """
+                
+                fatalError("Tested program ended without explicitly calling `exit(0)`.")
+            """.trimIndent()
+        )
+    }
+
+    private fun copyKotlinTestFiles(swiftTestFile: File, kotlinPlaygroundSourcesDirectory: File) {
+        var currentDirectory = swiftTestFile.parentFile
+
+        while (currentDirectory != testsDirectory) {
+            copySingleKotlinTestDirectory(currentDirectory, kotlinPlaygroundSourcesDirectory)
+
+            currentDirectory = currentDirectory.parentFile
+        }
+    }
+
+    private fun copySingleKotlinTestDirectory(kotlinTestDirectory: File, kotlinPlaygroundSourcesDirectory: File) {
+        val relocatedDirectory = prepareSingleKotlinPlaygroundDirectory(
+            kotlinTestDirectory,
+            kotlinPlaygroundSourcesDirectory,
+        )
+
+        kotlinTestDirectory.listFiles()
+            ?.filter { it.extension == "kt" }
+            ?.forEach { kotlinFile ->
+                val playgroundKotlinFile = relocatedDirectory.resolve(kotlinFile.name)
+
+                kotlinFile.copyTo(playgroundKotlinFile)
+            }
+    }
+
+    private fun prepareSingleKotlinPlaygroundDirectory(
+        kotlinTestDirectory: File,
+        kotlinPlaygroundSourcesDirectory: File,
+    ): File {
+        val relocatedDirectory = kotlinPlaygroundSourcesDirectory.resolve(
+            kotlinTestDirectory.absolutePath
+                .removePrefix(testsDirectory.absolutePath)
+                .removePrefix("/")
+        )
+
+        relocatedDirectory.mkdirs()
+
+        return relocatedDirectory
+    }
+}
