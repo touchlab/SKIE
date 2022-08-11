@@ -1,4 +1,4 @@
-package tests.sealed.classes.collission.base.x
+package tests.sealed.classes.collision.base.x
 
 sealed class A
 

@@ -1,4 +1,4 @@
-package tests.sealed.classes.collission.nested_and_outer.base
+package tests.sealed.classes.collision.nested_and_outer.base
 
 sealed class A {
 
