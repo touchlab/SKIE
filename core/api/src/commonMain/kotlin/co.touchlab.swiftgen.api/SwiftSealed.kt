@@ -13,4 +13,8 @@ object SwiftSealed {
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.SOURCE)
     annotation class FunctionName(val functionName: String)
+
+    @Target(AnnotationTarget.CLASS)
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class ElseName(val elseName: String)
 }

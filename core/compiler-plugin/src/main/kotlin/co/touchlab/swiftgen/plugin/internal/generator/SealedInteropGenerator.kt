@@ -8,6 +8,7 @@ import co.touchlab.swiftgen.plugin.internal.util.findAnnotation
 import co.touchlab.swiftgen.plugin.internal.util.kotlinName
 import co.touchlab.swiftgen.plugin.internal.util.swiftName
 import io.outfoxx.swiftpoet.*
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 
@@ -18,7 +19,6 @@ internal class SealedInteropGenerator(
 
     // TODO Verify annotation usage on correct objects
     // TODO Verify that you cannot apply conflicting annotation
-    // TODO Add configuration for Else
     // TODO Handle case when everything is hidden
     // TODO Add Global module configuration to Gradle
 
@@ -37,7 +37,7 @@ internal class SealedInteropGenerator(
     }
 
     private fun shouldGenerateSealedInterop(declaration: IrClass): Boolean {
-        val isSealed = declaration.sealedSubclasses.isNotEmpty()
+        val isSealed = declaration.isSealed
         val isEnabled = declaration.findAnnotation<SwiftSealed.Disabled>() == null
 
         return isSealed && isEnabled
@@ -149,8 +149,11 @@ internal class SealedInteropGenerator(
         endControlFlow("else")
     }
 
+    private val IrClass.isSealed: Boolean
+        get() = this.modality == Modality.SEALED
+
     private val IrClass.elseCaseName: String
-        get() = "Else"
+        get() = this.findAnnotation<SwiftSealed.ElseName>()?.elseName ?: "Else"
 
     private val IrClassSymbol.enumCaseName: String
         get() {
