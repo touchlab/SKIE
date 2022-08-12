@@ -122,9 +122,10 @@ class SwiftKtCompilePhase(
             }
             execute()
         }
-        kotlinHeader.appendText("\n#import \"${swiftHeader.name}\"\n")
+        // TODO: This line seems to fix the "warning: umbrella header for module 'ExampleKit' does not include header 'ExampleKit-Swift.h'",
+        // TODO: but not in all invocations, which is why it is commented out and to be investigated.
+        // kotlinHeader.appendText("\n#import \"${swiftHeader.name}\"\n")
 
-        // TODO: Generate .swiftmodule and .swiftinterface for other architectures of the platform to fix missing Xcode code completion
         if (targetTriple.isSimulator && configurables.target.architecture == Architecture.ARM64 && setOf(Family.IOS, Family.TVOS, Family.WATCHOS).contains(configurables.target.family)) {
             val otherTriple = targetTriple.copy(architecture = "x86_64")
             Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
