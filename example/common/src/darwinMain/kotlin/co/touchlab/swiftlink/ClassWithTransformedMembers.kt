@@ -15,7 +15,7 @@ class ClassWithTransformedMembers {
     fun toBeRenamedMethod(): String = "renamed"
 
     @Test(hide = true)
-    fun toBeHiddenMethodWithParams(param: String): String = "hidden"
+    fun toBeHiddenMethodWithParams(param: String): String = "hidden = $param"
 
     @Test(invocation = "()")
     fun overloadedMethod(): String = "overloaded"

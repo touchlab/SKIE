@@ -10,7 +10,10 @@ import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.ObjectFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
+import org.jetbrains.kotlin.konan.target.Architecture
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
+import org.jetbrains.kotlin.konan.target.Family
+import org.jetbrains.kotlin.konan.target.isSimulator
 import org.jetbrains.kotlin.konan.target.platformName
 import org.jetbrains.kotlin.konan.target.withOSVersion
 import org.jetbrains.kotlin.library.impl.javaFile
@@ -71,6 +74,8 @@ class SwiftKtCompilePhase(
         val framework = File(config.outputFile)
         val moduleName = framework.name.removeSuffix(".framework")
         val headersDir = framework.resolve("Headers")
+        val kotlinHeader = headersDir.resolve("$moduleName.h")
+        val swiftHeader = headersDir.resolve("$moduleName-Swift.h")
         val swiftModule = framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() }
         val modulemapFile = framework.resolve("Modules/module.modulemap")
         val apiNotes = ApiNotes(moduleName, transformResolver)
@@ -95,7 +100,7 @@ class SwiftKtCompilePhase(
             +"-emit-module-path"
             +swiftModule.resolve("$targetTriple.swiftmodule").absolutePath
             +"-emit-objc-header-path"
-            +headersDir.resolve("$moduleName-Swift.h").absolutePath
+            +swiftHeader.absolutePath
             if (swiftcBitcodeArg != null) {
                 +swiftcBitcodeArg
             }
@@ -117,8 +122,41 @@ class SwiftKtCompilePhase(
             }
             execute()
         }
+        kotlinHeader.appendText("\n#import \"${swiftHeader.name}\"\n")
 
         // TODO: Generate .swiftmodule and .swiftinterface for other architectures of the platform to fix missing Xcode code completion
+        if (targetTriple.isSimulator && configurables.target.architecture == Architecture.ARM64 && setOf(Family.IOS, Family.TVOS, Family.WATCHOS).contains(configurables.target.family)) {
+            val otherTriple = targetTriple.copy(architecture = "x86_64")
+            Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
+                +"-v"
+                +listOf("-module-name", moduleName)
+                +"-import-underlying-module"
+                +listOf("-Xcc", "-fmodule-map-file=$modulemapFile")
+                +"-emit-module-interface-path"
+                +swiftModule.resolve("$otherTriple.swiftinterface").absolutePath
+                +"-emit-module-path"
+                +swiftModule.resolve("$otherTriple.swiftmodule").absolutePath
+                if (swiftcBitcodeArg != null) {
+                    +swiftcBitcodeArg
+                }
+                +swiftcBuildTypeArgs
+                +"-enable-library-evolution"
+                +"-parse-as-library"
+                +"-g"
+                +"-sdk"
+                +configurables.absoluteTargetSysRoot
+                +"-target"
+                +otherTriple.withOSVersion(configurables.osVersionMin).toString()
+                +sourceFiles.map { it.absolutePath }
+
+                workingDirectory = swiftObjectsDir.javaFile()
+
+                logWith {
+                    println(it())
+                }
+                execute()
+            }
+        }
 
         val swiftLibSearchPaths = listOf(
             File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),
