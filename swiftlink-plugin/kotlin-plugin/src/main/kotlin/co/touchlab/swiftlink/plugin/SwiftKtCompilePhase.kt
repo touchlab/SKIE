@@ -170,6 +170,6 @@ class SwiftKtCompilePhase(
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
 
-        return swiftObjectsDir.listFiles.map { it.absolutePath }
+        return swiftObjectsDir.listFilesOrEmpty.filter { it.extension == "o" }.map { it.absolutePath }
     }
 }
