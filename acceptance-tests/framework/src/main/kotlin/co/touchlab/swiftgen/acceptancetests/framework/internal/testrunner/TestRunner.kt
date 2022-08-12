@@ -12,11 +12,16 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         val tempFileSystem = tempFileSystemFactory.create(test)
         val testResultBuilder = TestResultBuilder()
 
-        return compileKotlin(test.kotlinFiles, tempFileSystem, testResultBuilder)
+        return IntermediateResult.Value(test.kotlinFiles)
+            .map { enhanceKotlinCode(it) }
+            .flatMap { compileKotlin(it, tempFileSystem, testResultBuilder) }
             .map { enhanceSwiftCode(test.swiftCode, tempFileSystem) to it }
             .flatMap { compileSwift(it.first, it.second, tempFileSystem, testResultBuilder) }
             .finalize { runSwift(it, testResultBuilder) }
     }
+
+    private fun enhanceKotlinCode(kotlinFiles: List<Path>): List<Path> =
+        KotlinCodeEnhancer().enhance(kotlinFiles)
 
     private fun compileKotlin(
         kotlinFiles: List<Path>,

@@ -15,6 +15,7 @@ buildConfig {
 
 dependencies {
     testImplementation(project(":acceptance-tests:framework"))
+    testImplementation("co.touchlab.swiftgen:api")
 }
 
 tasks.test {

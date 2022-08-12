@@ -41,9 +41,11 @@ class AcceptanceTestsRunner(
 
     private suspend fun FunSpecContainerScope.outputEvaluatedTest(evaluatedTest: EvaluatedTestNode.Container) {
         context(evaluatedTest.name) {
-            evaluatedTest.children.forEach {
-                outputEvaluatedTest(it)
-            }
+            evaluatedTest.children
+                .sortedBy { it.name }
+                .forEach {
+                    outputEvaluatedTest(it)
+                }
         }
     }
 

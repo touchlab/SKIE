@@ -1,9 +1,12 @@
 package co.touchlab.swiftgen.plugin.internal.generator
 
+import co.touchlab.swiftgen.api.SwiftSealed
+import co.touchlab.swiftgen.api.SwiftSealedCase
 import co.touchlab.swiftgen.plugin.internal.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.NamespaceProvider
-import co.touchlab.swiftgen.plugin.internal.kotlinName
-import co.touchlab.swiftgen.plugin.internal.swiftName
+import co.touchlab.swiftgen.plugin.internal.util.findAnnotation
+import co.touchlab.swiftgen.plugin.internal.util.kotlinName
+import co.touchlab.swiftgen.plugin.internal.util.swiftName
 import io.outfoxx.swiftpoet.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -13,8 +16,14 @@ internal class SealedInteropGenerator(
     namespaceProvider: NamespaceProvider,
 ) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider) {
 
+    // TODO Verify annotation usage on correct objects
+    // TODO Verify that you cannot apply conflicting annotation
+    // TODO Add configuration for Else
+    // TODO Handle case when everything is hidden
+    // TODO Add Global module configuration to Gradle
+
     override fun generate(declaration: IrClass) {
-        if (declaration.sealedSubclasses.isEmpty()) {
+        if (!shouldGenerateSealedInterop(declaration)) {
             return
         }
 
@@ -25,6 +34,13 @@ internal class SealedInteropGenerator(
 
             addExhaustivelyFunction(declaration, enumType)
         }
+    }
+
+    private fun shouldGenerateSealedInterop(declaration: IrClass): Boolean {
+        val isSealed = declaration.sealedSubclasses.isNotEmpty()
+        val isEnabled = declaration.findAnnotation<SwiftSealed.Disabled>() == null
+
+        return isSealed && isEnabled
     }
 
     private fun FileSpec.Builder.addSealedEnum(
@@ -49,11 +65,17 @@ internal class SealedInteropGenerator(
     }
 
     private fun TypeSpec.Builder.addSealedEnumCases(declaration: IrClass): TypeSpec.Builder {
-        declaration.sealedSubclasses.forEach { sealedSubclass ->
-            addEnumCase(
-                sealedSubclass.enumCaseName,
-                sealedSubclass.owner.swiftName,
-            )
+        declaration.sealedSubclasses
+            .filterNot { it.isHiddenSealedSubclass }
+            .forEach { sealedSubclass ->
+                addEnumCase(
+                    sealedSubclass.enumCaseName,
+                    sealedSubclass.owner.swiftName,
+                )
+            }
+
+        if (declaration.hasAnyHiddenSealedSubclasses) {
+            addEnumCase(declaration.elseCaseName)
         }
 
         return this
@@ -61,7 +83,7 @@ internal class SealedInteropGenerator(
 
     private fun FileSpec.Builder.addExhaustivelyFunction(declaration: IrClass, enumType: DeclaredTypeName) {
         addFunction(
-            FunctionSpec.builder("exhaustively")
+            FunctionSpec.builder(getExhaustivelyFunctionName(declaration))
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter("_", "self", declaration.swiftName)
                 .returns(enumType)
@@ -70,41 +92,78 @@ internal class SealedInteropGenerator(
         )
     }
 
+    private fun getExhaustivelyFunctionName(declaration: IrClass): String =
+        declaration.findAnnotation<SwiftSealed.FunctionName>()?.functionName ?: "exhaustively"
+
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         declaration: IrClass,
         enumType: DeclaredTypeName,
     ): FunctionSpec.Builder = addCode(
         CodeBlock.builder()
             .apply {
-                var isFirst = true
+                val sealedSubclasses = declaration.sealedSubclasses
 
-                declaration.sealedSubclasses.forEach { sealedSubclassSymbol ->
-                    val condition = "let v = self as? ${sealedSubclassSymbol.owner.swiftName.canonicalName}"
-
-                    if (isFirst) {
-                        isFirst = false
-
-                        beginControlFlow("if", condition)
-                    } else {
-                        nextControlFlow("else if", condition)
-                    }
-
-                    add("return ${enumType.canonicalName}.${sealedSubclassSymbol.enumCaseName}(v)\n")
-                }
-
-                nextControlFlow("else")
-                add(
-                    "fatalError(" +
-                            "\"Unknown subtype. " +
-                            "This error should not happen under normal circumstances " +
-                            "since ${declaration.swiftName.canonicalName} is sealed." +
-                            "\")\n"
-                )
-                endControlFlow("else")
+                addExhaustivelyCaseBranches(sealedSubclasses, enumType)
+                addExhaustivelyElseBranch(declaration, enumType)
             }
             .build()
     )
 
+    private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
+        sealedSubclasses: List<IrClassSymbol>,
+        enumType: DeclaredTypeName,
+    ) {
+        sealedSubclasses
+            .filterNot { it.isHiddenSealedSubclass }
+            .forEachIndexed { index, sealedSubclassSymbol ->
+                val condition = "let v = self as? ${sealedSubclassSymbol.owner.swiftName.canonicalName}"
+
+                if (index == 0) {
+                    beginControlFlow("if", condition)
+                } else {
+                    nextControlFlow("else if", condition)
+                }
+
+                add("return ${enumType.canonicalName}.${sealedSubclassSymbol.enumCaseName}(v)\n")
+            }
+    }
+
+    private fun CodeBlock.Builder.addExhaustivelyElseBranch(
+        declaration: IrClass,
+        enumType: DeclaredTypeName,
+    ) {
+        nextControlFlow("else")
+
+        if (declaration.hasAnyHiddenSealedSubclasses) {
+            add("return ${enumType.canonicalName}.${declaration.elseCaseName}\n")
+        } else {
+            add(
+                "fatalError(" +
+                        "\"Unknown subtype. " +
+                        "This error should not happen under normal circumstances " +
+                        "since ${declaration.swiftName.canonicalName} is sealed." +
+                        "\")\n"
+            )
+        }
+
+        endControlFlow("else")
+    }
+
+    private val IrClass.elseCaseName: String
+        get() = "Else"
+
     private val IrClassSymbol.enumCaseName: String
-        get() = this.owner.name.identifier
+        get() {
+            val annotation = this.owner.findAnnotation<SwiftSealedCase.Name>()
+
+            return annotation?.name ?: this.owner.name.identifier
+        }
+
+    private val IrClass.hasAnyHiddenSealedSubclasses: Boolean
+        get() = this.sealedSubclasses.any { it.isHiddenSealedSubclass }
+
+    private val IrClassSymbol.isHiddenSealedSubclass: Boolean
+        get() {
+            return this.owner.findAnnotation<SwiftSealedCase.Hidden>() != null
+        }
 }

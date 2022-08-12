@@ -1,4 +1,4 @@
-package co.touchlab.swiftgen.plugin.internal
+package co.touchlab.swiftgen.plugin.internal.util
 
 import co.touchlab.swiftpack.api.kotlin
 import io.outfoxx.swiftpoet.DeclaredTypeName

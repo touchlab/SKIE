@@ -6,14 +6,6 @@ allprojects {
 subprojects {
     afterEvaluate {
         the<PublishingExtension>().apply {
-            if (!pluginManager.hasPlugin("com.gradle.plugin-publish")) {
-                publications {
-                    create<MavenPublication>("maven") {
-                        from(components["java"])
-                    }
-                }
-            }
-
             repositories {
                 val isReleaseBuild = !version.toString().contains("-SNAPSHOT")
                 val awsUrl = if (isReleaseBuild) {

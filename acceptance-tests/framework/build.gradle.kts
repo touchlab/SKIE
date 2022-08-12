@@ -13,6 +13,11 @@ buildConfig {
         name = "RESOURCES",
         value = "\"${layout.projectDirectory.dir("src/main/resources").asFile.absolutePath}\"",
     )
+    buildConfigField(
+        type = "String",
+        name = "SWIFT_GEN_API",
+        value = "\"${gradle.includedBuild("core").projectDir.resolve("api/src/commonMain/kotlin")}\"",
+    )
 }
 
 dependencies {
