@@ -1,5 +1,6 @@
 package co.touchlab.swiftgen.api
 
+// TODO Rename to SealedInterop
 object SwiftSealed {
 
     @Target(AnnotationTarget.CLASS)

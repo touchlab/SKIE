@@ -1,5 +1,7 @@
 package co.touchlab.swiftgen.acceptancetests.framework
 
+import co.touchlab.swiftgen.acceptancetests.framework.internal.TestCodeParser
+import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -42,16 +44,15 @@ sealed class TestNode {
             require(path.isRegularFile() && path.extension == "swift") { "Test $path is not a swift file." }
         }
 
-        private val rawCode: List<String> = path.readLines()
+        private val parsedTest = TestCodeParser.parse(path.readLines())
 
-        private val hasExplicitExpectedResult: Boolean = rawCode.firstOrNull()?.startsWith("#") ?: false
+        val expectedResult: ExpectedTestResult = parsedTest.expectedResult
 
-        val expectedResult: ExpectedTestResult =
-            if (hasExplicitExpectedResult) ExpectedTestResult(rawCode.first().drop(1)) else ExpectedTestResult.Success
+        val configuration: SwiftGenConfiguration = parsedTest.configuration
 
-        val swiftCode: String =
-            (if (hasExplicitExpectedResult) rawCode.drop(1) else rawCode)
-                .joinToString(System.lineSeparator())
+        val configurationChanges: Map<String, String> = parsedTest.configurationChanges
+
+        val swiftCode: String = parsedTest.swiftCode
 
         override fun toString(): String = fullName
     }

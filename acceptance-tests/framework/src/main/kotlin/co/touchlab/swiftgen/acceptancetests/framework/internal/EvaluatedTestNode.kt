@@ -12,6 +12,7 @@ internal sealed interface EvaluatedTestNode {
         override val name: String,
         val fullName: String,
         val path: Path,
+        val configurationChanges: Map<String, String>,
         val expectedResult: ExpectedTestResult,
         val actualResult: TestResult,
     ) : EvaluatedTestNode

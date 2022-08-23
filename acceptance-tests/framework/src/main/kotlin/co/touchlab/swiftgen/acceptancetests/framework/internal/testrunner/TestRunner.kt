@@ -4,6 +4,12 @@ import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.swiftgen.acceptancetests.framework.TestNode
 import co.touchlab.swiftgen.acceptancetests.framework.TestResult
+import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinCodeEnhancer
+import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
+import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.swift.SwiftCodeEnhancer
+import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.swift.SwiftProgramRunner
+import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.swift.SwiftTestCompiler
+import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import java.nio.file.Path
 
 internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFactory) {
@@ -14,7 +20,7 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
 
         return IntermediateResult.Value(test.kotlinFiles)
             .map { enhanceKotlinCode(it) }
-            .flatMap { compileKotlin(it, tempFileSystem, testResultBuilder) }
+            .flatMap { compileKotlin(it, test.configuration, tempFileSystem, testResultBuilder) }
             .map { enhanceSwiftCode(test.swiftCode, tempFileSystem) to it }
             .flatMap { compileSwift(it.first, it.second, tempFileSystem, testResultBuilder) }
             .finalize { runSwift(it, testResultBuilder) }
@@ -25,10 +31,11 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
 
     private fun compileKotlin(
         kotlinFiles: List<Path>,
+        configuration: SwiftGenConfiguration,
         tempFileSystem: TempFileSystem,
         testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles)
+        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles, configuration)
 
     private fun enhanceSwiftCode(swiftCode: String, tempFileSystem: TempFileSystem): Path =
         SwiftCodeEnhancer(tempFileSystem).enhance(swiftCode)

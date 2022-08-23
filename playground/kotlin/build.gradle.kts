@@ -22,6 +22,9 @@ kotlin {
     }
 
     val commonMain by sourceSets.getting {
+        dependencies {
+            implementation("co.touchlab.swiftgen:api")
+        }
     }
 
     val macosMain by sourceSets.creating {

@@ -1,3 +1,7 @@
+plugins {
+    alias(libs.plugins.kotlin.multiplatform) apply false
+}
+
 allprojects {
     group = "co.touchlab.swiftgen"
     version = System.getenv("RELEASE_VERSION") ?: "1.0.0-SNAPSHOT"

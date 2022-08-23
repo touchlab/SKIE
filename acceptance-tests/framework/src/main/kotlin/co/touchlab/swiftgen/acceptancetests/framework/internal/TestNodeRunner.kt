@@ -63,8 +63,14 @@ internal class TestNodeRunner(
     private fun mapEvaluatedTests(
         evaluatedTests: Map<TestNode.Test, TestResult>,
         test: TestNode.Test,
-    ): EvaluatedTestNode.Test? =
-        evaluatedTests[test]?.let {
-            EvaluatedTestNode.Test(test.name, test.fullName, test.path, test.expectedResult, it)
-        }
+    ): EvaluatedTestNode.Test? = evaluatedTests[test]?.let {
+        EvaluatedTestNode.Test(
+            name = test.name,
+            fullName = test.fullName,
+            path = test.path,
+            configurationChanges = test.configurationChanges,
+            expectedResult = test.expectedResult,
+            actualResult = it,
+        )
+    }
 }

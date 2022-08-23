@@ -1,4 +1,4 @@
-# SwiftCompilationError(argument type 'A' does not conform to expected type 'I')
+# expected = SwiftCompilationError(argument type 'A' does not conform to expected type 'I')
 
 func test(a: A) {
     switch exhaustively(a) {

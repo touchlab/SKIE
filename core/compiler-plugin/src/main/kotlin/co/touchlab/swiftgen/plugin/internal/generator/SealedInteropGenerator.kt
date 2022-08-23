@@ -2,11 +2,8 @@ package co.touchlab.swiftgen.plugin.internal.generator
 
 import co.touchlab.swiftgen.api.SwiftSealed
 import co.touchlab.swiftgen.api.SwiftSealedCase
-import co.touchlab.swiftgen.plugin.internal.FileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.NamespaceProvider
-import co.touchlab.swiftgen.plugin.internal.util.findAnnotation
-import co.touchlab.swiftgen.plugin.internal.util.kotlinName
-import co.touchlab.swiftgen.plugin.internal.util.swiftName
+import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.plugin.internal.util.*
 import io.outfoxx.swiftpoet.*
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -15,12 +12,12 @@ import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
+    private val configuration: SwiftGenConfiguration.SealedInteropDefaults,
 ) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider) {
 
     // TODO Verify annotation usage on correct objects
     // TODO Verify that you cannot apply conflicting annotation
-    // TODO Handle case when everything is hidden
-    // TODO Add Global module configuration to Gradle
+    // TODO Handle case when everything is hidden - after fix for visibility
 
     override fun generate(declaration: IrClass) {
         if (!shouldGenerateSealedInterop(declaration)) {
@@ -38,7 +35,11 @@ internal class SealedInteropGenerator(
 
     private fun shouldGenerateSealedInterop(declaration: IrClass): Boolean {
         val isSealed = declaration.isSealed
-        val isEnabled = declaration.findAnnotation<SwiftSealed.Disabled>() == null
+        val isEnabled = if (configuration.enabled) {
+            !declaration.hasAnnotation<SwiftSealed.Disabled>()
+        } else {
+            declaration.hasAnnotation<SwiftSealed.Enabled>()
+        }
 
         return isSealed && isEnabled
     }
@@ -93,7 +94,7 @@ internal class SealedInteropGenerator(
     }
 
     private fun getExhaustivelyFunctionName(declaration: IrClass): String =
-        declaration.findAnnotation<SwiftSealed.FunctionName>()?.functionName ?: "exhaustively"
+        declaration.findAnnotation<SwiftSealed.FunctionName>()?.functionName ?: configuration.functionName
 
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         declaration: IrClass,
@@ -153,7 +154,7 @@ internal class SealedInteropGenerator(
         get() = this.modality == Modality.SEALED
 
     private val IrClass.elseCaseName: String
-        get() = this.findAnnotation<SwiftSealed.ElseName>()?.elseName ?: "Else"
+        get() = this.findAnnotation<SwiftSealed.ElseName>()?.elseName ?: configuration.elseName
 
     private val IrClassSymbol.enumCaseName: String
         get() {
@@ -166,7 +167,9 @@ internal class SealedInteropGenerator(
         get() = this.sealedSubclasses.any { it.isHiddenSealedSubclass }
 
     private val IrClassSymbol.isHiddenSealedSubclass: Boolean
-        get() {
-            return this.owner.findAnnotation<SwiftSealedCase.Hidden>() != null
+        get() = if (configuration.visibleCases) {
+            this.owner.hasAnnotation<SwiftSealedCase.Hidden>()
+        } else {
+            !this.owner.hasAnnotation<SwiftSealedCase.Visible>()
         }
 }

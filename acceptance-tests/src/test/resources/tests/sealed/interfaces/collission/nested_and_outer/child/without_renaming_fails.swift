@@ -1,4 +1,4 @@
-#KotlinCompilationError(case already exists: A1)
+# expected = KotlinCompilationError(case already exists: A1)
 
 let a: A = A1()
 

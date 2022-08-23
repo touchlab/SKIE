@@ -2,6 +2,7 @@ rootProject.name = "SwiftGen-plugin"
 
 include(
     ":api",
+    ":configuration",
     ":compiler-plugin",
     ":gradle-plugin",
 )

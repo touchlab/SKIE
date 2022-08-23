@@ -27,6 +27,7 @@ dependencies {
     runtimeOnly(files(kotlinNativeCompilerEmbeddable().absolutePath))
 
     implementation("co.touchlab.swiftgen:compiler-plugin")
+    implementation("co.touchlab.swiftgen:configuration")
     implementation(libs.swiftpack.api)
     implementation(libs.swiftpack.spi)
     implementation(libs.swiftkt.kotlin.plugin)

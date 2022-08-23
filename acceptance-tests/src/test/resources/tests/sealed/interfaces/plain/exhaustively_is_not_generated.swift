@@ -1,4 +1,4 @@
-# SwiftCompilationError(cannot find 'exhaustively' in scope)
+# expected = SwiftCompilationError(cannot find 'exhaustively' in scope)
 
 func test(a: A) {
     switch exhaustively(a) {

@@ -14,13 +14,12 @@ swiftkt = { id = "co.touchlab.swiftkt", version.ref = "swiftkt" }
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 
 [libraries]
-
 swiftkt-kotlin-plugin = { module = "co.touchlab.swiftkt:kotlin-plugin", version.ref = "swiftkt" }
 swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
 swiftpack-spi = { module = "co.touchlab.swiftpack:swiftpack-spi", version.ref = "swiftpack" }
 compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
-compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.9" }
 
+compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.9" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }

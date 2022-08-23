@@ -5,9 +5,10 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.*
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import javax.inject.Inject
 
 abstract class SwiftGenSubplugin @Inject constructor(
@@ -16,6 +17,8 @@ abstract class SwiftGenSubplugin @Inject constructor(
 
     override fun apply(target: Project) {
         super.apply(target)
+
+        target.extensions.create("swiftgen", SwiftGenExtension::class.java)
 
         target.configure<KotlinMultiplatformExtension> {
             sourceSets.getByName("commonMain").dependencies {
@@ -26,18 +29,22 @@ abstract class SwiftGenSubplugin @Inject constructor(
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
         val target = kotlinCompilation.target
-        return target is org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget && target.konanTarget.family.isAppleFamily
+
+        return target is KotlinNativeTarget && target.konanTarget.family.isAppleFamily
     }
 
     override fun getCompilerPluginId(): String = BuildConfig.KOTLIN_PLUGIN_ID
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
-        project.configurations.getByName(kotlinCompilation.pluginConfigurationName).dependencies.add(
-            project.dependencies.create("co.touchlab.swiftgen:api:${BuildConfig.KOTLIN_PLUGIN_VERSION}")
-        )
+        project.configurations.getByName(kotlinCompilation.pluginConfigurationName).dependencies.apply {
+            add(project.dependencies.create("co.touchlab.swiftgen:api:${BuildConfig.KOTLIN_PLUGIN_VERSION}"))
+            add(project.dependencies.create("co.touchlab.swiftgen:configuration:${BuildConfig.KOTLIN_PLUGIN_VERSION}"))
+        }
 
         return kotlinCompilation.target.project.provider {
-            emptyList()
+            val pluginConfiguration = project.extensions.getByType<SwiftGenExtension>()
+
+            pluginConfiguration.toSubpluginOptions()
         }
     }
 

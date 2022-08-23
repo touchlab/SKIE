@@ -1,5 +1,6 @@
 package co.touchlab.swiftgen.api
 
+// TODO Move inside SwiftSealed
 object SwiftSealedCase {
 
     @Target(AnnotationTarget.CLASS)

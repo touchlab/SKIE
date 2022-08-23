@@ -1,1 +1,1 @@
-co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.PluginRegistrar
+co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin.PluginRegistrar

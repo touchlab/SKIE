@@ -1,7 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.generator
 
-import co.touchlab.swiftgen.plugin.internal.FileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.NamespaceProvider
+import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
+import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent

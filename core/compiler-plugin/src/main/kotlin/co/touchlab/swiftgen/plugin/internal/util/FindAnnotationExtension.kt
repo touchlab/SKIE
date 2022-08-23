@@ -5,9 +5,16 @@ import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.util.getAnnotation
+import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import kotlin.reflect.KParameter
+
+internal inline fun <reified T : Annotation> IrAnnotationContainer.hasAnnotation(): Boolean {
+    val annotationName = FqName(T::class.qualifiedName!!)
+
+    return hasAnnotation(annotationName)
+}
 
 internal inline fun <reified T : Annotation> IrAnnotationContainer.findAnnotation(): T? {
     val annotationName = FqName(T::class.qualifiedName!!)

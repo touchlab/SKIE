@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    kotlin("jvm")
     `java-gradle-plugin`
     alias(libs.plugins.pluginPublish)
     `maven-publish`
@@ -9,7 +9,10 @@ plugins {
 
 buildConfig {
     packageName(project.group.toString())
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"swiftgen\"")
+
+    val pluginId: String by properties
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
+
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":compiler-plugin").name}\"")
@@ -21,7 +24,7 @@ dependencies {
     compileOnly(gradleKotlinDsl())
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))
-    compileOnly(project(":compiler-plugin"))
+    implementation(project(":configuration"))
 }
 
 java {
