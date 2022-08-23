@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.Channel
 
 class AcceptanceTestsRunner(
     private val tempFileSystemFactory: TempFileSystemFactory,
-    private val selectedAcceptanceTest: String?,
+    private val selectedAcceptanceTestRegexPattern: String?,
 ) {
 
     fun runTests(scope: FunSpec, testNode: TestNode) {
@@ -17,7 +17,7 @@ class AcceptanceTestsRunner(
         scope.concurrency = 2
 
         scope.test("Evaluation") {
-            val testNodeRunner = TestNodeRunner(tempFileSystemFactory, selectedAcceptanceTest)
+            val testNodeRunner = TestNodeRunner(tempFileSystemFactory, selectedAcceptanceTestRegexPattern)
 
             val evaluatedTests = testNodeRunner.runTests(testNode)
 

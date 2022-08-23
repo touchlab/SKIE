@@ -8,10 +8,12 @@ import kotlin.streams.toList
 
 internal class TestNodeRunner(
     tempFileSystemFactory: TempFileSystemFactory,
-    private val selectedAcceptanceTest: String?,
+    selectedAcceptanceTestRegexPattern: String?,
 ) {
 
     private val testRunner = TestRunner(tempFileSystemFactory)
+
+    private val selectedAcceptanceTestRegex = selectedAcceptanceTestRegexPattern?.let { Regex(it) }
 
     fun runTests(testNode: TestNode): EvaluatedTestNode {
         val tests = testNode.flatten()
@@ -30,7 +32,7 @@ internal class TestNodeRunner(
     }
 
     private val TestNode.shouldBeEvaluated: Boolean
-        get() = selectedAcceptanceTest?.let { this.fullName.startsWith(it) } ?: true
+        get() = selectedAcceptanceTestRegex?.containsMatchIn(this.fullName) ?: true
 
     private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResult> =
         tests
