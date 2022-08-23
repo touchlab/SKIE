@@ -1,8 +1,8 @@
 package tests.sealed.classes.configuration.annotations.parent.disabled
 
-import co.touchlab.swiftgen.api.SwiftSealed
+import co.touchlab.swiftgen.api.SealedInterop
 
-@SwiftSealed.Disabled
+@SealedInterop.Disabled
 sealed class A
 
 class A1 : A()

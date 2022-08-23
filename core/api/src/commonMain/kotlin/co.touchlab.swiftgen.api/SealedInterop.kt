@@ -1,7 +1,6 @@
 package co.touchlab.swiftgen.api
 
-// TODO Rename to SealedInterop
-object SwiftSealed {
+object SealedInterop {
 
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.SOURCE)
@@ -18,4 +17,19 @@ object SwiftSealed {
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.SOURCE)
     annotation class ElseName(val elseName: String)
+
+    object Case {
+
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Hidden
+
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Visible
+
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Name(val name: String)
+    }
 }

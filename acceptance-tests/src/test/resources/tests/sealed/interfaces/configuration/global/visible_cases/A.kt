@@ -1,10 +1,10 @@
-package tests.sealed.interfaces.configuration.global.child.visible_cases
+package tests.sealed.interfaces.configuration.global.visible_cases
 
-import co.touchlab.swiftgen.api.SwiftSealedCase
+import co.touchlab.swiftgen.api.SealedInterop
 
 sealed interface A
 
 class A1(val i: Int) : A
 
-@SwiftSealedCase.Visible
+@SealedInterop.Case.Visible
 class A2(val k: Int) : A

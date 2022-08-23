@@ -1,8 +1,8 @@
 package tests.sealed.classes.configuration.global.enabled
 
-import co.touchlab.swiftgen.api.SwiftSealed
+import co.touchlab.swiftgen.api.SealedInterop
 
-@SwiftSealed.Enabled
+@SealedInterop.Enabled
 sealed class A
 
 class A1 : A()

@@ -1,9 +1,9 @@
 package tests.sealed.classes.configuration.annotations.child.name
 
-import co.touchlab.swiftgen.api.SwiftSealedCase
+import co.touchlab.swiftgen.api.SealedInterop
 
 sealed class A
 
-@SwiftSealedCase.Name("A3")
+@SealedInterop.Case.Name("A3")
 class A1(val i: Int) : A()
 class A2(val k: Int) : A()

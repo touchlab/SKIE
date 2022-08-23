@@ -1,11 +1,10 @@
 package tests.sealed.interfaces.configuration.annotations.parent.else_name
 
-import co.touchlab.swiftgen.api.SwiftSealed
-import co.touchlab.swiftgen.api.SwiftSealedCase
+import co.touchlab.swiftgen.api.SealedInterop
 
-@SwiftSealed.ElseName("Other")
+@SealedInterop.ElseName("Other")
 sealed interface A
 
-@SwiftSealedCase.Hidden
+@SealedInterop.Case.Hidden
 class A1(val i: Int) : A
 class A2(val k: Int) : A
