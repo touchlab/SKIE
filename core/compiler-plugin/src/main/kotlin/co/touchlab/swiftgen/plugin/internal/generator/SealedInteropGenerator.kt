@@ -16,7 +16,7 @@ internal class SealedInteropGenerator(
 
     // TODO Verify annotation usage on correct objects
     // TODO Verify that you cannot apply conflicting annotation
-    // TODO Handle case when everything is hidden - after fix for visibility
+    // TODO Better handle name collisions
 
     override fun generate(declaration: IrClass) {
         if (!shouldGenerateSealedInterop(declaration)) {
@@ -77,7 +77,7 @@ internal class SealedInteropGenerator(
                 )
             }
 
-        if (declaration.hasAnyHiddenSealedSubclasses) {
+        if (declaration.needsElseCase) {
             addEnumCase(declaration.elseCaseName)
         }
 
@@ -107,7 +107,7 @@ internal class SealedInteropGenerator(
                 val sealedSubclasses = declaration.sealedSubclasses
 
                 addExhaustivelyCaseBranches(sealedSubclasses, enumType)
-                addExhaustivelyElseBranch(declaration, enumType)
+                addExhaustivelyFunctionEnd(declaration, enumType)
             }
             .build()
     )
@@ -131,14 +131,19 @@ internal class SealedInteropGenerator(
             }
     }
 
-    private fun CodeBlock.Builder.addExhaustivelyElseBranch(
-        declaration: IrClass,
-        enumType: DeclaredTypeName,
-    ) {
+    private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(declaration: IrClass, enumType: DeclaredTypeName) {
+        if (declaration.hasAnyVisibleSealedSubclasses) {
+            addExhaustivelyElseBranch(declaration, enumType)
+        } else {
+            addReturnElse(declaration, enumType)
+        }
+    }
+
+    private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: IrClass, enumType: DeclaredTypeName) {
         nextControlFlow("else")
 
-        if (declaration.hasAnyHiddenSealedSubclasses) {
-            add("return ${enumType.canonicalName}.${declaration.elseCaseName}\n")
+        if (declaration.needsElseCase) {
+            addReturnElse(declaration, enumType)
         } else {
             add(
                 "fatalError(" +
@@ -152,6 +157,10 @@ internal class SealedInteropGenerator(
         endControlFlow("else")
     }
 
+    private fun CodeBlock.Builder.addReturnElse(declaration: IrClass, enumType: DeclaredTypeName) {
+        add("return ${enumType.canonicalName}.${declaration.elseCaseName}\n")
+    }
+
     private val IrClass.elseCaseName: String
         get() = this.findAnnotation<SealedInterop.ElseName>()?.elseName ?: configuration.elseName
 
@@ -162,8 +171,11 @@ internal class SealedInteropGenerator(
             return annotation?.name ?: this.owner.name.identifier
         }
 
-    private val IrClass.hasAnyHiddenSealedSubclasses: Boolean
-        get() = this.sealedSubclasses.any { !it.isVisibleSealedSubclass }
+    private val IrClass.hasAnyVisibleSealedSubclasses: Boolean
+        get() = this.sealedSubclasses.any { it.isVisibleSealedSubclass }
+
+    private val IrClass.needsElseCase: Boolean
+        get() = this.sealedSubclasses.any { !it.isVisibleSealedSubclass } || this.sealedSubclasses.isEmpty()
 
     private val IrClassSymbol.isVisibleSealedSubclass: Boolean
         get() {

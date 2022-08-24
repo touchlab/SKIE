@@ -6,7 +6,6 @@ import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.Interm
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestResultBuilder
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.SwiftGenComponentRegistrar
-import co.touchlab.swiftgen.plugin.SwiftGenPluginCommandLineProcessor
 import co.touchlab.swiftkt.plugin.ConfigurationKeys
 import co.touchlab.swiftkt.plugin.SwiftKtComponentRegistrar
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
@@ -105,21 +104,23 @@ internal class KotlinTestCompiler(
         outputDirectory: Path,
         outputStream: OutputStream,
         generatedSwiftDirectory: Path,
-    ): IntermediateResult<Path> = when (result) {
-        ExitCode.OK -> {
-            testResultBuilder.appendLog("Kotlin compilation", outputStream.toString())
-
-            val generatedSwift = generatedSwiftDirectory.listDirectoryEntries().joinToString("\n") {
-                "------ ${it.name} ------\n" + it.readText()
-            }
-            testResultBuilder.appendLog("Generated Swift", generatedSwift)
-
-            IntermediateResult.Value(outputDirectory)
+    ): IntermediateResult<Path> {
+        val generatedSwift = generatedSwiftDirectory.listDirectoryEntries().joinToString("\n") {
+            "------ ${it.name} ------\n" + it.readText()
         }
-        else -> {
-            val testResult = testResultBuilder.buildKotlinCompilationError(outputStream.toString())
+        testResultBuilder.appendLog("Generated Swift", generatedSwift)
 
-            IntermediateResult.Error(testResult)
+        return when (result) {
+            ExitCode.OK -> {
+                testResultBuilder.appendLog("Kotlin compilation", outputStream.toString())
+
+                IntermediateResult.Value(outputDirectory)
+            }
+            else -> {
+                val testResult = testResultBuilder.buildKotlinCompilationError(outputStream.toString())
+
+                IntermediateResult.Error(testResult)
+            }
         }
     }
 }
