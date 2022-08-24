@@ -5,7 +5,6 @@ import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.*
 import io.outfoxx.swiftpoet.*
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 
@@ -15,9 +14,6 @@ internal class SealedInteropGenerator(
     private val configuration: SwiftGenConfiguration.SealedInteropDefaults,
     private val reporter: Reporter,
 ) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider) {
-
-    // TODO Verify annotation usage on correct objects
-    // TODO Verify that you cannot apply conflicting annotation
 
     override fun generate(declaration: IrClass) {
         if (!shouldGenerateSealedInterop(declaration)) {
@@ -36,8 +32,6 @@ internal class SealedInteropGenerator(
     }
 
     private fun shouldGenerateSealedInterop(declaration: IrClass): Boolean {
-        val isSealed = declaration.modality == Modality.SEALED
-
         val isVisible = declaration.visibility.isPublicAPI
 
         val isEnabled = if (configuration.enabled) {
@@ -46,7 +40,7 @@ internal class SealedInteropGenerator(
             declaration.hasAnnotation<SealedInterop.Enabled>()
         }
 
-        return isSealed && isVisible && isEnabled
+        return declaration.isSealed && isVisible && isEnabled
     }
 
     private fun verifyUniqueCaseNames(declaration: IrClass): Boolean {

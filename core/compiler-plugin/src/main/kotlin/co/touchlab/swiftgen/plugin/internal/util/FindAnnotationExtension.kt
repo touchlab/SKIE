@@ -8,10 +8,14 @@ import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 
-internal inline fun <reified T : Annotation> IrAnnotationContainer.hasAnnotation(): Boolean {
-    val annotationName = FqName(T::class.qualifiedName!!)
+internal inline fun <reified T : Annotation> IrAnnotationContainer.hasAnnotation(): Boolean =
+    hasAnnotation(T::class)
+
+internal fun <T : Annotation> IrAnnotationContainer.hasAnnotation(annotation: KClass<T>): Boolean {
+    val annotationName = FqName(annotation.qualifiedName!!)
 
     return hasAnnotation(annotationName)
 }
