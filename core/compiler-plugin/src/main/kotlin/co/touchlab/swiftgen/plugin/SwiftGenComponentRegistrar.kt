@@ -13,6 +13,6 @@ class SwiftGenComponentRegistrar : ComponentRegistrar {
     override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
         val pluginConfiguration = SwiftGenCompilerConfiguration.Key.getOrNull(configuration) ?: SwiftGenConfiguration()
 
-        IrGenerationExtension.registerExtension(project, SwiftGenExtension(pluginConfiguration))
+        IrGenerationExtension.registerExtension(project, SwiftGenExtension(pluginConfiguration, configuration))
     }
 }

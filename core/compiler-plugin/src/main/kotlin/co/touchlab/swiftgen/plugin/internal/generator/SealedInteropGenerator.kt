@@ -4,6 +4,7 @@ import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.*
 import io.outfoxx.swiftpoet.*
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -12,11 +13,11 @@ internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
     private val configuration: SwiftGenConfiguration.SealedInteropDefaults,
+    private val reporter: Reporter,
 ) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider) {
 
     // TODO Verify annotation usage on correct objects
     // TODO Verify that you cannot apply conflicting annotation
-    // TODO Better handle name collisions
 
     override fun generate(declaration: IrClass) {
         if (!shouldGenerateSealedInterop(declaration)) {
@@ -26,9 +27,11 @@ internal class SealedInteropGenerator(
         generateCode(declaration) {
             val classNamespace = addNamespace(swiftGenNamespace, declaration.kotlinName)
 
-            val enumType = addSealedEnum(declaration, classNamespace)
+            if (verifyUniqueCaseNames(declaration)) {
+                val enumType = addSealedEnum(declaration, classNamespace)
 
-            addExhaustivelyFunction(declaration, enumType)
+                addExhaustivelyFunction(declaration, enumType)
+            }
         }
     }
 
@@ -44,6 +47,30 @@ internal class SealedInteropGenerator(
         }
 
         return isSealed && isVisible && isEnabled
+    }
+
+    private fun verifyUniqueCaseNames(declaration: IrClass): Boolean {
+        val conflictingDeclarations = declaration.sealedSubclasses
+            .filter { it.isVisibleSealedSubclass }
+            .groupBy { it.enumCaseName }
+            .filter { it.value.size > 1 }
+
+        conflictingDeclarations
+            .forEach { (name, cases) ->
+                cases.forEach { case ->
+                    val message = "SwiftGen cannot generate sealed interop for this declaration. " +
+                            "There are multiple sealed class/interface children with the same name `$name` for the enum case. " +
+                            "Consider resolving this conflict using annotation `${SealedInterop.Case.Name::class.qualifiedName}`."
+
+                    reporter.report(
+                        severity = CompilerMessageSeverity.ERROR,
+                        message = message,
+                        declaration = case.owner,
+                    )
+                }
+            }
+
+        return conflictingDeclarations.isEmpty()
     }
 
     private fun FileSpec.Builder.addSealedEnum(
