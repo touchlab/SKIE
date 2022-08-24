@@ -1,4 +1,4 @@
-package tests.sealed.classes.empty
+package `tests`.`sealed`.`classes`.`empty`
 
 sealed class A
 

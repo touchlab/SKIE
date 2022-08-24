@@ -1,4 +1,4 @@
-package tests.sealed.classes.nested
+package `tests`.`sealed`.`classes`.`nested`
 
 sealed class A {
 

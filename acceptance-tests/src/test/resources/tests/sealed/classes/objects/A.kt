@@ -1,4 +1,4 @@
-package tests.sealed.classes.objects
+package `tests`.`sealed`.`classes`.`objects`
 
 sealed class A
 

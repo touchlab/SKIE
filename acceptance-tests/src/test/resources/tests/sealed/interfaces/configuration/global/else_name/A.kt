@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.configuration.global.else_name
+package `tests`.`sealed`.`interfaces`.`configuration`.`global`.`else_name`
 
 import co.touchlab.swiftgen.api.SealedInterop
 

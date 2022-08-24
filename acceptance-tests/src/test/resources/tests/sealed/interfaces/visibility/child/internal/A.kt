@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.visibility.child.internal
+package `tests`.`sealed`.`interfaces`.`visibility`.`child`.`internal`
 
 sealed interface A {
 

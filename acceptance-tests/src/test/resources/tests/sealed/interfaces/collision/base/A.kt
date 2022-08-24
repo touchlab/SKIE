@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.collision.base
+package `tests`.`sealed`.`interfaces`.`collision`.`base`
 
 sealed interface A
 

@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.collision.nested_and_outer.base
+package `tests`.`sealed`.`interfaces`.`collision`.`nested_and_outer`.`base`
 
 sealed interface A {
 

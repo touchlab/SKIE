@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.collision.nested_and_outer.child.without_renaming_fails
+package `tests`.`sealed`.`interfaces`.`collision`.`nested_and_outer`.`child`.`without_renaming_fails`
 
 sealed interface A {
 

@@ -1,4 +1,4 @@
-package tests.sealed.combined.non_sealed_class_with_sealed_interface
+package `tests`.`sealed`.`combined`.`non_sealed_class_with_sealed_interface`
 
 abstract class A(val value_A: Int)
 

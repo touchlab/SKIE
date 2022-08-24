@@ -1,4 +1,4 @@
-package tests.sealed.classes.collision.nested_and_outer.child.without_renaming_fails
+package `tests`.`sealed`.`classes`.`collision`.`nested_and_outer`.`child`.`without_renaming_fails`
 
 sealed class A {
 

@@ -1,4 +1,4 @@
-package tests.sealed.classes.no_accessible_children.visibility
+package `tests`.`sealed`.`classes`.`no_accessible_children`.`visibility`
 
 sealed class A {
 
@@ -11,4 +11,3 @@ sealed class A {
         fun createA1(): A = A1()
     }
 }
-

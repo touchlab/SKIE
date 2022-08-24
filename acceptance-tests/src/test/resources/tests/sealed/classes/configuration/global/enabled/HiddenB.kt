@@ -1,4 +1,4 @@
-package tests.sealed.classes.configuration.global.enabled
+package `tests`.`sealed`.`classes`.`configuration`.`global`.`enabled`
 
 sealed class B
 

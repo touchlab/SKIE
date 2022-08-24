@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.collision.nested_and_outer.child.is_solved_by_renaming
+package `tests`.`sealed`.`interfaces`.`collision`.`nested_and_outer`.`child`.`is_solved_by_renaming`
 
 import co.touchlab.swiftgen.api.SealedInterop
 

@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.configuration.global.function_name
+package `tests`.`sealed`.`interfaces`.`configuration`.`global`.`function_name`
 
 sealed interface A
 

@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.no_accessible_children.visibility
+package `tests`.`sealed`.`interfaces`.`no_accessible_children`.`visibility`
 
 sealed interface A {
 
@@ -11,4 +11,3 @@ sealed interface A {
         fun createA1(): A = A1()
     }
 }
-

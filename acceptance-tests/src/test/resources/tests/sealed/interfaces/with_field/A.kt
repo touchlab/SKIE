@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.with_field
+package `tests`.`sealed`.`interfaces`.`with_field`
 
 sealed interface A {
 

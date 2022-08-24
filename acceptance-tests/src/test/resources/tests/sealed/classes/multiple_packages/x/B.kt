@@ -1,4 +1,4 @@
-package tests.sealed.classes.multiple_packages.x
+package `tests`.`sealed`.`classes`.`multiple_packages`.`x`
 
 sealed class B
 

@@ -1,4 +1,4 @@
-package tests.sealed.combined.with_field
+package `tests`.`sealed`.`combined`.`class_and_interface`
 
 sealed class A(val value_A: Int)
 

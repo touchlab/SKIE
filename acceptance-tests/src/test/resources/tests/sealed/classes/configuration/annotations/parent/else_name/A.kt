@@ -1,4 +1,4 @@
-package tests.sealed.classes.configuration.annotations.parent.else_name
+package `tests`.`sealed`.`classes`.`configuration`.`annotations`.`parent`.`else_name`
 
 import co.touchlab.swiftgen.api.SealedInterop
 

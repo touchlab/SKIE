@@ -1,4 +1,4 @@
-package tests.sealed.classes.visibility.child.internal
+package `tests`.`sealed`.`classes`.`visibility`.`child`.`internal`
 
 sealed class A {
 

@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.configuration.annotations.child.visible
+package `tests`.`sealed`.`interfaces`.`configuration`.`annotations`.`child`.`visible`
 
 import co.touchlab.swiftgen.api.SealedInterop
 

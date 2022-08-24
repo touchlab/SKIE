@@ -1,3 +1,3 @@
-package tests.sealed.classes.collision.child.x.x
+package `tests`.`sealed`.`classes`.`collision`.`child`.`x`.`x`
 
 class A1

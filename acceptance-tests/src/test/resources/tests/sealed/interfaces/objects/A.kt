@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.objects
+package `tests`.`sealed`.`interfaces`.`objects`
 
 sealed interface A
 

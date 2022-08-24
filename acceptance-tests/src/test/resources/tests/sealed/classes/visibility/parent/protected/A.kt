@@ -1,4 +1,4 @@
-package tests.sealed.classes.visibility.parent.protected
+package `tests`.`sealed`.`classes`.`visibility`.`parent`.`protected`
 
 abstract class Wrapper {
 

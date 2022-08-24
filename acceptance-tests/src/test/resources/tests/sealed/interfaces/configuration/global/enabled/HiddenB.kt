@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.configuration.global.enabled
+package `tests`.`sealed`.`interfaces`.`configuration`.`global`.`enabled`
 
 sealed interface B
 

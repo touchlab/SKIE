@@ -1,4 +1,4 @@
-package tests.sealed.classes.visibility.parent.private
+package `tests`.`sealed`.`classes`.`visibility`.`parent`.`private`
 
 private sealed class A {
 

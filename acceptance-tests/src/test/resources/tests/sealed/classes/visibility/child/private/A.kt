@@ -1,4 +1,4 @@
-package tests.sealed.classes.visibility.child.private
+package `tests`.`sealed`.`classes`.`visibility`.`child`.`private`
 
 sealed class A {
 
@@ -11,4 +11,3 @@ sealed class A {
         fun createA1(): A = A1()
     }
 }
-

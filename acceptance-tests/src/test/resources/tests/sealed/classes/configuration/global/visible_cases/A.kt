@@ -1,4 +1,4 @@
-package tests.sealed.classes.configuration.global.child.visible_cases
+package `tests`.`sealed`.`classes`.`configuration`.`global`.`visible_cases`
 
 import co.touchlab.swiftgen.api.SealedInterop
 

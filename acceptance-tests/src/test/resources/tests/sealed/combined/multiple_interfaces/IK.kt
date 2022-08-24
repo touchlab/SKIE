@@ -1,4 +1,4 @@
-package tests.sealed.combined.multiple_interfaces
+package `tests`.`sealed`.`combined`.`multiple_interfaces`
 
 sealed interface I {
 

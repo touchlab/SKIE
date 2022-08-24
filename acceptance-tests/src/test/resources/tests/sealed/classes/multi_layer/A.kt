@@ -1,4 +1,4 @@
-package tests.sealed.classes.multi_layer
+package `tests`.`sealed`.`classes`.`multi_layer`
 
 sealed class A(val value_A: Int)
 

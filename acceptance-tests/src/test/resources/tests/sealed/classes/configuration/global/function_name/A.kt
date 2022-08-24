@@ -1,4 +1,4 @@
-package tests.sealed.classes.configuration.global.function_name
+package `tests`.`sealed`.`classes`.`configuration`.`global`.`function_name`
 
 sealed class A
 

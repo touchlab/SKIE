@@ -1,4 +1,4 @@
-package tests.sealed.classes.collision.base
+package `tests`.`sealed`.`classes`.`collision`.`base`
 
 sealed class A
 

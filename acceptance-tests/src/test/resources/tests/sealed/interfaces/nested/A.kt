@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.nested
+package `tests`.`sealed`.`interfaces`.`nested`
 
 sealed interface A {
 

@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.multi_layer
+package `tests`.`sealed`.`interfaces`.`multi_layer`
 
 sealed interface A {
 

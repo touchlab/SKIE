@@ -1,4 +1,4 @@
-package tests.sealed.classes.configuration.global.enabled
+package `tests`.`sealed`.`classes`.`configuration`.`global`.`enabled`
 
 import co.touchlab.swiftgen.api.SealedInterop
 

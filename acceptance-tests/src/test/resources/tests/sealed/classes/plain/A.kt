@@ -1,4 +1,4 @@
-package tests.sealed.classes.plain
+package `tests`.`sealed`.`classes`.`plain`
 
 open class A
 
