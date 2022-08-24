@@ -33,14 +33,17 @@ internal class SealedInteropGenerator(
     }
 
     private fun shouldGenerateSealedInterop(declaration: IrClass): Boolean {
-        val isSealed = declaration.isSealed
+        val isSealed = declaration.modality == Modality.SEALED
+
+        val isVisible = declaration.visibility.isPublicAPI
+
         val isEnabled = if (configuration.enabled) {
             !declaration.hasAnnotation<SealedInterop.Disabled>()
         } else {
             declaration.hasAnnotation<SealedInterop.Enabled>()
         }
 
-        return isSealed && isEnabled
+        return isSealed && isVisible && isEnabled
     }
 
     private fun FileSpec.Builder.addSealedEnum(
@@ -66,7 +69,7 @@ internal class SealedInteropGenerator(
 
     private fun TypeSpec.Builder.addSealedEnumCases(declaration: IrClass): TypeSpec.Builder {
         declaration.sealedSubclasses
-            .filterNot { it.isHiddenSealedSubclass }
+            .filter { it.isVisibleSealedSubclass }
             .forEach { sealedSubclass ->
                 addEnumCase(
                     sealedSubclass.enumCaseName,
@@ -114,7 +117,7 @@ internal class SealedInteropGenerator(
         enumType: DeclaredTypeName,
     ) {
         sealedSubclasses
-            .filterNot { it.isHiddenSealedSubclass }
+            .filter { it.isVisibleSealedSubclass }
             .forEachIndexed { index, sealedSubclassSymbol ->
                 val condition = "let v = self as? ${sealedSubclassSymbol.owner.swiftName.canonicalName}"
 
@@ -149,9 +152,6 @@ internal class SealedInteropGenerator(
         endControlFlow("else")
     }
 
-    private val IrClass.isSealed: Boolean
-        get() = this.modality == Modality.SEALED
-
     private val IrClass.elseCaseName: String
         get() = this.findAnnotation<SealedInterop.ElseName>()?.elseName ?: configuration.elseName
 
@@ -163,12 +163,18 @@ internal class SealedInteropGenerator(
         }
 
     private val IrClass.hasAnyHiddenSealedSubclasses: Boolean
-        get() = this.sealedSubclasses.any { it.isHiddenSealedSubclass }
+        get() = this.sealedSubclasses.any { !it.isVisibleSealedSubclass }
 
-    private val IrClassSymbol.isHiddenSealedSubclass: Boolean
-        get() = if (configuration.visibleCases) {
-            this.owner.hasAnnotation<SealedInterop.Case.Hidden>()
-        } else {
-            !this.owner.hasAnnotation<SealedInterop.Case.Visible>()
+    private val IrClassSymbol.isVisibleSealedSubclass: Boolean
+        get() {
+            val isVisible = owner.visibility.isPublicAPI
+
+            val isEnabled = if (configuration.visibleCases) {
+                !this.owner.hasAnnotation<SealedInterop.Case.Hidden>()
+            } else {
+                this.owner.hasAnnotation<SealedInterop.Case.Visible>()
+            }
+
+            return isVisible && isEnabled
         }
 }

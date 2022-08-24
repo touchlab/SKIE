@@ -62,8 +62,8 @@ tasks.register<SetupPlaygroundTask>("setupPlayground") {
 abstract class SetupPlaygroundTask : DefaultTask() {
 
     @get:Input
-    @set:Option(option = "test", description = "the test to be copied to the playground")
-    var test: String? = null
+    @set:Option(option = "acceptanceTest", description = "the test to be copied to the playground")
+    var acceptanceTest: String? = null
 
     @InputDirectory
     lateinit var testsDirectory: File
@@ -93,14 +93,13 @@ abstract class SetupPlaygroundTask : DefaultTask() {
     }
 
     private fun getSwiftTestFile(): File {
-        requireNotNull(test) {
+        requireNotNull(acceptanceTest) {
             "Missing property \"test\" that specifies which test should be copied to the playground. " +
                     "Pass the argument using \"-Ptest=...\""
         }
 
-        val swiftTestFile = testsDirectory.resolve(test!!)
+        val swiftTestFile = testsDirectory.resolve(acceptanceTest!! + ".swift")
 
-        require(swiftTestFile.extension == "swift") { "Test file \"$swiftTestFile\" must be a swift file." }
         require(swiftTestFile.exists()) { "Test file \"$swiftTestFile\" does not exist." }
         require(swiftTestFile.startsWith(testsDirectory)) {
             "Test file \"$swiftTestFile\" must be located in the acceptance tests directory."
@@ -128,6 +127,7 @@ abstract class SetupPlaygroundTask : DefaultTask() {
                 
                 
             """.trimIndent() + swiftTestFile.readText() + """
+                
                 
                 fatalError("Tested program ended without explicitly calling `exit(0)`.")
             """.trimIndent()
