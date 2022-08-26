@@ -40,7 +40,7 @@ kotlin {
     }
 }
 
-val linkReleaseFrameworkMacosArm64 by tasks.getting {
+val printArmGeneratedSwift by tasks.register("printArmGeneratedSwift") {
     doLast {
         val generatedSwiftDirectory =
             layout.buildDirectory.dir("generated/swiftpack-expanded/releaseFramework/macosArm64").get().asFile
@@ -49,13 +49,21 @@ val linkReleaseFrameworkMacosArm64 by tasks.getting {
     }
 }
 
-val linkReleaseFrameworkMacosX64 by tasks.getting {
+val printX64GeneratedSwift by tasks.register("printX64GeneratedSwift") {
     doLast {
         val generatedSwiftDirectory =
             layout.buildDirectory.dir("generated/swiftpack-expanded/releaseFramework/macosX64").get().asFile
 
         printGeneratedSwift(generatedSwiftDirectory)
     }
+}
+
+val linkReleaseFrameworkMacosArm64 by tasks.getting {
+    finalizedBy(printArmGeneratedSwift)
+}
+
+val linkReleaseFrameworkMacosX64 by tasks.getting {
+    finalizedBy(printX64GeneratedSwift)
 }
 
 fun printGeneratedSwift(path: File) {

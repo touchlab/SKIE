@@ -1,7 +1,5 @@
-package co.touchlab.swiftgen.plugin.internal.generator
+package co.touchlab.swiftgen.plugin.internal.util
 
-import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
@@ -12,7 +10,7 @@ internal abstract class BaseGenerator<T>(
     private val namespaceProvider: NamespaceProvider,
 ) {
 
-    val swiftGenNamespace: DeclaredTypeName
+    protected val swiftGenNamespace: DeclaredTypeName
         get() = namespaceProvider.swiftGenNamespace
 
     protected fun generateCode(declaration: IrDeclarationParent, codeBuilder: FileSpec.Builder.() -> Unit) {

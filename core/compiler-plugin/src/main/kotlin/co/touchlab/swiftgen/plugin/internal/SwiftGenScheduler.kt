@@ -1,7 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal
 
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
-import co.touchlab.swiftgen.plugin.internal.generator.SealedInteropGenerator
+import co.touchlab.swiftgen.plugin.internal.sealed.SealedInteropGenerator
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter

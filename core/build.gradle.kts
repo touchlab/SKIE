@@ -37,3 +37,13 @@ subprojects {
         }
     }
 }
+
+tasks.create("cleanAll") {
+    allprojects.forEach { project ->
+        project.afterEvaluate {
+            project.tasks.findByName("clean")?.let {
+                dependsOn(it)
+            }
+        }
+    }
+}
