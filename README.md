@@ -12,9 +12,11 @@ Certainly do not use it in any production project.
 
 SwiftGen currently supports the following features:
 
-- Sealed class/interfaces (*)
+- Sealed class/interfaces
 
-(*) - These features are not fully implemented yet. Expect bugs and compilation errors.
+These features are under active development - expect bugs and compilation errors:
+
+- Default arguments
 
 The discussion about any part of the SwiftKt project happens in the `swiftkt` Slack channel.
 
@@ -135,3 +137,44 @@ case .A2(_):
 }
 ```
 
+## Configuration
+
+SwiftGen plugin makes some opinionated choices that might not work for every use case.
+To solve this issue, the plugin provides a way to change some of its default behavior.
+There are two different ways to change the configuration:
+
+- locally - using Kotlin annotations
+- globally - using Gradle extension provided by the SwiftGen Gradle plugin
+
+The local configuration changes the behavior only for a single declaration.
+This makes it for example suitable for suppressing the plugin if it does not work properly because of some bug.
+The available annotations can be found in the `:core:api` module.
+
+The following example changes the name of the `exhaustively` function generated for the sealed class interop to `something`:
+
+```kotlin
+// A.kt
+
+@SealedInterop.FunctionName("something")
+sealed class A {
+    ...
+}
+```
+
+The global configuration affects the whole module, which makes it a good place for changing the plugin default behavior.
+Note that it's possible to make different changes for each module.
+The available options are listed in the `SwiftGenConfiguration` class in `:core:configuration` module.
+
+Example:
+
+```kotlin
+// build.gradle.kts
+
+swiftGen {
+    sealedInteropDefaults {
+        functionName = "something"
+    }
+}
+```
+
+The local and global configuration can be used at the same time in which case the local configuration takes precedence.

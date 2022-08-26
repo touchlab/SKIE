@@ -18,7 +18,7 @@ abstract class SwiftGenSubplugin @Inject constructor(
     override fun apply(target: Project) {
         super.apply(target)
 
-        target.extensions.create("swiftgen", SwiftGenExtension::class.java)
+        target.extensions.create("swiftGen", SwiftGenExtension::class.java)
 
         target.configure<KotlinMultiplatformExtension> {
             sourceSets.getByName("commonMain").dependencies {

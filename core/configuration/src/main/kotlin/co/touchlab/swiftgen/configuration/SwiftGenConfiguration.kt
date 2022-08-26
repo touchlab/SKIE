@@ -35,8 +35,8 @@ class SwiftGenConfiguration : ConfigurationDeclaration() {
             defaultValue = true,
             description = "If true the enum cases are generated for all direct children of " +
                     "sealed class/interface that are visible from Swift." +
-                    "This behavior can be overridden on a case by case bases by an annotation. " +
-                    "If false, each child must be explicitly annotated or it will be considered as hidden.",
+                    "This behavior can be overridden on a case by case basis by an annotation. " +
+                    "If false, each child must be explicitly annotated, otherwise it will be considered as hidden.",
             valueDescription = "<true|false>, defaults to 'true'"
         )
     }
