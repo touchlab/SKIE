@@ -3,6 +3,7 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.*
+import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
 import io.outfoxx.swiftpoet.TypeName
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
@@ -13,7 +14,7 @@ import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-internal interface SealedGeneratorExtensionContainer {
+internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContainer {
 
     val configuration: SwiftGenConfiguration.SealedInteropDefaults
 

@@ -3,6 +3,7 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.*
+import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -11,11 +12,12 @@ internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
     override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
+    override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
     private val reporter: Reporter,
 ) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider), SealedGeneratorExtensionContainer {
 
-    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
-    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
+    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration, swiftPackModuleBuilder)
+    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration, swiftPackModuleBuilder)
 
     override fun generate(declaration: IrClass) {
         if (!shouldGenerateSealedInterop(declaration) || !verifyUniqueCaseNames(declaration)) {

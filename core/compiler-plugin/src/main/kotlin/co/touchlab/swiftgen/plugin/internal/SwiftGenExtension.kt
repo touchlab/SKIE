@@ -23,6 +23,7 @@ internal class SwiftGenExtension(
                 fileBuilderFactory = fileBuilderFactory,
                 namespaceProvider = NamespaceProvider(fileBuilderFactory, moduleFragment),
                 configuration = pluginConfiguration,
+                swiftPackModuleBuilder = this,
                 reporter = Reporter(compilerConfiguration),
             )
 

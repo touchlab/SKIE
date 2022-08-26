@@ -6,6 +6,7 @@ import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.validation.IrValidator
+import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
@@ -14,6 +15,7 @@ internal class SwiftGenScheduler(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
     configuration: SwiftGenConfiguration,
+    swiftPackModuleBuilder: SwiftPackModuleBuilder,
     reporter: Reporter,
 ) {
 
@@ -23,6 +25,7 @@ internal class SwiftGenScheduler(
         fileBuilderFactory = fileBuilderFactory,
         namespaceProvider = namespaceProvider,
         configuration = configuration.sealedInteropDefaults,
+        swiftPackModuleBuilder = swiftPackModuleBuilder,
         reporter = reporter,
     )
 

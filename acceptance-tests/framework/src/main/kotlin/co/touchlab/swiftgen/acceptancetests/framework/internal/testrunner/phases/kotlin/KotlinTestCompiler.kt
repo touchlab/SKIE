@@ -6,8 +6,8 @@ import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.Interm
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestResultBuilder
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.SwiftGenComponentRegistrar
-import co.touchlab.swiftkt.plugin.ConfigurationKeys
-import co.touchlab.swiftkt.plugin.SwiftKtComponentRegistrar
+import co.touchlab.swiftlink.plugin.ConfigurationKeys
+import co.touchlab.swiftlink.plugin.SwiftKtComponentRegistrar
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import org.jetbrains.kotlin.cli.bc.K2Native

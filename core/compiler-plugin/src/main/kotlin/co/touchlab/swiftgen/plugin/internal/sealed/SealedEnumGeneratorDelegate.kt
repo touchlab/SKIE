@@ -1,13 +1,13 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
-import co.touchlab.swiftgen.plugin.internal.util.typeVariablesNames
-import co.touchlab.swiftgen.plugin.internal.util.withTypeParameters
+import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
 
 internal class SealedEnumGeneratorDelegate(
     override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
+    override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
 ) : SealedGeneratorExtensionContainer {
 
     private val enumName = "Enum"

@@ -11,6 +11,7 @@ The SwiftKt project is under heavy development and is far from being stable.
 Certainly do not use it in any production project.
 
 SwiftGen currently supports the following features:
+
 - Sealed class/interfaces (*)
 
 (*) - These features are not fully implemented yet. Expect bugs and compilation errors.
@@ -22,10 +23,11 @@ The discussion about any part of the SwiftKt project happens in the `swiftkt` Sl
 As the first step make sure that your project uses exactly the same Kotlin compiler version as this plugin.
 (Kotlin compiler plugins are in general not stable and break with almost every release.)
 
-At this point make sure that your project compiles before you do anything else (especially if you had to change the Kotlin compiler version).  
+At this point make sure that your project compiles before you do anything else (especially if you had to change the Kotlin compiler version).
 
-The SwiftKt project is deployed in a private Touchlab's Maven repository. 
-To access artifacts from that repository, you need to add the following code in the `build.gradle.kts`: 
+The SwiftKt project is deployed in a private Touchlab's Maven repository.
+To access artifacts from that repository, you need to add the following code in the `build.gradle.kts`:
+
 ```kotlin
 repositories {
     maven("https://api.touchlab.dev/public")
@@ -33,6 +35,7 @@ repositories {
 ```
 
 Kotlin compiler plugins are configured by a Gradle plugin, so you also need to modify the `settings.gradle.kts` file and add:
+
 ```kotlin
 pluginManagement {
     repositories {
@@ -42,9 +45,10 @@ pluginManagement {
 ```
 
 To enable SwiftGen, register the following plugins in `build.gradle.kts`:
+
 ```kotlin
 plugins {
-    id("co.touchlab.swiftkt") version "XXX"
+    id("co.touchlab.swiftlink") version "XXX"
     id("co.touchlab.swiftpack") version "YYY"
     id("co.touchlab.swiftgen") version "ZZZ"
 }
@@ -53,10 +57,10 @@ plugins {
 You can find the most recent version of each plugin by looking at the tags in the corresponding repository.
 (The Maven repository does not have a browser at the time of writing.)
 
-Note that `co.touchlab.swiftkt` is only necessary in the final module that builds the Kotlin framework.
+Note that `co.touchlab.swiftlink` is only necessary in the final module that builds the Kotlin framework.
 Including it in other modules has no effect.
 `co.touchlab.swiftgen` depends on `co.touchlab.swiftpack` so you always need to include both if you want to use SwiftGen.
-However, you do not have to include them if you do not want to use SwiftGen in the given module. 
+However, you do not have to include them if you do not want to use SwiftGen in the given module.
 
 The Swift/Xcode side does not require any configuration changes.
 
@@ -75,6 +79,7 @@ class A2(val k: Int) : A
 ```
 
 In Kotlin you can write this:
+
 ```kotlin
 when (a) {
     is A1 -> a.i
@@ -87,6 +92,7 @@ Not only that, but the compiler also smart-casts the `a` expression to the corre
 The smart-cast allows the developer to access the inner properties of each type without an additional cast.
 
 To support this feature in Swift, we generate code that can be reduced to this:
+
 ```swift
 enum Enum {
     case A1(A1)

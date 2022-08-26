@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 
     alias(libs.plugins.swiftpack)
-    alias(libs.plugins.swiftkt)
+    alias(libs.plugins.swiftlink)
     id("co.touchlab.swiftgen")
 }
 
