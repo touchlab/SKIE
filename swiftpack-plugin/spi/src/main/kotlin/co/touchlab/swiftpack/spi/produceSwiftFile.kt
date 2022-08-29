@@ -1,5 +1,6 @@
 package co.touchlab.swiftpack.spi
 
+import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_ENUM_ENTRY_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_FUNCTION_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_PROPERTY_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_TYPE_PREFIX
@@ -15,5 +16,8 @@ fun SwiftPackModule.TemplateFile.produceSwiftFile(swiftNameProvider: SwiftNamePr
         }
         .replace("($SWIFTPACK_KOTLIN_FUNCTION_PREFIX[a-zA-Z0-9_]+)".toRegex()) { match ->
             swiftNameProvider.getSwiftFunctionSelector(match.groupValues[1])
+        }
+        .replace("($SWIFTPACK_KOTLIN_ENUM_ENTRY_PREFIX[a-zA-Z0-9_]+)".toRegex()) { match ->
+            swiftNameProvider.getSwiftEnumEntryName(match.groupValues[1])
         }
 }

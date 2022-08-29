@@ -9,6 +9,7 @@ data class KobjcTransforms(
     val files: Map<KotlinFileReference, FileTransform> = emptyMap(),
     val properties: Map<KotlinPropertyReference, PropertyTransform> = emptyMap(),
     val functions: Map<KotlinFunctionReference, FunctionTransform> = emptyMap(),
+    val enumEntries: Map<KotlinEnumEntryReference, EnumEntryTransform> = emptyMap(),
 ) {
     @Serializable
     data class FileTransform(
@@ -28,6 +29,7 @@ data class KobjcTransforms(
         val bridge: String? = null,
         val properties: Map<KotlinPropertyReference, PropertyTransform> = emptyMap(),
         val methods: Map<KotlinFunctionReference, FunctionTransform> = emptyMap(),
+        val enumEntries: Map<KotlinEnumEntryReference, EnumEntryTransform> = emptyMap(),
     )
 
     @Serializable
@@ -41,6 +43,14 @@ data class KobjcTransforms(
     @Serializable
     class FunctionTransform(
         val reference: KotlinFunctionReference,
+        val hide: Boolean = false,
+        val remove: Boolean = false,
+        val rename: String? = null,
+    )
+
+    @Serializable
+    class EnumEntryTransform(
+        val reference: KotlinEnumEntryReference,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,

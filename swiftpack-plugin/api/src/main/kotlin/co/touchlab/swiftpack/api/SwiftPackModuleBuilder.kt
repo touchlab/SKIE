@@ -1,12 +1,14 @@
 package co.touchlab.swiftpack.api
 
 import co.touchlab.swiftpack.spec.KobjcTransforms
+import co.touchlab.swiftpack.spec.KotlinEnumEntryReference
 import co.touchlab.swiftpack.spec.KotlinFileReference
 import co.touchlab.swiftpack.spec.KotlinFunctionReference
 import co.touchlab.swiftpack.spec.KotlinPackageReference
 import co.touchlab.swiftpack.spec.KotlinPropertyReference
 import co.touchlab.swiftpack.spec.KotlinTypeReference
 import co.touchlab.swiftpack.spec.MemberParentReference
+import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_ENUM_ENTRY_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_FUNCTION_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_PROPERTY_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_TYPE_PREFIX
@@ -25,12 +27,15 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
+import org.jetbrains.kotlin.ir.declarations.IrEnumEntry
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.isFileClass
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.utils.addToStdlib.getOrPut
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -47,6 +52,7 @@ class SwiftPackModuleBuilder(
     private val typeReferences = ReferenceMap<KotlinTypeReference>(SWIFTPACK_KOTLIN_TYPE_PREFIX, referenceCounter)
     private val propertyReferences = ReferenceMap<KotlinPropertyReference>(SWIFTPACK_KOTLIN_PROPERTY_PREFIX, referenceCounter)
     private val functionReferences = ReferenceMap<KotlinFunctionReference>(SWIFTPACK_KOTLIN_FUNCTION_PREFIX, referenceCounter)
+    private val enumEntryReferences = ReferenceMap<KotlinEnumEntryReference>(SWIFTPACK_KOTLIN_ENUM_ENTRY_PREFIX, referenceCounter)
 
     fun KotlinTypeReference.swiftReference(): DeclaredTypeName {
         val ref = typeReferences.getReference(this)
@@ -75,6 +81,16 @@ class SwiftPackModuleBuilder(
 
     fun KotlinFunctionReference.applyTransform(transform: KobjcTransformScope.FunctionTransformScope.() -> Unit): KotlinFunctionReference {
         kobjcTransformsScope.function(this, transform)
+        return this
+    }
+
+    fun KotlinEnumEntryReference.swiftReference(): PropertySpec {
+        val ref = enumEntryReferences.getReference(this)
+        return PropertySpec.builder(ref, SelfTypeName.INSTANCE).build()
+    }
+
+    fun KotlinEnumEntryReference.applyTransform(transform: KobjcTransformScope.EnumEntryTransformScope.() -> Unit): KotlinEnumEntryReference {
+        kobjcTransformsScope.enumEntry(this, transform)
         return this
     }
 
@@ -108,6 +124,10 @@ class SwiftPackModuleBuilder(
                 "Function reference parameter type has no originalKotlinType"
             }
         })
+    }
+
+    fun IrEnumEntry.reference(): KotlinEnumEntryReference {
+        return KotlinEnumEntryReference(parentAsClass.reference(), name.asString())
     }
 
     private fun ClassifierDescriptor.reference(): KotlinTypeReference = when (this) {
@@ -157,6 +177,7 @@ class SwiftPackModuleBuilder(
                 types = typeReferences.reverseReferences,
                 properties = propertyReferences.reverseReferences,
                 functions = functionReferences.reverseReferences,
+                enumEntries = enumEntryReferences.reverseReferences,
             ),
             mutableFiles.map {
                 SwiftPackModule.TemplateFile(
@@ -173,11 +194,12 @@ class SwiftPackModuleBuilder(
 
     @KobjcScopeMarker
     class KobjcTransformScope(
-        private val packageReference: KotlinPackageReference = KotlinPackageReference.ROOT,
+        val packageReference: KotlinPackageReference = KotlinPackageReference.ROOT,
         private val types: MutableMap<KotlinTypeReference, TypeTransformScope> = mutableMapOf(),
         private val files: MutableMap<KotlinFileReference, FileTransformScope> = mutableMapOf(),
         private val properties: MutableMap<KotlinPropertyReference, PropertyTransformScope> = mutableMapOf(),
         private val functions: MutableMap<KotlinFunctionReference, FunctionTransformScope> = mutableMapOf(),
+        private val enumEntries: MutableMap<KotlinEnumEntryReference, EnumEntryTransformScope> = mutableMapOf(),
     ) {
         fun type(name: String, builder: TypeTransformScope.() -> Unit) {
             val reference = KotlinTypeReference(packageReference, name)
@@ -214,7 +236,6 @@ class SwiftPackModuleBuilder(
                     property(reference, builder)
                 }
             }
-
         }
 
         fun function(name: String, builder: FunctionTransformScope.() -> Unit) {
@@ -232,7 +253,12 @@ class SwiftPackModuleBuilder(
                     method(reference, builder)
                 }
             }
+        }
 
+        fun enumEntry(reference: KotlinEnumEntryReference, builder: EnumEntryTransformScope.() -> Unit) {
+            type(reference.enumType) {
+                enumEntry(reference, builder)
+            }
         }
 
         fun inPackage(packageName: String, builder: KobjcTransformScope.() -> Unit) {
@@ -242,6 +268,7 @@ class SwiftPackModuleBuilder(
                 files = files,
                 properties = properties,
                 functions = functions,
+                enumEntries = enumEntries,
             )
             scope.builder()
         }
@@ -252,12 +279,13 @@ class SwiftPackModuleBuilder(
                 files = files.mapValues { it.value.build() },
                 properties = properties.mapValues { it.value.build() },
                 functions = functions.mapValues { it.value.build() },
+                enumEntries = enumEntries.mapValues { it.value.build() },
             )
         }
 
         @KobjcScopeMarker
         class FileTransformScope(
-            private val reference: KotlinFileReference,
+            val reference: KotlinFileReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
             private var rename: String? = null,
@@ -292,13 +320,14 @@ class SwiftPackModuleBuilder(
 
         @KobjcScopeMarker
         class TypeTransformScope(
-            private val reference: KotlinTypeReference,
+            val reference: KotlinTypeReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
             private var rename: String? = null,
             private var bridge: String? = null,
             private val properties: MutableMap<KotlinPropertyReference, PropertyTransformScope> = mutableMapOf(),
             private val methods: MutableMap<KotlinFunctionReference, FunctionTransformScope> = mutableMapOf(),
+            private val enumEntries: MutableMap<KotlinEnumEntryReference, EnumEntryTransformScope> = mutableMapOf(),
         ) {
             fun remove() {
                 remove = true
@@ -336,6 +365,11 @@ class SwiftPackModuleBuilder(
                 scope.builder()
             }
 
+            fun enumEntry(reference: KotlinEnumEntryReference, builder: EnumEntryTransformScope.() -> Unit) {
+                val scope = enumEntries.getOrPut(reference) { EnumEntryTransformScope(reference) }
+                scope.builder()
+            }
+
             internal fun build(): KobjcTransforms.TypeTransform {
                 return KobjcTransforms.TypeTransform(
                     reference = reference,
@@ -345,13 +379,14 @@ class SwiftPackModuleBuilder(
                     bridge = bridge,
                     properties = properties.mapValues { it.value.build() },
                     methods = methods.mapValues { it.value.build() },
+                    enumEntries = enumEntries.mapValues { it.value.build() },
                 )
             }
         }
 
         @KobjcScopeMarker
         class PropertyTransformScope(
-            private val reference: KotlinPropertyReference,
+            val reference: KotlinPropertyReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
             private var rename: String? = null,
@@ -380,7 +415,7 @@ class SwiftPackModuleBuilder(
 
         @KobjcScopeMarker
         class FunctionTransformScope(
-            private val reference: KotlinFunctionReference,
+            val reference: KotlinFunctionReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
             private var rename: String? = null,
@@ -399,6 +434,35 @@ class SwiftPackModuleBuilder(
 
             internal fun build(): KobjcTransforms.FunctionTransform {
                 return KobjcTransforms.FunctionTransform(
+                    reference = reference,
+                    hide = hide,
+                    remove = remove,
+                    rename = rename,
+                )
+            }
+        }
+
+        @KobjcScopeMarker
+        class EnumEntryTransformScope(
+            val reference: KotlinEnumEntryReference,
+            private var hide: Boolean = false,
+            private var remove: Boolean = false,
+            private var rename: String? = null,
+        ) {
+            fun remove() {
+                remove = true
+            }
+
+            fun hide() {
+                hide = true
+            }
+
+            fun rename(newSwiftName: String) {
+                rename = newSwiftName
+            }
+
+            internal fun build(): KobjcTransforms.EnumEntryTransform {
+                return KobjcTransforms.EnumEntryTransform(
                     reference = reference,
                     hide = hide,
                     remove = remove,

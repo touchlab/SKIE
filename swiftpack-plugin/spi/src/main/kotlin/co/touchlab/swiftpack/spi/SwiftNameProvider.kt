@@ -8,4 +8,6 @@ interface SwiftNameProvider {
     fun getSwiftPropertyName(kotlinPropertyReference: SwiftPackReference): String
 
     fun getSwiftFunctionSelector(kotlinFunctionReference: SwiftPackReference): String
+
+    fun getSwiftEnumEntryName(kotlinEnumEntryReference: SwiftPackReference): String
 }
