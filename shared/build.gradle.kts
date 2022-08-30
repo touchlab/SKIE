@@ -1,47 +1,21 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
+
     kotlin("multiplatform")
     kotlin("native.cocoapods")
+
+
     id("kotlinx-serialization")
-    id("com.android.library")
     id("com.squareup.sqldelight")
-}
-
-android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
-    lint {
-        isWarningsAsErrors = true
-        isAbortOnError = true
-    }
+    id("co.touchlab.swiftlink") version "0.0.20"
+    id("co.touchlab.swiftpack") version "0.0.19"
+    id("co.touchlab.swiftgen") version "0.0.2"
 }
 
 version = "1.2"
 
-android {
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
-
 kotlin {
-    android()
     ios()
     // Note: iosSimulatorArm64 target requires that all dependencies have M1 support
     iosSimulatorArm64()
@@ -79,18 +53,6 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.shared.commonTest)
-            }
-        }
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.androidx.lifecycle.viewmodel)
-                implementation(libs.sqlDelight.android)
-                implementation(libs.ktor.client.okHttp)
-            }
-        }
-        val androidTest by getting {
-            dependencies {
-                implementation(libs.bundles.shared.androidTest)
             }
         }
         val iosMain by getting {

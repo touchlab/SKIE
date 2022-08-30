@@ -7,11 +7,11 @@ compileSdk = "31"
 # Dependencies
 compose = "1.1.1"
 composeCompiler = "1.2.0-alpha08"
-coroutines = "1.6.1"
+coroutines = "1.6.4"
 multiplatformSettings = "0.9"
 koin = "3.1.6"
-kotlin = "1.6.20"
-ktor = "2.0.0"
+kotlin = "1.7.10"
+ktor = "2.1.0"
 lifecycle = "2.4.1"
 sqlDelight = "1.5.3"
 
@@ -35,7 +35,7 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 
 google-accompanist-swipeRefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version = "0.23.1" }
 
-gradlePlugin-android = "com.android.tools.build:gradle:7.0.3"
+gradlePlugin-android = "com.android.tools.build:gradle:7.2.2"
 gradlePlugin-kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 gradlePlugin-ktlint = { module = "org.jlleitschuh.gradle:ktlint-gradle", version = "10.2.1" }
 gradlePlugin-sqlDelight = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqlDelight" }
@@ -46,7 +46,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 
-kotlinx-dateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.3.2" }
+kotlinx-dateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.4.0" }
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
@@ -68,9 +68,9 @@ sqlDelight-native = { module = "com.squareup.sqldelight:native-driver", version.
 sqlDelight-runtime = { module = "com.squareup.sqldelight:runtime", version.ref = "sqlDelight" }
 
 touchlab-kermit = { module = "co.touchlab:kermit", version = "1.0.3" }
-touchlab-stately = { module = "co.touchlab:stately-common", version = "1.2.1" }
+touchlab-stately = { module = "co.touchlab:stately-common", version = "1.2.3" }
 
-turbine = { module = "app.cash.turbine:turbine", version = "0.7.0" }
+turbine = { module = "app.cash.turbine:turbine", version = "0.9.0" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 [plugins]

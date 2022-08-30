@@ -17,7 +17,7 @@ class BreedViewModel(
     private val log = log.withTag("BreedCommonViewModel")
 
     private val mutableBreedState: MutableStateFlow<BreedViewState> =
-        MutableStateFlow(BreedViewState(isLoading = true))
+        MutableStateFlow(BreedViewState.Loading)
 
     val breedState: StateFlow<BreedViewState> = mutableBreedState
 
@@ -47,14 +47,20 @@ class BreedViewModel(
                         val errorMessage = if (error != null) {
                             "Unable to download breed list"
                         } else {
-                            previousState.error
+                            if (previousState is BreedViewState.Error) {
+                                previousState.message
+                            } else {
+                                null
+                            }
                         }
-                        BreedViewState(
-                            isLoading = false,
-                            breeds = breeds.takeIf { it.isNotEmpty() },
-                            error = errorMessage.takeIf { breeds.isEmpty() },
-                            isEmpty = breeds.isEmpty() && errorMessage == null
-                        )
+
+                        if (breeds.isNotEmpty()) {
+                            BreedViewState.Data(breeds)
+                        } else if (errorMessage != null) {
+                            BreedViewState.Error(errorMessage)
+                        } else {
+                            BreedViewState.Empty
+                        }
                     }
                 }
         }
@@ -62,7 +68,7 @@ class BreedViewModel(
 
     fun refreshBreeds(): Job {
         // Set loading state, which will be cleared when the repository re-emits
-        mutableBreedState.update { it.copy(isLoading = true) }
+        mutableBreedState.update { BreedViewState.Loading }
         return viewModelScope.launch {
             log.v { "refreshBreeds" }
             try {
@@ -82,19 +88,22 @@ class BreedViewModel(
     private fun handleBreedError(throwable: Throwable) {
         log.e(throwable) { "Error downloading breed list" }
         mutableBreedState.update {
-            if (it.breeds.isNullOrEmpty()) {
-                BreedViewState(error = "Unable to refresh breed list")
-            } else {
-                // Just let it fail silently if we have a cache
-                it.copy(isLoading = false)
-            }
+            BreedViewState.Error("Unable to refresh breed list")
         }
     }
 }
 
+sealed interface BreedViewState {
+    class Data(val breeds: List<Breed>) : BreedViewState
+    class Error(val message: String) : BreedViewState
+    object Loading : BreedViewState
+    object Empty : BreedViewState
+}
+
+/*
 data class BreedViewState(
     val breeds: List<Breed>? = null,
     val error: String? = null,
     val isLoading: Boolean = false,
     val isEmpty: Boolean = false
-)
+)*/

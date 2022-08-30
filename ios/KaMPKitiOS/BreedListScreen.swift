@@ -30,6 +30,17 @@ class ObservableBreedModel: ObservableObject {
         let viewModel = KotlinDependencies.shared.getBreedViewModel()
 
         doPublish(viewModel.breeds) { [weak self] dogsState in
+            switch exhaustively(dogsState){
+                
+            case .Data(_):
+                <#code#>
+            case .Empty(_):
+                <#code#>
+            case .Error(_):
+                <#code#>
+            case .Loading(_):
+                <#code#>
+            }
             self?.loading = dogsState.isLoading
             self?.breeds = dogsState.breeds
             self?.error = dogsState.error

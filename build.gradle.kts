@@ -5,10 +5,9 @@ buildscript {
         google()
         mavenCentral()
         maven("https://plugins.gradle.org/m2/")
+        maven("https://api.touchlab.dev/public")
     }
     dependencies {
-        val libs = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
-            as org.gradle.accessors.dm.LibrariesForLibs
         classpath(libs.bundles.gradlePlugins)
         classpath(kotlin("gradle-plugin", libs.versions.kotlin.get()))
         // NOTE: Do not place your application dependencies here; they belong
@@ -26,6 +25,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven("https://api.touchlab.dev/public")
     }
 }
 
