@@ -1,6 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal
 
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.plugin.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.swiftgen.plugin.internal.sealed.SealedInteropGenerator
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
@@ -29,6 +30,8 @@ internal class SwiftGenScheduler(
         reporter = reporter,
     )
 
+    private val exhaustiveEnumsGenerator = ExhaustiveEnumsGenerator(fileBuilderFactory, namespaceProvider, swiftPackModuleBuilder)
+
     fun process(element: IrElement) {
         Visitor().visitElement(element, Unit)
     }
@@ -44,6 +47,7 @@ internal class SwiftGenScheduler(
 
             irValidator.verify(declaration)
             sealedInteropGenerator.generate(declaration)
+            exhaustiveEnumsGenerator.generate(declaration)
         }
     }
 }
