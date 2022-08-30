@@ -1,6 +1,7 @@
 package co.touchlab.swiftlink.plugin
 
 import co.touchlab.swiftpack.spec.KobjcTransforms
+import co.touchlab.swiftpack.spec.KotlinEnumEntryReference
 import co.touchlab.swiftpack.spec.KotlinFunctionReference
 import co.touchlab.swiftpack.spec.KotlinPackageReference
 import co.touchlab.swiftpack.spec.KotlinPropertyReference
@@ -10,6 +11,7 @@ import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -50,6 +52,7 @@ class TransformResolver(
 
     private val properties: Map<KotlinPropertyReference, ResolvedPropertyTransform>
     private val functions: Map<KotlinFunctionReference, ResolvedFunctionTransform>
+    private val enumEntries: Map<KotlinEnumEntryReference, ResolvedEnumEntryTransform>
 
     init {
         val allTypes: Map<KotlinTypeReference, ResolvedTypeTransform> = transforms.types.mapValues { (_, transform) ->
@@ -82,6 +85,18 @@ class TransformResolver(
                     isStatic = false,
                 )
             }
+            val enumEntries = transform.enumEntries.mapValues { (_, transform) ->
+                val enumEntryDescriptor = kotlinNameResolver.resolveEnumEntry(transform.reference)
+                val name = namer.getEnumEntrySelector(enumEntryDescriptor)
+                ResolvedEnumEntryTransform(
+                    reference = transform.reference,
+                    descriptor = enumEntryDescriptor,
+                    name = name,
+                    newSwiftName = transform.rename ?: transform.hide.ifTrue { "__${name}" },
+                    hide = transform.hide,
+                    remove = transform.remove,
+                )
+            }
 
             ResolvedTypeTransform(
                 isProtocol = classDescriptor.kind == ClassKind.INTERFACE,
@@ -92,6 +107,7 @@ class TransformResolver(
                 remove = transform.remove,
                 properties = properties,
                 methods = methods,
+                enumEntries = enumEntries,
             )
         }
 
@@ -140,6 +156,7 @@ class TransformResolver(
                 remove = fileTransform?.remove ?: false,
                 properties = globalProperties[file]?.associateBy { it.reference } ?: emptyMap(),
                 methods = globalFunctions[file]?.associateBy { it.reference } ?: emptyMap(),
+                enumEntries = emptyMap(),
             )
         }
 
@@ -150,6 +167,7 @@ class TransformResolver(
 
         properties = (types.values + fileClasses.values).flatMap { it.properties.values }.associateBy { it.reference }
         functions = (types.values + fileClasses.values).flatMap { it.methods.values }.associateBy { it.reference }
+        enumEntries = types.values.flatMap { it.enumEntries.values }.associateBy { it.reference }
     }
 
     fun findTypeTransform(type: KotlinTypeReference): ResolvedTypeTransform? = types[type]
@@ -157,6 +175,8 @@ class TransformResolver(
     fun findPropertyTransform(reference: KotlinPropertyReference): ResolvedPropertyTransform? = properties[reference]
 
     fun findFunctionTransform(reference: KotlinFunctionReference): ResolvedFunctionTransform? = functions[reference]
+
+    fun findEnumEntryTransform(reference: KotlinEnumEntryReference): ResolvedEnumEntryTransform? = enumEntries[reference]
 
     fun findFileTransform(file: FileInPackage): ResolvedTypeTransform? = fileClasses[file]
 }
@@ -178,6 +198,7 @@ class ResolvedTypeTransform(
     val remove: Boolean,
     val properties: Map<KotlinPropertyReference, ResolvedPropertyTransform>,
     val methods: Map<KotlinFunctionReference, ResolvedFunctionTransform>,
+    val enumEntries: Map<KotlinEnumEntryReference, ResolvedEnumEntryTransform>,
 )
 
 class ResolvedPropertyTransform(
@@ -200,12 +221,21 @@ class ResolvedFunctionTransform(
     val isStatic: Boolean,
 )
 
+class ResolvedEnumEntryTransform(
+    val reference: KotlinEnumEntryReference,
+    val descriptor: ClassDescriptor,
+    val name: String,
+    val newSwiftName: String?,
+    val hide: Boolean,
+    val remove: Boolean,
+)
+
 class ApiNotes(
     private val moduleName: String,
     private val transformResolver: TransformResolver,
 ) {
 
-    fun save(directory: File) {
+    fun save(directory: File, enableBridging: Boolean) {
         val builder = Builder()
         with(builder) {
             +"Name: \"$moduleName\""
@@ -216,7 +246,9 @@ class ApiNotes(
                 +"- Name: \"${name.objCName}\""
 
                 indented {
-                    transform.bridgedName?.let { +"SwiftBridge: $it" }
+                    if (enableBridging) {
+                        transform.bridgedName?.let { +"SwiftBridge: $it" }
+                    }
                     transform.hide.ifTrue { +"SwiftPrivate: true" }
                     transform.newSwiftName?.let { +"SwiftName: $it" }
                     transform.remove.ifTrue { +"Availability: nonswift" }

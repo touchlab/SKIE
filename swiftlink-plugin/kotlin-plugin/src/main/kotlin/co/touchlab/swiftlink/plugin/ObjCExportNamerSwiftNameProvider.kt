@@ -3,10 +3,12 @@ package co.touchlab.swiftlink.plugin
 import co.touchlab.swiftpack.spec.CallableMemberReference
 import co.touchlab.swiftpack.spec.KotlinPackageReference
 import co.touchlab.swiftpack.spec.KotlinTypeReference
+import co.touchlab.swiftpack.spec.MemberParentReference
 import co.touchlab.swiftpack.spec.SwiftPackReference
 import co.touchlab.swiftpack.spi.SwiftNameProvider
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 
 class ObjCExportNamerSwiftNameProvider(
     private val namer: ObjCExportNamer,
@@ -17,7 +19,8 @@ class ObjCExportNamerSwiftNameProvider(
 
     override fun getSwiftTypeName(kotlinTypeReference: SwiftPackReference): String {
         return referenceResolver.resolveTypeReference(kotlinTypeReference).let { reference ->
-            transformResolver.findTypeTransform(reference)?.newSwiftName ?: namer.getClassOrProtocolName(kotlinNameResolver.resolveClass(reference)).swiftName
+            transformResolver.findTypeTransform(reference)?.newSwiftName
+                ?: namer.getClassOrProtocolName(kotlinNameResolver.resolveClass(reference)).swiftName
         }
     }
 
@@ -25,7 +28,8 @@ class ObjCExportNamerSwiftNameProvider(
         return referenceResolver.resolvePropertyReference(kotlinPropertyReference).let { reference ->
             val propertyDescriptor = lazy { kotlinNameResolver.resolveProperty(reference) }
             val parentPrefix = getParentPrefix(reference, propertyDescriptor)
-            val propertyName = transformResolver.findPropertyTransform(reference)?.newSwiftName ?: namer.getPropertyName(propertyDescriptor.value)
+            val propertyName = transformResolver.findPropertyTransform(reference)?.newSwiftName
+                ?: namer.getPropertyName(propertyDescriptor.value)
             parentPrefix + propertyName
         }
     }
@@ -42,6 +46,13 @@ class ObjCExportNamerSwiftNameProvider(
                 functionSelector
             }
             parentPrefix + swiftFunctionReference
+        }
+    }
+
+    override fun getSwiftEnumEntryName(kotlinEnumEntryReference: SwiftPackReference): String {
+        return referenceResolver.resolveEnumEntryReference(kotlinEnumEntryReference).let { reference ->
+            transformResolver.findEnumEntryTransform(reference)?.newSwiftName
+                ?: namer.getEnumEntrySelector(kotlinNameResolver.resolveEnumEntry(reference))
         }
     }
 

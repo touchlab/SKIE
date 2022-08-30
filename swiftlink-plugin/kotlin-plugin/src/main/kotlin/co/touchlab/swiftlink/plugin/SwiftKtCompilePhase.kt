@@ -79,7 +79,7 @@ class SwiftKtCompilePhase(
         val swiftModule = framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() }
         val modulemapFile = framework.resolve("Modules/module.modulemap")
         val apiNotes = ApiNotes(moduleName, transformResolver)
-        apiNotes.save(headersDir)
+        apiNotes.save(headersDir, sourceFiles.isEmpty())
 
         // We want to make sure we generate .apinotes file even if there are no Swift source files.
         if (sourceFiles.isEmpty()) {
@@ -158,6 +158,8 @@ class SwiftKtCompilePhase(
                 execute()
             }
         }
+
+        apiNotes.save(headersDir, true)
 
         val swiftLibSearchPaths = listOf(
             File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),

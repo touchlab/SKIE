@@ -1,5 +1,6 @@
 package co.touchlab.swiftlink.plugin
 
+import co.touchlab.swiftpack.spec.KotlinEnumEntryReference
 import co.touchlab.swiftpack.spec.KotlinFileReference
 import co.touchlab.swiftpack.spec.KotlinFunctionReference
 import co.touchlab.swiftpack.spec.KotlinPackageReference
@@ -77,6 +78,18 @@ class KotlinNameResolver(
                 param.type.constructor.declarationDescriptor?.fqNameSafe == type.fqName
             }
         }
+    }
+
+    fun resolveEnumEntry(reference: KotlinEnumEntryReference): ClassDescriptor {
+        return checkNotNull(findEnumEntry(reference)) {
+            "Could not find enum entry $reference"
+        }
+    }
+
+    fun findEnumEntry(reference: KotlinEnumEntryReference): ClassDescriptor? {
+        val memberScope = resolveClass(reference.enumType).unsubstitutedMemberScope
+
+        return memberScope.getContributedClassifier(Name.identifier(reference.entryName), NoLookupLocation.FROM_BACKEND) as? ClassDescriptor
     }
 
     fun resolveClass(reference: KotlinTypeReference): ClassDescriptor {

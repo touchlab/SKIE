@@ -1,5 +1,6 @@
 package co.touchlab.swiftlink.plugin
 
+import co.touchlab.swiftpack.spec.KotlinEnumEntryReference
 import co.touchlab.swiftpack.spec.KotlinFunctionReference
 import co.touchlab.swiftpack.spec.KotlinPropertyReference
 import co.touchlab.swiftpack.spec.KotlinTypeReference
@@ -25,6 +26,12 @@ class SwiftReferenceResolver(
     fun resolveFunctionReference(swiftPackReference: SwiftPackReference): KotlinFunctionReference {
         return requireNotNull(references.functions[swiftPackReference]) {
             "Could not resolve function reference $swiftPackReference"
+        }
+    }
+
+    fun resolveEnumEntryReference(swiftPackReference: SwiftPackReference): KotlinEnumEntryReference {
+        return requireNotNull(references.enumEntries[swiftPackReference]) {
+            "Could not resolve enum entry reference $swiftPackReference"
         }
     }
 }
