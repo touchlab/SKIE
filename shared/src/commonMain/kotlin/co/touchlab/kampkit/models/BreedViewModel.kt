@@ -1,6 +1,7 @@
 package co.touchlab.kampkit.models
 
 import co.touchlab.kampkit.db.Breed
+import co.touchlab.kampkit.sqldelight.FavoriteType
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,9 +80,9 @@ class BreedViewModel(
         }
     }
 
-    fun updateBreedFavorite(breed: Breed): Job {
+    fun updateBreedFavorite(breed: Breed, favoriteType: FavoriteType): Job {
         return viewModelScope.launch {
-            breedRepository.updateBreedFavorite(breed)
+            breedRepository.updateBreedFavorite(breed, favoriteType)
         }
     }
 

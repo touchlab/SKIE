@@ -4,6 +4,7 @@ import co.touchlab.kampkit.db.Breed
 import co.touchlab.kampkit.models.BreedRepository
 import co.touchlab.kampkit.models.BreedViewModel
 import co.touchlab.kampkit.models.CallbackViewModel
+import co.touchlab.kampkit.sqldelight.FavoriteType
 import co.touchlab.kermit.Logger
 
 @Suppress("Unused") // Members are called from Swift
@@ -20,7 +21,7 @@ class BreedCallbackViewModel(
         viewModel.refreshBreeds()
     }
 
-    fun updateBreedFavorite(breed: Breed) {
-        viewModel.updateBreedFavorite(breed)
+    fun updateBreedFavorite(breed: Breed, favoriteType: FavoriteType) {
+        viewModel.updateBreedFavorite(breed, favoriteType)
     }
 }

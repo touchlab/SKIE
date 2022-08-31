@@ -1,7 +1,9 @@
+import co.touchlab.kampkit.sqldelight.FavoriteType;
+
 CREATE TABLE Breed (
 id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 name TEXT NOT NULL UNIQUE,
-favorite INTEGER AS Boolean NOT NULL DEFAULT 0
+favorite INTEGER AS FavoriteType NOT NULL DEFAULT 0
 );
 
 selectAll:

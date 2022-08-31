@@ -16,13 +16,7 @@ class ObservableBreedModel: ObservableObject {
     private var viewModel: BreedCallbackViewModel?
 
     @Published
-    var loading = false
-
-    @Published
-    var breeds: [Breed]?
-
-    @Published
-    var error: String?
+    var state: BreedViewState = BreedViewStateEmpty()
 
     private var cancellables = [AnyCancellable]()
 
@@ -30,27 +24,7 @@ class ObservableBreedModel: ObservableObject {
         let viewModel = KotlinDependencies.shared.getBreedViewModel()
 
         doPublish(viewModel.breeds) { [weak self] dogsState in
-            switch exhaustively(dogsState){
-                
-            case .Data(_):
-                <#code#>
-            case .Empty(_):
-                <#code#>
-            case .Error(_):
-                <#code#>
-            case .Loading(_):
-                <#code#>
-            }
-            self?.loading = dogsState.isLoading
-            self?.breeds = dogsState.breeds
-            self?.error = dogsState.error
-
-            if let breeds = dogsState.breeds {
-                log.d(message: {"View updating with \(breeds.count) breeds"})
-            }
-            if let errorMessage = dogsState.error {
-                log.e(message: {"Displaying error: \(errorMessage)"})
-            }
+            self?.state = dogsState
         }.store(in: &cancellables)
 
         self.viewModel = viewModel
@@ -65,7 +39,10 @@ class ObservableBreedModel: ObservableObject {
     }
 
     func onBreedFavorite(_ breed: Breed) {
-        viewModel?.updateBreedFavorite(breed: breed)
+        viewModel?.updateBreedFavorite(
+            breed: breed,
+            favoriteType: breed.favorite == .bark ? .wag : .bark
+        )
     }
 
     func refresh() {
@@ -79,9 +56,7 @@ struct BreedListScreen: View {
 
     var body: some View {
         BreedListContent(
-            loading: observableModel.loading,
-            breeds: observableModel.breeds,
-            error: observableModel.error,
+            breedState: observableModel.state,
             onBreedFavorite: { observableModel.onBreedFavorite($0) },
             refresh: { observableModel.refresh() }
         )
@@ -95,31 +70,29 @@ struct BreedListScreen: View {
 }
 
 struct BreedListContent: View {
-    var loading: Bool
-    var breeds: [Breed]?
-    var error: String?
+    var breedState: BreedViewState
     var onBreedFavorite: (Breed) -> Void
     var refresh: () -> Void
 
     var body: some View {
         ZStack {
             VStack {
-                if let breeds = breeds {
-                    List(breeds, id: \.id) { breed in
-                        BreedRowView(breed: breed) {
-                            onBreedFavorite(breed)
-                        }
+                switch exhaustively(breedState) {
+                case .Data(let state):
+                    List(state.breeds, id: \.id) { breed in
+                        BreedRowView(breed: breed) { onBreedFavorite(breed) }
                     }
-                }
-                if let error = error {
-                    Text(error)
+                case .Empty(_ ):
+                    Text("Empty...")
+                case .Error(let state):
+                    Text(state.message)
                         .foregroundColor(.red)
+                case .Loading(_):
+                    Text("Loading...")
                 }
-                Button("Refresh") {
-                    refresh()
-                }
+
+                Button("Refresh") { refresh() }
             }
-            if loading { Text("Loading...") }
         }
     }
 }
@@ -134,7 +107,7 @@ struct BreedRowView: View {
                 Text(breed.name)
                     .padding(4.0)
                 Spacer()
-                Image(systemName: (!breed.favorite) ? "heart" : "heart.fill")
+                Image(systemName: (breed.favorite == .bark) ? "heart" : "heart.fill")
                     .padding(4.0)
             }
         }
@@ -143,13 +116,13 @@ struct BreedRowView: View {
 
 struct BreedListScreen_Previews: PreviewProvider {
     static var previews: some View {
+        let state = BreedViewStateData(breeds: [
+            Breed(id: 0, name: "appenzeller", favorite: .bark),
+            Breed(id: 1, name: "australian", favorite: .wag)
+        ])
+
         BreedListContent(
-            loading: false,
-            breeds: [
-                Breed(id: 0, name: "appenzeller", favorite: false),
-                Breed(id: 1, name: "australian", favorite: true)
-            ],
-            error: nil,
+            breedState: state,
             onBreedFavorite: { _ in },
             refresh: {}
         )

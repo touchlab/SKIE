@@ -3,6 +3,7 @@ package co.touchlab.kampkit.models
 import co.touchlab.kampkit.DatabaseHelper
 import co.touchlab.kampkit.db.Breed
 import co.touchlab.kampkit.ktor.DogApi
+import co.touchlab.kampkit.sqldelight.FavoriteType
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.russhwolf.settings.Settings
@@ -47,8 +48,8 @@ class BreedRepository(
         }
     }
 
-    suspend fun updateBreedFavorite(breed: Breed) {
-        dbHelper.updateFavorite(breed.id, !breed.favorite)
+    suspend fun updateBreedFavorite(breed: Breed, favoriteType: FavoriteType) {
+        dbHelper.updateFavorite(breed.id, favoriteType)
     }
 
     private fun isBreedListStale(): Boolean {
