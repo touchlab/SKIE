@@ -4,6 +4,7 @@ import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.RecursiveClassDescriptorVisitor
+import co.touchlab.swiftgen.plugin.internal.util.accept
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import co.touchlab.swiftpack.spec.KotlinEnumEntryReference
 import io.outfoxx.swiftpoet.BOOL
@@ -17,8 +18,8 @@ import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.isEnumClass
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 
@@ -28,15 +29,13 @@ internal class ExhaustiveEnumsGenerator(
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
 ) : BaseGenerator(fileBuilderFactory, namespaceProvider) {
 
-    override fun generate(module: IrModuleFragment) {
-        module.descriptor.accept(Visitor(), Unit)
-    }
+    override fun generate(module: ModuleDescriptor) {
+        module.accept(object : RecursiveClassDescriptorVisitor() {
 
-    private inner class Visitor : RecursiveClassDescriptorVisitor() {
-
-        override fun visitClass(descriptor: ClassDescriptor) {
-            generate(descriptor)
-        }
+            override fun visitClass(descriptor: ClassDescriptor) {
+                generate(descriptor)
+            }
+        })
     }
 
     private fun generate(declaration: ClassDescriptor) {

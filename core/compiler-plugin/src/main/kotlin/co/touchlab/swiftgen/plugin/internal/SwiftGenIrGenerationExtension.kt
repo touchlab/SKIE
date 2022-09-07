@@ -19,15 +19,17 @@ internal class SwiftGenIrGenerationExtension(
         buildSwiftPackModule("SwiftGen") {
             val fileBuilderFactory = FileBuilderFactory()
 
+            val descriptor = moduleFragment.descriptor
+
             val swiftGenScheduler = SwiftGenScheduler(
                 fileBuilderFactory = fileBuilderFactory,
-                namespaceProvider = NamespaceProvider(fileBuilderFactory, moduleFragment),
+                namespaceProvider = NamespaceProvider(fileBuilderFactory, descriptor),
                 configuration = pluginConfiguration,
                 swiftPackModuleBuilder = this,
                 reporter = Reporter(compilerConfiguration),
             )
 
-            swiftGenScheduler.process(moduleFragment)
+            swiftGenScheduler.process(descriptor)
 
             fileBuilderFactory.buildAll()
                 .forEach { addFile(it) }

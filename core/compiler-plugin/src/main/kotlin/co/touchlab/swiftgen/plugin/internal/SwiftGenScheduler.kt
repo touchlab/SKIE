@@ -8,7 +8,7 @@ import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.validation.IrValidator
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 internal class SwiftGenScheduler(
     fileBuilderFactory: FileBuilderFactory,
@@ -30,8 +30,8 @@ internal class SwiftGenScheduler(
         reporter = reporter,
     )
 
-    fun process(module: IrModuleFragment) {
-        irValidator.verify(module)
+    fun process(module: ModuleDescriptor) {
+        irValidator.validate(module)
         sealedInteropGenerator.generate(module)
         exhaustiveEnumsGenerator.generate(module)
     }

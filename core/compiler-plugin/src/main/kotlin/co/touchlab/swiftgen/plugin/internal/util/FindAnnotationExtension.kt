@@ -2,12 +2,11 @@ package co.touchlab.swiftgen.plugin.internal.util
 
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
-import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.constants.AnnotationValue
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
+import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.constants.EnumValue
 import org.jetbrains.kotlin.resolve.constants.KClassValue
 import kotlin.reflect.KClass
@@ -15,13 +14,6 @@ import kotlin.reflect.KParameter
 
 internal inline fun <reified T : Annotation> Annotated.hasAnnotation(): Boolean =
     hasAnnotation(T::class)
-
-@Deprecated("Descriptors")
-internal fun <T : Annotation> IrAnnotationContainer.hasAnnotation(annotation: KClass<T>): Boolean {
-    val annotationName = FqName(annotation.qualifiedName!!)
-
-    return this.hasAnnotation(annotationName)
-}
 
 internal fun <T : Annotation> Annotated.hasAnnotation(annotation: KClass<T>): Boolean {
     val annotationName = FqName(annotation.qualifiedName!!)
@@ -48,14 +40,15 @@ private fun assignArgumentsToParameters(
         .mapNotNull { parameter ->
             val argumentExpression = annotation.argumentValue(parameter.name!!) ?: return@mapNotNull null
 
-            val argument = when (argumentExpression) {
-                is KClassValue, is EnumValue, is ArrayValue, is AnnotationValue -> {
-                    throw AssertionError("Unsupported annotation parameter type $argumentExpression.")
-                }
-
-                else -> argumentExpression.value
-            }
-
-            parameter to argument
+            parameter to argumentExpression.runtimeValue
         }
         .toMap()
+
+private val ConstantValue<*>.runtimeValue: Any?
+    get() = when (this) {
+        is KClassValue, is EnumValue, is ArrayValue, is AnnotationValue -> {
+            throw AssertionError("Unsupported annotation parameter type $this.")
+        }
+
+        else -> this.value
+    }

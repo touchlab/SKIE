@@ -7,20 +7,14 @@ import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.RecursiveClassDescriptorVisitor
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
+import co.touchlab.swiftgen.plugin.internal.util.accept
 import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
 import co.touchlab.swiftgen.plugin.internal.util.isSealed
 import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
-import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
@@ -33,15 +27,13 @@ internal class SealedInteropGenerator(
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration, swiftPackModuleBuilder)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration, swiftPackModuleBuilder)
 
-    override fun generate(module: IrModuleFragment) {
-        module.descriptor.accept(Visitor(), Unit)
-    }
+    override fun generate(module: ModuleDescriptor) {
+        module.accept(object : RecursiveClassDescriptorVisitor() {
 
-    private inner class Visitor : RecursiveClassDescriptorVisitor() {
-
-        override fun visitClass(descriptor: ClassDescriptor) {
-            generate(descriptor)
-        }
+            override fun visitClass(descriptor: ClassDescriptor) {
+                generate(descriptor)
+            }
+        })
     }
 
     private fun generate(declaration: ClassDescriptor) {
