@@ -2,21 +2,25 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
-import co.touchlab.swiftgen.plugin.internal.util.*
+import co.touchlab.swiftgen.plugin.internal.util.findAnnotation
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import io.outfoxx.swiftpoet.*
-import org.jetbrains.kotlin.ir.declarations.IrClass
+import io.outfoxx.swiftpoet.CodeBlock
+import io.outfoxx.swiftpoet.FileSpec
+import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.Modifier
+import io.outfoxx.swiftpoet.TypeName
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedFunctionGeneratorDelegate(
     override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
 ) : SealedGeneratorExtensionContainer {
 
-    fun generate(declaration: IrClass, enumType: TypeName, fileBuilder: FileSpec.Builder) {
+    fun generate(declaration: ClassDescriptor, enumType: TypeName, fileBuilder: FileSpec.Builder) {
         fileBuilder.addFunction(
             FunctionSpec.builder(declaration.exhaustivelyFunctionName)
                 .addModifiers(Modifier.PUBLIC)
-                .addTypeVariables(declaration.typeVariablesNames)
+                .addTypeVariables(declaration.swiftTypeVariablesNames)
                 .addParameter("_", "self", declaration.swiftNameWithTypeParameters)
                 .returns(enumType)
                 .addExhaustivelyFunctionBody(declaration, enumType)
@@ -24,11 +28,11 @@ internal class SealedFunctionGeneratorDelegate(
         )
     }
 
-    private val IrClass.exhaustivelyFunctionName: String
+    private val ClassDescriptor.exhaustivelyFunctionName: String
         get() = this.findAnnotation<SealedInterop.FunctionName>()?.functionName ?: configuration.functionName
 
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
-        declaration: IrClass,
+        declaration: ClassDescriptor,
         enumType: TypeName,
     ): FunctionSpec.Builder = addCode(
         CodeBlock.builder()
@@ -38,13 +42,12 @@ internal class SealedFunctionGeneratorDelegate(
     )
 
     private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
-        declaration: IrClass,
+        declaration: ClassDescriptor,
         enumType: TypeName,
     ): CodeBlock.Builder {
         declaration.visibleSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
-                val subclassName =
-                    subclassSymbol.owner.swiftNameWithTypeParametersForSealedCase(declaration).canonicalName
+                val subclassName = subclassSymbol.swiftNameWithTypeParametersForSealedCase(declaration).canonicalName
 
                 val condition = "let self = self as? $subclassName"
 
@@ -61,7 +64,7 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(
-        declaration: IrClass,
+        declaration: ClassDescriptor,
         enumType: TypeName,
     ): CodeBlock.Builder {
         if (declaration.hasAnyVisibleSealedSubclasses) {
@@ -73,10 +76,10 @@ internal class SealedFunctionGeneratorDelegate(
         return this
     }
 
-    private val IrClass.hasAnyVisibleSealedSubclasses: Boolean
+    private val ClassDescriptor.hasAnyVisibleSealedSubclasses: Boolean
         get() = this.sealedSubclasses.any { it.isVisibleSealedSubclass }
 
-    private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: IrClass, enumType: TypeName) {
+    private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: ClassDescriptor, enumType: TypeName) {
         nextControlFlow("else")
 
         if (declaration.hasElseCase) {
@@ -94,7 +97,7 @@ internal class SealedFunctionGeneratorDelegate(
         endControlFlow("else")
     }
 
-    private fun CodeBlock.Builder.addReturnElse(declaration: IrClass, enumType: TypeName) {
+    private fun CodeBlock.Builder.addReturnElse(declaration: ClassDescriptor, enumType: TypeName) {
         add("return ${enumType.canonicalName}.${declaration.elseCaseName}\n")
     }
 }

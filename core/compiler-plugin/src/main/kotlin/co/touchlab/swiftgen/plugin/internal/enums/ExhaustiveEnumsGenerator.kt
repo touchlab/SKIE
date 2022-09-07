@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 internal class ExhaustiveEnumsGenerator(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
-    private val swiftPackModuleBuilder: SwiftPackModuleBuilder,
+    override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
 ) : BaseGenerator(fileBuilderFactory, namespaceProvider) {
 
     override fun generate(module: IrModuleFragment) {

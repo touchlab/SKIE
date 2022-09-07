@@ -2,8 +2,13 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import io.outfoxx.swiftpoet.*
-import org.jetbrains.kotlin.ir.declarations.IrClass
+import io.outfoxx.swiftpoet.DeclaredTypeName
+import io.outfoxx.swiftpoet.ExtensionSpec
+import io.outfoxx.swiftpoet.FileSpec
+import io.outfoxx.swiftpoet.Modifier
+import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeSpec
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedEnumGeneratorDelegate(
     override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
@@ -12,14 +17,14 @@ internal class SealedEnumGeneratorDelegate(
 
     private val enumName = "Enum"
 
-    fun generate(declaration: IrClass, classNamespace: DeclaredTypeName, fileBuilder: FileSpec.Builder): TypeName {
+    fun generate(declaration: ClassDescriptor, classNamespace: DeclaredTypeName, fileBuilder: FileSpec.Builder): TypeName {
         fileBuilder.addExtension(
             ExtensionSpec.builder(classNamespace)
                 .addModifiers(Modifier.PUBLIC)
                 .addType(
                     TypeSpec.enumBuilder(enumName)
                         .addAttribute("frozen")
-                        .addTypeVariables(declaration.typeVariablesNames)
+                        .addTypeVariables(declaration.swiftTypeVariablesNames)
                         .addSealedEnumCases(declaration)
                         .build()
                 )
@@ -29,12 +34,12 @@ internal class SealedEnumGeneratorDelegate(
         return classNamespace.nestedType(enumName).withTypeParameters(declaration)
     }
 
-    private fun TypeSpec.Builder.addSealedEnumCases(declaration: IrClass): TypeSpec.Builder {
+    private fun TypeSpec.Builder.addSealedEnumCases(declaration: ClassDescriptor): TypeSpec.Builder {
         declaration.visibleSealedSubclasses
             .forEach { sealedSubclass ->
                 addEnumCase(
                     sealedSubclass.enumCaseName,
-                    sealedSubclass.owner.swiftNameWithTypeParametersForSealedCase(declaration),
+                    sealedSubclass.swiftNameWithTypeParametersForSealedCase(declaration),
                 )
             }
 

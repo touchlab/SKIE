@@ -6,7 +6,6 @@ import co.touchlab.swiftgen.plugin.internal.validation.rules.ValidationRule
 import co.touchlab.swiftgen.plugin.internal.validation.rules.sealed.SealedInteropRules
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 
 internal class IrValidator(private val reporter: Reporter) {

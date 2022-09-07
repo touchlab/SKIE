@@ -2,13 +2,24 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
-import co.touchlab.swiftgen.plugin.internal.util.*
+import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
+import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
+import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
+import co.touchlab.swiftgen.plugin.internal.util.Reporter
+import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
+import co.touchlab.swiftgen.plugin.internal.util.isSealed
+import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
+import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
@@ -22,19 +33,44 @@ internal class SealedInteropGenerator(
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration, swiftPackModuleBuilder)
 
     override fun generate(module: IrModuleFragment) {
-        module.acceptChildrenVoid(Walker())
+        module.descriptor.accept(Visitor(), Unit)
     }
 
-    private inner class Walker : IrWalker {
+    // Temporary code - not correct. Based on DeepVisitor from Konan. Remove after transition to Descriptors.
+    @Deprecated("Descriptors")
+    private inner class Visitor : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
 
-        override fun visitClass(declaration: IrClass) {
-            super.visitClass(declaration)
+        override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: Unit) {
+            visitChildren(DescriptorUtils.getAllDescriptors(descriptor.getMemberScope()), data)
+        }
 
-            generate(declaration)
+        override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, data: Unit) {
+            visitChildren(DescriptorUtils.getAllDescriptors(descriptor.memberScope), data)
+        }
+
+        override fun visitClassDescriptor(descriptor: ClassDescriptor, data: Unit) {
+            // Workaround because we do not filter non-exported modules yet.
+            if (!descriptor.kotlinName.startsWith("tests.")) {
+                return
+            }
+
+            generate(descriptor)
+
+            visitChildren(DescriptorUtils.getAllDescriptors(descriptor.defaultType.memberScope), data)
+        }
+
+        override fun visitModuleDeclaration(descriptor: ModuleDescriptor, data: Unit) {
+            descriptor.getPackage(FqName.ROOT).accept(this, data)
+        }
+
+        private fun visitChildren(descriptors: Collection<DeclarationDescriptor>, data: Unit) {
+            descriptors.forEach {
+                it.accept(this, data)
+            }
         }
     }
 
-    private fun generate(declaration: IrClass) {
+    private fun generate(declaration: ClassDescriptor) {
         if (!shouldGenerateSealedInterop(declaration) || !verifyUniqueCaseNames(declaration)) {
             return
         }
@@ -48,17 +84,17 @@ internal class SealedInteropGenerator(
         }
     }
 
-    private fun shouldGenerateSealedInterop(declaration: IrClass): Boolean =
+    private fun shouldGenerateSealedInterop(declaration: ClassDescriptor): Boolean =
         declaration.isSealed && declaration.isVisibleFromSwift && declaration.isSealedInteropEnabled
 
-    private val IrClass.isSealedInteropEnabled: Boolean
+    private val ClassDescriptor.isSealedInteropEnabled: Boolean
         get() = if (configuration.enabled) {
             !this.hasAnnotation<SealedInterop.Disabled>()
         } else {
             this.hasAnnotation<SealedInterop.Enabled>()
         }
 
-    private fun verifyUniqueCaseNames(declaration: IrClass): Boolean {
+    private fun verifyUniqueCaseNames(declaration: ClassDescriptor): Boolean {
         val conflictingDeclarations = declaration.visibleSealedSubclasses
             .groupBy { it.enumCaseName }
             .filter { it.value.size > 1 }
@@ -72,7 +108,7 @@ internal class SealedInteropGenerator(
         return conflictingDeclarations.isEmpty()
     }
 
-    private fun reportConflictingDeclaration(subclass: IrClassSymbol) {
+    private fun reportConflictingDeclaration(subclass: ClassDescriptor) {
         val message = "SwiftGen cannot generate sealed interop for this declaration. " +
                 "There are multiple sealed class/interface children with the same name " +
                 "`${subclass.enumCaseName}` for the enum case. " +
@@ -81,7 +117,7 @@ internal class SealedInteropGenerator(
         reporter.report(
             severity = CompilerMessageSeverity.ERROR,
             message = message,
-            declaration = subclass.owner,
+            declaration = subclass,
         )
     }
 }

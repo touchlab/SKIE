@@ -1,28 +1,37 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
-import org.jetbrains.kotlin.backend.jvm.ir.getValueArgument
+import org.jetbrains.kotlin.descriptors.annotations.Annotated
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
-import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
-import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.annotations.argumentValue
+import org.jetbrains.kotlin.resolve.constants.AnnotationValue
+import org.jetbrains.kotlin.resolve.constants.ArrayValue
+import org.jetbrains.kotlin.resolve.constants.EnumValue
+import org.jetbrains.kotlin.resolve.constants.KClassValue
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 
-internal inline fun <reified T : Annotation> IrAnnotationContainer.hasAnnotation(): Boolean =
+internal inline fun <reified T : Annotation> Annotated.hasAnnotation(): Boolean =
     hasAnnotation(T::class)
 
+@Deprecated("Descriptors")
 internal fun <T : Annotation> IrAnnotationContainer.hasAnnotation(annotation: KClass<T>): Boolean {
     val annotationName = FqName(annotation.qualifiedName!!)
 
-    return hasAnnotation(annotationName)
+    return this.hasAnnotation(annotationName)
 }
 
-internal inline fun <reified T : Annotation> IrAnnotationContainer.findAnnotation(): T? {
+internal fun <T : Annotation> Annotated.hasAnnotation(annotation: KClass<T>): Boolean {
+    val annotationName = FqName(annotation.qualifiedName!!)
+
+    return this.annotations.hasAnnotation(annotationName)
+}
+
+internal inline fun <reified T : Annotation> Annotated.findAnnotation(): T? {
     val annotationName = FqName(T::class.qualifiedName!!)
-    val annotation = getAnnotation(annotationName) ?: return null
+    val annotation = this.annotations.findAnnotation(annotationName) ?: return null
 
     val constructor = T::class.constructors.first()
 
@@ -33,25 +42,18 @@ internal inline fun <reified T : Annotation> IrAnnotationContainer.findAnnotatio
 
 private fun assignArgumentsToParameters(
     parameters: List<KParameter>,
-    annotation: IrConstructorCall,
+    annotation: AnnotationDescriptor,
 ): Map<KParameter, Any?> =
     parameters
         .mapNotNull { parameter ->
-            val argumentName = Name.identifier(parameter.name!!)
-
-            val argumentExpression = annotation.getValueArgument(argumentName) ?: return@mapNotNull null
+            val argumentExpression = annotation.argumentValue(parameter.name!!) ?: return@mapNotNull null
 
             val argument = when (argumentExpression) {
-                is IrConst<*> -> argumentExpression.value
-                /*
-                     * IrClassReference is non-trivial to implement due to a limitation of Kotlin reflection.
-                     * The following is not possible:
-                     * is IrClassReference -> Class.forName(argumentExpression.classType.classFqName?.asString()).kotlin
-                     * https://youtrack.jetbrains.com/issue/KT-10440/Add-Kotlin-equivalent-to-ClassforName-for-KClass
-                     * Possible to workaround is to "mock" the created KClass.
-                     */
-                // Add support for other cases as necessary
-                else -> throw AssertionError("Unsupported annotation parameter type $argumentExpression.")
+                is KClassValue, is EnumValue, is ArrayValue, is AnnotationValue -> {
+                    throw AssertionError("Unsupported annotation parameter type $argumentExpression.")
+                }
+
+                else -> argumentExpression.value
             }
 
             parameter to argument

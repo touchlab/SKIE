@@ -2,61 +2,59 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
-import co.touchlab.swiftgen.plugin.internal.util.*
+import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
+import co.touchlab.swiftgen.plugin.internal.util.findAnnotation
+import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
+import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
 import io.outfoxx.swiftpoet.TypeName
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.getClass
-import org.jetbrains.kotlin.ir.util.isInterface
-import org.jetbrains.kotlin.ir.util.parentAsClass
-import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.isInterface
 
 internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContainer {
 
     val configuration: SwiftGenConfiguration.SealedInteropDefaults
 
-    val IrClass.elseCaseName: String
+    val ClassDescriptor.elseCaseName: String
         get() = this.findAnnotation<SealedInterop.ElseName>()?.elseName ?: configuration.elseName
 
-    val IrClassSymbol.enumCaseName: String
+    val ClassDescriptor.enumCaseName: String
         get() {
-            val annotation = this.owner.findAnnotation<SealedInterop.Case.Name>()
+            val annotation = this.findAnnotation<SealedInterop.Case.Name>()
 
-            return annotation?.name ?: this.owner.name.identifier
+            return annotation?.name ?: this.name.identifier
         }
 
-    val IrClass.hasElseCase: Boolean
+    val ClassDescriptor.hasElseCase: Boolean
         get() = this.sealedSubclasses.any { !it.isVisibleSealedSubclass } || this.sealedSubclasses.isEmpty()
 
-    val IrClass.visibleSealedSubclasses: List<IrClassSymbol>
+    val ClassDescriptor.visibleSealedSubclasses: List<ClassDescriptor>
         get() = this.sealedSubclasses.filter { it.isVisibleSealedSubclass }
 
-    val IrClassSymbol.isVisibleSealedSubclass: Boolean
+    val ClassDescriptor.isVisibleSealedSubclass: Boolean
         get() {
-            val isVisible = this.owner.isVisibleFromSwift
+            val isVisible = this.isVisibleFromSwift
 
             val isEnabled = if (configuration.visibleCases) {
-                !this.owner.hasAnnotation<SealedInterop.Case.Hidden>()
+                !this.hasAnnotation<SealedInterop.Case.Hidden>()
             } else {
-                this.owner.hasAnnotation<SealedInterop.Case.Visible>()
+                this.hasAnnotation<SealedInterop.Case.Visible>()
             }
 
             return isVisible && isEnabled
         }
 
-    fun IrClass.swiftNameWithTypeParametersForSealedCase(parent: IrClass): TypeName {
-        if (this.isInterface) {
+    fun ClassDescriptor.swiftNameWithTypeParametersForSealedCase(parent: ClassDescriptor): TypeName {
+        if (this.kind.isInterface) {
             return this.swiftName
         }
 
-        val typeParameters = this.typeParameters.map {
-            val indexInParent = it.indexInParent(parent)
+        val typeParameters = this.declaredTypeParameters.map {
+            val indexInParent = it.indexInParent(this, parent)
 
             if (indexInParent != null) {
-                parent.typeParameters[indexInParent].swiftName
+                parent.declaredTypeParameters[indexInParent].swiftName
             } else {
                 TYPE_VARIABLE_BASE_BOUND_NAME
             }
@@ -65,17 +63,16 @@ internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContain
         return this.swiftName.withTypeParameters(typeParameters)
     }
 
-    private fun IrTypeParameter.indexInParent(parent: IrClass): Int? {
-        if (parent.isInterface) {
+    private fun TypeParameterDescriptor.indexInParent(child: ClassDescriptor, parent: ClassDescriptor): Int? {
+        if (parent.kind.isInterface) {
             return null
         }
 
-        val parentType = this.parentAsClass.superTypes
-            .firstOrNull { it.getClass() == parent }
-            ?.cast<IrSimpleType>()
+        val parentType = child.typeConstructor.supertypes
+            .firstOrNull { it.constructor.declarationDescriptor == parent }
             ?: throw IllegalArgumentException("$parent is not a parent of $this.")
 
-        val index = parentType.arguments.indexOfFirst { it.cast<IrSimpleType>().classifier.owner == this }
+        val index = parentType.arguments.indexOfFirst { it.type == this.defaultType }
 
         return if (index != -1) index else null
     }

@@ -22,6 +22,8 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+
+    jvmArgs = (jvmArgs ?: emptyList()) + listOf("-Xmx16g")
 }
 
 tasks.register("reformatPackagesInAcceptanceTests") {
