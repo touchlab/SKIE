@@ -3,9 +3,10 @@ package co.touchlab.swiftgen.plugin.internal.util
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
-internal abstract class BaseGenerator<T>(
+internal abstract class BaseGenerator(
     private val fileBuilderFactory: FileBuilderFactory,
     private val namespaceProvider: NamespaceProvider,
 ) {
@@ -22,5 +23,5 @@ internal abstract class BaseGenerator<T>(
     protected fun addNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName =
         namespaceProvider.addNamespace(base, name)
 
-    abstract fun generate(declaration: T)
+    abstract fun generate(module: IrModuleFragment)
 }

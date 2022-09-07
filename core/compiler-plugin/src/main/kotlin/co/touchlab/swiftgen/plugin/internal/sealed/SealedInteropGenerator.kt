@@ -6,7 +6,9 @@ import co.touchlab.swiftgen.plugin.internal.util.*
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
@@ -14,12 +16,25 @@ internal class SealedInteropGenerator(
     override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
     private val reporter: Reporter,
-) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider), SealedGeneratorExtensionContainer {
+) : BaseGenerator(fileBuilderFactory, namespaceProvider), SealedGeneratorExtensionContainer {
 
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration, swiftPackModuleBuilder)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration, swiftPackModuleBuilder)
 
-    override fun generate(declaration: IrClass) {
+    override fun generate(module: IrModuleFragment) {
+        module.acceptChildrenVoid(Walker())
+    }
+
+    private inner class Walker : IrWalker {
+
+        override fun visitClass(declaration: IrClass) {
+            super.visitClass(declaration)
+
+            generate(declaration)
+        }
+    }
+
+    private fun generate(declaration: IrClass) {
         if (!shouldGenerateSealedInterop(declaration) || !verifyUniqueCaseNames(declaration)) {
             return
         }

@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
-internal class SwiftGenExtension(
+internal class SwiftGenIrGenerationExtension(
     private val pluginConfiguration: SwiftGenConfiguration,
     private val compilerConfiguration: CompilerConfiguration,
 ) : IrGenerationExtension {

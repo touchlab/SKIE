@@ -2,6 +2,7 @@ package co.touchlab.swiftgen.plugin.internal.enums
 
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
+import co.touchlab.swiftgen.plugin.internal.util.IrWalker
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.BOOL
@@ -15,15 +16,30 @@ import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrEnumEntry
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.isEnumClass
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 internal class ExhaustiveEnumsGenerator(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
     private val swiftPackModuleBuilder: SwiftPackModuleBuilder,
-) : BaseGenerator<IrClass>(fileBuilderFactory, namespaceProvider) {
+) : BaseGenerator(fileBuilderFactory, namespaceProvider) {
 
-    override fun generate(declaration: IrClass) {
+    override fun generate(module: IrModuleFragment) {
+        module.acceptChildrenVoid(Walker())
+    }
+
+    private inner class Walker : IrWalker {
+
+        override fun visitClass(declaration: IrClass) {
+            super.visitClass(declaration)
+
+            generate(declaration)
+        }
+    }
+
+    private fun generate(declaration: IrClass) {
         if (!shouldGenerateExhaustiveEnums(declaration)) {
             return
         }
