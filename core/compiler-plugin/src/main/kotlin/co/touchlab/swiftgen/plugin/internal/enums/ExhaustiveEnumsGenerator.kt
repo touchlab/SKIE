@@ -2,9 +2,10 @@ package co.touchlab.swiftgen.plugin.internal.enums
 
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.util.IrWalker
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
+import co.touchlab.swiftgen.plugin.internal.util.RecursiveClassDescriptorVisitor
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
+import co.touchlab.swiftpack.spec.KotlinEnumEntryReference
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -14,11 +15,12 @@ import io.outfoxx.swiftpoet.SelfTypeName
 import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrEnumEntry
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.descriptors.isEnumClass
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.util.isEnumClass
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 
 internal class ExhaustiveEnumsGenerator(
     fileBuilderFactory: FileBuilderFactory,
@@ -27,32 +29,35 @@ internal class ExhaustiveEnumsGenerator(
 ) : BaseGenerator(fileBuilderFactory, namespaceProvider) {
 
     override fun generate(module: IrModuleFragment) {
-        module.acceptChildrenVoid(Walker())
+        module.descriptor.accept(Visitor(), Unit)
     }
 
-    private inner class Walker : IrWalker {
+    private inner class Visitor : RecursiveClassDescriptorVisitor() {
 
-        override fun visitClass(declaration: IrClass) {
-            super.visitClass(declaration)
-
-            generate(declaration)
+        override fun visitClass(descriptor: ClassDescriptor) {
+            generate(descriptor)
         }
     }
 
-    private fun generate(declaration: IrClass) {
+    private fun generate(declaration: ClassDescriptor) {
         if (!shouldGenerateExhaustiveEnums(declaration)) {
             return
         }
 
         generateCode(declaration) {
             with(swiftPackModuleBuilder) {
+                @Deprecated("Use equivalent function from SwiftPack once available")
+                fun ClassDescriptor.enumEntryReference(): KotlinEnumEntryReference {
+                    return KotlinEnumEntryReference(this.getSuperClassOrAny().reference(), name.asString())
+                }
+
                 val declarationReference = declaration.reference()
                 declarationReference.applyTransform {
                     hide()
                     bridge(declarationReference.typeName)
                 }
 
-                val declaredCases = declaration.declarations.filterIsInstance<IrEnumEntry>().map { it.reference() }
+                val declaredCases = declaration.enumEntries.map { it.enumEntryReference() }
                 addType(
                     TypeSpec.enumBuilder(declarationReference.typeName)
                         .apply {
@@ -148,7 +153,12 @@ internal class ExhaustiveEnumsGenerator(
         }
     }
 
-    private fun shouldGenerateExhaustiveEnums(declaration: IrClass): Boolean {
-        return declaration.isEnumClass
+    private val ClassDescriptor.enumEntries: List<ClassDescriptor>
+        get() = DescriptorUtils.getAllDescriptors(this.unsubstitutedInnerClassesScope)
+            .filterIsInstance<ClassDescriptor>()
+            .filter { it.kind == ClassKind.ENUM_ENTRY }
+
+    private fun shouldGenerateExhaustiveEnums(declaration: ClassDescriptor): Boolean {
+        return declaration.kind.isEnumClass
     }
 }

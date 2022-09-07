@@ -5,6 +5,7 @@ import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
+import co.touchlab.swiftgen.plugin.internal.util.RecursiveClassDescriptorVisitor
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
 import co.touchlab.swiftgen.plugin.internal.util.isSealed
@@ -36,37 +37,10 @@ internal class SealedInteropGenerator(
         module.descriptor.accept(Visitor(), Unit)
     }
 
-    // Temporary code - not correct. Based on DeepVisitor from Konan. Remove after transition to Descriptors.
-    @Deprecated("Descriptors")
-    private inner class Visitor : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
+    private inner class Visitor : RecursiveClassDescriptorVisitor() {
 
-        override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: Unit) {
-            visitChildren(DescriptorUtils.getAllDescriptors(descriptor.getMemberScope()), data)
-        }
-
-        override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, data: Unit) {
-            visitChildren(DescriptorUtils.getAllDescriptors(descriptor.memberScope), data)
-        }
-
-        override fun visitClassDescriptor(descriptor: ClassDescriptor, data: Unit) {
-            // Workaround because we do not filter non-exported modules yet.
-            if (!descriptor.kotlinName.startsWith("tests.")) {
-                return
-            }
-
+        override fun visitClass(descriptor: ClassDescriptor) {
             generate(descriptor)
-
-            visitChildren(DescriptorUtils.getAllDescriptors(descriptor.defaultType.memberScope), data)
-        }
-
-        override fun visitModuleDeclaration(descriptor: ModuleDescriptor, data: Unit) {
-            descriptor.getPackage(FqName.ROOT).accept(this, data)
-        }
-
-        private fun visitChildren(descriptors: Collection<DeclarationDescriptor>, data: Unit) {
-            descriptors.forEach {
-                it.accept(this, data)
-            }
         }
     }
 
