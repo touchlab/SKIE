@@ -9,11 +9,17 @@ import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -27,12 +33,29 @@ import java.io.File
 
 const val EXTENSION_NAME = "swiftlink"
 
+const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "swiftLinkPlugin"
+
 // We need to use an anonymous class instead of lambda to keep execution optimizations.
 // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
 @Suppress("ObjectLiteralToLambda")
 abstract class SwiftKtPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         val extension = extensions.create(EXTENSION_NAME, SwiftKtExtension::class.java, this)
+
+        val swiftLinkPluginConfiguration = configurations.maybeCreate(SWIFT_LINK_PLUGIN_CONFIGURATION_NAME).apply {
+            isCanBeResolved = true
+            isCanBeConsumed = false
+            isVisible = false
+            isTransitive = false
+
+            exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+
+            attributes {
+                it.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                it.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+            }
+        }
 
         // WORKAROUND: Fix fat framework name for CocoaPods plugin.
         pluginManager.withPlugin("kotlin-native-cocoapods") {
@@ -83,7 +106,11 @@ abstract class SwiftKtPlugin : Plugin<Project> {
 
                         val swiftSources = project.objects.fileCollection().from(allSwiftSourceSets)
 
-                        linkTask.compilerPluginClasspath = linkTask.compilerPluginClasspath?.let { it + swiftKtCompilerPluginConfiguration } ?: swiftKtCompilerPluginConfiguration
+                        linkTask.compilerPluginClasspath = listOfNotNull(
+                            linkTask.compilerPluginClasspath,
+                            swiftKtCompilerPluginConfiguration,
+                            swiftLinkPluginConfiguration
+                        ).reduce(FileCollection::plus)
                         linkTask.compilerPluginOptions.addPluginArgument(
                             SwiftKtCommandLineProcessor.pluginId, SwiftKtCommandLineProcessor.Options.expandedSwiftDir.subpluginOption(
                                 layout.buildDirectory.dir("generated/swiftpack-expanded/${framework.name}/${framework.target.targetName}").get().asFile

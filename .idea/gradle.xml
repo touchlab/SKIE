@@ -10,8 +10,9 @@
               <build path="$PROJECT_DIR$/swiftlink-plugin" name="swiftlink-plugin">
                 <projects>
                   <project path="$PROJECT_DIR$/swiftlink-plugin" />
-                  <project path="$PROJECT_DIR$/swiftlink-plugin/kotlin-plugin" />
+                  <project path="$PROJECT_DIR$/swiftlink-plugin/gradle-plugin" />
                   <project path="$PROJECT_DIR$/swiftlink-plugin/plugin" />
+                  <project path="$PROJECT_DIR$/swiftlink-plugin/plugin-spi" />
                   <project path="$PROJECT_DIR$/swiftlink-plugin/test-suite" />
                 </projects>
               </build>
@@ -32,8 +33,9 @@
             <option value="$PROJECT_DIR$/example/static" />
             <option value="$PROJECT_DIR$/swiftlink-plugin" />
             <option value="$PROJECT_DIR$/swiftlink-plugin/buildSrc" />
-            <option value="$PROJECT_DIR$/swiftlink-plugin/kotlin-plugin" />
+            <option value="$PROJECT_DIR$/swiftlink-plugin/gradle-plugin" />
             <option value="$PROJECT_DIR$/swiftlink-plugin/plugin" />
+            <option value="$PROJECT_DIR$/swiftlink-plugin/plugin-spi" />
             <option value="$PROJECT_DIR$/swiftlink-plugin/test-suite" />
           </set>
         </option>

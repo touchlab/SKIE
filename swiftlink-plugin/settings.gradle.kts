@@ -16,5 +16,6 @@ dependencyResolutionManagement {
 rootProject.name = "swiftlink-plugin"
 
 include(":plugin")
-include(":kotlin-plugin")
+include(":plugin-spi")
+include(":gradle-plugin")
 include(":test-suite")

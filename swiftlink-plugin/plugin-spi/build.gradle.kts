@@ -8,11 +8,8 @@ plugins {
 
 dependencies {
     compileOnly(strippedKotlinNativeCompilerEmbeddable())
-
-    implementation(libs.swiftpack.spi)
-
-    compileOnly(libs.auto.service)
-    kapt(libs.auto.service)
+    //
+    // implementation(libs.swiftpack.spi)
 }
 
 
