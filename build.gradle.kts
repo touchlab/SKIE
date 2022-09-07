@@ -64,8 +64,8 @@ tasks.register("preMerge") {
 
     dependsOn(":example:dynamic:check")
     dependsOn(":example:static:check")
-    dependsOn(gradle.includedBuild("swiftlink-plugin").task(":plugin:check"))
-    dependsOn(gradle.includedBuild("swiftlink-plugin").task(":plugin:validatePlugins"))
+    dependsOn(gradle.includedBuild("swiftlink-plugin").task(":gradle-plugin:check"))
+    dependsOn(gradle.includedBuild("swiftlink-plugin").task(":gradle-plugin:validatePlugins"))
 }
 
 tasks.wrapper {
