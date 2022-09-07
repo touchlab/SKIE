@@ -19,3 +19,5 @@ include(":plugin")
 include(":plugin-spi")
 include(":gradle-plugin")
 include(":test-suite")
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
