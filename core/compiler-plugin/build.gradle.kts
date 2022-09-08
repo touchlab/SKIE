@@ -15,6 +15,7 @@ buildConfig {
 dependencies {
     compileOnly(kotlin("compiler-embeddable"))
     implementation(libs.swiftpack.api)
+    implementation(libs.swiftlink.plugin.spi)
     implementation(project(":api"))
     implementation(project(":configuration"))
 }

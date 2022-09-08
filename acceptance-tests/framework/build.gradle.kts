@@ -30,7 +30,7 @@ dependencies {
     implementation("co.touchlab.swiftgen:configuration")
     implementation(libs.swiftpack.api)
     implementation(libs.swiftpack.spi)
-    implementation(libs.swiftlink.kotlin.plugin)
+    implementation(libs.swiftlink.plugin)
 }
 
 tasks.test {
