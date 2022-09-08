@@ -3,12 +3,12 @@ package co.touchlab.swiftgen.plugin.internal
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.swiftgen.plugin.internal.sealed.SealedInteropGenerator
+import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.validation.IrValidator
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 internal class SwiftGenScheduler(
     fileBuilderFactory: FileBuilderFactory,
@@ -30,9 +30,9 @@ internal class SwiftGenScheduler(
         reporter = reporter,
     )
 
-    fun process(module: ModuleDescriptor) {
-        irValidator.validate(module)
-        sealedInteropGenerator.generate(module)
-        exhaustiveEnumsGenerator.generate(module)
+    fun process(descriptorProvider: DescriptorProvider) {
+        irValidator.validate(descriptorProvider)
+        sealedInteropGenerator.generate(descriptorProvider)
+        exhaustiveEnumsGenerator.generate(descriptorProvider)
     }
 }

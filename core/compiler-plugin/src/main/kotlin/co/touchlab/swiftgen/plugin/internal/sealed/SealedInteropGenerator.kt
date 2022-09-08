@@ -3,18 +3,16 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
+import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
-import co.touchlab.swiftgen.plugin.internal.util.RecursiveClassDescriptorVisitor
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
-import co.touchlab.swiftgen.plugin.internal.util.accept
 import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
 import co.touchlab.swiftgen.plugin.internal.util.isSealed
 import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
@@ -27,13 +25,10 @@ internal class SealedInteropGenerator(
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration, swiftPackModuleBuilder)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration, swiftPackModuleBuilder)
 
-    override fun generate(module: ModuleDescriptor) {
-        module.accept(object : RecursiveClassDescriptorVisitor() {
-
-            override fun visitClass(descriptor: ClassDescriptor) {
-                generate(descriptor)
-            }
-        })
+    override fun generate(descriptorProvider: DescriptorProvider) {
+        descriptorProvider.classDescriptors.forEach {
+            generate(it)
+        }
     }
 
     private fun generate(declaration: ClassDescriptor) {
@@ -51,7 +46,7 @@ internal class SealedInteropGenerator(
     }
 
     private fun shouldGenerateSealedInterop(declaration: ClassDescriptor): Boolean =
-        declaration.isSealed && declaration.isVisibleFromSwift && declaration.isSealedInteropEnabled
+        declaration.isSealed && declaration.isSealedInteropEnabled
 
     private val ClassDescriptor.isSealedInteropEnabled: Boolean
         get() = if (configuration.enabled) {

@@ -5,7 +5,6 @@ import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestResultBuilder
 import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
-import co.touchlab.swiftgen.plugin.SwiftGenComponentRegistrar
 import co.touchlab.swiftlink.plugin.ConfigurationKeys
 import co.touchlab.swiftlink.plugin.SwiftKtComponentRegistrar
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
@@ -60,7 +59,6 @@ internal class KotlinTestCompiler(
         PluginRegistrar.plugins.set(
             listOf(
                 SwiftKtComponentRegistrar(),
-                SwiftGenComponentRegistrar(),
             )
         )
 

@@ -3,7 +3,6 @@ package co.touchlab.swiftgen.plugin.internal.util
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 internal abstract class BaseGenerator(
     private val fileBuilderFactory: FileBuilderFactory,
@@ -20,5 +19,5 @@ internal abstract class BaseGenerator(
     protected fun addNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName =
         namespaceProvider.addNamespace(base, name)
 
-    abstract fun generate(module: ModuleDescriptor)
+    abstract fun generate(descriptorProvider: DescriptorProvider)
 }

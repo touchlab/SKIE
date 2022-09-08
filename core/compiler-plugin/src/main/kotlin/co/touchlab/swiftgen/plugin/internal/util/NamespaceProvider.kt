@@ -1,19 +1,13 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
 import io.outfoxx.swiftpoet.*
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.safeModuleName
-import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.safeName
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 internal class NamespaceProvider(
     fileBuilderFactory: FileBuilderFactory,
-    module: ModuleDescriptor,
 ) {
 
     val swiftGenNamespace: DeclaredTypeName =
-        DeclaredTypeName.qualifiedTypeName(".__SwiftGen_${module.fqNameSafe.toString().safeModuleName}")
+        DeclaredTypeName.qualifiedTypeName(".__SwiftGen")
 
     private val fileBuilder = fileBuilderFactory.create(swiftGenNamespace.simpleName)
 
