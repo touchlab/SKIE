@@ -46,7 +46,8 @@ class PhaseInterceptor(
 
     companion object {
         fun setupPhaseListeners(configuration: CompilerConfiguration) {
-            (javaClass.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) } ?: ServiceLoader.load(PhaseListener::class.java)
+            val phaseListeners = (javaClass.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) } ?: ServiceLoader.load(PhaseListener::class.java)
+            phaseListeners
                 .groupBy { it.phase }
                 .forEach { (phaseKey, interceptions) ->
                     val phaseAccessor = when (phaseKey) {
