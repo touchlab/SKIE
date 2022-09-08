@@ -45,7 +45,7 @@ subprojects {
     afterEvaluate {
         if (!plugins.hasPlugin(PublishingPlugin::class)) { return@afterEvaluate }
         the<PublishingExtension>().apply {
-            if (this@subprojects.name != "plugin") {
+            if (this@subprojects.name != "gradle-plugin") {
                 publications {
                     create<MavenPublication>("maven") {
                         from(components["java"])
