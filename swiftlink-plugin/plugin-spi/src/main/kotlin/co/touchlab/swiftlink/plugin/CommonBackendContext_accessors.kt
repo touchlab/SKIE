@@ -25,7 +25,9 @@ val CommonBackendContext.moduleDescriptor: ModuleDescriptor?
     get() = javaClass.getMethod("getModuleDescriptor").invoke(this) as? ModuleDescriptor
 
 fun CommonBackendContext.getExportedDependencies(): List<ModuleDescriptor> {
-    return javaClass.getMethod("getExportedDependencies").invoke(this) as? List<ModuleDescriptor> ?: emptyList()
+    val method = Class.forName("org.jetbrains.kotlin.backend.konan.FeaturedLibrariesKt")
+        .getMethod("getExportedDependencies", Class.forName("org.jetbrains.kotlin.backend.konan.Context"))
+    return method.invoke(null, this) as? List<ModuleDescriptor> ?: emptyList()
 }
 
 fun CommonBackendContext.getAllExportedModuleDescriptors(): List<ModuleDescriptor> {
