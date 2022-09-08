@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.cli.jvm.plugins.ServiceLoaderLite
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import java.net.URLClassLoader
+import java.util.ServiceLoader
 import kotlin.reflect.jvm.jvmName
 
 typealias InterceptedPhase = CompilerPhase<CommonBackendContext, Unit, Unit>
@@ -45,7 +46,7 @@ class PhaseInterceptor(
 
     companion object {
         fun setupPhaseListeners(configuration: CompilerConfiguration) {
-            ServiceLoaderLite.loadImplementations(PhaseListener::class.java, this::class.java.classLoader as URLClassLoader)
+            (javaClass.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) } ?: ServiceLoader.load(PhaseListener::class.java)
                 .groupBy { it.phase }
                 .forEach { (phaseKey, interceptions) ->
                     val phaseAccessor = when (phaseKey) {
