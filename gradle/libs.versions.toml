@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.7.10"
-swiftpack = "0.0.19"
-swiftlink = "0.0.23"
+swiftpack = "0.0.20"
+swiftlink = "0.0.24"
 kotest = "5.4.0"
 pluginPublish = "1.0.0"
 
@@ -14,6 +14,7 @@ swiftlink = { id = "co.touchlab.swiftlink", version.ref = "swiftlink" }
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 
 [libraries]
+swiftlink-gradle-plugin = { module = "co.touchlab.swiftlink:gradle-plugin", version.ref = "swiftlink" }
 swiftlink-plugin = { module = "co.touchlab.swiftlink:plugin", version.ref = "swiftlink" }
 swiftlink-plugin-spi = { module = "co.touchlab.swiftlink:plugin-spi", version.ref = "swiftlink" }
 swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
