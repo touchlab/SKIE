@@ -26,36 +26,10 @@ object SwiftPack {
 
     val Framework.swiftPackModuleReferences: Provider<List<NamespacedSwiftPackModule.Reference>>
         get() = unpackSwiftPack.map { it.destinationDir }.zip(project.swiftTemplateDirectory(target)) { dependenciesDir, localDir ->
-            fun isSwiftPackModule(file: File): Boolean = file.isFile && file.extension == "swiftpack"
             val dependencyModules = dependenciesDir.listFiles()?.mapNotNull {
-                it.listFiles(::isSwiftPackModule)?.map { file ->
-                    NamespacedSwiftPackModule.Reference(file.parentFile.name, file)
-                }
+                NamespacedSwiftPackModule.moduleReferencesInDir(it.name, it)
             }?.flatten()
-            val localModules = localDir.asFile.listFiles(::isSwiftPackModule)?.map { file ->
-                NamespacedSwiftPackModule.Reference("local", file)
-            }
-            listOfNotNull(dependencyModules, localModules).flatten()
-        }
-
-    val Framework.swiftPackModules: Provider<List<NamespacedSwiftPackModule>>
-        get() = unpackSwiftPack.map { it.destinationDir }.zip(project.swiftTemplateDirectory(target)) { dependenciesDir, localDir ->
-            fun isSwiftPackModule(file: File): Boolean = file.isFile && file.extension == "swiftpack"
-            val dependencyModules = dependenciesDir.listFiles()?.mapNotNull {
-                it.listFiles(::isSwiftPackModule)?.map { file ->
-                    val module = SwiftPackModule.read(file)
-                    NamespacedSwiftPackModule(
-                        file.parentFile.name,
-                        module,
-                    )
-                }
-            }?.flatten()
-            val localModules = localDir.asFile.listFiles(::isSwiftPackModule)?.map { file ->
-                NamespacedSwiftPackModule(
-                    file.parentFile.name,
-                    SwiftPackModule.read(file),
-                )
-            }
+            val localModules = NamespacedSwiftPackModule.moduleReferencesInDir("local", localDir.asFile)
             listOfNotNull(dependencyModules, localModules).flatten()
         }
 
