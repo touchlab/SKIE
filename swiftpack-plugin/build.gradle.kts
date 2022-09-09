@@ -46,6 +46,11 @@ allprojects {
 
 subprojects {
     afterEvaluate {
+        the<JavaPluginExtension>().apply {
+            withJavadocJar()
+            withSourcesJar()
+        }
+
         the<PublishingExtension>().apply {
             if (this@subprojects.name != "swiftpack-gradle-plugin") {
                 publications {
@@ -97,4 +102,3 @@ tasks.register("clean", Delete::class.java) {
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
-
