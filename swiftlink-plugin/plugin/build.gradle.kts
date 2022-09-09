@@ -9,6 +9,7 @@ plugins {
 dependencies {
     compileOnly(strippedKotlinNativeCompilerEmbeddable())
 
+    implementation(libs.swiftpack.api)
     implementation(libs.swiftpack.spi)
     implementation(projects.pluginSpi)
 

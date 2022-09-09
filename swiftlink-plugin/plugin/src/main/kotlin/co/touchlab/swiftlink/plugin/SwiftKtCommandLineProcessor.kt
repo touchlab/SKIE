@@ -20,6 +20,7 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
         Options.swiftPackModule,
         Options.swiftSourceFile,
         Options.expandedSwiftDir,
+        Options.linkPhaseSwiftPackOutputDir,
     )
     private val optionsMap = options.associateBy { it.optionName }
     override val pluginOptions: Collection<AbstractCliOption> = options.map { it.toCliOption() }
@@ -37,6 +38,14 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
                 val (namespace, absolutePath) = value.split(File.pathSeparator)
                 NamespacedSwiftPackModule.Reference(namespace, File(absolutePath))
             },
+        )
+
+        val linkPhaseSwiftPackOutputDir = PluginOption(
+            optionName = "linkPhaseSwiftPackOutputDir",
+            valueDescription = "<absolute path>",
+            description = "",
+            serialize = File::getAbsolutePath,
+            deserialize = ::File,
         )
 
         val swiftSourceFile = PluginOption(
@@ -70,6 +79,9 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
             }
             Options.expandedSwiftDir -> {
                 configuration.putIfNotNull(ConfigurationKeys.expandedSwiftDir, Options.expandedSwiftDir.deserialize(value))
+            }
+            Options.linkPhaseSwiftPackOutputDir -> {
+                configuration.putIfNotNull(ConfigurationKeys.linkPhaseSwiftPackOutputDir, Options.linkPhaseSwiftPackOutputDir.deserialize(value))
             }
         }
     }

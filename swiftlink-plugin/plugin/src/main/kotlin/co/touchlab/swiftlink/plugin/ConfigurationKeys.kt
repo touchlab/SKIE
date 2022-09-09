@@ -8,4 +8,5 @@ object ConfigurationKeys {
     val swiftPackModules = CompilerConfigurationKey<List<NamespacedSwiftPackModule.Reference>>("SwiftPack modules")
     val swiftSourceFiles = CompilerConfigurationKey<List<File>>("Swift source files")
     val expandedSwiftDir = CompilerConfigurationKey<File>("expanded Swift directory")
+    val linkPhaseSwiftPackOutputDir = CompilerConfigurationKey<File>("link phase SwiftPack output directory")
 }

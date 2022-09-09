@@ -1,6 +1,8 @@
 package co.touchlab.swiftlink.plugin
 
 import co.touchlab.swiftlink.BuildConfig
+import co.touchlab.swiftpack.plugin.SpecConfigGradleSubplugin
+import co.touchlab.swiftpack.plugin.SwiftPack
 import co.touchlab.swiftpack.plugin.SwiftPack.swiftPackModuleReferences
 import co.touchlab.swiftpack.plugin.SwiftPack.unpackSwiftPack
 import co.touchlab.swiftpack.plugin.SwiftPack.unpackSwiftPackName
@@ -9,6 +11,7 @@ import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
@@ -23,6 +26,7 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -35,6 +39,16 @@ const val EXTENSION_NAME = "swiftlink"
 
 const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "swiftLinkPlugin"
 
+interface SwiftLinkSubplugin: Plugin<Project> {
+    val compilerPluginId: String
+
+    override fun apply(target: Project) { }
+
+    fun getOptions(project: Project): List<SubpluginOption> { return emptyList() }
+
+    fun configureDependencies(project: Project, pluginConfiguration: Configuration)
+}
+
 // We need to use an anonymous class instead of lambda to keep execution optimizations.
 // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
 @Suppress("ObjectLiteralToLambda")
@@ -46,7 +60,7 @@ abstract class SwiftKtPlugin : Plugin<Project> {
             isCanBeResolved = true
             isCanBeConsumed = false
             isVisible = false
-            isTransitive = false
+            isTransitive = true
 
             exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
 
@@ -79,6 +93,8 @@ abstract class SwiftKtPlugin : Plugin<Project> {
             val swiftKtCompilerPluginConfiguration = configurations.create("swiftKtCompilerPlugin") {
                 it.isCanBeConsumed = false
                 it.isCanBeResolved = true
+
+                it.exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
             }
 
             dependencies {
@@ -88,6 +104,9 @@ abstract class SwiftKtPlugin : Plugin<Project> {
                     version = BuildConfig.KOTLIN_PLUGIN_VERSION
                 )
             }
+
+            val swiftLinkSubplugins = plugins.withType<SwiftLinkSubplugin>()
+            swiftLinkSubplugins.forEach { it.configureDependencies(project, swiftLinkPluginConfiguration) }
 
             val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
             val appleTargets = kotlin.targets
@@ -118,19 +137,32 @@ abstract class SwiftKtPlugin : Plugin<Project> {
                         )
 
                         swiftSources.forEach { swiftFile ->
-                            framework.linkTask.compilerPluginOptions.addPluginArgument(
+                            linkTask.compilerPluginOptions.addPluginArgument(
                                 SwiftKtCommandLineProcessor.pluginId,
                                 SwiftKtCommandLineProcessor.Options.swiftSourceFile.subpluginOption(swiftFile)
                             )
                         }
 
+                        swiftLinkSubplugins.forEach { subplugin ->
+                            subplugin.getOptions(project).forEach {
+                                linkTask.compilerPluginOptions.addPluginArgument(subplugin.compilerPluginId, it)
+                            }
+                        }
+
                         if (extension.isSwiftPackEnabled.get()) {
+                            linkTask.compilerPluginOptions.addPluginArgument(
+                                SwiftKtCommandLineProcessor.pluginId,
+                                SwiftKtCommandLineProcessor.Options.linkPhaseSwiftPackOutputDir.subpluginOption(
+                                    layout.buildDirectory.dir("generated/swiftpack-link/${framework.name}/${framework.target.targetName}").get().asFile
+                                ),
+                            )
+
                             linkTask.dependsOn(framework.unpackSwiftPackName)
 
                             linkTask.doFirst(object: Action<Task> {
                                 override fun execute(t: Task) {
                                     framework.swiftPackModuleReferences.get().forEach { reference ->
-                                        framework.linkTask.compilerPluginOptions.addPluginArgument(
+                                        linkTask.compilerPluginOptions.addPluginArgument(
                                             SwiftKtCommandLineProcessor.pluginId,
                                             SwiftKtCommandLineProcessor.Options.swiftPackModule.subpluginOption(
                                                 reference

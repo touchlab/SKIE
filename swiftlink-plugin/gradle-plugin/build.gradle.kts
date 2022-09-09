@@ -25,6 +25,7 @@ dependencies {
 
     implementation(project(":plugin"))
     implementation(libs.swiftpack.gradle.plugin)
+    implementation(libs.swiftpack.config.plugin)
     implementation(libs.swiftpack.spi)
 
     testImplementation(gradleKotlinDsl())
