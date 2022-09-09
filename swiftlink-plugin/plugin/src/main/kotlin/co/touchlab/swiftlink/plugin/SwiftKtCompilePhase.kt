@@ -161,6 +161,10 @@ class SwiftKtCompilePhase(
 
         apiNotes.save(headersDir, true)
 
+        modulemapFile.writeText(
+            modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
+        )
+
         val swiftLibSearchPaths = listOf(
             File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),
             File(configurables.absoluteTargetSysRoot, "usr/lib/swift"),
