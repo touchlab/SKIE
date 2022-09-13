@@ -17,6 +17,7 @@ import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
@@ -32,6 +33,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Architecture
 import java.io.File
 
@@ -44,7 +46,7 @@ interface SwiftLinkSubplugin: Plugin<Project> {
 
     override fun apply(target: Project) { }
 
-    fun getOptions(project: Project): List<SubpluginOption> { return emptyList() }
+    fun getOptions(project: Project, framework: Framework): Provider<List<SubpluginOption>> { return project.provider { emptyList() } }
 
     fun configureDependencies(project: Project, pluginConfiguration: Configuration)
 }
@@ -116,6 +118,10 @@ abstract class SwiftKtPlugin : Plugin<Project> {
             appleTargets.forEach { target ->
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
                 frameworks.forEach { framework ->
+                    val subpluginOptions = swiftLinkSubplugins.associateWith { subplugin ->
+                        subplugin.getOptions(project, framework)
+                    }
+
                     framework.linkTaskProvider.configure { linkTask ->
                         val defaultSwiftSourceSet = configureSwiftSourceSet(framework.compilation.defaultSourceSet)
                         val allSwiftSourceSets = (framework.compilation.allKotlinSourceSets - framework.compilation.defaultSourceSet)
@@ -143,8 +149,8 @@ abstract class SwiftKtPlugin : Plugin<Project> {
                             )
                         }
 
-                        swiftLinkSubplugins.forEach { subplugin ->
-                            subplugin.getOptions(project).forEach {
+                        subpluginOptions.forEach { (subplugin, options) ->
+                            options.get().forEach {
                                 linkTask.compilerPluginOptions.addPluginArgument(subplugin.compilerPluginId, it)
                             }
                         }
