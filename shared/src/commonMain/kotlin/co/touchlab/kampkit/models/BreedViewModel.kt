@@ -46,22 +46,21 @@ class BreedViewModel(
                 .collect { (error, breeds) ->
                     mutableBreedState.update { previousState ->
                         val errorMessage = if (error != null) {
+							// print("breed fetch error code : ${error.type}")
                             "Unable to download breed list"
                         } else {
                             if (previousState is BreedViewState.Error) {
-                                previousState.message
+                                previousState.type.message
                             } else {
                                 null
                             }
                         }
 
-                        if (breeds.isNotEmpty()) {
-                            BreedViewState.Data(breeds)
-                        } else if (errorMessage != null) {
-                            BreedViewState.Error(errorMessage)
-                        } else {
-                            BreedViewState.Empty
-                        }
+						if (errorMessage != null) {
+							BreedViewState.Error(BreedErrorType.Other(errorMessage))
+						} else {
+							BreedViewState.Data(breeds)
+						}
                     }
                 }
         }
@@ -89,16 +88,28 @@ class BreedViewModel(
     private fun handleBreedError(throwable: Throwable) {
         log.e(throwable) { "Error downloading breed list" }
         mutableBreedState.update {
-            BreedViewState.Error("Unable to refresh breed list")
+            BreedViewState.Error(BreedErrorType.Other("Unable to refresh breed list"))
         }
     }
 }
 
 sealed interface BreedViewState {
     class Data(val breeds: List<Breed>) : BreedViewState
-    class Error(val message: String) : BreedViewState
     object Loading : BreedViewState
-    object Empty : BreedViewState
+	class Error(val type: BreedErrorType): BreedViewState
+}
+
+sealed interface BreedErrorType {
+	val message: String
+		get() = when (this) {
+			is Network -> "A connection error occurred. Please try again."
+			is Invalid -> "Invalid response."
+			is Other -> "An error occurred."
+		}
+
+	class Other(override val message: String) : BreedErrorType
+	object Network : BreedErrorType
+	object Invalid : BreedErrorType
 }
 
 /*

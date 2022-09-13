@@ -16,7 +16,7 @@ class ObservableBreedModel: ObservableObject {
     private var viewModel: BreedCallbackViewModel?
 
     @Published
-    var state: BreedViewState = BreedViewStateEmpty()
+    var state: BreedViewState = BreedViewStateData(breeds: [])
 
     private var cancellables = [AnyCancellable]()
 
@@ -60,12 +60,8 @@ struct BreedListScreen: View {
             onBreedFavorite: { observableModel.onBreedFavorite($0) },
             refresh: { observableModel.refresh() }
         )
-        .onAppear(perform: {
-            observableModel.activate()
-        })
-        .onDisappear(perform: {
-            observableModel.deactivate()
-        })
+        .onAppear(perform: { observableModel.activate() })
+        .onDisappear(perform: { observableModel.deactivate() })
     }
 }
 
@@ -79,20 +75,37 @@ struct BreedListContent: View {
             VStack {
                 switch exhaustively(breedState) {
                 case .Data(let state):
-                    List(state.breeds, id: \.id) { breed in
-                        BreedRowView(breed: breed) { onBreedFavorite(breed) }
+                    if state.breeds.isEmpty {
+                        Text("Empty...")
+                    } else {
+                        List(state.breeds, id: \.id) { breed in
+                            BreedRowView(breed: breed) { onBreedFavorite(breed) }
+                        }
                     }
-                case .Empty(_ ):
-                    Text("Empty...")
-                case .Error(let state):
-                    Text(state.message)
+                case .Error(let error):
+                    Text(error.type.message)
                         .foregroundColor(.red)
+
+                    Image(systemName: error.type.imageName)
+                        .renderingMode(.template)
+                        .foregroundColor(.red)
+
                 case .Loading(_):
                     Text("Loading...")
                 }
 
                 Button("Refresh") { refresh() }
             }
+        }
+    }
+}
+
+extension BreedErrorType {
+    var imageName: String {
+        switch exhaustively(self) {
+        case .Network: return "wifi.exclamationmark"
+        case .Invalid: return "xmark.bin.fill"
+        case .Other(_): return "xmark.circle.fill"
         }
     }
 }
