@@ -14,11 +14,21 @@ import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_PROPERTY_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_TYPE_PREFIX
 import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spec.SwiftPackModule.Companion.write
+import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DeclaredTypeName
+import io.outfoxx.swiftpoet.FLOAT32
+import io.outfoxx.swiftpoet.FLOAT64
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.INT16
+import io.outfoxx.swiftpoet.INT32
+import io.outfoxx.swiftpoet.INT64
+import io.outfoxx.swiftpoet.INT8
 import io.outfoxx.swiftpoet.PropertySpec
+import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.SelfTypeName
+import io.outfoxx.swiftpoet.VOID
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -35,6 +45,16 @@ import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.isFileClass
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.typeUtil.isBoolean
+import org.jetbrains.kotlin.types.typeUtil.isByte
+import org.jetbrains.kotlin.types.typeUtil.isDouble
+import org.jetbrains.kotlin.types.typeUtil.isFloat
+import org.jetbrains.kotlin.types.typeUtil.isInt
+import org.jetbrains.kotlin.types.typeUtil.isLong
+import org.jetbrains.kotlin.types.typeUtil.isShort
+import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.utils.addToStdlib.getOrPut
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
@@ -128,6 +148,29 @@ class SwiftPackModuleBuilder(
 
     fun IrEnumEntry.reference(): KotlinEnumEntryReference {
         return KotlinEnumEntryReference(parentAsClass.reference(), name.asString())
+    }
+
+    fun ClassDescriptor.enumEntryReference(): KotlinEnumEntryReference {
+        return KotlinEnumEntryReference(getSuperClassOrAny().reference(), name.asString())
+    }
+
+    fun KotlinType.reference(): KotlinTypeReference {
+        return requireNotNull(constructor.declarationDescriptor?.reference()) {
+            "Type reference has no declaration descriptor"
+        }
+    }
+
+    fun KotlinType.topLevelSwiftReference(): DeclaredTypeName = when {
+        isBoolean() -> BOOL
+        isByte() -> INT8
+        isShort() -> INT16
+        isInt() -> INT32
+        isLong() -> INT64
+        isFloat() -> FLOAT32
+        isDouble() -> FLOAT64
+        KotlinBuiltIns.isString(this) -> STRING
+        isUnit() -> VOID
+        else -> reference().swiftReference()
     }
 
     private fun ClassifierDescriptor.reference(): KotlinTypeReference = when (this) {
