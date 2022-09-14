@@ -14,9 +14,9 @@ SwiftGen currently supports the following features:
 
 - Sealed class/interfaces
 
-These features are under active development - expect bugs and compilation errors:
+These features are under active development - expect bugs:
 
-- Default arguments
+- Exhaustive enums
 
 The discussion about any part of the SwiftKt project happens in the `swiftkt` Slack channel.
 
@@ -28,15 +28,7 @@ As the first step make sure that your project uses exactly the same Kotlin compi
 At this point make sure that your project compiles before you do anything else (especially if you had to change the Kotlin compiler version).
 
 The SwiftKt project is deployed in a private Touchlab's Maven repository.
-To access artifacts from that repository, you need to add the following code in the `build.gradle.kts`:
-
-```kotlin
-repositories {
-    maven("https://api.touchlab.dev/public")
-}
-```
-
-Kotlin compiler plugins are configured by a Gradle plugin, so you also need to modify the `settings.gradle.kts` file and add:
+To access plugins from that repository, you need to add the following code in the `settings.gradle.kts` file:
 
 ```kotlin
 pluginManagement {
@@ -46,23 +38,26 @@ pluginManagement {
 }
 ```
 
-To enable SwiftGen, register the following plugins in `build.gradle.kts`:
+If you want to add a dependency to some SwiftKt artifact (for example to use annotation configuration), then register the repository in the given `build.gradle.kts`:
 
 ```kotlin
-plugins {
-    id("co.touchlab.swiftlink") version "XXX"
-    id("co.touchlab.swiftpack") version "YYY"
-    id("co.touchlab.swiftgen") version "ZZZ"
+repositories {
+    maven("https://api.touchlab.dev/public")
 }
 ```
 
-You can find the most recent version of each plugin by looking at the tags in the corresponding repository.
-(The Maven repository does not have a browser at the time of writing.)
+To enable SwiftGen, add the plugin in `build.gradle.kts` of the module that builds the native framework:
 
-Note that `co.touchlab.swiftlink` is only necessary in the final module that builds the Kotlin framework.
-Including it in other modules has no effect.
-`co.touchlab.swiftgen` depends on `co.touchlab.swiftpack` so you always need to include both if you want to use SwiftGen.
-However, you do not have to include them if you do not want to use SwiftGen in the given module.
+```kotlin
+plugins {
+    id("co.touchlab.swiftgen") version "XXX"
+}
+```
+
+Do not add the plugin to other modules.
+
+You can find the most recent version of the plugin by looking at the tags in this repository.
+(The Maven repository does not have a browser at the time of writing.)
 
 The Swift/Xcode side does not require any configuration changes.
 
@@ -137,6 +132,13 @@ case .A2(_):
 }
 ```
 
+### Exhaustive enums
+
+SwiftGen can generate a bridging header for Kotlin enums that maps them to Swift enum.
+As a result the Kotlin enums looks like Swift enums, whereas without the bridging they would behave like Obj-c classes.
+This feature is under development so not everything works properly.
+Namely, we are currently aware of a missing support for suspend functions (they will not be visible from Swift).
+
 ## Configuration
 
 SwiftGen plugin makes some opinionated choices that might not work for every use case.
@@ -145,6 +147,8 @@ There are two different ways to change the configuration:
 
 - locally - using Kotlin annotations
 - globally - using Gradle extension provided by the SwiftGen Gradle plugin
+
+### Annotations
 
 The local configuration changes the behavior only for a single declaration.
 This makes it for example suitable for suppressing the plugin if it does not work properly because of some bug.
@@ -161,20 +165,106 @@ sealed class A {
 }
 ```
 
-The global configuration affects the whole module, which makes it a good place for changing the plugin default behavior.
-Note that it's possible to make different changes for each module.
-The available options are listed in the `SwiftGenConfiguration` class in `:core:configuration` module.
+To use these annotations you need to add a dependency to the module in `build.gradle.kts`:
 
-Example:
+```kotlin
+dependencies {
+    implementation("co.touchlab.swiftgen:api:XXX")
+}
+```
+
+(Do not forget to register the internal repository as mentioned before.)
+
+### Gradle
+
+The global configuration can be applied to any class including those from 3rd party dependencies.
+This ability makes it a good place for changing the plugin default behavior and to provide configuration for classes that you cannot modify.
+The configuration is performed through a `swiftGen` Gradle extension:
 
 ```kotlin
 // build.gradle.kts
 
 swiftGen {
-    sealedInteropDefaults {
-        functionName = "something"
+    configuration {
+        group {
+            ConfigurationKeys.SealedInterop.FunctionName("something")
+        }
     }
 }
 ```
 
+The above example changes the name of the `exhaustively` function to `something` for all sealed classes/interfaces.
+All the available configuration options are listed in the `ConfigurationKeys` class located in `:core:configuration` module.
+Note that you can add multiple options to a single group.
+
+The configuration can be applied only to some declarations:
+
+```kotlin
+// build.gradle.kts
+
+swiftGen {
+    configuration {
+        group("co.touchlab.") {
+            ConfigurationKeys.SealedInterop.FunctionName("something")
+        }
+    }
+}
+```
+
+In the above example the configuration is applied only to declarations from the `co.touchlab` package.
+The argument represents a prefix that is matched against the declaration's fully qualified name.
+You can target all declarations (by passing an empty string), everything in a package or just a single class.
+
+The `group` block can be called multiple times so that declarations can have different configurations.
+For example:
+
+```kotlin
+// build.gradle.kts
+
+swiftGen {
+    configuration {
+        group {
+            ConfigurationKeys.SealedInterop.FunctionName("something")
+        }
+        group("co.touchlab.") {
+            ConfigurationKeys.SealedInterop.FunctionName("somethingElse")
+        }
+    }
+}
+```
+
+If multiple matching groups provide the same configuration key, then the last one added wins.
+
 The local and global configuration can be used at the same time in which case the local configuration takes precedence.
+This behavior can be overridden:
+
+```kotlin
+// build.gradle.kts
+
+swiftGen {
+    configuration {
+        group(overridesAnnotations = true) {
+            ConfigurationKeys.SealedInterop.FunctionName("something")
+        }
+    }
+}
+```
+
+If the `overridesAnnotations` argument is set, then all keys in the group take precedence over the annotations.
+The configuration can still be changed by another `group` block.
+Annotations can still be used to configure behavior not specified in the overriding group.
+
+Configuration can be loaded from a file:
+
+```kotlin
+// build.gradle.kts
+
+swiftGen {
+    configuration {
+        from(File("config.json"))
+    }
+}
+```
+
+`group` and `from` can be freely mixed together and repeated multiple times.
+The file format is identical to `build/swiftgen/config.json` which contains a JSON encoding all applied configuration.
