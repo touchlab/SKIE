@@ -3,6 +3,7 @@ package co.touchlab.swiftlink.plugin
 import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import com.google.auto.service.AutoService
+import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -21,6 +22,7 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
         Options.swiftSourceFile,
         Options.expandedSwiftDir,
         Options.linkPhaseSwiftPackOutputDir,
+        Options.disableWildcardExport,
     )
     private val optionsMap = options.associateBy { it.optionName }
     override val pluginOptions: Collection<AbstractCliOption> = options.map { it.toCliOption() }
@@ -65,6 +67,14 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
             serialize = File::getAbsolutePath,
             deserialize = ::File,
         )
+
+        val disableWildcardExport = PluginOption(
+            optionName = "disableWildcardExport",
+            valueDescription = "<true|false>",
+            description = "",
+            serialize = Boolean::toString,
+            deserialize = String::toBooleanStrict,
+        )
     }
 
     override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
@@ -82,6 +92,9 @@ class SwiftKtCommandLineProcessor: CommandLineProcessor {
             }
             Options.linkPhaseSwiftPackOutputDir -> {
                 configuration.putIfNotNull(ConfigurationKeys.linkPhaseSwiftPackOutputDir, Options.linkPhaseSwiftPackOutputDir.deserialize(value))
+            }
+            Options.disableWildcardExport -> {
+                configuration.putIfNotNull(ConfigurationKeys.disableWildcardExport, Options.disableWildcardExport.deserialize(value))
             }
         }
     }

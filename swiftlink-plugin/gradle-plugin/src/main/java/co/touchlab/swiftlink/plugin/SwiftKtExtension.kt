@@ -14,4 +14,5 @@ abstract class SwiftKtExtension @Inject constructor(project: Project) {
     private val objects = project.objects
 
     val isSwiftPackEnabled: Property<Boolean> = objects.property<Boolean>().convention(true)
+    val isWildcardExportPrevented: Property<Boolean> = objects.property<Boolean>().convention(true)
 }

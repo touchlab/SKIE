@@ -122,48 +122,20 @@ class SwiftKtCompilePhase(
             }
             execute()
         }
-        // TODO: This line seems to fix the "warning: umbrella header for module 'ExampleKit' does not include header 'ExampleKit-Swift.h'",
-        // TODO: but not in all invocations, which is why it is commented out and to be investigated.
-        // kotlinHeader.appendText("\n#import \"${swiftHeader.name}\"\n")
 
-        if (targetTriple.isSimulator && configurables.target.architecture == Architecture.ARM64 && setOf(Family.IOS, Family.TVOS, Family.WATCHOS).contains(configurables.target.family)) {
-            val otherTriple = targetTriple.copy(architecture = "x86_64")
-            Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
-                +"-v"
-                +listOf("-module-name", moduleName)
-                +"-import-underlying-module"
-                +listOf("-Xcc", "-fmodule-map-file=$modulemapFile")
-                +"-emit-module-interface-path"
-                +swiftModule.resolve("$otherTriple.swiftinterface").absolutePath
-                +"-emit-module-path"
-                +swiftModule.resolve("$otherTriple.swiftmodule").absolutePath
-                if (swiftcBitcodeArg != null) {
-                    +swiftcBitcodeArg
-                }
-                +swiftcBuildTypeArgs
-                +"-enable-library-evolution"
-                +"-parse-as-library"
-                +"-g"
-                +"-sdk"
-                +configurables.absoluteTargetSysRoot
-                +"-target"
-                +otherTriple.withOSVersion(configurables.osVersionMin).toString()
-                +sourceFiles.map { it.absolutePath }
-
-                workingDirectory = swiftObjectsDir.javaFile()
-
-                logWith {
-                    println(it())
-                }
-                execute()
-            }
+        if (swiftHeader.exists()) {
+            // TODO: This line seems to fix the "warning: umbrella header for module 'ExampleKit' does not include header 'ExampleKit-Swift.h'",
+            // TODO: but not in all invocations, which is why it needs to be investigated (for example running link for both dynamic and static).
+            kotlinHeader.appendText("\n#import \"${swiftHeader.name}\"\n")
         }
 
         apiNotes.save(headersDir, true)
 
-        modulemapFile.writeText(
-            modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
-        )
+        if (config.configuration.getBoolean(ConfigurationKeys.disableWildcardExport)) {
+            modulemapFile.writeText(
+                modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
+            )
+        }
 
         val swiftLibSearchPaths = listOf(
             File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),
