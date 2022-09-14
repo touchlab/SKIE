@@ -1,9 +1,13 @@
 package co.touchlab.swiftgen.acceptancetests.framework
 
 import co.touchlab.swiftgen.acceptancetests.framework.internal.TestCodeParser
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
+import kotlin.io.path.readLines
 
 sealed class TestNode {
 
@@ -40,6 +44,9 @@ sealed class TestNode {
         val kotlinFiles: List<Path>
             get() = parent.kotlinFiles
 
+        val configFiles: List<Path>
+            get() = parent.configFiles
+
         init {
             require(path.isRegularFile() && path.extension == "swift") { "Test $path is not a swift file." }
         }
@@ -47,10 +54,6 @@ sealed class TestNode {
         private val parsedTest = TestCodeParser.parse(path.readLines())
 
         val expectedResult: ExpectedTestResult = parsedTest.expectedResult
-
-        val configuration: SwiftGenConfiguration = parsedTest.configuration
-
-        val configurationChanges: Map<String, String> = parsedTest.configurationChanges
 
         val swiftCode: String = parsedTest.swiftCode
 
@@ -64,7 +67,7 @@ sealed class TestNode {
 
         override val directChildren: List<TestNode> by lazy {
             path.listDirectoryEntries()
-                .filterNot { it.isKotlinFile }
+                .filter { it.isDirectChildren }
                 .map { TestNode(it, this) }
         }
 
@@ -74,8 +77,20 @@ sealed class TestNode {
                     (parent?.kotlinFiles ?: emptyList())
         }
 
+        val configFiles: List<Path> by lazy {
+            (parent?.configFiles ?: emptyList()) +
+                    path.listDirectoryEntries()
+                        .filter { it.isConfigFile }
+        }
+
         private val Path.isKotlinFile: Boolean
-            get() = extension == "kt"
+            get() = this.extension == "kt"
+
+        private val Path.isConfigFile: Boolean
+            get() = this.name == "config.json"
+
+        private val Path.isDirectChildren: Boolean
+            get() = this.isDirectory() || this.extension == "swift"
 
         init {
             require(path.isDirectory()) { "Container $path is not a directory." }

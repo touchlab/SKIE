@@ -4,7 +4,7 @@ import co.touchlab.swiftgen.BuildConfig
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestResultBuilder
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftlink.plugin.ConfigurationKeys
 import co.touchlab.swiftlink.plugin.SwiftKtComponentRegistrar
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
@@ -29,7 +29,7 @@ internal class KotlinTestCompiler(
     private val testResultBuilder: TestResultBuilder,
 ) {
 
-    fun compile(kotlinFiles: List<Path>, configuration: SwiftGenConfiguration): IntermediateResult<Path> {
+    fun compile(kotlinFiles: List<Path>, configuration: Path): IntermediateResult<Path> {
         val outputDirectory = tempFileSystem.createDirectory("kotlin-build")
 
         val generatedSwiftDirectory = configureSwiftKt()
@@ -79,13 +79,13 @@ internal class KotlinTestCompiler(
 
     private fun createCompilerArguments(
         kotlinFiles: List<Path>,
-        configuration: SwiftGenConfiguration,
+        configuration: Path,
         outputDirectory: Path,
     ): K2NativeCompilerArguments =
         K2NativeCompilerArguments().apply {
             freeArgs = kotlinFiles.map { it.absolutePathString() }
 
-            pluginOptions = (pluginOptions ?: emptyArray()) + configuration.toPluginOptions()
+            pluginOptions = (pluginOptions ?: emptyArray()) + createConfigurationPathOption(configuration)
 
             produce = "framework"
             staticFramework = true
@@ -96,6 +96,9 @@ internal class KotlinTestCompiler(
 
             pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.RESOURCES)
         }
+
+    private fun createConfigurationPathOption(configuration: Path): String =
+        "plugin:${Configuration.CliPluginId}:${Configuration.CliOptionKey}=${configuration.absolutePathString()}"
 
     private fun interpretResult(
         result: ExitCode,

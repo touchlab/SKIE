@@ -21,11 +21,14 @@ internal fun <T : Annotation> Annotated.hasAnnotation(annotation: KClass<T>): Bo
     return this.annotations.hasAnnotation(annotationName)
 }
 
-internal inline fun <reified T : Annotation> Annotated.findAnnotation(): T? {
-    val annotationName = FqName(T::class.qualifiedName!!)
+internal inline fun <reified T : Annotation> Annotated.findAnnotation(): T? =
+    findAnnotation(T::class)
+
+internal fun <T : Annotation> Annotated.findAnnotation(annotationClass: KClass<T>): T? {
+    val annotationName = FqName(annotationClass.qualifiedName!!)
     val annotation = this.annotations.findAnnotation(annotationName) ?: return null
 
-    val constructor = T::class.constructors.first()
+    val constructor = annotationClass.constructors.first()
 
     val parametersWithArguments = assignArgumentsToParameters(constructor.parameters, annotation)
 

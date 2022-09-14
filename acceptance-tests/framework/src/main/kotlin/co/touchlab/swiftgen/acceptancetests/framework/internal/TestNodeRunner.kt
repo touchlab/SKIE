@@ -70,7 +70,6 @@ internal class TestNodeRunner(
             name = test.name,
             fullName = test.fullName,
             path = test.path,
-            configurationChanges = test.configurationChanges,
             expectedResult = test.expectedResult,
             actualResult = it,
         )

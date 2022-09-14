@@ -1,0 +1,9 @@
+[
+    {
+        "target": "",
+        "overridesAnnotations": false,
+        "items": {
+            "SealedInterop.FunctionName": "exhaustively2"
+        }
+    }
+]

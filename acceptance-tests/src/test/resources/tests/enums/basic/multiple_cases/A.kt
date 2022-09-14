@@ -1,4 +1,4 @@
-package tests.enums.basic.multiple_cases
+package `tests`.`enums`.`basic`.`multiple_cases`
 
 enum class A {
     A1,

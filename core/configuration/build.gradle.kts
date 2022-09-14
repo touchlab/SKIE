@@ -2,7 +2,13 @@ plugins {
     kotlin("jvm")
     `maven-publish`
 
+    alias(libs.plugins.serialization)
     alias(libs.plugins.buildconfig)
+}
+
+dependencies {
+    implementation(project(":api"))
+    implementation(libs.serialization)
 }
 
 buildConfig {

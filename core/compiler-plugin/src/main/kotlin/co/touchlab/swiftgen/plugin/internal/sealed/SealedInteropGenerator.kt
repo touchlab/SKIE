@@ -1,15 +1,15 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.api.SealedInterop
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.configuration.ConfigurationKeys
+import co.touchlab.swiftgen.plugin.internal.configuration.getConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
-import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
 import co.touchlab.swiftgen.plugin.internal.util.isSealed
-import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -17,10 +17,10 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 internal class SealedInteropGenerator(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
-    override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
+    configuration: Configuration,
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
     private val reporter: Reporter,
-) : BaseGenerator(fileBuilderFactory, namespaceProvider), SealedGeneratorExtensionContainer {
+) : BaseGenerator(fileBuilderFactory, namespaceProvider, configuration), SealedGeneratorExtensionContainer {
 
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration, swiftPackModuleBuilder)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration, swiftPackModuleBuilder)
@@ -49,11 +49,7 @@ internal class SealedInteropGenerator(
         declaration.isSealed && declaration.isSealedInteropEnabled
 
     private val ClassDescriptor.isSealedInteropEnabled: Boolean
-        get() = if (configuration.enabled) {
-            !this.hasAnnotation<SealedInterop.Disabled>()
-        } else {
-            this.hasAnnotation<SealedInterop.Enabled>()
-        }
+        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Enabled)
 
     private fun verifyUniqueCaseNames(declaration: ClassDescriptor): Boolean {
         val conflictingDeclarations = declaration.visibleSealedSubclasses

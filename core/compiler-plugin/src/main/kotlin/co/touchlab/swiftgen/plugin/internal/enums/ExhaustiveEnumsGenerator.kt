@@ -1,5 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal.enums
 
+import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
@@ -24,8 +25,9 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 internal class ExhaustiveEnumsGenerator(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
+    configuration: Configuration,
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
-) : BaseGenerator(fileBuilderFactory, namespaceProvider) {
+) : BaseGenerator(fileBuilderFactory, namespaceProvider, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider) {
         descriptorProvider.classDescriptors.forEach {

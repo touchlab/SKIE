@@ -1,20 +1,20 @@
 package co.touchlab.swiftgen.gradle
 
 import co.touchlab.swiftgen.BuildConfig
+import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftlink.plugin.SwiftKtPlugin
 import co.touchlab.swiftlink.plugin.SwiftLinkSubplugin
+import co.touchlab.swiftpack.plugin.SwiftPackPlugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.provider.Provider
-import org.gradle.configurationcache.extensions.capitalized
-import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.*
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import javax.inject.Inject
+import org.gradle.api.artifacts.Configuration as PluginConfiguration
 
 abstract class SwiftGenSubplugin @Inject constructor() : SwiftLinkSubplugin {
 
@@ -23,24 +23,25 @@ abstract class SwiftGenSubplugin @Inject constructor() : SwiftLinkSubplugin {
     override fun apply(target: Project) {
         super.apply(target)
 
+        registerPlugins(target)
+        registerSwiftGenConfigTask(target)
+        registerExtension(target)
+    }
+
+    private fun registerPlugins(target: Project) {
+        target.apply<SwiftKtPlugin>()
+        target.apply<SwiftPackPlugin>()
+    }
+
+    private fun registerSwiftGenConfigTask(target: Project) {
+        target.tasks.register<CreateSwiftGenConfigTask>(CreateSwiftGenConfigTask.name)
+    }
+
+    private fun registerExtension(target: Project) {
         target.extensions.create("swiftGen", SwiftGenExtension::class.java)
-
-        target.plugins.withType<KotlinMultiplatformPlugin> {
-            target.configure<KotlinMultiplatformExtension> {
-                sourceSets.getByName("commonMain").dependencies {
-                    implementation("co.touchlab.swiftgen:api:${BuildConfig.KOTLIN_PLUGIN_VERSION}")
-                }
-            }
-        }
     }
 
-    override fun getOptions(project: Project): List<SubpluginOption> {
-        val pluginConfiguration = project.extensions.getByType<SwiftGenExtension>()
-
-        return pluginConfiguration.toSubpluginOptions()
-    }
-
-    override fun configureDependencies(project: Project, pluginConfiguration: Configuration) {
+    override fun configureDependencies(project: Project, pluginConfiguration: PluginConfiguration) {
         project.dependencies {
             pluginConfiguration("co.touchlab.swiftgen:api:${BuildConfig.KOTLIN_PLUGIN_VERSION}")
             pluginConfiguration("co.touchlab.swiftgen:configuration:${BuildConfig.KOTLIN_PLUGIN_VERSION}")
@@ -50,5 +51,23 @@ abstract class SwiftGenSubplugin @Inject constructor() : SwiftLinkSubplugin {
                 version = BuildConfig.KOTLIN_PLUGIN_VERSION,
             )
         }
+    }
+
+    override fun getOptions(project: Project, framework: Framework): Provider<List<SubpluginOption>> {
+        val task = project.tasks.withType<CreateSwiftGenConfigTask>().getByName(CreateSwiftGenConfigTask.name)
+
+        framework.linkTaskProvider.configure {
+            it.dependsOn(task)
+        }
+
+        return project.provider {
+            listOf(task.getSubpluginOption())
+        }
+    }
+
+    private fun CreateSwiftGenConfigTask.getSubpluginOption(): SubpluginOption {
+        val configFilePath = this.configFile.absolutePath
+
+        return SubpluginOption(Configuration.CliOptionKey, configFilePath)
     }
 }

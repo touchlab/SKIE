@@ -1,5 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
+import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.configuration.ConfigurationContainer
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -7,7 +9,8 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 internal abstract class BaseGenerator(
     private val fileBuilderFactory: FileBuilderFactory,
     private val namespaceProvider: NamespaceProvider,
-) : SwiftPackExtensionContainer {
+    override val configuration: Configuration,
+) : SwiftPackExtensionContainer, ConfigurationContainer {
 
     protected val swiftGenNamespace: DeclaredTypeName
         get() = namespaceProvider.swiftGenNamespace

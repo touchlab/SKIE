@@ -3,9 +3,19 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
 
-    alias(libs.plugins.swiftpack)
-    alias(libs.plugins.swiftlink)
     id("co.touchlab.swiftgen")
+}
+
+swiftGen {
+    configuration {
+        val configFiles = layout.projectDirectory.dir("../kotlin/swiftgen").asFile
+            .listFiles()
+            ?.filter { it.extension == "json" }
+            ?.sortedBy { it.name }
+            ?: emptyList()
+
+        from(configFiles)
+    }
 }
 
 kotlin {

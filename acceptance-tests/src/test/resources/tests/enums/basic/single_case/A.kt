@@ -1,4 +1,4 @@
-package tests.enums.basic.single_case
+package `tests`.`enums`.`basic`.`single_case`
 
 enum class A {
     A1

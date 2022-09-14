@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal
 
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
@@ -19,7 +19,8 @@ internal class SwiftGenPhaseListener : PhaseListener {
         super.beforePhase(phaseConfig, phaserState, context)
 
         val compilerConfiguration = context.configuration
-        val pluginConfiguration = SwiftGenCompilerConfiguration.Key.getOrNull(compilerConfiguration) ?: SwiftGenConfiguration()
+        val pluginConfiguration = SwiftGenCompilerConfiguration.Key.getOrNull(compilerConfiguration) ?: Configuration {}
+
         buildSwiftPackModule("SwiftGen") {
             val fileBuilderFactory = FileBuilderFactory()
 

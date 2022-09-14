@@ -1,4 +1,4 @@
-# expected = KotlinCompilationError(There are multiple sealed class/interface children with the same name `A1` for the enum case.)
+# KotlinCompilationError(There are multiple sealed class/interface children with the same name `A1` for the enum case.)
 
 let a: A = A1()
 

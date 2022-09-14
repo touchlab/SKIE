@@ -1,13 +1,14 @@
 [versions]
 kotlin = "1.7.10"
 swiftpack = "0.0.20"
-swiftlink = "0.0.24"
+swiftlink = "0.0.25"
 kotest = "5.4.0"
 pluginPublish = "1.0.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.0.3" }
 swiftpack = { id = "co.touchlab.swiftpack", version.ref = "swiftpack" }
 swiftlink = { id = "co.touchlab.swiftlink", version.ref = "swiftlink" }
@@ -17,9 +18,11 @@ pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish
 swiftlink-gradle-plugin = { module = "co.touchlab.swiftlink:gradle-plugin", version.ref = "swiftlink" }
 swiftlink-plugin = { module = "co.touchlab.swiftlink:plugin", version.ref = "swiftlink" }
 swiftlink-plugin-spi = { module = "co.touchlab.swiftlink:plugin-spi", version.ref = "swiftlink" }
+swiftpack-gradle-plugin = { module = "co.touchlab.swiftpack:swiftpack-gradle-plugin", version.ref = "swiftpack" }
 swiftpack-api = { module = "co.touchlab.swiftpack:swiftpack-api", version.ref = "swiftpack" }
 swiftpack-spi = { module = "co.touchlab.swiftpack:swiftpack-spi", version.ref = "swiftpack" }
 compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
 
 compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.9" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }

@@ -1,8 +1,8 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
-import co.touchlab.swiftgen.api.SealedInterop
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
-import co.touchlab.swiftgen.plugin.internal.util.findAnnotation
+import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.configuration.ConfigurationKeys
+import co.touchlab.swiftgen.plugin.internal.configuration.getConfiguration
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FileSpec
@@ -12,7 +12,7 @@ import io.outfoxx.swiftpoet.TypeName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedFunctionGeneratorDelegate(
-    override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
+    override val configuration: Configuration,
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
 ) : SealedGeneratorExtensionContainer {
 
@@ -29,7 +29,7 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     private val ClassDescriptor.exhaustivelyFunctionName: String
-        get() = this.findAnnotation<SealedInterop.FunctionName>()?.functionName ?: configuration.functionName
+        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.FunctionName)
 
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         declaration: ClassDescriptor,

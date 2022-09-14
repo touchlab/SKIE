@@ -56,6 +56,7 @@ tasks.register<SetupPlaygroundTask>("setupPlayground") {
 
     testsDirectory = layout.projectDirectory.dir("../../acceptance-tests/src/test/resources").asFile
     kotlinPlaygroundDirectory = layout.projectDirectory.dir("../kotlin/src").asFile
+    configDirectory = layout.projectDirectory.dir("../kotlin/swiftgen").asFile
     swiftPlaygroundFile = layout.projectDirectory.file("main.swift").asFile
 }
 
@@ -71,6 +72,9 @@ abstract class SetupPlaygroundTask : DefaultTask() {
     @InputDirectory
     lateinit var kotlinPlaygroundDirectory: File
 
+    @InputDirectory
+    lateinit var configDirectory: File
+
     @InputFile
     lateinit var swiftPlaygroundFile: File
 
@@ -79,11 +83,13 @@ abstract class SetupPlaygroundTask : DefaultTask() {
         checkInputs()
 
         val swiftTestFile = getSwiftTestFile()
+        copySwiftTestFile(swiftTestFile)
 
         val kotlinPlaygroundSourcesDirectory = prepareKotlinPlaygroundSourcesDirectory()
-
-        copySwiftTestFile(swiftTestFile)
         copyKotlinTestFiles(swiftTestFile, kotlinPlaygroundSourcesDirectory)
+
+        prepareConfigDirectory()
+        copyConfigFiles(swiftTestFile)
     }
 
     private fun checkInputs() {
@@ -135,12 +141,8 @@ abstract class SetupPlaygroundTask : DefaultTask() {
     }
 
     private fun copyKotlinTestFiles(swiftTestFile: File, kotlinPlaygroundSourcesDirectory: File) {
-        var currentDirectory = swiftTestFile.parentFile
-
-        while (currentDirectory != testsDirectory) {
-            copySingleKotlinTestDirectory(currentDirectory, kotlinPlaygroundSourcesDirectory)
-
-            currentDirectory = currentDirectory.parentFile
+        swiftTestFile.walkUpToTestsDirectory {
+            copySingleKotlinTestDirectory(it, kotlinPlaygroundSourcesDirectory)
         }
     }
 
@@ -172,5 +174,48 @@ abstract class SetupPlaygroundTask : DefaultTask() {
         relocatedDirectory.mkdirs()
 
         return relocatedDirectory
+    }
+
+    private fun prepareConfigDirectory() {
+        configDirectory.deleteRecursively()
+        configDirectory.mkdirs()
+    }
+
+    private fun copyConfigFiles(swiftTestFile: File) {
+        val configFiles = getConfigFiles(swiftTestFile)
+
+        writeConfigFiles(configFiles)
+    }
+
+    private fun getConfigFiles(swiftTestFile: File): List<File> {
+        val configFilesInReverseOrder = mutableListOf<File>()
+
+        swiftTestFile.walkUpToTestsDirectory { directory ->
+            val localConfigFiles = directory.listFiles()?.filter { it.name == "config.json" } ?: emptyList()
+
+            configFilesInReverseOrder.addAll(localConfigFiles)
+        }
+
+        return configFilesInReverseOrder.reversed()
+    }
+
+    private fun writeConfigFiles(configFiles: List<File>) {
+        configFiles.forEachIndexed { index, file ->
+            val fileName = "config_${index + 1}.json"
+
+            val fileContent = file.readText()
+
+            configDirectory.resolve(fileName).writeText(fileContent)
+        }
+    }
+
+    private fun File.walkUpToTestsDirectory(action: (File) -> Unit) {
+        var currentDirectory = this.parentFile
+
+        while (currentDirectory != testsDirectory) {
+            action(currentDirectory)
+
+            currentDirectory = currentDirectory.parentFile
+        }
     }
 }

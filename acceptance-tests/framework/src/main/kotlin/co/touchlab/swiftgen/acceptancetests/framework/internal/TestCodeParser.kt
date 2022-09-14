@@ -1,46 +1,37 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal
 
 import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.*
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.IncorrectOutput
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.KotlinCompilationError
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.MissingExit
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.RuntimeError
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.Success
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.SwiftCompilationError
 import kotlin.reflect.KClass
 
 internal object TestCodeParser {
 
     private val expectedResultRegex = "^\\s*([a-zA-Z]+)\\s*(\\((.*)\\))?\\s*\$".toRegex()
-    private const val expectedResultKey = "expected"
 
-    fun parse(lines: List<String>): ParsedTest {
-        val hasConfigurationLine = lines.firstOrNull()?.startsWith("#") ?: false
+    fun parse(lines: List<String>): ParsedTest = ParsedTest(
+        expectedResult = getExpectedResult(lines),
+        swiftCode = getSwiftCode(lines),
+    )
 
-        val configurationChanges = if (hasConfigurationLine) parseConfigurationLine(lines.first()) else emptyMap()
+    private fun getSwiftCode(lines: List<String>): String =
+        lines.dropConfigurationLine().joinToString(System.lineSeparator())
 
-        return ParsedTest(
-            expectedResult = buildExpectedResult(configurationChanges),
-            configuration = buildSwiftGenConfiguration(configurationChanges),
-            configurationChanges = configurationChanges,
-            swiftCode = (if (hasConfigurationLine) lines.drop(1) else lines).joinToString(System.lineSeparator()),
-        )
-    }
+    private fun List<String>.dropConfigurationLine(): List<String> =
+        if (this.hasConfigurationLine) this.drop(1) else this
 
-    private fun parseConfigurationLine(line: String): Map<String, String> =
-        line.drop(1)
-            .split(";")
-            .associate { singleConfiguration ->
-                val components = singleConfiguration.trim().split("=")
+    private fun List<String>.getConfiguration(): String? =
+        if (this.hasConfigurationLine) this.first().drop(1) else null
 
-                require(components.size >= 2) {
-                    "Incorrect format of configuration item, it must be 'key=value'. Was: '$singleConfiguration'"
-                }
+    private val List<String>.hasConfigurationLine: Boolean
+        get() = this.firstOrNull()?.startsWith("#") ?: false
 
-                val key = components.first().trim()
-                val value = components.drop(1).joinToString("=").trim()
-
-                key to value
-            }
-
-    private fun buildExpectedResult(configurationChanges: Map<String, String>): ExpectedTestResult {
-        val expectedResultConfiguration = configurationChanges[expectedResultKey] ?: return Success
+    private fun getExpectedResult(lines: List<String>): ExpectedTestResult {
+        val expectedResultConfiguration = lines.getConfiguration() ?: return Success
 
         val match = expectedResultRegex.matchEntire(expectedResultConfiguration)
             ?: throwInvalidExpectedResult(expectedResultConfiguration)
@@ -92,22 +83,8 @@ internal object TestCodeParser {
         )
     }
 
-    private fun buildSwiftGenConfiguration(configurationChanges: Map<String, String>): SwiftGenConfiguration {
-        val configuration = SwiftGenConfiguration()
-
-        configurationChanges
-            .filter { it.key != expectedResultKey }
-            .forEach {
-                configuration.set(it.key, it.value)
-            }
-
-        return configuration
-    }
-
     data class ParsedTest(
         val expectedResult: ExpectedTestResult,
-        val configuration: SwiftGenConfiguration,
-        val configurationChanges: Map<String, String>,
         val swiftCode: String,
     )
 }

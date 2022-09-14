@@ -22,6 +22,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk7"))
     implementation(gradleApi())
     implementation(libs.swiftlink.gradle.plugin)
+    implementation(libs.swiftpack.gradle.plugin)
     compileOnly(gradleKotlinDsl())
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))

@@ -1,29 +1,26 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
-import co.touchlab.swiftgen.api.SealedInterop
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.configuration.ConfigurationContainer
+import co.touchlab.swiftgen.configuration.ConfigurationKeys
+import co.touchlab.swiftgen.plugin.internal.configuration.getConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
-import co.touchlab.swiftgen.plugin.internal.util.findAnnotation
-import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
 import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
 import io.outfoxx.swiftpoet.TypeName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 
-internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContainer {
-
-    val configuration: SwiftGenConfiguration.SealedInteropDefaults
+internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContainer, ConfigurationContainer {
 
     val ClassDescriptor.elseCaseName: String
-        get() = this.findAnnotation<SealedInterop.ElseName>()?.elseName ?: configuration.elseName
+        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.ElseName)
 
     val ClassDescriptor.enumCaseName: String
         get() {
-            val annotation = this.findAnnotation<SealedInterop.Case.Name>()
+            val configuredName = this.getConfiguration(ConfigurationKeys.SealedInterop.Case.Name)
 
-            return annotation?.name ?: this.name.identifier
+            return configuredName ?: this.name.identifier
         }
 
     val ClassDescriptor.hasElseCase: Boolean
@@ -36,11 +33,7 @@ internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContain
         get() {
             val isVisible = this.isVisibleFromSwift
 
-            val isEnabled = if (configuration.visibleCases) {
-                !this.hasAnnotation<SealedInterop.Case.Hidden>()
-            } else {
-                this.hasAnnotation<SealedInterop.Case.Visible>()
-            }
+            val isEnabled = this.getConfiguration(ConfigurationKeys.SealedInterop.Case.Visible)
 
             return isVisible && isEnabled
         }

@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -11,7 +11,7 @@ import io.outfoxx.swiftpoet.TypeSpec
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedEnumGeneratorDelegate(
-    override val configuration: SwiftGenConfiguration.SealedInteropDefaults,
+    override val configuration: Configuration,
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
 ) : SealedGeneratorExtensionContainer {
 

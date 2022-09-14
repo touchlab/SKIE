@@ -56,15 +56,6 @@ class AcceptanceTestsRunner(
             println("To run only this test add env variable: acceptanceTest=${evaluatedTest.fullName}")
             println()
 
-            if (evaluatedTest.configurationChanges.isNotEmpty()) {
-                val configurationChanges = evaluatedTest.configurationChanges.toList().joinToString("; ") {
-                    "${it.first} = ${it.second}"
-                }
-
-                println("# $configurationChanges")
-                println()
-            }
-
             outputTestResult(evaluatedTest)
         }
     }

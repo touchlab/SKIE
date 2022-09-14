@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal
 
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.swiftgen.plugin.internal.sealed.SealedInteropGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
@@ -13,19 +13,24 @@ import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 internal class SwiftGenScheduler(
     fileBuilderFactory: FileBuilderFactory,
     namespaceProvider: NamespaceProvider,
-    configuration: SwiftGenConfiguration,
+    configuration: Configuration,
     swiftPackModuleBuilder: SwiftPackModuleBuilder,
     reporter: Reporter,
 ) {
 
     private val irValidator = IrValidator(reporter)
 
-    private val exhaustiveEnumsGenerator = ExhaustiveEnumsGenerator(fileBuilderFactory, namespaceProvider, swiftPackModuleBuilder)
+    private val exhaustiveEnumsGenerator = ExhaustiveEnumsGenerator(
+        fileBuilderFactory = fileBuilderFactory,
+        namespaceProvider = namespaceProvider,
+        configuration = configuration,
+        swiftPackModuleBuilder = swiftPackModuleBuilder,
+    )
 
     private val sealedInteropGenerator = SealedInteropGenerator(
         fileBuilderFactory = fileBuilderFactory,
         namespaceProvider = namespaceProvider,
-        configuration = configuration.sealedInteropDefaults,
+        configuration = configuration,
         swiftPackModuleBuilder = swiftPackModuleBuilder,
         reporter = reporter,
     )

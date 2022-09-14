@@ -1,4 +1,4 @@
-# expected = SwiftCompilationError(switch must be exhaustive)
+# SwiftCompilationError(switch must be exhaustive)
 
 let a: A = A1()
 

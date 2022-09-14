@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal
 
-import co.touchlab.swiftgen.configuration.SwiftGenConfiguration
+import co.touchlab.swiftgen.configuration.Configuration
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
@@ -21,7 +21,5 @@ internal sealed class SwiftGenCompilerConfiguration<T : Any>(name: String) {
     fun getOrNull(configuration: CompilerConfiguration): T? =
         configuration.get(key)
 
-    object Key : SwiftGenCompilerConfiguration<SwiftGenConfiguration>(
-        "configuration"
-    )
+    object Key : SwiftGenCompilerConfiguration<Configuration>("configuration")
 }

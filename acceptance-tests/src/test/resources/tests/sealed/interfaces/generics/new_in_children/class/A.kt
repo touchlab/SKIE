@@ -1,4 +1,4 @@
-package tests.sealed.interfaces.generics.new_in_children.`class`
+package `tests`.`sealed`.`interfaces`.`generics`.`new_in_children`.`class`
 
 sealed interface A
 
