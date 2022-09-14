@@ -6,7 +6,7 @@ import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.Interm
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestResultBuilder
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftlink.plugin.ConfigurationKeys
-import co.touchlab.swiftlink.plugin.SwiftKtComponentRegistrar
+import co.touchlab.swiftlink.plugin.SwiftLinkComponentRegistrar
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import org.jetbrains.kotlin.cli.bc.K2Native
@@ -58,7 +58,7 @@ internal class KotlinTestCompiler(
 
         PluginRegistrar.plugins.set(
             listOf(
-                SwiftKtComponentRegistrar(),
+                SwiftLinkComponentRegistrar(),
             )
         )
 
@@ -85,6 +85,7 @@ internal class KotlinTestCompiler(
         K2NativeCompilerArguments().apply {
             freeArgs = kotlinFiles.map { it.absolutePathString() }
 
+            memoryModel = "experimental"
             pluginOptions = (pluginOptions ?: emptyArray()) + createConfigurationPathOption(configuration)
 
             produce = "framework"

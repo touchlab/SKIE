@@ -2,7 +2,7 @@ package co.touchlab.swiftgen.gradle
 
 import co.touchlab.swiftgen.BuildConfig
 import co.touchlab.swiftgen.configuration.Configuration
-import co.touchlab.swiftlink.plugin.SwiftKtPlugin
+import co.touchlab.swiftlink.plugin.SwiftLinkPlugin
 import co.touchlab.swiftlink.plugin.SwiftLinkSubplugin
 import co.touchlab.swiftpack.plugin.SwiftPackPlugin
 import org.gradle.api.Project
@@ -29,7 +29,7 @@ abstract class SwiftGenSubplugin @Inject constructor() : SwiftLinkSubplugin {
     }
 
     private fun registerPlugins(target: Project) {
-        target.apply<SwiftKtPlugin>()
+        target.apply<SwiftLinkPlugin>()
         target.apply<SwiftPackPlugin>()
     }
 

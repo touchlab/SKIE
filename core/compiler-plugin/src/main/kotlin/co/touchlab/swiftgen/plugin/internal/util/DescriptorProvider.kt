@@ -1,6 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -11,11 +12,11 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 
 internal class DescriptorProvider(private val context: CommonBackendContext) {
 
-    val classDescriptors: Set<ClassDescriptor> by lazy {
-        val getter = exportedInterfaceClass.getDeclaredMethod("getGeneratedClasses")
-
-        @Suppress("UNCHECKED_CAST")
-        getter.invoke(exportedInterface) as Set<ClassDescriptor>
+    val classDescriptors: Set<ClassDescriptor> by lazyMethod("getGeneratedClasses")
+    val categoryMembers: Map<ClassDescriptor, List<CallableMemberDescriptor>> by lazyMethod("getCategoryMembers")
+    val mapper: ObjcMapper by lazy {
+        val mapper = lazyMethod<Any>("getMapper").value
+        ObjcMapper(mapper)
     }
 
     private val exportedInterface: Any by lazy {
@@ -44,6 +45,13 @@ internal class DescriptorProvider(private val context: CommonBackendContext) {
 
     private fun createSymbolTable(): SymbolTable =
         SymbolTable(DummySignaturer(), IrFactoryImpl)
+
+    private fun <T> lazyMethod(name: String): Lazy<T> = lazy {
+        val getter = exportedInterfaceClass.getDeclaredMethod(name)
+
+        @Suppress("UNCHECKED_CAST")
+        getter.invoke(exportedInterface) as T
+    }
 
     private class DummySignaturer : IdSignatureComposer {
 
