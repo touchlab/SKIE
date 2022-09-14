@@ -10,16 +10,13 @@ import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.ObjectFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
-import org.jetbrains.kotlin.konan.target.Architecture
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
-import org.jetbrains.kotlin.konan.target.Family
-import org.jetbrains.kotlin.konan.target.isSimulator
 import org.jetbrains.kotlin.konan.target.platformName
 import org.jetbrains.kotlin.konan.target.withOSVersion
 import org.jetbrains.kotlin.library.impl.javaFile
 import java.io.File
 
-class SwiftKtCompilePhase(
+class SwiftLinkCompilePhase(
     val swiftPackModuleReferences: List<NamespacedSwiftPackModule.Reference>,
     val swiftSourceFiles: List<File>,
     val expandedSwiftDir: File,

@@ -13,7 +13,6 @@ import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
@@ -28,7 +27,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Architecture
 import java.io.File
 
@@ -39,9 +37,9 @@ const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "swiftLinkPlugin"
 // We need to use an anonymous class instead of lambda to keep execution optimizations.
 // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
 @Suppress("ObjectLiteralToLambda")
-abstract class SwiftKtPlugin : Plugin<Project> {
+abstract class SwiftLinkPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
-        val extension = extensions.create(EXTENSION_NAME, SwiftKtExtension::class.java, this)
+        val extension = extensions.create(EXTENSION_NAME, SwiftLinkExtension::class.java, this)
 
         val swiftLinkPluginConfiguration = configurations.maybeCreate(SWIFT_LINK_PLUGIN_CONFIGURATION_NAME).apply {
             isCanBeResolved = true
@@ -122,20 +120,20 @@ abstract class SwiftKtPlugin : Plugin<Project> {
                             swiftLinkPluginConfiguration
                         ).reduce(FileCollection::plus)
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SwiftKtCommandLineProcessor.pluginId, SwiftKtCommandLineProcessor.Options.expandedSwiftDir.subpluginOption(
+                            SwiftLinkCommandLineProcessor.pluginId, SwiftLinkCommandLineProcessor.Options.expandedSwiftDir.subpluginOption(
                                 layout.buildDirectory.dir("generated/swiftpack-expanded/${framework.name}/${framework.target.targetName}").get().asFile
                             )
                         )
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SwiftKtCommandLineProcessor.pluginId, SwiftKtCommandLineProcessor.Options.disableWildcardExport.subpluginOption(
+                            SwiftLinkCommandLineProcessor.pluginId, SwiftLinkCommandLineProcessor.Options.disableWildcardExport.subpluginOption(
                                 extension.isWildcardExportPrevented.get()
                             )
                         )
 
                         swiftSources.forEach { swiftFile ->
                             linkTask.compilerPluginOptions.addPluginArgument(
-                                SwiftKtCommandLineProcessor.pluginId,
-                                SwiftKtCommandLineProcessor.Options.swiftSourceFile.subpluginOption(swiftFile)
+                                SwiftLinkCommandLineProcessor.pluginId,
+                                SwiftLinkCommandLineProcessor.Options.swiftSourceFile.subpluginOption(swiftFile)
                             )
                         }
 
@@ -147,8 +145,8 @@ abstract class SwiftKtPlugin : Plugin<Project> {
 
                         if (extension.isSwiftPackEnabled.get()) {
                             linkTask.compilerPluginOptions.addPluginArgument(
-                                SwiftKtCommandLineProcessor.pluginId,
-                                SwiftKtCommandLineProcessor.Options.linkPhaseSwiftPackOutputDir.subpluginOption(
+                                SwiftLinkCommandLineProcessor.pluginId,
+                                SwiftLinkCommandLineProcessor.Options.linkPhaseSwiftPackOutputDir.subpluginOption(
                                     layout.buildDirectory.dir("generated/swiftpack-link/${framework.name}/${framework.target.targetName}").get().asFile
                                 ),
                             )
@@ -159,8 +157,8 @@ abstract class SwiftKtPlugin : Plugin<Project> {
                                 override fun execute(t: Task) {
                                     framework.swiftPackModuleReferences.get().forEach { reference ->
                                         linkTask.compilerPluginOptions.addPluginArgument(
-                                            SwiftKtCommandLineProcessor.pluginId,
-                                            SwiftKtCommandLineProcessor.Options.swiftPackModule.subpluginOption(
+                                            SwiftLinkCommandLineProcessor.pluginId,
+                                            SwiftLinkCommandLineProcessor.Options.swiftPackModule.subpluginOption(
                                                 reference
                                             )
                                         )

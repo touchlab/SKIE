@@ -1,9 +1,7 @@
 import co.touchlab.swiftpack.plugin.SWIFT_PACK_PLUGIN_CONFIGURATION_NAME
-import co.touchlab.swiftpack.plugin.SwiftPackExtension
 import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     id("co.touchlab.swiftlink") apply false

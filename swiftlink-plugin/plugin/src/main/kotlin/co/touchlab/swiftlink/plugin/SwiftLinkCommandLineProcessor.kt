@@ -1,21 +1,19 @@
 package co.touchlab.swiftlink.plugin
 
-import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
 import com.google.auto.service.AutoService
-import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import java.io.File
 
 @AutoService(CommandLineProcessor::class)
-class SwiftKtCommandLineProcessor: CommandLineProcessor {
+class SwiftLinkCommandLineProcessor: CommandLineProcessor {
     companion object {
         const val pluginId = "co.touchlab.swiftlink"
     }
 
-    override val pluginId: String = SwiftKtCommandLineProcessor.pluginId
+    override val pluginId: String = SwiftLinkCommandLineProcessor.pluginId
 
     private val options = listOf(
         Options.swiftPackModule,

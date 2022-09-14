@@ -10,6 +10,6 @@ class SwiktPluginTest {
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("co.touchlab.swiftlink")
 
-        assert(project.extensions.getByName("swiftlink") is SwiftKtExtension)
+        assert(project.extensions.getByName("swiftlink") is SwiftLinkExtension)
     }
 }

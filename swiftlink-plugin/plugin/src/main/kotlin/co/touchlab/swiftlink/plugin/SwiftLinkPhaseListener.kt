@@ -28,7 +28,7 @@ class SwiftLinkPhaseListener: PhaseListener {
         val modules = context.configuration.getList(ConfigurationKeys.swiftPackModules) + localModules
         val swiftSources = context.configuration.getList(ConfigurationKeys.swiftSourceFiles)
         val expandedSwiftDir = context.configuration.getNotNull(ConfigurationKeys.expandedSwiftDir)
-        val swiftObjectFiles = SwiftKtCompilePhase(modules, swiftSources, expandedSwiftDir).process(config, context, namer)
+        val swiftObjectFiles = SwiftLinkCompilePhase(modules, swiftSources, expandedSwiftDir).process(config, context, namer)
 
         context.compilerOutput += swiftObjectFiles
     }
