@@ -1,18 +1,28 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
+import co.touchlab.swiftlink.plugin.getAllExportedModuleDescriptors
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.IdSignatureComposer
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 internal class DescriptorProvider(private val context: CommonBackendContext) {
 
-    val classDescriptors: Set<ClassDescriptor> by lazyMethod("getGeneratedClasses")
+    val exportedModules: List<ModuleDescriptor> by lazy {
+        context.getAllExportedModuleDescriptors()
+    }
+    val allClassDescriptors: Set<ClassDescriptor> by lazyMethod("getGeneratedClasses")
+    val classDescriptors: Set<ClassDescriptor> by lazy {
+        val exportedModulesSet = exportedModules.toSet()
+        allClassDescriptors.filter { it.module in exportedModulesSet }.toSet()
+    }
     val categoryMembers: Map<ClassDescriptor, List<CallableMemberDescriptor>> by lazyMethod("getCategoryMembers")
     val mapper: ObjcMapper by lazy {
         val mapper = lazyMethod<Any>("getMapper").value
