@@ -1,6 +1,6 @@
 let a: A = A1()
 
-switch exhaustively(a) {
+switch onEnum(of: a) {
     case .X(_):
         exit(0)
     case .Other:

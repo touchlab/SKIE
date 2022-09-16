@@ -1,5 +1,5 @@
 func test(a: A) {
-    switch exhaustively(a) {
+    switch onEnum(of: a) {
     case .Else:
         exit(1)
     }

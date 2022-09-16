@@ -17,7 +17,9 @@ internal class SealedInteropRules(configuration: Configuration) {
         SealedClassAnnotationApplicabilityRule(SealedInterop.Disabled::class, configuration),
         SealedClassAnnotationApplicabilityRule(SealedInterop.ElseName::class, configuration),
         SealedClassAnnotationApplicabilityRule(SealedInterop.Enabled::class, configuration),
-        SealedClassAnnotationApplicabilityRule(SealedInterop.FunctionName::class, configuration),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.Name::class, configuration),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.ArgumentLabel::class, configuration),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.ParameterName::class, configuration),
         ConflictingAnnotationsRule(configuration, SealedInterop.Enabled::class, SealedInterop.Disabled::class),
     )
 }

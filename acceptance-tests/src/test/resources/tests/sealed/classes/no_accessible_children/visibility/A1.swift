@@ -1,6 +1,6 @@
 let a: A = A.Companion.shared.createA1()
 
-switch exhaustively(a) {
+switch onEnum(of: a) {
     case .Else:
         exit(0)
 }

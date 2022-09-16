@@ -1,5 +1,5 @@
-# SwiftCompilationError(cannot find 'exhaustively' in scope)
+# SwiftCompilationError(cannot find 'onEnum' in scope)
 
 func test(a: A) {
-    exhaustively(a)
+    onEnum(of: a)
 }

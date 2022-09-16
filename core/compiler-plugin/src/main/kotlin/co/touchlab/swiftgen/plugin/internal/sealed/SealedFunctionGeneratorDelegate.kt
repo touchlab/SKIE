@@ -18,18 +18,28 @@ internal class SealedFunctionGeneratorDelegate(
 
     fun generate(declaration: ClassDescriptor, enumType: TypeName, fileBuilder: FileSpec.Builder) {
         fileBuilder.addFunction(
-            FunctionSpec.builder(declaration.exhaustivelyFunctionName)
+            FunctionSpec.builder(declaration.enumConstructorFunctionName)
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeVariables(declaration.swiftTypeVariablesNames)
-                .addParameter("_", "self", declaration.swiftNameWithTypeParameters)
+                .addParameter(
+                    label = declaration.enumConstructorArgumentLabel,
+                    name = declaration.enumConstructorParameterName,
+                    type = declaration.swiftNameWithTypeParameters,
+                )
                 .returns(enumType)
                 .addExhaustivelyFunctionBody(declaration, enumType)
                 .build()
         )
     }
 
-    private val ClassDescriptor.exhaustivelyFunctionName: String
-        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.FunctionName)
+    private val ClassDescriptor.enumConstructorFunctionName: String
+        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.Name)
+
+    private val ClassDescriptor.enumConstructorArgumentLabel: String
+        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.ArgumentLabel)
+
+    private val ClassDescriptor.enumConstructorParameterName: String
+        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.ParameterName)
 
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         declaration: ClassDescriptor,
@@ -47,9 +57,10 @@ internal class SealedFunctionGeneratorDelegate(
     ): CodeBlock.Builder {
         declaration.visibleSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
+                val parameterName = declaration.enumConstructorParameterName
                 val subclassName = subclassSymbol.swiftNameWithTypeParametersForSealedCase(declaration).canonicalName
 
-                val condition = "let self = self as? $subclassName"
+                val condition = "let $parameterName = $parameterName as? $subclassName"
 
                 if (index == 0) {
                     beginControlFlow("if", condition)
@@ -57,7 +68,7 @@ internal class SealedFunctionGeneratorDelegate(
                     nextControlFlow("else if", condition)
                 }
 
-                add("return ${enumType.canonicalName}.${subclassSymbol.enumCaseName}(self)\n")
+                add("return ${enumType.canonicalName}.${subclassSymbol.enumCaseName}($parameterName)\n")
             }
 
         return this

@@ -96,11 +96,11 @@ enum Enum {
     case A2(A2)
 }
 
-func exhaustively(_ self: A) -> Enum {
-    if let v = self as? A1 {
-        return Enum.A1(v)
-    } else if let v = self as? A2 {
-        return Enum.A2(v)
+func onEnum(of sealed: A) -> Enum {
+    if let sealed = sealed as? A1 {
+        return Enum.A1(sealed)
+    } else if let sealed = sealed as? A2 {
+        return Enum.A2(sealed)
     } else {
         fatalError("Unknown subtype. This error should not happen under normal circumstances since A is sealed.")
     }
@@ -108,12 +108,12 @@ func exhaustively(_ self: A) -> Enum {
 ```
 
 The interop utilizes the fact that Swift supports exhaustive switch if used with Swift enums.
-Therefore, we use the `exhaustively` function to wrap the Kotlin object in a Swift enum.
+Therefore, we use the `onEnum(of:)` function to wrap the Kotlin object in a Swift enum.
 To simulate the smart-casting we use an enum with associated value.
 Thanks to the above code you can write this:
 
 ```swift
-switch exhaustively(a) {
+switch onEnum(of: a) {
 case .A1(let a):
     return a.i
 case .A2(let a):
@@ -124,7 +124,7 @@ case .A2(let a):
 If you do not need the smart-casting, you can write just this:
 
 ```swift
-switch exhaustively(a) {
+switch onEnum(of: a) {
 case .A1(_):
     print(a)
 case .A2(_):
@@ -154,12 +154,12 @@ The local configuration changes the behavior only for a single declaration.
 This makes it for example suitable for suppressing the plugin if it does not work properly because of some bug.
 The available annotations can be found in the `:core:api` module.
 
-The following example changes the name of the `exhaustively` function generated for the sealed class interop to `something`:
+The following example changes the name of the `onEnum(of:)` function generated for the sealed class interop to `something(of:)`:
 
 ```kotlin
 // A.kt
 
-@SealedInterop.FunctionName("something")
+@SealedInterop.Function.Name("something")
 sealed class A {
     ...
 }
@@ -187,13 +187,13 @@ The configuration is performed through a `swiftGen` Gradle extension:
 swiftGen {
     configuration {
         group {
-            ConfigurationKeys.SealedInterop.FunctionName("something")
+            ConfigurationKeys.SealedInterop.Function.Name("something")
         }
     }
 }
 ```
 
-The above example changes the name of the `exhaustively` function to `something` for all sealed classes/interfaces.
+The above example changes the name of the `onEnum(of:)` function to `something(of:)` for all sealed classes/interfaces.
 All the available configuration options are listed in the `ConfigurationKeys` class located in `:core:configuration` module.
 Note that you can add multiple options to a single group.
 
@@ -205,7 +205,7 @@ The configuration can be applied only to some declarations:
 swiftGen {
     configuration {
         group("co.touchlab.") {
-            ConfigurationKeys.SealedInterop.FunctionName("something")
+            ConfigurationKeys.SealedInterop.Function.Name("something")
         }
     }
 }
@@ -224,10 +224,10 @@ For example:
 swiftGen {
     configuration {
         group {
-            ConfigurationKeys.SealedInterop.FunctionName("something")
+            ConfigurationKeys.SealedInterop.Function.Name("something")
         }
         group("co.touchlab.") {
-            ConfigurationKeys.SealedInterop.FunctionName("somethingElse")
+            ConfigurationKeys.SealedInterop.Function.Name("somethingElse")
         }
     }
 }
@@ -244,7 +244,7 @@ This behavior can be overridden:
 swiftGen {
     configuration {
         group(overridesAnnotations = true) {
-            ConfigurationKeys.SealedInterop.FunctionName("something")
+            ConfigurationKeys.SealedInterop.Function.Name("something")
         }
     }
 }

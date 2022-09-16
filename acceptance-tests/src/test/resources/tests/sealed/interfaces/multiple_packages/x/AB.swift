@@ -1,9 +1,9 @@
 let a: A = A1()
 let b: B = B2()
 
-switch exhaustively(a) {
+switch onEnum(of: a) {
     case .A1(_):
-        switch exhaustively(b) {
+        switch onEnum(of: b) {
             case .B1(_):
                 exit(1)
             case .B2(_):

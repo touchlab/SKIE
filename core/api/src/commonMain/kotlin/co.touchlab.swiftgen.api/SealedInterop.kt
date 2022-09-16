@@ -17,12 +17,31 @@ object SealedInterop {
     @Retention(AnnotationRetention.BINARY)
     annotation class Disabled
 
-    /**
-     * Changes the name for the generated function used inside `switch`.
-     */
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class FunctionName(val functionName: String)
+    object Function {
+
+        /**
+         * Changes the name for the generated function used inside `switch`.
+         */
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.BINARY)
+        annotation class Name(val name: String)
+
+        /**
+         * Changes the argument label for the generated function used inside `switch`.
+         * Disable the argument label by passing "_".
+         * No argumentLabel is generated if the name is empty.
+         */
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.BINARY)
+        annotation class ArgumentLabel(val argumentLabel: String)
+
+        /**
+         * Changes the parameter name for the generated function used inside `switch`.
+         */
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.BINARY)
+        annotation class ParameterName(val parameterName: String)
+    }
 
     /**
      * Changes the name for the custom `else` case that is generated if some children are hidden / not accessible from Swift.

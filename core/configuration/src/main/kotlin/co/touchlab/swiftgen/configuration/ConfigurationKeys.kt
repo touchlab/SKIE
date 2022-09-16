@@ -5,9 +5,12 @@ import co.touchlab.swiftgen.configuration.values.ValidationSeverity
 import co.touchlab.swiftgen.api.SealedInterop as SealedInteropAnnotations
 
 object ConfigurationKeys {
-    
+
     object Validation {
 
+        /**
+         * The severity of messages thrown by the compiler plugin as a result of validation error.
+         */
         object Severity : ConfigurationKey<ValidationSeverity> {
 
             override val name: String = "Validation.Severity"
@@ -40,17 +43,48 @@ object ConfigurationKeys {
                 }
         }
 
-        /**
-         * The name for the function used inside `switch`.
-         */
-        object FunctionName : ConfigurationKey.String {
+        object Function {
 
-            override val name: String = "SealedInterop.FunctionName"
+            /**
+             * The name for the function used inside `switch`.
+             */
+            object Name : ConfigurationKey.String {
 
-            override val defaultValue: String = "exhaustively"
+                override val name: String = "SealedInterop.Function.Name"
 
-            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
-                configurationTarget.findAnnotation<SealedInteropAnnotations.FunctionName>()?.functionName
+                override val defaultValue: String = "onEnum"
+
+                override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
+                    configurationTarget.findAnnotation<SealedInteropAnnotations.Function.Name>()?.name
+            }
+
+            /**
+             * The argument label for the function used inside `switch`.
+             * Disable the argument label by passing "_".
+             * No argumentLabel is generated if the name is empty.
+             */
+            object ArgumentLabel : ConfigurationKey.String {
+
+                override val name: String = "SealedInterop.Function.ArgumentLabel"
+
+                override val defaultValue: String = "of"
+
+                override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
+                    configurationTarget.findAnnotation<SealedInteropAnnotations.Function.ArgumentLabel>()?.argumentLabel
+            }
+
+            /**
+             * The parameter name for the function used inside `switch`.
+             */
+            object ParameterName : ConfigurationKey.String {
+
+                override val name: String = "SealedInterop.Function.ParameterName"
+
+                override val defaultValue: String = "sealed"
+
+                override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
+                    configurationTarget.findAnnotation<SealedInteropAnnotations.Function.ParameterName>()?.parameterName
+            }
         }
 
         /**
