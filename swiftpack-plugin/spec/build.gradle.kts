@@ -5,12 +5,12 @@ plugins {
 }
 
 dependencies {
-    api("io.outfoxx:swiftpoet:1.4.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+    api(libs.swiftPoet)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation(platform(libs.junit.bom))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.9")

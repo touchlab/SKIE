@@ -22,13 +22,14 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))
 
-    implementation("io.outfoxx:swiftpoet:1.4.0")
-    implementation("com.squareup:kotlinpoet:1.11.0")
+    implementation(libs.swiftPoet)
     implementation(projects.swiftpackSpi)
     api(projects.swiftpackPluginApi)
     implementation(projects.swiftpackConfigPlugin)
 
     testImplementation(libs.junit)
+    testImplementation(platform(libs.junit.bom))
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(kotlin("gradle-plugin"))
 }
 
@@ -49,15 +50,9 @@ gradlePlugin {
 }
 
 // // Configuration Block for the Plugin Marker artifact on Plugin Central
-// pluginBundle {
-//     website = PluginBundle.WEBSITE
-//     vcsUrl = PluginBundle.VCS
-//     description = PluginBundle.DESCRIPTION
-//     tags = PluginBundle.TAGS
-//
-//     mavenCoordinates {
-//         groupId = PluginCoordinates.GROUP
-//         artifactId = PluginCoordinates.ARTIFACT_ID
-//         version = PluginCoordinates.VERSION
-//     }
-// }
+pluginBundle {
+    website = "https://github.com/touchlab/SwiftPack"
+    vcsUrl = "https://github.com/touchlab/SwiftPack.git"
+    description = "A Gradle plugin to publish Swift templates into Maven repositories"
+    tags = listOf("plugin", "gradle", "swift", "template", "kotlin", "native")
+}
