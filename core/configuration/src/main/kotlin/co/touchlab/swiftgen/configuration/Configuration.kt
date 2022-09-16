@@ -13,7 +13,7 @@ data class Configuration(
 ) {
 
     operator fun <T> get(target: ConfigurationTarget, key: ConfigurationKey<T>): T {
-        val group = findGroup(target)
+        val group = findGroup(target, key)
 
         val configurationValue = group?.findValue(key) ?: key.defaultValue
 
@@ -24,8 +24,8 @@ data class Configuration(
         }
     }
 
-    private fun findGroup(target: ConfigurationTarget): Group? =
-        groups.lastOrNull { target.fqName.startsWith(it.targetFqNamePrefix) }
+    private fun findGroup(target: ConfigurationTarget, key: ConfigurationKey<*>): Group? =
+        groups.lastOrNull { target.fqName.startsWith(it.targetFqNamePrefix) && key.name in it.items }
 
     private fun <T> Group.findValue(key: ConfigurationKey<T>): T? =
         this.items[key.name]?.let { key.deserialize(it) }

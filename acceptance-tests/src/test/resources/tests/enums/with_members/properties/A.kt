@@ -1,4 +1,4 @@
-package tests.enums.with_members.properties
+package `tests`.`enums`.`with_members`.`properties`
 
 enum class A {
     A1,

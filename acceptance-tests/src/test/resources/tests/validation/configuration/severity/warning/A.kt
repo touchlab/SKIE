@@ -1,4 +1,4 @@
-package tests.validation.configuration.severity.warning
+package `tests`.`validation`.`configuration`.`severity`.`warning`
 
 import co.touchlab.swiftgen.api.SealedInterop
 

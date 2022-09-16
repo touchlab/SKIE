@@ -1,4 +1,4 @@
-package tests.validation.configuration.severity.default
+package `tests`.`validation`.`configuration`.`severity`.`default`
 
 import co.touchlab.swiftgen.api.SealedInterop
 
