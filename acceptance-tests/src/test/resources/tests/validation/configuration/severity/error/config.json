@@ -1,9 +1,9 @@
 [
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "Validation.Severity": "Error"
-        }
+  {
+    "target": "",
+    "overridesAnnotations": false,
+    "items": {
+      "Validation.Severity": "Error"
     }
+  }
 ]

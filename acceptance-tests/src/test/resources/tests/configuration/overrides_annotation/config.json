@@ -1,9 +1,9 @@
 [
-    {
-        "target": "",
-        "overridesAnnotations": true,
-        "items": {
-            "SealedInterop.Case.Name": "X"
-        }
+  {
+    "target": "",
+    "overridesAnnotations": true,
+    "items": {
+      "SealedInterop.Case.Name": "X"
     }
+  }
 ]

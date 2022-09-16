@@ -1,9 +1,9 @@
 [
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "SealedInterop.Case.Name": "A3"
-        }
+  {
+    "target": "",
+    "overridesAnnotations": false,
+    "items": {
+      "SealedInterop.Case.Name": "A3"
     }
+  }
 ]
