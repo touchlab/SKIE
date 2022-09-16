@@ -1,8 +1,25 @@
 package co.touchlab.swiftgen.configuration
 
+import co.touchlab.swiftgen.configuration.util.throwIfNull
+import co.touchlab.swiftgen.configuration.values.ValidationSeverity
 import co.touchlab.swiftgen.api.SealedInterop as SealedInteropAnnotations
 
 object ConfigurationKeys {
+    
+    object Validation {
+
+        object Severity : ConfigurationKey<ValidationSeverity> {
+
+            override val name: String = "Validation.Severity"
+
+            override val defaultValue: ValidationSeverity = ValidationSeverity.Error
+
+            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): ValidationSeverity? = null
+
+            override fun deserialize(value: String?): ValidationSeverity =
+                ValidationSeverity.valueOf(value.throwIfNull())
+        }
+    }
 
     object SealedInterop {
 

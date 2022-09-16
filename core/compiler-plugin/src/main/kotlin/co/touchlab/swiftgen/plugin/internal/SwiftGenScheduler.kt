@@ -18,7 +18,7 @@ internal class SwiftGenScheduler(
     reporter: Reporter,
 ) {
 
-    private val irValidator = IrValidator(reporter)
+    private val irValidator = IrValidator(reporter, configuration)
 
     private val exhaustiveEnumsGenerator = ExhaustiveEnumsGenerator(
         fileBuilderFactory = fileBuilderFactory,
