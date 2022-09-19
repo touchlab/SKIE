@@ -12,8 +12,13 @@ internal sealed interface EvaluatedTestNode {
         override val name: String,
         val fullName: String,
         val path: Path,
+        val resultPath: Path,
         val expectedResult: ExpectedTestResult,
         val actualResult: TestResult,
+    ) : EvaluatedTestNode
+
+    data class SkippedTest(
+        override val name: String,
     ) : EvaluatedTestNode
 
     data class Container(

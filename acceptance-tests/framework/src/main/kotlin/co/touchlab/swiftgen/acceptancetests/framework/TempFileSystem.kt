@@ -1,19 +1,20 @@
 package co.touchlab.swiftgen.acceptancetests.framework
 
-import io.kotest.core.TestConfiguration
-import io.kotest.engine.spec.tempdir
-import io.kotest.engine.spec.tempfile
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createDirectory
+import kotlin.io.path.createFile
 
-class TempFileSystem(private val testConfiguration: TestConfiguration) {
+class TempFileSystem(private val tempDirectory: Path) {
 
-    private val files = mutableMapOf<String, Path>()
-    private val directories = mutableMapOf<String, Path>()
+    init {
+        tempDirectory.toFile().deleteRecursively()
+        tempDirectory.createDirectories()
+    }
 
-    fun createFile(debugName: String, suffix: String? = null): Path =
-        testConfiguration.tempfile(suffix = suffix).toPath()
-            .also { files[debugName] = it }
+    fun createFile(name: String): Path =
+        tempDirectory.resolve(name).createFile()
 
-    fun createDirectory(debugName: String): Path = testConfiguration.tempdir().toPath()
-        .also { directories[debugName] = it }
+    fun createDirectory(name: String): Path =
+        tempDirectory.resolve(name).createDirectory()
 }

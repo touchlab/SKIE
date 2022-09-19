@@ -58,6 +58,12 @@ sealed class TestNode {
         val swiftCode: String = parsedTest.swiftCode
 
         override fun toString(): String = fullName
+
+        fun testTempDirectory(tempFileSystemFactory: TempFileSystemFactory): Path =
+            tempFileSystemFactory.tempDirectory.resolve(fullName)
+
+        fun resultPath(tempFileSystemFactory: TempFileSystemFactory): Path =
+            testTempDirectory(tempFileSystemFactory).resolve("result.txt")
     }
 
     data class Container constructor(

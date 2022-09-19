@@ -1,22 +1,21 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal
 
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystemFactory
+import co.touchlab.swiftgen.acceptancetests.framework.TestFilter
 import co.touchlab.swiftgen.acceptancetests.framework.TestNode
 import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRunner
 import kotlin.streams.toList
 
 internal class TestNodeRunner(
-    tempFileSystemFactory: TempFileSystemFactory,
-    selectedAcceptanceTestRegexPattern: String?,
+    private val tempFileSystemFactory: TempFileSystemFactory,
+    private val testFilter: TestFilter,
 ) {
 
     private val testRunner = TestRunner(tempFileSystemFactory)
 
-    private val selectedAcceptanceTestRegex = selectedAcceptanceTestRegexPattern?.let { Regex(it) }
-
     fun runTests(testNode: TestNode): EvaluatedTestNode {
-        val tests = testNode.flatten()
+        val tests = testNode.flattenEvaluated()
 
         val testsWithResults = runTests(tests)
 
@@ -26,13 +25,13 @@ internal class TestNodeRunner(
         )
     }
 
-    private fun TestNode.flatten(): List<TestNode.Test> = when (this) {
-        is TestNode.Container -> this.directChildren.flatMap { it.flatten() }
+    private fun TestNode.flattenEvaluated(): List<TestNode.Test> = when (this) {
+        is TestNode.Container -> this.directChildren.flatMap { it.flattenEvaluated() }
         is TestNode.Test -> if (this.shouldBeEvaluated) listOf(this) else emptyList()
     }
 
-    private val TestNode.shouldBeEvaluated: Boolean
-        get() = selectedAcceptanceTestRegex?.containsMatchIn(this.fullName) ?: true
+    private val TestNode.Test.shouldBeEvaluated: Boolean
+        get() = testFilter.shouldBeEvaluated(this, tempFileSystemFactory)
 
     private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResult> =
         tests
@@ -65,13 +64,14 @@ internal class TestNodeRunner(
     private fun mapEvaluatedTests(
         evaluatedTests: Map<TestNode.Test, TestResult>,
         test: TestNode.Test,
-    ): EvaluatedTestNode.Test? = evaluatedTests[test]?.let {
+    ): EvaluatedTestNode? = evaluatedTests[test]?.let {
         EvaluatedTestNode.Test(
             name = test.name,
             fullName = test.fullName,
             path = test.path,
+            resultPath = test.resultPath(tempFileSystemFactory),
             expectedResult = test.expectedResult,
             actualResult = it,
         )
-    }
+    } ?: EvaluatedTestNode.SkippedTest(test.name)
 }

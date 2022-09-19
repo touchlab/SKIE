@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.Channel
 
 class AcceptanceTestsRunner(
     private val tempFileSystemFactory: TempFileSystemFactory,
-    private val selectedAcceptanceTestRegexPattern: String?,
+    private val testFilter: TestFilter = TestFilter.Empty,
 ) {
 
     fun runTests(scope: FunSpec, testNode: TestNode) {
@@ -17,7 +17,7 @@ class AcceptanceTestsRunner(
         scope.concurrency = 2
 
         scope.test("Evaluation") {
-            val testNodeRunner = TestNodeRunner(tempFileSystemFactory, selectedAcceptanceTestRegexPattern)
+            val testNodeRunner = TestNodeRunner(tempFileSystemFactory, testFilter)
 
             val evaluatedTests = testNodeRunner.runTests(testNode)
 
@@ -36,6 +36,7 @@ class AcceptanceTestsRunner(
         when (evaluatedTest) {
             is EvaluatedTestNode.Container -> outputEvaluatedTest(evaluatedTest)
             is EvaluatedTestNode.Test -> outputEvaluatedTest(evaluatedTest)
+            is EvaluatedTestNode.SkippedTest -> outputEvaluatedTest(evaluatedTest)
         }
     }
 
@@ -51,8 +52,9 @@ class AcceptanceTestsRunner(
 
     private suspend fun FunSpecContainerScope.outputEvaluatedTest(evaluatedTest: EvaluatedTestNode.Test) {
         test(evaluatedTest.name) {
-            println(evaluatedTest.path.toAbsolutePath())
-            println(evaluatedTest.fullName)
+            println("Test name: ${evaluatedTest.fullName}")
+            println("Test file: ${evaluatedTest.path.toAbsolutePath()}")
+            println("Result file: ${evaluatedTest.resultPath.toAbsolutePath()}")
             println("To run only this test add env variable: acceptanceTest=${evaluatedTest.fullName}")
             println()
 
@@ -66,5 +68,10 @@ class AcceptanceTestsRunner(
         print(result.logs)
 
         evaluatedTest.expectedResult.evaluate(evaluatedTest.actualResult)
+    }
+
+    private suspend fun FunSpecContainerScope.outputEvaluatedTest(evaluatedTest: EvaluatedTestNode.SkippedTest) {
+        xtest(evaluatedTest.name) {
+        }
     }
 }

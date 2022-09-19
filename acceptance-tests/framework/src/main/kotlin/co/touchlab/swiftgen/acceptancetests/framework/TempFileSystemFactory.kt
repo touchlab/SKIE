@@ -1,13 +1,14 @@
 package co.touchlab.swiftgen.acceptancetests.framework
 
-import io.kotest.core.TestConfiguration
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
 
-class TempFileSystemFactory(private val testConfiguration: TestConfiguration) {
+class TempFileSystemFactory(val tempDirectory: Path) {
 
-    private val fileSystems = mutableMapOf<TestNode.Test, TempFileSystem>()
+    init {
+        tempDirectory.createDirectories()
+    }
 
-    @Synchronized
     fun create(test: TestNode.Test): TempFileSystem =
-        TempFileSystem(testConfiguration)
-            .also { fileSystems[test] = it }
+        TempFileSystem(test.testTempDirectory(this))
 }

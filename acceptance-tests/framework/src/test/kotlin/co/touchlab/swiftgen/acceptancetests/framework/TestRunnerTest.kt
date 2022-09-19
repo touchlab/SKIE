@@ -111,7 +111,7 @@ private fun ShouldSpec.test(
     swift: String,
     expectedResult: TestResult,
 ) {
-    val tempFileSystem = TempFileSystem(this)
+    val tempFileSystem = TempFileSystem(test, this)
 
     should(name) {
         val kotlinFile = tempfile(suffix = ".kt")
@@ -136,6 +136,7 @@ private fun ShouldSpec.test(
             is TestResult.KotlinCompilationError -> {
                 result.error shouldContain (expectedResult as TestResult.KotlinCompilationError).error
             }
+            // TODO ?
             else -> {}
         }
     }

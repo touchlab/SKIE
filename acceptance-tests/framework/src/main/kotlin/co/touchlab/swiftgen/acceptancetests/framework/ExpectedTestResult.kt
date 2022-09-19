@@ -6,7 +6,19 @@ sealed interface ExpectedTestResult {
 
     fun evaluate(testResult: TestResult)
 
-    companion object
+    fun hasSucceeded(testResult: TestResult): Boolean = try {
+        evaluate(testResult)
+
+        true
+    } catch (_: Throwable) {
+        false
+    }
+
+    companion object {
+
+        const val SUCCESS: String = "Success"
+        const val FAILURE: String = "Failure"
+    }
 
     object Success : ExpectedTestResult {
 

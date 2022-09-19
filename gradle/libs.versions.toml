@@ -25,6 +25,7 @@ compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddabl
 serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
 
 compiler-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.9" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
@@ -32,6 +33,7 @@ mockk = { module = "io.mockk:mockk", version = "1.12.5" }
 
 [bundles]
 testing-jvm = [
+    "kotlin-test",
     "kotest-runner-junit5",
     "kotest-assertions-core",
     "kotest-framework-datatest",

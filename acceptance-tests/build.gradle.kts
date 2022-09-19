@@ -13,6 +13,12 @@ buildConfig {
         name = "RESOURCES",
         value = "\"${acceptanceTestsDirectory.absolutePath}\"",
     )
+
+    buildConfigField(
+        type = "String",
+        name = "BUILD",
+        value = "\"${layout.buildDirectory.get().asFile.absolutePath}\"",
+    )
 }
 
 dependencies {
@@ -23,7 +29,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 
-    jvmArgs = (jvmArgs ?: emptyList()) + listOf("-Xmx16g")
+    maxHeapSize = "16g"
 }
 
 tasks.register("reformatPackagesInAcceptanceTests") {
