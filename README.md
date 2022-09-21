@@ -38,7 +38,7 @@ pluginManagement {
 }
 ```
 
-If you want to add a dependency to some SwiftKt artifact (for example to use annotation configuration), then register the repository in the given `build.gradle.kts`:
+Then register the repository in the given `build.gradle.kts`:
 
 ```kotlin
 repositories {
