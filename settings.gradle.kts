@@ -3,6 +3,7 @@ rootProject.name = "SwiftGen"
 include(
     ":acceptance-tests:framework",
     ":acceptance-tests",
+    ":playground:irinspector",
     ":playground:kotlin",
     ":playground:swift",
 )
