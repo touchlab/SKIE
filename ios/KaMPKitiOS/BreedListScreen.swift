@@ -39,10 +39,7 @@ class ObservableBreedModel: ObservableObject {
     }
 
     func onBreedFavorite(_ breed: Breed) {
-        viewModel?.updateBreedFavorite(
-            breed: breed,
-            favoriteType: breed.favorite == .bark ? .wag : .bark
-        )
+        viewModel?.updateBreedFavorite(breed: breed)
     }
 
     func refresh() {
@@ -120,7 +117,7 @@ struct BreedRowView: View {
                 Text(breed.name)
                     .padding(4.0)
                 Spacer()
-                Image(systemName: (breed.favorite == .bark) ? "heart" : "heart.fill")
+                Image(systemName: breed.favorite ? "heart.fill" : "heart")
                     .padding(4.0)
             }
         }
@@ -130,8 +127,8 @@ struct BreedRowView: View {
 struct BreedListScreen_Previews: PreviewProvider {
     static var previews: some View {
         let state = BreedViewStateData(breeds: [
-            Breed(id: 0, name: "appenzeller", favorite: .bark),
-            Breed(id: 1, name: "australian", favorite: .wag)
+            Breed(id: 0, name: "appenzeller", favorite: false),
+            Breed(id: 1, name: "australian", favorite: true)
         ])
 
         BreedListContent(

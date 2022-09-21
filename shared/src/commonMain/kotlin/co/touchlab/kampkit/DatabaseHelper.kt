@@ -2,11 +2,8 @@ package co.touchlab.kampkit
 
 import co.touchlab.kampkit.db.Breed
 import co.touchlab.kampkit.db.KaMPKitDb
-import co.touchlab.kampkit.sqldelight.FavoriteType
 import co.touchlab.kampkit.sqldelight.transactionWithContext
 import co.touchlab.kermit.Logger
-import com.squareup.sqldelight.ColumnAdapter
-import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -19,7 +16,7 @@ class DatabaseHelper(
     private val log: Logger,
     private val backgroundDispatcher: CoroutineDispatcher
 ) {
-    private val dbRef: KaMPKitDb = KaMPKitDb(sqlDriver, BreedAdapter = Breed.Adapter(FavoriteTypeAdapter))
+	private val dbRef: KaMPKitDb = KaMPKitDb(sqlDriver)
 
     fun selectAllItems(): Flow<List<Breed>> =
         dbRef.tableQueries
@@ -51,16 +48,10 @@ class DatabaseHelper(
         }
     }
 
-    suspend fun updateFavorite(breedId: Long, favorite: FavoriteType) {
+    suspend fun updateFavorite(breedId: Long, favorite: Boolean) {
         log.i { "Breed $breedId: Favorited $favorite" }
         dbRef.transactionWithContext(backgroundDispatcher) {
             dbRef.tableQueries.updateFavorite(favorite, breedId)
         }
     }
-}
-
-internal object FavoriteTypeAdapter: ColumnAdapter<FavoriteType, Long> {
-    override fun decode(databaseValue: Long): FavoriteType = FavoriteType.values()[databaseValue.toInt()]
-
-    override fun encode(value: FavoriteType): Long = value.ordinal.toLong()
 }
