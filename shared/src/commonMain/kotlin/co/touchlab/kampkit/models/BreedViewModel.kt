@@ -46,7 +46,6 @@ class BreedViewModel(
                 .collect { (error, breeds) ->
                     mutableBreedState.update { previousState ->
                         val errorMessage = if (error != null) {
-							// print("breed fetch error code : ${error.type}")
                             "Unable to download breed list"
                         } else {
                             if (previousState is BreedViewState.Error) {
