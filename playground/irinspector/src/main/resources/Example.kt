@@ -1,9 +1,3 @@
-suspend fun foo() {
+fun foo() {
 
-}
-
-suspend fun callFoo() {
-    foo()
-    foo()
-    foo()
 }

@@ -2,7 +2,7 @@ package co.touchlab.swiftgen.plugin
 
 import co.touchlab.swiftgen.BuildConfig
 import co.touchlab.swiftgen.configuration.Configuration
-import co.touchlab.swiftgen.plugin.internal.SwiftGenCompilerConfiguration
+import co.touchlab.swiftgen.plugin.internal.SwiftGenCompilerConfigurationKey
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -33,7 +33,7 @@ class SwiftGenPluginCommandLineProcessor : CommandLineProcessor {
 
             val swiftGenConfiguration = Configuration.deserialize(configText)
 
-            SwiftGenCompilerConfiguration.Key.put(swiftGenConfiguration, configuration)
+            SwiftGenCompilerConfigurationKey.Configuration.put(swiftGenConfiguration, configuration)
         }
     }
 }

@@ -1,20 +1,20 @@
 import org.codehaus.groovy.runtime.ProcessGroovyMethods
 import org.gradle.configurationcache.extensions.capitalized
 
-val architecture = when (
-    val arch = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
-) {
+val architecture = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
+
+val architectureKotlinName = when (architecture) {
     "arm64" -> "macosArm64"
     "x86_64" -> "macosX64"
-    else -> error("Unsupported architecture: $arch")
+    else -> error("Unsupported architecture: $architecture")
 }
 
 val compileSwift = tasks.register<Exec>("compileSwift") {
-    val frameworkDirectory = layout.projectDirectory.dir("../kotlin/build/bin/$architecture/releaseFramework")
+    val frameworkDirectory = layout.projectDirectory.dir("../kotlin/build/bin/$architectureKotlinName/releaseFramework")
     val mainFile = layout.buildDirectory.file("main").get().asFile
 
     group = "build"
-    dependsOn(":playground:kotlin:linkReleaseFramework${architecture.capitalized()}")
+    dependsOn(":playground:kotlin:linkReleaseFramework${architectureKotlinName.capitalized()}")
 
     inputs.dir(frameworkDirectory)
     outputs.file(mainFile)
@@ -26,6 +26,8 @@ val compileSwift = tasks.register<Exec>("compileSwift") {
         println("---------------- Swift compilation ----------------")
     }
     commandLine(
+        "arch",
+        "-$architecture",
         "swiftc",
         "main.swift",
         "-F",

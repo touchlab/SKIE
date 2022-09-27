@@ -3,7 +3,7 @@ package co.touchlab.swiftgen.plugin.internal.enums
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
-import co.touchlab.swiftgen.plugin.internal.util.FileBuilderFactory
+import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.BOOL
@@ -26,11 +26,10 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class ExhaustiveEnumsGenerator(
-    fileBuilderFactory: FileBuilderFactory,
+    swiftFileBuilderFactory: SwiftFileBuilderFactory,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
-    override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
-) : BaseGenerator(fileBuilderFactory, namespaceProvider, configuration) {
+) : BaseGenerator(swiftFileBuilderFactory, namespaceProvider, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
         descriptorProvider.classDescriptors.forEach {

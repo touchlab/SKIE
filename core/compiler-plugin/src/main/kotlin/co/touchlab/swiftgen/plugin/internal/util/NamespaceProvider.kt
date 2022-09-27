@@ -3,13 +3,13 @@ package co.touchlab.swiftgen.plugin.internal.util
 import io.outfoxx.swiftpoet.*
 
 internal class NamespaceProvider(
-    fileBuilderFactory: FileBuilderFactory,
+    swiftFileBuilderFactory: SwiftFileBuilderFactory,
 ) {
 
     val swiftGenNamespace: DeclaredTypeName =
         DeclaredTypeName.qualifiedTypeName(".__SwiftGen")
 
-    private val fileBuilder = fileBuilderFactory.create(swiftGenNamespace.simpleName)
+    private val fileBuilder = swiftFileBuilderFactory.create(swiftGenNamespace.simpleName)
 
     private val existingNamespaces = mutableSetOf<String>()
 

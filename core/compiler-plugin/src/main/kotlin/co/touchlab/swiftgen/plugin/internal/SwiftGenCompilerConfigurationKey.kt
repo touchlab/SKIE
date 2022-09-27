@@ -1,10 +1,11 @@
 package co.touchlab.swiftgen.plugin.internal
 
-import co.touchlab.swiftgen.configuration.Configuration
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
+import co.touchlab.swiftgen.configuration.Configuration as ConfigurationType
+import co.touchlab.swiftgen.plugin.internal.util.ir.IrGenerator as IrGeneratorType
 
-internal sealed class SwiftGenCompilerConfiguration<T : Any>(name: String) {
+internal sealed class SwiftGenCompilerConfigurationKey<T : Any>(name: String) {
 
     private val key: CompilerConfigurationKey<T> = CompilerConfigurationKey(name)
 
@@ -21,5 +22,7 @@ internal sealed class SwiftGenCompilerConfiguration<T : Any>(name: String) {
     fun getOrNull(configuration: CompilerConfiguration): T? =
         configuration.get(key)
 
-    object Key : SwiftGenCompilerConfiguration<Configuration>("configuration")
+    object Configuration : SwiftGenCompilerConfigurationKey<ConfigurationType>("configuration")
+
+    object IrGenerator : SwiftGenCompilerConfigurationKey<IrGeneratorType>("ir_generator")
 }

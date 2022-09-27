@@ -1,8 +1,9 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
+import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.FileSpec
 
-internal class FileBuilderFactory {
+internal class SwiftFileBuilderFactory(val swiftPackModuleBuilder: SwiftPackModuleBuilder) {
 
     private val builders = mutableListOf<FileSpec.Builder>()
 
