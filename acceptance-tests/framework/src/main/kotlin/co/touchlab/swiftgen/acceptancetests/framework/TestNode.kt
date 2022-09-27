@@ -12,12 +12,14 @@ import kotlin.io.path.readLines
 sealed class TestNode {
 
     val name: String
-        get() = path.name.removeSuffix(".swift")
+        get() = testName(path)
 
     val fullName: String
         get() = listOfNotNull(parent?.fullName, name).joinToString(fullNameSeparator)
 
     abstract val directChildren: List<TestNode>
+
+    abstract val outputPath: Path
 
     protected abstract val path: Path
 
@@ -27,15 +29,19 @@ sealed class TestNode {
 
         private const val fullNameSeparator = "/"
 
-        operator fun invoke(path: Path): TestNode =
-            Container(path, null)
+        operator fun invoke(path: Path, outputPath: Path): TestNode =
+            Container(path, outputPath, null)
 
-        operator fun invoke(path: Path, parent: Container): TestNode =
-            if (path.isRegularFile()) Test(path, parent) else Container(path, parent)
+        operator fun invoke(path: Path, outputPath: Path, parent: Container): TestNode =
+            if (path.isRegularFile()) Test(path, outputPath, parent) else Container(path, outputPath, parent)
+
+        fun testName(path: Path): String =
+            path.name.removeSuffix(".swift")
     }
 
     data class Test constructor(
         public override val path: Path,
+        override val outputPath: Path,
         override val parent: Container,
     ) : TestNode() {
 
@@ -46,6 +52,9 @@ sealed class TestNode {
 
         val configFiles: List<Path>
             get() = parent.configFiles
+
+        val resultPath: Path
+            get() = outputPath.resolve("result.txt")
 
         init {
             require(path.isRegularFile() && path.extension == "swift") { "Test $path is not a swift file." }
@@ -58,23 +67,18 @@ sealed class TestNode {
         val swiftCode: String = parsedTest.swiftCode
 
         override fun toString(): String = fullName
-
-        fun testTempDirectory(tempFileSystemFactory: TempFileSystemFactory): Path =
-            tempFileSystemFactory.tempDirectory.resolve(fullName)
-
-        fun resultPath(tempFileSystemFactory: TempFileSystemFactory): Path =
-            testTempDirectory(tempFileSystemFactory).resolve("result.txt")
     }
 
     data class Container constructor(
         override val path: Path,
+        override val outputPath: Path,
         override val parent: Container?,
     ) : TestNode() {
 
         override val directChildren: List<TestNode> by lazy {
             path.listDirectoryEntries()
                 .filter { it.isDirectChildren }
-                .map { TestNode(it, this) }
+                .map { TestNode(it, outputPath.resolve(testName(it)), this) }
         }
 
         val kotlinFiles: List<Path> by lazy {

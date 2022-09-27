@@ -11,13 +11,15 @@ import io.kotest.core.spec.style.FunSpec
 import kotlin.io.path.Path
 
 class AcceptanceTests : FunSpec({
-    val tempDirectory = Path(BuildConfig.BUILD).resolve("test-temp")
-    val tempFileSystemFactory = TempFileSystemFactory(tempDirectory)
 
     val testsDirectory = Path(BuildConfig.RESOURCES).resolve("tests")
+    val tempDirectory = Path(BuildConfig.BUILD).resolve("test-temp")
+
+    val tests = TestNode(testsDirectory, tempDirectory)
+
+    val tempFileSystemFactory = TempFileSystemFactory()
     val testFilter = buildTestFilter()
 
-    val tests = TestNode(testsDirectory)
     val runner = AcceptanceTestsRunner(tempFileSystemFactory, testFilter)
 
     runner.runTests(this, tests)

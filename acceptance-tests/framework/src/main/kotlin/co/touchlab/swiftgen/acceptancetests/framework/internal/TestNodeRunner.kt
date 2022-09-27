@@ -8,7 +8,7 @@ import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRu
 import kotlin.streams.toList
 
 internal class TestNodeRunner(
-    private val tempFileSystemFactory: TempFileSystemFactory,
+    tempFileSystemFactory: TempFileSystemFactory,
     private val testFilter: TestFilter,
 ) {
 
@@ -31,7 +31,7 @@ internal class TestNodeRunner(
     }
 
     private val TestNode.Test.shouldBeEvaluated: Boolean
-        get() = testFilter.shouldBeEvaluated(this, tempFileSystemFactory)
+        get() = testFilter.shouldBeEvaluated(this)
 
     private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResult> =
         tests
@@ -64,12 +64,12 @@ internal class TestNodeRunner(
     private fun mapEvaluatedTests(
         evaluatedTests: Map<TestNode.Test, TestResult>,
         test: TestNode.Test,
-    ): EvaluatedTestNode? = evaluatedTests[test]?.let {
+    ): EvaluatedTestNode = evaluatedTests[test]?.let {
         EvaluatedTestNode.Test(
             name = test.name,
             fullName = test.fullName,
             path = test.path,
-            resultPath = test.resultPath(tempFileSystemFactory),
+            resultPath = test.resultPath,
             expectedResult = test.expectedResult,
             actualResult = it,
         )

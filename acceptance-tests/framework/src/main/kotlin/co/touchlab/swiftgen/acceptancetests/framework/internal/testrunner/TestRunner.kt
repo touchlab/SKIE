@@ -64,11 +64,9 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         SwiftProgramRunner(testResultBuilder).runProgram(binary)
 
     private fun writeResult(test: TestNode.Test, result: TestResult) {
-        val resultFile = test.resultPath(tempFileSystemFactory)
-
         val resultAsText = test.expectedResult.hasSucceededAsString(result)
 
-        resultFile.writeText(resultAsText)
+        test.resultPath.writeText(resultAsText)
     }
 
     private fun reportResult(test: TestNode.Test, result: TestResult) {

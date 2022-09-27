@@ -5,20 +5,20 @@ import kotlin.io.path.readText
 
 interface TestFilter {
 
-    fun shouldBeEvaluated(test: TestNode.Test, tempFileSystemFactory: TempFileSystemFactory): Boolean
+    fun shouldBeEvaluated(test: TestNode.Test): Boolean
 
     data class Regex(private val pattern: String) : TestFilter {
 
         private val regex = kotlin.text.Regex(pattern)
 
-        override fun shouldBeEvaluated(test: TestNode.Test, tempFileSystemFactory: TempFileSystemFactory): Boolean =
+        override fun shouldBeEvaluated(test: TestNode.Test): Boolean =
             regex.containsMatchIn(test.fullName)
     }
 
     object FailedOnly : TestFilter {
 
-        override fun shouldBeEvaluated(test: TestNode.Test, tempFileSystemFactory: TempFileSystemFactory): Boolean {
-            val resultFile = test.resultPath(tempFileSystemFactory)
+        override fun shouldBeEvaluated(test: TestNode.Test): Boolean {
+            val resultFile = test.resultPath
 
             return resultFile.notExists() || resultFile.readText() != ExpectedTestResult.SUCCESS
         }
@@ -26,13 +26,13 @@ interface TestFilter {
 
     object Empty : TestFilter {
 
-        override fun shouldBeEvaluated(test: TestNode.Test, tempFileSystemFactory: TempFileSystemFactory): Boolean = true
+        override fun shouldBeEvaluated(test: TestNode.Test): Boolean = true
     }
 
     data class Intersection(val filters: List<TestFilter>) : TestFilter {
 
-        override fun shouldBeEvaluated(test: TestNode.Test, tempFileSystemFactory: TempFileSystemFactory): Boolean =
-            filters.all { it.shouldBeEvaluated(test, tempFileSystemFactory) }
+        override fun shouldBeEvaluated(test: TestNode.Test): Boolean =
+            filters.all { it.shouldBeEvaluated(test) }
     }
 }
 
