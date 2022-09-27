@@ -22,7 +22,7 @@ typealias ErasedListener = Pair<
 class PhaseInterceptor(
     private val interceptedPhase: InterceptedPhase,
     private val listenersKey: CompilerConfigurationKey<List<ErasedListener>>,
-): CompilerPhase<CommonBackendContext, Unit, Unit> {
+) : CompilerPhase<CommonBackendContext, Unit, Unit> {
 
     override val stickyPostconditions: Set<Checker<Unit>>
         get() = interceptedPhase.stickyPostconditions
@@ -46,12 +46,15 @@ class PhaseInterceptor(
 
     companion object {
         fun setupPhaseListeners(configuration: CompilerConfiguration) {
-            val phaseListeners = (javaClass.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) } ?: ServiceLoader.load(PhaseListener::class.java)
+            val phaseListeners =
+                (javaClass.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) }
+                    ?: ServiceLoader.load(PhaseListener::class.java)
             phaseListeners
                 .groupBy { it.phase }
                 .forEach { (phaseKey, interceptions) ->
                     val phaseAccessor = when (phaseKey) {
                         PhaseListener.Phase.OBJC_EXPORT -> "getObjCExportPhase"
+                        PhaseListener.Phase.PSI_TO_IR -> "getPsiToIrPhase"
                         PhaseListener.Phase.OBJECT_FILES -> "getObjectFilesPhase"
                     }
 

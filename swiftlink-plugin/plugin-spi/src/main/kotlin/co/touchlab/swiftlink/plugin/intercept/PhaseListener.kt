@@ -13,6 +13,7 @@ interface PhaseListener {
 
     enum class Phase {
         OBJC_EXPORT,
+        PSI_TO_IR,
         OBJECT_FILES,
     }
 }
