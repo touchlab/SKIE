@@ -1,8 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
-import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.configuration.ConfigurationKeys
-import co.touchlab.swiftgen.plugin.internal.configuration.getConfiguration
+import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
 import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift

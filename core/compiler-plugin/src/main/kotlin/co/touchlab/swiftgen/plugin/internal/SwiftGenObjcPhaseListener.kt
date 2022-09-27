@@ -2,9 +2,9 @@ package co.touchlab.swiftgen.plugin.internal
 
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
-import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
+import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.ir.IrBuilder
 import co.touchlab.swiftgen.plugin.internal.util.ir.IrGenerator
 import co.touchlab.swiftlink.plugin.intercept.PhaseListener
@@ -12,9 +12,6 @@ import co.touchlab.swiftpack.api.buildSwiftPackModule
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
-import org.jetbrains.kotlin.ir.builders.irBlockBody
-import org.jetbrains.kotlin.ir.builders.irReturn
-import org.jetbrains.kotlin.ir.builders.irString
 
 internal class SwiftGenObjcPhaseListener : PhaseListener {
 

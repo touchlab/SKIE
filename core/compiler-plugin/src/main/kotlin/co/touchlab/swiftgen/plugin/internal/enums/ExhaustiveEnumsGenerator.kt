@@ -3,9 +3,8 @@ package co.touchlab.swiftgen.plugin.internal.enums
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
-import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
+import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName

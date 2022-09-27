@@ -22,19 +22,25 @@ internal abstract class Reflector {
         reflectedClass = this::class.java.classLoader.loadClass(fqName)
     }
 
-    protected inline fun <reified R> declaredMethod(): Provider<DeclaredMethod0<R>> =
+    protected inline fun <reified R> declaredMethod0() =
         Provider { DeclaredMethod0(it, R::class.java) }
 
-    protected inline fun <reified P1, reified R> declaredMethod(param1: Class<*>): Provider<DeclaredMethod1<P1, R>> =
+    protected inline fun <reified P1, reified R> declaredMethod1() =
         Provider { DeclaredMethod1(it, P1::class.java, R::class.java) }
 
-    protected inline fun <reified T> declaredProperty(): Provider<DeclaredProperty<T>> =
+    protected inline fun <reified T> declaredProperty() =
         Provider { DeclaredProperty(it, T::class.java) }
 
-    protected inline fun <reified T> declaredField(): Provider<DeclaredField<T>> =
+    protected inline fun <reified T> declaredField() =
         Provider { DeclaredField(it, T::class.java) }
 
-    protected inline fun <reified T> extensionProperty(extensionClassFqName: String): Provider<ExtensionProperty<T>> =
+    protected inline fun <reified R> extensionFunction0(extensionClassFqName: String) =
+        Provider { ExtensionFunction0(it, extensionClassFqName, R::class.java) }
+
+    protected inline fun <reified P1, reified R> extensionFunction1(extensionClassFqName: String) =
+        Provider { ExtensionFunction1(it, extensionClassFqName, P1::class.java, R::class.java) }
+
+    protected inline fun <reified T> extensionProperty(extensionClassFqName: String) =
         Provider { ExtensionProperty(it, extensionClassFqName, T::class.java) }
 
     protected class Provider<T>(private val factory: (String) -> T) : PropertyDelegateProvider<Reflector, T> {
@@ -108,7 +114,7 @@ internal abstract class Reflector {
         }
     }
 
-    protected abstract inner class ExtensionMethod<T, R>(
+    protected abstract inner class ExtensionFunction<T, R>(
         name: String,
         extensionClassFqName: String,
         private val returnType: Class<R>,
@@ -125,23 +131,23 @@ internal abstract class Reflector {
             method.invoke(null, *arguments).let { returnType.cast(it) }
     }
 
-    protected inner class ExtensionMethod0<R>(
+    protected inner class ExtensionFunction0<R>(
         name: String,
         extensionClassFqName: String,
         returnType: Class<R>,
-    ) : ExtensionMethod<() -> R, R>(name, extensionClassFqName, returnType, emptyArray()) {
+    ) : ExtensionFunction<() -> R, R>(name, extensionClassFqName, returnType, emptyArray()) {
 
         override fun getValue(thisRef: Reflector, property: KProperty<*>): () -> R = {
             invoke(arrayOf(instance))
         }
     }
 
-    protected inner class ExtensionMethod1<P1, R>(
+    protected inner class ExtensionFunction1<P1, R>(
         name: String,
         extensionClassFqName: String,
         param1: Class<P1>,
         returnType: Class<R>,
-    ) : ExtensionMethod<(P1) -> R, R>(name, extensionClassFqName, returnType, arrayOf(param1)) {
+    ) : ExtensionFunction<(P1) -> R, R>(name, extensionClassFqName, returnType, arrayOf(param1)) {
 
         override fun getValue(thisRef: Reflector, property: KProperty<*>): (P1) -> R = {
             invoke(arrayOf(instance, it))
@@ -155,10 +161,10 @@ internal abstract class Reflector {
     ) : ReadWriteProperty<Reflector, T> {
 
         private val getter by lazy {
-            ExtensionMethod0("get" + name.replaceFirstChar { it.uppercase() }, extensionClassFqName, type)
+            ExtensionFunction0("get" + name.replaceFirstChar { it.uppercase() }, extensionClassFqName, type)
         }
         private val setter by lazy {
-            ExtensionMethod1("set" + name.replaceFirstChar { it.uppercase() }, extensionClassFqName, type, Unit::class.java)
+            ExtensionFunction1("set" + name.replaceFirstChar { it.uppercase() }, extensionClassFqName, type, Unit::class.java)
         }
 
         override fun getValue(thisRef: Reflector, property: KProperty<*>): T =

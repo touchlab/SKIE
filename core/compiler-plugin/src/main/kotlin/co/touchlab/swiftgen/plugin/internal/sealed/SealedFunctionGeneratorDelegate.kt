@@ -2,7 +2,6 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.configuration.ConfigurationKeys
-import co.touchlab.swiftgen.plugin.internal.configuration.getConfiguration
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FileSpec
