@@ -1,7 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
 import co.touchlab.swiftgen.configuration.Configuration
-import co.touchlab.swiftgen.configuration.ConfigurationContainer
+import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec

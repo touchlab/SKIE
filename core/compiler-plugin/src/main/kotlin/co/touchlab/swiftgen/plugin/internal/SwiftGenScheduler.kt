@@ -13,7 +13,7 @@ import co.touchlab.swiftgen.plugin.internal.validation.IrValidator
 
 internal class SwiftGenScheduler(
     swiftFileBuilderFactory: SwiftFileBuilderFactory,
-    private val irBuilder: IrBuilder,
+    irBuilder: IrBuilder,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     reporter: Reporter,

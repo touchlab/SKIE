@@ -5,26 +5,21 @@ import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.validation.rules.ValidationRule
 import co.touchlab.swiftgen.plugin.internal.validation.rules.sealed.SealedInteropRules
+import co.touchlab.swiftgen.plugin.internal.validation.rules.validate
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
-internal class IrValidator(private val reporter: Reporter, configuration: Configuration) {
+internal class IrValidator(private val reporter: Reporter, private val configuration: Configuration) {
 
     private val classRules: List<ValidationRule<ClassDescriptor>> =
-        SealedInteropRules(configuration).all
+        SealedInteropRules.all
 
     fun validate(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.classDescriptors.forEach {
-            validate(it)
-        }
-    }
-
-    private fun validate(descriptor: ClassDescriptor) {
-        classRules
-            .filter { !it.isSatisfied(descriptor) }
-            .forEach { brokenRule ->
-                val severity = brokenRule.severity(descriptor)
-
-                reporter.report(severity, brokenRule.message, descriptor)
+        with(reporter) {
+            with(configuration) {
+                descriptorProvider.classDescriptors.forEach {
+                    classRules.validate(it)
+                }
             }
+        }
     }
 }

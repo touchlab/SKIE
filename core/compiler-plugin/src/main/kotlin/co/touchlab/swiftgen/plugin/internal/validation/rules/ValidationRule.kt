@@ -1,20 +1,17 @@
 package co.touchlab.swiftgen.plugin.internal.validation.rules
 
-import co.touchlab.swiftgen.configuration.values.ValidationSeverity
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
+import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 
 internal interface ValidationRule<D : DeclarationDescriptor> {
 
-    val message: String
-
-    fun isSatisfied(descriptor: D): Boolean
-
-    fun severity(descriptor: D): CompilerMessageSeverity
+    context(Reporter, Configuration)
+    fun validate(descriptor: D)
 }
 
-context(ValidationRule<*>)
-fun ValidationSeverity.toCompilerMessageSeverity(): CompilerMessageSeverity = when (this) {
-    ValidationSeverity.Error -> CompilerMessageSeverity.ERROR
-    ValidationSeverity.Warning -> CompilerMessageSeverity.WARNING
+context(Reporter, Configuration) internal fun <D : DeclarationDescriptor> Iterable<ValidationRule<D>>.validate(descriptor: D) {
+    this.forEach {
+        it.validate(descriptor)
+    }
 }

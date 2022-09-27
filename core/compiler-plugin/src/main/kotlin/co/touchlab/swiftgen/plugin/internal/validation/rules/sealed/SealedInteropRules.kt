@@ -1,25 +1,24 @@
 package co.touchlab.swiftgen.plugin.internal.validation.rules.sealed
 
 import co.touchlab.swiftgen.api.SealedInterop
-import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.validation.rules.ConflictingAnnotationsRule
 import co.touchlab.swiftgen.plugin.internal.validation.rules.ValidationRule
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
-internal class SealedInteropRules(configuration: Configuration) {
+internal object SealedInteropRules {
 
     val all: List<ValidationRule<ClassDescriptor>> = listOf(
-        SealedChildrenAnnotationApplicabilityRule(SealedInterop.Case.Hidden::class, configuration),
-        SealedChildrenAnnotationApplicabilityRule(SealedInterop.Case.Name::class, configuration),
-        SealedChildrenAnnotationApplicabilityRule(SealedInterop.Case.Visible::class, configuration),
-        ConflictingAnnotationsRule(configuration, SealedInterop.Case.Visible::class, SealedInterop.Case.Hidden::class),
+        SealedChildrenAnnotationApplicabilityRule(SealedInterop.Case.Hidden::class),
+        SealedChildrenAnnotationApplicabilityRule(SealedInterop.Case.Name::class),
+        SealedChildrenAnnotationApplicabilityRule(SealedInterop.Case.Visible::class),
+        ConflictingAnnotationsRule(SealedInterop.Case.Visible::class, SealedInterop.Case.Hidden::class),
 
-        SealedClassAnnotationApplicabilityRule(SealedInterop.Disabled::class, configuration),
-        SealedClassAnnotationApplicabilityRule(SealedInterop.ElseName::class, configuration),
-        SealedClassAnnotationApplicabilityRule(SealedInterop.Enabled::class, configuration),
-        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.Name::class, configuration),
-        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.ArgumentLabel::class, configuration),
-        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.ParameterName::class, configuration),
-        ConflictingAnnotationsRule(configuration, SealedInterop.Enabled::class, SealedInterop.Disabled::class),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Disabled::class),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.ElseName::class),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Enabled::class),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.Name::class),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.ArgumentLabel::class),
+        SealedClassAnnotationApplicabilityRule(SealedInterop.Function.ParameterName::class),
+        ConflictingAnnotationsRule(SealedInterop.Enabled::class, SealedInterop.Disabled::class),
     )
 }

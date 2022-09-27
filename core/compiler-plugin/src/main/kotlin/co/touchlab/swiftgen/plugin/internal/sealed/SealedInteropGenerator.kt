@@ -3,15 +3,12 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 import co.touchlab.swiftgen.api.SealedInterop
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.configuration.ConfigurationKeys
-import co.touchlab.swiftgen.plugin.internal.configuration.getConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
-import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
+import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.isSealed
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedInteropGenerator(
@@ -71,7 +68,7 @@ internal class SealedInteropGenerator(
                 "Consider resolving this conflict using annotation `${SealedInterop.Case.Name::class.qualifiedName}`."
 
         reporter.report(
-            severity = CompilerMessageSeverity.ERROR,
+            severity = Reporter.Severity.Error,
             message = message,
             declaration = subclass,
         )

@@ -6,6 +6,8 @@ import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.KotlinC
 import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.MissingExit
 import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.RuntimeError
 import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.Success
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.SuccessWithWarning
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.SuccessWithoutWarning
 import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.SwiftCompilationError
 import kotlin.reflect.KClass
 
@@ -46,27 +48,35 @@ internal object TestCodeParser {
         className: String,
         arguments: String?,
         expectedResultConfiguration: String,
-    ): ExpectedTestResult = when (className) {
-        Success::class.configurationName() -> Success
-        MissingExit::class.configurationName() -> MissingExit
-        IncorrectOutput::class.configurationName() -> {
-            val exitCode = arguments?.let {
-                arguments.toIntOrNull() ?: throw IllegalArgumentException(
-                    "Argument for ${IncorrectOutput::class.simpleName} " +
-                            "must be an Int. Was: $arguments"
-                )
-            }
+    ): ExpectedTestResult {
+        val requiredArgument by lazy {
+            requireNotNull(arguments) { "$className requires an argument." }
+        }
 
-            IncorrectOutput(exitCode)
+        return when (className) {
+            Success::class.configurationName() -> Success
+            SuccessWithWarning::class.configurationName() -> SuccessWithWarning(requiredArgument)
+            SuccessWithoutWarning::class.configurationName() -> SuccessWithoutWarning(requiredArgument)
+            MissingExit::class.configurationName() -> MissingExit
+            IncorrectOutput::class.configurationName() -> {
+                val exitCode = arguments?.let {
+                    arguments.toIntOrNull() ?: throw IllegalArgumentException(
+                        "Argument for ${IncorrectOutput::class.simpleName} " +
+                                "must be an Int. Was: $arguments"
+                    )
+                }
+
+                IncorrectOutput(exitCode)
+            }
+            RuntimeError::class.configurationName() -> RuntimeError(arguments)
+            SwiftCompilationError::class.configurationName() -> {
+                SwiftCompilationError(arguments)
+            }
+            KotlinCompilationError::class.configurationName() -> {
+                KotlinCompilationError(arguments)
+            }
+            else -> throwInvalidExpectedResult(expectedResultConfiguration)
         }
-        RuntimeError::class.configurationName() -> RuntimeError(arguments)
-        SwiftCompilationError::class.configurationName() -> {
-            SwiftCompilationError(arguments)
-        }
-        KotlinCompilationError::class.configurationName() -> {
-            KotlinCompilationError(arguments)
-        }
-        else -> throwInvalidExpectedResult(expectedResultConfiguration)
     }
 
     private fun KClass<*>.configurationName(): String? =

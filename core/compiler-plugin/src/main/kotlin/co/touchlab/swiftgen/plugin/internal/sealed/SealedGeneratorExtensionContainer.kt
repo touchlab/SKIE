@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
-import co.touchlab.swiftgen.configuration.ConfigurationContainer
+import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.configuration.ConfigurationKeys
 import co.touchlab.swiftgen.plugin.internal.configuration.getConfiguration
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer

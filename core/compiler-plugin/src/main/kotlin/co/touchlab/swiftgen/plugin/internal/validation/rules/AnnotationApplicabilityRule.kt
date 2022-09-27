@@ -4,7 +4,7 @@ import co.touchlab.swiftgen.plugin.internal.util.hasAnnotation
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import kotlin.reflect.KClass
 
-internal interface AnnotationApplicabilityRule<D : DeclarationDescriptor> : ValidationRule<D> {
+internal interface AnnotationApplicabilityRule<D : DeclarationDescriptor> : BaseValidationRule<D> {
 
     val targetAnnotation: KClass<out Annotation>
 

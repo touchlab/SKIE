@@ -31,6 +31,28 @@ sealed interface ExpectedTestResult {
         }
     }
 
+    data class SuccessWithWarning(val warning: String) : ExpectedTestResult {
+
+        override fun evaluate(testResult: TestResult) {
+            if (testResult is TestResult.Success && testResult.logs.contains(warning)) {
+                return
+            }
+
+            failTest(testResult, "Tested program ended successfully by explicitly calling exit(0) and produced warning: $warning")
+        }
+    }
+
+    data class SuccessWithoutWarning(val warning: String) : ExpectedTestResult {
+
+        override fun evaluate(testResult: TestResult) {
+            if (testResult is TestResult.Success && !testResult.logs.contains(warning)) {
+                return
+            }
+
+            failTest(testResult, "Tested program ended successfully by explicitly calling exit(0) and did not produce warning: $warning")
+        }
+    }
+
     object MissingExit : ExpectedTestResult {
 
         override fun evaluate(testResult: TestResult) {
