@@ -1,6 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.arguments
 
 import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.configuration.ConfigurationKeys
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
@@ -25,20 +26,22 @@ internal class DefaultArgumentGenerator(
 ) : BaseGenerator(swiftFileBuilderFactory, namespaceProvider, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.classDescriptors.forEach { classDescriptor ->
-            classDescriptor.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
-                .filterIsInstance<SimpleFunctionDescriptor>()
-                .filter { it.visibility == DescriptorVisibilities.PUBLIC }
-                .filter { functionDescriptor ->
-                    functionDescriptor.valueParameters.any { it.declaresDefaultValue() }
-                }
-                .filter { it.dispatchReceiverParameter != null }
-                .filter { it.extensionReceiverParameter == null }
-                .filter { it.typeParameters.isEmpty() }
-                .forEach {
-                    generateOverload(it)
-                }
-        }
+        descriptorProvider.classDescriptors
+            .filter { it.getConfiguration(ConfigurationKeys.ExperimentalFeatures.Enabled) }
+            .forEach { classDescriptor ->
+                classDescriptor.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
+                    .filterIsInstance<SimpleFunctionDescriptor>()
+                    .filter { it.visibility == DescriptorVisibilities.PUBLIC }
+                    .filter { functionDescriptor ->
+                        functionDescriptor.valueParameters.any { it.declaresDefaultValue() }
+                    }
+                    .filter { it.dispatchReceiverParameter != null }
+                    .filter { it.extensionReceiverParameter == null }
+                    .filter { it.typeParameters.isEmpty() }
+                    .forEach {
+                        generateOverload(it)
+                    }
+            }
     }
 
     private fun generateOverload(function: SimpleFunctionDescriptor) {

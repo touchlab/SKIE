@@ -1,6 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.enums
 
 import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.configuration.ConfigurationKeys
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
@@ -31,9 +32,11 @@ internal class ExhaustiveEnumsGenerator(
 ) : BaseGenerator(swiftFileBuilderFactory, namespaceProvider, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
-        descriptorProvider.classDescriptors.forEach {
-            generate(it)
-        }
+        descriptorProvider.classDescriptors
+            .filter { it.getConfiguration(ConfigurationKeys.ExperimentalFeatures.Enabled) }
+            .forEach {
+                generate(it)
+            }
     }
 
     private fun DescriptorProvider.generate(declaration: ClassDescriptor) {

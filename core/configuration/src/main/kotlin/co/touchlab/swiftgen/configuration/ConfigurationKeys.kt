@@ -2,9 +2,30 @@ package co.touchlab.swiftgen.configuration
 
 import co.touchlab.swiftgen.configuration.util.throwIfNull
 import co.touchlab.swiftgen.configuration.values.ValidationSeverity
+import co.touchlab.swiftgen.api.ExperimentalFeatures as ExperimentalFeaturesAnnotations
 import co.touchlab.swiftgen.api.SealedInterop as SealedInteropAnnotations
 
 object ConfigurationKeys {
+
+    object ExperimentalFeatures {
+
+        /**
+         * If true, enables experimental features which might not be fully implemented yet which may cause compilation problems.
+         */
+        object Enabled : ConfigurationKey.Boolean {
+
+            override val name: String = "ExperimentalFeatures.Enabled"
+
+            override val defaultValue: Boolean = false
+
+            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+                when {
+                    configurationTarget.hasAnnotation<ExperimentalFeaturesAnnotations.Enabled>() -> true
+                    configurationTarget.hasAnnotation<ExperimentalFeaturesAnnotations.Disabled>() -> false
+                    else -> null
+                }
+        }
+    }
 
     object Validation {
 

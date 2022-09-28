@@ -14,9 +14,10 @@ SwiftGen currently supports the following features:
 
 - Sealed class/interfaces
 
-These features are under active development - expect bugs:
+These features are under active development and requires extra opt in (see section about "Experimental features"):
 
 - Exhaustive enums
+- Default arguments
 
 The discussion about any part of the SwiftKt project happens in the `swiftkt` Slack channel.
 
@@ -268,3 +269,11 @@ swiftGen {
 
 `group` and `from` can be freely mixed together and repeated multiple times.
 The file format is identical to `build/swiftgen/config.json` which contains a JSON encoding all applied configuration.
+
+## Experimental features
+
+Experimental features are not ready for production use because they are not fully implemented.
+
+Experimental features can be enabled using Gradle configuration via `ConfigurationKeys.ExperimentalFeatures.Enabled(true)`.
+There are also the `ExperimentalFeatures.Enabled` and `ExperimentalFeatures.Disabled` annotations.
+Note that some features may require additional configuration to work properly.
