@@ -26,10 +26,10 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    lint {
-        isWarningsAsErrors = true
-        isAbortOnError = true
-    }
+    // lint {
+    //     isWarningsAsErrors = true
+    //     isAbortOnError = true
+    // }
 
     buildFeatures {
         compose = true
