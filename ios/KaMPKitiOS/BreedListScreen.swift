@@ -103,6 +103,7 @@ extension BreedErrorType {
         case .Network: return "wifi.exclamationmark"
         case .Invalid: return "xmark.bin.fill"
         case .Other(_): return "xmark.circle.fill"
+        case .RefreshFailure: return "exclamationmark.arrow.triangle.2.circlepath"
         }
     }
 }

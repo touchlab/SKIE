@@ -54,11 +54,11 @@ class BreedViewModel(
                             }
                         }
 
-						if (errorMessage != null) {
-							BreedViewState.Error(BreedErrorType.Other(errorMessage))
-						} else {
-							BreedViewState.Data(breeds)
-						}
+                        if (errorMessage != null) {
+                            BreedViewState.Error(BreedErrorType.Other(errorMessage))
+                        } else {
+                            BreedViewState.Data(breeds)
+                        }
                     }
                 }
         }
@@ -86,7 +86,7 @@ class BreedViewModel(
     private fun handleBreedError(throwable: Throwable) {
         log.e(throwable) { "Error downloading breed list" }
         mutableBreedState.update {
-            BreedViewState.Error(BreedErrorType.Other("Unable to refresh breed list"))
+            BreedViewState.Error(BreedErrorType.RefreshFailure)
         }
     }
 }
@@ -94,20 +94,22 @@ class BreedViewModel(
 sealed interface BreedViewState {
     class Data(val breeds: List<Breed>) : BreedViewState
     object Loading : BreedViewState
-	class Error(val type: BreedErrorType): BreedViewState
+    class Error(val type: BreedErrorType): BreedViewState
 }
 
 sealed interface BreedErrorType {
-	val message: String
-		get() = when (this) {
-			is Network -> "A connection error occurred. Please try again."
-			is Invalid -> "Invalid response."
-			is Other -> "An error occurred."
-		}
+    val message: String
+        get() = when (this) {
+            is Network -> "A connection error occurred. Please try again."
+            is Invalid -> "Invalid response."
+            is Other -> "An error occurred."
+            is RefreshFailure -> "Unable to refresh breed list"
+        }
 
-	class Other(override val message: String) : BreedErrorType
-	object Network : BreedErrorType
-	object Invalid : BreedErrorType
+    class Other(override val message: String) : BreedErrorType
+    object Network : BreedErrorType
+    object Invalid : BreedErrorType
+    object RefreshFailure : BreedErrorType
 }
 
 /*
