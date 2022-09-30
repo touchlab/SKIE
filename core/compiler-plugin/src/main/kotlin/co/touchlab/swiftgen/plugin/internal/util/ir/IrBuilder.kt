@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -32,25 +31,30 @@ internal class IrBuilder(
     val moduleDescriptor: ModuleDescriptor
         get() = descriptorRegistrar.moduleDescriptor
 
-    private val sourceElement = SourceElement { SourceFile { IrGenerator.generatedFileName } }
+    private val defaultFileName = "__SwiftGen"
 
     fun createFunction(
         name: String,
+        fileName: String = defaultFileName,
         init: FunctionBuilder.(SimpleFunctionDescriptor) -> Unit,
     ): SimpleFunctionDescriptor =
-        createFunction(Name.identifier(name), init)
+        createFunction(Name.identifier(name), fileName, init)
 
     fun createFunction(
         name: Name,
+        fileName: String = defaultFileName,
         init: FunctionBuilder.(SimpleFunctionDescriptor) -> Unit,
-    ): SimpleFunctionDescriptor = create {
-        object : IrTemplate<SimpleFunctionDescriptor, IrSimpleFunction, IrSimpleFunctionSymbol> {
+    ): SimpleFunctionDescriptor = create(fileName) {
+        object : DeclarationBuilder<SimpleFunctionDescriptor, IrSimpleFunction, IrSimpleFunctionSymbol> {
 
             val builder: FunctionBuilder = FunctionBuilder(moduleDescriptor.builtIns)
 
-            override fun createDescriptor(): SimpleFunctionDescriptor {
+            override fun createDescriptor(
+                containingDeclarationDescriptor: DeclarationDescriptor,
+                sourceElement: SourceElement,
+            ): SimpleFunctionDescriptor {
                 val descriptor = SimpleFunctionDescriptorImpl.create(
-                    descriptorRegistrar.syntheticPackageDescriptor,
+                    containingDeclarationDescriptor,
                     Annotations.EMPTY,
                     name,
                     CallableMemberDescriptor.Kind.SYNTHESIZED,
@@ -109,10 +113,11 @@ internal class IrBuilder(
     }
 
     private fun <D : DeclarationDescriptor, I : IrDeclaration, S : IrBindableSymbol<*, I>> create(
-        builder: () -> IrTemplate<D, I, S>,
+        fileName: String,
+        builder: () -> DeclarationBuilder<D, I, S>,
     ): D {
         val irTemplate = builder()
 
-        return descriptorRegistrar.add(irTemplate)
+        return descriptorRegistrar.add(fileName, irTemplate)
     }
 }

@@ -31,22 +31,19 @@ internal class IrGenerator(
         val functionSymbolTable = symbolTable.reflectedBy<SymbolTableReflector>().simpleFunctionSymbolTable
         val unboundFunctions = functionSymbolTable.reflectedBy<SymbolTableBaseReflector>().unboundSymbols
 
-        unboundFunctions.removeIf { it.descriptor in descriptorRegistrar.descriptorsWithIrTemplate }
+        val allDescriptors = descriptorRegistrar.packages.flatMap { it.descriptors }.toSet()
+
+        unboundFunctions.removeIf { it.descriptor in allDescriptors }
     }
 
     fun generateIr(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         val symbolTable = getSymbolTable()
 
-        val irRegistrar = IrRegistrar(descriptorRegistrar, moduleFragment, pluginContext, symbolTable)
+        val irRegistrar = IrRegistrar(moduleFragment, pluginContext, symbolTable)
 
-        irRegistrar.registerIr()
+        irRegistrar.registerIr(descriptorRegistrar.packages)
     }
 
     private fun getSymbolTable(): SymbolTable =
         context.reflectedBy<ContextReflector>().symbolTable
-
-    companion object {
-
-        const val generatedFileName: String = "SwiftGen_Generated.kt"
-    }
 }
