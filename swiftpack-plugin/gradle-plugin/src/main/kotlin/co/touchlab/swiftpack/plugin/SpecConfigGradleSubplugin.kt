@@ -8,6 +8,7 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
@@ -15,9 +16,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 const val SWIFT_PACK_PLUGIN_CONFIGURATION_NAME = "swiftPackPlugin"
-
 
 class SpecConfigGradleSubplugin: KotlinCompilerPluginSupportPlugin {
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
@@ -42,26 +43,12 @@ class SpecConfigGradleSubplugin: KotlinCompilerPluginSupportPlugin {
         }
     }
 
+
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
 
-        val dependencies = listOf(
-            "co.touchlab.swiftpack:swiftpack-api:${BuildConfig.KOTLIN_PLUGIN_VERSION}",
-            "co.touchlab.swiftpack:swiftpack-plugin-api:${BuildConfig.KOTLIN_PLUGIN_VERSION}",
-            "co.touchlab.swiftpack:swiftpack-spec:${BuildConfig.KOTLIN_PLUGIN_VERSION}",
-            "io.outfoxx:swiftpoet:1.4.2",
-            "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.3.3",
-            "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.3.3",
-        )
-
-        dependencies.forEach { dependency ->
-            project.configurations.getByName(kotlinCompilation.pluginConfigurationName).dependencies.add(
-                project.dependencies.create(dependency)
-            )
-        }
-
         project.configurations.getByName(kotlinCompilation.pluginConfigurationName).extendsFrom(
-            project.configurations.getByName(SWIFT_PACK_PLUGIN_CONFIGURATION_NAME)
+            project.configurations.getByName(SWIFT_PACK_PLUGIN_CONFIGURATION_NAME),
         )
 
         return project.swiftTemplateDirectory(kotlinCompilation.target).map { templateDir ->

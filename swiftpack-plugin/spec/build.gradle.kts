@@ -8,6 +8,8 @@ dependencies {
     api(libs.swiftPoet)
     implementation(libs.kotlinx.serialization.json)
 
+    compileOnly(kotlin("compiler-embeddable"))
+
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
     testImplementation(platform(libs.junit.bom))

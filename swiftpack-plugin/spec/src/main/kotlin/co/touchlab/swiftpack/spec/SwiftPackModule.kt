@@ -46,108 +46,170 @@ data class SwiftPackModule(
     )
 }
 
-val SWIFTPACK_KOTLIN_TYPE_PREFIX = "__swiftpack__type__"
-val SWIFTPACK_KOTLIN_PROPERTY_PREFIX = "__swiftpack__prop__"
-val SWIFTPACK_KOTLIN_FUNCTION_PREFIX = "__swiftpack__func__"
-val SWIFTPACK_KOTLIN_ENUM_ENTRY_PREFIX = "__swiftpack__enum_entry__"
-
-typealias SwiftPackReference = String
-
 @Serializable
-sealed interface MemberParentReference
+data class SwiftPackModule2(
+    val name: Name,
+    val templateVariables: List<SwiftTemplateVariable<*>>,
+    val symbols: List<KotlinSymbol<*>>,
+    val files: List<TemplateFile>,
+    val transforms: List<ApiTransform>,
+) {
+    fun namespaced(namespace: String): SwiftPackModule2 {
+        return copy(
+            name = Name.Namespaced(namespace = namespace, name = name),
+        )
+    }
 
-fun MemberParentReference.property(name: String): KotlinPropertyReference {
-    return KotlinPropertyReference(this, name)
-}
+    @Serializable
+    data class TemplateFile(
+        val name: String,
+        val contents: String,
+    )
 
-fun MemberParentReference.function(name: String, vararg args: KotlinTypeReference): KotlinFunctionReference {
-    return KotlinFunctionReference(this, name, args.toList())
-}
+    @Serializable
+    sealed interface Name {
+        @Serializable
+        data class Simple(val name: String) : Name
 
-@Serializable
-sealed interface CallableMemberReference {
-    val parent: MemberParentReference
-}
+        @Serializable
+        data class Namespaced(val namespace: String, val name: Name): Name
+    }
 
-@Serializable
-data class KotlinPropertyReference(override val parent: MemberParentReference, val propertyName: String): CallableMemberReference {
     companion object {
-        private val regex = "^(?:(\\w+(?:\\.?\\w+)*)\\.)?(\\w*):(\\w+)$".toRegex()
-        operator fun invoke(fqdn: String) {
-            val match = requireNotNull(regex.matchEntire(fqdn)) { "Invalid reference: $fqdn" }
-
-            println(match.groups)
+        private val json = Json {
+            allowStructuredMapKeys = true
+            classDiscriminator = "@type"
         }
-    }
-}
 
-@Serializable
-data class KotlinFunctionReference(
-    override val parent: MemberParentReference,
-    val functionName: String,
-    val parameterTypes: List<KotlinTypeReference>,
-): CallableMemberReference {
-    companion object {
-        private val regex = "^(?:(\\w+(?:\\.?\\w+)*)\\.)?(\\w*):(\\w+)\\(([\\w:.$]*)\\)$".toRegex()
-
-        operator fun invoke(fqdn: String) {
-            val match = requireNotNull(regex.matchEntire(fqdn)) { "Invalid reference: $fqdn" }
-            println(match.groups)
-        }
-    }
-}
-
-@Serializable
-data class KotlinFileReference(val packageReference: KotlinPackageReference, val fileName: String) {
-    companion object {
-        operator fun invoke(path: String): KotlinFileReference {
-            val parts = path.split("/")
-            val packageName = parts.dropLast(1).joinToString(".")
-            val fileName = parts.last()
-            return KotlinFileReference(KotlinPackageReference(packageName), fileName)
-        }
-    }
-}
-
-@Serializable
-data class KotlinTypeReference(val container: MemberParentReference, val typeName: String): MemberParentReference {
-    fun child(name: String): KotlinTypeReference {
-        return KotlinTypeReference(this, name)
-    }
-
-    companion object {
-        operator fun invoke(fqdn: String): KotlinTypeReference {
-            val parts = fqdn.split('.')
-            val packageName = parts.dropLast(1).joinToString(".")
-            val classNames = parts.last().split('$')
-
-            val packageReference = KotlinPackageReference(packageName)
-            val container = classNames.dropLast(1).fold(packageReference as MemberParentReference) { acc, className ->
-                KotlinTypeReference(acc, className)
+        fun read(file: File): SwiftPackModule2 {
+            return file.inputStream().use {
+                json.decodeFromStream(serializer(), it)
             }
-            return KotlinTypeReference(container, classNames.last())
+        }
+
+        fun SwiftPackModule2.write(file: File) {
+            file.outputStream().use {
+                json.encodeToStream(serializer(), this, it)
+            }
         }
     }
 }
 
+const val SWIFTPACK_TEMPLATE_VARIABLE_PREFIX = "__swiftpack__"
+
 @Serializable
-data class KotlinPackageReference(val packageName: String): MemberParentReference {
-    fun child(childName: String): KotlinPackageReference {
-        return if (packageName.isBlank()) {
-            KotlinPackageReference(childName)
-        } else {
-            KotlinPackageReference("$packageName.$childName")
-        }
+sealed interface SwiftTemplateVariable<SYMBOL_ID: KotlinSymbol.Id> {
+    val name: Name
+    val symbol: SYMBOL_ID
+
+    @Serializable
+    class TypeReference(
+        override val name: Name,
+        val type: KotlinType.Id,
+    ) : SwiftTemplateVariable<KotlinType.Id> {
+        override val symbol: KotlinType.Id
+            get() = type
     }
 
-    fun type(typeName: String): KotlinTypeReference {
-        return KotlinTypeReference(this, typeName)
+    @Serializable
+    class PropertyReference(
+        override val name: Name,
+        val property: KotlinProperty.Id,
+    ): SwiftTemplateVariable<KotlinProperty.Id> {
+        override val symbol: KotlinProperty.Id
+            get() = property
     }
 
-    companion object {
-        val ROOT = KotlinPackageReference("")
+    @Serializable
+    class FunctionReference(
+        override val name: Name,
+        val function: KotlinFunction.Id
+    ): SwiftTemplateVariable<KotlinFunction.Id> {
+        override val symbol: KotlinFunction.Id
+            get() = function
     }
+
+    @Serializable
+    class EnumEntryReference(
+        override val name: Name,
+        val enumEntry: KotlinEnumEntry.Id,
+    ): SwiftTemplateVariable<KotlinEnumEntry.Id> {
+        override val symbol: KotlinEnumEntry.Id
+            get() = enumEntry
+    }
+
+    @JvmInline
+    @Serializable
+    value class Name(val value: String)
 }
 
 @Serializable
-data class KotlinEnumEntryReference(val enumType: KotlinTypeReference, val entryName: String)
+sealed interface ApiTransform {
+    @Serializable
+    data class FileTransform(
+        val fileId: KotlinFile.Id,
+        val hide: Boolean = false,
+        val remove: Boolean = false,
+        val rename: TypeTransform.Rename.Action? = null,
+        val bridge: String? = null,
+    ): ApiTransform
+
+    @Serializable
+    data class TypeTransform(
+        val typeId: KotlinType.Id,
+        val hide: Boolean = false,
+        val remove: Boolean = false,
+        val rename: Rename? = null,
+        val bridge: Bridge? = null,
+    ): ApiTransform {
+        @Serializable
+        data class Rename(val kind: Kind, val action: Action) {
+            @Serializable
+            enum class Kind {
+                ABSOLUTE, RELATIVE
+            }
+
+            @Serializable
+            sealed interface Action {
+                @Serializable
+                class Prefix(val prefix: String) : Action
+                @Serializable
+                class Suffix(val suffix: String) : Action
+                @Serializable
+                class Replace(val newName: String) : Action
+            }
+        }
+
+        @Serializable
+        sealed interface Bridge {
+            @Serializable
+            data class Absolute(val swiftType: String): Bridge
+            @Serializable
+            data class Relative(val parentKotlinClass: KotlinClass.Id, val swiftType: String): Bridge
+        }
+    }
+
+    @Serializable
+    class PropertyTransform(
+        val propertyId: KotlinProperty.Id,
+        val hide: Boolean = false,
+        val remove: Boolean = false,
+        val rename: String? = null,
+    ): ApiTransform
+
+    @Serializable
+    class FunctionTransform(
+        val functionId: KotlinFunction.Id,
+        val hide: Boolean = false,
+        val remove: Boolean = false,
+        val rename: String? = null,
+    ): ApiTransform
+
+    @Serializable
+    class EnumEntryTransform(
+        val enumEntryId: KotlinEnumEntry.Id,
+        val hide: Boolean = false,
+        val remove: Boolean = false,
+        val rename: String? = null,
+    ): ApiTransform
+}

@@ -12,7 +12,7 @@ class SwiftGenContextTest {
 
     @Test
     fun basicTest() {
-        buildSwiftPackModule {
+        buildSwiftPackModule2 {
             val kotlinTest = KotlinTypeReference("co.touchlab.swiftkt.KotlinTest").applyTransform {
                 hide()
             }
@@ -40,15 +40,15 @@ class SwiftGenContextTest {
                 )
             }
 
-            kobjcTransforms {
-                type("") {
-                    hide()
-
-                    property("") {
-                        hide()
-                    }
-                }
-            }
+            // kobjcTransforms {
+            //     type("") {
+            //         hide()
+            //
+            //         property("") {
+            //             hide()
+            //         }
+            //     }
+            // }
 
             println(swiftTest.toString())
         }

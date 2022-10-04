@@ -16,8 +16,7 @@ buildConfig {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk7"))
-    implementation(gradleApi())
+    compileOnly(gradleApi())
     compileOnly(gradleKotlinDsl())
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))

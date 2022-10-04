@@ -14,6 +14,7 @@ import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_PROPERTY_PREFIX
 import co.touchlab.swiftpack.spec.SWIFTPACK_KOTLIN_TYPE_PREFIX
 import co.touchlab.swiftpack.spec.SwiftPackModule
 import co.touchlab.swiftpack.spec.SwiftPackModule.Companion.write
+import co.touchlab.swiftpack.spec.SwiftPackModule2
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FLOAT32
@@ -55,7 +56,6 @@ import org.jetbrains.kotlin.types.typeUtil.isInt
 import org.jetbrains.kotlin.types.typeUtil.isLong
 import org.jetbrains.kotlin.types.typeUtil.isShort
 import org.jetbrains.kotlin.types.typeUtil.isUnit
-import org.jetbrains.kotlin.utils.addToStdlib.getOrPut
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -213,6 +213,16 @@ class SwiftPackModuleBuilder(
         kobjcTransformsScope.block()
     }
 
+    fun build2(): SwiftPackModule2 {
+        return SwiftPackModule2(
+            name = SwiftPackModule2.Name.Simple(moduleName),
+            templateVariables = listOf(),
+            symbols = listOf(),
+            files = listOf(),
+            transforms = listOf(),
+        )
+    }
+
     fun build(): SwiftPackModule {
         return SwiftPackModule(
             moduleName,
@@ -331,7 +341,7 @@ class SwiftPackModuleBuilder(
             val reference: KotlinFileReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
-            private var rename: String? = null,
+            private var rename: KobjcTransforms.TypeTransform.Rename.Absolute? = null,
             private var bridge: String? = null,
         ) {
             fun remove() {
@@ -343,7 +353,7 @@ class SwiftPackModuleBuilder(
             }
 
             fun rename(newSwiftName: String) {
-                rename = newSwiftName
+                rename = KobjcTransforms.TypeTransform.Rename.Absolute(KobjcTransforms.TypeTransform.Rename.Action.Replace(newSwiftName))
             }
 
             fun bridge(swiftType: String) {
@@ -366,7 +376,7 @@ class SwiftPackModuleBuilder(
             val reference: KotlinTypeReference,
             private var hide: Boolean = false,
             private var remove: Boolean = false,
-            private var rename: String? = null,
+            private var rename: KobjcTransforms.TypeTransform.Rename? = null,
             private var bridge: String? = null,
             private val properties: MutableMap<KotlinPropertyReference, PropertyTransformScope> = mutableMapOf(),
             private val methods: MutableMap<KotlinFunctionReference, FunctionTransformScope> = mutableMapOf(),
@@ -381,6 +391,10 @@ class SwiftPackModuleBuilder(
             }
 
             fun rename(newSwiftName: String) {
+                rename(KobjcTransforms.TypeTransform.Rename.Relative(KobjcTransforms.TypeTransform.Rename.Action.Replace(newSwiftName)))
+            }
+
+            fun rename(newSwiftName: KobjcTransforms.TypeTransform.Rename) {
                 rename = newSwiftName
             }
 

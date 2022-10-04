@@ -16,7 +16,7 @@ data class KobjcTransforms(
         val reference: KotlinFileReference,
         val hide: Boolean = false,
         val remove: Boolean = false,
-        val rename: String? = null,
+        val rename: TypeTransform.Rename.Absolute? = null,
         val bridge: String? = null,
     )
 
@@ -25,12 +25,30 @@ data class KobjcTransforms(
         val reference: KotlinTypeReference,
         val hide: Boolean = false,
         val remove: Boolean = false,
-        val rename: String? = null,
+        val rename: Rename? = null,
         val bridge: String? = null,
         val properties: Map<KotlinPropertyReference, PropertyTransform> = emptyMap(),
         val methods: Map<KotlinFunctionReference, FunctionTransform> = emptyMap(),
         val enumEntries: Map<KotlinEnumEntryReference, EnumEntryTransform> = emptyMap(),
-    )
+    ) {
+        @Serializable
+        sealed interface Rename {
+            @Serializable
+            class Absolute(val action: Action) : Rename
+            @Serializable
+            class Relative(val action: Action) : Rename
+
+            @Serializable
+            sealed interface Action {
+                @Serializable
+                class Prefix(val prefix: String) : Action
+                @Serializable
+                class Suffix(val suffix: String) : Action
+                @Serializable
+                class Replace(val newName: String) : Action
+            }
+        }
+    }
 
     @Serializable
     class PropertyTransform(
