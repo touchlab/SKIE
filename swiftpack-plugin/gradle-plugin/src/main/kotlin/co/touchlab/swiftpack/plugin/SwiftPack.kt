@@ -1,7 +1,6 @@
 package co.touchlab.swiftpack.plugin
 
-import co.touchlab.swiftpack.spec.SwiftPackModule
-import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
+import co.touchlab.swiftpack.spec.module.SwiftPackModule
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
@@ -12,7 +11,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
-import java.io.File
 
 object SwiftPack {
     val Framework.capitalizedTargetName: String
@@ -24,12 +22,12 @@ object SwiftPack {
     val Framework.unpackSwiftPack: Provider<Sync>
         get() = target.project.tasks.named<Sync>(unpackSwiftPackName)
 
-    val Framework.swiftPackModuleReferences: Provider<List<NamespacedSwiftPackModule.Reference>>
+    val Framework.swiftPackModuleReferences: Provider<List<SwiftPackModule.Reference>>
         get() = unpackSwiftPack.map { it.destinationDir }.zip(project.swiftTemplateDirectory(target)) { dependenciesDir, localDir ->
             val dependencyModules = dependenciesDir.listFiles()?.mapNotNull {
-                NamespacedSwiftPackModule.moduleReferencesInDir(it.name, it)
+                SwiftPackModule.moduleReferencesInDir(it.name, it)
             }?.flatten()
-            val localModules = NamespacedSwiftPackModule.moduleReferencesInDir("local", localDir.asFile)
+            val localModules = SwiftPackModule.moduleReferencesInDir("local", localDir.asFile)
             listOfNotNull(dependencyModules, localModules).flatten()
         }
 

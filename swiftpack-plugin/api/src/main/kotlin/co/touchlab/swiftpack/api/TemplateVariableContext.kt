@@ -1,10 +1,9 @@
 package co.touchlab.swiftpack.api
 
-import co.touchlab.swiftpack.spec.KotlinEnumEntry
-import co.touchlab.swiftpack.spec.KotlinFunction
-import co.touchlab.swiftpack.spec.KotlinProperty
-import co.touchlab.swiftpack.spec.KotlinType
-import co.touchlab.swiftpack.spec.SwiftTemplateVariable
+import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
+import co.touchlab.swiftpack.spec.symbol.KotlinFunction
+import co.touchlab.swiftpack.spec.symbol.KotlinProperty
+import co.touchlab.swiftpack.spec.symbol.KotlinType
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.PropertySpec
@@ -34,8 +33,4 @@ interface TemplateVariableContext {
     fun KotlinEnumEntry.templateVariable(): PropertySpec {
         return id.templateVariable()
     }
-}
-
-internal interface InternalTemplateVariableContext: TemplateVariableContext {
-    val variables: Collection<SwiftTemplateVariable<*>>
 }

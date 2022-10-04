@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import java.util.ServiceLoader
 
 @AutoService(ComponentRegistrar::class)
 class SwiftPackConfigComponentRegistrar: ComponentRegistrar {
@@ -17,4 +16,3 @@ class SwiftPackConfigComponentRegistrar: ComponentRegistrar {
         IrGenerationExtension.registerExtension(project, SwiftPackGenerationExtensionRunner())
     }
 }
-

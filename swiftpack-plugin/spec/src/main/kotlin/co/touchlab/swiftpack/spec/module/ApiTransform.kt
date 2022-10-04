@@ -1,42 +1,38 @@
-package co.touchlab.swiftpack.spec
+package co.touchlab.swiftpack.spec.module
 
+import co.touchlab.swiftpack.spec.symbol.KotlinClass
+import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
+import co.touchlab.swiftpack.spec.symbol.KotlinFile
+import co.touchlab.swiftpack.spec.symbol.KotlinFunction
+import co.touchlab.swiftpack.spec.symbol.KotlinProperty
+import co.touchlab.swiftpack.spec.symbol.KotlinType
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class KobjcTransforms(
-    val types: Map<KotlinTypeReference, TypeTransform> = emptyMap(),
-    val files: Map<KotlinFileReference, FileTransform> = emptyMap(),
-    val properties: Map<KotlinPropertyReference, PropertyTransform> = emptyMap(),
-    val functions: Map<KotlinFunctionReference, FunctionTransform> = emptyMap(),
-    val enumEntries: Map<KotlinEnumEntryReference, EnumEntryTransform> = emptyMap(),
-) {
+sealed interface ApiTransform {
     @Serializable
     data class FileTransform(
-        val reference: KotlinFileReference,
+        val fileId: KotlinFile.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
-        val rename: TypeTransform.Rename.Absolute? = null,
+        val rename: TypeTransform.Rename.Action? = null,
         val bridge: String? = null,
-    )
+    ): ApiTransform
 
     @Serializable
     data class TypeTransform(
-        val reference: KotlinTypeReference,
+        val typeId: KotlinType.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: Rename? = null,
-        val bridge: String? = null,
-        val properties: Map<KotlinPropertyReference, PropertyTransform> = emptyMap(),
-        val methods: Map<KotlinFunctionReference, FunctionTransform> = emptyMap(),
-        val enumEntries: Map<KotlinEnumEntryReference, EnumEntryTransform> = emptyMap(),
-    ) {
+        val bridge: Bridge? = null,
+    ): ApiTransform {
         @Serializable
-        sealed interface Rename {
+        data class Rename(val kind: Kind, val action: Action) {
             @Serializable
-            class Absolute(val action: Action) : Rename
-            @Serializable
-            class Relative(val action: Action) : Rename
+            enum class Kind {
+                ABSOLUTE, RELATIVE
+            }
 
             @Serializable
             sealed interface Action {
@@ -48,29 +44,37 @@ data class KobjcTransforms(
                 class Replace(val newName: String) : Action
             }
         }
+
+        @Serializable
+        sealed interface Bridge {
+            @Serializable
+            data class Absolute(val swiftType: String): Bridge
+            @Serializable
+            data class Relative(val parentKotlinClass: KotlinClass.Id, val swiftType: String): Bridge
+        }
     }
 
     @Serializable
     class PropertyTransform(
-        val reference: KotlinPropertyReference,
+        val propertyId: KotlinProperty.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
-    )
+    ): ApiTransform
 
     @Serializable
     class FunctionTransform(
-        val reference: KotlinFunctionReference,
+        val functionId: KotlinFunction.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
-    )
+    ): ApiTransform
 
     @Serializable
     class EnumEntryTransform(
-        val reference: KotlinEnumEntryReference,
+        val enumEntryId: KotlinEnumEntry.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
-    )
+    ): ApiTransform
 }

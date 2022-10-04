@@ -1,23 +1,7 @@
-package co.touchlab.swiftpack.spec
+package co.touchlab.swiftpack.spec.signature
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.jetbrains.kotlin.ir.util.IdSignature
-
-@Serializable
-sealed interface KotlinSymbol<ID: KotlinSymbol.Id> {
-    val id: ID
-    val signature: IdSignature
-
-    @Serializable
-    sealed interface Id
-}
 
 @Serializable
 sealed interface KotlinIdSignature {
@@ -158,121 +142,10 @@ fun KotlinIdSignature(signature: IdSignature): KotlinIdSignature {
         is IdSignature.CommonSignature -> KotlinIdSignature.CommonSignature(signature)
         is IdSignature.CompositeSignature -> KotlinIdSignature.CompositeSignature(signature)
         is IdSignature.FileLocalSignature -> KotlinIdSignature.FileLocalSignature(signature)
-        is IdSignature.FileSignature -> TODO() // KotlinIdSignature.FileSignature(signature)
+        is IdSignature.FileSignature -> TODO("FileSignature is not supported") // KotlinIdSignature.FileSignature(signature)
         is IdSignature.LocalSignature -> KotlinIdSignature.LocalSignature(signature)
         is IdSignature.LoweredDeclarationSignature -> KotlinIdSignature.LoweredDeclarationSignature(signature)
         is IdSignature.ScopeLocalDeclaration -> KotlinIdSignature.ScopeLocalDeclarationSignature(signature)
         is IdSignature.SpecialFakeOverrideSignature -> KotlinIdSignature.SpecialFakeOverrideSignature(signature)
     }
-}
-
-object IdSignatureSerializer: KSerializer<IdSignature> {
-    private val wrappedSerializer = KotlinIdSignature.serializer()
-
-    override val descriptor: SerialDescriptor = wrappedSerializer.descriptor
-
-    override fun deserialize(decoder: Decoder): IdSignature {
-        val wrapped = decoder.decodeSerializableValue(wrappedSerializer)
-        return wrapped.toIdSignature()
-    }
-
-    override fun serialize(encoder: Encoder, value: IdSignature) {
-        val wrapped = KotlinIdSignature(value)
-        encoder.encodeSerializableValue(wrappedSerializer, wrapped)
-    }
-}
-
-// TODO: KotlinFile isn't a KotlinSymbol, but we need it to be for Transforms. Might find a better name to avoid confusion.
-@Serializable
-data class KotlinFile(
-    val id: Id,
-) {
-    @Serializable
-    data class Id(val value: String): KotlinSymbol.Id
-}
-
-@Serializable
-sealed interface KotlinMemberParent<ID: KotlinMemberParent.Id>: KotlinSymbol<ID> {
-    @Serializable
-    sealed interface Id: KotlinSymbol.Id
-}
-
-@Serializable
-sealed interface KotlinCallableMember<ID: KotlinCallableMember.Id>: KotlinSymbol<ID>, KotlinTypeParameterParent<ID> {
-    sealed interface Id: KotlinSymbol.Id, KotlinTypeParameterParent.Id
-}
-
-@Serializable
-sealed interface KotlinTypeParameterParent<ID: KotlinTypeParameterParent.Id>: KotlinSymbol<ID> {
-    @Serializable
-    sealed interface Id: KotlinSymbol.Id
-}
-
-@Serializable
-data class KotlinProperty(
-    override val id: Id,
-    @Serializable(with = IdSignatureSerializer::class)
-    override val signature: IdSignature,
-): KotlinCallableMember<KotlinProperty.Id> {
-
-    @Serializable
-    data class Id(val value: String): KotlinCallableMember.Id
-}
-
-@Serializable
-data class KotlinFunction(
-    override val id: Id,
-    @Serializable(with = IdSignatureSerializer::class)
-    override val signature: IdSignature,
-): KotlinCallableMember<KotlinFunction.Id> {
-
-    @Serializable
-    data class Id(val value: String): KotlinCallableMember.Id
-}
-
-@Serializable
-sealed interface KotlinType<ID: KotlinType.Id>: KotlinMemberParent<ID> {
-
-    @Serializable
-    sealed interface Id: KotlinMemberParent.Id
-}
-
-@Serializable
-data class KotlinClass(
-    override val id: Id,
-    @Serializable(with = IdSignatureSerializer::class)
-    override val signature: IdSignature,
-): KotlinType<KotlinClass.Id>, KotlinTypeParameterParent<KotlinClass.Id> {
-
-    @Serializable
-    data class Id(val value: String): KotlinType.Id, KotlinTypeParameterParent.Id
-}
-
-@Serializable
-data class KotlinTypeParameter(
-    override val id: Id,
-    @Serializable(with = IdSignatureSerializer::class)
-    override val signature: IdSignature,
-): KotlinType<KotlinTypeParameter.Id> {
-    @Serializable
-    data class Id(val value: String): KotlinType.Id
-}
-
-@Serializable
-data class KotlinEnumEntry(
-    override val id: Id,
-    @Serializable(with = IdSignatureSerializer::class)
-    override val signature: IdSignature,
-): KotlinSymbol<KotlinEnumEntry.Id> {
-    @Serializable
-    data class Id(val value: String): KotlinSymbol.Id
-}
-
-data class KotlinPackage(
-    override val id: Id,
-    @Serializable(with = IdSignatureSerializer::class)
-    override val signature: IdSignature,
-): KotlinMemberParent<KotlinPackage.Id> {
-    @Serializable
-    data class Id(val value: String): KotlinMemberParent.Id
 }

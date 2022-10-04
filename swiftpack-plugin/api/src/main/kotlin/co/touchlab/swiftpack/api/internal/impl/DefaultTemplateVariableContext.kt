@@ -1,12 +1,13 @@
-package co.touchlab.swiftpack.api
+package co.touchlab.swiftpack.api.internal.impl
 
-import co.touchlab.swiftpack.spec.KotlinEnumEntry
-import co.touchlab.swiftpack.spec.KotlinFunction
-import co.touchlab.swiftpack.spec.KotlinProperty
-import co.touchlab.swiftpack.spec.KotlinSymbol
-import co.touchlab.swiftpack.spec.KotlinType
-import co.touchlab.swiftpack.spec.SWIFTPACK_TEMPLATE_VARIABLE_PREFIX
-import co.touchlab.swiftpack.spec.SwiftTemplateVariable
+import co.touchlab.swiftpack.api.internal.InternalTemplateVariableContext
+import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
+import co.touchlab.swiftpack.spec.symbol.KotlinFunction
+import co.touchlab.swiftpack.spec.symbol.KotlinProperty
+import co.touchlab.swiftpack.spec.symbol.KotlinSymbol
+import co.touchlab.swiftpack.spec.symbol.KotlinType
+import co.touchlab.swiftpack.spec.module.SWIFTPACK_TEMPLATE_VARIABLE_PREFIX
+import co.touchlab.swiftpack.spec.module.SwiftTemplateVariable
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.PropertySpec
