@@ -1,7 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal.arguments
 
 import co.touchlab.swiftgen.configuration.Configuration
-import co.touchlab.swiftgen.configuration.ConfigurationKeys
 import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
@@ -49,10 +48,10 @@ internal class DefaultArgumentGenerator(
 
     private fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> =
         this.classDescriptors
-            .filter { it.getConfiguration(ConfigurationKeys.ExperimentalFeatures.Enabled) }
             .flatMap { classDescriptor ->
                 classDescriptor.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
                     .filterIsInstance<SimpleFunctionDescriptor>()
+                    .filter { it.canBeUsedWithExperimentalFeatures }
                     .filter { it.isSupported }
             }
 
