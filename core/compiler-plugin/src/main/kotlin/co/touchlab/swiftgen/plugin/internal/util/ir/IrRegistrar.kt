@@ -60,7 +60,7 @@ internal class IrRegistrar constructor(
 
         val symbol = declarationBuilder.getSymbol(descriptor, symbolTable)
 
-        val declarationIrBuilder = DeclarationIrBuilder(generatorContext, symbol)
+        val declarationIrBuilder = DeclarationIrBuilder(generatorContext, symbol, startOffset = 0, endOffset = 0)
 
         declarationBuilder.initializeIr(symbol.owner, symbolTable, declarationIrBuilder)
     }

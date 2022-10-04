@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrBindableSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
+import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -36,13 +37,15 @@ internal class IrBuilder(
     fun createFunction(
         name: String,
         fileName: String = defaultFileName,
+        annotations: Annotations = Annotations.EMPTY,
         init: FunctionBuilder.(SimpleFunctionDescriptor) -> Unit,
     ): SimpleFunctionDescriptor =
-        createFunction(Name.identifier(name), fileName, init)
+        createFunction(Name.identifier(name), fileName, annotations, init)
 
     fun createFunction(
         name: Name,
         fileName: String = defaultFileName,
+        annotations: Annotations = Annotations.EMPTY,
         init: FunctionBuilder.(SimpleFunctionDescriptor) -> Unit,
     ): SimpleFunctionDescriptor = create(fileName) {
         object : DeclarationBuilder<SimpleFunctionDescriptor, IrSimpleFunction, IrSimpleFunctionSymbol> {
@@ -55,7 +58,7 @@ internal class IrBuilder(
             ): SimpleFunctionDescriptor {
                 val descriptor = SimpleFunctionDescriptorImpl.create(
                     containingDeclarationDescriptor,
-                    Annotations.EMPTY,
+                    annotations,
                     name,
                     CallableMemberDescriptor.Kind.SYNTHESIZED,
                     sourceElement,
@@ -74,6 +77,9 @@ internal class IrBuilder(
                     builder.modality,
                     builder.visibility,
                 )
+
+                descriptor.isInline = builder.isInline
+                descriptor.isSuspend = builder.isSuspend
 
                 return descriptor
             }
@@ -108,6 +114,10 @@ internal class IrBuilder(
         var modality: Modality = Modality.FINAL
 
         var visibility: DescriptorVisibility = DescriptorVisibilities.PUBLIC
+
+        var isInline: Boolean = false
+
+        var isSuspend: Boolean = false
 
         var body: (context(ReferenceSymbolTable) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody)? = null
     }

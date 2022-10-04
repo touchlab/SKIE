@@ -1,4 +1,4 @@
-package tests.default_arguments.classes.methods.single_parameter
+package `tests`.`default_arguments`.`classes`.`methods`.`single_parameter`
 
 class A {
 
