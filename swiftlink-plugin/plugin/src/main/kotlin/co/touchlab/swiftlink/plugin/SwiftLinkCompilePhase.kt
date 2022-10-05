@@ -5,8 +5,13 @@ import co.touchlab.swiftlink.plugin.resolve.KotlinSymbolRegistry
 import co.touchlab.swiftlink.plugin.resolve.KotlinSymbolResolver
 import co.touchlab.swiftlink.plugin.transform.ApiNotes
 import co.touchlab.swiftlink.plugin.transform.ApiTransformResolver
+import co.touchlab.swiftlink.plugin.transform.BridgedName
 import co.touchlab.swiftpack.spec.module.SwiftPackModule
 import co.touchlab.swiftpack.spi.produceSwiftFile
+import io.outfoxx.swiftpoet.DeclaredTypeName
+import io.outfoxx.swiftpoet.FileSpec
+import io.outfoxx.swiftpoet.Modifier
+import io.outfoxx.swiftpoet.TypeAliasSpec
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
 import org.jetbrains.kotlin.backend.konan.KonanConfig
@@ -49,9 +54,36 @@ class SwiftLinkCompilePhase(
             it.mkdirs()
         }
 
-        val sourceFiles = moduleLoader.modules.flatMap { module ->
+        val bridgeTypealiases = transformResolver.typeTransforms.mapNotNull { typeTransform ->
+            val bridgedName = typeTransform.bridgedName as? BridgedName.Relative ?: return@mapNotNull null
+            TypeAliasSpec.builder(bridgedName.typealiasName, DeclaredTypeName.qualifiedTypeName(".${bridgedName.typealiasValue}"))
+                .addModifiers(Modifier.PUBLIC)
+                .build()
+        }
+
+        val bridgeTypealiasesFile = if (bridgeTypealiases.isNotEmpty()) {
+            val file = swiftSourcesDir.resolve("__ObjCBridgeTypeAliases.swift")
+            FileSpec.builder("__ObjCBridgeTypeAliases")
+                .apply {
+                    bridgeTypealiases.forEach { addType(it) }
+                }
+                .build()
+                .toString()
+                .also { file.writeText(it) }
+            file
+        } else {
+            null
+        }
+
+        val sourceFiles = listOfNotNull(bridgeTypealiasesFile) + moduleLoader.modules.flatMap { module ->
             val filenamePrefix = module.name.sourceFilePrefix
-            val templateVariableResolver = DefaultTemplateVariableResolver(namer, symbolResolver, transformResolver, module.templateVariables)
+            val templateVariableResolver = DefaultTemplateVariableResolver(
+                config.moduleId,
+                namer,
+                symbolResolver,
+                transformResolver,
+                module.templateVariables,
+            )
 
             module.files.map { file ->
                 val finalContents = file.produceSwiftFile(templateVariableResolver)

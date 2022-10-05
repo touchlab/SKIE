@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.types.typeUtil.isShort
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 class DefaultTemplateVariableResolver(
+    private val moduleName: String,
     private val namer: ObjCExportNamer,
     private val symbolResolver: KotlinSymbolResolver,
     private val transformResolver: ApiTransformResolver,
@@ -66,7 +67,8 @@ class DefaultTemplateVariableResolver(
                 isUnit() -> "Swift.Void"
                 else -> {
                     val transform = transformResolver.findTypeTransform(classDescriptor)
-                    transform?.newSwiftName?.newQualifiedName() ?: namer.getClassOrProtocolName(classDescriptor).swiftName
+                    val finalName = transform?.newSwiftName?.newQualifiedName() ?: namer.getClassOrProtocolName(classDescriptor).swiftName
+                    "$moduleName.$finalName"
                 }
             }
         }
