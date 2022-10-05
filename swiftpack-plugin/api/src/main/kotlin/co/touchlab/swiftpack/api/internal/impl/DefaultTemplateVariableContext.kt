@@ -1,11 +1,11 @@
 package co.touchlab.swiftpack.api.internal.impl
 
 import co.touchlab.swiftpack.api.internal.InternalTemplateVariableContext
-import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
-import co.touchlab.swiftpack.spec.symbol.KotlinFunction
-import co.touchlab.swiftpack.spec.symbol.KotlinProperty
-import co.touchlab.swiftpack.spec.symbol.KotlinSymbol
-import co.touchlab.swiftpack.spec.symbol.KotlinType
+import co.touchlab.swiftpack.spec.reference.KotlinEnumEntryReference
+import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.reference.KotlinDeclarationReference
+import co.touchlab.swiftpack.spec.reference.KotlinTypeReference
 import co.touchlab.swiftpack.spec.module.SWIFTPACK_TEMPLATE_VARIABLE_PREFIX
 import co.touchlab.swiftpack.spec.module.SwiftTemplateVariable
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -17,17 +17,17 @@ import java.util.concurrent.atomic.AtomicInteger
 internal class DefaultTemplateVariableContext: InternalTemplateVariableContext {
     private val referenceCounter = AtomicInteger(-1)
 
-    private val referencedSymbols = mutableMapOf<KotlinSymbol.Id, SwiftTemplateVariable<*>>()
+    private val referencedSymbols = mutableMapOf<KotlinDeclarationReference.Id, SwiftTemplateVariable<*>>()
     override val variables: Collection<SwiftTemplateVariable<*>> = referencedSymbols.values
 
-    override fun KotlinType.Id.templateVariable(): DeclaredTypeName {
+    override fun KotlinTypeReference.Id.templateVariable(): DeclaredTypeName {
         val ref = getVariable(this) { name, symbolId ->
             SwiftTemplateVariable.TypeReference(name, symbolId)
         }
         return DeclaredTypeName.typeName(".${ref.name.value}")
     }
 
-    override fun KotlinProperty.Id.templateVariable(): PropertySpec {
+    override fun KotlinPropertyReference.Id.templateVariable(): PropertySpec {
         val variable = getVariable(this) { name, symbolId ->
             SwiftTemplateVariable.PropertyReference(name, symbolId)
         }
@@ -35,7 +35,7 @@ internal class DefaultTemplateVariableContext: InternalTemplateVariableContext {
         return PropertySpec.builder(variable.name.value, SelfTypeName.INSTANCE).build()
     }
 
-    override fun KotlinFunction.Id.templateVariable(): FunctionSpec {
+    override fun KotlinFunctionReference.Id.templateVariable(): FunctionSpec {
         val variable = getVariable(this) { name, symbolId ->
             SwiftTemplateVariable.FunctionReference(name, symbolId)
         }
@@ -43,7 +43,7 @@ internal class DefaultTemplateVariableContext: InternalTemplateVariableContext {
         return FunctionSpec.builder(variable.name.value).build()
     }
 
-    override fun KotlinEnumEntry.Id.templateVariable(): PropertySpec {
+    override fun KotlinEnumEntryReference.Id.templateVariable(): PropertySpec {
         val variable = getVariable(this) { name, symbolId ->
             SwiftTemplateVariable.EnumEntryReference(name, symbolId)
         }
@@ -51,7 +51,7 @@ internal class DefaultTemplateVariableContext: InternalTemplateVariableContext {
         return PropertySpec.builder(variable.name.value, SelfTypeName.INSTANCE).build()
     }
 
-    private fun <ID: KotlinSymbol.Id> getVariable(
+    private fun <ID: KotlinDeclarationReference.Id> getVariable(
         symbolId: ID,
         variableFactory: (name: SwiftTemplateVariable.Name, symbolId: ID) -> SwiftTemplateVariable<ID>,
     ): SwiftTemplateVariable<ID> {

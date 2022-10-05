@@ -1,6 +1,6 @@
 package co.touchlab.swiftpack.spec.module
 
-import co.touchlab.swiftpack.spec.symbol.KotlinSymbol
+import co.touchlab.swiftpack.spec.reference.KotlinDeclarationReference
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -12,7 +12,7 @@ import java.io.File
 data class SwiftPackModule(
     val name: Name,
     val templateVariables: List<SwiftTemplateVariable<*>>,
-    val symbols: List<KotlinSymbol<*>>,
+    val symbols: List<KotlinDeclarationReference<*>>,
     val files: List<TemplateFile>,
     val transforms: List<ApiTransform>,
 ) {

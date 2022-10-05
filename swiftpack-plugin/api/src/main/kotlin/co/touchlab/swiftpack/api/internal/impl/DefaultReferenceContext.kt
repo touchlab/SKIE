@@ -1,11 +1,12 @@
 package co.touchlab.swiftpack.api.internal.impl
 
 import co.touchlab.swiftpack.api.internal.InternalReferenceContext
-import co.touchlab.swiftpack.spec.symbol.KotlinClass
-import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
-import co.touchlab.swiftpack.spec.symbol.KotlinFunction
-import co.touchlab.swiftpack.spec.symbol.KotlinProperty
-import co.touchlab.swiftpack.spec.symbol.KotlinSymbol
+import co.touchlab.swiftpack.spec.reference.KotlinClassReference
+import co.touchlab.swiftpack.spec.reference.KotlinEnumEntryReference
+import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.reference.KotlinDeclarationReference
+import co.touchlab.swiftpack.spec.reference.KotlinTypeReference
 import org.jetbrains.kotlin.backend.konan.serialization.KonanIdSignaturer
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerIr
@@ -30,16 +31,16 @@ internal class DefaultReferenceContext(
 
     private val signaturer = KonanIdSignaturer(descriptorMangler)
 
-    private val mutableReferences = mutableMapOf<KotlinSymbol.Id, KotlinSymbol<*>>()
-    override val references: Map<KotlinSymbol.Id, KotlinSymbol<*>>
+    private val mutableReferences = mutableMapOf<KotlinDeclarationReference.Id, KotlinDeclarationReference<*>>()
+    override val references: Map<KotlinDeclarationReference.Id, KotlinDeclarationReference<*>>
         get() = mutableReferences
 
-    override val symbols: List<KotlinSymbol<*>>
+    override val symbols: List<KotlinDeclarationReference<*>>
         get() = references.values.toList()
 
-    override fun IrClass.reference(): KotlinClass = with(irMangler) {
-        getReference(KotlinClass.Id(mangleString(compatibleMode))) { id ->
-            KotlinClass(
+    override fun IrClass.reference(): KotlinClassReference = with(irMangler) {
+        getReference(KotlinClassReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinClassReference(
                 id = id,
                 signature = requireNotNull(symbol.signature) {
                     "Class ${this@reference} has no signature"
@@ -48,9 +49,9 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun IrProperty.reference(): KotlinProperty = with(irMangler) {
-        getReference(KotlinProperty.Id(mangleString(compatibleMode))) { id ->
-            KotlinProperty(
+    override fun IrProperty.reference(): KotlinPropertyReference = with(irMangler) {
+        getReference(KotlinPropertyReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinPropertyReference(
                 id = id,
                 signature = requireNotNull(symbol.signature) {
                     "Property ${this@reference} has no signature"
@@ -59,9 +60,9 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun IrFunction.reference(): KotlinFunction = with(irMangler) {
-        getReference(KotlinFunction.Id(mangleString(compatibleMode))) { id ->
-            KotlinFunction(
+    override fun IrFunction.reference(): KotlinFunctionReference = with(irMangler) {
+        getReference(KotlinFunctionReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinFunctionReference(
                 id = id,
                 signature = requireNotNull(symbol.signature) {
                     "Function ${this@reference} has no signature"
@@ -70,9 +71,9 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun IrEnumEntry.reference(): KotlinEnumEntry = with (irMangler) {
-        getReference(KotlinEnumEntry.Id(mangleString(compatibleMode))) { id ->
-            KotlinEnumEntry(
+    override fun IrEnumEntry.reference(): KotlinEnumEntryReference = with (irMangler) {
+        getReference(KotlinEnumEntryReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinEnumEntryReference(
                 id = id,
                 signature = requireNotNull(symbol.signature) {
                     "Enum entry ${this@reference} has no signature"
@@ -81,9 +82,9 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun ClassDescriptor.classReference(): KotlinClass = with (descriptorMangler) {
-        getReference(KotlinClass.Id(mangleString(compatibleMode))) { id ->
-            KotlinClass(
+    override fun ClassDescriptor.classReference(): KotlinClassReference = with (descriptorMangler) {
+        getReference(KotlinClassReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinClassReference(
                 id = id,
                 signature = requireNotNull(signaturer.composeSignature(this@classReference)) {
                     "Class ${this@classReference} has no signature"
@@ -92,9 +93,9 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun ClassDescriptor.enumEntryReference(): KotlinEnumEntry = with(descriptorMangler) {
-        getReference(KotlinEnumEntry.Id(mangleString(compatibleMode))) { id ->
-            KotlinEnumEntry(
+    override fun ClassDescriptor.enumEntryReference(): KotlinEnumEntryReference = with(descriptorMangler) {
+        getReference(KotlinEnumEntryReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinEnumEntryReference(
                 id = id,
                 signature = requireNotNull(signaturer.composeEnumEntrySignature(this@enumEntryReference)) {
                     "Enum entry ${this@enumEntryReference} has no signature"
@@ -103,12 +104,12 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun KotlinType.reference(): co.touchlab.swiftpack.spec.symbol.KotlinType<*> = with(descriptorMangler) {
+    override fun KotlinType.reference(): KotlinTypeReference<*> = with(descriptorMangler) {
         val declarationDescriptor = requireNotNull(constructor.declarationDescriptor) {
             "Type $this has no declaration descriptor"
         }
-        getReference(KotlinClass.Id(declarationDescriptor.mangleString(compatibleMode))) { id ->
-            KotlinClass(
+        getReference(KotlinClassReference.Id(declarationDescriptor.mangleString(compatibleMode))) { id ->
+            KotlinClassReference(
                 id = id,
                 signature = requireNotNull(signaturer.composeSignature(declarationDescriptor)) {
                     "Class ${this@reference} has no signature"
@@ -117,9 +118,9 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun PropertyDescriptor.reference(): KotlinProperty = with(descriptorMangler) {
-        getReference(KotlinProperty.Id(mangleString(compatibleMode))) { id ->
-            KotlinProperty(
+    override fun PropertyDescriptor.reference(): KotlinPropertyReference = with(descriptorMangler) {
+        getReference(KotlinPropertyReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinPropertyReference(
                 id = id,
                 signature = requireNotNull(signaturer.composeSignature(this@reference)) {
                     "Property ${this@reference} has no signature"
@@ -128,9 +129,9 @@ internal class DefaultReferenceContext(
         }
     }
 
-    override fun FunctionDescriptor.reference(): KotlinFunction = with(descriptorMangler) {
-        getReference(KotlinFunction.Id(mangleString(compatibleMode))) { id ->
-            KotlinFunction(
+    override fun FunctionDescriptor.reference(): KotlinFunctionReference = with(descriptorMangler) {
+        getReference(KotlinFunctionReference.Id(mangleString(compatibleMode))) { id ->
+            KotlinFunctionReference(
                 id = id,
                 signature = requireNotNull(signaturer.composeSignature(this@reference)) {
                     "Function ${this@reference} has no signature"
@@ -139,7 +140,7 @@ internal class DefaultReferenceContext(
         }
     }
 
-    private fun <S: KotlinSymbol<ID>, ID: KotlinSymbol.Id> getReference(id: ID, symbolFactory: (ID) -> S): S {
+    private fun <S: KotlinDeclarationReference<ID>, ID: KotlinDeclarationReference.Id> getReference(id: ID, symbolFactory: (ID) -> S): S {
         @Suppress("UNCHECKED_CAST")
         return mutableReferences.getOrPut(id) {
             symbolFactory(id)

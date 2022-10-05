@@ -3,63 +3,63 @@ package co.touchlab.swiftpack.api.internal.impl
 import co.touchlab.swiftpack.api.TransformContext
 import co.touchlab.swiftpack.api.internal.InternalTransformContext
 import co.touchlab.swiftpack.spec.module.ApiTransform
-import co.touchlab.swiftpack.spec.symbol.KotlinClass
-import co.touchlab.swiftpack.spec.symbol.KotlinFile
-import co.touchlab.swiftpack.spec.symbol.KotlinFunction
-import co.touchlab.swiftpack.spec.symbol.KotlinProperty
-import co.touchlab.swiftpack.spec.symbol.KotlinSymbol
+import co.touchlab.swiftpack.spec.reference.KotlinClassReference
+import co.touchlab.swiftpack.spec.reference.KotlinFileReference
+import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.reference.KotlinDeclarationReference
 
 internal class DefaultTransformContext: InternalTransformContext {
-    private val mutableTransforms = mutableMapOf<KotlinSymbol.Id, ApiTransformScope<*>>()
+    private val mutableTransforms = mutableMapOf<KotlinDeclarationReference.Id, ApiTransformScope<*>>()
     override val transforms: List<ApiTransform>
         get() = mutableTransforms.values.map { it.build() }
 
-    override fun KotlinClass.applyTransform(transform: TransformContext.KotlinClassTransformScope.() -> Unit): KotlinClass {
+    override fun KotlinClassReference.applyTransform(transform: TransformContext.KotlinClassTransformScope.() -> Unit): KotlinClassReference {
         getScope(id) {
             KotlinClassTransformScope(id)
         }.transform()
         return this
     }
 
-    override fun KotlinProperty.applyTransform(transform: TransformContext.KotlinPropertyTransformScope.() -> Unit): KotlinProperty {
+    override fun KotlinPropertyReference.applyTransform(transform: TransformContext.KotlinPropertyTransformScope.() -> Unit): KotlinPropertyReference {
         getScope(id) {
             KotlinPropertyTransformScope(id)
         }.transform()
         return this
     }
 
-    override fun KotlinFunction.applyTransform(transform: TransformContext.KotlinFunctionTransformScope.() -> Unit): KotlinFunction {
+    override fun KotlinFunctionReference.applyTransform(transform: TransformContext.KotlinFunctionTransformScope.() -> Unit): KotlinFunctionReference {
         getScope(id) {
             KotlinFunctionTransformScope(id)
         }.transform()
         return this
     }
 
-    override fun KotlinFile.applyTransform(transform: TransformContext.KotlinFileTransformScope.() -> Unit): KotlinFile {
+    override fun KotlinFileReference.applyTransform(transform: TransformContext.KotlinFileTransformScope.() -> Unit): KotlinFileReference {
         getScope(id) {
             KotlinFileTransformScope(id)
         }.transform()
         return this
     }
 
-    private fun <SCOPE: ApiTransformScope<ID>, ID: KotlinSymbol.Id> getScope(id: ID, scopeFactory: (ID) -> SCOPE): SCOPE {
+    private fun <SCOPE: ApiTransformScope<ID>, ID: KotlinDeclarationReference.Id> getScope(id: ID, scopeFactory: (ID) -> SCOPE): SCOPE {
         @Suppress("UNCHECKED_CAST")
         return mutableTransforms.getOrPut(id) {
             scopeFactory(id)
         } as SCOPE
     }
 
-    private interface ApiTransformScope<ID: KotlinSymbol.Id> {
+    private interface ApiTransformScope<ID: KotlinDeclarationReference.Id> {
         fun build(): ApiTransform
     }
 
     private class KotlinClassTransformScope(
-        private val classId: KotlinClass.Id,
+        private val classId: KotlinClassReference.Id,
         private var isRemoved: Boolean = false,
         private var isHidden: Boolean = false,
         private var rename: ApiTransform.TypeTransform.Rename? = null,
         private var bridge: ApiTransform.TypeTransform.Bridge? = null,
-    ): TransformContext.KotlinClassTransformScope, ApiTransformScope<KotlinClass.Id> {
+    ): TransformContext.KotlinClassTransformScope, ApiTransformScope<KotlinClassReference.Id> {
          override fun remove() {
             isRemoved = true
         }
@@ -99,11 +99,11 @@ internal class DefaultTransformContext: InternalTransformContext {
     }
 
     private class KotlinPropertyTransformScope(
-        private val propertyId: KotlinProperty.Id,
+        private val propertyId: KotlinPropertyReference.Id,
         private var isRemoved: Boolean = false,
         private var isHidden: Boolean = false,
         private var rename: String? = null,
-    ): TransformContext.KotlinPropertyTransformScope, ApiTransformScope<KotlinProperty.Id> {
+    ): TransformContext.KotlinPropertyTransformScope, ApiTransformScope<KotlinPropertyReference.Id> {
         override fun remove() {
             isRemoved = true
         }
@@ -125,11 +125,11 @@ internal class DefaultTransformContext: InternalTransformContext {
     }
 
     private class KotlinFunctionTransformScope(
-        private val functionId: KotlinFunction.Id,
+        private val functionId: KotlinFunctionReference.Id,
         private var isRemoved: Boolean = false,
         private var isHidden: Boolean = false,
         private var rename: String? = null,
-    ): TransformContext.KotlinFunctionTransformScope, ApiTransformScope<KotlinFunction.Id> {
+    ): TransformContext.KotlinFunctionTransformScope, ApiTransformScope<KotlinFunctionReference.Id> {
         override fun remove() {
             isRemoved = true
         }
@@ -151,12 +151,12 @@ internal class DefaultTransformContext: InternalTransformContext {
     }
 
     private class KotlinFileTransformScope(
-        private val fileId: KotlinFile.Id,
+        private val fileId: KotlinFileReference.Id,
         private var isRemoved: Boolean = false,
         private var isHidden: Boolean = false,
         private var rename: String? = null,
         private var bridge: String? = null,
-    ): TransformContext.KotlinFileTransformScope, ApiTransformScope<KotlinFile.Id> {
+    ): TransformContext.KotlinFileTransformScope, ApiTransformScope<KotlinFileReference.Id> {
         override fun remove() {
             isRemoved = true
         }

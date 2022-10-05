@@ -1,19 +1,19 @@
 package co.touchlab.swiftpack.api
 
 import co.touchlab.swiftpack.spec.module.ApiTransform
-import co.touchlab.swiftpack.spec.symbol.KotlinClass
-import co.touchlab.swiftpack.spec.symbol.KotlinFile
-import co.touchlab.swiftpack.spec.symbol.KotlinFunction
-import co.touchlab.swiftpack.spec.symbol.KotlinProperty
+import co.touchlab.swiftpack.spec.reference.KotlinClassReference
+import co.touchlab.swiftpack.spec.reference.KotlinFileReference
+import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
 
 interface TransformContext {
-    fun KotlinClass.applyTransform(transform: KotlinClassTransformScope.() -> Unit): KotlinClass
+    fun KotlinClassReference.applyTransform(transform: KotlinClassTransformScope.() -> Unit): KotlinClassReference
 
-    fun KotlinProperty.applyTransform(transform: KotlinPropertyTransformScope.() -> Unit): KotlinProperty
+    fun KotlinPropertyReference.applyTransform(transform: KotlinPropertyTransformScope.() -> Unit): KotlinPropertyReference
 
-    fun KotlinFunction.applyTransform(transform: KotlinFunctionTransformScope.() -> Unit): KotlinFunction
+    fun KotlinFunctionReference.applyTransform(transform: KotlinFunctionTransformScope.() -> Unit): KotlinFunctionReference
 
-    fun KotlinFile.applyTransform(transform: KotlinFileTransformScope.() -> Unit): KotlinFile
+    fun KotlinFileReference.applyTransform(transform: KotlinFileTransformScope.() -> Unit): KotlinFileReference
 
     @DslMarker
     annotation class TransformScopeMarker

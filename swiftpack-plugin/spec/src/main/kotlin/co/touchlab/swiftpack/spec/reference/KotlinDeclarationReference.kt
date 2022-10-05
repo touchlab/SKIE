@@ -1,10 +1,10 @@
-package co.touchlab.swiftpack.spec.symbol
+package co.touchlab.swiftpack.spec.reference
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.ir.util.IdSignature
 
 @Serializable
-sealed interface KotlinSymbol<ID: KotlinSymbol.Id> {
+sealed interface KotlinDeclarationReference<ID: KotlinDeclarationReference.Id> {
     val id: ID
     val signature: IdSignature
 

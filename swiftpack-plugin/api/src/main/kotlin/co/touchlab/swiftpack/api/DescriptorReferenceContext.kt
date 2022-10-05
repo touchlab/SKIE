@@ -1,22 +1,23 @@
 package co.touchlab.swiftpack.api
 
-import co.touchlab.swiftpack.spec.symbol.KotlinClass
-import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
-import co.touchlab.swiftpack.spec.symbol.KotlinFunction
-import co.touchlab.swiftpack.spec.symbol.KotlinProperty
+import co.touchlab.swiftpack.spec.reference.KotlinClassReference
+import co.touchlab.swiftpack.spec.reference.KotlinEnumEntryReference
+import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.reference.KotlinTypeReference
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
 interface DescriptorReferenceContext {
-    fun ClassDescriptor.classReference(): KotlinClass
+    fun ClassDescriptor.classReference(): KotlinClassReference
 
-    fun ClassDescriptor.enumEntryReference(): KotlinEnumEntry
+    fun ClassDescriptor.enumEntryReference(): KotlinEnumEntryReference
 
-    fun KotlinType.reference(): co.touchlab.swiftpack.spec.symbol.KotlinType<*>
+    fun KotlinType.reference(): KotlinTypeReference<*>
 
-    fun PropertyDescriptor.reference(): KotlinProperty
+    fun PropertyDescriptor.reference(): KotlinPropertyReference
 
-    fun FunctionDescriptor.reference(): KotlinFunction
+    fun FunctionDescriptor.reference(): KotlinFunctionReference
 }

@@ -1,36 +1,36 @@
 package co.touchlab.swiftpack.api
 
-import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
-import co.touchlab.swiftpack.spec.symbol.KotlinFunction
-import co.touchlab.swiftpack.spec.symbol.KotlinProperty
-import co.touchlab.swiftpack.spec.symbol.KotlinType
+import co.touchlab.swiftpack.spec.reference.KotlinEnumEntryReference
+import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.reference.KotlinTypeReference
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.PropertySpec
 
 interface TemplateVariableContext {
-    fun KotlinType.Id.templateVariable(): DeclaredTypeName
+    fun KotlinTypeReference.Id.templateVariable(): DeclaredTypeName
 
     // TODO: Add support for "top-level" Swift types (e.g. String, Int8, Int16, etc.)
-    fun KotlinType<*>.templateVariable(): DeclaredTypeName {
+    fun KotlinTypeReference<*>.templateVariable(): DeclaredTypeName {
         return id.templateVariable()
     }
 
-    fun KotlinProperty.Id.templateVariable(): PropertySpec
+    fun KotlinPropertyReference.Id.templateVariable(): PropertySpec
 
-    fun KotlinProperty.templateVariable(): PropertySpec {
+    fun KotlinPropertyReference.templateVariable(): PropertySpec {
         return id.templateVariable()
     }
 
-    fun KotlinFunction.Id.templateVariable(): FunctionSpec
+    fun KotlinFunctionReference.Id.templateVariable(): FunctionSpec
 
-    fun KotlinFunction.templateVariable(): FunctionSpec {
+    fun KotlinFunctionReference.templateVariable(): FunctionSpec {
         return id.templateVariable()
     }
 
-    fun KotlinEnumEntry.Id.templateVariable(): PropertySpec
+    fun KotlinEnumEntryReference.Id.templateVariable(): PropertySpec
 
-    fun KotlinEnumEntry.templateVariable(): PropertySpec {
+    fun KotlinEnumEntryReference.templateVariable(): PropertySpec {
         return id.templateVariable()
     }
 }

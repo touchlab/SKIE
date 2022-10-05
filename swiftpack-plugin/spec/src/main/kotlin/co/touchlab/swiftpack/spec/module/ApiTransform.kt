@@ -1,18 +1,18 @@
 package co.touchlab.swiftpack.spec.module
 
-import co.touchlab.swiftpack.spec.symbol.KotlinClass
-import co.touchlab.swiftpack.spec.symbol.KotlinEnumEntry
-import co.touchlab.swiftpack.spec.symbol.KotlinFile
-import co.touchlab.swiftpack.spec.symbol.KotlinFunction
-import co.touchlab.swiftpack.spec.symbol.KotlinProperty
-import co.touchlab.swiftpack.spec.symbol.KotlinType
+import co.touchlab.swiftpack.spec.reference.KotlinClassReference
+import co.touchlab.swiftpack.spec.reference.KotlinEnumEntryReference
+import co.touchlab.swiftpack.spec.reference.KotlinFileReference
+import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
+import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
+import co.touchlab.swiftpack.spec.reference.KotlinTypeReference
 import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface ApiTransform {
     @Serializable
     data class FileTransform(
-        val fileId: KotlinFile.Id,
+        val fileId: KotlinFileReference.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: TypeTransform.Rename.Action? = null,
@@ -21,7 +21,7 @@ sealed interface ApiTransform {
 
     @Serializable
     data class TypeTransform(
-        val typeId: KotlinType.Id,
+        val typeId: KotlinTypeReference.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: Rename? = null,
@@ -50,13 +50,13 @@ sealed interface ApiTransform {
             @Serializable
             data class Absolute(val swiftType: String): Bridge
             @Serializable
-            data class Relative(val parentKotlinClass: KotlinClass.Id, val swiftType: String): Bridge
+            data class Relative(val parentKotlinClass: KotlinClassReference.Id, val swiftType: String): Bridge
         }
     }
 
     @Serializable
     class PropertyTransform(
-        val propertyId: KotlinProperty.Id,
+        val propertyId: KotlinPropertyReference.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
@@ -64,7 +64,7 @@ sealed interface ApiTransform {
 
     @Serializable
     class FunctionTransform(
-        val functionId: KotlinFunction.Id,
+        val functionId: KotlinFunctionReference.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
@@ -72,7 +72,7 @@ sealed interface ApiTransform {
 
     @Serializable
     class EnumEntryTransform(
-        val enumEntryId: KotlinEnumEntry.Id,
+        val enumEntryId: KotlinEnumEntryReference.Id,
         val hide: Boolean = false,
         val remove: Boolean = false,
         val rename: String? = null,
