@@ -1,4 +1,4 @@
-let allValues = [AKt.a1(), AKt.a2(), AKt.a3()]
+let allValues = [AKt.a1(), AKt.a2()]
 
 for (index, value) in allValues.enumerated() {
     switch value {
@@ -6,9 +6,10 @@ for (index, value) in allValues.enumerated() {
         assert(index == 0)
     case .a2:
         assert(index == 1)
-    case .a3:
-        assert(index == 2)
     }
 }
+
+let b1 = AKt.b()
+let b2 = A.B()
 
 exit(0)

@@ -4,6 +4,7 @@ import co.touchlab.swiftgen.configuration.util.throwIfNull
 import co.touchlab.swiftgen.configuration.values.ValidationSeverity
 import co.touchlab.swiftgen.api.ExperimentalFeatures as ExperimentalFeaturesAnnotations
 import co.touchlab.swiftgen.api.SealedInterop as SealedInteropAnnotations
+import co.touchlab.swiftgen.api.EnumInterop as EnumInteropAnnotations
 
 object ConfigurationKeys {
 
@@ -154,6 +155,24 @@ object ConfigurationKeys {
             }
         }
     }
+
+    object EnumInterop {
+
+        /**
+        * If true, the interop code is generated for the given enum.
+        */
+        object Enabled : ConfigurationKey.Boolean {
+
+            override val name: String = "EnumInterop.Enabled"
+
+            override val defaultValue: Boolean = true
+
+            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+                when {
+                    configurationTarget.hasAnnotation<EnumInteropAnnotations.Enabled>() -> true
+                    configurationTarget.hasAnnotation<EnumInteropAnnotations.Disabled>() -> false
+                    else -> null
+                }
+        }
+    }
 }
-
-

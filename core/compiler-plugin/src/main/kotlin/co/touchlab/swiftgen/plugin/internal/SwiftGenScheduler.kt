@@ -25,6 +25,7 @@ internal class SwiftGenScheduler(
         swiftFileBuilderFactory = swiftFileBuilderFactory,
         namespaceProvider = namespaceProvider,
         configuration = configuration,
+        reporter = reporter,
     )
 
     private val sealedInteropGenerator = SealedInteropGenerator(

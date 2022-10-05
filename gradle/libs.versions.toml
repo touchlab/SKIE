@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.7.10"
-swiftpack = "0.0.21"
-swiftlink = "0.0.27"
+swiftpack = "0.0.23"
+swiftlink = "0.0.28"
 kotest = "5.4.0"
 pluginPublish = "1.0.0"
 

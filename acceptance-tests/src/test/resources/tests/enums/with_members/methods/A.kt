@@ -1,19 +1,80 @@
-package `tests`.`enums`.`with_members`.`methods`
+package tests.enums.with_members.methods
 
 enum class A {
-    A1,
-    A2;
+    A1 {
+        override fun abstractFun(): Int = 1
+    },
+    A2 {
+        override fun abstractFun(): Int = 2
 
-    fun foo() = 0
+        override fun overridableFun(): Int = 1
+    };
 
-    fun bar(param: Int) = param
+    fun noParam() = Unit
+
+    fun singleParam(p: Int) = Unit
+
+    fun twoParams(p1: Int, p2: String) = Unit
+
+    fun threeParams(p1: Int, p2: String, p3: Double) = Unit
+
+    abstract fun abstractFun(): Int
+
+    open fun overridableFun(): Int = 0
 
     @Throws(Exception::class)
-    fun throwingFoo() { }
+    fun throwingNoParam() {
+        throw Exception()
+    }
 
-    suspend fun suspendingFoo() { }
+    @Throws(Exception::class)
+    fun throwingSingleParam(p: Int) {
+        throw Exception()
+    }
+
+    @Throws(Exception::class)
+    fun throwingTwoParams(p1: Int, p2: String) {
+        throw Exception()
+    }
+
+    @Throws(Exception::class)
+    fun throwingThreeParams(p1: Int, p2: String, p3: Double) {
+        throw Exception()
+    }
+
+    suspend fun suspendingNoParam() { }
+
+    suspend fun suspendingSingleParam(p: Int) { }
+
+    suspend fun suspendingTwoParams(p1: Int, p2: String) { }
+
+    suspend fun suspendingThreeParams(p1: Int, p2: String, p3: Double) { }
+
+    @Throws(Exception::class)
+    suspend fun suspendingThrowingNoParam() {
+        throw Exception()
+    }
+
+    @Throws(Exception::class)
+    suspend fun suspendingThrowingSingleParam(p: Int) {
+        throw Exception()
+    }
+
+    @Throws(Exception::class)
+    suspend fun suspendingThrowingTwoParams(p1: Int, p2: String) {
+        throw Exception()
+    }
+
+    @Throws(Exception::class)
+    suspend fun suspendingThrowingThreeParams(p1: Int, p2: String, p3: Double) {
+        throw Exception()
+    }
+
+    companion object {
+        fun staticFun() = Unit
+    }
 }
 
-fun randomA(): A {
-    return A.values().random()
-}
+fun a1(): A = A.A1
+
+fun a2(): A = A.A2

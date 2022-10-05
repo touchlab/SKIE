@@ -4,6 +4,6 @@ enum class A {
     A1
 }
 
-fun randomA(): A {
-    return A.values().random()
+fun a1(): A {
+    return A.A1
 }

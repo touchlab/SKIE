@@ -6,6 +6,14 @@ enum class A {
     A3
 }
 
-fun randomA(): A {
-    return A.values().random()
+fun a1(): A {
+    return A.A1
+}
+
+fun a2(): A {
+    return A.A2
+}
+
+fun a3(): A {
+    return A.A3
 }

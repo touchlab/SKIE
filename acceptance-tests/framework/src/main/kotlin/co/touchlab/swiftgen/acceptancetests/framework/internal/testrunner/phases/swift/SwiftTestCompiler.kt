@@ -32,6 +32,10 @@ internal class SwiftTestCompiler(
         swiftFile.absolutePathString(),
         "-F",
         kotlinFrameworkDirectory.absolutePathString(),
+        "-v",
+        // "-driver-time-compilation",
+        // "-print-educational-notes",
+        // "-Xfrontend", "-debug-constraints",
         "-o",
         output.absolutePathString(),
     ).joinToString(" ")

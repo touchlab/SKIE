@@ -21,7 +21,7 @@ internal interface SwiftPackExtensionContainer {
 
     val ClassDescriptor.swiftName: DeclaredTypeName
         get() = with(swiftPackModuleBuilder) {
-            this@swiftName.reference().swiftReference()
+            this@swiftName.classReference().swiftTemplateVariable()
         }
 
     val ClassDescriptor.swiftNameWithTypeParameters: TypeName

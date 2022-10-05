@@ -8,7 +8,7 @@ import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftlink.plugin.ConfigurationKeys
 import co.touchlab.swiftlink.plugin.SwiftLinkComponentRegistrar
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
+import co.touchlab.swiftpack.spec.module.SwiftPackModule
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.bc.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -50,7 +50,7 @@ internal class KotlinTestCompiler(
         SwiftPackModuleBuilder.Config.outputDir = outputDirectory.toFile()
 
         PluginRegistrar.configure.set {
-            val swiftPackModule = NamespacedSwiftPackModule.Reference("Kotlin", outputDirectory.toFile())
+            val swiftPackModule = SwiftPackModule.Reference("Kotlin", outputDirectory.toFile())
 
             add(ConfigurationKeys.swiftPackModules, swiftPackModule)
             put(ConfigurationKeys.expandedSwiftDir, expandedSwiftDirectory.toFile())
