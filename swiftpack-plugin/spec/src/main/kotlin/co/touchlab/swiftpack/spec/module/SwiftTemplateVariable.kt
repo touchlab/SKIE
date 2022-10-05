@@ -8,16 +8,16 @@ import co.touchlab.swiftpack.spec.reference.KotlinTypeReference
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface SwiftTemplateVariable<SYMBOL_ID: KotlinDeclarationReference.Id> {
+sealed interface SwiftTemplateVariable<REFERENCE_ID: KotlinDeclarationReference.Id> {
     val name: Name
-    val symbol: SYMBOL_ID
+    val referenceId: REFERENCE_ID
 
     @Serializable
     class TypeReference(
         override val name: Name,
         val type: KotlinTypeReference.Id,
     ) : SwiftTemplateVariable<KotlinTypeReference.Id> {
-        override val symbol: KotlinTypeReference.Id
+        override val referenceId: KotlinTypeReference.Id
             get() = type
     }
 
@@ -26,7 +26,7 @@ sealed interface SwiftTemplateVariable<SYMBOL_ID: KotlinDeclarationReference.Id>
         override val name: Name,
         val property: KotlinPropertyReference.Id,
     ): SwiftTemplateVariable<KotlinPropertyReference.Id> {
-        override val symbol: KotlinPropertyReference.Id
+        override val referenceId: KotlinPropertyReference.Id
             get() = property
     }
 
@@ -35,7 +35,7 @@ sealed interface SwiftTemplateVariable<SYMBOL_ID: KotlinDeclarationReference.Id>
         override val name: Name,
         val function: KotlinFunctionReference.Id
     ): SwiftTemplateVariable<KotlinFunctionReference.Id> {
-        override val symbol: KotlinFunctionReference.Id
+        override val referenceId: KotlinFunctionReference.Id
             get() = function
     }
 
@@ -44,7 +44,7 @@ sealed interface SwiftTemplateVariable<SYMBOL_ID: KotlinDeclarationReference.Id>
         override val name: Name,
         val enumEntry: KotlinEnumEntryReference.Id,
     ): SwiftTemplateVariable<KotlinEnumEntryReference.Id> {
-        override val symbol: KotlinEnumEntryReference.Id
+        override val referenceId: KotlinEnumEntryReference.Id
             get() = enumEntry
     }
 

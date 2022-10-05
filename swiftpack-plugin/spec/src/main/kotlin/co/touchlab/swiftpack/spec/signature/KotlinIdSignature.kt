@@ -65,6 +65,7 @@ sealed interface KotlinIdSignature {
         )
     }
 
+    // TODO: FileSignature is nto supported because it requires an instance of "Any" to initialize and we don't know how to (de)serialize it
     // @Serializable
     // data class FileSignature(val packageFqName: String, val filePath: String): KotlinIdSignature {
     //     constructor(signature: IdSignature.FileSignature): this(

@@ -9,28 +9,28 @@ import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.PropertySpec
 
 interface TemplateVariableContext {
-    fun KotlinTypeReference.Id.templateVariable(): DeclaredTypeName
+    fun KotlinTypeReference.Id.swiftTemplateVariable(): DeclaredTypeName
 
     // TODO: Add support for "top-level" Swift types (e.g. String, Int8, Int16, etc.)
-    fun KotlinTypeReference<*>.templateVariable(): DeclaredTypeName {
-        return id.templateVariable()
+    fun KotlinTypeReference<*>.swiftTemplateVariable(): DeclaredTypeName {
+        return id.swiftTemplateVariable()
     }
 
-    fun KotlinPropertyReference.Id.templateVariable(): PropertySpec
+    fun KotlinPropertyReference.Id.swiftTemplateVariable(): PropertySpec
 
-    fun KotlinPropertyReference.templateVariable(): PropertySpec {
-        return id.templateVariable()
+    fun KotlinPropertyReference.swiftTemplateVariable(): PropertySpec {
+        return id.swiftTemplateVariable()
     }
 
-    fun KotlinFunctionReference.Id.templateVariable(): FunctionSpec
+    fun KotlinFunctionReference.Id.swiftTemplateVariable(): FunctionSpec
 
-    fun KotlinFunctionReference.templateVariable(): FunctionSpec {
-        return id.templateVariable()
+    fun KotlinFunctionReference.swiftTemplateVariable(): FunctionSpec {
+        return id.swiftTemplateVariable()
     }
 
-    fun KotlinEnumEntryReference.Id.templateVariable(): PropertySpec
+    fun KotlinEnumEntryReference.Id.swiftTemplateVariable(): PropertySpec
 
-    fun KotlinEnumEntryReference.templateVariable(): PropertySpec {
-        return id.templateVariable()
+    fun KotlinEnumEntryReference.swiftTemplateVariable(): PropertySpec {
+        return id.swiftTemplateVariable()
     }
 }

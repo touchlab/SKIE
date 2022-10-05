@@ -28,9 +28,9 @@ interface TransformContext {
 
         fun rename(newSwiftName: ApiTransform.TypeTransform.Rename)
 
-        fun bridge(bridge: ApiTransform.TypeTransform.Bridge)
-
         fun bridge(swiftType: String)
+
+        fun bridge(bridge: ApiTransform.TypeTransform.Bridge)
     }
 
     @TransformScopeMarker

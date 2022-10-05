@@ -20,44 +20,44 @@ internal class DefaultTemplateVariableContext: InternalTemplateVariableContext {
     private val referencedSymbols = mutableMapOf<KotlinDeclarationReference.Id, SwiftTemplateVariable<*>>()
     override val variables: Collection<SwiftTemplateVariable<*>> = referencedSymbols.values
 
-    override fun KotlinTypeReference.Id.templateVariable(): DeclaredTypeName {
-        val ref = getVariable(this) { name, symbolId ->
-            SwiftTemplateVariable.TypeReference(name, symbolId)
+    override fun KotlinTypeReference.Id.swiftTemplateVariable(): DeclaredTypeName {
+        val ref = getVariable(this) { name, referenceId ->
+            SwiftTemplateVariable.TypeReference(name, referenceId)
         }
         return DeclaredTypeName.typeName(".${ref.name.value}")
     }
 
-    override fun KotlinPropertyReference.Id.templateVariable(): PropertySpec {
-        val variable = getVariable(this) { name, symbolId ->
-            SwiftTemplateVariable.PropertyReference(name, symbolId)
+    override fun KotlinPropertyReference.Id.swiftTemplateVariable(): PropertySpec {
+        val variable = getVariable(this) { name, referenceId ->
+            SwiftTemplateVariable.PropertyReference(name, referenceId)
         }
         // TODO: Should we provide the builder with a real type?
         return PropertySpec.builder(variable.name.value, SelfTypeName.INSTANCE).build()
     }
 
-    override fun KotlinFunctionReference.Id.templateVariable(): FunctionSpec {
-        val variable = getVariable(this) { name, symbolId ->
-            SwiftTemplateVariable.FunctionReference(name, symbolId)
+    override fun KotlinFunctionReference.Id.swiftTemplateVariable(): FunctionSpec {
+        val variable = getVariable(this) { name, referenceId ->
+            SwiftTemplateVariable.FunctionReference(name, referenceId)
         }
         // TODO: Should we provide the builder with a real return type and parameters?
         return FunctionSpec.builder(variable.name.value).build()
     }
 
-    override fun KotlinEnumEntryReference.Id.templateVariable(): PropertySpec {
-        val variable = getVariable(this) { name, symbolId ->
-            SwiftTemplateVariable.EnumEntryReference(name, symbolId)
+    override fun KotlinEnumEntryReference.Id.swiftTemplateVariable(): PropertySpec {
+        val variable = getVariable(this) { name, referenceId ->
+            SwiftTemplateVariable.EnumEntryReference(name, referenceId)
         }
         // TODO: Should we provide the builder with a real type?
         return PropertySpec.builder(variable.name.value, SelfTypeName.INSTANCE).build()
     }
 
     private fun <ID: KotlinDeclarationReference.Id> getVariable(
-        symbolId: ID,
-        variableFactory: (name: SwiftTemplateVariable.Name, symbolId: ID) -> SwiftTemplateVariable<ID>,
+        referenceId: ID,
+        variableFactory: (name: SwiftTemplateVariable.Name, referenceId: ID) -> SwiftTemplateVariable<ID>,
     ): SwiftTemplateVariable<ID> {
-        return referencedSymbols.getOrPut(symbolId) {
+        return referencedSymbols.getOrPut(referenceId) {
             val name = SwiftTemplateVariable.Name("$SWIFTPACK_TEMPLATE_VARIABLE_PREFIX${referenceCounter.incrementAndGet()}")
-            variableFactory(name, symbolId)
+            variableFactory(name, referenceId)
         } as SwiftTemplateVariable<ID>
     }
 }

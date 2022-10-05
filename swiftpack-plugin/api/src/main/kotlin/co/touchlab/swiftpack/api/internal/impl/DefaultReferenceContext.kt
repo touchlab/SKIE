@@ -32,11 +32,9 @@ internal class DefaultReferenceContext(
     private val signaturer = KonanIdSignaturer(descriptorMangler)
 
     private val mutableReferences = mutableMapOf<KotlinDeclarationReference.Id, KotlinDeclarationReference<*>>()
-    override val references: Map<KotlinDeclarationReference.Id, KotlinDeclarationReference<*>>
-        get() = mutableReferences
 
-    override val symbols: List<KotlinDeclarationReference<*>>
-        get() = references.values.toList()
+    override val references: List<KotlinDeclarationReference<*>>
+        get() = mutableReferences.values.toList()
 
     override fun IrClass.reference(): KotlinClassReference = with(irMangler) {
         getReference(KotlinClassReference.Id(mangleString(compatibleMode))) { id ->
@@ -140,10 +138,10 @@ internal class DefaultReferenceContext(
         }
     }
 
-    private fun <S: KotlinDeclarationReference<ID>, ID: KotlinDeclarationReference.Id> getReference(id: ID, symbolFactory: (ID) -> S): S {
+    private fun <S: KotlinDeclarationReference<ID>, ID: KotlinDeclarationReference.Id> getReference(id: ID, referenceFactory: (ID) -> S): S {
         @Suppress("UNCHECKED_CAST")
         return mutableReferences.getOrPut(id) {
-            symbolFactory(id)
+            referenceFactory(id)
         } as S
     }
 }

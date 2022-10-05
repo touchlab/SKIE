@@ -12,7 +12,7 @@ import java.io.File
 data class SwiftPackModule(
     val name: Name,
     val templateVariables: List<SwiftTemplateVariable<*>>,
-    val symbols: List<KotlinDeclarationReference<*>>,
+    val references: List<KotlinDeclarationReference<*>>,
     val files: List<TemplateFile>,
     val transforms: List<ApiTransform>,
 ) {

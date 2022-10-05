@@ -37,7 +37,7 @@ class SwiftPackModuleBuilder internal constructor(
         return SwiftPackModule(
             name = SwiftPackModule.Name.Simple(moduleName),
             templateVariables = templateVariableContext.variables.toList(),
-            symbols = referenceContext.symbols,
+            references = referenceContext.references,
             files = files.map {
                 SwiftPackModule.TemplateFile(
                     name = it.name,
