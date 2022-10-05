@@ -3,10 +3,6 @@ package co.touchlab.swiftlink.example
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import co.touchlab.swiftpack.api.buildSwiftPackModule
 import co.touchlab.swiftpack.plugin.SwiftPackGenerationExtension
-import co.touchlab.swiftpack.spec.KotlinPackageReference
-import co.touchlab.swiftpack.spec.KotlinTypeReference
-import co.touchlab.swiftpack.spec.function
-import co.touchlab.swiftpack.spec.property
 import com.google.auto.service.AutoService
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -20,6 +16,7 @@ import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -69,7 +66,7 @@ class TestIrGenerator(val moduleBuilder: SwiftPackModuleBuilder, val codeBlocks:
             val typeSuffix = testAnnotation.invocation ?: ".self"
 
             codeBlocks.add(
-                CodeBlock.of("print(%S, %T%L)", declaration.name.asString(), ref.swiftReference(), typeSuffix)
+                CodeBlock.of("print(%S, %T%L)", declaration.name.asString(), ref.swiftTemplateVariable(), typeSuffix)
             )
         }
 
@@ -92,12 +89,12 @@ class TestIrGenerator(val moduleBuilder: SwiftPackModuleBuilder, val codeBlocks:
                 }
             }
 
-            when (val parent = ref.parent) {
-                is KotlinPackageReference -> codeBlocks.add(
-                    CodeBlock.of("print(%S, %N)", declaration.name.asString(), ref.swiftReference())
+            when (val parent = declaration.parent) {
+                is IrPackageFragment -> codeBlocks.add(
+                    CodeBlock.of("print(%S, %N)", declaration.name.asString(), ref.swiftTemplateVariable())
                 )
-                is KotlinTypeReference -> codeBlocks.add(
-                    CodeBlock.of("print(%S, %T().%N)", declaration.name.asString(), parent.swiftReference(), ref.swiftReference())
+                is IrClass -> codeBlocks.add(
+                    CodeBlock.of("print(%S, %T().%N)", declaration.name.asString(), parent.reference().swiftTemplateVariable(), ref.swiftTemplateVariable())
                 )
             }
         }
@@ -121,13 +118,19 @@ class TestIrGenerator(val moduleBuilder: SwiftPackModuleBuilder, val codeBlocks:
                 }
             }
             val functionSuffix = testAnnotation.invocation ?: ""
-            when (val parent = ref.parent) {
-                is KotlinPackageReference -> codeBlocks.add(
-                    CodeBlock.of("print(%S, %N%L)", declaration.name.asString(), ref.swiftReference(), functionSuffix)
+            when (val parent = declaration.parent) {
+                is IrClass -> codeBlocks.add(
+                    CodeBlock.of("print(%S, %T().%N%L)", declaration.name.asString(), parent.reference().swiftTemplateVariable(), ref.swiftTemplateVariable(), functionSuffix)
                 )
-                is KotlinTypeReference -> codeBlocks.add(
-                    CodeBlock.of("print(%S, %T().%N%L)", declaration.name.asString(), parent.swiftReference(), ref.swiftReference(), functionSuffix)
+                is IrPackageFragment -> codeBlocks.add(
+                    CodeBlock.of("print(%S, %N%L)", declaration.name.asString(), ref.swiftTemplateVariable(), functionSuffix)
                 )
+                // is KotlinPackageReference -> codeBlocks.add(
+                //     CodeBlock.of("print(%S, %N%L)", declaration.name.asString(), ref.templateVariable(), functionSuffix)
+                // )
+                // is KotlinTypeReference -> codeBlocks.add(
+                //     CodeBlock.of("print(%S, %T().%N%L)", declaration.name.asString(), parent.swiftReference(), ref.templateVariable(), functionSuffix)
+                // )
             }
         }
 

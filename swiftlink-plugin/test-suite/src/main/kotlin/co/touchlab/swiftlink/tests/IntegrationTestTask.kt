@@ -80,10 +80,6 @@ abstract class IntegrationTestTask @Inject constructor(
 
         dependsOn(*project.subprojects.map { it.tasks.withType<PodInstallTask>() }.toTypedArray())
 
-        project.the<KotlinMultiplatformExtension>().apply {
-
-        }
-
         val onlySdks: String? by project
         val onlyArchs: String? by project
         val onlyBuildTypes: String? by project

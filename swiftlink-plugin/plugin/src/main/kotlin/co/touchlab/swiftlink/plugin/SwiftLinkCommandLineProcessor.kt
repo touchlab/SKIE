@@ -1,6 +1,6 @@
 package co.touchlab.swiftlink.plugin
 
-import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
+import co.touchlab.swiftpack.spec.module.SwiftPackModule
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -36,7 +36,7 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
             },
             deserialize = { value ->
                 val (namespace, absolutePath) = value.split(File.pathSeparator)
-                NamespacedSwiftPackModule.Reference(namespace, File(absolutePath))
+                SwiftPackModule.Reference(namespace, File(absolutePath))
             },
         )
 

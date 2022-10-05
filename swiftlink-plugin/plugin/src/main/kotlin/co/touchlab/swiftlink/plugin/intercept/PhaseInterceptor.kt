@@ -1,6 +1,7 @@
 package co.touchlab.swiftlink.plugin.intercept
 
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import org.jetbrains.kotlin.backend.common.phaser.AnyNamedPhase
 import org.jetbrains.kotlin.backend.common.phaser.Checker
 import org.jetbrains.kotlin.backend.common.phaser.CompilerPhase
 import org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase
@@ -52,24 +53,11 @@ class PhaseInterceptor(
             phaseListeners
                 .groupBy { it.phase }
                 .forEach { (phaseKey, interceptions) ->
-                    val phaseAccessor = when (phaseKey) {
-                        PhaseListener.Phase.OBJC_EXPORT -> "getObjCExportPhase"
-                        PhaseListener.Phase.PSI_TO_IR -> "getPsiToIrPhase"
-                        PhaseListener.Phase.OBJECT_FILES -> "getObjectFilesPhase"
-                    }
+                    val phaseAccessor = getPhaseAccessor(phaseKey)
+                    val namedPhase = getNamedPhase(phaseAccessor)
 
-                    val phase = this::class.java.classLoader
-                        .loadClass("org.jetbrains.kotlin.backend.konan.ToplevelPhasesKt")
-                        .getDeclaredMethod(phaseAccessor)
-                        .invoke(null)
-
-                    synchronized(phase) {
-                        val field = phase.javaClass
-                            .getDeclaredField("lower")
-
-                        check(field.trySetAccessible()) { "Failed to make field `lower` accessible" }
-
-                        val currentPhase = field.get(phase) as CompilerPhase<CommonBackendContext, Unit, Unit>
+                    synchronized(namedPhase) {
+                        val currentPhase = namedPhase.lower
                         val (originalPhase, listenersKey) = if (currentPhase.javaClass.name == PhaseInterceptor::class.jvmName) {
                             currentPhase.javaClass.getDeclaredMethod(PhaseInterceptor::accessInitialConfigForCopy.name)
                                 .invoke(currentPhase) as Pair<InterceptedPhase, CompilerConfigurationKey<List<ErasedListener>>>
@@ -81,10 +69,30 @@ class PhaseInterceptor(
                         configuration.addAll(listenersKey, interceptions.map { it::beforePhase to it::afterPhase })
 
                         val interceptorPhase = PhaseInterceptor(originalPhase, listenersKey)
-                        field.set(phase, interceptorPhase)
+                        namedPhase.lower = interceptorPhase
                     }
 
                 }
         }
+
+        private fun getNamedPhase(phaseAccessor: String): AnyNamedPhase = this::class.java.classLoader
+            .loadClass("org.jetbrains.kotlin.backend.konan.ToplevelPhasesKt")
+            .getDeclaredMethod(phaseAccessor)
+            .invoke(null) as AnyNamedPhase
+
+        private fun getPhaseAccessor(phaseKey: PhaseListener.Phase) = when (phaseKey) {
+            PhaseListener.Phase.OBJC_EXPORT -> "getObjCExportPhase"
+            PhaseListener.Phase.PSI_TO_IR -> "getPsiToIrPhase"
+            PhaseListener.Phase.OBJECT_FILES -> "getObjectFilesPhase"
+        }
+
+        private val lowerField by lazy {
+            val field = NamedCompilerPhase::class.java.getDeclaredField("lower")
+            check(field.trySetAccessible()) { "Failed to make field `lower` accessible" }
+            field
+        }
+        private var AnyNamedPhase.lower: CompilerPhase<CommonBackendContext, Unit, Unit>
+            get() = lowerField.get(this) as CompilerPhase<CommonBackendContext, Unit, Unit>
+            set(value) = lowerField.set(this, value)
     }
 }

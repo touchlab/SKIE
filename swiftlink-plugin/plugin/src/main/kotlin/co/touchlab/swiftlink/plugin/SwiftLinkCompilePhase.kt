@@ -1,7 +1,11 @@
 package co.touchlab.swiftlink.plugin
 
-import co.touchlab.swiftpack.spec.SwiftPackModule
-import co.touchlab.swiftpack.spi.NamespacedSwiftPackModule
+import co.touchlab.swiftlink.plugin.resolve.DefaultTemplateVariableResolver
+import co.touchlab.swiftlink.plugin.resolve.KotlinSymbolRegistry
+import co.touchlab.swiftlink.plugin.resolve.KotlinSymbolResolver
+import co.touchlab.swiftlink.plugin.transform.ApiNotes
+import co.touchlab.swiftlink.plugin.transform.ApiTransformResolver
+import co.touchlab.swiftpack.spec.module.SwiftPackModule
 import co.touchlab.swiftpack.spi.produceSwiftFile
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
@@ -17,41 +21,41 @@ import org.jetbrains.kotlin.library.impl.javaFile
 import java.io.File
 
 class SwiftLinkCompilePhase(
-    val swiftPackModuleReferences: List<NamespacedSwiftPackModule.Reference>,
-    val swiftSourceFiles: List<File>,
-    val expandedSwiftDir: File,
+    private val config: KonanConfig,
+    private val context: CommonBackendContext,
+    private val namer: ObjCExportNamer,
+    private val swiftSourceFiles: List<File>,
+    private val expandedSwiftDir: File,
 ) {
-    fun process(config: KonanConfig, context: CommonBackendContext, namer: ObjCExportNamer): List<ObjectFile> {
+    private val moduleLoader = SwiftPackModuleLoader(context.configuration)
+
+    private val SwiftPackModule.Name.sourceFilePrefix: String
+        get() = when (this) {
+            is SwiftPackModule.Name.Simple -> name
+            is SwiftPackModule.Name.Namespaced -> "${namespace}_${name.sourceFilePrefix}"
+        }
+
+    fun process(): List<ObjectFile> {
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
             return emptyList()
         }
-        val swiftPackModules = swiftPackModuleReferences.flatMap { (namespace, moduleFile) ->
-            if (moduleFile.isDirectory) {
-                moduleFile.listFiles()?.map {
-                    NamespacedSwiftPackModule(namespace, SwiftPackModule.read(it))
-                } ?: emptyList()
-            } else {
-                listOf(NamespacedSwiftPackModule(namespace, SwiftPackModule.read(moduleFile)))
-            }
-        }
-        val kotlinNameResolver = KotlinNameResolver(context)
-        val transformResolver = TransformResolver(
-            namer,
-            kotlinNameResolver,
-            swiftPackModules,
-        )
+
+        val symbolRegistry = KotlinSymbolRegistry(moduleLoader.references)
+        val symbolResolver = KotlinSymbolResolver(context, symbolRegistry)
+        val transformResolver = ApiTransformResolver(namer, symbolResolver, moduleLoader.transforms)
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
         val swiftSourcesDir = expandedSwiftDir.also {
             it.deleteRecursively()
             it.mkdirs()
         }
 
-        val sourceFiles = swiftPackModules.flatMap { (namespace, module) ->
-            val referenceResolver = SwiftReferenceResolver(module.references)
-            val swiftNameProvider = ObjCExportNamerSwiftNameProvider(namer, kotlinNameResolver, transformResolver, referenceResolver)
+        val sourceFiles = moduleLoader.modules.flatMap { module ->
+            val filenamePrefix = module.name.sourceFilePrefix
+            val templateVariableResolver = DefaultTemplateVariableResolver(namer, symbolResolver, transformResolver, module.templateVariables)
+
             module.files.map { file ->
-                val finalContents = file.produceSwiftFile(swiftNameProvider)
-                val targetSwiftFile = swiftSourcesDir.resolve("${namespace}_${module.name}_${file.name}.swift")
+                val finalContents = file.produceSwiftFile(templateVariableResolver)
+                val targetSwiftFile = swiftSourcesDir.resolve("${filenamePrefix}_${file.name}.swift")
                 targetSwiftFile.writeText(finalContents)
                 targetSwiftFile
             }
@@ -76,9 +80,10 @@ class SwiftLinkCompilePhase(
         val swiftModule = framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() }
         val modulemapFile = framework.resolve("Modules/module.modulemap")
         val apiNotes = ApiNotes(moduleName, transformResolver)
-        apiNotes.save(headersDir, sourceFiles.isEmpty())
 
         // We want to make sure we generate .apinotes file even if there are no Swift source files.
+        apiNotes.save(headersDir, sourceFiles.isEmpty())
+
         if (sourceFiles.isEmpty()) {
             return emptyList()
         }
