@@ -1,4 +1,4 @@
-package tests.enums.configuration.global.enabled
+package `tests`.`enums`.`configuration`.`global`.`enabled`
 
 import co.touchlab.swiftgen.api.EnumInterop
 

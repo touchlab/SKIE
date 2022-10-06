@@ -1,4 +1,4 @@
-package tests.enums.with_members.properties_and_methods
+package `tests`.`enums`.`with_members`.`properties_and_methods`
 
 enum class A {
     A1,
@@ -39,9 +39,10 @@ enum class A {
     fun booleanReturnWithParam(a: Boolean): Boolean = a
 
     @Throws(Exception::class)
-    fun throwingFoo() { }
+    fun throwingFoo() {
+    }
 
-    suspend fun suspendingFoo() { }
+    suspend fun suspendingFoo() {}
 }
 
 fun a1(): A = A.A1

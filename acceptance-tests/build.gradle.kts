@@ -56,7 +56,7 @@ fun reformatPackage(file: File) {
         }
     }
 
-    val modifiedText = modifiedLines.joinToString(System.lineSeparator())
+    val modifiedText = modifiedLines.joinToString(System.lineSeparator(), postfix = System.lineSeparator())
 
     file.writeText(modifiedText)
 }

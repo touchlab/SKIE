@@ -1,4 +1,4 @@
-package tests.enums.with_members.generic
+package `tests`.`enums`.`with_members`.`generic`
 
 enum class A {
     A1,

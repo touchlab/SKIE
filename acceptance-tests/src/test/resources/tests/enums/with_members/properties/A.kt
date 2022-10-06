@@ -1,6 +1,4 @@
-package tests.enums.with_members.properties
-
-import co.touchlab.swiftgen.api.EnumInterop
+package `tests`.`enums`.`with_members`.`properties`
 
 enum class A {
     A1 {

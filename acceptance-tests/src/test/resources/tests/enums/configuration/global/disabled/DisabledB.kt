@@ -1,4 +1,4 @@
-package tests.enums.configuration.global.disabled
+package `tests`.`enums`.`configuration`.`global`.`disabled`
 
 enum class B {
     B1,

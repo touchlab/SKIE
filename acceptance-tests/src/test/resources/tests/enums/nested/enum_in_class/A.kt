@@ -1,4 +1,4 @@
-package tests.enums.nested.enum_in_class
+package `tests`.`enums`.`nested`.`enum_in_class`
 
 class A {
     enum class B {

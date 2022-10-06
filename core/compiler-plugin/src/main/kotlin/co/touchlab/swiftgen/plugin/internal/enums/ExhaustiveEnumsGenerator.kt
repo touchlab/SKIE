@@ -19,10 +19,8 @@ import io.outfoxx.swiftpoet.SelfTypeName
 import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -224,7 +222,11 @@ internal class ExhaustiveEnumsGenerator(
                                         .beginControlFlow("switch", "source")
                                         .add(
                                             declaredCases.map {
-                                                CodeBlock.of("case .%N?: return .%N", it.swiftTemplateVariable(), it.swiftTemplateVariable())
+                                                CodeBlock.of(
+                                                    "case .%N?: return .%N",
+                                                    it.swiftTemplateVariable(),
+                                                    it.swiftTemplateVariable()
+                                                )
                                             }.joinToCode("\n", suffix = "\n")
                                         )
                                         .addStatement("default: fatalError(\"Couldn't map value of \\(String(describing: source)) to ${declaration.name.asString()}\")")

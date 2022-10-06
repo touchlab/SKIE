@@ -1,4 +1,4 @@
-package tests.enums.with_members.methods
+package `tests`.`enums`.`with_members`.`methods`
 
 enum class A {
     A1 {
@@ -42,13 +42,13 @@ enum class A {
         throw Exception()
     }
 
-    suspend fun suspendingNoParam() { }
+    suspend fun suspendingNoParam() {}
 
-    suspend fun suspendingSingleParam(p: Int) { }
+    suspend fun suspendingSingleParam(p: Int) {}
 
-    suspend fun suspendingTwoParams(p1: Int, p2: String) { }
+    suspend fun suspendingTwoParams(p1: Int, p2: String) {}
 
-    suspend fun suspendingThreeParams(p1: Int, p2: String, p3: Double) { }
+    suspend fun suspendingThreeParams(p1: Int, p2: String, p3: Double) {}
 
     @Throws(Exception::class)
     suspend fun suspendingThrowingNoParam() {

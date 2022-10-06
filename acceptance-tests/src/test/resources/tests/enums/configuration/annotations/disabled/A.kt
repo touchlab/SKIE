@@ -1,4 +1,4 @@
-package tests.enums.configuration.annotations.disabled
+package `tests`.`enums`.`configuration`.`annotations`.`disabled`
 
 import co.touchlab.swiftgen.api.EnumInterop
 
