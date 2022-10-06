@@ -19,8 +19,15 @@ internal abstract class BaseGenerator(
     protected val swiftGenNamespace: DeclaredTypeName
         get() = namespaceProvider.swiftGenNamespace
 
-    protected fun generateCode(declaration: DeclarationDescriptor, codeBuilder: FileSpec.Builder.() -> Unit) {
-        swiftFileBuilderFactory.create(declaration.kotlinName).apply(codeBuilder)
+    protected fun generateCode(
+        declaration: DeclarationDescriptor,
+        codeBuilder: context(SwiftPackModuleBuilder) FileSpec.Builder.() -> Unit,
+    ) {
+        with (swiftPackModuleBuilder) {
+            swiftFileBuilderFactory.create(declaration.kotlinName).apply {
+                codeBuilder(this)
+            }
+        }
     }
 
     protected fun addNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName =
