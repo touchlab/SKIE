@@ -141,7 +141,7 @@ class SwiftLinkCompilePhase(
             +"-v"
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
-            +listOf("-Xcc", "-fmodule-map-file=$framework.modulemapFile")
+            +listOf("-Xcc", "-fmodule-map-file=${framework.modulemapFile}")
             +"-emit-module-interface-path"
             +framework.swiftModule.resolve("$targetTriple.swiftinterface").absolutePath
             +"-emit-module-path"
