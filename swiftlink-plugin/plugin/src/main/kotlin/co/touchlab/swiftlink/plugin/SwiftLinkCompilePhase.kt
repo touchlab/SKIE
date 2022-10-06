@@ -54,6 +54,41 @@ class SwiftLinkCompilePhase(
             it.mkdirs()
         }
 
+        val bridgeTypeAliasesFile = createBridgeTypeAliasesFileIfNeeded(transformResolver, swiftSourcesDir)
+
+        val sourceFiles = listOfNotNull(bridgeTypeAliasesFile) +
+            produceSwiftFilesFromModules(symbolResolver, transformResolver, swiftSourcesDir) + swiftSourceFiles
+
+        val framework = FrameworkLayout(config.outputFile)
+        val apiNotes = ApiNotes(framework.moduleName, transformResolver)
+
+        val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
+            apiNotes.save(framework.headersDir, false)
+
+            val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
+
+            compileSwift(configurables, framework, sourceFiles, swiftObjectsDir.javaFile())
+
+            appendSwiftHeaderImportIfNeeded(framework)
+
+            addSwiftSpecificLinkerArgs(configurables)
+
+            swiftObjectsDir.listFilesOrEmpty.filter { it.extension == "o" }.map { it.absolutePath }
+        } else {
+            emptyList()
+        }
+
+        apiNotes.save(framework.headersDir, true)
+
+        disableWildcardExportIfNeeded(framework)
+
+        return swiftObjectPaths
+    }
+
+    private fun createBridgeTypeAliasesFileIfNeeded(
+        transformResolver: ApiTransformResolver,
+        swiftSourcesDir: File,
+    ): File? {
         val bridgeTypealiases = transformResolver.typeTransforms.mapNotNull { typeTransform ->
             val bridgedName = typeTransform.bridgedName as? BridgedName.Relative ?: return@mapNotNull null
             TypeAliasSpec.builder(bridgedName.typealiasName, DeclaredTypeName.qualifiedTypeName(".${bridgedName.typealiasValue}"))
@@ -61,84 +96,60 @@ class SwiftLinkCompilePhase(
                 .build()
         }
 
-        val bridgeTypealiasesFile = if (bridgeTypealiases.isNotEmpty()) {
-            val file = swiftSourcesDir.resolve("__ObjCBridgeTypeAliases.swift")
-            FileSpec.builder("__ObjCBridgeTypeAliases")
-                .apply {
-                    bridgeTypealiases.forEach { addType(it) }
-                }
-                .build()
-                .toString()
-                .also { file.writeText(it) }
-            file
-        } else {
-            null
+        if (bridgeTypealiases.isEmpty()) {
+            return null
         }
 
-        val sourceFiles = listOfNotNull(bridgeTypealiasesFile) + moduleLoader.modules.flatMap { module ->
-            val filenamePrefix = module.name.sourceFilePrefix
-            val templateVariableResolver = DefaultTemplateVariableResolver(
-                config.moduleId,
-                namer,
-                symbolResolver,
-                transformResolver,
-                module.templateVariables,
-            )
-
-            module.files.map { file ->
-                val finalContents = file.produceSwiftFile(templateVariableResolver)
-                val targetSwiftFile = swiftSourcesDir.resolve("${filenamePrefix}_${file.name}.swift")
-                targetSwiftFile.writeText(finalContents)
-                targetSwiftFile
+        val file = swiftSourcesDir.resolve("__ObjCBridgeTypeAliases.swift")
+        FileSpec.builder("__ObjCBridgeTypeAliases")
+            .apply {
+                bridgeTypealiases.forEach { addType(it) }
             }
-        } + swiftSourceFiles
+            .build()
+            .toString()
+            .also { file.writeText(it) }
 
-        val (swiftcBitcodeArg, _) = when (config.configuration.get(KonanConfigKeys.BITCODE_EMBEDDING_MODE)) {
-            BitcodeEmbedding.Mode.NONE, null -> null to emptyList()
-            BitcodeEmbedding.Mode.FULL -> "-embed-bitcode" to listOf("-bitcode_bundle")
-            BitcodeEmbedding.Mode.MARKER -> "-embed-bitcode-marker" to listOf("-bitcode_bundle", "-bitcode_process_mode", "marker")
+        return file
+    }
+
+    private fun produceSwiftFilesFromModules(
+        symbolResolver: KotlinSymbolResolver,
+        transformResolver: ApiTransformResolver,
+        swiftSourcesDir: File,
+    ) = moduleLoader.modules.flatMap { module ->
+        val filenamePrefix = module.name.sourceFilePrefix
+        val templateVariableResolver = DefaultTemplateVariableResolver(
+            config.moduleId,
+            namer,
+            symbolResolver,
+            transformResolver,
+            module.templateVariables,
+        )
+
+        module.files.map { file ->
+            val finalContents = file.produceSwiftFile(templateVariableResolver)
+            val targetSwiftFile = swiftSourcesDir.resolve("${filenamePrefix}_${file.name}.swift")
+            targetSwiftFile.writeText(finalContents)
+            targetSwiftFile
         }
-        val swiftcBuildTypeArgs = if (config.debug) {
-            emptyList()
-        } else {
-            listOf("-O", "-whole-module-optimization")
-        }
+    }
 
-        val framework = File(config.outputFile)
-        val moduleName = framework.name.removeSuffix(".framework")
-        val headersDir = framework.resolve("Headers")
-        val kotlinHeader = headersDir.resolve("$moduleName.h")
-        val swiftHeader = headersDir.resolve("$moduleName-Swift.h")
-        val swiftModule = framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() }
-        val modulemapFile = framework.resolve("Modules/module.modulemap")
-        val apiNotes = ApiNotes(moduleName, transformResolver)
-
-        // We want to make sure we generate .apinotes file even if there are no Swift source files.
-        apiNotes.save(headersDir, sourceFiles.isEmpty())
-
-        if (sourceFiles.isEmpty()) {
-            return emptyList()
-        }
-
-        val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
-
+    private fun compileSwift(configurables: AppleConfigurables, framework: FrameworkLayout, sourceFiles: List<File>, swiftObjectsDir: File) {
         val targetTriple = configurables.targetTriple
 
         Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
             +"-v"
-            +listOf("-module-name", moduleName)
+            +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
-            +listOf("-Xcc", "-fmodule-map-file=$modulemapFile")
+            +listOf("-Xcc", "-fmodule-map-file=$framework.modulemapFile")
             +"-emit-module-interface-path"
-            +swiftModule.resolve("$targetTriple.swiftinterface").absolutePath
+            +framework.swiftModule.resolve("$targetTriple.swiftinterface").absolutePath
             +"-emit-module-path"
-            +swiftModule.resolve("$targetTriple.swiftmodule").absolutePath
+            +framework.swiftModule.resolve("$targetTriple.swiftmodule").absolutePath
             +"-emit-objc-header-path"
-            +swiftHeader.absolutePath
-            if (swiftcBitcodeArg != null) {
-                +swiftcBitcodeArg
-            }
-            +swiftcBuildTypeArgs
+            +framework.swiftHeader.absolutePath
+            getSwiftcBitcodeArg()?.let { +it }
+            +getSwiftcBuildTypeArgs()
             +"-emit-object"
             +"-enable-library-evolution"
             +"-parse-as-library"
@@ -149,28 +160,36 @@ class SwiftLinkCompilePhase(
             +targetTriple.withOSVersion(configurables.osVersionMin).toString()
             +sourceFiles.map { it.absolutePath }
 
-            workingDirectory = swiftObjectsDir.javaFile()
+            workingDirectory = swiftObjectsDir
 
             logWith {
                 println(it())
             }
             execute()
         }
+    }
 
-        if (swiftHeader.exists()) {
+    private fun getSwiftcBitcodeArg() = when (config.configuration.get(KonanConfigKeys.BITCODE_EMBEDDING_MODE)) {
+        BitcodeEmbedding.Mode.NONE, null -> null
+        BitcodeEmbedding.Mode.FULL -> "-embed-bitcode"
+        BitcodeEmbedding.Mode.MARKER -> "-embed-bitcode-marker"
+    }
+
+    private fun getSwiftcBuildTypeArgs() = if (config.debug) {
+        emptyList()
+    } else {
+        listOf("-O", "-whole-module-optimization")
+    }
+
+    private fun appendSwiftHeaderImportIfNeeded(framework: FrameworkLayout) {
+        if (framework.swiftHeader.exists()) {
             // TODO: This line seems to fix the "warning: umbrella header for module 'ExampleKit' does not include header 'ExampleKit-Swift.h'",
             // TODO: but not in all invocations, which is why it needs to be investigated (for example running link for both dynamic and static).
-            kotlinHeader.appendText("\n#import \"${swiftHeader.name}\"\n")
+            framework.kotlinHeader.appendText("\n#import \"${framework.swiftHeader.name}\"\n")
         }
+    }
 
-        apiNotes.save(headersDir, true)
-
-        if (config.configuration.getBoolean(ConfigurationKeys.disableWildcardExport)) {
-            modulemapFile.writeText(
-                modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
-            )
-        }
-
+    private fun addSwiftSpecificLinkerArgs(configurables: AppleConfigurables) {
         val swiftLibSearchPaths = listOf(
             File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),
             File(configurables.absoluteTargetSysRoot, "usr/lib/swift"),
@@ -181,7 +200,13 @@ class SwiftLinkCompilePhase(
 
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
+    }
 
-        return swiftObjectsDir.listFilesOrEmpty.filter { it.extension == "o" }.map { it.absolutePath }
+    private fun disableWildcardExportIfNeeded(framework: FrameworkLayout) {
+        if (config.configuration.getBoolean(ConfigurationKeys.disableWildcardExport)) {
+            framework.modulemapFile.writeText(
+                framework.modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
+            )
+        }
     }
 }
