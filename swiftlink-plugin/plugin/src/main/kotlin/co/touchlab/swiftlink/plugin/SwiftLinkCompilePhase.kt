@@ -162,9 +162,6 @@ class SwiftLinkCompilePhase(
 
             workingDirectory = swiftObjectsDir
 
-            logWith {
-                println(it())
-            }
             execute()
         }
     }
