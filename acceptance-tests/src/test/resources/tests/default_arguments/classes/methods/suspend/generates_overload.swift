@@ -1,5 +1,5 @@
-func callFoo(a: A) async {
-    try! await a.foo()
-}
+let a = A()
 
-exit(0)
+let result = try! await a.foo()
+
+exit(result.int32Value)

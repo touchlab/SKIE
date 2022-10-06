@@ -1,4 +1,4 @@
-# SwiftCompilationError(7:16: error: value of type 'A' has no member 'foo')
+# SwiftCompilationError(error: value of type 'A' has no member 'foo')
 
 let a: A = A()
 

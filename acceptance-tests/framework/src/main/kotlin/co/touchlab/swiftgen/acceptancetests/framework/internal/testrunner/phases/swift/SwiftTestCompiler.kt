@@ -38,6 +38,8 @@ internal class SwiftTestCompiler(
         // "-Xfrontend", "-debug-constraints",
         "-o",
         output.absolutePathString(),
+        // Workaround for https://github.com/apple/swift/issues/55127
+        "-parse-as-library",
     ).joinToString(" ")
 
     private fun interpretResult(result: CommandResult, output: Path): IntermediateResult<Path> =

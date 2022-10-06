@@ -1,4 +1,4 @@
-# SwiftCompilationError(error: call can throw but is not marked with 'try')
+# SwiftCompilationError(error: call can throw, but it is not marked with 'try')
 
 let a = A()
 

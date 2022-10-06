@@ -34,6 +34,8 @@ val compileSwift = tasks.register<Exec>("compileSwift") {
         frameworkDirectory.asFile.absolutePath,
         "-o",
         mainFile.absolutePath,
+        // Workaround for https://github.com/apple/swift/issues/55127
+        "-parse-as-library",
     )
 }
 
@@ -128,19 +130,29 @@ abstract class SetupPlaygroundTask : DefaultTask() {
     }
 
     private fun copySwiftTestFile(swiftTestFile: File) {
-        swiftPlaygroundFile.writeText(
-            """
-                import Foundation
-                import Kotlin
-                
-                
-            """.trimIndent() + swiftTestFile.readText() + """
-                
-                
-                fatalError("Tested program ended without explicitly calling `exit(0)`.")
-            """.trimIndent()
-        )
+        val swiftCode = swiftTestFile.readText().trim()
+
+        val enhancedSwiftCode = enhanceSwiftCode(swiftCode)
+
+        swiftPlaygroundFile.writeText(enhancedSwiftCode)
     }
+
+    private fun enhanceSwiftCode(swiftCode: String): String =
+        swiftCode
+            .let(::addExitCallCheck)
+            .let(::addMainFunction)
+            .let(::addImports)
+
+    private fun addExitCallCheck(code: String): String =
+        "$code\n\nfatalError(\"Tested program ended without explicitly calling `exit(0)`.\")\n"
+
+    private fun addMainFunction(code: String): String =
+        "@main struct Main {\n\n    static func main() async {\n" +
+                code.prependIndent("        ").trimEnd() +
+                "\n    }\n}\n"
+
+    private fun addImports(code: String): String =
+        "import Foundation\nimport Kotlin\n\n$code"
 
     private fun copyKotlinTestFiles(swiftTestFile: File, kotlinPlaygroundSourcesDirectory: File) {
         swiftTestFile.walkUpToTestsDirectory {
