@@ -12,8 +12,8 @@ internal class SwiftGenIrPhaseListener : PhaseListener {
     override fun beforePhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
         super.beforePhase(phaseConfig, phaserState, context)
 
-        val irGenerator = SwiftGenCompilerConfigurationKey.IrGenerator.getOrNull(context.configuration)
+        val declarationBuilder = SwiftGenCompilerConfigurationKey.DeclarationBuilder.getOrNull(context.configuration)
 
-        irGenerator?.suppressUnboundSymbolsError()
+        declarationBuilder?.suppressUnboundSymbolsError()
     }
 }

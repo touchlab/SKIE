@@ -8,12 +8,12 @@ import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.util.ir.IrBuilder
+import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.validation.IrValidator
 
 internal class SwiftGenScheduler(
     swiftFileBuilderFactory: SwiftFileBuilderFactory,
-    irBuilder: IrBuilder,
+    declarationBuilder: DeclarationBuilder,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     reporter: Reporter,
@@ -36,7 +36,7 @@ internal class SwiftGenScheduler(
     )
 
     private val defaultArgumentGenerator = DefaultArgumentGenerator(
-        irBuilder = irBuilder,
+        declarationBuilder = declarationBuilder,
         swiftFileBuilderFactory = swiftFileBuilderFactory,
         namespaceProvider = namespaceProvider,
         configuration = configuration,

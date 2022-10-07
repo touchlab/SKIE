@@ -5,7 +5,7 @@ import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.util.ir.IrBuilder
+import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class DefaultArgumentGenerator(
-    private val irBuilder: IrBuilder,
+    private val declarationBuilder: DeclarationBuilder,
     swiftFileBuilderFactory: SwiftFileBuilderFactory,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
@@ -93,13 +93,13 @@ internal class DefaultArgumentGenerator(
         (this shr n) and 1 == 1
 
     private fun generateOverload(function: SimpleFunctionDescriptor, parameters: List<ValueParameterDescriptor>, index: Int) {
-        irBuilder.createFunction(
+        declarationBuilder.createFunction(
             name = function.name,
-            fileName = "__DefaultArguments_$index",
+            namespace = declarationBuilder.getNamespace("__DefaultArguments_$index"),
             annotations = function.annotations,
-        ) { overload ->
+        ) {
             extensionReceiverParameter = function.dispatchReceiverParameter
-            valueParameters = parameters.mapIndexed { index, valueParameter -> valueParameter.copyWithoutDefaultValue(overload, index) }
+            valueParameters = parameters.mapIndexed { index, valueParameter -> valueParameter.copyWithoutDefaultValue(descriptor, index) }
             returnType = function.returnTypeOrNothing
             isInline = function.isInline
             isSuspend = function.isSuspend

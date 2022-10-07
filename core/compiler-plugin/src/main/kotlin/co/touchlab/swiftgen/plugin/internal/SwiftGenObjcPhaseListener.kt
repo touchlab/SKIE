@@ -5,8 +5,8 @@ import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.util.ir.IrBuilder
-import co.touchlab.swiftgen.plugin.internal.util.ir.IrGenerator
+import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
+import co.touchlab.swiftgen.plugin.internal.util.ir.impl.DeclarationBuilderImpl
 import co.touchlab.swiftlink.plugin.intercept.PhaseListener
 import co.touchlab.swiftpack.api.buildSwiftPackModule
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -21,10 +21,10 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
         super.beforePhase(phaseConfig, phaserState, context)
 
         buildSwift { swiftFileBuilderFactory ->
-            buildIr(context) { irBuilder ->
+            buildIr(context) { declarationBuilder ->
                 val swiftGenScheduler = SwiftGenScheduler(
                     swiftFileBuilderFactory = swiftFileBuilderFactory,
-                    irBuilder = irBuilder,
+                    declarationBuilder = declarationBuilder,
                     namespaceProvider = NamespaceProvider(swiftFileBuilderFactory),
                     configuration = context.pluginConfiguration,
                     reporter = Reporter(context.configuration),
@@ -51,13 +51,11 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
         }
     }
 
-    private fun buildIr(context: CommonBackendContext, action: (IrBuilder) -> Unit) {
-        val irGenerator = IrGenerator(context)
+    private fun buildIr(context: CommonBackendContext, action: (DeclarationBuilder) -> Unit) {
+        val declarationBuilder = DeclarationBuilderImpl(context)
 
-        SwiftGenCompilerConfigurationKey.IrGenerator.put(irGenerator, context.configuration)
+        SwiftGenCompilerConfigurationKey.DeclarationBuilder.put(declarationBuilder, context.configuration)
 
-        action(irGenerator.builder)
-
-        irGenerator.generateDescriptors()
+        action(declarationBuilder)
     }
 }

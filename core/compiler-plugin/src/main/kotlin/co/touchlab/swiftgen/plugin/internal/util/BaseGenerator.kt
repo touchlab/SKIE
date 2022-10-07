@@ -23,7 +23,7 @@ internal abstract class BaseGenerator(
         declaration: DeclarationDescriptor,
         codeBuilder: context(SwiftPackModuleBuilder) FileSpec.Builder.() -> Unit,
     ) {
-        with (swiftPackModuleBuilder) {
+        with(swiftPackModuleBuilder) {
             swiftFileBuilderFactory.create(declaration.kotlinName).apply {
                 codeBuilder(this)
             }

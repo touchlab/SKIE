@@ -8,8 +8,8 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 class SwiftGenIrGenerationExtension(private val configuration: CompilerConfiguration) : IrGenerationExtension {
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-        val irGenerator = SwiftGenCompilerConfigurationKey.IrGenerator.getOrNull(configuration)
+        val declarationBuilder = SwiftGenCompilerConfigurationKey.DeclarationBuilder.getOrNull(configuration)
 
-        irGenerator?.generateIr(moduleFragment, pluginContext)
+        declarationBuilder?.generateIr(moduleFragment, pluginContext)
     }
 }
