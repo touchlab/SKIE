@@ -11,27 +11,27 @@ internal class SwiftTestCompiler(
     private val testResultBuilder: TestResultBuilder,
 ) {
 
-    fun compile(swiftFile: Path, kotlinFrameworkDirectory: Path): IntermediateResult<Path> {
+    fun compile(kotlinFramework: Path, swiftFile: Path): IntermediateResult<Path> {
         val output = tempFileSystem.createFile("swift-binary")
 
-        val command = createCompileSwiftCommand(swiftFile, kotlinFrameworkDirectory, output)
+        val command = createCompileSwiftCommand(kotlinFramework, swiftFile, output)
 
         val result = command.execute()
 
-        testResultBuilder.appendLog("Swift compilation", result.stdOut)
+        testResultBuilder.appendLog("Swift compiler", result.stdOut)
 
         return interpretResult(result, output)
     }
 
     private fun createCompileSwiftCommand(
+        kotlinFramework: Path,
         swiftFile: Path,
-        kotlinFrameworkDirectory: Path,
         output: Path,
     ): String = listOf(
         "swiftc",
         swiftFile.absolutePathString(),
         "-F",
-        kotlinFrameworkDirectory.absolutePathString(),
+        kotlinFramework.parent.absolutePathString(),
         "-v",
         // "-driver-time-compilation",
         // "-print-educational-notes",

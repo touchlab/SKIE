@@ -1,14 +1,8 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin
 
-import co.touchlab.swiftgen.BuildConfig
 import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestResultBuilder
-import co.touchlab.swiftgen.configuration.Configuration
-import co.touchlab.swiftlink.plugin.ConfigurationKeys
-import co.touchlab.swiftlink.plugin.SwiftLinkComponentRegistrar
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import co.touchlab.swiftpack.spec.module.SwiftPackModule
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.bc.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -20,49 +14,23 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
-import kotlin.io.path.readText
 
 internal class KotlinTestCompiler(
     private val tempFileSystem: TempFileSystem,
     private val testResultBuilder: TestResultBuilder,
 ) {
 
-    fun compile(kotlinFiles: List<Path>, configuration: Path): IntermediateResult<Path> {
-        val outputDirectory = tempFileSystem.createDirectory("kotlin-build")
-
-        val generatedSwiftDirectory = configureSwiftKt()
+    fun compile(kotlinFiles: List<Path>): IntermediateResult<Path> {
+        val tempDirectory = tempFileSystem.createDirectory("kotlin-compiler")
+        val outputFile = tempFileSystem.createFile("kotlin.klib")
 
         val (messageCollector, outputStream) = createCompilerOutputStream()
 
-        val arguments = createCompilerArguments(kotlinFiles, configuration, outputDirectory)
+        val arguments = createCompilerArguments(kotlinFiles, tempDirectory, outputFile)
 
         val result = K2Native().exec(messageCollector, Services.EMPTY, arguments)
 
-        return interpretResult(result, outputDirectory, outputStream, generatedSwiftDirectory)
-    }
-
-    private fun configureSwiftKt(): Path {
-        val outputDirectory = tempFileSystem.createDirectory("swiftpack")
-        val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
-
-        SwiftPackModuleBuilder.Config.outputDir = outputDirectory.toFile()
-
-        PluginRegistrar.configure.set {
-            val swiftPackModule = SwiftPackModule.Reference("Kotlin", outputDirectory.toFile())
-
-            add(ConfigurationKeys.swiftPackModules, swiftPackModule)
-            put(ConfigurationKeys.expandedSwiftDir, expandedSwiftDirectory.toFile())
-        }
-
-        PluginRegistrar.plugins.set(
-            listOf(
-                SwiftLinkComponentRegistrar(),
-            )
-        )
-
-        return expandedSwiftDirectory
+        return interpretResult(result, outputFile, outputStream)
     }
 
     private fun createCompilerOutputStream(): Pair<PrintingMessageCollector, OutputStream> {
@@ -79,50 +47,35 @@ internal class KotlinTestCompiler(
 
     private fun createCompilerArguments(
         kotlinFiles: List<Path>,
-        configuration: Path,
-        outputDirectory: Path,
+        tempDirectory: Path,
+        outputFile: Path,
     ): K2NativeCompilerArguments =
         K2NativeCompilerArguments().apply {
             freeArgs = kotlinFiles.map { it.absolutePathString() }
 
             memoryModel = "experimental"
-            pluginOptions = (pluginOptions ?: emptyArray()) + createConfigurationPathOption(configuration)
 
-            produce = "framework"
-            staticFramework = true
+            produce = "library"
+            moduleName = "co.touchlab.swiftgen:kotlin"
 
-            temporaryFilesDir = outputDirectory.absolutePathString()
-            outputName = outputDirectory.resolve("Kotlin").absolutePathString()
-            bundleId = "Kotlin"
-
-            pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.RESOURCES)
+            this.temporaryFilesDir = tempDirectory.absolutePathString()
+            outputName = outputFile.absolutePathString()
         }
-
-    private fun createConfigurationPathOption(configuration: Path): String =
-        "plugin:${Configuration.CliPluginId}:${Configuration.CliOptionKey}=${configuration.absolutePathString()}"
 
     private fun interpretResult(
         result: ExitCode,
-        outputDirectory: Path,
+        klibFile: Path,
         outputStream: OutputStream,
-        generatedSwiftDirectory: Path,
-    ): IntermediateResult<Path> {
-        val generatedSwift = generatedSwiftDirectory.listDirectoryEntries().joinToString("\n") {
-            "------ ${it.name} ------\n" + it.readText()
+    ): IntermediateResult<Path> = when (result) {
+        ExitCode.OK -> {
+            testResultBuilder.appendLog("Kotlin compiler", outputStream.toString())
+
+            IntermediateResult.Value(klibFile)
         }
-        testResultBuilder.appendLog("Generated Swift", generatedSwift)
+        else -> {
+            val testResult = testResultBuilder.buildKotlinCompilationError(outputStream.toString())
 
-        return when (result) {
-            ExitCode.OK -> {
-                testResultBuilder.appendLog("Kotlin compilation", outputStream.toString())
-
-                IntermediateResult.Value(outputDirectory)
-            }
-            else -> {
-                val testResult = testResultBuilder.buildKotlinCompilationError(outputStream.toString())
-
-                IntermediateResult.Error(testResult)
-            }
+            IntermediateResult.Error(testResult)
         }
     }
 }

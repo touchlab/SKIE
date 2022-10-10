@@ -7,6 +7,7 @@ import co.touchlab.swiftgen.acceptancetests.framework.TestNode
 import co.touchlab.swiftgen.acceptancetests.framework.TestResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinCodeEnhancer
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
+import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestLinker
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.kotlin.PluginConfigurationGenerator
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.swift.SwiftCodeEnhancer
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.phases.swift.SwiftProgramRunner
@@ -22,9 +23,10 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
 
         return IntermediateResult.Value(test.kotlinFiles)
             .map { enhanceKotlinCode(it) }
+            .flatMap { compileKotlin(it, tempFileSystem, testResultBuilder) }
             .zip { generateConfiguration(test.configFiles, tempFileSystem, testResultBuilder) }
-            .flatMap { compileKotlin(it.first, it.second, tempFileSystem, testResultBuilder) }
-            .map { enhanceSwiftCode(test.swiftCode, tempFileSystem) to it }
+            .flatMap { linkKotlin(it.first, it.second, tempFileSystem, testResultBuilder) }
+            .pairWith { enhanceSwiftCode(test.swiftCode, tempFileSystem) }
             .flatMap { compileSwift(it.first, it.second, tempFileSystem, testResultBuilder) }
             .finalize { runSwift(it, testResultBuilder) }
             .also { writeResult(test, it) }
@@ -34,6 +36,13 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     private fun enhanceKotlinCode(kotlinFiles: List<Path>): List<Path> =
         KotlinCodeEnhancer().enhance(kotlinFiles)
 
+    private fun compileKotlin(
+        kotlinFiles: List<Path>,
+        tempFileSystem: TempFileSystem,
+        testResultBuilder: TestResultBuilder,
+    ): IntermediateResult<Path> =
+        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles)
+
     private fun generateConfiguration(
         configFiles: List<Path>,
         tempFileSystem: TempFileSystem,
@@ -41,24 +50,24 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     ): IntermediateResult<Path> =
         PluginConfigurationGenerator(tempFileSystem, testResultBuilder).generate(configFiles)
 
-    private fun compileKotlin(
-        kotlinFiles: List<Path>,
+    private fun linkKotlin(
+        klib: Path,
         configuration: Path,
         tempFileSystem: TempFileSystem,
         testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles, configuration)
+        KotlinTestLinker(tempFileSystem, testResultBuilder).link(klib, configuration)
 
     private fun enhanceSwiftCode(swiftCode: String, tempFileSystem: TempFileSystem): Path =
         SwiftCodeEnhancer(tempFileSystem).enhance(swiftCode)
 
     private fun compileSwift(
+        kotlinFramework: Path,
         swiftFile: Path,
-        kotlinFrameworkDirectory: Path,
         tempFileSystem: TempFileSystem,
         testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        SwiftTestCompiler(tempFileSystem, testResultBuilder).compile(swiftFile, kotlinFrameworkDirectory)
+        SwiftTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFramework, swiftFile)
 
     private fun runSwift(binary: Path, testResultBuilder: TestResultBuilder): TestResult =
         SwiftProgramRunner(testResultBuilder).runProgram(binary)

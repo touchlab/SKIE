@@ -10,6 +10,8 @@ internal sealed interface IntermediateResult<out T> {
 
     fun <R> zip(action: () -> IntermediateResult<R>): IntermediateResult<Pair<T, R>>
 
+    fun <R> pairWith(action: () -> R): IntermediateResult<Pair<T, R>>
+
     fun finalize(action: (T) -> TestResult): TestResult
 
     data class Value<T>(val value: T) : IntermediateResult<T> {
@@ -23,6 +25,9 @@ internal sealed interface IntermediateResult<out T> {
         override fun <R> zip(action: () -> IntermediateResult<R>): IntermediateResult<Pair<T, R>> =
             action().map { value to it }
 
+        override fun <R> pairWith(action: () -> R): IntermediateResult<Pair<T, R>> =
+            Value(value to action())
+
         override fun finalize(action: (T) -> TestResult): TestResult =
             action(value)
     }
@@ -33,6 +38,9 @@ internal sealed interface IntermediateResult<out T> {
             this
 
         override fun <R> zip(action: () -> IntermediateResult<R>): IntermediateResult<Pair<Nothing, R>> =
+            this
+
+        override fun <R> pairWith(action: () -> R): IntermediateResult<Pair<Nothing, R>> =
             this
 
         override fun <R> flatMap(action: (Nothing) -> IntermediateResult<R>): IntermediateResult<R> =
