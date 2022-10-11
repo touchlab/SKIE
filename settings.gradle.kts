@@ -16,6 +16,8 @@ pluginManagement {
         gradlePluginPortal()
         maven("https://api.touchlab.dev/public")
     }
+
+    includeBuild("gradle-src")
 }
 
 dependencyResolutionManagement {

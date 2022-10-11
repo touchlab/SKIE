@@ -1,3 +1,8 @@
+plugins {
+    alias(libs.plugins.kotlin.jvm) apply false
+    id("gradle-src-classpath-loader")
+}
+
 allprojects {
     group = "co.touchlab.swiftgen"
     version = "0.1"
