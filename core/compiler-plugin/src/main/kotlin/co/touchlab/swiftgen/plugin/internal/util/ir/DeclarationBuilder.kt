@@ -1,5 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal.util.ir
 
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.Name
@@ -7,6 +8,8 @@ import org.jetbrains.kotlin.name.Name
 internal interface DeclarationBuilder {
 
     fun getNamespace(name: String): Namespace
+
+    fun getNamespace(classDescriptor: ClassDescriptor): Namespace
 
     fun createFunction(
         name: Name,

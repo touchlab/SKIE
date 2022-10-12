@@ -1,3 +1,5 @@
+# Skip
+
 let a = A()
 
 let result = try! await a.foo()

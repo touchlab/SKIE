@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.symbols.IrBindableSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
+import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.SyntheticDeclarationsGenerator
 
@@ -19,10 +20,12 @@ internal abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : 
         descriptor.accept(syntheticDeclarationsGenerator, parent)
 
         val symbol = generatorContext.symbolTable.getSymbol(descriptor)
+        val ir = symbol.owner
 
         val declarationIrBuilder = DeclarationIrBuilder(generatorContext, symbol, startOffset = 0, endOffset = 0)
 
-        symbol.owner.initialize(generatorContext.symbolTable, declarationIrBuilder)
+        ir.patchDeclarationParents(ir.parent)
+        ir.initialize(generatorContext.symbolTable, declarationIrBuilder)
     }
 
     protected abstract fun ReferenceSymbolTable.getSymbol(descriptor: D): S

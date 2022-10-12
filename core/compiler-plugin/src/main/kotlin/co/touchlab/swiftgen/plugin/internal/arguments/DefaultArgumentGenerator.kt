@@ -6,9 +6,13 @@ import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
+import co.touchlab.swiftgen.plugin.internal.util.ir.createFunction
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -36,31 +40,38 @@ internal class DefaultArgumentGenerator(
 
     override fun generate(descriptorProvider: DescriptorProvider) {
         descriptorProvider.allSupportedFunctions()
-            .filter { descriptorProvider.shouldBeExposed(it) }
-            .filter { it.hasDefaultArguments }
+            .filter { descriptorProvider.shouldBeExposed(it.first) }
+            .filter { it.first.hasDefaultArguments }
             .forEach {
-                generateOverloads(it)
+                generateOverloads(it.first, it.second)
             }
     }
 
     private val SimpleFunctionDescriptor.hasDefaultArguments: Boolean
         get() = this.valueParameters.any { it.declaresDefaultValue() }
 
-    private fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> =
+    private fun DescriptorProvider.allSupportedFunctions(): List<Pair<SimpleFunctionDescriptor, ClassDescriptor>> =
         this.classDescriptors
+            .filter { it.isSupported }
             .flatMap { classDescriptor ->
                 classDescriptor.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
                     .filterIsInstance<SimpleFunctionDescriptor>()
                     .filter { it.canBeUsedWithExperimentalFeatures }
                     .filter { it.isSupported }
+                    .map { it to classDescriptor }
             }
+
+    private val ClassDescriptor.isSupported: Boolean
+        get() = when (this.kind) {
+            ClassKind.CLASS, ClassKind.ENUM_CLASS, ClassKind.OBJECT -> true
+            ClassKind.INTERFACE, ClassKind.ENUM_ENTRY, ClassKind.ANNOTATION_CLASS -> false
+        }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
         get() = this.dispatchReceiverParameter != null &&
-                this.extensionReceiverParameter == null &&
-                this.typeParameters.isEmpty()
+                this.extensionReceiverParameter == null
 
-    private fun generateOverloads(function: SimpleFunctionDescriptor) {
+    private fun generateOverloads(function: SimpleFunctionDescriptor, parentClass: ClassDescriptor) {
         val parametersWithDefaultValues = function.valueParameters.filter { it.hasDefaultValue() }
 
         parametersWithDefaultValues.forEachSubsetIndexed { index, omittedParameters ->
@@ -68,7 +79,7 @@ internal class DefaultArgumentGenerator(
                 @Suppress("ConvertArgumentToSet")
                 val overloadParameters = function.valueParameters - omittedParameters
 
-                generateOverload(function, overloadParameters, index)
+                generateOverload(function, overloadParameters, parentClass, index)
             }
         }
     }
@@ -92,22 +103,39 @@ internal class DefaultArgumentGenerator(
     private fun Int.testBit(n: Int): Boolean =
         (this shr n) and 1 == 1
 
-    private fun generateOverload(function: SimpleFunctionDescriptor, parameters: List<ValueParameterDescriptor>, index: Int) {
+    private fun generateOverload(
+        function: SimpleFunctionDescriptor,
+        parameters: List<ValueParameterDescriptor>,
+        parentClass: ClassDescriptor,
+        index: Int,
+    ) {
+        val newFunction = generateOverloadWithUniqueName(index, function, parentClass, parameters)
+
+        renameOverloadedFunction(newFunction, function)
+    }
+
+    private fun generateOverloadWithUniqueName(
+        index: Int,
+        function: SimpleFunctionDescriptor,
+        parentClass: ClassDescriptor,
+        parameters: List<ValueParameterDescriptor>,
+    ): FunctionDescriptor =
         declarationBuilder.createFunction(
-            name = function.name,
-            namespace = declarationBuilder.getNamespace("__DefaultArguments_$index"),
+            name = "__SwiftGen__${index}__${function.name.identifier}",
+            namespace = declarationBuilder.getNamespace(parentClass),
             annotations = function.annotations,
         ) {
-            extensionReceiverParameter = function.dispatchReceiverParameter
+            dispatchReceiverParameter = function.dispatchReceiverParameter
             valueParameters = parameters.mapIndexed { index, valueParameter -> valueParameter.copyWithoutDefaultValue(descriptor, index) }
+            typeParameters = function.typeParameters
             returnType = function.returnTypeOrNothing
             isInline = function.isInline
             isSuspend = function.isSuspend
+            modality = Modality.FINAL
             body = { overloadIr ->
                 getOverloadBody(function, overloadIr)
             }
         }
-    }
 
     private fun ValueParameterDescriptor.copyWithoutDefaultValue(
         newOwner: CallableDescriptor,
@@ -129,12 +157,12 @@ internal class DefaultArgumentGenerator(
     context(ReferenceSymbolTable, DeclarationIrBuilder) private fun getOverloadBody(
         originalFunction: FunctionDescriptor, overloadIr: IrFunction,
     ): IrBody {
-        val functionIr = referenceSimpleFunction(originalFunction)
+        val functionIrSymbol = referenceSimpleFunction(originalFunction)
 
         return irBlockBody {
             +irReturn(
-                irCall(functionIr).apply {
-                    dispatchReceiver = overloadIr.extensionReceiverParameter?.let { irGet(it) }
+                irCall(functionIrSymbol).apply {
+                    dispatchReceiver = overloadIr.dispatchReceiverParameter?.let { irGet(it) }
                     overloadIr.valueParameters.forEach { valueParameter ->
                         val indexInCalledFunction = originalFunction.indexOfValueParameterByName(valueParameter.name)
 
@@ -147,4 +175,16 @@ internal class DefaultArgumentGenerator(
 
     private fun FunctionDescriptor.indexOfValueParameterByName(name: Name): Int =
         this.valueParameters.indexOfFirst { it.name == name }
+
+    private fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
+        val baseSignature = function.name.identifier
+        val parameters = overloadDescriptor.valueParameters.joinToString("") { it.name.identifier + ":" }
+        val fullSignature = "$baseSignature($parameters)"
+
+        with(swiftPackModuleBuilder) {
+            overloadDescriptor.reference().applyTransform {
+                rename(fullSignature)
+            }
+        }
+    }
 }

@@ -45,7 +45,7 @@ internal class SwiftGenScheduler(
     fun process(descriptorProvider: DescriptorProvider) {
         irValidator.validate(descriptorProvider)
         sealedInteropGenerator.generate(descriptorProvider)
-        exhaustiveEnumsGenerator.generate(descriptorProvider)
         defaultArgumentGenerator.generate(descriptorProvider)
+        exhaustiveEnumsGenerator.generate(descriptorProvider)
     }
 }

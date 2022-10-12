@@ -4,6 +4,7 @@ import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationTemplate
 import co.touchlab.swiftgen.plugin.internal.util.ir.FunctionBuilder
 import co.touchlab.swiftgen.plugin.internal.util.ir.Namespace
+import co.touchlab.swiftgen.plugin.internal.util.ir.impl.namespace.DeserializedClassNamespace
 import co.touchlab.swiftgen.plugin.internal.util.ir.impl.namespace.NewFileNamespace
 import co.touchlab.swiftgen.plugin.internal.util.ir.impl.template.FunctionTemplate
 import co.touchlab.swiftgen.plugin.internal.util.reflection.reflectedBy
@@ -12,12 +13,14 @@ import co.touchlab.swiftgen.plugin.internal.util.reflection.reflectors.SymbolTab
 import co.touchlab.swiftgen.plugin.internal.util.reflection.reflectors.SymbolTableReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 internal class DeclarationBuilderImpl(
     context: CommonBackendContext,
@@ -25,18 +28,28 @@ internal class DeclarationBuilderImpl(
 
     private val symbolTable = context.reflectedBy<ContextReflector>().symbolTable
 
-    private lateinit var mairIrModuleFragment: IrModuleFragment
+    private lateinit var mainIrModuleFragment: IrModuleFragment
 
-    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mairIrModuleFragment })
+    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mainIrModuleFragment })
 
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
+    private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
 
     private val allNamespaces: List<Namespace>
-        get() = newFileNamespacesByName.values.toList()
+        get() = newFileNamespacesByName.values + classNamespacesByDescriptor.values
 
     override fun getNamespace(name: String): Namespace =
         newFileNamespacesByName.getOrPut(name) {
             newFileNamespaceFactory.create(name)
+        }
+
+    override fun getNamespace(classDescriptor: ClassDescriptor): Namespace =
+        classNamespacesByDescriptor.getOrPut(classDescriptor) {
+            require(classDescriptor is DeserializedClassDescriptor) {
+                "Only DeserializedClassDescriptor is currently supported. Was: $classDescriptor"
+            }
+
+            DeserializedClassNamespace(classDescriptor)
         }
 
     override fun createFunction(
@@ -69,7 +82,7 @@ internal class DeclarationBuilderImpl(
     }
 
     fun generateIr(mairIrModuleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-        this.mairIrModuleFragment = mairIrModuleFragment
+        this.mainIrModuleFragment = mairIrModuleFragment
 
         allNamespaces.forEach {
             it.generateIr(pluginContext, symbolTable)
