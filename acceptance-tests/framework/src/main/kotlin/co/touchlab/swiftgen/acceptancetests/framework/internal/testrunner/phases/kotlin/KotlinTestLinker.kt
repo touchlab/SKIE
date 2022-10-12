@@ -121,7 +121,7 @@ internal class KotlinTestLinker(
                 IntermediateResult.Value(outputFile)
             }
             else -> {
-                val testResult = testResultBuilder.buildKotlinCompilationError(outputStream.toString())
+                val testResult = testResultBuilder.buildKotlinLinkingError(outputStream.toString())
 
                 IntermediateResult.Error(testResult)
             }

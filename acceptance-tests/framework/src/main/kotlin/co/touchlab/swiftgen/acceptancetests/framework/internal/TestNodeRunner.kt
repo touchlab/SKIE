@@ -31,7 +31,7 @@ internal class TestNodeRunner(
     }
 
     private val TestNode.Test.shouldBeEvaluated: Boolean
-        get() = testFilter.shouldBeEvaluated(this)
+        get() = this.isActive && testFilter.shouldBeEvaluated(this)
 
     private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResult> =
         tests

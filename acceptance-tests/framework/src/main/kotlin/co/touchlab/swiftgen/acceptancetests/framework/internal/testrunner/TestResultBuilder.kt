@@ -32,6 +32,9 @@ internal class TestResultBuilder {
     fun buildSwiftCompilationError(error: String): TestResult.SwiftCompilationError =
         TestResult.SwiftCompilationError(logger.toString(), error)
 
+    fun buildKotlinLinkingError(error: String): TestResult.KotlinLinkingError =
+        TestResult.KotlinLinkingError(logger.toString(), error)
+
     fun buildKotlinCompilationError(error: String): TestResult.KotlinCompilationError =
         TestResult.KotlinCompilationError(logger.toString(), error)
 }

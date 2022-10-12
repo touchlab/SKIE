@@ -56,6 +56,12 @@ sealed interface TestResult {
             get() = "Swift compilation ended with the following error: $error"
     }
 
+    data class KotlinLinkingError(override val logs: String, val error: String) : TestResult {
+
+        override val actualErrorMessage: String
+            get() = "Kotlin linking ended with the following error: $error"
+    }
+
     data class KotlinCompilationError(override val logs: String, val error: String) : TestResult {
 
         override val actualErrorMessage: String

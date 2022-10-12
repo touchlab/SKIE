@@ -2,6 +2,7 @@ package co.touchlab.swiftgen.acceptancetests.framework
 
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestRunner
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.engine.spec.tempdir
 import io.kotest.engine.spec.tempfile
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -88,6 +89,8 @@ class TestRunnerTest : ShouldSpec({
         )
     )
 
+    // Kotlin linking error is not testable this way
+
     test(
         name = "Kotlin compilation error",
         kotlin = """
@@ -111,24 +114,33 @@ private fun ShouldSpec.test(
     swift: String,
     expectedResult: TestResult,
 ) {
-    val tempFileSystem = TempFileSystem(test, this)
+    val tempFileSystemFactory = TempFileSystemFactory()
 
     should(name) {
         val kotlinFile = tempfile(suffix = ".kt")
         kotlinFile.writeText(kotlin)
 
+        val outputPath = tempdir().toPath()
+
         val test = mockk<TestNode.Test>()
         every { test.kotlinFiles } returns listOf(kotlinFile.toPath())
         every { test.swiftCode } returns swift
+        every { test.outputPath } returns outputPath
+        every { test.configFiles } returns emptyList()
+        every { test.expectedResult } returns ExpectedTestResult.Success
+        every { test.resultPath } returns outputPath.resolve("result")
+        every { test.fullName } returns "name"
 
-        val result = TestRunner(tempFileSystem).runTest(test)
+        val result = TestRunner(tempFileSystemFactory).runTest(test)
 
         if (result.javaClass != expectedResult.javaClass) {
             result shouldBe expectedResult
         }
 
-        result.logs shouldBe expectedResult.logs
+        result.logs shouldContain expectedResult.logs
         when (result) {
+            is TestResult.Success, is TestResult.MissingExit -> {}
+            is TestResult.IncorrectOutput -> result.exitCode shouldBe (expectedResult as TestResult.IncorrectOutput).exitCode
             is TestResult.RuntimeError -> result.error shouldContain (expectedResult as TestResult.RuntimeError).error
             is TestResult.SwiftCompilationError -> {
                 result.error shouldContain (expectedResult as TestResult.SwiftCompilationError).error
@@ -136,8 +148,7 @@ private fun ShouldSpec.test(
             is TestResult.KotlinCompilationError -> {
                 result.error shouldContain (expectedResult as TestResult.KotlinCompilationError).error
             }
-            // TODO ?
-            else -> {}
+            else -> throw UnsupportedOperationException("Unknown result type: ${result::class}.")
         }
     }
 }

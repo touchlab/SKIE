@@ -1,14 +1,7 @@
 package co.touchlab.swiftgen.acceptancetests.framework.internal
 
 import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.IncorrectOutput
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.KotlinCompilationError
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.MissingExit
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.RuntimeError
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.Success
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.SuccessWithWarning
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.SuccessWithoutWarning
-import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.SwiftCompilationError
+import co.touchlab.swiftgen.acceptancetests.framework.ExpectedTestResult.*
 import kotlin.reflect.KClass
 
 internal object TestCodeParser {
@@ -69,12 +62,9 @@ internal object TestCodeParser {
                 IncorrectOutput(exitCode)
             }
             RuntimeError::class.configurationName() -> RuntimeError(arguments)
-            SwiftCompilationError::class.configurationName() -> {
-                SwiftCompilationError(arguments)
-            }
-            KotlinCompilationError::class.configurationName() -> {
-                KotlinCompilationError(arguments)
-            }
+            SwiftCompilationError::class.configurationName() -> SwiftCompilationError(arguments)
+            KotlinLinkingError::class.configurationName() -> KotlinLinkingError(arguments)
+            KotlinCompilationError::class.configurationName() -> KotlinCompilationError(arguments)
             else -> throwInvalidExpectedResult(expectedResultConfiguration)
         }
     }

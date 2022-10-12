@@ -56,17 +56,31 @@ sealed class TestNode {
         val resultPath: Path
             get() = outputPath.resolve("result.txt")
 
+        private val fileLines = path.readLines()
+
+        val isActive: Boolean
+            get() = fileLines.firstOrNull()?.let { !skippedTestRegex.containsMatchIn(it) } ?: true
+
         init {
             require(path.isRegularFile() && path.extension == "swift") { "Test $path is not a swift file." }
         }
 
-        private val parsedTest = TestCodeParser.parse(path.readLines())
+        private val parsedTest by lazy {
+            TestCodeParser.parse(fileLines)
+        }
 
-        val expectedResult: ExpectedTestResult = parsedTest.expectedResult
+        val expectedResult: ExpectedTestResult
+            get() = parsedTest.expectedResult
 
-        val swiftCode: String = parsedTest.swiftCode
+        val swiftCode: String
+            get() = parsedTest.swiftCode
 
         override fun toString(): String = fullName
+
+        private companion object {
+
+            private val skippedTestRegex = Regex("^#\\s*Skip", RegexOption.IGNORE_CASE)
+        }
     }
 
     data class Container constructor(

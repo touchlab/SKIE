@@ -121,6 +121,25 @@ sealed interface ExpectedTestResult {
         }
     }
 
+    data class KotlinLinkingError(val error: String?) : ExpectedTestResult {
+
+        override fun evaluate(testResult: TestResult) {
+            if (error != null) {
+                if (testResult is TestResult.KotlinLinkingError && testResult.error.contains(error)) {
+                    return
+                }
+
+                failTest(testResult, "Kotlin linking ended with an error containing: $error")
+            } else {
+                if (testResult is TestResult.KotlinLinkingError) {
+                    return
+                }
+
+                failTest(testResult, "Kotlin linking ended with any error.")
+            }
+        }
+    }
+
     data class KotlinCompilationError(val error: String?) : ExpectedTestResult {
 
         override fun evaluate(testResult: TestResult) {
