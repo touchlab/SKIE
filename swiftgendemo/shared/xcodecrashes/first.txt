@@ -1,0 +1,1050 @@
+-------------------------------------
+Translated Report (Full Report Below)
+-------------------------------------
+
+Process:               Xcode [26907]
+Path:                  /Applications/Xcode.app/Contents/MacOS/Xcode
+Identifier:            com.apple.dt.Xcode
+Version:               13.4.1 (20504)
+Build Info:            IDEFrameworks-20504000000000000~2 (13F100)
+App Item ID:           497799835
+App External ID:       849405240
+Code Type:             X86-64 (Native)
+Parent Process:        launchd [1]
+User ID:               501
+
+Date/Time:             2022-08-30 18:42:07.8758 -0400
+OS Version:            macOS 12.4 (21F79)
+Report Version:        12
+Bridge OS Version:     6.5 (19P5071)
+Anonymous UUID:        AEC65A05-0368-59A4-5D74-B89B5B205DAB
+
+Sleep/Wake UUID:       BC1C47C0-4F29-44E8-8637-B5D2E71DCA18
+
+Time Awake Since Boot: 310000 seconds
+Time Since Wake:       2823 seconds
+
+System Integrity Protection: enabled
+
+Crashed Thread:        0  Dispatch queue: com.apple.main-thread
+
+Exception Type:        EXC_BAD_ACCESS (SIGSEGV)
+Exception Codes:       KERN_PROTECTION_FAILURE at 0x00007ff7bf1a2ff8
+Exception Codes:       0x0000000000000002, 0x00007ff7bf1a2ff8
+Exception Note:        EXC_CORPSE_NOTIFY
+
+Termination Reason:    Namespace SIGNAL, Code 11 Segmentation fault: 11
+Terminating Process:   exc handler [26907]
+
+VM Region Info: 0x7ff7bf1a2ff8 is in 0x7ff7bb9a3000-0x7ff7bf1a3000;  bytes after start: 58720248  bytes before end: 7
+      REGION TYPE                    START - END         [ VSIZE] PRT/MAX SHRMOD  REGION DETAIL
+      MALLOC_TINY              7fa028e00000-7fa028f00000 [ 1024K] rw-/rwx SM=PRV
+      GAP OF 0x5792aa3000 BYTES
+--->  STACK GUARD              7ff7bb9a3000-7ff7bf1a3000 [ 56.0M] ---/rwx SM=NUL  ... for thread 0
+      Stack                    7ff7bf1a3000-7ff7bf9a3000 [ 8192K] rw-/rwx SM=PRV  thread 0
+
+Kernel Triage:
+VM - Compressor failed a blocking pager_get
+VM - Compressor failed a blocking pager_get
+VM - Compressor failed a blocking pager_get
+VM - Compressor failed a blocking pager_get
+VM - Compressor failed a blocking pager_get
+
+
+Thread 0 Crashed::  Dispatch queue: com.apple.main-thread
+0   libsystem_pthread.dylib       	    0x7ff81232efa7 ___chkstk_darwin + 55
+1   Foundation                    	    0x7ff813222be5 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 509
+2   Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+3   Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+4   DVTFoundation                 	       0x101d77ad5 -[DVTModelGraphTransactionScope performTransaction:] + 46
+5   IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+6   IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+7   DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+8   IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+9   IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+10  IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+11  IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+12  IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+13  IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+14  IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+15  IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+16  IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+17  DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+18  Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+19  Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+20  Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+21  Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+22  Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+23  DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+24  DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+25  DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+26  IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+27  IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+28  DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+29  IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+30  IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+31  IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+32  IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+33  IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+34  IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+35  IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+36  IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+37  IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+38  DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+39  Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+40  Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+41  Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+42  Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+43  Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+44  DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+45  DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+46  DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+47  IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+48  IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+49  DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+50  IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+51  IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+52  IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+53  IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+54  IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+55  IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+56  IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+57  IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+58  IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+59  DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+60  Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+61  Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+62  Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+63  Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+64  Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+65  DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+66  DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+67  DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+68  IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+69  IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+70  DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+71  IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+72  IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+73  IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+74  IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+75  IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+76  IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+77  IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+78  IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+79  IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+80  DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+81  Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+82  Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+83  Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+84  Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+85  Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+86  DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+87  DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+88  DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+89  IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+90  IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+91  DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+92  IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+93  IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+94  IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+95  IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+96  IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+97  IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+98  IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+99  IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+100 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+101 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+102 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+103 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+104 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+105 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+106 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+107 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+108 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+109 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+110 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+111 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+112 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+113 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+114 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+115 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+116 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+117 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+118 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+119 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+120 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+121 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+122 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+123 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+124 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+125 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+126 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+127 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+128 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+129 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+130 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+131 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+132 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+133 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+134 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+135 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+136 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+137 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+138 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+139 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+140 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+141 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+142 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+143 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+144 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+145 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+146 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+147 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+148 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+149 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+150 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+151 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+152 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+153 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+154 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+155 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+156 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+157 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+158 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+159 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+160 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+161 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+162 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+163 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+164 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+165 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+166 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+167 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+168 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+169 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+170 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+171 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+172 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+173 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+174 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+175 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+176 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+177 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+178 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+179 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+180 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+181 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+182 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+183 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+184 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+185 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+186 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+187 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+188 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+189 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+190 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+191 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+192 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+193 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+194 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+195 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+196 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+197 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+198 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+199 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+200 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+201 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+202 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+203 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+204 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+205 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+206 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+207 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+208 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+209 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+210 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+211 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+212 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+213 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+214 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+215 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+216 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+217 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+218 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+219 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+220 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+221 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+222 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+223 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+224 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+225 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+226 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+227 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+228 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+229 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+230 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+231 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+232 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+233 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+234 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+235 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+236 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+237 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+238 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+239 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+240 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+241 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+242 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+243 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+244 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+245 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+246 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+247 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+248 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+249 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+250 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+251 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+252 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+253 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+254 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+255 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+256 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+257 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+258 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+259 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+260 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+261 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+262 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+263 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+264 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+265 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+266 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+267 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+268 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+269 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+270 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+271 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+272 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+273 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+274 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+275 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+276 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+277 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+278 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+279 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+280 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+281 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+282 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+283 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+284 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+285 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+286 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+287 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+288 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+289 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+290 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+291 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+292 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+293 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+294 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+295 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+296 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+297 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+298 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+299 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+300 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+301 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+302 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+303 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+304 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+305 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+306 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+307 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+308 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+309 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+310 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+311 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+312 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+313 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+314 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+315 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+316 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+317 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+318 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+319 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+320 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+321 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+322 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+323 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+324 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+325 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+326 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+327 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+328 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+329 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+330 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+331 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+332 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+333 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+334 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+335 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+336 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+337 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+338 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+339 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+340 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+341 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+342 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+343 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+344 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+345 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+346 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+347 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+348 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+349 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+350 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+351 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+352 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+353 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+354 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+355 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+356 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+357 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+358 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+359 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+360 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+361 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+362 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+363 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+364 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+365 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+366 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+367 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+368 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+369 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+370 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+371 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+372 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+373 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+374 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+375 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+376 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+377 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+378 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+379 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+380 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+381 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+382 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+383 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+384 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+385 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+386 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+387 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+388 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+389 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+390 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+391 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+392 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+393 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+394 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+395 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+396 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+397 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+398 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+399 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+400 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+401 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+402 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+403 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+404 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+405 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+406 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+407 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+408 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+409 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+410 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+411 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+412 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+413 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+414 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+415 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+416 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+417 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+418 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+419 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+420 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+421 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+422 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+423 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+424 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+425 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+426 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+427 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+428 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+429 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+430 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+431 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+432 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+433 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+434 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+435 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+436 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+437 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+438 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+439 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+440 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+441 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+442 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+443 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+444 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+445 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+446 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+447 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+448 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+449 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+450 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+451 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+452 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+453 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+454 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+455 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+456 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+457 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+458 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+459 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+460 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+461 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+462 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+463 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+464 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+465 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+466 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+467 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+468 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+469 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+470 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+471 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+472 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+473 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+474 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+475 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+476 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+477 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+478 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+479 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+480 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+481 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+482 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+483 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+484 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+485 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+486 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+487 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+488 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+489 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+490 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+491 IDEKit                        	       0x1052e3f76 +[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:] + 382
+492 IDEKit                        	       0x104fc38c9 -[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:] + 638
+493 IDEKit                        	       0x104fc0ed7 -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:] + 116
+494 IDEKit                        	       0x104fc177f -[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:] + 523
+495 IDEKit                        	       0x104fc1ab0 -[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:] + 268
+496 IDEKit                        	       0x104daf457 -[IDEEditorContext _greatestDocumentAncestorWillBeForgotten] + 959
+497 IDEKit                        	       0x104dad144 -[IDEEditorContext _didForgetNavigableItems:] + 199
+498 IDEKit                        	       0x104db055b -[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:] + 174
+499 IDEKit                        	       0x104fc0576 __35-[IDENavigableItemCoordinator init]_block_invoke + 209
+500 DVTFoundation                 	       0x101d8bc10 -[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:] + 265
+501 Foundation                    	    0x7ff8132301aa NSKeyValueNotifyObserver + 306
+502 Foundation                    	    0x7ff8132f40b9 NSKeyValueDidChange + 431
+503 Foundation                    	    0x7ff813222cde -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 758
+504 Foundation                    	    0x7ff81324e172 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 68
+505 Foundation                    	    0x7ff813250817 _NSSetCharValueAndNotify + 267
+506 DVTFoundation                 	       0x101d7775d -[DVTModelGraphTransactionScope _decrementTransactionCount] + 68
+507 DVTFoundation                 	       0x101d77a93 -[DVTModelGraphTransactionScope _endTransactionUpward] + 27
+508 DVTFoundation                 	       0x101d77b0d -[DVTModelGraphTransactionScope performTransaction:] + 102
+509 IDEKit                        	       0x1051603e4 -[IDELogNavigatorRootItem _updateLogGroups] + 236
+510 IDEKit                        	       0x10515dff7 __60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke + 39
+511 DVTFoundation                 	       0x101b54a78 -[DVTDelayedInvocation runBlock:] + 409
+
+Thread 1:
+0   libsystem_kernel.dylib        	    0x7ff8122f697a mach_msg_trap + 10
+1   libsystem_kernel.dylib        	    0x7ff8122f6ce8 mach_msg + 56
+2   CoreFoundation                	    0x7ff8123fa38d __CFRunLoopServiceMachPort + 319
+3   CoreFoundation                	    0x7ff8123f8a18 __CFRunLoopRun + 1276
+4   CoreFoundation                	    0x7ff8123f7e5c CFRunLoopRunSpecific + 562
+5   Foundation                    	    0x7ff81325bd6a -[NSRunLoop(NSRunLoop) runMode:beforeDate:] + 216
+6   DTDeviceKitBase               	       0x113fd1f01 +[DTDKRemoteDeviceConnection startServiceBrowsers] + 194
+7   Foundation                    	    0x7ff8132549c4 __NSThread__start__ + 1009
+8   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+9   libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 2:
+0   libsystem_kernel.dylib        	    0x7ff8122f697a mach_msg_trap + 10
+1   libsystem_kernel.dylib        	    0x7ff8122f6ce8 mach_msg + 56
+2   CoreFoundation                	    0x7ff8123fa38d __CFRunLoopServiceMachPort + 319
+3   CoreFoundation                	    0x7ff8123f8a18 __CFRunLoopRun + 1276
+4   CoreFoundation                	    0x7ff8123f7e5c CFRunLoopRunSpecific + 562
+5   Foundation                    	    0x7ff81325bd6a -[NSRunLoop(NSRunLoop) runMode:beforeDate:] + 216
+6   DTDeviceKitBase               	       0x113fdf993 -[DTDKRemoteDeviceDataListener listenerThreadImplementation] + 248
+7   Foundation                    	    0x7ff8132549c4 __NSThread__start__ + 1009
+8   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+9   libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 3:: com.apple.CFSocket.private
+0   libsystem_kernel.dylib        	    0x7ff8122fed5a __select + 10
+1   CoreFoundation                	    0x7ff812421639 __CFSocketManager + 641
+2   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+3   libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 4:: com.apple.CFStream.LegacyThread
+0   libsystem_kernel.dylib        	    0x7ff8122f697a mach_msg_trap + 10
+1   libsystem_kernel.dylib        	    0x7ff8122f6ce8 mach_msg + 56
+2   CoreFoundation                	    0x7ff8123fa38d __CFRunLoopServiceMachPort + 319
+3   CoreFoundation                	    0x7ff8123f8a18 __CFRunLoopRun + 1276
+4   CoreFoundation                	    0x7ff8123f7e5c CFRunLoopRunSpecific + 562
+5   CoreFoundation                	    0x7ff812475b88 _legacyStreamRunLoop_workThread + 251
+6   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+7   libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 5:: com.apple.NSEventThread
+0   libsystem_kernel.dylib        	    0x7ff8122f697a mach_msg_trap + 10
+1   libsystem_kernel.dylib        	    0x7ff8122f6ce8 mach_msg + 56
+2   CoreFoundation                	    0x7ff8123fa38d __CFRunLoopServiceMachPort + 319
+3   CoreFoundation                	    0x7ff8123f8a18 __CFRunLoopRun + 1276
+4   CoreFoundation                	    0x7ff8123f7e5c CFRunLoopRunSpecific + 562
+5   AppKit                        	    0x7ff814fa4c1e _NSEventThread + 132
+6   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+7   libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 6:: DYMobileDeviceManager
+0   libsystem_kernel.dylib        	    0x7ff8122f697a mach_msg_trap + 10
+1   libsystem_kernel.dylib        	    0x7ff8122f6ce8 mach_msg + 56
+2   CoreFoundation                	    0x7ff8123fa38d __CFRunLoopServiceMachPort + 319
+3   CoreFoundation                	    0x7ff8123f8a18 __CFRunLoopRun + 1276
+4   CoreFoundation                	    0x7ff8123f7e5c CFRunLoopRunSpecific + 562
+5   Foundation                    	    0x7ff81325bd6a -[NSRunLoop(NSRunLoop) runMode:beforeDate:] + 216
+6   Foundation                    	    0x7ff8132e67b7 -[NSRunLoop(NSRunLoop) run] + 76
+7   GPUToolsMobileFoundation      	       0x124e6d75e -[DYMobileDeviceManager _deviceNotificationThread:] + 127
+8   Foundation                    	    0x7ff8132549c4 __NSThread__start__ + 1009
+9   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+10  libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 7:: com.apple.NSURLConnectionLoader
+0   libsystem_kernel.dylib        	    0x7ff8122f697a mach_msg_trap + 10
+1   libsystem_kernel.dylib        	    0x7ff8122f6ce8 mach_msg + 56
+2   CoreFoundation                	    0x7ff8123fa38d __CFRunLoopServiceMachPort + 319
+3   CoreFoundation                	    0x7ff8123f8a18 __CFRunLoopRun + 1276
+4   CoreFoundation                	    0x7ff8123f7e5c CFRunLoopRunSpecific + 562
+5   CFNetwork                     	    0x7ff817024874 0x7ff816ddc000 + 2394228
+6   Foundation                    	    0x7ff8132549c4 __NSThread__start__ + 1009
+7   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+8   libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 8:
+0   libsystem_kernel.dylib        	    0x7ff8122f697a mach_msg_trap + 10
+1   libsystem_kernel.dylib        	    0x7ff8122f6ce8 mach_msg + 56
+2   CoreFoundation                	    0x7ff8123fa38d __CFRunLoopServiceMachPort + 319
+3   CoreFoundation                	    0x7ff8123f8a18 __CFRunLoopRun + 1276
+4   CoreFoundation                	    0x7ff8123f7e5c CFRunLoopRunSpecific + 562
+5   CoreFoundation                	    0x7ff81247fdeb CFRunLoopRun + 40
+6   SwiftPM                       	       0x12b67a99e closure #1 in FSEventStream.start() + 254
+7   SwiftPM                       	       0x12b647c9a closure #1 in Thread.init(task:) + 106
+8   SwiftPM                       	       0x12b636f79 thunk for @escaping @callee_guaranteed () -> () + 25
+9   SwiftPM                       	       0x12b647d96 @objc ThreadImpl.main() + 38
+10  Foundation                    	    0x7ff8132549c4 __NSThread__start__ + 1009
+11  libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+12  libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 9:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 10:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 11:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 12:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 13:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 14:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 15:: JavaScriptCore libpas scavenger
+0   libsystem_kernel.dylib        	    0x7ff8122f93ea __psynch_cvwait + 10
+1   libsystem_pthread.dylib       	    0x7ff812333a6f _pthread_cond_wait + 1249
+2   JavaScriptCore                	    0x7ff82ad54885 scavenger_thread_main + 1397
+3   libsystem_pthread.dylib       	    0x7ff8123334e1 _pthread_start + 125
+4   libsystem_pthread.dylib       	    0x7ff81232ef6b thread_start + 15
+
+Thread 16:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 17:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 18:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 19:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+Thread 20:
+0   libsystem_pthread.dylib       	    0x7ff81232ef48 start_wqthread + 0
+
+
+Thread 0 crashed with X86 Thread State (64-bit):
+  rax: 0x0000000000001f98  rbx: 0x00007ff7bf1a47f0  rcx: 0x00007ff7bf1a3000  rdx: 0x00007fa019c11e90
+  rdi: 0x00007fa00c062e60  rsi: 0x00007ff82c7332f1  rbp: 0x00007ff7bf1a48d0  rsp: 0x00007ff7bf1a47c8
+   r8: 0x00007ff8133181bd   r9: 0x0000000000000000  r10: 0x00007ff8538eb350  r11: 0x00007ff8123d63f7
+  r12: 0x00007fa00c062db0  r13: 0x00000000000003f3  r14: 0x0000000105820140  r15: 0x00007ff7bf1a4900
+  rip: 0x00007ff81232efa7  rfl: 0x0000000000010206  cr2: 0x00007ff7bf1a2ff8
+
+Logical CPU:     2
+Error Code:      0x00000004 (no mapping for user data read)
+Trap Number:     14
+
+Thread 0 instruction stream:
+  7a 00 00 8b 04 81 c3 90-6a 00 55 48 89 e5 48 83  z.......j.UH..H.
+  ec 10 e8 33 0f 00 00 0f-0b 0f 1f 00 6a 00 55 48  ...3........j.UH
+  89 e5 48 83 ec 10 e8 f9-44 00 00 c9 c3 0f 1f 00  ..H.....D.......
+  51 48 8d 4c 24 10 65 48-39 0c 25 d0 ff ff ff 72  QH.L$.eH9.%....r
+  2a 65 48 39 0c 25 d8 ff-ff ff 73 1f 48 29 c1 72  *eH9.%....s.H).r
+  0d 65 48 39 0c 25 d8 ff-ff ff 77 02 59 c3 65 48  .eH9.%....w.Y.eH
+  8b 0c 25 d8 ff ff ff[48-85 49 f8 48 3d 00 10 00  ..%....H.I.H=...	<==
+  00 72 1a 50 48 81 e9 00-10 00 00 48 85 09 48 2d  .r.PH......H..H-
+  00 10 00 00 48 3d 00 10-00 00 77 e8 58 48 29 c1  ....H=....w.XH).
+  48 85 09 59 c3 65 48 8b-04 fd 00 00 00 00 c3 48  H..Y.eH........H
+  8d 4f f6 b8 16 00 00 00-48 81 f9 f5 02 00 00 77  .O......H......w
+  22 65 48 8b 0c 25 00 00-00 00 4c 8d 05 6f 67 75  "eH..%....L..ogu
+
+Binary Images:
+    0x7ff81232d000 -     0x7ff812338fff libsystem_pthread.dylib (*) <bc574849-1aae-31e7-b350-916dda999d97> /usr/lib/system/libsystem_pthread.dylib
+    0x7ff8131fc000 -     0x7ff8135b8fff com.apple.Foundation (6.9) <ceb9e591-a1ad-3ebc-ab8d-410f4ff96307> /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation
+       0x101b1d000 -        0x102170fff com.apple.dt.DVTFoundation (13.4.1) <7d865aca-e957-3810-9dda-d58ff4b26b4a> /Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/DVTFoundation
+       0x104d13000 -        0x1057cefff com.apple.dt.IDEKit (13.4.1) <60aae03d-8393-374c-bf14-6340f93bd64a> /Applications/Xcode.app/Contents/Frameworks/IDEKit.framework/Versions/A/IDEKit
+    0x7ff8122f5000 -     0x7ff81232cfff libsystem_kernel.dylib (*) <61711d11-e776-3bc3-b9a2-6f9f37cb8499> /usr/lib/system/libsystem_kernel.dylib
+    0x7ff81237a000 -     0x7ff81287cfff com.apple.CoreFoundation (6.9) <f8e45ef9-9fd2-3331-bb1b-703d5dacdaf1> /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation
+       0x113fb9000 -        0x114048fff com.apple.DTDeviceKitBase (13.4.1) <ed4f2a12-005e-394b-8447-84ab00d25ef1> /Applications/Xcode.app/Contents/SharedFrameworks/DTDeviceKitBase.framework/Versions/A/DTDeviceKitBase
+    0x7ff814df8000 -     0x7ff815c86fff com.apple.AppKit (6.9) <832ad371-d3b8-3061-b4e2-1c4e0cffce0b> /System/Library/Frameworks/AppKit.framework/Versions/C/AppKit
+       0x124e63000 -        0x124e76fff com.apple.GPUToolsMobileFoundation (1.0) <fa9df557-d688-351c-b6dc-75a2af6318c6> /Applications/Xcode.app/Contents/SharedFrameworks/GPUToolsMobileFoundation.framework/Versions/A/GPUToolsMobileFoundation
+    0x7ff816ddc000 -     0x7ff81726afff com.apple.CFNetwork (1333.0.4) <5d19915e-1fbd-30ab-9777-84c32ae75738> /System/Library/Frameworks/CFNetwork.framework/Versions/A/CFNetwork
+       0x12b13c000 -        0x12b87bfff com.apple.dt.IDE.SwiftPM (1.0) <e42b5a55-a0df-3ad4-abb2-6602a0b60883> /Applications/Xcode.app/Contents/PlugIns/IDESwiftPackageCore.framework/Versions/A/Frameworks/SwiftPM.framework/Versions/A/SwiftPM
+    0x7ff82aaed000 -     0x7ff82c0f8fff com.apple.JavaScriptCore (17613) <162b1ef9-61d9-32f4-80da-21ca5ca38d87> /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/JavaScriptCore
+               0x0 - 0xffffffffffffffff ??? (*) <00000000-0000-0000-0000-000000000000> ???
+
+External Modification Summary:
+  Calls made by other processes targeting this process:
+    task_for_pid: 0
+    thread_create: 0
+    thread_set_state: 0
+  Calls made by this process:
+    task_for_pid: 0
+    thread_create: 0
+    thread_set_state: 0
+  Calls made by all processes on this machine:
+    task_for_pid: 63
+    thread_create: 0
+    thread_set_state: 2084
+
+VM Region Summary:
+ReadOnly portion of Libraries: Total=1.9G resident=0K(0%) swapped_out_or_unallocated=1.9G(100%)
+Writable regions: Total=1.8G written=0K(0%) resident=0K(0%) swapped_out=0K(0%) unallocated=1.8G(100%)
+
+                                VIRTUAL   REGION
+REGION TYPE                        SIZE    COUNT (non-coalesced)
+===========                     =======  =======
+Accelerate framework              1536K       12
+Activity Tracing                   256K        1
+CG backing stores                 3648K        8
+CG image                          6480K      175
+CG raster data                      16K        2
+ColorSync                          236K       28
+CoreAnimation                     38.1M      353
+CoreData                            12K        1
+CoreGraphics                        16K        3
+CoreImage                          104K       25
+CoreUI image data                 3320K       37
+Dispatch continuations            96.0M        1
+Foundation                         816K        3
+JS JIT generated code              1.0G        3
+Kernel Alloc Once                    8K        1
+MALLOC                           480.7M     1758
+MALLOC guard page                   48K       11
+ObjC additional data                15K        1
+Performance tool data                4K        1         not counted in TOTAL below
+SQLite page cache                  384K        6
+STACK GUARD                       56.1M       21
+Stack                             18.2M       21
+VM_ALLOCATE                       1140K       28
+WebKit Malloc                    192.0M        5
+__CTF                               756        1
+__DATA                            80.6M     1061
+__DATA_CONST                      50.9M      759
+__DATA_DIRTY                      2446K      279
+__FONT_DATA                          4K        1
+__LINKEDIT                       905.9M      300
+__TEXT                             1.1G      999
+__UNICODE                          592K        1
+dyld private memory               1024K        1
+libnetwork                         640K       16
+mapped file                      255.5M       86
+shared memory                      784K       20
+===========                     =======  =======
+TOTAL                              4.2G     6028
+
+
+
+-----------
+Full Report
+-----------
+
+{"app_name":"Xcode","timestamp":"2022-08-30 18:43:08.00 -0400","app_version":"13.4.1","slice_uuid":"92564dff-7804-3b98-9e11-580d10da8034","adam_id":"497799835","build_version":"20504","platform":1,"bundleID":"com.apple.dt.Xcode","share_with_app_devs":1,"is_first_party":0,"bug_type":"309","os_version":"macOS 12.4 (21F79)","incident_id":"7F1641E2-5B96-49AF-9923-8EF642E779D6","name":"Xcode"}
+{
+  "uptime" : 310000,
+  "procLaunch" : "2022-08-30 18:26:10.1948 -0400",
+  "procRole" : "Foreground",
+  "version" : 2,
+  "userID" : 501,
+  "deployVersion" : 210,
+  "modelCode" : "MacBookPro16,1",
+  "procStartAbsTime" : 316854177888232,
+  "coalitionID" : 544,
+  "osVersion" : {
+    "train" : "macOS 12.4",
+    "build" : "21F79",
+    "releaseType" : "User"
+  },
+  "captureTime" : "2022-08-30 18:42:07.8758 -0400",
+  "incident" : "7F1641E2-5B96-49AF-9923-8EF642E779D6",
+  "bug_type" : "309",
+  "pid" : 26907,
+  "procExitAbsTime" : 317811616609280,
+  "cpuType" : "X86-64",
+  "procName" : "Xcode",
+  "procPath" : "\/Applications\/Xcode.app\/Contents\/MacOS\/Xcode",
+  "bundleInfo" : {"CFBundleShortVersionString":"13.4.1","CFBundleVersion":"20504","CFBundleIdentifier":"com.apple.dt.Xcode"},
+  "buildInfo" : {"ProjectName":"IDEFrameworks","SourceVersion":"20504000000000000","ProductBuildVersion":"13F100","BuildVersion":"2"},
+  "storeInfo" : {"storeCohortMetadata":"8|date=1354503814000&amp;sf=143441","itemID":"497799835","deviceIdentifierForVendor":"91D3C616-AE20-529A-BB66-67E52A6FD142","thirdParty":true,"softwareVersionExternalIdentifier":"849405240"},
+  "parentProc" : "launchd",
+  "parentPid" : 1,
+  "coalitionName" : "com.apple.dt.Xcode",
+  "crashReporterKey" : "AEC65A05-0368-59A4-5D74-B89B5B205DAB",
+  "wakeTime" : 2823,
+  "bridgeVersion" : {"build":"19P5071","train":"6.5"},
+  "sleepWakeUUID" : "BC1C47C0-4F29-44E8-8637-B5D2E71DCA18",
+  "sip" : "enabled",
+  "vmRegionInfo" : "0x7ff7bf1a2ff8 is in 0x7ff7bb9a3000-0x7ff7bf1a3000;  bytes after start: 58720248  bytes before end: 7\n      REGION TYPE                    START - END         [ VSIZE] PRT\/MAX SHRMOD  REGION DETAIL\n      MALLOC_TINY              7fa028e00000-7fa028f00000 [ 1024K] rw-\/rwx SM=PRV  \n      GAP OF 0x5792aa3000 BYTES\n--->  STACK GUARD              7ff7bb9a3000-7ff7bf1a3000 [ 56.0M] ---\/rwx SM=NUL  ... for thread 0\n      Stack                    7ff7bf1a3000-7ff7bf9a3000 [ 8192K] rw-\/rwx SM=PRV  thread 0",
+  "isCorpse" : 1,
+  "exception" : {"codes":"0x0000000000000002, 0x00007ff7bf1a2ff8","rawCodes":[2,140702039814136],"type":"EXC_BAD_ACCESS","signal":"SIGSEGV","subtype":"KERN_PROTECTION_FAILURE at 0x00007ff7bf1a2ff8"},
+  "termination" : {"flags":0,"code":11,"namespace":"SIGNAL","indicator":"Segmentation fault: 11","byProc":"exc handler","byPid":26907},
+  "ktriageinfo" : "VM - Compressor failed a blocking pager_get\nVM - Compressor failed a blocking pager_get\nVM - Compressor failed a blocking pager_get\nVM - Compressor failed a blocking pager_get\nVM - Compressor failed a blocking pager_get\n",
+  "vmregioninfo" : "0x7ff7bf1a2ff8 is in 0x7ff7bb9a3000-0x7ff7bf1a3000;  bytes after start: 58720248  bytes before end: 7\n      REGION TYPE                    START - END         [ VSIZE] PRT\/MAX SHRMOD  REGION DETAIL\n      MALLOC_TINY              7fa028e00000-7fa028f00000 [ 1024K] rw-\/rwx SM=PRV  \n      GAP OF 0x5792aa3000 BYTES\n--->  STACK GUARD              7ff7bb9a3000-7ff7bf1a3000 [ 56.0M] ---\/rwx SM=NUL  ... for thread 0\n      Stack                    7ff7bf1a3000-7ff7bf9a3000 [ 8192K] rw-\/rwx SM=PRV  thread 0",
+  "extMods" : {"caller":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"system":{"thread_create":0,"thread_set_state":2084,"task_for_pid":63},"targeted":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"warnings":0},
+  "faultingThread" : 0,
+  "threads" : [{"triggered":true,"id":6591741,"instructionState":{"instructionStream":{"bytes":[122,0,0,139,4,129,195,144,106,0,85,72,137,229,72,131,236,16,232,51,15,0,0,15,11,15,31,0,106,0,85,72,137,229,72,131,236,16,232,249,68,0,0,201,195,15,31,0,81,72,141,76,36,16,101,72,57,12,37,208,255,255,255,114,42,101,72,57,12,37,216,255,255,255,115,31,72,41,193,114,13,101,72,57,12,37,216,255,255,255,119,2,89,195,101,72,139,12,37,216,255,255,255,72,133,73,248,72,61,0,16,0,0,114,26,80,72,129,233,0,16,0,0,72,133,9,72,45,0,16,0,0,72,61,0,16,0,0,119,232,88,72,41,193,72,133,9,89,195,101,72,139,4,253,0,0,0,0,195,72,141,79,246,184,22,0,0,0,72,129,249,245,2,0,0,119,34,101,72,139,12,37,0,0,0,0,76,141,5,111,103,117],"offset":103}},"threadState":{"r13":{"value":1011},"rax":{"value":8088},"rflags":{"value":66054},"cpu":{"value":2},"r14":{"value":4387373376},"rsi":{"value":140703874364145},"r8":{"value":140703450628541,"symbolLocation":0,"symbol":"NSKeyValueWillChangeBySetting"},"cr2":{"value":140702039814136},"rdx":{"value":140325603581584},"r10":{"value":140704530477904,"symbolLocation":0,"symbol":"OBJC_CLASS_$___NSArrayI_Transfer"},"r9":{"value":0},"r15":{"value":140702039820544},"rbx":{"value":140702039820272},"trap":{"value":14,"description":"(no mapping for user data read)"},"err":{"value":4},"r11":{"value":140703434630135,"symbolLocation":0,"symbol":"-[__NSArrayI_Transfer count]"},"rip":{"value":140703433944999,"matchesCrashFrame":1},"rbp":{"value":140702039820496},"rsp":{"value":140702039820232},"r12":{"value":140325373226416},"rcx":{"value":140702039814144},"flavor":"x86_THREAD_STATE","rdi":{"value":140325373226592}},"queue":"com.apple.main-thread","frames":[{"imageOffset":8103,"symbol":"___chkstk_darwin","symbolLocation":55,"imageIndex":0},{"imageOffset":158693,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":509,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2468565,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":46,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2},{"imageOffset":6098806,"symbol":"+[IDENavigableItemWorkspaceGroupedLogsDomainProvider domainObjectForWorkspace:]","symbolLocation":382,"imageIndex":3},{"imageOffset":2820297,"symbol":"-[IDENavigableItemCoordinator rootNavigableItemInDomain:forWorkspace:]","symbolLocation":638,"imageIndex":3},{"imageOffset":2809559,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:domainExtension:inWorkspace:error:]","symbolLocation":116,"imageIndex":3},{"imageOffset":2811775,"symbol":"-[IDENavigableItemCoordinator _structureNavigableItemForNonFileURL:inWorkspace:error:]","symbolLocation":523,"imageIndex":3},{"imageOffset":2812592,"symbol":"-[IDENavigableItemCoordinator structureNavigableItemForDocumentURL:inWorkspace:error:]","symbolLocation":268,"imageIndex":3},{"imageOffset":640087,"symbol":"-[IDEEditorContext _greatestDocumentAncestorWillBeForgotten]","symbolLocation":959,"imageIndex":3},{"imageOffset":631108,"symbol":"-[IDEEditorContext _didForgetNavigableItems:]","symbolLocation":199,"imageIndex":3},{"imageOffset":644443,"symbol":"-[IDEEditorContext didEndTransactionScopeForNavigableItemCoordinator:]","symbolLocation":174,"imageIndex":3},{"imageOffset":2807158,"symbol":"__35-[IDENavigableItemCoordinator init]_block_invoke","symbolLocation":209,"imageIndex":3},{"imageOffset":2550800,"symbol":"-[DVTObservingBlockToken observeValueForKeyPath:ofObject:change:context:]","symbolLocation":265,"imageIndex":2},{"imageOffset":213418,"symbol":"NSKeyValueNotifyObserver","symbolLocation":306,"imageIndex":1},{"imageOffset":1015993,"symbol":"NSKeyValueDidChange","symbolLocation":431,"imageIndex":1},{"imageOffset":158942,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:]","symbolLocation":758,"imageIndex":1},{"imageOffset":336242,"symbol":"-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]","symbolLocation":68,"imageIndex":1},{"imageOffset":346135,"symbol":"_NSSetCharValueAndNotify","symbolLocation":267,"imageIndex":1},{"imageOffset":2467677,"symbol":"-[DVTModelGraphTransactionScope _decrementTransactionCount]","symbolLocation":68,"imageIndex":2},{"imageOffset":2468499,"symbol":"-[DVTModelGraphTransactionScope _endTransactionUpward]","symbolLocation":27,"imageIndex":2},{"imageOffset":2468621,"symbol":"-[DVTModelGraphTransactionScope performTransaction:]","symbolLocation":102,"imageIndex":2},{"imageOffset":4510692,"symbol":"-[IDELogNavigatorRootItem _updateLogGroups]","symbolLocation":236,"imageIndex":3},{"imageOffset":4501495,"symbol":"__60-[IDELogNavigatorRootItem initWithLogManager:groupedByTime:]_block_invoke","symbolLocation":39,"imageIndex":3},{"imageOffset":227960,"symbol":"-[DVTDelayedInvocation runBlock:]","symbolLocation":409,"imageIndex":2}]},{"id":6592666,"frames":[{"imageOffset":6522,"symbol":"mach_msg_trap","symbolLocation":10,"imageIndex":4},{"imageOffset":7400,"symbol":"mach_msg","symbolLocation":56,"imageIndex":4},{"imageOffset":525197,"symbol":"__CFRunLoopServiceMachPort","symbolLocation":319,"imageIndex":5},{"imageOffset":518680,"symbol":"__CFRunLoopRun","symbolLocation":1276,"imageIndex":5},{"imageOffset":515676,"symbol":"CFRunLoopRunSpecific","symbolLocation":562,"imageIndex":5},{"imageOffset":392554,"symbol":"-[NSRunLoop(NSRunLoop) runMode:beforeDate:]","symbolLocation":216,"imageIndex":1},{"imageOffset":102145,"symbol":"+[DTDKRemoteDeviceConnection startServiceBrowsers]","symbolLocation":194,"imageIndex":6},{"imageOffset":362948,"symbol":"__NSThread__start__","symbolLocation":1009,"imageIndex":1},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6592667,"frames":[{"imageOffset":6522,"symbol":"mach_msg_trap","symbolLocation":10,"imageIndex":4},{"imageOffset":7400,"symbol":"mach_msg","symbolLocation":56,"imageIndex":4},{"imageOffset":525197,"symbol":"__CFRunLoopServiceMachPort","symbolLocation":319,"imageIndex":5},{"imageOffset":518680,"symbol":"__CFRunLoopRun","symbolLocation":1276,"imageIndex":5},{"imageOffset":515676,"symbol":"CFRunLoopRunSpecific","symbolLocation":562,"imageIndex":5},{"imageOffset":392554,"symbol":"-[NSRunLoop(NSRunLoop) runMode:beforeDate:]","symbolLocation":216,"imageIndex":1},{"imageOffset":158099,"symbol":"-[DTDKRemoteDeviceDataListener listenerThreadImplementation]","symbolLocation":248,"imageIndex":6},{"imageOffset":362948,"symbol":"__NSThread__start__","symbolLocation":1009,"imageIndex":1},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6592671,"name":"com.apple.CFSocket.private","frames":[{"imageOffset":40282,"symbol":"__select","symbolLocation":10,"imageIndex":4},{"imageOffset":685625,"symbol":"__CFSocketManager","symbolLocation":641,"imageIndex":5},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6592922,"name":"com.apple.CFStream.LegacyThread","frames":[{"imageOffset":6522,"symbol":"mach_msg_trap","symbolLocation":10,"imageIndex":4},{"imageOffset":7400,"symbol":"mach_msg","symbolLocation":56,"imageIndex":4},{"imageOffset":525197,"symbol":"__CFRunLoopServiceMachPort","symbolLocation":319,"imageIndex":5},{"imageOffset":518680,"symbol":"__CFRunLoopRun","symbolLocation":1276,"imageIndex":5},{"imageOffset":515676,"symbol":"CFRunLoopRunSpecific","symbolLocation":562,"imageIndex":5},{"imageOffset":1031048,"symbol":"_legacyStreamRunLoop_workThread","symbolLocation":251,"imageIndex":5},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6593096,"name":"com.apple.NSEventThread","frames":[{"imageOffset":6522,"symbol":"mach_msg_trap","symbolLocation":10,"imageIndex":4},{"imageOffset":7400,"symbol":"mach_msg","symbolLocation":56,"imageIndex":4},{"imageOffset":525197,"symbol":"__CFRunLoopServiceMachPort","symbolLocation":319,"imageIndex":5},{"imageOffset":518680,"symbol":"__CFRunLoopRun","symbolLocation":1276,"imageIndex":5},{"imageOffset":515676,"symbol":"CFRunLoopRunSpecific","symbolLocation":562,"imageIndex":5},{"imageOffset":1756190,"symbol":"_NSEventThread","symbolLocation":132,"imageIndex":7},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6593235,"name":"DYMobileDeviceManager","frames":[{"imageOffset":6522,"symbol":"mach_msg_trap","symbolLocation":10,"imageIndex":4},{"imageOffset":7400,"symbol":"mach_msg","symbolLocation":56,"imageIndex":4},{"imageOffset":525197,"symbol":"__CFRunLoopServiceMachPort","symbolLocation":319,"imageIndex":5},{"imageOffset":518680,"symbol":"__CFRunLoopRun","symbolLocation":1276,"imageIndex":5},{"imageOffset":515676,"symbol":"CFRunLoopRunSpecific","symbolLocation":562,"imageIndex":5},{"imageOffset":392554,"symbol":"-[NSRunLoop(NSRunLoop) runMode:beforeDate:]","symbolLocation":216,"imageIndex":1},{"imageOffset":960439,"symbol":"-[NSRunLoop(NSRunLoop) run]","symbolLocation":76,"imageIndex":1},{"imageOffset":42846,"symbol":"-[DYMobileDeviceManager _deviceNotificationThread:]","symbolLocation":127,"imageIndex":8},{"imageOffset":362948,"symbol":"__NSThread__start__","symbolLocation":1009,"imageIndex":1},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6593244,"name":"com.apple.NSURLConnectionLoader","frames":[{"imageOffset":6522,"symbol":"mach_msg_trap","symbolLocation":10,"imageIndex":4},{"imageOffset":7400,"symbol":"mach_msg","symbolLocation":56,"imageIndex":4},{"imageOffset":525197,"symbol":"__CFRunLoopServiceMachPort","symbolLocation":319,"imageIndex":5},{"imageOffset":518680,"symbol":"__CFRunLoopRun","symbolLocation":1276,"imageIndex":5},{"imageOffset":515676,"symbol":"CFRunLoopRunSpecific","symbolLocation":562,"imageIndex":5},{"imageOffset":2394228,"imageIndex":9},{"imageOffset":362948,"symbol":"__NSThread__start__","symbolLocation":1009,"imageIndex":1},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6593358,"frames":[{"imageOffset":6522,"symbol":"mach_msg_trap","symbolLocation":10,"imageIndex":4},{"imageOffset":7400,"symbol":"mach_msg","symbolLocation":56,"imageIndex":4},{"imageOffset":525197,"symbol":"__CFRunLoopServiceMachPort","symbolLocation":319,"imageIndex":5},{"imageOffset":518680,"symbol":"__CFRunLoopRun","symbolLocation":1276,"imageIndex":5},{"imageOffset":515676,"symbol":"CFRunLoopRunSpecific","symbolLocation":562,"imageIndex":5},{"imageOffset":1072619,"symbol":"CFRunLoopRun","symbolLocation":40,"imageIndex":5},{"imageOffset":5499294,"symbol":"closure #1 in FSEventStream.start()","symbolLocation":254,"imageIndex":10},{"imageOffset":5291162,"symbol":"closure #1 in Thread.init(task:)","symbolLocation":106,"imageIndex":10},{"imageOffset":5222265,"symbol":"thunk for @escaping @callee_guaranteed () -> ()","symbolLocation":25,"imageIndex":10},{"imageOffset":5291414,"symbol":"@objc ThreadImpl.main()","symbolLocation":38,"imageIndex":10},{"imageOffset":362948,"symbol":"__NSThread__start__","symbolLocation":1009,"imageIndex":1},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6608834,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609011,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609012,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609406,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609700,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609701,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609778,"name":"JavaScriptCore libpas scavenger","frames":[{"imageOffset":17386,"symbol":"__psynch_cvwait","symbolLocation":10,"imageIndex":4},{"imageOffset":27247,"symbol":"_pthread_cond_wait","symbolLocation":1249,"imageIndex":0},{"imageOffset":2521221,"symbol":"scavenger_thread_main","symbolLocation":1397,"imageIndex":11},{"imageOffset":25825,"symbol":"_pthread_start","symbolLocation":125,"imageIndex":0},{"imageOffset":8043,"symbol":"thread_start","symbolLocation":15,"imageIndex":0}]},{"id":6609787,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609788,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609789,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609790,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]},{"id":6609848,"frames":[{"imageOffset":8008,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":0}]}],
+  "usedImages" : [
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 140703433936896,
+    "size" : 49152,
+    "uuid" : "bc574849-1aae-31e7-b350-916dda999d97",
+    "path" : "\/usr\/lib\/system\/libsystem_pthread.dylib",
+    "name" : "libsystem_pthread.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 140703449464832,
+    "CFBundleShortVersionString" : "6.9",
+    "CFBundleIdentifier" : "com.apple.Foundation",
+    "size" : 3919872,
+    "uuid" : "ceb9e591-a1ad-3ebc-ab8d-410f4ff96307",
+    "path" : "\/System\/Library\/Frameworks\/Foundation.framework\/Versions\/C\/Foundation",
+    "name" : "Foundation",
+    "CFBundleVersion" : "1863"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 4323397632,
+    "CFBundleShortVersionString" : "13.4.1",
+    "CFBundleIdentifier" : "com.apple.dt.DVTFoundation",
+    "size" : 6635520,
+    "uuid" : "7d865aca-e957-3810-9dda-d58ff4b26b4a",
+    "path" : "\/Applications\/Xcode.app\/Contents\/SharedFrameworks\/DVTFoundation.framework\/Versions\/A\/DVTFoundation",
+    "name" : "DVTFoundation",
+    "CFBundleVersion" : "20504"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 4375785472,
+    "CFBundleShortVersionString" : "13.4.1",
+    "CFBundleIdentifier" : "com.apple.dt.IDEKit",
+    "size" : 11255808,
+    "uuid" : "60aae03d-8393-374c-bf14-6340f93bd64a",
+    "path" : "\/Applications\/Xcode.app\/Contents\/Frameworks\/IDEKit.framework\/Versions\/A\/IDEKit",
+    "name" : "IDEKit",
+    "CFBundleVersion" : "20504"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 140703433707520,
+    "size" : 229376,
+    "uuid" : "61711d11-e776-3bc3-b9a2-6f9f37cb8499",
+    "path" : "\/usr\/lib\/system\/libsystem_kernel.dylib",
+    "name" : "libsystem_kernel.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64h",
+    "base" : 140703434252288,
+    "CFBundleShortVersionString" : "6.9",
+    "CFBundleIdentifier" : "com.apple.CoreFoundation",
+    "size" : 5255168,
+    "uuid" : "f8e45ef9-9fd2-3331-bb1b-703d5dacdaf1",
+    "path" : "\/System\/Library\/Frameworks\/CoreFoundation.framework\/Versions\/A\/CoreFoundation",
+    "name" : "CoreFoundation",
+    "CFBundleVersion" : "1863"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 4630220800,
+    "CFBundleShortVersionString" : "13.4.1",
+    "CFBundleIdentifier" : "com.apple.DTDeviceKitBase",
+    "size" : 589824,
+    "uuid" : "ed4f2a12-005e-394b-8447-84ab00d25ef1",
+    "path" : "\/Applications\/Xcode.app\/Contents\/SharedFrameworks\/DTDeviceKitBase.framework\/Versions\/A\/DTDeviceKitBase",
+    "name" : "DTDeviceKitBase",
+    "CFBundleVersion" : "20038"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 140703478808576,
+    "CFBundleShortVersionString" : "6.9",
+    "CFBundleIdentifier" : "com.apple.AppKit",
+    "size" : 15265792,
+    "uuid" : "832ad371-d3b8-3061-b4e2-1c4e0cffce0b",
+    "path" : "\/System\/Library\/Frameworks\/AppKit.framework\/Versions\/C\/AppKit",
+    "name" : "AppKit",
+    "CFBundleVersion" : "2113.50.132"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 4914032640,
+    "CFBundleShortVersionString" : "1.0",
+    "CFBundleIdentifier" : "com.apple.GPUToolsMobileFoundation",
+    "size" : 81920,
+    "uuid" : "fa9df557-d688-351c-b6dc-75a2af6318c6",
+    "path" : "\/Applications\/Xcode.app\/Contents\/SharedFrameworks\/GPUToolsMobileFoundation.framework\/Versions\/A\/GPUToolsMobileFoundation",
+    "name" : "GPUToolsMobileFoundation",
+    "CFBundleVersion" : "30013"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 140703512248320,
+    "CFBundleShortVersionString" : "1333.0.4",
+    "CFBundleIdentifier" : "com.apple.CFNetwork",
+    "size" : 4780032,
+    "uuid" : "5d19915e-1fbd-30ab-9777-84c32ae75738",
+    "path" : "\/System\/Library\/Frameworks\/CFNetwork.framework\/Versions\/A\/CFNetwork",
+    "name" : "CFNetwork",
+    "CFBundleVersion" : "1333.0.4"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 5017681920,
+    "CFBundleShortVersionString" : "1.0",
+    "CFBundleIdentifier" : "com.apple.dt.IDE.SwiftPM",
+    "size" : 7602176,
+    "uuid" : "e42b5a55-a0df-3ad4-abb2-6602a0b60883",
+    "path" : "\/Applications\/Xcode.app\/Contents\/PlugIns\/IDESwiftPackageCore.framework\/Versions\/A\/Frameworks\/SwiftPM.framework\/Versions\/A\/SwiftPM",
+    "name" : "SwiftPM",
+    "CFBundleVersion" : "20504"
+  },
+  {
+    "source" : "P",
+    "arch" : "x86_64",
+    "base" : 140703844716544,
+    "CFBundleShortVersionString" : "17613",
+    "CFBundleIdentifier" : "com.apple.JavaScriptCore",
+    "size" : 23117824,
+    "uuid" : "162b1ef9-61d9-32f4-80da-21ca5ca38d87",
+    "path" : "\/System\/Library\/Frameworks\/JavaScriptCore.framework\/Versions\/A\/JavaScriptCore",
+    "name" : "JavaScriptCore",
+    "CFBundleVersion" : "17613.2.7.1.8"
+  },
+  {
+    "size" : 0,
+    "source" : "A",
+    "base" : 0,
+    "uuid" : "00000000-0000-0000-0000-000000000000"
+  }
+],
+  "sharedCache" : {
+  "base" : 140703430680576,
+  "size" : 15220686848,
+  "uuid" : "398acfb4-57f6-31e0-bc82-e9959e5c92ce"
+},
+  "vmSummary" : "ReadOnly portion of Libraries: Total=1.9G resident=0K(0%) swapped_out_or_unallocated=1.9G(100%)\nWritable regions: Total=1.8G written=0K(0%) resident=0K(0%) swapped_out=0K(0%) unallocated=1.8G(100%)\n\n                                VIRTUAL   REGION \nREGION TYPE                        SIZE    COUNT (non-coalesced) \n===========                     =======  ======= \nAccelerate framework              1536K       12 \nActivity Tracing                   256K        1 \nCG backing stores                 3648K        8 \nCG image                          6480K      175 \nCG raster data                      16K        2 \nColorSync                          236K       28 \nCoreAnimation                     38.1M      353 \nCoreData                            12K        1 \nCoreGraphics                        16K        3 \nCoreImage                          104K       25 \nCoreUI image data                 3320K       37 \nDispatch continuations            96.0M        1 \nFoundation                         816K        3 \nJS JIT generated code              1.0G        3 \nKernel Alloc Once                    8K        1 \nMALLOC                           480.7M     1758 \nMALLOC guard page                   48K       11 \nObjC additional data                15K        1 \nPerformance tool data                4K        1         not counted in TOTAL below\nSQLite page cache                  384K        6 \nSTACK GUARD                       56.1M       21 \nStack                             18.2M       21 \nVM_ALLOCATE                       1140K       28 \nWebKit Malloc                    192.0M        5 \n__CTF                               756        1 \n__DATA                            80.6M     1061 \n__DATA_CONST                      50.9M      759 \n__DATA_DIRTY                      2446K      279 \n__FONT_DATA                          4K        1 \n__LINKEDIT                       905.9M      300 \n__TEXT                             1.1G      999 \n__UNICODE                          592K        1 \ndyld private memory               1024K        1 \nlibnetwork                         640K       16 \nmapped file                      255.5M       86 \nshared memory                      784K       20 \n===========                     =======  ======= \nTOTAL                              4.2G     6028 \n",
+  "legacyInfo" : {
+  "threadTriggered" : {
+    "queue" : "com.apple.main-thread"
+  }
+},
+  "trialInfo" : {
+  "rollouts" : [
+    {
+      "rolloutId" : "6112e14f37f5d11121dcd519",
+      "factorPackIds" : {
+        "SIRI_TEXT_TO_SPEECH" : "62f3b99fd7b78f3a74434a79"
+      },
+      "deploymentId" : 240000198
+    },
+    {
+      "rolloutId" : "607844aa04477260f58a8077",
+      "factorPackIds" : {
+        "SIRI_MORPHUN_ASSETS" : "6103050cbfe6dc472e1c982a"
+      },
+      "deploymentId" : 240000066
+    }
+  ],
+  "experiments" : [
+
+  ]
+}
+}
+
+Model: MacBookPro16,1, BootROM 1731.120.10.0.0 (iBridge: 19.16.15071.0.0,0), 6 processors, 6-Core Intel Core i7, 2.6 GHz, 16 GB, SMC
+Graphics: Intel UHD Graphics 630, Intel UHD Graphics 630, Built-In
+Graphics: AMD Radeon Pro 5300M, AMD Radeon Pro 5300M, PCIe, 4 GB
+Display: Color LCD, 3072 x 1920 Retina, Main, MirrorOff, Online
+Display: ASUS PB277, 2560 x 1440 (QHD/WQHD - Wide Quad High Definition), MirrorOff, Online
+Memory Module: BANK 0/ChannelA-DIMM0, 8 GB, DDR4, 2667 MHz, Micron, 8ATF1G64HZ-2G6E1
+Memory Module: BANK 2/ChannelB-DIMM0, 8 GB, DDR4, 2667 MHz, Micron, 8ATF1G64HZ-2G6E1
+AirPort: spairport_wireless_card_type_wifi (0x14E4, 0x7BF), wl0: Jul 12 2021 18:02:56 version 9.30.464.0.32.5.76 FWID 01-c081cfed
+Bluetooth: Version (null), 0 services, 0 devices, 0 incoming serial ports
+Network Service: Wi-Fi, AirPort, en0
+USB Device: USB31Bus
+USB Device: USB 2.0 BILLBOARD
+USB Device: T2Bus
+USB Device: composite_device
+USB Device: Touch Bar Backlight
+USB Device: Touch Bar Display
+USB Device: Apple Internal Keyboard / Trackpad
+USB Device: Headset
+USB Device: Ambient Light Sensor
+USB Device: FaceTime HD Camera (Built-in)
+USB Device: Apple T2 Controller
+Thunderbolt Bus: MacBook Pro, Apple Inc., 63.5
+Thunderbolt Bus: MacBook Pro, Apple Inc., 63.5
