@@ -1,0 +1,9 @@
+[
+  {
+    "target": "",
+    "overridesAnnotations": true,
+    "items": {
+      "SealedInterop.Case.Name": "X"
+    }
+  }
+]
