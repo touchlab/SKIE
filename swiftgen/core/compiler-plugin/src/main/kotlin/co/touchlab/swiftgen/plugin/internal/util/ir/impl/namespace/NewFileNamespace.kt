@@ -24,7 +24,10 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 
-internal class NewFileNamespace private constructor(name: FqName, private val context: Context) : BaseNamespace() {
+internal class NewFileNamespace private constructor(
+    name: FqName,
+    private val context: Context,
+) : BaseNamespace<PackageFragmentDescriptor>() {
 
     private val packageContent = mutableListOf<DeclarationDescriptor>()
 

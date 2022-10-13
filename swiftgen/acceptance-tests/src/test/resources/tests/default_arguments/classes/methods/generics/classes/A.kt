@@ -1,4 +1,4 @@
-package tests.default_arguments.classes.methods.generics.classes
+package `tests`.`default_arguments`.`classes`.`methods`.`generics`.`classes`
 
 import tests.default_arguments.classes.methods.generics.I
 import tests.default_arguments.classes.methods.generics.K

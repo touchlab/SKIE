@@ -1,4 +1,4 @@
-package tests.default_arguments.classes.methods.generics
+package `tests`.`default_arguments`.`classes`.`methods`.`generics`
 
 interface I
 

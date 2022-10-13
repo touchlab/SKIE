@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.name.Name
 
 internal class FunctionTemplate(
     name: Name,
-    namespace: Namespace,
+    namespace: Namespace<*>,
     annotations: Annotations,
     config: FunctionBuilder.() -> Unit,
 ) : BaseDeclarationTemplate<FunctionDescriptor, IrSimpleFunction, IrSimpleFunctionSymbol>() {

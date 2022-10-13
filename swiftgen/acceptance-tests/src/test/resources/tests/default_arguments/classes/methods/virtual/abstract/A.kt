@@ -1,4 +1,4 @@
-package tests.default_arguments.classes.methods.virtual.abstract
+package `tests`.`default_arguments`.`classes`.`methods`.`virtual`.`abstract`
 
 abstract class A {
 
@@ -7,5 +7,5 @@ abstract class A {
 
 class B : A() {
 
-    override fun foo(i: Int, k: Int, m: Int, o: Int): Int = i + k + m + o
+    override fun foo(i: Int, k: Int, m: Int, o: Int): Int = i + k * m - o
 }

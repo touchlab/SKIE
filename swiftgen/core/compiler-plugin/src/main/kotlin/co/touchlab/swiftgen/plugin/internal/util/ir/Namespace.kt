@@ -5,9 +5,9 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
-internal interface Namespace {
+internal interface Namespace<D : DeclarationDescriptor> {
 
-    val descriptor: DeclarationDescriptor
+    val descriptor: D
 
     val sourceElement: SourceElement
 

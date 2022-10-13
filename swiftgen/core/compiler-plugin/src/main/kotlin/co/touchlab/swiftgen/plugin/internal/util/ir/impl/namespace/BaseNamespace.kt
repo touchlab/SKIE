@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-internal abstract class BaseNamespace : Namespace {
+internal abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
 
     override val declarations: List<DeclarationDescriptor>
         get() = templates.map { it.descriptor }

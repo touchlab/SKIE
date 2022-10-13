@@ -11,7 +11,7 @@ internal abstract class BaseGenerator(
     private val swiftFileBuilderFactory: SwiftFileBuilderFactory,
     private val namespaceProvider: NamespaceProvider,
     override val configuration: Configuration,
-) : SwiftPackExtensionContainer, ConfigurationContainer {
+) : Generator, SwiftPackExtensionContainer, ConfigurationContainer {
 
     override val swiftPackModuleBuilder: SwiftPackModuleBuilder
         get() = swiftFileBuilderFactory.swiftPackModuleBuilder
@@ -32,6 +32,4 @@ internal abstract class BaseGenerator(
 
     protected fun addNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName =
         namespaceProvider.addNamespace(base, name)
-
-    abstract fun generate(descriptorProvider: DescriptorProvider)
 }

@@ -4,18 +4,22 @@ import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationTemplate
 import co.touchlab.swiftgen.plugin.internal.util.ir.FunctionBuilder
 import co.touchlab.swiftgen.plugin.internal.util.ir.Namespace
+import co.touchlab.swiftgen.plugin.internal.util.ir.SecondaryConstructorBuilder
 import co.touchlab.swiftgen.plugin.internal.util.ir.impl.namespace.DeserializedClassNamespace
 import co.touchlab.swiftgen.plugin.internal.util.ir.impl.namespace.NewFileNamespace
 import co.touchlab.swiftgen.plugin.internal.util.ir.impl.template.FunctionTemplate
+import co.touchlab.swiftgen.plugin.internal.util.ir.impl.template.SecondaryConstructorTemplate
 import co.touchlab.swiftgen.plugin.internal.util.reflection.reflectedBy
 import co.touchlab.swiftgen.plugin.internal.util.reflection.reflectors.ContextReflector
 import co.touchlab.swiftgen.plugin.internal.util.reflection.reflectors.SymbolTableBaseReflector
 import co.touchlab.swiftgen.plugin.internal.util.reflection.reflectors.SymbolTableReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -35,15 +39,15 @@ internal class DeclarationBuilderImpl(
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
 
-    private val allNamespaces: List<Namespace>
+    private val allNamespaces: List<Namespace<*>>
         get() = newFileNamespacesByName.values + classNamespacesByDescriptor.values
 
-    override fun getNamespace(name: String): Namespace =
+    override fun getNamespace(name: String): Namespace<PackageFragmentDescriptor> =
         newFileNamespacesByName.getOrPut(name) {
             newFileNamespaceFactory.create(name)
         }
 
-    override fun getNamespace(classDescriptor: ClassDescriptor): Namespace =
+    override fun getNamespace(classDescriptor: ClassDescriptor): Namespace<ClassDescriptor> =
         classNamespacesByDescriptor.getOrPut(classDescriptor) {
             require(classDescriptor is DeserializedClassDescriptor) {
                 "Only DeserializedClassDescriptor is currently supported. Was: $classDescriptor"
@@ -54,14 +58,22 @@ internal class DeclarationBuilderImpl(
 
     override fun createFunction(
         name: Name,
-        namespace: Namespace,
+        namespace: Namespace<*>,
         annotations: Annotations,
         builder: FunctionBuilder.() -> Unit,
     ): FunctionDescriptor =
         create(namespace) { FunctionTemplate(name, namespace, annotations, builder) }
 
+    override fun createSecondaryConstructor(
+        name: Name,
+        namespace: Namespace<ClassDescriptor>,
+        annotations: Annotations,
+        builder: SecondaryConstructorBuilder.() -> Unit,
+    ): ClassConstructorDescriptor =
+        create(namespace) { SecondaryConstructorTemplate(name, namespace, annotations, builder) }
+
     private fun <D : DeclarationDescriptor> create(
-        namespace: Namespace,
+        namespace: Namespace<*>,
         templateBuilder: () -> DeclarationTemplate<D>,
     ): D {
         val declarationTemplate = templateBuilder()
@@ -71,14 +83,27 @@ internal class DeclarationBuilderImpl(
         return declarationTemplate.descriptor
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     fun suppressUnboundSymbolsError() {
+        val allDescriptors = allNamespaces.flatMap { it.declarations }.toSet()
+
+        suppressUnboundFunctionSymbolsError(allDescriptors)
+        suppressUnboundConstructorsSymbolsError(allDescriptors)
+    }
+
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun suppressUnboundFunctionSymbolsError(descriptors: Set<DeclarationDescriptor>) {
         val functionSymbolTable = symbolTable.reflectedBy<SymbolTableReflector>().simpleFunctionSymbolTable
         val unboundFunctions = functionSymbolTable.reflectedBy<SymbolTableBaseReflector>().unboundSymbols
 
-        val allDescriptors = allNamespaces.flatMap { it.declarations }.toSet()
+        unboundFunctions.removeIf { it.descriptor in descriptors }
+    }
 
-        unboundFunctions.removeIf { it.descriptor in allDescriptors }
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun suppressUnboundConstructorsSymbolsError(descriptors: Set<DeclarationDescriptor>) {
+        val constructorSymbolTable = symbolTable.reflectedBy<SymbolTableReflector>().constructorSymbolTable
+        val unboundConstructors = constructorSymbolTable.reflectedBy<SymbolTableBaseReflector>().unboundSymbols
+
+        unboundConstructors.removeIf { it.descriptor in descriptors }
     }
 
     fun generateIr(mairIrModuleFragment: IrModuleFragment, pluginContext: IrPluginContext) {

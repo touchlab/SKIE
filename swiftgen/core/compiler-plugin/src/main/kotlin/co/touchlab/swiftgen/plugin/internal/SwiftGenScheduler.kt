@@ -37,8 +37,7 @@ internal class SwiftGenScheduler(
 
     private val defaultArgumentGenerator = DefaultArgumentGenerator(
         declarationBuilder = declarationBuilder,
-        swiftFileBuilderFactory = swiftFileBuilderFactory,
-        namespaceProvider = namespaceProvider,
+        swiftPackModuleBuilder = swiftFileBuilderFactory.swiftPackModuleBuilder,
         configuration = configuration,
     )
 

@@ -8,4 +8,6 @@ internal class SymbolTableReflector(
 ) : Reflector(SymbolTable::class) {
 
     val simpleFunctionSymbolTable by declaredField<Any>()
+
+    val constructorSymbolTable by declaredField<Any>()
 }
