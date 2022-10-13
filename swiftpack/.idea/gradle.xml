@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/swiftpack-plugin" name="swiftpack-plugin">
+                <projects>
+                  <project path="$PROJECT_DIR$/swiftpack-plugin" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/api" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/plugin-api" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/spec" />
+                  <project path="$PROJECT_DIR$/swiftpack-plugin/spi" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/example/consumer" />
+            <option value="$PROJECT_DIR$/example/nonproducer" />
+            <option value="$PROJECT_DIR$/example/producer" />
+            <option value="$PROJECT_DIR$/example/producer/ksp-plugin" />
+            <option value="$PROJECT_DIR$/example/producer/simple-plugin" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/api" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/config-plugin" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/gradle-plugin" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/plugin-api" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/spec" />
+            <option value="$PROJECT_DIR$/swiftpack-plugin/spi" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
