@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="11">
+      <module name="com.ncorti.kotlin.gradle.template.plugin" target="1.8" />
+      <module name="com.ncorti.kotlin.gradle.template.plugin.main" target="1.8" />
+      <module name="com.ncorti.kotlin.gradle.template.plugin.test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
