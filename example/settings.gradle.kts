@@ -1,13 +1,15 @@
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         google()
         mavenCentral()
-        maven("https://plugins.gradle.org/m2/")
-        maven("https://api.touchlab.dev/public")
+        mavenLocal()
     }
 }
 
 include(":app", ":shared")
-rootProject.name = "KaMPKit"
+rootProject.name = "example"
 
 enableFeaturePreview("VERSION_CATALOGS")
+
+includeBuild("../plugin")

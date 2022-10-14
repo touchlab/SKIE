@@ -19,5 +19,5 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "SKIE"
 
-//includeBuild("example")
+includeBuild("example")
 includeBuild("plugin")

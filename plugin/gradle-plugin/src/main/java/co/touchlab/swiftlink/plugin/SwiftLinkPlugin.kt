@@ -1,6 +1,6 @@
 package co.touchlab.swiftlink.plugin
 
-import co.touchlab.swiftlink.BuildConfig
+import co.touchlab.skie.BuildConfig
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -11,7 +11,6 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.findByType
@@ -36,7 +35,7 @@ const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "swiftLinkPlugin"
 @Suppress("ObjectLiteralToLambda")
 abstract class SwiftLinkPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
-        val extension = extensions.create(EXTENSION_NAME, SwiftLinkExtension::class.java, this)
+        val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java, this)
 
         val swiftLinkPluginConfiguration = configurations.maybeCreate(SWIFT_LINK_PLUGIN_CONFIGURATION_NAME).apply {
             isCanBeResolved = true

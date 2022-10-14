@@ -5,10 +5,10 @@ import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
-const val DEFAULT_OUTPUT_DIR = "swiftlink"
+const val DEFAULT_OUTPUT_DIR = "skie"
 
 @Suppress("UnnecessaryAbstractClass")
-abstract class SwiftLinkExtension @Inject constructor(project: Project) {
+abstract class SkieExtension @Inject constructor(project: Project) {
 
     private val objects = project.objects
 
