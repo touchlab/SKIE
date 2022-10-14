@@ -8,7 +8,7 @@ import java.io.File
 
 class SwiftLinkCommandLineProcessor: CommandLineProcessor {
     companion object {
-        const val pluginId = "co.touchlab.swiftlink"
+        const val pluginId = "co.touchlab.skie"
     }
 
     override val pluginId: String = SwiftLinkCommandLineProcessor.pluginId

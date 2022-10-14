@@ -8,9 +8,7 @@ plugins {
 dependencies {
     compileOnly(strippedKotlinNativeCompilerEmbeddable())
 
-    implementation(projects.api)
-    implementation(projects.interceptor)
-    implementation(projects.linker)
+    implementation(projects.reflector)
     implementation(projects.spi)
 }
 

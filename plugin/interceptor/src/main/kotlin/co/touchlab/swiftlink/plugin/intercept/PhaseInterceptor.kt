@@ -1,7 +1,9 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.swiftlink.plugin.intercept
 
+import co.touchlab.swiftlink.plugin.reflection.PropertyField
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.backend.common.phaser.AnyNamedPhase
 import org.jetbrains.kotlin.backend.common.phaser.Checker
 import org.jetbrains.kotlin.backend.common.phaser.CompilerPhase
 import org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase
@@ -13,26 +15,29 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import java.net.URLClassLoader
 import java.util.ServiceLoader
 import kotlin.reflect.jvm.jvmName
+import org.jetbrains.kotlin.backend.konan.objectFilesPhase
+import org.jetbrains.kotlin.backend.konan.psiToIrPhase
+import org.jetbrains.kotlin.backend.konan.objCExportPhase
 
-typealias InterceptedPhase = CompilerPhase<CommonBackendContext, Unit, Unit>
+typealias InterceptedPhase<CONTEXT> = CompilerPhase<CONTEXT, Unit, Unit>
 typealias ErasedListener = Pair<
         (phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) -> Unit,
         (phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) -> Unit
     >
 
-class PhaseInterceptor(
-    private val interceptedPhase: InterceptedPhase,
+class PhaseInterceptor<in CONTEXT: CommonBackendContext>(
+    private val interceptedPhase: InterceptedPhase<CONTEXT>,
     private val listenersKey: CompilerConfigurationKey<List<ErasedListener>>,
-) : CompilerPhase<CommonBackendContext, Unit, Unit> {
+) : CompilerPhase<CONTEXT, Unit, Unit> {
 
     override val stickyPostconditions: Set<Checker<Unit>>
         get() = interceptedPhase.stickyPostconditions
 
-    override fun getNamedSubphases(startDepth: Int): List<Pair<Int, NamedCompilerPhase<CommonBackendContext, *>>> {
+    override fun getNamedSubphases(startDepth: Int): List<Pair<Int, NamedCompilerPhase<CONTEXT, *>>> {
         return interceptedPhase.getNamedSubphases(startDepth)
     }
 
-    override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext, input: Unit) {
+    override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CONTEXT, input: Unit) {
         val listeners = context.configuration.getList(listenersKey)
 
         listeners.forEach { it.first(phaseConfig, phaserState, context) }
@@ -42,25 +47,24 @@ class PhaseInterceptor(
         listeners.forEach { it.second(phaseConfig, phaserState, context) }
     }
 
-    fun accessInitialConfigForCopy(): Pair<InterceptedPhase, CompilerConfigurationKey<List<ErasedListener>>> =
+    fun accessInitialConfigForCopy(): Pair<InterceptedPhase<CONTEXT>, CompilerConfigurationKey<List<ErasedListener>>> =
         interceptedPhase to listenersKey
 
     companion object {
         fun setupPhaseListeners(configuration: CompilerConfiguration) {
             val phaseListeners =
-                (javaClass.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) }
+                (this::class.java.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) }
                     ?: ServiceLoader.load(PhaseListener::class.java)
             phaseListeners
                 .groupBy { it.phase }
                 .forEach { (phaseKey, interceptions) ->
-                    val phaseAccessor = getPhaseAccessor(phaseKey)
-                    val namedPhase = getNamedPhase(phaseAccessor)
+                    val namedPhase = getPhase(phaseKey)
 
                     synchronized(namedPhase) {
-                        val currentPhase = namedPhase.lower
+                        val currentPhase = namedPhase.lowerField
                         val (originalPhase, listenersKey) = if (currentPhase.javaClass.name == PhaseInterceptor::class.jvmName) {
-                            currentPhase.javaClass.getDeclaredMethod(PhaseInterceptor::accessInitialConfigForCopy.name)
-                                .invoke(currentPhase) as Pair<InterceptedPhase, CompilerConfigurationKey<List<ErasedListener>>>
+                            currentPhase.javaClass.getDeclaredMethod(PhaseInterceptor<Nothing>::accessInitialConfigForCopy.name)
+                                .invoke(currentPhase) as Pair<InterceptedPhase<Nothing>, CompilerConfigurationKey<List<ErasedListener>>>
                         } else {
                             currentPhase to CompilerConfigurationKey.create("phaseListeners")
                         }
@@ -69,30 +73,18 @@ class PhaseInterceptor(
                         configuration.addAll(listenersKey, interceptions.map { it::beforePhase to it::afterPhase })
 
                         val interceptorPhase = PhaseInterceptor(originalPhase, listenersKey)
-                        namedPhase.lower = interceptorPhase
+                        namedPhase.lowerField = interceptorPhase
                     }
 
                 }
         }
 
-        private fun getNamedPhase(phaseAccessor: String): AnyNamedPhase = this::class.java.classLoader
-            .loadClass("org.jetbrains.kotlin.backend.konan.ToplevelPhasesKt")
-            .getDeclaredMethod(phaseAccessor)
-            .invoke(null) as AnyNamedPhase
-
-        private fun getPhaseAccessor(phaseKey: PhaseListener.Phase) = when (phaseKey) {
-            PhaseListener.Phase.OBJC_EXPORT -> "getObjCExportPhase"
-            PhaseListener.Phase.PSI_TO_IR -> "getPsiToIrPhase"
-            PhaseListener.Phase.OBJECT_FILES -> "getObjectFilesPhase"
+        private fun getPhase(phaseKey: PhaseListener.Phase) = when (phaseKey) {
+            PhaseListener.Phase.OBJC_EXPORT -> objCExportPhase
+            PhaseListener.Phase.PSI_TO_IR -> psiToIrPhase
+            PhaseListener.Phase.OBJECT_FILES -> objectFilesPhase
         }
 
-        private val lowerField by lazy {
-            val field = NamedCompilerPhase::class.java.getDeclaredField("lower")
-            check(field.trySetAccessible()) { "Failed to make field `lower` accessible" }
-            field
-        }
-        private var AnyNamedPhase.lower: CompilerPhase<CommonBackendContext, Unit, Unit>
-            get() = lowerField.get(this) as CompilerPhase<CommonBackendContext, Unit, Unit>
-            set(value) = lowerField.set(this, value)
+        private var NamedCompilerPhase<Nothing, Unit>.lowerField: CompilerPhase<Nothing, Unit, Unit> by PropertyField(NamedCompilerPhase<Nothing, Unit>::lower.name)
     }
 }

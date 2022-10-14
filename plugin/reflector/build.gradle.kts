@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 
 plugins {
     kotlin("jvm")
+    kotlin("kapt")
     `maven-publish`
 }
 
@@ -9,11 +10,7 @@ dependencies {
     compileOnly(strippedKotlinNativeCompilerEmbeddable())
 
     implementation(projects.api)
-    implementation(projects.interceptor)
-    implementation(projects.linker)
-    implementation(projects.spi)
 }
-
 
 fun strippedKotlinNativeCompilerEmbeddable(): FileCollection {
     val targetFile = layout.buildDirectory.file("tmp/kotlin-native-stripped").map {
