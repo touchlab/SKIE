@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
+    id("gradle-src-classpath-loader")
 }
 
 allprojects {

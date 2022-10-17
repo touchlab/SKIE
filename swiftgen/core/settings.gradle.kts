@@ -12,6 +12,8 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+
+    includeBuild("../gradle-src")
 }
 
 dependencyResolutionManagement {

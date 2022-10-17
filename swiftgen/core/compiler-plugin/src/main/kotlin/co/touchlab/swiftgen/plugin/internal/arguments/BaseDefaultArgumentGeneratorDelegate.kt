@@ -3,11 +3,10 @@ package co.touchlab.swiftgen.plugin.internal.arguments
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.plugin.internal.util.Generator
-import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
+import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -93,16 +92,4 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
 
     private fun IrFunction.indexOfValueParameterByName(name: Name): Int =
         this.valueParameters.indexOfFirst { it.name == name }
-
-    protected fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
-        val baseSignature = function.name.identifier
-        val parameters = overloadDescriptor.valueParameters.joinToString("") { it.name.identifier + ":" }
-        val fullSignature = "$baseSignature($parameters)"
-
-        with(swiftPackModuleBuilder) {
-            overloadDescriptor.reference().applyTransform {
-                rename(fullSignature)
-            }
-        }
-    }
 }

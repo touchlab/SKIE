@@ -2,8 +2,9 @@ package co.touchlab.swiftgen.plugin.internal.arguments
 
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
-import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
-import co.touchlab.swiftgen.plugin.internal.util.ir.createSecondaryConstructor
+import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.swiftgen.plugin.internal.util.irbuilder.createSecondaryConstructor
+import co.touchlab.swiftgen.plugin.internal.util.irbuilder.getNamespace
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -24,8 +25,8 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
 
     override fun generate(descriptorProvider: DescriptorProvider) {
         descriptorProvider.allSupportedClasses().forEach { classDescriptor ->
-            classDescriptor.allSupportedConstructors(descriptorProvider).forEach { constructorDescriptor ->
-                generateOverloads(constructorDescriptor, classDescriptor)
+            classDescriptor.allSupportedConstructors(descriptorProvider).forEach {
+                generateOverloads(it)
             }
         }
     }
@@ -42,21 +43,20 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
             .filter { descriptorProvider.shouldBeExposed(it) }
             .filter { it.canBeUsedWithExperimentalFeatures }
 
-    private fun generateOverloads(constructor: ClassConstructorDescriptor, parentClass: ClassDescriptor) {
+    private fun generateOverloads(constructor: ClassConstructorDescriptor) {
         constructor.forEachDefaultArgumentOverload { index, overloadParameters ->
-            generateOverload(constructor, parentClass, index, overloadParameters)
+            generateOverload(constructor, index, overloadParameters)
         }
     }
 
     private fun generateOverload(
         constructor: ClassConstructorDescriptor,
-        parentClass: ClassDescriptor,
         index: Int,
         parameters: List<ValueParameterDescriptor>,
     ) {
         declarationBuilder.createSecondaryConstructor(
             name = "<init__SwiftGen__${index}>",
-            namespace = declarationBuilder.getNamespace(parentClass),
+            namespace = declarationBuilder.getNamespace(constructor),
             annotations = constructor.annotations,
         ) {
             valueParameters = parameters.copyWithoutDefaultValue(descriptor)

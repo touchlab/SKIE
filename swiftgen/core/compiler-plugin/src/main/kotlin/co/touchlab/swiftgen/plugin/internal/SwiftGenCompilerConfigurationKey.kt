@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal
 
-import co.touchlab.swiftgen.plugin.internal.util.ir.impl.DeclarationBuilderImpl
+import co.touchlab.swiftgen.plugin.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import co.touchlab.swiftgen.configuration.Configuration as ConfigurationType

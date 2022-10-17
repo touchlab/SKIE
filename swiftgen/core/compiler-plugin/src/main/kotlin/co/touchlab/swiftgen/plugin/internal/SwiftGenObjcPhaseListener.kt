@@ -5,8 +5,8 @@ import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
-import co.touchlab.swiftgen.plugin.internal.util.ir.DeclarationBuilder
-import co.touchlab.swiftgen.plugin.internal.util.ir.impl.DeclarationBuilderImpl
+import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.swiftgen.plugin.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.swiftlink.plugin.intercept.PhaseListener
 import co.touchlab.swiftpack.api.buildSwiftPackModule
 import org.jetbrains.kotlin.backend.common.CommonBackendContext

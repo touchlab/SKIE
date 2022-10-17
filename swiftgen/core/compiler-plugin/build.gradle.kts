@@ -1,3 +1,4 @@
+import co.touchlab.swiftgen.gradle.extractedKotlinNativeCompilerEmbeddable
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -21,7 +22,7 @@ buildConfig {
 }
 
 dependencies {
-    compileOnly(kotlin("compiler-embeddable"))
+    compileOnly(extractedKotlinNativeCompilerEmbeddable())
     implementation(libs.swiftpack.api)
     implementation(libs.swiftlink.plugin.spi)
     implementation(project(":api"))
