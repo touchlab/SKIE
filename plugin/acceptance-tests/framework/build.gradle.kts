@@ -30,7 +30,14 @@ dependencies {
     implementation(projects.configurationApi)
     implementation(projects.api)
     implementation(projects.spi)
+    implementation(projects.generator.core)
     implementation(projects.kotlinPlugin)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + listOf("-Xcontext-receivers")
+    }
 }
 
 tasks.test {

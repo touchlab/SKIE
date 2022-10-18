@@ -1,6 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal
 
 import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.plugin.ConfigurationKeys
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
@@ -38,7 +39,7 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
     }
 
     private val CommonBackendContext.pluginConfiguration: Configuration
-        get() = SwiftGenCompilerConfigurationKey.Configuration.getOrNull(this.configuration) ?: Configuration {}
+        get() = configuration.get(ConfigurationKeys.swiftGenConfiguration, Configuration {})
 
     private fun buildSwift(action: (SwiftFileBuilderFactory) -> Unit) {
         buildSwiftPackModule("SwiftGen") {

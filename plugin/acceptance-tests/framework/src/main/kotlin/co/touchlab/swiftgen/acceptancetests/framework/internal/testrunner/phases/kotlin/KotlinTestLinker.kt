@@ -5,7 +5,8 @@ import co.touchlab.swiftgen.acceptancetests.framework.TempFileSystem
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.swiftgen.acceptancetests.framework.internal.testrunner.TestResultBuilder
 import co.touchlab.swiftgen.configuration.Configuration
-import co.touchlab.swiftlink.plugin.ConfigurationKeys
+import co.touchlab.swiftlink.plugin.ConfigurationKeys as SwiftLinkConfigurationKeys
+import co.touchlab.swiftgen.plugin.ConfigurationKeys as SwiftGenConfigurationKeys
 import co.touchlab.swiftlink.plugin.SwiftLinkComponentRegistrar
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import co.touchlab.swiftpack.spec.module.SwiftPackModule
@@ -33,18 +34,18 @@ internal class KotlinTestLinker(
         val tempDirectory = tempFileSystem.createDirectory("kotlin-linker")
         val outputFile = tempFileSystem.createDirectory("Kotlin.framework")
 
-        val generatedSwiftDirectory = configureSwiftKt()
+        val generatedSwiftDirectory = configureSwiftKt(configuration)
 
         val (messageCollector, outputStream) = createCompilerOutputStream()
 
-        val arguments = createCompilerArguments(klib, configuration, tempDirectory, outputFile)
+        val arguments = createCompilerArguments(klib, tempDirectory, outputFile)
 
         val result = K2Native().exec(messageCollector, Services.EMPTY, arguments)
 
         return interpretResult(result, outputFile, outputStream, generatedSwiftDirectory)
     }
 
-    private fun configureSwiftKt(): Path {
+    private fun configureSwiftKt(configuration: Path): Path {
         val outputDirectory = tempFileSystem.createDirectory("swiftpack")
         val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
 
@@ -53,8 +54,9 @@ internal class KotlinTestLinker(
         PluginRegistrar.configure.set {
             val swiftPackModule = SwiftPackModule.Reference("Kotlin", outputDirectory.toFile())
 
-            add(ConfigurationKeys.swiftPackModules, swiftPackModule)
-            put(ConfigurationKeys.expandedSwiftDir, expandedSwiftDirectory.toFile())
+            add(SwiftLinkConfigurationKeys.swiftPackModules, swiftPackModule)
+            put(SwiftLinkConfigurationKeys.expandedSwiftDir, expandedSwiftDirectory.toFile())
+            put(SwiftGenConfigurationKeys.swiftGenConfiguration, Configuration.deserialize(configuration.readText()))
         }
 
         PluginRegistrar.plugins.set(
@@ -80,7 +82,6 @@ internal class KotlinTestLinker(
 
     private fun createCompilerArguments(
         klib: Path,
-        configuration: Path,
         tempDirectory: Path,
         outputFile: Path,
     ): K2NativeCompilerArguments =
@@ -88,7 +89,6 @@ internal class KotlinTestLinker(
             includes = (includes ?: emptyArray()) + klib.absolutePathString()
 
             memoryModel = "experimental"
-            pluginOptions = (pluginOptions ?: emptyArray()) + createConfigurationPathOption(configuration)
 
             produce = "framework"
             staticFramework = true
@@ -99,9 +99,6 @@ internal class KotlinTestLinker(
 
             pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.RESOURCES)
         }
-
-    private fun createConfigurationPathOption(configuration: Path): String =
-        "plugin:${Configuration.CliPluginId}:${Configuration.CliOptionKey}=${configuration.absolutePathString()}"
 
     private fun interpretResult(
         result: ExitCode,

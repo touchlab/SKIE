@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import co.touchlab.swiftlink.plugin.SkiePlugin.Options
+import co.touchlab.swiftgen.plugin.ConfigurationKeys as SwiftGenConfigurationKeys
 
 class SwiftLinkCommandLineProcessor: CommandLineProcessor {
 
@@ -44,7 +45,7 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
                 val config = Options.swiftGenConfigPath.deserialize(value).readText()
                 val swiftGenConfiguration = Configuration.deserialize(config)
 
-                configuration.put(ConfigurationKeys.swiftGenConfiguration, swiftGenConfiguration)
+                configuration.put(SwiftGenConfigurationKeys.swiftGenConfiguration, swiftGenConfiguration)
             }
         }
     }

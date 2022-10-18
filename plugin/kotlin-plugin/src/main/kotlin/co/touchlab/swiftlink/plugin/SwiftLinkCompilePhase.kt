@@ -138,7 +138,6 @@ class SwiftLinkCompilePhase(
         val targetTriple = configurables.targetTriple
 
         Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
-            +"-v"
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
             +listOf("-Xcc", "-fmodule-map-file=${framework.modulemapFile}")

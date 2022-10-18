@@ -43,6 +43,13 @@ tasks.register("reformatPackagesInAcceptanceTests") {
     }
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + listOf("-Xcontext-receivers")
+    }
+}
+
+
 fun reformatPackage(file: File) {
     val lines = file.readLines()
 

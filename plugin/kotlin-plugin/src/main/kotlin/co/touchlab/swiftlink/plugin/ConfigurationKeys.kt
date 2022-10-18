@@ -11,5 +11,4 @@ object ConfigurationKeys {
     val expandedSwiftDir = CompilerConfigurationKey<File>("expanded Swift directory")
     val linkPhaseSwiftPackOutputDir = CompilerConfigurationKey<File>("link phase SwiftPack output directory")
     val disableWildcardExport = CompilerConfigurationKey<Boolean>("disable wildcard export")
-    val swiftGenConfiguration = CompilerConfigurationKey<Configuration>("SwiftGen configuration")
 }
