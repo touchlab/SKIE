@@ -11,6 +11,9 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":kotlin-plugin").name}\"")
+
+    val pluginId: String by properties
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
 }
 
 dependencies {
@@ -20,10 +23,12 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))
 
-    implementation("io.outfoxx:swiftpoet:1.4.0")
+    implementation("io.outfoxx:swiftpoet:1.4.3")
     implementation("com.squareup:kotlinpoet:1.11.0")
 
-    implementation(project(":kotlin-plugin"))
+    implementation(projects.configurationApi)
+    implementation(projects.kotlinPlugin)
+    implementation(projects.kotlinPlugin.options)
 
     testImplementation(gradleKotlinDsl())
     testImplementation(libs.junit)
@@ -37,27 +42,33 @@ java {
 
 gradlePlugin {
     plugins {
-        create(PluginCoordinates.ID) {
-            id = PluginCoordinates.ID
-            displayName = PluginBundle.DISPLAY_NAME
-            implementationClass = PluginCoordinates.IMPLEMENTATION_CLASS
-            version = PluginCoordinates.VERSION
+        create("co.touchlab.skie") {
+            id = "co.touchlab.skie"
+            displayName = "Swift and Kotlin, unified"
+            implementationClass = "co.touchlab.swiftlink.plugin.SwiftLinkPlugin"
+            version = project.version
         }
     }
 }
 
 // Configuration Block for the Plugin Marker artifact on Plugin Central
 pluginBundle {
-    website = PluginBundle.WEBSITE
-    vcsUrl = PluginBundle.VCS
-    description = PluginBundle.DESCRIPTION
-    tags = PluginBundle.TAGS
-
-    mavenCoordinates {
-        groupId = PluginCoordinates.GROUP
-        artifactId = PluginCoordinates.ARTIFACT_ID
-        version = PluginCoordinates.VERSION
-    }
+    website = "https://github.com/touchlab/SKIE"
+    vcsUrl = "https://github.com/touchlab/SKIE.git"
+    description = "A Gradle plugin to add Swift into Kotlin/Native framework."
+    tags = listOf(
+        "plugin",
+        "gradle",
+        "swift",
+        "kotlin",
+        "native",
+    )
+    //
+    // mavenCoordinates {
+    //     groupId = PluginCoordinates.GROUP
+    //     artifactId = PluginCoordinates.ARTIFACT_ID
+    //     version = PluginCoordinates.VERSION
+    // }
 }
 
 tasks.create("setupPluginUploadFromEnvironment") {

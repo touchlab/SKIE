@@ -1,17 +1,14 @@
 package co.touchlab.swiftlink.plugin
 
-import co.touchlab.swiftpack.spec.module.SwiftPackModule
+import co.touchlab.swiftgen.configuration.Configuration
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import java.io.File
+import co.touchlab.swiftlink.plugin.SkiePlugin.Options
 
 class SwiftLinkCommandLineProcessor: CommandLineProcessor {
-    companion object {
-        const val pluginId = "co.touchlab.skie"
-    }
 
-    override val pluginId: String = SwiftLinkCommandLineProcessor.pluginId
+    override val pluginId: String = SkiePlugin.id
 
     private val options = listOf(
         Options.swiftPackModule,
@@ -19,59 +16,10 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
         Options.expandedSwiftDir,
         Options.linkPhaseSwiftPackOutputDir,
         Options.disableWildcardExport,
+        Options.swiftGenConfigPath,
     )
     private val optionsMap = options.associateBy { it.optionName }
     override val pluginOptions: Collection<AbstractCliOption> = options.map { it.toCliOption() }
-
-    object Options {
-        val swiftPackModule = PluginOption(
-            optionName = "swiftPackModule",
-            valueDescription = "<namespace>${File.pathSeparator}<absolute path>",
-            description = "",
-            allowMultipleOccurrences = true,
-            serialize = { (namespace, moduleFile) ->
-                "$namespace${File.pathSeparator}${moduleFile.absolutePath}"
-            },
-            deserialize = { value ->
-                val (namespace, absolutePath) = value.split(File.pathSeparator)
-                SwiftPackModule.Reference(namespace, File(absolutePath))
-            },
-        )
-
-        val linkPhaseSwiftPackOutputDir = PluginOption(
-            optionName = "linkPhaseSwiftPackOutputDir",
-            valueDescription = "<absolute path>",
-            description = "",
-            serialize = File::getAbsolutePath,
-            deserialize = ::File,
-        )
-
-        val swiftSourceFile = PluginOption(
-            optionName = "swiftSourceFile",
-            valueDescription = "<absolute path>",
-            description = "",
-            allowMultipleOccurrences = true,
-            serialize = File::getAbsolutePath,
-            deserialize = ::File,
-        )
-
-        val expandedSwiftDir = PluginOption(
-            optionName = "expandedSwiftDir",
-            valueDescription = "<absolute path>",
-            description = "",
-            isRequired = true,
-            serialize = File::getAbsolutePath,
-            deserialize = ::File,
-        )
-
-        val disableWildcardExport = PluginOption(
-            optionName = "disableWildcardExport",
-            valueDescription = "<true|false>",
-            description = "",
-            serialize = Boolean::toString,
-            deserialize = String::toBooleanStrict,
-        )
-    }
 
     override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
         super.processOption(option, value, configuration)
@@ -91,6 +39,12 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
             }
             Options.disableWildcardExport -> {
                 configuration.putIfNotNull(ConfigurationKeys.disableWildcardExport, Options.disableWildcardExport.deserialize(value))
+            }
+            Options.swiftGenConfigPath -> {
+                val config = Options.swiftGenConfigPath.deserialize(value).readText()
+                val swiftGenConfiguration = Configuration.deserialize(config)
+
+                configuration.put(ConfigurationKeys.swiftGenConfiguration, swiftGenConfiguration)
             }
         }
     }

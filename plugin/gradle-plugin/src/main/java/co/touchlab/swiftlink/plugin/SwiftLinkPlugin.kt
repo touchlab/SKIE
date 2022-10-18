@@ -1,6 +1,7 @@
 package co.touchlab.swiftlink.plugin
 
 import co.touchlab.skie.BuildConfig
+import co.touchlab.swiftgen.configuration.Configuration
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -15,6 +16,7 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -26,9 +28,9 @@ import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
 import org.jetbrains.kotlin.konan.target.Architecture
 import java.io.File
 
-const val EXTENSION_NAME = "swiftlink"
+const val EXTENSION_NAME = "skie"
 
-const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "swiftLinkPlugin"
+const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "skiePlugin"
 
 // We need to use an anonymous class instead of lambda to keep execution optimizations.
 // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
@@ -36,6 +38,7 @@ const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "swiftLinkPlugin"
 abstract class SwiftLinkPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java, this)
+        val createSwiftGenConfigTask = tasks.register<CreateSwiftGenConfigTask>(CreateSwiftGenConfigTask.name)
 
         val swiftLinkPluginConfiguration = configurations.maybeCreate(SWIFT_LINK_PLUGIN_CONFIGURATION_NAME).apply {
             isCanBeResolved = true
@@ -101,6 +104,8 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         val allSwiftSourceSets = (framework.compilation.allKotlinSourceSets - framework.compilation.defaultSourceSet)
                             .map { configureSwiftSourceSet(it) } + listOf(defaultSwiftSourceSet)
 
+                        linkTask.dependsOn(createSwiftGenConfigTask)
+
                         // TODO: linkTask.inputs
 
                         val swiftSources = project.objects.fileCollection().from(allSwiftSourceSets)
@@ -110,21 +115,31 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                             swiftKtCompilerPluginConfiguration,
                             swiftLinkPluginConfiguration
                         ).reduce(FileCollection::plus)
+
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SwiftLinkCommandLineProcessor.pluginId, SwiftLinkCommandLineProcessor.Options.expandedSwiftDir.subpluginOption(
+                            SkiePlugin.id, SkiePlugin.Options.linkPhaseSwiftPackOutputDir.subpluginOption(
+                                layout.buildDirectory.dir("generated/swiftpack").get().asFile
+                            )
+                        )
+                        linkTask.compilerPluginOptions.addPluginArgument(
+                            SkiePlugin.id, SkiePlugin.Options.expandedSwiftDir.subpluginOption(
                                 layout.buildDirectory.dir("generated/swiftpack-expanded/${framework.name}/${framework.target.targetName}").get().asFile
                             )
                         )
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SwiftLinkCommandLineProcessor.pluginId, SwiftLinkCommandLineProcessor.Options.disableWildcardExport.subpluginOption(
+                            SkiePlugin.id, SkiePlugin.Options.disableWildcardExport.subpluginOption(
                                 extension.isWildcardExportPrevented.get()
                             )
                         )
 
+                        linkTask.compilerPluginOptions.addPluginArgument(
+                            SkiePlugin.id, SkiePlugin.Options.swiftGenConfigPath.subpluginOption(createSwiftGenConfigTask.get().configFile)
+                        )
+
                         swiftSources.forEach { swiftFile ->
                             linkTask.compilerPluginOptions.addPluginArgument(
-                                SwiftLinkCommandLineProcessor.pluginId,
-                                SwiftLinkCommandLineProcessor.Options.swiftSourceFile.subpluginOption(swiftFile)
+                                SkiePlugin.id,
+                                SkiePlugin.Options.swiftSourceFile.subpluginOption(swiftFile)
                             )
                         }
 

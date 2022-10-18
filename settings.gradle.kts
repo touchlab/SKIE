@@ -21,3 +21,4 @@ rootProject.name = "SKIE"
 
 includeBuild("example")
 includeBuild("plugin")
+includeBuild("dev-support")

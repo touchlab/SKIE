@@ -1,17 +1,21 @@
 import io.gitlab.arturbosch.detekt.Detekt
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformJvmPlugin
 
 plugins {
+    alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.plugin.serialization) apply false
     alias(libs.plugins.pluginPublish) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.versionCheck)
+
+    id("gradle-src-classpath-loader")
 }
 
 allprojects {
-    group = PluginCoordinates.GROUP
-    version = PluginCoordinates.VERSION
+    group = "co.touchlab.skie"
+    version = System.getenv("RELEASE_VERSION") ?: "1.0.0-SNAPSHOT"
 
     repositories {
         google()
@@ -44,7 +48,7 @@ allprojects {
 
 subprojects {
     afterEvaluate {
-        if (!plugins.hasPlugin(PublishingPlugin::class)) { return@afterEvaluate }
+        if (!plugins.hasPlugin(PublishingPlugin::class) || !plugins.hasPlugin(KotlinPlatformJvmPlugin::class)) { return@afterEvaluate }
 
         the<JavaPluginExtension>().apply {
             withJavadocJar()
@@ -95,9 +99,9 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.register("clean", Delete::class.java) {
-    delete(rootProject.buildDir)
-}
+// tasks.register("clean", Delete::class.java) {
+//     delete(rootProject.buildDir)
+// }
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL

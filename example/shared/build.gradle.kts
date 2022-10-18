@@ -9,7 +9,7 @@ plugins {
     id("kotlinx-serialization")
     id("com.squareup.sqldelight")
 
-    id("co.touchlab.skie") version "0.0.1-SNAPSHOT"
+    id("co.touchlab.skie")
 
     id("com.android.library")
 }

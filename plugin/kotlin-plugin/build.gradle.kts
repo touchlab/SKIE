@@ -8,12 +8,20 @@ plugins {
 dependencies {
     compileOnly(strippedKotlinNativeCompilerEmbeddable())
 
+    implementation(projects.kotlinPlugin.options)
     implementation(projects.api)
+    implementation(projects.configurationApi)
     implementation(projects.interceptor)
+    implementation(projects.generator.core)
     implementation(projects.linker)
     implementation(projects.spi)
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + listOf("-Xcontext-receivers")
+    }
+}
 
 fun strippedKotlinNativeCompilerEmbeddable(): FileCollection {
     val targetFile = layout.buildDirectory.file("tmp/kotlin-native-stripped").map {
