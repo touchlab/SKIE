@@ -1,0 +1,9 @@
+[
+    {
+        "target": "",
+        "overridesAnnotations": false,
+        "items": {
+            "DefaultArgumentInterop.Enabled": "false"
+        }
+    }
+]

@@ -6,6 +6,7 @@ import co.touchlab.swiftgen.configuration.util.throwIfNull
 import co.touchlab.swiftgen.api.ExperimentalFeatures as ExperimentalFeaturesAnnotations
 import co.touchlab.swiftgen.api.SealedInterop as SealedInteropAnnotations
 import co.touchlab.swiftgen.api.EnumInterop as EnumInteropAnnotations
+import co.touchlab.swiftgen.api.DefaultArgumentInterop as DefaultArgumentInteropAnnotations
 
 object ConfigurationKeys {
 
@@ -42,10 +43,38 @@ object ConfigurationKeys {
             override val defaultValue: co.touchlab.swiftgen.configuration.values.ValidationSeverity =
                 co.touchlab.swiftgen.configuration.values.ValidationSeverity.Error
 
-            override fun getAnnotationValue(configurationTarget: co.touchlab.swiftgen.configuration.ConfigurationTarget): co.touchlab.swiftgen.configuration.values.ValidationSeverity? = null
+            override fun getAnnotationValue(configurationTarget: co.touchlab.swiftgen.configuration.ConfigurationTarget): co.touchlab.swiftgen.configuration.values.ValidationSeverity? =
+                null
 
             override fun deserialize(value: String?): co.touchlab.swiftgen.configuration.values.ValidationSeverity =
                 co.touchlab.swiftgen.configuration.values.ValidationSeverity.valueOf(value.throwIfNull())
+        }
+    }
+
+    object DefaultArgumentInterop {
+
+        object Enabled : ConfigurationKey.Boolean {
+
+            override val name: String = "DefaultArgumentInterop.Enabled"
+
+            override val defaultValue: Boolean = true
+
+            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+                when {
+                    configurationTarget.hasAnnotation<DefaultArgumentInteropAnnotations.Enabled>() -> true
+                    configurationTarget.hasAnnotation<DefaultArgumentInteropAnnotations.Disabled>() -> false
+                    else -> null
+                }
+        }
+
+        object MaximumDefaultArgumentCount : ConfigurationKey.Int {
+
+            override val name: String = "DefaultArgumentInterop.MaximumDefaultArgumentCount"
+
+            override val defaultValue: Int = 5
+
+            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Int? =
+                configurationTarget.findAnnotation<DefaultArgumentInteropAnnotations.MaximumDefaultArgumentCount>()?.count
         }
     }
 

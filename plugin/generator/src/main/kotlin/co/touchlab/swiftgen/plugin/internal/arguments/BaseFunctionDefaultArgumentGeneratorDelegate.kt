@@ -28,6 +28,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     override fun generate(descriptorProvider: DescriptorProvider) {
         descriptorProvider.allSupportedFunctions()
+            .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
             .filter { descriptorProvider.shouldBeExposed(it) }
             .forEach {

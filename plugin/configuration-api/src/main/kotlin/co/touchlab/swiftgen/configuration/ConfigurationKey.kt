@@ -28,6 +28,12 @@ interface ConfigurationKey<T> {
             value.throwIfNull().toBooleanStrict()
     }
 
+    interface Int : ConfigurationKey<kotlin.Int> {
+
+        override fun deserialize(value: kotlin.String?): kotlin.Int =
+            value.throwIfNull().toInt()
+    }
+
     interface OptionalString : ConfigurationKey<kotlin.String?> {
 
         override fun deserialize(value: kotlin.String?): kotlin.String? = value

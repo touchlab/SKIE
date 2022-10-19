@@ -1,6 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.arguments
 
 import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.configuration.ConfigurationKeys.DefaultArgumentInterop
 import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.plugin.internal.util.Generator
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
@@ -27,6 +28,15 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
 
     protected val FunctionDescriptor.hasDefaultArguments: Boolean
         get() = this.valueParameters.any { it.declaresDefaultValue() }
+
+    protected val FunctionDescriptor.isInteropEnabled: Boolean
+        get() = this.getConfiguration(DefaultArgumentInterop.Enabled) && this.satisfiesMaximumDefaultArgumentCount
+
+    private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean
+        get() = this.defaultArgumentCount <= this.getConfiguration(DefaultArgumentInterop.MaximumDefaultArgumentCount)
+
+    private val FunctionDescriptor.defaultArgumentCount: Int
+        get() = this.valueParameters.count { it.declaresDefaultValue() }
 
     protected fun FunctionDescriptor.forEachDefaultArgumentOverload(
         action: (index: Int, overloadParameters: List<ValueParameterDescriptor>) -> Unit,

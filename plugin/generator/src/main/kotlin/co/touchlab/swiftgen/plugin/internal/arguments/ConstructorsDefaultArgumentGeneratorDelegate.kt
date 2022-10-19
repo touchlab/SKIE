@@ -39,6 +39,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
 
     private fun ClassDescriptor.allSupportedConstructors(descriptorProvider: DescriptorProvider): List<ClassConstructorDescriptor> =
         this.constructors
+            .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
             .filter { descriptorProvider.shouldBeExposed(it) }
             .filter { it.canBeUsedWithExperimentalFeatures }
