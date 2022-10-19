@@ -8,8 +8,6 @@ import org.gradle.kotlin.dsl.property
 import co.touchlab.swiftgen.configuration.builder.ConfigurationBuilder
 import javax.inject.Inject
 
-const val DEFAULT_OUTPUT_DIR = "skie"
-
 @Suppress("UnnecessaryAbstractClass")
 abstract class SkieExtension @Inject constructor(project: Project) {
 

@@ -30,7 +30,7 @@ dependencies {
     implementation(projects.configurationApi)
     implementation(projects.api)
     implementation(projects.spi)
-    implementation(projects.generator.core)
+    implementation(projects.generator)
     implementation(projects.kotlinPlugin)
 }
 

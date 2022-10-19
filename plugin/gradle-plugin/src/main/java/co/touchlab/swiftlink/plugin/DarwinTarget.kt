@@ -35,9 +35,6 @@ data class DarwinTarget(
     }
 }
 
-val Framework.darwinTarget: DarwinTarget
-    get() = target.konanTarget.darwinTarget
-
 val FrameworkDescriptor.darwinTarget: DarwinTarget
     get() = target.darwinTarget
 

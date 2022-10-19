@@ -26,7 +26,7 @@ include(
     ":spi",
     ":configuration-api",
     ":linker",
-    ":generator:core",
+    ":generator",
     ":generator:configuration-annotations",
     ":generator:configuration-gradle",
     ":interceptor",

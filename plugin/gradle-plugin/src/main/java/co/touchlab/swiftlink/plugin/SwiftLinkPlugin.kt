@@ -1,7 +1,6 @@
 package co.touchlab.swiftlink.plugin
 
 import co.touchlab.skie.BuildConfig
-import co.touchlab.swiftgen.configuration.Configuration
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project

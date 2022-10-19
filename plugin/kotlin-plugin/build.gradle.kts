@@ -12,7 +12,7 @@ dependencies {
     implementation(projects.api)
     implementation(projects.configurationApi)
     implementation(projects.interceptor)
-    implementation(projects.generator.core)
+    implementation(projects.generator)
     implementation(projects.linker)
     implementation(projects.spi)
 }
