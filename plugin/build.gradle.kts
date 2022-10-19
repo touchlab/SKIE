@@ -48,15 +48,17 @@ allprojects {
 
 subprojects {
     afterEvaluate {
-        if (!plugins.hasPlugin(PublishingPlugin::class) || !plugins.hasPlugin(KotlinPlatformJvmPlugin::class)) { return@afterEvaluate }
+        if (!plugins.hasPlugin(PublishingPlugin::class)) { return@afterEvaluate }
 
-        the<JavaPluginExtension>().apply {
-            withJavadocJar()
-            withSourcesJar()
+        if (this@subprojects.name != "configuration-annotations") {
+            the<JavaPluginExtension>().apply {
+                withJavadocJar()
+                withSourcesJar()
+            }
         }
 
         the<PublishingExtension>().apply {
-            if (this@subprojects.name != "gradle-plugin") {
+            if (this@subprojects.name != "gradle-plugin" && this@subprojects.name != "configuration-annotations") {
                 publications {
                     create<MavenPublication>("maven") {
                         from(components["java"])

@@ -42,3 +42,11 @@ kotlin {
 
     wasm32()
 }
+
+publishing {
+    publications.all {
+        (this as? MavenPublication)?.apply {
+            artifactId = "generator-${artifactId}"
+        }
+    }
+}
