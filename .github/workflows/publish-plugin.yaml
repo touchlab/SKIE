@@ -31,7 +31,7 @@ jobs:
           java-version: 11
       # TODO Ensure all tests pass
       - name: Publish on AWS
-        run: ./gradlew --project-dir core publishAllPublicationsToAwsRepository
+        run: ./gradlew --project-dir plugin publishAllPublicationsToAwsRepository
         env:
           AWS_TOUCHLAB_DEPLOY_ACCESS: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
           AWS_TOUCHLAB_DEPLOY_SECRET: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
