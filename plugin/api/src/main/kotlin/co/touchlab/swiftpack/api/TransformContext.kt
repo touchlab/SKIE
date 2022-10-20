@@ -5,15 +5,23 @@ import co.touchlab.swiftpack.spec.reference.KotlinClassReference
 import co.touchlab.swiftpack.spec.reference.KotlinFileReference
 import co.touchlab.swiftpack.spec.reference.KotlinFunctionReference
 import co.touchlab.swiftpack.spec.reference.KotlinPropertyReference
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrProperty
 
 interface TransformContext {
-    fun KotlinClassReference.applyTransform(transform: KotlinClassTransformScope.() -> Unit): KotlinClassReference
 
-    fun KotlinPropertyReference.applyTransform(transform: KotlinPropertyTransformScope.() -> Unit): KotlinPropertyReference
+    fun ClassDescriptor.applyTransform(transform: KotlinClassTransformScope.() -> Unit)
+    fun IrClass.applyTransform(transform: KotlinClassTransformScope.() -> Unit)
 
-    fun KotlinFunctionReference.applyTransform(transform: KotlinFunctionTransformScope.() -> Unit): KotlinFunctionReference
+    fun PropertyDescriptor.applyTransform(transform: KotlinPropertyTransformScope.() -> Unit)
+    fun IrProperty.applyTransform(transform: KotlinPropertyTransformScope.() -> Unit)
 
-    fun KotlinFileReference.applyTransform(transform: KotlinFileTransformScope.() -> Unit): KotlinFileReference
+    fun FunctionDescriptor.applyTransform(transform: KotlinFunctionTransformScope.() -> Unit)
+    fun IrFunction.applyTransform(transform: KotlinFunctionTransformScope.() -> Unit)
 
     @DslMarker
     annotation class TransformScopeMarker
@@ -24,13 +32,9 @@ interface TransformContext {
 
         fun hide()
 
-        fun rename(newSwiftName: String)
-
-        fun rename(newSwiftName: ApiTransform.TypeTransform.Rename)
+        fun rename(newName: String)
 
         fun bridge(swiftType: String)
-
-        fun bridge(bridge: ApiTransform.TypeTransform.Bridge)
     }
 
     @TransformScopeMarker
@@ -39,7 +43,7 @@ interface TransformContext {
 
         fun hide()
 
-        fun rename(newSwiftName: String)
+        fun rename(newName: String)
     }
 
     @TransformScopeMarker

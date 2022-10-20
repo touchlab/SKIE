@@ -5,6 +5,7 @@ import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.createFunction
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.getNamespace
+import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -21,10 +22,10 @@ import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
 
 internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
+    skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
-    swiftPackModuleBuilder: SwiftPackModuleBuilder,
     configuration: Configuration,
-) : BaseDefaultArgumentGeneratorDelegate(declarationBuilder, swiftPackModuleBuilder, configuration) {
+) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider) {
         descriptorProvider.allSupportedFunctions()
@@ -96,10 +97,8 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         val parameters = overloadDescriptor.valueParameters.joinToString("") { it.name.identifier + ":" }
         val fullSignature = "$baseSignature($parameters)"
 
-        with(swiftPackModuleBuilder) {
-            overloadDescriptor.reference().applyTransform {
-                rename(fullSignature)
-            }
+        skieContext.module.configure {
+            overloadDescriptor.swiftName = fullSignature
         }
     }
 }

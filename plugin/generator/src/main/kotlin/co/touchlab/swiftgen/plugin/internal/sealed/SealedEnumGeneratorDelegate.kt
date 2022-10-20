@@ -1,7 +1,10 @@
 package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.configuration.Configuration
+import co.touchlab.swiftgen.plugin.internal.util.SwiftPoetExtensionContainer
+import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
+import co.touchlab.swiftpack.api.SwiftPoetContext
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
@@ -12,11 +15,11 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedEnumGeneratorDelegate(
     override val configuration: Configuration,
-    override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
 ) : SealedGeneratorExtensionContainer {
 
     private val enumName = "Enum"
 
+    context(SwiftPoetContext)
     fun generate(declaration: ClassDescriptor, classNamespace: DeclaredTypeName, fileBuilder: FileSpec.Builder): TypeName {
         fileBuilder.addExtension(
             ExtensionSpec.builder(classNamespace)
@@ -34,12 +37,15 @@ internal class SealedEnumGeneratorDelegate(
         return classNamespace.nestedType(enumName).withTypeParameters(declaration)
     }
 
+    context(SwiftPoetContext)
     private fun TypeSpec.Builder.addSealedEnumCases(declaration: ClassDescriptor): TypeSpec.Builder {
         declaration.visibleSealedSubclasses
             .forEach { sealedSubclass ->
                 addEnumCase(
                     sealedSubclass.enumCaseName,
-                    sealedSubclass.swiftNameWithTypeParametersForSealedCase(declaration),
+                    with (sealedSubclass) {
+                        swiftNameWithTypeParametersForSealedCase(declaration)
+                    },
                 )
             }
 

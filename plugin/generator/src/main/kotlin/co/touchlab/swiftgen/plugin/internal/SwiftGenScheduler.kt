@@ -10,9 +10,10 @@ import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.validation.IrValidator
+import co.touchlab.swiftpack.api.SkieContext
 
 internal class SwiftGenScheduler(
-    swiftFileBuilderFactory: SwiftFileBuilderFactory,
+    skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
@@ -22,22 +23,22 @@ internal class SwiftGenScheduler(
     private val irValidator = IrValidator(reporter, configuration)
 
     private val exhaustiveEnumsGenerator = ExhaustiveEnumsGenerator(
-        swiftFileBuilderFactory = swiftFileBuilderFactory,
+        skieContext = skieContext,
         namespaceProvider = namespaceProvider,
         configuration = configuration,
         reporter = reporter,
     )
 
     private val sealedInteropGenerator = SealedInteropGenerator(
-        swiftFileBuilderFactory = swiftFileBuilderFactory,
+        skieContext = skieContext,
         namespaceProvider = namespaceProvider,
         configuration = configuration,
         reporter = reporter,
     )
 
     private val defaultArgumentGenerator = DefaultArgumentGenerator(
+        skieContext = skieContext,
         declarationBuilder = declarationBuilder,
-        swiftPackModuleBuilder = swiftFileBuilderFactory.swiftPackModuleBuilder,
         configuration = configuration,
     )
 

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
@@ -21,6 +23,12 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + listOf("-Xcontext-receivers")
+    }
 }
 
 fun strippedKotlinNativeCompilerEmbeddable(): FileCollection {

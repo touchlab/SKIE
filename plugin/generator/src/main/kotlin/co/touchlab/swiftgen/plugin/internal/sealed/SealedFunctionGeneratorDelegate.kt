@@ -2,7 +2,10 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.configuration.ConfigurationKeys
+import co.touchlab.swiftgen.plugin.internal.util.SwiftPoetExtensionContainer
+import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
+import co.touchlab.swiftpack.api.SwiftPoetContext
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -12,9 +15,9 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedFunctionGeneratorDelegate(
     override val configuration: Configuration,
-    override val swiftPackModuleBuilder: SwiftPackModuleBuilder,
-) : SealedGeneratorExtensionContainer {
+) : SealedGeneratorExtensionContainer, SwiftPoetExtensionContainer {
 
+    context(SwiftPoetContext)
     fun generate(declaration: ClassDescriptor, enumType: TypeName, fileBuilder: FileSpec.Builder) {
         fileBuilder.addFunction(
             FunctionSpec.builder(declaration.enumConstructorFunctionName)
@@ -23,7 +26,7 @@ internal class SealedFunctionGeneratorDelegate(
                 .addParameter(
                     label = declaration.enumConstructorArgumentLabel,
                     name = declaration.enumConstructorParameterName,
-                    type = declaration.swiftNameWithTypeParameters,
+                    type = with(declaration) { swiftNameWithTypeParameters },
                 )
                 .returns(enumType)
                 .addExhaustivelyFunctionBody(declaration, enumType)
@@ -40,6 +43,7 @@ internal class SealedFunctionGeneratorDelegate(
     private val ClassDescriptor.enumConstructorParameterName: String
         get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.ParameterName)
 
+    context(SwiftPoetContext)
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         declaration: ClassDescriptor,
         enumType: TypeName,
@@ -50,6 +54,7 @@ internal class SealedFunctionGeneratorDelegate(
             .build()
     )
 
+    context(SwiftPoetContext)
     private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
         declaration: ClassDescriptor,
         enumType: TypeName,
@@ -57,7 +62,7 @@ internal class SealedFunctionGeneratorDelegate(
         declaration.visibleSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
                 val parameterName = declaration.enumConstructorParameterName
-                val subclassName = subclassSymbol.swiftNameWithTypeParametersForSealedCase(declaration).canonicalName
+                val subclassName = with(subclassSymbol) { swiftNameWithTypeParametersForSealedCase(declaration).canonicalName }
 
                 val condition = "let $parameterName = $parameterName as? $subclassName"
 
@@ -73,6 +78,7 @@ internal class SealedFunctionGeneratorDelegate(
         return this
     }
 
+    context(SwiftPoetContext)
     private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(
         declaration: ClassDescriptor,
         enumType: TypeName,
@@ -89,6 +95,7 @@ internal class SealedFunctionGeneratorDelegate(
     private val ClassDescriptor.hasAnyVisibleSealedSubclasses: Boolean
         get() = this.sealedSubclasses.any { it.isVisibleSealedSubclass }
 
+    context(SwiftPoetContext)
     private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: ClassDescriptor, enumType: TypeName) {
         nextControlFlow("else")
 
@@ -99,7 +106,7 @@ internal class SealedFunctionGeneratorDelegate(
                 "fatalError(" +
                         "\"Unknown subtype. " +
                         "This error should not happen under normal circumstances " +
-                        "since ${declaration.swiftName.canonicalName} is sealed." +
+                        "since ${declaration.spec.canonicalName} is sealed." +
                         "\")\n"
             )
         }

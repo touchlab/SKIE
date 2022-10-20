@@ -9,17 +9,18 @@ import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.isSealed
+import co.touchlab.swiftpack.api.SkieContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedInteropGenerator(
-    swiftFileBuilderFactory: SwiftFileBuilderFactory,
+    skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     private val reporter: Reporter,
-) : BaseGenerator(swiftFileBuilderFactory, namespaceProvider, configuration), SealedGeneratorExtensionContainer {
+) : BaseGenerator(skieContext, namespaceProvider, configuration), SealedGeneratorExtensionContainer {
 
-    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration, swiftPackModuleBuilder)
-    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration, swiftPackModuleBuilder)
+    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
+    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
 
     override fun generate(descriptorProvider: DescriptorProvider) {
         descriptorProvider.classDescriptors.forEach {

@@ -7,13 +7,12 @@ import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
-import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import co.touchlab.swiftpack.spec.module.ApiTransform
-import co.touchlab.swiftpack.spec.reference.KotlinClassReference
+import co.touchlab.swiftpack.api.SkieContext
+import co.touchlab.swiftpack.api.SwiftBridgedName
+import co.touchlab.swiftpack.api.SwiftPoetContext
 import io.outfoxx.swiftpoet.CodeBlock
+import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
-import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.PropertySpec
@@ -23,7 +22,6 @@ import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.isEnumClass
 import org.jetbrains.kotlin.ir.expressions.typeParametersCount
@@ -31,12 +29,21 @@ import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
+internal fun String.splitByLast(separator: String): Pair<String, String> {
+    val lastSeparatorIndex = lastIndexOf(separator)
+    return if (lastSeparatorIndex == -1) {
+        "" to this
+    } else {
+        substring(0, lastSeparatorIndex) to substring(lastSeparatorIndex + 1)
+    }
+}
+
 internal class ExhaustiveEnumsGenerator(
-    swiftFileBuilderFactory: SwiftFileBuilderFactory,
+    skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     private val reporter: Reporter,
-) : BaseGenerator(swiftFileBuilderFactory, namespaceProvider, configuration) {
+) : BaseGenerator(skieContext, namespaceProvider, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
         classDescriptors
@@ -49,32 +56,59 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider)
-    private fun generate(declaration: ClassDescriptor) = generateCode(declaration) {
-        val declarationReference = declaration.classReference()
-        val declaredCases = declaration.enumEntries.map { it.enumEntryReference() }
-        val enumDeclaration = TypeSpec.enumBuilder(declaration.name.asString())
-            .apply {
-                addAttribute("frozen")
-                addModifiers(Modifier.PUBLIC)
+    private fun generate(declaration: ClassDescriptor) {
+        module.configure {
+            declaration.isHiddenFromSwift = true
+            declaration.swiftBridgeType = SwiftBridgedName(declaration.swiftName.parent, declaration.swiftName.originalSimpleName)
+        }
 
-                declaredCases.forEach {
-                    addEnumCase(it.swiftTemplateVariable().name)
+        generateCode(declaration) {
+            val extensionName = declaration.swiftName.qualifiedName.substringBeforeLast('.', "")
+            val declarationName = declaration.swiftName.originalQualifiedName.substringAfterLast('.')
+
+            val enumDeclaration = TypeSpec.enumBuilder(declarationName)
+                .apply {
+                    addAttribute("frozen")
+                    addModifiers(Modifier.PUBLIC)
+
+                    declaration.enumEntries.forEach {
+                        addEnumCase(it.swiftName.simpleName)
+                    }
+
+                    addNestedClassTypeAliases(declaration)
+
+                    addPassthroughForProperties(declaration)
+
+                    addPassthroughForFunctions(declaration)
+
+                    addObjcBridgeableImplementation(declaration)
                 }
+                .build()
 
-                addNestedClassTypeAliases(declaration)
-
-                addPassthroughForProperties(declaration)
-
-                addPassthroughForFunctions(declaration)
-
-                addObjcBridgeableImplementation(declaration, declarationReference, declaredCases)
+            if (extensionName.isNotEmpty()) {
+                addExtension(
+                    ExtensionSpec.builder(DeclaredTypeName.qualifiedTypeName(".$extensionName"))
+                        .addType(enumDeclaration)
+                        .build()
+                )
+            } else {
+                addType(enumDeclaration)
             }
-            .build()
-
-        configureBridgingTransform(declaration, enumDeclaration, declarationReference)
+        }
     }
 
-    context(SwiftPackModuleBuilder, DescriptorProvider)
+    context(SwiftPoetContext)
+    private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
+        declaration.nestedClasses.forEach {
+            addType(
+                TypeAliasSpec.builder(it.name.asString(), it.spec)
+                    .addModifiers(Modifier.PUBLIC)
+                    .build()
+            )
+        }
+    }
+
+    context(DescriptorProvider, SwiftPoetContext)
     private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor
     ) {
@@ -83,14 +117,14 @@ internal class ExhaustiveEnumsGenerator(
             .filter { mapper.isBaseProperty(it) && mapper.isObjCProperty(it) }
             .forEach { property ->
                 addProperty(
-                    PropertySpec.builder(property.name.asString(), property.type.reference().swiftTemplateVariable())
+                    PropertySpec.builder(property.name.asString(), property.type.spec)
                         .addModifiers(Modifier.PUBLIC)
                         .getter(
                             FunctionSpec.getterBuilder()
                                 .addStatement(
                                     "return %L(self as _ObjectiveCType).%N",
                                     if (mapper.doesThrow(property.getter!!)) "try " else "",
-                                    property.reference().swiftTemplateVariable(),
+                                    property.swiftName,
                                 )
                                 .build()
                         )
@@ -99,11 +133,11 @@ internal class ExhaustiveEnumsGenerator(
                                 setter(
                                     FunctionSpec.setterBuilder()
                                         .addModifiers(Modifier.NONMUTATING)
-                                        .addParameter("value", property.type.reference().swiftTemplateVariable())
+                                        .addParameter("value", property.type.spec)
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
                                             if (mapper.doesThrow(property.setter!!)) "try " else "",
-                                            property.reference().swiftTemplateVariable(),
+                                            property.swiftName,
                                         )
                                         .build()
                                 )
@@ -114,7 +148,7 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(SwiftPackModuleBuilder, DescriptorProvider)
+    context(DescriptorProvider, SwiftPoetContext)
     private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
@@ -145,12 +179,12 @@ internal class ExhaustiveEnumsGenerator(
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
                             function.returnType?.let { returnType ->
-                                returns(returnType.reference().swiftTemplateVariable())
+                                returns(returnType.spec)
                             }
                             function.valueParameters.forEach { parameter ->
                                 addParameter(
                                     parameter.name.asString(),
-                                    parameter.type.reference().swiftTemplateVariable(),
+                                    parameter.type.spec,
                                 )
                             }
 
@@ -159,53 +193,12 @@ internal class ExhaustiveEnumsGenerator(
                         .addStatement(
                             "return %L(self as _ObjectiveCType).%N(%L)",
                             if (mapper.doesThrow(function)) "try " else "",
-                            function.reference().swiftTemplateVariable(),
+                            function.swiftName,
                             function.valueParameters.map { CodeBlock.of("%N", it.name.asString()) }.joinToCode(", "),
                         )
                         .build()
                 )
             }
-    }
-
-    context(SwiftPackModuleBuilder)
-    private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
-        declaration.nestedClasses.forEach {
-            addType(
-                TypeAliasSpec.builder(it.name.asString(), it.classReference().swiftTemplateVariable())
-                    .addModifiers(Modifier.PUBLIC)
-                    .build()
-            )
-        }
-    }
-
-    context(DescriptorProvider, SwiftPackModuleBuilder)
-    private fun FileSpec.Builder.configureBridgingTransform(
-        declaration: ClassDescriptor,
-        enumDeclaration: TypeSpec,
-        declarationReference: KotlinClassReference,
-    ) {
-        val bridge = when (val parent = declaration.containingDeclaration) {
-            is ClassDescriptor -> {
-                addExtension(
-                    ExtensionSpec.Companion.builder(parent.classReference().swiftTemplateVariable())
-                        .addType(enumDeclaration)
-                        .build()
-                )
-                ApiTransform.TypeTransform.Bridge.Relative(parent.classReference().id, enumDeclaration.name)
-            }
-
-            is PackageFragmentDescriptor -> {
-                addType(enumDeclaration)
-                ApiTransform.TypeTransform.Bridge.Absolute(enumDeclaration.name)
-            }
-
-            else -> error("Unexpected parent type: $parent")
-        }
-
-        declarationReference.applyTransform {
-            hide()
-            bridge(bridge)
-        }
     }
 
     private val ClassDescriptor.enumEntries: List<ClassDescriptor>

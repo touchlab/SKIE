@@ -10,6 +10,7 @@ import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.swiftlink.plugin.intercept.PhaseListener
 import co.touchlab.swiftpack.api.buildSwiftPackModule
+import co.touchlab.swiftpack.api.skieContext
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
@@ -24,9 +25,9 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
         buildSwift { swiftFileBuilderFactory ->
             buildIr(context) { declarationBuilder ->
                 val swiftGenScheduler = SwiftGenScheduler(
-                    swiftFileBuilderFactory = swiftFileBuilderFactory,
+                    skieContext = context.skieContext,
                     declarationBuilder = declarationBuilder,
-                    namespaceProvider = NamespaceProvider(swiftFileBuilderFactory),
+                    namespaceProvider = NamespaceProvider(context.skieContext.module),
                     configuration = context.pluginConfiguration,
                     reporter = Reporter(context.configuration),
                 )

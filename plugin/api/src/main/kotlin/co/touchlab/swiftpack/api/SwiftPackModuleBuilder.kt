@@ -44,7 +44,7 @@ class SwiftPackModuleBuilder internal constructor(
                     contents = it.toString(),
                 )
             }.sortedBy { it.name },
-            transforms = transformContext.transforms,
+            transforms = emptyList(),
         )
     }
 

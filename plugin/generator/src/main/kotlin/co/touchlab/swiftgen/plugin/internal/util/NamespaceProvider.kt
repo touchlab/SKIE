@@ -1,15 +1,18 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
+import co.touchlab.swiftpack.api.SkieModule
+import co.touchlab.swiftpack.api.SwiftPoetContext
 import io.outfoxx.swiftpoet.*
 
 internal class NamespaceProvider(
-    swiftFileBuilderFactory: SwiftFileBuilderFactory,
+    private val module: SkieModule,
 ) {
-
     val swiftGenNamespace: DeclaredTypeName =
         DeclaredTypeName.qualifiedTypeName(".__SwiftGen")
 
-    private val fileBuilder = swiftFileBuilderFactory.create(swiftGenNamespace.simpleName)
+    private fun withFileBuilder(block: context(SwiftPoetContext) FileSpec.Builder.() -> Unit) {
+        module.file(swiftGenNamespace.simpleName, block)
+    }
 
     private val existingNamespaces = mutableSetOf<String>()
 
@@ -49,11 +52,13 @@ internal class NamespaceProvider(
         }
         existingNamespaces.add(namespace.canonicalName)
 
-        fileBuilder.addType(
-            TypeSpec.enumBuilder(namespace)
-                .addModifiers(Modifier.PUBLIC)
-                .build()
-        )
+        withFileBuilder {
+            addType(
+                TypeSpec.enumBuilder(namespace)
+                    .addModifiers(Modifier.PUBLIC)
+                    .build()
+            )
+        }
 
         return namespace
     }
@@ -65,15 +70,17 @@ internal class NamespaceProvider(
         }
         existingNamespaces.add(namespace.canonicalName)
 
-        fileBuilder.addExtension(
-            ExtensionSpec.builder(base)
-                .addModifiers(Modifier.PUBLIC)
-                .addType(
-                    TypeSpec.enumBuilder(name)
-                        .build()
-                )
-                .build()
-        )
+        withFileBuilder {
+            addExtension(
+                ExtensionSpec.builder(base)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addType(
+                        TypeSpec.enumBuilder(name)
+                            .build()
+                    )
+                    .build()
+            )
+        }
 
         return namespace
     }

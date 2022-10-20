@@ -12,7 +12,6 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
     override val pluginId: String = SkiePlugin.id
 
     private val options = listOf(
-        Options.swiftPackModule,
         Options.swiftSourceFile,
         Options.expandedSwiftDir,
         Options.linkPhaseSwiftPackOutputDir,
@@ -26,9 +25,6 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
         super.processOption(option, value, configuration)
 
         when (optionsMap[option.optionName]) {
-            Options.swiftPackModule -> {
-                configuration.add(ConfigurationKeys.swiftPackModules, Options.swiftPackModule.deserialize(value))
-            }
             Options.swiftSourceFile -> {
                 configuration.add(ConfigurationKeys.swiftSourceFiles, Options.swiftSourceFile.deserialize(value))
             }

@@ -5,6 +5,7 @@ import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.createSecondaryConstructor
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.getNamespace
+import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -18,10 +19,10 @@ import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 
 internal class ConstructorsDefaultArgumentGeneratorDelegate(
+    skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
-    swiftPackModuleBuilder: SwiftPackModuleBuilder,
     configuration: Configuration,
-) : BaseDefaultArgumentGeneratorDelegate(declarationBuilder, swiftPackModuleBuilder, configuration) {
+) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider) {
         descriptorProvider.allSupportedClasses().forEach { classDescriptor ->

@@ -14,6 +14,7 @@ dependencies {
     implementation(projects.interceptor)
     implementation(projects.generator)
     implementation(projects.linker)
+    implementation(projects.reflector)
     implementation(projects.spi)
 }
 

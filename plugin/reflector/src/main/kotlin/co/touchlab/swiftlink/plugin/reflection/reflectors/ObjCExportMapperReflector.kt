@@ -13,6 +13,8 @@ import kotlin.reflect.KProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberScope.Implementation
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberScope.OptimizedImplementation
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.backend.konan.objcexport.TypeBridge
 
 // context()
 internal class ObjCExportMapperReflector(override val instance: Any) : Reflector(
@@ -32,11 +34,8 @@ internal class ObjCExportMapperReflector(override val instance: Any) : Reflector
     val shouldBeExposed by extensionFunction1<CallableMemberDescriptor, Boolean>(extensionClass)
 
     val bridgeMethod by declaredMethod1<FunctionDescriptor, MethodBridge>()
-}
 
-internal fun x(r: ObjCExportMapperReflector) {
-    val x = r.bridgeMethod(null as FunctionDescriptor)
-    println(x.receiver)
+    val bridgeType by extensionFunction1<KotlinType, TypeBridge>(extensionClass)
 }
 
 // context(MethodBridge)

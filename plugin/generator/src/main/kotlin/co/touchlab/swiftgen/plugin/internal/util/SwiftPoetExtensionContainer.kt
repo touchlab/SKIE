@@ -1,6 +1,7 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
+import co.touchlab.swiftpack.api.SwiftPoetContext
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ParameterizedTypeName
 import io.outfoxx.swiftpoet.TypeName
@@ -12,20 +13,14 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
-internal interface SwiftPackExtensionContainer {
-
-    val swiftPackModuleBuilder: SwiftPackModuleBuilder
+internal interface SwiftPoetExtensionContainer {
 
     val DeclarationDescriptor.kotlinName: String
         get() = this.fqNameSafe.asString()
 
-    val ClassDescriptor.swiftName: DeclaredTypeName
-        get() = with(swiftPackModuleBuilder) {
-            this@swiftName.classReference().swiftTemplateVariable()
-        }
-
-    val ClassDescriptor.swiftNameWithTypeParameters: TypeName
-        get() = this.swiftName.withTypeParameters(this)
+    context(SwiftPoetContext, ClassDescriptor)
+    val swiftNameWithTypeParameters: TypeName
+        get() = this@ClassDescriptor.spec.withTypeParameters(this@ClassDescriptor)
 
     fun DeclaredTypeName.withTypeParameters(declaration: ClassDescriptor): TypeName =
         this.withTypeParameters(declaration.swiftTypeVariablesNames)

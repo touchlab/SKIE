@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 
 plugins {
@@ -11,6 +12,13 @@ dependencies {
     implementation(projects.reflector)
     implementation(projects.spi)
 }
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + listOf("-Xcontext-receivers")
+    }
+}
+
 
 
 fun strippedKotlinNativeCompilerEmbeddable(): FileCollection {

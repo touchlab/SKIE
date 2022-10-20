@@ -2,15 +2,16 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 
 import co.touchlab.swiftgen.configuration.ConfigurationKeys
 import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
-import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer
-import co.touchlab.swiftgen.plugin.internal.util.SwiftPackExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
+import co.touchlab.swiftgen.plugin.internal.util.SwiftPoetExtensionContainer
+import co.touchlab.swiftgen.plugin.internal.util.SwiftPoetExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
 import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
+import co.touchlab.swiftpack.api.SwiftPoetContext
 import io.outfoxx.swiftpoet.TypeName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 
-internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContainer, ConfigurationContainer {
+internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, SwiftPoetExtensionContainer {
 
     val ClassDescriptor.elseCaseName: String
         get() = this.getConfiguration(ConfigurationKeys.SealedInterop.ElseName)
@@ -37,13 +38,14 @@ internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContain
             return isVisible && isEnabled
         }
 
-    fun ClassDescriptor.swiftNameWithTypeParametersForSealedCase(parent: ClassDescriptor): TypeName {
-        if (this.kind.isInterface) {
-            return this.swiftName
+    context(ClassDescriptor, SwiftPoetContext)
+    fun swiftNameWithTypeParametersForSealedCase(parent: ClassDescriptor): TypeName {
+        if (kind.isInterface) {
+            return this@ClassDescriptor.spec
         }
 
-        val typeParameters = this.declaredTypeParameters.map {
-            val indexInParent = it.indexInParent(this, parent)
+        val typeParameters = declaredTypeParameters.map {
+            val indexInParent = it.indexInParent(this@ClassDescriptor, parent)
 
             if (indexInParent != null) {
                 parent.declaredTypeParameters[indexInParent].swiftName
@@ -52,7 +54,7 @@ internal interface SealedGeneratorExtensionContainer : SwiftPackExtensionContain
             }
         }
 
-        return this.swiftName.withTypeParameters(typeParameters)
+        return this@ClassDescriptor.spec.withTypeParameters(typeParameters)
     }
 
     private fun TypeParameterDescriptor.indexInParent(child: ClassDescriptor, parent: ClassDescriptor): Int? {

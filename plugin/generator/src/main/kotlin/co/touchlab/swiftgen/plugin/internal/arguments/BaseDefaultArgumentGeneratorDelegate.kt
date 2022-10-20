@@ -5,6 +5,7 @@ import co.touchlab.swiftgen.configuration.ConfigurationKeys.DefaultArgumentInter
 import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.plugin.internal.util.Generator
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -21,8 +22,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 
 internal abstract class BaseDefaultArgumentGeneratorDelegate(
+    protected val skieContext: SkieContext,
     protected val declarationBuilder: DeclarationBuilder,
-    protected val swiftPackModuleBuilder: SwiftPackModuleBuilder,
     override val configuration: Configuration,
 ) : Generator, ConfigurationContainer {
 

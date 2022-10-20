@@ -3,6 +3,7 @@ package co.touchlab.swiftgen.plugin.internal.arguments
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -11,10 +12,10 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class ClassMethodsDefaultArgumentGeneratorDelegate(
+    skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
-    swiftPackModuleBuilder: SwiftPackModuleBuilder,
     configuration: Configuration,
-) : BaseFunctionDefaultArgumentGeneratorDelegate(declarationBuilder, swiftPackModuleBuilder, configuration) {
+) : BaseFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
     override fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> =
         this.allSupportedClasses().flatMap { classDescriptor ->

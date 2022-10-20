@@ -3,14 +3,15 @@ package co.touchlab.swiftgen.plugin.internal.arguments
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 internal class GlobalFunctionDefaultArgumentGeneratorDelegate(
+    skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
-    swiftPackModuleBuilder: SwiftPackModuleBuilder,
     configuration: Configuration,
-) : BaseFunctionDefaultArgumentGeneratorDelegate(declarationBuilder, swiftPackModuleBuilder, configuration) {
+) : BaseFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
     override fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> =
         this.topLevelCallableDescriptors
