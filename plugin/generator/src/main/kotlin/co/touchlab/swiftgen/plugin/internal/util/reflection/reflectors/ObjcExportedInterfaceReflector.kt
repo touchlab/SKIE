@@ -12,6 +12,8 @@ internal class ObjcExportedInterfaceReflector(
 
     val generatedClasses by declaredProperty<Set<ClassDescriptor>>()
 
+    val categoryMembers by declaredProperty<Map<ClassDescriptor, List<CallableMemberDescriptor>>>()
+
     val topLevel by declaredProperty<Map<SourceFile, List<CallableMemberDescriptor>>>()
 
     private val mapper by declaredProperty<Any>()

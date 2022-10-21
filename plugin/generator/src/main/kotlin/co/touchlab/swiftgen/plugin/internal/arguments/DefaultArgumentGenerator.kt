@@ -15,7 +15,8 @@ internal class DefaultArgumentGenerator(
     private val delegates = listOf(
         ClassMethodsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
         ConstructorsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
-        GlobalFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
+        TopLevelFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
+        ExtensionFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
     )
 
     override fun generate(descriptorProvider: DescriptorProvider) {

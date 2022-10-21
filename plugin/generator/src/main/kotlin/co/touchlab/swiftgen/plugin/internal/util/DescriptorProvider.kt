@@ -16,6 +16,10 @@ internal class DescriptorProvider(private val context: CommonBackendContext) {
         exportedInterface.generatedClasses.filter { it.isExported }.toSet()
     }
 
+    val categoryMembersCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
+        exportedInterface.categoryMembers.values.flatten().filter { it.isExported }.toSet()
+    }
+
     val topLevelCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
         exportedInterface.topLevel.values.flatten().filter { it.isExported }.toSet()
     }

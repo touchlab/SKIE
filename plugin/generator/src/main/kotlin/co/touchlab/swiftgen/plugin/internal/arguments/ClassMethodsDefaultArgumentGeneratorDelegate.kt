@@ -38,6 +38,6 @@ internal class ClassMethodsDefaultArgumentGeneratorDelegate(
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
         get() = this.dispatchReceiverParameter != null &&
-                this.extensionReceiverParameter == null &&
-                this.contextReceiverParameters.isEmpty()
+            this.extensionReceiverParameter == null &&
+            this.contextReceiverParameters.isEmpty()
 }

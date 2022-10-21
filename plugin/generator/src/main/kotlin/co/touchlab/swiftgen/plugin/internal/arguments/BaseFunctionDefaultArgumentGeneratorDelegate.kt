@@ -65,6 +65,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             annotations = function.annotations,
         ) {
             dispatchReceiverParameter = function.dispatchReceiverParameter
+            extensionReceiverParameter = function.extensionReceiverParameter
             valueParameters = parameters.copyWithoutDefaultValue(descriptor)
             typeParameters = function.typeParameters
             returnType = function.returnTypeOrNothing
@@ -85,6 +86,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             +irReturn(
                 irCall(originalFunctionSymbol).apply {
                     dispatchReceiver = overloadIr.dispatchReceiverParameter?.let { irGet(it) }
+                    extensionReceiver = overloadIr.extensionReceiverParameter?.let { irGet(it) }
                     passArgumentsWithMatchingNames(overloadIr)
                 }
             )
