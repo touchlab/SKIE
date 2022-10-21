@@ -146,6 +146,7 @@ internal class TransformAccumulator(
         }
 
         mutableTypeTransforms
+            .toList()
             .forEach { (target, transform) ->
                 if (target is TypeTransformTarget.Class && transform.newSwiftName != null) {
                     touchNestedClassTransforms(target.descriptor)
