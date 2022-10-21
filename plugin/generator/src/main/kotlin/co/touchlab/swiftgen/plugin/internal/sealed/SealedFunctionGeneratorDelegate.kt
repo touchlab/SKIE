@@ -3,9 +3,7 @@ package co.touchlab.swiftgen.plugin.internal.sealed
 import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.configuration.ConfigurationKeys
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPoetExtensionContainer
-import co.touchlab.swiftpack.api.SkieContext
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import co.touchlab.swiftpack.api.SwiftPoetContext
+import co.touchlab.swiftpack.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -17,7 +15,7 @@ internal class SealedFunctionGeneratorDelegate(
     override val configuration: Configuration,
 ) : SealedGeneratorExtensionContainer, SwiftPoetExtensionContainer {
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     fun generate(declaration: ClassDescriptor, enumType: TypeName, fileBuilder: FileSpec.Builder) {
         fileBuilder.addFunction(
             FunctionSpec.builder(declaration.enumConstructorFunctionName)
@@ -43,7 +41,7 @@ internal class SealedFunctionGeneratorDelegate(
     private val ClassDescriptor.enumConstructorParameterName: String
         get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.ParameterName)
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         declaration: ClassDescriptor,
         enumType: TypeName,
@@ -54,7 +52,7 @@ internal class SealedFunctionGeneratorDelegate(
             .build()
     )
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
         declaration: ClassDescriptor,
         enumType: TypeName,
@@ -78,7 +76,7 @@ internal class SealedFunctionGeneratorDelegate(
         return this
     }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(
         declaration: ClassDescriptor,
         enumType: TypeName,
@@ -95,7 +93,7 @@ internal class SealedFunctionGeneratorDelegate(
     private val ClassDescriptor.hasAnyVisibleSealedSubclasses: Boolean
         get() = this.sealedSubclasses.any { it.isVisibleSealedSubclass }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: ClassDescriptor, enumType: TypeName) {
         nextControlFlow("else")
 

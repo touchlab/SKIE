@@ -13,8 +13,7 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
 
     private val options = listOf(
         Options.swiftSourceFile,
-        Options.expandedSwiftDir,
-        Options.linkPhaseSwiftPackOutputDir,
+        Options.generatedSwiftDir,
         Options.disableWildcardExport,
         Options.swiftGenConfigPath,
     )
@@ -28,11 +27,8 @@ class SwiftLinkCommandLineProcessor: CommandLineProcessor {
             Options.swiftSourceFile -> {
                 configuration.add(ConfigurationKeys.swiftSourceFiles, Options.swiftSourceFile.deserialize(value))
             }
-            Options.expandedSwiftDir -> {
-                configuration.putIfNotNull(ConfigurationKeys.expandedSwiftDir, Options.expandedSwiftDir.deserialize(value))
-            }
-            Options.linkPhaseSwiftPackOutputDir -> {
-                configuration.putIfNotNull(ConfigurationKeys.linkPhaseSwiftPackOutputDir, Options.linkPhaseSwiftPackOutputDir.deserialize(value))
+            Options.generatedSwiftDir -> {
+                configuration.putIfNotNull(ConfigurationKeys.generatedSwiftDir, Options.generatedSwiftDir.deserialize(value))
             }
             Options.disableWildcardExport -> {
                 configuration.putIfNotNull(ConfigurationKeys.disableWildcardExport, Options.disableWildcardExport.deserialize(value))

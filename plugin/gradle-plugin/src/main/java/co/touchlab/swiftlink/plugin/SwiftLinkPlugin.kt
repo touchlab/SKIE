@@ -116,13 +116,8 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         ).reduce(FileCollection::plus)
 
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.linkPhaseSwiftPackOutputDir.subpluginOption(
-                                layout.buildDirectory.dir("generated/swiftpack").get().asFile
-                            )
-                        )
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.expandedSwiftDir.subpluginOption(
-                                layout.buildDirectory.dir("generated/swiftpack-expanded/${framework.name}/${framework.target.targetName}").get().asFile
+                            SkiePlugin.id, SkiePlugin.Options.generatedSwiftDir.subpluginOption(
+                                layout.buildDirectory.dir("generated/swift/${framework.name}/${framework.target.targetName}").get().asFile
                             )
                         )
                         linkTask.compilerPluginOptions.addPluginArgument(

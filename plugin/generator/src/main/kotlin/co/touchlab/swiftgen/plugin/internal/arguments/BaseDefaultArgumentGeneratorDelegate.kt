@@ -6,7 +6,6 @@ import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.plugin.internal.util.Generator
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftpack.api.SkieContext
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement

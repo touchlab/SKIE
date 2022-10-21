@@ -4,12 +4,10 @@ import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SkieModule
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import co.touchlab.swiftpack.api.SwiftPoetContext
+import co.touchlab.swiftpack.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 internal abstract class BaseGenerator(
     private val skieContext: SkieContext,
@@ -25,7 +23,7 @@ internal abstract class BaseGenerator(
 
     protected fun generateCode(
         declaration: DeclarationDescriptor,
-        codeBuilder: context(SwiftPoetContext) FileSpec.Builder.() -> Unit,
+        codeBuilder: context(SwiftPoetScope) FileSpec.Builder.() -> Unit,
     ) {
         module.file(declaration.kotlinName, codeBuilder)
     }

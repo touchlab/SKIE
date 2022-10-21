@@ -8,8 +8,6 @@ import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftlink.plugin.ConfigurationKeys as SwiftLinkConfigurationKeys
 import co.touchlab.swiftgen.plugin.ConfigurationKeys as SwiftGenConfigurationKeys
 import co.touchlab.swiftlink.plugin.SwiftLinkComponentRegistrar
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import co.touchlab.swiftpack.spec.module.SwiftPackModule
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.bc.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -49,13 +47,8 @@ internal class KotlinTestLinker(
         val outputDirectory = tempFileSystem.createDirectory("swiftpack")
         val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
 
-        SwiftPackModuleBuilder.Config.outputDir = outputDirectory.toFile()
-
         PluginRegistrar.configure.set {
-            val swiftPackModule = SwiftPackModule.Reference("Kotlin", outputDirectory.toFile())
-
-            add(SwiftLinkConfigurationKeys.swiftPackModules, swiftPackModule)
-            put(SwiftLinkConfigurationKeys.expandedSwiftDir, expandedSwiftDirectory.toFile())
+            put(SwiftLinkConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
             put(SwiftGenConfigurationKeys.swiftGenConfiguration, Configuration.deserialize(configuration.readText()))
         }
 

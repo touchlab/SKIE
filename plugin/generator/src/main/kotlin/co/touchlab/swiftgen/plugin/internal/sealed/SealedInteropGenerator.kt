@@ -7,7 +7,6 @@ import co.touchlab.swiftgen.plugin.internal.util.BaseGenerator
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
-import co.touchlab.swiftgen.plugin.internal.util.SwiftFileBuilderFactory
 import co.touchlab.swiftgen.plugin.internal.util.isSealed
 import co.touchlab.swiftpack.api.SkieContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

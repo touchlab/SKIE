@@ -1,7 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal.util
 
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
-import co.touchlab.swiftpack.api.SwiftPoetContext
+import co.touchlab.swiftpack.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ParameterizedTypeName
 import io.outfoxx.swiftpoet.TypeName
@@ -18,7 +17,7 @@ internal interface SwiftPoetExtensionContainer {
     val DeclarationDescriptor.kotlinName: String
         get() = this.fqNameSafe.asString()
 
-    context(SwiftPoetContext, ClassDescriptor)
+    context(SwiftPoetScope, ClassDescriptor)
     val swiftNameWithTypeParameters: TypeName
         get() = this@ClassDescriptor.spec.withTypeParameters(this@ClassDescriptor)
 

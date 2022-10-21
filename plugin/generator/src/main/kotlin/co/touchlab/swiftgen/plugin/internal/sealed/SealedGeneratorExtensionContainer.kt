@@ -5,7 +5,7 @@ import co.touchlab.swiftgen.plugin.internal.configuration.ConfigurationContainer
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPoetExtensionContainer
 import co.touchlab.swiftgen.plugin.internal.util.SwiftPoetExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
 import co.touchlab.swiftgen.plugin.internal.util.isVisibleFromSwift
-import co.touchlab.swiftpack.api.SwiftPoetContext
+import co.touchlab.swiftpack.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.TypeName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -38,7 +38,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
             return isVisible && isEnabled
         }
 
-    context(ClassDescriptor, SwiftPoetContext)
+    context(ClassDescriptor, SwiftPoetScope)
     fun swiftNameWithTypeParametersForSealedCase(parent: ClassDescriptor): TypeName {
         if (kind.isInterface) {
             return this@ClassDescriptor.spec

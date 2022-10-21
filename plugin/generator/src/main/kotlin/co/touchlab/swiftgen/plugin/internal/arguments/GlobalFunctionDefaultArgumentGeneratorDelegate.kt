@@ -4,7 +4,6 @@ import co.touchlab.swiftgen.configuration.Configuration
 import co.touchlab.swiftgen.plugin.internal.util.DescriptorProvider
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftpack.api.SkieContext
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 internal class GlobalFunctionDefaultArgumentGeneratorDelegate(

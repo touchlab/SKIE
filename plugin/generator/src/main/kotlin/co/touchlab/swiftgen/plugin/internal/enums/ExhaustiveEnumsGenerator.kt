@@ -9,7 +9,7 @@ import co.touchlab.swiftgen.plugin.internal.util.NamespaceProvider
 import co.touchlab.swiftgen.plugin.internal.util.Reporter
 import co.touchlab.swiftpack.api.SkieContext
 import co.touchlab.swiftpack.api.SwiftBridgedName
-import co.touchlab.swiftpack.api.SwiftPoetContext
+import co.touchlab.swiftpack.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -97,7 +97,7 @@ internal class ExhaustiveEnumsGenerator(
         }
     }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
         declaration.nestedClasses.forEach {
             addType(
@@ -108,7 +108,7 @@ internal class ExhaustiveEnumsGenerator(
         }
     }
 
-    context(DescriptorProvider, SwiftPoetContext)
+    context(DescriptorProvider, SwiftPoetScope)
     private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor
     ) {
@@ -148,7 +148,7 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(DescriptorProvider, SwiftPoetContext)
+    context(DescriptorProvider, SwiftPoetScope)
     private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {

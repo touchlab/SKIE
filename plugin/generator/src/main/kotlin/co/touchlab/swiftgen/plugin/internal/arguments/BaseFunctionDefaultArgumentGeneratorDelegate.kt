@@ -6,7 +6,6 @@ import co.touchlab.swiftgen.plugin.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.createFunction
 import co.touchlab.swiftgen.plugin.internal.util.irbuilder.getNamespace
 import co.touchlab.swiftpack.api.SkieContext
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality

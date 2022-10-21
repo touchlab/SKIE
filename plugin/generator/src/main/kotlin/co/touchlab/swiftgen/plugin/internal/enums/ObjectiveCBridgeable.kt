@@ -1,6 +1,6 @@
 package co.touchlab.swiftgen.plugin.internal.enums
 
-import co.touchlab.swiftpack.api.SwiftPoetContext
+import co.touchlab.swiftpack.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal object ObjectiveCBridgeable {
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     fun TypeSpec.Builder.addObjcBridgeableImplementation(
         declaration: ClassDescriptor,
     ) {
@@ -37,7 +37,7 @@ internal object ObjectiveCBridgeable {
         addFromObjectiveC(declaration)
     }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addBridgeToObjectiveC(
         declaration: ClassDescriptor,
     ) {
@@ -65,7 +65,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addForceBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_forceBridgeFromObjectiveC")
@@ -77,7 +77,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addConditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_conditionallyBridgeFromObjectiveC")
@@ -91,7 +91,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addUnconditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_unconditionallyBridgeFromObjectiveC")
@@ -103,7 +103,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetContext)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addFromObjectiveC(
         declaration: ClassDescriptor,
     ) {

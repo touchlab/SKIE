@@ -3,7 +3,6 @@
 package co.touchlab.swiftlink.plugin
 
 import co.touchlab.swiftlink.plugin.intercept.PhaseListener
-import co.touchlab.swiftpack.api.SwiftPackModuleBuilder
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
@@ -20,11 +19,8 @@ class SwiftLinkPhaseListener: PhaseListener {
         val config = context.config
         val namer = context.objCExport.namer
 
-        // We want to make sure that building new modules beyond this point fails, this is a hack to do that.
-        SwiftPackModuleBuilder.Config.outputDir = null
-
         val swiftSources = context.configuration.getList(ConfigurationKeys.swiftSourceFiles)
-        val expandedSwiftDir = context.configuration.getNotNull(ConfigurationKeys.expandedSwiftDir)
+        val expandedSwiftDir = context.configuration.getNotNull(ConfigurationKeys.generatedSwiftDir)
         val swiftObjectFiles = SwiftLinkCompilePhase(
             config,
             context,

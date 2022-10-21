@@ -6,14 +6,6 @@ object SkiePlugin {
     const val id = "co.touchlab.skie"
 
     object Options {
-        val linkPhaseSwiftPackOutputDir = PluginOption(
-            optionName = "linkPhaseSwiftPackOutputDir",
-            valueDescription = "<absolute path>",
-            description = "",
-            serialize = File::getAbsolutePath,
-            deserialize = ::File,
-        )
-
         val swiftSourceFile = PluginOption(
             optionName = "swiftSourceFile",
             valueDescription = "<absolute path>",
@@ -23,7 +15,7 @@ object SkiePlugin {
             deserialize = ::File,
         )
 
-        val expandedSwiftDir = PluginOption(
+        val generatedSwiftDir = PluginOption(
             optionName = "expandedSwiftDir",
             valueDescription = "<absolute path>",
             description = "",
