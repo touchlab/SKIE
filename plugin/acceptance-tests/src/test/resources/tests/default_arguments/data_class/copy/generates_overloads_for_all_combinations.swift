@@ -1,5 +1,3 @@
-# Skip
-
 let a: A = A(i: 0, k: 1)
 
 let r0 = a.doCopy(i: 2, k: 3).i

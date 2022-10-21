@@ -47,7 +47,7 @@ internal class ApiNotesBuilder(
                         +"- Selector: \"${namer.getSelector(method)}\""
                         indented {
                             +"MethodKind: ${if (method.dispatchReceiverParameter == null) "Class" else "Instance"}"
-                            methodTransform.rename?.let { +"SwiftName: \"$it\"" }
+                            methodTransform.newSwiftName?.let { +"SwiftName: \"${it.qualifiedName}\"" }
                             methodTransform.isHidden.ifTrue { +"SwiftPrivate: true" }
                             methodTransform.isRemoved.ifTrue { +"Availability: nonswift" }
                         }
@@ -56,7 +56,7 @@ internal class ApiNotesBuilder(
             }
         }
 
-        accumulator.ensureChildClassesRenamedWhereNeeded()
+        accumulator.close()
 
         val notesByTypes = accumulator.typeTransforms.mapValues { (descriptor, transform) ->
             typeNotes(descriptor, transform)

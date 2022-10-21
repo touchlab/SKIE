@@ -92,12 +92,11 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     }
 
     private fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
-        val baseSignature = function.name.identifier
-        val parameters = overloadDescriptor.valueParameters.joinToString("") { it.name.identifier + ":" }
-        val fullSignature = "$baseSignature($parameters)"
-
         skieContext.module.configure {
-            overloadDescriptor.swiftName = fullSignature
+            val baseSignature = function.swiftName.name
+            val parameters = overloadDescriptor.valueParameters.map { it.name.identifier }
+
+            overloadDescriptor.swiftName.rename(baseSignature, parameters)
         }
     }
 }

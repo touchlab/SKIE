@@ -1,5 +1,3 @@
-# Skip
-
 let a: A = A.x
 
 let r0 = a.foo(i: 0, k: 1, m: 2, o: 3)

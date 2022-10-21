@@ -175,7 +175,7 @@ internal class ExhaustiveEnumsGenerator(
                 }
 
                 addFunction(
-                    FunctionSpec.builder(function.name.asString())
+                    FunctionSpec.builder(function.swiftName.name)
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
                             function.returnType?.let { returnType ->
@@ -193,7 +193,7 @@ internal class ExhaustiveEnumsGenerator(
                         .addStatement(
                             "return %L(self as _ObjectiveCType).%N(%L)",
                             if (mapper.doesThrow(function)) "try " else "",
-                            function.swiftName,
+                            function.swiftName.reference,
                             function.valueParameters.map { CodeBlock.of("%N", it.name.asString()) }.joinToCode(", "),
                         )
                         .build()

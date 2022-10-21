@@ -4,9 +4,11 @@ package co.touchlab.swiftlink.plugin
 
 import co.touchlab.swiftlink.plugin.reflection.reflectors.ObjCExportMapperReflector
 import co.touchlab.swiftlink.plugin.reflection.reflectors.mapper
+import co.touchlab.swiftpack.api.MutableSwiftFunctionName
 import co.touchlab.swiftpack.api.MutableSwiftScope
 import co.touchlab.swiftpack.api.MutableSwiftTypeName
 import co.touchlab.swiftpack.api.SwiftBridgedName
+import co.touchlab.swiftpack.api.SwiftFunctionName
 import co.touchlab.swiftpack.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -93,20 +95,10 @@ internal class DefaultMutableSwiftScope(
             transformAccumulator.transform(this).isRemoved = value
         }
 
-    override val FunctionDescriptor.originalSwiftName: String
-        get() {
-            val name = namer.getSwiftName(this)
-            return if (valueParameters.isEmpty()) {
-                name.dropLast(2)
-            } else {
-                name
-            }
-        }
-
-    override var FunctionDescriptor.swiftName: String
-        get() = transformAccumulator[this]?.rename ?: originalSwiftName
+    override var FunctionDescriptor.swiftName: MutableSwiftFunctionName
+        get() = transformAccumulator.resolveName(this)
         set(value) {
-            transformAccumulator.transform(this).rename = value
+            transformAccumulator.transform(this).swiftName = value
         }
 
     override var FunctionDescriptor.isHiddenFromSwift: Boolean
