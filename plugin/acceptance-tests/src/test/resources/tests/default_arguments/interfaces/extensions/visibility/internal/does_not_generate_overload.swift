@@ -1,4 +1,4 @@
-// # SwiftCompilationError(error: cannot find 'AImpl' in scope)
+# SwiftCompilationError(error: cannot find 'AImpl' in scope)
 
 let a: A = AImpl()
 

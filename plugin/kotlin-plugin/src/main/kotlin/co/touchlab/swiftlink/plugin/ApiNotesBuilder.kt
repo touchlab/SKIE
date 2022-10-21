@@ -1,8 +1,12 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.swiftlink.plugin
 
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
+import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
+import co.touchlab.swiftlink.plugin.reflection.reflectors.mapper
 import java.io.File
 
 internal class ApiNotesBuilder(
@@ -33,7 +37,7 @@ internal class ApiNotesBuilder(
                     transform.properties.forEach { (property, propertyTransform) ->
                         +"- Name: ${namer.getPropertyName(property)}"
                         indented {
-                            +"PropertyKind: ${if (property.dispatchReceiverParameter == null) "Class" else "Instance"}"
+                            +"PropertyKind: ${if (namer.mapper.isTopLevel(property)) "Class" else "Instance"}"
                             propertyTransform.rename?.let { +"SwiftName: $it" }
                             propertyTransform.isHidden.ifTrue { +"SwiftPrivate: true" }
                             propertyTransform.isRemoved.ifTrue { +"Availability: nonswift" }
@@ -41,12 +45,13 @@ internal class ApiNotesBuilder(
                     }
                 }
 
+
                 if (transform.methods.isNotEmpty()) {
                     +"Methods:"
                     transform.methods.forEach { (method, methodTransform) ->
                         +"- Selector: \"${namer.getSelector(method)}\""
                         indented {
-                            +"MethodKind: ${if (method.dispatchReceiverParameter == null) "Class" else "Instance"}"
+                            +"MethodKind: ${if (namer.mapper.isTopLevel(method)) "Class" else "Instance"}"
                             methodTransform.newSwiftName?.let { +"SwiftName: \"${it.qualifiedName}\"" }
                             methodTransform.isHidden.ifTrue { +"SwiftPrivate: true" }
                             methodTransform.isRemoved.ifTrue { +"Availability: nonswift" }

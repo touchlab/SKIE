@@ -1,3 +1,5 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.swiftlink.plugin
 
 import co.touchlab.swiftpack.api.DefaultMutableSwiftFunctionName
@@ -8,6 +10,8 @@ import co.touchlab.swiftpack.api.MutableSwiftTypeName
 import co.touchlab.swiftpack.api.SwiftBridgedName
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
+import co.touchlab.swiftlink.plugin.reflection.reflectors.mapper
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -39,6 +43,7 @@ internal class TransformAccumulator(
 
     fun transform(descriptor: ClassDescriptor): ObjcClassTransformScope {
         val target = TypeTransformTarget.Class(descriptor)
+
         return mutableTypeTransforms.getOrPut(target) {
             ObjcClassTransformScope(resolveName(target))
         }
@@ -163,10 +168,16 @@ internal class TransformAccumulator(
     }
 
     private val CallableMemberDescriptor.containingTarget: TypeTransformTarget
-        get() = when (val containingDeclaration = containingDeclaration) {
-            is ClassDescriptor -> TypeTransformTarget.Class(containingDeclaration)
-            is PackageFragmentDescriptor -> TypeTransformTarget.File(findSourceFile())
-            else -> error("Unexpected containing declaration: $containingDeclaration")
+        get() {
+            val categoryClass = namer.mapper.getClassIfCategory(this)
+            if (categoryClass != null) {
+                return TypeTransformTarget.Class(categoryClass)
+            }
+            return when (val containingDeclaration = containingDeclaration) {
+                is ClassDescriptor -> TypeTransformTarget.Class(containingDeclaration)
+                is PackageFragmentDescriptor -> TypeTransformTarget.File(findSourceFile())
+                else -> error("Unexpected containing declaration: $containingDeclaration")
+            }
         }
 
     private fun typeTransform(typeTransformTarget: TypeTransformTarget): ObjcClassTransformScope {
