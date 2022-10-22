@@ -26,7 +26,7 @@ internal class ApiNotesBuilder(
 
             indented {
                 if (enableBridging) {
-                    transform.bridge?.let { +"SwiftBridge: ${moduleName}.${it.resolve()}" }
+                    transform.bridge?.let { +"SwiftBridge: ${moduleName}.${it.typeAliasName}" }
                 }
                 transform.isHidden.ifTrue { +"SwiftPrivate: true" }
                 transform.newSwiftName?.let { +"SwiftName: ${it.qualifiedName}" }

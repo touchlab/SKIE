@@ -1,28 +1,27 @@
 package co.touchlab.swiftpack.api
 
-sealed interface SwiftBridgedName {
-    data class Absolute(val name: String): SwiftBridgedName {
-        override fun resolve(): String = name
-    }
-    data class Relative(val parent: SwiftTypeName, val childName: String): SwiftBridgedName {
-        val typealiasName: String
-            get() = "${parent.qualifiedName}__$childName"
+data class SwiftBridgedName(
+    val parent: SwiftTypeName?,
+    val isNestedInParent: Boolean,
+    val name: String,
+) {
+    val qualifiedName: String
+        get() = if (parent == null) name else "${parent.qualifiedName}$separator$name"
 
-        val typealiasValue: String
-            get() = "${parent.qualifiedName}.$childName"
+    val typeAliasName: String
+        get() = if (parent == null) name else "${parent.qualifiedNameWithSeparators(DEFAULT_SEPARATOR)}$typeAliasSeparator$name"
 
-        override fun resolve(): String = typealiasName
-    }
+    // TODO: Not the best way to do this, but it works for now.
+    val needsTypeAlias: Boolean
+        get() = qualifiedName != typeAliasName
 
-    fun resolve(): String
+    private val separator: String
+        get() = if (isNestedInParent) SwiftTypeName.DEFAULT_SEPARATOR else ""
+
+    private val typeAliasSeparator: String
+        get() = if (isNestedInParent) DEFAULT_SEPARATOR else ""
 
     companion object {
-        operator fun invoke(parentOrNull: SwiftTypeName?, name: String): SwiftBridgedName {
-            return if (parentOrNull == null) {
-                Absolute(name)
-            } else {
-                Relative(parentOrNull, name)
-            }
-        }
+        const val DEFAULT_SEPARATOR = "__"
     }
 }

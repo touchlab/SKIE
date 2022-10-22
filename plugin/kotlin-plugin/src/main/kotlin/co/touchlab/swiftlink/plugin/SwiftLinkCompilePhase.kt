@@ -88,8 +88,9 @@ class SwiftLinkCompilePhase(
         swiftSourcesDir: File,
     ): File? {
         val bridgeTypealiases = transformAccumulator.typeTransforms.mapNotNull { (declaration, transform) ->
-            val bridgedName = transform.bridge as? SwiftBridgedName.Relative ?: return@mapNotNull null
-            TypeAliasSpec.builder(bridgedName.typealiasName, DeclaredTypeName.qualifiedTypeName(".${bridgedName.typealiasValue}"))
+            val bridgedName = transform.bridge ?: return@mapNotNull null
+            if (!bridgedName.needsTypeAlias) { return@mapNotNull null }
+            TypeAliasSpec.builder(bridgedName.typeAliasName, DeclaredTypeName.qualifiedTypeName(".${bridgedName.qualifiedName}"))
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         }

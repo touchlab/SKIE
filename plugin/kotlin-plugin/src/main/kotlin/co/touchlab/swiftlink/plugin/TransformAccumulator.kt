@@ -72,7 +72,7 @@ internal class TransformAccumulator(
                 when (val parent = target.descriptor.containingDeclaration) {
                     is PackageFragmentDescriptor, is PackageViewDescriptor -> DefaultMutableSwiftTypeName(
                         originalParent = null,
-                        originalSeparator = "",
+                        originalIsNestedInParent = false,
                         originalSimpleName = name,
                     )
                     is ClassDescriptor -> {
@@ -83,14 +83,14 @@ internal class TransformAccumulator(
                         } else {
                             name
                         }
-                        val (separator, simpleName) = if (simpleNameCandidate.startsWith('.')) {
-                            "." to simpleNameCandidate.drop(1)
+                        val (isNestedInParent, simpleName) = if (simpleNameCandidate.startsWith('.')) {
+                            true to simpleNameCandidate.drop(1)
                         } else {
-                            "" to simpleNameCandidate
+                            false to simpleNameCandidate
                         }
                         DefaultMutableSwiftTypeName(
                             originalParent = parentName,
-                            originalSeparator = separator,
+                            originalIsNestedInParent = isNestedInParent,
                             originalSimpleName = simpleName,
                         )
                     }
@@ -100,7 +100,7 @@ internal class TransformAccumulator(
             is TypeTransformTarget.File -> {
                 DefaultMutableSwiftTypeName(
                     originalParent = null,
-                    originalSeparator = "",
+                    originalIsNestedInParent = false,
                     originalSimpleName = namer.getFileClassName(target.file).swiftName,
                 )
             }
