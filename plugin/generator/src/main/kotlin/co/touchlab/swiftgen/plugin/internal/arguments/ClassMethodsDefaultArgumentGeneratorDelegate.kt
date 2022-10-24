@@ -37,7 +37,5 @@ internal class ClassMethodsDefaultArgumentGeneratorDelegate(
             .filter { it.canBeUsedWithExperimentalFeatures }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
-        get() = this.dispatchReceiverParameter != null &&
-            this.extensionReceiverParameter == null &&
-            this.contextReceiverParameters.isEmpty()
+        get() = this.contextReceiverParameters.isEmpty()
 }
