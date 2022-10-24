@@ -1,13 +1,13 @@
 {
   "name": "shared",
   "version": "1.2",
-  "homepage": "https://github.com/touchlab/KaMPKit",
+  "homepage": "https://github.com/touchlab/SKIE",
   "source": {
     "http": ""
   },
   "authors": "",
   "license": "",
-  "summary": "Common library for the KaMP starter kit",
+  "summary": "Common library for the SKIE demo project",
   "vendored_frameworks": "build/cocoapods/framework/shared.framework",
   "libraries": "c++",
   "platforms": {

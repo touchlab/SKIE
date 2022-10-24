@@ -126,8 +126,8 @@ kotlin {
         }
 
     cocoapods {
-        summary = "Common library for the KaMP starter kit"
-        homepage = "https://github.com/touchlab/KaMPKit"
+        summary = "Common library for the SKIE demo project"
+        homepage = "https://github.com/touchlab/SKIE"
         framework {
             isStatic = false // SwiftUI preview requires dynamic framework
         }
@@ -137,8 +137,8 @@ kotlin {
 }
 
 sqldelight {
-    database("KaMPKitDb") {
-        packageName = "co.touchlab.kampkit.db"
+    database("SkieDB") {
+        packageName = "co.touchlab.skie.db"
     }
 }
 

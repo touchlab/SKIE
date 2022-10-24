@@ -16,7 +16,7 @@ func startKoin() {
     // Kotlin is more difficult, or where they're also used in
     // iOS-specific code.
 
-    let userDefaults = UserDefaults(suiteName: "KAMPSTARTER_SETTINGS")!
+    let userDefaults = UserDefaults(suiteName: "SKIEDEMO_SETTINGS")!
     let iosAppInfo = IosAppInfo()
     let doOnStartup = { NSLog("Hello from iOS/Swift!") }
 

@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 include(":app", ":shared")
-rootProject.name = "example"
+rootProject.name = "SkieDemo"
 
 enableFeaturePreview("VERSION_CATALOGS")
 

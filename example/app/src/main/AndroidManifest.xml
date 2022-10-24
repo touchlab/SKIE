@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="co.touchlab.kampkit.android">
+    package="co.touchlab.skie.android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="co.touchlab.kampkit.android.MainApp"
+        android:name="co.touchlab.skie.android.MainApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="DataExtractionRules">
         <activity
-            android:name="co.touchlab.kampkit.android.MainActivity"
+            android:name="co.touchlab.skie.android.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
