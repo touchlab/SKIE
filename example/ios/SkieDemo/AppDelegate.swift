@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  KaMPKitiOS
+//  SkieDemo
 //
 //  Created by Kevin Schildhorn on 12/18/19.
 //  Copyright © 2019 Touchlab. All rights reserved.

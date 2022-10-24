@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F1465EFC23AA94BF0055F7C3"
-               BuildableName = "KaMPKitiOS.app"
-               BlueprintName = "KaMPKitiOS"
-               ReferencedContainer = "container:KaMPKitiOS.xcodeproj">
+               BuildableName = "SkieDemo.app"
+               BlueprintName = "SkieDemo"
+               ReferencedContainer = "container:SkieDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F1465F1223AA94C00055F7C3"
-               BuildableName = "KaMPKitiOSTests.xctest"
-               BlueprintName = "KaMPKitiOSTests"
-               ReferencedContainer = "container:KaMPKitiOS.xcodeproj">
+               BuildableName = "SkieDemoTests.xctest"
+               BlueprintName = "SkieDemoTests"
+               ReferencedContainer = "container:SkieDemo.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -43,9 +43,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F1465F1D23AA94C00055F7C3"
-               BuildableName = "KaMPKitiOSUITests.xctest"
-               BlueprintName = "KaMPKitiOSUITests"
-               ReferencedContainer = "container:KaMPKitiOS.xcodeproj">
+               BuildableName = "SkieDemoUITests.xctest"
+               BlueprintName = "SkieDemoUITests"
+               ReferencedContainer = "container:SkieDemo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -65,9 +65,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F1465EFC23AA94BF0055F7C3"
-            BuildableName = "KaMPKitiOS.app"
-            BlueprintName = "KaMPKitiOS"
-            ReferencedContainer = "container:KaMPKitiOS.xcodeproj">
+            BuildableName = "SkieDemo.app"
+            BlueprintName = "SkieDemo"
+            ReferencedContainer = "container:SkieDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -82,9 +82,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F1465EFC23AA94BF0055F7C3"
-            BuildableName = "KaMPKitiOS.app"
-            BlueprintName = "KaMPKitiOS"
-            ReferencedContainer = "container:KaMPKitiOS.xcodeproj">
+            BuildableName = "SkieDemo.app"
+            BlueprintName = "SkieDemo"
+            ReferencedContainer = "container:SkieDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

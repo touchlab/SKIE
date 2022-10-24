@@ -1,15 +1,15 @@
 //
-//  KaMPKitiOSTests.swift
-//  KaMPKitiOSTests
+//  SkieDemoTests.swift
+//  SkieDemoTests
 //
 //  Created by Kevin Schildhorn on 12/18/19.
 //  Copyright © 2019 Touchlab. All rights reserved.
 //
 
 import XCTest
-@testable import KaMPKitiOS
+@testable import SkieDemo
 
-class KaMPKitiOSTests: XCTestCase {
+class SkieDemoTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.

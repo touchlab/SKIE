@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3DFF917C64A18A83DA010EE1 /* Pods_KaMPKitiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B859F3FB23133D22AB9DD835 /* Pods_KaMPKitiOS.framework */; };
+		21E4037F99EB1D31AD67F45F /* Pods_SkieDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B80E01B4323B43F0780D74D /* Pods_SkieDemo.framework */; };
 		461C74AA2788F5F3004B1FFC /* CombineAdapters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461C74A92788F5F3004B1FFC /* CombineAdapters.swift */; };
 		46A5B5EF26AF54F7002EFEAA /* BreedListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A5B5EE26AF54F7002EFEAA /* BreedListScreen.swift */; };
 		46A5B60826B04921002EFEAA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 46A5B60626B04920002EFEAA /* Main.storyboard */; };
@@ -15,8 +15,8 @@
 		F1465F0123AA94BF0055F7C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1465F0023AA94BF0055F7C3 /* AppDelegate.swift */; };
 		F1465F0A23AA94BF0055F7C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1465F0923AA94BF0055F7C3 /* Assets.xcassets */; };
 		F1465F0D23AA94BF0055F7C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F1465F0B23AA94BF0055F7C3 /* LaunchScreen.storyboard */; };
-		F1465F1823AA94C00055F7C3 /* KaMPKitiOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1465F1723AA94C00055F7C3 /* KaMPKitiOSTests.swift */; };
-		F1465F2323AA94C00055F7C3 /* KaMPKitiOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1465F2223AA94C00055F7C3 /* KaMPKitiOSUITests.swift */; };
+		F1465F1823AA94C00055F7C3 /* SkieDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1465F1723AA94C00055F7C3 /* SkieDemoTests.swift */; };
+		F1465F2323AA94C00055F7C3 /* SkieDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1465F2223AA94C00055F7C3 /* SkieDemoUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,24 +37,26 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1D20313478D4A7E63C5A3692 /* Pods-SkieDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SkieDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SkieDemo/Pods-SkieDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		1DFCC00C8DAA719770A18D1A /* Pods-KaMPKitiOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KaMPKitiOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-KaMPKitiOS/Pods-KaMPKitiOS.release.xcconfig"; sourceTree = "<group>"; };
 		2A1ED6A4A2A53F5F75C58E5F /* Pods-KaMPKitiOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KaMPKitiOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-KaMPKitiOS/Pods-KaMPKitiOS.release.xcconfig"; sourceTree = "<group>"; };
 		461C74A92788F5F3004B1FFC /* CombineAdapters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineAdapters.swift; sourceTree = "<group>"; };
 		46A5B5EE26AF54F7002EFEAA /* BreedListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreedListScreen.swift; sourceTree = "<group>"; };
 		46A5B60726B04920002EFEAA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		46B5284C249C5CF400A7725D /* Koin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Koin.swift; sourceTree = "<group>"; };
-		B859F3FB23133D22AB9DD835 /* Pods_KaMPKitiOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KaMPKitiOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B80E01B4323B43F0780D74D /* Pods_SkieDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SkieDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1D895EA0C2D98D6D4CED857 /* Pods-SkieDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SkieDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-SkieDemo/Pods-SkieDemo.release.xcconfig"; sourceTree = "<group>"; };
 		ED1F782AF3705197012D0C33 /* Pods-KaMPKitiOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KaMPKitiOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KaMPKitiOS/Pods-KaMPKitiOS.debug.xcconfig"; sourceTree = "<group>"; };
-		F1465EFD23AA94BF0055F7C3 /* KaMPKitiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KaMPKitiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1465EFD23AA94BF0055F7C3 /* SkieDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkieDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1465F0023AA94BF0055F7C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F1465F0923AA94BF0055F7C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F1465F0C23AA94BF0055F7C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F1465F0E23AA94BF0055F7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F1465F1323AA94C00055F7C3 /* KaMPKitiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KaMPKitiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F1465F1723AA94C00055F7C3 /* KaMPKitiOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaMPKitiOSTests.swift; sourceTree = "<group>"; };
+		F1465F1323AA94C00055F7C3 /* SkieDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkieDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1465F1723AA94C00055F7C3 /* SkieDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkieDemoTests.swift; sourceTree = "<group>"; };
 		F1465F1923AA94C00055F7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F1465F1E23AA94C00055F7C3 /* KaMPKitiOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KaMPKitiOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F1465F2223AA94C00055F7C3 /* KaMPKitiOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaMPKitiOSUITests.swift; sourceTree = "<group>"; };
+		F1465F1E23AA94C00055F7C3 /* SkieDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkieDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1465F2223AA94C00055F7C3 /* SkieDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkieDemoUITests.swift; sourceTree = "<group>"; };
 		F1465F2423AA94C00055F7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F9C259C83C689DF8F4602F38 /* Pods-KaMPKitiOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KaMPKitiOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KaMPKitiOS/Pods-KaMPKitiOS.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -64,7 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DFF917C64A18A83DA010EE1 /* Pods_KaMPKitiOS.framework in Frameworks */,
+				21E4037F99EB1D31AD67F45F /* Pods_SkieDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,7 +90,7 @@
 		6278498AD96A4D949D39BF44 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B859F3FB23133D22AB9DD835 /* Pods_KaMPKitiOS.framework */,
+				5B80E01B4323B43F0780D74D /* Pods_SkieDemo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -100,6 +102,8 @@
 				1DFCC00C8DAA719770A18D1A /* Pods-KaMPKitiOS.release.xcconfig */,
 				ED1F782AF3705197012D0C33 /* Pods-KaMPKitiOS.debug.xcconfig */,
 				2A1ED6A4A2A53F5F75C58E5F /* Pods-KaMPKitiOS.release.xcconfig */,
+				1D20313478D4A7E63C5A3692 /* Pods-SkieDemo.debug.xcconfig */,
+				E1D895EA0C2D98D6D4CED857 /* Pods-SkieDemo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -107,9 +111,9 @@
 		F1465EF423AA94BF0055F7C3 = {
 			isa = PBXGroup;
 			children = (
-				F1465EFF23AA94BF0055F7C3 /* KaMPKitiOS */,
-				F1465F1623AA94C00055F7C3 /* KaMPKitiOSTests */,
-				F1465F2123AA94C00055F7C3 /* KaMPKitiOSUITests */,
+				F1465EFF23AA94BF0055F7C3 /* SkieDemo */,
+				F1465F1623AA94C00055F7C3 /* SkieDemoTests */,
+				F1465F2123AA94C00055F7C3 /* SkieDemoUITests */,
 				F1465EFE23AA94BF0055F7C3 /* Products */,
 				DF9BBECBCD175B90105DA8D9 /* Pods */,
 				6278498AD96A4D949D39BF44 /* Frameworks */,
@@ -119,14 +123,14 @@
 		F1465EFE23AA94BF0055F7C3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F1465EFD23AA94BF0055F7C3 /* KaMPKitiOS.app */,
-				F1465F1323AA94C00055F7C3 /* KaMPKitiOSTests.xctest */,
-				F1465F1E23AA94C00055F7C3 /* KaMPKitiOSUITests.xctest */,
+				F1465EFD23AA94BF0055F7C3 /* SkieDemo.app */,
+				F1465F1323AA94C00055F7C3 /* SkieDemoTests.xctest */,
+				F1465F1E23AA94C00055F7C3 /* SkieDemoUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F1465EFF23AA94BF0055F7C3 /* KaMPKitiOS */ = {
+		F1465EFF23AA94BF0055F7C3 /* SkieDemo */ = {
 			isa = PBXGroup;
 			children = (
 				F1465F0023AA94BF0055F7C3 /* AppDelegate.swift */,
@@ -138,33 +142,33 @@
 				46A5B5EE26AF54F7002EFEAA /* BreedListScreen.swift */,
 				461C74A92788F5F3004B1FFC /* CombineAdapters.swift */,
 			);
-			path = KaMPKitiOS;
+			path = SkieDemo;
 			sourceTree = "<group>";
 		};
-		F1465F1623AA94C00055F7C3 /* KaMPKitiOSTests */ = {
+		F1465F1623AA94C00055F7C3 /* SkieDemoTests */ = {
 			isa = PBXGroup;
 			children = (
-				F1465F1723AA94C00055F7C3 /* KaMPKitiOSTests.swift */,
+				F1465F1723AA94C00055F7C3 /* SkieDemoTests.swift */,
 				F1465F1923AA94C00055F7C3 /* Info.plist */,
 			);
-			path = KaMPKitiOSTests;
+			path = SkieDemoTests;
 			sourceTree = "<group>";
 		};
-		F1465F2123AA94C00055F7C3 /* KaMPKitiOSUITests */ = {
+		F1465F2123AA94C00055F7C3 /* SkieDemoUITests */ = {
 			isa = PBXGroup;
 			children = (
-				F1465F2223AA94C00055F7C3 /* KaMPKitiOSUITests.swift */,
+				F1465F2223AA94C00055F7C3 /* SkieDemoUITests.swift */,
 				F1465F2423AA94C00055F7C3 /* Info.plist */,
 			);
-			path = KaMPKitiOSUITests;
+			path = SkieDemoUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F1465EFC23AA94BF0055F7C3 /* KaMPKitiOS */ = {
+		F1465EFC23AA94BF0055F7C3 /* SkieDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F1465F2723AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "KaMPKitiOS" */;
+			buildConfigurationList = F1465F2723AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "SkieDemo" */;
 			buildPhases = (
 				DE3B37D33D11C1968D62DBBA /* [CP] Check Pods Manifest.lock */,
 				F1465EF923AA94BF0055F7C3 /* Sources */,
@@ -177,14 +181,14 @@
 			);
 			dependencies = (
 			);
-			name = KaMPKitiOS;
+			name = SkieDemo;
 			productName = KaMPKitiOS;
-			productReference = F1465EFD23AA94BF0055F7C3 /* KaMPKitiOS.app */;
+			productReference = F1465EFD23AA94BF0055F7C3 /* SkieDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F1465F1223AA94C00055F7C3 /* KaMPKitiOSTests */ = {
+		F1465F1223AA94C00055F7C3 /* SkieDemoTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F1465F2A23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "KaMPKitiOSTests" */;
+			buildConfigurationList = F1465F2A23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "SkieDemoTests" */;
 			buildPhases = (
 				F1465F0F23AA94C00055F7C3 /* Sources */,
 				F1465F1023AA94C00055F7C3 /* Frameworks */,
@@ -195,14 +199,14 @@
 			dependencies = (
 				F1465F1523AA94C00055F7C3 /* PBXTargetDependency */,
 			);
-			name = KaMPKitiOSTests;
+			name = SkieDemoTests;
 			productName = KaMPKitiOSTests;
-			productReference = F1465F1323AA94C00055F7C3 /* KaMPKitiOSTests.xctest */;
+			productReference = F1465F1323AA94C00055F7C3 /* SkieDemoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		F1465F1D23AA94C00055F7C3 /* KaMPKitiOSUITests */ = {
+		F1465F1D23AA94C00055F7C3 /* SkieDemoUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F1465F2D23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "KaMPKitiOSUITests" */;
+			buildConfigurationList = F1465F2D23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "SkieDemoUITests" */;
 			buildPhases = (
 				F1465F1A23AA94C00055F7C3 /* Sources */,
 				F1465F1B23AA94C00055F7C3 /* Frameworks */,
@@ -213,9 +217,9 @@
 			dependencies = (
 				F1465F2023AA94C00055F7C3 /* PBXTargetDependency */,
 			);
-			name = KaMPKitiOSUITests;
+			name = SkieDemoUITests;
 			productName = KaMPKitiOSUITests;
-			productReference = F1465F1E23AA94C00055F7C3 /* KaMPKitiOSUITests.xctest */;
+			productReference = F1465F1E23AA94C00055F7C3 /* SkieDemoUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -241,7 +245,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F1465EF823AA94BF0055F7C3 /* Build configuration list for PBXProject "KaMPKitiOS" */;
+			buildConfigurationList = F1465EF823AA94BF0055F7C3 /* Build configuration list for PBXProject "SkieDemo" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -254,9 +258,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F1465EFC23AA94BF0055F7C3 /* KaMPKitiOS */,
-				F1465F1223AA94C00055F7C3 /* KaMPKitiOSTests */,
-				F1465F1D23AA94C00055F7C3 /* KaMPKitiOSUITests */,
+				F1465EFC23AA94BF0055F7C3 /* SkieDemo */,
+				F1465F1223AA94C00055F7C3 /* SkieDemoTests */,
+				F1465F1D23AA94C00055F7C3 /* SkieDemoUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -313,15 +317,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KaMPKitiOS/Pods-KaMPKitiOS-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-SkieDemo/Pods-SkieDemo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KaMPKitiOS/Pods-KaMPKitiOS-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-SkieDemo/Pods-SkieDemo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KaMPKitiOS/Pods-KaMPKitiOS-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SkieDemo/Pods-SkieDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		DE3B37D33D11C1968D62DBBA /* [CP] Check Pods Manifest.lock */ = {
@@ -339,7 +343,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KaMPKitiOS-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-SkieDemo-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -364,7 +368,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F1465F1823AA94C00055F7C3 /* KaMPKitiOSTests.swift in Sources */,
+				F1465F1823AA94C00055F7C3 /* SkieDemoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,7 +376,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F1465F2323AA94C00055F7C3 /* KaMPKitiOSUITests.swift in Sources */,
+				F1465F2323AA94C00055F7C3 /* SkieDemoUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,12 +385,12 @@
 /* Begin PBXTargetDependency section */
 		F1465F1523AA94C00055F7C3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F1465EFC23AA94BF0055F7C3 /* KaMPKitiOS */;
+			target = F1465EFC23AA94BF0055F7C3 /* SkieDemo */;
 			targetProxy = F1465F1423AA94C00055F7C3 /* PBXContainerItemProxy */;
 		};
 		F1465F2023AA94C00055F7C3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F1465EFC23AA94BF0055F7C3 /* KaMPKitiOS */;
+			target = F1465EFC23AA94BF0055F7C3 /* SkieDemo */;
 			targetProxy = F1465F1F23AA94C00055F7C3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -535,12 +539,12 @@
 		};
 		F1465F2823AA94C00055F7C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ED1F782AF3705197012D0C33 /* Pods-KaMPKitiOS.debug.xcconfig */;
+			baseConfigurationReference = 1D20313478D4A7E63C5A3692 /* Pods-SkieDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = KaMPKitiOS/Info.plist;
+				INFOPLIST_FILE = SkieDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -562,12 +566,12 @@
 		};
 		F1465F2923AA94C00055F7C3 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2A1ED6A4A2A53F5F75C58E5F /* Pods-KaMPKitiOS.release.xcconfig */;
+			baseConfigurationReference = E1D895EA0C2D98D6D4CED857 /* Pods-SkieDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = KaMPKitiOS/Info.plist;
+				INFOPLIST_FILE = SkieDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -595,7 +599,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = KaMPKitiOSTests/Info.plist;
+				INFOPLIST_FILE = SkieDemoTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -606,7 +610,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KaMPKitiOS.app/KaMPKitiOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SkieDemo.app/SkieDemo";
 			};
 			name = Debug;
 		};
@@ -618,7 +622,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = KaMPKitiOSTests/Info.plist;
+				INFOPLIST_FILE = SkieDemoTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -629,7 +633,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KaMPKitiOS.app/KaMPKitiOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SkieDemo.app/SkieDemo";
 			};
 			name = Release;
 		};
@@ -640,7 +644,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = KaMPKitiOSUITests/Info.plist;
+				INFOPLIST_FILE = SkieDemoUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -650,7 +654,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = KaMPKitiOS;
+				TEST_TARGET_NAME = SkieDemo;
 			};
 			name = Debug;
 		};
@@ -661,7 +665,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = KaMPKitiOSUITests/Info.plist;
+				INFOPLIST_FILE = SkieDemoUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -671,14 +675,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = KaMPKitiOS;
+				TEST_TARGET_NAME = SkieDemo;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F1465EF823AA94BF0055F7C3 /* Build configuration list for PBXProject "KaMPKitiOS" */ = {
+		F1465EF823AA94BF0055F7C3 /* Build configuration list for PBXProject "SkieDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1465F2523AA94C00055F7C3 /* Debug */,
@@ -687,7 +691,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F1465F2723AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "KaMPKitiOS" */ = {
+		F1465F2723AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "SkieDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1465F2823AA94C00055F7C3 /* Debug */,
@@ -696,7 +700,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F1465F2A23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "KaMPKitiOSTests" */ = {
+		F1465F2A23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "SkieDemoTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1465F2B23AA94C00055F7C3 /* Debug */,
@@ -705,7 +709,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F1465F2D23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "KaMPKitiOSUITests" */ = {
+		F1465F2D23AA94C00055F7C3 /* Build configuration list for PBXNativeTarget "SkieDemoUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1465F2E23AA94C00055F7C3 /* Debug */,

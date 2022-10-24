@@ -1,6 +1,6 @@
 //
 //  KoinApplication.swift
-//  KaMPStarteriOS
+//  SkieDemo
 //
 //  Created by Russell Wolf on 6/18/20.
 //  Copyright © 2020 Touchlab. All rights reserved.

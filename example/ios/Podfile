@@ -4,7 +4,7 @@ platform :ios, '12.4'
 
 install! 'cocoapods', :deterministic_uuids => false
 
-target 'KaMPKitiOS' do
+target 'SkieDemo' do
     pod 'shared', :path => '../shared/'
     pod 'SwiftLint'
 end
