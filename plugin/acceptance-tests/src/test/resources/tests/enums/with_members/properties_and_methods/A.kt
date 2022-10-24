@@ -20,6 +20,8 @@ enum class A {
 
     fun booleanReturn(): Boolean = true
 
+    fun stringListReturn(): List<String> = listOf("1")
+
     fun voidReturn() {}
 
     fun int8ReturnWithParam(a: Byte): Byte = a

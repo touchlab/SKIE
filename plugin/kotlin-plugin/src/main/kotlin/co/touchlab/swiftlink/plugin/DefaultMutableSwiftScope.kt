@@ -10,6 +10,7 @@ import co.touchlab.swiftpack.api.MutableSwiftTypeName
 import co.touchlab.swiftpack.api.SwiftBridgedName
 import co.touchlab.swiftpack.api.SwiftFunctionName
 import co.touchlab.swiftpack.api.SwiftPoetScope
+import io.outfoxx.swiftpoet.ARRAY
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FLOAT32
@@ -22,20 +23,26 @@ import io.outfoxx.swiftpoet.INT8
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeVariableName
 import io.outfoxx.swiftpoet.UIN16
 import io.outfoxx.swiftpoet.UINT32
 import io.outfoxx.swiftpoet.UINT64
 import io.outfoxx.swiftpoet.UINT8
 import io.outfoxx.swiftpoet.VOID
+import io.outfoxx.swiftpoet.parameterizedBy
 import org.jetbrains.kotlin.backend.konan.objcexport.BlockPointerBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCValueType
 import org.jetbrains.kotlin.backend.konan.objcexport.ReferenceBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.isInterface
+import org.jetbrains.kotlin.resolve.descriptorUtil.classId
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
@@ -116,15 +123,18 @@ internal class DefaultMutableSwiftScope(
     override val KotlinType.spec: TypeName
         get() {
             val reflector = ObjCExportMapperReflector(namer.mapper)
-            // val bridge = namer.mapper.bridgeType(this)
             val bridge = reflector.bridgeType.invoke(this)
 
             return when (bridge) {
                 is BlockPointerBridge -> TODO()
-                ReferenceBridge -> when {
-                    KotlinBuiltIns.isString(this) -> STRING
-                    isUnit() -> VOID
-                    else -> (constructor.declarationDescriptor as ClassDescriptor).spec
+                ReferenceBridge -> with (StandardNames.FqNames) {
+                    when (constructor.declarationDescriptor?.fqNameUnsafe) {
+                        string -> STRING
+                        unit -> VOID
+                        list.toUnsafe() -> ARRAY
+                        mutableList.toUnsafe() -> ARRAY
+                        else -> (constructor.declarationDescriptor as ClassDescriptor).spec
+                    }
                 }
                 is ValueTypeBridge -> when (bridge.objCValueType) {
                     ObjCValueType.BOOL -> BOOL
@@ -142,8 +152,26 @@ internal class DefaultMutableSwiftScope(
                     ObjCValueType.POINTER -> TODO()
                 }
                 else -> TODO()
-            }
+            }.withTypeParameters(this)
         }
+
+    private fun DeclaredTypeName.withTypeParameters(type: KotlinType): TypeName =
+        this.withTypeParameters(type.arguments.map { it.type.spec })
+
+
+    private fun DeclaredTypeName.withTypeParameters(typeParameters: List<TypeName>): TypeName =
+        if (typeParameters.isNotEmpty()) {
+            this.parameterizedBy(*typeParameters.toTypedArray())
+        } else {
+            this
+        }
+
+    /*val ClassDescriptor.swiftTypeVariablesNames: List<TypeVariableName>
+        get() = if (this.kind.isInterface) {
+            emptyList()
+        } else {
+            this.declaredTypeParameters.map { it.swiftName }
+        }*/
 
     override val ClassDescriptor.spec: DeclaredTypeName
         get() = DeclaredTypeName.qualifiedTypeName("$moduleName.${swiftName.qualifiedName}")
