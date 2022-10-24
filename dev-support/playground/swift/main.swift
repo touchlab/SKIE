@@ -4,7 +4,6 @@ import Kotlin
 @main
 struct Main {
     static func main() async {
-        print("Whatwhat")
         let a: A = A1()
 
         switch onEnum(of: a) {

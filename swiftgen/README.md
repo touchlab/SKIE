@@ -23,7 +23,7 @@ The discussion about any part of the SwiftKt project happens in the `swiftkt` Sl
 
 ## Installation
 
-As the first step make sure that your project uses exactly the same Kotlin compiler version as this plugin (1.7.10).
+As the first step make sure that your project uses exactly the same Kotlin compiler version as this plugin (1.7.20).
 (Kotlin compiler plugins are in general not stable and break with almost every release.)
 
 At this point make sure that your project compiles before you do anything else (especially if you had to change the Kotlin compiler version).

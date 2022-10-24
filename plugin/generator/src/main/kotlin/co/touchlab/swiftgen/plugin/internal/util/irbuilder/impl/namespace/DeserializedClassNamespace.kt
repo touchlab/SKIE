@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
@@ -46,6 +47,7 @@ internal class DeserializedClassNamespace(override val descriptor: DeserializedC
         (descriptor.constructors as MutableCollection).add(constructorDescriptor)
     }
 
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun generateNamespaceIr(generatorContext: GeneratorContext): IrDeclarationContainer =
         generatorContext.symbolTable.referenceClass(descriptor).owner
 }

@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irDelegatingConstructorCall
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
@@ -67,7 +68,9 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
         }
     }
 
-    context(ReferenceSymbolTable, DeclarationIrBuilder) private fun getOverloadBody(
+    context(ReferenceSymbolTable, DeclarationIrBuilder)
+        @OptIn(ObsoleteDescriptorBasedAPI::class)
+        private fun getOverloadBody(
         originalConstructor: ClassConstructorDescriptor, overloadIr: IrConstructor,
     ): IrBody {
         val originalConstructorSymbol = referenceConstructor(originalConstructor)

@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
@@ -32,6 +33,7 @@ internal class DeserializedPackageNamespace(
         descriptor.getMemberScope().addFunctionDescriptorToImpl(functionDescriptor)
     }
 
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun generateNamespaceIr(generatorContext: GeneratorContext): IrDeclarationContainer =
         generatorContext.symbolTable.referenceFunction(existingMember).owner.parent as IrDeclarationContainer
 }

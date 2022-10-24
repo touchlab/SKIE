@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
@@ -65,6 +66,7 @@ internal class FunctionTemplate(
         symbolTable.declareSimpleFunction(signature, symbolFactory, ::DummyIrSimpleFunction)
     }
 
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun getSymbol(symbolTable: ReferenceSymbolTable): IrSimpleFunctionSymbol =
         symbolTable.referenceSimpleFunction(descriptor)
 

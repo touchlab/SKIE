@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
@@ -61,6 +62,7 @@ internal class SecondaryConstructorTemplate(
         symbolTable.declareConstructor(signature, symbolFactory, ::DummyIrConstructor)
     }
 
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun getSymbol(symbolTable: ReferenceSymbolTable): IrConstructorSymbol =
         symbolTable.referenceConstructor(descriptor)
 

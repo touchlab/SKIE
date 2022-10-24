@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irGet
@@ -77,7 +78,9 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             }
         }
 
-    context(ReferenceSymbolTable, DeclarationIrBuilder) private fun getOverloadBody(
+    context(ReferenceSymbolTable, DeclarationIrBuilder)
+        @OptIn(ObsoleteDescriptorBasedAPI::class)
+        private fun getOverloadBody(
         originalFunction: FunctionDescriptor, overloadIr: IrFunction,
     ): IrBody {
         val originalFunctionSymbol = referenceSimpleFunction(originalFunction)
