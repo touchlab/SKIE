@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator
 
-import co.touchlab.skie.BuildConfig
+import co.touchlab.skie.generator.BuildConfig
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.generator.internal.SwiftGenCompilerConfigurationKey
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption

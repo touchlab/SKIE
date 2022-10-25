@@ -8,7 +8,7 @@ plugins {
 }
 
 buildConfig {
-    packageName(project.group.toString().replace("-", "_"))
+    packageName(("${project.group}.${project.name}").replace("-", "_"))
     buildConfigField(
         type = "String",
         name = "CODE",

@@ -15,7 +15,7 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 buildConfig {
-    packageName(project.group.toString())
+    packageName(("${project.group}.${project.name}").replace("-", "_"))
 
     val pluginId: String by properties
     buildConfigField("String", "PLUGIN_ID", "\"$pluginId\"")

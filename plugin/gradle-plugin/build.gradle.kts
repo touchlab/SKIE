@@ -7,7 +7,7 @@ plugins {
 }
 
 buildConfig {
-    packageName(project.group.toString())
+    packageName(("${project.group}.${project.name}").replace("-", "_"))
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":kotlin-plugin").name}\"")

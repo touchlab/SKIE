@@ -1,6 +1,6 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin
 
-import co.touchlab.skie.BuildConfig
+import co.touchlab.skie.framework.BuildConfig
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestResultBuilder

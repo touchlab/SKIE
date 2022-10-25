@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.BuildConfig
+import co.touchlab.skie.gradle_plugin.BuildConfig
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project

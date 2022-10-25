@@ -1,6 +1,6 @@
 package co.touchlab.skie.acceptancetests
 
-import co.touchlab.skie.BuildConfig
+import co.touchlab.skie.acceptance_tests.BuildConfig
 import co.touchlab.skie.acceptancetests.framework.AcceptanceTestsRunner
 import co.touchlab.skie.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.skie.acceptancetests.framework.TestFilter

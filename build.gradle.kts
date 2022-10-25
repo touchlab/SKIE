@@ -11,6 +11,10 @@ plugins {
     id("gradle-src-classpath-loader")
 }
 
+allprojects {
+    group = "co.touchlab.skie"
+}
+
 subprojects {
     apply {
         plugin("io.gitlab.arturbosch.detekt")

@@ -7,7 +7,7 @@ plugins {
 val acceptanceTestsDirectory: File = layout.projectDirectory.dir("src/test/resources").asFile
 
 buildConfig {
-    packageName(project.group.toString())
+    packageName(("${project.group}.${project.name}").replace("-", "_"))
     buildConfigField(
         type = "String",
         name = "RESOURCES",

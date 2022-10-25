@@ -9,7 +9,7 @@ plugins {
 }
 
 buildConfig {
-    packageName(project.group.toString())
+    packageName(("${project.group}.${project.name}").replace("-", "_"))
     buildConfigField(
         type = "String",
         name = "RESOURCES",

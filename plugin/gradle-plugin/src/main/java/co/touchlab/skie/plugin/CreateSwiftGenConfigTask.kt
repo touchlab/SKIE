@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.BuildConfig
+import co.touchlab.skie.gradle_plugin.BuildConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
