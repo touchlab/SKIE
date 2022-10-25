@@ -45,7 +45,7 @@ gradlePlugin {
         create("co.touchlab.skie") {
             id = "co.touchlab.skie"
             displayName = "Swift and Kotlin, unified"
-            implementationClass = "co.touchlab.swiftlink.plugin.SwiftLinkPlugin"
+            implementationClass = "co.touchlab.skie.plugin.SwiftLinkPlugin"
             version = project.version
         }
     }

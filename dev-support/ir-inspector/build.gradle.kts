@@ -1,5 +1,5 @@
-import co.touchlab.swiftgen.gradle.extractedKotlinNativeCompilerEmbeddable
-import co.touchlab.swiftgen.gradle.kotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.extractedKotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.kotlinNativeCompilerEmbeddable
 
 plugins {
     alias(libs.plugins.kotlin.jvm)

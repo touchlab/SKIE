@@ -34,9 +34,6 @@ include(
     ":gradle-plugin",
     ":kotlin-plugin",
     ":kotlin-plugin:options",
-
-    ":acceptance-tests:framework",
-    ":acceptance-tests",
 )
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

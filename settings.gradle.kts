@@ -5,6 +5,8 @@ pluginManagement {
         google()
         mavenLocal()
     }
+
+    includeBuild("build-setup")
 }
 
 dependencyResolutionManagement {
@@ -22,3 +24,8 @@ rootProject.name = "SKIE"
 includeBuild("example")
 includeBuild("plugin")
 includeBuild("dev-support")
+
+include(
+    ":acceptance-tests:framework",
+    ":acceptance-tests",
+)

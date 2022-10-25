@@ -1,9 +1,0 @@
-[
-  {
-    "target": "",
-    "overridesAnnotations": false,
-    "items": {
-      "SealedInterop.Case.Visible": "true"
-    }
-  }
-]

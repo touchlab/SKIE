@@ -1,5 +1,4 @@
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformJvmPlugin
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
@@ -48,7 +47,9 @@ allprojects {
 
 subprojects {
     afterEvaluate {
-        if (!plugins.hasPlugin(PublishingPlugin::class)) { return@afterEvaluate }
+        if (!plugins.hasPlugin(PublishingPlugin::class)) {
+            return@afterEvaluate
+        }
 
         if (this@subprojects.name != "configuration-annotations") {
             the<JavaPluginExtension>().apply {
@@ -107,4 +108,15 @@ tasks.withType<Detekt>().configureEach {
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
+}
+
+// TODO
+tasks.register("cleanAll") {
+//    allprojects.forEach { project ->
+//        project.afterEvaluate {
+//            project.tasks.findByName("clean")?.let {
+//                dependsOn(it)
+//            }
+//        }
+//    }
 }

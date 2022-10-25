@@ -14,6 +14,6 @@ dependencies {
 gradlePlugin {
     plugins.register("gradle-src-classpath-loader") {
         id = "gradle-src-classpath-loader"
-        implementationClass = "co.touchlab.swiftgen.gradle.GradleSrcClasspathLoader"
+        implementationClass = "co.touchlab.skie.gradle.GradleSrcClasspathLoader"
     }
 }

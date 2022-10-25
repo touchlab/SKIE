@@ -1,9 +1,0 @@
-[
-  {
-    "target": "",
-    "overridesAnnotations": false,
-    "items": {
-      "EnumInterop.Enabled": "true"
-    }
-  }
-]

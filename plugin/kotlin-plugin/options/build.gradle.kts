@@ -1,4 +1,4 @@
-import co.touchlab.swiftgen.gradle.kotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.kotlinNativeCompilerEmbeddable
 
 plugins {
     kotlin("jvm")

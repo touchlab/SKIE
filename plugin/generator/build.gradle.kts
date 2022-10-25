@@ -1,4 +1,4 @@
-import co.touchlab.swiftgen.gradle.extractedKotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.extractedKotlinNativeCompilerEmbeddable
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {

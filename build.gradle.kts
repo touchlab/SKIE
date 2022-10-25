@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.versionCheck)
+
+    id("gradle-src-classpath-loader")
 }
 
 subprojects {
@@ -52,23 +54,37 @@ fun String.isNonStable() = "^[0-9,.v-]+(-r)?$".toRegex().matches(this).not()
 tasks.register("clean", Delete::class.java) {
     delete(rootProject.buildDir)
 }
-
-tasks.register("reformatAll") {
-    description = "Reformat all the Kotlin Code"
-
-    dependsOn("ktlintFormat")
-    dependsOn(gradle.includedBuild("swiftlink-plugin").task(":plugin:ktlintFormat"))
-}
-
-tasks.register("preMerge") {
-    description = "Runs all the tests/verification tasks on both top level and included build."
-
-    // dependsOn(":example:dynamic:check")
-    // dependsOn(":example:static:check")
-    dependsOn(gradle.includedBuild("plugin").task(":gradle-plugin:check"))
-    dependsOn(gradle.includedBuild("plugin").task(":gradle-plugin:validatePlugins"))
-}
+//
+//tasks.register("reformatAll") {
+//    description = "Reformat all the Kotlin Code"
+//
+//    dependsOn("ktlintFormat")
+//    dependsOn(gradle.includedBuild("swiftlink-plugin").task(":plugin:ktlintFormat"))
+//}
+//
+//tasks.register("preMerge") {
+//    description = "Runs all the tests/verification tasks on both top level and included build."
+//
+//    // dependsOn(":example:dynamic:check")
+//    // dependsOn(":example:static:check")
+//    dependsOn(gradle.includedBuild("plugin").task(":gradle-plugin:check"))
+//    dependsOn(gradle.includedBuild("plugin").task(":gradle-plugin:validatePlugins"))
+//}
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
+
+// TODO
+tasks.register("cleanAll") {
+//    dependsOn(gradle.includedBuild("core").task(":cleanAll"))
+//
+//    allprojects.forEach { project ->
+//        project.afterEvaluate {
+//            project.tasks.findByName("clean")?.let {
+//                dependsOn(it)
+//            }
+//        }
+//    }
+}
+

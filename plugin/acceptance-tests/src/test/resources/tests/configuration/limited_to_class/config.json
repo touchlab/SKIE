@@ -1,9 +1,0 @@
-[
-  {
-    "target": "tests.configuration.limited_to_class.B",
-    "overridesAnnotations": false,
-    "items": {
-      "SealedInterop.Case.Name": "X"
-    }
-  }
-]

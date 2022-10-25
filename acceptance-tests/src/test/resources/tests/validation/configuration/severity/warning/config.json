@@ -1,0 +1,9 @@
+[
+    {
+        "target": "",
+        "overridesAnnotations": false,
+        "items": {
+            "Validation.Severity": "Warning"
+        }
+    }
+]

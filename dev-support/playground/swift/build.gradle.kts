@@ -105,7 +105,7 @@ abstract class SetupPlaygroundTask : DefaultTask() {
     private fun getSwiftTestFile(): File {
         requireNotNull(acceptanceTest) {
             "Missing property \"test\" that specifies which test should be copied to the playground. " +
-                    "Pass the argument using \"-Ptest=...\""
+                "Pass the argument using \"-Ptest=...\""
         }
 
         val swiftTestFile = testsDirectory.resolve(acceptanceTest!! + ".swift")
@@ -148,8 +148,8 @@ abstract class SetupPlaygroundTask : DefaultTask() {
 
     private fun addMainFunction(code: String): String =
         "@main struct Main {\n\n    static func main() async {\n" +
-                code.prependIndent("        ").trimEnd() +
-                "\n    }\n}\n"
+            code.prependIndent("        ").trimEnd() +
+            "\n    }\n}\n"
 
     private fun addImports(code: String): String =
         "import Foundation\nimport Kotlin\n\n$code"
