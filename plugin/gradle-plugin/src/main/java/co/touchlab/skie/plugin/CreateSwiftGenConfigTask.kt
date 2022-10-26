@@ -12,6 +12,10 @@ abstract class CreateSwiftGenConfigTask : DefaultTask() {
     @get:OutputFile
     val configFile: File = project.layout.buildDirectory.get().asFile.resolve("${BuildConfig.KOTLIN_PLUGIN_ID}/config.json")
 
+    init {
+        doNotTrackState("Tracking configuration changes is currently not supported.")
+    }
+
     @TaskAction
     fun createConfig() {
         configFile.parentFile.mkdirs()

@@ -21,9 +21,11 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Architecture
 import java.io.File
 
@@ -35,9 +37,22 @@ const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "skiePlugin"
 // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
 @Suppress("ObjectLiteralToLambda")
 abstract class SwiftLinkPlugin : Plugin<Project> {
+
+    private fun createSwiftGenConfiguration(project: Project): TaskProvider<CreateSwiftGenConfigTask> {
+        val task = project.tasks.register<CreateSwiftGenConfigTask>(CreateSwiftGenConfigTask.name)
+
+        project.afterEvaluate {
+            project.tasks.withType<KotlinNativeLink> {
+                inputs.file(task.map { it.configFile })
+            }
+        }
+
+        return task
+    }
+
     override fun apply(project: Project): Unit = with(project) {
         val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java, this)
-        val createSwiftGenConfigTask = tasks.register<CreateSwiftGenConfigTask>(CreateSwiftGenConfigTask.name)
+        val createSwiftGenConfigTask = createSwiftGenConfiguration(project)
 
         val swiftLinkPluginConfiguration = configurations.maybeCreate(SWIFT_LINK_PLUGIN_CONFIGURATION_NAME).apply {
             isCanBeResolved = true
