@@ -1,38 +1,25 @@
 [versions]
-detekt = "1.20.0"
 kotlin = "1.7.20"
-ktlintGradle = "10.3.0"
 pluginPublish = "1.0.0"
 versionCheck = "0.42.0"
 auto-service = "1.0"
-kotlinCompileTesting = "1.4.9"
-ksp = "1.7.10-1.0.6"
 kotest = "5.4.0"
 
 [plugins]
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.1.0" }
-shadow = { id = "com.github.johnrengelman.shadow", version = "7.1.2" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [libraries]
-junit = "junit:junit:4.13.2"
-junit-bom = { module = "org.junit:junit-bom", version = "5.9.0" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
 auto-service = { module = "com.google.auto.service:auto-service", version.ref = "auto-service" }
 swiftPoet = { module = "io.outfoxx:swiftpoet", version = "1.4.3" }
-compileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlinCompileTesting" }
-compileTesting-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
 
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }

@@ -30,8 +30,8 @@ dependencies {
     implementation(projects.kotlinPlugin)
     implementation(projects.kotlinPlugin.options)
 
+    testImplementation(libs.bundles.testing.jvm)
     testImplementation(gradleKotlinDsl())
-    testImplementation(libs.junit)
     testImplementation(kotlin("gradle-plugin"))
 }
 

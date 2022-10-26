@@ -50,3 +50,7 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.buildDir)
 }
+
+tasks.register("cleanAll") {
+    dependsOn(allprojects.mapNotNull { it.tasks.findByName("clean") })
+}

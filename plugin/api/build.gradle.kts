@@ -2,23 +2,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization")
     `maven-publish`
 }
 
 dependencies {
     api(libs.swiftPoet)
-    implementation(libs.kotlinx.serialization.json)
 
     compileOnly(strippedKotlinNativeCompilerEmbeddable())
-
-    testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit5"))
-    testImplementation(platform(libs.junit.bom))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-
-    testImplementation(libs.compileTesting)
-    testImplementation(libs.compileTesting.ksp)
 }
 
 tasks.test {

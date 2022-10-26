@@ -1,4 +1,4 @@
-rootProject.name = "gradle-src"
+rootProject.name = "build-setup"
 
 dependencyResolutionManagement {
     versionCatalogs {

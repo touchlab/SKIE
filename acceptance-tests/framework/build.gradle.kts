@@ -28,9 +28,6 @@ dependencies {
     compileOnly(extractedKotlinNativeCompilerEmbeddable())
     runtimeOnly(files(kotlinNativeCompilerEmbeddable()))
 
-    implementation("co.touchlab.skie:api")
-    implementation("co.touchlab.skie:spi")
-    implementation("co.touchlab.skie:configuration-api")
     implementation("co.touchlab.skie:generator")
     implementation("co.touchlab.skie:kotlin-plugin")
 }

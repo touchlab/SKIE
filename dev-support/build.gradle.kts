@@ -7,3 +7,7 @@ plugins {
 allprojects {
     group = "co.touchlab.skie.dev-support"
 }
+
+tasks.register("cleanAll") {
+    dependsOn(allprojects.mapNotNull { it.tasks.findByName("clean") })
+}

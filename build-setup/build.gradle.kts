@@ -17,3 +17,7 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.gradle.GradleSrcClasspathLoader"
     }
 }
+
+tasks.register("cleanAll") {
+    dependsOn(allprojects.mapNotNull { it.tasks.findByName("clean") })
+}
