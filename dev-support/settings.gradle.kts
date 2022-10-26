@@ -1,13 +1,5 @@
 rootProject.name = "dev-support"
 
-include(
-    ":ir-inspector",
-    ":playground:kotlin",
-    ":playground:swift",
-)
-
-includeBuild("../plugin")
-
 pluginManagement {
     repositories {
         mavenCentral()
@@ -30,3 +22,15 @@ dependencyResolutionManagement {
         }
     }
 }
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+includeBuild("../plugin")
+
+include(
+    ":ir-inspector",
+    ":playground",
+    ":playground:kotlin:library",
+    ":playground:kotlin:framework",
+    ":playground:swift",
+)
