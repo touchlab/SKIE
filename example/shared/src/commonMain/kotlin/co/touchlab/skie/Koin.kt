@@ -59,10 +59,10 @@ private val coreModule = module {
     }
 
     // platformLogWriter() is a relatively simple config option, useful for local debugging. For production
-    // uses you *may* want to have a more robust configuration from the native platform. In KaMP Kit,
+    // uses you *may* want to have a more robust configuration from the native platform. In SkieDemo,
     // that would likely go into platformModule expect/actual.
     // See https://github.com/touchlab/Kermit
-    val baseLogger = Logger(config = StaticConfig(logWriterList = listOf(platformLogWriter())), "KampKit")
+    val baseLogger = Logger(config = StaticConfig(logWriterList = listOf(platformLogWriter())), "SkieDemo")
     factory { (tag: String?) -> if (tag != null) baseLogger.withTag(tag) else baseLogger }
 
     single {
