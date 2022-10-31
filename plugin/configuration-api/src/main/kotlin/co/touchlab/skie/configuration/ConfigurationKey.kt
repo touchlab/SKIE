@@ -5,6 +5,16 @@ import co.touchlab.skie.configuration.util.throwIfNull
 interface ConfigurationKey<T> {
 
     val name: kotlin.String
+        get() {
+            val canonicalName = this::class.java.canonicalName
+            val packageName = this::class.java.packageName
+
+            return if (packageName.isEmpty()) {
+                canonicalName
+            } else {
+                canonicalName.drop(packageName.length + 1)
+            }
+        }
 
     val defaultValue: T
 

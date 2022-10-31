@@ -1,7 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.enums
 
 import co.touchlab.skie.configuration.Configuration
-import co.touchlab.skie.configuration.ConfigurationKeys
+import co.touchlab.skie.configuration.gradle.EnumInterop
+import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
@@ -48,7 +49,7 @@ internal class ExhaustiveEnumsGenerator(
     override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
         classDescriptors
             .filter {
-                it.getConfiguration(ConfigurationKeys.ExperimentalFeatures.Enabled) && shouldGenerateExhaustiveEnums(it)
+                it.getConfiguration(ExperimentalFeatures.Enabled) && shouldGenerateExhaustiveEnums(it)
             }
             .forEach {
                 generate(it)
@@ -218,5 +219,5 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
-        get() = getConfiguration(ConfigurationKeys.EnumInterop.Enabled)
+        get() = getConfiguration(EnumInterop.Enabled)
 }

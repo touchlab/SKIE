@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
-import co.touchlab.skie.configuration.ConfigurationKeys
+import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import io.outfoxx.swiftpoet.CodeBlock
@@ -33,13 +33,13 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     private val ClassDescriptor.enumConstructorFunctionName: String
-        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.Name)
+        get() = this.getConfiguration(SealedInterop.Function.Name)
 
     private val ClassDescriptor.enumConstructorArgumentLabel: String
-        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.ArgumentLabel)
+        get() = this.getConfiguration(SealedInterop.Function.ArgumentLabel)
 
     private val ClassDescriptor.enumConstructorParameterName: String
-        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.Function.ParameterName)
+        get() = this.getConfiguration(SealedInterop.Function.ParameterName)
 
     context(SwiftPoetScope)
         private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(

@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
-import co.touchlab.skie.configuration.ConfigurationKeys
+import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
@@ -14,11 +14,11 @@ import org.jetbrains.kotlin.descriptors.isInterface
 internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, SwiftPoetExtensionContainer {
 
     val ClassDescriptor.elseCaseName: String
-        get() = this.getConfiguration(ConfigurationKeys.SealedInterop.ElseName)
+        get() = this.getConfiguration(SealedInterop.ElseName)
 
     val ClassDescriptor.enumCaseName: String
         get() {
-            val configuredName = this.getConfiguration(ConfigurationKeys.SealedInterop.Case.Name)
+            val configuredName = this.getConfiguration(SealedInterop.Case.Name)
 
             return configuredName ?: this.name.identifier
         }
@@ -33,7 +33,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
         get() {
             val isVisible = this.isVisibleFromSwift
 
-            val isEnabled = this.getConfiguration(ConfigurationKeys.SealedInterop.Case.Visible)
+            val isEnabled = this.getConfiguration(SealedInterop.Case.Visible)
 
             return isVisible && isEnabled
         }

@@ -1,4 +1,3 @@
-import co.touchlab.skie.plugin.ConfigurationKeys
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
