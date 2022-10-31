@@ -1,9 +1,9 @@
-package co.touchlab.skie.gradle
+package co.touchlab.skie.gradle.loader
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class GradleSrcClasspathLoader : Plugin<Project> {
+class GradleSrcClasspathLoaderPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
     }

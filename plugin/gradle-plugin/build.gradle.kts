@@ -1,13 +1,11 @@
 plugins {
-    kotlin("jvm")
+    id("skie-jvm")
     id("java-gradle-plugin")
-    id("com.gradle.plugin-publish")
-    `maven-publish`
-    alias(libs.plugins.buildconfig)
+    id("skie-publish-gradle")
+    id("skie-buildconfig")
 }
 
 buildConfig {
-    packageName(("${project.group}.${project.name}").replace("-", "_"))
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":kotlin-plugin").name}\"")
@@ -20,11 +18,8 @@ dependencies {
     implementation(kotlin("stdlib-jdk7"))
     implementation(gradleApi())
     compileOnly(gradleKotlinDsl())
-    compileOnly(kotlin("gradle-plugin"))
-    compileOnly(kotlin("gradle-plugin-api"))
-
-    implementation("io.outfoxx:swiftpoet:1.4.3")
-    implementation("com.squareup:kotlinpoet:1.11.0")
+    compileOnly(libs.plugin.kotlin.gradle)
+    compileOnly(libs.plugin.kotlin.gradle.api)
 
     implementation(projects.configurationApi)
     implementation(projects.kotlinPlugin)
@@ -32,7 +27,7 @@ dependencies {
 
     testImplementation(libs.bundles.testing.jvm)
     testImplementation(gradleKotlinDsl())
-    testImplementation(kotlin("gradle-plugin"))
+    testImplementation(libs.plugin.kotlin.gradle)
 }
 
 java {

@@ -1,13 +1,11 @@
 plugins {
-    kotlin("jvm")
-
-    alias(libs.plugins.buildconfig)
+    id("skie-jvm")
+    id("skie-buildconfig")
 }
 
 val acceptanceTestsDirectory: File = layout.projectDirectory.dir("src/test/resources").asFile
 
 buildConfig {
-    packageName(("${project.group}.${project.name}").replace("-", "_"))
     buildConfigField(
         type = "String",
         name = "RESOURCES",
@@ -21,74 +19,78 @@ buildConfig {
     )
 }
 
+skieJvm {
+    areContextReceiversEnabled.set(true)
+}
+
 dependencies {
     testImplementation(projects.acceptanceTests.framework)
     testImplementation("co.touchlab.skie:configuration-annotations")
 }
 
 tasks.test {
-    useJUnitPlatform()
-
     maxHeapSize = "16g"
 }
 
-tasks.register("reformatPackagesInAcceptanceTests") {
-    doLast {
-        acceptanceTestsDirectory.resolve("tests")
+tasks.register<ReformatPackagesInAcceptanceTests>("reformatPackagesInAcceptanceTests") {
+    directory = acceptanceTestsDirectory
+}
+
+abstract class ReformatPackagesInAcceptanceTests : DefaultTask() {
+
+    @InputDirectory
+    lateinit var directory: File
+
+    @TaskAction
+    fun execute() {
+        directory.resolve("tests")
             .walkTopDown()
             .filter { it.extension == "kt" }
             .forEach {
                 reformatPackage(it)
             }
     }
-}
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + listOf("-Xcontext-receivers")
-    }
-}
+    private fun reformatPackage(file: File) {
+        val lines = file.readLines()
 
+        val indexOfLineWithPackageDeclaration = lines.indexOfFirst { it.trimStart().startsWith("package ") }
 
-fun reformatPackage(file: File) {
-    val lines = file.readLines()
-
-    val indexOfLineWithPackageDeclaration = lines.indexOfFirst { it.trimStart().startsWith("package ") }
-
-    val modifiedLines = lines.mapIndexed { index, line ->
-        if (index == indexOfLineWithPackageDeclaration) {
-            file.correctPackageDeclaration()
-        } else {
-            line
+        val modifiedLines = lines.mapIndexed { index, line ->
+            if (index == indexOfLineWithPackageDeclaration) {
+                file.correctPackageDeclaration()
+            } else {
+                line
+            }
         }
+
+        val modifiedText = modifiedLines.joinToString(System.lineSeparator(), postfix = System.lineSeparator())
+
+        file.writeText(modifiedText)
     }
 
-    val modifiedText = modifiedLines.joinToString(System.lineSeparator(), postfix = System.lineSeparator())
+    private fun File.correctPackageDeclaration(): String {
+        val pathComponents = this.getRelativePathComponents(directory)
 
-    file.writeText(modifiedText)
-}
+        val packageName = pathComponents.joinToString(".") { "`$it`" }
 
-fun File.correctPackageDeclaration(): String {
-    val pathComponents = this.getRelativePathComponents(acceptanceTestsDirectory)
-
-    val packageName = pathComponents.joinToString(".") { "`$it`" }
-
-    return "package $packageName"
-}
-
-fun File.getRelativePathComponents(base: File): List<String> {
-    require(this.toPath().startsWith(base.toPath()) && this != base) {
-        "File $this must be located inside ${base}."
+        return "package $packageName"
     }
 
-    val pathComponents = mutableListOf<String>()
+    private fun File.getRelativePathComponents(base: File): List<String> {
+        require(this.toPath().startsWith(base.toPath()) && this != base) {
+            "File $this must be located inside ${base}."
+        }
 
-    var currentDirectory = this.parentFile
-    while (currentDirectory != base) {
-        pathComponents.add(currentDirectory.name)
+        val pathComponents = mutableListOf<String>()
 
-        currentDirectory = currentDirectory.parentFile
+        var currentDirectory = this.parentFile
+        while (currentDirectory != base) {
+            pathComponents.add(currentDirectory.name)
+
+            currentDirectory = currentDirectory.parentFile
+        }
+
+        return pathComponents.reversed()
     }
-
-    return pathComponents.reversed()
 }

@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    `maven-publish`
+    id("skie-publish-multiplatform")
 }
 
 kotlin {
@@ -41,12 +41,4 @@ kotlin {
     mingwX86()
 
     wasm32()
-}
-
-publishing {
-    publications.all {
-        (this as? MavenPublication)?.apply {
-            artifactId = "generator-${artifactId}"
-        }
-    }
 }

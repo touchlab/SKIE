@@ -1,19 +1,12 @@
 rootProject.name = "dev-support"
 
 pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-        maven("https://api.touchlab.dev/public")
-    }
-
     includeBuild("../build-setup")
 }
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-        maven("https://api.touchlab.dev/public")
     }
 
     versionCatalogs {

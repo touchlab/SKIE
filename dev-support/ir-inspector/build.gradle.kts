@@ -1,14 +1,12 @@
-import co.touchlab.skie.gradle.extractedKotlinNativeCompilerEmbeddable
-import co.touchlab.skie.gradle.kotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.util.extractedKotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddable
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-
-    alias(libs.plugins.buildconfig)
+    id("skie-jvm")
+    id("skie-buildconfig")
 }
 
 buildConfig {
-    packageName(("${project.group}.${project.name}").replace("-", "_"))
     buildConfigField(
         type = "String",
         name = "CODE",
@@ -23,11 +21,5 @@ buildConfig {
 
 dependencies {
     compileOnly(extractedKotlinNativeCompilerEmbeddable())
-    runtimeOnly(files(kotlinNativeCompilerEmbeddable()))
-
-    testImplementation(libs.bundles.testing.jvm)
-}
-
-tasks.test {
-    useJUnitPlatform()
+    runtimeOnly(kotlinNativeCompilerEmbeddable())
 }

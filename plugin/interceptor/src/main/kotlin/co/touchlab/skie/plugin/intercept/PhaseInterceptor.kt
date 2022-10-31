@@ -63,6 +63,7 @@ class PhaseInterceptor<in CONTEXT : CommonBackendContext>(
                     synchronized(namedPhase) {
                         val currentPhase = namedPhase.lowerField
                         val (originalPhase, listenersKey) = if (currentPhase.javaClass.name == PhaseInterceptor::class.jvmName) {
+                            @Suppress("UNCHECKED_CAST")
                             currentPhase.javaClass.getDeclaredMethod(PhaseInterceptor<Nothing>::accessInitialConfigForCopy.name)
                                 .invoke(currentPhase) as Pair<InterceptedPhase<Nothing>, CompilerConfigurationKey<List<ErasedListener>>>
                         } else {

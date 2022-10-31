@@ -1,9 +1,8 @@
-package co.touchlab.skie.gradle
+package co.touchlab.skie.gradle.util
 
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
-import java.io.File
 
 fun Project.extractedKotlinNativeCompilerEmbeddable(): FileCollection {
     val targetFile = layout.buildDirectory.file("tmp/kotlin-native").map {
@@ -23,8 +22,9 @@ fun Project.extractedKotlinNativeCompilerEmbeddable(): FileCollection {
     return files(targetFile)
 }
 
-fun Project.kotlinNativeCompilerEmbeddable(): File =
+fun Project.kotlinNativeCompilerEmbeddable(): FileCollection =
     NativeCompilerDownloader(project)
         .also { it.downloadIfNeeded() }
         .compilerDirectory
         .resolve("konan/lib/kotlin-native-compiler-embeddable.jar")
+        .let { files(it) }

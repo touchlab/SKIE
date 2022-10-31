@@ -1,31 +1,25 @@
-import co.touchlab.skie.gradle.extractedKotlinNativeCompilerEmbeddable
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import co.touchlab.skie.gradle.util.extractedKotlinNativeCompilerEmbeddable
 
 plugins {
-    kotlin("jvm")
-    `maven-publish`
-
-    alias(libs.plugins.buildconfig)
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + listOf("-Xcontext-receivers")
-    }
+    id("skie-jvm")
+    id("skie-publish-jvm")
+    id("skie-buildconfig")
 }
 
 buildConfig {
-    packageName(("${project.group}.${project.name}").replace("-", "_"))
-
     val pluginId: String by properties
     buildConfigField("String", "PLUGIN_ID", "\"$pluginId\"")
+}
+
+skieJvm {
+    areContextReceiversEnabled.set(true)
 }
 
 dependencies {
     compileOnly(extractedKotlinNativeCompilerEmbeddable())
     implementation(projects.api)
     implementation(projects.spi)
-    implementation(projects.configurationApi)
+    api(projects.configurationApi)
     implementation(projects.generator.configurationAnnotations)
     implementation(projects.generator.configurationGradle)
 }

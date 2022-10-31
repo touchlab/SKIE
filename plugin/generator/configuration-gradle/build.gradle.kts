@@ -1,17 +1,9 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    `maven-publish`
+    id("skie-jvm")
+    id("skie-publish-jvm")
 }
 
 dependencies {
     implementation(projects.configurationApi)
     implementation(projects.generator.configurationAnnotations)
-}
-
-publishing {
-    publications.all {
-        (this as? MavenPublication)?.apply {
-            artifactId = "generator-${artifactId}"
-        }
-    }
 }

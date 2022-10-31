@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm")
-    `maven-publish`
+    id("skie-jvm")
+    id("skie-publish-jvm")
+    id("skie-buildconfig")
 
     alias(libs.plugins.kotlin.plugin.serialization)
-    alias(libs.plugins.buildconfig)
 }
 
 dependencies {
@@ -12,8 +12,6 @@ dependencies {
 }
 
 buildConfig {
-    packageName(("${project.group}.${project.name}").replace("-", "_"))
-
     val pluginId: String by properties
     buildConfigField("String", "PLUGIN_ID", "\"$pluginId\"")
 }

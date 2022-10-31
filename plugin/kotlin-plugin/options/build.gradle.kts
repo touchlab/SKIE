@@ -1,12 +1,13 @@
-import co.touchlab.skie.gradle.kotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.util.extractedKotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddable
 
 plugins {
-    kotlin("jvm")
-    `maven-publish`
+    id("skie-jvm")
+    id("skie-publish-jvm")
 }
 
 dependencies {
     implementation(projects.api)
-    compileOnly(files(kotlinNativeCompilerEmbeddable()))
-    // compileOnly(strippedKotlinNativeCompilerEmbeddable())
+    compileOnly(extractedKotlinNativeCompilerEmbeddable())
+    runtimeOnly(kotlinNativeCompilerEmbeddable())
 }

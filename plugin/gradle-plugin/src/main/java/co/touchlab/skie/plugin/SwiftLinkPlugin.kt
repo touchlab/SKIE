@@ -196,7 +196,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
                         target.swiftModuleDir.mkdirs()
 
-                        frameworksByArchs.toList().forEach { (arch, framework) ->
+                        frameworksByArchs.toList().forEach { (_, framework) ->
                             framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
                                 it.copy {
                                     it.from(swiftmoduleFile)

@@ -7,6 +7,7 @@ import kotlin.reflect.KProperty1
 
 class PropertyField<T : Any, V>(private val originalPropertyName: String) : ReadWriteProperty<T, V> {
     override operator fun getValue(thisRef: T, property: KProperty<*>): V = onFieldOf(thisRef) { field ->
+        @Suppress("UNCHECKED_CAST")
         field.get(thisRef) as V
     }
 
@@ -17,7 +18,6 @@ class PropertyField<T : Any, V>(private val originalPropertyName: String) : Read
     private inline fun <U> onFieldOf(thisRef: T, run: (Field) -> U): U {
         thisRef.javaClass.getDeclaredField(originalPropertyName).let { field ->
             check(field.trySetAccessible()) { "Failed to make field `${originalPropertyName}` accessible" }
-            @Suppress("UNCHECKED_CAST")
             return run(field)
         }
     }

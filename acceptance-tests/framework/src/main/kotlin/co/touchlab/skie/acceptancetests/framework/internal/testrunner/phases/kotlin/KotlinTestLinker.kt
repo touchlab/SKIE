@@ -17,8 +17,6 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
 import kotlin.io.path.readText
 import co.touchlab.skie.plugin.ConfigurationKeys as SwiftLinkConfigurationKeys
 import co.touchlab.skie.plugin.generator.ConfigurationKeys as SwiftGenConfigurationKeys
@@ -32,7 +30,7 @@ internal class KotlinTestLinker(
         val tempDirectory = tempFileSystem.createDirectory("kotlin-linker")
         val outputFile = tempFileSystem.createDirectory("Kotlin.framework")
 
-        val generatedSwiftDirectory = configureSwiftKt(configuration)
+        configureSwiftKt(configuration)
 
         val (messageCollector, outputStream) = createCompilerOutputStream()
 
@@ -40,11 +38,10 @@ internal class KotlinTestLinker(
 
         val result = K2Native().exec(messageCollector, Services.EMPTY, arguments)
 
-        return interpretResult(result, outputFile, outputStream, generatedSwiftDirectory)
+        return interpretResult(result, outputFile, outputStream)
     }
 
-    private fun configureSwiftKt(configuration: Path): Path {
-        val outputDirectory = tempFileSystem.createDirectory("swiftpack")
+    private fun configureSwiftKt(configuration: Path) {
         val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
 
         PluginRegistrar.configure.set {
@@ -57,8 +54,6 @@ internal class KotlinTestLinker(
                 SwiftLinkComponentRegistrar(),
             )
         )
-
-        return expandedSwiftDirectory
     }
 
     private fun createCompilerOutputStream(): Pair<PrintingMessageCollector, OutputStream> {
@@ -97,24 +92,16 @@ internal class KotlinTestLinker(
         result: ExitCode,
         outputFile: Path,
         outputStream: OutputStream,
-        generatedSwiftDirectory: Path,
-    ): IntermediateResult<Path> {
-        val generatedSwift = generatedSwiftDirectory.listDirectoryEntries().joinToString("\n") {
-            "------ ${it.name} ------\n" + it.readText()
+    ): IntermediateResult<Path> = when (result) {
+        ExitCode.OK -> {
+            testResultBuilder.appendLog("Kotlin linker", outputStream.toString())
+
+            IntermediateResult.Value(outputFile)
         }
-        testResultBuilder.appendLog("Generated Swift", generatedSwift)
+        else -> {
+            val testResult = testResultBuilder.buildKotlinLinkingError(outputStream.toString())
 
-        return when (result) {
-            ExitCode.OK -> {
-                testResultBuilder.appendLog("Kotlin linker", outputStream.toString())
-
-                IntermediateResult.Value(outputFile)
-            }
-            else -> {
-                val testResult = testResultBuilder.buildKotlinLinkingError(outputStream.toString())
-
-                IntermediateResult.Error(testResult)
-            }
+            IntermediateResult.Error(testResult)
         }
     }
 }
