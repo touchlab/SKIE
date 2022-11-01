@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")
+    id("skie-multiplatform")
 }
 
 kotlin {

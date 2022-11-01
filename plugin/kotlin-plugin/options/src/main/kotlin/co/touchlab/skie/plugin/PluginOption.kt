@@ -1,7 +1,5 @@
 package co.touchlab.skie.plugin
 
-import org.jetbrains.kotlin.compiler.plugin.CliOption
-
 data class PluginOption<T>(
     val optionName: String,
     val valueDescription: String,
@@ -10,12 +8,4 @@ data class PluginOption<T>(
     val allowMultipleOccurrences: Boolean = false,
     val serialize: (T) -> String,
     val deserialize: (String) -> T,
-) {
-    fun toCliOption() = CliOption(
-        optionName,
-        valueDescription,
-        description,
-        isRequired,
-        allowMultipleOccurrences
-    )
-}
+)

@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
+    id("skie-multiplatform")
     id("skie-publish-multiplatform")
 }
 

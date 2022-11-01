@@ -15,8 +15,7 @@ buildConfig {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk7"))
-    implementation(gradleApi())
+    compileOnly(gradleApi())
     compileOnly(gradleKotlinDsl())
     compileOnly(libs.plugin.kotlin.gradle)
     compileOnly(libs.plugin.kotlin.gradle.api)
@@ -25,14 +24,8 @@ dependencies {
     implementation(projects.kotlinPlugin)
     implementation(projects.kotlinPlugin.options)
 
-    testImplementation(libs.bundles.testing.jvm)
     testImplementation(gradleKotlinDsl())
     testImplementation(libs.plugin.kotlin.gradle)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
 }
 
 gradlePlugin {
@@ -58,24 +51,4 @@ pluginBundle {
         "kotlin",
         "native",
     )
-    //
-    // mavenCoordinates {
-    //     groupId = PluginCoordinates.GROUP
-    //     artifactId = PluginCoordinates.ARTIFACT_ID
-    //     version = PluginCoordinates.VERSION
-    // }
-}
-
-tasks.create("setupPluginUploadFromEnvironment") {
-    doLast {
-        val key = System.getenv("GRADLE_PUBLISH_KEY")
-        val secret = System.getenv("GRADLE_PUBLISH_SECRET")
-
-        if (key == null || secret == null) {
-            throw GradleException("gradlePublishKey and/or gradlePublishSecret are not defined environment variables")
-        }
-
-        System.setProperty("gradle.publish.key", key)
-        System.setProperty("gradle.publish.secret", secret)
-    }
 }

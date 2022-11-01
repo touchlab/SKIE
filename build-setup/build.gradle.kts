@@ -20,9 +20,17 @@ gradlePlugin {
         id = "skie-buildconfig"
         implementationClass = "co.touchlab.skie.gradle.buildconfig.SkieBuildConfigPlugin"
     }
+    plugins.register("debug") {
+        id = "skie-debug"
+        implementationClass = "co.touchlab.skie.gradle.debug.GradleScriptDebugPlugin"
+    }
     plugins.register("jvm") {
         id = "skie-jvm"
         implementationClass = "co.touchlab.skie.gradle.kotlin.SkieKotlinJvmPlugin"
+    }
+    plugins.register("multiplatform") {
+        id = "skie-multiplatform"
+        implementationClass = "co.touchlab.skie.gradle.kotlin.SkieKotlinMultiplatformPlugin"
     }
     plugins.register("gradle-src-classpath-loader") {
         id = "gradle-src-classpath-loader"

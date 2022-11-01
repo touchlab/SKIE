@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 import java.io.File
 
 fun Project.extractedKotlinNativeCompilerEmbeddable(): FileCollection {
-    val targetFile = layout.buildDirectory.file("tmp/kotlin-native").map {
+    val targetFile = rootProject.layout.buildDirectory.file("tmp/kotlin-native").map {
         val file = it.asFile
         if (!file.exists()) {
             val tree = zipTree(kotlinNativeCompilerEmbeddableFile())
