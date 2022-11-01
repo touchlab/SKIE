@@ -11,11 +11,11 @@ Certainly do not use it in any production project.
 SKIE currently supports the following features:
 
 - Sealed class/interfaces
+- Default arguments
 
 These features are under active development and requires extra opt in (see section about "Experimental features"):
 
 - Exhaustive enums
-- Default arguments
 
 The discussion about SKIE project happens in the `skie` Slack channel.
 
@@ -130,6 +130,12 @@ case .A2(_):
     fatalError()
 }
 ```
+
+### Default arguments
+
+TODO
+
+- interface methods are not implemented yet
 
 ### Exhaustive enums
 

@@ -16,7 +16,6 @@ internal class ExtensionFunctionDefaultArgumentGeneratorDelegate(
         this.categoryMembersCallableDescriptors
             .filterIsInstance<SimpleFunctionDescriptor>()
             .filter { it.isSupported }
-            .filter { it.canBeUsedWithExperimentalFeatures }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
         get() = this.contextReceiverParameters.isEmpty()

@@ -34,7 +34,6 @@ internal class ClassMethodsDefaultArgumentGeneratorDelegate(
         this.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
             .filterIsInstance<SimpleFunctionDescriptor>()
             .filter { it.isSupported }
-            .filter { it.canBeUsedWithExperimentalFeatures }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
         get() = this.contextReceiverParameters.isEmpty()

@@ -43,7 +43,6 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
             .filter { descriptorProvider.shouldBeExposed(it) }
-            .filter { it.canBeUsedWithExperimentalFeatures }
 
     private fun generateOverloads(constructor: ClassConstructorDescriptor) {
         constructor.forEachDefaultArgumentOverload { index, overloadParameters ->
