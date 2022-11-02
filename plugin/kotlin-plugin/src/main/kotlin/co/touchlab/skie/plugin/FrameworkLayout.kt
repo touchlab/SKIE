@@ -11,4 +11,10 @@ class FrameworkLayout(val framework: File) {
     val swiftHeader by lazy { headersDir.resolve("$moduleName-Swift.h") }
     val swiftModule by lazy { framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() } }
     val modulemapFile by lazy { framework.resolve("Modules/module.modulemap") }
+
+    fun cleanSkie() {
+        swiftHeader.delete()
+        swiftModule.deleteRecursively()
+        swiftModule.mkdirs()
+    }
 }
