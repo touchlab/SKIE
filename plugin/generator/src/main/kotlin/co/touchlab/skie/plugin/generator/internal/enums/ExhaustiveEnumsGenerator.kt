@@ -163,15 +163,6 @@ internal class ExhaustiveEnumsGenerator(
                     return@forEach
                 }
 
-                if (function.typeParametersCount > 0) {
-                    reporter.report(
-                        Reporter.Severity.Warning,
-                        "Exhaustive enums do not support bridging of generic functions, skipping.",
-                        function
-                    )
-                    return@forEach
-                }
-
                 addFunction(
                     FunctionSpec.builder(function.swiftName.name)
                         .addModifiers(Modifier.PUBLIC)

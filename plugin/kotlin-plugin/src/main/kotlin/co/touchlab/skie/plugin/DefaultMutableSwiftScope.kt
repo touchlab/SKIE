@@ -10,6 +10,7 @@ import co.touchlab.skie.plugin.api.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportMapperReflector
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
+import io.outfoxx.swiftpoet.ANY
 import io.outfoxx.swiftpoet.ARRAY
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DICTIONARY
@@ -27,6 +28,7 @@ import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.SET
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeVariableName
 import io.outfoxx.swiftpoet.UIN16
 import io.outfoxx.swiftpoet.UINT32
 import io.outfoxx.swiftpoet.UINT64
@@ -40,8 +42,10 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ReferenceBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -140,7 +144,7 @@ internal class DefaultMutableSwiftScope(
                         set.toUnsafe() -> SET.withTypeParameters(this@spec, KotlinTypeSpecKind.SWIFT_GENERICS)
                         map.toUnsafe() -> DICTIONARY.withTypeParameters(this@spec, KotlinTypeSpecKind.SWIFT_GENERICS)
                         mutableList.toUnsafe() -> DeclaredTypeName.typeName("Foundation.NSMutableArray")
-                        else -> (constructor.declarationDescriptor as ClassDescriptor).spec.withTypeParameters(this@spec, KotlinTypeSpecKind.ORIGINAL)
+                        else -> constructor.declarationDescriptor.spec()
                     }
                 }
             }
@@ -177,6 +181,19 @@ internal class DefaultMutableSwiftScope(
                 }
             }
             else -> TODO("Unknown bridge type: $bridge")
+        }
+    }
+
+    context(KotlinType)
+    private fun ClassifierDescriptor?.spec(): TypeName {
+        return when (this) {
+            is ClassDescriptor -> spec.withTypeParameters(this@KotlinType, KotlinTypeSpecKind.ORIGINAL)
+            is TypeParameterDescriptor -> if (containingDeclaration is ClassDescriptor) {
+                TypeVariableName(namer.getTypeParameterName(this))
+            } else {
+                ANY
+            }
+            else -> ANY
         }
     }
 
