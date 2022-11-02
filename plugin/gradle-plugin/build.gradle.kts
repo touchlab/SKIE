@@ -30,6 +30,13 @@ dependencies {
     testImplementation(libs.plugin.kotlin.gradle)
 }
 
+configurations.configureEach {
+    attributes {
+        @Suppress("UnstableApiUsage")
+        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("7.3"))
+    }
+}
+
 gradlePlugin {
     plugins {
         create("co.touchlab.skie") {
