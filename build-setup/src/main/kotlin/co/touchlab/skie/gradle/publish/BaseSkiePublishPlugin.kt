@@ -11,9 +11,6 @@ import org.gradle.kotlin.dsl.maven
 
 abstract class BaseSkiePublishPlugin : Plugin<Project> {
 
-    protected val Project.mavenArtifactId: String
-        get() = "skie" + this.path.replace(":", "-")
-
     private val accessKeyProvider = EnvironmentVariableProvider("AWS_TOUCHLAB_DEPLOY_ACCESS")
     private val secretKeyProvider = EnvironmentVariableProvider("AWS_TOUCHLAB_DEPLOY_SECRET")
 

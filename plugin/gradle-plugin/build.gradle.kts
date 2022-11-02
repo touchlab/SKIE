@@ -1,3 +1,5 @@
+import co.touchlab.skie.gradle.publish.mavenArtifactId
+
 plugins {
     id("skie-jvm")
     id("java-gradle-plugin")
@@ -8,7 +10,7 @@ plugins {
 buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":kotlin-plugin").name}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":kotlin-plugin").mavenArtifactId}\"")
 
     val pluginId: String by properties
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
