@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 internal fun String.splitByLast(separator: String): Pair<String, String> {
     val lastSeparatorIndex = lastIndexOf(separator)
+
     return if (lastSeparatorIndex == -1) {
         "" to this
     } else {
@@ -33,8 +34,8 @@ internal fun String.splitByLast(separator: String): Pair<String, String> {
 internal class TransformAccumulator(
     private val namer: ObjCExportNamer,
 ) {
-    val typeNames = mutableMapOf<TypeTransformTarget, MutableSwiftTypeName>()
-    val functionNames = mutableMapOf<FunctionDescriptor, MutableSwiftFunctionName>()
+    private val typeNames = mutableMapOf<TypeTransformTarget, MutableSwiftTypeName>()
+    private val functionNames = mutableMapOf<FunctionDescriptor, MutableSwiftFunctionName>()
 
     private val mutableTypeTransforms = mutableMapOf<TypeTransformTarget, ObjcClassTransformScope>()
     val typeTransforms: Map<TypeTransformTarget, ObjcClassTransformScope> = mutableTypeTransforms
@@ -117,10 +118,7 @@ internal class TransformAccumulator(
             name to parameters.dropLast(1).split(":").map { it.trim() }.filter { it.isNotEmpty() }
         }
 
-        // Parameters seem duplicite, but we need separate instances for renaming.
         DefaultMutableSwiftFunctionName(
-            functionName,
-            parameters.map { DefaultMutableSwiftParameterName(it) },
             functionName,
             parameters.map { DefaultMutableSwiftParameterName(it) },
         )
@@ -130,6 +128,7 @@ internal class TransformAccumulator(
         // TODO: Add check for closed state in all mutating methods.
         ensureTypesRenamedWhereNeeded()
         ensureChildClassesRenamedWhereNeeded()
+        ensurePropertiesRenamedWhereNeeded()
         ensureFunctionsRenamedWhereNeeded()
     }
 
@@ -137,6 +136,12 @@ internal class TransformAccumulator(
         typeNames.forEach { (target, name) ->
             if (name.isChanged) {
                 typeTransform(target)
+            }
+        }
+
+        typeTransforms.values.forEach { scope ->
+            if (scope.isHidden && !scope.swiftName.isSimpleNameChanged) {
+                scope.swiftName.simpleName = "__${scope.swiftName.simpleName}"
             }
         }
     }
@@ -148,7 +153,7 @@ internal class TransformAccumulator(
                 .forEach { childDescriptor ->
                     val target = TypeTransformTarget.Class(childDescriptor)
                     val transform = typeTransform(target)
-                    assert(transform.newSwiftName != null) { "Expected to have a new name for $childDescriptor" }
+                    assert(transform.swiftName.isChanged) { "Expected to have a new name for $childDescriptor" }
 
                     touchNestedClassTransforms(childDescriptor)
                 }
@@ -157,16 +162,34 @@ internal class TransformAccumulator(
         mutableTypeTransforms
             .toList()
             .forEach { (target, transform) ->
-                if (target is TypeTransformTarget.Class && transform.newSwiftName != null) {
+                if (target is TypeTransformTarget.Class && transform.swiftName.isChanged) {
                     touchNestedClassTransforms(target.descriptor)
                 }
             }
+    }
+
+    private fun ensurePropertiesRenamedWhereNeeded() {
+        typeTransforms.values.forEach { classScope ->
+            classScope.properties.forEach { (property, scope) ->
+                if (scope.isHidden && scope.rename == null) {
+                    scope.rename = "__${property.name.asString()}"
+                }
+            }
+        }
     }
 
     private fun ensureFunctionsRenamedWhereNeeded() {
         functionNames.forEach { (descriptor, name) ->
             if (name.isChanged) {
                 transform(descriptor)
+            }
+        }
+
+        typeTransforms.values.forEach { classScope ->
+            classScope.methods.values.forEach { scope ->
+                if (scope.isHidden && !scope.swiftName.isChanged) {
+                    scope.swiftName.name = "__${scope.swiftName.name}"
+                }
             }
         }
     }

@@ -5,17 +5,17 @@ import co.touchlab.skie.plugin.api.SwiftFunctionName
 
 class DefaultMutableSwiftFunctionName(
     override val originalName: String,
-    override val originalParameterNames: List<SwiftFunctionName.ParameterName>,
-    override var name: String,
     override val parameterNames: List<MutableSwiftFunctionName.MutableParameterName>,
 ) : MutableSwiftFunctionName {
+    override var name: String = originalName
+
     override val originalQualifiedName: String
-        get() = "$originalName(${originalParameterNames.joinToString("") { "${it.originalName}:" }})"
+        get() = "$originalName(${parameterNames.joinToString("") { "${it.originalName}:" }})"
     override val qualifiedName: String
         get() = "$name(${parameterNames.joinToString("") { "${it.name}:" }})"
 
     override val originalReference: String
-        get() = if (originalParameterNames.isEmpty()) {
+        get() = if (parameterNames.isEmpty()) {
             originalName
         } else {
             originalQualifiedName

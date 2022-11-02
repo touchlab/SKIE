@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.enums
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
+import co.touchlab.skie.plugin.api.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
@@ -11,11 +12,14 @@ import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
+import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.Modifier
+import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
@@ -29,15 +33,6 @@ import org.jetbrains.kotlin.ir.expressions.typeParametersCount
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
-
-internal fun String.splitByLast(separator: String): Pair<String, String> {
-    val lastSeparatorIndex = lastIndexOf(separator)
-    return if (lastSeparatorIndex == -1) {
-        "" to this
-    } else {
-        substring(0, lastSeparatorIndex) to substring(lastSeparatorIndex + 1)
-    }
-}
 
 internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,
@@ -120,7 +115,7 @@ internal class ExhaustiveEnumsGenerator(
             .filter { mapper.isBaseProperty(it) && mapper.isObjCProperty(it) }
             .forEach { property ->
                 addProperty(
-                    PropertySpec.builder(property.name.asString(), property.type.spec)
+                    PropertySpec.builder(property.name.asString(), property.type.spec(KotlinTypeSpecKind.BRIDGED))
                         .addModifiers(Modifier.PUBLIC)
                         .getter(
                             FunctionSpec.getterBuilder()
@@ -136,7 +131,7 @@ internal class ExhaustiveEnumsGenerator(
                                 setter(
                                     FunctionSpec.setterBuilder()
                                         .addModifiers(Modifier.NONMUTATING)
-                                        .addParameter("value", property.type.spec)
+                                        .addParameter("value", property.type.spec(KotlinTypeSpecKind.BRIDGED))
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
                                             if (mapper.doesThrow(property.setter!!)) "try " else "",
@@ -161,7 +156,7 @@ internal class ExhaustiveEnumsGenerator(
             .forEach { function ->
                 if (function.isSuspend) {
                     reporter.report(
-                        co.touchlab.skie.plugin.generator.internal.util.Reporter.Severity.Warning,
+                        Reporter.Severity.Warning,
                         "Exhaustive enums do not support bridging of suspend functions, skipping.",
                         function
                     )
@@ -170,7 +165,7 @@ internal class ExhaustiveEnumsGenerator(
 
                 if (function.typeParametersCount > 0) {
                     reporter.report(
-                        co.touchlab.skie.plugin.generator.internal.util.Reporter.Severity.Warning,
+                        Reporter.Severity.Warning,
                         "Exhaustive enums do not support bridging of generic functions, skipping.",
                         function
                     )
@@ -182,12 +177,20 @@ internal class ExhaustiveEnumsGenerator(
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
                             function.returnType?.let { returnType ->
-                                returns(returnType.spec)
+                                returns(returnType.spec(KotlinTypeSpecKind.BRIDGED))
                             }
                             function.valueParameters.forEach { parameter ->
+                                val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecKind.BRIDGED)
                                 addParameter(
-                                    parameter.name.asString(),
-                                    parameter.type.spec,
+                                    ParameterSpec.builder(
+                                        parameter.name.asString(),
+                                        parameterTypeSpec,
+                                    ).apply {
+                                        if (parameterTypeSpec is FunctionTypeName) {
+                                            addAttribute(AttributeSpec.ESCAPING)
+                                        }
+                                    }
+                                        .build()
                                 )
                             }
 

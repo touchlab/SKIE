@@ -33,6 +33,21 @@ for (index, value) in allValues.enumerated() {
     } catch {
     }
 
+    value.inlineNoParam()
+    value.inlineSingleParam(p: 0)
+    value.inlineSingleParamClosure { }
+    value.inlineSingleParamCrossinlineClosure { }
+    value.inlineSingleParamNoinlineClosure { }
+
+    value.singleVarargParam(p: KotlinIntArray(size: 3) { $0 })
+    value.singleParamSingleVarargParamSameType(p1: 0, p: KotlinIntArray(size: 3) { $0 })
+    value.singleParamSingleVarargParamDifferentType(p1: 0, p: KotlinArray<NSString>(size: 1) { _ in "Hello World" })
+
+    value.closureSingleParam { p1 in }
+    value.closureTwoParams { p1, p2 in }
+    value.closureSingleParamReturnInt { p1 in p1 }
+    value.closureTwoParamsReturnString { p1, p2 in p2 }
+
     switch value {
     case .a1:
         assert(index == 0)

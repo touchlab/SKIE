@@ -6,4 +6,5 @@ interface MutableSwiftTypeName : SwiftTypeName {
     override var simpleName: String
 
     val isChanged: Boolean
+    val isSimpleNameChanged: Boolean
 }

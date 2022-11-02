@@ -19,11 +19,14 @@ class DefaultSkieModule() : SkieModule {
         fileBlocks.getOrPut(name) { mutableListOf() }.add(contents)
     }
 
-    fun consumeConfigureBlocks(): List<context(MutableSwiftScope) () -> Unit> {
+    fun consumeConfigureBlocks(scope: MutableSwiftScope) {
         configureBlocksConsumed = true
         val result = configureBlocks.toList()
         configureBlocks.clear()
-        return result
+
+        result.forEach {
+            it(scope)
+        }
     }
 
     fun produceFiles(context: SwiftPoetScope): List<FileSpec> {

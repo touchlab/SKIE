@@ -41,9 +41,8 @@ class SwiftLinkCompilePhase(
         val transformAccumulator = TransformAccumulator(namer)
         val swiftScope = DefaultMutableSwiftScope(namer, transformAccumulator, framework.moduleName)
         val skieModule = context.skieContext.module as DefaultSkieModule
-        skieModule.consumeConfigureBlocks().forEach {
-            it(swiftScope)
-        }
+        skieModule.consumeConfigureBlocks(swiftScope)
+        transformAccumulator.close()
         val swiftFileSpecs = skieModule.produceFiles(swiftScope)
 
         val newFiles = swiftFileSpecs.map { fileSpec ->

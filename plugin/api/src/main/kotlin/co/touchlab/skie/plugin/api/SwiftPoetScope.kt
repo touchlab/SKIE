@@ -10,11 +10,18 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
 interface SwiftPoetScope : SwiftScope {
-    val KotlinType.spec: TypeName
+    fun KotlinType.spec(kind: KotlinTypeSpecKind): TypeName
 
     val ClassDescriptor.spec: DeclaredTypeName
 
     val PropertyDescriptor.spec: PropertySpec
 
     val FunctionDescriptor.spec: FunctionSpec
+}
+
+
+enum class KotlinTypeSpecKind {
+    ORIGINAL,
+    SWIFT_GENERICS,
+    BRIDGED,
 }

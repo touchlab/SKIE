@@ -2,9 +2,8 @@ package co.touchlab.skie.plugin.api
 
 interface SwiftFunctionName {
     val originalName: String
-    val originalParameterNames: List<ParameterName>
-
     val name: String
+
     val parameterNames: List<ParameterName>
 
     val originalQualifiedName: String

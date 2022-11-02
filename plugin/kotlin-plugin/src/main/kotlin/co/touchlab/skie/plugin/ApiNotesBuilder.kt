@@ -48,7 +48,6 @@ internal class ApiNotesBuilder(
                     }
                 }
 
-
                 if (transform.methods.isNotEmpty()) {
                     +"Methods:"
                     transform.methods.forEach { (method, methodTransform) ->
@@ -63,8 +62,6 @@ internal class ApiNotesBuilder(
                 }
             }
         }
-
-        accumulator.close()
 
         val notesByTypes = accumulator.typeTransforms.mapValues { (descriptor, transform) ->
             typeNotes(descriptor, transform)

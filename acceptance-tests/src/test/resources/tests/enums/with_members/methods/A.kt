@@ -70,6 +70,34 @@ enum class A {
         throw Exception()
     }
 
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun inlineNoParam() = Unit
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun inlineSingleParam(p: Int) = Unit
+
+    inline fun inlineSingleParamClosure(p1: () -> Unit) = p1()
+
+    inline fun inlineSingleParamCrossinlineClosure(crossinline p1: () -> Unit) = p1()
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun inlineSingleParamNoinlineClosure(noinline p1: () -> Unit) = p1()
+
+    fun singleVarargParam(vararg p: Int) = Unit
+
+    fun singleParamSingleVarargParamSameType(p1: Int, vararg p: Int) = Unit
+
+    fun singleParamSingleVarargParamDifferentType(p1: Int, vararg p: String) = Unit
+
+
+    fun closureSingleParam(p1: (Int) -> Unit) = p1(0)
+
+    fun closureTwoParams(p1: (Int, String) -> Unit) = p1(0, "")
+
+    fun closureSingleParamReturnInt(p1: (Int) -> Int) = p1(0)
+
+    fun closureTwoParamsReturnString(p1: (Int, String) -> String) = p1(0, "")
+
     companion object {
         fun staticFun() = Unit
     }

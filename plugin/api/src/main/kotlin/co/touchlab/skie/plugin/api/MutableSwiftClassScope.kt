@@ -3,7 +3,7 @@ package co.touchlab.skie.plugin.api
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 interface MutableSwiftClassScope : SwiftClassScope {
-    override var ClassDescriptor.swiftName: MutableSwiftTypeName
+    override val ClassDescriptor.swiftName: MutableSwiftTypeName
 
     override var ClassDescriptor.isHiddenFromSwift: Boolean
 

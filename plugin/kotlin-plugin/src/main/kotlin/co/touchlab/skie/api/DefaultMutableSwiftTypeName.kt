@@ -13,7 +13,10 @@ class DefaultMutableSwiftTypeName(
     override var simpleName = originalSimpleName
 
     override val isChanged: Boolean
-        get() = simpleName != originalSimpleName || separator != originalSeparator || parent != originalParent || parent?.isChanged == true
+        get() = isSimpleNameChanged || separator != originalSeparator || parent != originalParent || parent?.isChanged == true
+
+    override val isSimpleNameChanged: Boolean
+        get() = simpleName != originalSimpleName
 
     override val originalQualifiedName: String
         get() {
