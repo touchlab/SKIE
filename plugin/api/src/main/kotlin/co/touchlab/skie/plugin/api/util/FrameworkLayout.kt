@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin
+package co.touchlab.skie.plugin.api.util
 
 import java.io.File
 

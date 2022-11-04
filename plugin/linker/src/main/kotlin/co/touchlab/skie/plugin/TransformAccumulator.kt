@@ -2,12 +2,9 @@
 
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.api.DefaultMutableSwiftFunctionName
-import co.touchlab.skie.api.DefaultMutableSwiftParameterName
-import co.touchlab.skie.api.DefaultMutableSwiftTypeName
-import co.touchlab.skie.plugin.api.MutableSwiftFunctionName
-import co.touchlab.skie.plugin.api.MutableSwiftTypeName
-import co.touchlab.skie.plugin.api.SwiftBridgedName
+import co.touchlab.skie.plugin.api.function.MutableSwiftFunctionName
+import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
+import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -17,28 +14,16 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
-
-internal fun String.splitByLast(separator: String): Pair<String, String> {
-    val lastSeparatorIndex = lastIndexOf(separator)
-
-    return if (lastSeparatorIndex == -1) {
-        "" to this
-    } else {
-        substring(0, lastSeparatorIndex) to substring(lastSeparatorIndex + 1)
-    }
-}
 
 internal class TransformAccumulator(
     private val namer: ObjCExportNamer,
 ) {
-    private val typeNames = mutableMapOf<TypeTransformTarget, MutableSwiftTypeName>()
-    private val functionNames = mutableMapOf<FunctionDescriptor, MutableSwiftFunctionName>()
-
     private val mutableTypeTransforms = mutableMapOf<TypeTransformTarget, ObjcClassTransformScope>()
     val typeTransforms: Map<TypeTransformTarget, ObjcClassTransformScope> = mutableTypeTransforms
+
+    private val nameResolver = NameResolver(namer)
 
     operator fun get(descriptor: ClassDescriptor): ObjcClassTransformScope? = mutableTypeTransforms[TypeTransformTarget.Class(descriptor)]
 
@@ -46,9 +31,11 @@ internal class TransformAccumulator(
         val target = TypeTransformTarget.Class(descriptor)
 
         return mutableTypeTransforms.getOrPut(target) {
-            ObjcClassTransformScope(resolveName(target))
+            ObjcClassTransformScope(nameResolver.resolveName(target))
         }
     }
+
+    fun resolveName(descriptor: ClassDescriptor): MutableSwiftTypeName = nameResolver.resolveName(TypeTransformTarget.Class(descriptor))
 
     operator fun get(descriptor: PropertyDescriptor): ObjcPropertyTransformScope? =
         mutableTypeTransforms[descriptor.containingTarget]?.properties?.get(descriptor)
@@ -63,66 +50,10 @@ internal class TransformAccumulator(
 
     fun transform(descriptor: FunctionDescriptor): ObjcMethodTransformScope =
         typeTransform(descriptor.containingTarget).methods.getOrPut(descriptor) {
-            ObjcMethodTransformScope(swiftName = resolveName(descriptor))
+            ObjcMethodTransformScope(swiftName = nameResolver.resolveName(descriptor))
         }
 
-    fun resolveName(target: TypeTransformTarget): MutableSwiftTypeName = typeNames.getOrPut(target) {
-        when (target) {
-            is TypeTransformTarget.Class -> {
-                val name = if (target.descriptor.kind == ClassKind.ENUM_ENTRY) {
-                    namer.getEnumEntrySelector(target.descriptor)
-                } else {
-                    namer.getClassOrProtocolName(target.descriptor).swiftName
-                }
-                when (val parent = target.descriptor.containingDeclaration) {
-                    is PackageFragmentDescriptor, is PackageViewDescriptor -> DefaultMutableSwiftTypeName(
-                        originalParent = null,
-                        originalIsNestedInParent = false,
-                        originalSimpleName = name,
-                    )
-                    is ClassDescriptor -> {
-                        val parentName = resolveName(TypeTransformTarget.Class(parent))
-                        val parentQualifiedName = parentName.originalQualifiedName
-                        val simpleNameCandidate = if (name.startsWith(parentQualifiedName)) {
-                            name.drop(parentQualifiedName.length)
-                        } else {
-                            name
-                        }
-                        val (isNestedInParent, simpleName) = if (simpleNameCandidate.startsWith('.')) {
-                            true to simpleNameCandidate.drop(1)
-                        } else {
-                            false to simpleNameCandidate
-                        }
-                        DefaultMutableSwiftTypeName(
-                            originalParent = parentName,
-                            originalIsNestedInParent = isNestedInParent,
-                            originalSimpleName = simpleName,
-                        )
-                    }
-                    else -> error("Unexpected parent type: $parent")
-                }
-            }
-            is TypeTransformTarget.File -> {
-                DefaultMutableSwiftTypeName(
-                    originalParent = null,
-                    originalIsNestedInParent = false,
-                    originalSimpleName = namer.getFileClassName(target.file).swiftName,
-                )
-            }
-        }
-    }
-
-    fun resolveName(functionDescriptor: FunctionDescriptor): MutableSwiftFunctionName = functionNames.getOrPut(functionDescriptor) {
-        val swiftName = namer.getSwiftName(functionDescriptor)
-        val (functionName, parameters) = swiftName.splitByLast("(").let { (name, parameters) ->
-            name to parameters.dropLast(1).split(":").map { it.trim() }.filter { it.isNotEmpty() }
-        }
-
-        DefaultMutableSwiftFunctionName(
-            functionName,
-            parameters.map { DefaultMutableSwiftParameterName(it) },
-        )
-    }
+    fun resolveName(descriptor: FunctionDescriptor): MutableSwiftFunctionName = nameResolver.resolveName(descriptor)
 
     fun close() {
         // TODO: Add check for closed state in all mutating methods.
@@ -133,7 +64,7 @@ internal class TransformAccumulator(
     }
 
     private fun ensureTypesRenamedWhereNeeded() {
-        typeNames.forEach { (target, name) ->
+        nameResolver.typeNames.forEach { (target, name) ->
             if (name.isChanged) {
                 typeTransform(target)
             }
@@ -179,7 +110,7 @@ internal class TransformAccumulator(
     }
 
     private fun ensureFunctionsRenamedWhereNeeded() {
-        functionNames.forEach { (descriptor, name) ->
+        nameResolver.functionNames.forEach { (descriptor, name) ->
             if (name.isChanged) {
                 transform(descriptor)
             }
@@ -209,7 +140,7 @@ internal class TransformAccumulator(
 
     private fun typeTransform(typeTransformTarget: TypeTransformTarget): ObjcClassTransformScope {
         return mutableTypeTransforms.getOrPut(typeTransformTarget) {
-            ObjcClassTransformScope(resolveName(typeTransformTarget))
+            ObjcClassTransformScope(nameResolver.resolveName(typeTransformTarget))
         }
     }
 
@@ -226,17 +157,22 @@ internal class TransformAccumulator(
         val methods = mutableMapOf<FunctionDescriptor, ObjcMethodTransformScope>()
     }
 
+    sealed interface ObjcCallableMemberTransformScope {
+        var isRemoved: Boolean
+        var isHidden: Boolean
+    }
+
     class ObjcPropertyTransformScope(
-        var isRemoved: Boolean = false,
-        var isHidden: Boolean = false,
+        override var isRemoved: Boolean = false,
+        override var isHidden: Boolean = false,
         var rename: String? = null,
-    )
+    ): ObjcCallableMemberTransformScope
 
     class ObjcMethodTransformScope(
-        var isRemoved: Boolean = false,
-        var isHidden: Boolean = false,
+        override var isRemoved: Boolean = false,
+        override var isHidden: Boolean = false,
         var swiftName: MutableSwiftFunctionName,
-    ) {
+    ): ObjcCallableMemberTransformScope {
         val newSwiftName: MutableSwiftFunctionName?
             get() = swiftName.takeIf { it.isChanged }
     }

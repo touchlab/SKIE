@@ -1,6 +1,8 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.api.impl.DefaultMutableSwiftScope
 import co.touchlab.skie.api.impl.DefaultSkieModule
+import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.api.skieContext
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
@@ -23,16 +25,15 @@ class SwiftLinkCompilePhase(
     private val config: KonanConfig,
     private val context: CommonBackendContext,
     private val namer: ObjCExportNamer,
-    private val swiftSourceFiles: List<File>,
-    private val expandedSwiftDir: File,
 ) {
+    private val skieContext = context.skieContext
+
     fun process(): List<ObjectFile> {
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
             return emptyList()
         }
-
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
-        val swiftSourcesDir = expandedSwiftDir.also {
+        val swiftSourcesDir = skieContext.expandedSwiftDir.also {
             it.deleteRecursively()
             it.mkdirs()
         }
@@ -53,7 +54,7 @@ class SwiftLinkCompilePhase(
 
         val bridgeTypeAliasesFile = createBridgeTypeAliasesFileIfNeeded(transformAccumulator, swiftSourcesDir)
 
-        val sourceFiles = listOfNotNull(bridgeTypeAliasesFile) + swiftSourceFiles + newFiles
+        val sourceFiles = listOfNotNull(bridgeTypeAliasesFile) + skieContext.swiftSourceFiles + newFiles
 
         val apiNotesBuilder = ApiNotesBuilder(transformAccumulator, namer, framework.moduleName)
 
@@ -180,7 +181,7 @@ class SwiftLinkCompilePhase(
     }
 
     private fun disableWildcardExportIfNeeded(framework: FrameworkLayout) {
-        if (config.configuration.getBoolean(ConfigurationKeys.disableWildcardExport)) {
+        if (skieContext.disableWildcardExport) {
             framework.modulemapFile.writeText(
                 framework.modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
             )

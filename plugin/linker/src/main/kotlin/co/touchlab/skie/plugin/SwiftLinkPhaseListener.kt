@@ -21,14 +21,11 @@ class SwiftLinkPhaseListener : PhaseListener {
         val config = context.config
         val namer = context.objCExport.namer
 
-        val swiftSources = context.configuration.getList(ConfigurationKeys.swiftSourceFiles)
-        val expandedSwiftDir = context.configuration.getNotNull(ConfigurationKeys.generatedSwiftDir)
+
         val swiftObjectFiles = SwiftLinkCompilePhase(
             config,
             context,
             namer,
-            swiftSources,
-            expandedSwiftDir,
         ).process()
 
         context.compilerOutput += swiftObjectFiles

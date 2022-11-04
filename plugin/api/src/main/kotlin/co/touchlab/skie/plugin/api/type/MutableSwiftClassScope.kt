@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.api
+package co.touchlab.skie.plugin.api.type
 
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 

@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.api
+package co.touchlab.skie.plugin.api.property
 
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 

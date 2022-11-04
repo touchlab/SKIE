@@ -10,4 +10,9 @@ dependencies {
 
     implementation(projects.api)
     implementation(projects.spi)
+    implementation(projects.reflector)
+}
+
+skieJvm {
+    areContextReceiversEnabled.set(true)
 }

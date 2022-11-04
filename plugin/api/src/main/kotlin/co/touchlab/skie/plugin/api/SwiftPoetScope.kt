@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.api
 
+import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.PropertySpec
@@ -17,11 +18,4 @@ interface SwiftPoetScope : SwiftScope {
     val PropertyDescriptor.spec: PropertySpec
 
     val FunctionDescriptor.spec: FunctionSpec
-}
-
-
-enum class KotlinTypeSpecKind {
-    ORIGINAL,
-    SWIFT_GENERICS,
-    BRIDGED,
 }

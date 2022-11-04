@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.api
+package co.touchlab.skie.plugin.api.function
 
 interface MutableSwiftFunctionName : SwiftFunctionName {
     override var name: String

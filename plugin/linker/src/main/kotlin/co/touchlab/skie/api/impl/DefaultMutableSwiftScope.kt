@@ -1,12 +1,13 @@
 @file:Suppress("invisible_reference", "invisible_member")
 
-package co.touchlab.skie.plugin
+package co.touchlab.skie.api.impl
 
-import co.touchlab.skie.plugin.api.KotlinTypeSpecKind
-import co.touchlab.skie.plugin.api.MutableSwiftFunctionName
+import co.touchlab.skie.plugin.TransformAccumulator
+import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.function.MutableSwiftFunctionName
 import co.touchlab.skie.plugin.api.MutableSwiftScope
-import co.touchlab.skie.plugin.api.MutableSwiftTypeName
-import co.touchlab.skie.plugin.api.SwiftBridgedName
+import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
+import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportMapperReflector
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
@@ -55,7 +56,7 @@ internal class DefaultMutableSwiftScope(
     private val moduleName: String,
 ) : MutableSwiftScope, SwiftPoetScope {
     override val ClassDescriptor.swiftName: MutableSwiftTypeName
-        get() = transformAccumulator.resolveName(TransformAccumulator.TypeTransformTarget.Class(this))
+        get() = transformAccumulator.resolveName(this)
 
     override var ClassDescriptor.isHiddenFromSwift: Boolean
         get() = transformAccumulator[this]?.isHidden ?: false
