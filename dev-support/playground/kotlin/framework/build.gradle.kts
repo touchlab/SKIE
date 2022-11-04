@@ -46,3 +46,9 @@ kotlin {
         dependsOn(macosMain)
     }
 }
+
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("co.touchlab.skie:skie-kotlin-plugin")).using(module("co.touchlab.skie:kotlin-plugin:${version}"))
+    }
+}

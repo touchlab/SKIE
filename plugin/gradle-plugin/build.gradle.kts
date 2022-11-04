@@ -8,9 +8,10 @@ plugins {
 }
 
 buildConfig {
-    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project(":kotlin-plugin").mavenArtifactId}\"")
+    val kotlinPlugin = project(":kotlin-plugin")
+    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${kotlinPlugin.group}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${kotlinPlugin.mavenArtifactId}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${kotlinPlugin.version}\"")
 
     val pluginId: String by properties
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
