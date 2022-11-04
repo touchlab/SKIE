@@ -24,7 +24,7 @@ dependencies {
     compileOnly(libs.plugin.kotlin.gradle.api)
 
     implementation(projects.configurationApi)
-    implementation(projects.kotlinPlugin)
+    implementation(projects.generator.configurationGradle)
     implementation(projects.kotlinPlugin.options)
 
     testImplementation(gradleKotlinDsl())
