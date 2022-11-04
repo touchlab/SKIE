@@ -2,8 +2,7 @@
 
 IMPORTANT: SKIE is not publicly released.
 
-SKIE is a compiler plugin that generates Swift code wrappers for Objective-C headers provided by the Kotlin compiler.
-The goal is to improve interop between Kotlin and Swift.
+SKIE is a compiler plugin whose goal is to improve interop between Kotlin and Swift.
 
 SKIE is under heavy development and is far from being stable.
 Certainly do not use it in any production project.
@@ -11,52 +10,56 @@ Certainly do not use it in any production project.
 SKIE currently supports the following features:
 
 - Sealed class/interfaces
+- Exhaustive enums
 - Default arguments
 
 These features are under active development and requires extra opt in (see section about "Experimental features"):
 
-- Exhaustive enums
+-
 
-The discussion about SKIE project happens in the `skie` Slack channel.
+The discussion about SKIE project happens in the `skie` and `skie-pm` Touchlab Slack channels.
 
 ## Installation
 
 As the first step make sure that your project uses exactly the same Kotlin compiler version as this plugin (1.7.20).
 (Kotlin compiler plugins are in general not stable and break with almost every release.)
+Next, ensure that you are using Gradle 7.3 or higher.
 
-At this point make sure that your project compiles before you do anything else (especially if you had to change the Kotlin compiler version).
+At this point check that your project compiles before you do anything else (especially if you had to change the versions).
 
-The SwiftKt project is deployed in a private Touchlab's Maven repository.
-To access plugins from that repository, you need to add the following code in the `settings.gradle.kts` file:
+The SKIE project is deployed in a private Touchlab's Maven repository.
+To access artifacts from that repository, you need to add the following code in the `settings.gradle.kts` file:
 
 ```kotlin
 pluginManagement {
     repositories {
+        // Previously present repositories like mavenCentral()
+        // ...
+        maven("https://api.touchlab.dev/public")
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        // Previously present repositories like mavenCentral()
+        // ...
         maven("https://api.touchlab.dev/public")
     }
 }
 ```
 
-Then register the repository in the given `build.gradle.kts`:
-
-```kotlin
-repositories {
-    maven("https://api.touchlab.dev/public")
-}
-```
-
-To enable SwiftGen, add the plugin in `build.gradle.kts` of the module that builds the native framework:
+To enable SKIE, add the plugin in `build.gradle.kts` of the module that builds the native framework:
 
 ```kotlin
 plugins {
-    id("co.touchlab.swiftgen") version "XXX"
+    id("co.touchlab.skie") version "XXX"
 }
 ```
 
-Do not add the plugin to other modules.
-
 You can find the most recent version of the plugin by looking at the tags in this repository.
 (The Maven repository does not have a browser at the time of writing.)
+
+The plugin should not be applied to other modules - SKIE automatically works with all code from all modules (included 3rd party dependencies).
 
 The Swift/Xcode side does not require any configuration changes.
 
@@ -124,40 +127,125 @@ If you do not need the smart-casting, you can write just this:
 
 ```swift
 switch onEnum(of: a) {
-case .A1(_):
+case .A1:
     print(a)
-case .A2(_):
+case .A2:
     fatalError()
 }
 ```
 
-### Default arguments
-
-TODO
-
-- interface methods are not implemented yet
-
 ### Exhaustive enums
 
-SwiftGen can generate a bridging header for Kotlin enums that maps them to Swift enum.
-As a result the Kotlin enums looks like Swift enums, whereas without the bridging they would behave like Obj-c classes.
-This feature is under development so not everything works properly.
-Namely, we are currently aware of a missing support for suspend functions (they will not be visible from Swift).
+Kotlin compiler exposes Kotlin enums as regular Objc classes (albeit with restricted subclassing).
+As a result Swift code cannot leverage some features of enums, mainly exhaustive switching.
+
+SKIE returns back this functionality by generating a Swift version of the given enum.
+The Swift enum is accessible without writing any extra code (like the `onEnum` in the case of sealed classes).
+This is possible because SKIE generates a so-called bridging header that tells the Swift compiler how to do the conversion automatically.
+
+As an example consider following Kotlin code:
+
+```kotlin
+enum class A {
+    A1, A2
+}
+```
+
+Without SKIE you can still use `switch` from Swift code, like this:
+
+```swift
+switch (a) {
+case .a1: print("A1")
+case .a2: print("A2")
+default: print("Unknown")
+}
+```
+
+Note that the `default` case is required.
+
+After applying SKIE plugin, the `default` case is no longer necessary.
+Instead, you will see a compiler warning similar to this one:
+
+```
+warning: default will never be executed
+default: print("Unknown")
+```
+
+### Default arguments
+
+Both Kotlin and Swift have a feature called default arguments.
+This feature allows the function caller to omit some function arguments.
+The missing arguments are provided by the called function.
+
+The problem with this feature is that Objc does not support default arguments in any way.
+Therefore, Swift code must always call Kotlin functions with all arguments.
+
+Adding the default arguments back is not that straightforward even-though both Kotlin and Swift support them.
+The reason is that both languages implement this feature differently and therefore have different semantics.
+
+For example, Kotlin default arguments can access the values of previous function parameters as well as `this` expression.
+However, Swift default arguments can access only expression from global scope.
+
+As a result, SKIE cannot just generate Swift functions with default arguments (at least not in all cases).
+To solve this issue, generates Kotlin overloads of the given functions to match all possible ways to call that functions.
+
+For example, let's take a data class:
+
+```kotlin
+data class A(val i: Int, val k: Int)
+```
+
+Data classes in Kotlin have an automatically generated method `copy`.
+This method is used to create a new instance of the data class with some values modified.
+For our example `A` the method can be written in the following way:
+
+```kotlin
+fun A.copy(i: Int = this.i, k: Int = this.k) = A(i, k)
+```
+
+Without SKIE the `copy` method is exposed to Swift under the following signature: `A.doCopy(i:k:)`.
+(The renaming is necessary because of collision with Objc method `copy`.)
+Since the Swift code cannot use Kotlin default arguments, all parameters must be provided - defeating the `copy` method purpose.
+
+SKIE generates additional Kotlin overloads, that are visible from Swift under the following signatures:
+
+- `A.doCopy()`
+- `A.doCopy(i:)`
+- `A.doCopy(k:)`
+
+These overloads allow the Swift code to call the `copy` method as if the default arguments were directly supported.
+
+While this approach is completely transparent from the Swift code, it has some drawbacks:
+
+- It does not support interface methods (all other types of functions are supported, including interface extensions)
+- The number of generated overloads is `O(2^n)` where `n` is the number of default arguments (not all parameters).
+
+Since it is not possible to generate exponential number of functions, there is a limit to how many default arguments are supported.
+If that number is exceeded, no extra functions are generated.
+
+By default, the limit is set to 5, meaning at most 31 additional functions will be generated per function with default arguments.
+This number was chosen based on internal experiments.
+So far it seems to be a good trade-off between the number of supported cases (very few functions exceed that number) and the introduced overhead in compilation time and binary size.
+However, that number might change in the future as we test the plugin on larger project.
+
+The limit can be explicitly configured using the `DefaultArgumentInterop.MaximumDefaultArgumentCount` key/annotation (see section about Configuration).
+
+Note that both of the above-mentioned problems might be mitigated in the future versions of SKIE.
 
 ## Configuration
 
-SwiftGen plugin makes some opinionated choices that might not work for every use case.
+SKIE plugin makes some opinionated choices that might not work for every use case.
 To solve this issue, the plugin provides a way to change some of its default behavior.
 There are two different ways to change the configuration:
 
 - locally - using Kotlin annotations
-- globally - using Gradle extension provided by the SwiftGen Gradle plugin
+- globally - using Gradle extension provided by the SKIE Gradle plugin
 
 ### Annotations
 
 The local configuration changes the behavior only for a single declaration.
 This makes it for example suitable for suppressing the plugin if it does not work properly because of some bug.
-The available annotations can be found in the `:core:api` module.
+The available annotations can be found in the `:plugin:generator:configuration-annotations` module.
 
 The following example changes the name of the `onEnum(of:)` function generated for the sealed class interop to `something(of:)`:
 
@@ -170,47 +258,50 @@ sealed class A {
 }
 ```
 
-To use these annotations you need to add a dependency to the module in `build.gradle.kts`:
+To use these annotations you need to add a dependency in `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("co.touchlab.swiftgen:api:XXX")
+    implementation("co.touchlab.skie:skie-generator-configuration-annotations:XXX")
 }
 ```
 
-(Do not forget to register the internal repository as mentioned before.)
+These annotations can be used in any module that has access to that dependency - not just the one that applies the SKIE plugin.
 
 ### Gradle
 
 The global configuration can be applied to any class including those from 3rd party dependencies.
 This ability makes it a good place for changing the plugin default behavior and to provide configuration for classes that you cannot modify.
-The configuration is performed through a `swiftGen` Gradle extension:
+The configuration is performed through a `skie` Gradle extension:
 
 ```kotlin
 // build.gradle.kts
+import co.touchlab.skie.configuration.gradle.SealedInterop
 
-swiftGen {
+skie {
     configuration {
         group {
-            ConfigurationKeys.SealedInterop.Function.Name("something")
+            SealedInterop.Function.Name("something")
         }
     }
 }
 ```
 
 The above example changes the name of the `onEnum(of:)` function to `something(of:)` for all sealed classes/interfaces.
-All the available configuration options are listed in the `ConfigurationKeys` class located in `:core:configuration` module.
+All the available configuration options are listed in the `:plugin:generator:configuration-gradle` module.
 Note that you can add multiple options to a single group.
 
-The configuration can be applied only to some declarations:
+Make sure that you are importing classes from package "co.touchlab.skie.configuration.gradle" (not ".annotations").
+
+The configuration can be applied such that it affects only some declarations:
 
 ```kotlin
 // build.gradle.kts
 
-swiftGen {
+skie {
     configuration {
         group("co.touchlab.") {
-            ConfigurationKeys.SealedInterop.Function.Name("something")
+            SealedInterop.Function.Name("something")
         }
     }
 }
@@ -218,7 +309,7 @@ swiftGen {
 
 In the above example the configuration is applied only to declarations from the `co.touchlab` package.
 The argument represents a prefix that is matched against the declaration's fully qualified name.
-You can target all declarations (by passing an empty string), everything in a package or just a single class.
+You can target all declarations (by passing an empty string), everything in a package, just a single class, etc.
 
 The `group` block can be called multiple times so that declarations can have different configurations.
 For example:
@@ -226,13 +317,13 @@ For example:
 ```kotlin
 // build.gradle.kts
 
-swiftGen {
+skie {
     configuration {
         group {
-            ConfigurationKeys.SealedInterop.Function.Name("something")
+            SealedInterop.Function.Name("something")
         }
         group("co.touchlab.") {
-            ConfigurationKeys.SealedInterop.Function.Name("somethingElse")
+            SealedInterop.Function.Name("somethingElse")
         }
     }
 }
@@ -246,10 +337,10 @@ This behavior can be overridden:
 ```kotlin
 // build.gradle.kts
 
-swiftGen {
+skie {
     configuration {
         group(overridesAnnotations = true) {
-            ConfigurationKeys.SealedInterop.Function.Name("something")
+            SealedInterop.Function.Name("something")
         }
     }
 }
@@ -264,7 +355,7 @@ Configuration can be loaded from a file:
 ```kotlin
 // build.gradle.kts
 
-swiftGen {
+skie {
     configuration {
         from(File("config.json"))
     }
@@ -272,12 +363,12 @@ swiftGen {
 ```
 
 `group` and `from` can be freely mixed together and repeated multiple times.
-The file format is identical to `build/swiftgen/config.json` which contains a JSON encoding all applied configuration.
+The file format is identical to `build/co.touchlab.skie/config.json` which contains a JSON encoding all applied configuration.
 
 ## Experimental features
 
-Experimental features are not ready for production use because they are not fully implemented.
+Experimental features are not fully implemented yet and have a high risk of introducing compilation errors.
 
-Experimental features can be enabled using Gradle configuration via `ConfigurationKeys.ExperimentalFeatures.Enabled(true)`.
+Experimental features can be enabled using Gradle configuration via `ExperimentalFeatures.Enabled(true)`.
 There are also the `ExperimentalFeatures.Enabled` and `ExperimentalFeatures.Disabled` annotations.
-Note that some features may require additional configuration to work properly.
+Some features may require additional configuration to work properly.
