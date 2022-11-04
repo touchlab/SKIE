@@ -41,16 +41,14 @@ internal class ExhaustiveEnumsGenerator(
 
     override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
         classDescriptors
-            .filter {
-                it.getConfiguration(ExperimentalFeatures.Enabled) && shouldGenerateExhaustiveEnums(it)
-            }
+            .filter(::shouldGenerateExhaustiveEnums)
             .forEach {
                 generate(it)
             }
     }
 
     context(DescriptorProvider)
-        private fun generate(declaration: ClassDescriptor) {
+    private fun generate(declaration: ClassDescriptor) {
         module.configure {
             declaration.isHiddenFromSwift = true
 
@@ -94,7 +92,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
+    private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
         declaration.nestedClasses.forEach {
             addType(
                 TypeAliasSpec.builder(it.name.asString(), it.spec)
@@ -105,7 +103,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider, SwiftPoetScope)
-        private fun TypeSpec.Builder.addPassthroughForProperties(
+    private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
@@ -145,7 +143,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider, SwiftPoetScope)
-        private fun TypeSpec.Builder.addPassthroughForFunctions(
+    private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
