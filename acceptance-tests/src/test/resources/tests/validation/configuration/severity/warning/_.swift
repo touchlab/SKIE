@@ -1,3 +1,3 @@
-# SuccessWithWarning(Annotation 'co.touchlab.skie.configuration.SealedInterop.Enabled' can be applied only to sealed classes / interfaces.)
+# SuccessWithWarning(Annotation 'co.touchlab.skie.configuration.annotations.SealedInterop.Enabled' can be applied only to sealed classes / interfaces.)
 
 exit(0)

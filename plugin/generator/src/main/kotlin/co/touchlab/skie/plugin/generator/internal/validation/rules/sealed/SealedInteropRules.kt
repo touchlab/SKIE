@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.validation.rules.sealed
 
-import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.annotations.SealedInterop
 import co.touchlab.skie.plugin.generator.internal.validation.rules.ConflictingAnnotationsRule
 import co.touchlab.skie.plugin.generator.internal.validation.rules.ValidationRule
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

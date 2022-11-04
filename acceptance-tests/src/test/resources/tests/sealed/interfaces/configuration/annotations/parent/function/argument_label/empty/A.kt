@@ -1,6 +1,6 @@
 package `tests`.`sealed`.`interfaces`.`configuration`.`annotations`.`parent`.`function`.`argument_label`.`empty`
 
-import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.annotations.SealedInterop
 
 @SealedInterop.Function.ArgumentLabel("")
 sealed interface A

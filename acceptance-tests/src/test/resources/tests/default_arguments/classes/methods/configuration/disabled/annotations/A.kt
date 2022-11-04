@@ -1,6 +1,6 @@
 package `tests`.`default_arguments`.`classes`.`methods`.`configuration`.`disabled`.`annotations`
 
-import co.touchlab.skie.configuration.DefaultArgumentInterop
+import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
 
 class A {
 

@@ -1,6 +1,6 @@
 package `tests`.`sealed`.`interfaces`.`configuration`.`global`.`child`.`visible`
 
-import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.annotations.SealedInterop
 
 sealed interface A
 

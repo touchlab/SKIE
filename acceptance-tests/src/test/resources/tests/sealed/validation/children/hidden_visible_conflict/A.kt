@@ -1,6 +1,6 @@
 package `tests`.`sealed`.`validation`.`children`.`hidden_visible_conflict`
 
-import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.annotations.SealedInterop
 
 sealed class A {
 

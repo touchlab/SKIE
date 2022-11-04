@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
-import co.touchlab.skie.configuration.SealedInterop as SealedInteropAnnotation
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
@@ -62,10 +61,10 @@ internal class SealedInteropGenerator(
     }
 
     private fun reportConflictingDeclaration(subclass: ClassDescriptor) {
-        val message = "SwiftGen cannot generate sealed interop for this declaration. " +
+        val message = "SKIE cannot generate sealed interop for this declaration. " +
             "There are multiple sealed class/interface children with the same name " +
             "`${subclass.enumCaseName}` for the enum case. " +
-            "Consider resolving this conflict using annotation `${SealedInteropAnnotation.Case.Name::class.qualifiedName}`."
+            "Consider resolving this conflict using configuration `${SealedInterop.Case.Name::class.qualifiedName}` or associated annotation."
 
         reporter.report(
             severity = Reporter.Severity.Error,

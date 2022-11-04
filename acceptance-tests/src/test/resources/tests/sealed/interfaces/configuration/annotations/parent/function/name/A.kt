@@ -1,6 +1,6 @@
 package `tests`.`sealed`.`interfaces`.`configuration`.`annotations`.`parent`.`function`.`name`
 
-import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.annotations.SealedInterop
 
 @SealedInterop.Function.Name("onEnum2")
 sealed interface A

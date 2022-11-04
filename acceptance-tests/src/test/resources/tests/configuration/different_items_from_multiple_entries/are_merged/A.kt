@@ -1,6 +1,6 @@
 package `tests`.`configuration`.`different_items_from_multiple_entries`.`are_merged`
 
-import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.annotations.SealedInterop
 
 sealed class A
 

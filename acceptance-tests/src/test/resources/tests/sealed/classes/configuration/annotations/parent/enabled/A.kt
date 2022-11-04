@@ -1,6 +1,6 @@
 package `tests`.`sealed`.`classes`.`configuration`.`annotations`.`parent`.`enabled`
 
-import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.annotations.SealedInterop
 
 @SealedInterop.Enabled
 sealed class A

@@ -2,7 +2,7 @@ package co.touchlab.skie.configuration.gradle
 
 import co.touchlab.skie.configuration.ConfigurationKey
 import co.touchlab.skie.configuration.ConfigurationTarget
-import co.touchlab.skie.configuration.DefaultArgumentInterop
+import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
 import co.touchlab.skie.configuration.findAnnotation
 import co.touchlab.skie.configuration.hasAnnotation
 

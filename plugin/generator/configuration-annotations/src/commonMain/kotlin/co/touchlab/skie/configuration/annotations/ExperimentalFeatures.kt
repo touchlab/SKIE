@@ -1,4 +1,4 @@
-package co.touchlab.skie.configuration
+package co.touchlab.skie.configuration.annotations
 
 object ExperimentalFeatures {
 

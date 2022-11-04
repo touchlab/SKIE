@@ -1,1 +1,1 @@
-# KotlinLinkingError(Annotations 'co.touchlab.skie.configuration.SealedInterop.Case.Visible', 'co.touchlab.skie.configuration.SealedInterop.Case.Hidden' cannot be used at the same time.)
+# KotlinLinkingError(Annotations 'co.touchlab.skie.configuration.annotations.SealedInterop.Case.Visible', 'co.touchlab.skie.configuration.annotations.SealedInterop.Case.Hidden' cannot be used at the same time.)

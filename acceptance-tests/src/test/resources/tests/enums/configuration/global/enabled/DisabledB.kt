@@ -1,6 +1,6 @@
 package `tests`.`enums`.`configuration`.`global`.`enabled`
 
-import co.touchlab.skie.configuration.EnumInterop
+import co.touchlab.skie.configuration.annotations.EnumInterop
 
 @EnumInterop.Disabled
 enum class B {
