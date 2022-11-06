@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.api.impl
 
+import co.touchlab.skie.plugin.api.NativeKotlinType
 import co.touchlab.skie.plugin.TransformAccumulator
 import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.function.MutableSwiftFunctionName
@@ -41,6 +42,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCValueType
 import org.jetbrains.kotlin.backend.konan.objcexport.ReferenceBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge
+import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
@@ -115,73 +117,149 @@ internal class DefaultMutableSwiftScope(
             transformAccumulator.transform(this).isRemoved = value
         }
 
-    override fun KotlinType.spec(kind: KotlinTypeSpecKind): TypeName {
-        val reflector = ObjCExportMapperReflector(namer.mapper)
-        val bridge = reflector.bridgeType.invoke(this)
+    override val KotlinType.native: NativeKotlinType
+        get() {
+            val reflector = ObjCExportMapperReflector(namer.mapper)
+            val bridge = reflector.bridgeType.invoke(this)
 
-        return when (bridge) {
-            is BlockPointerBridge -> {
-                FunctionTypeName.get(
-                    parameters = arguments.dropLast(1).map { ParameterSpec.unnamed(it.type.spec(KotlinTypeSpecKind.SWIFT_GENERICS)) },
-                    returnType = arguments.last().type.spec(KotlinTypeSpecKind.SWIFT_GENERICS),
-                )
-            }
-            ReferenceBridge -> with(StandardNames.FqNames) {
-                when (kind) {
-                    KotlinTypeSpecKind.ORIGINAL -> when (constructor.declarationDescriptor?.fqNameUnsafe) {
-                        string -> DeclaredTypeName.typeName("Foundation.NSString")
-                        unit -> VOID
-                        else -> (constructor.declarationDescriptor as ClassDescriptor).spec.withTypeParameters(this@spec, KotlinTypeSpecKind.ORIGINAL)
-                    }
-                    KotlinTypeSpecKind.SWIFT_GENERICS -> when (constructor.declarationDescriptor?.fqNameUnsafe) {
-                        string -> STRING
-                        unit -> VOID
-                        else -> (constructor.declarationDescriptor as ClassDescriptor).spec.withTypeParameters(this@spec, KotlinTypeSpecKind.ORIGINAL)
-                    }
-                    KotlinTypeSpecKind.BRIDGED -> when (constructor.declarationDescriptor?.fqNameUnsafe) {
-                        string -> STRING
-                        unit -> VOID
-                        list.toUnsafe() -> ARRAY.withTypeParameters(this@spec, KotlinTypeSpecKind.SWIFT_GENERICS)
-                        set.toUnsafe() -> SET.withTypeParameters(this@spec, KotlinTypeSpecKind.SWIFT_GENERICS)
-                        map.toUnsafe() -> DICTIONARY.withTypeParameters(this@spec, KotlinTypeSpecKind.SWIFT_GENERICS)
-                        mutableList.toUnsafe() -> DeclaredTypeName.typeName("Foundation.NSMutableArray")
-                        else -> constructor.declarationDescriptor.spec()
+            return when (bridge) {
+                is BlockPointerBridge -> {
+                    NativeKotlinType.BlockPointer(
+                        parameterTypes = arguments.dropLast(1).map { it.type.native },
+                        returnType = arguments.last().type.native,
+                    )
+                }
+                ReferenceBridge -> with(StandardNames.FqNames) {
+                    when (val fqName = constructor.declarationDescriptor?.fqNameUnsafe) {
+                        string -> NativeKotlinType.Reference.Known.String
+                        unit -> NativeKotlinType.Reference.Known.Unit
+                        list.toUnsafe() -> NativeKotlinType.Reference.Known.List(arguments.single().type.native)
+                        mutableList.toUnsafe() -> NativeKotlinType.Reference.Known.MutableList(arguments.single().type.native)
+                        set.toUnsafe() -> NativeKotlinType.Reference.Known.Set(arguments.single().type.native)
+                        mutableSet.toUnsafe() -> NativeKotlinType.Reference.Known.MutableSet(arguments.single().type.native)
+                        map.toUnsafe() -> NativeKotlinType.Reference.Known.Map(
+                            keyType = arguments.first().type.native,
+                            valueType = arguments.last().type.native,
+                        )
+                        mutableMap.toUnsafe() -> NativeKotlinType.Reference.Known.MutableMap(
+                            keyType = arguments.first().type.native,
+                            valueType = arguments.last().type.native,
+                        )
+                        array -> NativeKotlinType.Reference.Known.Array.Generic(arguments.single().type.native)
+                        else -> if (fqName != null && StandardNames.isPrimitiveArray(fqName)) {
+                            NativeKotlinType.Reference.Known.Array.Primitive(arrayClassFqNameToPrimitiveType.getValue(fqName))
+                        } else when (val descriptor = constructor.declarationDescriptor) {
+                            is ClassDescriptor -> NativeKotlinType.Reference.Unknown(this@KotlinType, descriptor)
+                            is TypeParameterDescriptor -> if (descriptor.containingDeclaration is ClassDescriptor) {
+                                NativeKotlinType.Reference.TypeParameter(
+                                    name = namer.getTypeParameterName(descriptor)
+                                )
+                            } else {
+                                NativeKotlinType.Any
+                            }
+                            else -> NativeKotlinType.Any
+                        }
                     }
                 }
+                is ValueTypeBridge -> when (bridge.objCValueType) {
+                    ObjCValueType.BOOL -> NativeKotlinType.Value.BOOL
+                    ObjCValueType.UNICHAR -> NativeKotlinType.Value.UNICHAR
+                    ObjCValueType.CHAR -> NativeKotlinType.Value.CHAR
+                    ObjCValueType.SHORT -> NativeKotlinType.Value.SHORT
+                    ObjCValueType.INT -> NativeKotlinType.Value.INT
+                    ObjCValueType.LONG_LONG -> NativeKotlinType.Value.LONG_LONG
+                    ObjCValueType.UNSIGNED_CHAR -> NativeKotlinType.Value.UNSIGNED_CHAR
+                    ObjCValueType.UNSIGNED_SHORT -> NativeKotlinType.Value.UNSIGNED_SHORT
+                    ObjCValueType.UNSIGNED_INT -> NativeKotlinType.Value.UNSIGNED_INT
+                    ObjCValueType.UNSIGNED_LONG_LONG -> NativeKotlinType.Value.UNSIGNED_LONG_LONG
+                    ObjCValueType.FLOAT -> NativeKotlinType.Value.FLOAT
+                    ObjCValueType.DOUBLE -> NativeKotlinType.Value.DOUBLE
+                    ObjCValueType.POINTER -> NativeKotlinType.Value.POINTER
+                }
+                // else -> TODO("Unknown bridge type: $bridge")
             }
-            is ValueTypeBridge -> when (kind) {
-                KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> when (bridge.objCValueType) {
-                    ObjCValueType.BOOL -> ".KotlinBoolean"
-                    ObjCValueType.UNICHAR -> TODO()
-                    ObjCValueType.CHAR -> ".KotlinByte"
-                    ObjCValueType.SHORT -> ".KotlinShort"
-                    ObjCValueType.LONG_LONG -> ".KotlinLong"
-                    ObjCValueType.INT -> ".KotlinInt"
-                    ObjCValueType.UNSIGNED_CHAR -> ".KotlinUByte"
-                    ObjCValueType.UNSIGNED_SHORT -> ".KotlinUShort"
-                    ObjCValueType.UNSIGNED_INT -> ".KotlinUInt"
-                    ObjCValueType.UNSIGNED_LONG_LONG -> ".KotlinULong"
-                    ObjCValueType.FLOAT -> ".KotlinFloat"
-                    ObjCValueType.DOUBLE -> ".KotlinDouble"
-                    ObjCValueType.POINTER -> TODO()
+        }
+
+    override fun KotlinType.spec(kind: KotlinTypeSpecKind): TypeName = native.spec(kind)
+
+    override fun PrimitiveType.spec(kind: KotlinTypeSpecKind): TypeName = when (this) {
+        PrimitiveType.BOOLEAN -> NativeKotlinType.Value.BOOL
+        PrimitiveType.CHAR -> NativeKotlinType.Value.UNICHAR
+        PrimitiveType.BYTE -> NativeKotlinType.Value.CHAR
+        PrimitiveType.SHORT -> NativeKotlinType.Value.SHORT
+        PrimitiveType.INT -> NativeKotlinType.Value.INT
+        PrimitiveType.LONG -> NativeKotlinType.Value.LONG_LONG
+        PrimitiveType.FLOAT -> NativeKotlinType.Value.FLOAT
+        PrimitiveType.DOUBLE -> NativeKotlinType.Value.DOUBLE
+    }.spec(kind)
+
+    override fun NativeKotlinType.spec(kind: KotlinTypeSpecKind): TypeName {
+        return when (this) {
+            is NativeKotlinType.BlockPointer -> FunctionTypeName.get(
+                parameters = parameterTypes.map { ParameterSpec.unnamed(it.spec(KotlinTypeSpecKind.SWIFT_GENERICS)) },
+                returnType = returnType.spec(KotlinTypeSpecKind.SWIFT_GENERICS),
+            )
+            is NativeKotlinType.Reference -> when (this) {
+                is NativeKotlinType.Reference.Known.Array -> when (this) {
+                    is NativeKotlinType.Reference.Known.Array.Generic -> DeclaredTypeName.typeName(".KotlinArray").withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
+                    is NativeKotlinType.Reference.Known.Array.Primitive -> DeclaredTypeName.typeName(".Kotlin${elementType.typeName.asString()}Array")
+                }
+                is NativeKotlinType.Reference.Known.List -> when (kind) {
+                    KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSArray")
+                    KotlinTypeSpecKind.BRIDGED -> ARRAY.withTypeParameters(elementType, kind = KotlinTypeSpecKind.SWIFT_GENERICS)
+                }
+                is NativeKotlinType.Reference.Known.Set -> when (kind) {
+                    KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSSet")
+                    KotlinTypeSpecKind.BRIDGED -> SET.withTypeParameters(elementType, kind = KotlinTypeSpecKind.SWIFT_GENERICS)
+                }
+                is NativeKotlinType.Reference.Known.Map -> when (kind) {
+                    KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSDictionary")
+                    KotlinTypeSpecKind.BRIDGED -> DICTIONARY.withTypeParameters(keyType, valueType, kind = KotlinTypeSpecKind.SWIFT_GENERICS)
+                }
+                is NativeKotlinType.Reference.Known.MutableList -> DeclaredTypeName.typeName("Foundation.NSMutableArray")
+                is NativeKotlinType.Reference.Known.MutableMap -> DeclaredTypeName.typeName(".KotlinMutableMap").withTypeParameters(keyType, valueType, kind = KotlinTypeSpecKind.ORIGINAL)
+                is NativeKotlinType.Reference.Known.MutableSet -> DeclaredTypeName.typeName(".KotlinMutableSet").withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
+                NativeKotlinType.Reference.Known.String -> when (kind) {
+                    KotlinTypeSpecKind.ORIGINAL -> DeclaredTypeName.typeName("Foundation.NSString")
+                    KotlinTypeSpecKind.SWIFT_GENERICS, KotlinTypeSpecKind.BRIDGED -> STRING
+                }
+                NativeKotlinType.Reference.Known.Unit -> VOID
+                is NativeKotlinType.Reference.TypeParameter -> TypeVariableName(name)
+                is NativeKotlinType.Reference.Unknown -> descriptor.spec.withTypeParameters(kotlinType, KotlinTypeSpecKind.ORIGINAL)
+            }
+            is NativeKotlinType.Value -> when (kind) {
+                KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> when (this) {
+                    NativeKotlinType.Value.BOOL -> ".KotlinBoolean"
+                    NativeKotlinType.Value.UNICHAR -> TODO("unichar")
+                    NativeKotlinType.Value.CHAR -> ".KotlinByte"
+                    NativeKotlinType.Value.SHORT -> ".KotlinShort"
+                    NativeKotlinType.Value.LONG_LONG -> ".KotlinLong"
+                    NativeKotlinType.Value.INT -> ".KotlinInt"
+                    NativeKotlinType.Value.UNSIGNED_CHAR -> ".KotlinUByte"
+                    NativeKotlinType.Value.UNSIGNED_SHORT -> ".KotlinUShort"
+                    NativeKotlinType.Value.UNSIGNED_INT -> ".KotlinUInt"
+                    NativeKotlinType.Value.UNSIGNED_LONG_LONG -> ".KotlinULong"
+                    NativeKotlinType.Value.FLOAT -> ".KotlinFloat"
+                    NativeKotlinType.Value.DOUBLE -> ".KotlinDouble"
+                    NativeKotlinType.Value.POINTER -> TODO("Pointer")
                 }.let(DeclaredTypeName::typeName)
-                KotlinTypeSpecKind.BRIDGED -> when (bridge.objCValueType) {
-                    ObjCValueType.BOOL -> BOOL
-                    ObjCValueType.UNICHAR -> TODO("unichar ${bridge.objCValueType}")
-                    ObjCValueType.CHAR -> INT8
-                    ObjCValueType.SHORT -> INT16
-                    ObjCValueType.INT -> INT32
-                    ObjCValueType.LONG_LONG -> INT64
-                    ObjCValueType.UNSIGNED_CHAR -> UINT8
-                    ObjCValueType.UNSIGNED_SHORT -> UIN16
-                    ObjCValueType.UNSIGNED_INT -> UINT32
-                    ObjCValueType.UNSIGNED_LONG_LONG -> UINT64
-                    ObjCValueType.FLOAT -> FLOAT32
-                    ObjCValueType.DOUBLE -> FLOAT64
-                    ObjCValueType.POINTER -> TODO("Pointer ${bridge.objCValueType}")
+                KotlinTypeSpecKind.BRIDGED -> when (this) {
+                    NativeKotlinType.Value.BOOL -> BOOL
+                    NativeKotlinType.Value.UNICHAR -> DeclaredTypeName.typeName("Foundation.unichar")
+                    NativeKotlinType.Value.CHAR -> INT8
+                    NativeKotlinType.Value.SHORT -> INT16
+                    NativeKotlinType.Value.INT -> INT32
+                    NativeKotlinType.Value.LONG_LONG -> INT64
+                    NativeKotlinType.Value.UNSIGNED_CHAR -> UINT8
+                    NativeKotlinType.Value.UNSIGNED_SHORT -> UIN16
+                    NativeKotlinType.Value.UNSIGNED_INT -> UINT32
+                    NativeKotlinType.Value.UNSIGNED_LONG_LONG -> UINT64
+                    NativeKotlinType.Value.FLOAT -> FLOAT32
+                    NativeKotlinType.Value.DOUBLE -> FLOAT64
+                    NativeKotlinType.Value.POINTER -> TODO("Pointer")
                 }
             }
-            else -> TODO("Unknown bridge type: $bridge")
+            NativeKotlinType.Any -> ANY
         }
     }
 
@@ -201,6 +279,9 @@ internal class DefaultMutableSwiftScope(
     private fun DeclaredTypeName.withTypeParameters(type: KotlinType, kind: KotlinTypeSpecKind): TypeName =
         this.withTypeParameters(type.arguments.map { it.type.spec(kind) })
 
+    private fun DeclaredTypeName.withTypeParameters(vararg typeParameters: NativeKotlinType, kind: KotlinTypeSpecKind): TypeName =
+        this.withTypeParameters(typeParameters.map { it.spec(kind) })
+
     private fun DeclaredTypeName.withTypeParameters(typeParameters: List<TypeName>): TypeName =
         if (typeParameters.isNotEmpty()) {
             this.parameterizedBy(*typeParameters.toTypedArray())
@@ -212,7 +293,7 @@ internal class DefaultMutableSwiftScope(
         get() = DeclaredTypeName.qualifiedTypeName("$moduleName.${swiftName.qualifiedName}")
 
     override val PropertyDescriptor.spec: PropertySpec
-        get() = TODO("Not yet implemented")
+        get() = PropertySpec.builder(swiftName, type.spec(KotlinTypeSpecKind.BRIDGED)).build()
 
     override val FunctionDescriptor.spec: FunctionSpec
         get() = TODO("Not yet implemented")

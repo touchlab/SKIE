@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.generator.internal.enums
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
-import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope

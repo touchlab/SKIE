@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
+import co.touchlab.skie.plugin.generator.internal.datastruct.DataStructGenerator
 import co.touchlab.skie.plugin.generator.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
@@ -41,10 +42,18 @@ internal class SwiftGenScheduler(
         configuration = configuration,
     )
 
+    private val dataStructGenerator = DataStructGenerator(
+        skieContext = skieContext,
+        namespaceProvider = namespaceProvider,
+        configuration = configuration,
+        reporter = reporter,
+    )
+
     fun process(descriptorProvider: DescriptorProvider) {
         irValidator.validate(descriptorProvider)
         sealedInteropGenerator.generate(descriptorProvider)
         defaultArgumentGenerator.generate(descriptorProvider)
         exhaustiveEnumsGenerator.generate(descriptorProvider)
+        dataStructGenerator.generate(descriptorProvider)
     }
 }
