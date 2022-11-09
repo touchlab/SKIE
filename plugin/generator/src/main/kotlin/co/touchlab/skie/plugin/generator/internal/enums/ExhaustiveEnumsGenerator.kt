@@ -1,3 +1,5 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin.generator.internal.enums
 
 import co.touchlab.skie.configuration.Configuration
@@ -30,6 +32,10 @@ import org.jetbrains.kotlin.descriptors.isEnumClass
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
+import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
+import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 
 internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,

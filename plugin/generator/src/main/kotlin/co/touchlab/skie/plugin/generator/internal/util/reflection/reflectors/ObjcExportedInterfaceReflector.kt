@@ -1,10 +1,12 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors
 
 import co.touchlab.skie.plugin.generator.internal.util.reflection.Reflector
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 
 internal class ObjcExportedInterfaceReflector(
     override val instance: Any,
@@ -16,8 +18,5 @@ internal class ObjcExportedInterfaceReflector(
 
     val topLevel by declaredProperty<Map<SourceFile, List<CallableMemberDescriptor>>>()
 
-    private val mapper by declaredProperty<Any>()
-
-    val reflectedMapper: ObjCExportMapperReflector
-        get() = mapper.reflectedBy()
+    val mapper by declaredProperty<ObjCExportMapper>()
 }

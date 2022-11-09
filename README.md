@@ -218,9 +218,15 @@ These overloads allow the Swift code to call the `copy` method as if the default
 While this approach is completely transparent from the Swift code, it has some drawbacks:
 
 - It does not support interface methods (all other types of functions are supported, including interface extensions)
+- Generated overloads may cause overload resolution conflicts.
 - The number of generated overloads is `O(2^n)` where `n` is the number of default arguments (not all parameters).
 
-Since it is not possible to generate exponential number of functions, there is a limit to how many default arguments are supported.
+SKIE tries to not generate functions that would cause conflicts, however, the implementation is not complete yet.
+Namely, it does not properly handle inheritance, generics and generated overloads of multiple functions with default arguments.
+If you run into this issue, you might have to disable the code generation for one of the functions (see section about Configuration).
+Alternatively, you can rename one those functions (or their parameters).
+
+As for the number of generated overloads: Since it is not possible to generate exponential number of functions, there is a limit to how many default arguments are supported.
 If that number is exceeded, no extra functions are generated.
 
 By default, the limit is set to 5, meaning at most 31 additional functions will be generated per function with default arguments.
@@ -230,7 +236,7 @@ However, that number might change in the future as we test the plugin on larger 
 
 The limit can be explicitly configured using the `DefaultArgumentInterop.MaximumDefaultArgumentCount` key/annotation (see section about Configuration).
 
-Note that both of the above-mentioned problems might be mitigated in the future versions of SKIE.
+Note that all of the above-mentioned problems might be mitigated in the future versions of SKIE.
 
 ## Configuration
 
