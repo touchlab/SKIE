@@ -4,14 +4,16 @@ Make sure that your project uses Gradle 7.3 or higher and exactly the same Kotli
 
 Kotlin compiler plugins are generally not stable and break with almost every release. So before you do anything else, check that your project compiles (especially if you had to change the versions).
 
-SKIE is deployed in a private Touchlab Maven repository. To access artifacts from that repository, you need to add the following code in `settings.gradle.kts`:
+SKIE is deployed in a private Touchlab Maven repository. To access artifacts from that repository, you will need an API key from Touchlab, which we will happily provide upon request. If you do not know how to contact us, you can either [do so here](https://touchlab.co/contact-us/) or in the `#touchlab-tools` channel of the Kotlin Community Slack. To join the Kotlin Community Slack, [request access here](http://slack.kotlinlang.org/).
+
+Once you have your API key, you will then need to add the following code in `settings.gradle.kts` with your API key substituting for "YOUR_API_KEY_HERE":
 
 ```kotlin
 pluginManagement {
     repositories {
         // Previously present repositories like mavenCentral()
         // ...
-        maven("https://api.touchlab.dev/public")
+        maven("https://api.touchlab.dev/mvn/YOUR_API_KEY_HERE")
     }
 }
 
@@ -19,7 +21,7 @@ dependencyResolutionManagement {
     repositories {
         // Previously present repositories like mavenCentral()
         // ...
-        maven("https://api.touchlab.dev/public")
+        maven("https://api.touchlab.dev/mvn/YOUR_API_KEY_HERE")
     }
 }
 ```
