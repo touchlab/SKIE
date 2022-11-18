@@ -70,7 +70,7 @@ struct BreedListContent: View {
     var body: some View {
         ZStack {
             VStack {
-                switch onEnum(of: breedState) {
+                switch exhaustively(breedState) {
                 case .Data(let state):
                     if state.breeds.isEmpty {
                         Text("Empty...")
@@ -95,18 +95,14 @@ struct BreedListContent: View {
             }
         }
     }
-
-    func someFunction(with paramter: BreedViewState = breedState) {
-
-    }
 }
 
 extension BreedErrorType {
     var imageName: String {
-        switch onEnum(of: self) {
+        switch exhaustively(self) {
         case .Network: return "wifi.exclamationmark"
         case .Invalid: return "xmark.bin.fill"
-        case .Other: return "xmark.circle.fill"
+        case .Other(_): return "xmark.circle.fill"
         case .RefreshFailure: return "exclamationmark.arrow.triangle.2.circlepath"
         }
     }
