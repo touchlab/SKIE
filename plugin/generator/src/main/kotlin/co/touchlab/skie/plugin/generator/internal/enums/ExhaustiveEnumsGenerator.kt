@@ -7,6 +7,7 @@ import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
@@ -118,7 +119,7 @@ internal class ExhaustiveEnumsGenerator(
                 addProperty(
                     PropertySpec.builder(
                         property.name.asString(),
-                        property.type.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED)
+                        property.type.spec(KotlinTypeSpecKind.BRIDGED)
                     )
                         .addModifiers(Modifier.PUBLIC)
                         .getter(
@@ -137,7 +138,7 @@ internal class ExhaustiveEnumsGenerator(
                                         .addModifiers(Modifier.NONMUTATING)
                                         .addParameter(
                                             "value",
-                                            property.type.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED)
+                                            property.type.spec(KotlinTypeSpecKind.BRIDGED)
                                         )
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
@@ -175,10 +176,10 @@ internal class ExhaustiveEnumsGenerator(
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
                             function.returnType?.let { returnType ->
-                                returns(returnType.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED))
+                                returns(returnType.spec(KotlinTypeSpecKind.BRIDGED))
                             }
                             function.valueParameters.forEach { parameter ->
-                                val parameterTypeSpec = parameter.type.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED)
+                                val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecKind.BRIDGED)
                                 addParameter(
                                     ParameterSpec.builder(
                                         parameter.name.asString(),

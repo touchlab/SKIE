@@ -15,6 +15,8 @@ internal abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : 
     DeclarationTemplate<D> {
 
     override fun generateIr(parent: IrDeclarationContainer, generatorContext: GeneratorContext) {
+        createDeclarationStubsIfIrLazyClass(parent)
+        
         val syntheticDeclarationsGenerator = SyntheticDeclarationsGenerator(generatorContext)
 
         descriptor.accept(syntheticDeclarationsGenerator, parent)
@@ -26,6 +28,10 @@ internal abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : 
 
         ir.patchDeclarationParents(ir.parent)
         ir.initialize(generatorContext.symbolTable, declarationIrBuilder)
+    }
+
+    private fun createDeclarationStubsIfIrLazyClass(parent: IrDeclarationContainer) {
+        parent.declarations
     }
 
     protected abstract fun getSymbol(symbolTable: ReferenceSymbolTable): S

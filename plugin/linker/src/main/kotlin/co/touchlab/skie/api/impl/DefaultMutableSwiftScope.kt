@@ -46,9 +46,11 @@ import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -232,7 +234,13 @@ internal class DefaultMutableSwiftScope(
                 }
                 NativeKotlinType.Reference.Known.Unit -> VOID
                 is NativeKotlinType.Reference.TypeParameter -> TypeVariableName(name)
-                is NativeKotlinType.Reference.Unknown -> descriptor.spec.withTypeParameters(kotlinType, KotlinTypeSpecKind.ORIGINAL)
+                is NativeKotlinType.Reference.Unknown -> {
+                    if (descriptor.canBeSpecializedInSwift) {
+                        descriptor.spec.withTypeParameters(kotlinType, KotlinTypeSpecKind.ORIGINAL)
+                    } else {
+                        descriptor.spec
+                    }
+                }
             }
             is NativeKotlinType.Value -> when (kind) {
                 KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> when (this) {
@@ -269,6 +277,9 @@ internal class DefaultMutableSwiftScope(
             NativeKotlinType.Any -> ANY
         }
     }
+
+    private val ClassDescriptor.canBeSpecializedInSwift: Boolean
+        get() = !this.kind.isInterface
 
     context(KotlinType)
         private fun ClassifierDescriptor?.spec(): TypeName {
