@@ -14,9 +14,9 @@ If you have any questions, we invite you to ask in the `#touchlab-tools` channel
 
 ## Installation
 
-Make sure that your project uses Gradle 7.3 or higher and exactly the same Kotlin compiler version as SKIE (1.7.20).
+Kotlin compiler plugins are generally not stable and break with almost every release, so please make sure that your project uses exactly the same Kotlin compiler version as SKIE (1.7.20) and Gradle 7.3 or higher.
 
-Kotlin compiler plugins are generally not stable and break with almost every release. So before you do anything else, check that your project compiles (especially if you had to change the versions).
+**Before you do anything else, check that your project compiles (especially if you had to change Gradle and/or Kotlin versions).**
 
 SKIE is deployed in a private Touchlab Maven repository. To access artifacts from that repository, you will need an API key from Touchlab, which we will happily provide upon request. If you do not know how to contact us, you can either [do so here](https://touchlab.co/contact-us/) or in the `#touchlab-tools` channel of the Kotlin Community Slack mentioned in [the previous section](#skie).
 
@@ -84,17 +84,17 @@ To support this feature in Swift, SKIE generates code that can be reduced to thi
 
 ```swift
 enum SwiftWrapperEnum {
-    case Success(data: [Any])
-    case Error(message: String)
-    case Loading
+    case Success(KotlinSealedInterfaceSuccess)
+    case Error(KotlinSealedInterfaceError)
+    case Loading(KotlinSealedInterfaceLoading)
 }
 
 func onEnum(of sealed: KotlinSealedInterface) -> SwiftWrapperEnum {
-    if let sealed = sealed as? KotlinSealedSuccess {
+    if let sealed = sealed as? KotlinSealedInterfaceSuccess {
         return SwiftWrapperEnum.Success(data: sealed.data)
-    } else if let sealed = sealed as? KotlinSealedError {
+    } else if let sealed = sealed as? KotlinSealedInterfaceError {
         return SwiftWrapperEnum.Error(message: sealed.message)
-    } else if sealed is KotlinSealedLoading {
+    } else if sealed is KotlinSealedInterfaceLoading {
         return SwiftWrapperEnum.Loading
     } else {
         fatalError("Unknown subtype. This error should not happen under normal circumstances since KotlinSealedInterace is sealed.")
@@ -111,7 +111,7 @@ To simulate Kotlin's smart-casting we use an enum with associated values.
 Thanks to the above code you can now write this:
 
 ```swift
-switch onEnum(of: wrapperEnum) {
+switch onEnum(of: sealedInterface) {
 case .Success(let data):
     configureForSuccess(withData: data)
 case .Error(let message):
@@ -124,7 +124,7 @@ case .Loading:
 If you do not need the smart-casting, you can write just this:
 
 ```swift
-switch onEnum(of: wrapperEnum) {
+switch onEnum(of: sealedInterface) {
 case .Success:
     print("success!")
 case .Error:
@@ -211,7 +211,7 @@ While this approach to default arguments is completely transparent from Swift, i
 
 SKIE tries to avoid generating functions that would cause conflicts, however the implementation is not complete yet. Specifically, it does not yet properly handle inheritance, generics, and generated overloads of multiple functions with default arguments. If you run into this issue, you might have to disable the code generation for one of the functions (see [Local Configuration section](#local-via-kotlin-annontation)).
 
-Alternatively, you can rename one conflicting functions (or their parameters).
+Alternatively, you can rename one of the conflicting functions (or their parameters).
 
 Since it is not possible to generate exponential numbers of functions, the number of default arguments supported is limited to 5, so that at most 31 additional functions will be generated per function with default arguments. If a function has more than 5 default arguments, SKIE will not generate any extra functions.
 
@@ -219,7 +219,7 @@ The limit of 5 was chosen as the result of internal experiments, but that number
 
 The maximum number of default arguments can be explicitly configured using the `DefaultArgumentInterop.MaximumDefaultArgumentCount` key/annotation (see Configuration, and specifically Local in the next section).
 
-*NOTE: All of the above-mentioned problems might be mitigated in the future versions of SKIE. For instancce, the limit on the number of default arguments may increase in the future as we test the plugin on larger projects.*
+*NOTE: All of the above-mentioned problems might be mitigated in the future versions of SKIE. For instance, the limit on the number of default arguments may increase in the future as we test the plugin on larger projects.*
 
 ## Configuration
 
