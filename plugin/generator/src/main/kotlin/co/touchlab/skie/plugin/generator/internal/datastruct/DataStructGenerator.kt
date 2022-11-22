@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.datastruct
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.DataStruct
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
@@ -16,8 +17,6 @@ import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
-import io.outfoxx.swiftpoet.tag
-import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -29,13 +28,13 @@ internal class DataStructGenerator(
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     private val reporter: Reporter,
-): BaseGenerator(skieContext, namespaceProvider, configuration) {
+) : BaseGenerator(skieContext, namespaceProvider, configuration) {
     class DataStructHelpers(val helpers: MutableSet<FileMemberSpec> = mutableSetOf())
 
     override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
-        classDescriptors
+        exportedClassDescriptors
             .filter {
-                it.getConfiguration(DataStruct.Enabled) && it.isData
+                it.getConfiguration(DataStruct.Enabled) && it.isData && !it.belongsToSkieRuntime
             }
             .forEach {
                 generate(it)
@@ -43,7 +42,7 @@ internal class DataStructGenerator(
     }
 
     context(DescriptorProvider)
-    private fun generate(declaration: ClassDescriptor) {
+        private fun generate(declaration: ClassDescriptor) {
         val primaryConstructor = declaration.unsubstitutedPrimaryConstructor ?: return
 
         generateCode(declaration) {
@@ -90,7 +89,7 @@ internal class DataStructGenerator(
                             }
                         )
                         .apply {
-                            parametersWithMappings.map { (parameter, mapping) ->
+                            parametersWithMappings.map { (parameter, _) ->
                                 addStatement("self.%N = %N", parameter.name.asString(), parameter.name.asString())
                             }
                         }
@@ -100,9 +99,14 @@ internal class DataStructGenerator(
                     PropertySpec.builder("unbridged", declaration.spec, Modifier.PUBLIC)
                         .getter(
                             FunctionSpec.getterBuilder()
-                                .addCode("%T(%L)\n", declaration.spec,
+                                .addCode(
+                                    "%T(%L)\n", declaration.spec,
                                     parametersWithMappings.map { (parameter, mapping) ->
-                                        CodeBlock.of("%N: %L", parameter.name.asString(), mapping.swiftToKotlinMapping ?: parameter.name.asString())
+                                        CodeBlock.of(
+                                            "%N: %L",
+                                            parameter.name.asString(),
+                                            mapping.swiftToKotlinMapping ?: parameter.name.asString()
+                                        )
                                     }.joinToCode()
                                 )
                                 .build()
@@ -114,17 +118,24 @@ internal class DataStructGenerator(
             addExtension(
                 ExtensionSpec.builder(declaration.spec)
                     .addModifiers(Modifier.PUBLIC)
-                    .addProperty(PropertySpec.builder("bridged", declaration.spec.nestedType("Bridge"))
-                        .getter(
-                            FunctionSpec.getterBuilder()
-                                .addCode("%T(%L)\n", declaration.spec.nestedType("Bridge"),
-                                    parametersWithMappings.map { (parameter, mapping) ->
-                                        CodeBlock.of("%N: %L", parameter.name.asString(), mapping.kotlinToSwiftMapping ?: parameter.name.asString())
-                                    }.joinToCode()
-                                )
-                                .build()
-                        )
-                        .build())
+                    .addProperty(
+                        PropertySpec.builder("bridged", declaration.spec.nestedType("Bridge"))
+                            .getter(
+                                FunctionSpec.getterBuilder()
+                                    .addCode(
+                                        "%T(%L)\n", declaration.spec.nestedType("Bridge"),
+                                        parametersWithMappings.map { (parameter, mapping) ->
+                                            CodeBlock.of(
+                                                "%N: %L",
+                                                parameter.name.asString(),
+                                                mapping.kotlinToSwiftMapping ?: parameter.name.asString()
+                                            )
+                                        }.joinToCode()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    )
                     .addType(bridge)
                     .build()
             )
@@ -144,11 +155,10 @@ internal class DataStructGenerator(
     }
 
     context(ClassDescriptor)
-    private val ValueParameterDescriptor.backingProperty: PropertyDescriptor
+        private val ValueParameterDescriptor.backingProperty: PropertyDescriptor
         get() {
             return unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.VARIABLES) {
                 it == this@backingProperty.name
             }.single() as PropertyDescriptor
         }
-
 }

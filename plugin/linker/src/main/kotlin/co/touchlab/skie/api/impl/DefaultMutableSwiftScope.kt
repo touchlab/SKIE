@@ -201,7 +201,8 @@ internal class DefaultMutableSwiftScope(
             )
             is NativeKotlinType.Reference -> when (this) {
                 is NativeKotlinType.Reference.Known.Array -> when (this) {
-                    is NativeKotlinType.Reference.Known.Array.Generic -> DeclaredTypeName.typeName(".KotlinArray").withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
+                    is NativeKotlinType.Reference.Known.Array.Generic -> DeclaredTypeName.typeName(".KotlinArray")
+                        .withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
                     is NativeKotlinType.Reference.Known.Array.Primitive -> DeclaredTypeName.typeName(".Kotlin${elementType.typeName.asString()}Array")
                 }
                 is NativeKotlinType.Reference.Known.List -> when (kind) {
@@ -214,11 +215,17 @@ internal class DefaultMutableSwiftScope(
                 }
                 is NativeKotlinType.Reference.Known.Map -> when (kind) {
                     KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSDictionary")
-                    KotlinTypeSpecKind.BRIDGED -> DICTIONARY.withTypeParameters(keyType, valueType, kind = KotlinTypeSpecKind.SWIFT_GENERICS)
+                    KotlinTypeSpecKind.BRIDGED -> DICTIONARY.withTypeParameters(
+                        keyType,
+                        valueType,
+                        kind = KotlinTypeSpecKind.SWIFT_GENERICS
+                    )
                 }
                 is NativeKotlinType.Reference.Known.MutableList -> DeclaredTypeName.typeName("Foundation.NSMutableArray")
-                is NativeKotlinType.Reference.Known.MutableMap -> DeclaredTypeName.typeName(".KotlinMutableMap").withTypeParameters(keyType, valueType, kind = KotlinTypeSpecKind.ORIGINAL)
-                is NativeKotlinType.Reference.Known.MutableSet -> DeclaredTypeName.typeName(".KotlinMutableSet").withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
+                is NativeKotlinType.Reference.Known.MutableMap -> DeclaredTypeName.typeName(".KotlinMutableDictionary")
+                    .withTypeParameters(keyType, valueType, kind = KotlinTypeSpecKind.ORIGINAL)
+                is NativeKotlinType.Reference.Known.MutableSet -> DeclaredTypeName.typeName(".KotlinMutableSet")
+                    .withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
                 NativeKotlinType.Reference.Known.String -> when (kind) {
                     KotlinTypeSpecKind.ORIGINAL -> DeclaredTypeName.typeName("Foundation.NSString")
                     KotlinTypeSpecKind.SWIFT_GENERICS, KotlinTypeSpecKind.BRIDGED -> STRING
@@ -264,7 +271,7 @@ internal class DefaultMutableSwiftScope(
     }
 
     context(KotlinType)
-    private fun ClassifierDescriptor?.spec(): TypeName {
+        private fun ClassifierDescriptor?.spec(): TypeName {
         return when (this) {
             is ClassDescriptor -> spec.withTypeParameters(this@KotlinType, KotlinTypeSpecKind.ORIGINAL)
             is TypeParameterDescriptor -> if (containingDeclaration is ClassDescriptor) {

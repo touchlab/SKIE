@@ -44,11 +44,16 @@ class SwiftLinkCompilePhase(
         val skieModule = context.skieContext.module as DefaultSkieModule
         skieModule.consumeConfigureBlocks(swiftScope)
         transformAccumulator.close()
-        val swiftFileSpecs = skieModule.produceFiles(swiftScope)
+        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftScope)
+        val swiftTextFiles = skieModule.produceTextFiles()
 
         val newFiles = swiftFileSpecs.map { fileSpec ->
             val file = swiftSourcesDir.resolve("${fileSpec.name}.swift")
             fileSpec.toString().also { file.writeText(it) }
+            file
+        } + swiftTextFiles.map { textFile ->
+            val file = swiftSourcesDir.resolve("${textFile.name}.swift")
+            file.writeText(textFile.content)
             file
         }
 

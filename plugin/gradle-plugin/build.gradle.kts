@@ -1,3 +1,4 @@
+import co.touchlab.skie.gradle.publish.dependencyName
 import co.touchlab.skie.gradle.publish.mavenArtifactId
 
 plugins {
@@ -8,10 +9,13 @@ plugins {
 }
 
 buildConfig {
-    val kotlinPlugin = project(":kotlin-plugin")
+    val kotlinPlugin = projects.kotlinPlugin.dependencyProject
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${kotlinPlugin.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${kotlinPlugin.mavenArtifactId}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${kotlinPlugin.version}\"")
+
+    val runtime = projects.runtime.kotlin.dependencyProject
+    buildConfigField("String", "RUNTIME_DEPENDENCY", "\"${runtime.dependencyName}\"")
 
     val pluginId: String by properties
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")

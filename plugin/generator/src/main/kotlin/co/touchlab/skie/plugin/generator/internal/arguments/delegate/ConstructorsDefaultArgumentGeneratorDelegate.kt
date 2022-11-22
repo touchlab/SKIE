@@ -5,6 +5,7 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
+import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createSecondaryConstructor
@@ -40,10 +41,10 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
     }
 
     private fun DescriptorProvider.allSupportedClasses(): List<ClassDescriptor> =
-        this.classDescriptors.filter { it.isSupported }
+        this.exportedClassDescriptors.filter { it.isSupported }
 
     private val ClassDescriptor.isSupported: Boolean
-        get() = this.kind == ClassKind.CLASS
+        get() = this.kind == ClassKind.CLASS && !this.belongsToSkieRuntime
 
     private fun ClassDescriptor.allSupportedConstructors(descriptorProvider: DescriptorProvider): List<ClassConstructorDescriptor> =
         this.constructors

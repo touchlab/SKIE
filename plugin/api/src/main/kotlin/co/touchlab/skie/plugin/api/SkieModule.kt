@@ -6,4 +6,6 @@ interface SkieModule {
     fun configure(configure: context(MutableSwiftScope) () -> Unit)
 
     fun file(name: String, contents: context(SwiftPoetScope) FileSpec.Builder.() -> Unit)
+
+    fun file(name: String, contents: String)
 }

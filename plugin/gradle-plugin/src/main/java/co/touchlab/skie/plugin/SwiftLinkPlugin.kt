@@ -20,8 +20,8 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractNativeLibrary
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
@@ -105,6 +105,8 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                 .filter { it.konanTarget.family.isAppleFamily }
 
             appleTargets.forEach { target ->
+                target.registerRuntime()
+
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
                 frameworks.forEach { framework ->
                     val subpluginOptions = swiftLinkSubplugins.associateWith { subplugin ->
@@ -204,6 +206,20 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         }
                     }
                 })
+            }
+        }
+    }
+
+    private fun KotlinNativeTarget.registerRuntime() {
+        this.compilations.named("main") {
+            it.defaultSourceSet.dependencies {
+                api(BuildConfig.RUNTIME_DEPENDENCY)
+            }
+        }
+
+        this.binaries {
+            this.filterIsInstance<AbstractNativeLibrary>().forEach {
+                it.export(BuildConfig.RUNTIME_DEPENDENCY)
             }
         }
     }

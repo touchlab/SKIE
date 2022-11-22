@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
+import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
@@ -45,7 +46,7 @@ internal class ExhaustiveEnumsGenerator(
 ) : BaseGenerator(skieContext, namespaceProvider, configuration) {
 
     override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
-        classDescriptors
+        exportedClassDescriptors
             .filter(::shouldGenerateExhaustiveEnums)
             .forEach {
                 generate(it)
@@ -53,7 +54,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider)
-    private fun generate(declaration: ClassDescriptor) {
+        private fun generate(declaration: ClassDescriptor) {
         module.configure {
             declaration.isHiddenFromSwift = true
 
@@ -97,7 +98,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(SwiftPoetScope)
-    private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
+        private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
         declaration.nestedClasses.forEach {
             addType(
                 TypeAliasSpec.builder(it.name.asString(), it.spec)
@@ -108,7 +109,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider, SwiftPoetScope)
-    private fun TypeSpec.Builder.addPassthroughForProperties(
+        private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
@@ -116,7 +117,10 @@ internal class ExhaustiveEnumsGenerator(
             .filter { mapper.isBaseProperty(it) && mapper.isObjCProperty(it) }
             .forEach { property ->
                 addProperty(
-                    PropertySpec.builder(property.name.asString(), property.type.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED))
+                    PropertySpec.builder(
+                        property.name.asString(),
+                        property.type.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED)
+                    )
                         .addModifiers(Modifier.PUBLIC)
                         .getter(
                             FunctionSpec.getterBuilder()
@@ -132,7 +136,10 @@ internal class ExhaustiveEnumsGenerator(
                                 setter(
                                     FunctionSpec.setterBuilder()
                                         .addModifiers(Modifier.NONMUTATING)
-                                        .addParameter("value", property.type.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED))
+                                        .addParameter(
+                                            "value",
+                                            property.type.spec(co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind.BRIDGED)
+                                        )
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
                                             if (mapper.doesThrow(property.setter!!)) "try " else "",
@@ -148,7 +155,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider, SwiftPoetScope)
-    private fun TypeSpec.Builder.addPassthroughForFunctions(
+        private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
@@ -210,7 +217,7 @@ internal class ExhaustiveEnumsGenerator(
             .filter { it.kind == ClassKind.CLASS }
 
     private fun shouldGenerateExhaustiveEnums(declaration: ClassDescriptor): Boolean {
-        return declaration.kind.isEnumClass && declaration.isEnumInteropEnabled
+        return declaration.kind.isEnumClass && declaration.isEnumInteropEnabled && !declaration.belongsToSkieRuntime
     }
 
     private val ClassDescriptor.isEnumInteropEnabled: Boolean

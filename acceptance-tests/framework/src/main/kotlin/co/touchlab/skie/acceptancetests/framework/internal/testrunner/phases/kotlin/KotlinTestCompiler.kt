@@ -3,6 +3,7 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.ko
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestResultBuilder
+import co.touchlab.skie.framework.BuildConfig
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.bc.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -60,6 +61,8 @@ internal class KotlinTestCompiler(
 
             this.temporaryFilesDir = tempDirectory.absolutePathString()
             outputName = outputFile.absolutePathString()
+
+            libraries = BuildConfig.DEPENDENCIES
         }
 
     private fun interpretResult(

@@ -9,6 +9,7 @@ val run by tasks.registering {
 }
 
 tasks.register("cleanRun") {
+    dependsOn(clean)
     dependsOn(run).mustRunAfter(clean)
 }
 

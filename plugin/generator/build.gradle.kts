@@ -22,4 +22,5 @@ dependencies {
     api(projects.configurationApi)
     implementation(projects.generator.configurationAnnotations)
     implementation(projects.generator.configurationGradle)
+    implementation(projects.runtime.swift)
 }

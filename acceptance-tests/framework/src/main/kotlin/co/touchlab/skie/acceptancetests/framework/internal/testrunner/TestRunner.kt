@@ -5,7 +5,6 @@ import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.skie.acceptancetests.framework.TestNode
 import co.touchlab.skie.acceptancetests.framework.TestResult
-import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinCodeEnhancer
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestLinker
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.PluginConfigurationGenerator
@@ -22,7 +21,6 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         val testResultBuilder = TestResultBuilder()
 
         return IntermediateResult.Value(test.kotlinFiles)
-            .map { enhanceKotlinCode(it) }
             .flatMap { compileKotlin(it, tempFileSystem, testResultBuilder) }
             .zip { generateConfiguration(test.configFiles, tempFileSystem, testResultBuilder) }
             .flatMap { linkKotlin(it.first, it.second, tempFileSystem, testResultBuilder) }
@@ -32,9 +30,6 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
             .also { writeResult(test, it) }
             .also { reportResult(test, it) }
     }
-
-    private fun enhanceKotlinCode(kotlinFiles: List<Path>): List<Path> =
-        KotlinCodeEnhancer().enhance(kotlinFiles)
 
     private fun compileKotlin(
         kotlinFiles: List<Path>,

@@ -3,11 +3,13 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.isSealed
+import co.touchlab.skie.plugin.generator.internal.util.isVisibleFromSwift
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedInteropGenerator(
@@ -21,13 +23,21 @@ internal class SealedInteropGenerator(
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
 
     override fun generate(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.classDescriptors.forEach {
-            generate(it)
-        }
+        descriptorProvider.exportedClassDescriptors
+            .filter { it.shouldHaveSealedInterop }
+            .forEach {
+                generate(it)
+            }
     }
 
+    private val ClassDescriptor.shouldHaveSealedInterop: Boolean
+        get() = this.isSealed && this.isSealedInteropEnabled && !this.belongsToSkieRuntime
+
+    private val ClassDescriptor.isSealedInteropEnabled: Boolean
+        get() = this.getConfiguration(SealedInterop.Enabled)
+
     private fun generate(declaration: ClassDescriptor) {
-        if (!shouldGenerateSealedInterop(declaration) || !verifyUniqueCaseNames(declaration)) {
+        if (!verifyUniqueCaseNames(declaration)) {
             return
         }
 
@@ -39,12 +49,6 @@ internal class SealedInteropGenerator(
             sealedFunctionGeneratorDelegate.generate(declaration, enumType, this)
         }
     }
-
-    private fun shouldGenerateSealedInterop(declaration: ClassDescriptor): Boolean =
-        declaration.isSealed && declaration.isSealedInteropEnabled
-
-    private val ClassDescriptor.isSealedInteropEnabled: Boolean
-        get() = this.getConfiguration(SealedInterop.Enabled)
 
     private fun verifyUniqueCaseNames(declaration: ClassDescriptor): Boolean {
         val conflictingDeclarations = declaration.visibleSealedSubclasses

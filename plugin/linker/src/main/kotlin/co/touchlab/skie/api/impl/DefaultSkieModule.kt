@@ -6,8 +6,10 @@ import co.touchlab.skie.plugin.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.FileSpec
 
 class DefaultSkieModule() : SkieModule {
+
     private val configureBlocks = mutableListOf<context(MutableSwiftScope) () -> Unit>()
-    private val fileBlocks = mutableMapOf<String, MutableList<context(SwiftPoetScope) FileSpec.Builder.() -> Unit>>()
+    private val swiftPoetFileBlocks = mutableMapOf<String, MutableList<context(SwiftPoetScope) FileSpec.Builder.() -> Unit>>()
+    private val textFileBlocks = mutableMapOf<String, MutableList<String>>()
     private var configureBlocksConsumed = false
 
     override fun configure(configure: context(MutableSwiftScope) () -> Unit) {
@@ -16,7 +18,11 @@ class DefaultSkieModule() : SkieModule {
     }
 
     override fun file(name: String, contents: context(SwiftPoetScope) FileSpec.Builder.() -> Unit) {
-        fileBlocks.getOrPut(name) { mutableListOf() }.add(contents)
+        swiftPoetFileBlocks.getOrPut(name) { mutableListOf() }.add(contents)
+    }
+
+    override fun file(name: String, contents: String) {
+        textFileBlocks.getOrPut(name) { mutableListOf() }.add(contents)
     }
 
     fun consumeConfigureBlocks(scope: MutableSwiftScope) {
@@ -29,12 +35,12 @@ class DefaultSkieModule() : SkieModule {
         }
     }
 
-    fun produceFiles(context: SwiftPoetScope): List<FileSpec> {
+    fun produceSwiftPoetFiles(context: SwiftPoetScope): List<FileSpec> {
         val result = mutableMapOf<String, FileSpec.Builder>()
 
         do {
-            val consumedValues = fileBlocks.toMap()
-            fileBlocks.clear()
+            val consumedValues = swiftPoetFileBlocks.toMap()
+            swiftPoetFileBlocks.clear()
             consumedValues.forEach { (fileName, blocks) ->
                 blocks.forEach { block ->
                     with(context) {
@@ -42,8 +48,18 @@ class DefaultSkieModule() : SkieModule {
                     }
                 }
             }
-        } while (fileBlocks.isNotEmpty())
+        } while (swiftPoetFileBlocks.isNotEmpty())
 
         return result.values.map { it.build() }
     }
+
+    fun produceTextFiles(): List<TextFile> {
+        val textFiles = textFileBlocks.map { TextFile(it.key, it.value.joinToString("\n")) }
+
+        textFileBlocks.clear()
+
+        return textFiles
+    }
+
+    data class TextFile(val name: String, val content: String)
 }

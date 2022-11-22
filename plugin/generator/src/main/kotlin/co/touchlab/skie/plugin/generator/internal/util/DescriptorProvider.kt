@@ -16,15 +16,19 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 internal class DescriptorProvider(private val context: CommonBackendContext) {
 
     val classDescriptors: Set<ClassDescriptor> by lazy {
-        exportedInterface.generatedClasses.filter { it.isExported }.toSet()
+        exportedInterface.generatedClasses
     }
 
-    val categoryMembersCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
-        exportedInterface.categoryMembers.values.flatten().filter { it.isExported }.toSet()
+    val exportedClassDescriptors: Set<ClassDescriptor> by lazy {
+        classDescriptors.filter { it.isExported }.toSet()
     }
 
-    val topLevelCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
-        exportedInterface.topLevel.values.flatten().filter { it.isExported }.toSet()
+    val exportedCategoryMembersCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
+        exportedInterface.categoryMembers.values.flatten().toSet().filter { it.isExported }.toSet()
+    }
+
+    val exportedTopLevelCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
+        exportedInterface.topLevel.values.flatten().toSet().filter { it.isExported }.toSet()
     }
 
     private val exportedModules: Set<ModuleDescriptor> by lazy {

@@ -86,6 +86,9 @@ internal class KotlinTestLinker(
             bundleId = "Kotlin"
 
             pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.RESOURCES)
+
+            libraries = BuildConfig.DEPENDENCIES
+            exportedLibraries = BuildConfig.EXPORTED_DEPENDENCIES
         }
 
     private fun interpretResult(

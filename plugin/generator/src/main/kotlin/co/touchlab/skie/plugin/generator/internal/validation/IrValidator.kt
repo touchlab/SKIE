@@ -16,7 +16,7 @@ internal class IrValidator(private val reporter: Reporter, private val configura
     fun validate(descriptorProvider: DescriptorProvider) {
         with(reporter) {
             with(configuration) {
-                descriptorProvider.classDescriptors.forEach {
+                descriptorProvider.exportedClassDescriptors.forEach {
                     classRules.validate(it)
                 }
             }

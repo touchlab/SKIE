@@ -63,6 +63,9 @@ val build by tasks.registering(Exec::class) {
             output.absolutePath,
             // Workaround for https://github.com/apple/swift/issues/55127
             "-parse-as-library",
+            // Workaround for missing symbol when compiling with Coroutines for MacosArm64
+            "-Xlinker",
+            "-dead_strip",
         )
     }
 }

@@ -22,6 +22,7 @@ kotlin {
             framework {
                 isStatic = true
                 baseName = "Kotlin"
+                freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
             }
         }
     }
@@ -50,5 +51,6 @@ kotlin {
 configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("co.touchlab.skie:skie-kotlin-plugin")).using(module("co.touchlab.skie:kotlin-plugin:${version}"))
+        substitute(module("co.touchlab.skie:skie-runtime-kotlin")).using(module("co.touchlab.skie:kotlin:${version}"))
     }
 }
