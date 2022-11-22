@@ -1,5 +1,6 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin
 
+import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.framework.BuildConfig
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
@@ -26,7 +27,7 @@ internal class KotlinTestLinker(
     private val testResultBuilder: TestResultBuilder,
 ) {
 
-    fun link(klib: Path, configuration: Path): IntermediateResult<Path> {
+    fun link(klib: Path, configuration: Path, compilerConfiguration: CompilerConfiguration): IntermediateResult<Path> {
         val tempDirectory = tempFileSystem.createDirectory("kotlin-linker")
         val outputFile = tempFileSystem.createDirectory("Kotlin.framework")
 
@@ -34,7 +35,7 @@ internal class KotlinTestLinker(
 
         val (messageCollector, outputStream) = createCompilerOutputStream()
 
-        val arguments = createCompilerArguments(klib, tempDirectory, outputFile)
+        val arguments = createCompilerArguments(klib, tempDirectory, outputFile, compilerConfiguration)
 
         val result = K2Native().exec(messageCollector, Services.EMPTY, arguments)
 
@@ -72,6 +73,7 @@ internal class KotlinTestLinker(
         klib: Path,
         tempDirectory: Path,
         outputFile: Path,
+        compilerConfiguration: CompilerConfiguration,
     ): K2NativeCompilerArguments =
         K2NativeCompilerArguments().apply {
             includes = (includes ?: emptyArray()) + klib.absolutePathString()
@@ -87,8 +89,8 @@ internal class KotlinTestLinker(
 
             pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.RESOURCES)
 
-            libraries = BuildConfig.DEPENDENCIES
-            exportedLibraries = BuildConfig.EXPORTED_DEPENDENCIES
+            libraries = compilerConfiguration.dependencies.toTypedArray()
+            exportedLibraries = compilerConfiguration.exportedDependencies.toTypedArray()
         }
 
     private fun interpretResult(

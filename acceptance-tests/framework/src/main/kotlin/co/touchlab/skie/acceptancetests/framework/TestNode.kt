@@ -29,11 +29,15 @@ sealed class TestNode {
 
         private const val fullNameSeparator = "/"
 
-        operator fun invoke(path: Path, outputPath: Path): TestNode =
-            Container(path, outputPath, null)
+        operator fun invoke(path: Path, outputPath: Path, compilerConfiguration: CompilerConfiguration): TestNode =
+            Container(path, outputPath, null, compilerConfiguration)
 
-        operator fun invoke(path: Path, outputPath: Path, parent: Container): TestNode =
-            if (path.isRegularFile()) Test(path, outputPath, parent) else Container(path, outputPath, parent)
+        operator fun invoke(path: Path, outputPath: Path, parent: Container, compilerConfiguration: CompilerConfiguration): TestNode =
+            if (path.isRegularFile()) {
+                Test(path, outputPath, parent, compilerConfiguration)
+            } else {
+                Container(path, outputPath, parent, compilerConfiguration)
+            }
 
         fun testName(path: Path): String =
             path.name.removeSuffix(".swift")
@@ -43,6 +47,7 @@ sealed class TestNode {
         public override val path: Path,
         override val outputPath: Path,
         override val parent: Container,
+        val compilerConfiguration: CompilerConfiguration,
     ) : TestNode() {
 
         override val directChildren: List<TestNode> = emptyList()
@@ -87,12 +92,13 @@ sealed class TestNode {
         override val path: Path,
         override val outputPath: Path,
         override val parent: Container?,
+        private val compilerConfiguration: CompilerConfiguration,
     ) : TestNode() {
 
         override val directChildren: List<TestNode> by lazy {
             path.listDirectoryEntries()
                 .filter { it.isDirectChildren }
-                .map { TestNode(it, outputPath.resolve(testName(it)), this) }
+                .map { TestNode(it, outputPath.resolve(testName(it)), this, compilerConfiguration) }
         }
 
         val kotlinFiles: List<Path> by lazy {

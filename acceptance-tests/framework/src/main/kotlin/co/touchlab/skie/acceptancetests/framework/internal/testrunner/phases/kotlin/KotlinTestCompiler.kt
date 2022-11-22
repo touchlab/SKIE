@@ -1,5 +1,6 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin
 
+import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestResultBuilder
@@ -21,13 +22,13 @@ internal class KotlinTestCompiler(
     private val testResultBuilder: TestResultBuilder,
 ) {
 
-    fun compile(kotlinFiles: List<Path>): IntermediateResult<Path> {
+    fun compile(kotlinFiles: List<Path>, compilerConfiguration: CompilerConfiguration): IntermediateResult<Path> {
         val tempDirectory = tempFileSystem.createDirectory("kotlin-compiler")
         val outputFile = tempFileSystem.createFile("kotlin.klib")
 
         val (messageCollector, outputStream) = createCompilerOutputStream()
 
-        val arguments = createCompilerArguments(kotlinFiles, tempDirectory, outputFile)
+        val arguments = createCompilerArguments(kotlinFiles, tempDirectory, outputFile, compilerConfiguration)
 
         val result = K2Native().exec(messageCollector, Services.EMPTY, arguments)
 
@@ -50,6 +51,7 @@ internal class KotlinTestCompiler(
         kotlinFiles: List<Path>,
         tempDirectory: Path,
         outputFile: Path,
+        compilerConfiguration: CompilerConfiguration,
     ): K2NativeCompilerArguments =
         K2NativeCompilerArguments().apply {
             freeArgs = kotlinFiles.map { it.absolutePathString() }
@@ -62,7 +64,7 @@ internal class KotlinTestCompiler(
             this.temporaryFilesDir = tempDirectory.absolutePathString()
             outputName = outputFile.absolutePathString()
 
-            libraries = BuildConfig.DEPENDENCIES
+            libraries = compilerConfiguration.dependencies.toTypedArray()
         }
 
     private fun interpretResult(

@@ -1,5 +1,6 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner
 
+import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.ExpectedTestResult
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TempFileSystemFactory
@@ -21,9 +22,9 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         val testResultBuilder = TestResultBuilder()
 
         return IntermediateResult.Value(test.kotlinFiles)
-            .flatMap { compileKotlin(it, tempFileSystem, testResultBuilder) }
+            .flatMap { compileKotlin(it, test.compilerConfiguration, tempFileSystem, testResultBuilder) }
             .zip { generateConfiguration(test.configFiles, tempFileSystem, testResultBuilder) }
-            .flatMap { linkKotlin(it.first, it.second, tempFileSystem, testResultBuilder) }
+            .flatMap { linkKotlin(it.first, it.second, test.compilerConfiguration, tempFileSystem, testResultBuilder) }
             .pairWith { enhanceSwiftCode(test.swiftCode, tempFileSystem) }
             .flatMap { compileSwift(it.first, it.second, tempFileSystem, testResultBuilder) }
             .finalize { runSwift(it, testResultBuilder) }
@@ -33,10 +34,11 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
 
     private fun compileKotlin(
         kotlinFiles: List<Path>,
+        compilerConfiguration: CompilerConfiguration,
         tempFileSystem: TempFileSystem,
         testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles)
+        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles, compilerConfiguration)
 
     private fun generateConfiguration(
         configFiles: List<Path>,
@@ -48,10 +50,11 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     private fun linkKotlin(
         klib: Path,
         configuration: Path,
+        compilerConfiguration: CompilerConfiguration,
         tempFileSystem: TempFileSystem,
         testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        KotlinTestLinker(tempFileSystem, testResultBuilder).link(klib, configuration)
+        KotlinTestLinker(tempFileSystem, testResultBuilder).link(klib, configuration, compilerConfiguration)
 
     private fun enhanceSwiftCode(swiftCode: String, tempFileSystem: TempFileSystem): Path =
         SwiftCodeEnhancer(tempFileSystem).enhance(swiftCode)
