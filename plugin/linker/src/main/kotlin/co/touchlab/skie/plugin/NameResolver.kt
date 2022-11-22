@@ -41,12 +41,12 @@ internal class NameResolver(
 
     private fun resolveFileName(target: TransformAccumulator.TypeTransformTarget.File): MutableSwiftTypeName = DefaultMutableSwiftTypeName(
         originalParent = null,
-        originalIsNestedInParent = false,
         originalSimpleName = namer.getFileClassName(target.file).swiftName,
     )
 
     private fun resolveClassName(target: TransformAccumulator.TypeTransformTarget.Class): MutableSwiftTypeName {
-        val name = if (target.descriptor.kind == ClassKind.ENUM_ENTRY) {
+        val isEnumEntry = target.descriptor.kind == ClassKind.ENUM_ENTRY
+        val name = if (isEnumEntry) {
             namer.getEnumEntrySelector(target.descriptor)
         } else {
             namer.getClassOrProtocolName(target.descriptor).swiftName
@@ -54,7 +54,6 @@ internal class NameResolver(
         return when (val parent = target.descriptor.containingDeclaration) {
             is PackageFragmentDescriptor, is PackageViewDescriptor -> DefaultMutableSwiftTypeName(
                 originalParent = null,
-                originalIsNestedInParent = false,
                 originalSimpleName = name,
             )
             is ClassDescriptor -> {
@@ -65,14 +64,15 @@ internal class NameResolver(
                 } else {
                     name
                 }
-                val (isNestedInParent, simpleName) = if (simpleNameCandidate.startsWith('.')) {
-                    true to simpleNameCandidate.drop(1)
+                val (realParent, simpleName) = if (simpleNameCandidate.startsWith('.')) {
+                    parentName to simpleNameCandidate.drop(1)
+                } else if (isEnumEntry) {
+                    parentName to simpleNameCandidate
                 } else {
-                    false to simpleNameCandidate
+                    parentName.parent to parentName.originalSimpleName + simpleNameCandidate
                 }
                 DefaultMutableSwiftTypeName(
-                    originalParent = parentName,
-                    originalIsNestedInParent = isNestedInParent,
+                    originalParent = realParent,
                     originalSimpleName = simpleName,
                 )
             }

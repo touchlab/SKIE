@@ -53,13 +53,12 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(DescriptorProvider)
-        private fun generate(declaration: ClassDescriptor) {
+    context(DescriptorProvider) private fun generate(declaration: ClassDescriptor) {
         module.configure {
             declaration.isHiddenFromSwift = true
 
             val swiftName = declaration.swiftName
-            declaration.swiftBridgeType = SwiftBridgedName(swiftName.parent, swiftName.isNestedInParent, swiftName.originalSimpleName)
+            declaration.swiftBridgeType = SwiftBridgedName(swiftName.parent, swiftName.originalSimpleName)
         }
 
         generateCode(declaration) {
