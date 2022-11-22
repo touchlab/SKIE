@@ -1,4 +1,4 @@
-# SwiftCompilationError(error: value of type 'I' has no member 'value')
+# SwiftCompilationError(error: value of type 'any I' has no member 'value')
 
 let a = A<C>()
 

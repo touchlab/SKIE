@@ -1,4 +1,4 @@
-# SwiftCompilationError(argument type 'B' does not conform to expected type 'A')
+# SwiftCompilationError(argument type 'any B' does not conform to expected type 'A')
 
 let b: B = B1()
 
