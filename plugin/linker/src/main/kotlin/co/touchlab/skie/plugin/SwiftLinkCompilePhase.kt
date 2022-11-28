@@ -40,7 +40,7 @@ class SwiftLinkCompilePhase(
 
         val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
         val transformAccumulator = TransformAccumulator(namer)
-        val swiftScope = DefaultMutableSwiftScope(namer, transformAccumulator, framework.moduleName)
+        val swiftScope = DefaultMutableSwiftScope(namer, transformAccumulator)
         val skieModule = context.skieContext.module as DefaultSkieModule
         skieModule.consumeConfigureBlocks(swiftScope)
         transformAccumulator.close()

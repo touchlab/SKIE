@@ -57,7 +57,6 @@ import org.jetbrains.kotlin.types.KotlinType
 internal class DefaultMutableSwiftScope(
     private val namer: ObjCExportNamer,
     private val transformAccumulator: TransformAccumulator,
-    private val moduleName: String,
 ) : MutableSwiftScope, SwiftPoetScope {
     override val ClassDescriptor.swiftName: MutableSwiftTypeName
         get() = transformAccumulator.resolveName(this)
@@ -308,7 +307,7 @@ internal class DefaultMutableSwiftScope(
         }
 
     override val ClassDescriptor.spec: DeclaredTypeName
-        get() = DeclaredTypeName.qualifiedTypeName("$moduleName.${swiftName.qualifiedName}")
+        get() = DeclaredTypeName.qualifiedTypeName(".${swiftName.qualifiedName}")
 
     override val PropertyDescriptor.spec: PropertySpec
         get() = PropertySpec.builder(swiftName, type.spec(KotlinTypeSpecKind.BRIDGED)).build()

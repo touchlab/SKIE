@@ -23,7 +23,7 @@ internal class NamespaceProvider(
     fun addNamespace(namespace: DeclaredTypeName) {
         val nameComponents = namespace.simpleNames
 
-        val baseNamespace = DeclaredTypeName.qualifiedTypeName("${namespace.moduleName}.${nameComponents.first()}")
+        val baseNamespace = DeclaredTypeName.qualifiedTypeName(".${nameComponents.first()}")
         addSingleNamespace(baseNamespace)
 
         nameComponents.drop(1).fold(baseNamespace) { acc, nameComponent ->
