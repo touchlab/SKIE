@@ -3,7 +3,7 @@ package co.touchlab.skie.acceptancetests.framework.internal
 import co.touchlab.skie.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.skie.acceptancetests.framework.TestFilter
 import co.touchlab.skie.acceptancetests.framework.TestNode
-import co.touchlab.skie.acceptancetests.framework.TestResult
+import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestRunner
 import kotlin.streams.toList
 
@@ -33,7 +33,7 @@ internal class TestNodeRunner(
     private val TestNode.Test.shouldBeEvaluated: Boolean
         get() = this.isActive && testFilter.shouldBeEvaluated(this)
 
-    private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResult> =
+    private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResultWithLogs> =
         tests
             .parallelStream()
             .map { it to testRunner.runTest(it) }
@@ -41,7 +41,7 @@ internal class TestNodeRunner(
             .toMap()
 
     private fun mapEvaluatedTests(
-        evaluatedTests: Map<TestNode.Test, TestResult>,
+        evaluatedTests: Map<TestNode.Test, TestResultWithLogs>,
         testNode: TestNode,
     ): EvaluatedTestNode? = when (testNode) {
         is TestNode.Container -> mapEvaluatedTests(evaluatedTests, testNode)
@@ -49,7 +49,7 @@ internal class TestNodeRunner(
     }
 
     private fun mapEvaluatedTests(
-        evaluatedTests: Map<TestNode.Test, TestResult>,
+        evaluatedTests: Map<TestNode.Test, TestResultWithLogs>,
         container: TestNode.Container,
     ): EvaluatedTestNode.Container? {
         val children = container.directChildren.mapNotNull { mapEvaluatedTests(evaluatedTests, it) }
@@ -62,16 +62,13 @@ internal class TestNodeRunner(
     }
 
     private fun mapEvaluatedTests(
-        evaluatedTests: Map<TestNode.Test, TestResult>,
+        evaluatedTests: Map<TestNode.Test, TestResultWithLogs>,
         test: TestNode.Test,
     ): EvaluatedTestNode = evaluatedTests[test]?.let {
         EvaluatedTestNode.Test(
             name = test.name,
-            fullName = test.fullName,
-            path = test.path,
-            resultPath = test.resultPath,
             expectedResult = test.expectedResult,
-            actualResult = it,
+            actualResultWithLogs = it,
         )
     } ?: EvaluatedTestNode.SkippedTest(test.name)
 }

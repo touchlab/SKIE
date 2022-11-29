@@ -6,77 +6,89 @@ import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.skie.acceptancetests.framework.TestNode
 import co.touchlab.skie.acceptancetests.framework.TestResult
+import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestLinker
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.PluginConfigurationGenerator
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.SwiftCodeEnhancer
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.SwiftProgramRunner
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.SwiftTestCompiler
+import co.touchlab.skie.acceptancetests.framework.internal.util.CreatedFilesDescriptionFilter
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.relativeTo
 import kotlin.io.path.writeText
 
 internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFactory) {
 
-    fun runTest(test: TestNode.Test): TestResult {
+    fun runTest(test: TestNode.Test): TestResultWithLogs {
         val tempFileSystem = tempFileSystemFactory.create(test)
-        val testResultBuilder = TestResultBuilder()
+        val testLogger = TestLogger()
 
-        return IntermediateResult.Value(test.kotlinFiles)
-            .flatMap { compileKotlin(it, test.compilerConfiguration, tempFileSystem, testResultBuilder) }
-            .zip { generateConfiguration(test.configFiles, tempFileSystem, testResultBuilder) }
-            .flatMap { linkKotlin(it.first, it.second, test.compilerConfiguration, tempFileSystem, testResultBuilder) }
-            .pairWith { enhanceSwiftCode(test.swiftCode, tempFileSystem) }
-            .flatMap { compileSwift(it.first, it.second, tempFileSystem, testResultBuilder) }
-            .finalize { runSwift(it, testResultBuilder) }
-            .also { writeResult(test, it) }
-            .also { reportResult(test, it) }
+        val testResult = with(tempFileSystem) {
+            with(testLogger) {
+                IntermediateResult.Value(test.kotlinFiles)
+                    .flatMap { compileKotlin(it, test.compilerConfiguration) }
+                    .zip { generateConfiguration(test.configFiles) }
+                    .flatMap { linkKotlin(it.first, it.second, test.compilerConfiguration) }
+                    .pairWith { enhanceSwiftCode(test.swiftCode) }
+                    .flatMap { compileSwift(it.first, it.second) }
+                    .finalize { runSwift(it) }
+                    .also { testLogger.prependTestInfo(test, tempFileSystem) }
+            }
+        }
+
+        val testResultWithLogs = testResult.withLogs(testLogger)
+
+        writeResult(test, testResultWithLogs)
+        reportResult(test, testResultWithLogs)
+
+        return testResultWithLogs
     }
 
-    private fun compileKotlin(
+    context(TempFileSystem, TestLogger)
+        private fun compileKotlin(
         kotlinFiles: List<Path>,
         compilerConfiguration: CompilerConfiguration,
-        tempFileSystem: TempFileSystem,
-        testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        KotlinTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFiles, compilerConfiguration)
+        KotlinTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFiles, compilerConfiguration)
 
-    private fun generateConfiguration(
+    context(TempFileSystem)
+        private fun generateConfiguration(
         configFiles: List<Path>,
-        tempFileSystem: TempFileSystem,
-        testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        PluginConfigurationGenerator(tempFileSystem, testResultBuilder).generate(configFiles)
+        PluginConfigurationGenerator(this@TempFileSystem).generate(configFiles)
 
-    private fun linkKotlin(
+    context(TempFileSystem, TestLogger)
+        private fun linkKotlin(
         klib: Path,
         configuration: Path,
         compilerConfiguration: CompilerConfiguration,
-        tempFileSystem: TempFileSystem,
-        testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        KotlinTestLinker(tempFileSystem, testResultBuilder).link(klib, configuration, compilerConfiguration)
+        KotlinTestLinker(this@TempFileSystem, this@TestLogger).link(klib, configuration, compilerConfiguration)
 
-    private fun enhanceSwiftCode(swiftCode: String, tempFileSystem: TempFileSystem): Path =
-        SwiftCodeEnhancer(tempFileSystem).enhance(swiftCode)
+    context(TempFileSystem)
+        private fun enhanceSwiftCode(swiftCode: String): Path =
+        SwiftCodeEnhancer(this@TempFileSystem).enhance(swiftCode)
 
-    private fun compileSwift(
+    context(TempFileSystem, TestLogger)
+        private fun compileSwift(
         kotlinFramework: Path,
         swiftFile: Path,
-        tempFileSystem: TempFileSystem,
-        testResultBuilder: TestResultBuilder,
     ): IntermediateResult<Path> =
-        SwiftTestCompiler(tempFileSystem, testResultBuilder).compile(kotlinFramework, swiftFile)
+        SwiftTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFramework, swiftFile)
 
-    private fun runSwift(binary: Path, testResultBuilder: TestResultBuilder): TestResult =
-        SwiftProgramRunner(testResultBuilder).runProgram(binary)
+    context(TestLogger)
+        private fun runSwift(binary: Path): TestResult =
+        SwiftProgramRunner(this@TestLogger).runProgram(binary)
 
-    private fun writeResult(test: TestNode.Test, result: TestResult) {
+    private fun writeResult(test: TestNode.Test, result: TestResultWithLogs) {
         val resultAsText = test.expectedResult.hasSucceededAsString(result)
 
         test.resultPath.writeText(resultAsText)
     }
 
-    private fun reportResult(test: TestNode.Test, result: TestResult) {
+    private fun reportResult(test: TestNode.Test, result: TestResultWithLogs) {
         if (test.expectedResult.hasSucceeded(result)) {
             print("\u001b[32m")
         } else {
@@ -88,6 +100,30 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         println("\u001b[0m")
     }
 
-    private fun ExpectedTestResult.hasSucceededAsString(result: TestResult): String =
+    private fun TestLogger.prependTestInfo(test: TestNode.Test, tempFileSystem: TempFileSystem) {
+        val createdFilesDescription = tempFileSystem.describeCreatedFiles(CreatedFilesDescriptionFilter)
+        this.prependSection("Created files", createdFilesDescription)
+
+        val testFilesDescription = test.describeTestFiles()
+        this.prependSection("Test files", testFilesDescription)
+
+        this.prependLine(
+            """
+                Test name: ${test.fullName}
+                To run only this test add env variable: acceptanceTest=${test.fullName}
+            """.trimIndent()
+        )
+    }
+
+    private fun TestNode.Test.describeTestFiles(): String =
+        (listOf(this.path) + this.kotlinFiles).joinToString("\n") { it.absolutePathString() }
+
+    private fun TestResult.withLogs(testLogger: TestLogger): TestResultWithLogs =
+        TestResultWithLogs(
+            this,
+            testLogger.toString(),
+        )
+
+    private fun ExpectedTestResult.hasSucceededAsString(result: TestResultWithLogs): String =
         if (this.hasSucceeded(result)) ExpectedTestResult.SUCCESS else ExpectedTestResult.FAILURE
 }

@@ -1,14 +1,15 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift
 
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
+import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
-import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestResultBuilder
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
 internal class SwiftTestCompiler(
     private val tempFileSystem: TempFileSystem,
-    private val testResultBuilder: TestResultBuilder,
+    private val testLogger: TestLogger,
 ) {
 
     fun compile(kotlinFramework: Path, swiftFile: Path): IntermediateResult<Path> {
@@ -18,7 +19,7 @@ internal class SwiftTestCompiler(
 
         val result = command.execute()
 
-        testResultBuilder.appendLog("Swift compiler", result.stdOut)
+        testLogger.appendSection("Swift compiler", result.stdOut)
 
         return interpretResult(result, output)
     }
@@ -46,8 +47,6 @@ internal class SwiftTestCompiler(
         if (result.exitCode == 0) {
             IntermediateResult.Value(output)
         } else {
-            val testResult = testResultBuilder.buildSwiftCompilationError(result.stdErr)
-
-            IntermediateResult.Error(testResult)
+            IntermediateResult.Error(TestResult.SwiftCompilationError(result.stdErr))
         }
 }

@@ -1,5 +1,6 @@
 package co.touchlab.skie.acceptancetests.framework
 
+import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
@@ -17,4 +18,15 @@ class TempFileSystem(private val tempDirectory: Path) {
 
     fun createDirectory(name: String): Path =
         tempDirectory.resolve(name).createDirectory()
+
+    fun describeCreatedFiles(filter: (File) -> Boolean): String {
+        val tempDirectoryFile = tempDirectory.toFile()
+
+        return tempDirectoryFile.walk(FileWalkDirection.TOP_DOWN)
+            .filter { it.isFile }
+            .filter(filter)
+            .joinToString("\n") {
+                it.relativeTo(tempDirectoryFile).path + ": " + it.absolutePath
+            }
+    }
 }

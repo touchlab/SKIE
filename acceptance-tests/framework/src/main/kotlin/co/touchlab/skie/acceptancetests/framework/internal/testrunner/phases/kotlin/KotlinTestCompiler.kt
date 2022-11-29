@@ -2,9 +2,9 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.ko
 
 import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
+import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
-import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestResultBuilder
-import co.touchlab.skie.framework.BuildConfig
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.bc.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -19,7 +19,7 @@ import kotlin.io.path.absolutePathString
 
 internal class KotlinTestCompiler(
     private val tempFileSystem: TempFileSystem,
-    private val testResultBuilder: TestResultBuilder,
+    private val testLogger: TestLogger,
 ) {
 
     fun compile(kotlinFiles: List<Path>, compilerConfiguration: CompilerConfiguration): IntermediateResult<Path> {
@@ -73,15 +73,13 @@ internal class KotlinTestCompiler(
         outputStream: OutputStream,
     ): IntermediateResult<Path> = when (result) {
         ExitCode.OK -> {
-            testResultBuilder.appendLog("Kotlin compiler", outputStream.toString())
+            testLogger.appendSection("Kotlin compiler", outputStream.toString())
 
             IntermediateResult.Value(klibFile)
         }
 
         else -> {
-            val testResult = testResultBuilder.buildKotlinCompilationError(outputStream.toString())
-
-            IntermediateResult.Error(testResult)
+            IntermediateResult.Error(TestResult.SwiftCompilationError(outputStream.toString()))
         }
     }
 }

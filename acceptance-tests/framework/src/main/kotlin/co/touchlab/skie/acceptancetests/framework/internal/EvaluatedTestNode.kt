@@ -2,7 +2,7 @@ package co.touchlab.skie.acceptancetests.framework.internal
 
 import co.touchlab.skie.acceptancetests.framework.ExpectedTestResult
 import co.touchlab.skie.acceptancetests.framework.TestResult
-import java.nio.file.Path
+import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
 
 internal sealed interface EvaluatedTestNode {
 
@@ -10,12 +10,14 @@ internal sealed interface EvaluatedTestNode {
 
     data class Test(
         override val name: String,
-        val fullName: String,
-        val path: Path,
-        val resultPath: Path,
         val expectedResult: ExpectedTestResult,
-        val actualResult: TestResult,
-    ) : EvaluatedTestNode
+        val actualResultWithLogs: TestResultWithLogs,
+    ) : EvaluatedTestNode {
+
+        fun outputResult() {
+            expectedResult.shouldBe(actualResultWithLogs)
+        }
+    }
 
     data class SkippedTest(
         override val name: String,

@@ -4,10 +4,14 @@ import io.kotest.assertions.fail
 
 sealed interface ExpectedTestResult {
 
-    fun evaluate(testResult: TestResult)
+    fun shouldBe(testResultWithLogs: TestResultWithLogs) {
+        shouldBe(testResultWithLogs.testResult, testResultWithLogs.logs)
+    }
 
-    fun hasSucceeded(testResult: TestResult): Boolean = try {
-        evaluate(testResult)
+    fun shouldBe(testResult: TestResult, logs: String)
+
+    fun hasSucceeded(testResultWithLogs: TestResultWithLogs): Boolean = try {
+        shouldBe(testResultWithLogs)
 
         true
     } catch (_: Throwable) {
@@ -22,7 +26,7 @@ sealed interface ExpectedTestResult {
 
     object Success : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
             if (testResult is TestResult.Success) {
                 return
             }
@@ -33,8 +37,8 @@ sealed interface ExpectedTestResult {
 
     data class SuccessWithWarning(val warning: String) : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
-            if (testResult is TestResult.Success && testResult.logs.contains(warning)) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
+            if (testResult is TestResult.Success && logs.contains(warning)) {
                 return
             }
 
@@ -44,8 +48,8 @@ sealed interface ExpectedTestResult {
 
     data class SuccessWithoutWarning(val warning: String) : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
-            if (testResult is TestResult.Success && !testResult.logs.contains(warning)) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
+            if (testResult is TestResult.Success && !logs.contains(warning)) {
                 return
             }
 
@@ -55,7 +59,7 @@ sealed interface ExpectedTestResult {
 
     object MissingExit : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
             if (testResult is TestResult.MissingExit) {
                 return
             }
@@ -66,7 +70,7 @@ sealed interface ExpectedTestResult {
 
     data class IncorrectOutput(val exitCode: Int?) : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
             if (exitCode != null) {
                 if (testResult is TestResult.IncorrectOutput && testResult.exitCode == exitCode) {
                     return
@@ -85,7 +89,7 @@ sealed interface ExpectedTestResult {
 
     data class RuntimeError(val error: String?) : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
             if (error != null) {
                 if (testResult is TestResult.RuntimeError && testResult.error.contains(error)) {
                     return
@@ -104,7 +108,7 @@ sealed interface ExpectedTestResult {
 
     data class SwiftCompilationError(val error: String?) : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
             if (error != null) {
                 if (testResult is TestResult.SwiftCompilationError && testResult.error.contains(error)) {
                     return
@@ -123,7 +127,7 @@ sealed interface ExpectedTestResult {
 
     data class KotlinLinkingError(val error: String?) : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
             if (error != null) {
                 if (testResult is TestResult.KotlinLinkingError && testResult.error.contains(error)) {
                     return
@@ -142,7 +146,7 @@ sealed interface ExpectedTestResult {
 
     data class KotlinCompilationError(val error: String?) : ExpectedTestResult {
 
-        override fun evaluate(testResult: TestResult) {
+        override fun shouldBe(testResult: TestResult, logs: String) {
             if (error != null) {
                 if (testResult is TestResult.KotlinCompilationError && testResult.error.contains(error)) {
                     return
