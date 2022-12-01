@@ -164,7 +164,7 @@
 				451A87F626D69EA40013D7F8 /* SwiftLint */,
 				F1465EFA23AA94BF0055F7C3 /* Frameworks */,
 				F1465EFB23AA94BF0055F7C3 /* Resources */,
-				5EFFFDD843E31ED877BF82D0 /* [CP] Embed Pods Frameworks */,
+				D1CA6024A1439EF9344B8C2A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -299,7 +299,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# For reference: https://github.com/realm/SwiftLint\n\n${PODS_ROOT}/SwiftLint/swiftlint\n";
 		};
-		5EFFFDD843E31ED877BF82D0 /* [CP] Embed Pods Frameworks */ = {
+		D1CA6024A1439EF9344B8C2A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
