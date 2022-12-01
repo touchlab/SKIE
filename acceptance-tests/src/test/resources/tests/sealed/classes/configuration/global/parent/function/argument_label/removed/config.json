@@ -1,9 +1,13 @@
-[
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "SealedInterop.Function.ArgumentLabel": "_"
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "SealedInterop.Function.ArgumentLabel": "_"
+            }
         }
-    }
-]
+    ]
+}

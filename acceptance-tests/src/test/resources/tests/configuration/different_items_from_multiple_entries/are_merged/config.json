@@ -1,16 +1,20 @@
-[
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "SealedInterop.ElseName": "Other"
-        }
+{
+    "enabledFeatures": {
     },
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "SealedInterop.Case.Name": "X"
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "SealedInterop.ElseName": "Other"
+            }
+        },
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "SealedInterop.Case.Name": "X"
+            }
         }
-    }
-]
+    ]
+}

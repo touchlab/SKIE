@@ -7,6 +7,9 @@ plugins {
 }
 
 skie {
+    features {
+        suspendInterop.set(true)
+    }
     configuration {
         group {
         }

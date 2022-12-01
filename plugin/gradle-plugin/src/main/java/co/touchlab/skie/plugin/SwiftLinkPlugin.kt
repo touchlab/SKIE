@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -49,7 +50,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
     }
 
     override fun apply(project: Project): Unit = with(project) {
-        val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java, this)
+        val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java)
         val createSwiftGenConfigTask = createSwiftGenConfiguration(project)
 
         val swiftLinkPluginConfiguration = configurations.maybeCreate(SWIFT_LINK_PLUGIN_CONFIGURATION_NAME).apply {
@@ -105,7 +106,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                 .filter { it.konanTarget.family.isAppleFamily }
 
             appleTargets.forEach { target ->
-                target.registerRuntime()
+                target.registerRuntime(extension)
 
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
                 frameworks.forEach { framework ->
@@ -210,7 +211,11 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         }
     }
 
-    private fun KotlinNativeTarget.registerRuntime() {
+    private fun KotlinNativeTarget.registerRuntime(skieExtension: SkieExtension) {
+        if (!skieExtension.features.suspendInterop.get()) {
+            return
+        }
+
         this.compilations.named("main") {
             it.defaultSourceSet.dependencies {
                 api(BuildConfig.RUNTIME_DEPENDENCY)

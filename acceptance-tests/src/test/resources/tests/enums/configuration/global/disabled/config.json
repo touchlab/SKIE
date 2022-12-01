@@ -1,9 +1,13 @@
-[
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "EnumInterop.Enabled": "false"
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "EnumInterop.Enabled": "false"
+            }
         }
-    }
-]
+    ]
+}

@@ -23,7 +23,7 @@ internal class SwiftGenScheduler(
 
     private val irValidator = IrValidator(reporter, configuration)
 
-    private val runtimeGenerator = RuntimeGenerator(skieContext)
+    private val runtimeGenerator = RuntimeGenerator(skieContext, configuration)
 
     private val exhaustiveEnumsGenerator = ExhaustiveEnumsGenerator(
         skieContext = skieContext,

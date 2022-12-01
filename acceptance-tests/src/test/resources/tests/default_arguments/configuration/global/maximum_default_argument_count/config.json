@@ -1,9 +1,13 @@
-[
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "DefaultArgumentInterop.MaximumDefaultArgumentCount": "1"
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "DefaultArgumentInterop.MaximumDefaultArgumentCount": "1"
+            }
         }
-    }
-]
+    ]
+}

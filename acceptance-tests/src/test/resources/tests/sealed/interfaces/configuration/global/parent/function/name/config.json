@@ -1,9 +1,13 @@
-[
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "SealedInterop.Function.Name": "onEnum2"
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "SealedInterop.Function.Name": "onEnum2"
+            }
         }
-    }
-]
+    ]
+}

@@ -1,9 +1,13 @@
-[
-    {
-        "target": "",
-        "overridesAnnotations": true,
-        "items": {
-            "SealedInterop.Case.Name": "X"
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": true,
+            "items": {
+                "SealedInterop.Case.Name": "X"
+            }
         }
-    }
-]
+    ]
+}

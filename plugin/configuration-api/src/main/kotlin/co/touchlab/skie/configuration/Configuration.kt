@@ -2,6 +2,7 @@ package co.touchlab.skie.configuration
 
 import co.touchlab.skie.configuration_api.BuildConfig
 import co.touchlab.skie.configuration.builder.ConfigurationBuilder
+import co.touchlab.skie.configuration.features.SkieFeatureSet
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -9,6 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 data class Configuration(
+    val enabledFeatures: SkieFeatureSet,
     private val groups: List<Group>,
 ) {
 
@@ -33,11 +35,19 @@ data class Configuration(
     fun serialize(): String {
         val json = Json { prettyPrint = true }
 
-        return json.encodeToString(groups)
+        val wrapper = SerializationWrapper(enabledFeatures, groups)
+
+        return json.encodeToString(wrapper)
     }
 
     operator fun plus(other: Configuration): Configuration =
-        Configuration(groups + other.groups)
+        Configuration(enabledFeatures + other.enabledFeatures, groups + other.groups)
+
+    @Serializable
+    data class SerializationWrapper(
+        val enabledFeatures: SkieFeatureSet,
+        val groups: List<Group>,
+    )
 
     @Serializable
     data class Group(
@@ -59,9 +69,9 @@ data class Configuration(
             builder.build()
 
         fun deserialize(string: String): Configuration {
-            val groups = Json.decodeFromString<List<Group>>(string)
+            val wrapper = Json.decodeFromString<SerializationWrapper>(string)
 
-            return Configuration(groups)
+            return Configuration(wrapper.enabledFeatures, wrapper.groups)
         }
     }
 }

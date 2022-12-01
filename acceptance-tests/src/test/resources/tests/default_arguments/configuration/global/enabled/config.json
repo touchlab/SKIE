@@ -1,9 +1,13 @@
-[
-    {
-        "target": "",
-        "overridesAnnotations": false,
-        "items": {
-            "DefaultArgumentInterop.Enabled": "true"
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "DefaultArgumentInterop.Enabled": "true"
+            }
         }
-    }
-]
+    ]
+}
