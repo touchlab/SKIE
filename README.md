@@ -91,9 +91,9 @@ enum SwiftWrapperEnum {
 
 func onEnum(of sealed: KotlinSealedInterface) -> SwiftWrapperEnum {
     if let sealed = sealed as? KotlinSealedInterfaceSuccess {
-        return SwiftWrapperEnum.Success(data: sealed.data)
+        return SwiftWrapperEnum.Success(sealed)
     } else if let sealed = sealed as? KotlinSealedInterfaceError {
-        return SwiftWrapperEnum.Error(message: sealed.message)
+        return SwiftWrapperEnum.Error(sealed)
     } else if sealed is KotlinSealedInterfaceLoading {
         return SwiftWrapperEnum.Loading
     } else {
@@ -112,10 +112,10 @@ Thanks to the above code you can now write this:
 
 ```swift
 switch onEnum(of: sealedInterface) {
-case .Success(let data):
-    configureForSuccess(withData: data)
-case .Error(let message):
-    configureForError(withMessage: String)
+case .Success(let sealedInterface):
+    configureForSuccess(withData: sealedInterface.data)
+case .Error(let sealedInterface):
+    configureForError(withMessage: sealedInterface.message)
 case .Loading:
     configureForLoading()
 }
