@@ -29,9 +29,12 @@ internal class DataStructGenerator(
     configuration: Configuration,
     private val reporter: Reporter,
 ) : BaseGenerator(skieContext, namespaceProvider, configuration) {
+
     class DataStructHelpers(val helpers: MutableSet<FileMemberSpec> = mutableSetOf())
 
-    override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
+    override val isActive: Boolean = true
+
+    override fun execute(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
         exportedClassDescriptors
             .filter {
                 it.getConfiguration(DataStruct.Enabled) && it.isData && !it.belongsToSkieRuntime
@@ -45,7 +48,7 @@ internal class DataStructGenerator(
         private fun generate(declaration: ClassDescriptor) {
         val primaryConstructor = declaration.unsubstitutedPrimaryConstructor ?: return
 
-        generateCode(declaration) {
+        module.generateCode(declaration) {
             val parametersWithMappings = primaryConstructor.valueParameters.mapNotNull { parameter ->
                 val backingProperty = with(declaration) { parameter.backingProperty }
                 val mapping = DataStructTypeMapper.supportedBuiltins.firstNotNullOfOrNull {

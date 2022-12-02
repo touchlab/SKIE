@@ -13,20 +13,13 @@ internal abstract class BaseGenerator(
     private val skieContext: SkieContext,
     private val namespaceProvider: NamespaceProvider,
     override val configuration: Configuration,
-) : Generator, ConfigurationContainer, SwiftPoetExtensionContainer {
+) : SkieCompilationPhase, ConfigurationContainer, SwiftPoetExtensionContainer {
 
     protected val module: SkieModule
         get() = skieContext.module
 
     protected val swiftGenNamespace: DeclaredTypeName
         get() = namespaceProvider.swiftGenNamespace
-
-    protected fun generateCode(
-        declaration: DeclarationDescriptor,
-        codeBuilder: context(SwiftPoetScope) FileSpec.Builder.() -> Unit,
-    ) {
-        module.file(declaration.kotlinName, codeBuilder)
-    }
 
     protected fun addNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName =
         namespaceProvider.addNamespace(base, name)

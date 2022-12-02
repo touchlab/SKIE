@@ -13,5 +13,7 @@ internal interface Namespace<D : DeclarationDescriptor> {
 
     fun addTemplate(declarationTemplate: DeclarationTemplate<*>, symbolTable: SymbolTable)
 
-    fun generateIr(pluginContext: IrPluginContext, symbolTable: SymbolTable)
+    fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable)
+
+    fun generateIrBodies(pluginContext: IrPluginContext)
 }

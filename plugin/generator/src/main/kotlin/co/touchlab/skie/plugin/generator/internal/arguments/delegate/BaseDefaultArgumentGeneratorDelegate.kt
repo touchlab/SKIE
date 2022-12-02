@@ -7,12 +7,8 @@ import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionD
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.toFunctionSignature
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
-import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -86,26 +82,6 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
 
     private fun Int.testBit(n: Int): Boolean =
         (this shr n) and 1 == 1
-
-    protected fun List<ValueParameterDescriptor>.copyWithoutDefaultValue(newOwner: CallableDescriptor): List<ValueParameterDescriptor> =
-        this.mapIndexed { index, valueParameter -> valueParameter.copyWithoutDefaultValue(newOwner, index) }
-
-    private fun ValueParameterDescriptor.copyWithoutDefaultValue(
-        newOwner: CallableDescriptor,
-        newIndex: Int,
-    ): ValueParameterDescriptor = ValueParameterDescriptorImpl(
-        containingDeclaration = newOwner,
-        original = null,
-        index = newIndex,
-        annotations = Annotations.EMPTY,
-        name = this.name,
-        outType = this.type,
-        declaresDefaultValue = false,
-        isCrossinline = this.isCrossinline,
-        isNoinline = this.isNoinline,
-        varargElementType = this.varargElementType,
-        source = SourceElement.NO_SOURCE,
-    )
 
     context(IrBuilderWithScope) protected fun IrFunctionAccessExpression.passArgumentsWithMatchingNames(from: IrFunction) {
         from.valueParameters.forEach { valueParameter: IrValueParameter ->

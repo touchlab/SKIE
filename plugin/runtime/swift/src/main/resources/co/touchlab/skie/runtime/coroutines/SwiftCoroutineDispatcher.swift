@@ -57,7 +57,11 @@ struct SwiftCoroutineDispatcher {
         suspendResult: SKIE_co_touchlab_skie_runtime_coroutines_Skie_SuspendResult
     ) -> Result<T, Error> {
         if let suspendResult = suspendResult as? SKIE_co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Success {
-            return .success(suspendResult.value as! T)
+            if T.self == Swift.Void.self {
+                return .success(Swift.Void() as! T)
+            } else {
+                return .success(suspendResult.value as! T)
+            }
         } else if let suspendResult = suspendResult as? SKIE_co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Error {
             return .failure(suspendResult.error)
         } else if suspendResult is SKIE_co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Canceled {

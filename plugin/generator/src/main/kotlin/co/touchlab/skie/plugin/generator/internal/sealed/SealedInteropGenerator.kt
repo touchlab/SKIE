@@ -9,7 +9,6 @@ import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.isSealed
-import co.touchlab.skie.plugin.generator.internal.util.isVisibleFromSwift
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedInteropGenerator(
@@ -19,10 +18,12 @@ internal class SealedInteropGenerator(
     private val reporter: Reporter,
 ) : BaseGenerator(skieContext, namespaceProvider, configuration), SealedGeneratorExtensionContainer {
 
+    override val isActive: Boolean = true
+
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
 
-    override fun generate(descriptorProvider: DescriptorProvider) {
+    override fun execute(descriptorProvider: DescriptorProvider) {
         descriptorProvider.exportedClassDescriptors
             .filter { it.shouldHaveSealedInterop }
             .forEach {
@@ -41,7 +42,7 @@ internal class SealedInteropGenerator(
             return
         }
 
-        generateCode(declaration) {
+        module.generateCode(declaration) {
             val classNamespace = addNamespace(swiftGenNamespace, declaration.kotlinName)
 
             val enumType = sealedEnumGeneratorDelegate.generate(declaration, classNamespace, this)

@@ -10,6 +10,7 @@ import co.touchlab.skie.plugin.api.MutableSwiftScope
 import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
 import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportMapperReflector
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import io.outfoxx.swiftpoet.ANY
@@ -118,6 +119,7 @@ internal class DefaultMutableSwiftScope(
             transformAccumulator.transform(this).isRemoved = value
         }
 
+    // TODO Optional type is not handled
     override val KotlinType.native: NativeKotlinType
         get() {
             val reflector = ObjCExportMapperReflector(namer.mapper)
@@ -206,6 +208,7 @@ internal class DefaultMutableSwiftScope(
                         .withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
                     is NativeKotlinType.Reference.Known.Array.Primitive -> DeclaredTypeName.typeName(".Kotlin${elementType.typeName.asString()}Array")
                 }
+                // TODO List<List<Int>> is not translated correctly
                 is NativeKotlinType.Reference.Known.List -> when (kind) {
                     KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSArray")
                     KotlinTypeSpecKind.BRIDGED -> ARRAY.withTypeParameters(elementType, kind = KotlinTypeSpecKind.SWIFT_GENERICS)
@@ -273,7 +276,7 @@ internal class DefaultMutableSwiftScope(
                     NativeKotlinType.Value.POINTER -> TODO("Pointer")
                 }
             }
-            NativeKotlinType.Any -> ANY
+            NativeKotlinType.Any -> DeclaredTypeName.typeName(".Any")
         }
     }
 
@@ -307,7 +310,7 @@ internal class DefaultMutableSwiftScope(
         }
 
     override val ClassDescriptor.spec: DeclaredTypeName
-        get() = DeclaredTypeName.qualifiedTypeName(".${swiftName.qualifiedName}")
+        get() = DeclaredTypeName.qualifiedLocalTypeName(swiftName.qualifiedName)
 
     override val PropertyDescriptor.spec: PropertySpec
         get() = PropertySpec.builder(swiftName, type.spec(KotlinTypeSpecKind.BRIDGED)).build()

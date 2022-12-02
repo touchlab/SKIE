@@ -4,21 +4,19 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.Generator
+import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import io.outfoxx.swiftpoet.TypeAliasSpec
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 internal class RuntimeGenerator(
     private val skieContext: SkieContext,
-    private val configuration: Configuration,
-) : Generator {
+    configuration: Configuration,
+) : SkieCompilationPhase {
 
-    override fun generate(descriptorProvider: DescriptorProvider) {
-        if (SkieFeature.SuspendInterop !in configuration.enabledFeatures) {
-            return
-        }
+    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures
 
+    override fun execute(descriptorProvider: DescriptorProvider) {
         hideKotlinRuntime(descriptorProvider)
         generateTypeAliases(descriptorProvider)
         includeSwiftRuntime()

@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder
 
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
@@ -11,6 +12,7 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -36,6 +38,6 @@ internal class FunctionBuilder(val descriptor: SimpleFunctionDescriptor) {
 
     var isSuspend: Boolean = false
 
-    // TODO Change to context(ReferenceSymbolTable, DeclarationIrBuilder) once are context implemented properly
-    var body: (context(ReferenceSymbolTable) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody)? = null
+    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
+    var body: (context(IrPluginContext) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody)? = null
 }

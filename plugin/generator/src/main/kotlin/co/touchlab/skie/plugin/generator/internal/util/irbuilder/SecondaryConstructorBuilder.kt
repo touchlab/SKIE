@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder
 
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -8,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 
 internal class SecondaryConstructorBuilder(val descriptor: ClassConstructorDescriptor) {
 
@@ -15,6 +17,6 @@ internal class SecondaryConstructorBuilder(val descriptor: ClassConstructorDescr
 
     var visibility: DescriptorVisibility = DescriptorVisibilities.PUBLIC
 
-    // TODO Change to context(ReferenceSymbolTable, DeclarationIrBuilder) once are context implemented properly
-    var body: (context(ReferenceSymbolTable) DeclarationIrBuilder.(IrConstructor) -> IrBody)? = null
+    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
+    var body: (context(IrPluginContext) DeclarationIrBuilder.(IrConstructor) -> IrBody)? = null
 }

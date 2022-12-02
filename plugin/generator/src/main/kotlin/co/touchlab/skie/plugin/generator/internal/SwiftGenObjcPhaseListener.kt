@@ -20,7 +20,7 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
     override fun beforePhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
         super.beforePhase(phaseConfig, phaserState, context)
 
-        buildIr(context) { declarationBuilder ->
+        buildIr(context) { descriptorProvider, declarationBuilder ->
             val swiftGenScheduler = SwiftGenScheduler(
                 skieContext = context.skieContext,
                 declarationBuilder = declarationBuilder,
@@ -29,8 +29,6 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
                 reporter = Reporter(context.configuration),
             )
 
-            val descriptorProvider = DescriptorProvider(context)
-
             swiftGenScheduler.process(descriptorProvider)
         }
     }
@@ -38,11 +36,13 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
     private val CommonBackendContext.pluginConfiguration: Configuration
         get() = configuration.get(ConfigurationKeys.swiftGenConfiguration, Configuration {})
 
-    private fun buildIr(context: CommonBackendContext, action: (DeclarationBuilder) -> Unit) {
-        val declarationBuilder = DeclarationBuilderImpl(context)
+    private fun buildIr(context: CommonBackendContext, action: (DescriptorProvider, DeclarationBuilder) -> Unit) {
+        val descriptorProvider = DescriptorProvider(context)
+
+        val declarationBuilder = DeclarationBuilderImpl(context, descriptorProvider)
 
         SwiftGenCompilerConfigurationKey.DeclarationBuilder.put(declarationBuilder, context.configuration)
 
-        action(declarationBuilder)
+        action(descriptorProvider, declarationBuilder)
     }
 }

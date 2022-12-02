@@ -4,9 +4,12 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.ir.copy
+import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.getNamespace
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
@@ -19,7 +22,7 @@ import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
-import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
 
 internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
@@ -69,7 +72,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             dispatchReceiverParameter = function.dispatchReceiverParameter
             extensionReceiverParameter = function.extensionReceiverParameter
             valueParameters = parameters.copyWithoutDefaultValue(descriptor)
-            typeParameters = function.typeParameters
+            typeParameters = function.typeParameters.copy(descriptor)
             returnType = function.returnTypeOrNothing
             isInline = function.isInline
             isSuspend = function.isSuspend
@@ -79,12 +82,12 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             }
         }
 
-    context(ReferenceSymbolTable, DeclarationIrBuilder)
+    context(IrPluginContext, DeclarationIrBuilder)
         @OptIn(ObsoleteDescriptorBasedAPI::class)
         private fun getOverloadBody(
         originalFunction: FunctionDescriptor, overloadIr: IrFunction,
     ): IrBody {
-        val originalFunctionSymbol = referenceSimpleFunction(originalFunction)
+        val originalFunctionSymbol = symbolTable.referenceSimpleFunction(originalFunction)
 
         return irBlockBody {
             +irReturn(

@@ -1,4 +1,4 @@
-package tests.datastruct.basic.all_supported_types
+package `tests`.`datastruct`.`basic`.`all_supported_types`
 
 data class A(
     val boolean: Boolean,

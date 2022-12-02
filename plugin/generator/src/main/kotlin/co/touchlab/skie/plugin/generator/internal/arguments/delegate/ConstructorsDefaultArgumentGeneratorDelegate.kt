@@ -7,9 +7,11 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createSecondaryConstructor
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.getNamespace
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.valueParametersAssociated
@@ -24,7 +26,7 @@ import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irDelegatingConstructorCall
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
-import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 
 internal class ConstructorsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
@@ -76,12 +78,12 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
             }
         }
 
-    context(ReferenceSymbolTable, DeclarationIrBuilder)
+    context(IrPluginContext, DeclarationIrBuilder)
         @OptIn(ObsoleteDescriptorBasedAPI::class)
         private fun getOverloadBody(
         originalConstructor: ClassConstructorDescriptor, overloadIr: IrConstructor,
     ): IrBody {
-        val originalConstructorSymbol = referenceConstructor(originalConstructor)
+        val originalConstructorSymbol = symbolTable.referenceConstructor(originalConstructor)
 
         return irBlockBody {
             +irDelegatingConstructorCall(originalConstructorSymbol.owner).apply {

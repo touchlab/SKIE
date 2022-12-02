@@ -5,15 +5,12 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.plugin.api.function.MutableSwiftFunctionName
 import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
 import co.touchlab.skie.plugin.api.type.SwiftBridgedName
-import co.touchlab.skie.plugin.reflection.reflectors.mapper
-import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
+import co.touchlab.skie.util.getContainingTarget
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
@@ -126,17 +123,7 @@ internal class TransformAccumulator(
     }
 
     private val CallableMemberDescriptor.containingTarget: TypeTransformTarget
-        get() {
-            val categoryClass = namer.mapper.getClassIfCategory(this)
-            if (categoryClass != null) {
-                return TypeTransformTarget.Class(categoryClass)
-            }
-            return when (val containingDeclaration = containingDeclaration) {
-                is ClassDescriptor -> TypeTransformTarget.Class(containingDeclaration)
-                is PackageFragmentDescriptor -> TypeTransformTarget.File(findSourceFile())
-                else -> error("Unexpected containing declaration: $containingDeclaration")
-            }
-        }
+        get() = namer.getContainingTarget(this)
 
     private fun typeTransform(typeTransformTarget: TypeTransformTarget): ObjcClassTransformScope {
         return mutableTypeTransforms.getOrPut(typeTransformTarget) {
@@ -166,13 +153,13 @@ internal class TransformAccumulator(
         override var isRemoved: Boolean = false,
         override var isHidden: Boolean = false,
         var rename: String? = null,
-    ): ObjcCallableMemberTransformScope
+    ) : ObjcCallableMemberTransformScope
 
     class ObjcMethodTransformScope(
         override var isRemoved: Boolean = false,
         override var isHidden: Boolean = false,
         var swiftName: MutableSwiftFunctionName,
-    ): ObjcCallableMemberTransformScope {
+    ) : ObjcCallableMemberTransformScope {
         val newSwiftName: MutableSwiftFunctionName?
             get() = swiftName.takeIf { it.isChanged }
     }

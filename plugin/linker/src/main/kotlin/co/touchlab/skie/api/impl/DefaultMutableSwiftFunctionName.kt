@@ -1,10 +1,12 @@
 package co.touchlab.skie.api.impl
 
 import co.touchlab.skie.plugin.api.function.MutableSwiftFunctionName
+import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
 
 class DefaultMutableSwiftFunctionName(
     override val originalName: String,
     override val parameterNames: List<MutableSwiftFunctionName.MutableParameterName>,
+    override val receiverName: MutableSwiftTypeName,
 ) : MutableSwiftFunctionName {
     override var name: String = originalName
 

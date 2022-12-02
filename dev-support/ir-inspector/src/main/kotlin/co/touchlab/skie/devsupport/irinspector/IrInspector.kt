@@ -1,6 +1,6 @@
 package co.touchlab.skie.devsupport.irinspector
 
-import co.touchlab.skie.dev_support.BuildConfig
+import co.touchlab.skie.dev_support.ir_inspector.BuildConfig
 import co.touchlab.skie.devsupport.irinspector.plugin.IrInspectorPluginCommandLineProcessor
 import co.touchlab.skie.devsupport.irinspector.plugin.IrInspectorPluginOption
 import org.jetbrains.kotlin.cli.bc.K2Native

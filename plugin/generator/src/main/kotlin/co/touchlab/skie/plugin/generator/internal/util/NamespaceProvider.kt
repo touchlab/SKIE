@@ -2,13 +2,14 @@ package co.touchlab.skie.plugin.generator.internal.util
 
 import co.touchlab.skie.plugin.api.SkieModule
 import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.*
 
 internal class NamespaceProvider(
     private val module: SkieModule,
 ) {
     val swiftGenNamespace: DeclaredTypeName =
-        DeclaredTypeName.qualifiedTypeName(".__SwiftGen")
+        DeclaredTypeName.qualifiedLocalTypeName("__SwiftGen")
 
     private fun withFileBuilder(block: context(SwiftPoetScope) FileSpec.Builder.() -> Unit) {
         module.file(swiftGenNamespace.simpleName, block)
@@ -23,7 +24,7 @@ internal class NamespaceProvider(
     fun addNamespace(namespace: DeclaredTypeName) {
         val nameComponents = namespace.simpleNames
 
-        val baseNamespace = DeclaredTypeName.qualifiedTypeName(".${nameComponents.first()}")
+        val baseNamespace = DeclaredTypeName.qualifiedLocalTypeName(nameComponents.first())
         addSingleNamespace(baseNamespace)
 
         nameComponents.drop(1).fold(baseNamespace) { acc, nameComponent ->

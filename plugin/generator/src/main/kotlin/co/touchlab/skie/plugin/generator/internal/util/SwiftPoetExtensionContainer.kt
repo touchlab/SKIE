@@ -1,7 +1,9 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
+import co.touchlab.skie.plugin.api.SkieModule
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.DeclaredTypeName
+import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.ParameterizedTypeName
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
@@ -52,6 +54,13 @@ internal interface SwiftPoetExtensionContainer {
 
             else -> error("TypeName $this is not supported.")
         }
+
+    fun SkieModule.generateCode(
+        declaration: DeclarationDescriptor,
+        codeBuilder: context(SwiftPoetScope) FileSpec.Builder.() -> Unit,
+    ) {
+        this.file(declaration.kotlinName, codeBuilder)
+    }
 
     companion object {
 

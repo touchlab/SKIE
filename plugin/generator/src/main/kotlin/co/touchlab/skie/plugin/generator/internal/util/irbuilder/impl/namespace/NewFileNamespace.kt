@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
+import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ModuleDescriptorImplReflector
@@ -27,7 +28,8 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 internal class NewFileNamespace private constructor(
     name: FqName,
     private val context: Context,
-) : BaseNamespace<PackageFragmentDescriptor>() {
+    descriptorProvider: DescriptorProvider,
+) : BaseNamespace<PackageFragmentDescriptor>(descriptorProvider) {
 
     private val packageContent = mutableListOf<DeclarationDescriptor>()
 
@@ -43,9 +45,11 @@ internal class NewFileNamespace private constructor(
 
     private val fileName = name.asString().split(".").joinToString("/") + ".kt"
 
-    override val sourceElement: SourceElement = SourceElement { SourceFile { fileName } }
+    private val sourceFile = SourceFile { fileName }
 
-    override fun addDescriptor(declarationDescriptor: DeclarationDescriptor) {
+    override val sourceElement: SourceElement = SourceElement { sourceFile }
+
+    override fun addDescriptorIntoDescriptorHierarchy(declarationDescriptor: DeclarationDescriptor) {
         packageContent.add(declarationDescriptor)
     }
 
@@ -68,11 +72,15 @@ internal class NewFileNamespace private constructor(
         override fun getLineNumber(offset: Int): Int = 0
 
         override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int): SourceRangeInfo = SourceRangeInfo(
-            name, 0, 0, 0, -1, 0, 0,
+            name, 0, 0, 0, 0, 0, 0,
         )
     }
 
-    class Factory(context: CommonBackendContext, mainIrModuleFragment: Lazy<IrModuleFragment>) {
+    class Factory(
+        context: CommonBackendContext,
+        mainIrModuleFragment: Lazy<IrModuleFragment>,
+        private val descriptorProvider: DescriptorProvider,
+    ) {
 
         private val moduleDescriptor = requireNotNull(context.moduleDescriptorOrNull) { "Context must have a module descriptor." }
 
@@ -94,7 +102,7 @@ internal class NewFileNamespace private constructor(
         fun create(name: String): NewFileNamespace {
             val fqName = FqName("$basePackage.$name")
 
-            val namespace = NewFileNamespace(fqName, namespaceContext)
+            val namespace = NewFileNamespace(fqName, namespaceContext, descriptorProvider)
 
             addPackageDescriptor(namespace.descriptor)
 

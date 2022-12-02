@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltabl
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.IrRebindableConstructorPublicSymbol
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.DeclarationDescriptorImplReflector
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -13,11 +14,13 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 
 internal class SecondaryConstructorTemplate(
     name: Name,
@@ -35,8 +38,8 @@ internal class SecondaryConstructorTemplate(
 
     private val constructorBuilder = SecondaryConstructorBuilder(descriptor)
 
-    // TODO Change to context(ReferenceSymbolTable, DeclarationIrBuilder) once are context implemented properly
-    private val irBodyBuilder: context(ReferenceSymbolTable) DeclarationIrBuilder.(IrConstructor) -> IrBody
+    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
+    private val irBodyBuilder: context(IrPluginContext) DeclarationIrBuilder.(IrConstructor) -> IrBody
 
     init {
         descriptor.reflectedBy<DeclarationDescriptorImplReflector>().name = name
@@ -66,7 +69,11 @@ internal class SecondaryConstructorTemplate(
     override fun getSymbol(symbolTable: ReferenceSymbolTable): IrConstructorSymbol =
         symbolTable.referenceConstructor(descriptor)
 
-    override fun IrConstructor.initialize(symbolTable: ReferenceSymbolTable, declarationIrBuilder: DeclarationIrBuilder) {
-        body = irBodyBuilder(symbolTable, declarationIrBuilder, this)
+    override fun initializeBody(
+        declaration: IrConstructor,
+        irPluginContext: IrPluginContext,
+        declarationIrBuilder: DeclarationIrBuilder,
+    ) {
+        declaration.body = irBodyBuilder(irPluginContext, declarationIrBuilder, declaration)
     }
 }

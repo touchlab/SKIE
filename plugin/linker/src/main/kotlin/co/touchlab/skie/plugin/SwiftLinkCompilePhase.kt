@@ -4,6 +4,7 @@ import co.touchlab.skie.api.impl.DefaultMutableSwiftScope
 import co.touchlab.skie.api.impl.DefaultSkieModule
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.api.skieContext
+import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.Modifier
@@ -95,7 +96,7 @@ class SwiftLinkCompilePhase(
             if (!bridgedName.needsTypeAlias) {
                 return@mapNotNull null
             }
-            TypeAliasSpec.builder(bridgedName.typeAliasName, DeclaredTypeName.qualifiedTypeName(".${bridgedName.qualifiedName}"))
+            TypeAliasSpec.builder(bridgedName.typeAliasName, DeclaredTypeName.qualifiedLocalTypeName(bridgedName.qualifiedName))
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         }

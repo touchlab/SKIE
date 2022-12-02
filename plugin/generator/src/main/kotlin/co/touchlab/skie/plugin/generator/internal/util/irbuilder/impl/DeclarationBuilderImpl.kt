@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl
 
+import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.FunctionBuilder
@@ -26,13 +27,14 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 
 internal class DeclarationBuilderImpl(
     context: CommonBackendContext,
+    private val descriptorProvider: DescriptorProvider,
 ) : DeclarationBuilder {
 
     private val symbolTable = context.reflectedBy<ContextReflector>().symbolTable
 
     private lateinit var mainIrModuleFragment: IrModuleFragment
 
-    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mainIrModuleFragment })
+    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mainIrModuleFragment }, descriptorProvider)
 
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
@@ -56,7 +58,7 @@ internal class DeclarationBuilderImpl(
                 "Only DeserializedClassDescriptor is currently supported. Was: $classDescriptor"
             }
 
-            DeserializedClassNamespace(classDescriptor)
+            DeserializedClassNamespace(classDescriptor, descriptorProvider)
         }
 
     override fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor> {
@@ -64,7 +66,7 @@ internal class DeclarationBuilderImpl(
             ?: throw IllegalArgumentException("existingMember must be a direct package member.")
 
         return packageNamespacesByDescriptor.getOrPut(packageFragment) {
-            DeserializedPackageNamespace(existingMember)
+            DeserializedPackageNamespace(existingMember, descriptorProvider)
         }
     }
 
@@ -99,7 +101,11 @@ internal class DeclarationBuilderImpl(
         this.mainIrModuleFragment = mairIrModuleFragment
 
         allNamespaces.forEach {
-            it.generateIr(pluginContext, symbolTable)
+            it.generateIrDeclarations(pluginContext, symbolTable)
+        }
+
+        allNamespaces.forEach {
+            it.generateIrBodies(pluginContext)
         }
     }
 }

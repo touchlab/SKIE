@@ -19,37 +19,34 @@ class Skie_SuspendHandler(
     private val dispatcher = CoroutineDispatcherWithDelegate(dispatcherDelegate)
 
     internal fun launch(checkedExceptions: Array<KClass<out Throwable>>, coroutine: suspend () -> Any?) {
-        val job = coroutine.launch()
-
-        job.invokeOnCompletion { cause ->
-            handleJobCompletion(cause, checkedExceptions)
-        }
-
-        cancellationHandler.setCancellationCallback {
-            job.cancel(it)
-        }
-    }
-
-    private fun (suspend () -> Any?).launch(): Job =
         CoroutineScope(dispatcher).launch {
-            val result = invoke()
-
-            onResult(Skie_SuspendResult.Success(result))
-        }
-
-    private fun handleJobCompletion(cause: Throwable?, checkedExceptions: Array<out KClass<out Throwable>>) {
-        when {
-            cause is CancellationException -> onResult(Skie_SuspendResult.Canceled)
-            cause?.isCheckedException(checkedExceptions) == true -> {
-                val error = cause.toNSError()
-
-                onResult(Skie_SuspendResult.Error(error))
+            cancellationHandler.setCancellationCallback {
+                cancel()
             }
-            cause != null -> throw cause
+
+            try {
+                val result = coroutine.invoke()
+
+                onResult(Skie_SuspendResult.Success(result))
+            } catch (_: CancellationException) {
+                onResult(Skie_SuspendResult.Canceled)
+            } catch (e: Throwable) {
+                if (e.isCheckedException(checkedExceptions)) {
+                    throwSwiftException(e)
+                } else {
+                    throw e
+                }
+            }
         }
     }
 
     private fun Throwable.isCheckedException(checkedExceptions: Array<out KClass<out Throwable>>): Boolean =
         checkedExceptions.any { it.isInstance(this) }
+
+    private fun throwSwiftException(e: Throwable) {
+        val error = e.toNSError()
+
+        onResult(Skie_SuspendResult.Error(error))
+    }
 }
 

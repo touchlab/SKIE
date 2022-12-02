@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
@@ -46,7 +47,9 @@ internal class ExhaustiveEnumsGenerator(
     private val reporter: Reporter,
 ) : BaseGenerator(skieContext, namespaceProvider, configuration) {
 
-    override fun generate(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
+    override val isActive: Boolean = true
+
+    override fun execute(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
         exportedClassDescriptors
             .filter(::shouldGenerateExhaustiveEnums)
             .forEach {
@@ -62,7 +65,7 @@ internal class ExhaustiveEnumsGenerator(
             declaration.swiftBridgeType = SwiftBridgedName(swiftName.parent, swiftName.originalSimpleName)
         }
 
-        generateCode(declaration) {
+        module.generateCode(declaration) {
             val extensionName = declaration.swiftName.qualifiedName.substringBeforeLast('.', "")
             val declarationName = declaration.swiftName.originalQualifiedName.substringAfterLast('.')
 
@@ -87,7 +90,7 @@ internal class ExhaustiveEnumsGenerator(
 
             if (extensionName.isNotEmpty()) {
                 addExtension(
-                    ExtensionSpec.builder(DeclaredTypeName.qualifiedTypeName(".$extensionName"))
+                    ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(extensionName))
                         .addType(enumDeclaration)
                         .build()
                 )

@@ -8,14 +8,16 @@ import co.touchlab.skie.plugin.generator.internal.arguments.delegate.Constructor
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ExtensionFunctionDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.TopLevelFunctionDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.Generator
+import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 
 internal class DefaultArgumentGenerator(
     skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
-) : Generator {
+) : SkieCompilationPhase {
+
+    override val isActive: Boolean = true
 
     private val delegates = listOf(
         ClassMethodsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
@@ -24,7 +26,7 @@ internal class DefaultArgumentGenerator(
         ExtensionFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
     )
 
-    override fun generate(descriptorProvider: DescriptorProvider) {
+    override fun execute(descriptorProvider: DescriptorProvider) {
         val collisionDetector = CollisionDetector(descriptorProvider)
 
         delegates.forEach {

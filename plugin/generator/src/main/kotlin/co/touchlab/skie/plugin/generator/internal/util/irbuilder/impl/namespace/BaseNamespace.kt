@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
+import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.Namespace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -12,7 +13,7 @@ import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-internal abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
+internal abstract class BaseNamespace<D : DeclarationDescriptor>(private val descriptorProvider: DescriptorProvider) : Namespace<D> {
 
     private val templates = mutableListOf<DeclarationTemplate<*>>()
 
@@ -21,11 +22,20 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> 
 
         declarationTemplate.declareSymbol(symbolTable)
 
-        addDescriptor(declarationTemplate.descriptor)
+        registerDescriptorProvider(declarationTemplate.descriptor)
+    }
+
+    private fun registerDescriptorProvider(declarationDescriptor: DeclarationDescriptor) {
+        addDescriptorIntoDescriptorHierarchy(declarationDescriptor)
+        addDescriptorIntoDescriptorProvider(declarationDescriptor)
+    }
+
+    private fun addDescriptorIntoDescriptorProvider(declarationDescriptor: DeclarationDescriptor) {
+        descriptorProvider.registerDescriptor(declarationDescriptor)
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
-    override fun generateIr(pluginContext: IrPluginContext, symbolTable: SymbolTable) {
+    override fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable) {
         val generatorContext = GeneratorContext(
             Psi2IrConfiguration(ignoreErrors = false, allowUnboundSymbols = false),
             descriptor.module,
@@ -41,11 +51,17 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> 
         val namespaceIr = generateNamespaceIr(generatorContext)
 
         templates.forEach {
-            it.generateIr(namespaceIr, generatorContext)
+            it.generateIrDeclaration(namespaceIr, generatorContext)
         }
     }
 
-    protected abstract fun addDescriptor(declarationDescriptor: DeclarationDescriptor)
+    override fun generateIrBodies(pluginContext: IrPluginContext) {
+        templates.forEach {
+            it.generateIrBody(pluginContext)
+        }
+    }
+
+    protected abstract fun addDescriptorIntoDescriptorHierarchy(declarationDescriptor: DeclarationDescriptor)
 
     protected abstract fun generateNamespaceIr(generatorContext: GeneratorContext): IrDeclarationContainer
 }

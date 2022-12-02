@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template
 
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationTemplate
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -14,9 +15,9 @@ import org.jetbrains.kotlin.psi2ir.generators.SyntheticDeclarationsGenerator
 internal abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : IrDeclaration, S : IrBindableSymbol<D, IR>> :
     DeclarationTemplate<D> {
 
-    override fun generateIr(parent: IrDeclarationContainer, generatorContext: GeneratorContext) {
+    override fun generateIrDeclaration(parent: IrDeclarationContainer, generatorContext: GeneratorContext) {
         createDeclarationStubsIfIrLazyClass(parent)
-        
+
         val syntheticDeclarationsGenerator = SyntheticDeclarationsGenerator(generatorContext)
 
         descriptor.accept(syntheticDeclarationsGenerator, parent)
@@ -24,18 +25,22 @@ internal abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : 
         val symbol = getSymbol(generatorContext.symbolTable)
         val ir = symbol.owner
 
-        val declarationIrBuilder = DeclarationIrBuilder(generatorContext, symbol, startOffset = 0, endOffset = 0)
-
         ir.patchDeclarationParents(ir.parent)
-        ir.initialize(generatorContext.symbolTable, declarationIrBuilder)
     }
 
     private fun createDeclarationStubsIfIrLazyClass(parent: IrDeclarationContainer) {
         parent.declarations
     }
 
+    override fun generateIrBody(irPluginContext: IrPluginContext) {
+        val symbol = getSymbol(irPluginContext.symbolTable)
+
+        val declarationIrBuilder = DeclarationIrBuilder(irPluginContext, symbol, startOffset = 0, endOffset = 0)
+
+        initializeBody(symbol.owner, irPluginContext, declarationIrBuilder)
+    }
+
     protected abstract fun getSymbol(symbolTable: ReferenceSymbolTable): S
 
-    // TODO Change to context(ReferenceSymbolTable, DeclarationIrBuilder) protected abstract fun IR.initialize() once possible
-    protected abstract fun IR.initialize(symbolTable: ReferenceSymbolTable, declarationIrBuilder: DeclarationIrBuilder)
+    protected abstract fun initializeBody(declaration: IR, irPluginContext: IrPluginContext, declarationIrBuilder: DeclarationIrBuilder)
 }

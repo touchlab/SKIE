@@ -1,4 +1,4 @@
-package tests.enums.with_members.methods.parameter_with_generic_interface
+package `tests`.`enums`.`with_members`.`methods`.`parameter_with_generic_interface`
 
 enum class A {
     A1;

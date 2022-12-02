@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
+import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.SuspendGenerator
 import co.touchlab.skie.plugin.generator.internal.datastruct.DataStructGenerator
 import co.touchlab.skie.plugin.generator.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.plugin.generator.internal.runtime.RuntimeGenerator
@@ -10,6 +11,7 @@ import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
+import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
 
@@ -21,43 +23,49 @@ internal class SwiftGenScheduler(
     reporter: Reporter,
 ) {
 
-    private val irValidator = IrValidator(reporter, configuration)
-
-    private val runtimeGenerator = RuntimeGenerator(skieContext, configuration)
-
-    private val exhaustiveEnumsGenerator = ExhaustiveEnumsGenerator(
-        skieContext = skieContext,
-        namespaceProvider = namespaceProvider,
-        configuration = configuration,
-        reporter = reporter,
-    )
-
-    private val sealedInteropGenerator = SealedInteropGenerator(
-        skieContext = skieContext,
-        namespaceProvider = namespaceProvider,
-        configuration = configuration,
-        reporter = reporter,
-    )
-
-    private val defaultArgumentGenerator = DefaultArgumentGenerator(
-        skieContext = skieContext,
-        declarationBuilder = declarationBuilder,
-        configuration = configuration,
-    )
-
-    private val dataStructGenerator = DataStructGenerator(
-        skieContext = skieContext,
-        namespaceProvider = namespaceProvider,
-        configuration = configuration,
-        reporter = reporter,
+    private val compilationPhases = listOf(
+        IrValidator(
+            reporter = reporter,
+            configuration = configuration
+        ),
+        RuntimeGenerator(
+            skieContext = skieContext,
+            configuration = configuration
+        ),
+        SealedInteropGenerator(
+            skieContext = skieContext,
+            namespaceProvider = namespaceProvider,
+            configuration = configuration,
+            reporter = reporter,
+        ),
+        DefaultArgumentGenerator(
+            skieContext = skieContext,
+            declarationBuilder = declarationBuilder,
+            configuration = configuration,
+        ),
+        ExhaustiveEnumsGenerator(
+            skieContext = skieContext,
+            namespaceProvider = namespaceProvider,
+            configuration = configuration,
+            reporter = reporter,
+        ),
+        SuspendGenerator(
+            skieContext = skieContext,
+            namespaceProvider = namespaceProvider,
+            configuration = configuration,
+            declarationBuilder = declarationBuilder,
+        ),
+        DataStructGenerator(
+            skieContext = skieContext,
+            namespaceProvider = namespaceProvider,
+            configuration = configuration,
+            reporter = reporter,
+        ),
     )
 
     fun process(descriptorProvider: DescriptorProvider) {
-        irValidator.validate(descriptorProvider)
-        runtimeGenerator.generate(descriptorProvider)
-        sealedInteropGenerator.generate(descriptorProvider)
-        defaultArgumentGenerator.generate(descriptorProvider)
-        exhaustiveEnumsGenerator.generate(descriptorProvider)
-        dataStructGenerator.generate(descriptorProvider)
+        compilationPhases
+            .filter { it.isActive }
+            .forEach { it.execute(descriptorProvider) }
     }
 }

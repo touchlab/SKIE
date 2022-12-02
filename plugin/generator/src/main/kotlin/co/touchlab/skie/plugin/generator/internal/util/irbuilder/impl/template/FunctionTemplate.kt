@@ -4,6 +4,7 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.FunctionBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.Namespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrSimpleFunction
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.IrRebindableSimpleFunctionPublicSymbol
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 
 internal class FunctionTemplate(
     name: Name,
@@ -34,8 +36,8 @@ internal class FunctionTemplate(
 
     private val functionBuilder = FunctionBuilder(descriptor)
 
-    // TODO Change to context(ReferenceSymbolTable, DeclarationIrBuilder) once are context implemented properly
-    private val irBodyBuilder: context(ReferenceSymbolTable) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody
+    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
+    private val irBodyBuilder: context(IrPluginContext) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody
 
     init {
         functionBuilder.config()
@@ -70,7 +72,11 @@ internal class FunctionTemplate(
     override fun getSymbol(symbolTable: ReferenceSymbolTable): IrSimpleFunctionSymbol =
         symbolTable.referenceSimpleFunction(descriptor)
 
-    override fun IrSimpleFunction.initialize(symbolTable: ReferenceSymbolTable, declarationIrBuilder: DeclarationIrBuilder) {
-        body = irBodyBuilder(symbolTable, declarationIrBuilder, this)
+    override fun initializeBody(
+        declaration: IrSimpleFunction,
+        irPluginContext: IrPluginContext,
+        declarationIrBuilder: DeclarationIrBuilder,
+    ) {
+        declaration.body = irBodyBuilder(irPluginContext, declarationIrBuilder, declaration)
     }
 }

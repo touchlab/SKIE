@@ -1,3 +1,4 @@
+import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
@@ -12,6 +13,7 @@ skie {
     }
     configuration {
         group {
+            ExperimentalFeatures.Enabled(true)
         }
     }
 }
@@ -32,6 +34,8 @@ kotlin {
 
     val commonMain by sourceSets.getting {
         dependencies {
+            implementation(libs.kotlinx.coroutines.core)
+
             implementation(projects.playground.kotlin.library)
 
             implementation("co.touchlab.skie:configuration-annotations")

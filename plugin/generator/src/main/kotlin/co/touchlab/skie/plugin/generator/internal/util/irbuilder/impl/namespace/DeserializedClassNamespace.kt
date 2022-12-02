@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
+import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.UnsupportedDeclarationDescriptorException
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.DeserializedClassMemberScopeReflector
@@ -13,13 +14,15 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
-internal class DeserializedClassNamespace(override val descriptor: DeserializedClassDescriptor) :
-    BaseDeserializedNamespace<ClassDescriptor>() {
+internal class DeserializedClassNamespace(
+    override val descriptor: DeserializedClassDescriptor,
+    descriptorProvider: DescriptorProvider,
+) : BaseDeserializedNamespace<ClassDescriptor>(descriptorProvider) {
 
     override val sourceElement: SourceElement
         get() = descriptor.source
 
-    override fun addDescriptor(declarationDescriptor: DeclarationDescriptor) {
+    override fun addDescriptorIntoDescriptorHierarchy(declarationDescriptor: DeclarationDescriptor) {
         when (declarationDescriptor) {
             is SimpleFunctionDescriptor -> addFunctionDescriptor(declarationDescriptor)
             is ClassConstructorDescriptor -> addSecondaryConstructorDescriptor(declarationDescriptor)

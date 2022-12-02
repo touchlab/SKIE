@@ -11,25 +11,34 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
+import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 internal class DescriptorProvider(private val context: CommonBackendContext) {
 
-    val classDescriptors: Set<ClassDescriptor> by lazy {
-        exportedInterface.generatedClasses
+    private val mutableClassDescriptors by lazy {
+        exportedInterface.generatedClasses.toMutableSet()
     }
 
-    val exportedClassDescriptors: Set<ClassDescriptor> by lazy {
-        classDescriptors.filter { it.isExported }.toSet()
+    val classDescriptors: Set<ClassDescriptor> by ::mutableClassDescriptors
+
+    private val mutableExportedClassDescriptors by lazy {
+        classDescriptors.filter { it.isExported }.toMutableSet()
     }
 
-    val exportedCategoryMembersCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
-        exportedInterface.categoryMembers.values.flatten().toSet().filter { it.isExported }.toSet()
+    val exportedClassDescriptors: Set<ClassDescriptor> by ::mutableExportedClassDescriptors
+
+    private val mutableExportedCategoryMembersCallableDescriptors by lazy {
+        exportedInterface.categoryMembers.values.flatten().toSet().filter { it.isExported }.toMutableSet()
     }
 
-    val exportedTopLevelCallableDescriptors: Set<CallableMemberDescriptor> by lazy {
-        exportedInterface.topLevel.values.flatten().toSet().filter { it.isExported }.toSet()
+    val exportedCategoryMembersCallableDescriptors: Set<CallableMemberDescriptor> by ::mutableExportedCategoryMembersCallableDescriptors
+
+    private val mutableExportedTopLevelCallableDescriptors by lazy {
+        exportedInterface.topLevel.values.flatten().toSet().filter { it.isExported }.toMutableSet()
     }
+
+    val exportedTopLevelCallableDescriptors: Set<CallableMemberDescriptor> by ::mutableExportedTopLevelCallableDescriptors
 
     private val exportedModules: Set<ModuleDescriptor> by lazy {
         context.getAllExportedModuleDescriptors().toSet()
@@ -42,12 +51,45 @@ internal class DescriptorProvider(private val context: CommonBackendContext) {
     private val DeclarationDescriptor.isExported: Boolean
         get() = this.module in exportedModules
 
-    fun shouldBeExposed(descriptor: CallableMemberDescriptor): Boolean =
-        mapper.shouldBeExposed(descriptor)
-
     private val exportedInterface by lazy {
         val objCExport = ObjCExportReflector.new(context)
 
         objCExport.reflectedExportedInterface
+    }
+
+    fun shouldBeExposed(descriptor: CallableMemberDescriptor): Boolean =
+        mapper.shouldBeExposed(descriptor)
+
+    fun registerDescriptor(descriptor: DeclarationDescriptor) {
+        when (descriptor) {
+            is ClassDescriptor -> registerDescriptor(descriptor)
+            is CallableMemberDescriptor -> registerDescriptor(descriptor)
+            else -> error("Unsupported descriptor type: $descriptor.")
+        }
+    }
+
+    private fun registerDescriptor(descriptor: ClassDescriptor) {
+        if (!mapper.shouldBeExposed(descriptor) || !descriptor.isExported) {
+            return
+        }
+
+        mutableClassDescriptors.add(descriptor)
+        mutableExportedClassDescriptors.add(descriptor)
+    }
+
+    private fun registerDescriptor(descriptor: CallableMemberDescriptor) {
+        if (!mapper.shouldBeExposed(descriptor) || !descriptor.isExported) {
+            return
+        }
+
+        if (descriptor.containingDeclaration is ClassDescriptor) {
+            return
+        }
+
+        if (mapper.isTopLevel(descriptor)) {
+            mutableExportedTopLevelCallableDescriptors.add(descriptor)
+        } else {
+            mutableExportedCategoryMembersCallableDescriptors.add(descriptor)
+        }
     }
 }
