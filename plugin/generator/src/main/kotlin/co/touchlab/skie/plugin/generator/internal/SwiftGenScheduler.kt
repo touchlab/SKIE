@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.generator.internal.datastruct.DataStructGenerator
 import co.touchlab.skie.plugin.generator.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.plugin.generator.internal.runtime.RuntimeGenerator
 import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
+import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
@@ -60,6 +61,10 @@ internal class SwiftGenScheduler(
             namespaceProvider = namespaceProvider,
             configuration = configuration,
             reporter = reporter,
+        ),
+        TypeAliasGenerator(
+            skieContext = skieContext,
+            configuration = configuration,
         ),
     )
 

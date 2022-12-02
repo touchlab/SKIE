@@ -1,4 +1,4 @@
-# SwiftCompilationError(cannot convert value of type 'B' to expected argument type 'A')
+# SwiftCompilationError(cannot convert value of type 'B' to expected argument type)
 
 let b: B = B1()
 

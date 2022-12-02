@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.util.typeAliasSpec
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
@@ -41,7 +42,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
     context(ClassDescriptor, SwiftPoetScope)
     fun swiftNameWithTypeParametersForSealedCase(parent: ClassDescriptor): TypeName {
         if (kind.isInterface) {
-            return this@ClassDescriptor.spec
+            return this@ClassDescriptor.typeAliasSpec
         }
 
         val typeParameters = declaredTypeParameters.map {
@@ -54,7 +55,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
             }
         }
 
-        return this@ClassDescriptor.spec.withTypeParameters(typeParameters)
+        return this@ClassDescriptor.typeAliasSpec.withTypeParameters(typeParameters)
     }
 
     private fun TypeParameterDescriptor.indexInParent(child: ClassDescriptor, parent: ClassDescriptor): Int? {

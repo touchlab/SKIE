@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.api.type
 
 interface SwiftTypeName {
+
     val parent: SwiftTypeName?
     val originalParent: SwiftTypeName?
 
@@ -15,7 +16,7 @@ interface SwiftTypeName {
         return "$parentName${separator}$simpleName"
     }
 
-    fun originalQualifiedNameWithSeparators(separator: String = SwiftTypeName.DEFAULT_SEPARATOR): String {
+    fun originalQualifiedNameWithSeparators(separator: String = DEFAULT_SEPARATOR): String {
         val parentName = originalParent?.originalQualifiedNameWithSeparators(separator) ?: return originalSimpleName
         return "$parentName${separator}$originalSimpleName"
     }

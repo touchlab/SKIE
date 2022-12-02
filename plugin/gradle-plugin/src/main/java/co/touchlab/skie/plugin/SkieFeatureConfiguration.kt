@@ -9,10 +9,12 @@ import javax.inject.Inject
 abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFactory) {
 
     val suspendInterop: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val fqNames: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     internal fun buildFeatureSet(): SkieFeatureSet =
         listOf(
-            SkieFeature.SuspendInterop to suspendInterop
+            SkieFeature.SuspendInterop to suspendInterop,
+            SkieFeature.FqNames to fqNames,
         )
             .filter { it.second.get() }
             .map { it.first }

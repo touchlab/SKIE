@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.datastruct
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.DataStruct
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.util.typeAliasSpec
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
@@ -99,11 +100,11 @@ internal class DataStructGenerator(
                         .build()
                 )
                 .addProperty(
-                    PropertySpec.builder("unbridged", declaration.spec, Modifier.PUBLIC)
+                    PropertySpec.builder("unbridged", declaration.typeAliasSpec, Modifier.PUBLIC)
                         .getter(
                             FunctionSpec.getterBuilder()
                                 .addCode(
-                                    "%T(%L)\n", declaration.spec,
+                                    "%T(%L)\n", declaration.typeAliasSpec,
                                     parametersWithMappings.map { (parameter, mapping) ->
                                         CodeBlock.of(
                                             "%N: %L",
@@ -119,14 +120,14 @@ internal class DataStructGenerator(
                 .build()
 
             addExtension(
-                ExtensionSpec.builder(declaration.spec)
+                ExtensionSpec.builder(declaration.typeAliasSpec)
                     .addModifiers(Modifier.PUBLIC)
                     .addProperty(
-                        PropertySpec.builder("bridged", declaration.spec.nestedType("Bridge"))
+                        PropertySpec.builder("bridged", declaration.typeAliasSpec.nestedType("Bridge"))
                             .getter(
                                 FunctionSpec.getterBuilder()
                                     .addCode(
-                                        "%T(%L)\n", declaration.spec.nestedType("Bridge"),
+                                        "%T(%L)\n", declaration.typeAliasSpec.nestedType("Bridge"),
                                         parametersWithMappings.map { (parameter, mapping) ->
                                             CodeBlock.of(
                                                 "%N: %L",

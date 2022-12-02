@@ -9,6 +9,7 @@ import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
+import co.touchlab.skie.plugin.api.util.typeAliasSpec
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
@@ -104,7 +105,7 @@ internal class ExhaustiveEnumsGenerator(
         private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
         declaration.nestedClasses.forEach {
             addType(
-                TypeAliasSpec.builder(it.name.asString(), it.spec)
+                TypeAliasSpec.builder(it.name.asString(), it.typeAliasSpec)
                     .addModifiers(Modifier.PUBLIC)
                     .build()
             )

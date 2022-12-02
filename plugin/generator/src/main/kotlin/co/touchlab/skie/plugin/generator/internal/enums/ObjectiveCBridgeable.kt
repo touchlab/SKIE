@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.enums
 
 import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.util.typeAliasSpec
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -21,7 +22,7 @@ internal object ObjectiveCBridgeable {
         addSuperType(DeclaredTypeName("Swift", "_ObjectiveCBridgeable"))
 
         addType(
-            TypeAliasSpec.builder("_ObjectiveCType", declaration.spec)
+            TypeAliasSpec.builder("_ObjectiveCType", declaration.typeAliasSpec)
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
@@ -44,7 +45,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_bridgeToObjectiveC")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(declaration.spec)
+                .returns(declaration.typeAliasSpec)
                 .addCode(
                     CodeBlock.builder()
                         .beginControlFlow("switch", "self")
@@ -53,10 +54,10 @@ internal object ObjectiveCBridgeable {
                                 CodeBlock.of(
                                     "case .%N: return %T.%N",
                                     it.swiftName.simpleName,
-                                    declaration.spec,
+                                    declaration.typeAliasSpec,
                                     it.swiftName.simpleName,
                                 )
-                            }.joinToCode("\n")
+                            }.joinToCode("\n", suffix = "\n")
                         )
                         .endControlFlow("switch")
                         .build()
@@ -70,7 +71,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_forceBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", declaration.spec)
+                .addParameter("_", "source", declaration.typeAliasSpec)
                 .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
                 .addStatement("result = fromObjectiveC(source)")
                 .build()
@@ -82,7 +83,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_conditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", declaration.spec)
+                .addParameter("_", "source", declaration.typeAliasSpec)
                 .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
                 .addStatement("result = fromObjectiveC(source)")
                 .addStatement("return true")
@@ -96,7 +97,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_unconditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", declaration.spec.makeOptional())
+                .addParameter("_", "source", declaration.typeAliasSpec.makeOptional())
                 .addStatement("return fromObjectiveC(source)")
                 .returns(SelfTypeName.INSTANCE)
                 .build()
@@ -110,7 +111,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("fromObjectiveC")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                .addParameter("_", "source", declaration.spec.makeOptional())
+                .addParameter("_", "source", declaration.typeAliasSpec.makeOptional())
                 .addCode(
                     CodeBlock.builder()
                         .beginControlFlow("switch", "source")

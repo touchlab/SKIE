@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.api.type
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 interface SwiftClassScope {
+
     val ClassDescriptor.swiftName: SwiftTypeName
 
     val ClassDescriptor.isHiddenFromSwift: Boolean

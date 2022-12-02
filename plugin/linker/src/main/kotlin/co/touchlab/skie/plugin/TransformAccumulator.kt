@@ -17,14 +17,14 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 internal class TransformAccumulator(
     private val namer: ObjCExportNamer,
 ) {
+
     private val mutableTypeTransforms = mutableMapOf<TypeTransformTarget, ObjcClassTransformScope>()
+
     val typeTransforms: Map<TypeTransformTarget, ObjcClassTransformScope> = mutableTypeTransforms
 
     private val nameResolver = NameResolver(namer)
 
-    operator fun get(descriptor: ClassDescriptor): ObjcClassTransformScope? = mutableTypeTransforms[TypeTransformTarget.Class(descriptor)]
-
-    fun transform(descriptor: ClassDescriptor): ObjcClassTransformScope {
+    operator fun get(descriptor: ClassDescriptor): ObjcClassTransformScope {
         val target = TypeTransformTarget.Class(descriptor)
 
         return mutableTypeTransforms.getOrPut(target) {
@@ -32,25 +32,23 @@ internal class TransformAccumulator(
         }
     }
 
-    fun resolveName(descriptor: ClassDescriptor): MutableSwiftTypeName = nameResolver.resolveName(TypeTransformTarget.Class(descriptor))
+    operator fun get(sourceFile: SourceFile): ObjcClassTransformScope {
+        val target = TypeTransformTarget.File(sourceFile)
 
-    operator fun get(descriptor: PropertyDescriptor): ObjcPropertyTransformScope? =
-        mutableTypeTransforms[descriptor.containingTarget]?.properties?.get(descriptor)
+        return mutableTypeTransforms.getOrPut(target) {
+            ObjcClassTransformScope(nameResolver.resolveName(target))
+        }
+    }
 
-    fun transform(descriptor: PropertyDescriptor): ObjcPropertyTransformScope =
+    operator fun get(descriptor: PropertyDescriptor): ObjcPropertyTransformScope =
         typeTransform(descriptor.containingTarget).properties.getOrPut(descriptor) {
             ObjcPropertyTransformScope()
         }
 
-    operator fun get(descriptor: FunctionDescriptor): ObjcMethodTransformScope? =
-        mutableTypeTransforms[descriptor.containingTarget]?.methods?.get(descriptor)
-
-    fun transform(descriptor: FunctionDescriptor): ObjcMethodTransformScope =
+    operator fun get(descriptor: FunctionDescriptor): ObjcMethodTransformScope =
         typeTransform(descriptor.containingTarget).methods.getOrPut(descriptor) {
             ObjcMethodTransformScope(swiftName = nameResolver.resolveName(descriptor))
         }
-
-    fun resolveName(descriptor: FunctionDescriptor): MutableSwiftFunctionName = nameResolver.resolveName(descriptor)
 
     fun close() {
         // TODO: Add check for closed state in all mutating methods.
@@ -109,7 +107,7 @@ internal class TransformAccumulator(
     private fun ensureFunctionsRenamedWhereNeeded() {
         nameResolver.functionNames.forEach { (descriptor, name) ->
             if (name.isChanged) {
-                transform(descriptor)
+                get(descriptor)
             }
         }
 
@@ -137,10 +135,12 @@ internal class TransformAccumulator(
         var isHidden: Boolean = false,
         var bridge: SwiftBridgedName? = null,
     ) {
+
         val newSwiftName: MutableSwiftTypeName?
             get() = swiftName.takeIf { it.isChanged }
 
         val properties = mutableMapOf<PropertyDescriptor, ObjcPropertyTransformScope>()
+
         val methods = mutableMapOf<FunctionDescriptor, ObjcMethodTransformScope>()
     }
 

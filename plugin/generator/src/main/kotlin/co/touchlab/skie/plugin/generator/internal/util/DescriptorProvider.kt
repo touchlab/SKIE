@@ -5,6 +5,7 @@ package co.touchlab.skie.plugin.generator.internal.util
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ObjCExportReflector
 import co.touchlab.skie.plugin.getAllExportedModuleDescriptors
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -12,6 +13,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
+import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 internal class DescriptorProvider(private val context: CommonBackendContext) {
@@ -33,6 +35,12 @@ internal class DescriptorProvider(private val context: CommonBackendContext) {
     }
 
     val exportedCategoryMembersCallableDescriptors: Set<CallableMemberDescriptor> by ::mutableExportedCategoryMembersCallableDescriptors
+
+    private val mutableTopLevelFiles by lazy {
+        exportedInterface.topLevel.keys.toMutableSet()
+    }
+
+    val topLevelFiles: Set<SourceFile> by ::mutableTopLevelFiles
 
     private val mutableExportedTopLevelCallableDescriptors by lazy {
         exportedInterface.topLevel.values.flatten().toSet().filter { it.isExported }.toMutableSet()
@@ -88,6 +96,7 @@ internal class DescriptorProvider(private val context: CommonBackendContext) {
 
         if (mapper.isTopLevel(descriptor)) {
             mutableExportedTopLevelCallableDescriptors.add(descriptor)
+            mutableTopLevelFiles.add(descriptor.findSourceFile())
         } else {
             mutableExportedCategoryMembersCallableDescriptors.add(descriptor)
         }

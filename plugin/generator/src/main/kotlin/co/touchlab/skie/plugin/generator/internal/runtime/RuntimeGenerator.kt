@@ -18,7 +18,6 @@ internal class RuntimeGenerator(
 
     override fun execute(descriptorProvider: DescriptorProvider) {
         hideKotlinRuntime(descriptorProvider)
-        generateTypeAliases(descriptorProvider)
         includeSwiftRuntime()
     }
 
@@ -29,19 +28,6 @@ internal class RuntimeGenerator(
                 .forEach {
                     it.isHiddenFromSwift = true
                 }
-        }
-    }
-
-    private fun generateTypeAliases(descriptorProvider: DescriptorProvider) {
-        skieContext.module.file("TypeAliases") {
-            descriptorProvider.classDescriptors.forEach { classDescriptor ->
-                addType(
-                    TypeAliasSpec.builder(
-                        name = classDescriptor.typeAliasName,
-                        type = classDescriptor.spec,
-                    ).build()
-                )
-            }
         }
     }
 
@@ -57,9 +43,6 @@ internal class RuntimeGenerator(
             .lines()
             .filter { it.isNotBlank() }
             .map { Resource(it) }
-
-    private val ClassDescriptor.typeAliasName: String
-        get() = "SKIE_" + this.fqNameSafe.asString().replace(".", "_")
 
     private val Resource.swiftFileName: String
         get() = this.name.replace("/", "_").removeSuffix(".swift")

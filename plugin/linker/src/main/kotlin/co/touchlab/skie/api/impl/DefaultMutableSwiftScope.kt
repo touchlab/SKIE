@@ -2,18 +2,17 @@
 
 package co.touchlab.skie.api.impl
 
-import co.touchlab.skie.plugin.api.NativeKotlinType
 import co.touchlab.skie.plugin.TransformAccumulator
-import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
-import co.touchlab.skie.plugin.api.function.MutableSwiftFunctionName
 import co.touchlab.skie.plugin.api.MutableSwiftScope
+import co.touchlab.skie.plugin.api.NativeKotlinType
+import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.function.MutableSwiftFunctionName
+import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
 import co.touchlab.skie.plugin.api.type.SwiftBridgedName
-import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportMapperReflector
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
-import io.outfoxx.swiftpoet.ANY
 import io.outfoxx.swiftpoet.ARRAY
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DICTIONARY
@@ -46,10 +45,9 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
@@ -59,25 +57,47 @@ internal class DefaultMutableSwiftScope(
     private val namer: ObjCExportNamer,
     private val transformAccumulator: TransformAccumulator,
 ) : MutableSwiftScope, SwiftPoetScope {
+
     override val ClassDescriptor.swiftName: MutableSwiftTypeName
-        get() = transformAccumulator.resolveName(this)
+        get() = transformAccumulator[this].swiftName
 
     override var ClassDescriptor.isHiddenFromSwift: Boolean
-        get() = transformAccumulator[this]?.isHidden ?: false
+        get() = transformAccumulator[this].isHidden
         set(value) {
-            transformAccumulator.transform(this).isHidden = value
+            transformAccumulator[this].isHidden = value
         }
 
     override var ClassDescriptor.isRemovedFromSwift: Boolean
-        get() = transformAccumulator[this]?.isRemoved ?: false
+        get() = transformAccumulator[this].isRemoved
         set(value) {
-            transformAccumulator.transform(this).isRemoved = value
+            transformAccumulator[this].isRemoved = value
         }
 
     override var ClassDescriptor.swiftBridgeType: SwiftBridgedName?
-        get() = transformAccumulator[this]?.bridge
+        get() = transformAccumulator[this].bridge
         set(value) {
-            transformAccumulator.transform(this).bridge = value
+            transformAccumulator[this].bridge = value
+        }
+
+    override val SourceFile.swiftName: MutableSwiftTypeName
+        get() = transformAccumulator[this].swiftName
+
+    override var SourceFile.isHiddenFromSwift: Boolean
+        get() = transformAccumulator[this].isHidden
+        set(value) {
+            transformAccumulator[this].isHidden = value
+        }
+
+    override var SourceFile.isRemovedFromSwift: Boolean
+        get() = transformAccumulator[this].isRemoved
+        set(value) {
+            transformAccumulator[this].isRemoved = value
+        }
+
+    override var SourceFile.swiftBridgeType: SwiftBridgedName?
+        get() = transformAccumulator[this].bridge
+        set(value) {
+            transformAccumulator[this].bridge = value
         }
 
     override val KotlinType.swiftName: String
@@ -87,36 +107,36 @@ internal class DefaultMutableSwiftScope(
         get() = namer.getPropertyName(this)
 
     override var PropertyDescriptor.swiftName: String
-        get() = transformAccumulator[this]?.rename ?: originalSwiftName
+        get() = transformAccumulator[this].rename ?: originalSwiftName
         set(value) {
-            transformAccumulator.transform(this).rename = value
+            transformAccumulator[this].rename = value
         }
 
     override var PropertyDescriptor.isHiddenFromSwift: Boolean
-        get() = transformAccumulator[this]?.isHidden ?: false
+        get() = transformAccumulator[this].isHidden
         set(value) {
-            transformAccumulator.transform(this).isHidden = value
+            transformAccumulator[this].isHidden = value
         }
 
     override var PropertyDescriptor.isRemovedFromSwift: Boolean
-        get() = transformAccumulator[this]?.isRemoved ?: false
+        get() = transformAccumulator[this].isRemoved
         set(value) {
-            transformAccumulator.transform(this).isRemoved = value
+            transformAccumulator[this].isRemoved = value
         }
 
     override val FunctionDescriptor.swiftName: MutableSwiftFunctionName
-        get() = transformAccumulator.resolveName(this)
+        get() = transformAccumulator[this].swiftName
 
     override var FunctionDescriptor.isHiddenFromSwift: Boolean
-        get() = transformAccumulator[this]?.isHidden ?: false
+        get() = transformAccumulator[this].isHidden
         set(value) {
-            transformAccumulator.transform(this).isHidden = value
+            transformAccumulator[this].isHidden = value
         }
 
     override var FunctionDescriptor.isRemovedFromSwift: Boolean
-        get() = transformAccumulator[this]?.isRemoved ?: false
+        get() = transformAccumulator[this].isRemoved
         set(value) {
-            transformAccumulator.transform(this).isRemoved = value
+            transformAccumulator[this].isRemoved = value
         }
 
     // TODO Optional type is not handled
@@ -283,19 +303,6 @@ internal class DefaultMutableSwiftScope(
     private val ClassDescriptor.canBeSpecializedInSwift: Boolean
         get() = !this.kind.isInterface
 
-    context(KotlinType)
-        private fun ClassifierDescriptor?.spec(): TypeName {
-        return when (this) {
-            is ClassDescriptor -> spec.withTypeParameters(this@KotlinType, KotlinTypeSpecKind.ORIGINAL)
-            is TypeParameterDescriptor -> if (containingDeclaration is ClassDescriptor) {
-                TypeVariableName(namer.getTypeParameterName(this))
-            } else {
-                ANY
-            }
-            else -> ANY
-        }
-    }
-
     private fun DeclaredTypeName.withTypeParameters(type: KotlinType, kind: KotlinTypeSpecKind): TypeName =
         this.withTypeParameters(type.arguments.map { it.type.spec(kind) })
 
@@ -310,6 +317,9 @@ internal class DefaultMutableSwiftScope(
         }
 
     override val ClassDescriptor.spec: DeclaredTypeName
+        get() = DeclaredTypeName.qualifiedLocalTypeName(swiftName.qualifiedName)
+
+    override val SourceFile.spec: DeclaredTypeName
         get() = DeclaredTypeName.qualifiedLocalTypeName(swiftName.qualifiedName)
 
     override val PropertyDescriptor.spec: PropertySpec
