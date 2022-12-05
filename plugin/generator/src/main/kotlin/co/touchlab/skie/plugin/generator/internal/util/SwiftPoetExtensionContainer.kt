@@ -20,9 +20,8 @@ internal interface SwiftPoetExtensionContainer {
     val DeclarationDescriptor.kotlinName: String
         get() = this.fqNameSafe.asString()
 
-    context(SwiftPoetScope, ClassDescriptor)
-    val swiftNameWithTypeParameters: TypeName
-        get() = this@ClassDescriptor.typeAliasSpec.withTypeParameters(this@ClassDescriptor)
+    val ClassDescriptor.swiftNameWithTypeParameters: TypeName
+        get() = this.typeAliasSpec.withTypeParameters(this)
 
     fun DeclaredTypeName.withTypeParameters(declaration: ClassDescriptor): TypeName =
         this.withTypeParameters(declaration.swiftTypeVariablesNames)

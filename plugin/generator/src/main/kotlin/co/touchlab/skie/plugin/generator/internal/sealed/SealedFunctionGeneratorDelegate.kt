@@ -4,11 +4,13 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
+import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeString
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeVariableName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedFunctionGeneratorDelegate(
@@ -17,14 +19,16 @@ internal class SealedFunctionGeneratorDelegate(
 
     context(SwiftPoetScope)
     fun generate(declaration: ClassDescriptor, enumType: TypeName, fileBuilder: FileSpec.Builder) {
+        val enumGenericTypeParameter = declaration.enumGenericTypeParameter
+
         fileBuilder.addFunction(
             FunctionSpec.builder(declaration.enumConstructorFunctionName)
                 .addModifiers(Modifier.PUBLIC)
-                .addTypeVariables(declaration.swiftTypeVariablesNames)
+                .addTypeVariables(declaration.swiftTypeVariablesNames + enumGenericTypeParameter)
                 .addParameter(
                     label = declaration.enumConstructorArgumentLabel,
                     name = declaration.enumConstructorParameterName,
-                    type = with(declaration) { swiftNameWithTypeParameters },
+                    type = enumGenericTypeParameter,
                 )
                 .returns(enumType)
                 .addExhaustivelyFunctionBody(declaration, enumType)
@@ -40,6 +44,15 @@ internal class SealedFunctionGeneratorDelegate(
 
     private val ClassDescriptor.enumConstructorParameterName: String
         get() = this.getConfiguration(SealedInterop.Function.ParameterName)
+
+    private val ClassDescriptor.enumGenericTypeParameter: TypeVariableName
+        get() {
+            val otherTypeNames = this.swiftTypeVariablesNames.map { it.name }
+
+            val typeName = createCollisionFreeString("SEALED") { it in otherTypeNames }
+
+            return TypeVariableName.typeVariable(typeName).withBounds(TypeVariableName.bound(this.swiftNameWithTypeParameters))
+        }
 
     context(SwiftPoetScope)
         private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(

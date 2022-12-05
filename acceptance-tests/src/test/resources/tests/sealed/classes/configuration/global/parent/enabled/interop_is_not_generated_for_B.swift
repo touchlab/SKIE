@@ -1,4 +1,4 @@
-# SwiftCompilationError(cannot convert value of type 'B' to expected argument type)
+# SwiftCompilationError(error: global function 'onEnum(of:)' requires that 'B' inherit from 'A')
 
 let b: B = B1()
 

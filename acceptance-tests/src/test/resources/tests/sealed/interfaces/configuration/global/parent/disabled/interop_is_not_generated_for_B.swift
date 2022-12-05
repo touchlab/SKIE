@@ -1,4 +1,4 @@
-# SwiftCompilationError(argument type 'any B' does not conform to expected type 'A')
+# SwiftCompilationError(global function 'onEnum(of:)' requires that 'SEALED' conform to 'A')
 
 let b: B = B1()
 

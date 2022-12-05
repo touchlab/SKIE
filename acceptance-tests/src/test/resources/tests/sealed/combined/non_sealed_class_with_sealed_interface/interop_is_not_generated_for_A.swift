@@ -1,4 +1,4 @@
-# SwiftCompilationError(argument type 'A' does not conform to expected type 'I')
+# SwiftCompilationError(error: global function 'onEnum(of:)' requires that 'A' conform to 'I')
 
 func test(a: A) {
     switch onEnum(of: a) {

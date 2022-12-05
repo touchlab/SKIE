@@ -26,19 +26,19 @@ internal class TypeAliasGenerator(
 
     private val baseTypeAliasContainerName = "Skie"
 
-    private val typeAliasContainerName = if (areTypeAliasesExported) baseTypeAliasContainerName else "__$baseTypeAliasContainerName"
+    private val publicTypeAliasContainerName = "__$baseTypeAliasContainerName"
 
     override fun execute(descriptorProvider: DescriptorProvider) {
         skieContext.module.file("TypeAliases") {
             addTypeAliasContainer(descriptorProvider)
-            addTypeAliasContainerInternalTypeAlias()
+            addBaseTypeAliasContainerTypeAlias()
         }
     }
 
     context(SwiftPoetScope)
         private fun FileSpec.Builder.addTypeAliasContainer(descriptorProvider: DescriptorProvider) {
         addType(
-            TypeSpec.enumBuilder(DeclaredTypeName.qualifiedLocalTypeName(typeAliasContainerName))
+            TypeSpec.enumBuilder(DeclaredTypeName.qualifiedLocalTypeName(publicTypeAliasContainerName))
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeAliases(descriptorProvider)
                 .build()
@@ -66,17 +66,16 @@ internal class TypeAliasGenerator(
     }
 
     context(SwiftPoetScope)
-        private fun FileSpec.Builder.addTypeAliasContainerInternalTypeAlias() {
+        private fun FileSpec.Builder.addBaseTypeAliasContainerTypeAlias() {
+        val builder = TypeAliasSpec.builder(
+            name = baseTypeAliasContainerName,
+            type = DeclaredTypeName.qualifiedLocalTypeName(publicTypeAliasContainerName),
+        )
+
         if (areTypeAliasesExported) {
-            return
+            builder.addModifiers(Modifier.PUBLIC)
         }
 
-        addType(
-            TypeAliasSpec.builder(
-                name = baseTypeAliasContainerName,
-                type = DeclaredTypeName.qualifiedLocalTypeName(typeAliasContainerName),
-            )
-                .build()
-        )
+        addType(builder.build())
     }
 }
