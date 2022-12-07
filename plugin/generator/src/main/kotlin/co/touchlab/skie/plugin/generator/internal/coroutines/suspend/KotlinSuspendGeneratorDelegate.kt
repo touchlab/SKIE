@@ -78,6 +78,7 @@ internal class KotlinSuspendGeneratorDelegate(
     private fun createBridgingFunction(
         function: FunctionDescriptor,
     ): FunctionDescriptor =
+        // TODO Does not work with two function with the same name
         declarationBuilder.createFunction(
             name = function.name,
             namespace = declarationBuilder.getCustomNamespace("Skie_suspend"),

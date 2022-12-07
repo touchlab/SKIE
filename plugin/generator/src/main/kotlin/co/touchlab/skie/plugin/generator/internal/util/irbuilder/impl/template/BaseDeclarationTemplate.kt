@@ -29,6 +29,7 @@ internal abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : 
     }
 
     private fun createDeclarationStubsIfIrLazyClass(parent: IrDeclarationContainer) {
+        // Instantiates lazy value
         parent.declarations
     }
 

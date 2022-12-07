@@ -12,12 +12,11 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
     val fqNames: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     internal fun buildFeatureSet(): SkieFeatureSet =
-        listOf(
-            SkieFeature.SuspendInterop to suspendInterop,
-            SkieFeature.FqNames to fqNames,
-        )
-            .filter { it.second.get() }
-            .map { it.first }
-            .toSet()
-            .let { SkieFeatureSet(it) }
+        setOfNotNull(
+            SkieFeature.SuspendInterop takeIf suspendInterop,
+            SkieFeature.FqNames takeIf fqNames,
+        ).let { SkieFeatureSet(it) }
+
+    private infix fun SkieFeature.takeIf(property: Property<Boolean>): SkieFeature? =
+        this.takeIf { property.get() }
 }

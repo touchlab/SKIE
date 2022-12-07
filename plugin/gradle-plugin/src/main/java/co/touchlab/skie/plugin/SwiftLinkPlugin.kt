@@ -222,10 +222,8 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             }
         }
 
-        this.binaries {
-            this.filterIsInstance<AbstractNativeLibrary>().forEach {
-                it.export(BuildConfig.RUNTIME_DEPENDENCY)
-            }
+        this.binaries.withType<AbstractNativeLibrary>().configureEach {
+            it.export(BuildConfig.RUNTIME_DEPENDENCY)
         }
     }
 

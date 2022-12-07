@@ -1,3 +1,9 @@
+import org.codehaus.groovy.runtime.ProcessGroovyMethods
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.KonanTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
+
 plugins {
     id("skie-jvm")
     id("skie-buildconfig")
@@ -29,22 +35,18 @@ val acceptanceTestDependencies: Configuration = configurations.create("acceptanc
 
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
 
-    val konanTarget = when (val architecture = "uname -m".let(org.codehaus.groovy.runtime.ProcessGroovyMethods::execute)
-        .let(org.codehaus.groovy.runtime.ProcessGroovyMethods::getText).trim()) {
-        "arm64" -> org.jetbrains.kotlin.konan.target.KonanTarget.MACOS_ARM64.name
-        "x86_64" -> org.jetbrains.kotlin.konan.target.KonanTarget.MACOS_X64.name
+    val konanTarget = when (val architecture = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()) {
+        "arm64" -> KonanTarget.MACOS_ARM64.name
+        "x86_64" -> KonanTarget.MACOS_X64.name
         else -> error("Unsupported architecture: $architecture")
     }
 
     attributes.attribute(
-        org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.attribute,
-        org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.native
+        KotlinPlatformType.attribute,
+        KotlinPlatformType.native
     )
-    attributes.attribute(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.konanTargetAttribute, konanTarget)
-    attributes.attribute(
-        Usage.USAGE_ATTRIBUTE,
-        objects.named(Usage::class.java, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages.KOTLIN_API)
-    )
+    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget)
+    attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
 }
 
 dependencies {
