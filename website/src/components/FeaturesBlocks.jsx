@@ -1,5 +1,16 @@
 import React, {useState} from 'react';
-import {Android, Apple, Cyborg, DecisionProcess, FavList, Messaging, Note, ThumbUp, World2} from "./FeatureIcons";
+import {
+    Android,
+    Apple,
+    Cyborg,
+    DecisionProcess,
+    FavList, Geometry, Link,
+    Messaging,
+    NetworkConnection,
+    Note, PillBottle,
+    ThumbUp,
+    World2
+} from "./FeatureIcons";
 
 function FeatureBlock(name, description, svgBody){
   return(
@@ -34,25 +45,25 @@ function FeaturesBlocks() {
             {FeatureBlock(
                 "Transparent Enums",
                 "Kotlin enums are transparently converted to proper Swift enums. This allows for exhaustive operations on the Swift side.",
-                FavList
+                Geometry
             )}
 
             {FeatureBlock(
                 "Sealed Classes",
                 "Sealed Class handling allows you to exhaustively switch on sealed Kotlin hierarchies from Swift.",
-                Note
+                PillBottle
             )}
 
             {FeatureBlock(
                 "Default Parameters",
                 "Overloaded methods are added to the exposed Swift interface to allow for calling methods without needing to specify every argument.",
-                World2
+                NetworkConnection
             )}
 
               {FeatureBlock(
                   "Direct Linking",
                   "The generated Swift and augmented interface are compiled and linked directly to the Xcode Framework. No extra deployment config required.",
-                  World2
+                  Link
               )}
 
           </div>

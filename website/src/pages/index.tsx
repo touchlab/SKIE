@@ -28,9 +28,7 @@ export default function Home(): JSX.Element {
   });*/
 
   return (
-    <Layout
-      title={`SKIE`}
-      description="Yada yada">
+    <Layout>
       <HeroAbout/>
       {/*<HeroHome />*/}
       {/*<Process/>*/}
