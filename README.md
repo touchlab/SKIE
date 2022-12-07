@@ -10,8 +10,6 @@ SKIE currently supports the following features:
 
 To see how to add SKIE to your project, check out the [Installation doc](/docs/Installation.md).
 
-If you have any questions, we invite you to ask in the `#touchlab-tools` channel of the Kotlin Community Slack. To join the Kotlin Community Slack, [request access here](http://slack.kotlinlang.org/).
-
 *Please note that Skie is still under active development, has not been publicly released, and should not be used in any production project.*
 
 ## Supported features
