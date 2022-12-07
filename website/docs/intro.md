@@ -172,7 +172,7 @@ While this approach to default arguments is completely transparent from Swift, i
 - Generated overloads may cause resolution conflicts.
 - The number of generated overloads is `O(2^n)` where `n` is the number of default arguments (not all parameters).
 
-SKIE tries to avoid generating functions that would cause conflicts, however the implementation is not complete yet. Specifically, it does not yet properly handle inheritance, generics, and generated overloads of multiple functions with default arguments. If you run into this issue, you might have to disable the code generation for one of the functions (see [Local section of the Configuration doc](/docs/Configuration.md#local-via-kotlin-annontation)).
+SKIE tries to avoid generating functions that would cause conflicts, however the implementation is not complete yet. Specifically, it does not yet properly handle inheritance, generics, and generated overloads of multiple functions with default arguments. If you run into this issue, you might have to disable the code generation for one of the functions (see [Local section of the Configuration doc](Configuration.md#local-via-kotlin-annontation)).
 
 Alternatively, you can rename one of the conflicting functions (or their parameters).
 
