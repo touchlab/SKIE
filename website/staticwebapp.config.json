@@ -1,0 +1,11 @@
+{
+  "responseOverrides": {
+    "401": {
+      "redirect": "/.auth/login/github?post_login_redirect_uri=.referrer",
+      "statusCode": 302
+    },
+    "404": {
+      "rewrite": "/404.html"
+    }
+  }
+}

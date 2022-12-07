@@ -1,0 +1,16 @@
+name: Publish the website
+on: workflow_dispatch
+
+jobs:
+  docusaurus-deploy:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Publish website
+        run: |
+          git config --global user.email "kgalligan@gmail.com"
+          git config --global user.name "Kevin Galligan"
+          npm install
+          GIT_USER=ciuser GIT_PASS=${{ secrets.GITHUB_TOKEN }} yarn deploy
