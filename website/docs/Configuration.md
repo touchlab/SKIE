@@ -120,4 +120,4 @@ skie {
 }
 ```
 
-`group` and `from` can be freely mixed together and repeated multiple times. The file format is identical to [`acceptance-tests/src/test/resources/tests/config.json`](/acceptance-tests/src/test/resources/tests/config.json).
+`group` and `from` can be freely mixed together and repeated multiple times. The file format is identical to [`acceptance-tests/src/test/resources/tests/config.json`](https://github.com/touchlab/SKIE/acceptance-tests/src/test/resources/tests/config.json).
