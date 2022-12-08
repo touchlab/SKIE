@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Installation
 
 Installing SKIE involves small additions to just two gradle files. The Swift/Xcode side does not require any configuration changes.

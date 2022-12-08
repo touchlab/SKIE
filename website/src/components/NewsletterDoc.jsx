@@ -26,7 +26,7 @@ function NewsletterDoc() {
 
               {/* CTA content */}
                 <h4 className="h4 text-white xl:mb-0 text-center">Request Early Access</h4>
-                <a className="btn text-teal-600 bg-teal-100 hover:bg-white shadow text-xl" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Request</a>
+                <a className="btn text-teal-600 bg-teal-100 hover:bg-white shadow text-xl" href="https://form.typeform.com/to/XjtmUzbs">Request</a>
 
             </div>
 
