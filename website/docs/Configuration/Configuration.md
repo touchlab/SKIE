@@ -9,11 +9,11 @@ SKIE is an opinionated plugin and makes choices that might not work for every us
 - locally - using Kotlin annotations
 - globally - using Gradle extension provided by the SKIE Gradle plugin
 
-## Local (via Kotlin annontation)
+## Local (via Kotlin annotation)
 
 A local configuration change affects the behavior of a single declaration, which makes it suitable for suppressing the plugin if for example it does not work properly because of a bug.
 
-The available annotations can be found in [the `:plugin:generator:configuration-annotations` module](https://github.com/touchlab/SKIE/tree/main/plugin/generator/configuration-annotations).
+The available annotations can be found [here](/docs/Configuration/AvailableAnnotations.md).
 
 The following example changes the name of the `onEnum(of:)` function generated for `SealedKotlinClass` to `something(of:)`:
 
@@ -57,7 +57,7 @@ skie {
 
 The above example changes the name of the `onEnum(of:)` function to `something(of:)` for **all** sealed classes and interfaces. Note that you can add multiple options to a single `group { ... }`.
 
-All of the available configuration options are listed in [the `:plugin:generator:configuration-gradle` module](https://github.com/touchlab/SKIE/tree/main/plugin/generator/configuration-gradle). Make sure that you import classes from package `co.touchlab.skie.configuration.gradle` (not `.annotations`).
+All of the available configuration options are listed [here](/docs/Configuration/AvailableConfigurations.md). Make sure that you import classes from package `co.touchlab.skie.configuration.gradle` (not `.annotations`).
 
 The configuration can also be applied such that it affects only some declarations:
 
@@ -112,7 +112,7 @@ skie {
 
 If the `overridesAnnotations` argument is set, then all keys in the group take precedence over the annotations. Keep in mind that the configuration can still be changed by another `group` block. Annotations can still be used to configure behavior not specified in the overriding group.
 
-Configuration can be loaded from a file:
+Configurations can also be loaded from a JSON file (such as [this example](/docs/Configuration/JsonConfigurationFileExample.md)) like so:
 
 ```kotlin
 // build.gradle.kts
@@ -124,4 +124,4 @@ skie {
 }
 ```
 
-`group` and `from` can be freely mixed together and repeated multiple times. The file format is identical to [`acceptance-tests/src/test/resources/tests/config.json`](https://github.com/touchlab/SKIE/acceptance-tests/src/test/resources/tests/config.json).
+Note that `group` and `from` can be freely mixed together and repeated multiple times.
