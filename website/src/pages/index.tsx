@@ -37,7 +37,7 @@ export default function Home(): JSX.Element {
       <StakeholderValue/>
       <Automatic/>
       {/*<NewsletterDoc/>*/}
-      {/*<FeaturesZigzag/>*/}
+      <FeaturesZigzag/>
       <FeaturesBlocks/>
       <Newsletter/>
       <div>&nbsp;</div>

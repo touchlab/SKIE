@@ -5,10 +5,17 @@ import FeatImage01 from '@site/static/componentimg/features-03-image-01.png';
 import FeatImage02 from '@site/static/componentimg/features-03-image-02.png';
 import FeatImage03 from '@site/static/componentimg/features-03-image-03.png';
 
+import enumKotlin from '@site/static/samples/enum/kotlin.png';
+import enumSwiftBefore from '@site/static/samples/enum/swiftbefore.png';
+import enumSwiftAfter from '@site/static/samples/enum/swiftafter.png';
+import sealedKotlin from '@site/static/samples/sealed-class/kotlin-sealed-class.png';
+import sealedSwiftBefore from '@site/static/samples/sealed-class/swift-before-skie-sealed-class.png';
+import sealedSwiftAfter from '@site/static/samples/sealed-class/swift-after-skie-sealed-class.png';
+
 function ShowKotlinSwiftToggle(kotlinBlock, swiftBlock){
     const [showKotlin, setShowKotlin] = useState(true);
     return (
-        <div className="md:col-span-6 flex flex-wrap justify-center -m-2 my-8">
+        <div className=" flex flex-wrap justify-center -m-2 my-8">
           <div
               className={`flex flex-row justify-center items-center font-medium py-2 px-4 m-2 bg-gray-100 dark:bg-gray-800 rounded-full group transition duration-200 ${!showKotlin && 'opacity-50 hover:opacity-75 cursor-pointer'}`}
               onClick={() => { setShowKotlin(true);}}
@@ -28,47 +35,40 @@ function ShowKotlinSwiftToggle(kotlinBlock, swiftBlock){
     )
 }
 
-function ShowKotlinSwiftFriends(imgK, imgS) {
+function labelImage(label, imgObj) {
+    return (
+        <>
+            <div
+                className="w-48 mt-4 mb-2 text-center inline-block text-black bg-slate-400 dark:text-white dark:bg-slate-600 py-1 px-3 rounded-full text-lg">{label}</div>
+            <br/>
+            <img className="h-auto w-[580px]" src={imgObj}
+                 alt="Features 01"/><br/>
+        </>
+    )
+}
+
+function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter) {
   return (
       <>
-        <div className="block md:hidden items-center">
+        {/*<div className="block md:hidden items-center">
           {ShowKotlinSwiftToggle(() => {
             return (
-                <img className="max-w-full mx-auto md:max-w-none h-auto" src={imgK} width="540" height="405"
+                <img className="max-w-full mx-auto md:max-w-none h-auto" src={imgK} width="540" height="auto"
                      alt="Features 01"/>
             )
           }, () => {
             return (
-                <img className="max-w-full mx-auto md:max-w-none h-auto" src={imgS} width="540" height="405"
+                <img className="max-w-full mx-auto md:max-w-none h-auto" src={imgS} width="540" height="auto"
                      alt="Features 01"/>
             )
           })}
-        </div>
-        <div className="hidden md:block md:grid md:grid-cols-12 md:gap-6">
+        </div>*/}
+
+      <div className="max-w-6xl mx-auto text-center">
           {/* Image */}
-          <div className="md:col-span-6 flex flex-wrap justify-center my-8">
-            <div className="mb-3">
-              <ul className="flex flex-wrap text-xs font-medium -m-1 list-none">
-                <li className="m-1">
-                  <span
-                      className="inline-flex text-center text-black bg-lime-400 dark:text-white dark:bg-lime-600 py-1 px-3 rounded-full text-lg">Kotlin</span>
-                </li>
-              </ul>
-            </div>
-            <img className="max-w-full mx-auto md:max-w-none h-auto" src={imgK} width="540" height="405"
-                 alt="Features 01"/>
-          </div>
-          <div className="md:col-span-6 flex flex-wrap justify-center my-8">
-            <div className="mb-3">
-              <ul className="flex flex-wrap text-xs font-medium -m-1 list-none">
-                <li className="m-1">
-                  <a className="inline-flex text-center text-black bg-lime-400 dark:text-white dark:bg-lime-600 py-1 px-3 rounded-full text-lg">Swift</a>
-                </li>
-              </ul>
-            </div>
-            <img className="max-w-full mx-auto md:max-w-none h-auto" src={imgS} width="540" height="405"
-                 alt="Features 01"/>
-          </div>
+            {labelImage("Kotlin", imgK)}
+            {labelImage("Without SKIE ❌", imgS)}
+            {labelImage("With SKIE ✅", imgSAfter)}
         </div>
       </>
   )
@@ -88,7 +88,7 @@ function FeaturesZigzag() {
           </div>
 
           {/* Items */}
-          <div className="grid gap-5">
+          <div className="">
 
             <div className="items-center">
               <div className="font-architects-daughter text-xl text-lime-700 dark:text-lime-300 mb-2">Exhaustive enums</div>
@@ -111,7 +111,8 @@ function FeaturesZigzag() {
             </div>
 
             {/* 1st item */}
-            {ShowKotlinSwiftFriends(FeatImage01, FeatImage02)}
+
+              {ShowKotlinSwiftFriends(enumKotlin, enumSwiftBefore, enumSwiftAfter)}
 
           </div>
 
