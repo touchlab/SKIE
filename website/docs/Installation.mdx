@@ -1,13 +1,12 @@
----
-sidebar_position: 2
----
-
-import CodeBlock from "@theme/CodeBlock";
+import useIsBrowser from "@docusaurus/useIsBrowser";import CodeBlock from "@theme/CodeBlock";
 import {interpolate} from "@docusaurus/Interpolate";
 export function ApiKeyInterpolatedCodeBlock({children, language, title}) {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const apiKey = urlParams.get('api_key')
+    let apiKey = undefined;
+    if (useIsBrowser()) {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        apiKey = urlParams.get('api_key')
+    }
     return (
         <CodeBlock language={language} title={title}>
             {interpolate(children, {API_KEY: apiKey || "YOUR_API_KEY_HERE"})}
