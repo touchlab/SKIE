@@ -38,4 +38,4 @@ plugins {
 
 SKIE should not be applied to other modules - it automatically works with all of the code in every module (including 3rd party dependencies).
 
-That is the totality of what's required to integrate SKIE! Below is a list of features that SKIE supports. If you find that you want or need to customize SKIE's behavior, then check out the [Configuration doc](/Configuration.md).
+That is the totality of what's required to integrate SKIE! Below is a list of features that SKIE supports. If you find that you want or need to customize SKIE's behavior, then check out the [Configuration doc](/docs/Configuration/Configuration.md).

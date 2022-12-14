@@ -172,7 +172,7 @@ While this approach to default arguments is completely transparent from Swift, i
 - Generated overloads may cause resolution conflicts.
 - The number of generated overloads is `O(2^n)` where `n` is the number of default arguments (not all parameters).
 
-SKIE tries to avoid generating functions that would cause conflicts, however the implementation is not complete yet. Specifically, it does not yet properly handle inheritance, generics, and generated overloads of multiple functions with default arguments. If you run into this issue, you might have to disable the code generation for one of the functions (see the Local section of [the Configuration doc](/Configuration.md)).
+SKIE tries to avoid generating functions that would cause conflicts, however the implementation is not complete yet. Specifically, it does not yet properly handle inheritance, generics, and generated overloads of multiple functions with default arguments. If you run into this issue, you might have to disable the code generation for one of the functions (see the Local section of [the Configuration doc](/docs/Configuration/Configuration.md)).
 
 Alternatively, you can rename one of the conflicting functions (or their parameters).
 
@@ -180,6 +180,6 @@ Since it is not possible to generate exponential numbers of functions, the numbe
 
 The limit of 5 was chosen as the result of internal experiments, but that number might change. For now, we think it's a suitable balance between the number of supported cases (since not many functions exceed that number) and the overhead introduced in the form of compilation time and binary size.
 
-The maximum number of default arguments can be explicitly configured using the `DefaultArgumentInterop.MaximumDefaultArgumentCount` key/annotation (see the Local section of [the Configuration doc](/docs/Configuration.md).
+The maximum number of default arguments can be explicitly configured using the `DefaultArgumentInterop.MaximumDefaultArgumentCount` key/annotation (see the Local section of [the Configuration doc](/docs/Configuration/Configuration.md).
 
 *NOTE: All of the above-mentioned problems might be mitigated in the future versions of SKIE. For instance, the limit on the number of default arguments may increase in the future as we test the plugin on larger projects.*
