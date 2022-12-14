@@ -41,7 +41,8 @@ function labelImage(label, imgObj) {
             <div
                 className="w-48 mt-4 mb-2 text-center inline-block text-black bg-slate-400 dark:text-white dark:bg-slate-600 py-1 px-3 rounded-full text-lg">{label}</div>
             <br/>
-            <img className="h-auto w-[580px]" src={imgObj}
+
+            <img className=" " src={imgObj}
                  alt="Features 01"/><br/>
         </>
     )
@@ -64,7 +65,7 @@ function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter) {
           })}
         </div>*/}
 
-      <div className="max-w-6xl mx-auto text-center">
+      <div className="max-w-4xl mx-auto text-center">
           {/* Image */}
             {labelImage("Kotlin", imgK)}
             {labelImage("Without SKIE ❌", imgS)}
@@ -79,7 +80,7 @@ function FeaturesZigzag() {
     return (
     <section>
       <div className="hidden text-lime-600"></div>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="pb-12 md:pb-20 border-t border-gray-800">
 
           {/*border-gray-800 border-solid border-t border-b-0 border-x-0*/}
