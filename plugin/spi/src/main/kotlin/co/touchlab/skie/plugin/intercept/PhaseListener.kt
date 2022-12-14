@@ -12,6 +12,7 @@ interface PhaseListener {
     fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {}
 
     enum class Phase {
+        CREATE_SYMBOL_TABLE,
         OBJC_EXPORT,
         PSI_TO_IR,
         OBJECT_FILES,

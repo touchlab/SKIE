@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.backend.konan.objCExportPhase
 import org.jetbrains.kotlin.backend.konan.objectFilesPhase
 import org.jetbrains.kotlin.backend.konan.psiToIrPhase
+import org.jetbrains.kotlin.backend.konan.createSymbolTablePhase
 import org.jetbrains.kotlin.cli.jvm.plugins.ServiceLoaderLite
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
@@ -81,6 +82,7 @@ class PhaseInterceptor<in CONTEXT : CommonBackendContext>(
         }
 
         private fun getPhase(phaseKey: PhaseListener.Phase) = when (phaseKey) {
+            PhaseListener.Phase.CREATE_SYMBOL_TABLE -> createSymbolTablePhase
             PhaseListener.Phase.OBJC_EXPORT -> objCExportPhase
             PhaseListener.Phase.PSI_TO_IR -> psiToIrPhase
             PhaseListener.Phase.OBJECT_FILES -> objectFilesPhase

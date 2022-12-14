@@ -7,7 +7,6 @@ import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
-import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
@@ -37,12 +36,8 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
         get() = configuration.get(ConfigurationKeys.swiftGenConfiguration, Configuration {})
 
     private fun buildIr(context: CommonBackendContext, action: (DescriptorProvider, DeclarationBuilder) -> Unit) {
-        val descriptorProvider = DescriptorProvider(context)
-
-        val declarationBuilder = DeclarationBuilderImpl(context, descriptorProvider)
-
-        SwiftGenCompilerConfigurationKey.DeclarationBuilder.put(declarationBuilder, context.configuration)
-
+        val descriptorProvider = context.skieDescriptorProvider
+        val declarationBuilder = context.skieDeclarationBuilder
         action(descriptorProvider, declarationBuilder)
     }
 }
