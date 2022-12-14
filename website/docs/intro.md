@@ -13,7 +13,7 @@ SKIE currently supports the following features:
 - Exhaustive enums
 - Default arguments
 
-To see how to add SKIE to your project, check out the [Installation doc](/docs/Installation.md).
+To see how to add SKIE to your project, check out the [Installation doc](/docs/Installation.mdx).
 
 *Please note that Skie is still under active development, has not been publicly released, and should not be used in any production project.*
 
