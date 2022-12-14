@@ -2,6 +2,20 @@
 sidebar_position: 2
 ---
 
+import CodeBlock from "@theme/CodeBlock";
+import {interpolate} from "@docusaurus/Interpolate";
+export function ApiKeyInterpolatedCodeBlock({children, language, title}) {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const apiKey = urlParams.get('api_key')
+    return (
+        <CodeBlock language={language} title={title}>
+            {interpolate(children, {API_KEY: apiKey || "YOUR_API_KEY_HERE"})}
+        </CodeBlock>
+    );
+}
+
+
 # Installation
 
 Installing SKIE involves small additions to just two gradle files. The Swift/Xcode side does not require any configuration changes.
@@ -14,27 +28,28 @@ SKIE is deployed in a private Touchlab Maven repository. To access artifacts fro
 
 Once you have your API key, you will then need to add the following code in `settings.gradle.kts` with your API key substituting for "YOUR_API_KEY_HERE":
 
-```kotlin
-pluginManagement {
+<ApiKeyInterpolatedCodeBlock
+    language="kotlin"
+    title="settings.gradle.kts">
+{`pluginManagement {
     repositories {
         // Previously present repositories like mavenCentral()
         // ...
-        maven("https://api.touchlab.dev/mvn/YOUR_API_KEY_HERE")
+        maven("https://api.touchlab.dev/mvn/{API_KEY}")
     }
-}
-
+}\n
 dependencyResolutionManagement {
     repositories {
         // Previously present repositories like mavenCentral()
         // ...
-        maven("https://api.touchlab.dev/mvn/YOUR_API_KEY_HERE")
+        maven("https://api.touchlab.dev/mvn/{API_KEY}")
     }
-}
-```
+}`}
+</ApiKeyInterpolatedCodeBlock>
 
 To enable SKIE, add the plugin in `build.gradle.kts` of the module that builds the native framework:
 
-```kotlin
+```kotlin title=build.gradle.kts
 plugins {
     id("co.touchlab.skie") version "{{LATEST_GITHUB_VERSION}}"
 }
