@@ -1,5 +1,6 @@
 import Foundation
 
+@available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
 class AsyncStreamDispatcherDelegate: Skie.co_touchlab_skie_runtime_coroutines_Skie_DispatcherDelegate {
 
     private let continuation: AsyncStream<Skie.kotlinx_coroutines_Runnable>.Continuation

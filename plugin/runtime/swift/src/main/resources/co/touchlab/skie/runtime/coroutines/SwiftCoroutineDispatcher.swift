@@ -1,5 +1,6 @@
 import Foundation
 
+@available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
 struct SwiftCoroutineDispatcher {
 
     static func dispatch<T>(

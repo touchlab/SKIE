@@ -42,6 +42,7 @@ internal class SwiftSuspendGeneratorDelegate(
             addFunction(
                 FunctionSpec.builder(function.swiftName.name)
                     .addModifiers(Modifier.STATIC)
+                    .addAttribute(AttributeSpec.available("iOS" to "13", "macOS" to "10.15", "watchOS" to "6", "tvOS" to "13", "*" to ""))
                     .async(true)
                     .throws(true)
                     .addValueParameters(function)
