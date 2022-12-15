@@ -1,18 +1,5 @@
 import React, {useState} from 'react';
-import {
-    Android,
-    AndroidOnly,
-    Apple,
-    AppleOnly,
-    DecisionProcess,
-    DecisionProcessOnly,
-    ThumbDownTab,
-    ThumbUpTab
-} from "./FeatureIcons";
-
-import FeatImage01 from '@site/static/componentimg/features-03-image-01.png';
-import FeatImage02 from '@site/static/componentimg/features-03-image-02.png';
-import FeatImage03 from '@site/static/componentimg/features-03-image-03.png';
+import {AndroidOnly, AppleOnly, ThumbDownTab, ThumbUpTab} from "./FeatureIcons";
 
 import enumKotlin from '@site/static/samples/enum/kotlin.png';
 import enumSwiftBefore from '@site/static/samples/enum/swiftbefore.png';
@@ -22,37 +9,8 @@ import sealedSwiftBefore from '@site/static/samples/sealed-class/swiftbefore.png
 import sealedSwiftAfter from '@site/static/samples/sealed-class/swiftafter.png';
 import sealedSwiftAfterComplete from '@site/static/samples/sealed-class/swiftaftercomplete.png';
 
-function ShowKotlinSwiftToggle(kotlinBlock, swiftBlock){
-    const [showKotlin, setShowKotlin] = useState(true);
-    return (
-        <div className=" flex flex-wrap justify-center -m-2 my-8">
-          <div
-              className={`flex flex-row justify-center items-center font-medium py-2 px-4 m-2 bg-gray-100 dark:bg-gray-800 rounded-full group transition duration-200 ${!showKotlin && 'opacity-50 hover:opacity-75 cursor-pointer'}`}
-              onClick={() => { setShowKotlin(true);}}
-          >
-            <span className="mr-2 p-0 -mb-1">{AndroidOnly("lime")}</span>
-            <span className="text-gray-600 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-200 transition-colors duration-150 ease-in-out">Kotlin</span>
-          </div>
-          <div
-              className={`flex flex-row justify-center items-center font-medium py-2 px-4 m-2 bg-gray-100 dark:bg-gray-800 rounded-full group transition duration-200 ${showKotlin && 'opacity-50 hover:opacity-75 cursor-pointer'}`}
-              onClick={() => { setShowKotlin(false);}}
-          >
-            <span className="mr-2 p-0 -mb-1">{AppleOnly("lime")}</span>
-            <span className="text-gray-600 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-200 transition-colors duration-150 ease-in-out">Swift</span>
-          </div>
-            {showKotlin ? kotlinBlock() : swiftBlock()}
-        </div>
-    )
-}
-
 function labelImage(label, imgObj) {
     return (imgObj instanceof Array) ? labelImageScroller(label, imgObj) : labelImageScroller(label, [imgObj])
-    //     (
-    //     <>
-    //         <img src={imgObj}
-    //              alt={label}/><br/>
-    //     </>
-    // )
 }
 
 function labelImageScroller(label, imgObjs) {

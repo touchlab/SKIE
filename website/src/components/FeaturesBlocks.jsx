@@ -1,16 +1,5 @@
-import React, {useState} from 'react';
-import {
-    Android,
-    Apple,
-    Cyborg,
-    DecisionProcess,
-    FavList, Geometry, Link,
-    Messaging,
-    NetworkConnection,
-    Note, PillBottle,
-    ThumbUp,
-    World2
-} from "./FeatureIcons";
+import React from 'react';
+import {Geometry, Link, NetworkConnection, PillBottle} from "./FeatureIcons";
 
 function FeatureBlock(name, description, svgBody){
   return(
@@ -23,9 +12,6 @@ function FeatureBlock(name, description, svgBody){
 }
 
 function FeaturesBlocks() {
-  const [block, setBlock] = useState("android");
-
-  const setTab = () =>{}
   return (
     <section>
 

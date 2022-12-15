@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Android, AndroidOnly, Apple, AppleOnly, DecisionProcess, DecisionProcessOnly} from "./FeatureIcons";
+import {AndroidOnly, AppleOnly, DecisionProcessOnly} from "./FeatureIcons";
 
 function ToggleBlock(currentBlock, blockName, setBlock, title, svgBody){
   return(

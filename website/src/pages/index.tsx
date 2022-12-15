@@ -1,23 +1,17 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Layout from '@theme/Layout';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Process from '@site/src/components/Process';
 import HeroAbout from '@site/src/components/HeroAbout';
-import Stats from '@site/src/components/Stats';
 import FeaturesBlocks from '@site/src/components/FeaturesBlocks';
 import FeaturesZigzag from '@site/src/components/FeaturesZigzag';
-import HeroHome from '@site/src/components/HeroHome';
-import Newsletter from '@site/src/components/Newsletter';
-import NewsletterDoc from '@site/src/components/NewsletterDoc';
+import EarlyAccess from '@site/src/components/EarlyAccess';
 import StakeholderValue from '@site/src/components/StakeholderValue';
 import Overview from '@site/src/components/Overview';
 import Automatic from '@site/src/components/Automatic';
-import AOS from 'aos';
+// Uncomment for animations
 // import 'aos/dist/aos.css';
 
 export default function Home(): JSX.Element {
-  const {siteConfig} = useDocusaurusContext();
-
+// Uncomment for animations
   /*useEffect(() => {
     AOS.init({
       once: true,
@@ -30,16 +24,12 @@ export default function Home(): JSX.Element {
   return (
     <Layout>
       <HeroAbout/>
-      {/*<HeroHome />*/}
-      {/*<Process/>*/}
-      {/*<Stats/>*/}
       <Overview/>
       <StakeholderValue/>
       <Automatic/>
-      {/*<NewsletterDoc/>*/}
       <FeaturesZigzag/>
       <FeaturesBlocks/>
-      <Newsletter/>
+      <EarlyAccess/>
       <div>&nbsp;</div>
       <div>&nbsp;</div>
     </Layout>

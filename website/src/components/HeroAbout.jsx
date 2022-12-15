@@ -2,7 +2,7 @@ import React from 'react';
 
 import HeroImage from '@site/static/componentimg/hero.jpg';
 
-function HeroAbout() {
+export default function HeroAbout() {
   return (
     <section className="relative">
 
@@ -30,5 +30,3 @@ function HeroAbout() {
     </section>
   );
 }
-
-export default HeroAbout;

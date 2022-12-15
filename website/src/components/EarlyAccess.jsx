@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Newsletter() {
+export default function EarlyAccess() {
   return (
     <section>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -43,5 +43,3 @@ function Newsletter() {
     </section>
   );
 }
-
-export default Newsletter;
