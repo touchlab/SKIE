@@ -23,7 +23,9 @@ data class TargetTriple(
     val os: String,
     val environment: String?,
 ) {
+
     companion object {
+
         /**
          * Parse <arch>-<vendor>-<os>-<environment?> [tripleString].
          *

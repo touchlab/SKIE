@@ -55,7 +55,7 @@ internal class SealedFunctionGeneratorDelegate(
         }
 
     context(SwiftPoetScope)
-        private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
+    private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         declaration: ClassDescriptor,
         enumType: TypeName,
     ): FunctionSpec.Builder = addCode(
@@ -66,7 +66,7 @@ internal class SealedFunctionGeneratorDelegate(
     )
 
     context(SwiftPoetScope)
-        private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
+    private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
         declaration: ClassDescriptor,
         enumType: TypeName,
     ): CodeBlock.Builder {
@@ -90,7 +90,7 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     context(SwiftPoetScope)
-        private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(
+    private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(
         declaration: ClassDescriptor,
         enumType: TypeName,
     ): CodeBlock.Builder {
@@ -107,7 +107,7 @@ internal class SealedFunctionGeneratorDelegate(
         get() = this.sealedSubclasses.any { it.isVisibleSealedSubclass }
 
     context(SwiftPoetScope)
-        private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: ClassDescriptor, enumType: TypeName) {
+    private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: ClassDescriptor, enumType: TypeName) {
         nextControlFlow("else")
 
         if (declaration.hasElseCase) {

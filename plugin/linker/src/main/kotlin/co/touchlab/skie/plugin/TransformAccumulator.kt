@@ -145,6 +145,7 @@ internal class TransformAccumulator(
     }
 
     sealed interface ObjcCallableMemberTransformScope {
+
         var isRemoved: Boolean
         var isHidden: Boolean
     }
@@ -160,6 +161,7 @@ internal class TransformAccumulator(
         override var isHidden: Boolean = false,
         var swiftName: MutableSwiftFunctionName,
     ) : ObjcCallableMemberTransformScope {
+
         val newSwiftName: MutableSwiftFunctionName?
             get() = swiftName.takeIf { it.isChanged }
     }

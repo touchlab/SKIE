@@ -15,7 +15,8 @@ import org.jetbrains.kotlin.types.KotlinType
 
 class DataStructDeclarationChecker(
     override val configuration: Configuration,
-): DeclarationChecker, ConfigurationContainer {
+) : DeclarationChecker, ConfigurationContainer {
+
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
         val trace = context.trace
 

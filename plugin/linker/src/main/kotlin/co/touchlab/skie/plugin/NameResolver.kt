@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 internal class NameResolver(
     private val namer: ObjCExportNamer,
 ) {
+
     private val mutableTypeNames = mutableMapOf<TypeTransformTarget, MutableSwiftTypeName>()
     private val mutableFunctionNames = mutableMapOf<FunctionDescriptor, MutableSwiftFunctionName>()
 

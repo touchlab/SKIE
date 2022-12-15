@@ -3,6 +3,7 @@ package `tests`.`default_arguments`.`special_declarations`.`enums`.`virtual`
 enum class A {
 
     X {
+
         override fun foo(i: Int, k: Int, m: Int, o: Int): Int = i + k * m - o
     };
 

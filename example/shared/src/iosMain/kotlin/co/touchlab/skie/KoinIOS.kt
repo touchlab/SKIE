@@ -1,7 +1,7 @@
 package co.touchlab.skie
 
-import co.touchlab.skie.db.SkieDB
 import co.touchlab.kermit.Logger
+import co.touchlab.skie.db.SkieDB
 import com.russhwolf.settings.AppleSettings
 import com.russhwolf.settings.Settings
 import com.squareup.sqldelight.db.SqlDriver
@@ -17,7 +17,7 @@ import platform.Foundation.NSUserDefaults
 fun initKoinIos(
     userDefaults: NSUserDefaults,
     appInfo: AppInfo,
-    doOnStartup: () -> Unit
+    doOnStartup: () -> Unit,
 ): KoinApplication = initKoin(
     module {
         single<Settings> { AppleSettings(userDefaults) }
@@ -41,5 +41,6 @@ fun Koin.loggerWithTag(tag: String) =
 
 @Suppress("unused") // Called from Swift
 object KotlinDependencies : KoinComponent {
+
     fun getBreedViewModel() = getKoin().get<BreedCallbackViewModel>()
 }

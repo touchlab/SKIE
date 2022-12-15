@@ -4,6 +4,7 @@ data class SwiftBridgedName(
     val parent: SwiftTypeName?,
     val name: String,
 ) {
+
     val qualifiedName: String
         get() = if (parent == null) name else "${parent.qualifiedName}${SwiftTypeName.DEFAULT_SEPARATOR}$name"
 
@@ -15,6 +16,7 @@ data class SwiftBridgedName(
         get() = qualifiedName != typeAliasName
 
     companion object {
+
         const val DEFAULT_SEPARATOR = "__"
     }
 }

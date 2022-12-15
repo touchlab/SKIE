@@ -40,8 +40,9 @@ export function Note() {
         <>{CircleBlock(() => {
             return (
                 <>
-                    <path className="stroke-current text-amber-100" strokeWidth="2" strokeLinecap="square" d="M21 23h22v18H21z" fill="none" fillRule="evenodd" />
-                    <path className="stroke-current text-amber-300" d="M26 28h12M26 32h12M26 36h5" strokeWidth="2" strokeLinecap="square" />
+                    <path className="stroke-current text-amber-100" strokeWidth="2" strokeLinecap="square" d="M21 23h22v18H21z" fill="none"
+                          fillRule="evenodd"/>
+                    <path className="stroke-current text-amber-300" d="M26 28h12M26 32h12M26 36h5" strokeWidth="2" strokeLinecap="square"/>
                 </>
             )
         })}</>
@@ -53,9 +54,9 @@ export function World2() {
         <>{CircleBlock(() => {
             return (
                 <g transform="translate(21 21)" strokeLinecap="square" strokeWidth="2" fill="none" fillRule="evenodd">
-                    <ellipse className="stroke-current text-amber-300" cx="11" cy="11" rx="5.5" ry="11" />
-                    <path className="stroke-current text-amber-100" d="M11 0v22M0 11h22" />
-                    <circle className="stroke-current text-amber-100" cx="11" cy="11" r="11" />
+                    <ellipse className="stroke-current text-amber-300" cx="11" cy="11" rx="5.5" ry="11"/>
+                    <path className="stroke-current text-amber-100" d="M11 0v22M0 11h22"/>
+                    <circle className="stroke-current text-amber-100" cx="11" cy="11" r="11"/>
                 </g>
             )
         })}</>
@@ -67,8 +68,9 @@ export function Cyborg() {
         <>{CircleBlock(() => {
             return (
                 <g transform="translate(22 21)" strokeLinecap="square" strokeWidth="2" fill="none" fillRule="evenodd">
-                    <path className="stroke-current text-amber-100" d="M17 22v-6.3a8.97 8.97 0 003-6.569A9.1 9.1 0 0011.262 0 9 9 0 002 9v1l-2 5 2 1v4a2 2 0 002 2h4a5 5 0 005-5v-5" />
-                    <circle className="stroke-current text-amber-300" cx="13" cy="9" r="3" />
+                    <path className="stroke-current text-amber-100"
+                          d="M17 22v-6.3a8.97 8.97 0 003-6.569A9.1 9.1 0 0011.262 0 9 9 0 002 9v1l-2 5 2 1v4a2 2 0 002 2h4a5 5 0 005-5v-5"/>
+                    <circle className="stroke-current text-amber-300" cx="13" cy="9" r="3"/>
                 </g>
             )
         })}</>
@@ -80,8 +82,9 @@ export function ThumbUp() {
         <>{CircleBlock(() => {
             return (
                 <g strokeLinecap="square" strokeWidth="2" fill="none" fillRule="evenodd">
-                    <path className="stroke-current text-amber-100" d="M29 42h10.229a2 2 0 001.912-1.412l2.769-9A2 2 0 0042 29h-7v-4c0-2.373-1.251-3.494-2.764-3.86a1.006 1.006 0 00-1.236.979V26l-5 6" />
-                    <path className="stroke-current text-amber-300" d="M22 30h4v12h-4z" />
+                    <path className="stroke-current text-amber-100"
+                          d="M29 42h10.229a2 2 0 001.912-1.412l2.769-9A2 2 0 0042 29h-7v-4c0-2.373-1.251-3.494-2.764-3.86a1.006 1.006 0 00-1.236.979V26l-5 6"/>
+                    <path className="stroke-current text-amber-300" d="M22 30h4v12h-4z"/>
                 </g>
             )
         })}</>
@@ -93,9 +96,11 @@ export function Messaging() {
         <>{CircleBlock(() => {
             return (
                 <g transform="translate(21 22)" strokeLinecap="square" strokeWidth="2" fill="none" fillRule="evenodd">
-                    <path className="stroke-current text-amber-300" d="M17 2V0M19.121 2.879l1.415-1.415M20 5h2M19.121 7.121l1.415 1.415M17 8v2M14.879 7.121l-1.415 1.415M14 5h-2M14.879 2.879l-1.415-1.415" />
-                    <circle className="stroke-current text-amber-300" cx="17" cy="5" r="3" />
-                    <path className="stroke-current text-amber-100" d="M8.86 1.18C3.8 1.988 0 5.6 0 10c0 5 4.9 9 11 9a10.55 10.55 0 003.1-.4L20 21l-.6-5.2a9.125 9.125 0 001.991-2.948" />
+                    <path className="stroke-current text-amber-300"
+                          d="M17 2V0M19.121 2.879l1.415-1.415M20 5h2M19.121 7.121l1.415 1.415M17 8v2M14.879 7.121l-1.415 1.415M14 5h-2M14.879 2.879l-1.415-1.415"/>
+                    <circle className="stroke-current text-amber-300" cx="17" cy="5" r="3"/>
+                    <path className="stroke-current text-amber-100"
+                          d="M8.86 1.18C3.8 1.988 0 5.6 0 10c0 5 4.9 9 11 9a10.55 10.55 0 003.1-.4L20 21l-.6-5.2a9.125 9.125 0 001.991-2.948"/>
                 </g>
             )
         })}</>
@@ -206,7 +211,7 @@ const big = false
 export function Apple() {
     return (
         <>{WhiteCircleBlock(() => {
-            if(big){
+            if (big) {
                 return (
                     <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
                        className="nc-icon-wrapper" stroke-miterlimit="10">
@@ -220,7 +225,7 @@ export function Apple() {
                     </g>
 
                 )
-            }else{
+            } else {
                 return (
                     <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
                        className="nc-icon-wrapper" stroke-miterlimit="10">
@@ -241,9 +246,9 @@ export function Apple() {
 export function Android() {
     return (
         <>{WhiteCircleBlock(() => {
-            if(big){
+            if (big) {
                 return (
-                    <g stroke-linecap="square" stroke-width="2" fill="none"  stroke-linejoin="miter"
+                    <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
                        className="nc-icon-wrapper" stroke-miterlimit="10">
                         <g transform="translate(16 15)">
                             <path d="M31,23A15.154,15.154,0,0,0,1,23Z" className="stroke-current text-gray-700"></path>
@@ -254,7 +259,7 @@ export function Android() {
                         </g>
                     </g>
                 )
-            }else{
+            } else {
                 return (
                     <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
                        className="nc-icon-wrapper" stroke-miterlimit="10">
@@ -297,7 +302,7 @@ export function DecisionProcess() {
 export function AppleOnly(color) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" height="28" width="24" viewBox="0 0 24 28"
-             className={`fill-current text-${color?color:"cyan"}-600`}><title>apple</title>
+             className={`fill-current text-${color ? color : "cyan"}-600`}><title>apple</title>
             <g transform="translate(0 2)" className="nc-icon-wrapper">
                 <path
                     d="M21.354,16.487c-1.338-0.506-2.233-1.721-2.334-3.17c-0.099-1.412,0.593-2.666,1.851-3.355l1.046-0.573 l-0.747-0.93c-1.255-1.563-3.051-2.497-4.804-2.497c-1.215,0-2.058,0.318-2.735,0.574c-0.478,0.181-0.855,0.323-1.269,0.323 c-0.472,0-0.938-0.166-1.478-0.358c-0.708-0.252-1.51-0.538-2.54-0.538c-1.99,0-3.997,1.188-5.237,3.098 c-1.851,2.849-1.343,7.734,1.208,11.616C5.326,22.215,6.743,23.982,8.75,24c0.013,0,0.026,0,0.039,0 c1.643,0,2.003-0.876,3.598-0.886c1.742,0.082,1.962,0.893,3.589,0.882c1.961-0.018,3.375-1.771,4.499-3.484 c0.664-1.007,0.921-1.534,1.438-2.678l0.438-0.97L21.354,16.487z"></path>
@@ -311,7 +316,7 @@ export function AppleOnly(color) {
 export function AndroidOnly(color, saturation) {
     return (
         <svg width="24" height="28" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 28"
-             className={`fill-current text-${color?color:"cyan"}-${saturation?saturation:"600"}`}><title>android</title>
+             className={`fill-current text-${color ? color : "cyan"}-${saturation ? saturation : "600"}`}><title>android</title>
             <g transform="translate(0 4)" className="nc-icon-wrapper">
                 <path
                     d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85a.637.637 0 0 0-.83.22l-1.88 3.24a11.463 11.463 0 0 0-8.94 0L5.65 5.67a.643.643 0 0 0-.87-.2c-.28.18-.37.54-.22.83L6.4 9.48A10.78 10.78 0 0 0 1 18h22a10.78 10.78 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"
@@ -323,38 +328,40 @@ export function AndroidOnly(color, saturation) {
 
 export function DecisionProcessOnly() {
     return (<svg xmlns="http://www.w3.org/2000/svg" height="28" width="24" viewBox="0 0 24 28"
-             className="fill-current text-cyan-600"><title>decision process</title>
-            <g transform="translate(0 4)" className="nc-icon-wrapper">
-                <path d="M10,7H2A1,1,0,0,1,1,6V2A1,1,0,0,1,2,1h8a1,1,0,0,1,1,1V6A1,1,0,0,1,10,7Z"></path>
-                <path d="M10,23H2a1,1,0,0,1-1-1V18a1,1,0,0,1,1-1h8a1,1,0,0,1,1,1v4A1,1,0,0,1,10,23Z"></path>
-                <rect x="5" y="8" width="2" height="8"></rect>
-                <path d="M19,7H17V5H12V3h6a1,1,0,0,1,1,1Z"></path>
-                <path d="M18,21H12V19h5V17h2v3A1,1,0,0,1,18,21Z"></path>
-                <path
-                    d="M18,16a1,1,0,0,1-.515-.143l-5-3a1,1,0,0,1,0-1.714l5-3a1,1,0,0,1,1.03,0l5,3a1,1,0,0,1,0,1.714l-5,3A1,1,0,0,1,18,16Z"
-                    data-color="color-2"></path>
-            </g>
-        </svg>)
+                 className="fill-current text-cyan-600"><title>decision process</title>
+        <g transform="translate(0 4)" className="nc-icon-wrapper">
+            <path d="M10,7H2A1,1,0,0,1,1,6V2A1,1,0,0,1,2,1h8a1,1,0,0,1,1,1V6A1,1,0,0,1,10,7Z"></path>
+            <path d="M10,23H2a1,1,0,0,1-1-1V18a1,1,0,0,1,1-1h8a1,1,0,0,1,1,1v4A1,1,0,0,1,10,23Z"></path>
+            <rect x="5" y="8" width="2" height="8"></rect>
+            <path d="M19,7H17V5H12V3h6a1,1,0,0,1,1,1Z"></path>
+            <path d="M18,21H12V19h5V17h2v3A1,1,0,0,1,18,21Z"></path>
+            <path
+                d="M18,16a1,1,0,0,1-.515-.143l-5-3a1,1,0,0,1,0-1.714l5-3a1,1,0,0,1,1.03,0l5,3a1,1,0,0,1,0,1.714l-5,3A1,1,0,0,1,18,16Z"
+                data-color="color-2"></path>
+        </g>
+    </svg>)
 }
 
 export function ThumbUpTab() {
-    return (<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" className="fill-current text-lime-600"><title>thumb up</title>
-        <g  className="nc-icon-wrapper">
+    return (<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" className="fill-current text-lime-600">
+        <title>thumb up</title>
+        <g className="nc-icon-wrapper">
             <path data-color="color-2" d="M4,11H1a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H4Z"></path>
             <path
                 d="M22.539,10.4A4,4,0,0,0,19.5,9H13V4c0-2.206-.794-4-3-4a1,1,0,0,0-.965.737L6,11V24H18.426a3.979,3.979,0,0,0,3.954-3.392l1.076-7A4,4,0,0,0,22.539,10.4Z"
-                ></path>
+            ></path>
         </g>
     </svg>)
 }
 
 export function ThumbDownTab() {
-    return (<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" className="fill-current text-lime-600"><title>thumb down</title>
+    return (<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" className="fill-current text-lime-600">
+        <title>thumb down</title>
         <g className="nc-icon-wrapper">
             <path data-color="color-2" d="M4,13H1a1,1,0,0,1-1-1V1A1,1,0,0,1,1,0H4Z"></path>
             <path
                 d="M22.539,13.605A4,4,0,0,1,19.5,15H13v5c0,2.206-.794,4-3,4a1,1,0,0,1-.965-.737L6,13V0H18.426A3.979,3.979,0,0,1,22.38,3.392l1.076,7A4,4,0,0,1,22.539,13.605Z"
-                ></path>
+            ></path>
         </g>
     </svg>)
 }

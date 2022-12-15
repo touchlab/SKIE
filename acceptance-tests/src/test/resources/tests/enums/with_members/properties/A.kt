@@ -2,12 +2,14 @@ package `tests`.`enums`.`with_members`.`properties`
 
 enum class A {
     A1 {
+
         override val abstractImmutableProperty: Int
             get() = 1
 
         override var abstractMutableProperty: Int = 0
     },
     A2 {
+
         override val abstractImmutableProperty: Int
             get() = 2
 

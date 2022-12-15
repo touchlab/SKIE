@@ -1,8 +1,8 @@
 import org.codehaus.groovy.runtime.ProcessGroovyMethods
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
+import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
     id("skie-jvm")

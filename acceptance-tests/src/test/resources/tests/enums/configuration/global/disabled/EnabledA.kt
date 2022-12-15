@@ -4,6 +4,7 @@ import co.touchlab.skie.configuration.annotations.EnumInterop
 
 @EnumInterop.Enabled
 enum class A {
+
     A1,
     A2,
 }

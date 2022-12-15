@@ -34,7 +34,7 @@ internal class SwiftSuspendGeneratorDelegate(
     }
 
     context(SwiftPoetScope)
-        private fun ExtensionSpec.Builder.addSwiftBridgingFunction(
+    private fun ExtensionSpec.Builder.addSwiftBridgingFunction(
         function: FunctionDescriptor,
         kotlinBridgingFunction: FunctionDescriptor,
     ): ExtensionSpec.Builder =
@@ -53,7 +53,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
     context(SwiftPoetScope)
-        private fun FunctionSpec.Builder.addValueParameters(function: FunctionDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.addValueParameters(function: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
             function.valueParameters.forEach {
                 addValueParameter(it)
@@ -61,7 +61,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
     context(SwiftPoetScope)
-        private fun FunctionSpec.Builder.addValueParameter(valueParameter: ValueParameterDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.addValueParameter(valueParameter: ValueParameterDescriptor): FunctionSpec.Builder =
         this.apply {
             val parameterTypeSpec = valueParameter.type.spec(KotlinTypeSpecKind.BRIDGED)
 
@@ -75,7 +75,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
     context(SwiftPoetScope)
-        private fun FunctionSpec.Builder.addReturnType(function: FunctionDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.addReturnType(function: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
             if (!function.returnTypeOrNothing.isUnit()) {
                 val returnType = function.returnTypeOrNothing.spec(KotlinTypeSpecKind.SWIFT_GENERICS)
@@ -85,7 +85,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
     context(SwiftPoetScope)
-        private fun FunctionSpec.Builder.addFunctionBody(
+    private fun FunctionSpec.Builder.addFunctionBody(
         function: FunctionDescriptor,
         kotlinBridgingFunction: FunctionDescriptor,
     ): FunctionSpec.Builder =

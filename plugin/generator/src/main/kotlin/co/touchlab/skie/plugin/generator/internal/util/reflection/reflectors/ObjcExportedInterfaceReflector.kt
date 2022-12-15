@@ -3,10 +3,10 @@
 package co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors
 
 import co.touchlab.skie.plugin.generator.internal.util.reflection.Reflector
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 
 internal class ObjcExportedInterfaceReflector(
     override val instance: Any,

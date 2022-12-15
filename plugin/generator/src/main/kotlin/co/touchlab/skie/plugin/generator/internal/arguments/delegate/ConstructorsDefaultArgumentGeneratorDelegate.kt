@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irDelegatingConstructorCall
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
-import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 
 internal class ConstructorsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
@@ -79,8 +78,8 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
         }
 
     context(IrPluginContext, DeclarationIrBuilder)
-        @OptIn(ObsoleteDescriptorBasedAPI::class)
-        private fun getOverloadBody(
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun getOverloadBody(
         originalConstructor: ClassConstructorDescriptor, overloadIr: IrConstructor,
     ): IrBody {
         val originalConstructorSymbol = symbolTable.referenceConstructor(originalConstructor)

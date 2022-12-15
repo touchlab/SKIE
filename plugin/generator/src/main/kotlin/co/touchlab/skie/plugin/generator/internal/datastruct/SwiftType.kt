@@ -10,9 +10,9 @@ import io.outfoxx.swiftpoet.INT
 import io.outfoxx.swiftpoet.INT16
 import io.outfoxx.swiftpoet.INT32
 import io.outfoxx.swiftpoet.INT64
+import io.outfoxx.swiftpoet.INT8
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
-import io.outfoxx.swiftpoet.INT8
 import io.outfoxx.swiftpoet.UIN16
 import io.outfoxx.swiftpoet.UINT32
 import io.outfoxx.swiftpoet.UINT64
@@ -20,6 +20,7 @@ import io.outfoxx.swiftpoet.UINT8
 import io.outfoxx.swiftpoet.parameterizedBy
 
 object SwiftType {
+
     val bool = BOOL
     val int8 = INT8
     val uint8 = UINT8

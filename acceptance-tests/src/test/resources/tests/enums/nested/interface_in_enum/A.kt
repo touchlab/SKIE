@@ -8,7 +8,7 @@ enum class A {
     }
 }
 
-private class C: A.B
+private class C : A.B
 
 fun a1(): A = A.A1
 fun a2(): A = A.A2

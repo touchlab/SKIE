@@ -7,28 +7,29 @@ import org.jetbrains.kotlin.types.KotlinType
 sealed interface NativeKotlinType {
     data class BlockPointer(val parameterTypes: List<NativeKotlinType>, val returnType: NativeKotlinType) : NativeKotlinType
 
-    sealed interface Reference: NativeKotlinType {
-        sealed interface Known: Reference {
-            object String: Known
-            object Unit: Known
-            sealed interface Array: Known {
-                data class Primitive(val elementType: PrimitiveType): Array
-                data class Generic(val elementType: NativeKotlinType): Array
+    sealed interface Reference : NativeKotlinType {
+        sealed interface Known : Reference {
+            object String : Known
+            object Unit : Known
+            sealed interface Array : Known {
+                data class Primitive(val elementType: PrimitiveType) : Array
+                data class Generic(val elementType: NativeKotlinType) : Array
             }
-            data class List(val elementType: NativeKotlinType): Known
-            data class MutableList(val elementType: NativeKotlinType): Known
-            data class Set(val elementType: NativeKotlinType): Known
-            data class MutableSet(val elementType: NativeKotlinType): Known
-            data class Map(val keyType: NativeKotlinType, val valueType: NativeKotlinType): Known
-            data class MutableMap(val keyType: NativeKotlinType, val valueType: NativeKotlinType): Known
+
+            data class List(val elementType: NativeKotlinType) : Known
+            data class MutableList(val elementType: NativeKotlinType) : Known
+            data class Set(val elementType: NativeKotlinType) : Known
+            data class MutableSet(val elementType: NativeKotlinType) : Known
+            data class Map(val keyType: NativeKotlinType, val valueType: NativeKotlinType) : Known
+            data class MutableMap(val keyType: NativeKotlinType, val valueType: NativeKotlinType) : Known
         }
 
-        data class TypeParameter(val name: String): Reference
+        data class TypeParameter(val name: String) : Reference
 
         data class Unknown(val kotlinType: KotlinType, val descriptor: ClassDescriptor) : Reference
     }
 
-    enum class Value: NativeKotlinType {
+    enum class Value : NativeKotlinType {
         BOOL,
         UNICHAR,
         CHAR,
@@ -44,5 +45,5 @@ sealed interface NativeKotlinType {
         POINTER,
     }
 
-    object Any: NativeKotlinType
+    object Any : NativeKotlinType
 }

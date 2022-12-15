@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 
 interface SwiftLinkSubplugin : Plugin<Project> {
+
     val compilerPluginId: String
 
     override fun apply(target: Project) {}

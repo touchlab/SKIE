@@ -55,7 +55,8 @@ skie {
 }
 ```
 
-The above example changes the name of the `onEnum(of:)` function to `something(of:)` for **all** sealed classes and interfaces. Note that you can add multiple options to a single `group { ... }`.
+The above example changes the name of the `onEnum(of:)` function to `something(of:)` for **all
+** sealed classes and interfaces. Note that you can add multiple options to a single `group { ... }`.
 
 All of the available configuration options are listed [here](/docs/Configuration/AvailableConfigurations.md). Make sure that you import classes from package `co.touchlab.skie.configuration.gradle` (not `.annotations`).
 

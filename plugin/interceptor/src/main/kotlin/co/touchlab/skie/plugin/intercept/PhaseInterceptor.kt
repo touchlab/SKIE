@@ -9,15 +9,15 @@ import org.jetbrains.kotlin.backend.common.phaser.CompilerPhase
 import org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
+import org.jetbrains.kotlin.backend.konan.createSymbolTablePhase
 import org.jetbrains.kotlin.backend.konan.objCExportPhase
 import org.jetbrains.kotlin.backend.konan.objectFilesPhase
 import org.jetbrains.kotlin.backend.konan.psiToIrPhase
-import org.jetbrains.kotlin.backend.konan.createSymbolTablePhase
 import org.jetbrains.kotlin.cli.jvm.plugins.ServiceLoaderLite
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import java.net.URLClassLoader
-import java.util.*
+import java.util.ServiceLoader
 import kotlin.reflect.jvm.jvmName
 
 typealias InterceptedPhase<CONTEXT> = CompilerPhase<CONTEXT, Unit, Unit>
@@ -52,9 +52,10 @@ class PhaseInterceptor<in CONTEXT : CommonBackendContext>(
         interceptedPhase to listenersKey
 
     companion object {
+
         fun setupPhaseListeners(configuration: CompilerConfiguration) {
             val phaseListeners =
-                (this::class.java.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations<PhaseListener>(it) }
+                (this::class.java.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations(it) }
                     ?: ServiceLoader.load(PhaseListener::class.java)
             phaseListeners
                 .groupBy { it.phase }

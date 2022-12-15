@@ -46,7 +46,7 @@ internal class DataStructGenerator(
     }
 
     context(DescriptorProvider)
-        private fun generate(declaration: ClassDescriptor) {
+    private fun generate(declaration: ClassDescriptor) {
         val primaryConstructor = declaration.unsubstitutedPrimaryConstructor ?: return
 
         module.generateCode(declaration) {
@@ -159,7 +159,7 @@ internal class DataStructGenerator(
     }
 
     context(ClassDescriptor)
-        private val ValueParameterDescriptor.backingProperty: PropertyDescriptor
+    private val ValueParameterDescriptor.backingProperty: PropertyDescriptor
         get() {
             return unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.VARIABLES) {
                 it == this@backingProperty.name

@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal object ObjectiveCBridgeable {
+
     context(SwiftPoetScope)
     fun TypeSpec.Builder.addObjcBridgeableImplementation(
         declaration: ClassDescriptor,
@@ -39,7 +40,7 @@ internal object ObjectiveCBridgeable {
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addBridgeToObjectiveC(
+    private fun TypeSpec.Builder.addBridgeToObjectiveC(
         declaration: ClassDescriptor,
     ) {
         addFunction(
@@ -67,7 +68,7 @@ internal object ObjectiveCBridgeable {
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addForceBridgeFromObjectiveC(declaration: ClassDescriptor) {
+    private fun TypeSpec.Builder.addForceBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_forceBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -79,7 +80,7 @@ internal object ObjectiveCBridgeable {
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addConditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
+    private fun TypeSpec.Builder.addConditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_conditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -93,7 +94,7 @@ internal object ObjectiveCBridgeable {
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addUnconditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
+    private fun TypeSpec.Builder.addUnconditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_unconditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -105,7 +106,7 @@ internal object ObjectiveCBridgeable {
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addFromObjectiveC(
+    private fun TypeSpec.Builder.addFromObjectiveC(
         declaration: ClassDescriptor,
     ) {
         addFunction(

@@ -4,7 +4,6 @@ import co.touchlab.skie.runtime.coroutines.internal.CoroutineDispatcherWithDeleg
 import co.touchlab.skie.runtime.coroutines.internal.toNSError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass

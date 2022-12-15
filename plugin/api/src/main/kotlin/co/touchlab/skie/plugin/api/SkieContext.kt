@@ -4,6 +4,7 @@ import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import java.io.File
 
 interface SkieContext {
+
     val module: SkieModule
     val swiftSourceFiles: List<File>
     val expandedSwiftDir: File

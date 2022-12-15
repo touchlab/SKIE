@@ -1,12 +1,12 @@
 package co.touchlab.skie
 
 import app.cash.turbine.test
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.StaticConfig
 import co.touchlab.skie.db.Breed
 import co.touchlab.skie.mock.ClockMock
 import co.touchlab.skie.mock.DogApiMock
 import co.touchlab.skie.models.BreedRepository
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.StaticConfig
 import com.russhwolf.settings.MockSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -37,6 +37,7 @@ class BreedRepositoryTest {
     private val repository: BreedRepository = BreedRepository(dbHelper, settings, ktorApi, kermit, clock)
 
     companion object {
+
         private val appenzeller = Breed(1, "appenzeller", false)
         private val australianNoLike = Breed(2, "australian", false)
         private val australianLike = Breed(2, "australian", true)

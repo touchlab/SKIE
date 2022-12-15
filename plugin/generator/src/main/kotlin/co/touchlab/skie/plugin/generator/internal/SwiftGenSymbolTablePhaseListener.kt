@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 
 internal class SwiftGenSymbolTablePhaseListener : PhaseListener {
+
     override val phase: PhaseListener.Phase = PhaseListener.Phase.CREATE_SYMBOL_TABLE
 
     override fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {

@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator
 
-import co.touchlab.skie.plugin.generator.internal.datastruct.DataStructContainerContributor
 import co.touchlab.skie.plugin.generator.internal.SwiftGenIrGenerationExtension
+import co.touchlab.skie.plugin.generator.internal.datastruct.DataStructContainerContributor
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar

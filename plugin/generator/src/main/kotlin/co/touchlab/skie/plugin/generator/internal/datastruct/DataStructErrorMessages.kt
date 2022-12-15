@@ -4,7 +4,8 @@ import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.Renderers
 
-object DataStructErrorMessages: DefaultErrorMessages.Extension {
+object DataStructErrorMessages : DefaultErrorMessages.Extension {
+
     private val MAP = DiagnosticFactoryToRendererMap()
 
     init {

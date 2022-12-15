@@ -9,6 +9,7 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 
 class KoinTest {
+
     @Test
     fun checkAllModules() {
         initKoinIos(

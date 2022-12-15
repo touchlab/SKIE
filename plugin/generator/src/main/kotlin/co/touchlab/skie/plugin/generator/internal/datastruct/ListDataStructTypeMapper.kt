@@ -4,30 +4,14 @@ import co.touchlab.skie.plugin.api.NativeKotlinType
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
 import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.DeclaredTypeName
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.getClass
-import org.jetbrains.kotlin.ir.types.isBoolean
-import org.jetbrains.kotlin.ir.types.isByte
-import org.jetbrains.kotlin.ir.types.isDouble
-import org.jetbrains.kotlin.ir.types.isFloat
-import org.jetbrains.kotlin.ir.types.isInt
-import org.jetbrains.kotlin.ir.types.isLong
-import org.jetbrains.kotlin.ir.types.isShort
-import org.jetbrains.kotlin.ir.types.isString
-import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
-import org.jetbrains.kotlin.ir.types.typeOrNull
-import org.jetbrains.kotlin.name.Name
 
-object ListDataStructTypeMapper: DataStructTypeMapper {
+object ListDataStructTypeMapper : DataStructTypeMapper {
+
     context(SwiftPoetScope) override fun provideMapping(
         property: PropertyDescriptor,
-        parameter: ValueParameterDescriptor
+        parameter: ValueParameterDescriptor,
     ): DataStructTypeMapper.Mapping? {
         val elementType = when (val nativeType = property.type.native) {
             is NativeKotlinType.Reference.Known.List -> nativeType.elementType

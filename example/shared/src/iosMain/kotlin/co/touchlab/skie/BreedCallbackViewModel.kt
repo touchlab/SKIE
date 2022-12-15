@@ -1,15 +1,15 @@
 package co.touchlab.skie
 
+import co.touchlab.kermit.Logger
 import co.touchlab.skie.db.Breed
 import co.touchlab.skie.models.BreedRepository
 import co.touchlab.skie.models.BreedViewModel
 import co.touchlab.skie.models.CallbackViewModel
-import co.touchlab.kermit.Logger
 
 @Suppress("Unused") // Members are called from Swift
 class BreedCallbackViewModel(
     breedRepository: BreedRepository,
-    log: Logger
+    log: Logger,
 ) : CallbackViewModel() {
 
     override val viewModel = BreedViewModel(breedRepository, log)

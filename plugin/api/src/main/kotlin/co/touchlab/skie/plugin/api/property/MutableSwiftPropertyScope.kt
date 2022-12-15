@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.api.property
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 interface MutableSwiftPropertyScope : SwiftPropertyScope {
+
     override var PropertyDescriptor.swiftName: String
 
     override var PropertyDescriptor.isHiddenFromSwift: Boolean

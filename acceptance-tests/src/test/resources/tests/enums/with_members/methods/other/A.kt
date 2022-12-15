@@ -2,9 +2,11 @@ package `tests`.`enums`.`with_members`.`methods`.`other`
 
 enum class A {
     A1 {
+
         override fun abstractFun(): Int = 1
     },
     A2 {
+
         override fun abstractFun(): Int = 2
 
         override fun overridableFun(): Int = 1
@@ -89,7 +91,6 @@ enum class A {
 
     fun singleParamSingleVarargParamDifferentType(p1: Int, vararg p: String) = Unit
 
-
     fun closureSingleParam(p1: (Int) -> Unit) = p1(0)
 
     fun closureTwoParams(p1: (Int, String) -> Unit) = p1(0, "")
@@ -99,6 +100,7 @@ enum class A {
     fun closureTwoParamsReturnString(p1: (Int, String) -> String) = p1(0, "")
 
     companion object {
+
         fun staticFun() = Unit
     }
 }

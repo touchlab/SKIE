@@ -12,26 +12,26 @@ import Automatic from '@site/src/components/Automatic';
 
 export default function Home(): JSX.Element {
 // Uncomment for animations
-  /*useEffect(() => {
-    AOS.init({
-      once: true,
-      disable: 'phone',
-      duration: 350,
-      easing: 'ease-out-sine',
-    });
-  });*/
+    /*useEffect(() => {
+      AOS.init({
+        once: true,
+        disable: 'phone',
+        duration: 350,
+        easing: 'ease-out-sine',
+      });
+    });*/
 
-  return (
-    <Layout>
-      <HeroAbout/>
-      <Overview/>
-      <StakeholderValue/>
-      <Automatic/>
-      <FeaturesZigzag/>
-      <FeaturesBlocks/>
-      <EarlyAccess/>
-      <div>&nbsp;</div>
-      <div>&nbsp;</div>
-    </Layout>
-  );
+    return (
+        <Layout>
+            <HeroAbout/>
+            <Overview/>
+            <StakeholderValue/>
+            <Automatic/>
+            <FeaturesZigzag/>
+            <FeaturesBlocks/>
+            <EarlyAccess/>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+        </Layout>
+    );
 }

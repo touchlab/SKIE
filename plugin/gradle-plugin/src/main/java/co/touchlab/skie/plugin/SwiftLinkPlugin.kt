@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import org.gradle.api.Action
 import org.gradle.api.Plugin

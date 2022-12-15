@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
-import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
 
 internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
@@ -83,8 +82,8 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         }
 
     context(IrPluginContext, DeclarationIrBuilder)
-        @OptIn(ObsoleteDescriptorBasedAPI::class)
-        private fun getOverloadBody(
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun getOverloadBody(
         originalFunction: FunctionDescriptor, overloadIr: IrFunction,
     ): IrBody {
         val originalFunctionSymbol = symbolTable.referenceSimpleFunction(originalFunction)

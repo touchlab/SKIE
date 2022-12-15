@@ -5,9 +5,9 @@ package co.touchlab.skie.plugin.generator.internal.enums
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.type.SwiftBridgedName
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.api.util.typeAliasSpec
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
@@ -28,6 +28,10 @@ import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
+import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
+import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -36,10 +40,6 @@ import org.jetbrains.kotlin.descriptors.isEnumClass
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 
 internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,
@@ -102,7 +102,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
+    private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
         declaration.nestedClasses.forEach {
             addType(
                 TypeAliasSpec.builder(it.name.asString(), it.typeAliasSpec)
@@ -113,7 +113,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider, SwiftPoetScope)
-        private fun TypeSpec.Builder.addPassthroughForProperties(
+    private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
@@ -159,7 +159,7 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     context(DescriptorProvider, SwiftPoetScope)
-        private fun TypeSpec.Builder.addPassthroughForFunctions(
+    private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)

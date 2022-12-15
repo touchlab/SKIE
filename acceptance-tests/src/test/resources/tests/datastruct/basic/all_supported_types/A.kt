@@ -26,6 +26,7 @@ data class A(
     val doubleList: List<Double>,
     val stringList: List<String>,
 ) {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (this::class != other?.let { it::class }) return false

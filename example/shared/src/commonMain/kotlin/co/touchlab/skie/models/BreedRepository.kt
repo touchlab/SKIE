@@ -1,9 +1,9 @@
 package co.touchlab.skie.models
 
+import co.touchlab.kermit.Logger
 import co.touchlab.skie.DatabaseHelper
 import co.touchlab.skie.db.Breed
 import co.touchlab.skie.ktor.DogApi
-import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.Flow
@@ -14,12 +14,13 @@ class BreedRepository(
     private val settings: Settings,
     private val dogApi: DogApi,
     log: Logger,
-    private val clock: Clock
+    private val clock: Clock,
 ) {
 
     private val log = log.withTag("BreedModel")
 
     companion object {
+
         internal const val DB_TIMESTAMP_KEY = "DbTimestampKey"
     }
 

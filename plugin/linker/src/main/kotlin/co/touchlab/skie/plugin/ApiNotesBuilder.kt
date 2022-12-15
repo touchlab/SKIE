@@ -102,12 +102,13 @@ internal class ApiNotesBuilder(
     }
 
     private val TransformAccumulator.TypeTransformTarget.descriptorName: ObjCExportNamer.ClassOrProtocolName
-        get() = when(this) {
+        get() = when (this) {
             is TransformAccumulator.TypeTransformTarget.Class -> namer.getClassOrProtocolName(descriptor)
             is TransformAccumulator.TypeTransformTarget.File -> namer.getFileClassName(file)
         }
 
     private class YamlBuilder(val storage: StringBuilder = StringBuilder()) {
+
         operator fun String.unaryPlus() {
             storage.appendLine(this)
         }

@@ -1,6 +1,6 @@
 package `tests`.`default_arguments`.`classes`.`constructors`.`collision_detection`.`collision`.`generic_class`
 
-class A<T: Int> {
+class A<T : Int> {
 
     val value: Int
 

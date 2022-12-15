@@ -2,8 +2,8 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.impl.DefaultMutableSwiftScope
 import co.touchlab.skie.api.impl.DefaultSkieModule
-import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.api.skieContext
+import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
@@ -27,6 +27,7 @@ class SwiftLinkCompilePhase(
     private val context: CommonBackendContext,
     private val namer: ObjCExportNamer,
 ) {
+
     private val skieContext = context.skieContext
 
     fun process(): List<ObjectFile> {

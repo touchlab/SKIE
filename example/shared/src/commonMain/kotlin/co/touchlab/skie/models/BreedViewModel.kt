@@ -1,7 +1,7 @@
 package co.touchlab.skie.models
 
-import co.touchlab.skie.db.Breed
 import co.touchlab.kermit.Logger
+import co.touchlab.skie.db.Breed
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,8 +12,9 @@ import kotlinx.coroutines.launch
 
 class BreedViewModel(
     private val breedRepository: BreedRepository,
-    log: Logger
+    log: Logger,
 ) : ViewModel() {
+
     private val log = log.withTag("BreedCommonViewModel")
 
     private val mutableBreedState: MutableStateFlow<BreedViewState> =
@@ -94,10 +95,11 @@ class BreedViewModel(
 sealed interface BreedViewState {
     class Data(val breeds: List<Breed>) : BreedViewState
     object Loading : BreedViewState
-    class Error(val type: BreedErrorType): BreedViewState
+    class Error(val type: BreedErrorType) : BreedViewState
 }
 
 sealed interface BreedErrorType {
+
     val message: String
         get() = when (this) {
             is Network -> "A connection error occurred. Please try again."

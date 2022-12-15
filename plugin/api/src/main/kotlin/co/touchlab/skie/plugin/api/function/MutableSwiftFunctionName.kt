@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.api.function
 import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
 
 interface MutableSwiftFunctionName : SwiftFunctionName {
+
     override var name: String
     override val parameterNames: List<MutableParameterName>
 
@@ -13,6 +14,7 @@ interface MutableSwiftFunctionName : SwiftFunctionName {
     val isChanged: Boolean
 
     interface MutableParameterName : SwiftFunctionName.ParameterName {
+
         override var name: String
 
         val isChanged: Boolean

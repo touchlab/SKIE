@@ -35,7 +35,7 @@ internal class SealedEnumGeneratorDelegate(
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addSealedEnumCases(declaration: ClassDescriptor): TypeSpec.Builder {
+    private fun TypeSpec.Builder.addSealedEnumCases(declaration: ClassDescriptor): TypeSpec.Builder {
         declaration.visibleSealedSubclasses
             .forEach { sealedSubclass ->
                 addEnumCase(

@@ -1,11 +1,11 @@
 package co.touchlab.skie
 
-import co.touchlab.skie.ktor.DogApiImpl
-import co.touchlab.skie.response.BreedResult
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.LoggerConfig
 import co.touchlab.kermit.Severity
+import co.touchlab.skie.ktor.DogApiImpl
+import co.touchlab.skie.response.BreedResult
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.ClientRequestException
@@ -19,6 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class DogApiTest {
+
     private val emptyLogger = Logger(
         config = object : LoggerConfig {
             override val logWriterList: List<LogWriter> = emptyList()

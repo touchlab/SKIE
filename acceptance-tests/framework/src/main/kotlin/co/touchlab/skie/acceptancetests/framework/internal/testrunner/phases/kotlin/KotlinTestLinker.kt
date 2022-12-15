@@ -1,12 +1,12 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin
 
 import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
-import co.touchlab.skie.framework.BuildConfig
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.framework.BuildConfig
 import co.touchlab.skie.plugin.SwiftLinkComponentRegistrar
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.bc.K2NativeCompilerArguments

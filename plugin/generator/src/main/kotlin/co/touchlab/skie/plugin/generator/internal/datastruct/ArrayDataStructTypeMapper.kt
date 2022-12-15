@@ -23,18 +23,24 @@ import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 
-object ArrayDataStructTypeMapper: DataStructTypeMapper {
+object ArrayDataStructTypeMapper : DataStructTypeMapper {
+
     private val helpers = mutableMapOf<NativeKotlinType.Reference.Known.Array, List<FileMemberSpec>>()
 
-    context(SwiftPoetScope) override fun provideMapping(
+    context(SwiftPoetScope)
+    override fun provideMapping(
         property: PropertyDescriptor,
-        parameter: ValueParameterDescriptor
+        parameter: ValueParameterDescriptor,
     ): DataStructTypeMapper.Mapping? {
         val propertyType = property.type.native as? NativeKotlinType.Reference.Known.Array ?: return null
         return mapping(property.spec.name, propertyType)
     }
 
-    context(SwiftPoetScope) private fun mapping(propertyName: String, arrayType: NativeKotlinType.Reference.Known.Array): DataStructTypeMapper.Mapping {
+    context(SwiftPoetScope)
+    private fun mapping(
+        propertyName: String,
+        arrayType: NativeKotlinType.Reference.Known.Array,
+    ): DataStructTypeMapper.Mapping {
         return DataStructTypeMapper.Mapping(
             swiftTypeName = ARRAY.parameterizedBy(arrayType.swiftElementType),
             additionalSingletonDeclarations = helpersFor(arrayType),
@@ -43,78 +49,101 @@ object ArrayDataStructTypeMapper: DataStructTypeMapper {
         )
     }
 
-    context(SwiftPoetScope) private fun helpersFor(arrayType: NativeKotlinType.Reference.Known.Array): List<FileMemberSpec> = helpers.getOrPut(arrayType) {
-        val (kotlinToSwift, swiftToKotlin) = when (arrayType) {
-            is NativeKotlinType.Reference.Known.Array.Generic -> if (arrayType.elementType == NativeKotlinType.Reference.Known.String) {
-                CodeBlock.of("""
+    context(SwiftPoetScope)
+    private fun helpersFor(arrayType: NativeKotlinType.Reference.Known.Array): List<FileMemberSpec> =
+        helpers.getOrPut(arrayType) {
+            val (kotlinToSwift, swiftToKotlin) = when (arrayType) {
+                is NativeKotlinType.Reference.Known.Array.Generic -> if (arrayType.elementType == NativeKotlinType.Reference.Known.String) {
+                    CodeBlock.of(
+                        """
                             assert(value != nil, "A string in an arrays of strings is nullable even though it wasn't in Kotlin")
                             return %T(value ?? "")
-                        """.trimIndent(), STRING) to CodeBlock.of("return value as %T", SwiftType.nsString)
-            } else {
-                // TODO: Add support for arrays of data structs
-                return emptyList()
-            }
-            is Primitive -> {
-                val kotlinElementType = arrayType.elementType.spec(KotlinTypeSpecKind.ORIGINAL)
-                val bridgedElementType = arrayType.elementType.spec(KotlinTypeSpecKind.BRIDGED)
-                val swiftElementType = arrayType.swiftElementType
-                when (arrayType.elementType) {
-                    PrimitiveType.BOOLEAN -> CodeBlock.of("return %T(value)", swiftElementType) to CodeBlock.of("return %T(value: value)", kotlinElementType)
-                    PrimitiveType.BYTE, PrimitiveType.SHORT, PrimitiveType.INT, PrimitiveType.LONG, PrimitiveType.FLOAT, PrimitiveType.DOUBLE ->
-                        CodeBlock.of("return %T(value)", swiftElementType) to CodeBlock.of("return %T(value: %T(value))", kotlinElementType, bridgedElementType)
-                    PrimitiveType.CHAR -> CodeBlock.of("""
+                        """.trimIndent(), STRING
+                    ) to CodeBlock.of("return value as %T", SwiftType.nsString)
+                } else {
+                    // TODO: Add support for arrays of data structs
+                    return emptyList()
+                }
+                is Primitive -> {
+                    val kotlinElementType = arrayType.elementType.spec(KotlinTypeSpecKind.ORIGINAL)
+                    val bridgedElementType = arrayType.elementType.spec(KotlinTypeSpecKind.BRIDGED)
+                    val swiftElementType = arrayType.swiftElementType
+                    when (arrayType.elementType) {
+                        PrimitiveType.BOOLEAN -> CodeBlock.of(
+                            "return %T(value)",
+                            swiftElementType
+                        ) to CodeBlock.of("return %T(value: value)", kotlinElementType)
+                        PrimitiveType.BYTE, PrimitiveType.SHORT, PrimitiveType.INT, PrimitiveType.LONG, PrimitiveType.FLOAT, PrimitiveType.DOUBLE ->
+                            CodeBlock.of("return %T(value)", swiftElementType) to CodeBlock.of(
+                                "return %T(value: %T(value))",
+                                kotlinElementType,
+                                bridgedElementType
+                            )
+                        PrimitiveType.CHAR -> CodeBlock.of(
+                            """
                         let char = UnicodeScalar(value)
                         assert(char != nil, "A unichar is not convertable to UnicodeScalar!")
                         return %T(char ?? '?')
-                    """.trimIndent(), SwiftType.unicodeScalar, SwiftType.character) to CodeBlock.of("""
+                    """.trimIndent(), SwiftType.unicodeScalar, SwiftType.character
+                        ) to CodeBlock.of(
+                            """
                         assert(value.utf16.count == 1, "A Character is not convertable to unichar!")
                         return value.utf16.first!
-                    """.trimIndent())
+                    """.trimIndent()
+                        )
+                    }
                 }
             }
-        }
 
-        val kotlinArrayType = arrayType.spec(KotlinTypeSpecKind.ORIGINAL)
-        val swiftElementType = arrayType.swiftElementType
-        listOf(
-            ExtensionSpec.builder(ARRAY)
-                .addModifiers(Modifier.INTERNAL)
-                .addConditionalConstraint(
-                    TypeVariableName.typeVariable(
-                        "Element",
-                        TypeVariableName.bound(
-                            TypeVariableName.Bound.Constraint.SAME_TYPE,
-                            swiftElementType,
-                        ),
+            val kotlinArrayType = arrayType.spec(KotlinTypeSpecKind.ORIGINAL)
+            val swiftElementType = arrayType.swiftElementType
+            listOf(
+                ExtensionSpec.builder(ARRAY)
+                    .addModifiers(Modifier.INTERNAL)
+                    .addConditionalConstraint(
+                        TypeVariableName.typeVariable(
+                            "Element",
+                            TypeVariableName.bound(
+                                TypeVariableName.Bound.Constraint.SAME_TYPE,
+                                swiftElementType,
+                            ),
+                        )
                     )
-                )
-                .addFunction(FunctionSpec.constructorBuilder()
-                    .addParameter("kotlinArray", kotlinArrayType)
-                    .addCode("""
+                    .addFunction(
+                        FunctionSpec.constructorBuilder()
+                            .addParameter("kotlinArray", kotlinArrayType)
+                            .addCode(
+                                """
                                 self = (0 ..< Int(kotlinArray.size)).map { index in
                                     let value = kotlinArray.get(index: Int32(index))
                                     %L
                                 }${"\n"}
-                                """.trimIndent(), kotlinToSwift)
-                    .build())
-                .build(),
-            ExtensionSpec.builder(arrayType.rawKotlinName)
-                .addModifiers(Modifier.INTERNAL)
-                .addFunction(FunctionSpec.builder("from")
-                    .addAttribute("objc")
-                    .addModifiers(Modifier.STATIC)
-                    .addParameter("array", ARRAY.parameterizedBy(swiftElementType))
-                    .returns(kotlinArrayType)
-                    .addCode("""
+                                """.trimIndent(), kotlinToSwift
+                            )
+                            .build()
+                    )
+                    .build(),
+                ExtensionSpec.builder(arrayType.rawKotlinName)
+                    .addModifiers(Modifier.INTERNAL)
+                    .addFunction(
+                        FunctionSpec.builder("from")
+                            .addAttribute("objc")
+                            .addModifiers(Modifier.STATIC)
+                            .addParameter("array", ARRAY.parameterizedBy(swiftElementType))
+                            .returns(kotlinArrayType)
+                            .addCode(
+                                """
                                 return %T(size: Int32(array.count)) { index in
                                     let value = array[index.intValue]
                                     %L
                                 }
-                                """.trimIndent(), kotlinArrayType, swiftToKotlin)
-                    .build())
-                .build(),
-        ).map { FileMemberSpec.builder(it).build() }
-    }
+                                """.trimIndent(), kotlinArrayType, swiftToKotlin
+                            )
+                            .build()
+                    )
+                    .build(),
+            ).map { FileMemberSpec.builder(it).build() }
+        }
 
     context(SwiftPoetScope)
     private val NativeKotlinType.Reference.Known.Array.swiftElementType

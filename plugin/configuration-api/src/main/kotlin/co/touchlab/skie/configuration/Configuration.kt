@@ -1,8 +1,8 @@
 package co.touchlab.skie.configuration
 
-import co.touchlab.skie.configuration_api.BuildConfig
 import co.touchlab.skie.configuration.builder.ConfigurationBuilder
 import co.touchlab.skie.configuration.features.SkieFeatureSet
+import co.touchlab.skie.configuration_api.BuildConfig
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString

@@ -1,7 +1,6 @@
 package `tests`.`coroutines`.`suspend`.`global_functions`.`simple`.`can_be_cancelled`.`from_swift`
 
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 suspend fun foo(): Int {

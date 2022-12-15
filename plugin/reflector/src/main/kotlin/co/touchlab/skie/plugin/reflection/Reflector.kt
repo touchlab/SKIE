@@ -7,6 +7,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 internal abstract class Reflector {
+
     private val reflectedClass: Class<*>
 
     protected abstract val instance: Any
@@ -97,6 +98,7 @@ internal abstract class Reflector {
         private val method: DeclaredMethod<WRAPPED, Any>,
         private val reflectorFactory: (invoke: WRAPPED) -> T,
     ) : ReadOnlyProperty<Reflector, T> {
+
         override fun getValue(thisRef: Reflector, property: KProperty<*>): T {
             return method.getValue(thisRef, property).let(reflectorFactory)
         }

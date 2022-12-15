@@ -4,6 +4,7 @@ import tests.default_arguments.interfaces.extensions.generics.I
 import tests.default_arguments.interfaces.extensions.generics.K
 
 interface A<T> where T : I, T : K {
+
     val defaultForDefault: T
 }
 

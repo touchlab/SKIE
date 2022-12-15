@@ -3,11 +3,8 @@ package co.touchlab.skie.plugin.generator.internal.util
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.SkieModule
-import co.touchlab.skie.plugin.api.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import io.outfoxx.swiftpoet.DeclaredTypeName
-import io.outfoxx.swiftpoet.FileSpec
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 
 internal abstract class BaseGenerator(
     private val skieContext: SkieContext,

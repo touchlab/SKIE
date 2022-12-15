@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
@@ -32,18 +31,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
+import co.touchlab.kermit.Logger
 import co.touchlab.skie.android.R
 import co.touchlab.skie.db.Breed
 import co.touchlab.skie.models.BreedViewModel
 import co.touchlab.skie.models.BreedViewState
-import co.touchlab.kermit.Logger
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun MainScreen(
     viewModel: BreedViewModel,
-    log: Logger
+    log: Logger,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleAwareDogsFlow = remember(viewModel.breedState, lifecycleOwner) {
@@ -68,7 +67,7 @@ fun MainScreenContent(
     onRefresh: () -> Unit = {},
     onSuccess: (List<Breed>) -> Unit = {},
     onError: (String) -> Unit = {},
-    onFavorite: (Breed) -> Unit = {}
+    onFavorite: (Breed) -> Unit = {},
 ) {
     Surface(
         color = MaterialTheme.colors.background,
@@ -78,25 +77,27 @@ fun MainScreenContent(
             state = rememberSwipeRefreshState(isRefreshing = dogsState == BreedViewState.Loading),
             onRefresh = onRefresh
         ) {
-			when (dogsState) {
-				is BreedViewState.Data -> {
-					if (dogsState.breeds.isEmpty()) {
-						Empty()
-					} else {
-						LaunchedEffect(dogsState.breeds) {
-							onSuccess(dogsState.breeds)
-						}
-						Success(successData = dogsState.breeds, favoriteBreed = onFavorite)
-					}
-				}
-				is BreedViewState.Error -> {
-					LaunchedEffect(dogsState.type) {
-						onError(dogsState.type.message)
-					}
-					Error(dogsState.type.message)
-				}
-				else -> { "Unhandled BreedViewState"}
-			}
+            when (dogsState) {
+                is BreedViewState.Data -> {
+                    if (dogsState.breeds.isEmpty()) {
+                        Empty()
+                    } else {
+                        LaunchedEffect(dogsState.breeds) {
+                            onSuccess(dogsState.breeds)
+                        }
+                        Success(successData = dogsState.breeds, favoriteBreed = onFavorite)
+                    }
+                }
+                is BreedViewState.Error -> {
+                    LaunchedEffect(dogsState.type) {
+                        onError(dogsState.type.message)
+                    }
+                    Error(dogsState.type.message)
+                }
+                else -> {
+                    "Unhandled BreedViewState"
+                }
+            }
         }
     }
 }
@@ -130,7 +131,7 @@ fun Error(error: String) {
 @Composable
 fun Success(
     successData: List<Breed>,
-    favoriteBreed: (Breed) -> Unit
+    favoriteBreed: (Breed) -> Unit,
 ) {
     DogList(breeds = successData, favoriteBreed)
 }

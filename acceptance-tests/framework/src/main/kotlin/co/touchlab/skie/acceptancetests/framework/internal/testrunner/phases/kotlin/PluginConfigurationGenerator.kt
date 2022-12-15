@@ -2,7 +2,6 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.ko
 
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
-import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.configuration.Configuration
 import java.nio.file.Path
 import kotlin.io.path.writeText

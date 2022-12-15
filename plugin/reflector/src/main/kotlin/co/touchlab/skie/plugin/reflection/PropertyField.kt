@@ -6,6 +6,7 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 
 class PropertyField<T : Any, V>(private val originalPropertyName: String) : ReadWriteProperty<T, V> {
+
     override operator fun getValue(thisRef: T, property: KProperty<*>): V = onFieldOf(thisRef) { field ->
         @Suppress("UNCHECKED_CAST")
         field.get(thisRef) as V

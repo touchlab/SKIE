@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.datastruct
 
 import co.touchlab.skie.plugin.api.NativeKotlinType
-import co.touchlab.skie.plugin.api.NativeKotlinType.Reference.Known.Array.Primitive
 import co.touchlab.skie.plugin.api.SwiftPoetScope
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
@@ -11,12 +10,11 @@ import io.outfoxx.swiftpoet.FileMemberSpec
 import io.outfoxx.swiftpoet.INT
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.UINT8
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import kotlin.reflect.full.valueParameters
 
 sealed interface DataStructTypeMapper {
+
     context(SwiftPoetScope)
     fun provideMapping(property: PropertyDescriptor, parameter: ValueParameterDescriptor): Mapping?
 
@@ -38,12 +36,13 @@ sealed interface DataStructTypeMapper {
         val kotlinToSwiftMapping: CodeBlock? = null,
         val swiftToKotlinMapping: CodeBlock? = null,
     ) {
+
         constructor(
             swiftTypeName: TypeName,
             additionalSingletonDeclaration: FileMemberSpec,
             kotlinToSwiftMapping: CodeBlock? = null,
             swiftToKotlinMapping: CodeBlock? = null,
-        ): this(
+        ) : this(
             swiftTypeName,
             listOf(additionalSingletonDeclaration),
             kotlinToSwiftMapping,
@@ -52,6 +51,7 @@ sealed interface DataStructTypeMapper {
     }
 
     companion object {
+
         val supportedBuiltins: List<DataStructTypeMapper> = listOf(
             ScalarDataStructTypeMapper,
             ListDataStructTypeMapper,

@@ -15,7 +15,8 @@ SKIE currently supports the following features:
 
 To see how to add SKIE to your project, check out the [Installation doc](/docs/Installation.mdx).
 
-*Please note that Skie is still under active development, has not been publicly released, and should not be used in any production project.*
+*Please note that Skie is still under active development, has not been publicly released, and should not be used in any
+production project.*
 
 ## Supported features
 
@@ -67,7 +68,8 @@ func onEnum(of sealed: KotlinSealedInterface) -> SwiftWrapperEnum {
 
 The `onEnum(of:)` function wraps the Kotlin object in a Swift enum.
 
-SKIE leverages the fact that Swift `switch` statements **do not** always require a `default` case. A `default` is **not** required if every possible value of the type being considered is matched by one of the `switch` statement's cases (e.g. a `switch` that takes an enum and has a `case` for each and every `case` in that enum.)
+SKIE leverages the fact that Swift `switch` statements **do not** always require a `default` case. A `default` is **not
+** required if every possible value of the type being considered is matched by one of the `switch` statement's cases (e.g. a `switch` that takes an enum and has a `case` for each and every `case` in that enum.)
 
 To simulate Kotlin's smart-casting we use an enum with associated values.
 
@@ -182,4 +184,5 @@ The limit of 5 was chosen as the result of internal experiments, but that number
 
 The maximum number of default arguments can be explicitly configured using the `DefaultArgumentInterop.MaximumDefaultArgumentCount` key/annotation (see the Local section of [the Configuration doc](/docs/Configuration/Configuration.md).
 
-*NOTE: All of the above-mentioned problems might be mitigated in the future versions of SKIE. For instance, the limit on the number of default arguments may increase in the future as we test the plugin on larger projects.*
+*NOTE: All of the above-mentioned problems might be mitigated in the future versions of SKIE. For instance, the limit on
+the number of default arguments may increase in the future as we test the plugin on larger projects.*

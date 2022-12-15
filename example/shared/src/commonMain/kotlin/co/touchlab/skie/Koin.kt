@@ -1,11 +1,11 @@
 package co.touchlab.skie
 
-import co.touchlab.skie.ktor.DogApi
-import co.touchlab.skie.ktor.DogApiImpl
-import co.touchlab.skie.models.BreedRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
+import co.touchlab.skie.ktor.DogApi
+import co.touchlab.skie.ktor.DogApiImpl
+import co.touchlab.skie.models.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import org.koin.core.KoinApplication

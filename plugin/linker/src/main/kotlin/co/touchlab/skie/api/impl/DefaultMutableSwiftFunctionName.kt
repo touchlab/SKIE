@@ -8,6 +8,7 @@ class DefaultMutableSwiftFunctionName(
     override val parameterNames: List<MutableSwiftFunctionName.MutableParameterName>,
     override val receiverName: MutableSwiftTypeName,
 ) : MutableSwiftFunctionName {
+
     override var name: String = originalName
 
     override val originalQualifiedName: String

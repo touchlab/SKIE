@@ -1,12 +1,12 @@
 package co.touchlab.skie.plugin.generator.internal
 
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider as DescriptorProviderInstance
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import co.touchlab.skie.configuration.Configuration as ConfigurationType
+import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider as DescriptorProviderInstance
 
 internal sealed class SwiftGenCompilerConfigurationKey<T : Any>(name: String) {
 

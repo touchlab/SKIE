@@ -36,7 +36,7 @@ internal class TypeAliasGenerator(
     }
 
     context(SwiftPoetScope)
-        private fun FileSpec.Builder.addTypeAliasContainer(descriptorProvider: DescriptorProvider) {
+    private fun FileSpec.Builder.addTypeAliasContainer(descriptorProvider: DescriptorProvider) {
         addType(
             TypeSpec.enumBuilder(DeclaredTypeName.qualifiedLocalTypeName(publicTypeAliasContainerName))
                 .addModifiers(Modifier.PUBLIC)
@@ -46,7 +46,7 @@ internal class TypeAliasGenerator(
     }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addTypeAliases(descriptorProvider: DescriptorProvider): TypeSpec.Builder =
+    private fun TypeSpec.Builder.addTypeAliases(descriptorProvider: DescriptorProvider): TypeSpec.Builder =
         this.apply {
             descriptorProvider.classDescriptors.forEach { classDescriptor ->
                 addTypeAlias(classDescriptor)
@@ -54,7 +54,7 @@ internal class TypeAliasGenerator(
         }
 
     context(SwiftPoetScope)
-        private fun TypeSpec.Builder.addTypeAlias(classDescriptor: ClassDescriptor) {
+    private fun TypeSpec.Builder.addTypeAlias(classDescriptor: ClassDescriptor) {
         addType(
             TypeAliasSpec.builder(
                 name = classDescriptor.typeAliasName,
@@ -66,7 +66,7 @@ internal class TypeAliasGenerator(
     }
 
     context(SwiftPoetScope)
-        private fun FileSpec.Builder.addBaseTypeAliasContainerTypeAlias() {
+    private fun FileSpec.Builder.addBaseTypeAliasContainerTypeAlias() {
         val builder = TypeAliasSpec.builder(
             name = baseTypeAliasContainerName,
             type = DeclaredTypeName.qualifiedLocalTypeName(publicTypeAliasContainerName),

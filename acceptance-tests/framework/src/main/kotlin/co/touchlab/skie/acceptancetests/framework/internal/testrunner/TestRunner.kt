@@ -16,7 +16,6 @@ import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swi
 import co.touchlab.skie.acceptancetests.framework.internal.util.CreatedFilesDescriptionFilter
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.relativeTo
 import kotlin.io.path.writeText
 
 internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFactory) {
@@ -47,20 +46,20 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     }
 
     context(TempFileSystem, TestLogger)
-        private fun compileKotlin(
+    private fun compileKotlin(
         kotlinFiles: List<Path>,
         compilerConfiguration: CompilerConfiguration,
     ): IntermediateResult<Path> =
         KotlinTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFiles, compilerConfiguration)
 
     context(TempFileSystem)
-        private fun generateConfiguration(
+    private fun generateConfiguration(
         configFiles: List<Path>,
     ): IntermediateResult<Path> =
         PluginConfigurationGenerator(this@TempFileSystem).generate(configFiles)
 
     context(TempFileSystem, TestLogger)
-        private fun linkKotlin(
+    private fun linkKotlin(
         klib: Path,
         configuration: Path,
         compilerConfiguration: CompilerConfiguration,
@@ -68,18 +67,18 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         KotlinTestLinker(this@TempFileSystem, this@TestLogger).link(klib, configuration, compilerConfiguration)
 
     context(TempFileSystem)
-        private fun enhanceSwiftCode(swiftCode: String): Path =
+    private fun enhanceSwiftCode(swiftCode: String): Path =
         SwiftCodeEnhancer(this@TempFileSystem).enhance(swiftCode)
 
     context(TempFileSystem, TestLogger)
-        private fun compileSwift(
+    private fun compileSwift(
         kotlinFramework: Path,
         swiftFile: Path,
     ): IntermediateResult<Path> =
         SwiftTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFramework, swiftFile)
 
     context(TestLogger)
-        private fun runSwift(binary: Path): TestResult =
+    private fun runSwift(binary: Path): TestResult =
         SwiftProgramRunner(this@TestLogger).runProgram(binary)
 
     private fun writeResult(test: TestNode.Test, result: TestResultWithLogs) {

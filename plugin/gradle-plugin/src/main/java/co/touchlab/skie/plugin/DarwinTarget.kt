@@ -8,6 +8,7 @@ data class DarwinTarget(
     val targetTriple: TargetTriple,
     val sdk: String,
 ) {
+
     constructor(
         konanTarget: KonanTarget,
         targetTripleString: String,
@@ -15,6 +16,7 @@ data class DarwinTarget(
     ) : this(konanTarget, TargetTriple.fromString(targetTripleString), sdk)
 
     companion object {
+
         val allTargets = listOf(
             DarwinTarget(KonanTarget.IOS_ARM32, "armv7-apple-ios", "iphoneos"),
             DarwinTarget(KonanTarget.IOS_ARM64, "arm64-apple-ios", "iphoneos"),

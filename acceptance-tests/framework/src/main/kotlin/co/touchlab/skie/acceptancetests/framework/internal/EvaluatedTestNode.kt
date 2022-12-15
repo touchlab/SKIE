@@ -1,7 +1,6 @@
 package co.touchlab.skie.acceptancetests.framework.internal
 
 import co.touchlab.skie.acceptancetests.framework.ExpectedTestResult
-import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
 
 internal sealed interface EvaluatedTestNode {

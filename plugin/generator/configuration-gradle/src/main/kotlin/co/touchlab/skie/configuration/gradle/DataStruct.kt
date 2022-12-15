@@ -3,7 +3,6 @@ package co.touchlab.skie.configuration.gradle
 import co.touchlab.skie.configuration.ConfigurationKey
 import co.touchlab.skie.configuration.ConfigurationTarget
 import co.touchlab.skie.configuration.annotations.DataStruct
-import co.touchlab.skie.configuration.annotations.EnumInterop
 import co.touchlab.skie.configuration.hasAnnotation
 
 object DataStruct {

@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.onEach
 
 class FlowAdapter<T : Any>(
     private val scope: CoroutineScope,
-    private val flow: Flow<T>
+    private val flow: Flow<T>,
 ) {
+
     fun subscribe(
         onEach: (item: T) -> Unit,
         onComplete: () -> Unit,
-        onThrow: (error: Throwable) -> Unit
+        onThrow: (error: Throwable) -> Unit,
     ): Canceller = JobCanceller(
         flow.onEach { onEach(it) }
             .catch { onThrow(it) }
@@ -25,10 +26,12 @@ class FlowAdapter<T : Any>(
 }
 
 interface Canceller {
+
     fun cancel()
 }
 
 private class JobCanceller(private val job: Job) : Canceller {
+
     override fun cancel() {
         job.cancel()
     }

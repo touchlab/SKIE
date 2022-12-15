@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.api.function
 import co.touchlab.skie.plugin.api.type.SwiftTypeName
 
 interface SwiftFunctionName {
+
     val originalName: String
     val name: String
 
@@ -17,6 +18,7 @@ interface SwiftFunctionName {
     val receiverName: SwiftTypeName
 
     interface ParameterName {
+
         val originalName: String
         val name: String
     }

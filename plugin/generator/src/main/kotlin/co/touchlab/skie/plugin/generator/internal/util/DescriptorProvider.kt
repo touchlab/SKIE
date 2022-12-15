@@ -6,13 +6,13 @@ import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.Obj
 import co.touchlab.skie.plugin.getAllExportedModuleDescriptors
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
+import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
+import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
-import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
-import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 

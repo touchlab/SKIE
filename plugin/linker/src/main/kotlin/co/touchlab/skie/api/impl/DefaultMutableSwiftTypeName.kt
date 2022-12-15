@@ -1,12 +1,12 @@
 package co.touchlab.skie.api.impl
 
 import co.touchlab.skie.plugin.api.type.MutableSwiftTypeName
-import co.touchlab.skie.plugin.api.type.SwiftTypeName
 
 class DefaultMutableSwiftTypeName(
     override val originalParent: MutableSwiftTypeName?,
     override val originalSimpleName: String,
 ) : MutableSwiftTypeName {
+
     override var parent: MutableSwiftTypeName? = originalParent
     override var simpleName = originalSimpleName
 

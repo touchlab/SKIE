@@ -22,6 +22,7 @@ interface SwiftTypeName {
     }
 
     companion object {
+
         const val DEFAULT_SEPARATOR = "."
     }
 }

@@ -3,9 +3,11 @@ package co.touchlab.skie.plugin
 import java.io.File
 
 object SkiePlugin {
+
     const val id = "co.touchlab.skie"
 
     object Options {
+
         val swiftSourceFile = PluginOption(
             optionName = "swiftSourceFile",
             valueDescription = "<absolute path>",

@@ -1,7 +1,7 @@
 package co.touchlab.skie.runtime.coroutines
 
-import platform.Foundation.NSLock
 import co.touchlab.skie.runtime.coroutines.internal.withLock
+import platform.Foundation.NSLock
 
 @Suppress("ClassName")
 class Skie_CancellationHandler {

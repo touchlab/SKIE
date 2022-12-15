@@ -126,7 +126,7 @@ internal class KotlinSuspendGeneratorDelegate(
         this.valueParameters.any { name == it.name.toString() }
 
     context(IrPluginContext)
-        private fun DeclarationIrBuilder.createBody(
+    private fun DeclarationIrBuilder.createBody(
         bridgeFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrBody =
@@ -146,7 +146,7 @@ internal class KotlinSuspendGeneratorDelegate(
         }
 
     context(IrPluginContext)
-        private fun DeclarationIrBuilder.createGetCheckedExceptions(
+    private fun DeclarationIrBuilder.createGetCheckedExceptions(
         bridgeFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrExpression {
@@ -200,8 +200,8 @@ internal class KotlinSuspendGeneratorDelegate(
         }
 
     context(IrPluginContext)
-        @OptIn(ObsoleteDescriptorBasedAPI::class)
-        private fun createCheckedExceptionClassReferences(
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun createCheckedExceptionClassReferences(
         originalFunctionDescriptor: FunctionDescriptor,
     ): List<IrClassReference> =
         originalFunctionDescriptor.declaredThrownExceptions
@@ -238,7 +238,7 @@ internal class KotlinSuspendGeneratorDelegate(
         }
 
     context(IrPluginContext)
-        private fun IrBlockBodyBuilder.createOriginalFunctionCallLambda(
+    private fun IrBlockBodyBuilder.createOriginalFunctionCallLambda(
         bridgeFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrFunctionExpression =
@@ -249,7 +249,7 @@ internal class KotlinSuspendGeneratorDelegate(
         )
 
     context(IrPluginContext)
-        private fun IrBlockBodyBuilder.createOriginalFunctionCallLambdaFunction(
+    private fun IrBlockBodyBuilder.createOriginalFunctionCallLambdaFunction(
         bridgeFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrSimpleFunction =
@@ -263,8 +263,8 @@ internal class KotlinSuspendGeneratorDelegate(
         )
 
     context(IrPluginContext)
-        @OptIn(ObsoleteDescriptorBasedAPI::class)
-        private fun DeclarationIrBuilder.createOriginalFunctionCallLambdaFunctionBody(
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun DeclarationIrBuilder.createOriginalFunctionCallLambdaFunctionBody(
         bridgeFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrBlockBody =

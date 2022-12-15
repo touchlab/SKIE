@@ -2,6 +2,8 @@ package co.touchlab.skie
 
 import app.cash.turbine.FlowTurbine
 import app.cash.turbine.test
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.StaticConfig
 import co.touchlab.skie.db.Breed
 import co.touchlab.skie.mock.ClockMock
 import co.touchlab.skie.mock.DogApiMock
@@ -9,8 +11,6 @@ import co.touchlab.skie.models.BreedRepository
 import co.touchlab.skie.models.BreedViewModel
 import co.touchlab.skie.models.BreedViewState
 import co.touchlab.skie.response.BreedResult
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.StaticConfig
 import com.russhwolf.settings.MockSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -24,6 +24,7 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
 
 class BreedViewModelTest {
+
     private var kermit = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
     private var dbHelper = DatabaseHelper(
@@ -41,6 +42,7 @@ class BreedViewModelTest {
     private val viewModel by lazy { BreedViewModel(repository, kermit) }
 
     companion object {
+
         private val appenzeller = Breed(1, "appenzeller", false)
         private val australianNoLike = Breed(2, "australian", false)
         private val australianLike = Breed(2, "australian", true)
