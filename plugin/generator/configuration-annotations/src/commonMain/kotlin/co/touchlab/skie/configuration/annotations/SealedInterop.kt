@@ -1,6 +1,7 @@
 package co.touchlab.skie.configuration.annotations
 
-object SealedInterop {
+@Target
+annotation class SealedInterop {
 
     /**
      * Enables the sealed interop for the annotated declaration.
@@ -17,7 +18,8 @@ object SealedInterop {
     @Retention(AnnotationRetention.BINARY)
     annotation class Disabled
 
-    object Function {
+    @Target
+    annotation class Function {
 
         /**
          * Changes the name for the generated function used inside `switch`.
@@ -50,7 +52,8 @@ object SealedInterop {
     @Retention(AnnotationRetention.BINARY)
     annotation class ElseName(val elseName: String)
 
-    object Case {
+    @Target
+    annotation class Case {
 
         /**
          * Hides this subclass from the generated code, which means no dedicated enum case will be generated for it.

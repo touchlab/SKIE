@@ -1,6 +1,7 @@
 package co.touchlab.skie.configuration.annotations
 
-object ExperimentalFeatures {
+@Target
+annotation class ExperimentalFeatures {
 
     /**
      * Enables experimental features for the annotated declaration.

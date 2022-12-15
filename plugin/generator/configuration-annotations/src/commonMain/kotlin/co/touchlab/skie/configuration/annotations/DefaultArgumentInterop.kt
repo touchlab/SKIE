@@ -1,6 +1,7 @@
 package co.touchlab.skie.configuration.annotations
 
-object DefaultArgumentInterop {
+@Target
+annotation class DefaultArgumentInterop {
 
     @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
     @Retention(AnnotationRetention.BINARY)

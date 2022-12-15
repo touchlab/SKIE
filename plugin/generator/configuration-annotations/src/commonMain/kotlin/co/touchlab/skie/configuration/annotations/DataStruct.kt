@@ -1,6 +1,7 @@
 package co.touchlab.skie.configuration.annotations
 
-object DataStruct {
+@Target
+annotation class DataStruct {
 
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.BINARY)

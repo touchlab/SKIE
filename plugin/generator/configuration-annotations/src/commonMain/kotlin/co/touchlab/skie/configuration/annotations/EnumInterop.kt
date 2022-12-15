@@ -1,6 +1,7 @@
 package co.touchlab.skie.configuration.annotations
 
-object EnumInterop {
+@Target
+annotation class EnumInterop {
 
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.BINARY)
