@@ -12,6 +12,8 @@ internal class SwiftRuntimeGenerator(
 ) : SkieCompilationPhase {
 
     override val isActive: Boolean = SkieFeature.SwiftRuntime in configuration.enabledFeatures
+        // TODO change to per package filter
+        && SkieFeature.SuspendInterop in configuration.enabledFeatures
 
     override fun execute(descriptorProvider: DescriptorProvider) {
         getSwiftRuntimeFiles().forEach {
