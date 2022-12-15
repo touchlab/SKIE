@@ -20,7 +20,7 @@ internal class TypeAliasGenerator(
     configuration: Configuration,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = true
+    override val isActive: Boolean = SkieFeature.SwiftRuntime in configuration.enabledFeatures
 
     private val areTypeAliasesExported = SkieFeature.FqNames in configuration.enabledFeatures
 

@@ -5,33 +5,15 @@ import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
-import io.outfoxx.swiftpoet.TypeAliasSpec
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
-internal class RuntimeGenerator(
+internal class SwiftRuntimeGenerator(
     private val skieContext: SkieContext,
     configuration: Configuration,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.SwiftRuntime in configuration.enabledFeatures
 
     override fun execute(descriptorProvider: DescriptorProvider) {
-        hideKotlinRuntime(descriptorProvider)
-        includeSwiftRuntime()
-    }
-
-    private fun hideKotlinRuntime(descriptorProvider: DescriptorProvider) {
-        skieContext.module.configure {
-            descriptorProvider.classDescriptors
-                .filter { it.belongsToSkieRuntime }
-                .forEach {
-                    it.isHiddenFromSwift = true
-                }
-        }
-    }
-
-    private fun includeSwiftRuntime() {
         getSwiftRuntimeFiles().forEach {
             skieContext.module.file(it.swiftFileName, it.readText())
         }

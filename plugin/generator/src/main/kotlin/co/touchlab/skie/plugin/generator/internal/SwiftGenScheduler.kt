@@ -6,13 +6,13 @@ import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGener
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.SuspendGenerator
 import co.touchlab.skie.plugin.generator.internal.datastruct.DataStructGenerator
 import co.touchlab.skie.plugin.generator.internal.enums.ExhaustiveEnumsGenerator
-import co.touchlab.skie.plugin.generator.internal.runtime.RuntimeGenerator
+import co.touchlab.skie.plugin.generator.internal.runtime.KotlinRuntimeHidingPhase
+import co.touchlab.skie.plugin.generator.internal.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
 import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
-import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
 
@@ -29,7 +29,10 @@ internal class SwiftGenScheduler(
             reporter = reporter,
             configuration = configuration
         ),
-        RuntimeGenerator(
+        KotlinRuntimeHidingPhase(
+            skieContext = skieContext,
+        ),
+        SwiftRuntimeGenerator(
             skieContext = skieContext,
             configuration = configuration
         ),
