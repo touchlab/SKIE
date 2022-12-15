@@ -1,9 +1,7 @@
 package co.touchlab.skie.gradle.kotlin
 
-import co.touchlab.skie.gradle.util.bundles
 import co.touchlab.skie.gradle.util.libs
 import co.touchlab.skie.gradle.util.testImplementation
-import co.touchlab.skie.gradle.util.versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test

@@ -1,5 +1,3 @@
-import co.touchlab.skie.gradle.util.extractedKotlinNativeCompilerEmbeddable
-
 plugins {
     id("skie-jvm")
     id("skie-publish-jvm")
@@ -8,7 +6,7 @@ plugins {
 dependencies {
     api(libs.swiftPoet)
 
-    compileOnly(extractedKotlinNativeCompilerEmbeddable())
+    compileOnly(libs.kotlin.native.compiler.embeddable)
 }
 
 skieJvm {

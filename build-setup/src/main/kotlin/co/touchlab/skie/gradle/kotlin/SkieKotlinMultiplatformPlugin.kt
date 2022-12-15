@@ -1,7 +1,6 @@
 package co.touchlab.skie.gradle.kotlin
 
 import co.touchlab.skie.gradle.util.libs
-import co.touchlab.skie.gradle.util.versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension

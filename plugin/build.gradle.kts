@@ -8,11 +8,6 @@ plugins {
 allprojects {
     group = "co.touchlab.skie"
     version = System.getenv("RELEASE_VERSION") ?: "1.0.0-SNAPSHOT"
-
-    repositories {
-        google()
-        mavenCentral()
-    }
 }
 
 // Workaround for KMM plugin bug - JS target adds clean task for root project

@@ -1,5 +1,4 @@
-import co.touchlab.skie.gradle.util.extractedKotlinNativeCompilerEmbeddable
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddable
+import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddableRuntime
 
 plugins {
     id("skie-jvm")
@@ -21,8 +20,8 @@ skieJvm {
 dependencies {
     api(libs.bundles.testing.jvm)
 
-    compileOnly(extractedKotlinNativeCompilerEmbeddable())
-    runtimeOnly(kotlinNativeCompilerEmbeddable())
+    compileOnly(libs.kotlin.native.compiler.embeddable)
+    runtimeOnly(kotlinNativeCompilerEmbeddableRuntime())
 
     implementation("co.touchlab.skie:configuration-api")
     implementation("co.touchlab.skie:generator")

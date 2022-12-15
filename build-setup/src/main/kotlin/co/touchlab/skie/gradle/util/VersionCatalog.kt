@@ -1,18 +1,24 @@
 package co.touchlab.skie.gradle.util
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
+import java.util.*
 
-internal val Project.libs: VersionCatalog
-    get() = this.extensions.getByType<VersionCatalogsExtension>().named("libs")
+internal val Project.libs: VersionCatalogRoot
+    get() = this.extensions.getByType<VersionCatalogsExtension>().named("libs").let { VersionCatalogRoot(it) }
 
-internal val VersionCatalog.versions: VersionCatalogVersions
-    get() = VersionCatalogVersions(this)
+internal class VersionCatalogRoot(private val versionCatalog: VersionCatalog) {
 
-internal val VersionCatalog.bundles: VersionCatalogBundles
-    get() = VersionCatalogBundles(this)
+    val versions: VersionCatalogVersions
+        get() = VersionCatalogVersions(versionCatalog)
+
+    val bundles: VersionCatalogBundles
+        get() = VersionCatalogBundles(versionCatalog)
+}
 
 internal class VersionCatalogVersions(private val versionCatalog: VersionCatalog) {
 
