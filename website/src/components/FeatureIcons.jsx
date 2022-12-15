@@ -337,3 +337,25 @@ export function DecisionProcessOnly() {
         </svg>)
 }
 
+export function ThumbUpTab() {
+    return (<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" className="fill-current text-lime-600"><title>thumb up</title>
+        <g  className="nc-icon-wrapper">
+            <path data-color="color-2" d="M4,11H1a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H4Z"></path>
+            <path
+                d="M22.539,10.4A4,4,0,0,0,19.5,9H13V4c0-2.206-.794-4-3-4a1,1,0,0,0-.965.737L6,11V24H18.426a3.979,3.979,0,0,0,3.954-3.392l1.076-7A4,4,0,0,0,22.539,10.4Z"
+                ></path>
+        </g>
+    </svg>)
+}
+
+export function ThumbDownTab() {
+    return (<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" className="fill-current text-lime-600"><title>thumb down</title>
+        <g className="nc-icon-wrapper">
+            <path data-color="color-2" d="M4,13H1a1,1,0,0,1-1-1V1A1,1,0,0,1,1,0H4Z"></path>
+            <path
+                d="M22.539,13.605A4,4,0,0,1,19.5,15H13v5c0,2.206-.794,4-3,4a1,1,0,0,1-.965-.737L6,13V0H18.426A3.979,3.979,0,0,1,22.38,3.392l1.076,7A4,4,0,0,1,22.539,13.605Z"
+                ></path>
+        </g>
+    </svg>)
+}
+

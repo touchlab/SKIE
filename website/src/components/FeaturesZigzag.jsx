@@ -1,5 +1,14 @@
 import React, {useState} from 'react';
-import {Android, AndroidOnly, Apple, AppleOnly, DecisionProcess, DecisionProcessOnly} from "./FeatureIcons";
+import {
+    Android,
+    AndroidOnly,
+    Apple,
+    AppleOnly,
+    DecisionProcess,
+    DecisionProcessOnly,
+    ThumbDownTab,
+    ThumbUpTab
+} from "./FeatureIcons";
 
 import FeatImage01 from '@site/static/componentimg/features-03-image-01.png';
 import FeatImage02 from '@site/static/componentimg/features-03-image-02.png';
@@ -37,11 +46,66 @@ function ShowKotlinSwiftToggle(kotlinBlock, swiftBlock){
 }
 
 function labelImage(label, imgObj) {
+    return (imgObj instanceof Array) ? labelImageScroller(label, imgObj) : labelImageScroller(label, [imgObj])
+    //     (
+    //     <>
+    //         <img src={imgObj}
+    //              alt={label}/><br/>
+    //     </>
+    // )
+}
+
+function labelImageScroller(label, imgObjs) {
+    const [imgIndex, setImgIndex] = useState(0);
+    const adjustIndex = (adj) => {
+        let newIndex = imgIndex + adj
+        if(newIndex < 0){
+            newIndex = imgObjs.length - 1
+        }
+        setImgIndex(newIndex % imgObjs.length)
+    }
+
+    const currentIndex = imgIndex % imgObjs.length
+    const lastImage = currentIndex === imgObjs.length - 1
     return (
         <>
-            <img src={imgObj}
-                 alt="Features 01"/><br/>
+            <img src={imgObjs[currentIndex]} alt={label} onClick={()=>adjustIndex(1)}/>
+            {currentIndex !== 0 &&
+                <div className="absolute bottom-8 left-4">
+                    {leftArrow(()=>adjustIndex(-1))}
+                </div>
+            }
+
+            {!lastImage &&
+            <div className="absolute bottom-8 right-4">
+            {rightArrow(()=>adjustIndex(1))}
+            </div>
+            }
         </>
+    )
+}
+
+function leftArrow(onClick){
+    return (
+        <svg onClick={onClick} className="cursor-pointer" xmlns="http://www.w3.org/2000/svg" height="64" width="64" viewBox="0 0 64 64"><title>left arrow</title>
+            <g className="nc-icon-wrapper">
+                <path
+                    d="M47.621,3.793,46.207,2.379a1,1,0,0,0-1.414,0L15.879,31.293a1,1,0,0,0,0,1.414L44.793,61.621a1,1,0,0,0,1.414,0l1.414-1.414a1,1,0,0,0,0-1.414L20.828,32,47.621,5.207A1,1,0,0,0,47.621,3.793Z"
+                    className="fill-current text-white"></path>
+            </g>
+        </svg>
+    )
+}
+
+function rightArrow(onClick){
+    return (
+        <svg onClick={onClick} className="cursor-pointer" xmlns="http://www.w3.org/2000/svg" height="64" width="64" viewBox="0 0 64 64"><title>right arrow</title>
+            <g className="nc-icon-wrapper">
+                <path
+                    d="M19.207,2.379a1,1,0,0,0-1.414,0L16.379,3.793a1,1,0,0,0,0,1.414L43.172,32,16.379,58.793a1,1,0,0,0,0,1.414l1.414,1.414a1,1,0,0,0,1.414,0L48.121,32.707a1,1,0,0,0,0-1.414Z"
+                    className="fill-current text-white"></path>
+            </g>
+        </svg>
     )
 }
 
@@ -57,7 +121,7 @@ function ToggleBlock(currentBlock, blockName, setBlock, title, svgBody){
     )
 }
 
-function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter, imgSAfterComplete) {
+function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter) {
     const [block, setBlock] = useState("kotlin");
 
   return (
@@ -69,34 +133,27 @@ function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter, imgSAfterComplete) {
                   "kotlin",
                   setBlock,
                   "Kotlin",
-                  AndroidOnly
+                  () => AndroidOnly("lime")
               )}
               {ToggleBlock(
                   block,
                   "noskie",
                   setBlock,
                   "Without SKIE",
-                  AppleOnly
+                  ThumbDownTab
               )}
               {ToggleBlock(
                   block,
                   "withskie",
                   setBlock,
                   "With SKIE",
-                  DecisionProcessOnly
-              )}
-              {imgSAfterComplete && ToggleBlock(
-                  block,
-                  "withskiecomplete",
-                  setBlock,
-                  "With SKIE Fixed",
-                  DecisionProcessOnly
+                  ThumbUpTab
               )}
 
           </div>
       </div>
-      <div className="relative max-w-4xl mx-auto text-center">
-          <img className="absolute invisible" src={imgK}
+      <div className="relative max-w-4xl mx-auto text-center lg:h-[465px]">
+          <img className="absolute invisible top-0 left-0" src={imgK}
                alt="Features 01"/>
           {/* Image */}
           {block === "kotlin" &&
@@ -112,11 +169,6 @@ function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter, imgSAfterComplete) {
           {block === "withskie" &&
               <>
                   {labelImage("With SKIE ✅", imgSAfter)}
-              </>
-          }
-          {imgSAfterComplete && block === "withskiecomplete" &&
-              <>
-                  {labelImage("With SKIE ✅", imgSAfterComplete)}
               </>
           }
 
@@ -136,7 +188,8 @@ export default function FeaturesZigzag() {
     return (
     <section>
       <div className="hidden text-lime-600"></div>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      <div className="hidden text-lime-500"></div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="pb-12 md:pb-20 border-t border-gray-800">
 
           {/*border-gray-800 border-solid border-t border-b-0 border-x-0*/}
@@ -153,11 +206,11 @@ export default function FeaturesZigzag() {
               <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Kotlin enums are automatically and transparently converted to Swift enums.</p>
               <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2">
                 <li className="flex items-center mb-2">
-                    {checkMark("green")}
+                    {checkMark("lime")}
                   <span>Proper compile-time checking</span>
                 </li>
                 <li className="flex items-center mb-2">
-                    {checkMark("green")}
+                    {checkMark("lime")}
                   <span>Swift-native ergonomics</span>
                 </li>
               </ul>
@@ -171,7 +224,7 @@ export default function FeaturesZigzag() {
 
         </div>
       </div>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="pb-12 md:pb-20 border-t border-gray-800">
 
                 {/* Items */}
@@ -184,11 +237,11 @@ export default function FeaturesZigzag() {
                         generated, as well as a wrapper function to use for switch statements.</p>
                         <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2">
                             <li className="flex items-center mb-2">
-                                {checkMark("green")}
+                                {checkMark("lime")}
                                 <span>Sealed classes can be exhaustively checked</span>
                             </li>
                             <li className="flex items-center mb-2">
-                                {checkMark("green")}
+                                {checkMark("lime")}
                                 <span>Similar semantics to enums with associated values</span>
                             </li>
                         </ul>
@@ -196,7 +249,7 @@ export default function FeaturesZigzag() {
 
                     {/* 1st item */}
 
-                    {ShowKotlinSwiftFriends(sealedKotlin, sealedSwiftBefore, sealedSwiftAfter, sealedSwiftAfterComplete)}
+                    {ShowKotlinSwiftFriends(sealedKotlin, sealedSwiftBefore, [sealedSwiftAfter, sealedSwiftAfterComplete])}
 
                 </div>
 
