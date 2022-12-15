@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
 
     id("gradle-src-classpath-loader")
-    id("co.touchlab.touchlabtools.docusaurusosstemplate") version "0.1.8"
 }
 
 allprojects {

@@ -27,6 +27,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 includeBuild("example")
 includeBuild("plugin")
 includeBuild("dev-support")
+includeBuild("website")
 
 include(
     ":acceptance-tests:framework",
