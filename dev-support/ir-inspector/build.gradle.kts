@@ -1,11 +1,17 @@
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddableRuntime
+import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 
 plugins {
+    application
     id("skie-jvm")
     id("skie-buildconfig")
 }
 
 buildConfig {
+    buildConfigField(
+        type = "String",
+        name = "KONAN_HOME",
+        value = "\"${kotlinNativeCompilerHome.path}\"",
+    )
     buildConfigField(
         type = "String",
         name = "CODE",
@@ -18,7 +24,10 @@ buildConfig {
     )
 }
 
+application {
+    mainClass.set("co.touchlab.skie.devsupport.irinspector.IrInspectorKt")
+}
+
 dependencies {
-    compileOnly(libs.kotlin.native.compiler.embeddable)
-    runtimeOnly(kotlinNativeCompilerEmbeddableRuntime())
+    implementation(libs.kotlin.native.compiler.embeddable)
 }

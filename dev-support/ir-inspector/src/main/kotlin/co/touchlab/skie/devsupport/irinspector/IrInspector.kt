@@ -46,6 +46,7 @@ private fun runCompiler(
         false,
     )
 
+    System.setProperty("konan.home", BuildConfig.KONAN_HOME)
     val result = K2Native().exec(messageCollector, Services.EMPTY, arguments)
 
     if (result != ExitCode.OK) {

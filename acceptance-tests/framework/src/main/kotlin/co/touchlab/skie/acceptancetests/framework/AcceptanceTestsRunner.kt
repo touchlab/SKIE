@@ -2,6 +2,7 @@ package co.touchlab.skie.acceptancetests.framework
 
 import co.touchlab.skie.acceptancetests.framework.internal.EvaluatedTestNode
 import co.touchlab.skie.acceptancetests.framework.internal.TestNodeRunner
+import co.touchlab.skie.framework.BuildConfig
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import kotlinx.coroutines.channels.Channel
@@ -10,6 +11,10 @@ class AcceptanceTestsRunner(
     private val tempFileSystemFactory: TempFileSystemFactory,
     private val testFilter: TestFilter = TestFilter.Empty,
 ) {
+
+    init {
+        System.setProperty("konan.home", BuildConfig.KONAN_HOME)
+    }
 
     fun runTests(scope: FunSpec, testNode: TestNode) {
         val channel = Channel<EvaluatedTestNode>()

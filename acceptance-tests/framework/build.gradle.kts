@@ -1,4 +1,4 @@
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddableRuntime
+import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 
 plugins {
     id("skie-jvm")
@@ -6,6 +6,11 @@ plugins {
 }
 
 buildConfig {
+    buildConfigField(
+        type = "String",
+        name = "KONAN_HOME",
+        value = "\"${kotlinNativeCompilerHome.path}\"",
+    )
     buildConfigField(
         type = "String",
         name = "RESOURCES",
@@ -20,8 +25,7 @@ skieJvm {
 dependencies {
     api(libs.bundles.testing.jvm)
 
-    compileOnly(libs.kotlin.native.compiler.embeddable)
-    runtimeOnly(kotlinNativeCompilerEmbeddableRuntime())
+    implementation(libs.kotlin.native.compiler.embeddable)
 
     implementation("co.touchlab.skie:configuration-api")
     implementation("co.touchlab.skie:generator")
