@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
+import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 
@@ -86,7 +87,9 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
     context(IrBuilderWithScope) protected fun IrFunctionAccessExpression.passArgumentsWithMatchingNames(from: IrFunction) {
         from.valueParameters.forEach { valueParameter: IrValueParameter ->
             val indexInCalledFunction = this.symbol.owner.indexOfValueParameterByName(valueParameter.name)
-
+            check(indexInCalledFunction != -1) {
+                "Could not find value parameter with name ${valueParameter.name} in ${this.symbol.owner} (from $from)\n\nThis dump:\n${this.dump()}\n\nFrom dump:\n${from.dump()}"
+            }
             putValueArgument(indexInCalledFunction, irGet(valueParameter))
         }
     }
