@@ -197,6 +197,10 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         target.swiftModuleDir.mkdirs()
 
                         frameworksByArchs.toList().forEach { (_, framework) ->
+                            it.copy {
+                                it.from(framework.files.apiNotes)
+                                it.into(target.headerDir)
+                            }
                             framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
                                 it.copy {
                                     it.from(swiftmoduleFile)
@@ -251,6 +255,9 @@ private val FrameworkLayout.frameworkName: String
 
 val FrameworkLayout.swiftHeader: File
     get() = headerDir.resolve("$frameworkName-Swift.h")
+
+val FrameworkLayout.apiNotes: File
+    get() = headerDir.resolve("$frameworkName.apinotes")
 
 val FrameworkLayout.swiftModuleDir: File
     get() = modulesDir.resolve("$frameworkName.swiftmodule")
