@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 internal fun List<ValueParameterDescriptor>.copyWithoutDefaultValue(newOwner: CallableDescriptor): List<ValueParameterDescriptor> =
     this.mapIndexed { index, valueParameter -> valueParameter.copyWithoutDefaultValue(newOwner, index) }
 
-private fun ValueParameterDescriptor.copyWithoutDefaultValue(
+internal fun ValueParameterDescriptor.copyWithoutDefaultValue(
     newOwner: CallableDescriptor,
     newIndex: Int,
 ): ValueParameterDescriptor = ValueParameterDescriptorImpl(

@@ -1,4 +1,4 @@
-package tests.sealed.classes.generics.multi_layer.generic_child
+package `tests`.`sealed`.`classes`.`generics`.`multi_layer`.`generic_child`
 
 sealed class A
 

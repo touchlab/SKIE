@@ -15,6 +15,7 @@ import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ContextReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -62,8 +63,7 @@ internal class DeclarationBuilderImpl(
         }
 
     override fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor> {
-        val packageFragment = existingMember.containingDeclaration as? PackageFragmentDescriptor
-            ?: throw IllegalArgumentException("existingMember must be a direct package member.")
+        val packageFragment = existingMember.findPackage()
 
         return packageNamespacesByDescriptor.getOrPut(packageFragment) {
             DeserializedPackageNamespace(existingMember, descriptorProvider)

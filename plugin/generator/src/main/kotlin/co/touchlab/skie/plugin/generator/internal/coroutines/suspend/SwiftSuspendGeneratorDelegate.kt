@@ -13,49 +13,78 @@ import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.descriptors.getTopLevelContainingClassifier
+import org.jetbrains.kotlin.descriptors.isTopLevelInPackage
 import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.extractTypeParameters
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 internal class SwiftSuspendGeneratorDelegate(
     private val module: SkieModule,
 ) : SwiftPoetExtensionContainer {
 
-    fun generateSwiftBridgingFunction(function: FunctionDescriptor, kotlinBridgingFunction: FunctionDescriptor) {
-        module.generateCode(function) {
+    fun generateSwiftBridgingFunction(
+        originalFunctionDescriptor: FunctionDescriptor,
+        kotlinBridgingFunctionDescriptor: FunctionDescriptor,
+    ) {
+        if (originalFunctionDescriptor.isFromGenericClass) {
+            return
+        }
+
+        module.generateCode(originalFunctionDescriptor) {
             addExtension(
-                ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(function.swiftName.receiverName.qualifiedName))
+                ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(originalFunctionDescriptor.swiftName.receiverName.qualifiedName))
                     .addModifiers(Modifier.PUBLIC)
-                    .addSwiftBridgingFunction(function, kotlinBridgingFunction)
+                    .addSwiftBridgingFunction(originalFunctionDescriptor, kotlinBridgingFunctionDescriptor)
                     .build()
             )
         }
     }
 
+    private val FunctionDescriptor.isFromGenericClass: Boolean
+        get() {
+            val classifier = this.dispatchReceiverParameter?.type?.constructor?.declarationDescriptor
+
+            if (classifier !is ClassDescriptor) return false
+
+            return classifier.kind == ClassKind.CLASS && classifier.declaredTypeParameters.isNotEmpty()
+        }
+
     context(SwiftPoetScope)
     private fun ExtensionSpec.Builder.addSwiftBridgingFunction(
-        function: FunctionDescriptor,
-        kotlinBridgingFunction: FunctionDescriptor,
+        originalFunctionDescriptor: FunctionDescriptor,
+        kotlinBridgingFunctionDescriptor: FunctionDescriptor,
     ): ExtensionSpec.Builder =
         this.apply {
             addFunction(
-                FunctionSpec.builder(function.swiftName.name)
-                    .addModifiers(Modifier.STATIC)
+                FunctionSpec.builder(originalFunctionDescriptor.swiftName.name)
+                    .setScope(originalFunctionDescriptor)
                     .addAttribute(AttributeSpec.available("iOS" to "13", "macOS" to "10.15", "watchOS" to "6", "tvOS" to "13", "*" to ""))
                     .async(true)
                     .throws(true)
-                    .addValueParameters(function)
-                    .addReturnType(function)
-                    .addFunctionBody(function, kotlinBridgingFunction)
+                    .addValueParameters(originalFunctionDescriptor)
+                    .addReturnType(originalFunctionDescriptor)
+                    .addFunctionBody(originalFunctionDescriptor, kotlinBridgingFunctionDescriptor)
                     .build()
             )
         }
 
-    context(SwiftPoetScope)
-    private fun FunctionSpec.Builder.addValueParameters(function: FunctionDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.setScope(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
-            function.valueParameters.forEach {
+            if (originalFunctionDescriptor.isTopLevelInPackage()) {
+                this.addModifiers(Modifier.STATIC)
+            }
+        }
+
+    context(SwiftPoetScope)
+    private fun FunctionSpec.Builder.addValueParameters(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
+        this.apply {
+            originalFunctionDescriptor.valueParameters.forEach {
                 addValueParameter(it)
             }
         }
@@ -75,10 +104,10 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
     context(SwiftPoetScope)
-    private fun FunctionSpec.Builder.addReturnType(function: FunctionDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.addReturnType(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
-            if (!function.returnTypeOrNothing.isUnit()) {
-                val returnType = function.returnTypeOrNothing.spec(KotlinTypeSpecKind.SWIFT_GENERICS)
+            if (!originalFunctionDescriptor.returnTypeOrNothing.isUnit()) {
+                val returnType = originalFunctionDescriptor.returnTypeOrNothing.spec(KotlinTypeSpecKind.SWIFT_GENERICS)
 
                 returns(returnType)
             }
@@ -86,7 +115,7 @@ internal class SwiftSuspendGeneratorDelegate(
 
     context(SwiftPoetScope)
     private fun FunctionSpec.Builder.addFunctionBody(
-        function: FunctionDescriptor,
+        originalFunctionDescriptor: FunctionDescriptor,
         kotlinBridgingFunction: FunctionDescriptor,
     ): FunctionSpec.Builder =
         this.apply {
@@ -95,18 +124,34 @@ internal class SwiftSuspendGeneratorDelegate(
                     .addStatement("return try await SwiftCoroutineDispatcher.dispatch {")
                     .indent()
                     .apply {
-                        val parametersPlaceholder = (function.valueParameters.map { "%N" } + "$0").joinToString(", ")
-
                         addStatement(
-                            "%N.%N($parametersPlaceholder)",
+                            "%N.%N(${originalFunctionDescriptor.valueParametersPlaceholders})",
                             kotlinBridgingFunction.swiftName.receiverName.qualifiedName,
                             kotlinBridgingFunction.swiftName.reference,
-                            *function.valueParameters.map { it.name.asString() }.toTypedArray(),
+                            *originalFunctionDescriptor.argumentsForBridgingCall.toTypedArray(),
                         )
                     }
                     .unindent()
                     .addStatement("}")
                     .build()
             )
+        }
+
+    private val FunctionDescriptor.valueParametersPlaceholders: String
+        get() = (this.argumentsForBridgingCall.map { "%N" } + "$0").joinToString(", ")
+
+    private val FunctionDescriptor.argumentsForBridgingCall: List<String>
+        get() {
+            val arguments = mutableListOf<String>()
+
+            this.dispatchReceiverParameter?.let {
+                arguments.add("self")
+            }
+
+            this.valueParameters.forEach {
+                arguments.add(it.name.asString())
+            }
+
+            return arguments
         }
 }

@@ -9,7 +9,7 @@ abstract class BaseJavaSkiePublishPlugin : BaseSkiePublishPlugin() {
     override fun apply(target: Project) {
         super.apply(target)
 
-        target.plugins.withType(KotlinPluginWrapper::class.java) {
+        target.plugins.withType(KotlinPluginWrapper::class.java).configureEach {
             afterKotlinPlugin(target)
         }
     }

@@ -31,7 +31,7 @@ class SkieKotlinJvmPlugin : Plugin<Project> {
     }
 
     private fun Project.configureTests() {
-        tasks.withType(Test::class.java) {
+        tasks.withType(Test::class.java).configureEach {
             useJUnitPlatform()
         }
 

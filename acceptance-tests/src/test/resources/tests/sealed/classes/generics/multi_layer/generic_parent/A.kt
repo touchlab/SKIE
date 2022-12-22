@@ -1,4 +1,4 @@
-package tests.sealed.classes.generics.multi_layer.generic_parent
+package `tests`.`sealed`.`classes`.`generics`.`multi_layer`.`generic_parent`
 
 sealed class A<T : Any>(val value: T)
 

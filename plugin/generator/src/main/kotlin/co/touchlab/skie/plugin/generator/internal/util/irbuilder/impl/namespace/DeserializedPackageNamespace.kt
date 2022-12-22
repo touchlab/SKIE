@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
 import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.UnsupportedDeclarationDescriptorException
+import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -19,8 +20,8 @@ internal class DeserializedPackageNamespace(
     descriptorProvider: DescriptorProvider,
 ) : BaseDeserializedNamespace<PackageFragmentDescriptor>(descriptorProvider) {
 
-    override val descriptor: DeserializedPackageFragment = existingMember.containingDeclaration as? DeserializedPackageFragment
-        ?: throw IllegalArgumentException("existingMember must be a direct package member of a deserialized package fragment.")
+    override val descriptor: DeserializedPackageFragment = existingMember.findPackage() as? DeserializedPackageFragment
+        ?: throw IllegalArgumentException("existingMember must be a member of a deserialized package fragment.")
 
     override val sourceElement: SourceElement = SourceElement { existingMember.findSourceFile() }
 
