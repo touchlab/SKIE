@@ -99,6 +99,8 @@ enum class A {
 
     fun closureTwoParamsReturnString(p1: (Int, String) -> String) = p1(0, "")
 
+    fun optionalReturningFun(): Int? = null
+
     companion object {
 
         fun staticFun() = Unit

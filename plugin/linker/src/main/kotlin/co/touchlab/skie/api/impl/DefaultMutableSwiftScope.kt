@@ -52,6 +52,7 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.isNullable
 
 internal class DefaultMutableSwiftScope(
     private val namer: ObjCExportNamer,
@@ -261,6 +262,8 @@ internal class DefaultMutableSwiftScope(
                         descriptor.spec.withTypeParameters(kotlinType, KotlinTypeSpecKind.ORIGINAL)
                     } else {
                         descriptor.spec
+                    }.let {
+                        if (kotlinType.isNullable()) it.makeOptional() else it
                     }
                 }
             }

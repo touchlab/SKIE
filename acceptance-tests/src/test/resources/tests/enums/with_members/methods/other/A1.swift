@@ -48,6 +48,8 @@ for (index, value) in allValues.enumerated() {
     value.closureSingleParamReturnInt { p1 in p1 }
     value.closureTwoParamsReturnString { p1, p2 in p2 }
 
+    value.optionalReturningFun()
+
     switch value {
     case .a1:
         assert(index == 0)
