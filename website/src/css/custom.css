@@ -24,6 +24,53 @@
     opacity: .9;
 }
 
+html[data-theme='dark'] .language-swift{
+    background-color: #25252a !important;
+}
+
+html[data-theme='dark'] .language-swift .function {
+    color: #aa85e5 !important;
+}
+
+html[data-theme='dark'] .language-swift .function-definition {
+    color: #89ddfb !important;
+}
+
+html[data-theme='dark'] .language-swift .string-literal {
+    color: #ef8876 !important;
+}
+
+html[data-theme='dark'] .language-swift .string-literal.interpolation {
+    color: white !important;
+}
+
+html[data-theme='dark'] .language-swift .interpolation-punctuation.punctuation {
+    color: white !important;
+}
+
+html[data-theme='dark'] .language-swift .token.class-name {
+    color: #89ddfb !important;
+}
+
+html[data-theme='dark'] .language-swift .token.plain {
+    color: white !important;
+}
+
+html[data-theme='dark'] .language-swift .keyword {
+    font-weight: bold;
+    color: #ef82b0 !important;
+}
+
+html[data-theme='dark'] .language-swift .boolean {
+    font-weight: bold;
+    color: #ef82b0 !important;
+}
+
+html[data-theme='dark'] .language-swift .punctuation + .class-name {
+    font-weight: bold;
+    color: white !important;
+}
+
 /* You can override the default Infima variables here. */
 :root {
     /*--ifm-color-primary: #007521;*/
