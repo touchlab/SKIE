@@ -5,12 +5,16 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
 sealed interface NativeKotlinType {
+    data class Nullable(val type: NativeKotlinType): NativeKotlinType
+
     data class BlockPointer(val parameterTypes: List<NativeKotlinType>, val returnType: NativeKotlinType) : NativeKotlinType
 
     sealed interface Reference : NativeKotlinType {
         sealed interface Known : Reference {
             object String : Known
             object Unit : Known
+
+            object Nothing : Known
             sealed interface Array : Known {
                 data class Primitive(val elementType: PrimitiveType) : Array
                 data class Generic(val elementType: NativeKotlinType) : Array
@@ -22,6 +26,13 @@ sealed interface NativeKotlinType {
             data class MutableSet(val elementType: NativeKotlinType) : Known
             data class Map(val keyType: NativeKotlinType, val valueType: NativeKotlinType) : Known
             data class MutableMap(val keyType: NativeKotlinType, val valueType: NativeKotlinType) : Known
+
+            data class SuspendFunction(
+                val kotlinType: KotlinType,
+                val descriptor: ClassDescriptor,
+                val parameterTypes: kotlin.collections.List<NativeKotlinType>,
+                val returnType: NativeKotlinType,
+            ) : Known
         }
 
         data class TypeParameter(val name: String) : Reference

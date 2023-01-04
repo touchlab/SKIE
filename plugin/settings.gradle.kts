@@ -27,6 +27,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "plugin"
 
+includeBuild("../swiftpoet")
+
 include(
     ":api",
     ":spi",

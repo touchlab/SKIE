@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.api
 
 import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.type.KotlinTypeSpecUsage
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.PropertySpec
@@ -17,6 +18,8 @@ interface SwiftPoetScope : SwiftScope {
     val KotlinType.native: NativeKotlinType
 
     fun KotlinType.spec(kind: KotlinTypeSpecKind): TypeName
+
+    fun KotlinType.spec(usage: KotlinTypeSpecUsage): TypeName
 
     fun PrimitiveType.spec(kind: KotlinTypeSpecKind): TypeName
 

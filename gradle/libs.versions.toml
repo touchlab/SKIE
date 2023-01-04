@@ -22,7 +22,8 @@ plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-p
 kotlin-native-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-native-compiler-embeddable", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
-swiftPoet = { module = "io.outfoxx:swiftpoet", version = "1.4.3" }
+swiftPoet = { module = "co.touchlab.fork.swiftpoet:swiftpoet", version = "1.5.0-SNAPSHOT" }
+kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.12.0" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
