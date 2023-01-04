@@ -30,7 +30,7 @@ To use these annotations you need to add a dependency in `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("co.touchlab.skie:skie-generator-configuration-annotations:{LATEST_GITHUB_VERSION}")
+    implementation("co.touchlab.skie:skie-generator-configuration-annotations:{{LATEST_GITHUB_VERSION}}")
 }
 ```
 

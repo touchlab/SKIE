@@ -9,3 +9,7 @@ tasks.register("clean", Delete::class.java) {
 tasks.register("cleanAll") {
     dependsOn(allprojects.mapNotNull { it.tasks.findByName("clean") })
 }
+
+docusaurusOss{
+    destination.set(projectDir)
+}
