@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.datastruct
 
-import co.touchlab.skie.plugin.api.NativeKotlinType
-import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
+import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DOUBLE

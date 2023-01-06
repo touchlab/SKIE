@@ -1,8 +1,9 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
-import co.touchlab.skie.plugin.api.SkieModule
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeIdentifier
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
@@ -42,7 +43,7 @@ internal class KotlinSuspendGeneratorDelegate(
 
     private fun hideBridgingFunction(functionDescriptor: FunctionDescriptor) {
         module.configure {
-            functionDescriptor.isHiddenFromSwift = true
+            functionDescriptor.swiftModel.visibility = SwiftModelVisibility.Hidden
         }
     }
 

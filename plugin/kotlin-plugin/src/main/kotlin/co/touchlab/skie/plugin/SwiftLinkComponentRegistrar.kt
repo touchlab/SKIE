@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.api.impl.DefaultSkieContext
-import co.touchlab.skie.api.impl.DefaultSkieModule
+import co.touchlab.skie.api.DefaultSkieContext
+import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SwiftGenIrGenerationExtension

@@ -1,7 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.runtime
 
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
+import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class KotlinRuntimeHidingPhase(
@@ -10,12 +11,12 @@ internal class KotlinRuntimeHidingPhase(
 
     override val isActive: Boolean = true
 
-    override fun execute(descriptorProvider: DescriptorProvider) {
+    override fun execute(descriptorProvider: NativeDescriptorProvider) {
         skieContext.module.configure {
             descriptorProvider.classDescriptors
                 .filter { it.belongsToSkieRuntime }
                 .forEach {
-                    it.isHiddenFromSwift = true
+                    it.swiftModel.visibility = SwiftModelVisibility.Hidden
                 }
         }
     }

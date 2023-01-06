@@ -5,8 +5,8 @@ import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
+import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.isSealed
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -23,7 +23,7 @@ internal class SealedInteropGenerator(
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
 
-    override fun execute(descriptorProvider: DescriptorProvider) {
+    override fun execute(descriptorProvider: NativeDescriptorProvider) {
         descriptorProvider.exportedClassDescriptors
             .filter { it.shouldHaveSealedInterop }
             .forEach {

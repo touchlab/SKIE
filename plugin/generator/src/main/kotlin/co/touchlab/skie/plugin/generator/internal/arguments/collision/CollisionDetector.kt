@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.arguments.collision
 
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter

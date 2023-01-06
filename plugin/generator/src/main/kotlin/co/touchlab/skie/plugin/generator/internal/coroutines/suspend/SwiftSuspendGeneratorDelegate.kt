@@ -1,8 +1,10 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
-import co.touchlab.skie.plugin.api.SkieModule
-import co.touchlab.skie.plugin.api.SwiftPoetScope
-import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.function.name
+import co.touchlab.skie.plugin.api.model.function.reference
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.module.SkieModule
+import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import io.outfoxx.swiftpoet.AttributeSpec
@@ -17,11 +19,8 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.descriptors.getTopLevelContainingClassifier
 import org.jetbrains.kotlin.descriptors.isTopLevelInPackage
 import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.extractTypeParameters
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 internal class SwiftSuspendGeneratorDelegate(
@@ -38,7 +37,7 @@ internal class SwiftSuspendGeneratorDelegate(
 
         module.generateCode(originalFunctionDescriptor) {
             addExtension(
-                ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(originalFunctionDescriptor.swiftName.receiverName.qualifiedName))
+                ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(originalFunctionDescriptor.swiftModel.receiver.stableFqName))
                     .addModifiers(Modifier.PUBLIC)
                     .addSwiftBridgingFunction(originalFunctionDescriptor, kotlinBridgingFunctionDescriptor)
                     .build()
@@ -62,7 +61,7 @@ internal class SwiftSuspendGeneratorDelegate(
     ): ExtensionSpec.Builder =
         this.apply {
             addFunction(
-                FunctionSpec.builder(originalFunctionDescriptor.swiftName.name)
+                FunctionSpec.builder(originalFunctionDescriptor.swiftWrapperFunctionIdentifier)
                     .setScope(originalFunctionDescriptor)
                     .addAttribute(AttributeSpec.available("iOS" to "13", "macOS" to "10.15", "watchOS" to "6", "tvOS" to "13", "*" to ""))
                     .async(true)
@@ -72,6 +71,14 @@ internal class SwiftSuspendGeneratorDelegate(
                     .addFunctionBody(originalFunctionDescriptor, kotlinBridgingFunctionDescriptor)
                     .build()
             )
+        }
+
+    context(SwiftPoetScope)
+    private val FunctionDescriptor.swiftWrapperFunctionIdentifier: String
+        get() {
+            val suffixForPreventingCollisions = this.swiftModel.name.removeSuffix(":)").takeLastWhile { it == '_' }
+
+            return this.swiftModel.identifier + suffixForPreventingCollisions
         }
 
     private fun FunctionSpec.Builder.setScope(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
@@ -126,8 +133,8 @@ internal class SwiftSuspendGeneratorDelegate(
                     .apply {
                         addStatement(
                             "%N.%N(${originalFunctionDescriptor.valueParametersPlaceholders})",
-                            kotlinBridgingFunction.swiftName.receiverName.qualifiedName,
-                            kotlinBridgingFunction.swiftName.reference,
+                            kotlinBridgingFunction.swiftModel.receiver.stableFqName,
+                            kotlinBridgingFunction.swiftModel.reference,
                             *originalFunctionDescriptor.argumentsForBridgingCall.toTypedArray(),
                         )
                     }

@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
-import co.touchlab.skie.plugin.api.SkieModule
-import co.touchlab.skie.plugin.api.SwiftPoetScope
-import co.touchlab.skie.plugin.api.util.typeAliasSpec
+import co.touchlab.skie.plugin.api.module.SkieModule
+import co.touchlab.skie.plugin.api.module.SwiftPoetScope
+import co.touchlab.skie.plugin.api.module.stableSpec
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.ParameterizedTypeName
@@ -20,8 +20,9 @@ internal interface SwiftPoetExtensionContainer {
     val DeclarationDescriptor.kotlinName: String
         get() = this.fqNameSafe.asString()
 
-    val ClassDescriptor.swiftNameWithTypeParameters: TypeName
-        get() = this.typeAliasSpec.withTypeParameters(this)
+    // Cannot use context because of bug in implementation
+    fun SwiftPoetScope.swiftNameWithTypeParameters(declaration: ClassDescriptor): TypeName =
+        declaration.stableSpec.withTypeParameters(declaration)
 
     fun DeclaredTypeName.withTypeParameters(declaration: ClassDescriptor): TypeName =
         this.withTypeParameters(declaration.swiftTypeVariablesNames)

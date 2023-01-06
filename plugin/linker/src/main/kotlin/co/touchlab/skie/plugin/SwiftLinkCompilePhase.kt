@@ -1,14 +1,16 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.api.impl.DefaultMutableSwiftScope
-import co.touchlab.skie.api.impl.DefaultSkieModule
+import co.touchlab.skie.api.DefaultSkieModule
+import co.touchlab.skie.api.apinotes.builder.ApiNotes
+import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
+import co.touchlab.skie.api.model.DefaultSwiftModelScope
+import co.touchlab.skie.api.model.DefaultSwiftPoetScope
+import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
-import io.outfoxx.swiftpoet.DeclaredTypeName
-import io.outfoxx.swiftpoet.FileSpec
-import io.outfoxx.swiftpoet.Modifier
-import io.outfoxx.swiftpoet.TypeAliasSpec
+import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
 import org.jetbrains.kotlin.backend.konan.KonanConfig
@@ -41,12 +43,16 @@ class SwiftLinkCompilePhase(
         }
 
         val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
-        val transformAccumulator = TransformAccumulator(namer)
-        val swiftScope = DefaultMutableSwiftScope(namer, transformAccumulator)
+        val swiftModelScope = DefaultSwiftModelScope(namer, context.descriptorProvider)
+        val swiftPoetScope = DefaultSwiftPoetScope(swiftModelScope, namer)
         val skieModule = context.skieContext.module as DefaultSkieModule
-        skieModule.consumeConfigureBlocks(swiftScope)
-        transformAccumulator.close()
-        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftScope)
+        skieModule.consumeConfigureBlocks(swiftModelScope)
+
+        val apiNotes = ApiNotesFactory(framework.moduleName, context.descriptorProvider, namer.mapper, swiftModelScope).create()
+
+        apiNotes.createTypeAliasesForBridgingFile(skieModule)
+
+        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftPoetScope)
         val swiftTextFiles = skieModule.produceTextFiles()
 
         val newFiles = swiftFileSpecs.map { fileSpec ->
@@ -59,14 +65,10 @@ class SwiftLinkCompilePhase(
             file
         }
 
-        val bridgeTypeAliasesFile = createBridgeTypeAliasesFileIfNeeded(transformAccumulator, swiftSourcesDir)
-
-        val sourceFiles = listOfNotNull(bridgeTypeAliasesFile) + skieContext.swiftSourceFiles + newFiles
-
-        val apiNotesBuilder = ApiNotesBuilder(transformAccumulator, namer, framework.moduleName)
+        val sourceFiles = skieContext.swiftSourceFiles + newFiles
 
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
-            apiNotesBuilder.save(framework.headersDir, false)
+            apiNotes.withoutBridging().createApiNotesFile(framework)
 
             val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
 
@@ -81,41 +83,19 @@ class SwiftLinkCompilePhase(
             emptyList()
         }
 
-        apiNotesBuilder.save(framework.headersDir, true)
+        apiNotes.createApiNotesFile(framework)
 
         disableWildcardExportIfNeeded(framework)
 
         return swiftObjectPaths
     }
 
-    private fun createBridgeTypeAliasesFileIfNeeded(
-        transformAccumulator: TransformAccumulator,
-        swiftSourcesDir: File,
-    ): File? {
-        val bridgeTypealiases = transformAccumulator.typeTransforms.mapNotNull { (_, transform) ->
-            val bridgedName = transform.bridge ?: return@mapNotNull null
-            if (!bridgedName.needsTypeAlias) {
-                return@mapNotNull null
-            }
-            TypeAliasSpec.builder(bridgedName.typeAliasName, DeclaredTypeName.qualifiedLocalTypeName(bridgedName.qualifiedName))
-                .addModifiers(Modifier.PUBLIC)
-                .build()
-        }
+    private fun ApiNotes.createApiNotesFile(framework: FrameworkLayout) {
+        val content = this.createApiNotesFileContent()
 
-        if (bridgeTypealiases.isEmpty()) {
-            return null
-        }
+        val apiNotesFile = framework.headersDir.resolve("${framework.moduleName}.apinotes")
 
-        val file = swiftSourcesDir.resolve("__ObjCBridgeTypeAliases.swift")
-        FileSpec.builder("__ObjCBridgeTypeAliases")
-            .apply {
-                bridgeTypealiases.forEach { addType(it) }
-            }
-            .build()
-            .toString()
-            .also { file.writeText(it) }
-
-        return file
+        apiNotesFile.writeText(content)
     }
 
     private fun compileSwift(

@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
-import co.touchlab.skie.plugin.api.SwiftPoetScope
+import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeString
 import io.outfoxx.swiftpoet.CodeBlock
@@ -45,13 +45,14 @@ internal class SealedFunctionGeneratorDelegate(
     private val ClassDescriptor.enumConstructorParameterName: String
         get() = this.getConfiguration(SealedInterop.Function.ParameterName)
 
+    context(SwiftPoetScope)
     private val ClassDescriptor.enumGenericTypeParameter: TypeVariableName
         get() {
             val otherTypeNames = this.swiftTypeVariablesNames.map { it.name }
 
             val typeName = createCollisionFreeString("SEALED") { it in otherTypeNames }
 
-            return TypeVariableName.typeVariable(typeName).withBounds(TypeVariableName.bound(this.swiftNameWithTypeParameters))
+            return TypeVariableName.typeVariable(typeName).withBounds(TypeVariableName.bound(swiftNameWithTypeParameters(this)))
         }
 
     context(SwiftPoetScope)

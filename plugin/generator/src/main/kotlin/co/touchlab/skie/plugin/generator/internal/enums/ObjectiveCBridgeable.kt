@@ -1,7 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.enums
 
-import co.touchlab.skie.plugin.api.SwiftPoetScope
-import co.touchlab.skie.plugin.api.util.typeAliasSpec
+import co.touchlab.skie.plugin.api.model.type.simpleName
+import co.touchlab.skie.plugin.api.module.SwiftPoetScope
+import co.touchlab.skie.plugin.api.module.stableSpec
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -23,7 +24,7 @@ internal object ObjectiveCBridgeable {
         addSuperType(DeclaredTypeName("Swift", "_ObjectiveCBridgeable"))
 
         addType(
-            TypeAliasSpec.builder("_ObjectiveCType", declaration.typeAliasSpec)
+            TypeAliasSpec.builder("_ObjectiveCType", declaration.stableSpec)
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
@@ -46,7 +47,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_bridgeToObjectiveC")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(declaration.typeAliasSpec)
+                .returns(declaration.stableSpec)
                 .addCode(
                     CodeBlock.builder()
                         .beginControlFlow("switch", "self")
@@ -54,9 +55,9 @@ internal object ObjectiveCBridgeable {
                             declaration.enumEntries.map {
                                 CodeBlock.of(
                                     "case .%N: return %T.%N",
-                                    it.swiftName.simpleName,
-                                    declaration.typeAliasSpec,
-                                    it.swiftName.simpleName,
+                                    it.swiftModel.simpleName,
+                                    declaration.stableSpec,
+                                    it.swiftModel.simpleName,
                                 )
                             }.joinToCode("\n", suffix = "\n")
                         )
@@ -72,7 +73,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_forceBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", declaration.typeAliasSpec)
+                .addParameter("_", "source", declaration.stableSpec)
                 .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
                 .addStatement("result = fromObjectiveC(source)")
                 .build()
@@ -84,7 +85,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_conditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", declaration.typeAliasSpec)
+                .addParameter("_", "source", declaration.stableSpec)
                 .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
                 .addStatement("result = fromObjectiveC(source)")
                 .addStatement("return true")
@@ -98,7 +99,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("_unconditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", declaration.typeAliasSpec.makeOptional())
+                .addParameter("_", "source", declaration.stableSpec.makeOptional())
                 .addStatement("return fromObjectiveC(source)")
                 .returns(SelfTypeName.INSTANCE)
                 .build()
@@ -112,7 +113,7 @@ internal object ObjectiveCBridgeable {
         addFunction(
             FunctionSpec.builder("fromObjectiveC")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                .addParameter("_", "source", declaration.typeAliasSpec.makeOptional())
+                .addParameter("_", "source", declaration.stableSpec.makeOptional())
                 .addCode(
                     CodeBlock.builder()
                         .beginControlFlow("switch", "source")
@@ -120,8 +121,8 @@ internal object ObjectiveCBridgeable {
                             declaration.enumEntries.map {
                                 CodeBlock.of(
                                     "case .%N?: return .%N",
-                                    it.swiftName.simpleName,
-                                    it.swiftName.simpleName,
+                                    it.swiftModel.simpleName,
+                                    it.swiftModel.simpleName,
                                 )
                             }.joinToCode("\n", suffix = "\n")
                         )

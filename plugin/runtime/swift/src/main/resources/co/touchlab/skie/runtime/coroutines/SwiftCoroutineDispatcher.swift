@@ -4,9 +4,9 @@ import Foundation
 public struct SwiftCoroutineDispatcher {
 
     public static func dispatch<T>(
-        coroutine: (Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void
+        coroutine: (Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void
     ) async throws -> T {
-        let cancellationHandler = Skie.co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler()
+        let cancellationHandler = Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler()
 
         return try await withTaskCancellationHandler(operation: {
             try await dispatchCancellable(coroutine: coroutine, cancellationHandler: cancellationHandler)
@@ -16,8 +16,8 @@ public struct SwiftCoroutineDispatcher {
     }
 
     private static func dispatchCancellable<T>(
-        coroutine: (Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void,
-        cancellationHandler: Skie.co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler
+        coroutine: (Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void,
+        cancellationHandler: Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler
     ) async throws -> T {
         var result: Result<T, Error>? = nil
 
@@ -31,14 +31,14 @@ public struct SwiftCoroutineDispatcher {
     }
 
     private static func createDispatcher<T>(
-        coroutine: (Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void,
-        cancellationHandler: Skie.co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler,
+        coroutine: (Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void,
+        cancellationHandler: Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler,
         onResult: @escaping (Result<T, Error>) -> Void
-    ) -> AsyncStream<Skie.kotlinx_coroutines_Runnable> {
-        return AsyncStream<Skie.kotlinx_coroutines_Runnable> { continuation in
+    ) -> AsyncStream<Skie.org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> {
+        return AsyncStream<Skie.org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> { continuation in
             let dispatcherDelegate = AsyncStreamDispatcherDelegate(continuation: continuation)
 
-            let suspendHandler = Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler(
+            let suspendHandler = Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler(
                 cancellationHandler: cancellationHandler,
                 dispatcherDelegate: dispatcherDelegate,
                 onResult: { suspendResult in
@@ -55,24 +55,24 @@ public struct SwiftCoroutineDispatcher {
     }
 
     private static func convertToResult<T>(
-        suspendResult: Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendResult
+        suspendResult: Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendResult
     ) -> Result<T, Error> {
-        if let suspendResult = suspendResult as? Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Success {
+        if let suspendResult = suspendResult as? Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Success {
             if T.self == Swift.Void.self {
                 return .success(Swift.Void() as! T)
             } else {
                 return .success(suspendResult.value as! T)
             }
-        } else if let suspendResult = suspendResult as? Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Error {
+        } else if let suspendResult = suspendResult as? Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Error {
             return .failure(suspendResult.error)
-        } else if suspendResult is Skie.co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Canceled {
+        } else if suspendResult is Skie.co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendResult_Canceled {
             return .failure(CancellationError())
         } else {
             fatalError("Unknown suspend result. This is most likely a bug in SKIE.")
         }
     }
 
-    private static func executeWithoutCancellation(dispatcher: AsyncStream<Skie.kotlinx_coroutines_Runnable>) async {
+    private static func executeWithoutCancellation(dispatcher: AsyncStream<Skie.org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable>) async {
         await Task {
             for await block in dispatcher {
                 block.run()

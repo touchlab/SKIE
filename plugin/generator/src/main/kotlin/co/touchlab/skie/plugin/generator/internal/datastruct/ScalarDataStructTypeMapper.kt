@@ -1,8 +1,9 @@
 package co.touchlab.skie.plugin.generator.internal.datastruct
 
-import co.touchlab.skie.plugin.api.NativeKotlinType
-import co.touchlab.skie.plugin.api.SwiftPoetScope
-import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.property.reference
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
+import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
@@ -17,7 +18,7 @@ object ScalarDataStructTypeMapper : DataStructTypeMapper {
     ): DataStructTypeMapper.Mapping? {
         fun initializerMapping(kotlinName: TypeName, swiftName: TypeName) = DataStructTypeMapper.Mapping(
             swiftTypeName = swiftName,
-            kotlinToSwiftMapping = CodeBlock.of("%T(%N)", swiftName, property.swiftName),
+            kotlinToSwiftMapping = CodeBlock.of("%T(%N)", swiftName, property.swiftModel.reference),
             swiftToKotlinMapping = CodeBlock.of("%T(%N)", kotlinName, parameter.name.asString()),
         )
 

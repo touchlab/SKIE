@@ -10,8 +10,8 @@ import co.touchlab.skie.plugin.generator.internal.runtime.KotlinRuntimeHidingPha
 import co.touchlab.skie.plugin.generator.internal.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
 import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
+import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
@@ -71,7 +71,7 @@ internal class SwiftGenScheduler(
         ),
     )
 
-    fun process(descriptorProvider: DescriptorProvider) {
+    fun process(descriptorProvider: NativeDescriptorProvider) {
         compilationPhases
             .filter { it.isActive }
             .forEach { it.execute(descriptorProvider) }

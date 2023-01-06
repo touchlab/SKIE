@@ -2,8 +2,9 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
@@ -30,7 +31,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     configuration: Configuration,
 ) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
-    override fun generate(descriptorProvider: DescriptorProvider, collisionDetector: CollisionDetector) {
+    override fun generate(descriptorProvider: NativeDescriptorProvider, collisionDetector: CollisionDetector) {
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
@@ -101,7 +102,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     private fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
         skieContext.module.configure {
-            overloadDescriptor.swiftName.name = function.swiftName.name
+            overloadDescriptor.swiftModel.identifier = function.swiftModel.identifier
         }
     }
 }

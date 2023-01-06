@@ -5,16 +5,20 @@ package co.touchlab.skie.plugin.generator.internal.enums
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.SwiftPoetScope
-import co.touchlab.skie.plugin.api.type.KotlinTypeSpecKind
-import co.touchlab.skie.plugin.api.type.SwiftBridgedName
+import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.function.reference
+import co.touchlab.skie.plugin.api.model.property.reference
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.type.packageName
+import co.touchlab.skie.plugin.api.model.type.simpleName
+import co.touchlab.skie.plugin.api.module.SwiftPoetScope
+import co.touchlab.skie.plugin.api.module.stableSpec
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
-import co.touchlab.skie.plugin.api.util.typeAliasSpec
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
+import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
@@ -50,7 +54,7 @@ internal class ExhaustiveEnumsGenerator(
 
     override val isActive: Boolean = true
 
-    override fun execute(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
+    override fun execute(descriptorProvider: NativeDescriptorProvider): Unit = with(descriptorProvider) {
         exportedClassDescriptors
             .filter(::shouldGenerateExhaustiveEnums)
             .forEach {
@@ -58,17 +62,17 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(DescriptorProvider) private fun generate(declaration: ClassDescriptor) {
+    context(NativeDescriptorProvider)
+    private fun generate(declaration: ClassDescriptor) {
         module.configure {
-            declaration.isHiddenFromSwift = true
+            declaration.swiftModel.visibility = SwiftModelVisibility.Replaced
 
-            val swiftName = declaration.swiftName
-            declaration.swiftBridgeType = SwiftBridgedName(swiftName.parent, swiftName.originalSimpleName)
+            declaration.swiftModel.bridge = declaration.swiftModel.original
         }
 
         module.generateCode(declaration) {
-            val extensionName = declaration.swiftName.qualifiedName.substringBeforeLast('.', "")
-            val declarationName = declaration.swiftName.originalQualifiedName.substringAfterLast('.')
+            val extensionName = declaration.swiftModel.bridge!!.packageName
+            val declarationName = declaration.swiftModel.bridge!!.identifier
 
             val enumDeclaration = TypeSpec.enumBuilder(declarationName)
                 .apply {
@@ -76,7 +80,7 @@ internal class ExhaustiveEnumsGenerator(
                     addModifiers(Modifier.PUBLIC)
 
                     declaration.enumEntries.forEach {
-                        addEnumCase(it.swiftName.simpleName)
+                        addEnumCase(it.swiftModel.simpleName)
                     }
 
                     addNestedClassTypeAliases(declaration)
@@ -105,14 +109,14 @@ internal class ExhaustiveEnumsGenerator(
     private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
         declaration.nestedClasses.forEach {
             addType(
-                TypeAliasSpec.builder(it.name.asString(), it.typeAliasSpec)
+                TypeAliasSpec.builder(it.name.asString(), it.stableSpec)
                     .addModifiers(Modifier.PUBLIC)
                     .build()
             )
         }
     }
 
-    context(DescriptorProvider, SwiftPoetScope)
+    context(NativeDescriptorProvider, SwiftPoetScope)
     private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
@@ -131,7 +135,7 @@ internal class ExhaustiveEnumsGenerator(
                                 .addStatement(
                                     "return %L(self as _ObjectiveCType).%N",
                                     if (mapper.doesThrow(property.getter!!)) "try " else "",
-                                    property.swiftName,
+                                    property.swiftModel.reference,
                                 )
                                 .build()
                         )
@@ -147,7 +151,7 @@ internal class ExhaustiveEnumsGenerator(
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
                                             if (mapper.doesThrow(property.setter!!)) "try " else "",
-                                            property.swiftName,
+                                            property.swiftModel.reference,
                                         )
                                         .build()
                                 )
@@ -158,7 +162,7 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(DescriptorProvider, SwiftPoetScope)
+    context(NativeDescriptorProvider, SwiftPoetScope)
     private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
@@ -176,7 +180,7 @@ internal class ExhaustiveEnumsGenerator(
                 }
 
                 addFunction(
-                    FunctionSpec.builder(function.swiftName.name)
+                    FunctionSpec.builder(function.swiftModel.identifier)
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
                             function.returnType?.let { returnType ->
@@ -202,7 +206,7 @@ internal class ExhaustiveEnumsGenerator(
                         .addStatement(
                             "return %L(self as _ObjectiveCType).%N(%L)",
                             if (mapper.doesThrow(function)) "try " else "",
-                            function.swiftName.reference,
+                            function.swiftModel.reference,
                             function.valueParameters.map { CodeBlock.of("%N", it.name.asString()) }.joinToCode(", "),
                         )
                         .build()

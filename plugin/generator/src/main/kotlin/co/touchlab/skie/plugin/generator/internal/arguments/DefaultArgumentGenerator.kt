@@ -1,3 +1,5 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin.generator.internal.arguments
 
 import co.touchlab.skie.configuration.Configuration
@@ -7,7 +9,7 @@ import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ClassMethod
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ConstructorsDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ExtensionFunctionDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.TopLevelFunctionDefaultArgumentGeneratorDelegate
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 
@@ -26,7 +28,7 @@ internal class DefaultArgumentGenerator(
         ExtensionFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
     )
 
-    override fun execute(descriptorProvider: DescriptorProvider) {
+    override fun execute(descriptorProvider: NativeDescriptorProvider) {
         val collisionDetector = CollisionDetector(descriptorProvider)
 
         delegates.forEach {

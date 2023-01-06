@@ -3,11 +3,12 @@ package co.touchlab.skie.plugin.generator.internal.datastruct
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.DataStruct
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.util.typeAliasSpec
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.module.stableSpec
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
-import co.touchlab.skie.plugin.generator.internal.util.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
+import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -35,7 +36,7 @@ internal class DataStructGenerator(
 
     override val isActive: Boolean = true
 
-    override fun execute(descriptorProvider: DescriptorProvider): Unit = with(descriptorProvider) {
+    override fun execute(descriptorProvider: NativeDescriptorProvider): Unit = with(descriptorProvider) {
         exportedClassDescriptors
             .filter {
                 it.getConfiguration(DataStruct.Enabled) && it.isData && !it.belongsToSkieRuntime
@@ -100,11 +101,11 @@ internal class DataStructGenerator(
                         .build()
                 )
                 .addProperty(
-                    PropertySpec.builder("unbridged", declaration.typeAliasSpec, Modifier.PUBLIC)
+                    PropertySpec.builder("unbridged", declaration.stableSpec, Modifier.PUBLIC)
                         .getter(
                             FunctionSpec.getterBuilder()
                                 .addCode(
-                                    "%T(%L)\n", declaration.typeAliasSpec,
+                                    "%T(%L)\n", declaration.stableSpec,
                                     parametersWithMappings.map { (parameter, mapping) ->
                                         CodeBlock.of(
                                             "%N: %L",
@@ -120,14 +121,14 @@ internal class DataStructGenerator(
                 .build()
 
             addExtension(
-                ExtensionSpec.builder(declaration.typeAliasSpec)
+                ExtensionSpec.builder(declaration.stableSpec)
                     .addModifiers(Modifier.PUBLIC)
                     .addProperty(
-                        PropertySpec.builder("bridged", declaration.typeAliasSpec.nestedType("Bridge"))
+                        PropertySpec.builder("bridged", declaration.stableSpec.nestedType("Bridge"))
                             .getter(
                                 FunctionSpec.getterBuilder()
                                     .addCode(
-                                        "%T(%L)\n", declaration.typeAliasSpec.nestedType("Bridge"),
+                                        "%T(%L)\n", declaration.stableSpec.nestedType("Bridge"),
                                         parametersWithMappings.map { (parameter, mapping) ->
                                             CodeBlock.of(
                                                 "%N: %L",
