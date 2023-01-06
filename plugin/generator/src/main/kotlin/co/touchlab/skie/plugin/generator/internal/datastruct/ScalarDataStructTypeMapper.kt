@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.datastruct
 
 import co.touchlab.skie.plugin.api.model.property.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import io.outfoxx.swiftpoet.CodeBlock
@@ -25,7 +26,7 @@ object ScalarDataStructTypeMapper : DataStructTypeMapper {
         return when (val nativeType = property.type.native) {
             NativeKotlinType.Value.BOOL -> DataStructTypeMapper.Mapping(swiftTypeName = SwiftType.bool)
             is NativeKotlinType.Value -> {
-                initializerMapping(nativeType.spec(KotlinTypeSpecKind.BRIDGED), nativeType.swiftPrimitiveType)
+                initializerMapping(nativeType.spec(KotlinTypeSpecUsage), nativeType.swiftPrimitiveType)
             }
             NativeKotlinType.Reference.Known.String -> DataStructTypeMapper.Mapping(swiftTypeName = STRING)
             // type.isDataStruct() -> DataStructTypeMapper.Mapping(

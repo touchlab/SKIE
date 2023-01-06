@@ -149,11 +149,9 @@ internal class DefaultSwiftPoetScope(
             }
         }
 
-    override fun KotlinType.spec(kind: KotlinTypeSpecKind): TypeName = native.spec(kind)
-
     override fun KotlinType.spec(usage: KotlinTypeSpecUsage): TypeName = native.spec(usage)
 
-    override fun PrimitiveType.spec(kind: KotlinTypeSpecKind): TypeName = when (this) {
+    override fun PrimitiveType.spec(usage: KotlinTypeSpecUsage): TypeName = when (this) {
         PrimitiveType.BOOLEAN -> NativeKotlinType.Value.BOOL
         PrimitiveType.CHAR -> NativeKotlinType.Value.UNICHAR
         PrimitiveType.BYTE -> NativeKotlinType.Value.CHAR
@@ -162,7 +160,80 @@ internal class DefaultSwiftPoetScope(
         PrimitiveType.LONG -> NativeKotlinType.Value.LONG_LONG
         PrimitiveType.FLOAT -> NativeKotlinType.Value.FLOAT
         PrimitiveType.DOUBLE -> NativeKotlinType.Value.DOUBLE
-    }.spec(kind)
+    }.spec(usage)
+
+    override fun NativeKotlinType.spec(usage: KotlinTypeSpecUsage): TypeName {
+        val path = when (usage) {
+            KotlinTypeSpecUsage -> listOf(
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.ParameterType -> listOf(
+                KotlinTypeSpecUsage.ParameterType,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.ParameterType.Lambda -> listOf(
+                KotlinTypeSpecUsage.ParameterType.Lambda,
+                KotlinTypeSpecUsage.ParameterType,
+                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.ReturnType -> listOf(
+                KotlinTypeSpecUsage.ReturnType,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.ReturnType.Lambda -> listOf(
+                KotlinTypeSpecUsage.ReturnType.Lambda,
+                KotlinTypeSpecUsage.ReturnType,
+                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.ReturnType.SuspendFunction -> listOf(
+                KotlinTypeSpecUsage.ReturnType.SuspendFunction,
+                KotlinTypeSpecUsage.ReturnType,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.TypeParam -> listOf(
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.TypeParam.IsHashable -> listOf(
+                KotlinTypeSpecUsage.TypeParam.IsHashable,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.TypeParam.IsReference -> listOf(
+                KotlinTypeSpecUsage.TypeParam.IsReference,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.TypeParam.OptionalWrapped -> listOf(
+                KotlinTypeSpecUsage.TypeParam.OptionalWrapped,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement -> listOf(
+                KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement,
+                KotlinTypeSpecUsage.TypeParam.IsReference,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+            KotlinTypeSpecUsage.TypeParam.AllowingNullability -> listOf(
+                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
+                KotlinTypeSpecUsage.TypeParam,
+                KotlinTypeSpecUsage,
+            )
+
+        }
+
+        path.forEach {
+            exactSpec(it)?.let { return it }
+        }
+
+        error("No spec for $this with usage $usage")
+    }
 
     fun NativeKotlinType.exactSpec(usage: KotlinTypeSpecUsage): TypeName? {
         val anyHashable = DeclaredTypeName("Swift", "AnyHashable")
@@ -351,175 +422,8 @@ internal class DefaultSwiftPoetScope(
         }
     }
 
-    fun NativeKotlinType.spec(usage: KotlinTypeSpecUsage): TypeName {
-        val path = when (usage) {
-            KotlinTypeSpecUsage -> listOf(
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.ParameterType -> listOf(
-                KotlinTypeSpecUsage.ParameterType,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.ParameterType.Lambda -> listOf(
-                KotlinTypeSpecUsage.ParameterType.Lambda,
-                KotlinTypeSpecUsage.ParameterType,
-                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.ReturnType -> listOf(
-                KotlinTypeSpecUsage.ReturnType,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.ReturnType.Lambda -> listOf(
-                KotlinTypeSpecUsage.ReturnType.Lambda,
-                KotlinTypeSpecUsage.ReturnType,
-                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.ReturnType.SuspendFunction -> listOf(
-                KotlinTypeSpecUsage.ReturnType.SuspendFunction,
-                KotlinTypeSpecUsage.ReturnType,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.TypeParam -> listOf(
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.TypeParam.IsHashable -> listOf(
-                KotlinTypeSpecUsage.TypeParam.IsHashable,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.TypeParam.IsReference -> listOf(
-                KotlinTypeSpecUsage.TypeParam.IsReference,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.TypeParam.OptionalWrapped -> listOf(
-                KotlinTypeSpecUsage.TypeParam.OptionalWrapped,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement -> listOf(
-                KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement,
-                KotlinTypeSpecUsage.TypeParam.IsReference,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-            KotlinTypeSpecUsage.TypeParam.AllowingNullability -> listOf(
-                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
-            )
-
-        }
-
-        path.forEach {
-            exactSpec(it)?.let { return it }
-        }
-
-        error("No spec for $this with usage $usage")
-    }
-
-    override fun NativeKotlinType.spec(kind: KotlinTypeSpecKind): TypeName {
-        return when (this) {
-            is NativeKotlinType.Nullable -> type.spec(kind).makeOptional()
-            is NativeKotlinType.BlockPointer -> FunctionTypeName.get(
-                parameters = parameterTypes.map { ParameterSpec.unnamed(it.spec(KotlinTypeSpecKind.SWIFT_GENERICS)) },
-                returnType = returnType.spec(KotlinTypeSpecKind.SWIFT_GENERICS),
-            )
-            is NativeKotlinType.Reference -> when (this) {
-                is NativeKotlinType.Reference.Known.Array -> when (this) {
-                    is NativeKotlinType.Reference.Known.Array.Generic -> DeclaredTypeName.typeName(".KotlinArray")
-                        .withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
-                    is NativeKotlinType.Reference.Known.Array.Primitive -> DeclaredTypeName.typeName(".Kotlin${elementType.typeName.asString()}Array")
-                }
-                // TODO List<List<Int>> is not translated correctly
-                is NativeKotlinType.Reference.Known.List -> when (kind) {
-                    KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSArray")
-                    KotlinTypeSpecKind.BRIDGED -> ARRAY.withTypeParameters(elementType, kind = KotlinTypeSpecKind.SWIFT_GENERICS)
-                }
-                is NativeKotlinType.Reference.Known.Set -> when (kind) {
-                    KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSSet")
-                    KotlinTypeSpecKind.BRIDGED -> SET.withTypeParameters(elementType, kind = KotlinTypeSpecKind.SWIFT_GENERICS)
-                }
-                is NativeKotlinType.Reference.Known.Map -> when (kind) {
-                    KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> DeclaredTypeName.typeName("Foundation.NSDictionary")
-                    KotlinTypeSpecKind.BRIDGED -> DICTIONARY.withTypeParameters(
-                        keyType,
-                        valueType,
-                        kind = KotlinTypeSpecKind.SWIFT_GENERICS
-                    )
-                }
-                is NativeKotlinType.Reference.Known.MutableList -> DeclaredTypeName.typeName("Foundation.NSMutableArray")
-                is NativeKotlinType.Reference.Known.MutableMap -> DeclaredTypeName.typeName(".KotlinMutableDictionary")
-                    .withTypeParameters(keyType, valueType, kind = KotlinTypeSpecKind.ORIGINAL)
-                is NativeKotlinType.Reference.Known.MutableSet -> DeclaredTypeName.typeName(".KotlinMutableSet")
-                    .withTypeParameters(elementType, kind = KotlinTypeSpecKind.ORIGINAL)
-                NativeKotlinType.Reference.Known.String -> when (kind) {
-                    KotlinTypeSpecKind.ORIGINAL -> DeclaredTypeName.typeName("Foundation.NSString")
-                    KotlinTypeSpecKind.SWIFT_GENERICS, KotlinTypeSpecKind.BRIDGED -> STRING
-                }
-                NativeKotlinType.Reference.Known.Unit, NativeKotlinType.Reference.Known.Nothing -> VOID
-                is NativeKotlinType.Reference.TypeParameter -> TypeVariableName(name)
-                is NativeKotlinType.Reference.Known.SuspendFunction -> descriptor.spec
-                is NativeKotlinType.Reference.Unknown -> {
-                    if (descriptor.canBeSpecializedInSwift) {
-                        descriptor.spec.withTypeParameters(kotlinType, KotlinTypeSpecKind.ORIGINAL)
-                    } else {
-                        descriptor.spec
-                    }.let {
-                        if (kotlinType.isNullable()) it.makeOptional() else it
-                    }
-                }
-            }
-            is NativeKotlinType.Value -> when (kind) {
-                KotlinTypeSpecKind.ORIGINAL, KotlinTypeSpecKind.SWIFT_GENERICS -> when (this) {
-                    NativeKotlinType.Value.BOOL -> ".KotlinBoolean"
-                    NativeKotlinType.Value.UNICHAR -> return ANY
-                    NativeKotlinType.Value.CHAR -> ".KotlinByte"
-                    NativeKotlinType.Value.SHORT -> ".KotlinShort"
-                    NativeKotlinType.Value.LONG_LONG -> ".KotlinLong"
-                    NativeKotlinType.Value.INT -> ".KotlinInt"
-                    NativeKotlinType.Value.UNSIGNED_CHAR -> ".KotlinUByte"
-                    NativeKotlinType.Value.UNSIGNED_SHORT -> ".KotlinUShort"
-                    NativeKotlinType.Value.UNSIGNED_INT -> ".KotlinUInt"
-                    NativeKotlinType.Value.UNSIGNED_LONG_LONG -> ".KotlinULong"
-                    NativeKotlinType.Value.FLOAT -> ".KotlinFloat"
-                    NativeKotlinType.Value.DOUBLE -> ".KotlinDouble"
-                    NativeKotlinType.Value.POINTER -> TODO("Pointer")
-                }.let(DeclaredTypeName::typeName)
-                KotlinTypeSpecKind.BRIDGED -> when (this) {
-                    NativeKotlinType.Value.BOOL -> BOOL
-                    NativeKotlinType.Value.UNICHAR -> DeclaredTypeName.typeName("Foundation.unichar")
-                    NativeKotlinType.Value.CHAR -> INT8
-                    NativeKotlinType.Value.SHORT -> INT16
-                    NativeKotlinType.Value.INT -> INT32
-                    NativeKotlinType.Value.LONG_LONG -> INT64
-                    NativeKotlinType.Value.UNSIGNED_CHAR -> UINT8
-                    NativeKotlinType.Value.UNSIGNED_SHORT -> UIN16
-                    NativeKotlinType.Value.UNSIGNED_INT -> UINT32
-                    NativeKotlinType.Value.UNSIGNED_LONG_LONG -> UINT64
-                    NativeKotlinType.Value.FLOAT -> FLOAT32
-                    NativeKotlinType.Value.DOUBLE -> FLOAT64
-                    NativeKotlinType.Value.POINTER -> TODO("Pointer")
-                }
-            }
-            NativeKotlinType.Any -> DeclaredTypeName.typeName(".Any")
-        }
-    }
-
     private val ClassDescriptor.canBeSpecializedInSwift: Boolean
         get() = !this.kind.isInterface
-
-    private fun DeclaredTypeName.withTypeParameters(type: KotlinType, kind: KotlinTypeSpecKind): TypeName =
-        this.withTypeParameters(type.arguments.map { it.type.spec(kind) })
-
-    private fun DeclaredTypeName.withTypeParameters(vararg typeParameters: NativeKotlinType, kind: KotlinTypeSpecKind): TypeName =
-        this.withTypeParameters(typeParameters.map { it.spec(kind) })
 
     private fun DeclaredTypeName.withTypeParametersOf(
         type: KotlinType,
@@ -544,7 +448,7 @@ internal class DefaultSwiftPoetScope(
         get() = DeclaredTypeName.qualifiedLocalTypeName(this.swiftModel.fqName)
 
     override val PropertyDescriptor.spec: PropertySpec
-        get() = PropertySpec.builder(this.swiftModel.reference, type.spec(KotlinTypeSpecKind.BRIDGED)).build()
+        get() = PropertySpec.builder(this.swiftModel.reference, type.spec(KotlinTypeSpecUsage)).build()
 
     override val FunctionDescriptor.spec: FunctionSpec
         get() = TODO("Not yet implemented")

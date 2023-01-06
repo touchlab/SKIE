@@ -20,13 +20,11 @@ interface SwiftPoetScope : SwiftModelScope {
 
     val KotlinType.native: NativeKotlinType
 
-    fun KotlinType.spec(kind: KotlinTypeSpecKind): TypeName
+    fun PrimitiveType.spec(usage: KotlinTypeSpecUsage): TypeName
 
     fun KotlinType.spec(usage: KotlinTypeSpecUsage): TypeName
 
-    fun PrimitiveType.spec(kind: KotlinTypeSpecKind): TypeName
-
-    fun NativeKotlinType.spec(kind: KotlinTypeSpecKind): TypeName
+    fun NativeKotlinType.spec(usage: KotlinTypeSpecUsage): TypeName
 
     val ClassDescriptor.spec: DeclaredTypeName
 

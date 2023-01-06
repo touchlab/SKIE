@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.datastruct
 
 import co.touchlab.skie.plugin.api.model.property.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import io.outfoxx.swiftpoet.CodeBlock
@@ -19,7 +20,7 @@ object ListDataStructTypeMapper : DataStructTypeMapper {
             is NativeKotlinType.Reference.Known.MutableList -> nativeType.elementType
             else -> return null
         }
-        val elementGenericType = elementType.spec(KotlinTypeSpecKind.SWIFT_GENERICS)
+        val elementGenericType = elementType.spec(KotlinTypeSpecUsage.TypeParam)
 
         return when (elementType) {
             is NativeKotlinType.Value -> when (elementType) {

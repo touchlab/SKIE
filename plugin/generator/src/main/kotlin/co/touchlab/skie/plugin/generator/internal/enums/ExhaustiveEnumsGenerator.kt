@@ -9,6 +9,7 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.function.reference
 import co.touchlab.skie.plugin.api.model.property.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.packageName
 import co.touchlab.skie.plugin.api.model.type.simpleName
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
@@ -127,7 +128,7 @@ internal class ExhaustiveEnumsGenerator(
                 addProperty(
                     PropertySpec.builder(
                         property.name.asString(),
-                        property.type.spec(KotlinTypeSpecKind.BRIDGED)
+                        property.type.spec(KotlinTypeSpecUsage)
                     )
                         .addModifiers(Modifier.PUBLIC)
                         .getter(
@@ -146,7 +147,7 @@ internal class ExhaustiveEnumsGenerator(
                                         .addModifiers(Modifier.NONMUTATING)
                                         .addParameter(
                                             "value",
-                                            property.type.spec(KotlinTypeSpecKind.BRIDGED)
+                                            property.type.spec(KotlinTypeSpecUsage.ParameterType)
                                         )
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
@@ -184,20 +185,15 @@ internal class ExhaustiveEnumsGenerator(
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
                             function.returnType?.let { returnType ->
-                                returns(returnType.spec(KotlinTypeSpecKind.BRIDGED))
+                                returns(returnType.spec(KotlinTypeSpecUsage.ReturnType))
                             }
                             function.valueParameters.forEach { parameter ->
-                                val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecKind.BRIDGED)
+                                val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
                                 addParameter(
                                     ParameterSpec.builder(
                                         parameter.name.asString(),
                                         parameterTypeSpec,
-                                    ).apply {
-                                        if (parameterTypeSpec is FunctionTypeName) {
-                                            addAttribute(AttributeSpec.ESCAPING)
-                                        }
-                                    }
-                                        .build()
+                                    ).build()
                                 )
                             }
 

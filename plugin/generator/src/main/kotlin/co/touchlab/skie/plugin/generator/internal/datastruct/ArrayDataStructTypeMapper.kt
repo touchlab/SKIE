@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.datastruct
 
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType.Reference.Known.Array.Primitive
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
@@ -45,7 +46,7 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
             swiftTypeName = ARRAY.parameterizedBy(arrayType.swiftElementType),
             additionalSingletonDeclarations = helpersFor(arrayType),
             kotlinToSwiftMapping = CodeBlock.of("Array(kotlinArray: %N)", propertyName),
-            swiftToKotlinMapping = CodeBlock.of("%T.from(array: %N)", arrayType.spec(KotlinTypeSpecKind.BRIDGED), propertyName),
+            swiftToKotlinMapping = CodeBlock.of("%T.from(array: %N)", arrayType.spec(KotlinTypeSpecUsage.TypeParam), propertyName),
         )
     }
 
@@ -65,8 +66,8 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
                     return emptyList()
                 }
                 is Primitive -> {
-                    val kotlinElementType = arrayType.elementType.spec(KotlinTypeSpecKind.ORIGINAL)
-                    val bridgedElementType = arrayType.elementType.spec(KotlinTypeSpecKind.BRIDGED)
+                    val kotlinElementType = arrayType.elementType.spec(KotlinTypeSpecUsage.TypeParam)
+                    val bridgedElementType = arrayType.elementType.spec(KotlinTypeSpecUsage)
                     val swiftElementType = arrayType.swiftElementType
                     when (arrayType.elementType) {
                         PrimitiveType.BOOLEAN -> CodeBlock.of(
@@ -95,7 +96,7 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
                 }
             }
 
-            val kotlinArrayType = arrayType.spec(KotlinTypeSpecKind.ORIGINAL)
+            val kotlinArrayType = arrayType.spec(KotlinTypeSpecUsage)
             val swiftElementType = arrayType.swiftElementType
             listOf(
                 ExtensionSpec.builder(ARRAY)
@@ -155,12 +156,12 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
                 PrimitiveType.FLOAT, PrimitiveType.DOUBLE -> DOUBLE
                 PrimitiveType.CHAR -> SwiftType.character
             }
-            is NativeKotlinType.Reference.Known.Array.Generic -> elementType.spec(KotlinTypeSpecKind.BRIDGED)
+            is NativeKotlinType.Reference.Known.Array.Generic -> elementType.spec(KotlinTypeSpecUsage)
         }
 
     context(SwiftPoetScope)
     private val NativeKotlinType.Reference.Known.Array.rawKotlinName: DeclaredTypeName
-        get() = when (val typeName = this.spec(KotlinTypeSpecKind.BRIDGED)) {
+        get() = when (val typeName = this.spec(KotlinTypeSpecUsage)) {
             is DeclaredTypeName -> typeName
             is ParameterizedTypeName -> typeName.rawType
             else -> error("Unexpected type: $typeName")

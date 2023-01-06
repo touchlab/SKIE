@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 import co.touchlab.skie.plugin.api.model.function.name
 import co.touchlab.skie.plugin.api.model.function.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
@@ -99,7 +100,7 @@ internal class SwiftSuspendGeneratorDelegate(
     context(SwiftPoetScope)
     private fun FunctionSpec.Builder.addValueParameter(valueParameter: ValueParameterDescriptor): FunctionSpec.Builder =
         this.apply {
-            val parameterTypeSpec = valueParameter.type.spec(KotlinTypeSpecKind.BRIDGED)
+            val parameterTypeSpec = valueParameter.type.spec(KotlinTypeSpecUsage.ParameterType)
 
             val parameterBuilder = ParameterSpec.builder(valueParameter.name.asString(), parameterTypeSpec)
 
@@ -113,11 +114,8 @@ internal class SwiftSuspendGeneratorDelegate(
     context(SwiftPoetScope)
     private fun FunctionSpec.Builder.addReturnType(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
-            if (!originalFunctionDescriptor.returnTypeOrNothing.isUnit()) {
-                val returnType = originalFunctionDescriptor.returnTypeOrNothing.spec(KotlinTypeSpecKind.SWIFT_GENERICS)
-
-                returns(returnType)
-            }
+            val returnType = originalFunctionDescriptor.returnTypeOrNothing.spec(KotlinTypeSpecUsage.ReturnType.SuspendFunction)
+            returns(returnType)
         }
 
     context(SwiftPoetScope)
