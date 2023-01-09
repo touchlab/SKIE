@@ -42,7 +42,6 @@ sealed interface NativeKotlinType {
 
     enum class Value : NativeKotlinType {
         BOOL,
-        UNICHAR,
         CHAR,
         SHORT,
         LONG_LONG,
@@ -53,7 +52,14 @@ sealed interface NativeKotlinType {
         UNSIGNED_LONG_LONG,
         FLOAT,
         DOUBLE,
-        POINTER,
+    }
+
+    object Unichar: NativeKotlinType
+
+    sealed interface Pointer: NativeKotlinType {
+        object NativePtr: Pointer
+
+        object Other: Pointer
     }
 
     object Any : NativeKotlinType

@@ -27,6 +27,7 @@ object ScalarDataStructTypeMapper : DataStructTypeMapper {
             is NativeKotlinType.Value -> {
                 initializerMapping(nativeType.spec(KotlinTypeSpecUsage.Default), nativeType.swiftPrimitiveType)
             }
+            NativeKotlinType.Unichar -> initializerMapping(nativeType.spec(KotlinTypeSpecUsage.Default), SwiftType.character)
             NativeKotlinType.Reference.Known.String -> DataStructTypeMapper.Mapping(swiftTypeName = STRING)
             // type.isDataStruct() -> DataStructTypeMapper.Mapping(
             //     swiftTypeName = DeclaredTypeName.kotlin(type.getClass()!!).nestedType("Bridge"),

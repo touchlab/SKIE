@@ -21,13 +21,11 @@ sealed interface DataStructTypeMapper {
     val NativeKotlinType.Value.swiftPrimitiveType: DeclaredTypeName
         get() = when (this) {
             NativeKotlinType.Value.BOOL -> BOOL
-            NativeKotlinType.Value.UNICHAR -> SwiftType.character
             NativeKotlinType.Value.CHAR -> UINT8
             NativeKotlinType.Value.SHORT, NativeKotlinType.Value.INT, NativeKotlinType.Value.LONG_LONG -> INT
             NativeKotlinType.Value.UNSIGNED_CHAR -> UINT8
             NativeKotlinType.Value.UNSIGNED_SHORT, NativeKotlinType.Value.UNSIGNED_INT, NativeKotlinType.Value.UNSIGNED_LONG_LONG -> SwiftType.uint
             NativeKotlinType.Value.FLOAT, NativeKotlinType.Value.DOUBLE -> DOUBLE
-            NativeKotlinType.Value.POINTER -> TODO("pointer?")
         }
 
     data class Mapping(

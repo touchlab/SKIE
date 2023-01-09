@@ -53,6 +53,8 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
+import org.jetbrains.kotlin.name.FqNameUnsafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeProjection
@@ -132,7 +134,7 @@ internal class DefaultSwiftPoetScope(
                 }
                 is ValueTypeBridge -> when (bridge.objCValueType) {
                     ObjCValueType.BOOL -> NativeKotlinType.Value.BOOL
-                    ObjCValueType.UNICHAR -> NativeKotlinType.Value.UNICHAR
+                    ObjCValueType.UNICHAR -> NativeKotlinType.Unichar
                     ObjCValueType.CHAR -> NativeKotlinType.Value.CHAR
                     ObjCValueType.SHORT -> NativeKotlinType.Value.SHORT
                     ObjCValueType.INT -> NativeKotlinType.Value.INT
@@ -143,7 +145,11 @@ internal class DefaultSwiftPoetScope(
                     ObjCValueType.UNSIGNED_LONG_LONG -> NativeKotlinType.Value.UNSIGNED_LONG_LONG
                     ObjCValueType.FLOAT -> NativeKotlinType.Value.FLOAT
                     ObjCValueType.DOUBLE -> NativeKotlinType.Value.DOUBLE
-                    ObjCValueType.POINTER -> NativeKotlinType.Value.POINTER
+                    ObjCValueType.POINTER -> if (constructor.declarationDescriptor?.fqNameUnsafe == FqNameUnsafe("kotlin.native.internal.NativePtr")) {
+                        NativeKotlinType.Pointer.NativePtr
+                    }  else {
+                        NativeKotlinType.Pointer.Other
+                    }
                 }
             }
         }
@@ -152,7 +158,7 @@ internal class DefaultSwiftPoetScope(
 
     override fun PrimitiveType.spec(usage: KotlinTypeSpecUsage): TypeName = when (this) {
         PrimitiveType.BOOLEAN -> NativeKotlinType.Value.BOOL
-        PrimitiveType.CHAR -> NativeKotlinType.Value.UNICHAR
+        PrimitiveType.CHAR -> NativeKotlinType.Unichar
         PrimitiveType.BYTE -> NativeKotlinType.Value.CHAR
         PrimitiveType.SHORT -> NativeKotlinType.Value.SHORT
         PrimitiveType.INT -> NativeKotlinType.Value.INT
@@ -236,14 +242,14 @@ internal class DefaultSwiftPoetScope(
             is NativeKotlinType.Nullable -> when (usage) {
                 Default -> type.spec(TypeParam.OptionalWrapped).makeOptional()
                 ReturnType.SuspendFunction -> {
-                    if (type == NativeKotlinType.Value.POINTER) ANY.makeOptional() else type.spec(TypeParam.OptionalWrapped).makeOptional()
+                    if (type == NativeKotlinType.Pointer.Other) ANY.makeOptional() else type.spec(TypeParam.OptionalWrapped).makeOptional()
                 }
                 TypeParam.AllowingNullability -> type.spec(TypeParam.OptionalWrapped).makeOptional()
                 TypeParam -> ANY
                 TypeParam.IsHashable -> anyHashable
                 TypeParam.IsReference -> type.spec(TypeParam.IsReference)
                 TypeParam.ObjcCollectionElement -> ANY_OBJECT
-                ParameterType.Lambda, ReturnType.Lambda -> if (type == NativeKotlinType.Value.POINTER) ANY.makeOptional() else null
+                ParameterType.Lambda, ReturnType.Lambda -> if (type == NativeKotlinType.Pointer.Other) ANY.makeOptional() else null
                 else -> null
             }
             is NativeKotlinType.BlockPointer -> {
@@ -357,14 +363,22 @@ internal class DefaultSwiftPoetScope(
                     }
                 }
             }
-            NativeKotlinType.Value.UNICHAR -> when (usage) {
+            NativeKotlinType.Unichar -> when (usage) {
                 Default -> DeclaredTypeName.typeName("Foundation.unichar")
                 TypeParam -> ANY
                 TypeParam.IsHashable -> anyHashable
                 TypeParam.IsReference -> ANY_OBJECT
                 else -> null
             }
-            NativeKotlinType.Value.POINTER -> when (usage) {
+            NativeKotlinType.Pointer.NativePtr -> when (usage) {
+                Default -> DeclaredTypeName.typeName("Swift.UnsafeMutableRawPointer").makeOptional()
+                TypeParam -> ANY
+                TypeParam.IsHashable -> anyHashable
+                TypeParam.IsReference -> ANY_OBJECT
+                ReturnType.SuspendFunction -> ANY.makeOptional()
+                else -> null
+            }
+            NativeKotlinType.Pointer.Other -> when (usage) {
                 Default, TypeParam.OptionalWrapped -> DeclaredTypeName.typeName("Swift.UnsafeMutableRawPointer")
                 TypeParam -> ANY
                 TypeParam.IsHashable -> anyHashable
@@ -384,7 +398,6 @@ internal class DefaultSwiftPoetScope(
                     NativeKotlinType.Value.UNSIGNED_LONG_LONG -> UINT64
                     NativeKotlinType.Value.FLOAT -> FLOAT32
                     NativeKotlinType.Value.DOUBLE -> FLOAT64
-                    NativeKotlinType.Value.UNICHAR, NativeKotlinType.Value.POINTER -> error("Should be handled above.")
                 }
 
                 TypeParam -> @Suppress("KotlinConstantConditions") when (this) {
@@ -399,7 +412,6 @@ internal class DefaultSwiftPoetScope(
                     NativeKotlinType.Value.UNSIGNED_LONG_LONG -> ".KotlinULong"
                     NativeKotlinType.Value.FLOAT -> ".KotlinFloat"
                     NativeKotlinType.Value.DOUBLE -> ".KotlinDouble"
-                    NativeKotlinType.Value.UNICHAR, NativeKotlinType.Value.POINTER -> error("Should be handled above.")
                 }.let(DeclaredTypeName::typeName)
 
                 else -> null
