@@ -87,6 +87,7 @@ sealed interface TestedType {
         Any(ANY),
         COpaquePointer(ClassName("kotlinx.cinterop", "COpaquePointer")),
         NativePtr(ClassName("kotlin.native.internal", "NativePtr")),
+        NativePointed(ClassName("kotlinx.cinterop", "NativePointed")),
         ;
 
         override val safeName: kotlin.String
@@ -112,10 +113,64 @@ sealed interface TestedType {
         override val safeName: String get() = name
     }
 
-    // TODO
-    enum class CPointedVar(
+    sealed interface CPointed: TestedType {
+        object CFunction: CPointed {
+            override val safeName: String = "CFunction"
+            override val kotlinType: TypeName = ClassName("kotlinx.cinterop", "CFunction")
+                .parameterizedBy(STAR)
+        }
 
-    )
+        enum class COpaque(override val kotlinType: TypeName): CPointed {
+            // FIXME? `clang` and `llvm` are not available for the tested Kotlin file
+            // CXTargetInfoImpl(ClassName("clang", "CXTargetInfoImpl")),
+            ;
+
+            override val safeName: String
+                get() = name
+        }
+
+        sealed interface CVariable: CPointed {
+            class CPointerVarOf(type: TestedType): CVariable {
+                override val safeName: String = "CPointerVarOf__${type.safeName}__"
+                override val kotlinType: TypeName = ClassName("kotlinx.cinterop", "CPointerVarOf").parameterizedBy(type.kotlinType)
+            }
+
+            enum class CPrimitiveVar: CVariable {
+                Boolean,
+                Byte,
+                Int,
+                UInt,
+                ;
+
+                override val safeName: String
+                    get() = "${name}VarOf"
+
+                override val kotlinType: TypeName
+                    get() = ClassName("kotlinx.cinterop", safeName)
+                        .parameterizedBy(ClassName("kotlin", name))
+            }
+
+            enum class CEnumVar(override val kotlinType: TypeName): CVariable {
+                NSProcessInfoThermalState(ClassName("platform.Foundation", "NSProcessInfoThermalState", "Var")),
+                NSTimeZoneNameStyle(ClassName("platform.Foundation", "NSTimeZoneNameStyle", "Var")),
+                ;
+
+                override val safeName: String
+                    get() = name
+            }
+            
+            enum class CStructVar(override val kotlinType: TypeName): CVariable {
+                NSDecimal(ClassName("platform.Foundation", "NSDecimal")),
+                CGRect(ClassName("platform.CoreGraphics", "CGRect")),
+                CGSize(ClassName("platform.CoreGraphics", "CGSize")),
+                CGPoint(ClassName("platform.CoreGraphics", "CGPoint")),
+                ;
+
+                override val safeName: String
+                    get() = name
+            }
+        }
+    }
 
     data class Nullable(
         val wrapped: TestedType
@@ -187,6 +242,10 @@ sealed interface TestedType {
                 Basic(exported("ExportedInterface")),
                 Basic(exported("ExportedObject")),
                 WithTypeParameters(
+                    type = exported("ExportedSingleParamInterface"),
+                    typeParameters = listOf(param),
+                ),
+                WithTypeParameters(
                     type = exported("ExportedSingleParamClass"),
                     typeParameters = listOf(param),
                 ),
@@ -242,22 +301,41 @@ sealed interface TestedType {
             typeParameters = listOf(key, value),
         )
 
-        // TODO
-        fun CPointer(type: TestedType) = WithTypeParameters(
+        fun CPointer(type: CPointed) = WithTypeParameters(
             type = ClassName("kotlinx.cinterop", "CPointer"),
             typeParameters = listOf(type),
         )
+
+        val CPOINTEDS by lazy {
+            listOf(
+                CPointed.CFunction,
+            ) + CPointed.COpaque.values().toList() +
+                CPointed.CVariable.CPrimitiveVar.values().toList() +
+                CPointed.CVariable.CEnumVar.values().toList()
+        }
+
+        val CPOINTERS_FIRST_LEVEL by lazy {
+            CPOINTEDS.map {
+                CPointer(it)
+            }
+        }
+
+        val CPOINTERS_SECOND_LEVEL by lazy {
+            CPOINTERS_FIRST_LEVEL.map {
+                CPointer(CPointed.CVariable.CPointerVarOf(it))
+            }
+        }
 
         val BASIC by lazy<List<TestedType>> {
             listOf(Primitive.values(), PrimitiveArray.values(), Builtin.values()).flatMap { it.toList() }
         }
 
         val FIRST_LEVEL by lazy {
-            level(BASIC)
+            level(BASIC + CPOINTEDS) + CPOINTERS_FIRST_LEVEL
         }
 
         val SECOND_LEVEL by lazy {
-            level(FIRST_LEVEL)
+            level(FIRST_LEVEL) + CPOINTERS_SECOND_LEVEL
         }
 
         val SPECIFIC by lazy {
