@@ -1,3 +1,5 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.test
 
 import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration

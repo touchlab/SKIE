@@ -23,19 +23,19 @@ internal class ApiNotesFactory(
     private val swiftModelScope: SwiftModelScope,
 ) {
 
-    private val cache = HierarchicalDescriptorProvider(descriptorProvider, mapper)
+    private val descriptorProvider = HierarchicalDescriptorProvider(descriptorProvider, mapper)
 
     fun create(): ApiNotes = with(swiftModelScope) {
         ApiNotes(
             moduleName = moduleName,
-            classes = cache.swiftModelsForExportedClassesAndFiles.map { it.toApiNote() },
-            protocols = cache.exportedInterfaces.map { it.swiftModel.toApiNote() },
+            classes = descriptorProvider.swiftModelsForExportedClassesAndFiles.map { it.toApiNote() },
+            protocols = descriptorProvider.exportedInterfaces.map { it.swiftModel.toApiNote() },
         )
     }
 
     context(SwiftModelScope)
     private val HierarchicalDescriptorProvider.swiftModelsForExportedClassesAndFiles: List<KotlinTypeSwiftModel>
-        get() = (cache.exportedClasses.map { it.swiftModel } + cache.exportedFiles.map { it.swiftModel })
+        get() = (descriptorProvider.exportedClasses.map { it.swiftModel } + descriptorProvider.exportedFiles.map { it.swiftModel })
 
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
@@ -45,8 +45,8 @@ internal class ApiNotesFactory(
             swiftFqName = this.fqName,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,
-            methods = cache.exportedBaseFunctions(this.descriptorHolder).map { it.swiftModel.toApiNote() },
-            properties = cache.exportedBaseProperties(this.descriptorHolder).map { it.swiftModel.toApiNote() },
+            methods = descriptorProvider.exportedBaseFunctions(this.descriptorHolder).map { it.swiftModel.toApiNote() },
+            properties = descriptorProvider.exportedBaseProperties(this.descriptorHolder).map { it.swiftModel.toApiNote() },
         )
 
     private fun KotlinFunctionSwiftModel.toApiNote(): ApiNotesMethod =
@@ -68,7 +68,7 @@ internal class ApiNotesFactory(
         )
 
     private val SwiftModelVisibility.isHiddenOrReplaced: Boolean
-        get() = isHidden || isReplaced
+        get() = this.isHidden || this.isReplaced
 
     private fun KotlinTypeSwiftModel.Kind.toMemberKind(): ApiNotesTypeMemberKind =
         when (this) {

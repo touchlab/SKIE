@@ -148,7 +148,7 @@ internal abstract class Reflector {
             extensionClass.getDeclaredMethod(name, reflectedClass, *parameterTypes).also { it.isAccessible = true }
         }
 
-        protected fun invoke(arguments: Array<Any?>): R =
+        protected operator fun invoke(arguments: Array<Any?>): R =
             method.invoke(null, *arguments).let { returnType.cast(it) }
     }
 

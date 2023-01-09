@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.datastruct
 
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType.Reference.Known.Array.Primitive
@@ -67,7 +66,7 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
                 }
                 is Primitive -> {
                     val kotlinElementType = arrayType.elementType.spec(KotlinTypeSpecUsage.TypeParam)
-                    val bridgedElementType = arrayType.elementType.spec(KotlinTypeSpecUsage)
+                    val bridgedElementType = arrayType.elementType.spec(KotlinTypeSpecUsage.Default)
                     val swiftElementType = arrayType.swiftElementType
                     when (arrayType.elementType) {
                         PrimitiveType.BOOLEAN -> CodeBlock.of(
@@ -96,7 +95,7 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
                 }
             }
 
-            val kotlinArrayType = arrayType.spec(KotlinTypeSpecUsage)
+            val kotlinArrayType = arrayType.spec(KotlinTypeSpecUsage.Default)
             val swiftElementType = arrayType.swiftElementType
             listOf(
                 ExtensionSpec.builder(ARRAY)
@@ -156,12 +155,12 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
                 PrimitiveType.FLOAT, PrimitiveType.DOUBLE -> DOUBLE
                 PrimitiveType.CHAR -> SwiftType.character
             }
-            is NativeKotlinType.Reference.Known.Array.Generic -> elementType.spec(KotlinTypeSpecUsage)
+            is NativeKotlinType.Reference.Known.Array.Generic -> elementType.spec(KotlinTypeSpecUsage.Default)
         }
 
     context(SwiftPoetScope)
     private val NativeKotlinType.Reference.Known.Array.rawKotlinName: DeclaredTypeName
-        get() = when (val typeName = this.spec(KotlinTypeSpecUsage)) {
+        get() = when (val typeName = this.spec(KotlinTypeSpecUsage.Default)) {
             is DeclaredTypeName -> typeName
             is ParameterizedTypeName -> typeName.rawType
             else -> error("Unexpected type: $typeName")

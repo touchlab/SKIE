@@ -1,11 +1,5 @@
 package co.touchlab.skie.plugin.api.model.type
 
-enum class KotlinTypeSpecKind {
-    ORIGINAL,
-    SWIFT_GENERICS,
-    BRIDGED,
-}
-
 sealed interface KotlinTypeSpecUsage {
     sealed interface ParameterType: KotlinTypeSpecUsage {
         object Lambda: ParameterType
@@ -34,5 +28,5 @@ sealed interface KotlinTypeSpecUsage {
         companion object: TypeParam
     }
 
-    companion object: KotlinTypeSpecUsage
+    object Default: KotlinTypeSpecUsage
 }

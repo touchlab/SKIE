@@ -4,8 +4,8 @@ package co.touchlab.skie.api.model
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.property.reference
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage.*
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
@@ -57,7 +57,6 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.isSuspendFunctionTypeOrSubtype
-import org.jetbrains.kotlin.types.isNullable
 import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
 import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 
@@ -164,127 +163,120 @@ internal class DefaultSwiftPoetScope(
 
     override fun NativeKotlinType.spec(usage: KotlinTypeSpecUsage): TypeName {
         val path = when (usage) {
-            KotlinTypeSpecUsage -> listOf(
-                KotlinTypeSpecUsage,
+            Default -> listOf(
+                Default,
             )
-            KotlinTypeSpecUsage.ParameterType -> listOf(
-                KotlinTypeSpecUsage.ParameterType,
-                KotlinTypeSpecUsage,
+            ParameterType -> listOf(
+                ParameterType,
+                Default,
             )
-            KotlinTypeSpecUsage.ParameterType.Lambda -> listOf(
-                KotlinTypeSpecUsage.ParameterType.Lambda,
-                KotlinTypeSpecUsage.ParameterType,
-                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            ParameterType.Lambda -> listOf(
+                ParameterType.Lambda,
+                ParameterType,
+                TypeParam.AllowingNullability,
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.ReturnType -> listOf(
-                KotlinTypeSpecUsage.ReturnType,
-                KotlinTypeSpecUsage,
+            ReturnType -> listOf(
+                ReturnType,
+                Default,
             )
-            KotlinTypeSpecUsage.ReturnType.Lambda -> listOf(
-                KotlinTypeSpecUsage.ReturnType.Lambda,
-                KotlinTypeSpecUsage.ReturnType,
-                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            ReturnType.Lambda -> listOf(
+                ReturnType.Lambda,
+                ReturnType,
+                TypeParam.AllowingNullability,
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.ReturnType.SuspendFunction -> listOf(
-                KotlinTypeSpecUsage.ReturnType.SuspendFunction,
-                KotlinTypeSpecUsage.ReturnType,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            ReturnType.SuspendFunction -> listOf(
+                ReturnType.SuspendFunction,
+                ReturnType,
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.TypeParam -> listOf(
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            TypeParam -> listOf(
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.TypeParam.IsHashable -> listOf(
-                KotlinTypeSpecUsage.TypeParam.IsHashable,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            TypeParam.IsHashable -> listOf(
+                TypeParam.IsHashable,
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.TypeParam.IsReference -> listOf(
-                KotlinTypeSpecUsage.TypeParam.IsReference,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            TypeParam.IsReference -> listOf(
+                TypeParam.IsReference,
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.TypeParam.OptionalWrapped -> listOf(
-                KotlinTypeSpecUsage.TypeParam.OptionalWrapped,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            TypeParam.OptionalWrapped -> listOf(
+                TypeParam.OptionalWrapped,
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement -> listOf(
-                KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement,
-                KotlinTypeSpecUsage.TypeParam.IsReference,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            TypeParam.ObjcCollectionElement -> listOf(
+                TypeParam.ObjcCollectionElement,
+                TypeParam.IsReference,
+                TypeParam,
+                Default,
             )
-            KotlinTypeSpecUsage.TypeParam.AllowingNullability -> listOf(
-                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                KotlinTypeSpecUsage.TypeParam,
-                KotlinTypeSpecUsage,
+            TypeParam.AllowingNullability -> listOf(
+                TypeParam.AllowingNullability,
+                TypeParam,
+                Default,
             )
 
         }
 
-        path.forEach {
-            exactSpec(it)?.let { return it }
-        }
-
-        error("No spec for $this with usage $usage")
+        return path.firstNotNullOfOrNull { exactSpec(it) } ?: error("No spec for $this with usage $usage")
     }
 
-    fun NativeKotlinType.exactSpec(usage: KotlinTypeSpecUsage): TypeName? {
+    private fun NativeKotlinType.exactSpec(usage: KotlinTypeSpecUsage): TypeName? {
         val anyHashable = DeclaredTypeName("Swift", "AnyHashable")
         return when (this) {
             is NativeKotlinType.Nullable -> when (usage) {
-                KotlinTypeSpecUsage -> type.spec(KotlinTypeSpecUsage.TypeParam.OptionalWrapped).makeOptional()
-                KotlinTypeSpecUsage.ReturnType.SuspendFunction,
-                KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                -> type.spec(KotlinTypeSpecUsage.TypeParam.OptionalWrapped).makeOptional()
-                KotlinTypeSpecUsage.TypeParam -> ANY
-                KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
-                KotlinTypeSpecUsage.TypeParam.IsReference -> type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)
-                KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement -> ANY_OBJECT
+                Default -> type.spec(TypeParam.OptionalWrapped).makeOptional()
+                ReturnType.SuspendFunction -> {
+                    if (type == NativeKotlinType.Value.POINTER) ANY.makeOptional() else type.spec(TypeParam.OptionalWrapped).makeOptional()
+                }
+                TypeParam.AllowingNullability -> type.spec(TypeParam.OptionalWrapped).makeOptional()
+                TypeParam -> ANY
+                TypeParam.IsHashable -> anyHashable
+                TypeParam.IsReference -> type.spec(TypeParam.IsReference)
+                TypeParam.ObjcCollectionElement -> ANY_OBJECT
+                ParameterType.Lambda, ReturnType.Lambda -> if (type == NativeKotlinType.Value.POINTER) ANY.makeOptional() else null
                 else -> null
             }
             is NativeKotlinType.BlockPointer -> {
                 val lambdaType = FunctionTypeName.get(
-                    parameters = parameterTypes.map { ParameterSpec.unnamed(it.spec(KotlinTypeSpecUsage.ParameterType.Lambda)) },
-                    returnType = returnType.spec(KotlinTypeSpecUsage.ReturnType.Lambda),
+                    parameters = parameterTypes.map { ParameterSpec.unnamed(it.spec(ParameterType.Lambda)) },
+                    returnType = returnType.spec(ReturnType.Lambda),
                 )
                 when (usage) {
-                    KotlinTypeSpecUsage,
-                    KotlinTypeSpecUsage.TypeParam.OptionalWrapped,
-                    KotlinTypeSpecUsage.TypeParam.AllowingNullability,
-                    KotlinTypeSpecUsage.ReturnType,
-                    -> lambdaType
-
-                    KotlinTypeSpecUsage.ParameterType -> lambdaType.copy(attributes = listOf(AttributeSpec.ESCAPING))
-                    KotlinTypeSpecUsage.ParameterType.Lambda -> lambdaType.copy(
+                    Default, TypeParam.OptionalWrapped, TypeParam.AllowingNullability, ReturnType -> lambdaType
+                    ParameterType -> lambdaType.copy(attributes = listOf(AttributeSpec.ESCAPING))
+                    ParameterType.Lambda -> lambdaType.copy(
                         attributes = listOf(AttributeSpec.ESCAPING),
-                        returnType = returnType.spec(KotlinTypeSpecUsage.TypeParam.AllowingNullability),
+                        returnType = returnType.spec(TypeParam.AllowingNullability),
                     )
 
-                    KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
+                    TypeParam.IsHashable -> anyHashable
 
-                    KotlinTypeSpecUsage.TypeParam -> lambdaType.copy(
+                    TypeParam -> lambdaType.copy(
                         attributes = listOf(AttributeSpec.CONVENTION_BLOCK),
-                        returnType = NativeKotlinType.Nullable(returnType).spec(KotlinTypeSpecUsage.ReturnType.Lambda),
+                        returnType = NativeKotlinType.Nullable(returnType).spec(ReturnType.Lambda),
                     )
 
-                    KotlinTypeSpecUsage.ReturnType.Lambda -> lambdaType.copy(
+                    ReturnType.Lambda -> lambdaType.copy(
                         returnType = returnType.spec(
                             if (returnType is NativeKotlinType.BlockPointer) {
-                                KotlinTypeSpecUsage.ReturnType.Lambda
+                                ReturnType.Lambda
                             } else {
-                                KotlinTypeSpecUsage.TypeParam.AllowingNullability
+                                TypeParam.AllowingNullability
                             }
                         ),
                     )
-                    KotlinTypeSpecUsage.ReturnType.SuspendFunction -> lambdaType.copy(
-                        returnType = returnType.spec(KotlinTypeSpecUsage.TypeParam.AllowingNullability),
+                    ReturnType.SuspendFunction -> lambdaType.copy(
+                        returnType = returnType.spec(TypeParam.AllowingNullability),
                     )
 
                     else -> null
@@ -293,93 +285,95 @@ internal class DefaultSwiftPoetScope(
             is NativeKotlinType.Reference -> when (this) {
                 is NativeKotlinType.Reference.Known.Array -> when (this) {
                     is NativeKotlinType.Reference.Known.Array.Generic -> DeclaredTypeName.typeName(".KotlinArray")
-                        .withTypeParameters(elementType to KotlinTypeSpecUsage.TypeParam.IsReference)
+                        .withTypeParameters(elementType to TypeParam.IsReference)
                     is NativeKotlinType.Reference.Known.Array.Primitive -> DeclaredTypeName.typeName(".Kotlin${elementType.typeName.asString()}Array")
                 }
-                // TODO List<List<Int>> is not translated correctly
                 is NativeKotlinType.Reference.Known.List -> when (usage) {
-                    KotlinTypeSpecUsage -> ARRAY.withTypeParameters(elementType to KotlinTypeSpecUsage.TypeParam)
-                    KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
-                    KotlinTypeSpecUsage.TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSArray")
+                    Default -> ARRAY.withTypeParameters(elementType to TypeParam)
+                    TypeParam.IsHashable -> anyHashable
+                    TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSArray")
                     else -> null
                 }
                 is NativeKotlinType.Reference.Known.Set -> when (usage) {
-                    KotlinTypeSpecUsage -> SET.withTypeParameters(elementType to KotlinTypeSpecUsage.TypeParam.IsHashable)
+                    Default -> SET.withTypeParameters(elementType to TypeParam.IsHashable)
 
-                    KotlinTypeSpecUsage.TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSSet")
+                    TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSSet")
                     else -> null
                 }
                 is NativeKotlinType.Reference.Known.Map -> when (usage) {
-                    KotlinTypeSpecUsage -> DICTIONARY.withTypeParameters(
-                        keyType to KotlinTypeSpecUsage.TypeParam.IsHashable,
-                        valueType to KotlinTypeSpecUsage.TypeParam,
+                    Default -> DICTIONARY.withTypeParameters(
+                        keyType to TypeParam.IsHashable,
+                        valueType to TypeParam,
                     )
 
-                    KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
+                    TypeParam.IsHashable -> anyHashable
 
-                    KotlinTypeSpecUsage.TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSDictionary")
+                    TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSDictionary")
 
                     else -> null
                 }
                 is NativeKotlinType.Reference.Known.MutableList -> DeclaredTypeName.typeName("Foundation.NSMutableArray")
                 is NativeKotlinType.Reference.Known.MutableSet -> DeclaredTypeName.typeName(".KotlinMutableSet")
-                    .withTypeParameters(elementType to KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement)
+                    .withTypeParameters(elementType to TypeParam.ObjcCollectionElement)
                 is NativeKotlinType.Reference.Known.MutableMap -> DeclaredTypeName.typeName(".KotlinMutableDictionary")
                     .withTypeParameters(
-                        keyType to KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement,
-                        valueType to KotlinTypeSpecUsage.TypeParam.ObjcCollectionElement,
+                        keyType to TypeParam.ObjcCollectionElement,
+                        valueType to TypeParam.ObjcCollectionElement,
                     )
                 NativeKotlinType.Reference.Known.String -> when (usage) {
-                    KotlinTypeSpecUsage -> STRING
-                    KotlinTypeSpecUsage.TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSString")
+                    Default -> STRING
+                    TypeParam.IsReference -> DeclaredTypeName.typeName("Foundation.NSString")
                     else -> null
                 }
                 NativeKotlinType.Reference.Known.Unit -> when (usage) {
-                    KotlinTypeSpecUsage -> DeclaredTypeName.typeName(".KotlinUnit")
-                    KotlinTypeSpecUsage.ReturnType -> VOID
+                    Default -> DeclaredTypeName.typeName(".KotlinUnit")
+                    ReturnType -> VOID
                     else -> null
                 }
                 NativeKotlinType.Reference.Known.Nothing -> when (usage) {
-                    KotlinTypeSpecUsage, KotlinTypeSpecUsage.ReturnType.SuspendFunction -> DeclaredTypeName.typeName(".KotlinNothing")
-                    KotlinTypeSpecUsage.ReturnType -> VOID
+                    Default, ReturnType.SuspendFunction -> DeclaredTypeName.typeName(".KotlinNothing")
+                    ReturnType -> VOID
                     else -> null
                 }
                 is NativeKotlinType.Reference.Known.SuspendFunction -> when (usage) {
-                    KotlinTypeSpecUsage -> descriptor.spec
+                    Default -> descriptor.spec
 
-                    KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
+                    TypeParam.IsHashable -> anyHashable
 
                     else -> null
                 }
                 is NativeKotlinType.Reference.TypeParameter -> TypeVariableName(name)
                 is NativeKotlinType.Reference.Unknown -> {
                     if (descriptor.canBeSpecializedInSwift) {
-                        descriptor.spec.withTypeParametersOf(kotlinType) { _, _ -> KotlinTypeSpecUsage.TypeParam.IsReference }
+                        descriptor.spec.withTypeParametersOf(kotlinType) { _, _ -> TypeParam.IsReference }
                     } else if (descriptor.kind == ClassKind.INTERFACE) {
                         when (usage) {
-                            KotlinTypeSpecUsage -> descriptor.spec
-                            KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
+                            Default -> descriptor.spec
+                            TypeParam.IsHashable -> anyHashable
                             else -> null
                         }
                     } else {
                         descriptor.spec
                     }
-                    //     .let {
-                    //     if (kotlinType.isNullable()) it.makeOptional() else it
-                    // }
                 }
             }
             NativeKotlinType.Value.UNICHAR -> when (usage) {
-                KotlinTypeSpecUsage -> DeclaredTypeName.typeName("Foundation.unichar")
-                KotlinTypeSpecUsage.TypeParam -> ANY
-                KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
-                KotlinTypeSpecUsage.TypeParam.IsReference -> ANY_OBJECT
+                Default -> DeclaredTypeName.typeName("Foundation.unichar")
+                TypeParam -> ANY
+                TypeParam.IsHashable -> anyHashable
+                TypeParam.IsReference -> ANY_OBJECT
+                else -> null
+            }
+            NativeKotlinType.Value.POINTER -> when (usage) {
+                Default, TypeParam.OptionalWrapped -> DeclaredTypeName.typeName("Swift.UnsafeMutableRawPointer")
+                TypeParam -> ANY
+                TypeParam.IsHashable -> anyHashable
+                TypeParam.IsReference -> ANY_OBJECT
                 else -> null
             }
             is NativeKotlinType.Value -> when (usage) {
-                KotlinTypeSpecUsage -> when (this) {
+                Default -> @Suppress("KotlinConstantConditions") when (this) {
                     NativeKotlinType.Value.BOOL -> BOOL
-                    NativeKotlinType.Value.UNICHAR -> DeclaredTypeName.typeName("Foundation.unichar")
                     NativeKotlinType.Value.CHAR -> INT8
                     NativeKotlinType.Value.SHORT -> INT16
                     NativeKotlinType.Value.INT -> INT32
@@ -390,12 +384,11 @@ internal class DefaultSwiftPoetScope(
                     NativeKotlinType.Value.UNSIGNED_LONG_LONG -> UINT64
                     NativeKotlinType.Value.FLOAT -> FLOAT32
                     NativeKotlinType.Value.DOUBLE -> FLOAT64
-                    NativeKotlinType.Value.POINTER -> TODO("Pointer")
+                    NativeKotlinType.Value.UNICHAR, NativeKotlinType.Value.POINTER -> error("Should be handled above.")
                 }
 
-                KotlinTypeSpecUsage.TypeParam -> when (this) {
+                TypeParam -> @Suppress("KotlinConstantConditions") when (this) {
                     NativeKotlinType.Value.BOOL -> ".KotlinBoolean"
-                    NativeKotlinType.Value.UNICHAR -> return ANY
                     NativeKotlinType.Value.CHAR -> ".KotlinByte"
                     NativeKotlinType.Value.SHORT -> ".KotlinShort"
                     NativeKotlinType.Value.LONG_LONG -> ".KotlinLong"
@@ -406,17 +399,17 @@ internal class DefaultSwiftPoetScope(
                     NativeKotlinType.Value.UNSIGNED_LONG_LONG -> ".KotlinULong"
                     NativeKotlinType.Value.FLOAT -> ".KotlinFloat"
                     NativeKotlinType.Value.DOUBLE -> ".KotlinDouble"
-                    NativeKotlinType.Value.POINTER -> TODO("Pointer")
+                    NativeKotlinType.Value.UNICHAR, NativeKotlinType.Value.POINTER -> error("Should be handled above.")
                 }.let(DeclaredTypeName::typeName)
 
                 else -> null
             }
             NativeKotlinType.Any -> when (usage) {
-                KotlinTypeSpecUsage -> DeclaredTypeName.typeName(".Any")
+                Default -> DeclaredTypeName.typeName(".Any")
 
-                KotlinTypeSpecUsage.TypeParam.IsHashable -> anyHashable
+                TypeParam.IsHashable -> anyHashable
 
-                KotlinTypeSpecUsage.TypeParam.IsReference -> ANY_OBJECT
+                TypeParam.IsReference -> ANY_OBJECT
                 else -> null
             }
         }
@@ -448,7 +441,7 @@ internal class DefaultSwiftPoetScope(
         get() = DeclaredTypeName.qualifiedLocalTypeName(this.swiftModel.fqName)
 
     override val PropertyDescriptor.spec: PropertySpec
-        get() = PropertySpec.builder(this.swiftModel.reference, type.spec(KotlinTypeSpecUsage)).build()
+        get() = PropertySpec.builder(this.swiftModel.reference, type.spec(Default)).build()
 
     override val FunctionDescriptor.spec: FunctionSpec
         get() = TODO("Not yet implemented")

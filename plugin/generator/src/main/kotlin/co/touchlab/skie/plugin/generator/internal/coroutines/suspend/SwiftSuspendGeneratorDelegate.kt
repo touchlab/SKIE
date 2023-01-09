@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.model.function.name
 import co.touchlab.skie.plugin.api.model.function.reference
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope

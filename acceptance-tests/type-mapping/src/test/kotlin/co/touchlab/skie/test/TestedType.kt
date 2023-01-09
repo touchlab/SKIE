@@ -85,6 +85,8 @@ sealed interface TestedType {
         Number(NUMBER),
         String(STRING),
         Any(ANY),
+        COpaquePointer(ClassName("kotlinx.cinterop", "COpaquePointer")),
+        NativePtr(ClassName("kotlin.native.internal", "NativePtr")),
         ;
 
         override val safeName: kotlin.String
@@ -109,6 +111,11 @@ sealed interface TestedType {
 
         override val safeName: String get() = name
     }
+
+    // TODO
+    enum class CPointedVar(
+
+    )
 
     data class Nullable(
         val wrapped: TestedType
@@ -233,6 +240,12 @@ sealed interface TestedType {
         fun MutableMap(key: TestedType, value: TestedType) = WithTypeParameters(
             type = MUTABLE_MAP,
             typeParameters = listOf(key, value),
+        )
+
+        // TODO
+        fun CPointer(type: TestedType) = WithTypeParameters(
+            type = ClassName("kotlinx.cinterop", "CPointer"),
+            typeParameters = listOf(type),
         )
 
         val BASIC by lazy<List<TestedType>> {

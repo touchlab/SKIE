@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.datastruct
 
 import co.touchlab.skie.plugin.api.model.property.reference
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope

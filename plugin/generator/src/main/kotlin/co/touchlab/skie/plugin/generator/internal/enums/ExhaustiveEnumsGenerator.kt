@@ -8,7 +8,6 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.function.reference
 import co.touchlab.skie.plugin.api.model.property.reference
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecKind
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.packageName
 import co.touchlab.skie.plugin.api.model.type.simpleName
@@ -21,12 +20,10 @@ import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
-import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FunctionSpec
-import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
@@ -128,7 +125,7 @@ internal class ExhaustiveEnumsGenerator(
                 addProperty(
                     PropertySpec.builder(
                         property.name.asString(),
-                        property.type.spec(KotlinTypeSpecUsage)
+                        property.type.spec(KotlinTypeSpecUsage.Default)
                     )
                         .addModifiers(Modifier.PUBLIC)
                         .getter(

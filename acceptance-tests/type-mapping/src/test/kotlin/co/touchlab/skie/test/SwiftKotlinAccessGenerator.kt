@@ -1,7 +1,9 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.test
 
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.skieContext
-import co.touchlab.skie.plugin.api.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.generator.internal.skieDescriptorProvider
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -50,7 +52,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                     when (descriptor) {
                         is PropertyDescriptor -> {
                             addProperty(
-                                PropertySpec.builder(descriptor.name.identifier, descriptor.type.spec(KotlinTypeSpecUsage))
+                                PropertySpec.builder(descriptor.name.identifier, descriptor.type.spec(KotlinTypeSpecUsage.Default))
                                     .initializer("kotlinClass.%L", descriptor.name.identifier)
                                     .build()
                             )
