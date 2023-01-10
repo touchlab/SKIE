@@ -12,6 +12,9 @@ data class SwiftTypeSwiftModel(
             return "$parentName.$identifier"
         }
 
+    override val bridgedOrStableFqName: String
+        get() = stableFqName
+
     override fun fqName(separator: String): String {
         val parentName = containingType?.fqName(separator) ?: return identifier
 

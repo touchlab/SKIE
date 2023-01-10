@@ -46,7 +46,8 @@ internal class SuspendGenerator(
 
     private fun DescriptorProvider.allFunctions(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
         this.exportedTopLevelCallableDescriptors.filterIsInstance<SimpleFunctionDescriptor>() +
-            this.exportedClassDescriptors.flatMap { it.allDeclaredMethods(descriptorProvider) }
+            this.exportedClassDescriptors.flatMap { it.allDeclaredMethods(descriptorProvider) } +
+            this.exportedCategoryMembersCallableDescriptors.filterIsInstance<SimpleFunctionDescriptor>()
 
     private fun ClassDescriptor.allDeclaredMethods(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
         this.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
@@ -54,7 +55,7 @@ internal class SuspendGenerator(
             .filter { descriptorProvider.mapper.isBaseMethod(it) }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
-        get() = this.isSuspend && !this.belongsToSkieRuntime && this.extensionReceiverParameter == null
+        get() = this.isSuspend && !this.belongsToSkieRuntime
 
     private fun markOriginalFunctionAsReplaced(originalFunctionDescriptor: SimpleFunctionDescriptor) {
         module.configure {

@@ -5,4 +5,5 @@ class A {
     suspend fun foo(): Int = 0
 }
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 suspend fun A.foo(): Int = 1

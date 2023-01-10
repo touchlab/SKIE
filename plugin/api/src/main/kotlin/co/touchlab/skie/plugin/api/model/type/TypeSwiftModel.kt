@@ -7,10 +7,16 @@ interface TypeSwiftModel {
     val identifier: String
 
     /**
+     * Points to the original ObjC class.
      * This name does not change except when the type itself changes.
      * For example, it does not change when a new type with the same simple name is added.
      */
     val stableFqName: String
+
+    /**
+     * `stableFqName` for the final Swift class.
+     */
+    val bridgedOrStableFqName: String
 
     fun fqName(separator: String = DEFAULT_SEPARATOR): String
 

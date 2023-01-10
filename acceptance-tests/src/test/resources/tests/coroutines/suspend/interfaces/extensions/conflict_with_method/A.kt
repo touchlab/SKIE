@@ -7,4 +7,5 @@ interface A {
 
 class A1 : A
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 suspend fun A.foo(): Int = 1

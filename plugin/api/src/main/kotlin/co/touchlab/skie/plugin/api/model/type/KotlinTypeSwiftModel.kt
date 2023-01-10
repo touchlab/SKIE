@@ -24,6 +24,9 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
 
     val bridge: TypeSwiftModel?
 
+    override val bridgedOrStableFqName: String
+        get() = bridge?.fqName ?: stableFqName
+
     val kind: Kind
 
     val objCFqName: String

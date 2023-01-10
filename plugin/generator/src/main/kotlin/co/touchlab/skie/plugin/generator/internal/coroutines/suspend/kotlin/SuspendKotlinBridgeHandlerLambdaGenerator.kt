@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.name.SpecialNames
 
-internal class SuspendKotlinBridgeBodyLambdaGenerator {
+internal class SuspendKotlinBridgeHandlerLambdaGenerator {
 
     context(IrPluginContext, IrBlockBodyBuilder)
     fun createOriginalFunctionCallLambda(
@@ -63,6 +63,7 @@ internal class SuspendKotlinBridgeBodyLambdaGenerator {
 
             +irReturn(irCall(originalFunctionSymbol).apply {
                 setDispatchReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
+                setExtensionReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
                 setValueArgumentsForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
                 setTypeArgumentsForDelegatingCall(bridgingFunction)
             })
@@ -77,6 +78,20 @@ internal class SuspendKotlinBridgeBodyLambdaGenerator {
             val dispatchReceiverParameter = bridgingFunction.valueParameters.first()
 
             dispatchReceiver = irGet(dispatchReceiverParameter)
+        }
+    }
+
+    context(DeclarationIrBuilder)
+    private fun IrCall.setExtensionReceiverForDelegatingCall(
+        bridgingFunction: IrSimpleFunction,
+        originalFunctionDescriptor: FunctionDescriptor,
+    ) {
+        if (originalFunctionDescriptor.extensionReceiverParameter != null) {
+            val parameterIndex = if (originalFunctionDescriptor.dispatchReceiverParameter != null) 1 else 0
+
+            val extensionReceiverParameter = bridgingFunction.valueParameters[parameterIndex]
+
+            extensionReceiver = irGet(extensionReceiverParameter)
         }
     }
 
@@ -97,6 +112,9 @@ internal class SuspendKotlinBridgeBodyLambdaGenerator {
         var result = this.valueParameters
 
         if (originalFunctionDescriptor.dispatchReceiverParameter != null) {
+            result = result.drop(1)
+        }
+        if (originalFunctionDescriptor.extensionReceiverParameter != null) {
             result = result.drop(1)
         }
 

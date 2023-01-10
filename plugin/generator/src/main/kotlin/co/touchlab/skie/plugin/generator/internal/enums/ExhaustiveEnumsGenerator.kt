@@ -169,11 +169,6 @@ internal class ExhaustiveEnumsGenerator(
             .filter { mapper.isBaseMethod(it) }
             .forEach { function ->
                 if (function.isSuspend) {
-                    reporter.report(
-                        Reporter.Severity.Warning,
-                        "Exhaustive enums do not support bridging of suspend functions, skipping.",
-                        function
-                    )
                     return@forEach
                 }
 

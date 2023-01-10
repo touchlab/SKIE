@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeIdenti
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
@@ -27,6 +28,8 @@ internal class KotlinSuspendGeneratorDelegate(
     descriptorProvider: DescriptorProvider,
 ) {
 
+    private var nextBridgingFunctionIndex = 0
+
     private val suspendHandlerDescriptor: ClassDescriptor =
         descriptorProvider.classDescriptors
             .single { it.fqNameSafe == FqName("co.touchlab.skie.runtime.coroutines.Skie_SuspendHandler") }
@@ -34,16 +37,20 @@ internal class KotlinSuspendGeneratorDelegate(
     private val bodyGenerator = SuspendKotlinBridgeBodyGenerator(suspendHandlerDescriptor)
 
     fun generateKotlinBridgingFunction(functionDescriptor: FunctionDescriptor): FunctionDescriptor {
-        val descriptor = createBridgingFunction(functionDescriptor)
+        val bridgingFunctionDescriptor = createBridgingFunction(functionDescriptor)
 
-        hideBridgingFunction(descriptor)
+        hideAndRenameBridgingFunction(bridgingFunctionDescriptor, functionDescriptor)
 
-        return descriptor
+        return bridgingFunctionDescriptor
     }
 
-    private fun hideBridgingFunction(functionDescriptor: FunctionDescriptor) {
+    private fun hideAndRenameBridgingFunction(
+        bridgingFunctionDescriptor: FunctionDescriptor,
+        originalFunctionDescriptor: FunctionDescriptor,
+    ) {
         module.configure {
-            functionDescriptor.swiftModel.visibility = SwiftModelVisibility.Hidden
+            bridgingFunctionDescriptor.swiftModel.visibility = SwiftModelVisibility.Hidden
+            bridgingFunctionDescriptor.swiftModel.identifier = originalFunctionDescriptor.suspendWrapperFunctionIdentifier
         }
     }
 
@@ -51,7 +58,7 @@ internal class KotlinSuspendGeneratorDelegate(
         functionDescriptor: FunctionDescriptor,
     ): FunctionDescriptor =
         declarationBuilder.createFunction(
-            name = functionDescriptor.name,
+            name = "Skie__${nextBridgingFunctionIndex++}__${functionDescriptor.name.identifier}",
             namespace = declarationBuilder.getPackageNamespace(functionDescriptor),
             annotations = Annotations.EMPTY,
         ) {
@@ -72,6 +79,7 @@ internal class KotlinSuspendGeneratorDelegate(
         val parameters = mutableListOf<ValueParameterDescriptor>()
 
         parameters.addDispatchReceiver(this, bridgingFunctionDescriptor)
+        parameters.addExtensionReceiver(this, bridgingFunctionDescriptor)
         parameters.addCopiedValueParameters(this, bridgingFunctionDescriptor)
         parameters.addSuspendHandler(this, bridgingFunctionDescriptor)
 
@@ -91,6 +99,22 @@ internal class KotlinSuspendGeneratorDelegate(
             )
 
             this.add(dispatchReceiverParameter)
+        }
+    }
+
+    private fun MutableList<ValueParameterDescriptor>.addExtensionReceiver(
+        originalFunctionDescriptor: FunctionDescriptor,
+        bridgingFunctionDescriptor: FunctionDescriptor,
+    ) {
+        originalFunctionDescriptor.extensionReceiverParameter?.let { extensionReceiver ->
+            val extensionReceiverParameter = createValueParameter(
+                owner = bridgingFunctionDescriptor,
+                name = originalFunctionDescriptor.valueParameters.createCollisionFreeIdentifier("extensionReceiver"),
+                index = this.size,
+                type = extensionReceiver.type
+            )
+
+            this.add(extensionReceiverParameter)
         }
     }
 

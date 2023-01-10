@@ -17,7 +17,7 @@ internal class SuspendKotlinBridgeBodyGenerator(
 ) {
 
     private val exceptionFieldGenerator = SuspendKotlinBridgeCheckedExceptionsGenerator()
-    private val lambdaGenerator = SuspendKotlinBridgeBodyLambdaGenerator()
+    private val lambdaGenerator = SuspendKotlinBridgeHandlerLambdaGenerator()
 
     context(IrPluginContext, DeclarationIrBuilder)
     fun createBody(
