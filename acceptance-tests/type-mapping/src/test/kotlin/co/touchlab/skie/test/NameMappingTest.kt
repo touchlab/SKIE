@@ -14,10 +14,21 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.junit.jupiter.api.Test
 import kotlin.io.path.Path
 import co.touchlab.skie.configuration.Configuration
+import com.squareup.kotlinpoet.ANY
+import com.squareup.kotlinpoet.CHAR_SEQUENCE
+import com.squareup.kotlinpoet.COMPARABLE
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.PropertySpec
 import kotlin.io.path.writer
 
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.MUTABLE_LIST
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.SET
+import com.squareup.kotlinpoet.STAR
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeVariableName
 import kotlin.test.fail
 
@@ -37,6 +48,10 @@ class NameMappingTest {
         // TODO Generate Kotlin code
         FileSpec.builder("co.touchlab.skie.test", "KotlinFile")
             .addType(
+                TypeSpec.interfaceBuilder("TestInterface")
+                    .build()
+            )
+            .addType(
                 TypeSpec.classBuilder("SingleTypeParamClass")
                     // TODO: Add `T: Any`
                     .addTypeVariable(TypeVariableName("T"))
@@ -44,6 +59,9 @@ class NameMappingTest {
             )
             .addType(
                 TypeSpec.classBuilder("KotlinFile")
+                    .addTypeVariables(
+                        TestedType.CLASS_TYPE_PARAMS.map { it.kotlinType }
+                    )
                     .apply {
                         TestedType.ALL.forEach { type ->
                             addProperty(
@@ -84,6 +102,29 @@ class NameMappingTest {
                                     .build()
                             )
                         }
+
+                        // TestedType.ONLY.ifEmpty { TestedType.BASIC }.forEach { type ->
+                        //     if (type == TestedType.Builtin.Nothing) { return@forEach }
+                        //     val typeVariable = TypeVariableName("T", type.kotlinType)
+                        //     addFunction(
+                        //         FunSpec.builder("generic_function_${type.safeName}")
+                        //             .addTypeVariable(typeVariable)
+                        //             .addParameter("value", typeVariable)
+                        //             .returns(typeVariable)
+                        //             .addStatement("return value")
+                        //             .build()
+                        //     )
+                        // }
+
+                        // val typeVariable = TypeVariableName("T", SET.parameterizedBy(STRING), LIST.parameterizedBy(STRING), COMPARABLE.parameterizedBy(STRING))
+                        // addFunction(
+                        //     FunSpec.builder("complex_generic_function")
+                        //         .addTypeVariable(typeVariable)
+                        //         .addParameter("value", typeVariable)
+                        //         .returns(typeVariable)
+                        //         .addStatement("return value")
+                        //         .build()
+                        // )
                     }
                     .build()
             )

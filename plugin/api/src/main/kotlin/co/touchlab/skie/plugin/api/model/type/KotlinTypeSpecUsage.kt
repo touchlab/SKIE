@@ -10,7 +10,11 @@ sealed interface KotlinTypeSpecUsage {
     sealed interface ReturnType: KotlinTypeSpecUsage {
         object Lambda: ReturnType
 
-        object SuspendFunction: ReturnType
+        sealed interface SuspendFunction: ReturnType {
+            object OptionalWrapped: SuspendFunction
+
+            companion object: SuspendFunction
+        }
 
         companion object: ReturnType
     }

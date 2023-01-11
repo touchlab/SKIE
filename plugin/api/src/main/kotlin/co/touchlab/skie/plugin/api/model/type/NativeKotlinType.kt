@@ -35,7 +35,7 @@ sealed interface NativeKotlinType {
             ) : Known
         }
 
-        data class TypeParameter(val name: String) : Reference
+        data class TypeParameter(val name: String, val upperBound: NativeKotlinType) : Reference
 
         data class Unknown(val kotlinType: KotlinType, val descriptor: ClassDescriptor) : Reference
     }

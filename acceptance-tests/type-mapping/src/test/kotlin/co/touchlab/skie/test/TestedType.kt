@@ -1,5 +1,6 @@
 package co.touchlab.skie.test
 
+import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ARRAY
 import com.squareup.kotlinpoet.BOOLEAN
@@ -34,6 +35,7 @@ import com.squareup.kotlinpoet.SHORT_ARRAY
 import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.UNIT
 import com.squareup.kotlinpoet.U_BYTE
 import com.squareup.kotlinpoet.U_BYTE_ARRAY
@@ -43,6 +45,7 @@ import com.squareup.kotlinpoet.U_LONG
 import com.squareup.kotlinpoet.U_LONG_ARRAY
 import com.squareup.kotlinpoet.U_SHORT
 import com.squareup.kotlinpoet.U_SHORT_ARRAY
+import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
 fun TestedType.copy(
     safeName: String = this.safeName,
@@ -158,7 +161,7 @@ sealed interface TestedType {
                 override val safeName: String
                     get() = name
             }
-            
+
             enum class CStructVar(override val kotlinType: TypeName): CVariable {
                 NSDecimal(ClassName("platform.Foundation", "NSDecimal")),
                 CGRect(ClassName("platform.CoreGraphics", "CGRect")),
@@ -201,6 +204,14 @@ sealed interface TestedType {
     object Star: TestedType {
         override val safeName: String get() = "star"
         override val kotlinType: TypeName get() = STAR
+    }
+
+    data class TypeParam(val bounds: List<TestedType>): TestedType {
+        override val safeName: String
+            get() = bounds.joinToString("_") { it.safeName.uppercase() }
+
+        override val kotlinType: TypeVariableName
+            get() = TypeVariableName(safeName, bounds.map { it.kotlinType })
     }
 
     data class Lambda(
@@ -330,8 +341,27 @@ sealed interface TestedType {
             listOf(Primitive.values(), PrimitiveArray.values(), Builtin.values()).flatMap { it.toList() }
         }
 
+        val CLASS_TYPE_SPECIFIC_BOUNDS by lazy<List<TestedType>> {
+            (BASIC.map(::Nullable) + listOf(
+                List(Nullable(Builtin.String)),
+                List(List(Builtin.String)),
+                Nullable(List(Builtin.String)),
+            ) + level(listOf(Builtin.String)) + ExportedTypes(Builtin.String) + ExportedTypes(Primitive.Int).map(::Nullable))
+                .filter {
+                    it !is Lambda || it.receiverType == null
+                }
+                .filter(ENABLED_FILTER)
+                .toSet().sortedBy { it.safeName }
+        }
+
+        val CLASS_TYPE_PARAMS by lazy<List<TypeParam>> {
+            (BASIC + CLASS_TYPE_SPECIFIC_BOUNDS)
+                .filter { it != Builtin.Nothing }
+                .map { TypeParam(listOf(it)) }
+        }
+
         val FIRST_LEVEL by lazy {
-            level(BASIC + CPOINTEDS) + CPOINTERS_FIRST_LEVEL
+            level(BASIC + CPOINTEDS + CLASS_TYPE_PARAMS) + CPOINTERS_FIRST_LEVEL
         }
 
         val SECOND_LEVEL by lazy {
@@ -351,18 +381,28 @@ sealed interface TestedType {
         }
 
         val ONLY by lazy<List<TestedType>> {
-            listOf(
+            listOf<TestedType>(
+                // Builtin.NativePtr
                 // Lambda(false,
-                //     Lambda(false, null, listOf(TestedType.Builtin.Any), TestedType.Builtin.Any),
+                //     Lambda(false, null, listOf(TypeParam("T1")), TypeParam("T1")),
                 //     listOf(),
-                //     Lambda(false, null, listOf(TestedType.Builtin.Any), TestedType.Builtin.Any),
+                //     Lambda(false, null, listOf(TypeParam("T1")), TypeParam("T1")),
                 // ),
-            )
+                // Builtin.NativePtr,
+                // List(Builtin.NativePtr),
+                // Lambda(
+                //     false,
+                //     null,
+                //     listOf(Builtin.NativePtr),
+                //     Builtin.NativePtr,
+                // )
+            ) //+ CLASS_TYPE_PARAMS + level(CLASS_TYPE_PARAMS)
         }
 
         val ENABLED_FILTER: (TestedType) -> Boolean = {
             fun hasLambdaTypeParam(type: TestedType): Boolean = when (type) {
                 is WithTypeParameters -> type.typeParameters.any { it is Lambda || hasLambdaTypeParam(it) }
+                is TypeParam -> type.bounds.any { it is Lambda || hasLambdaTypeParam(it) }
                 else -> false
             }
 
@@ -371,14 +411,14 @@ sealed interface TestedType {
 
         val ALL_BUT_SECOND_LEVEL by lazy {
             ONLY.ifEmpty {
-                (BASIC + FIRST_LEVEL + SPECIFIC).toSet().sortedBy { it.safeName }.filter(ENABLED_FILTER)
-            }.filter(ENABLED_FILTER)
+                (BASIC + CLASS_TYPE_PARAMS + FIRST_LEVEL + SPECIFIC)
+            }.filter(ENABLED_FILTER).toSet().sortedBy { it.safeName }
         }
 
         val ALL by lazy {
             ONLY.ifEmpty {
-                (BASIC + FIRST_LEVEL + SECOND_LEVEL + SPECIFIC).toSet().sortedBy { it.safeName }.filter(ENABLED_FILTER)
-            }
+                (BASIC + CLASS_TYPE_PARAMS + FIRST_LEVEL + SECOND_LEVEL + SPECIFIC)
+            }.filter(ENABLED_FILTER).toSet().sortedBy { it.safeName }
         }
 
         private fun level(types: List<TestedType>): List<TestedType> {

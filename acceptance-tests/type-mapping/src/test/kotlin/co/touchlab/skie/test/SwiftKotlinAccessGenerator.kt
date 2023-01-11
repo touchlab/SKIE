@@ -6,11 +6,16 @@ import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.internal.skieDescriptorProvider
 import co.touchlab.skie.plugin.intercept.PhaseListener
+import io.outfoxx.swiftpoet.ANY_OBJECT
+import io.outfoxx.swiftpoet.AttributeSpec
+import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
+import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.TypeVariableName
 import io.outfoxx.swiftpoet.VOID
+import io.outfoxx.swiftpoet.parameterizedBy
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
@@ -27,70 +32,86 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
         val kotlinClass = context.skieDescriptorProvider.classDescriptors.first {
             it.name.identifier == "KotlinFile"
         }
+        // val genericKotlinClass = context.skieDescriptorProvider.classDescriptors.first {
+        //     it.name.identifier == "GenericKotlinFile"
+        // }
         context.skieContext.module.file("KotlinFile_access") {
-            addProperty(
-                PropertySpec.builder("kotlinClass", kotlinClass.spec)
-                    .initializer("%T()", kotlinClass.spec)
-                    .build()
-            )
-            addFunction(
-                FunctionSpec.builder("anything")
-                    .addTypeVariable(
-                        TypeVariableName("T")
-                    )
-                    .addParameter("type", TypeVariableName("T.Type"))
-                    .returns(TypeVariableName("T"))
-                    .addCode("fatalError(\"Never called\")")
-                    .build()
-            )
+            addType(
+                TypeSpec.classBuilder("KotlinFileWrapper")
+                    .apply {
+                        val typeVariables = kotlinClass.declaredTypeParameters.map { typeParameter ->
+                            TypeVariableName(typeParameter.name.identifier, TypeVariableName.bound(ANY_OBJECT))
+                        }
+                        val parametrizedKotlinClass = if (typeVariables.isNotEmpty()) {
+                            kotlinClass.spec.parameterizedBy(*typeVariables.toTypedArray())
+                        } else {
+                            kotlinClass.spec
+                        }
 
-            kotlinClass.unsubstitutedMemberScope.getContributedDescriptors()
-                .filter {
-                    (it as? CallableMemberDescriptor)?.overriddenDescriptors?.isEmpty() ?: true
-                }
-                .forEach { descriptor ->
-                    when (descriptor) {
-                        is PropertyDescriptor -> {
-                            addProperty(
-                                PropertySpec.builder(descriptor.name.identifier, descriptor.type.spec(KotlinTypeSpecUsage.Default))
-                                    .initializer("kotlinClass.%L", descriptor.name.identifier)
-                                    .build()
-                            )
+                        addProperty(
+                            PropertySpec.builder("kotlinClass", parametrizedKotlinClass)
+                                .initializer("%T()", parametrizedKotlinClass)
+                                .build()
+                        )
+
+                        typeVariables.forEach { typeVariable ->
+                            addTypeVariable(typeVariable)
                         }
-                        is FunctionDescriptor -> {
-                            addFunction(
-                                FunctionSpec.builder(descriptor.name.identifier)
-                                    .addParameters(
-                                        descriptor.valueParameters.map { parameter ->
-                                            ParameterSpec.builder(
-                                                parameter.name.identifier,
-                                                parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
-                                            ).build()
-                                        }
-                                    )
-                                    .async(descriptor.isSuspend)
-                                    .throws(descriptor.isSuspend)
-                                    .apply {
-                                        when {
-                                            descriptor.isSuspend -> {
-                                                returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType.SuspendFunction) ?: VOID)
-                                                addCode("try await kotlinClass.%L(value: value)", descriptor.name.identifier)
-                                            }
-                                            descriptor.extensionReceiverParameter != null -> {
-                                                returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType) ?: VOID)
-                                                addCode("kotlinClass.%L(value, value: value)", descriptor.name.identifier)
-                                            }
-                                            else -> {
-                                                returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType) ?: VOID)
-                                                addCode("kotlinClass.%L(value: value)", descriptor.name.identifier)
-                                            }
-                                        }
+
+                        kotlinClass.unsubstitutedMemberScope.getContributedDescriptors()
+                            .filter {
+                                (it as? CallableMemberDescriptor)?.overriddenDescriptors?.isEmpty() ?: true
+                            }
+                            .forEach { descriptor ->
+                                when (descriptor) {
+                                    is PropertyDescriptor -> {
+                                        addProperty(
+                                            PropertySpec.builder(descriptor.name.identifier, descriptor.type.spec(KotlinTypeSpecUsage.Default))
+                                                .getter(
+                                                    FunctionSpec.getterBuilder()
+                                                        .addStatement("kotlinClass.%L", descriptor.name.identifier)
+                                                        .build()
+                                                )
+                                                .build()
+                                        )
                                     }
-                                    .build()
-                            )
-                        }
+                                    is FunctionDescriptor -> {
+                                        addFunction(
+                                            FunctionSpec.builder(descriptor.name.identifier)
+                                                .addParameters(
+                                                    descriptor.valueParameters.map { parameter ->
+                                                        ParameterSpec.builder(
+                                                            parameter.name.identifier,
+                                                            parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
+                                                        ).build()
+                                                    }
+                                                )
+                                                .async(descriptor.isSuspend)
+                                                .throws(descriptor.isSuspend)
+                                                .apply {
+                                                    when {
+                                                        descriptor.isSuspend -> {
+                                                            returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType.SuspendFunction) ?: VOID)
+                                                            addCode("try await kotlinClass.%L(value: value)", descriptor.name.identifier)
+                                                        }
+                                                        descriptor.extensionReceiverParameter != null -> {
+                                                            returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType) ?: VOID)
+                                                            addCode("kotlinClass.%L(value, value: value)", descriptor.name.identifier)
+                                                        }
+                                                        else -> {
+                                                            returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType) ?: VOID)
+                                                            addCode("kotlinClass.%L(value: value)", descriptor.name.identifier)
+                                                        }
+                                                    }
+                                                }
+                                                .build()
+                                        )
+                                    }
+                                }
+                            }
                     }
-                }
+                    .build()
+            )
         }
 
     }
