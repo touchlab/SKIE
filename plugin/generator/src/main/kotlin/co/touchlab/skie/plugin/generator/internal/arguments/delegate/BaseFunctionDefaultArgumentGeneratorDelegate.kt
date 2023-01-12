@@ -1,3 +1,5 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
 import co.touchlab.skie.configuration.Configuration
@@ -12,6 +14,7 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.getNamespace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
@@ -36,6 +39,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
             .filter { descriptorProvider.shouldBeExposed(it) }
+            .filter { descriptorProvider.mapper.isBaseMethod(it) }
             .forEach {
                 generateOverloads(it, collisionDetector)
             }

@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
+import org.jetbrains.kotlin.resolve.descriptorUtil.declaresOrInheritsDefaultValue
 
 internal abstract class BaseDefaultArgumentGeneratorDelegate(
     protected val skieContext: SkieContext,
@@ -25,7 +25,7 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
 ) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
 
     protected val FunctionDescriptor.hasDefaultArguments: Boolean
-        get() = this.valueParameters.any { it.declaresDefaultValue() }
+        get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
 
     protected val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.getConfiguration(DefaultArgumentInterop.Enabled) && this.satisfiesMaximumDefaultArgumentCount
@@ -34,7 +34,7 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
         get() = this.defaultArgumentCount <= this.getConfiguration(DefaultArgumentInterop.MaximumDefaultArgumentCount)
 
     private val FunctionDescriptor.defaultArgumentCount: Int
-        get() = this.valueParameters.count { it.declaresDefaultValue() }
+        get() = this.valueParameters.count { it.declaresOrInheritsDefaultValue() }
 
     protected fun FunctionDescriptor.forEachNonCollidingDefaultArgumentOverload(
         collisionDetector: CollisionDetector,
@@ -53,7 +53,7 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
     private fun FunctionDescriptor.forEachDefaultArgumentOverload(
         action: (index: Int, overloadParameters: List<ValueParameterDescriptor>) -> Unit,
     ) {
-        val parametersWithDefaultValues = this.valueParameters.filter { it.hasDefaultValue() }
+        val parametersWithDefaultValues = this.valueParameters.filter { it.declaresOrInheritsDefaultValue() }
 
         parametersWithDefaultValues.forEachSubsetIndexed { index, omittedParameters ->
             if (omittedParameters.isNotEmpty()) {
