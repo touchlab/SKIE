@@ -3,16 +3,17 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.isSealed
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedInteropGenerator(
     skieContext: SkieContext,
+    override val descriptorProvider: DescriptorProvider,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     private val reporter: Reporter,
@@ -20,10 +21,10 @@ internal class SealedInteropGenerator(
 
     override val isActive: Boolean = true
 
-    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
-    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
+    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(descriptorProvider, configuration)
+    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(descriptorProvider, configuration)
 
-    override fun execute(descriptorProvider: NativeDescriptorProvider) {
+    override fun execute() {
         descriptorProvider.exportedClassDescriptors
             .filter { it.shouldHaveSealedInterop }
             .forEach {
@@ -52,7 +53,7 @@ internal class SealedInteropGenerator(
     }
 
     private fun verifyUniqueCaseNames(declaration: ClassDescriptor): Boolean {
-        val conflictingDeclarations = declaration.visibleSealedSubclasses
+        val conflictingDeclarations = declaration.explicitSealedSubclasses
             .groupBy { it.enumCaseName }
             .filter { it.value.size > 1 }
             .values

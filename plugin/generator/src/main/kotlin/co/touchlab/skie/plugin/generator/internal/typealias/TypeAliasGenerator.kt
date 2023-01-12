@@ -9,7 +9,6 @@ import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
@@ -19,6 +18,7 @@ import io.outfoxx.swiftpoet.TypeSpec
 
 internal class TypeAliasGenerator(
     private val skieContext: SkieContext,
+    private val descriptorProvider: DescriptorProvider,
     configuration: Configuration,
 ) : SkieCompilationPhase {
 
@@ -30,7 +30,7 @@ internal class TypeAliasGenerator(
 
     private val publicTypeAliasContainerName = KotlinTypeSwiftModel.StableFqNameNamespace.removeSuffix(".")
 
-    override fun execute(descriptorProvider: NativeDescriptorProvider) {
+    override fun execute() {
         skieContext.module.file("TypeAliases") {
             addTypeAliasContainer(descriptorProvider)
             addBaseTypeAliasContainerTypeAlias()

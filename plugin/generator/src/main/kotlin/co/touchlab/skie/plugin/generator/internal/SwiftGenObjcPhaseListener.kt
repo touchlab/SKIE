@@ -4,9 +4,7 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.ConfigurationKeys
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
-import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
@@ -19,25 +17,18 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
     override fun beforePhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
         super.beforePhase(phaseConfig, phaserState, context)
 
-        buildIr(context) { descriptorProvider, declarationBuilder ->
-            val swiftGenScheduler = SwiftGenScheduler(
-                skieContext = context.skieContext,
-                declarationBuilder = declarationBuilder,
-                namespaceProvider = NamespaceProvider(context.skieContext.module),
-                configuration = context.pluginConfiguration,
-                reporter = Reporter(context.configuration),
-            )
+        val skieScheduler = SkieScheduler(
+            skieContext = context.skieContext,
+            descriptorProvider = context.skieDescriptorProvider,
+            declarationBuilder = context.skieDeclarationBuilder,
+            namespaceProvider = NamespaceProvider(context.skieContext.module),
+            configuration = context.pluginConfiguration,
+            reporter = Reporter(context.configuration),
+        )
 
-            swiftGenScheduler.process(descriptorProvider)
-        }
+        skieScheduler.process()
     }
 
     private val CommonBackendContext.pluginConfiguration: Configuration
         get() = configuration.get(ConfigurationKeys.swiftGenConfiguration, Configuration {})
-
-    private fun buildIr(context: CommonBackendContext, action: (NativeDescriptorProvider, DeclarationBuilder) -> Unit) {
-        val descriptorProvider = context.skieDescriptorProvider
-        val declarationBuilder = context.skieDeclarationBuilder
-        action(descriptorProvider, declarationBuilder)
-    }
 }

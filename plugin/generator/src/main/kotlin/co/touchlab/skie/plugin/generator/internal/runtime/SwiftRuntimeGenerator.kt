@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.generator.internal.runtime
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class SwiftRuntimeGenerator(
@@ -15,7 +14,7 @@ internal class SwiftRuntimeGenerator(
         // TODO change to per package filter
         && SkieFeature.SuspendInterop in configuration.enabledFeatures
 
-    override fun execute(descriptorProvider: NativeDescriptorProvider) {
+    override fun execute() {
         getSwiftRuntimeFiles().forEach {
             skieContext.module.file(it.swiftFileName, it.readText())
         }

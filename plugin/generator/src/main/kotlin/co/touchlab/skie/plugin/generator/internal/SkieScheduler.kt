@@ -16,8 +16,9 @@ import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
 
-internal class SwiftGenScheduler(
+internal class SkieScheduler(
     skieContext: SkieContext,
+    descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
@@ -27,10 +28,12 @@ internal class SwiftGenScheduler(
     private val compilationPhases = listOf(
         IrValidator(
             reporter = reporter,
-            configuration = configuration
+            configuration = configuration,
+            descriptorProvider = descriptorProvider,
         ),
         KotlinRuntimeHidingPhase(
             skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
         ),
         SwiftRuntimeGenerator(
             skieContext = skieContext,
@@ -40,10 +43,12 @@ internal class SwiftGenScheduler(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
             configuration = configuration,
+            descriptorProvider = descriptorProvider,
             reporter = reporter,
         ),
         DefaultArgumentGenerator(
             skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
             configuration = configuration,
         ),
@@ -51,29 +56,32 @@ internal class SwiftGenScheduler(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
             configuration = configuration,
-            reporter = reporter,
+            descriptorProvider = descriptorProvider,
         ),
         SuspendGenerator(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
             configuration = configuration,
+            descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
         ),
         DataStructGenerator(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
             configuration = configuration,
+            descriptorProvider = descriptorProvider,
             reporter = reporter,
         ),
         TypeAliasGenerator(
             skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
             configuration = configuration,
         ),
     )
 
-    fun process(descriptorProvider: NativeDescriptorProvider) {
+    fun process() {
         compilationPhases
             .filter { it.isActive }
-            .forEach { it.execute(descriptorProvider) }
+            .forEach { it.execute() }
     }
 }

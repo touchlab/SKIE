@@ -4,5 +4,5 @@ internal interface SkieCompilationPhase {
 
     val isActive: Boolean
 
-    fun execute(descriptorProvider: NativeDescriptorProvider)
+    fun execute()
 }

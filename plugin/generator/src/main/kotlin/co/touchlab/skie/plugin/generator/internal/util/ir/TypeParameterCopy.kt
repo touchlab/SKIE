@@ -18,6 +18,7 @@ internal fun TypeParameterDescriptor.copy(newOwner: CallableDescriptor): TypePar
         this.source,
         this.storageManager,
     ).also { copy ->
+        // TODO Check that this works for nested generic types like <T, X : List<T>>
         this.upperBounds.forEach {
             copy.addUpperBound(it)
         }

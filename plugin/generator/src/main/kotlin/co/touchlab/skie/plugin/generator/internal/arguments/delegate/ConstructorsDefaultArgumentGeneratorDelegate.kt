@@ -31,15 +31,17 @@ import org.jetbrains.kotlin.ir.expressions.IrBody
 
 internal class ConstructorsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
+    private val descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
+    collisionDetector: CollisionDetector,
     private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
+) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, collisionDetector) {
 
-    override fun generate(descriptorProvider: NativeDescriptorProvider, collisionDetector: CollisionDetector) {
+    override fun generate() {
         descriptorProvider.allSupportedClasses().forEach { classDescriptor ->
             classDescriptor.allSupportedConstructors(descriptorProvider).forEach {
-                generateOverloads(it, descriptorProvider.mapper, collisionDetector)
+                generateOverloads(it, descriptorProvider.mapper)
             }
         }
     }
@@ -56,8 +58,8 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
             .filter { it.hasDefaultArguments }
             .filter { descriptorProvider.shouldBeExposed(it) }
 
-    private fun generateOverloads(constructor: ClassConstructorDescriptor, mapper: ObjCExportMapper, collisionDetector: CollisionDetector) {
-        constructor.forEachNonCollidingDefaultArgumentOverload(collisionDetector) { overloadParameters ->
+    private fun generateOverloads(constructor: ClassConstructorDescriptor, mapper: ObjCExportMapper) {
+        constructor.forEachNonCollidingDefaultArgumentOverload { overloadParameters ->
             val overload = generateOverload(constructor, overloadParameters)
 
             fixOverloadName(overload, mapper)

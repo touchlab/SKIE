@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -11,6 +12,7 @@ import io.outfoxx.swiftpoet.TypeSpec
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedEnumGeneratorDelegate(
+    override val descriptorProvider: DescriptorProvider,
     override val configuration: Configuration,
 ) : SealedGeneratorExtensionContainer {
 
@@ -36,7 +38,7 @@ internal class SealedEnumGeneratorDelegate(
 
     context(SwiftPoetScope)
     private fun TypeSpec.Builder.addSealedEnumCases(declaration: ClassDescriptor): TypeSpec.Builder {
-        declaration.visibleSealedSubclasses
+        declaration.explicitSealedSubclasses
             .forEach { sealedSubclass ->
                 addEnumCase(
                     sealedSubclass.enumCaseName,

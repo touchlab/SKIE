@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeString
@@ -14,6 +15,7 @@ import io.outfoxx.swiftpoet.TypeVariableName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedFunctionGeneratorDelegate(
+    override val descriptorProvider: DescriptorProvider,
     override val configuration: Configuration,
 ) : SealedGeneratorExtensionContainer, SwiftPoetExtensionContainer {
 
@@ -71,7 +73,7 @@ internal class SealedFunctionGeneratorDelegate(
         declaration: ClassDescriptor,
         enumType: TypeName,
     ): CodeBlock.Builder {
-        declaration.visibleSealedSubclasses
+        declaration.explicitSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
                 val parameterName = declaration.enumConstructorParameterName
                 val subclassName = with(subclassSymbol) { swiftNameWithTypeParametersForSealedCase(declaration).canonicalName }
@@ -105,7 +107,7 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     private val ClassDescriptor.hasAnyVisibleSealedSubclasses: Boolean
-        get() = this.sealedSubclasses.any { it.isVisibleSealedSubclass }
+        get() = this.sealedSubclasses.any { it.isExplicitSealedSubclass }
 
     context(SwiftPoetScope)
     private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: ClassDescriptor, enumType: TypeName) {

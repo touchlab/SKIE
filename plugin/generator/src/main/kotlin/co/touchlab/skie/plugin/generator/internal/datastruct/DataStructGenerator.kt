@@ -8,7 +8,6 @@ import co.touchlab.skie.plugin.api.module.stableSpec
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -29,6 +28,7 @@ internal class DataStructGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
+    private val descriptorProvider: DescriptorProvider,
     private val reporter: Reporter,
 ) : BaseGenerator(skieContext, namespaceProvider, configuration) {
 
@@ -36,8 +36,8 @@ internal class DataStructGenerator(
 
     override val isActive: Boolean = true
 
-    override fun execute(descriptorProvider: NativeDescriptorProvider): Unit = with(descriptorProvider) {
-        exportedClassDescriptors
+    override fun execute() {
+        descriptorProvider.exportedClassDescriptors
             .filter {
                 it.getConfiguration(DataStruct.Enabled) && it.isData && !it.belongsToSkieRuntime
             }
@@ -46,7 +46,6 @@ internal class DataStructGenerator(
             }
     }
 
-    context(DescriptorProvider)
     private fun generate(declaration: ClassDescriptor) {
         val primaryConstructor = declaration.unsubstitutedPrimaryConstructor ?: return
 

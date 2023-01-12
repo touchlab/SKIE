@@ -10,11 +10,12 @@ import co.touchlab.skie.plugin.generator.internal.arguments.delegate.Constructor
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ExtensionFunctionDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.TopLevelFunctionDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
-import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 
 internal class DefaultArgumentGenerator(
+    descriptorProvider: NativeDescriptorProvider,
     skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
@@ -24,18 +25,46 @@ internal class DefaultArgumentGenerator(
 
     private val sharedCounter = SharedCounter()
 
+    private val collisionDetector = CollisionDetector(descriptorProvider)
+
     private val delegates = listOf(
-        ClassMethodsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
-        ConstructorsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
-        TopLevelFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
-        ExtensionFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
+        ClassMethodsDefaultArgumentGeneratorDelegate(
+            skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
+            declarationBuilder = declarationBuilder,
+            configuration = configuration,
+            collisionDetector = collisionDetector,
+            sharedCounter = sharedCounter,
+        ),
+        ConstructorsDefaultArgumentGeneratorDelegate(
+            skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
+            declarationBuilder = declarationBuilder,
+            configuration = configuration,
+            collisionDetector = collisionDetector,
+            sharedCounter = sharedCounter
+        ),
+        TopLevelFunctionDefaultArgumentGeneratorDelegate(
+            skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
+            declarationBuilder = declarationBuilder,
+            configuration = configuration,
+            collisionDetector = collisionDetector,
+            sharedCounter = sharedCounter
+        ),
+        ExtensionFunctionDefaultArgumentGeneratorDelegate(
+            skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
+            declarationBuilder = declarationBuilder,
+            configuration = configuration,
+            collisionDetector = collisionDetector,
+            sharedCounter = sharedCounter
+        ),
     )
 
-    override fun execute(descriptorProvider: NativeDescriptorProvider) {
-        val collisionDetector = CollisionDetector(descriptorProvider)
-
+    override fun execute() {
         delegates.forEach {
-            it.generate(descriptorProvider, collisionDetector)
+            it.generate()
         }
     }
 }

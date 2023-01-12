@@ -22,7 +22,8 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
     protected val skieContext: SkieContext,
     protected val declarationBuilder: DeclarationBuilder,
     override val configuration: Configuration,
-) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
+    private val collisionDetector: CollisionDetector,
+    ) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
 
     protected val FunctionDescriptor.hasDefaultArguments: Boolean
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
@@ -37,7 +38,6 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
         get() = this.valueParameters.count { it.declaresOrInheritsDefaultValue() }
 
     protected fun FunctionDescriptor.forEachNonCollidingDefaultArgumentOverload(
-        collisionDetector: CollisionDetector,
         action: (overloadParameters: List<ValueParameterDescriptor>) -> Unit,
     ) {
         this.forEachDefaultArgumentOverload { overloadParameters ->

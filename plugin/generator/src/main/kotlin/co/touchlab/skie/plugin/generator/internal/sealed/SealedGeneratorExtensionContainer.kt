@@ -1,18 +1,20 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.gradle.SealedInterop
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.module.stableSpec
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
-import co.touchlab.skie.plugin.generator.internal.util.isVisibleFromSwift
 import io.outfoxx.swiftpoet.TypeName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 
 internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, SwiftPoetExtensionContainer {
+
+    val descriptorProvider: DescriptorProvider
 
     val ClassDescriptor.elseCaseName: String
         get() = this.getConfiguration(SealedInterop.ElseName)
@@ -25,14 +27,14 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
         }
 
     val ClassDescriptor.hasElseCase: Boolean
-        get() = this.sealedSubclasses.any { !it.isVisibleSealedSubclass } || this.sealedSubclasses.isEmpty()
+        get() = this.sealedSubclasses.any { !it.isExplicitSealedSubclass } || this.sealedSubclasses.isEmpty()
 
-    val ClassDescriptor.visibleSealedSubclasses: List<ClassDescriptor>
-        get() = this.sealedSubclasses.filter { it.isVisibleSealedSubclass }
+    val ClassDescriptor.explicitSealedSubclasses: List<ClassDescriptor>
+        get() = this.sealedSubclasses.filter { it.isExplicitSealedSubclass }
 
-    val ClassDescriptor.isVisibleSealedSubclass: Boolean
+    val ClassDescriptor.isExplicitSealedSubclass: Boolean
         get() {
-            val isVisible = this.isVisibleFromSwift
+            val isVisible = descriptorProvider.shouldBeExposed(this)
 
             val isEnabled = this.getConfiguration(SealedInterop.Case.Visible)
 

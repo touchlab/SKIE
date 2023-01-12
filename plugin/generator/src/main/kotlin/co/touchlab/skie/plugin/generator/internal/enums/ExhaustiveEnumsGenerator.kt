@@ -19,7 +19,6 @@ import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -47,20 +46,19 @@ internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
-    private val reporter: Reporter,
+    private val descriptorProvider: NativeDescriptorProvider,
 ) : BaseGenerator(skieContext, namespaceProvider, configuration) {
 
     override val isActive: Boolean = true
 
-    override fun execute(descriptorProvider: NativeDescriptorProvider): Unit = with(descriptorProvider) {
-        exportedClassDescriptors
+    override fun execute() {
+        descriptorProvider.exportedClassDescriptors
             .filter(::shouldGenerateExhaustiveEnums)
             .forEach {
                 generate(it)
             }
     }
 
-    context(NativeDescriptorProvider)
     private fun generate(declaration: ClassDescriptor) {
         module.configure {
             declaration.swiftModel.visibility = SwiftModelVisibility.Replaced
@@ -114,13 +112,13 @@ internal class ExhaustiveEnumsGenerator(
         }
     }
 
-    context(NativeDescriptorProvider, SwiftPoetScope)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
             .filterIsInstance<PropertyDescriptor>()
-            .filter { mapper.isBaseProperty(it) && mapper.isObjCProperty(it) }
+            .filter { descriptorProvider.mapper.isBaseProperty(it) && descriptorProvider.mapper.isObjCProperty(it) }
             .forEach { property ->
                 addProperty(
                     PropertySpec.builder(
@@ -132,7 +130,7 @@ internal class ExhaustiveEnumsGenerator(
                             FunctionSpec.getterBuilder()
                                 .addStatement(
                                     "return %L(self as _ObjectiveCType).%N",
-                                    if (mapper.doesThrow(property.getter!!)) "try " else "",
+                                    if (descriptorProvider.mapper.doesThrow(property.getter!!)) "try " else "",
                                     property.regularPropertySwiftModel.reference,
                                 )
                                 .build()
@@ -148,7 +146,7 @@ internal class ExhaustiveEnumsGenerator(
                                         )
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
-                                            if (mapper.doesThrow(property.setter!!)) "try " else "",
+                                            if (descriptorProvider.mapper.doesThrow(property.setter!!)) "try " else "",
                                             property.regularPropertySwiftModel.reference,
                                         )
                                         .build()
@@ -160,13 +158,13 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(NativeDescriptorProvider, SwiftPoetScope)
+    context(SwiftPoetScope)
     private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
         declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
             .filterIsInstance<FunctionDescriptor>()
-            .filter { mapper.isBaseMethod(it) }
+            .filter { descriptorProvider.mapper.isBaseMethod(it) }
             .forEach { function ->
                 if (function.isSuspend) {
                     return@forEach
@@ -189,11 +187,11 @@ internal class ExhaustiveEnumsGenerator(
                                 )
                             }
 
-                            throws(mapper.doesThrow(function))
+                            throws(descriptorProvider.mapper.doesThrow(function))
                         }
                         .addStatement(
                             "return %L(self as _ObjectiveCType).%N(%L)",
-                            if (mapper.doesThrow(function)) "try " else "",
+                            if (descriptorProvider.mapper.doesThrow(function)) "try " else "",
                             function.swiftModel.reference,
                             function.valueParameters.map { CodeBlock.of("%N", it.name.asString()) }.joinToCode(", "),
                         )

@@ -75,6 +75,9 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     override fun shouldBeExposed(descriptor: CallableMemberDescriptor): Boolean =
         mapper.shouldBeExposed(descriptor)
 
+    override fun shouldBeExposed(descriptor: ClassDescriptor): Boolean =
+        mapper.shouldBeExposed(descriptor)
+
     override fun registerDescriptor(descriptor: DeclarationDescriptor) {
         when (descriptor) {
             is ClassDescriptor -> registerDescriptor(descriptor)
@@ -84,7 +87,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     }
 
     private fun registerDescriptor(descriptor: ClassDescriptor) {
-        if (!mapper.shouldBeExposed(descriptor) || !descriptor.isExported) {
+        if (!shouldBeExposed(descriptor) || !descriptor.isExported) {
             return
         }
 
@@ -93,7 +96,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     }
 
     private fun registerDescriptor(descriptor: CallableMemberDescriptor) {
-        if (!mapper.shouldBeExposed(descriptor) || !descriptor.isExported) {
+        if (!shouldBeExposed(descriptor) || !descriptor.isExported) {
             return
         }
 

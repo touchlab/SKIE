@@ -31,26 +31,28 @@ import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
 
 internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
+    private val descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
+    collisionDetector: CollisionDetector,
     private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
+) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, collisionDetector) {
 
-    override fun generate(descriptorProvider: NativeDescriptorProvider, collisionDetector: CollisionDetector) {
+    override fun generate() {
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
             .filter { descriptorProvider.shouldBeExposed(it) }
             .filter { descriptorProvider.mapper.isBaseMethod(it) }
             .forEach {
-                generateOverloads(it, collisionDetector)
+                generateOverloads(it)
             }
     }
 
     protected abstract fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor>
 
-    private fun generateOverloads(function: SimpleFunctionDescriptor, collisionDetector: CollisionDetector) {
-        function.forEachNonCollidingDefaultArgumentOverload(collisionDetector) { overloadParameters ->
+    private fun generateOverloads(function: SimpleFunctionDescriptor) {
+        function.forEachNonCollidingDefaultArgumentOverload { overloadParameters ->
             generateOverload(function, overloadParameters)
         }
     }
