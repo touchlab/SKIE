@@ -2,13 +2,21 @@ package co.touchlab.skie.plugin.api.model.type
 
 sealed interface KotlinTypeSpecUsage {
     sealed interface ParameterType: KotlinTypeSpecUsage {
-        object Lambda: ParameterType
+        sealed interface Lambda: ParameterType {
+            object OptionalWrapped: Lambda
+
+            companion object: Lambda
+        }
 
         companion object: ParameterType
     }
 
     sealed interface ReturnType: KotlinTypeSpecUsage {
-        object Lambda: ReturnType
+        sealed interface Lambda: ReturnType {
+            object OptionalWrapped: Lambda
+
+            companion object: Lambda
+        }
 
         sealed interface SuspendFunction: ReturnType {
             object OptionalWrapped: SuspendFunction

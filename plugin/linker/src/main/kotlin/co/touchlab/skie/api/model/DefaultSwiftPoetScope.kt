@@ -186,11 +186,27 @@ internal class DefaultSwiftPoetScope(
                 TypeParam,
                 Default,
             )
+            ParameterType.Lambda.OptionalWrapped -> listOf(
+                ParameterType.Lambda.OptionalWrapped,
+                ParameterType.Lambda,
+                ParameterType,
+                TypeParam.AllowingNullability,
+                TypeParam,
+                Default,
+            )
             ReturnType -> listOf(
                 ReturnType,
                 Default,
             )
             ReturnType.Lambda -> listOf(
+                ReturnType.Lambda,
+                ReturnType,
+                TypeParam.AllowingNullability,
+                TypeParam,
+                Default,
+            )
+            ReturnType.Lambda.OptionalWrapped -> listOf(
+                ReturnType.Lambda.OptionalWrapped,
                 ReturnType.Lambda,
                 ReturnType,
                 TypeParam.AllowingNullability,
@@ -264,7 +280,8 @@ internal class DefaultSwiftPoetScope(
                 TypeParam.IsHashable -> anyHashable
                 TypeParam.IsReference -> type.spec(TypeParam.IsReference)
                 TypeParam.ObjcCollectionElement -> ANY_OBJECT
-                ParameterType.Lambda, ReturnType.Lambda -> if (type == NativeKotlinType.Pointer.Other) any.makeOptional() else null
+                ParameterType.Lambda -> type.spec(ParameterType.Lambda.OptionalWrapped).makeOptional()
+                ReturnType.Lambda -> type.spec(ReturnType.Lambda.OptionalWrapped).makeOptional()
                 else -> null
             }
             is NativeKotlinType.BlockPointer -> {
@@ -277,6 +294,10 @@ internal class DefaultSwiftPoetScope(
                     ParameterType -> lambdaType.copy(attributes = listOf(AttributeSpec.ESCAPING))
                     ParameterType.Lambda -> lambdaType.copy(
                         attributes = listOf(AttributeSpec.ESCAPING),
+                        returnType = returnType.spec(TypeParam.AllowingNullability),
+                    )
+                    ParameterType.Lambda.OptionalWrapped -> lambdaType.copy(
+                        attributes = emptyList(),
                         returnType = returnType.spec(TypeParam.AllowingNullability),
                     )
 
@@ -362,12 +383,12 @@ internal class DefaultSwiftPoetScope(
                     else -> null
                 }
                 NativeKotlinType.Reference.Known.Unit -> when (usage) {
-                    Default -> DeclaredTypeName.typeName(".KotlinUnit")
+                    Default, ReturnType.Lambda.OptionalWrapped -> DeclaredTypeName.typeName(".KotlinUnit")
                     ReturnType -> VOID
                     else -> null
                 }
                 NativeKotlinType.Reference.Known.Nothing -> when (usage) {
-                    Default, ReturnType.SuspendFunction -> DeclaredTypeName.typeName(".KotlinNothing")
+                    Default, ReturnType.SuspendFunction, ReturnType.Lambda.OptionalWrapped -> DeclaredTypeName.typeName(".KotlinNothing")
                     ReturnType -> VOID
                     else -> null
                 }
@@ -395,7 +416,8 @@ internal class DefaultSwiftPoetScope(
                                 TypeParam.IsHashable -> anyHashable
                                 TypeParam.OptionalWrapped -> unwrappedTypeParam.spec(TypeParam.OptionalWrapped)
                                 TypeParam.ObjcCollectionElement -> ANY_OBJECT
-                                ParameterType.Lambda, ReturnType.Lambda -> if (bound.type == NativeKotlinType.Pointer.Other) TypeVariableName(name).makeOptional() else null
+                                ParameterType.Lambda -> unwrappedTypeParam.spec(ParameterType.Lambda.OptionalWrapped).makeOptional()
+                                ReturnType.Lambda -> unwrappedTypeParam.spec(ReturnType.Lambda.OptionalWrapped).makeOptional()
                                 else -> null
                             }
                         }
@@ -420,14 +442,20 @@ internal class DefaultSwiftPoetScope(
                         }
                         NativeKotlinType.Pointer.Other -> when (usage) {
                             Default -> bound.exactSpec(Default)
-                            ParameterType.Lambda, ReturnType.Lambda, ReturnType.SuspendFunction, ReturnType.SuspendFunction.OptionalWrapped, TypeParam -> TypeVariableName(name)
+                            ParameterType.Lambda,
+                            ParameterType.Lambda.OptionalWrapped,
+                            ReturnType.Lambda,
+                            ReturnType.Lambda.OptionalWrapped,
+                            ReturnType.SuspendFunction,
+                            ReturnType.SuspendFunction.OptionalWrapped,
+                            TypeParam -> TypeVariableName(name)
                             TypeParam.IsHashable -> anyHashable
                             TypeParam.OptionalWrapped -> bound.exactSpec(TypeParam.OptionalWrapped)
                             else -> null
                         }
                         NativeKotlinType.Pointer.NativePtr -> when (usage) {
                             Default -> bound.exactSpec(Default)
-                            ParameterType.Lambda, ReturnType.Lambda, ReturnType.SuspendFunction -> TypeVariableName(name).makeOptional()
+                            ParameterType.Lambda, ReturnType.Lambda, ReturnType.SuspendFunction, TypeParam.AllowingNullability -> TypeVariableName(name).makeOptional()
                             TypeParam, ReturnType.SuspendFunction.OptionalWrapped -> TypeVariableName(name)
                             TypeParam.IsHashable -> anyHashable
                             else -> null
@@ -473,7 +501,10 @@ internal class DefaultSwiftPoetScope(
             }
             NativeKotlinType.Pointer.Other -> when (usage) {
                 Default, TypeParam.OptionalWrapped -> DeclaredTypeName.typeName("Swift.UnsafeMutableRawPointer")
-                TypeParam, ReturnType.SuspendFunction.OptionalWrapped -> any
+                TypeParam,
+                ParameterType.Lambda.OptionalWrapped,
+                ReturnType.Lambda.OptionalWrapped,
+                ReturnType.SuspendFunction.OptionalWrapped -> any
                 TypeParam.IsHashable -> anyHashable
                 TypeParam.IsReference -> ANY_OBJECT
                 else -> null
