@@ -7,7 +7,7 @@ import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.function.reference
-import co.touchlab.skie.plugin.api.model.property.reference
+import co.touchlab.skie.plugin.api.model.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.packageName
 import co.touchlab.skie.plugin.api.model.type.simpleName
@@ -133,7 +133,7 @@ internal class ExhaustiveEnumsGenerator(
                                 .addStatement(
                                     "return %L(self as _ObjectiveCType).%N",
                                     if (mapper.doesThrow(property.getter!!)) "try " else "",
-                                    property.swiftModel.reference,
+                                    property.regularPropertySwiftModel.reference,
                                 )
                                 .build()
                         )
@@ -149,7 +149,7 @@ internal class ExhaustiveEnumsGenerator(
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
                                             if (mapper.doesThrow(property.setter!!)) "try " else "",
-                                            property.swiftModel.reference,
+                                            property.regularPropertySwiftModel.reference,
                                         )
                                         .build()
                                 )

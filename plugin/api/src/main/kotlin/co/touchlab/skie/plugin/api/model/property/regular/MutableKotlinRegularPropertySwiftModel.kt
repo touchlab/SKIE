@@ -1,9 +1,9 @@
-package co.touchlab.skie.plugin.api.model.property
+package co.touchlab.skie.plugin.api.model.property.regular
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 
-interface MutableKotlinPropertySwiftModel : KotlinPropertySwiftModel {
+interface MutableKotlinRegularPropertySwiftModel : KotlinRegularPropertySwiftModel {
 
     override var visibility: SwiftModelVisibility
 

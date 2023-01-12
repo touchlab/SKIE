@@ -11,7 +11,9 @@ import co.touchlab.skie.plugin.api.model.isHidden
 import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.isReplaced
 import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.property.name
+import co.touchlab.skie.plugin.api.model.property.extension.KotlinInterfaceExtensionPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.property.regular.KotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.property.regular.name
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.fqName
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
@@ -45,9 +47,23 @@ internal class ApiNotesFactory(
             swiftFqName = this.fqName,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,
-            methods = descriptorProvider.exportedBaseFunctions(this.descriptorHolder).map { it.swiftModel.toApiNote() },
-            properties = descriptorProvider.exportedBaseProperties(this.descriptorHolder).map { it.swiftModel.toApiNote() },
+            methods = this.getApiNoteMethods(),
+            properties = this.getApiNoteProperties(),
         )
+
+    context(SwiftModelScope)
+    private fun KotlinTypeSwiftModel.getApiNoteMethods(): List<ApiNotesMethod> =
+        descriptorProvider.exportedBaseFunctions(this.descriptorHolder).map { it.swiftModel.toApiNote() } +
+            getExportedBasePropertiesSwiftModel().filterIsInstance<KotlinInterfaceExtensionPropertySwiftModel>().flatMap { it.toApiNotes() }
+
+
+    context(SwiftModelScope)
+    private fun KotlinTypeSwiftModel.getApiNoteProperties(): List<ApiNotesProperty> =
+        getExportedBasePropertiesSwiftModel().filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote() }
+
+    context(SwiftModelScope)
+    private fun KotlinTypeSwiftModel.getExportedBasePropertiesSwiftModel(): List<KotlinPropertySwiftModel> =
+        descriptorProvider.exportedBaseProperties(this.descriptorHolder).map { it.swiftModel }
 
     private fun KotlinFunctionSwiftModel.toApiNote(): ApiNotesMethod =
         ApiNotesMethod(
@@ -58,7 +74,7 @@ internal class ApiNotesFactory(
             isRemoved = this.visibility.isRemoved,
         )
 
-    private fun KotlinPropertySwiftModel.toApiNote(): ApiNotesProperty =
+    private fun KotlinRegularPropertySwiftModel.toApiNote(): ApiNotesProperty =
         ApiNotesProperty(
             objCName = this.objCName,
             kind = this.receiver.kind.toMemberKind(),
@@ -66,6 +82,9 @@ internal class ApiNotesFactory(
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,
         )
+
+    private fun KotlinInterfaceExtensionPropertySwiftModel.toApiNotes(): List<ApiNotesMethod> =
+        accessors.map { it.toApiNote() }
 
     private val SwiftModelVisibility.isHiddenOrReplaced: Boolean
         get() = this.isHidden || this.isReplaced

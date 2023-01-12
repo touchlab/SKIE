@@ -33,7 +33,7 @@ object ArrayDataStructTypeMapper : DataStructTypeMapper {
         parameter: ValueParameterDescriptor,
     ): DataStructTypeMapper.Mapping? {
         val propertyType = property.type.native as? NativeKotlinType.Reference.Known.Array ?: return null
-        return mapping(property.spec.name, propertyType)
+        return mapping(property.regularPropertySpec.name, propertyType)
     }
 
     context(SwiftPoetScope)

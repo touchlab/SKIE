@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.datastruct
 
-import co.touchlab.skie.plugin.api.model.property.reference
+import co.touchlab.skie.plugin.api.model.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
@@ -18,7 +18,7 @@ object ScalarDataStructTypeMapper : DataStructTypeMapper {
     ): DataStructTypeMapper.Mapping? {
         fun initializerMapping(kotlinName: TypeName, swiftName: TypeName) = DataStructTypeMapper.Mapping(
             swiftTypeName = swiftName,
-            kotlinToSwiftMapping = CodeBlock.of("%T(%N)", swiftName, property.swiftModel.reference),
+            kotlinToSwiftMapping = CodeBlock.of("%T(%N)", swiftName, property.regularPropertySwiftModel.reference),
             swiftToKotlinMapping = CodeBlock.of("%T(%N)", kotlinName, parameter.name.asString()),
         )
 

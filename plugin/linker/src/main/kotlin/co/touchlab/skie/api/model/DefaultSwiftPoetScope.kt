@@ -3,7 +3,7 @@
 package co.touchlab.skie.api.model
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.property.reference
+import co.touchlab.skie.plugin.api.model.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage.*
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
@@ -576,8 +576,11 @@ internal class DefaultSwiftPoetScope(
     override val SourceFile.spec: DeclaredTypeName
         get() = DeclaredTypeName.qualifiedLocalTypeName(this.swiftModel.fqName)
 
-    override val PropertyDescriptor.spec: PropertySpec
-        get() = PropertySpec.builder(this.swiftModel.reference, type.spec(Default)).build()
+    override val PropertyDescriptor.regularPropertySpec: PropertySpec
+        get() = PropertySpec.builder(this.regularPropertySwiftModel.reference, type.spec(Default)).build()
+
+    override val PropertyDescriptor.interfaceExtensionPropertySpec: FunctionSpec
+        get() = TODO("Not yet implemented")
 
     override val FunctionDescriptor.spec: FunctionSpec
         get() = TODO("Not yet implemented")

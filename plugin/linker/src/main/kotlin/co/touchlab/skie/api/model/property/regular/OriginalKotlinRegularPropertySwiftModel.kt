@@ -1,17 +1,17 @@
-package co.touchlab.skie.api.model.property
+package co.touchlab.skie.api.model.property.regular
 
-import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
-class OriginalKotlinPropertySwiftModel(
+class OriginalKotlinRegularPropertySwiftModel(
     propertyDescriptor: PropertyDescriptor,
     receiver: KotlinTypeSwiftModel,
     namer: ObjCExportNamer,
-) : BaseKotlinPropertySwiftModel(propertyDescriptor, receiver, namer) {
+) : BaseKotlinRegularPropertySwiftModel(propertyDescriptor, receiver, namer) {
 
     override val isChanged: Boolean = false
 
-    override val original: KotlinPropertySwiftModel = this
+    override val original: KotlinRegularPropertySwiftModel = this
 }

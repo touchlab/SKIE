@@ -1,16 +1,16 @@
-package co.touchlab.skie.api.model.property
+package co.touchlab.skie.api.model.property.regular
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
-abstract class BaseKotlinPropertySwiftModel(
+abstract class BaseKotlinRegularPropertySwiftModel(
     final override val descriptor: PropertyDescriptor,
     override val receiver: KotlinTypeSwiftModel,
     namer: ObjCExportNamer,
-) : KotlinPropertySwiftModel {
+) : KotlinRegularPropertySwiftModel {
 
     override val identifier: String = namer.getPropertyName(descriptor)
 

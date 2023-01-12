@@ -1,7 +1,9 @@
 package co.touchlab.skie.api.model.function
 
+import co.touchlab.skie.api.model.parameter.OriginalKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -15,7 +17,7 @@ abstract class BaseKotlinFunctionSwiftModel(
     override val identifier: String
         get() = originalIdentifier
 
-    override val parameters: List<KotlinFunctionSwiftModel.Parameter>
+    override val parameters: List<KotlinParameterSwiftModel>
         get() = originalParameters
 
     override val visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
@@ -24,7 +26,7 @@ abstract class BaseKotlinFunctionSwiftModel(
 
     private val originalIdentifier: String
 
-    private val originalParameters: List<KotlinFunctionSwiftModel.Parameter>
+    private val originalParameters: List<KotlinParameterSwiftModel>
 
     init {
         val swiftName = namer.getSwiftName(descriptor)

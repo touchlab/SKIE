@@ -29,7 +29,9 @@ interface SwiftPoetScope : SwiftModelScope {
 
     val SourceFile.spec: DeclaredTypeName
 
-    val PropertyDescriptor.spec: PropertySpec
+    val PropertyDescriptor.regularPropertySpec: PropertySpec
+
+    val PropertyDescriptor.interfaceExtensionPropertySpec: FunctionSpec
 
     val FunctionDescriptor.spec: FunctionSpec
 }
