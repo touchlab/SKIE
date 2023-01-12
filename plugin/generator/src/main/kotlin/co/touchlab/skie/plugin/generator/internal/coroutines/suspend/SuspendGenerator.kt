@@ -52,6 +52,7 @@ internal class SuspendGenerator(
     private fun ClassDescriptor.allDeclaredMethods(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
         this.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
             .filterIsInstance<SimpleFunctionDescriptor>()
+            .filter { descriptorProvider.shouldBeExposed(it) }
             .filter { descriptorProvider.mapper.isBaseMethod(it) }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
