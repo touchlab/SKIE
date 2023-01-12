@@ -396,17 +396,39 @@ sealed interface TestedType {
                 //     listOf(Builtin.NativePtr),
                 //     Builtin.NativePtr,
                 // )
+                // Nullable(MutableSet(TypeParam(listOf(Lambda(
+                //     false, null, listOf(Builtin.String), Builtin.String,
+                // )))))
+
+                // Lambda(
+                //     false,
+                //     null,
+                //     listOf(
+                //         Array(
+                //             TypeParam(listOf(Lambda(
+                //                 false, null, listOf(Builtin.String), Builtin.String,
+                //             )))
+                //         )
+                //     ),
+                //     Array(
+                //         TypeParam(listOf(Lambda(
+                //             false, null, listOf(Builtin.String), Builtin.String,
+                //         )))
+                //     )
+                // )
             ) //+ CLASS_TYPE_PARAMS + level(CLASS_TYPE_PARAMS)
         }
 
-        val ENABLED_FILTER: (TestedType) -> Boolean = {
+        val ENABLED_FILTER: (TestedType) -> Boolean = { outerType ->
             fun hasLambdaTypeParam(type: TestedType): Boolean = when (type) {
                 is WithTypeParameters -> type.typeParameters.any { it is Lambda || hasLambdaTypeParam(it) }
                 is TypeParam -> type.bounds.any { it is Lambda || hasLambdaTypeParam(it) }
+                is Nullable -> type.wrapped is Lambda || hasLambdaTypeParam(type.wrapped)
+                is Lambda -> hasLambdaTypeParam(type.returnType) || type.parameterTypes.any { hasLambdaTypeParam(it) }
                 else -> false
             }
 
-            !hasLambdaTypeParam(it)
+            !hasLambdaTypeParam(outerType)
         }
 
         val ALL_BUT_SECOND_LEVEL by lazy {
