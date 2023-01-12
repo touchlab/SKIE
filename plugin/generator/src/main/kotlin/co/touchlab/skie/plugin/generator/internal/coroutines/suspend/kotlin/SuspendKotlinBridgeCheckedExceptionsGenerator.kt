@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irExprBody
 import org.jetbrains.kotlin.ir.builders.irGetField
 import org.jetbrains.kotlin.ir.builders.irVararg
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
 import org.jetbrains.kotlin.ir.expressions.IrClassReference
@@ -21,7 +23,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrClassReferenceImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrFieldSymbolImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.typeWith
-import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.referenceClassifier
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -63,10 +64,13 @@ internal class SuspendKotlinBridgeCheckedExceptionsGenerator {
 
         field.initializer = createCheckExceptionsFieldInitializer(fieldSymbol, originalFunctionDescriptor)
 
-        bridgingFunction.file.addChild(field)
+        bridgingFunction.parentPackageFragment.addChild(field)
 
         return field
     }
+
+    private val IrDeclaration.parentPackageFragment: IrPackageFragment
+        get() = parent as? IrPackageFragment ?: (parent as IrDeclaration).parentPackageFragment
 
     private val IrSimpleFunction.nameForCheckedExceptionsField: String
         get() = this.fqnString(false) + "_checkedExceptions"
