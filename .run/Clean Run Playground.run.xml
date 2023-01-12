@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Playground" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Clean Run Playground" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":dev-support:playground:run" />
+          <option value=":dev-support:playground:cleanRun" />
         </list>
       </option>
       <option name="vmOptions" />

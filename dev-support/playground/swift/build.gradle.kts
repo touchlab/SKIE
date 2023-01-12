@@ -1,13 +1,7 @@
-import org.codehaus.groovy.runtime.ProcessGroovyMethods
+import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.gradle.configurationcache.extensions.capitalized
 
-val architecture = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()
-
-val architectureKotlinName = when (architecture) {
-    "arm64" -> "macosArm64"
-    "x86_64" -> "macosX64"
-    else -> error("Unsupported architecture: $architecture")
-}
+val architecture = MacOsCpuArchitecture.getCurrent()
 
 val createSwiftMain by tasks.registering {
     val mainFile = layout.projectDirectory.file("main.swift")
@@ -37,7 +31,7 @@ val createSwiftMain by tasks.registering {
 val build by tasks.registering(Exec::class) {
     group = "build"
 
-    val linkTask = tasks.getByPath(":playground:kotlin:framework:linkDebugFramework${architectureKotlinName.capitalized()}")
+    val linkTask = tasks.getByPath(":playground:kotlin:framework:linkDebugFramework${architecture.kotlinGradleName.capitalized()}")
 
     inputs.files(linkTask.outputs)
     inputs.files(createSwiftMain.map { it.outputs })
@@ -54,7 +48,7 @@ val build by tasks.registering(Exec::class) {
     doFirst {
         commandLine(
             "arch",
-            "-$architecture",
+            "-${architecture.systemName}",
             "swiftc",
             createSwiftMain.get().outputs.files.first().absolutePath,
             "-F",

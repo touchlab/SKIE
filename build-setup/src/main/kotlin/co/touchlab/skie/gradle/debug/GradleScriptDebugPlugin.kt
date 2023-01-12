@@ -6,5 +6,8 @@ import org.gradle.api.Project
 class GradleScriptDebugPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
+        target.afterEvaluate {
+
+        }
     }
 }

@@ -32,6 +32,7 @@ includeBuild("swiftpoet")
 
 include(
     ":acceptance-tests:framework",
+    ":acceptance-tests:external-libraries",
     ":acceptance-tests:type-mapping",
     ":acceptance-tests:type-mapping:exported-dependency",
     ":acceptance-tests:type-mapping:nonexported-dependency",

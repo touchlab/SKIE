@@ -1,8 +1,7 @@
-import org.codehaus.groovy.runtime.ProcessGroovyMethods
+import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
-import org.jetbrains.kotlin.konan.target.KonanTarget
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 
 plugins {
@@ -28,17 +27,11 @@ val acceptanceTestDependencies: Configuration = configurations.create("acceptanc
 
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
 
-    val konanTarget = when (val architecture = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()) {
-        "arm64" -> KonanTarget.MACOS_ARM64.name
-        "x86_64" -> KonanTarget.MACOS_X64.name
-        else -> error("Unsupported architecture: $architecture")
-    }
-
     attributes.attribute(
         KotlinPlatformType.attribute,
         KotlinPlatformType.native
     )
-    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget)
+    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, MacOsCpuArchitecture.getCurrent().konanTarget)
     attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
 }
 
@@ -48,17 +41,11 @@ val acceptanceTestExportedDependencies: Configuration = configurations.create("a
 
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
 
-    val konanTarget = when (val architecture = "uname -m".let(ProcessGroovyMethods::execute).let(ProcessGroovyMethods::getText).trim()) {
-        "arm64" -> KonanTarget.MACOS_ARM64.name
-        "x86_64" -> KonanTarget.MACOS_X64.name
-        else -> error("Unsupported architecture: $architecture")
-    }
-
     attributes.attribute(
         KotlinPlatformType.attribute,
         KotlinPlatformType.native
     )
-    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget)
+    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, MacOsCpuArchitecture.getCurrent().konanTarget)
     attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
 }
 
