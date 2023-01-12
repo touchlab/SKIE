@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createSecondaryConstructor
@@ -32,6 +33,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
+    private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
     override fun generate(descriptorProvider: NativeDescriptorProvider, collisionDetector: CollisionDetector) {
@@ -55,8 +57,8 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
             .filter { descriptorProvider.shouldBeExposed(it) }
 
     private fun generateOverloads(constructor: ClassConstructorDescriptor, mapper: ObjCExportMapper, collisionDetector: CollisionDetector) {
-        constructor.forEachNonCollidingDefaultArgumentOverload(collisionDetector) { index, overloadParameters ->
-            val overload = generateOverload(constructor, index, overloadParameters)
+        constructor.forEachNonCollidingDefaultArgumentOverload(collisionDetector) { overloadParameters ->
+            val overload = generateOverload(constructor, overloadParameters)
 
             fixOverloadName(overload, mapper)
         }
@@ -64,11 +66,10 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
 
     private fun generateOverload(
         constructor: ClassConstructorDescriptor,
-        index: Int,
         parameters: List<ValueParameterDescriptor>,
     ): FunctionDescriptor =
         declarationBuilder.createSecondaryConstructor(
-            name = "<init__SwiftGen__${index}>",
+            name = "<init__Skie_DefaultArguments__${sharedCounter.next()}>",
             namespace = declarationBuilder.getNamespace(constructor),
             annotations = constructor.annotations,
         ) {

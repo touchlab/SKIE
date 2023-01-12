@@ -12,6 +12,7 @@ import co.touchlab.skie.plugin.generator.internal.arguments.delegate.TopLevelFun
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 
 internal class DefaultArgumentGenerator(
     skieContext: SkieContext,
@@ -21,11 +22,13 @@ internal class DefaultArgumentGenerator(
 
     override val isActive: Boolean = true
 
+    private val sharedCounter = SharedCounter()
+
     private val delegates = listOf(
-        ClassMethodsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
-        ConstructorsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
-        TopLevelFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
-        ExtensionFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration),
+        ClassMethodsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
+        ConstructorsDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
+        TopLevelFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
+        ExtensionFunctionDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, sharedCounter),
     )
 
     override fun execute(descriptorProvider: NativeDescriptorProvider) {

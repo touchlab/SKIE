@@ -38,39 +38,39 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
 
     protected fun FunctionDescriptor.forEachNonCollidingDefaultArgumentOverload(
         collisionDetector: CollisionDetector,
-        action: (index: Int, overloadParameters: List<ValueParameterDescriptor>) -> Unit,
+        action: (overloadParameters: List<ValueParameterDescriptor>) -> Unit,
     ) {
-        this.forEachDefaultArgumentOverload { index, overloadParameters ->
+        this.forEachDefaultArgumentOverload { overloadParameters ->
             val overloadSignature = this.toFunctionSignature().copy(overloadParameters)
 
             val createsCollision = collisionDetector.createsCollision(overloadSignature)
             if (!createsCollision) {
-                action(index, overloadParameters)
+                action(overloadParameters)
             }
         }
     }
 
     private fun FunctionDescriptor.forEachDefaultArgumentOverload(
-        action: (index: Int, overloadParameters: List<ValueParameterDescriptor>) -> Unit,
+        action: (overloadParameters: List<ValueParameterDescriptor>) -> Unit,
     ) {
         val parametersWithDefaultValues = this.valueParameters.filter { it.declaresOrInheritsDefaultValue() }
 
-        parametersWithDefaultValues.forEachSubsetIndexed { index, omittedParameters ->
+        parametersWithDefaultValues.forEachSubset { omittedParameters ->
             if (omittedParameters.isNotEmpty()) {
                 @Suppress("ConvertArgumentToSet")
                 val overloadParameters = this.valueParameters - omittedParameters
 
-                action(index, overloadParameters)
+                action(overloadParameters)
             }
         }
     }
 
-    private fun <T> Iterable<T>.forEachSubsetIndexed(action: (Int, List<T>) -> Unit) {
+    private fun <T> Iterable<T>.forEachSubset(action: (List<T>) -> Unit) {
         var bitmap = 0
         do {
             val subset = this.dropIndices(bitmap)
 
-            action(bitmap, subset)
+            action(subset)
 
             bitmap++
         } while (subset.isNotEmpty())

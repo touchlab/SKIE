@@ -7,6 +7,7 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
@@ -32,6 +33,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
+    private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
     override fun generate(descriptorProvider: NativeDescriptorProvider, collisionDetector: CollisionDetector) {
@@ -48,28 +50,26 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     protected abstract fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor>
 
     private fun generateOverloads(function: SimpleFunctionDescriptor, collisionDetector: CollisionDetector) {
-        function.forEachNonCollidingDefaultArgumentOverload(collisionDetector) { index, overloadParameters ->
-            generateOverload(function, index, overloadParameters)
+        function.forEachNonCollidingDefaultArgumentOverload(collisionDetector) { overloadParameters ->
+            generateOverload(function, overloadParameters)
         }
     }
 
     private fun generateOverload(
         function: SimpleFunctionDescriptor,
-        index: Int,
         parameters: List<ValueParameterDescriptor>,
     ) {
-        val newFunction = generateOverloadWithUniqueName(function, index, parameters)
+        val newFunction = generateOverloadWithUniqueName(function, parameters)
 
         renameOverloadedFunction(newFunction, function)
     }
 
     private fun generateOverloadWithUniqueName(
         function: SimpleFunctionDescriptor,
-        index: Int,
         parameters: List<ValueParameterDescriptor>,
     ): FunctionDescriptor =
         declarationBuilder.createFunction(
-            name = "__SwiftGen__${index}__${function.name.identifier}",
+            name = "Skie_DefaultArguments__${sharedCounter.next()}__${function.name.identifier}",
             namespace = declarationBuilder.getNamespace(function),
             annotations = function.annotations,
         ) {
