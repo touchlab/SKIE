@@ -29,7 +29,9 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.types.KotlinType
 
 class DefaultSwiftModelScope(
     private val namer: ObjCExportNamer,
@@ -139,4 +141,11 @@ class DefaultSwiftModelScope(
 
     override val SourceFile.swiftModel: MutableKotlinTypeSwiftModel
         get() = fileModelCache(this)
+
+    override val KotlinType.isBridged: Boolean
+        get() = when (val descriptor = constructor.declarationDescriptor) {
+            is ClassDescriptor -> descriptor.swiftModel.bridge != null
+            is TypeAliasDescriptor -> descriptor.expandedType.isBridged
+            else -> false
+        }
 }

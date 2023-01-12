@@ -15,6 +15,8 @@ data class SwiftTypeSwiftModel(
     override val bridgedOrStableFqName: String
         get() = stableFqName
 
+    override val isSwiftSymbol: Boolean = true
+
     override fun fqName(separator: String): String {
         val parentName = containingType?.fqName(separator) ?: return identifier
 

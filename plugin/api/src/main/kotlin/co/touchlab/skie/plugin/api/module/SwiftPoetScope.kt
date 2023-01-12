@@ -25,10 +25,6 @@ interface SwiftPoetScope : SwiftModelScope {
 
     fun NativeKotlinType.spec(usage: KotlinTypeSpecUsage): TypeName
 
-    val ClassDescriptor.spec: DeclaredTypeName
-
-    val SourceFile.spec: DeclaredTypeName
-
     val PropertyDescriptor.regularPropertySpec: PropertySpec
 
     val PropertyDescriptor.interfaceExtensionPropertySpec: FunctionSpec

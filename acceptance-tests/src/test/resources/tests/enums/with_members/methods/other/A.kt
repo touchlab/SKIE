@@ -107,6 +107,14 @@ enum class A {
     }
 }
 
+fun A.extensionFun() = Unit
+
+fun A.extensionFunWithParam(p: Int) = Unit
+
+fun A.extensionFunWithTwoParams(p1: Int, p2: String) = Unit
+
+fun A.extensionFunWithSelfParam(a: A): A = a
+
 fun a1(): A = A.A1
 
 fun a2(): A = A.A2

@@ -31,6 +31,9 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
 
     val objCFqName: String
 
+    override val isSwiftSymbol: Boolean
+        get() = bridge != null
+
     /**
      * Examples:
      * Foo

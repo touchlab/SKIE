@@ -120,7 +120,7 @@ internal class SealedFunctionGeneratorDelegate(
                 "fatalError(" +
                     "\"Unknown subtype. " +
                     "This error should not happen under normal circumstances " +
-                    "since ${declaration.spec.canonicalName} is sealed." +
+                    "since ${declaration.swiftModel.bridgedOrStableFqName} is sealed." +
                     "\")\n"
             )
         }

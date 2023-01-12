@@ -50,6 +50,11 @@ for (index, value) in allValues.enumerated() {
 
     value.optionalReturningFun()
 
+    value.extensionFun()
+    value.extensionFunWithParam(p: 0)
+    value.extensionFunWithTwoParams(p1: 0, p2: "")
+    value.extensionFunWithSelfParam(a: value)
+
     switch value {
     case .a1:
         assert(index == 0)

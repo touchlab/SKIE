@@ -19,10 +19,19 @@ for (index, value) in allValues.enumerated() {
         assert(value.overridableMutableProperty == 2 * (index + 3), "overridableMutableProperty should be \(2 * (index + 3))")
     }
 
+    assert(value.extensionProperty == 0, "extensionProperty should be 0")
+    assert(value.extensionMutableProperty == 0, "extensionMutableProperty should be 0")
+    value.extensionMutableProperty = Int32(index)
+    assert(value.extensionPropertyWithSelf == value, "value should be \(value)")
+    assert(value.extensionMutablePropertyWithSelf == value, "value should be \(value)")
+    value.extensionMutablePropertyWithSelf = value
+
     switch value {
     case .a1:
-        exit(index == 0 ? 0 : 1)
+        assert(index == 0)
     case .a2:
-        exit(index == 1 ? 0 : 1)
+        assert(index == 1)
     }
 }
+
+exit(0)

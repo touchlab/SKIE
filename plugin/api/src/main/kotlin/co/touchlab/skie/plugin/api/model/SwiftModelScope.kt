@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.types.KotlinType
 
 interface SwiftModelScope {
 
@@ -23,4 +24,6 @@ interface SwiftModelScope {
     val ClassDescriptor.swiftModel: KotlinTypeSwiftModel
 
     val SourceFile.swiftModel: KotlinTypeSwiftModel
+
+    val KotlinType.isBridged: Boolean
 }

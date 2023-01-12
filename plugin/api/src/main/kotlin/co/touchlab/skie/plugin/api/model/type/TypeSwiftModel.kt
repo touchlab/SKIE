@@ -1,5 +1,8 @@
 package co.touchlab.skie.plugin.api.model.type
 
+import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
+import io.outfoxx.swiftpoet.DeclaredTypeName
+
 interface TypeSwiftModel {
 
     val containingType: TypeSwiftModel?
@@ -17,6 +20,8 @@ interface TypeSwiftModel {
      * `stableFqName` for the final Swift class.
      */
     val bridgedOrStableFqName: String
+
+    val isSwiftSymbol: Boolean
 
     fun fqName(separator: String = DEFAULT_SEPARATOR): String
 
@@ -44,3 +49,9 @@ val TypeSwiftModel.simpleName: String
  */
 val TypeSwiftModel.packageName: String
     get() = fqName.substringBeforeLast('.', "")
+
+val TypeSwiftModel.stableSpec: DeclaredTypeName
+    get() = DeclaredTypeName.qualifiedLocalTypeName(this.stableFqName)
+
+val TypeSwiftModel.bridgedOrStableSpec: DeclaredTypeName
+    get() = DeclaredTypeName.qualifiedLocalTypeName(this.bridgedOrStableFqName)

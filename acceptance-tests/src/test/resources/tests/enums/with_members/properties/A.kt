@@ -52,6 +52,20 @@ enum class A {
     //     }
 }
 
+val A.extensionProperty: Int
+    get() = 0
+
+var A.extensionMutableProperty: Int
+    get() = 0
+    set(value) {}
+
+val A.extensionPropertyWithSelf: A
+    get() = this
+
+var A.extensionMutablePropertyWithSelf: A
+    get() = this
+    set(value) {}
+
 fun a1(): A {
     return A.A1
 }

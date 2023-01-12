@@ -116,22 +116,28 @@ internal class ExhaustiveEnumsGenerator(
     private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
-        declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
+        val allDescriptors =
+            descriptorProvider.getExportedCategoryMembers(declaration) +
+                declaration.unsubstitutedMemberScope.getContributedDescriptors()
+
+        allDescriptors
             .filterIsInstance<PropertyDescriptor>()
             .filter { descriptorProvider.mapper.isBaseProperty(it) && descriptorProvider.mapper.isObjCProperty(it) }
             .forEach { property ->
+                val propertyType = property.type.spec(KotlinTypeSpecUsage.Default)
                 addProperty(
                     PropertySpec.builder(
                         property.name.asString(),
-                        property.type.spec(KotlinTypeSpecUsage.Default)
+                        propertyType,
                     )
                         .addModifiers(Modifier.PUBLIC)
                         .getter(
                             FunctionSpec.getterBuilder()
                                 .addStatement(
-                                    "return %L(self as _ObjectiveCType).%N",
+                                    "return %L(self as _ObjectiveCType).%N%L",
                                     if (descriptorProvider.mapper.doesThrow(property.getter!!)) "try " else "",
                                     property.regularPropertySwiftModel.reference,
+                                    if (property.type.isBridged) CodeBlock.of(" as %T", propertyType) else CodeBlock.of("")
                                 )
                                 .build()
                         )
@@ -142,12 +148,13 @@ internal class ExhaustiveEnumsGenerator(
                                         .addModifiers(Modifier.NONMUTATING)
                                         .addParameter(
                                             "value",
-                                            property.type.spec(KotlinTypeSpecUsage.ParameterType)
+                                            property.type.spec(KotlinTypeSpecUsage.ParameterType),
                                         )
                                         .addStatement(
-                                            "%L(self as _ObjectiveCType).%N = value",
+                                            "%L(self as _ObjectiveCType).%N = value%L",
                                             if (descriptorProvider.mapper.doesThrow(property.setter!!)) "try " else "",
                                             property.regularPropertySwiftModel.reference,
+                                            if (property.type.isBridged) CodeBlock.of(" as %T", property.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)) else CodeBlock.of("")
                                         )
                                         .build()
                                 )
@@ -162,7 +169,11 @@ internal class ExhaustiveEnumsGenerator(
     private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
-        declaration.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
+        val allDescriptors =
+            descriptorProvider.getExportedCategoryMembers(declaration) +
+            declaration.unsubstitutedMemberScope.getContributedDescriptors()
+
+        allDescriptors
             .filterIsInstance<FunctionDescriptor>()
             .filter { descriptorProvider.mapper.isBaseMethod(it) }
             .forEach { function ->
@@ -174,8 +185,9 @@ internal class ExhaustiveEnumsGenerator(
                     FunctionSpec.builder(function.swiftModel.identifier)
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
-                            function.returnType?.let { returnType ->
-                                returns(returnType.spec(KotlinTypeSpecUsage.ReturnType))
+                            val returnType = function.returnType?.spec(KotlinTypeSpecUsage.ReturnType)
+                            returnType?.let {
+                                returns(it)
                             }
                             function.valueParameters.forEach { parameter ->
                                 val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
@@ -188,13 +200,21 @@ internal class ExhaustiveEnumsGenerator(
                             }
 
                             throws(descriptorProvider.mapper.doesThrow(function))
+
+                            addStatement(
+                                "return %L(self as _ObjectiveCType).%N(%L)%L",
+                                if (descriptorProvider.mapper.doesThrow(function)) "try " else "",
+                                function.swiftModel.reference,
+                                function.valueParameters.map {
+                                    CodeBlock.of(
+                                        "%N%L",
+                                        it.name.asString(),
+                                        if (it.type.isBridged) CodeBlock.of(" as %T", it.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)) else CodeBlock.of("")
+                                    )
+                                }.joinToCode(", "),
+                                if (function.returnType?.isBridged == true) CodeBlock.of(" as %T", returnType) else CodeBlock.of("")
+                            )
                         }
-                        .addStatement(
-                            "return %L(self as _ObjectiveCType).%N(%L)",
-                            if (descriptorProvider.mapper.doesThrow(function)) "try " else "",
-                            function.swiftModel.reference,
-                            function.valueParameters.map { CodeBlock.of("%N", it.name.asString()) }.joinToCode(", "),
-                        )
                         .build()
                 )
             }

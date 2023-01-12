@@ -11,7 +11,7 @@ class ActualKotlinRegularPropertySwiftModel(
     propertyDescriptor: PropertyDescriptor,
     override val receiver: MutableKotlinTypeSwiftModel,
     namer: ObjCExportNamer,
-) : BaseKotlinRegularPropertySwiftModel(propertyDescriptor, receiver, namer), MutableKotlinRegularPropertySwiftModel {
+) : BaseKotlinRegularPropertySwiftModel(propertyDescriptor, namer), MutableKotlinRegularPropertySwiftModel {
 
     override var identifier: String = super.identifier
 

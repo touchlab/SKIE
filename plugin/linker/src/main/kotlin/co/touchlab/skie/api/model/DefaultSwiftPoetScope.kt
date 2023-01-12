@@ -7,9 +7,9 @@ import co.touchlab.skie.plugin.api.model.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage.*
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
-import co.touchlab.skie.plugin.api.model.type.fqName
+import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
+import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
-import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportMapperReflector
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import io.outfoxx.swiftpoet.ANY_OBJECT
@@ -51,7 +51,6 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.name.FqNameUnsafe
@@ -393,7 +392,7 @@ internal class DefaultSwiftPoetScope(
                     else -> null
                 }
                 is NativeKotlinType.Reference.Known.SuspendFunction -> when (usage) {
-                    Default -> descriptor.spec
+                    Default -> descriptor.swiftModel.bridgedOrStableSpec
 
                     TypeParam.IsHashable -> anyHashable
 
@@ -471,15 +470,27 @@ internal class DefaultSwiftPoetScope(
 
                 is NativeKotlinType.Reference.Unknown -> {
                     if (descriptor.canBeSpecializedInSwift) {
-                        DefaultOnly(descriptor.spec.withTypeParametersOf(kotlinType) { _, _ -> TypeParam.IsReference })
+                        when (usage) {
+                            Default -> descriptor.swiftModel.bridgedOrStableSpec.withTypeParametersOf(kotlinType) { _, _ ->
+                                if (descriptor.swiftModel.isSwiftSymbol) {
+                                    TypeParam.IsReference
+                                } else {
+                                    TypeParam
+                                }
+                            }
+                            TypeParam.IsReference -> descriptor.swiftModel.stableSpec.withTypeParametersOf(kotlinType) { _, _ ->
+                                TypeParam.IsReference
+                            }
+                            else -> null
+                        }
                     } else if (descriptor.kind == ClassKind.INTERFACE) {
                         when (usage) {
-                            Default -> descriptor.spec
+                            Default -> descriptor.swiftModel.bridgedOrStableSpec
                             TypeParam.IsHashable -> anyHashable
                             else -> null
                         }
                     } else {
-                        DefaultOnly(descriptor.spec)
+                        DefaultOnly(descriptor.swiftModel.bridgedOrStableSpec)
                     }
                 }
             }
@@ -569,12 +580,6 @@ internal class DefaultSwiftPoetScope(
         } else {
             this
         }
-
-    override val ClassDescriptor.spec: DeclaredTypeName
-        get() = DeclaredTypeName.qualifiedLocalTypeName(this.swiftModel.fqName)
-
-    override val SourceFile.spec: DeclaredTypeName
-        get() = DeclaredTypeName.qualifiedLocalTypeName(this.swiftModel.fqName)
 
     override val PropertyDescriptor.regularPropertySpec: PropertySpec
         get() = PropertySpec.builder(this.regularPropertySwiftModel.reference, type.spec(Default)).build()

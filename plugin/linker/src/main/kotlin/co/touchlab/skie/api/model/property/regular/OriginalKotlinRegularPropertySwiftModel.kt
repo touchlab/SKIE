@@ -7,9 +7,9 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class OriginalKotlinRegularPropertySwiftModel(
     propertyDescriptor: PropertyDescriptor,
-    receiver: KotlinTypeSwiftModel,
+    override val receiver: KotlinTypeSwiftModel,
     namer: ObjCExportNamer,
-) : BaseKotlinRegularPropertySwiftModel(propertyDescriptor, receiver, namer) {
+) : BaseKotlinRegularPropertySwiftModel(propertyDescriptor, namer) {
 
     override val isChanged: Boolean = false
 
