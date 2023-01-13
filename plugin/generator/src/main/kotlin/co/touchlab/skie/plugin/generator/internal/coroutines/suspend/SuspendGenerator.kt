@@ -4,6 +4,8 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.gradle.DefaultArgumentInterop
+import co.touchlab.skie.configuration.gradle.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -14,6 +16,7 @@ import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
@@ -43,7 +46,9 @@ internal class SuspendGenerator(
     }
 
     private fun DescriptorProvider.allSupportedFunctions(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
-        this.allFunctions(descriptorProvider).filter { it.isSupported }
+        this.allFunctions(descriptorProvider)
+            .filter { it.isSupported }
+            .filter { it.isInteropEnabled }
 
     private fun DescriptorProvider.allFunctions(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
         this.exportedTopLevelCallableDescriptors.filterIsInstance<SimpleFunctionDescriptor>() +
@@ -56,8 +61,11 @@ internal class SuspendGenerator(
             .filter { descriptorProvider.shouldBeExposed(it) }
             .filter { descriptorProvider.mapper.isBaseMethod(it) }
 
-    private val SimpleFunctionDescriptor.isSupported: Boolean
+    private val FunctionDescriptor.isSupported: Boolean
         get() = this.isSuspend && !this.belongsToSkieRuntime
+
+    private val FunctionDescriptor.isInteropEnabled: Boolean
+        get() = this.getConfiguration(SuspendInterop.Enabled)
 
     private fun markOriginalFunctionAsReplaced(originalFunctionDescriptor: SimpleFunctionDescriptor) {
         module.configure {

@@ -1,0 +1,13 @@
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "SuspendInterop.Enabled": "false"
+            }
+        }
+    ]
+}
