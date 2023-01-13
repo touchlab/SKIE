@@ -1,3 +1,3 @@
 [submodule "swiftpoet"]
 	path = swiftpoet
-	url = git@github.com:touchlab-lab/swiftpoet.git
+	url = git@github.com:touchlab/swiftpoet.git
