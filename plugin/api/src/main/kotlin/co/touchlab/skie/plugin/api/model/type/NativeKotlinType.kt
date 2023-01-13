@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
 sealed interface NativeKotlinType {
-    data class Nullable(val type: NativeKotlinType): NativeKotlinType
+    data class Nullable(val type: NativeKotlinType) : NativeKotlinType
 
     data class BlockPointer(val parameterTypes: List<NativeKotlinType>, val returnType: NativeKotlinType) : NativeKotlinType
 
@@ -54,12 +54,12 @@ sealed interface NativeKotlinType {
         DOUBLE,
     }
 
-    object Unichar: NativeKotlinType
+    object Unichar : NativeKotlinType
 
-    sealed interface Pointer: NativeKotlinType {
-        object NativePtr: Pointer
+    sealed interface Pointer : NativeKotlinType {
+        object NativePtr : Pointer
 
-        object Other: Pointer
+        object Other : Pointer
     }
 
     object Any : NativeKotlinType

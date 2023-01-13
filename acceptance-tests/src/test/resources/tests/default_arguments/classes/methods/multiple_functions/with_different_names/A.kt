@@ -1,4 +1,4 @@
-package `tests`.`default_arguments`.`classes`.`methods`.`multiple_functions`
+package `tests`.`default_arguments`.`classes`.`methods`.`multiple_functions`.`with_different_names`
 
 class A {
 

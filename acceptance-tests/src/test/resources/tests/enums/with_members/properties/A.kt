@@ -52,6 +52,7 @@ enum class A {
     //     }
 
     companion object {
+
         val staticProperty: Int = 0
 
         var staticMutableProperty: Int = 0

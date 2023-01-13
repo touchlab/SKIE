@@ -1,4 +1,4 @@
-package tests.default_arguments.interfaces.method.delegated
+package `tests`.`default_arguments`.`interfaces`.`method`.`delegated`
 
 interface A {
 

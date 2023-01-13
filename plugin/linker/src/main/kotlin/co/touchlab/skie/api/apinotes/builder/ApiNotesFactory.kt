@@ -57,7 +57,6 @@ internal class ApiNotesFactory(
         descriptorProvider.exportedBaseFunctions(this.descriptorHolder).map { it.swiftModel.toApiNote() } +
             getExportedBasePropertiesSwiftModel().filterIsInstance<KotlinInterfaceExtensionPropertySwiftModel>().flatMap { it.toApiNotes() }
 
-
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.getApiNoteProperties(): List<ApiNotesProperty> =
         getExportedBasePropertiesSwiftModel().filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote() }

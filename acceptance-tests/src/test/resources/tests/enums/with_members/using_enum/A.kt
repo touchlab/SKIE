@@ -1,4 +1,4 @@
-package tests.enums.with_members.using_enum
+package `tests`.`enums`.`with_members`.`using_enum`
 
 enum class A {
     A1,

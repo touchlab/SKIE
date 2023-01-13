@@ -1,4 +1,4 @@
-package tests.sealed.classes.visibility.child.not_supported
+package `tests`.`sealed`.`classes`.`visibility`.`child`.`not_supported`
 
 sealed class A {
 

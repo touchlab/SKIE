@@ -1,4 +1,4 @@
-package tests.default_arguments.classes.methods.multiple_functions.with_different_parameters
+package `tests`.`default_arguments`.`classes`.`methods`.`multiple_functions`.`with_different_parameters`
 
 class A {
 

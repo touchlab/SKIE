@@ -23,7 +23,7 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
     protected val declarationBuilder: DeclarationBuilder,
     override val configuration: Configuration,
     private val collisionDetector: CollisionDetector,
-    ) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
+) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
 
     protected val FunctionDescriptor.hasDefaultArguments: Boolean
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }

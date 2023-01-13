@@ -1,4 +1,4 @@
-package tests.enums.with_members.methods.with_enum
+package `tests`.`enums`.`with_members`.`methods`.`with_enum`
 
 enum class A {
     A1;

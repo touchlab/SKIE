@@ -1,4 +1,4 @@
-package tests.enums.nested.companion_in_enum
+package `tests`.`enums`.`nested`.`companion_in_enum`
 
 enum class A {
     A1,
@@ -10,14 +10,16 @@ enum class A {
 }
 
 interface EnumInterface {
+
     fun foo()
 }
 
 interface EnumCompanionInterface {
+
     fun bar()
 }
 
-enum class B: EnumInterface {
+enum class B : EnumInterface {
     B1,
     B2;
 
@@ -25,11 +27,11 @@ enum class B: EnumInterface {
         TODO("Not yet implemented")
     }
 
-    companion object: EnumCompanionInterface {
+    companion object : EnumCompanionInterface {
+
         override fun bar() {
             TODO("Not yet implemented")
         }
-
     }
 }
 

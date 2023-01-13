@@ -1,7 +1,6 @@
 package `tests`.`coroutines`.`suspend`.`interfaces`.`extensions`.`simple`.`can_be_cancelled`.`from_swift`
 
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 interface A

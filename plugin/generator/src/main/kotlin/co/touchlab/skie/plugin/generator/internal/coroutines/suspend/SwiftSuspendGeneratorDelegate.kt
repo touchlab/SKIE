@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
+import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.function.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.module.SkieModule
@@ -7,7 +8,6 @@ import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.util.CallableMemberSwiftType
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
-import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.generator.internal.util.swiftKind
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock

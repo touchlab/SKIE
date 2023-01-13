@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.api.model
 
 import co.touchlab.skie.plugin.api.model.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.property.extension.MutableKotlinInterfaceExtensionPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

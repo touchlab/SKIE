@@ -1,4 +1,4 @@
-package tests.apinotes.`interface`.extension_property
+package `tests`.`apinotes`.`interface`.`extension_property`
 
 interface A
 

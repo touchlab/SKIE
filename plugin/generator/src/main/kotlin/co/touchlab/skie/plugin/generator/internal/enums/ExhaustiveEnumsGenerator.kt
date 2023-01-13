@@ -5,7 +5,6 @@ package co.touchlab.skie.plugin.generator.internal.enums
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.function.reference
 import co.touchlab.skie.plugin.api.model.property.regular.reference
@@ -20,7 +19,6 @@ import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -33,11 +31,9 @@ import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
 import org.jetbrains.kotlin.backend.konan.objcexport.getBaseProperties
-import org.jetbrains.kotlin.backend.konan.objcexport.getBaseMethods
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
-import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
+import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -171,7 +167,10 @@ internal class ExhaustiveEnumsGenerator(
                                             "%L(self as _ObjectiveCType).%N = value%L",
                                             if (descriptorProvider.mapper.doesThrow(property.setter!!)) "try " else "",
                                             property.regularPropertySwiftModel.reference,
-                                            if (property.type.isBridged) CodeBlock.of(" as %T", property.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)) else CodeBlock.of("")
+                                            if (property.type.isBridged) CodeBlock.of(
+                                                " as %T",
+                                                property.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)
+                                            ) else CodeBlock.of("")
                                         )
                                         .build()
                                 )
@@ -225,7 +224,10 @@ internal class ExhaustiveEnumsGenerator(
                                             "%L_ObjectiveCType.Companion.shared.%N = value%L",
                                             if (descriptorProvider.mapper.doesThrow(property.setter!!)) "try " else "",
                                             property.regularPropertySwiftModel.reference,
-                                            if (property.type.isBridged) CodeBlock.of(" as %T", property.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)) else CodeBlock.of("")
+                                            if (property.type.isBridged) CodeBlock.of(
+                                                " as %T",
+                                                property.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)
+                                            ) else CodeBlock.of("")
                                         )
                                         .build()
                                 )
@@ -242,7 +244,7 @@ internal class ExhaustiveEnumsGenerator(
     ) {
         val allDescriptors =
             descriptorProvider.getExportedCategoryMembers(declaration) +
-            declaration.unsubstitutedMemberScope.getContributedDescriptors()
+                declaration.unsubstitutedMemberScope.getContributedDescriptors()
 
         allDescriptors
             .filterIsInstance<FunctionDescriptor>()
@@ -284,7 +286,10 @@ internal class ExhaustiveEnumsGenerator(
                                     CodeBlock.of(
                                         "%N%L",
                                         it.name.asString(),
-                                        if (it.type.isBridged) CodeBlock.of(" as %T", it.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)) else CodeBlock.of("")
+                                        if (it.type.isBridged) CodeBlock.of(
+                                            " as %T",
+                                            it.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)
+                                        ) else CodeBlock.of("")
                                     )
                                 }.joinToCode(", "),
                                 if (function.returnType?.isBridged == true) CodeBlock.of(" as %T", returnType) else CodeBlock.of("")
@@ -303,13 +308,13 @@ internal class ExhaustiveEnumsGenerator(
 
         val allDescriptors =
             descriptorProvider.getExportedCategoryMembers(companion) +
-            companion.unsubstitutedMemberScope.getContributedDescriptors()
+                companion.unsubstitutedMemberScope.getContributedDescriptors()
 
         allDescriptors
             .filterIsInstance<FunctionDescriptor>()
             .filter {
                 descriptorProvider.mapper.isBaseMethod(it) &&
-                descriptorProvider.mapper.shouldBeExposed(it) &&
+                    descriptorProvider.mapper.shouldBeExposed(it) &&
                     !DescriptorUtils.isMethodOfAny(it)
             }
             .forEach { function ->
@@ -345,7 +350,10 @@ internal class ExhaustiveEnumsGenerator(
                                     CodeBlock.of(
                                         "%N%L",
                                         it.name.asString(),
-                                        if (it.type.isBridged) CodeBlock.of(" as %T", it.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)) else CodeBlock.of("")
+                                        if (it.type.isBridged) CodeBlock.of(
+                                            " as %T",
+                                            it.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)
+                                        ) else CodeBlock.of("")
                                     )
                                 }.joinToCode(", "),
                                 if (function.returnType?.isBridged == true) CodeBlock.of(" as %T", returnType) else CodeBlock.of("")

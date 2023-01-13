@@ -141,7 +141,7 @@ internal class DefaultSwiftPoetScope(
                                         ObjCValueType.DOUBLE -> NativeKotlinType.Value.DOUBLE
                                         ObjCValueType.POINTER -> if (constructor.declarationDescriptor?.fqNameUnsafe == FqNameUnsafe("kotlin.native.internal.NativePtr")) {
                                             NativeKotlinType.Pointer.NativePtr
-                                        }  else {
+                                        } else {
                                             NativeKotlinType.Pointer.Other
                                         }
                                     }
@@ -153,8 +153,6 @@ internal class DefaultSwiftPoetScope(
 
             }
         }
-
-
 
     override fun KotlinType.spec(usage: KotlinTypeSpecUsage): TypeName = native.spec(usage)
 
@@ -268,6 +266,7 @@ internal class DefaultSwiftPoetScope(
         } else {
             null
         }
+
         fun Always(name: TypeName): TypeName = name
 
         return when (this) {
@@ -409,7 +408,8 @@ internal class DefaultSwiftPoetScope(
                                 } else {
                                     unwrappedTypeParam.spec(TypeParam.OptionalWrapped).makeOptional()
                                 }
-                                ReturnType.SuspendFunction, ReturnType.SuspendFunction.OptionalWrapped -> unwrappedTypeParam.spec(ReturnType.SuspendFunction.OptionalWrapped).makeOptional()
+                                ReturnType.SuspendFunction, ReturnType.SuspendFunction.OptionalWrapped -> unwrappedTypeParam.spec(ReturnType.SuspendFunction.OptionalWrapped)
+                                    .makeOptional()
                                 TypeParam -> any
                                 TypeParam.IsReference -> unwrappedTypeParam.spec(TypeParam.IsReference)
                                 TypeParam.IsHashable -> anyHashable
@@ -424,14 +424,16 @@ internal class DefaultSwiftPoetScope(
                         is NativeKotlinType.BlockPointer -> bound.exactSpec(usage)
 
                         is NativeKotlinType.Value,
-                        is NativeKotlinType.Reference.Known.String -> bound.exactSpec(usage)
+                        is NativeKotlinType.Reference.Known.String,
+                        -> bound.exactSpec(usage)
 
                         is NativeKotlinType.Reference.Known.List,
                         is NativeKotlinType.Reference.Known.MutableList,
                         is NativeKotlinType.Reference.Known.Map,
                         is NativeKotlinType.Reference.Known.MutableMap,
                         is NativeKotlinType.Reference.Known.Set,
-                        is NativeKotlinType.Reference.Known.MutableSet -> bound.exactSpec(usage)
+                        is NativeKotlinType.Reference.Known.MutableSet,
+                        -> bound.exactSpec(usage)
 
                         is NativeKotlinType.Unichar -> when (usage) {
                             Default -> bound.exactSpec(Default)
@@ -447,14 +449,17 @@ internal class DefaultSwiftPoetScope(
                             ReturnType.Lambda.OptionalWrapped,
                             ReturnType.SuspendFunction,
                             ReturnType.SuspendFunction.OptionalWrapped,
-                            TypeParam -> TypeVariableName(name)
+                            TypeParam,
+                            -> TypeVariableName(name)
                             TypeParam.IsHashable -> anyHashable
                             TypeParam.OptionalWrapped -> bound.exactSpec(TypeParam.OptionalWrapped)
                             else -> null
                         }
                         NativeKotlinType.Pointer.NativePtr -> when (usage) {
                             Default -> bound.exactSpec(Default)
-                            ParameterType.Lambda, ReturnType.Lambda, ReturnType.SuspendFunction, TypeParam.AllowingNullability -> TypeVariableName(name).makeOptional()
+                            ParameterType.Lambda, ReturnType.Lambda, ReturnType.SuspendFunction, TypeParam.AllowingNullability -> TypeVariableName(
+                                name
+                            ).makeOptional()
                             TypeParam, ReturnType.SuspendFunction.OptionalWrapped -> TypeVariableName(name)
                             TypeParam.IsHashable -> anyHashable
                             else -> null
@@ -515,7 +520,8 @@ internal class DefaultSwiftPoetScope(
                 TypeParam,
                 ParameterType.Lambda.OptionalWrapped,
                 ReturnType.Lambda.OptionalWrapped,
-                ReturnType.SuspendFunction.OptionalWrapped -> any
+                ReturnType.SuspendFunction.OptionalWrapped,
+                -> any
                 TypeParam.IsHashable -> anyHashable
                 TypeParam.IsReference -> ANY_OBJECT
                 else -> null
