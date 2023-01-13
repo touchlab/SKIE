@@ -5,7 +5,7 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
-import co.touchlab.skie.api.apinotes.fixes.ExportedClassInsideNonExportedClassApiNotesFix
+import co.touchlab.skie.api.apinotes.fixes.ClassInsideNonExportedClassApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DefaultSwiftPoetScope
@@ -50,7 +50,7 @@ class SwiftLinkCompilePhase(
         val skieModule = context.skieContext.module as DefaultSkieModule
 
         NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()
-        ExportedClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
+        ClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
 
         skieModule.consumeConfigureBlocks(swiftModelScope)
         val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftPoetScope)

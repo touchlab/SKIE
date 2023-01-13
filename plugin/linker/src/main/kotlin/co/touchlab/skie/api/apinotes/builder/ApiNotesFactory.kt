@@ -31,14 +31,14 @@ internal class ApiNotesFactory(
     fun create(): ApiNotes = with(swiftModelScope) {
         ApiNotes(
             moduleName = moduleName,
-            classes = descriptorProvider.swiftModelsForExportedClassesAndFiles.map { it.toApiNote() },
-            protocols = descriptorProvider.exportedInterfaces.map { it.swiftModel.toApiNote() },
+            classes = descriptorProvider.swiftModelsForClassesAndFiles.map { it.toApiNote() },
+            protocols = descriptorProvider.interfaces.map { it.swiftModel.toApiNote() },
         )
     }
 
     context(SwiftModelScope)
-    private val HierarchicalDescriptorProvider.swiftModelsForExportedClassesAndFiles: List<KotlinTypeSwiftModel>
-        get() = (descriptorProvider.exportedClasses.map { it.swiftModel } + descriptorProvider.exportedFiles.map { it.swiftModel })
+    private val HierarchicalDescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
+        get() = (descriptorProvider.classes.map { it.swiftModel } + descriptorProvider.exportedFiles.map { it.swiftModel })
 
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =

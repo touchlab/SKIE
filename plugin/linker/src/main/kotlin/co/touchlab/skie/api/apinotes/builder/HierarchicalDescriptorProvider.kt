@@ -22,11 +22,11 @@ internal class HierarchicalDescriptorProvider(
     private val mapper: ObjCExportMapper,
 ) {
 
-    val exportedClasses: Set<ClassDescriptor>
-        get() = descriptorProvider.exportedClassDescriptors.filterNot { it.kind.isInterface }.toSet()
+    val classes: Set<ClassDescriptor>
+        get() = descriptorProvider.classDescriptors.filterNot { it.kind.isInterface }.toSet()
 
-    val exportedInterfaces: Set<ClassDescriptor>
-        get() = descriptorProvider.exportedClassDescriptors.filter { it.kind.isInterface }.toSet()
+    val interfaces: Set<ClassDescriptor>
+        get() = descriptorProvider.classDescriptors.filter { it.kind.isInterface }.toSet()
 
     val exportedFiles: Set<SourceFile>
         get() = descriptorProvider.exportedFiles

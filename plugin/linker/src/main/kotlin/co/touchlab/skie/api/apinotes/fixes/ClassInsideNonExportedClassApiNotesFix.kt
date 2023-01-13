@@ -7,16 +7,16 @@ import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 
-class ExportedClassInsideNonExportedClassApiNotesFix(
+class ClassInsideNonExportedClassApiNotesFix(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
 ) {
 
     fun renameProblematicClasses() {
         skieModule.configure {
-            val existingNames = descriptorProvider.exportedClassDescriptors.map { it.swiftModel.fqName }.toMutableSet()
+            val existingNames = descriptorProvider.classDescriptors.map { it.swiftModel.fqName }.toMutableSet()
 
-            descriptorProvider.exportedClassDescriptors
+            descriptorProvider.classDescriptors
                 .map { it.swiftModel }
                 .filter { it.needsRenaming }
                 .forEach {
