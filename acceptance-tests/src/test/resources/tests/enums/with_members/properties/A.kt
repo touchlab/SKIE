@@ -1,5 +1,8 @@
 package `tests`.`enums`.`with_members`.`properties`
 
+interface WrapperInterface<T>
+class WrapperClass<T>: WrapperInterface<T>
+
 enum class A {
     A1 {
 
@@ -40,6 +43,12 @@ enum class A {
 
     open var overridableMutableProperty: Int = 0
 
+    val immutableWrapperInterfaceProperty: WrapperInterface<A> = WrapperClass()
+    var mutableWrapperInterfaceProperty: WrapperInterface<A> = WrapperClass()
+
+    val immutableWrapperClassProperty: WrapperClass<A> = WrapperClass()
+    var mutableWrapperClassProperty: WrapperClass<A> = WrapperClass()
+
     // TODO: See if throwing properties are supported in Kotlin/Native
     // val throwingGetterProperty: Int
     //     @Throws(Exception::class)
@@ -56,6 +65,14 @@ enum class A {
         val staticProperty: Int = 0
 
         var staticMutableProperty: Int = 0
+
+        val staticWrapperInterfaceProperty: WrapperInterface<A> = WrapperClass()
+
+        var staticMutableWrapperInterfaceProperty: WrapperInterface<A> = WrapperClass()
+
+        val staticWrapperClassProperty: WrapperClass<A> = WrapperClass()
+
+        var staticMutableWrapperClassProperty: WrapperClass<A> = WrapperClass()
     }
 }
 

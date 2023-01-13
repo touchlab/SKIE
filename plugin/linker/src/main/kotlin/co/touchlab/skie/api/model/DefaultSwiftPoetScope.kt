@@ -478,9 +478,9 @@ internal class DefaultSwiftPoetScope(
                         when (usage) {
                             Default -> descriptor.swiftModel.bridgedOrStableSpec.withTypeParametersOf(kotlinType) { _, _ ->
                                 if (descriptor.swiftModel.isSwiftSymbol) {
-                                    TypeParam.IsReference
-                                } else {
                                     TypeParam
+                                } else {
+                                    TypeParam.IsReference
                                 }
                             }
                             TypeParam.IsReference -> descriptor.swiftModel.stableSpec.withTypeParametersOf(kotlinType) { _, _ ->

@@ -27,6 +27,12 @@ for (index, value) in allValues.enumerated() {
     assert(value.extensionMutablePropertyWithSelf == value, "value should be \(value)")
     value.extensionMutablePropertyWithSelf = value
 
+    assert(value.immutableWrapperInterfaceProperty is WrapperInterface, "immutableWrapperInterfaceProperty should be WrapperInterface")
+    assert(value.mutableWrapperInterfaceProperty is WrapperInterface, "mutableWrapperInterfaceProperty should be WrapperInterface")
+
+    assert(value.immutableWrapperClassProperty is WrapperClass, "immutableWrapperClassProperty should be WrapperClass")
+    assert(value.mutableWrapperClassProperty is WrapperClass, "mutableWrapperClassProperty should be WrapperClass")
+
     switch value {
     case .a1:
         assert(index == 0)
