@@ -35,11 +35,12 @@ for (index, value) in allValues.enumerated() {
     }
 }
 
-assert(A.staticProperty == 0, "staticProperty should be 0")
-assert(A.staticMutableProperty == 0, "staticProperty should be 0")
-A.staticMutableProperty = Int32(1)
+// Static properties are no longer supported, defer to `companion``
+assert(A.companion.staticProperty == 0, "staticProperty should be 0")
+assert(A.companion.staticMutableProperty == 0, "staticProperty should be 0")
+A.companion.staticMutableProperty = Int32(1)
 assert(__A.Companion.shared.staticMutableProperty == 1, "staticMutableProperty in Companion should be 1")
 __A.Companion.shared.staticMutableProperty = Int32(2)
-assert(A.staticMutableProperty == 2, "staticMutableProperty should be 2")
+assert(A.companion.staticMutableProperty == 2, "staticMutableProperty should be 2")
 
 exit(0)

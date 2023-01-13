@@ -1,6 +1,6 @@
 let allValues = [AKt.a1(), AKt.a2()]
 
-A.staticFun()
+A.companion.staticFun()
 
 for (index, value) in allValues.enumerated() {
     value.noParam()
