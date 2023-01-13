@@ -125,7 +125,7 @@ internal class SwiftSuspendGeneratorDelegate(
         val parameterTypeSpec = valueParameter.type.spec(KotlinTypeSpecUsage.ParameterType)
 
         addParameter(
-            ParameterSpec.builder(valueParameter.name.asString(), parameterTypeSpec)
+            ParameterSpec.builder(valueParameter.swiftModel.argumentLabel, parameterTypeSpec)
                 .build()
         )
     }
@@ -173,7 +173,7 @@ internal class SwiftSuspendGeneratorDelegate(
             arguments.addReceiversArguments(this)
 
             this.valueParameters.forEach {
-                arguments.add(it.name.asString())
+                arguments.add(it.swiftModel.argumentLabel)
             }
 
             return arguments

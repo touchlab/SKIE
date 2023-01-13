@@ -235,7 +235,7 @@ internal class ExhaustiveEnumsGenerator(
                                 val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
                                 addParameter(
                                     ParameterSpec.builder(
-                                        parameter.name.asString(),
+                                        parameter.swiftModel.argumentLabel,
                                         parameterTypeSpec,
                                     ).build()
                                 )
@@ -248,7 +248,7 @@ internal class ExhaustiveEnumsGenerator(
                                 if (descriptorProvider.mapper.doesThrow(function)) "try " else "",
                                 function.swiftModel.reference,
                                 function.valueParameters.map {
-                                    CodeBlock.of("%N", it.name.asString())
+                                    CodeBlock.of("%N", it.swiftModel.argumentLabel)
                                 }.joinToCode(", "),
                             )
                         }

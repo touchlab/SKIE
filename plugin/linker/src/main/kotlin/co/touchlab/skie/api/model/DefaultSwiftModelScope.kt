@@ -10,6 +10,7 @@ import co.touchlab.skie.api.model.type.files.ActualKotlinFileSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.property.extension.MutableKotlinInterfaceExtensionPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.property.regular.MutableKotlinRegularPropertySwiftModel
@@ -31,6 +32,7 @@ import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -68,6 +70,9 @@ class DefaultSwiftModelScope(
 
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
         get() = functionModelCache(this)
+
+    override val ValueParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
+        get() = (this.containingDeclaration as FunctionDescriptor).swiftModel.parameters[this.index]
 
     private val regularPropertyModelCache =
         storageManager.createMemoizedFunction<PropertyDescriptor, MutableKotlinRegularPropertySwiftModel> { propertyDescriptor ->
