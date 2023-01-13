@@ -6,7 +6,7 @@ interface MutableKotlinTypeSwiftModel : KotlinTypeSwiftModel {
 
     override var visibility: SwiftModelVisibility
 
-    override var containingType: MutableKotlinTypeSwiftModel?
+    override var containingType: MutableKotlinClassSwiftModel?
 
     override var identifier: String
 

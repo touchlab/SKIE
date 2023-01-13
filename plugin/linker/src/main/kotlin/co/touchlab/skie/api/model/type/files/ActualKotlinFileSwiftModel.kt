@@ -3,6 +3,7 @@ package co.touchlab.skie.api.model.type.files
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -14,7 +15,7 @@ class ActualKotlinFileSwiftModel(
     descriptorProvider: DescriptorProvider,
 ) : BaseKotlinFileSwiftModel(file, namer, descriptorProvider), MutableKotlinTypeSwiftModel {
 
-    override var containingType: MutableKotlinTypeSwiftModel? = null
+    override var containingType: MutableKotlinClassSwiftModel? = null
 
     override var identifier: String = super.identifier
 

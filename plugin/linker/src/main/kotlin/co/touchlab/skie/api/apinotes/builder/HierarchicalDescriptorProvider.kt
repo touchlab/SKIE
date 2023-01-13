@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
+// TODO Merge into DescriptorProvider and refactor usages
 internal class HierarchicalDescriptorProvider(
     private val descriptorProvider: DescriptorProvider,
     private val mapper: ObjCExportMapper,

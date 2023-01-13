@@ -1,7 +1,5 @@
 package co.touchlab.skie.api.apinotes.builder
 
-import co.touchlab.skie.plugin.api.module.SkieModule
-
 class ApiNotes(
     private val moduleName: String,
     private val classes: List<ApiNotesType>,
@@ -29,14 +27,6 @@ class ApiNotes(
             +"Protocols:"
             protocols.forEach {
                 it.appendApiNote()
-            }
-        }
-    }
-
-    fun createTypeAliasesForBridgingFile(skieModule: SkieModule) {
-        skieModule.file("SkieTypeAliasesForBridging") {
-            (classes + protocols).forEach {
-                it.appendTypeAliasForBridgingIfNeeded()
             }
         }
     }

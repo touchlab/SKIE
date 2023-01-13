@@ -5,6 +5,8 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
+import co.touchlab.skie.api.apinotes.fixes.ExportedClassInsideNonExportedClassApiNotesFix
+import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DefaultSwiftPoetScope
 import co.touchlab.skie.plugin.api.descriptorProvider
@@ -46,12 +48,11 @@ class SwiftLinkCompilePhase(
         val swiftModelScope = DefaultSwiftModelScope(namer, context.descriptorProvider)
         val swiftPoetScope = DefaultSwiftPoetScope(swiftModelScope, namer)
         val skieModule = context.skieContext.module as DefaultSkieModule
+
+        NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()
+        ExportedClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
+
         skieModule.consumeConfigureBlocks(swiftModelScope)
-
-        val apiNotes = ApiNotesFactory(framework.moduleName, context.descriptorProvider, namer.mapper, swiftModelScope).create()
-
-        apiNotes.createTypeAliasesForBridgingFile(skieModule)
-
         val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftPoetScope)
         val swiftTextFiles = skieModule.produceTextFiles()
 
@@ -66,6 +67,8 @@ class SwiftLinkCompilePhase(
         }
 
         val sourceFiles = skieContext.swiftSourceFiles + newFiles
+
+        val apiNotes = ApiNotesFactory(framework.moduleName, context.descriptorProvider, namer.mapper, swiftModelScope).create()
 
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
             apiNotes.withoutBridging().createApiNotesFile(framework)

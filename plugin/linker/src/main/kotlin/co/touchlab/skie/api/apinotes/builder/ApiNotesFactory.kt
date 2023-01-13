@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.api.apinotes.builder
 
+import co.touchlab.skie.api.apinotes.fixes.fqNameSafeForBridging
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -43,7 +44,7 @@ internal class ApiNotesFactory(
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
         ApiNotesType(
             objCFqName = this.objCFqName,
-            bridgeFqName = this.bridge?.fqName,
+            bridgeFqName = this.bridge?.fqNameSafeForBridging,
             swiftFqName = this.fqName,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,

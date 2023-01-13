@@ -1,17 +1,17 @@
 package co.touchlab.skie.api.model.type.classes
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 class ActualKotlinClassSwiftModel(
-    classDescriptor: ClassDescriptor,
-    override var containingType: MutableKotlinTypeSwiftModel?,
+    override val classDescriptor: ClassDescriptor,
+    override var containingType: MutableKotlinClassSwiftModel?,
     namer: ObjCExportNamer,
-) : BaseKotlinClassSwiftModel(classDescriptor, containingType, namer), MutableKotlinTypeSwiftModel {
+) : BaseKotlinClassSwiftModel(classDescriptor, namer), MutableKotlinClassSwiftModel {
 
     override var identifier: String = super.identifier
 
@@ -19,7 +19,7 @@ class ActualKotlinClassSwiftModel(
 
     override var bridge: TypeSwiftModel? = null
 
-    override val original: KotlinTypeSwiftModel = OriginalKotlinClassSwiftModel(classDescriptor, containingType, namer)
+    override val original: KotlinClassSwiftModel = OriginalKotlinClassSwiftModel(classDescriptor, containingType, namer)
 
     override val isChanged: Boolean
         get() = identifier != original.identifier ||

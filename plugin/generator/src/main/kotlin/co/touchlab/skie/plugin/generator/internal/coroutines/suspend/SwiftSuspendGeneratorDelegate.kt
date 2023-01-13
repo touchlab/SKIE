@@ -7,7 +7,7 @@ import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.util.CallableMemberSwiftType
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
-import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeIdentifier
+import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.generator.internal.util.swiftKind
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
@@ -108,7 +108,7 @@ internal class SwiftSuspendGeneratorDelegate(
     }
 
     private val FunctionDescriptor.swiftReceiverParameterName: String
-        get() = this.valueParameters.createCollisionFreeIdentifier("receiver").identifier
+        get() = "receiver".collisionFreeIdentifier(this.valueParameters).identifier
 
     context(SwiftPoetScope)
     private fun FunctionSpec.Builder.addReceiver(parameterName: String, receiverParameterDescriptor: ReceiverParameterDescriptor) {

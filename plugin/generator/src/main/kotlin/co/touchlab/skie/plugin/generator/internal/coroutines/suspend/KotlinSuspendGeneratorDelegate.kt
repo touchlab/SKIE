@@ -4,7 +4,8 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
-import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeIdentifier
+import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
+import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
@@ -93,7 +94,7 @@ internal class KotlinSuspendGeneratorDelegate(
         originalFunctionDescriptor.dispatchReceiverParameter?.let { dispatchReceiver ->
             val dispatchReceiverParameter = createValueParameter(
                 owner = bridgingFunctionDescriptor,
-                name = originalFunctionDescriptor.valueParameters.createCollisionFreeIdentifier("dispatchReceiver"),
+                name = "dispatchReceiver".collisionFreeIdentifier(originalFunctionDescriptor.valueParameters),
                 index = this.size,
                 type = dispatchReceiver.type
             )
@@ -109,7 +110,7 @@ internal class KotlinSuspendGeneratorDelegate(
         originalFunctionDescriptor.extensionReceiverParameter?.let { extensionReceiver ->
             val extensionReceiverParameter = createValueParameter(
                 owner = bridgingFunctionDescriptor,
-                name = originalFunctionDescriptor.valueParameters.createCollisionFreeIdentifier("extensionReceiver"),
+                name = "extensionReceiver".collisionFreeIdentifier(originalFunctionDescriptor.valueParameters),
                 index = this.size,
                 type = extensionReceiver.type
             )
@@ -144,7 +145,7 @@ internal class KotlinSuspendGeneratorDelegate(
     ): ValueParameterDescriptor =
         createValueParameter(
             owner = bridgingFunctionDescriptor,
-            name = this.valueParameters.createCollisionFreeIdentifier("suspendHandler"),
+            name = "suspendHandler".collisionFreeIdentifier(this.valueParameters),
             index = index,
             type = suspendHandlerDescriptor.defaultType,
         )

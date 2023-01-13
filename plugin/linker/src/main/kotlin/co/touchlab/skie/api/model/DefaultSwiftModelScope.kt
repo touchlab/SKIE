@@ -13,6 +13,7 @@ import co.touchlab.skie.plugin.api.model.function.MutableKotlinFunctionSwiftMode
 import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.property.extension.MutableKotlinInterfaceExtensionPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import co.touchlab.skie.util.getClassSwiftName
@@ -110,7 +111,7 @@ class DefaultSwiftModelScope(
         get() = if (namer.mapper.isObjCProperty(this)) regularPropertySwiftModel else interfaceExtensionPropertySwiftModel
 
     private val classModelCache =
-        storageManager.createMemoizedFunction<ClassDescriptor, MutableKotlinTypeSwiftModel> { classDescriptor ->
+        storageManager.createMemoizedFunction<ClassDescriptor, MutableKotlinClassSwiftModel> { classDescriptor ->
             val fullName = namer.getClassSwiftName(classDescriptor)
 
             val containingType = if (fullName.contains(".")) {
@@ -132,7 +133,7 @@ class DefaultSwiftModelScope(
         return if (containingClassName == name) containingClass else containingClass.containingClassNamed(name)
     }
 
-    override val ClassDescriptor.swiftModel: MutableKotlinTypeSwiftModel
+    override val ClassDescriptor.swiftModel: MutableKotlinClassSwiftModel
         get() = classModelCache(this)
 
     private val fileModelCache = storageManager.createMemoizedFunction<SourceFile, MutableKotlinTypeSwiftModel> { file ->

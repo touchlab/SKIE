@@ -13,7 +13,7 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
 
     val visibility: SwiftModelVisibility
 
-    override val containingType: KotlinTypeSwiftModel?
+    override val containingType: KotlinClassSwiftModel?
 
     /**
      * Examples:

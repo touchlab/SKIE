@@ -3,6 +3,7 @@ package co.touchlab.skie.api.model.type.files
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.util.sanitizeForIdentifier
@@ -18,7 +19,7 @@ abstract class BaseKotlinFileSwiftModel(
 
     override val descriptorHolder: ClassOrFileDescriptorHolder.File = ClassOrFileDescriptorHolder.File(file)
 
-    override val containingType: KotlinTypeSwiftModel? = null
+    override val containingType: KotlinClassSwiftModel? = null
 
     override val visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
 

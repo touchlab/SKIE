@@ -2,6 +2,7 @@ package co.touchlab.skie.api.model.type.classes
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.util.getClassSwiftName
@@ -13,9 +14,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 abstract class BaseKotlinClassSwiftModel(
     classDescriptor: ClassDescriptor,
-    override val containingType: KotlinTypeSwiftModel?,
     namer: ObjCExportNamer,
-) : KotlinTypeSwiftModel {
+) : KotlinTypeSwiftModel, KotlinClassSwiftModel {
 
     override val descriptorHolder: ClassOrFileDescriptorHolder.Class = ClassOrFileDescriptorHolder.Class(classDescriptor)
 

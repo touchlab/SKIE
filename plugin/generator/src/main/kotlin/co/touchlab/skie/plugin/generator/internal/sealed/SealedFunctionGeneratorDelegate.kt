@@ -3,9 +3,9 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
-import co.touchlab.skie.plugin.generator.internal.util.createCollisionFreeString
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -52,7 +52,7 @@ internal class SealedFunctionGeneratorDelegate(
         get() {
             val otherTypeNames = this.swiftTypeVariablesNames.map { it.name }
 
-            val typeName = createCollisionFreeString("SEALED") { it in otherTypeNames }
+            val typeName = "SEALED".collisionFreeIdentifier(otherTypeNames)
 
             return TypeVariableName.typeVariable(typeName).withBounds(TypeVariableName.bound(swiftNameWithTypeParameters(this)))
         }
