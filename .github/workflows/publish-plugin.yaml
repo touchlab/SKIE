@@ -20,7 +20,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-          ssh-key: ${{ secrets.SWIFTPOET_DEPLOY_KEY }}
+          ssh-key: |
+            ${{ secrets.SWIFTPOET_DEPLOY_KEY }}
+            ${{ secrets.SKIE_DEPLOY_KEY }}
       - name: Cache Gradle Caches
         uses: actions/cache@v3
         with:
