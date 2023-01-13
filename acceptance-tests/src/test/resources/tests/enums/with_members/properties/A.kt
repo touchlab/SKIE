@@ -50,6 +50,12 @@ enum class A {
     //     set(value) {
     //         throw Exception()
     //     }
+
+    companion object {
+        val staticProperty: Int = 0
+
+        var staticMutableProperty: Int = 0
+    }
 }
 
 val A.extensionProperty: Int

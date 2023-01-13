@@ -1,5 +1,7 @@
 let allValues = [AKt.a1(), AKt.a2()]
 
+A.staticFun()
+
 for (index, value) in allValues.enumerated() {
     value.noParam()
     value.singleParam(p: 0)

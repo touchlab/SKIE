@@ -3,6 +3,7 @@
 package co.touchlab.skie.test
 
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.internal.skieDescriptorProvider
 import co.touchlab.skie.plugin.intercept.PhaseListener
@@ -43,9 +44,9 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                             TypeVariableName(typeParameter.name.identifier, TypeVariableName.bound(ANY_OBJECT))
                         }
                         val parametrizedKotlinClass = if (typeVariables.isNotEmpty()) {
-                            kotlinClass.spec.parameterizedBy(*typeVariables.toTypedArray())
+                            kotlinClass.swiftModel.stableSpec.parameterizedBy(*typeVariables.toTypedArray())
                         } else {
-                            kotlinClass.spec
+                            kotlinClass.swiftModel.stableSpec
                         }
 
                         addProperty(
