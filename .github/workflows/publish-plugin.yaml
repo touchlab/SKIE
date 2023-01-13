@@ -16,8 +16,15 @@ jobs:
     env:
       RELEASE_VERSION: ${{ github.ref_name }}
     steps:
+      - name: Import Deploy Key for swiftpoet repository
+        run: |
+          eval `ssh-agent -s`
+          ssh-add - <<< '${{ secrets.SWIFTPOET_DEPLOY_KEY }}'
       - name: Checkout Repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
       - name: Cache Gradle Caches
         uses: actions/cache@v3
         with:
