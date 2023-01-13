@@ -1,6 +1,7 @@
 let allValues = [AKt.a1(), AKt.a2()]
 
 for (index, value) in allValues.enumerated() {
+    assert(value.name == "A\(index + 1)")
     assert(value.immutableProperty == 0, "immutableProperty should be 0")
     assert(value.mutableProperty == 0, "mutableProperty should be 0")
     value.mutableProperty = Int32(index)

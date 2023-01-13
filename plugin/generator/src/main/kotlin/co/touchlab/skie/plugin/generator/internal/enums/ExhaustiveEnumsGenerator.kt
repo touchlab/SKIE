@@ -127,9 +127,19 @@ internal class ExhaustiveEnumsGenerator(
             descriptorProvider.getExportedCategoryMembers(declaration) +
                 declaration.unsubstitutedMemberScope.getContributedDescriptors()
 
-        allDescriptors
+        val nameProperty = allDescriptors
             .filterIsInstance<PropertyDescriptor>()
-            .filter { descriptorProvider.mapper.isBaseProperty(it) && descriptorProvider.mapper.isObjCProperty(it) }
+            .first { it.name.asString() == "name" }
+            .let { descriptorProvider.mapper.getBaseProperties(it).first() }
+
+        val ordinalProperty = allDescriptors
+            .filterIsInstance<PropertyDescriptor>()
+            .first { it.name.asString() == "ordinal" }
+            .let { descriptorProvider.mapper.getBaseProperties(it).first() }
+
+        (allDescriptors + listOf(nameProperty, ordinalProperty))
+            .filterIsInstance<PropertyDescriptor>()
+            .filter { descriptorProvider.mapper.isBaseProperty(it) && descriptorProvider.mapper.shouldBeExposed(it) }
             .forEach { property ->
                 val propertyType = property.type.spec(KotlinTypeSpecUsage.Default)
                 addProperty(
@@ -184,7 +194,7 @@ internal class ExhaustiveEnumsGenerator(
 
         allDescriptors
             .filterIsInstance<PropertyDescriptor>()
-            .filter { descriptorProvider.mapper.isBaseProperty(it) && descriptorProvider.mapper.isObjCProperty(it) }
+            .filter { descriptorProvider.mapper.isBaseProperty(it) && descriptorProvider.mapper.shouldBeExposed(it) }
             .forEach { property ->
                 val propertyType = property.type.spec(KotlinTypeSpecUsage.Default)
                 addProperty(
@@ -236,7 +246,11 @@ internal class ExhaustiveEnumsGenerator(
 
         allDescriptors
             .filterIsInstance<FunctionDescriptor>()
-            .filter { descriptorProvider.mapper.isBaseMethod(it) && descriptorProvider.mapper.shouldBeExposed(it) && !DescriptorUtils.isMethodOfAny(it) }
+            .filter {
+                descriptorProvider.mapper.isBaseMethod(it) &&
+                    descriptorProvider.mapper.shouldBeExposed(it) &&
+                    !DescriptorUtils.isMethodOfAny(it)
+            }
             .forEach { function ->
                 if (function.isSuspend) {
                     return@forEach
@@ -295,7 +309,7 @@ internal class ExhaustiveEnumsGenerator(
             .filterIsInstance<FunctionDescriptor>()
             .filter {
                 descriptorProvider.mapper.isBaseMethod(it) &&
-                    descriptorProvider.mapper.shouldBeExposed(it) &&
+                descriptorProvider.mapper.shouldBeExposed(it) &&
                     !DescriptorUtils.isMethodOfAny(it)
             }
             .forEach { function ->
