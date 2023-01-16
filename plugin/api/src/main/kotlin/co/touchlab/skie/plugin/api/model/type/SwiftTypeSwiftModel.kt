@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.api.model.type
 data class SwiftTypeSwiftModel(
     override val containingType: TypeSwiftModel?,
     override val identifier: String,
+    val isHashable: Boolean,
 ) : TypeSwiftModel {
 
     override val stableFqName: String

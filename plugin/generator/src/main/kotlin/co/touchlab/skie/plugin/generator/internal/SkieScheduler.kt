@@ -57,6 +57,7 @@ internal class SkieScheduler(
             namespaceProvider = namespaceProvider,
             configuration = configuration,
             descriptorProvider = descriptorProvider,
+            reporter = reporter,
         ),
         SuspendGenerator(
             skieContext = skieContext,

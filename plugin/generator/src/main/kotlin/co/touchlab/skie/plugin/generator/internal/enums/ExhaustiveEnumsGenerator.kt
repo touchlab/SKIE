@@ -9,6 +9,7 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.function.reference
 import co.touchlab.skie.plugin.api.model.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
 import co.touchlab.skie.plugin.api.model.type.packageName
 import co.touchlab.skie.plugin.api.model.type.simpleName
@@ -20,6 +21,7 @@ import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -27,6 +29,7 @@ import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
+import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
@@ -50,6 +53,7 @@ internal class ExhaustiveEnumsGenerator(
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     private val descriptorProvider: NativeDescriptorProvider,
+    private val reporter: Reporter,
 ) : BaseGenerator(skieContext, namespaceProvider, configuration) {
 
     override val isActive: Boolean = true
@@ -63,10 +67,24 @@ internal class ExhaustiveEnumsGenerator(
     }
 
     private fun generate(declaration: ClassDescriptor) {
+        if (declaration.enumEntries.isEmpty()) {
+            reporter.report(
+                Reporter.Severity.Warning,
+                "Enum ${declaration.name} has no entries, no Swift enum will be generated. To silence this warning, add @EnumInterop.Disabled above the enum declaration.",
+                declaration,
+            )
+            return
+        }
+
         module.configure {
             declaration.swiftModel.visibility = SwiftModelVisibility.Replaced
 
-            declaration.swiftModel.bridge = declaration.swiftModel.original
+            val original = declaration.swiftModel.original
+            declaration.swiftModel.bridge = SwiftTypeSwiftModel(
+                containingType = original.containingType,
+                identifier = declaration.swiftModel.original.identifier,
+                isHashable = declaration.enumEntries.isNotEmpty(),
+            )
         }
 
         module.generateCode(declaration) {
@@ -77,6 +95,10 @@ internal class ExhaustiveEnumsGenerator(
                 .apply {
                     addAttribute("frozen")
                     addModifiers(Modifier.PUBLIC)
+                    if (declaration.enumEntries.isNotEmpty()) {
+                        addSuperType(STRING)
+                        addSuperType(DeclaredTypeName.typeName("Swift.Hashable"))
+                    }
 
                     declaration.enumEntries.forEach {
                         addEnumCase(it.swiftModel.simpleName)

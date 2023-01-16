@@ -7,6 +7,7 @@ import co.touchlab.skie.plugin.api.model.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage.*
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
+import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
@@ -474,28 +475,38 @@ internal class DefaultSwiftPoetScope(
                 }
 
                 is NativeKotlinType.Reference.Unknown -> {
+                    val swiftModel = descriptor.swiftModel
                     if (descriptor.canBeSpecializedInSwift) {
-                        when (usage) {
-                            Default -> descriptor.swiftModel.bridgedOrStableSpec.withTypeParametersOf(kotlinType) { _, _ ->
-                                if (descriptor.swiftModel.isSwiftSymbol) {
-                                    TypeParam
-                                } else {
-                                    TypeParam.IsReference
-                                }
+                        val defaultSpec = swiftModel.bridgedOrStableSpec.withTypeParametersOf(kotlinType) { _, _ ->
+                            if (swiftModel.isSwiftSymbol) {
+                                TypeParam
+                            } else {
+                                TypeParam.IsReference
                             }
-                            TypeParam.IsReference -> descriptor.swiftModel.stableSpec.withTypeParametersOf(kotlinType) { _, _ ->
+                        }
+                        when (usage) {
+                            Default -> defaultSpec
+                            TypeParam.IsHashable -> if (swiftModel.bridge == null || (swiftModel.bridge as? SwiftTypeSwiftModel)?.isHashable == true) {
+                                defaultSpec
+                            } else {
+                                anyHashable
+                            }
+                            TypeParam.IsReference -> swiftModel.stableSpec.withTypeParametersOf(kotlinType) { _, _ ->
                                 TypeParam.IsReference
                             }
                             else -> null
                         }
                     } else if (descriptor.kind == ClassKind.INTERFACE) {
                         when (usage) {
-                            Default -> descriptor.swiftModel.bridgedOrStableSpec
+                            Default -> swiftModel.bridgedOrStableSpec
                             TypeParam.IsHashable -> anyHashable
+                            TypeParam.IsReference -> swiftModel.stableSpec
                             else -> null
                         }
-                    } else {
-                        DefaultOnly(descriptor.swiftModel.bridgedOrStableSpec)
+                    } else when (usage) {
+                        Default -> swiftModel.bridgedOrStableSpec
+                        TypeParam.IsHashable -> anyHashable
+                        else -> null
                     }
                 }
             }

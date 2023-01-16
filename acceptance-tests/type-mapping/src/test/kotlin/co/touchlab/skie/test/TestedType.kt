@@ -250,6 +250,7 @@ sealed interface TestedType {
             return listOf(
                 Basic(exported("ExportedClass")),
                 Basic(exported("ExportedEnum")),
+                Basic(exported("ExportedEmptyEnum")),
                 Basic(exported("ExportedInterface")),
                 Basic(exported("ExportedObject")),
                 WithTypeParameters(
@@ -268,6 +269,7 @@ sealed interface TestedType {
             return listOf(
                 Basic(nonexported("NonexportedClass")),
                 Basic(nonexported("NonexportedEnum")),
+                Basic(nonexported("NonexportedEmptyEnum")),
                 Basic(nonexported("NonexportedInterface")),
                 Basic(nonexported("NonexportedObject")),
                 WithTypeParameters(
