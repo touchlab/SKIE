@@ -54,10 +54,11 @@ internal object ObjectiveCBridgeable {
                         .add(
                             declaration.enumEntries.map {
                                 CodeBlock.of(
-                                    "case .%N: return %T.%N",
+                                    "case .%N: return %T.%N as %T",
                                     it.swiftModel.simpleName,
                                     declaration.stableSpec,
                                     it.swiftModel.simpleName,
+                                    declaration.stableSpec,
                                 )
                             }.joinToCode("\n", suffix = "\n")
                         )
@@ -116,11 +117,22 @@ internal object ObjectiveCBridgeable {
                 .addParameter("_", "source", declaration.stableSpec.makeOptional())
                 .addCode(
                     CodeBlock.builder()
+                        .apply {
+                            declaration.enumEntries.forEach {
+                                addStatement(
+                                    "let objc__%N = %T.%N as %T",
+                                    it.swiftModel.simpleName,
+                                    declaration.stableSpec,
+                                    it.swiftModel.simpleName,
+                                    declaration.stableSpec,
+                                )
+                            }
+                        }
                         .beginControlFlow("switch", "source")
                         .add(
                             declaration.enumEntries.map {
                                 CodeBlock.of(
-                                    "case .%N?: return .%N",
+                                    "case objc__%N?: return .%N",
                                     it.swiftModel.simpleName,
                                     it.swiftModel.simpleName,
                                 )

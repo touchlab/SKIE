@@ -70,9 +70,9 @@ class SwiftLinkCompilePhase(
 
         val apiNotes = ApiNotesFactory(framework.moduleName, context.descriptorProvider, namer.mapper, swiftModelScope).create()
 
-        val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
-            apiNotes.withoutBridging().createApiNotesFile(framework)
+        apiNotes.createApiNotesFile(framework)
 
+        val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
             val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
 
             compileSwift(configurables, framework, sourceFiles, swiftObjectsDir.javaFile())
@@ -85,8 +85,6 @@ class SwiftLinkCompilePhase(
         } else {
             emptyList()
         }
-
-        apiNotes.createApiNotesFile(framework)
 
         disableWildcardExportIfNeeded(framework)
 

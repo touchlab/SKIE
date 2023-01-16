@@ -181,17 +181,15 @@ internal class SwiftSuspendGeneratorDelegate(
 
     context(SwiftPoetScope)
     private fun MutableList<String>.addReceiversArguments(originalFunctionDescriptor: FunctionDescriptor) {
-        val self = if (originalFunctionDescriptor.swiftKind is CallableMemberSwiftType.FromEnum) "(self as _ObjectiveCType)" else "self"
-
         when (originalFunctionDescriptor.swiftKind) {
             CallableMemberSwiftType.Extension.Class, CallableMemberSwiftType.Extension.Enum -> {
-                add(self)
+                add("self")
             }
             CallableMemberSwiftType.Extension.Interface -> {
                 add(originalFunctionDescriptor.swiftReceiverParameterName)
             }
             is CallableMemberSwiftType.Method -> {
-                add(self)
+                add("self")
                 originalFunctionDescriptor.extensionReceiverParameter?.let {
                     add(originalFunctionDescriptor.swiftReceiverParameterName)
                 }

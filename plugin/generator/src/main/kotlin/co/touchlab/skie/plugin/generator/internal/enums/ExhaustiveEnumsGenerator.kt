@@ -152,10 +152,9 @@ internal class ExhaustiveEnumsGenerator(
                         .getter(
                             FunctionSpec.getterBuilder()
                                 .addStatement(
-                                    "return %L(self as _ObjectiveCType).%N%L",
+                                    "return %L(self as _ObjectiveCType).%N",
                                     if (descriptorProvider.mapper.doesThrow(property.getter!!)) "try " else "",
                                     property.regularPropertySwiftModel.reference,
-                                    if (property.type.isBridged) CodeBlock.of(" as %T", propertyType) else CodeBlock.of("")
                                 )
                                 .build()
                         )
@@ -169,13 +168,9 @@ internal class ExhaustiveEnumsGenerator(
                                             property.type.spec(KotlinTypeSpecUsage.ParameterType),
                                         )
                                         .addStatement(
-                                            "%L(self as _ObjectiveCType).%N = value%L",
+                                            "%L(self as _ObjectiveCType).%N = value",
                                             if (descriptorProvider.mapper.doesThrow(property.setter!!)) "try " else "",
                                             property.regularPropertySwiftModel.reference,
-                                            if (property.type.isBridged) CodeBlock.of(
-                                                " as %T",
-                                                property.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)
-                                            ) else CodeBlock.of("")
                                         )
                                         .build()
                                 )
@@ -227,20 +222,12 @@ internal class ExhaustiveEnumsGenerator(
                             throws(descriptorProvider.mapper.doesThrow(function))
 
                             addStatement(
-                                "return %L(self as _ObjectiveCType).%N(%L)%L",
+                                "return %L(self as _ObjectiveCType).%N(%L)",
                                 if (descriptorProvider.mapper.doesThrow(function)) "try " else "",
                                 function.swiftModel.reference,
                                 function.valueParameters.map {
-                                    CodeBlock.of(
-                                        "%N%L",
-                                        it.name.asString(),
-                                        if (it.type.isBridged) CodeBlock.of(
-                                            " as %T",
-                                            it.type.spec(KotlinTypeSpecUsage.TypeParam.IsReference)
-                                        ) else CodeBlock.of("")
-                                    )
+                                    CodeBlock.of("%N", it.name.asString())
                                 }.joinToCode(", "),
-                                if (function.returnType?.isBridged == true) CodeBlock.of(" as %T", returnType) else CodeBlock.of("")
                             )
                         }
                         .build()
