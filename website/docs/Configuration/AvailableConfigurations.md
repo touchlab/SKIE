@@ -2,84 +2,9 @@
 title: Available Configurations
 ---
 
+## Sealed classes/interfaces
+
 ```kotlin
-object DataStruct {
-
-    /**
-     * If true, the struct code is generated for the given data class.
-     */
-    object Enabled : ConfigurationKey.Boolean {
-
-        override val defaultValue: Boolean = false
-
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<DataStruct.Enabled>() -> true
-                configurationTarget.hasAnnotation<DataStruct.Disabled>() -> false
-                else -> null
-            }
-    }
-}
-
-object DefaultArgumentInterop {
-
-    object Enabled : ConfigurationKey.Boolean {
-
-        override val defaultValue: Boolean = true
-
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<DefaultArgumentInterop.Enabled>() -> true
-                configurationTarget.hasAnnotation<DefaultArgumentInterop.Disabled>() -> false
-                else -> null
-            }
-    }
-
-    object MaximumDefaultArgumentCount : ConfigurationKey.Int {
-
-        override val defaultValue: Int = 5
-
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Int? =
-            configurationTarget.findAnnotation<DefaultArgumentInterop.MaximumDefaultArgumentCount>()?.count
-    }
-}
-
-object EnumInterop {
-
-    /**
-     * If true, the interop code is generated for the given enum.
-     */
-    object Enabled : ConfigurationKey.Boolean {
-
-        override val defaultValue: Boolean = true
-
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<EnumInterop.Enabled>() -> true
-                configurationTarget.hasAnnotation<EnumInterop.Disabled>() -> false
-                else -> null
-            }
-    }
-}
-
-object ExperimentalFeatures {
-
-    /**
-     * If true, enables experimental features which might not be fully implemented yet which may cause compilation problems.
-     */
-    object Enabled : ConfigurationKey.Boolean {
-
-        override val defaultValue: Boolean = false
-
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<ExperimentalFeatures.Enabled>() -> true
-                configurationTarget.hasAnnotation<ExperimentalFeatures.Disabled>() -> false
-                else -> null
-            }
-    }
-}
-
 object SealedInterop {
 
     /**
@@ -175,7 +100,104 @@ object SealedInterop {
         }
     }
 }
+```
 
+## Exhaustive enums
+
+```kotlin
+object EnumInterop {
+
+    /**
+     * If true, the interop code is generated for the given enum.
+     */
+    object Enabled : ConfigurationKey.Boolean {
+
+        override val defaultValue: Boolean = true
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            when {
+                configurationTarget.hasAnnotation<EnumInterop.Enabled>() -> true
+                configurationTarget.hasAnnotation<EnumInterop.Disabled>() -> false
+                else -> null
+            }
+    }
+}
+```
+
+## Default arguments/parameters
+
+```kotlin
+object DefaultArgumentInterop {
+
+    object Enabled : ConfigurationKey.Boolean {
+
+        override val defaultValue: Boolean = true
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            when {
+                configurationTarget.hasAnnotation<DefaultArgumentInterop.Enabled>() -> true
+                configurationTarget.hasAnnotation<DefaultArgumentInterop.Disabled>() -> false
+                else -> null
+            }
+    }
+
+    object MaximumDefaultArgumentCount : ConfigurationKey.Int {
+
+        override val defaultValue: Int = 5
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Int? =
+            configurationTarget.findAnnotation<DefaultArgumentInterop.MaximumDefaultArgumentCount>()?.count
+    }
+}
+```
+
+## DataStruct (preview)
+
+```kotlin
+object DataStruct {
+
+    /**
+     * If true, the struct code is generated for the given data class.
+     */
+    object Enabled : ConfigurationKey.Boolean {
+
+        override val defaultValue: Boolean = false
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            when {
+                configurationTarget.hasAnnotation<DataStruct.Enabled>() -> true
+                configurationTarget.hasAnnotation<DataStruct.Disabled>() -> false
+                else -> null
+            }
+    }
+}
+```
+
+## Experimental features
+
+```kotlin
+object ExperimentalFeatures {
+
+    /**
+     * If true, enables experimental features which might not be fully implemented yet which may cause compilation problems.
+     */
+    object Enabled : ConfigurationKey.Boolean {
+
+        override val defaultValue: Boolean = false
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            when {
+                configurationTarget.hasAnnotation<ExperimentalFeatures.Enabled>() -> true
+                configurationTarget.hasAnnotation<ExperimentalFeatures.Disabled>() -> false
+                else -> null
+            }
+    }
+}
+```
+
+## Validation
+
+```kotlin
 object Validation {
 
     /**

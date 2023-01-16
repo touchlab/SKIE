@@ -17,18 +17,16 @@ The available annotations can be found [here](/docs/Configuration/AvailableAnnot
 
 The following example changes the name of the `onEnum(of:)` function generated for `SealedKotlinClass` to `something(of:)`:
 
-```kotlin
-// SealedKotlinClass.kt
-
+```kotlin title=SealedKotlinClass.kt
 @SealedInterop.Function.Name("something")
 sealed class SealedKotlinClass {
     ...
 }
 ```
 
-To use these annotations you need to add a dependency in `build.gradle.kts`:
+To use these annotations you need to add a dependency:
 
-```kotlin
+```kotlin title=build.gradle.kts
 dependencies {
     implementation("co.touchlab.skie:skie-generator-configuration-annotations:{{LATEST_GITHUB_VERSION}}")
 }
@@ -42,8 +40,7 @@ The global configuration can be applied to any class, including those from third
 
 Global configurations are performed through a `skie` Gradle extension:
 
-```kotlin
-// build.gradle.kts
+```kotlin title=build.gradle.kts
 import co.touchlab.skie.configuration.gradle.SealedInterop
 
 skie {
@@ -62,9 +59,7 @@ All of the available configuration options are listed [here](/docs/Configuration
 
 The configuration can also be applied such that it affects only some declarations:
 
-```kotlin
-// build.gradle.kts
-
+```kotlin title=build.gradle.kts
 skie {
     configuration {
         group("co.touchlab.") {
@@ -78,9 +73,7 @@ The configuration in the above example only applies to declarations from the `co
 
 The `group` block can be called multiple times so that declarations can have different configurations. For example:
 
-```kotlin
-// build.gradle.kts
-
+```kotlin title=build.gradle.kts
 skie {
     configuration {
         group {
@@ -99,9 +92,7 @@ If multiple matching groups provide the same configuration key, then only the la
 
 Local and global configuration can be used at the same time, in which case the local configuration takes precedence. This behavior can be overridden like so:
 
-```kotlin
-// build.gradle.kts
-
+```kotlin title=build.gradle.kts
 skie {
     configuration {
         group(overridesAnnotations = true) {
@@ -115,9 +106,7 @@ If the `overridesAnnotations` argument is set, then all keys in the group take p
 
 Configurations can also be loaded from a JSON file (such as [this example](/docs/Configuration/JsonConfigurationFileExample.md)) like so:
 
-```kotlin
-// build.gradle.kts
-
+```kotlin title=build.gradle.kts
 skie {
     configuration {
         from(File("config.json"))

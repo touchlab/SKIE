@@ -2,61 +2,10 @@
 title: Available Annotations
 ---
 
+
+## Sealed classes/interfaces
+
 ```kotlin
-object DataStruct {
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Enabled
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Disabled
-}
-
-object DefaultArgumentInterop {
-
-    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Enabled
-
-    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Disabled
-
-    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class MaximumDefaultArgumentCount(val count: Int)
-}
-
-object EnumInterop {
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Enabled
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Disabled
-}
-
-object ExperimentalFeatures {
-
-    /**
-     * Enables experimental features for the annotated declaration.
-     * Experimental features might not be fully implemented yet which may cause compilation problems.
-     * Has effect only if the experimental features are globally disabled.
-     */
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Enabled
-
-    /**
-     * Disables experimental features for the annotated declaration.
-     */
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Disabled
-}
-
 object SealedInterop {
 
     /**
@@ -130,5 +79,75 @@ object SealedInterop {
         @Retention(AnnotationRetention.BINARY)
         annotation class Name(val name: String)
     }
+}
+```
+
+## Exhaustive enums
+
+```kotlin
+object EnumInterop {
+
+    @Target(AnnotationTarget.CLASS)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Enabled
+
+    @Target(AnnotationTarget.CLASS)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Disabled
+}
+```
+
+## Default arguments/parameters
+
+```kotlin
+object DefaultArgumentInterop {
+
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Enabled
+
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Disabled
+
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class MaximumDefaultArgumentCount(val count: Int)
+}
+```
+
+## DataStruct (preview)
+
+```kotlin
+object DataStruct {
+
+    @Target(AnnotationTarget.CLASS)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Enabled
+
+    @Target(AnnotationTarget.CLASS)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Disabled
+}
+```
+
+## Experimental features
+
+```kotlin
+object ExperimentalFeatures {
+
+    /**
+     * Enables experimental features for the annotated declaration.
+     * Experimental features might not be fully implemented yet which may cause compilation problems.
+     * Has effect only if the experimental features are globally disabled.
+     */
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Enabled
+
+    /**
+     * Disables experimental features for the annotated declaration.
+     */
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Disabled
 }
 ```
