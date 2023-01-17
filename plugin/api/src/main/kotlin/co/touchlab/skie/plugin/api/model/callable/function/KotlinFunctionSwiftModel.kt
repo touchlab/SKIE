@@ -1,14 +1,15 @@
-package co.touchlab.skie.plugin.api.model.function
+package co.touchlab.skie.plugin.api.model.callable.function
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.isReplaced
 import co.touchlab.skie.plugin.api.model.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
-interface KotlinFunctionSwiftModel {
+interface KotlinFunctionSwiftModel : KotlinCallableMemberSwiftModel {
 
-    val descriptor: FunctionDescriptor
+    override val descriptor: FunctionDescriptor
 
     val isChanged: Boolean
 

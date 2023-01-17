@@ -1,19 +1,23 @@
 package co.touchlab.skie.plugin.api.model
 
-import co.touchlab.skie.plugin.api.model.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.parameter.KotlinParameterSwiftModel
-import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.property.extension.KotlinInterfaceExtensionPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
 interface SwiftModelScope {
+
+    val CallableMemberDescriptor.swiftModel: KotlinCallableMemberSwiftModel
 
     val FunctionDescriptor.swiftModel: KotlinFunctionSwiftModel
 
@@ -23,7 +27,7 @@ interface SwiftModelScope {
 
     val PropertyDescriptor.regularPropertySwiftModel: KotlinRegularPropertySwiftModel
 
-    val PropertyDescriptor.interfaceExtensionPropertySwiftModel: KotlinInterfaceExtensionPropertySwiftModel
+    val PropertyDescriptor.convertedPropertySwiftModel: KotlinConvertedPropertySwiftModel
 
     val ClassDescriptor.swiftModel: KotlinTypeSwiftModel
 

@@ -3,7 +3,7 @@
 package co.touchlab.skie.api.model
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.property.regular.reference
+import co.touchlab.skie.plugin.api.model.callable.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage.*
 import co.touchlab.skie.plugin.api.model.type.NativeKotlinType

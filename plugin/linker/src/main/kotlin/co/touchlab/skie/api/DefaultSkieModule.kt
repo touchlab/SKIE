@@ -7,18 +7,18 @@ import io.outfoxx.swiftpoet.FileSpec
 
 class DefaultSkieModule : SkieModule {
 
-    private val configureBlocks = mutableListOf<context(MutableSwiftModelScope) () -> Unit>()
-    private val swiftPoetFileBlocks = mutableMapOf<String, MutableList<context(SwiftPoetScope) FileSpec.Builder.() -> Unit>>()
+    private val configureBlocks = OrderedList<context(MutableSwiftModelScope) () -> Unit>()
+    private val swiftPoetFileBlocks = mutableMapOf<String, OrderedList<context(SwiftPoetScope) FileSpec.Builder.() -> Unit>>()
     private val textFileBlocks = mutableMapOf<String, MutableList<String>>()
     private var configureBlocksConsumed = false
 
-    override fun configure(configure: context(MutableSwiftModelScope) () -> Unit) {
+    override fun configure(ordering: SkieModule.Ordering, configure: context(MutableSwiftModelScope) () -> Unit) {
         require(!configureBlocksConsumed) { "configure() must not be called again after consumed" }
-        configureBlocks.add(configure)
+        configureBlocks.add(configure, ordering)
     }
 
-    override fun file(name: String, contents: context(SwiftPoetScope) FileSpec.Builder.() -> Unit) {
-        swiftPoetFileBlocks.getOrPut(name) { mutableListOf() }.add(contents)
+    override fun file(name: String, ordering: SkieModule.Ordering, contents: context(SwiftPoetScope) FileSpec.Builder.() -> Unit) {
+        swiftPoetFileBlocks.getOrPut(name) { OrderedList() }.add(contents, ordering)
     }
 
     override fun file(name: String, contents: String) {
@@ -26,11 +26,10 @@ class DefaultSkieModule : SkieModule {
     }
 
     fun consumeConfigureBlocks(scope: MutableSwiftModelScope) {
+        require(!configureBlocksConsumed) { "Configuration already consumed." }
         configureBlocksConsumed = true
-        val result = configureBlocks.toList()
-        configureBlocks.clear()
 
-        result.forEach {
+        configureBlocks.forEach {
             it(scope)
         }
     }
@@ -62,4 +61,27 @@ class DefaultSkieModule : SkieModule {
     }
 
     data class TextFile(val name: String, val content: String)
+
+    private class OrderedList<T> {
+
+        private val first = mutableListOf<T>()
+        private val inOrder = mutableListOf<T>()
+        private val last = mutableListOf<T>()
+
+        fun add(element: T, ordering: SkieModule.Ordering) {
+            val queue = when (ordering) {
+                SkieModule.Ordering.First -> first
+                SkieModule.Ordering.InOrder -> inOrder
+                SkieModule.Ordering.Last -> last
+            }
+
+            queue.add(element)
+        }
+
+        fun forEach(action: (T) -> Unit) {
+            first.forEach(action)
+            inOrder.forEach(action)
+            last.forEach(action)
+        }
+    }
 }

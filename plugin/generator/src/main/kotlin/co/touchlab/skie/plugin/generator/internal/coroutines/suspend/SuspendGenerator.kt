@@ -4,7 +4,6 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
-import co.touchlab.skie.configuration.gradle.DefaultArgumentInterop
 import co.touchlab.skie.configuration.gradle.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider

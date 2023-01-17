@@ -2,8 +2,11 @@ package co.touchlab.skie.plugin.api.kotlin
 
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface DescriptorProvider {
@@ -26,7 +29,17 @@ interface DescriptorProvider {
 
     fun getModuleForFile(file: SourceFile): ModuleDescriptor
 
-    fun getExportedFileContent(file: SourceFile): Set<CallableMemberDescriptor>
+    fun getExposedBaseMethods(classDescriptor: ClassDescriptor): List<FunctionDescriptor>
 
-    fun getExportedCategoryMembers(classDescriptor: ClassDescriptor): Set<CallableMemberDescriptor>
+    fun getFirstBaseMethodForAllExposedMethods(classDescriptor: ClassDescriptor): List<FunctionDescriptor>
+
+    fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ConstructorDescriptor>
+
+    fun getExposedBaseProperties(classDescriptor: ClassDescriptor): List<PropertyDescriptor>
+
+    fun getFirstBasePropertyForAllExposedProperties(classDescriptor: ClassDescriptor): List<PropertyDescriptor>
+
+    fun getExposedFileContent(file: SourceFile): Set<CallableMemberDescriptor>
+
+    fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): Set<CallableMemberDescriptor>
 }

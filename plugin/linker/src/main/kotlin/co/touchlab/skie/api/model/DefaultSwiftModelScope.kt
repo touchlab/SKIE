@@ -3,17 +3,18 @@
 package co.touchlab.skie.api.model
 
 import co.touchlab.skie.api.model.function.ActualKotlinFunctionSwiftModel
-import co.touchlab.skie.api.model.property.extension.ActualKotlinInterfaceExtensionPropertySwiftModel
+import co.touchlab.skie.api.model.property.extension.ActualKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.api.model.property.regular.ActualKotlinRegularPropertySwiftModel
 import co.touchlab.skie.api.model.type.classes.ActualKotlinClassSwiftModel
 import co.touchlab.skie.api.model.type.files.ActualKotlinFileSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
-import co.touchlab.skie.plugin.api.model.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.parameter.MutableKotlinParameterSwiftModel
-import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.property.extension.MutableKotlinInterfaceExtensionPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
@@ -72,7 +73,7 @@ class DefaultSwiftModelScope(
         get() = functionModelCache(this)
 
     override val ValueParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
-        get() = (this.containingDeclaration as FunctionDescriptor).swiftModel.parameters[this.index]
+        get() = (this.containingDeclaration as FunctionDescriptor).swiftModel.parameters.first { it.descriptor == this }
 
     private val regularPropertyModelCache =
         storageManager.createMemoizedFunction<PropertyDescriptor, MutableKotlinRegularPropertySwiftModel> { propertyDescriptor ->
@@ -82,7 +83,7 @@ class DefaultSwiftModelScope(
                 )
             }
             if (!namer.mapper.isObjCProperty(propertyDescriptor)) {
-                throw IllegalArgumentException("Interface extensions properties must be handled separately from others: $propertyDescriptor")
+                throw IllegalArgumentException("Converted properties must be handled separately from regular ones: $propertyDescriptor")
             }
 
             ActualKotlinRegularPropertySwiftModel(propertyDescriptor, propertyDescriptor.receiverModel, namer)
@@ -92,28 +93,35 @@ class DefaultSwiftModelScope(
         get() = regularPropertyModelCache(this)
 
     private val interfaceExtensionPropertyModelCache =
-        storageManager.createMemoizedFunction<PropertyDescriptor, MutableKotlinInterfaceExtensionPropertySwiftModel> { propertyDescriptor ->
+        storageManager.createMemoizedFunction<PropertyDescriptor, MutableKotlinConvertedPropertySwiftModel> { propertyDescriptor ->
             if (!namer.mapper.isBaseProperty(propertyDescriptor)) {
                 throw IllegalArgumentException(
                     "Overriding properties are not supporting. Obtain model of the base overridden property instead: $propertyDescriptor"
                 )
             }
             if (namer.mapper.isObjCProperty(propertyDescriptor)) {
-                throw IllegalArgumentException("Property is not an interface extensions: $propertyDescriptor")
+                throw IllegalArgumentException("Property $propertyDescriptor is a regular property not a converted one.")
             }
 
-            ActualKotlinInterfaceExtensionPropertySwiftModel(
+            ActualKotlinConvertedPropertySwiftModel(
                 descriptor = propertyDescriptor,
                 getter = propertyDescriptor.getter?.swiftModel ?: error("Property does not have a getter: $propertyDescriptor"),
                 setter = propertyDescriptor.setter?.swiftModel,
             )
         }
 
-    override val PropertyDescriptor.interfaceExtensionPropertySwiftModel: MutableKotlinInterfaceExtensionPropertySwiftModel
+    override val PropertyDescriptor.convertedPropertySwiftModel: MutableKotlinConvertedPropertySwiftModel
         get() = interfaceExtensionPropertyModelCache(this)
 
     override val PropertyDescriptor.swiftModel: KotlinPropertySwiftModel
-        get() = if (namer.mapper.isObjCProperty(this)) regularPropertySwiftModel else interfaceExtensionPropertySwiftModel
+        get() = if (namer.mapper.isObjCProperty(this)) regularPropertySwiftModel else convertedPropertySwiftModel
+
+    override val CallableMemberDescriptor.swiftModel: KotlinCallableMemberSwiftModel
+        get() = when (this) {
+            is FunctionDescriptor -> this.swiftModel
+            is PropertyDescriptor -> this.swiftModel
+            else -> error("Unsupported callable member: $this")
+        }
 
     private val classModelCache =
         storageManager.createMemoizedFunction<ClassDescriptor, MutableKotlinClassSwiftModel> { classDescriptor ->

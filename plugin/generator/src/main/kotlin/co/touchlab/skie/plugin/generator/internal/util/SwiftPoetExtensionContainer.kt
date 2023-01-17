@@ -60,7 +60,7 @@ internal interface SwiftPoetExtensionContainer {
         declaration: DeclarationDescriptor,
         codeBuilder: context(SwiftPoetScope) FileSpec.Builder.() -> Unit,
     ) {
-        this.file(declaration.kotlinName, codeBuilder)
+        this.file(declaration.kotlinName, contents = codeBuilder)
     }
 
     companion object {

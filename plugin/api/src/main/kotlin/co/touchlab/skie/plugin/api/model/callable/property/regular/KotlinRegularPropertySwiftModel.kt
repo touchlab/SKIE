@@ -1,8 +1,8 @@
-package co.touchlab.skie.plugin.api.model.property.regular
+package co.touchlab.skie.plugin.api.model.callable.property.regular
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.isReplaced
-import co.touchlab.skie.plugin.api.model.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 
 interface KotlinRegularPropertySwiftModel : KotlinPropertySwiftModel {

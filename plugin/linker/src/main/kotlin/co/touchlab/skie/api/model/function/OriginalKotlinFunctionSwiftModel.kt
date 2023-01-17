@@ -1,6 +1,6 @@
 package co.touchlab.skie.api.model.function
 
-import co.touchlab.skie.plugin.api.model.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

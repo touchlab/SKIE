@@ -95,6 +95,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
         }
     }
 
+    // TODO Remove
     private fun fixOverloadName(overload: FunctionDescriptor, mapper: ObjCExportMapper) {
         skieContext.module.configure {
             val loweredValueParameters = overload.loweredValueParameters(mapper)

@@ -1,5 +1,3 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieModule
@@ -12,7 +10,6 @@ import co.touchlab.skie.api.model.DefaultSwiftPoetScope
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
 import org.jetbrains.kotlin.backend.konan.KonanConfig
@@ -47,7 +44,7 @@ class SwiftLinkCompilePhase(
         val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
         val swiftModelScope = DefaultSwiftModelScope(namer, context.descriptorProvider)
         val swiftPoetScope = DefaultSwiftPoetScope(swiftModelScope, namer)
-        val skieModule = context.skieContext.module as DefaultSkieModule
+        val skieModule = skieContext.module as DefaultSkieModule
 
         NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()
         ClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
@@ -68,7 +65,7 @@ class SwiftLinkCompilePhase(
 
         val sourceFiles = skieContext.swiftSourceFiles + newFiles
 
-        val apiNotes = ApiNotesFactory(framework.moduleName, context.descriptorProvider, namer.mapper, swiftModelScope).create()
+        val apiNotes = ApiNotesFactory(framework.moduleName, context.descriptorProvider, swiftModelScope).create()
 
         apiNotes.createApiNotesFile(framework)
 

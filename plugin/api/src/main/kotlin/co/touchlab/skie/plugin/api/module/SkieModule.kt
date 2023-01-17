@@ -5,9 +5,13 @@ import io.outfoxx.swiftpoet.FileSpec
 
 interface SkieModule {
 
-    fun configure(configure: context(MutableSwiftModelScope) () -> Unit)
+    fun configure(ordering: Ordering = Ordering.InOrder, configure: context(MutableSwiftModelScope) () -> Unit)
 
-    fun file(name: String, contents: context(SwiftPoetScope) FileSpec.Builder.() -> Unit)
+    fun file(name: String, ordering: Ordering = Ordering.InOrder, contents: context(SwiftPoetScope) FileSpec.Builder.() -> Unit)
 
     fun file(name: String, contents: String)
+
+    enum class Ordering {
+        InOrder, First, Last
+    }
 }

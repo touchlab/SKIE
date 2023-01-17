@@ -17,7 +17,7 @@ internal class NamespaceProvider(
         DeclaredTypeName.qualifiedLocalTypeName("__SwiftGen")
 
     private fun withFileBuilder(block: context(SwiftPoetScope) FileSpec.Builder.() -> Unit) {
-        module.file(swiftGenNamespace.simpleName, block)
+        module.file(swiftGenNamespace.simpleName, contents = block)
     }
 
     private val existingNamespaces = mutableSetOf<String>()

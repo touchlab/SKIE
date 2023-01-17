@@ -8,15 +8,25 @@ import co.touchlab.skie.plugin.getAllExportedModuleDescriptors
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
+import org.jetbrains.kotlin.backend.konan.objcexport.getBaseMethods
+import org.jetbrains.kotlin.backend.konan.objcexport.getBaseProperties
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
+import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class NativeDescriptorProvider(private val context: CommonBackendContext) : DescriptorProvider {
 
@@ -123,9 +133,41 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     override fun getModuleForFile(file: SourceFile): ModuleDescriptor =
         mutableTopLevel[file]?.firstOrNull()?.module ?: error("File $file is not known to contain exported top level declarations.")
 
-    override fun getExportedFileContent(file: SourceFile): Set<CallableMemberDescriptor> =
+    override fun getExposedBaseMethods(classDescriptor: ClassDescriptor): List<FunctionDescriptor> =
+        classDescriptor.unsubstitutedMemberScope
+            .getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
+            .filterIsInstance<SimpleFunctionDescriptor>()
+            .filter { shouldBeExposed(it) }
+            .filter { mapper.isBaseMethod(it) }
+
+    override fun getFirstBaseMethodForAllExposedMethods(classDescriptor: ClassDescriptor): List<FunctionDescriptor> =
+        classDescriptor.unsubstitutedMemberScope
+            .getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
+            .filterIsInstance<SimpleFunctionDescriptor>()
+            .filter { shouldBeExposed(it) }
+            .map { mapper.getBaseMethods(it).first() }
+
+    override fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ConstructorDescriptor> =
+        classDescriptor.constructors
+            .filter { shouldBeExposed(it) }
+
+    override fun getExposedBaseProperties(classDescriptor: ClassDescriptor): List<PropertyDescriptor> =
+        classDescriptor.unsubstitutedMemberScope
+            .getDescriptorsFiltered()
+            .filterIsInstance<PropertyDescriptor>()
+            .filter { shouldBeExposed(it) }
+            .filter { mapper.isBaseProperty(it) }
+
+    override fun getFirstBasePropertyForAllExposedProperties(classDescriptor: ClassDescriptor): List<PropertyDescriptor> =
+        classDescriptor.unsubstitutedMemberScope
+            .getDescriptorsFiltered()
+            .filterIsInstance<PropertyDescriptor>()
+            .filter { shouldBeExposed(it) }
+            .map { mapper.getBaseProperties(it).first() }
+
+    override fun getExposedFileContent(file: SourceFile): Set<CallableMemberDescriptor> =
         mutableTopLevel[file] ?: emptySet()
 
-    override fun getExportedCategoryMembers(classDescriptor: ClassDescriptor): Set<CallableMemberDescriptor> =
+    override fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): Set<CallableMemberDescriptor> =
         mutableCategoryMembersDescriptors[classDescriptor] ?: emptySet()
 }

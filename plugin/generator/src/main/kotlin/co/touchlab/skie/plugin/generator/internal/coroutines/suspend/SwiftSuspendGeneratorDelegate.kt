@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
-import co.touchlab.skie.plugin.api.model.function.reference
+import co.touchlab.skie.plugin.api.model.callable.function.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
@@ -122,10 +122,11 @@ internal class SwiftSuspendGeneratorDelegate(
 
     context(SwiftPoetScope)
     private fun FunctionSpec.Builder.addValueParameter(valueParameter: ValueParameterDescriptor) {
+        val parameterSwiftModel = valueParameter.swiftModel
         val parameterTypeSpec = valueParameter.type.spec(KotlinTypeSpecUsage.ParameterType)
 
         addParameter(
-            ParameterSpec.builder(valueParameter.swiftModel.argumentLabel, parameterTypeSpec)
+            ParameterSpec.builder(parameterSwiftModel.argumentLabel, parameterSwiftModel.parameterName, parameterTypeSpec)
                 .build()
         )
     }
@@ -173,7 +174,7 @@ internal class SwiftSuspendGeneratorDelegate(
             arguments.addReceiversArguments(this)
 
             this.valueParameters.forEach {
-                arguments.add(it.swiftModel.argumentLabel)
+                arguments.add(it.swiftModel.parameterName)
             }
 
             return arguments

@@ -2,8 +2,8 @@ package co.touchlab.skie.api.model.function
 
 import co.touchlab.skie.api.model.parameter.ActualKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -18,7 +18,7 @@ class ActualKotlinFunctionSwiftModel(
     override var identifier: String = super.identifier
 
     override val parameters: List<MutableKotlinParameterSwiftModel> =
-        super.parameters.map { ActualKotlinParameterSwiftModel(it.argumentLabel) }
+        super.parameters.map { ActualKotlinParameterSwiftModel(it.origin, it.argumentLabel, it.parameterName) }
 
     override var visibility: SwiftModelVisibility = super.visibility
 

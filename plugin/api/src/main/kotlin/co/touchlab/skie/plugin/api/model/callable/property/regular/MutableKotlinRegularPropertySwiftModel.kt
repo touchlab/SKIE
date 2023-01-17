@@ -1,16 +1,13 @@
-package co.touchlab.skie.plugin.api.model.function
+package co.touchlab.skie.plugin.api.model.callable.property.regular
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 
-interface MutableKotlinFunctionSwiftModel : KotlinFunctionSwiftModel {
+interface MutableKotlinRegularPropertySwiftModel : KotlinRegularPropertySwiftModel {
 
     override var visibility: SwiftModelVisibility
 
     override val receiver: MutableKotlinTypeSwiftModel
 
     override var identifier: String
-
-    override val parameters: List<MutableKotlinParameterSwiftModel>
 }

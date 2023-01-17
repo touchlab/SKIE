@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.function.name
+import co.touchlab.skie.plugin.api.model.callable.function.name
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 context(SwiftModelScope)

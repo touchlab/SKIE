@@ -6,8 +6,8 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.function.reference
-import co.touchlab.skie.plugin.api.model.property.regular.reference
+import co.touchlab.skie.plugin.api.model.callable.function.reference
+import co.touchlab.skie.plugin.api.model.callable.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
@@ -144,7 +144,7 @@ internal class ExhaustiveEnumsGenerator(
         declaration: ClassDescriptor,
     ) {
         val allDescriptors =
-            descriptorProvider.getExportedCategoryMembers(declaration) +
+            descriptorProvider.getExposedCategoryMembers(declaration) +
                 declaration.unsubstitutedMemberScope.getContributedDescriptors()
 
         val nameProperty = allDescriptors
@@ -208,7 +208,7 @@ internal class ExhaustiveEnumsGenerator(
         declaration: ClassDescriptor,
     ) {
         val allDescriptors =
-            descriptorProvider.getExportedCategoryMembers(declaration) +
+            descriptorProvider.getExposedCategoryMembers(declaration) +
                 declaration.unsubstitutedMemberScope.getContributedDescriptors()
 
         allDescriptors
@@ -233,9 +233,12 @@ internal class ExhaustiveEnumsGenerator(
                             }
                             function.valueParameters.forEach { parameter ->
                                 val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
+                                val parameterSwiftModel = parameter.swiftModel
+
                                 addParameter(
                                     ParameterSpec.builder(
-                                        parameter.swiftModel.argumentLabel,
+                                        parameterSwiftModel.argumentLabel,
+                                        parameterSwiftModel.parameterName,
                                         parameterTypeSpec,
                                     ).build()
                                 )
@@ -248,7 +251,7 @@ internal class ExhaustiveEnumsGenerator(
                                 if (descriptorProvider.mapper.doesThrow(function)) "try " else "",
                                 function.swiftModel.reference,
                                 function.valueParameters.map {
-                                    CodeBlock.of("%N", it.swiftModel.argumentLabel)
+                                    CodeBlock.of("%N", it.swiftModel.parameterName)
                                 }.joinToCode(", "),
                             )
                         }

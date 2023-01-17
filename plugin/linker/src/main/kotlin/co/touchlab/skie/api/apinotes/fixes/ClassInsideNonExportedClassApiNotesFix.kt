@@ -13,7 +13,7 @@ class ClassInsideNonExportedClassApiNotesFix(
 ) {
 
     fun renameProblematicClasses() {
-        skieModule.configure {
+        skieModule.configure(SkieModule.Ordering.Last) {
             val existingNames = descriptorProvider.classDescriptors.map { it.swiftModel.fqName }.toMutableSet()
 
             descriptorProvider.classDescriptors

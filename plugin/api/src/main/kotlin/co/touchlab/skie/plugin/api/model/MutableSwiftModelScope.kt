@@ -1,9 +1,9 @@
 package co.touchlab.skie.plugin.api.model
 
-import co.touchlab.skie.plugin.api.model.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.parameter.MutableKotlinParameterSwiftModel
-import co.touchlab.skie.plugin.api.model.property.extension.MutableKotlinInterfaceExtensionPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -20,7 +20,7 @@ interface MutableSwiftModelScope : SwiftModelScope {
 
     override val PropertyDescriptor.regularPropertySwiftModel: MutableKotlinRegularPropertySwiftModel
 
-    override val PropertyDescriptor.interfaceExtensionPropertySwiftModel: MutableKotlinInterfaceExtensionPropertySwiftModel
+    override val PropertyDescriptor.convertedPropertySwiftModel: MutableKotlinConvertedPropertySwiftModel
 
     override val ClassDescriptor.swiftModel: MutableKotlinClassSwiftModel
 
