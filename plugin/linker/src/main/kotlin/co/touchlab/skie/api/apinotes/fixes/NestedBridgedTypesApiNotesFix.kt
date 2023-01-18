@@ -1,8 +1,10 @@
 package co.touchlab.skie.api.apinotes.fixes
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.module.SkieModule
@@ -18,6 +20,15 @@ class NestedBridgedTypesApiNotesFix(
 ) {
 
     fun createTypeAliasesForBridgingFile() {
+        skieModule.configure {
+            descriptorProvider.allExportedTypesMutableSwiftModels
+                .filter { it.needsTypeAliasForBridging }
+                .forEach {
+                    it.identifier = listOfNotNull(it.containingType?.identifier, it.identifier).joinToString("__")
+                    it.containingType = null
+                }
+        }
+
         skieModule.file("SkieTypeAliasesForBridging") {
             descriptorProvider.allExportedTypesSwiftModels
                 .filter { it.needsTypeAliasForBridging }
@@ -31,7 +42,11 @@ class NestedBridgedTypesApiNotesFix(
     private val DescriptorProvider.allExportedTypesSwiftModels: List<KotlinTypeSwiftModel>
         get() = exportedClassDescriptors.map { it.swiftModel } + exportedFiles.map { it.swiftModel }
 
-    private val KotlinTypeSwiftModel.needsTypeAliasForBridging: Boolean
+    context(MutableSwiftModelScope)
+    private val DescriptorProvider.allExportedTypesMutableSwiftModels: List<MutableKotlinTypeSwiftModel>
+        get() = exportedClassDescriptors.map { it.swiftModel } + exportedFiles.map { it.swiftModel }
+    
+    val KotlinTypeSwiftModel.needsTypeAliasForBridging: Boolean
         get() = bridge?.fqName != bridge?.fqNameSafeForBridging
 
     context(FileSpec.Builder)

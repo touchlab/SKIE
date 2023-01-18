@@ -185,7 +185,7 @@ sealed interface TestedType {
     data class Basic(
         val type: ClassName,
     ): TestedType {
-        override val safeName: String get() = type.simpleName
+        override val safeName: String get() = type.simpleNames.joinToString("___")
         override val kotlinType: TypeName get() = type
     }
 
@@ -248,20 +248,71 @@ sealed interface TestedType {
         fun ExportedTypes(param: TestedType): List<TestedType> {
             fun exported(name: String) = ClassName("co.touchlab.skie.test.exported", name)
             return listOf(
-                Basic(exported("ExportedClass")),
-                Basic(exported("ExportedEnum")),
-                Basic(exported("ExportedEmptyEnum")),
-                Basic(exported("ExportedInterface")),
-                Basic(exported("ExportedObject")),
+                exported("ExportedClass").let {
+                    listOf(
+                        it,
+                        it.nestedClass("NestedClassInClass"),
+                        it.nestedClass("NestedEnumInClass"),
+                        it.nestedClass("NestedObjectInClass"),
+                        it.nestedClass("NestedInterfaceInClass"),
+                        it.nestedClass("Companion"),
+                    )
+                }.map(::Basic),
+                exported("ExportedEnum").let {
+                    listOf(
+                        it,
+                        it.nestedClass("NestedClassInEnum"),
+                        it.nestedClass("NestedEnumInEnum"),
+                        it.nestedClass("NestedObjectInEnum"),
+                        it.nestedClass("NestedInterfaceInEnum"),
+                        it.nestedClass("Companion"),
+                    )
+                }.map(::Basic),
+                listOf(Basic(exported("ExportedEmptyEnum"))),
+                exported("ExportedInterface").let {
+                    listOf(
+                        it,
+                        it.nestedClass("NestedClassInInterface"),
+                        it.nestedClass("NestedEnumInInterface"),
+                        it.nestedClass("NestedObjectInInterface"),
+                        it.nestedClass("NestedInterfaceInInterface"),
+                        it.nestedClass("Companion"),
+                    )
+                }.map(::Basic),
+                exported("ExportedObject").let {
+                    listOf(
+                        it,
+                        it.nestedClass("NestedClassInObject"),
+                        it.nestedClass("NestedEnumInObject"),
+                        it.nestedClass("NestedObjectInObject"),
+                        it.nestedClass("NestedInterfaceInObject"),
+                    )
+                }.map(::Basic),
                 WithTypeParameters(
                     type = exported("ExportedSingleParamInterface"),
                     typeParameters = listOf(param),
-                ),
+                ).let {
+                    listOf(it) + listOf(
+                        it.type.nestedClass("NestedClassInGenericInterface"),
+                        it.type.nestedClass("NestedEnumInGenericInterface"),
+                        it.type.nestedClass("NestedObjectInGenericInterface"),
+                        it.type.nestedClass("NestedInterfaceInGenericInterface"),
+                        it.type.nestedClass("Companion"),
+                    ).map(::Basic)
+                },
                 WithTypeParameters(
                     type = exported("ExportedSingleParamClass"),
                     typeParameters = listOf(param),
-                ),
-            )
+                ).let {
+                    listOf(it) + listOf(
+                        it.type.nestedClass("NestedClassInGenericClass"),
+                        it.type.nestedClass("NestedEnumInGenericClass"),
+                        it.type.nestedClass("NestedObjectInGenericClass"),
+                        it.type.nestedClass("NestedInterfaceInGenericClass"),
+                        it.type.nestedClass("Companion"),
+                    ).map(::Basic)
+                },
+            ).flatten()
         }
 
         fun NonexportedTypes(param: TestedType): List<TestedType> {
