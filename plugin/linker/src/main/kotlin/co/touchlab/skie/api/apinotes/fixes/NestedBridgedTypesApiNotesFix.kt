@@ -24,8 +24,7 @@ class NestedBridgedTypesApiNotesFix(
             descriptorProvider.allExportedTypesMutableSwiftModels
                 .filter { it.needsTypeAliasForBridging }
                 .forEach {
-                    it.identifier = listOfNotNull(it.containingType?.identifier, it.identifier).joinToString("__")
-                    it.containingType = null
+                    it.moveOutAndRenameOriginalClass()
                 }
         }
 
@@ -45,7 +44,7 @@ class NestedBridgedTypesApiNotesFix(
     context(MutableSwiftModelScope)
     private val DescriptorProvider.allExportedTypesMutableSwiftModels: List<MutableKotlinTypeSwiftModel>
         get() = exportedClassDescriptors.map { it.swiftModel } + exportedFiles.map { it.swiftModel }
-    
+
     val KotlinTypeSwiftModel.needsTypeAliasForBridging: Boolean
         get() = bridge?.fqName != bridge?.fqNameSafeForBridging
 
@@ -58,6 +57,13 @@ class NestedBridgedTypesApiNotesFix(
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
+    }
+
+    // Moves the class outside of its parent class and renames it to avoid name collisions.
+    // This is a workaround for `typealias` thinking that it's recursive (probably a bug in Swift compiler).
+    private fun MutableKotlinTypeSwiftModel.moveOutAndRenameOriginalClass() {
+        identifier = listOfNotNull(containingType?.identifier, identifier).joinToString("__")
+        containingType = null
     }
 }
 
