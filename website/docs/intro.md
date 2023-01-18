@@ -20,6 +20,30 @@ production project.*
 
 ## Supported features
 
+### Coroutine Interop
+
+SKIE adds support for using Kotlin coroutines in Swift's structured concurrency model. Although Kotlin produces API for `suspend` functions that can be called from Swift, it loses support for cooperative cancellation. Additionally, SKIE's coroutine interop maps `Flow`, `StateFlow` and `SharedFlow` (and their mutable counterparts) to structures usable from Swift.
+
+#### Suspend wrappers
+
+SKIE generates Kotlin functions for each `suspend fun` declaration that'd be visible from Swift. Additionally, SKIE generates a Swift function that replaces the original `suspend fun` declaration. The signature of the Swift function matches the original Kotlin function, for example:
+
+```kotlin
+suspend fun helloWorld(input: String): String
+```
+
+would generate a Swift function with the following signature:
+
+```swift
+func helloWorld(input: String) throws async -> String
+```
+
+Your Swift code would then call the `hellWorld(input:)` Swift function, as the original gets hidden by SKIE.
+
+#### Flows, StateFlows and SharedFlows
+
+TODO: When implemented.
+
 ### Sealed classes/interfaces
 
 SKIE allows you to exhaustively switch on sealed Kotlin hierarchies from Swift. For example, consider the following Kotlin code:
