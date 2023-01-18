@@ -28,7 +28,7 @@ internal class TypeAliasGenerator(
 
     private val baseTypeAliasContainerName = "Skie"
 
-    private val publicTypeAliasContainerName = KotlinTypeSwiftModel.StableFqNameNamespace.removeSuffix(".")
+    private val publicTypeAliasContainerName = TypeSwiftModel.StableFqNameNamespace.removeSuffix(".")
 
     override fun execute() {
         skieContext.module.file("TypeAliases") {
@@ -72,12 +72,23 @@ internal class TypeAliasGenerator(
     private fun TypeSpec.Builder.addTypeAlias(swiftModel: TypeSwiftModel) {
         addType(
             TypeAliasSpec.builder(
-                name = swiftModel.stableFqName.removePrefix(KotlinTypeSwiftModel.StableFqNameNamespace),
+                name = swiftModel.stableFqName.removePrefix(TypeSwiftModel.StableFqNameNamespace),
                 type = DeclaredTypeName.qualifiedLocalTypeName(swiftModel.fqName),
             )
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
+
+        (swiftModel as? KotlinTypeSwiftModel)?.bridge?.let { bridge ->
+            addType(
+                TypeAliasSpec.builder(
+                    name = bridge.stableFqName.removePrefix(TypeSwiftModel.StableFqNameNamespace),
+                    type = DeclaredTypeName.qualifiedLocalTypeName(bridge.fqName),
+                )
+                    .addModifiers(Modifier.PUBLIC)
+                    .build()
+            )
+        }
     }
 
     context(SwiftPoetScope)

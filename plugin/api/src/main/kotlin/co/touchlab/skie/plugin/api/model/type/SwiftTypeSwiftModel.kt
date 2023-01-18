@@ -1,5 +1,8 @@
 package co.touchlab.skie.plugin.api.model.type
 
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
+
 data class SwiftTypeSwiftModel(
     override val containingType: TypeSwiftModel?,
     override val identifier: String,
@@ -8,9 +11,7 @@ data class SwiftTypeSwiftModel(
 
     override val stableFqName: String
         get() {
-            val parentName = containingType?.stableFqName ?: return identifier
-
-            return "$parentName.$identifier"
+            return TypeSwiftModel.StableFqNameNamespace + "swift__${fqName("_")}"
         }
 
     override val bridgedOrStableFqName: String

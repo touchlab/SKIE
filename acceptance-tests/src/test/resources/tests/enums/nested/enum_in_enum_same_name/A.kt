@@ -6,7 +6,23 @@ enum class A {
 
     enum class A {
         A1,
-        A2,
+        A2;
+
+        fun returnsInnerA(): A {
+            return A1
+        }
+
+        fun returnsOuterA(): tests.enums.nested.enum_in_enum_same_name.A {
+            return tests.enums.nested.enum_in_enum_same_name.A.A1
+        }
+    }
+
+    fun returnsInnerA(): A {
+        return A.A1
+    }
+
+    fun returnsOuterA(): tests.enums.nested.enum_in_enum_same_name.A {
+        return tests.enums.nested.enum_in_enum_same_name.A.A1
     }
 }
 

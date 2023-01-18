@@ -25,7 +25,7 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
     val bridge: TypeSwiftModel?
 
     override val bridgedOrStableFqName: String
-        get() = bridge?.fqName ?: stableFqName
+        get() = bridge?.stableFqName ?: stableFqName
 
     val kind: Kind
 
@@ -52,10 +52,5 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
 
     enum class Kind {
         Class, File
-    }
-
-    companion object {
-
-        const val StableFqNameNamespace: String = "__Skie."
     }
 }

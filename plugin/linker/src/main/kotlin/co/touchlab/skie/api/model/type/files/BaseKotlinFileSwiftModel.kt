@@ -39,6 +39,6 @@ abstract class BaseKotlinFileSwiftModel(
         val fileNameFragment =
             file.name?.removeSuffix(".kt")?.let { it + "Kt" }?.sanitizeForIdentifier() ?: error("File does not have a name.")
 
-        KotlinTypeSwiftModel.StableFqNameNamespace + moduleFragment + "__" + fileNameFragment
+        TypeSwiftModel.StableFqNameNamespace + "file__" + moduleFragment + "__" + fileNameFragment
     }
 }

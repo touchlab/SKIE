@@ -28,6 +28,8 @@ interface TypeSwiftModel {
     companion object {
 
         const val DEFAULT_SEPARATOR = "."
+
+        const val StableFqNameNamespace: String = "__Skie."
     }
 }
 

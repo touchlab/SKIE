@@ -30,6 +30,6 @@ abstract class BaseKotlinClassSwiftModel(
     override val objCFqName: String = namer.getClassOrProtocolName(classDescriptor).objCName
 
     override val stableFqName: String =
-        KotlinTypeSwiftModel.StableFqNameNamespace +
-            ("${classDescriptor.module.stableIdentifier}__${classDescriptor.fqNameSafe.asString()}").replace(".", "_")
+        TypeSwiftModel.StableFqNameNamespace +
+            ("class__${classDescriptor.module.stableIdentifier}__${classDescriptor.fqNameSafe.asString()}").replace(".", "_")
 }
