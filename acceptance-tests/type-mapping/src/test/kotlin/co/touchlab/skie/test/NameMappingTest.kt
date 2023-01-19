@@ -14,23 +14,21 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.junit.jupiter.api.Test
 import kotlin.io.path.Path
 import co.touchlab.skie.configuration.Configuration
-import com.squareup.kotlinpoet.ANY
-import com.squareup.kotlinpoet.CHAR_SEQUENCE
-import com.squareup.kotlinpoet.COMPARABLE
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.PropertySpec
 import kotlin.io.path.writer
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.LIST
-import com.squareup.kotlinpoet.MUTABLE_LIST
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.SET
-import com.squareup.kotlinpoet.STAR
-import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeVariableName
+import org.jetbrains.kotlin.konan.file.File
+import java.nio.file.Path
+import java.time.LocalDateTime
+import java.util.stream.Collectors
+import kotlin.io.path.deleteIfExists
 import kotlin.test.fail
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 
 class NameMappingTest {
 
@@ -38,13 +36,67 @@ class NameMappingTest {
     fun runTest() {
         System.setProperty("konan.home", BuildConfig.KONAN_HOME)
         val tempDirectory = Path(BuildConfig.BUILD).resolve("test-temp")
-        val tempFileSystem = TempFileSystem(tempDirectory)
-        val tempSourceFile = tempDirectory.resolve("KotlinFile.kt")
+        tempDirectory.toFile().deleteRecursively()
+        tempDirectory.toFile().mkdirs()
 
         val compilerConfiguration = CompilerConfiguration(
             dependencies = BuildConfig.DEPENDENCIES.toList(),
             exportedDependencies = BuildConfig.EXPORTED_DEPENDENCIES.toList(),
         )
+
+        val splitTypes = TestedType.ALL.sortedBy { it.safeName }.windowed(size = 100, step = 100, partialWindows = true)
+
+        val onlyIndices = setOf<Int>() //424, 426, 427, 428, 461, 462)
+
+        val failures = splitTypes
+            .mapIndexed { index, testedTypes -> index to testedTypes }
+            .filter { onlyIndices.isEmpty() || onlyIndices.contains(it.first) }
+            .parallelStream()
+            .map { (index, types) ->
+                val start = System.currentTimeMillis()
+                val result = runTestForTypes(
+                    types = types,
+                    tempDirectory = tempDirectory.resolve("test-$index"),
+                    compilerConfiguration = compilerConfiguration,
+                )
+                println("[${if (result is TestResult.Success) "PASS" else "FAIL"}] Finished test ${index + 1}/${splitTypes.size} in ${(System.currentTimeMillis() - start).milliseconds.toString(DurationUnit.SECONDS, 2)} seconds")
+                index to result
+            }
+            .filter { it.second !is TestResult.Success }
+            .collect(Collectors.toList())
+
+        if (failures.isNotEmpty()) {
+            failures.forEach { (index, result) ->
+                println(result.actualErrorMessage)
+            }
+            println("To run only failed tests:")
+            println(failures.joinToString(", ") { "${it.first}" })
+            fail("${failures.size} tests failed.")
+        }
+
+    }
+
+    private fun List<TestedType>.findClassTypeParams(): List<TypeVariableName> {
+        fun TestedType.findClassTypeParams(): List<TypeVariableName> = when (this) {
+            is TestedType.CopiedType -> (kotlinType as? TypeVariableName)?.let { listOf(it) } ?: emptyList()
+            is TestedType.WithTypeParameters -> typeParameters.findClassTypeParams()
+            is TestedType.Lambda -> parameterTypes.findClassTypeParams() + returnType.findClassTypeParams()
+            is TestedType.Nullable -> wrapped.findClassTypeParams()
+            is TestedType.TypeParam -> listOf(this.kotlinType)
+            else -> emptyList()
+        }
+        return flatMap { testedType ->
+            testedType.findClassTypeParams()
+        }
+    }
+
+    private fun runTestForTypes(
+        types: List<TestedType>,
+        tempDirectory: Path,
+        compilerConfiguration: CompilerConfiguration,
+    ): TestResult {
+        val tempFileSystem = TempFileSystem(tempDirectory)
+        val tempSourceFile = tempDirectory.resolve("KotlinFile.kt")
         // TODO Generate Kotlin code
         FileSpec.builder("co.touchlab.skie.test", "KotlinFile")
             .addType(
@@ -60,10 +112,10 @@ class NameMappingTest {
             .addType(
                 TypeSpec.classBuilder("KotlinFile")
                     .addTypeVariables(
-                        TestedType.CLASS_TYPE_PARAMS.map { it.kotlinType }
+                        types.findClassTypeParams().distinct()
                     )
                     .apply {
-                        TestedType.ALL.forEach { type ->
+                        types.forEach { type ->
                             addProperty(
                                 PropertySpec.builder("property_" + type.safeName, type.kotlinType)
                                     .initializer("TODO()")
@@ -71,7 +123,7 @@ class NameMappingTest {
                             )
                         }
 
-                        TestedType.ALL_BUT_SECOND_LEVEL.forEach { type ->
+                        types.forEach { type ->
                             addFunction(
                                 FunSpec.builder("function_${type.safeName}")
                                     .addParameter("value", type.kotlinType)
@@ -81,7 +133,7 @@ class NameMappingTest {
                             )
                         }
 
-                        TestedType.ALL_BUT_SECOND_LEVEL.forEach { type ->
+                        types.forEach { type ->
                             addFunction(
                                 FunSpec.builder("suspend_function_${type.safeName}")
                                     .addModifiers(KModifier.SUSPEND)
@@ -92,7 +144,7 @@ class NameMappingTest {
                             )
                         }
 
-                        TestedType.ALL_BUT_SECOND_LEVEL.forEach { type ->
+                        types.forEach { type ->
                             addFunction(
                                 FunSpec.builder("extension_function_${type.safeName}")
                                     .receiver(type.kotlinType)
@@ -141,11 +193,11 @@ class NameMappingTest {
 
         }
 
-        val testResult = IntermediateResult.Value(listOf(tempSourceFile))
+        return IntermediateResult.Value(listOf(tempSourceFile))
             .flatMap {
                 val compiler = KotlinTestCompiler(tempFileSystem, testLogger)
                 compiler.compile(
-                    listOf(tempDirectory.resolve("KotlinFile.kt")),
+                    listOf(tempSourceFile),
                     compilerConfiguration,
                 )
             }
@@ -157,10 +209,5 @@ class NameMappingTest {
                     compilerConfiguration,
                 )
             }
-
-        if (testResult != TestResult.Success) {
-            println(testResult.actualErrorMessage)
-            fail("Tests failed")
-        }
     }
 }

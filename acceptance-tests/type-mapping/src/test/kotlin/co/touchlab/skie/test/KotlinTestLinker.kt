@@ -87,6 +87,14 @@ internal class KotlinTestLinker(
             outputName = outputFile.absolutePathString()
             bundleId = "Kotlin"
 
+            disablePhases = arrayOf(
+                "Linker",
+                "BitcodeOptimization",
+                "FinalizeDebugInfo",
+                "VerifyBitcode",
+                "LinkBitcodeDependencies",
+                "BitcodePostprocessing",
+            )
             pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.TEST_RESOURCES)
 
             libraries = compilerConfiguration.dependencies.toTypedArray()

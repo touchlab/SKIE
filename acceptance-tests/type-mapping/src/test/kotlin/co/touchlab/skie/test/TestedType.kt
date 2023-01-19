@@ -375,7 +375,8 @@ sealed interface TestedType {
                 CPointed.CFunction,
             ) + CPointed.COpaque.values().toList() +
                 CPointed.CVariable.CPrimitiveVar.values().toList() +
-                CPointed.CVariable.CEnumVar.values().toList()
+                CPointed.CVariable.CEnumVar.values().toList() +
+                CPointed.CVariable.CStructVar.values().toList()
         }
 
         val CPOINTERS_FIRST_LEVEL by lazy {
@@ -434,6 +435,37 @@ sealed interface TestedType {
         }
 
         val ONLY by lazy<List<TestedType>> {
+            // fun LL(type: TestedType) = Lambda(
+            //     false,
+            //     null,
+            //     listOf(
+            //         Lambda(
+            //             false,
+            //             null,
+            //             listOf(type),
+            //             type,
+            //         ),
+            //     ),
+            //     Lambda(
+            //         false,
+            //         null,
+            //         listOf(type),
+            //         type,
+            //     ),
+            // )
+            // fun LN(type: TestedType) = Lambda(
+            //     false,
+            //     null,
+            //     listOf(Nullable(type)),
+            //     Nullable(type),
+            // )
+            //
+            // listOf<TestedType>(
+            //     LL(Builtin.Nothing),
+            //     LL(Builtin.Unit),
+            // ) + CPOINTEDS.map {
+            //     LN(it)
+            // } +
             listOf<TestedType>(
                 // Builtin.NativePtr
                 // Lambda(false,
