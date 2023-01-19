@@ -24,14 +24,17 @@ import java.nio.file.Path
 import java.time.LocalDateTime
 import java.util.stream.Collectors
 import kotlin.io.path.deleteIfExists
+import kotlin.streams.toList
 import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 class NameMappingTest {
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun runTest() {
         System.setProperty("konan.home", BuildConfig.KONAN_HOME)
@@ -53,17 +56,21 @@ class NameMappingTest {
             .filter { onlyIndices.isEmpty() || onlyIndices.contains(it.first) }
             .parallelStream()
             .map { (index, types) ->
-                val start = System.currentTimeMillis()
-                val result = runTestForTypes(
-                    types = types,
-                    tempDirectory = tempDirectory.resolve("test-$index"),
-                    compilerConfiguration = compilerConfiguration,
-                )
-                println("[${if (result is TestResult.Success) "PASS" else "FAIL"}] Finished test ${index + 1}/${splitTypes.size} in ${(System.currentTimeMillis() - start).milliseconds.toString(DurationUnit.SECONDS, 2)} seconds")
+                val testTime = measureTimedValue {
+                    runTestForTypes(
+                        types = types,
+                        tempDirectory = tempDirectory.resolve("test-$index"),
+                        compilerConfiguration = compilerConfiguration,
+                    )
+                }
+                val result = testTime.value
+                println("[${if (result is TestResult.Success) "PASS" else "FAIL"}] Finished test $index (${index + 1}/${splitTypes.size}) in ${testTime.duration.toString(DurationUnit.SECONDS, 2)} seconds")
                 index to result
             }
             .filter { it.second !is TestResult.Success }
             .collect(Collectors.toList())
+            // TODO: Change to `toList()`
+            // .toList()
 
         if (failures.isNotEmpty()) {
             failures.forEach { (index, result) ->
@@ -97,7 +104,7 @@ class NameMappingTest {
     ): TestResult {
         val tempFileSystem = TempFileSystem(tempDirectory)
         val tempSourceFile = tempDirectory.resolve("KotlinFile.kt")
-        // TODO Generate Kotlin code
+
         FileSpec.builder("co.touchlab.skie.test", "KotlinFile")
             .addType(
                 TypeSpec.interfaceBuilder("TestInterface")

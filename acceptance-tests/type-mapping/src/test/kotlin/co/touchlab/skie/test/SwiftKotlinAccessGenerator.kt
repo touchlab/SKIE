@@ -33,9 +33,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
         val kotlinClass = context.skieDescriptorProvider.classDescriptors.first {
             it.name.identifier == "KotlinFile"
         }
-        // val genericKotlinClass = context.skieDescriptorProvider.classDescriptors.first {
-        //     it.name.identifier == "GenericKotlinFile"
-        // }
+
         context.skieContext.module.file("KotlinFile_access") {
             addType(
                 TypeSpec.classBuilder("KotlinFileWrapper")
