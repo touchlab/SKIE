@@ -9,9 +9,9 @@ class KotlinRegularPropertySwiftModelCore(
     namer: ObjCExportNamer,
 ) {
 
-    var identifier: String = namer.getPropertyName(descriptor.original)
+    var identifier: String = namer.getPropertyName(descriptor.original).swiftName
 
     var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
 
-    val objCName: String = namer.getPropertyName(descriptor.original)
+    val objCName: String = namer.getPropertyName(descriptor.original).objCName
 }
