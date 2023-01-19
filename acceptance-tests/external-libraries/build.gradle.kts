@@ -41,7 +41,7 @@ val updateExternalLibrariesLockfile = tasks.register<ExternalLibrariesTask>("upd
     group = "verification"
     description = "Loads external libraries for iosArm64"
 
-    acceptableKotlinPrefixes.addAll("1.4", "1.5", "1.6", "1.7")
+    acceptableKotlinPrefixes.addAll("1.4", "1.5", "1.6", "1.7", "1.8")
     platformSuffix.set("-iosarm64")
 
     mavenSearchCache.set(layout.buildDirectory.file("tmp/maven-search-cache.json"))
