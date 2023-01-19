@@ -41,8 +41,8 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
     private fun createSwiftGenConfiguration(project: Project): TaskProvider<CreateSwiftGenConfigTask> {
         val task = project.tasks.register<CreateSwiftGenConfigTask>(CreateSwiftGenConfigTask.name)
 
-        project.tasks.withType<KotlinNativeLink> {
-            inputs.file(task.map { it.configFile })
+        project.tasks.withType<KotlinNativeLink>().configureEach {
+            it.inputs.file(task.map { it.configFile })
         }
 
         return task
