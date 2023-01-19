@@ -13,9 +13,9 @@ import org.jetbrains.kotlin.backend.konan.createSymbolTablePhase
 import org.jetbrains.kotlin.backend.konan.objCExportPhase
 import org.jetbrains.kotlin.backend.konan.objectFilesPhase
 import org.jetbrains.kotlin.backend.konan.psiToIrPhase
-import org.jetbrains.kotlin.cli.jvm.plugins.ServiceLoaderLite
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
+import org.jetbrains.kotlin.util.ServiceLoaderLite
 import java.net.URLClassLoader
 import java.util.ServiceLoader
 import kotlin.reflect.jvm.jvmName

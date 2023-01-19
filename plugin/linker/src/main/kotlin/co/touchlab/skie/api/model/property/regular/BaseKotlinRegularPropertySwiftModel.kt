@@ -10,9 +10,9 @@ abstract class BaseKotlinRegularPropertySwiftModel(
     namer: ObjCExportNamer,
 ) : KotlinRegularPropertySwiftModel {
 
-    override val identifier: String = namer.getPropertyName(descriptor)
+    override val identifier: String = namer.getPropertyName(descriptor).swiftName
 
     override val visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
 
-    override val objCName: String = namer.getPropertyName(descriptor)
+    override val objCName: String = namer.getPropertyName(descriptor).objCName
 }
