@@ -11,6 +11,7 @@ class SkieKotlinMultiplatformPlugin : Plugin<Project> {
         with(target) {
             applyKotlinMultiplatformPlugin()
             setJvmToolchain()
+            configureOptIn()
         }
     }
 
@@ -21,6 +22,14 @@ class SkieKotlinMultiplatformPlugin : Plugin<Project> {
     private fun Project.setJvmToolchain() {
         extensions.configure(KotlinMultiplatformExtension::class.java) {
             jvmToolchain(libs.versions.java)
+        }
+    }
+
+    private fun Project.configureOptIn() {
+        extensions.configure(KotlinMultiplatformExtension::class.java) {
+            sourceSets.all {
+                languageSettings.optIn("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+            }
         }
     }
 }

@@ -164,7 +164,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             tasks.withType<FatFrameworkTask>().configureEach { task ->
                 task.doLast(object : Action<Task> {
                     override fun execute(p0: Task) {
-                        val target = FrameworkLayout(task.fatFramework)
+                        val target = FrameworkLayout(task.fatFramework, true)
 
                         val frameworksByArchs = task.frameworks.associateBy { it.target.architecture }
                         target.swiftHeader.writer().use { writer ->
