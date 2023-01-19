@@ -6,6 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
@@ -17,6 +18,7 @@ class SkieKotlinJvmPlugin : Plugin<Project> {
             setJvmToolchain()
             configureTests()
             configureContextReceivers()
+            configureOptIn()
         }
     }
 
@@ -51,6 +53,12 @@ class SkieKotlinJvmPlugin : Plugin<Project> {
                     }
                 }
             }
+        }
+    }
+
+    private fun Project.configureOptIn() {
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
+            compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
         }
     }
 }
