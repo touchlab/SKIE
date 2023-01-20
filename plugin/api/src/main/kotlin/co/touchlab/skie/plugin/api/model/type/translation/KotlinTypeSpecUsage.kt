@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.api.model.type
+package co.touchlab.skie.plugin.api.model.type.translation
 
 sealed interface KotlinTypeSpecUsage {
     sealed interface ParameterType : KotlinTypeSpecUsage {

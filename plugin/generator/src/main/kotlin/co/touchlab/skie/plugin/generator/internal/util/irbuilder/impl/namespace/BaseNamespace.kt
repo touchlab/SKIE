@@ -31,7 +31,7 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor>(private val des
     }
 
     private fun addDescriptorIntoDescriptorProvider(declarationDescriptor: DeclarationDescriptor) {
-        descriptorProvider.registerDescriptor(declarationDescriptor)
+        descriptorProvider.registerExposedDescriptor(declarationDescriptor)
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)

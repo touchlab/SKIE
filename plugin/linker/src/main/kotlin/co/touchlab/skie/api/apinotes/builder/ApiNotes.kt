@@ -6,6 +6,7 @@ class ApiNotes(
     private val protocols: List<ApiNotesType>,
 ) {
 
+    // TODO Remove
     fun withoutBridging(): ApiNotes =
         ApiNotes(
             moduleName = moduleName,

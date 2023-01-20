@@ -14,16 +14,21 @@ interface TypeSwiftModel {
      * This name does not change except when the type itself changes.
      * For example, it does not change when a new type with the same simple name is added.
      */
+    // TODO Rename to objCStableFqName
     val stableFqName: String
 
     /**
      * `stableFqName` for the final Swift class.
      */
+    // TODO Rename to fqName and point to bridged.fqName -> fqName to rawFqName
     val bridgedOrStableFqName: String
 
     val isSwiftSymbol: Boolean
 
+    // TODO Remove and keep only fqName also rename to localFqName
     fun fqName(separator: String = DEFAULT_SEPARATOR): String
+
+    // TODO Introduce FqName without replace prefix (copy from NestedBridgeTypesApiNotesFix)
 
     companion object {
 

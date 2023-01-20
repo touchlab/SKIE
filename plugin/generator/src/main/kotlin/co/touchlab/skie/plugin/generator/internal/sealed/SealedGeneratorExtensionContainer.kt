@@ -34,7 +34,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
 
     val ClassDescriptor.isExplicitSealedSubclass: Boolean
         get() {
-            val isVisible = descriptorProvider.shouldBeExposed(this)
+            val isVisible = descriptorProvider.isExposed(this)
 
             val isEnabled = this.getConfiguration(SealedInterop.Case.Visible)
 

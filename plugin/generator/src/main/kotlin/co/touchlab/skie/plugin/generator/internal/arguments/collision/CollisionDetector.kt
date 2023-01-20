@@ -18,31 +18,31 @@ internal class CollisionDetector(descriptorProvider: DescriptorProvider) {
     }
 
     private fun registerConstructors(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.exportedClassDescriptors
+        descriptorProvider.exposedClasses
             .flatMap { it.constructors }
-            .filter { descriptorProvider.shouldBeExposed(it) }
+            .filter { descriptorProvider.isExposed(it) }
             .forEach { register(it) }
     }
 
     private fun registerClassMethods(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.exportedClassDescriptors
+        descriptorProvider.exposedClasses
             .filter { !it.kind.isInterface }
             .flatMap {
                 it.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
             }
             .filterIsInstance<FunctionDescriptor>()
-            .filter { descriptorProvider.shouldBeExposed(it) }
+            .filter { descriptorProvider.isExposed(it) }
             .forEach { register(it) }
     }
 
     private fun registerExtensions(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.exportedCategoryMembersCallableDescriptors
+        descriptorProvider.exposedCategoryMembers
             .filterIsInstance<FunctionDescriptor>()
             .forEach { register(it) }
     }
 
     private fun registerGlobalFunctions(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.exportedTopLevelCallableDescriptors
+        descriptorProvider.exposedTopLevelMembers
             .filterIsInstance<FunctionDescriptor>()
             .forEach { register(it) }
     }

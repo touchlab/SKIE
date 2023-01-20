@@ -4,9 +4,9 @@ package co.touchlab.skie.api.model
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.property.regular.reference
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage.*
-import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
+import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage.*
+import co.touchlab.skie.plugin.api.model.type.translation.NativeKotlinType
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
 import co.touchlab.skie.plugin.api.model.type.stableSpec

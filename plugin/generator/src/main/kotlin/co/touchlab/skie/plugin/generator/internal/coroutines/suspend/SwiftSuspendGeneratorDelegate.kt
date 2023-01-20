@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.callable.function.reference
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName

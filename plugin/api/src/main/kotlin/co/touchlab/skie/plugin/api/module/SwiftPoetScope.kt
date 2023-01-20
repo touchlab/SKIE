@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.api.module
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
-import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
+import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.translation.NativeKotlinType
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionSpec

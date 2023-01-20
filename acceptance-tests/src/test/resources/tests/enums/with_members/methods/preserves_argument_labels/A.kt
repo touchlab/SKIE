@@ -1,4 +1,4 @@
-package tests.enums.with_members.methods.preserves_argument_labels
+package `tests`.`enums`.`with_members`.`methods`.`preserves_argument_labels`
 
 enum class A {
     A1;

@@ -37,7 +37,7 @@ internal class DataStructGenerator(
     override val isActive: Boolean = true
 
     override fun execute() {
-        descriptorProvider.exportedClassDescriptors
+        descriptorProvider.exposedClasses
             .filter {
                 it.getConfiguration(DataStruct.Enabled) && it.isData && !it.belongsToSkieRuntime
             }

@@ -36,7 +36,7 @@ internal class ClassMethodsDefaultArgumentGeneratorDelegate(
         }
 
     private fun DescriptorProvider.allSupportedClasses(): List<ClassDescriptor> =
-        this.exportedClassDescriptors.filter { it.isSupported }
+        this.exposedClasses.filter { it.isSupported }
 
     private val ClassDescriptor.isSupported: Boolean
         get() = when (this.kind) {

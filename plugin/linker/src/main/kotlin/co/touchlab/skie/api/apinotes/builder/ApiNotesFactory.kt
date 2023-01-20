@@ -2,6 +2,7 @@ package co.touchlab.skie.api.apinotes.builder
 
 import co.touchlab.skie.api.apinotes.fixes.fqNameSafeForBridging
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
@@ -16,8 +17,6 @@ import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.fqName
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.isInterface
 
 internal class ApiNotesFactory(
@@ -36,11 +35,12 @@ internal class ApiNotesFactory(
 
     context(SwiftModelScope)
     private val DescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
-        get() = this.classDescriptors.filterNot { it.kind.isInterface }.map { it.swiftModel } + this.exportedFiles.map { it.swiftModel }
+        get() = this.transitivelyExposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
+            this.exposedFiles.map { it.swiftModel }
 
     context(SwiftModelScope)
     private val DescriptorProvider.swiftModelsForInterfaces: List<KotlinTypeSwiftModel>
-        get() = this.classDescriptors.filter { it.kind.isInterface }.map { it.swiftModel }
+        get() = this.transitivelyExposedClasses.filter { it.kind.isInterface }.map { it.swiftModel }
 
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
@@ -56,7 +56,7 @@ internal class ApiNotesFactory(
 
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.getApiNoteMethods(): List<ApiNotesMethod> {
-        val callableMembers = descriptorProvider.getAllExposedBaseCallableMembers(this.descriptorHolder).map { it.swiftModel }
+        val callableMembers = descriptorProvider.getAllExposedMembers(this.descriptorHolder).map { it.swiftModel }
 
         val functions = callableMembers.filterIsInstance<KotlinFunctionSwiftModel>()
 
@@ -67,7 +67,7 @@ internal class ApiNotesFactory(
 
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.getApiNoteProperties(): List<ApiNotesProperty> =
-        descriptorProvider.getAllExposedBaseCallableMembers(this.descriptorHolder)
+        descriptorProvider.getAllExposedMembers(this.descriptorHolder)
             .map { it.swiftModel }
             .filterIsInstance<KotlinRegularPropertySwiftModel>()
             .map { it.toApiNote() }
@@ -99,22 +99,11 @@ internal class ApiNotesFactory(
             KotlinTypeSwiftModel.Kind.File -> ApiNotesTypeMemberKind.Class
         }
 
-    private fun DescriptorProvider.getAllExposedBaseCallableMembers(
+    private fun DescriptorProvider.getAllExposedMembers(
         containingDescriptorHolder: ClassOrFileDescriptorHolder,
     ): Collection<CallableMemberDescriptor> =
         when (containingDescriptorHolder) {
-            is ClassOrFileDescriptorHolder.Class -> this.getAllExposedBaseCallableMembers(containingDescriptorHolder.value)
-            is ClassOrFileDescriptorHolder.File -> this.getAllExposedBaseCallableMembers(containingDescriptorHolder.value)
+            is ClassOrFileDescriptorHolder.Class -> this.getAllExposedMembers(containingDescriptorHolder.value)
+            is ClassOrFileDescriptorHolder.File -> this.getExposedStaticMembers(containingDescriptorHolder.value)
         }
-
-    private fun DescriptorProvider.getAllExposedBaseCallableMembers(
-        classDescriptor: ClassDescriptor,
-    ): Collection<CallableMemberDescriptor> =
-        this.getFirstBaseMethodForAllExposedMethods(classDescriptor) +
-            this.getFirstBasePropertyForAllExposedProperties(classDescriptor) +
-            this.getExposedConstructors(classDescriptor) +
-            this.getExposedCategoryMembers(classDescriptor)
-
-    private fun DescriptorProvider.getAllExposedBaseCallableMembers(file: SourceFile): Collection<CallableMemberDescriptor> =
-        this.getExposedFileContent(file)
 }

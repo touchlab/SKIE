@@ -1,21 +1,22 @@
 package co.touchlab.skie.api.model.type.classes
 
+import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 class OriginalKotlinClassSwiftModel(
-    override val classDescriptor: ClassDescriptor,
-    containingType: KotlinClassSwiftModel?,
-    namer: ObjCExportNamer,
-) : BaseKotlinClassSwiftModel(classDescriptor, namer) {
+    private val delegate: KotlinClassSwiftModel,
+    containingType: Lazy<KotlinClassSwiftModel?>,
+) : KotlinClassSwiftModel by delegate {
 
-    override val isChanged: Boolean = false
+    override val identifier: String = delegate.identifier
 
-    override val original: KotlinClassSwiftModel = this
+    override val visibility: SwiftModelVisibility = delegate.visibility
 
-    override val containingType: KotlinClassSwiftModel? = containingType?.original
+    override val containingType: KotlinClassSwiftModel? by containingType
 
     override val bridge: TypeSwiftModel? = null
+
+    override val isChanged: Boolean = false
 }

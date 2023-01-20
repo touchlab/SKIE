@@ -27,7 +27,7 @@ internal class TopLevelFunctionDefaultArgumentGeneratorDelegate(
 ) {
 
     override fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> =
-        this.exportedTopLevelCallableDescriptors
+        this.exposedTopLevelMembers
             .filterIsInstance<SimpleFunctionDescriptor>()
             .filter { it.isSupported }
 

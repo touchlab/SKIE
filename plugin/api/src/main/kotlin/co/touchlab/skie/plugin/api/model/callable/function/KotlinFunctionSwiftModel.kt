@@ -2,14 +2,18 @@ package co.touchlab.skie.plugin.api.model.callable.function
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModelVisitor
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.isReplaced
-import co.touchlab.skie.plugin.api.model.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 interface KotlinFunctionSwiftModel : KotlinCallableMemberSwiftModel {
 
     override val descriptor: FunctionDescriptor
+
+    val kind: Kind
 
     val isChanged: Boolean
 
@@ -17,7 +21,7 @@ interface KotlinFunctionSwiftModel : KotlinCallableMemberSwiftModel {
 
     val visibility: SwiftModelVisibility
 
-    val receiver: KotlinTypeSwiftModel
+    val returnType: TypeSwiftModel
 
     /**
      * Examples:
@@ -29,6 +33,13 @@ interface KotlinFunctionSwiftModel : KotlinCallableMemberSwiftModel {
     val parameters: List<KotlinParameterSwiftModel>
 
     val objCSelector: String
+
+    override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
+        visitor.visit(this)
+
+    enum class Kind {
+        SimpleFunction, Constructor, ConvertedGetter, ConvertedSetter
+    }
 }
 
 /**

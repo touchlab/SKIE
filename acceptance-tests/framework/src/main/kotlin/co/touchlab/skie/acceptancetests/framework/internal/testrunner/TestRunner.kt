@@ -27,6 +27,7 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         val testResult = with(tempFileSystem) {
             with(testLogger) {
                 IntermediateResult.Value(test.kotlinFiles)
+                    .map { withJvmInlineAnnotation(it) }
                     .flatMap { compileKotlin(it, test.compilerConfiguration) }
                     .zip { generateConfiguration(test.configFiles) }
                     .flatMap { linkKotlin(it.first, it.second, test.compilerConfiguration) }
@@ -44,6 +45,12 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
 
         return testResultWithLogs
     }
+
+    context(TempFileSystem)
+    private fun withJvmInlineAnnotation(
+        kotlinFiles: List<Path>,
+    ): List<Path> =
+        kotlinFiles + listOf(createFile("JvmInline.kt").also { it.writeText("annotation class JvmInline") })
 
     context(TempFileSystem, TestLogger)
     private fun compileKotlin(

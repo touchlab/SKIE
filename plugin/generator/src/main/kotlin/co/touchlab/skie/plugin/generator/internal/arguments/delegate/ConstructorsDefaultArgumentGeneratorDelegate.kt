@@ -47,7 +47,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
     }
 
     private fun DescriptorProvider.allSupportedClasses(): List<ClassDescriptor> =
-        this.exportedClassDescriptors.filter { it.isSupported }
+        this.exposedClasses.filter { it.isSupported }
 
     private val ClassDescriptor.isSupported: Boolean
         get() = this.kind == ClassKind.CLASS && !this.belongsToSkieRuntime
@@ -56,7 +56,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
         this.constructors
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
-            .filter { descriptorProvider.shouldBeExposed(it) }
+            .filter { descriptorProvider.isExposed(it) }
 
     private fun generateOverloads(constructor: ClassConstructorDescriptor, mapper: ObjCExportMapper) {
         constructor.forEachNonCollidingDefaultArgumentOverload { overloadParameters ->

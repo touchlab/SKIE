@@ -4,6 +4,7 @@ enum class A {
     A1,
     A2;
 
+    @JvmInline
     value class B(val value: Int)
 }
 

@@ -50,14 +50,14 @@ internal class SuspendGenerator(
             .filter { it.isInteropEnabled }
 
     private fun DescriptorProvider.allFunctions(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
-        this.exportedTopLevelCallableDescriptors.filterIsInstance<SimpleFunctionDescriptor>() +
-            this.exportedClassDescriptors.flatMap { it.allDeclaredMethods(descriptorProvider) } +
-            this.exportedCategoryMembersCallableDescriptors.filterIsInstance<SimpleFunctionDescriptor>()
+        this.exposedTopLevelMembers.filterIsInstance<SimpleFunctionDescriptor>() +
+            this.exposedClasses.flatMap { it.allDeclaredMethods(descriptorProvider) } +
+            this.exposedCategoryMembers.filterIsInstance<SimpleFunctionDescriptor>()
 
     private fun ClassDescriptor.allDeclaredMethods(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
         this.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
             .filterIsInstance<SimpleFunctionDescriptor>()
-            .filter { descriptorProvider.shouldBeExposed(it) }
+            .filter { descriptorProvider.isExposed(it) }
             .filter { descriptorProvider.mapper.isBaseMethod(it) }
 
     private val FunctionDescriptor.isSupported: Boolean

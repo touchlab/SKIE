@@ -2,14 +2,12 @@
 
 package co.touchlab.skie.test
 
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.internal.skieDescriptorProvider
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import io.outfoxx.swiftpoet.ANY_OBJECT
-import io.outfoxx.swiftpoet.AttributeSpec
-import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
@@ -30,7 +28,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
     override fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
         super.afterPhase(phaseConfig, phaserState, context)
 
-        val kotlinClass = context.skieDescriptorProvider.classDescriptors.first {
+        val kotlinClass = context.skieDescriptorProvider.transitivelyExposedClasses.first {
             it.name.identifier == "KotlinFile"
         }
 

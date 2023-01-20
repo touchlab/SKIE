@@ -1,165 +1,97 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.api.model
 
-import co.touchlab.skie.api.model.function.ActualKotlinFunctionSwiftModel
-import co.touchlab.skie.api.model.property.extension.ActualKotlinConvertedPropertySwiftModel
-import co.touchlab.skie.api.model.property.regular.ActualKotlinRegularPropertySwiftModel
-import co.touchlab.skie.api.model.type.classes.ActualKotlinClassSwiftModel
-import co.touchlab.skie.api.model.type.files.ActualKotlinFileSwiftModel
+import co.touchlab.skie.api.model.factory.SwiftModelFactory
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
-import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
-import co.touchlab.skie.plugin.reflection.reflectors.mapper
-import co.touchlab.skie.util.getClassSwiftName
-import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
+import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
-import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.KotlinType
 
 class DefaultSwiftModelScope(
-    private val namer: ObjCExportNamer,
+    namer: ObjCExportNamer,
     descriptorProvider: DescriptorProvider,
 ) : MutableSwiftModelScope {
 
-    private val storageManager = LockBasedStorageManager("DefaultSwiftModelScope")
+    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer)
 
-    private val functionModelCache =
-        storageManager.createMemoizedFunction<FunctionDescriptor, MutableKotlinFunctionSwiftModel> { functionDescriptor ->
-            if (!namer.mapper.isBaseMethod(functionDescriptor)) {
-                throw IllegalArgumentException(
-                    "Overriding functions are not supporting. Obtain model of the base overridden function instead: $functionDescriptor"
-                )
-            }
+    private val members = swiftModelFactory.createMembers(descriptorProvider.allExposedMembers)
 
-            ActualKotlinFunctionSwiftModel(functionDescriptor, functionDescriptor.receiverModel, namer)
-        }
+    private val functionSwiftModels = members.filterIsInstance<FunctionDescriptor, MutableKotlinFunctionSwiftModel>()
+    private val regularPropertySwiftModels = members.filterIsInstance<PropertyDescriptor, MutableKotlinRegularPropertySwiftModel>()
+    private val convertedPropertySwiftModels = members.filterIsInstance<PropertyDescriptor, MutableKotlinConvertedPropertySwiftModel>()
 
-    private val CallableMemberDescriptor.receiverModel: MutableKotlinTypeSwiftModel
-        get() {
-            val categoryClass = namer.mapper.getClassIfCategory(this)
-            val containingDeclaration = this.containingDeclaration
+    private val valueParameterSwiftModels = (functionSwiftModels.values + convertedPropertySwiftModels.flatMap { it.value.accessors })
+        .flatMap { it.parameters }
+        .mapNotNull { swiftModel -> (swiftModel.descriptor as? ValueParameterDescriptor)?.let { it to swiftModel } }
+        .toMap()
 
-            return when {
-                categoryClass != null -> categoryClass.swiftModel
-                this is PropertyAccessorDescriptor -> correspondingProperty.receiverModel
-                containingDeclaration is ClassDescriptor -> containingDeclaration.swiftModel
-                containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
-                else -> error("Unsupported containing declaration for $this")
-            }
-        }
+    private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.transitivelyExposedClasses)
+    private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.transitivelyExposedClasses)
+    private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
+
+    override val CallableMemberDescriptor.swiftModel: MutableKotlinCallableMemberSwiftModel
+        get() = functionSwiftModels[this]
+            ?: regularPropertySwiftModels[this]
+            ?: convertedPropertySwiftModels[this]
+            ?: throwUnknownDescriptor()
 
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
-        get() = functionModelCache(this)
+        get() = functionSwiftModels[this] ?: throwUnknownDescriptor()
 
     override val ValueParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
-        get() = (this.containingDeclaration as FunctionDescriptor).swiftModel.parameters.first { it.descriptor == this }
+        get() = valueParameterSwiftModels[this] ?: throwUnknownDescriptor()
 
-    private val regularPropertyModelCache =
-        storageManager.createMemoizedFunction<PropertyDescriptor, MutableKotlinRegularPropertySwiftModel> { propertyDescriptor ->
-            if (!namer.mapper.isBaseProperty(propertyDescriptor)) {
-                throw IllegalArgumentException(
-                    "Overriding properties are not supporting. Obtain model of the base overridden property instead: $propertyDescriptor"
-                )
-            }
-            if (!namer.mapper.isObjCProperty(propertyDescriptor)) {
-                throw IllegalArgumentException("Converted properties must be handled separately from regular ones: $propertyDescriptor")
-            }
-
-            ActualKotlinRegularPropertySwiftModel(propertyDescriptor, propertyDescriptor.receiverModel, namer)
-        }
+    override val PropertyDescriptor.swiftModel: MutableKotlinPropertySwiftModel
+        get() = regularPropertySwiftModels[this]
+            ?: convertedPropertySwiftModels[this]
+            ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.regularPropertySwiftModel: MutableKotlinRegularPropertySwiftModel
-        get() = regularPropertyModelCache(this)
-
-    private val interfaceExtensionPropertyModelCache =
-        storageManager.createMemoizedFunction<PropertyDescriptor, MutableKotlinConvertedPropertySwiftModel> { propertyDescriptor ->
-            if (!namer.mapper.isBaseProperty(propertyDescriptor)) {
-                throw IllegalArgumentException(
-                    "Overriding properties are not supporting. Obtain model of the base overridden property instead: $propertyDescriptor"
-                )
-            }
-            if (namer.mapper.isObjCProperty(propertyDescriptor)) {
-                throw IllegalArgumentException("Property $propertyDescriptor is a regular property not a converted one.")
-            }
-
-            ActualKotlinConvertedPropertySwiftModel(
-                descriptor = propertyDescriptor,
-                getter = propertyDescriptor.getter?.swiftModel ?: error("Property does not have a getter: $propertyDescriptor"),
-                setter = propertyDescriptor.setter?.swiftModel,
-            )
-        }
+        get() = regularPropertySwiftModels[this] ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.convertedPropertySwiftModel: MutableKotlinConvertedPropertySwiftModel
-        get() = interfaceExtensionPropertyModelCache(this)
-
-    override val PropertyDescriptor.swiftModel: KotlinPropertySwiftModel
-        get() = if (namer.mapper.isObjCProperty(this)) regularPropertySwiftModel else convertedPropertySwiftModel
-
-    override val CallableMemberDescriptor.swiftModel: KotlinCallableMemberSwiftModel
-        get() = when (this) {
-            is FunctionDescriptor -> this.swiftModel
-            is PropertyDescriptor -> this.swiftModel
-            else -> error("Unsupported callable member: $this")
-        }
-
-    private val classModelCache =
-        storageManager.createMemoizedFunction<ClassDescriptor, MutableKotlinClassSwiftModel> { classDescriptor ->
-            val fullName = namer.getClassSwiftName(classDescriptor)
-
-            val containingType = if (fullName.contains(".")) {
-                val containingClassName = fullName.substringBefore(".")
-
-                classDescriptor.containingClassNamed(containingClassName).swiftModel
-            } else {
-                null
-            }
-
-            ActualKotlinClassSwiftModel(classDescriptor, containingType, namer)
-        }
-
-    private fun ClassDescriptor.containingClassNamed(name: String): ClassDescriptor {
-        val containingClass = this.containingDeclaration as ClassDescriptor
-
-        val containingClassName = namer.getClassSwiftName(containingClass)
-
-        return if (containingClassName == name) containingClass else containingClass.containingClassNamed(name)
-    }
+        get() = convertedPropertySwiftModels[this] ?: throwUnknownDescriptor()
 
     override val ClassDescriptor.swiftModel: MutableKotlinClassSwiftModel
-        get() = classModelCache(this)
+        get() = classSwiftModels[this] ?: throwUnknownDescriptor()
 
-    private val fileModelCache = storageManager.createMemoizedFunction<SourceFile, MutableKotlinTypeSwiftModel> { file ->
-        ActualKotlinFileSwiftModel(file, namer, descriptorProvider)
-    }
+    override val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
+        get() = enumEntrySwiftModels[this] ?: throwUnknownDescriptor()
 
     override val SourceFile.swiftModel: MutableKotlinTypeSwiftModel
-        get() = fileModelCache(this)
+        get() = fileSwiftModels[this]
+            ?: throw IllegalArgumentException("File $this is not exposed and therefore does not have a SwiftModel.")
 
     override val KotlinType.isBridged: Boolean
-        get() = when (val descriptor = constructor.declarationDescriptor) {
-            is ClassDescriptor -> descriptor.swiftModel.bridge != null
-            is TypeAliasDescriptor -> descriptor.expandedType.isBridged
-            else -> false
-        }
+        get() = TODO("Not yet implemented")
+
+    private fun DeclarationDescriptor.throwUnknownDescriptor(): Nothing {
+        throw IllegalArgumentException(
+            "Cannot find SwiftModel for descriptor: $this. Possible reasons: " +
+            "Descriptor is not exposed and therefore does not have a SwiftModel. " +
+            "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty)."
+        )
+    }
+
+    private inline fun <reified K2, reified V2> Map<*, *>.filterIsInstance(): Map<K2, V2> =
+        this.filterKeys { it is K2 }
+            .mapKeys { it.key as K2 }
+            .filterValues { it is V2 }
+            .mapValues { it.value as V2 }
 }

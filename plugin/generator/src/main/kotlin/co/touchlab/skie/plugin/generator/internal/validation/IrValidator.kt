@@ -23,7 +23,7 @@ internal class IrValidator(
     override fun execute() {
         with(reporter) {
             with(configuration) {
-                descriptorProvider.exportedClassDescriptors.forEach {
+                descriptorProvider.exposedClasses.forEach {
                     classRules.validate(it)
                 }
             }

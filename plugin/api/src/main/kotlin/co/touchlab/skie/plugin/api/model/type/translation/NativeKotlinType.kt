@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.api.model.type
+package co.touchlab.skie.plugin.api.model.type.translation
 
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

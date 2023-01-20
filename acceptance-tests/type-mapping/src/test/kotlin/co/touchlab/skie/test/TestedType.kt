@@ -1,6 +1,5 @@
 package co.touchlab.skie.test
 
-import co.touchlab.skie.plugin.api.model.type.NativeKotlinType
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ARRAY
 import com.squareup.kotlinpoet.BOOLEAN
@@ -45,7 +44,6 @@ import com.squareup.kotlinpoet.U_LONG
 import com.squareup.kotlinpoet.U_LONG_ARRAY
 import com.squareup.kotlinpoet.U_SHORT
 import com.squareup.kotlinpoet.U_SHORT_ARRAY
-import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
 fun TestedType.copy(
     safeName: String = this.safeName,

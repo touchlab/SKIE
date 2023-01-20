@@ -55,9 +55,9 @@ internal object ObjectiveCBridgeable {
                             declaration.enumEntries.map {
                                 CodeBlock.of(
                                     "case .%N: return %T.%N as %T",
-                                    it.swiftModel.simpleName,
+                                    it.enumEntrySwiftModel.identifier,
                                     declaration.stableSpec,
-                                    it.swiftModel.simpleName,
+                                    it.enumEntrySwiftModel.identifier,
                                     declaration.stableSpec,
                                 )
                             }.joinToCode("\n", suffix = "\n")
@@ -121,9 +121,9 @@ internal object ObjectiveCBridgeable {
                             declaration.enumEntries.forEach {
                                 addStatement(
                                     "let objc__%N = %T.%N as %T",
-                                    it.swiftModel.simpleName,
+                                    it.enumEntrySwiftModel.identifier,
                                     declaration.stableSpec,
-                                    it.swiftModel.simpleName,
+                                    it.enumEntrySwiftModel.identifier,
                                     declaration.stableSpec,
                                 )
                             }
@@ -133,8 +133,8 @@ internal object ObjectiveCBridgeable {
                             declaration.enumEntries.map {
                                 CodeBlock.of(
                                     "case objc__%N?: return .%N",
-                                    it.swiftModel.simpleName,
-                                    it.swiftModel.simpleName,
+                                    it.enumEntrySwiftModel.identifier,
+                                    it.enumEntrySwiftModel.identifier,
                                 )
                             }.joinToCode("\n", suffix = "\n")
                         )

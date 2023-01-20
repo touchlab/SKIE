@@ -5,10 +5,12 @@ package co.touchlab.skie.plugin.generator.internal.enums
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.reference
+import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.reference
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
 import co.touchlab.skie.plugin.api.model.type.packageName
@@ -59,7 +61,7 @@ internal class ExhaustiveEnumsGenerator(
     override val isActive: Boolean = true
 
     override fun execute() {
-        descriptorProvider.exportedClassDescriptors
+        descriptorProvider.exposedClasses
             .filter(::shouldGenerateExhaustiveEnums)
             .forEach {
                 generate(it)
@@ -101,7 +103,7 @@ internal class ExhaustiveEnumsGenerator(
                     }
 
                     declaration.enumEntries.forEach {
-                        addEnumCase(it.swiftModel.simpleName)
+                        addEnumCase(it.enumEntrySwiftModel.identifier)
                     }
 
                     addNestedClassTypeAliases(declaration)
@@ -143,27 +145,11 @@ internal class ExhaustiveEnumsGenerator(
     private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
-        val allDescriptors =
-            descriptorProvider.getExposedCategoryMembers(declaration) +
-                declaration.unsubstitutedMemberScope.getContributedDescriptors()
-
-        val nameProperty = allDescriptors
+        descriptorProvider.getAllExposedMembers(declaration)
             .filterIsInstance<PropertyDescriptor>()
-            .first { it.name.asString() == "name" }
-            .let { descriptorProvider.mapper.getBaseProperties(it).first() }
-
-        val ordinalProperty = allDescriptors
-            .filterIsInstance<PropertyDescriptor>()
-            .first { it.name.asString() == "ordinal" }
-            .let { descriptorProvider.mapper.getBaseProperties(it).first() }
-
-        (allDescriptors + listOf(nameProperty, ordinalProperty))
-            .filterIsInstance<PropertyDescriptor>()
-            .filter {
-                descriptorProvider.mapper.isBaseProperty(it) &&
-                    descriptorProvider.mapper.isObjCProperty(it) &&
-                    descriptorProvider.mapper.shouldBeExposed(it) }
-            .forEach { property ->
+            // TODO Add support for Converted properties
+            .mapNotNull { descriptor -> (descriptor.swiftModel as? KotlinRegularPropertySwiftModel)?.let { descriptor to it } }
+            .forEach { (property, swiftModel) ->
                 val propertyType = property.type.spec(KotlinTypeSpecUsage.Default)
                 addProperty(
                     PropertySpec.builder(
@@ -176,7 +162,7 @@ internal class ExhaustiveEnumsGenerator(
                                 .addStatement(
                                     "return %L(self as _ObjectiveCType).%N",
                                     if (descriptorProvider.mapper.doesThrow(property.getter!!)) "try " else "",
-                                    property.regularPropertySwiftModel.reference,
+                                    swiftModel.reference,
                                 )
                                 .build()
                         )
@@ -192,7 +178,7 @@ internal class ExhaustiveEnumsGenerator(
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
                                             if (descriptorProvider.mapper.doesThrow(property.setter!!)) "try " else "",
-                                            property.regularPropertySwiftModel.reference,
+                                            swiftModel.reference,
                                         )
                                         .build()
                                 )
@@ -207,15 +193,11 @@ internal class ExhaustiveEnumsGenerator(
     private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
-        val allDescriptors =
-            descriptorProvider.getExposedCategoryMembers(declaration) +
-                declaration.unsubstitutedMemberScope.getContributedDescriptors()
-
-        allDescriptors
+        descriptorProvider.getAllExposedMembers(declaration)
             .filterIsInstance<FunctionDescriptor>()
+            // TODO Solve together with interfaces
+            .filter { it.name.asString() != "compareTo" }
             .filter {
-                descriptorProvider.mapper.isBaseMethod(it) &&
-                    descriptorProvider.mapper.shouldBeExposed(it) &&
                     !DescriptorUtils.isMethodOfAny(it)
             }
             .forEach { function ->

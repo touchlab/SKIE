@@ -27,7 +27,7 @@ internal class ExtensionFunctionDefaultArgumentGeneratorDelegate(
 ) {
 
     override fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> =
-        this.exportedCategoryMembersCallableDescriptors
+        this.exposedCategoryMembers
             .filterIsInstance<SimpleFunctionDescriptor>()
             .filter { it.isSupported }
 

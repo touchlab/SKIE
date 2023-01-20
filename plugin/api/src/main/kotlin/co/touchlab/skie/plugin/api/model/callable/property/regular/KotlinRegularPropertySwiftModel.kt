@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.api.model.callable.property.regular
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.isReplaced
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
@@ -13,8 +14,6 @@ interface KotlinRegularPropertySwiftModel : KotlinPropertySwiftModel {
 
     val visibility: SwiftModelVisibility
 
-    val receiver: KotlinTypeSwiftModel
-
     /**
      * Examples:
      * foo
@@ -23,6 +22,9 @@ interface KotlinRegularPropertySwiftModel : KotlinPropertySwiftModel {
     val identifier: String
 
     val objCName: String
+
+    override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
+        visitor.visit(this)
 }
 
 /**

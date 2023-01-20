@@ -31,7 +31,7 @@ internal class TypeAliasGenerator(
     private val publicTypeAliasContainerName = TypeSwiftModel.StableFqNameNamespace.removeSuffix(".")
 
     override fun execute() {
-        skieContext.module.file("TypeAliases") {
+        skieContext.module.file("SkieTypeAliases") {
             addTypeAliasContainer(descriptorProvider)
             addBaseTypeAliasContainerTypeAlias()
         }
@@ -56,14 +56,14 @@ internal class TypeAliasGenerator(
 
     context(SwiftPoetScope)
     private fun TypeSpec.Builder.addClassTypeAliases(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.classDescriptors.forEach {
+        descriptorProvider.transitivelyExposedClasses.forEach {
             addTypeAlias(it.swiftModel)
         }
     }
 
     context(SwiftPoetScope)
     private fun TypeSpec.Builder.addFileTypeAliases(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.exportedFiles.forEach {
+        descriptorProvider.exposedFiles.forEach {
             addTypeAlias(it.swiftModel)
         }
     }

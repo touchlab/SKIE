@@ -14,9 +14,9 @@ class ClassInsideNonExportedClassApiNotesFix(
 
     fun renameProblematicClasses() {
         skieModule.configure(SkieModule.Ordering.Last) {
-            val existingNames = descriptorProvider.classDescriptors.map { it.swiftModel.fqName }.toMutableSet()
+            val existingNames = descriptorProvider.transitivelyExposedClasses.map { it.swiftModel.fqName }.toMutableSet()
 
-            descriptorProvider.classDescriptors
+            descriptorProvider.transitivelyExposedClasses
                 .map { it.swiftModel }
                 .filter { it.needsRenaming }
                 .forEach {
@@ -38,6 +38,6 @@ class ClassInsideNonExportedClassApiNotesFix(
         get() {
             val containingDescriptor = this.containingType?.classDescriptor ?: return false
 
-            return !descriptorProvider.shouldBeExposed(containingDescriptor)
+            return !descriptorProvider.isExposed(containingDescriptor)
         }
 }

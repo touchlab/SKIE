@@ -5,8 +5,9 @@ import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftMo
 import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.parameter.KotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -31,7 +32,10 @@ interface SwiftModelScope {
 
     val ClassDescriptor.swiftModel: KotlinTypeSwiftModel
 
+    val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
+
     val SourceFile.swiftModel: KotlinTypeSwiftModel
 
+    // TODO Remove
     val KotlinType.isBridged: Boolean
 }

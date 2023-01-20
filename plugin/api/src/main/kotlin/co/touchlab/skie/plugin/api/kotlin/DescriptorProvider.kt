@@ -7,39 +7,49 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface DescriptorProvider {
 
-    val classDescriptors: Set<ClassDescriptor>
+    val transitivelyExposedClasses: List<ClassDescriptor>
 
-    val exportedClassDescriptors: Set<ClassDescriptor>
+    val exposedClasses: List<ClassDescriptor>
 
-    val exportedFiles: Set<SourceFile>
+    val exposedFiles: List<SourceFile>
 
-    val exportedCategoryMembersCallableDescriptors: Set<CallableMemberDescriptor>
+    val exposedCategoryMembers: List<CallableMemberDescriptor>
 
-    val exportedTopLevelCallableDescriptors: Set<CallableMemberDescriptor>
+    val exposedTopLevelMembers: List<CallableMemberDescriptor>
 
-    fun shouldBeExposed(descriptor: CallableMemberDescriptor): Boolean
+    fun isExposed(descriptor: CallableMemberDescriptor): Boolean
 
-    fun shouldBeExposed(descriptor: ClassDescriptor): Boolean
+    fun isExposed(descriptor: ClassDescriptor): Boolean
 
-    fun registerDescriptor(descriptor: DeclarationDescriptor)
+    fun registerExposedDescriptor(descriptor: DeclarationDescriptor)
 
-    fun getModuleForFile(file: SourceFile): ModuleDescriptor
+    fun getFileModule(file: SourceFile): ModuleDescriptor
 
-    fun getExposedBaseMethods(classDescriptor: ClassDescriptor): List<FunctionDescriptor>
+    /**
+     * Functions/properties without extensions and constructors (including overridden ones)
+     */
+    fun getExposedClassMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor>
 
-    fun getFirstBaseMethodForAllExposedMethods(classDescriptor: ClassDescriptor): List<FunctionDescriptor>
+    /**
+     * Functions/properties extensions for classes (not interfaces or generics)
+     */
+    fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor>
 
     fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ConstructorDescriptor>
 
-    fun getExposedBaseProperties(classDescriptor: ClassDescriptor): List<PropertyDescriptor>
-
-    fun getFirstBasePropertyForAllExposedProperties(classDescriptor: ClassDescriptor): List<PropertyDescriptor>
-
-    fun getExposedFileContent(file: SourceFile): Set<CallableMemberDescriptor>
-
-    fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): Set<CallableMemberDescriptor>
+    fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor>
 }
+
+fun DescriptorProvider.getAllExposedMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
+    this.getExposedClassMembers(classDescriptor) +
+        this.getExposedCategoryMembers(classDescriptor) +
+        this.getExposedConstructors(classDescriptor)
+
+val DescriptorProvider.allExposedMembers: List<CallableMemberDescriptor>
+    get() = (this.exposedFiles.flatMap { this.getExposedStaticMembers(it) } +
+        this.exposedClasses.flatMap { this.getAllExposedMembers(it) })

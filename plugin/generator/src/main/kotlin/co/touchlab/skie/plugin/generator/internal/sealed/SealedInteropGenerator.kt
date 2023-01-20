@@ -25,7 +25,7 @@ internal class SealedInteropGenerator(
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(descriptorProvider, configuration)
 
     override fun execute() {
-        descriptorProvider.exportedClassDescriptors
+        descriptorProvider.exposedClasses
             .filter { it.shouldHaveSealedInterop }
             .forEach {
                 generate(it)

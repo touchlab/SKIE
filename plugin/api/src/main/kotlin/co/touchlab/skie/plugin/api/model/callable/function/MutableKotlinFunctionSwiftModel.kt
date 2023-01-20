@@ -1,16 +1,19 @@
 package co.touchlab.skie.plugin.api.model.callable.function
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.parameter.MutableKotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
+import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 
-interface MutableKotlinFunctionSwiftModel : KotlinFunctionSwiftModel {
+interface MutableKotlinFunctionSwiftModel : KotlinFunctionSwiftModel, MutableKotlinCallableMemberSwiftModel {
 
     override var visibility: SwiftModelVisibility
-
-    override val receiver: MutableKotlinTypeSwiftModel
 
     override var identifier: String
 
     override val parameters: List<MutableKotlinParameterSwiftModel>
+
+    override fun <OUT> accept(visitor: MutableKotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
+        visitor.visit(this)
 }
