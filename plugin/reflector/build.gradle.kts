@@ -6,5 +6,4 @@ plugins {
 dependencies {
     compileOnly(libs.kotlin.native.compiler.embeddable)
 
-    implementation(projects.api)
 }

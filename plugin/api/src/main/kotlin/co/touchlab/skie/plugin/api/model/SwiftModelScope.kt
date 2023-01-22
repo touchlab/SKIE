@@ -1,5 +1,7 @@
 package co.touchlab.skie.plugin.api.model
 
+import co.touchlab.skie.api.model.MethodBridge
+import co.touchlab.skie.api.model.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
@@ -8,9 +10,11 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegular
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -38,4 +42,14 @@ interface SwiftModelScope {
 
     // TODO Remove
     val KotlinType.isBridged: Boolean
+
+    fun PropertyDescriptor.propertyTypeModel(genericExportScope: SwiftGenericExportScope): SwiftTypeModel
+
+    fun FunctionDescriptor.returnTypeModel(genericExportScope: SwiftGenericExportScope, bridge: MethodBridge.ReturnValue): SwiftTypeModel
+
+    fun FunctionDescriptor.getParameterType(
+        descriptor: ParameterDescriptor?,
+        bridge: MethodBridgeParameter.ValueParameter,
+        genericExportScope: SwiftGenericExportScope,
+    ): SwiftTypeModel
 }

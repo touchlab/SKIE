@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.api.model
 
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
@@ -64,7 +65,10 @@ import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 internal class DefaultSwiftPoetScope(
     private val swiftModelScope: SwiftModelScope,
     private val namer: ObjCExportNamer,
+    descriptorProvider: DescriptorProvider,
 ) : SwiftPoetScope, SwiftModelScope by swiftModelScope {
+
+    // private val translator = SwiftTypeTranslator(descriptorProvider, namer)
 
     override val KotlinType.native: NativeKotlinType
         get() = with(StandardNames.FqNames) {
@@ -155,7 +159,11 @@ internal class DefaultSwiftPoetScope(
             }
         }
 
-    override fun KotlinType.spec(usage: KotlinTypeSpecUsage): TypeName = native.spec(usage)
+    override fun KotlinType.spec(usage: KotlinTypeSpecUsage): TypeName =
+    //     val model = translator.mapReferenceType(this, SwiftExportScope.None)
+    //     return DeclaredTypeName.qualifiedLocalTypeName(model.toString())
+    // }
+        native.spec(usage)
 
     override fun PrimitiveType.spec(usage: KotlinTypeSpecUsage): TypeName = when (this) {
         PrimitiveType.BOOLEAN -> NativeKotlinType.Value.BOOL

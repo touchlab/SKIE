@@ -14,9 +14,9 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 class ActualKotlinRegularPropertySwiftModel(
     override val descriptor: PropertyDescriptor,
     override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>,
-    core: KotlinRegularPropertySwiftModelCore,
+    private val core: KotlinRegularPropertySwiftModelCore,
     namer: ObjCExportNamer,
-    swiftModelScope: MutableSwiftModelScope,
+    private val swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinRegularPropertySwiftModel {
 
     override val receiver: MutableKotlinTypeSwiftModel by lazy {
@@ -37,5 +37,7 @@ class ActualKotlinRegularPropertySwiftModel(
         get() = identifier != original.identifier || visibility != original.visibility
 
     override val type: TypeSwiftModel
-        get() = TODO("Not yet implemented")
+        get() = with(swiftModelScope) {
+            core.descriptor.propertyTypeModel(receiver.swiftGenericExportScope)
+        }
 }

@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.api.model.factory
 
+import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.callable.function.ActualKotlinFunctionSwiftModel
 import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelCore
 import co.touchlab.skie.api.model.callable.property.converted.ActualKotlinConvertedPropertySwiftModel
@@ -37,6 +38,7 @@ class SwiftModelFactory(
     private val swiftModelScope: MutableSwiftModelScope,
     private val descriptorProvider: DescriptorProvider,
     private val namer: ObjCExportNamer,
+    private val bridgeProvider: DescriptorBridgeProvider,
 ) {
 
     fun createMembers(descriptors: List<CallableMemberDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> {
@@ -60,7 +62,7 @@ class SwiftModelFactory(
     private fun createBoundedFunctions(group: List<FunctionDescriptor>): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> {
         val allBoundedSwiftModels = mutableListOf<MutableKotlinCallableMemberSwiftModel>()
 
-        val core = KotlinFunctionSwiftModelCore(group.representative, namer)
+        val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider)
 
         return group
             .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, namer, swiftModelScope) }

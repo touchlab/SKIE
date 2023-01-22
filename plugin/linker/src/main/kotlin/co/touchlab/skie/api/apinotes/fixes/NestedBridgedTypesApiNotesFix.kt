@@ -51,7 +51,7 @@ class NestedBridgedTypesApiNotesFix(
     // Moves the class outside its parent class and renames it to avoid name collisions.
     // This is a workaround for `typealias` thinking that it's recursive (probably a bug in Swift compiler).
     private fun MutableKotlinTypeSwiftModel.moveOutAndRenameOriginalClass() {
-        this.identifier = this.fqIdentifier.replace(".", "__")
+        this.identifier = this.fqIdentifier.replace(".", "___")
         this.containingType = null
     }
 

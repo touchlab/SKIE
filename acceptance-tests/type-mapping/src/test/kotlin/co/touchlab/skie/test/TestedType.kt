@@ -499,7 +499,22 @@ sealed interface TestedType {
                 //         )))
                 //     )
                 // )
-            ) //+ CLASS_TYPE_PARAMS + level(CLASS_TYPE_PARAMS)
+                // Builtin.String
+                // SingleTypeParamClass(Builtin.String),
+
+                // Lambda(
+                //     false,
+                //     null,
+                //     listOf(
+                //         Builtin.String,
+                //     ),
+                //     Builtin.String,
+                // ),
+
+                // suspend_function_lambda_Map_Boolean_NULLABLE_CHAR_Map_Boolean_NULLABLE_CHAR
+            ) //+ CLASS_TYPE_PARAMS + level(CLASS_TYPE_PARAMS) +
+
+            // BASIC
         }
 
         val ENABLED_FILTER: (TestedType) -> Boolean = { outerType ->

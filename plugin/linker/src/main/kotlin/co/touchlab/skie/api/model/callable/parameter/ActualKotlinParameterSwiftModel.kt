@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 internal class ActualKotlinParameterSwiftModel(
     core: KotlinParameterSwiftModelCore,
     parameterDescriptor: ParameterDescriptor?,
+    private val getParameterType: () -> TypeSwiftModel,
 ) : MutableKotlinParameterSwiftModel {
 
     override val origin: Origin = core.getOrigin(parameterDescriptor)
@@ -23,5 +24,5 @@ internal class ActualKotlinParameterSwiftModel(
         get() = argumentLabel != original.argumentLabel
 
     override val type: TypeSwiftModel
-        get() = TODO("Not yet implemented")
+        get() = getParameterType()
 }

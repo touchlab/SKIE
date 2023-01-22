@@ -22,6 +22,7 @@ import com.squareup.kotlinpoet.TypeVariableName
 import org.jetbrains.kotlin.konan.file.File
 import java.nio.file.Path
 import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 import kotlin.io.path.deleteIfExists
 import kotlin.streams.toList
@@ -49,7 +50,11 @@ class NameMappingTest {
 
         val splitTypes = TestedType.ALL.sortedBy { it.safeName }.windowed(size = 100, step = 100, partialWindows = true)
 
-        val onlyIndices = setOf<Int>() //424, 426, 427, 428, 461, 462)
+        val onlyIndices = setOf<Int>(
+            // 126, 128, 129, 130, 131, 145, 336, 337, 339, 340, 341, 356
+        )
+
+        val testCompletionTracking = AtomicInteger(0)
 
         val failures = splitTypes
             .mapIndexed { index, testedTypes -> index to testedTypes }
@@ -64,7 +69,7 @@ class NameMappingTest {
                     )
                 }
                 val result = testTime.value
-                println("[${if (result is TestResult.Success) "PASS" else "FAIL"}] Finished test $index (${index + 1}/${splitTypes.size}) in ${testTime.duration.toString(DurationUnit.SECONDS, 2)} seconds")
+                println("[${if (result is TestResult.Success) "PASS" else "FAIL"}] Finished test $index (${testCompletionTracking.incrementAndGet()}/${splitTypes.size}) in ${testTime.duration.toString(DurationUnit.SECONDS, 2)} seconds")
                 index to result
             }
             .filter { it.second !is TestResult.Success }

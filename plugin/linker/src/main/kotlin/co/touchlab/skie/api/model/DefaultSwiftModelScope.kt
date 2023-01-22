@@ -4,7 +4,10 @@ import co.touchlab.skie.api.model.factory.SwiftModelFactory
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
+import co.touchlab.skie.plugin.api.model.SwiftExportScope
+import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
@@ -13,11 +16,19 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlin
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableRefefenceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidTypeModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -25,10 +36,12 @@ import org.jetbrains.kotlin.types.KotlinType
 
 class DefaultSwiftModelScope(
     namer: ObjCExportNamer,
-    descriptorProvider: DescriptorProvider,
+    private val descriptorProvider: DescriptorProvider,
+    private val bridgeProvider: DescriptorBridgeProvider,
+    private var translator: SwiftTypeTranslator,
 ) : MutableSwiftModelScope {
 
-    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer)
+    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider)
 
     private val members = swiftModelFactory.createMembers(descriptorProvider.allExposedMembers)
 
@@ -80,6 +93,51 @@ class DefaultSwiftModelScope(
 
     override val KotlinType.isBridged: Boolean
         get() = TODO("Not yet implemented")
+
+    override fun PropertyDescriptor.propertyTypeModel(genericExportScope: SwiftGenericExportScope): SwiftTypeModel {
+        val getterBridge = bridgeProvider.bridgeMethod(getter!!)
+        val exportScope = SwiftExportScope(genericExportScope)
+        return translator.mapReturnType(getterBridge.returnBridge, getter!!, exportScope)
+    }
+
+    override fun FunctionDescriptor.returnTypeModel(
+        genericExportScope: SwiftGenericExportScope,
+        bridge: MethodBridge.ReturnValue,
+    ): SwiftTypeModel {
+        val exportScope = SwiftExportScope(genericExportScope)
+        return translator.mapReturnType(bridge, this, exportScope)
+    }
+
+    override fun FunctionDescriptor.getParameterType(
+        descriptor: ParameterDescriptor?,
+        bridge: MethodBridgeParameter.ValueParameter,
+        genericExportScope: SwiftGenericExportScope
+    ): SwiftTypeModel {
+        val exportScope = SwiftExportScope(genericExportScope, SwiftExportScope.Flags.Escaping)
+        return when (bridge) {
+            is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge)
+            MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
+                SwiftPointerTypeModel(SwiftNullableRefefenceTypeModel(SwiftClassTypeModel("Error")), nullable = true)
+            is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
+                val resultType = if (bridge.useUnitCompletion) {
+                    null
+                } else {
+                    when (val it = translator.mapReferenceType(returnType!!, exportScope.removingFlags(SwiftExportScope.Flags.Escaping))) {
+                        is SwiftNonNullReferenceTypeModel -> SwiftNullableRefefenceTypeModel(it, isNullableResult = false)
+                        is SwiftNullableRefefenceTypeModel -> SwiftNullableRefefenceTypeModel(it.nonNullType, isNullableResult = true)
+                    }
+                }
+                SwiftLambdaTypeModel(
+                    returnType = SwiftVoidTypeModel,
+                    parameterTypes = listOfNotNull(
+                        resultType,
+                        SwiftNullableRefefenceTypeModel(SwiftClassTypeModel("Error"))
+                    ),
+                    isEscaping = true
+                )
+            }
+        }
+    }
 
     private fun DeclarationDescriptor.throwUnknownDescriptor(): Nothing {
         throw IllegalArgumentException(

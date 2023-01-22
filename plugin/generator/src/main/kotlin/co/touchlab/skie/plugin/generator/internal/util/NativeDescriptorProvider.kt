@@ -80,6 +80,9 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     override fun isExposed(descriptor: ClassDescriptor): Boolean =
         mapper.shouldBeExposed(descriptor) && descriptor.isExported
 
+    override fun isTransitivelyExposed(descriptor: ClassDescriptor): Boolean =
+        mapper.shouldBeExposed(descriptor)
+
     override fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
         when (descriptor) {
             is ClassDescriptor -> registerDescriptor(descriptor)

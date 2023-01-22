@@ -2,18 +2,24 @@
 
 package co.touchlab.skie.test
 
+import co.touchlab.skie.plugin.api.descriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.reference
 import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.internal.skieDescriptorProvider
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import io.outfoxx.swiftpoet.ANY_OBJECT
+import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.TypeVariableName
 import io.outfoxx.swiftpoet.VOID
+import io.outfoxx.swiftpoet.joinToCode
 import io.outfoxx.swiftpoet.parameterizedBy
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
@@ -21,6 +27,7 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 internal class SwiftKotlinAccessGenerator: PhaseListener {
     override val phase: PhaseListener.Phase = PhaseListener.Phase.OBJC_EXPORT
@@ -28,7 +35,9 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
     override fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
         super.afterPhase(phaseConfig, phaserState, context)
 
-        val kotlinClass = context.skieDescriptorProvider.transitivelyExposedClasses.first {
+        val descriptorProvider = context.descriptorProvider
+
+        val kotlinClass = descriptorProvider.transitivelyExposedClasses.first {
             it.name.identifier == "KotlinFile"
         }
 
@@ -55,15 +64,16 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                             addTypeVariable(typeVariable)
                         }
 
-                        kotlinClass.unsubstitutedMemberScope.getContributedDescriptors()
+                        descriptorProvider.getAllExposedMembers(kotlinClass)
                             .filter {
-                                (it as? CallableMemberDescriptor)?.overriddenDescriptors?.isEmpty() ?: true
+                                !DescriptorUtils.isMethodOfAny(it)
                             }
                             .forEach { descriptor ->
                                 when (descriptor) {
                                     is PropertyDescriptor -> {
+                                        val propertyModel = descriptor.swiftModel
                                         addProperty(
-                                            PropertySpec.builder(descriptor.name.identifier, descriptor.type.spec(KotlinTypeSpecUsage.Default))
+                                            PropertySpec.builder(descriptor.name.identifier, propertyModel.type.stableSpec)
                                                 .getter(
                                                     FunctionSpec.getterBuilder()
                                                         .addStatement("kotlinClass.%L", descriptor.name.identifier)
@@ -73,34 +83,29 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                                         )
                                     }
                                     is FunctionDescriptor -> {
+                                        val functionModel = descriptor.swiftModel
+                                        if (functionModel.kind == KotlinFunctionSwiftModel.Kind.Constructor) {
+                                            return@forEach
+                                        }
                                         addFunction(
-                                            FunctionSpec.builder(descriptor.name.identifier)
+                                            FunctionSpec.builder(functionModel.identifier)
                                                 .addParameters(
-                                                    descriptor.valueParameters.map { parameter ->
+                                                    functionModel.parameters.map { parameter ->
                                                         ParameterSpec.builder(
-                                                            parameter.name.identifier,
-                                                            parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
+                                                            parameter.argumentLabel,
+                                                            parameter.parameterName,
+                                                            parameter.type.stableSpec,
                                                         ).build()
                                                     }
                                                 )
-                                                .async(descriptor.isSuspend)
-                                                .throws(descriptor.isSuspend)
-                                                .apply {
-                                                    when {
-                                                        descriptor.isSuspend -> {
-                                                            returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType.SuspendFunction) ?: VOID)
-                                                            addCode("try await kotlinClass.%L(value: value)", descriptor.name.identifier)
-                                                        }
-                                                        descriptor.extensionReceiverParameter != null -> {
-                                                            returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType) ?: VOID)
-                                                            addCode("kotlinClass.%L(value, value: value)", descriptor.name.identifier)
-                                                        }
-                                                        else -> {
-                                                            returns(descriptor.returnType?.spec(KotlinTypeSpecUsage.ReturnType) ?: VOID)
-                                                            addCode("kotlinClass.%L(value: value)", descriptor.name.identifier)
-                                                        }
-                                                    }
-                                                }
+                                                .returns(functionModel.returnType.stableSpec)
+                                                .addCode(
+                                                    "kotlinClass.%N(%L)",
+                                                    functionModel.reference,
+                                                    functionModel.parameters.map { parameter ->
+                                                        CodeBlock.of("%N", parameter.parameterName)
+                                                    }.joinToCode(),
+                                                )
                                                 .build()
                                         )
                                     }

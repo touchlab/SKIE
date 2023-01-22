@@ -2,19 +2,21 @@
 
 package co.touchlab.skie.api.model.callable.function
 
+import co.touchlab.skie.api.model.DescriptorBridgeProvider
+import co.touchlab.skie.api.model.MethodBridgeParameter
 import co.touchlab.skie.api.model.callable.parameter.KotlinParameterSwiftModelCore
+import co.touchlab.skie.api.model.valueParametersAssociated
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.reflection.reflectors.mapper
-import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.backend.konan.objcexport.valueParametersAssociated
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 
 internal class KotlinFunctionSwiftModelCore(
-    private val descriptor: FunctionDescriptor,
+    val descriptor: FunctionDescriptor,
     private val namer: ObjCExportNamer,
+    bridgeProvider: DescriptorBridgeProvider,
 ) {
+    val methodBridge by lazy { bridgeProvider.bridgeMethod(descriptor) }
 
     private val swiftFunctionName = run {
         val swiftName = namer.getSwiftName(descriptor.original)
@@ -50,11 +52,10 @@ internal class KotlinFunctionSwiftModelCore(
                 )
             }
 
-    private fun FunctionDescriptor.getParameterBridgesWithDescriptors(): List<Pair<MethodBridgeValueParameter, ParameterDescriptor?>> =
-        namer.mapper
-            .bridgeMethod(descriptor)
+    private fun FunctionDescriptor.getParameterBridgesWithDescriptors(): List<Pair<MethodBridgeParameter.ValueParameter, ParameterDescriptor?>> =
+        methodBridge
             .valueParametersAssociated(this)
-            .filterNot { it.first is MethodBridgeValueParameter.ErrorOutParameter }
+            .filterNot { it.first is MethodBridgeParameter.ValueParameter.ErrorOutParameter }
 
     val objCSelector: String = namer.getSelector(descriptor.original)
 
@@ -65,4 +66,3 @@ internal class KotlinFunctionSwiftModelCore(
         val swiftNameComponentsRegex = "(.+?)\\((.*?)\\)".toRegex()
     }
 }
-

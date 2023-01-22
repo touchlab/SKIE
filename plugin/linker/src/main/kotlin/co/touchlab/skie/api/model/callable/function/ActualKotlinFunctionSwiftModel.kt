@@ -19,15 +19,24 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 internal class ActualKotlinFunctionSwiftModel(
     override val descriptor: FunctionDescriptor,
     override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>,
-    core: KotlinFunctionSwiftModelCore,
+    val core: KotlinFunctionSwiftModelCore,
     namer: ObjCExportNamer,
-    swiftModelScope: MutableSwiftModelScope,
+    private val swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinFunctionSwiftModel {
 
     override var identifier: String by core::identifier
 
-    override val parameters: List<MutableKotlinParameterSwiftModel> = core.getParameterCoresWithDescriptors(descriptor).map {
-        ActualKotlinParameterSwiftModel(it.first, it.second)
+    override val parameters: List<MutableKotlinParameterSwiftModel> by lazy {
+        core.getParameterCoresWithDescriptors(descriptor).map { (core, parameterDescriptor) ->
+            ActualKotlinParameterSwiftModel(
+                core,
+                parameterDescriptor,
+            ) {
+                with(swiftModelScope) {
+                    descriptor.getParameterType(parameterDescriptor, core.parameterBridge, receiver.swiftGenericExportScope)
+                }
+            }
+        }
     }
 
     override var visibility: SwiftModelVisibility by core::visibility
@@ -54,6 +63,7 @@ internal class ActualKotlinFunctionSwiftModel(
         get() = identifier != original.identifier || visibility != original.visibility || parameters.any { it.isChanged }
 
     override val returnType: TypeSwiftModel
-        get() = TODO()
+        get() = with(swiftModelScope) {
+            core.descriptor.returnTypeModel(receiver.swiftGenericExportScope, core.methodBridge.returnBridge)
+        }
 }
-

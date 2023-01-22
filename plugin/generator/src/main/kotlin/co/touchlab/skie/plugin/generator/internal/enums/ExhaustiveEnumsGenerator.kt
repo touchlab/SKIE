@@ -151,6 +151,7 @@ internal class ExhaustiveEnumsGenerator(
             .mapNotNull { descriptor -> (descriptor.swiftModel as? KotlinRegularPropertySwiftModel)?.let { descriptor to it } }
             .forEach { (property, swiftModel) ->
                 val propertyType = property.type.spec(KotlinTypeSpecUsage.Default)
+                val propertyTypeModel = swiftModel.type
                 addProperty(
                     PropertySpec.builder(
                         property.name.asString(),

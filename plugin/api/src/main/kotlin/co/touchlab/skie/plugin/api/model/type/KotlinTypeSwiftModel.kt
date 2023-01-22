@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.api.model.type
 
+import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.isReplaced
 
@@ -12,6 +13,8 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
     val original: KotlinTypeSwiftModel
 
     val visibility: SwiftModelVisibility
+
+    val swiftGenericExportScope: SwiftGenericExportScope
 
     override val containingType: KotlinClassSwiftModel?
 

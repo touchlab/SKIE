@@ -7,6 +7,9 @@ import co.touchlab.skie.api.apinotes.fixes.ClassInsideNonExportedClassApiNotesFi
 import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DefaultSwiftPoetScope
+import co.touchlab.skie.api.model.DescriptorBridgeProvider
+import co.touchlab.skie.api.model.SwiftTranslationProblemCollector
+import co.touchlab.skie.api.model.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
@@ -42,8 +45,19 @@ class SwiftLinkCompilePhase(
         }
 
         val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
-        val swiftModelScope = DefaultSwiftModelScope(namer, context.descriptorProvider)
-        val swiftPoetScope = DefaultSwiftPoetScope(swiftModelScope, namer)
+        val bridgeProvider = DescriptorBridgeProvider(namer)
+        val translator = SwiftTypeTranslator(
+            descriptorProvider = context.descriptorProvider,
+            namer = namer,
+            problemCollector = SwiftTranslationProblemCollector.Default(context),
+        )
+        val swiftModelScope = DefaultSwiftModelScope(
+            namer = namer,
+            descriptorProvider = context.descriptorProvider,
+            bridgeProvider = bridgeProvider,
+            translator = translator,
+        )
+        val swiftPoetScope = DefaultSwiftPoetScope(swiftModelScope, namer, context.descriptorProvider)
         val skieModule = skieContext.module as DefaultSkieModule
 
         NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()

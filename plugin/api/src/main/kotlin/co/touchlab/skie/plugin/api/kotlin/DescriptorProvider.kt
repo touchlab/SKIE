@@ -4,10 +4,7 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface DescriptorProvider {
@@ -25,6 +22,8 @@ interface DescriptorProvider {
     fun isExposed(descriptor: CallableMemberDescriptor): Boolean
 
     fun isExposed(descriptor: ClassDescriptor): Boolean
+
+    fun isTransitivelyExposed(descriptor: ClassDescriptor): Boolean
 
     fun registerExposedDescriptor(descriptor: DeclarationDescriptor)
 

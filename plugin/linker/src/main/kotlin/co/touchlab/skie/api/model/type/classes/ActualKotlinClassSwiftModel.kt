@@ -1,6 +1,7 @@
 package co.touchlab.skie.api.model.type.classes
 
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
+import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
@@ -31,6 +32,8 @@ class ActualKotlinClassSwiftModel(
     override val kind: KotlinTypeSwiftModel.Kind = KotlinTypeSwiftModel.Kind.Class
 
     override val objCFqName: String = namer.getClassOrProtocolName(classDescriptor.original).objCName
+
+    override val swiftGenericExportScope: SwiftGenericExportScope = SwiftGenericExportScope.Class(classDescriptor, namer)
 
     private val originalContainingType by lazy {
         with(swiftModelScope) {

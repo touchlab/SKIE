@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api(libs.swiftPoet)
+    implementation(projects.reflector)
 
     compileOnly(libs.kotlin.native.compiler.embeddable)
 }

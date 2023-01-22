@@ -51,6 +51,9 @@ internal abstract class Reflector {
     protected inline fun <reified P1, reified R> extensionFunction1(extensionClassFqName: String) =
         Provider { ExtensionFunction1(it, extensionClassFqName, P1::class.java, R::class.java) }
 
+    protected inline fun <reified P1, reified R> extensionFunction1(extensionClassFqName: String, functionName: String) =
+        Provider { ExtensionFunction1(functionName, extensionClassFqName, P1::class.java, R::class.java) }
+
     protected inline fun <reified T> extensionProperty(extensionClassFqName: String) =
         Provider { ExtensionProperty(it, extensionClassFqName, T::class.java) }
 

@@ -1,5 +1,6 @@
 package co.touchlab.skie.api.model.type.files
 
+import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
@@ -33,6 +34,8 @@ class ActualKotlinFileSwiftModel(
     override val kind: KotlinTypeSwiftModel.Kind = KotlinTypeSwiftModel.Kind.File
 
     override val objCFqName: String = fileClassName.objCName
+
+    override val swiftGenericExportScope: SwiftGenericExportScope = SwiftGenericExportScope.None
 
     override val stableFqName: String = run {
         val moduleFragment = module.swiftIdentifier

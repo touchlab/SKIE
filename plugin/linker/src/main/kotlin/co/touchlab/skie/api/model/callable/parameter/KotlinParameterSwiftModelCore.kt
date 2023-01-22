@@ -1,11 +1,10 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.api.model.callable.parameter
 
+import co.touchlab.skie.api.model.MethodBridge
+import co.touchlab.skie.api.model.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel.Origin
 import co.touchlab.skie.util.toValidSwiftIdentifier
-import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
@@ -13,13 +12,13 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 
 internal class KotlinParameterSwiftModelCore(
     var argumentLabel: String,
-    private val parameterBridge: MethodBridgeValueParameter,
+    val parameterBridge: MethodBridgeParameter.ValueParameter,
     baseParameterDescriptor: ParameterDescriptor?,
     allArgumentLabels: List<String>,
 ) {
 
     fun getOrigin(parameterDescriptor: ParameterDescriptor?): Origin = when (parameterBridge) {
-        is MethodBridgeValueParameter.Mapped -> {
+        is MethodBridgeParameter.ValueParameter.Mapped -> {
             when (parameterDescriptor) {
                 is ValueParameterDescriptor -> Origin.ValueParameter(parameterDescriptor)
                 is ReceiverParameterDescriptor -> Origin.Receiver(parameterDescriptor)
@@ -27,8 +26,8 @@ internal class KotlinParameterSwiftModelCore(
                 else -> error("Unknown parameter descriptor type: $parameterDescriptor")
             }
         }
-        is MethodBridgeValueParameter.SuspendCompletion -> Origin.SuspendCompletion
-        is MethodBridgeValueParameter.ErrorOutParameter -> error("ErrorOutParameter does not have a SwiftModel.")
+        is MethodBridgeParameter.ValueParameter.SuspendCompletion -> Origin.SuspendCompletion
+        is MethodBridgeParameter.ValueParameter.ErrorOutParameter -> error("ErrorOutParameter does not have a SwiftModel.")
     }
 
     /*

@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class KotlinRegularPropertySwiftModelCore(
-    descriptor: PropertyDescriptor,
+    val descriptor: PropertyDescriptor,
     namer: ObjCExportNamer,
 ) {
 
