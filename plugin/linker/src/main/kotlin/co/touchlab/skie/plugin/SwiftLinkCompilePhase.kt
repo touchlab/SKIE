@@ -3,7 +3,9 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
+import co.touchlab.skie.api.apinotes.fixes.CallableMembersConflictsApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.ClassInsideNonExportedClassApiNotesFix
+import co.touchlab.skie.api.apinotes.fixes.KonanManglingApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DefaultSwiftPoetScope
@@ -60,6 +62,8 @@ class SwiftLinkCompilePhase(
         val swiftPoetScope = DefaultSwiftPoetScope(swiftModelScope, namer, context.descriptorProvider)
         val skieModule = skieContext.module as DefaultSkieModule
 
+        KonanManglingApiNotesFix(skieModule, context.descriptorProvider).resetNames()
+        CallableMembersConflictsApiNotesFix(skieModule, context.descriptorProvider).fixNames()
         NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()
         ClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
 
