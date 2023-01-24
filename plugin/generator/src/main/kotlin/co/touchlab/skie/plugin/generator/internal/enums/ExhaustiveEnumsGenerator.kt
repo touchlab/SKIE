@@ -11,11 +11,9 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.reference
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.reference
-import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
 import co.touchlab.skie.plugin.api.model.type.packageName
-import co.touchlab.skie.plugin.api.model.type.simpleName
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.module.stableSpec
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
@@ -37,11 +35,6 @@ import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
-import org.jetbrains.kotlin.backend.konan.objcexport.getBaseProperties
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -133,13 +126,15 @@ internal class ExhaustiveEnumsGenerator(
 
     context(SwiftModelScope)
     private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
-        declaration.nestedClasses.forEach {
-            addType(
-                TypeAliasSpec.builder(it.name.asString(), it.stableSpec)
-                    .addModifiers(Modifier.PUBLIC)
-                    .build()
-            )
-        }
+        declaration.nestedClasses
+            .filter { descriptorProvider.isExposed(it) }
+            .forEach {
+                addType(
+                    TypeAliasSpec.builder(it.swiftModel.identifier, it.stableSpec)
+                        .addModifiers(Modifier.PUBLIC)
+                        .build()
+                )
+            }
     }
 
     context(SwiftModelScope)
@@ -200,7 +195,7 @@ internal class ExhaustiveEnumsGenerator(
             // TODO Solve together with interfaces
             .filter { it.name.asString() != "compareTo" }
             .filter {
-                    !DescriptorUtils.isMethodOfAny(it)
+                !DescriptorUtils.isMethodOfAny(it)
             }
             .forEach { function ->
                 if (function.isSuspend) {

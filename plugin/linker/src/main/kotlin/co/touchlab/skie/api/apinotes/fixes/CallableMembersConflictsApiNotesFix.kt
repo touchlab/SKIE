@@ -15,11 +15,9 @@ import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConve
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 import org.jetbrains.kotlin.backend.common.descriptors.allParameters
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
-import org.jetbrains.kotlin.descriptors.containingPackage
 import org.jetbrains.kotlin.descriptors.isOverridable
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
