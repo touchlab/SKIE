@@ -1,5 +1,8 @@
 package co.touchlab.skie.plugin.api.model.type.translation
 
+import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import org.jetbrains.kotlin.backend.konan.llvm.LlvmParameterAttribute
@@ -9,25 +12,37 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
-sealed interface SwiftTypeModel: TypeSwiftModel
+sealed interface SwiftTypeModel: TypeSwiftModel {
+    override val swiftGenericExportScope: SwiftGenericExportScope
+        get() = SwiftGenericExportScope.None
+
+    override val containingType: TypeSwiftModel?
+        get() = null
+
+    override val identifier: String
+        get() = stableFqName
+
+    override val bridgedOrStableFqName: String
+        get() = stableFqName
+
+    override val isSwiftSymbol: Boolean
+        get() = true
+
+    override fun fqName(separator: String): String {
+        return stableFqName
+    }
+}
+
+object SwiftErrorTypeModel: SwiftTypeModel {
+    override val stableFqName: String
+        get() = "ERROR"
+}
 
 data class SwiftRawTypeModel(
     val type: DeclaredTypeName,
 ): SwiftTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = TODO("Not yet implemented")
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 sealed interface SwiftReferenceTypeModel: SwiftTypeModel
@@ -38,48 +53,49 @@ data class SwiftNullableRefefenceTypeModel(
     val nonNullType: SwiftNonNullReferenceTypeModel,
     val isNullableResult: Boolean = false,
 ): SwiftReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = if (nonNullType is SwiftLambdaTypeModel) {
             "(${nonNullType.stableFqName})?"
         } else {
             "${nonNullType.stableFqName}?"
         }
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
+}
 
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
+data class SwiftKotlinTypeClassTypeModel(
+    val model: KotlinTypeSwiftModel,
+    val typeArguments: List<SwiftNonNullReferenceTypeModel> = emptyList(),
+): SwiftNonNullReferenceTypeModel, KotlinTypeSwiftModel by model {
+    override val stableFqName: String
+        get() = if (typeArguments.isEmpty()) {
+            model.stableFqName
+        } else {
+            "${model.stableFqName}<${typeArguments.joinToString { it.stableFqName }}>"
+        }
+
+    override val bridgedOrStableFqName: String
+        get() = model.bridgedOrStableFqName
+    override val isSwiftSymbol: Boolean
+        get() = model.isSwiftSymbol
+
+    override fun fqName(separator: String): String = model.fqName(separator)
+    override val containingType: KotlinClassSwiftModel?
+        get() = model.containingType
+    override val identifier: String
+        get() = model.identifier
+    override val swiftGenericExportScope: SwiftGenericExportScope
+        get() = model.swiftGenericExportScope
 }
 
 data class SwiftClassTypeModel(
     val className: String,
     val typeArguments: List<SwiftNonNullReferenceTypeModel> = emptyList(),
 ): SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = if (typeArguments.isEmpty()) {
             className
         } else {
             "$className<${typeArguments.joinToString { it.stableFqName }}>"
         }
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 sealed interface SwiftGenericTypeUsageModel: SwiftNonNullReferenceTypeModel {
@@ -89,20 +105,8 @@ sealed interface SwiftGenericTypeUsageModel: SwiftNonNullReferenceTypeModel {
 data class SwiftGenericTypeRawUsageModel(
     override val typeName: String,
 ): SwiftGenericTypeUsageModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = TODO("Not yet implemented")
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 data class SwiftGenericTypeParameterUsageModel(
@@ -112,109 +116,57 @@ data class SwiftGenericTypeParameterUsageModel(
     override val typeName: String
         get() = namer.getTypeParameterName(typeParameterDescriptor)
 
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = typeName
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
+}
 
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
+data class SwiftKotlinTypeProtocolTypeModel(
+    val model: KotlinTypeSwiftModel,
+): SwiftNonNullReferenceTypeModel, KotlinTypeSwiftModel by model {
+    override val bridgedOrStableFqName: String
+        get() = model.bridgedOrStableFqName
+    override val isSwiftSymbol: Boolean
+        get() = model.isSwiftSymbol
+
+    override fun fqName(separator: String): String = model.fqName(separator)
+
+    override val stableFqName: String
+        get() = model.stableFqName
+    override val containingType: KotlinClassSwiftModel?
+        get() = model.containingType
+    override val identifier: String
+        get() = model.identifier
+    override val swiftGenericExportScope: SwiftGenericExportScope
+        get() = model.swiftGenericExportScope
 }
 
 data class SwiftProtocolTypeModel(
     val protocolName: String,
 ): SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = protocolName
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 object SwiftAnyTypeModel: SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = "Any"
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 
 object SwiftAnyObjectTypeModel: SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = "AnyObject"
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 
 object SwiftAnyHashableTypeModel: SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = "AnyHashable"
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 object SwiftInstanceTypeModel: SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = "Self"
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 data class SwiftLambdaTypeModel(
@@ -222,37 +174,13 @@ data class SwiftLambdaTypeModel(
     val parameterTypes: List<SwiftReferenceTypeModel>,
     val isEscaping: Boolean,
 ): SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = if (isEscaping) { "@escaping " } else { "" } + "(${parameterTypes.joinToString { it.stableFqName }}) -> ${returnType.stableFqName}"
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 object SwiftMetaClassTypeModel: SwiftNonNullReferenceTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = TODO("Not yet implemented")
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 sealed class SwiftPrimitiveTypeModel(
@@ -283,57 +211,21 @@ sealed class SwiftPrimitiveTypeModel(
     object unsigned_long_long: SwiftPrimitiveTypeModel("unsigned long long")
     object short: SwiftPrimitiveTypeModel("short")
 
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = name
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 data class SwiftPointerTypeModel(
     val pointee: SwiftTypeModel,
     val nullable: Boolean = false,
 ): SwiftTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = "UnsafeMutableRawPointer" + if (nullable) "?" else ""
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 object SwiftVoidTypeModel: SwiftTypeModel {
-    override val containingType: TypeSwiftModel?
-        get() = TODO("Not yet implemented")
-    override val identifier: String
-        get() = TODO("Not yet implemented")
     override val stableFqName: String
         get() = "Void"
-    override val bridgedOrStableFqName: String
-        get() = TODO("Not yet implemented")
-    override val isSwiftSymbol: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun fqName(separator: String): String {
-        TODO("Not yet implemented")
-    }
 }
 
 

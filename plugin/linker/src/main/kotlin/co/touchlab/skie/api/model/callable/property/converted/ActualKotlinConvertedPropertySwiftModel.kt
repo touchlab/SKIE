@@ -1,6 +1,5 @@
 package co.touchlab.skie.api.model.callable.property.converted
 
-import co.touchlab.skie.api.model.callable.getReceiverSwiftModel
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
@@ -18,9 +17,9 @@ class ActualKotlinConvertedPropertySwiftModel(
     swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinConvertedPropertySwiftModel {
 
-    override val receiver: MutableKotlinTypeSwiftModel by lazy {
+    override val receiver: TypeSwiftModel by lazy {
         with(swiftModelScope) {
-            descriptor.getReceiverSwiftModel(namer)
+            descriptor.receiverTypeModel()
         }
     }
 

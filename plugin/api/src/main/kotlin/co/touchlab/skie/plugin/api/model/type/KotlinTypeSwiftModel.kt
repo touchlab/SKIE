@@ -14,8 +14,6 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
 
     val visibility: SwiftModelVisibility
 
-    val swiftGenericExportScope: SwiftGenericExportScope
-
     override val containingType: KotlinClassSwiftModel?
 
     /**

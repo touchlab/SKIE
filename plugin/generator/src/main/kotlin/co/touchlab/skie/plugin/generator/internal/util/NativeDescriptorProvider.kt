@@ -142,4 +142,8 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
 
     override fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor> =
         mutableTopLevel[file] ?: emptyList()
+
+    override fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor? {
+        return mapper.getClassIfCategory(descriptor)
+    }
 }

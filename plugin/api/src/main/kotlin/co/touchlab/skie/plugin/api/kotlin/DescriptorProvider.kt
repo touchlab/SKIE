@@ -42,6 +42,8 @@ interface DescriptorProvider {
     fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ConstructorDescriptor>
 
     fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor>
+
+    fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor?
 }
 
 fun DescriptorProvider.getAllExposedMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =

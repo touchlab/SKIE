@@ -9,6 +9,7 @@ import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConve
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -42,6 +43,8 @@ interface SwiftModelScope {
 
     // TODO Remove
     val KotlinType.isBridged: Boolean
+
+    fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel
 
     fun PropertyDescriptor.propertyTypeModel(genericExportScope: SwiftGenericExportScope): SwiftTypeModel
 

@@ -62,7 +62,7 @@ internal class ApiNotesFactory(
 
         val convertedPropertiesFunctions = callableMembers.filterIsInstance<KotlinConvertedPropertySwiftModel>().flatMap { it.accessors }
 
-        return (functions + convertedPropertiesFunctions).map { it.toApiNote() }
+        return (functions + convertedPropertiesFunctions).mapNotNull { it.toApiNote() }
     }
 
     context(SwiftModelScope)
@@ -70,25 +70,29 @@ internal class ApiNotesFactory(
         descriptorProvider.getAllExposedMembers(this.descriptorHolder)
             .map { it.swiftModel }
             .filterIsInstance<KotlinRegularPropertySwiftModel>()
-            .map { it.toApiNote() }
+            .mapNotNull { it.toApiNote() }
 
-    private fun KotlinFunctionSwiftModel.toApiNote(): ApiNotesMethod =
-        ApiNotesMethod(
+    private fun KotlinFunctionSwiftModel.toApiNote(): ApiNotesMethod? {
+        return ApiNotesMethod(
             objCSelector = this.objCSelector,
-            kind = this.receiver.kind.toMemberKind(),
+            // TODO: What to do if the receiver isn't `KotlinTypeSwiftModel`?
+            kind = (this.receiver as? KotlinTypeSwiftModel)?.kind?.toMemberKind() ?: return null,
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,
         )
+    }
 
-    private fun KotlinRegularPropertySwiftModel.toApiNote(): ApiNotesProperty =
-        ApiNotesProperty(
+    private fun KotlinRegularPropertySwiftModel.toApiNote(): ApiNotesProperty? {
+        return ApiNotesProperty(
             objCName = this.objCName,
-            kind = this.receiver.kind.toMemberKind(),
+            // TODO: What to do if the receiver isn't `KotlinTypeSwiftModel`?
+            kind = (this.receiver as? KotlinTypeSwiftModel)?.kind?.toMemberKind() ?: return null,
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,
         )
+    }
 
     private val SwiftModelVisibility.isHiddenOrReplaced: Boolean
         get() = this.isHidden || this.isReplaced

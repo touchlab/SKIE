@@ -1,6 +1,5 @@
 package co.touchlab.skie.api.model.callable.function
 
-import co.touchlab.skie.api.model.callable.getReceiverSwiftModel
 import co.touchlab.skie.api.model.callable.parameter.ActualKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -41,9 +40,9 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override var visibility: SwiftModelVisibility by core::visibility
 
-    override val receiver: MutableKotlinTypeSwiftModel by lazy {
+    override val receiver: TypeSwiftModel by lazy {
         with(swiftModelScope) {
-            descriptor.getReceiverSwiftModel(namer)
+            descriptor.receiverTypeModel()
         }
     }
 

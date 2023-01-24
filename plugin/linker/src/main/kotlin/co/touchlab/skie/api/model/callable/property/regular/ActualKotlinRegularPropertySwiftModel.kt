@@ -1,6 +1,5 @@
 package co.touchlab.skie.api.model.callable.property.regular
 
-import co.touchlab.skie.api.model.callable.getReceiverSwiftModel
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
@@ -19,9 +18,9 @@ class ActualKotlinRegularPropertySwiftModel(
     private val swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinRegularPropertySwiftModel {
 
-    override val receiver: MutableKotlinTypeSwiftModel by lazy {
+    override val receiver: TypeSwiftModel by lazy {
         with(swiftModelScope) {
-            descriptor.getReceiverSwiftModel(namer)
+            descriptor.receiverTypeModel()
         }
     }
 

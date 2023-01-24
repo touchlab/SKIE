@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.api.model.type
 
+import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 
@@ -24,6 +25,8 @@ interface TypeSwiftModel {
     val bridgedOrStableFqName: String
 
     val isSwiftSymbol: Boolean
+
+    val swiftGenericExportScope: SwiftGenericExportScope
 
     // TODO Remove and keep only fqName also rename to localFqName
     fun fqName(separator: String = DEFAULT_SEPARATOR): String

@@ -15,6 +15,7 @@ import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotl
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
@@ -23,19 +24,22 @@ import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableRefefence
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidTypeModel
+import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
 class DefaultSwiftModelScope(
-    namer: ObjCExportNamer,
+    private val namer: ObjCExportNamer,
     private val descriptorProvider: DescriptorProvider,
     private val bridgeProvider: DescriptorBridgeProvider,
     private var translator: SwiftTypeTranslator,
@@ -93,6 +97,20 @@ class DefaultSwiftModelScope(
 
     override val KotlinType.isBridged: Boolean
         get() = TODO("Not yet implemented")
+
+    override fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel {
+        val categoryClass = descriptorProvider.getClassIfCategory(this)
+        val containingDeclaration = containingDeclaration
+
+        val exportScope = SwiftExportScope(SwiftGenericExportScope.None, SwiftExportScope.Flags.ReferenceType)
+        return when {
+            categoryClass != null -> translator.mapReferenceType(categoryClass.defaultType, exportScope)
+            this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
+            containingDeclaration is ClassDescriptor -> translator.mapReferenceType(containingDeclaration.defaultType, exportScope)
+            containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
+            else -> error("Unsupported containing declaration for $this")
+        }
+    }
 
     override fun PropertyDescriptor.propertyTypeModel(genericExportScope: SwiftGenericExportScope): SwiftTypeModel {
         val getterBridge = bridgeProvider.bridgeMethod(getter!!)

@@ -5,13 +5,19 @@ package co.touchlab.skie.api.model
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftErrorTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftInstanceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeProtocolTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftMetaClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
@@ -66,7 +72,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.NSNumberKind as InternalNSN
 fun SwiftTypeModel.makeNullableIfReferenceOrPointer(): SwiftTypeModel = when (this) {
     is SwiftPointerTypeModel -> SwiftPointerTypeModel(pointee, nullable = true)
     is SwiftNonNullReferenceTypeModel -> SwiftNullableRefefenceTypeModel(this)
-    is SwiftNullableRefefenceTypeModel, is SwiftRawTypeModel, is SwiftPrimitiveTypeModel, SwiftVoidTypeModel -> this
+    is SwiftNullableRefefenceTypeModel, is SwiftRawTypeModel, is SwiftPrimitiveTypeModel, SwiftVoidTypeModel, SwiftErrorTypeModel -> this
 }
 
 
@@ -469,7 +475,14 @@ class SwiftTypeTranslator(
         return if (classDescriptor.isInterface) {
             when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
-                else -> SwiftProtocolTypeModel(translateClassOrInterfaceName(classDescriptor, swiftExportScope))
+                else -> {
+                    val model = translateClassOrInterfaceName(classDescriptor, swiftExportScope)
+                    if (model is KotlinTypeSwiftModel) {
+                        SwiftKotlinTypeProtocolTypeModel(model)
+                    } else {
+                        SwiftProtocolTypeModel(model.stableFqName)
+                    }
+                }
             }
         } else {
             val typeParamScope = swiftExportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType)
@@ -481,7 +494,12 @@ class SwiftTypeTranslator(
                 }
             }
 
-            SwiftClassTypeModel(translateClassOrInterfaceName(classDescriptor, swiftExportScope), typeArgs)
+            val model = translateClassOrInterfaceName(classDescriptor, swiftExportScope)
+            if (model is KotlinTypeSwiftModel) {
+                SwiftKotlinTypeClassTypeModel(model, typeArgs)
+            } else {
+                SwiftClassTypeModel(model.stableFqName, typeArgs)
+            }
         }
     }
 
@@ -592,22 +610,23 @@ class SwiftTypeTranslator(
     }
 
     context(SwiftModelScope)
-    private fun translateClassOrInterfaceName(descriptor: ClassDescriptor, exportScope: SwiftExportScope): String {
+    private fun translateClassOrInterfaceName(descriptor: ClassDescriptor, exportScope: SwiftExportScope): TypeSwiftModel {
         assert(descriptorProvider.isTransitivelyExposed(descriptor)) { "Shouldn't be exposed: $descriptor" }
 
         if (ErrorUtils.isError(descriptor)) {
-            return "ERROR"
+            return SwiftErrorTypeModel
         }
         val swiftModel = descriptor.swiftModel
+        val bridge = swiftModel.bridge
 
         return when {
-            exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> swiftModel.stableFqName
-            exportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> if (swiftModel.bridge == null || (swiftModel.bridge as? SwiftTypeSwiftModel)?.isHashable == true) {
-                swiftModel.bridgedOrStableFqName
+            exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> swiftModel
+            exportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> if (bridge is SwiftTypeSwiftModel && bridge.isHashable) {
+                bridge
             } else {
-                swiftModel.stableFqName
+                swiftModel
             }
-            else -> swiftModel.bridgedOrStableFqName
+            else -> swiftModel.bridge ?: swiftModel
         }
     }
 }
