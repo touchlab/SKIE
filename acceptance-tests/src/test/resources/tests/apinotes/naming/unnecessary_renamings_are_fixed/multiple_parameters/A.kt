@@ -2,4 +2,4 @@ package `tests`.`apinotes`.`naming`.`unnecessary_renamings_are_fixed`.`multiple_
 
 fun foo(a: Int, i: Int) = i
 
-fun foo(b: Int, i: String) = i.toInt()
+fun foo(a: Int, i: String) = i.toInt()

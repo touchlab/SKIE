@@ -16,6 +16,8 @@ import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swi
 import co.touchlab.skie.acceptancetests.framework.internal.util.CreatedFilesDescriptionFilter
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.createFile
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFactory) {
@@ -49,8 +51,27 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     context(TempFileSystem)
     private fun withJvmInlineAnnotation(
         kotlinFiles: List<Path>,
-    ): List<Path> =
-        kotlinFiles + listOf(createFile("JvmInline.kt").also { it.writeText("annotation class JvmInline") })
+    ): List<Path> {
+        val packageRegex = Regex("package (.*)\\n")
+
+        val kotlinDirectory = createDirectory("kotlin")
+
+        val jvmInlineFiles = kotlinFiles
+            .mapNotNull { packageRegex.find(it.readText())?.groupValues?.getOrNull(1) }
+            .distinct()
+            .mapIndexed { index, packageName ->
+                kotlinDirectory.resolve("JvmInline_$index.kt").also {
+                    it.writeText(
+                        """
+                            package $packageName
+                            annotation class JvmInline
+                        """.trimIndent()
+                    )
+                }
+            }
+
+        return kotlinFiles + jvmInlineFiles
+    }
 
     context(TempFileSystem, TestLogger)
     private fun compileKotlin(

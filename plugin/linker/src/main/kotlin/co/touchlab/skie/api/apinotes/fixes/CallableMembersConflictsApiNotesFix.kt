@@ -18,6 +18,8 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlin
 import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 import org.jetbrains.kotlin.backend.common.descriptors.allParameters
+import org.jetbrains.kotlin.backend.common.serialization.findPackage
+import org.jetbrains.kotlin.descriptors.containingPackage
 import org.jetbrains.kotlin.descriptors.isOverridable
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
@@ -48,6 +50,8 @@ class CallableMembersConflictsApiNotesFix(
      * property vs function (property is prioritized)
      * number value classes in parameter types (lower is better)
      * number of affected members (lower is better)
+     * number of nested packages (lower is better)
+     * length of fqname (lower is better)
      * hash of toString()
      */
     private val KotlinCallableMemberSwiftModel.collisionResolutionPriority: Long
@@ -73,11 +77,17 @@ class CallableMembersConflictsApiNotesFix(
                 priority += 1
             }
 
-            priority = priority shl 6
-            priority += 63 - this.descriptor.allParameters.count { it.type.isRecursiveInlineOrValueClassType() }
+            priority = priority shl 5
+            priority += 31 - this.descriptor.allParameters.count { it.type.isRecursiveInlineOrValueClassType() }.coerceAtMost(31)
 
-            priority = priority shl 6
-            priority += 63 - this.allBoundedSwiftModels.size
+            priority = priority shl 5
+            priority += 31 - this.allBoundedSwiftModels.size.coerceAtMost(31)
+
+            priority = priority shl 5
+            priority += 31 - this.descriptor.findPackage().fqName.pathSegments().size.coerceAtMost(31)
+
+            priority = priority shl 5
+            priority += 31 - this.descriptor.findPackage().fqName.asString().length.coerceAtMost(31)
 
             priority = priority shl 32
             priority += this.descriptor.toString().hashCode() - Int.MIN_VALUE.toLong()
@@ -114,7 +124,7 @@ class CallableMembersConflictsApiNotesFix(
         override fun visit(function: KotlinFunctionSwiftModel): List<Signature> =
             listOf(
                 Signature(
-                    receiver = function.receiver.fqName,
+                    receiver = function.receiver.stableFqName,
                     identifier = function.identifier,
                     parameters = function.parameters.map { it.toSignatureParameter() },
                     returnType = function.returnType.stableFqName,
