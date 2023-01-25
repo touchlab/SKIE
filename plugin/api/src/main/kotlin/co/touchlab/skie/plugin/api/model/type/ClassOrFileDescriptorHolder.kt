@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 sealed interface ClassOrFileDescriptorHolder {
 
-    class Class(val value: ClassDescriptor) : ClassOrFileDescriptorHolder
+    data class Class(val value: ClassDescriptor) : ClassOrFileDescriptorHolder
 
-    class File(val value: SourceFile) : ClassOrFileDescriptorHolder
+    data class File(val value: SourceFile) : ClassOrFileDescriptorHolder
 }

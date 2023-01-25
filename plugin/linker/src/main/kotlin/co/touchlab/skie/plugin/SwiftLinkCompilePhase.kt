@@ -5,6 +5,7 @@ import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
 import co.touchlab.skie.api.apinotes.fixes.CallableMembersConflictsApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.ClassInsideNonExportedClassApiNotesFix
+import co.touchlab.skie.api.apinotes.fixes.ClassesConflictsApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.KonanManglingApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
@@ -62,6 +63,7 @@ class SwiftLinkCompilePhase(
 
         KonanManglingApiNotesFix(skieModule, context.descriptorProvider).resetNames()
         CallableMembersConflictsApiNotesFix(skieModule, context.descriptorProvider).fixNames()
+        ClassesConflictsApiNotesFix(skieModule, context.descriptorProvider).fixNames()
         NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()
         ClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
 
