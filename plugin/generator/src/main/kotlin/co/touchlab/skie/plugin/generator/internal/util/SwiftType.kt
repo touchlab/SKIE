@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.generator.internal.datastruct
+package co.touchlab.skie.plugin.generator.internal.util
 
 import io.outfoxx.swiftpoet.ARRAY
 import io.outfoxx.swiftpoet.BOOL

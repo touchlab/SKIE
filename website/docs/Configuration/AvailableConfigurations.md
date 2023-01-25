@@ -151,28 +151,6 @@ object DefaultArgumentInterop {
 }
 ```
 
-## DataStruct (preview)
-
-```kotlin
-object DataStruct {
-
-    /**
-     * If true, the struct code is generated for the given data class.
-     */
-    object Enabled : ConfigurationKey.Boolean {
-
-        override val defaultValue: Boolean = false
-
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<DataStruct.Enabled>() -> true
-                configurationTarget.hasAnnotation<DataStruct.Disabled>() -> false
-                else -> null
-            }
-    }
-}
-```
-
 ## Experimental features
 
 ```kotlin

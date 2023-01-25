@@ -116,21 +116,6 @@ object DefaultArgumentInterop {
 }
 ```
 
-## DataStruct (preview)
-
-```kotlin
-object DataStruct {
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Enabled
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.BINARY)
-    annotation class Disabled
-}
-```
-
 ## Experimental features
 
 ```kotlin

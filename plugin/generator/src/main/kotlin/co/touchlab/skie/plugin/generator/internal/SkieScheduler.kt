@@ -4,7 +4,6 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.SuspendGenerator
-import co.touchlab.skie.plugin.generator.internal.datastruct.DataStructGenerator
 import co.touchlab.skie.plugin.generator.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.plugin.generator.internal.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.plugin.generator.internal.runtime.SwiftRuntimeGenerator
@@ -65,13 +64,6 @@ internal class SkieScheduler(
             configuration = configuration,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-        ),
-        DataStructGenerator(
-            skieContext = skieContext,
-            namespaceProvider = namespaceProvider,
-            configuration = configuration,
-            descriptorProvider = descriptorProvider,
-            reporter = reporter,
         ),
         TypeAliasGenerator(
             skieContext = skieContext,
