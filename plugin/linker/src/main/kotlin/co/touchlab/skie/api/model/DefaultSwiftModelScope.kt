@@ -1,6 +1,7 @@
 package co.touchlab.skie.api.model
 
 import co.touchlab.skie.api.model.factory.SwiftModelFactory
+import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
@@ -16,11 +17,13 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlin
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableRefefenceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReferenceTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidTypeModel

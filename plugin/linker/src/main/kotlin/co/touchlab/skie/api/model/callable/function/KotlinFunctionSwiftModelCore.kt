@@ -3,9 +3,9 @@
 package co.touchlab.skie.api.model.callable.function
 
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
-import co.touchlab.skie.api.model.MethodBridgeParameter
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.api.model.callable.parameter.KotlinParameterSwiftModelCore
-import co.touchlab.skie.api.model.valueParametersAssociated
+import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

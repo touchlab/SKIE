@@ -10,8 +10,8 @@ import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DefaultSwiftPoetScope
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
-import co.touchlab.skie.api.model.SwiftTranslationProblemCollector
-import co.touchlab.skie.api.model.SwiftTypeTranslator
+import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
+import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout

@@ -2,6 +2,9 @@
 
 package co.touchlab.skie.api.model
 
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
+import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
