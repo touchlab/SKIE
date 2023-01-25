@@ -18,8 +18,9 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlin
 import co.touchlab.skie.plugin.api.module.SkieModule
 import org.jetbrains.kotlin.backend.common.descriptors.allParameters
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isOverridable
-import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
+import org.jetbrains.kotlin.resolve.substitutedUnderlyingTypes
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 class CallableMembersConflictsApiNotesFix(
@@ -46,11 +47,12 @@ class CallableMembersConflictsApiNotesFix(
      * true member vs extension (member is prioritized)
      * open vs final (open is prioritized)
      * property vs function (property is prioritized)
-     * number value classes in parameter types (lower is better)
+     * number of substituted types in parameter types (lower is better)
+     * number of non-exported classes in parameter types (lower is better)
      * number of affected members (lower is better)
      * number of nested packages (lower is better)
      * length of fqname (lower is better)
-     * hash of toString()
+     * length of toString (lower is better)
      */
     private val KotlinCallableMemberSwiftModel.collisionResolutionPriority: Long
         get() {
@@ -76,7 +78,16 @@ class CallableMembersConflictsApiNotesFix(
             }
 
             priority = priority shl 5
-            priority += 31 - this.descriptor.allParameters.count { it.type.isRecursiveInlineOrValueClassType() }.coerceAtMost(31)
+            priority += 31 - this.descriptor.allParameters.sumOf { it.type.substitutedUnderlyingTypes().size }.coerceAtMost(31)
+
+            priority = priority shl 5
+            priority += 31 - this.descriptor.allParameters
+                .count { parameterDescriptor ->
+                    val parameterClassDescriptor = parameterDescriptor.type.constructor.declarationDescriptor as? ClassDescriptor
+
+                    parameterClassDescriptor?.let { descriptorProvider.isExposed(it) } != true
+                }
+                .coerceAtMost(31)
 
             priority = priority shl 5
             priority += 31 - this.allBoundedSwiftModels.size.coerceAtMost(31)
@@ -88,7 +99,7 @@ class CallableMembersConflictsApiNotesFix(
             priority += 31 - this.descriptor.findPackage().fqName.asString().length.coerceAtMost(31)
 
             priority = priority shl 32
-            priority += this.descriptor.toString().hashCode() - Int.MIN_VALUE.toLong()
+            priority += Int.MAX_VALUE - this.descriptor.toString().length
 
             return priority
         }

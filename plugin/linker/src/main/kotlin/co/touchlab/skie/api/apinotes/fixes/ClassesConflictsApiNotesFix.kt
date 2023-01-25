@@ -32,7 +32,6 @@ class ClassesConflictsApiNotesFix(
      * nested classes are renamed first so that their fqName is not changed before their renaming is resolved
      * was original identifier changed (unchanged is prioritized)
      * class vs file (class is prioritized)
-     * hash of toString()
      */
     private val MutableKotlinTypeSwiftModel.collisionResolutionPriority: Long
         get() {
@@ -51,9 +50,6 @@ class ClassesConflictsApiNotesFix(
             if (this is KotlinClassSwiftModel) {
                 priority += 1
             }
-
-            priority = priority shl 32
-            priority += this.descriptorHolder.toString().hashCode() - Int.MIN_VALUE.toLong()
 
             return priority
         }
