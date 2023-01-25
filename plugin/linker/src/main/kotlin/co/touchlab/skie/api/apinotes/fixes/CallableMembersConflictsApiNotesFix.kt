@@ -52,7 +52,7 @@ class CallableMembersConflictsApiNotesFix(
      * number of affected members (lower is better)
      * number of nested packages (lower is better)
      * length of fqname (lower is better)
-     * length of toString (lower is better)
+     * hash of toString
      */
     private val KotlinCallableMemberSwiftModel.collisionResolutionPriority: Long
         get() {
@@ -99,7 +99,8 @@ class CallableMembersConflictsApiNotesFix(
             priority += 31 - this.descriptor.findPackage().fqName.asString().length.coerceAtMost(31)
 
             priority = priority shl 32
-            priority += Int.MAX_VALUE - this.descriptor.toString().length
+            // Drops unstable part of toString()
+            priority += this.descriptor.toString().dropLastWhile { it != '@' }.hashCode()
 
             return priority
         }
