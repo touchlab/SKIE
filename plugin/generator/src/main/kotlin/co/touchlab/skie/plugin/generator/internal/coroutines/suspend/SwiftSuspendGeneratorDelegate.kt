@@ -1,10 +1,10 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.function.reference
-import co.touchlab.skie.plugin.api.model.type.translation.KotlinTypeSpecUsage
+import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.module.SkieModule
-import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.util.CallableMemberSwiftType
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
 
 internal class SwiftSuspendGeneratorDelegate(
     private val module: SkieModule,
@@ -54,7 +53,7 @@ internal class SwiftSuspendGeneratorDelegate(
             return classifier.kind == ClassKind.CLASS && classifier.declaredTypeParameters.isNotEmpty()
         }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun ExtensionSpec.Builder.addSwiftBridgingFunction(
         originalFunctionDescriptor: FunctionDescriptor,
         kotlinBridgingFunctionDescriptor: FunctionDescriptor,
@@ -82,7 +81,7 @@ internal class SwiftSuspendGeneratorDelegate(
             }
         }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun FunctionSpec.Builder.addValueParameters(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
             addReceiversParameters(originalFunctionDescriptor)
@@ -92,7 +91,7 @@ internal class SwiftSuspendGeneratorDelegate(
             }
         }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun FunctionSpec.Builder.addReceiversParameters(originalFunctionDescriptor: FunctionDescriptor) {
         when (originalFunctionDescriptor.swiftKind) {
             CallableMemberSwiftType.Extension.Interface -> {
@@ -110,35 +109,35 @@ internal class SwiftSuspendGeneratorDelegate(
     private val FunctionDescriptor.swiftReceiverParameterName: String
         get() = "receiver".collisionFreeIdentifier(this.valueParameters).identifier
 
-    context(SwiftPoetScope)
-    private fun FunctionSpec.Builder.addReceiver(parameterName: String, receiverParameterDescriptor: ReceiverParameterDescriptor) {
-        val parameterTypeSpec = receiverParameterDescriptor.type.spec(KotlinTypeSpecUsage.ParameterType)
+    context(SwiftModelScope)
+    private fun FunctionSpec.Builder.addReceiver(parameterName: String, receiverParameter: ReceiverParameterDescriptor) {
+        val receiverSwiftModel = receiverParameter.swiftModel
 
         addParameter(
-            ParameterSpec.builder("_", parameterName, parameterTypeSpec)
+            ParameterSpec.builder("_", parameterName, receiverSwiftModel.stableSpec)
                 .build()
         )
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun FunctionSpec.Builder.addValueParameter(valueParameter: ValueParameterDescriptor) {
         val parameterSwiftModel = valueParameter.swiftModel
-        val parameterTypeSpec = valueParameter.type.spec(KotlinTypeSpecUsage.ParameterType)
+        val parameterType = parameterSwiftModel.type
 
         addParameter(
-            ParameterSpec.builder(parameterSwiftModel.argumentLabel, parameterSwiftModel.parameterName, parameterTypeSpec)
+            ParameterSpec.builder(parameterSwiftModel.argumentLabel, parameterSwiftModel.parameterName, parameterType.stableSpec)
                 .build()
         )
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun FunctionSpec.Builder.addReturnType(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
-            val returnType = originalFunctionDescriptor.returnTypeOrNothing.spec(KotlinTypeSpecUsage.ReturnType.SuspendFunction)
-            returns(returnType)
+            val returnType = originalFunctionDescriptor.swiftModel.returnType
+            returns(returnType.stableSpec)
         }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun FunctionSpec.Builder.addFunctionBody(
         originalFunctionDescriptor: FunctionDescriptor,
         kotlinBridgingFunction: FunctionDescriptor,
@@ -162,11 +161,11 @@ internal class SwiftSuspendGeneratorDelegate(
             )
         }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private val FunctionDescriptor.valueParametersPlaceholders: String
         get() = (this.argumentsForBridgingCall.map { "%N" } + "$0").joinToString(", ")
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private val FunctionDescriptor.argumentsForBridgingCall: List<String>
         get() {
             val arguments = mutableListOf<String>()
@@ -180,7 +179,7 @@ internal class SwiftSuspendGeneratorDelegate(
             return arguments
         }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun MutableList<String>.addReceiversArguments(originalFunctionDescriptor: FunctionDescriptor) {
         when (originalFunctionDescriptor.swiftKind) {
             CallableMemberSwiftType.Extension.Class, CallableMemberSwiftType.Extension.Enum -> {

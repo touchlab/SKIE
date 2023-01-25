@@ -41,6 +41,8 @@ object SwiftType {
     val string = STRING
     val nsString = DeclaredTypeName.typeName("Foundation.NSString")
 
+    val nsMutableArray = DeclaredTypeName.typeName("Foundation.NSMutableArray")
+
     val array = ARRAY
     fun arrayOf(elementType: TypeName) = array.parameterizedBy(elementType)
 }

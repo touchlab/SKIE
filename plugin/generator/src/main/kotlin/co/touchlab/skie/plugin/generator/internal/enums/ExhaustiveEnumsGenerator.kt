@@ -6,6 +6,7 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.reference
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
@@ -15,7 +16,7 @@ import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
 import co.touchlab.skie.plugin.api.model.type.packageName
 import co.touchlab.skie.plugin.api.model.type.simpleName
-import co.touchlab.skie.plugin.api.module.SwiftPoetScope
+import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.module.stableSpec
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
@@ -130,7 +131,7 @@ internal class ExhaustiveEnumsGenerator(
         }
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addNestedClassTypeAliases(declaration: ClassDescriptor) {
         declaration.nestedClasses.forEach {
             addType(
@@ -141,7 +142,7 @@ internal class ExhaustiveEnumsGenerator(
         }
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addPassthroughForProperties(
         declaration: ClassDescriptor,
     ) {
@@ -150,12 +151,11 @@ internal class ExhaustiveEnumsGenerator(
             // TODO Add support for Converted properties
             .mapNotNull { descriptor -> (descriptor.swiftModel as? KotlinRegularPropertySwiftModel)?.let { descriptor to it } }
             .forEach { (property, swiftModel) ->
-                val propertyType = property.type.spec(KotlinTypeSpecUsage.Default)
                 val propertyTypeModel = swiftModel.type
                 addProperty(
                     PropertySpec.builder(
                         property.name.asString(),
-                        propertyType,
+                        propertyTypeModel.stableSpec,
                     )
                         .addModifiers(Modifier.PUBLIC)
                         .getter(
@@ -174,7 +174,8 @@ internal class ExhaustiveEnumsGenerator(
                                         .addModifiers(Modifier.NONMUTATING)
                                         .addParameter(
                                             "value",
-                                            property.type.spec(KotlinTypeSpecUsage.ParameterType),
+                                            // TODO: This might be a setter parameter, we need to investigate
+                                            propertyTypeModel.stableSpec,
                                         )
                                         .addStatement(
                                             "%L(self as _ObjectiveCType).%N = value",
@@ -190,7 +191,7 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addPassthroughForFunctions(
         declaration: ClassDescriptor,
     ) {
@@ -206,23 +207,21 @@ internal class ExhaustiveEnumsGenerator(
                     return@forEach
                 }
 
+                val swiftModel = function.swiftModel
                 addFunction(
-                    FunctionSpec.builder(function.swiftModel.identifier)
+                    FunctionSpec.builder(swiftModel.identifier)
                         .addModifiers(Modifier.PUBLIC)
                         .apply {
-                            val returnType = function.returnType?.spec(KotlinTypeSpecUsage.ReturnType)
-                            returnType?.let {
-                                returns(it)
-                            }
+                            returns(swiftModel.returnType.stableSpec)
                             function.valueParameters.forEach { parameter ->
-                                val parameterTypeSpec = parameter.type.spec(KotlinTypeSpecUsage.ParameterType)
                                 val parameterSwiftModel = parameter.swiftModel
+                                val parameterType = parameterSwiftModel.type
 
                                 addParameter(
                                     ParameterSpec.builder(
                                         parameterSwiftModel.argumentLabel,
                                         parameterSwiftModel.parameterName,
-                                        parameterTypeSpec,
+                                        parameterType.stableSpec,
                                     ).build()
                                 )
                             }
@@ -243,7 +242,7 @@ internal class ExhaustiveEnumsGenerator(
             }
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addCompanionObjectPropertyIfNeeded(
         declaration: ClassDescriptor,
     ) {

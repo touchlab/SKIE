@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.module.SkieModule
-import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.module.stableSpec
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
@@ -21,7 +21,7 @@ internal interface SwiftPoetExtensionContainer {
         get() = this.fqNameSafe.asString()
 
     // Cannot use context because of bug in implementation
-    fun SwiftPoetScope.swiftNameWithTypeParameters(declaration: ClassDescriptor): TypeName =
+    fun SwiftModelScope.swiftNameWithTypeParameters(declaration: ClassDescriptor): TypeName =
         declaration.stableSpec.withTypeParameters(declaration)
 
     fun DeclaredTypeName.withTypeParameters(declaration: ClassDescriptor): TypeName =
@@ -58,7 +58,7 @@ internal interface SwiftPoetExtensionContainer {
 
     fun SkieModule.generateCode(
         declaration: DeclarationDescriptor,
-        codeBuilder: context(SwiftPoetScope) FileSpec.Builder.() -> Unit,
+        codeBuilder: context(SwiftModelScope) FileSpec.Builder.() -> Unit,
     ) {
         this.file(declaration.kotlinName, contents = codeBuilder)
     }

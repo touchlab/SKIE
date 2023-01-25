@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.api.module.SwiftPoetScope
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.module.stableSpec
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
@@ -41,7 +41,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
             return isVisible && isEnabled
         }
 
-    context(ClassDescriptor, SwiftPoetScope)
+    context(ClassDescriptor, SwiftModelScope)
     fun swiftNameWithTypeParametersForSealedCase(parent: ClassDescriptor): TypeName {
         if (kind.isInterface) {
             return this@ClassDescriptor.stableSpec

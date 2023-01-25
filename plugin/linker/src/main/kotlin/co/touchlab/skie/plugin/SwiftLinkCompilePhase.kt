@@ -8,7 +8,6 @@ import co.touchlab.skie.api.apinotes.fixes.ClassInsideNonExportedClassApiNotesFi
 import co.touchlab.skie.api.apinotes.fixes.KonanManglingApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
-import co.touchlab.skie.api.model.DefaultSwiftPoetScope
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
@@ -59,7 +58,6 @@ class SwiftLinkCompilePhase(
             bridgeProvider = bridgeProvider,
             translator = translator,
         )
-        val swiftPoetScope = DefaultSwiftPoetScope(swiftModelScope, namer, context.descriptorProvider)
         val skieModule = skieContext.module as DefaultSkieModule
 
         KonanManglingApiNotesFix(skieModule, context.descriptorProvider).resetNames()
@@ -68,7 +66,7 @@ class SwiftLinkCompilePhase(
         ClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
 
         skieModule.consumeConfigureBlocks(swiftModelScope)
-        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftPoetScope)
+        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftModelScope)
         val swiftTextFiles = skieModule.produceTextFiles()
 
         val newFiles = swiftFileSpecs.map { fileSpec ->

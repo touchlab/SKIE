@@ -8,8 +8,8 @@ import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
@@ -98,8 +99,12 @@ class DefaultSwiftModelScope(
         get() = fileSwiftModels[this]
             ?: throw IllegalArgumentException("File $this is not exposed and therefore does not have a SwiftModel.")
 
-    override val KotlinType.isBridged: Boolean
-        get() = TODO("Not yet implemented")
+    override val ReceiverParameterDescriptor.swiftModel: TypeSwiftModel
+        get() = when (val containingDeclaration = this.containingDeclaration) {
+            is FunctionDescriptor -> containingDeclaration.swiftModel.receiver
+            is PropertyDescriptor -> containingDeclaration.swiftModel.receiver
+            else -> throw IllegalArgumentException("ReceiverParameterDescriptor $this is not contained in a FunctionDescriptor or PropertyDescriptor.")
+        }
 
     override fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel {
         val categoryClass = descriptorProvider.getClassIfCategory(this)
@@ -138,21 +143,21 @@ class DefaultSwiftModelScope(
         return when (bridge) {
             is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge)
             MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
-                SwiftPointerTypeModel(SwiftNullableRefefenceTypeModel(SwiftClassTypeModel("Error")), nullable = true)
+                SwiftPointerTypeModel(SwiftNullableReferenceTypeModel(SwiftClassTypeModel("Error")), nullable = true)
             is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
                 val resultType = if (bridge.useUnitCompletion) {
                     null
                 } else {
                     when (val it = translator.mapReferenceType(returnType!!, exportScope.removingFlags(SwiftExportScope.Flags.Escaping))) {
-                        is SwiftNonNullReferenceTypeModel -> SwiftNullableRefefenceTypeModel(it, isNullableResult = false)
-                        is SwiftNullableRefefenceTypeModel -> SwiftNullableRefefenceTypeModel(it.nonNullType, isNullableResult = true)
+                        is SwiftNonNullReferenceTypeModel -> SwiftNullableReferenceTypeModel(it, isNullableResult = false)
+                        is SwiftNullableReferenceTypeModel -> SwiftNullableReferenceTypeModel(it.nonNullType, isNullableResult = true)
                     }
                 }
                 SwiftLambdaTypeModel(
                     returnType = SwiftVoidTypeModel,
                     parameterTypes = listOfNotNull(
                         resultType,
-                        SwiftNullableRefefenceTypeModel(SwiftClassTypeModel("Error"))
+                        SwiftNullableReferenceTypeModel(SwiftClassTypeModel("Error"))
                     ),
                     isEscaping = true
                 )

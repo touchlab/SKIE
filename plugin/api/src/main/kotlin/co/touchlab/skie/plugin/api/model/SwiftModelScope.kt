@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
@@ -29,6 +30,8 @@ interface SwiftModelScope {
 
     val ValueParameterDescriptor.swiftModel: KotlinParameterSwiftModel
 
+    val ReceiverParameterDescriptor.swiftModel: TypeSwiftModel
+
     val PropertyDescriptor.swiftModel: KotlinPropertySwiftModel
 
     val PropertyDescriptor.regularPropertySwiftModel: KotlinRegularPropertySwiftModel
@@ -40,9 +43,6 @@ interface SwiftModelScope {
     val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
 
     val SourceFile.swiftModel: KotlinTypeSwiftModel
-
-    // TODO Remove
-    val KotlinType.isBridged: Boolean
 
     fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel
 

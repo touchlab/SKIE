@@ -1,14 +1,14 @@
 package co.touchlab.skie.api
 
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.module.SkieModule
-import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import io.outfoxx.swiftpoet.FileSpec
 
 class DefaultSkieModule : SkieModule {
 
     private val configureBlocks = OrderedList<context(MutableSwiftModelScope) () -> Unit>()
-    private val swiftPoetFileBlocks = mutableMapOf<String, OrderedList<context(SwiftPoetScope) FileSpec.Builder.() -> Unit>>()
+    private val swiftPoetFileBlocks = mutableMapOf<String, OrderedList<context(SwiftModelScope) FileSpec.Builder.() -> Unit>>()
     private val textFileBlocks = mutableMapOf<String, MutableList<String>>()
     private var configureBlocksConsumed = false
 
@@ -17,7 +17,7 @@ class DefaultSkieModule : SkieModule {
         configureBlocks.add(configure, ordering)
     }
 
-    override fun file(name: String, ordering: SkieModule.Ordering, contents: context(SwiftPoetScope) FileSpec.Builder.() -> Unit) {
+    override fun file(name: String, ordering: SkieModule.Ordering, contents: context(SwiftModelScope) FileSpec.Builder.() -> Unit) {
         swiftPoetFileBlocks.getOrPut(name) { OrderedList() }.add(contents, ordering)
     }
 
@@ -34,7 +34,7 @@ class DefaultSkieModule : SkieModule {
         }
     }
 
-    fun produceSwiftPoetFiles(context: SwiftPoetScope): List<FileSpec> {
+    fun produceSwiftPoetFiles(context: SwiftModelScope): List<FileSpec> {
         val result = mutableMapOf<String, FileSpec.Builder>()
 
         do {

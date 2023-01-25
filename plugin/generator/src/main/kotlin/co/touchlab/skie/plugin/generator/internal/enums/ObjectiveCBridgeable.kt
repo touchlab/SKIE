@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.enums
 
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.simpleName
-import co.touchlab.skie.plugin.api.module.SwiftPoetScope
 import co.touchlab.skie.plugin.api.module.stableSpec
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal object ObjectiveCBridgeable {
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     fun TypeSpec.Builder.addObjcBridgeableImplementation(
         declaration: ClassDescriptor,
     ) {
@@ -40,7 +40,7 @@ internal object ObjectiveCBridgeable {
         addFromObjectiveC(declaration)
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addBridgeToObjectiveC(
         declaration: ClassDescriptor,
     ) {
@@ -69,7 +69,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addForceBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_forceBridgeFromObjectiveC")
@@ -81,7 +81,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addConditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_conditionallyBridgeFromObjectiveC")
@@ -95,7 +95,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addUnconditionallyBridgeFromObjectiveC(declaration: ClassDescriptor) {
         addFunction(
             FunctionSpec.builder("_unconditionallyBridgeFromObjectiveC")
@@ -107,7 +107,7 @@ internal object ObjectiveCBridgeable {
         )
     }
 
-    context(SwiftPoetScope)
+    context(SwiftModelScope)
     private fun TypeSpec.Builder.addFromObjectiveC(
         declaration: ClassDescriptor,
     ) {
