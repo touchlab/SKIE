@@ -15,8 +15,6 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
@@ -69,7 +67,7 @@ class SwiftModelFactory(
             .also { allBoundedSwiftModels.addAll(it.values) }
     }
 
-    private fun createBoundedProperties(group: List<PropertyDescriptor>): Map<PropertyDescriptor, MutableKotlinPropertySwiftModel> =
+    private fun createBoundedProperties(group: List<PropertyDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
         if (namer.mapper.isObjCProperty(group.representative)) {
             createBoundedRegularProperties(group)
         } else {
@@ -78,7 +76,7 @@ class SwiftModelFactory(
 
     private fun createBoundedRegularProperties(
         group: List<PropertyDescriptor>,
-    ): Map<PropertyDescriptor, MutableKotlinRegularPropertySwiftModel> {
+    ): Map<CallableMemberDescriptor, MutableKotlinRegularPropertySwiftModel> {
         val allBoundedSwiftModels = mutableListOf<MutableKotlinCallableMemberSwiftModel>()
 
         val core = KotlinRegularPropertySwiftModelCore(group.representative, namer)
@@ -86,16 +84,36 @@ class SwiftModelFactory(
         return group
             .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, namer, swiftModelScope) }
             .also { allBoundedSwiftModels.addAll(it.values) }
+            .mapKeys {
+                @Suppress("USELESS_CAST")
+                it.key as CallableMemberDescriptor
+            }
     }
 
     private fun createBoundedConvertedProperties(
         group: List<PropertyDescriptor>,
-    ): Map<PropertyDescriptor, MutableKotlinConvertedPropertySwiftModel> {
+    ): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
+        createBoundedConvertedPropertiesEnclosingModels(group) +
+        createBoundedConvertedPropertiesFunctions(group)
+
+    private fun createBoundedConvertedPropertiesEnclosingModels(
+        group: List<PropertyDescriptor>,
+    ): Map<PropertyDescriptor, MutableKotlinCallableMemberSwiftModel> {
         val allBoundedSwiftModels = mutableListOf<MutableKotlinCallableMemberSwiftModel>()
 
         return group
-            .associateWith { ActualKotlinConvertedPropertySwiftModel(it, allBoundedSwiftModels, namer, swiftModelScope) }
+            .associateWith { ActualKotlinConvertedPropertySwiftModel(it, allBoundedSwiftModels, swiftModelScope) }
             .also { allBoundedSwiftModels.addAll(it.values) }
+    }
+
+    private fun createBoundedConvertedPropertiesFunctions(
+        group: List<PropertyDescriptor>,
+    ): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> {
+        val getters = createBoundedFunctions(group.mapNotNull { it.getter })
+
+        val setters = group.mapNotNull { it.setter }.takeIf { it.isNotEmpty() }?.let { createBoundedFunctions(it) }
+
+        return getters + (setters ?: emptyMap())
     }
 
     private val Collection<FunctionDescriptor>.representative: FunctionDescriptor

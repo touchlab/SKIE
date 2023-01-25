@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 class ActualKotlinConvertedPropertySwiftModel(
     override val descriptor: PropertyDescriptor,
     override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>,
-    namer: ObjCExportNamer,
     swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinConvertedPropertySwiftModel {
 
