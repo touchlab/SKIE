@@ -19,7 +19,6 @@ internal class ActualKotlinFunctionSwiftModel(
     override val descriptor: FunctionDescriptor,
     override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>,
     val core: KotlinFunctionSwiftModelCore,
-    namer: ObjCExportNamer,
     private val swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinFunctionSwiftModel {
 

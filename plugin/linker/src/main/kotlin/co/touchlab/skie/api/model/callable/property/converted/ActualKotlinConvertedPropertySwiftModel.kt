@@ -38,4 +38,6 @@ class ActualKotlinConvertedPropertySwiftModel(
 
     override val type: TypeSwiftModel
         get() = TODO("Not yet implemented")
+
+    override fun toString(): String = descriptor.toString()
 }

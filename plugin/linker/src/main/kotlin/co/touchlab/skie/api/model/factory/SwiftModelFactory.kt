@@ -65,7 +65,7 @@ class SwiftModelFactory(
         val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider)
 
         return group
-            .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, namer, swiftModelScope) }
+            .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }
             .also { allBoundedSwiftModels.addAll(it.values) }
     }
 
@@ -84,7 +84,7 @@ class SwiftModelFactory(
         val core = KotlinRegularPropertySwiftModelCore(group.representative, namer)
 
         return group
-            .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, namer, swiftModelScope) }
+            .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }
             .also { allBoundedSwiftModels.addAll(it.values) }
             .mapKeys {
                 @Suppress("USELESS_CAST")

@@ -137,7 +137,7 @@ class CallableMembersConflictsApiNotesFix(
                     receiver = function.receiver.stableFqName,
                     identifier = function.identifier,
                     parameters = function.parameters.map { it.toSignatureParameter() },
-                    returnType = function.returnType.stableFqName,
+                    returnType = Signature.ReturnType.Specific(function.returnType.stableFqName),
                 )
             )
 
@@ -153,7 +153,7 @@ class CallableMembersConflictsApiNotesFix(
                     receiver = regularProperty.receiver.stableFqName,
                     identifier = regularProperty.identifier,
                     parameters = emptyList(),
-                    returnType = regularProperty.type.stableFqName,
+                    returnType = Signature.ReturnType.Any,
                 )
             )
 
@@ -188,10 +188,41 @@ class CallableMembersConflictsApiNotesFix(
         val receiver: String,
         val identifier: String,
         val parameters: List<Parameter>,
-        val returnType: String,
+        val returnType: ReturnType,
     ) {
 
         data class Parameter(val argumentLabel: String, val type: String)
+
+        sealed interface ReturnType {
+
+            class Specific(val name: String) : ReturnType {
+
+                override fun equals(other: kotlin.Any?): Boolean {
+                    if (this === other) return true
+                    if (other is Any) return true
+                    if (javaClass != other?.javaClass) return false
+
+                    other as Specific
+
+                    if (name != other.name) return false
+
+                    return true
+                }
+
+                override fun hashCode(): Int = 0
+            }
+
+            object Any : ReturnType {
+
+                override fun equals(other: kotlin.Any?): Boolean {
+                    if (other is ReturnType) return true
+
+                    return super.equals(other)
+                }
+
+                override fun hashCode(): Int = 0
+            }
+        }
     }
 
     private class UniqueSignatureSet {
@@ -209,4 +240,3 @@ class CallableMembersConflictsApiNotesFix(
         }
     }
 }
-

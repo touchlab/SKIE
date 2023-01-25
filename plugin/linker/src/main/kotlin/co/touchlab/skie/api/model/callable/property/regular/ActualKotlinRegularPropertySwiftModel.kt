@@ -14,7 +14,6 @@ class ActualKotlinRegularPropertySwiftModel(
     override val descriptor: PropertyDescriptor,
     override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>,
     private val core: KotlinRegularPropertySwiftModelCore,
-    namer: ObjCExportNamer,
     private val swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinRegularPropertySwiftModel {
 
@@ -39,4 +38,6 @@ class ActualKotlinRegularPropertySwiftModel(
         get() = with(swiftModelScope) {
             core.descriptor.propertyTypeModel(receiver.swiftGenericExportScope)
         }
+
+    override fun toString(): String = descriptor.toString()
 }
