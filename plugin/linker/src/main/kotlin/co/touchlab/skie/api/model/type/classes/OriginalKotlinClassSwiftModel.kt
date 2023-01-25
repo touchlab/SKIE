@@ -7,10 +7,9 @@ import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 
 class OriginalKotlinClassSwiftModel(
     private val delegate: KotlinClassSwiftModel,
+    override val identifier: String,
     containingType: Lazy<KotlinClassSwiftModel?>,
 ) : KotlinClassSwiftModel by delegate {
-
-    override val identifier: String = delegate.identifier
 
     override val visibility: SwiftModelVisibility = delegate.visibility
 

@@ -18,12 +18,13 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class NativeDescriptorProvider(private val context: CommonBackendContext) : DescriptorProvider {
 
     private val mutableTransitivelyExposedClasses by lazy {
-        exportedInterface.generatedClasses.toMutableList()
+        exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableList()
     }
 
     override val transitivelyExposedClasses: List<ClassDescriptor> by ::mutableTransitivelyExposedClasses

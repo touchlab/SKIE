@@ -65,4 +65,6 @@ internal class ActualKotlinFunctionSwiftModel(
         get() = with(swiftModelScope) {
             core.descriptor.returnTypeModel(receiver.swiftGenericExportScope, core.methodBridge.returnBridge)
         }
+
+    override fun toString(): String = descriptor.toString()
 }

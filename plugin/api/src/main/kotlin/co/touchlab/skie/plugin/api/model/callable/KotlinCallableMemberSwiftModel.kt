@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.api.model.callable
 
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 

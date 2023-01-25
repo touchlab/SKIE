@@ -1,5 +1,6 @@
 package `tests`.`enums`.`nested`.`enum_in_value_class`
 
+@JvmInline
 value class A(val value: Int) {
     enum class B {
         B1,

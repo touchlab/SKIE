@@ -109,7 +109,8 @@ class SwiftModelFactory(
             ActualKotlinClassSwiftModel(
                 classDescriptor = classDescriptor,
                 namer = namer,
-                swiftModelScope = swiftModelScope
+                swiftModelScope = swiftModelScope,
+                descriptorProvider = descriptorProvider,
             )
         }
 
