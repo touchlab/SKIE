@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 
 internal class ActualKotlinFunctionSwiftModel(
     override val descriptor: FunctionDescriptor,
-    override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>,
+    override val allBoundedSwiftModels: List<MutableKotlinFunctionSwiftModel>,
     val core: KotlinFunctionSwiftModelCore,
     private val swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinFunctionSwiftModel {

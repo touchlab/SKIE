@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
@@ -38,7 +39,6 @@ import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
-import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 
 class DefaultSwiftModelScope(
     private val namer: ObjCExportNamer,
@@ -52,12 +52,13 @@ class DefaultSwiftModelScope(
     private val members = swiftModelFactory.createMembers(descriptorProvider.allExposedMembers)
 
     private val functionSwiftModels = members.filterIsInstance<FunctionDescriptor, MutableKotlinFunctionSwiftModel>()
+    private val asyncFunctionSwiftModels = swiftModelFactory.createAsyncFunctions(functionSwiftModels.values)
     private val regularPropertySwiftModels = members.filterIsInstance<PropertyDescriptor, MutableKotlinRegularPropertySwiftModel>()
     private val convertedPropertySwiftModels = members.filterIsInstance<PropertyDescriptor, MutableKotlinConvertedPropertySwiftModel>()
 
-    private val valueParameterSwiftModels = (functionSwiftModels.values + convertedPropertySwiftModels.flatMap { it.value.accessors })
+    private val parameterSwiftModels = (functionSwiftModels.values + convertedPropertySwiftModels.flatMap { it.value.accessors })
         .flatMap { it.parameters }
-        .mapNotNull { swiftModel -> (swiftModel.descriptor as? ValueParameterDescriptor)?.original?.let { it to swiftModel } }
+        .mapNotNull { swiftModel -> swiftModel.descriptor?.original?.let { it to swiftModel } }
         .toMap()
 
     private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.transitivelyExposedClasses)
@@ -73,8 +74,11 @@ class DefaultSwiftModelScope(
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
         get() = functionSwiftModels[this.original] ?: throwUnknownDescriptor()
 
-    override val ValueParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
-        get() = valueParameterSwiftModels[this.original] ?: throwUnknownDescriptor()
+    override val FunctionDescriptor.asyncSwiftModel: KotlinFunctionSwiftModel
+        get() = asyncFunctionSwiftModels[this.original] ?: throwUnknownDescriptor()
+
+    override val ParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
+        get() = parameterSwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.swiftModel: MutableKotlinPropertySwiftModel
         get() = regularPropertySwiftModels[this.original]
@@ -96,13 +100,6 @@ class DefaultSwiftModelScope(
     override val SourceFile.swiftModel: MutableKotlinTypeSwiftModel
         get() = fileSwiftModels[this]
             ?: throw IllegalArgumentException("File $this is not exposed and therefore does not have a SwiftModel.")
-
-    override val ReceiverParameterDescriptor.swiftModel: TypeSwiftModel
-        get() = when (val containingDeclaration = this.containingDeclaration) {
-            is FunctionDescriptor -> containingDeclaration.swiftModel.receiver
-            is PropertyDescriptor -> containingDeclaration.swiftModel.receiver
-            else -> throw IllegalArgumentException("ReceiverParameterDescriptor $this is not contained in a FunctionDescriptor or PropertyDescriptor.")
-        }
 
     override fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel {
         val categoryClass = descriptorProvider.getClassIfCategory(this)
@@ -130,6 +127,18 @@ class DefaultSwiftModelScope(
     ): SwiftTypeModel {
         val exportScope = SwiftExportScope(genericExportScope)
         return translator.mapReturnType(bridge, this, exportScope)
+    }
+
+    override fun FunctionDescriptor.asyncReturnTypeModel(
+        genericExportScope: SwiftGenericExportScope,
+        bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion
+    ): SwiftTypeModel {
+        val exportScope = SwiftExportScope(genericExportScope)
+        return if (bridge.useUnitCompletion) {
+            SwiftVoidTypeModel
+        } else {
+            translator.mapReferenceType(returnType!!, exportScope)
+        }
     }
 
     override fun FunctionDescriptor.getParameterType(

@@ -11,6 +11,7 @@ import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -21,7 +22,7 @@ interface MutableSwiftModelScope : SwiftModelScope {
 
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
 
-    override val ValueParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
+    override val ParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
 
     override val PropertyDescriptor.swiftModel: MutableKotlinPropertySwiftModel
 

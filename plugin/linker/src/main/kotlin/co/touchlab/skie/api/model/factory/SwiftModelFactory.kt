@@ -4,6 +4,7 @@ package co.touchlab.skie.api.model.factory
 
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.callable.function.ActualKotlinFunctionSwiftModel
+import co.touchlab.skie.api.model.callable.function.AsyncKotlinFunctionSwiftModel
 import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelCore
 import co.touchlab.skie.api.model.callable.property.converted.ActualKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.api.model.callable.property.regular.ActualKotlinRegularPropertySwiftModel
@@ -60,7 +61,7 @@ class SwiftModelFactory(
         } as Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel>
 
     private fun createBoundedFunctions(group: List<FunctionDescriptor>): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> {
-        val allBoundedSwiftModels = mutableListOf<MutableKotlinCallableMemberSwiftModel>()
+        val allBoundedSwiftModels = mutableListOf<MutableKotlinFunctionSwiftModel>()
 
         val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider)
 
@@ -151,4 +152,19 @@ class SwiftModelFactory(
                 namer = namer,
             )
         }
+
+    fun createAsyncFunctions(models: Collection<MutableKotlinFunctionSwiftModel>): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> =
+        models.filter { it.descriptor.isSuspend }
+            .map { it.allBoundedSwiftModels.toSet() }
+            .distinct()
+            .flatMap { group ->
+                val allBoundedSwiftModels = mutableListOf<MutableKotlinFunctionSwiftModel>()
+
+                group
+                    .map { AsyncKotlinFunctionSwiftModel(it, allBoundedSwiftModels, swiftModelScope) }
+                    .also { allBoundedSwiftModels.addAll(it) }
+                    .map { it.descriptor to it }
+            }
+            .toMap()
+
 }

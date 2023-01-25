@@ -3,7 +3,22 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.function.reference
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.stableSpec
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeParameterUsageModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeRawUsageModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftInstanceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeProtocolTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftMetaClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReferenceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftProtocolTypeModel
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.util.CallableMemberSwiftType
@@ -114,7 +129,7 @@ internal class SwiftSuspendGeneratorDelegate(
         val receiverSwiftModel = receiverParameter.swiftModel
 
         addParameter(
-            ParameterSpec.builder("_", parameterName, receiverSwiftModel.stableSpec)
+            ParameterSpec.builder("_", parameterName, receiverSwiftModel.type.stableSpec)
                 .build()
         )
     }
@@ -133,8 +148,8 @@ internal class SwiftSuspendGeneratorDelegate(
     context(SwiftModelScope)
     private fun FunctionSpec.Builder.addReturnType(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
         this.apply {
-            val returnType = originalFunctionDescriptor.swiftModel.returnType
-            returns(returnType.stableSpec)
+            val asyncSwiftModel = originalFunctionDescriptor.asyncSwiftModel
+            returns(asyncSwiftModel.returnType.stableSpec)
         }
 
     context(SwiftModelScope)

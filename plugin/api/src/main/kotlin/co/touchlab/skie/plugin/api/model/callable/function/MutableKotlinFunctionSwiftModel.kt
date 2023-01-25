@@ -8,6 +8,8 @@ import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 
 interface MutableKotlinFunctionSwiftModel : KotlinFunctionSwiftModel, MutableKotlinCallableMemberSwiftModel {
 
+    override val allBoundedSwiftModels: List<MutableKotlinFunctionSwiftModel>
+
     override var visibility: SwiftModelVisibility
 
     override var identifier: String

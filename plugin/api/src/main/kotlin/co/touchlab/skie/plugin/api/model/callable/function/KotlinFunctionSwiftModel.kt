@@ -13,6 +13,8 @@ interface KotlinFunctionSwiftModel : KotlinCallableMemberSwiftModel {
 
     override val descriptor: FunctionDescriptor
 
+    override val allBoundedSwiftModels: List<KotlinFunctionSwiftModel>
+
     val kind: Kind
 
     val isChanged: Boolean

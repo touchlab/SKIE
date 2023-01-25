@@ -28,9 +28,9 @@ interface SwiftModelScope {
 
     val FunctionDescriptor.swiftModel: KotlinFunctionSwiftModel
 
-    val ValueParameterDescriptor.swiftModel: KotlinParameterSwiftModel
+    val FunctionDescriptor.asyncSwiftModel: KotlinFunctionSwiftModel
 
-    val ReceiverParameterDescriptor.swiftModel: TypeSwiftModel
+    val ParameterDescriptor.swiftModel: KotlinParameterSwiftModel
 
     val PropertyDescriptor.swiftModel: KotlinPropertySwiftModel
 
@@ -49,6 +49,8 @@ interface SwiftModelScope {
     fun PropertyDescriptor.propertyTypeModel(genericExportScope: SwiftGenericExportScope): SwiftTypeModel
 
     fun FunctionDescriptor.returnTypeModel(genericExportScope: SwiftGenericExportScope, bridge: MethodBridge.ReturnValue): SwiftTypeModel
+
+    fun FunctionDescriptor.asyncReturnTypeModel(genericExportScope: SwiftGenericExportScope, bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion): SwiftTypeModel
 
     fun FunctionDescriptor.getParameterType(
         descriptor: ParameterDescriptor?,
