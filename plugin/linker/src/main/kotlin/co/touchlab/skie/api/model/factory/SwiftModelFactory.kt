@@ -40,9 +40,11 @@ class SwiftModelFactory(
 ) {
 
     fun createMembers(descriptors: List<CallableMemberDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> {
-        val disjointSet = MultiRootDisjointSet<CallableMemberDescriptor> { it.overriddenDescriptors }
+        val disjointSet = MultiRootDisjointSet<CallableMemberDescriptor> { descriptor ->
+            descriptor.overriddenDescriptors.map { it.original }
+        }
 
-        disjointSet.addAll(descriptors)
+        disjointSet.addAll(descriptors.map { it.original })
 
         return disjointSet.sets.map { createBoundedMembers(it) }.fold(emptyMap()) { acc, element -> acc + element }
     }
@@ -94,7 +96,7 @@ class SwiftModelFactory(
         group: List<PropertyDescriptor>,
     ): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
         createBoundedConvertedPropertiesEnclosingModels(group) +
-        createBoundedConvertedPropertiesFunctions(group)
+            createBoundedConvertedPropertiesFunctions(group)
 
     private fun createBoundedConvertedPropertiesEnclosingModels(
         group: List<PropertyDescriptor>,
@@ -109,9 +111,9 @@ class SwiftModelFactory(
     private fun createBoundedConvertedPropertiesFunctions(
         group: List<PropertyDescriptor>,
     ): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> {
-        val getters = createBoundedFunctions(group.mapNotNull { it.getter })
+        val getters = createBoundedFunctions(group.mapNotNull { it.getter?.original })
 
-        val setters = group.mapNotNull { it.setter }.takeIf { it.isNotEmpty() }?.let { createBoundedFunctions(it) }
+        val setters = group.mapNotNull { it.setter?.original }.takeIf { it.isNotEmpty() }?.let { createBoundedFunctions(it) }
 
         return getters + (setters ?: emptyMap())
     }
@@ -123,17 +125,20 @@ class SwiftModelFactory(
         get() = this.first { namer.mapper.isBaseProperty(it) }
 
     fun createClasses(descriptors: List<ClassDescriptor>): Map<ClassDescriptor, MutableKotlinClassSwiftModel> =
-        descriptors.associateWith { classDescriptor ->
-            ActualKotlinClassSwiftModel(
-                classDescriptor = classDescriptor,
-                namer = namer,
-                swiftModelScope = swiftModelScope,
-                descriptorProvider = descriptorProvider,
-            )
-        }
+        descriptors
+            .map { it.original }
+            .associateWith { classDescriptor ->
+                ActualKotlinClassSwiftModel(
+                    classDescriptor = classDescriptor,
+                    namer = namer,
+                    swiftModelScope = swiftModelScope,
+                    descriptorProvider = descriptorProvider,
+                )
+            }
 
     fun createEnumEntries(descriptors: List<ClassDescriptor>): Map<ClassDescriptor, KotlinEnumEntrySwiftModel> =
         descriptors
+            .map { it.original }
             .filter { it.kind.isEnumClass }
             .flatMap { it.enumEntries }
             .associateWith { ActualKotlinEnumEntrySwiftModel(it, namer) }

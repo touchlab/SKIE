@@ -9,7 +9,6 @@ import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
@@ -40,7 +39,6 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.types.KotlinType
 
 class DefaultSwiftModelScope(
     private val namer: ObjCExportNamer,
@@ -59,7 +57,7 @@ class DefaultSwiftModelScope(
 
     private val valueParameterSwiftModels = (functionSwiftModels.values + convertedPropertySwiftModels.flatMap { it.value.accessors })
         .flatMap { it.parameters }
-        .mapNotNull { swiftModel -> (swiftModel.descriptor as? ValueParameterDescriptor)?.let { it to swiftModel } }
+        .mapNotNull { swiftModel -> (swiftModel.descriptor as? ValueParameterDescriptor)?.original?.let { it to swiftModel } }
         .toMap()
 
     private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.transitivelyExposedClasses)
@@ -67,33 +65,33 @@ class DefaultSwiftModelScope(
     private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
 
     override val CallableMemberDescriptor.swiftModel: MutableKotlinCallableMemberSwiftModel
-        get() = functionSwiftModels[this]
-            ?: regularPropertySwiftModels[this]
-            ?: convertedPropertySwiftModels[this]
+        get() = functionSwiftModels[this.original]
+            ?: regularPropertySwiftModels[this.original]
+            ?: convertedPropertySwiftModels[this.original]
             ?: throwUnknownDescriptor()
 
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
-        get() = functionSwiftModels[this] ?: throwUnknownDescriptor()
+        get() = functionSwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val ValueParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
-        get() = valueParameterSwiftModels[this] ?: throwUnknownDescriptor()
+        get() = valueParameterSwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.swiftModel: MutableKotlinPropertySwiftModel
-        get() = regularPropertySwiftModels[this]
-            ?: convertedPropertySwiftModels[this]
+        get() = regularPropertySwiftModels[this.original]
+            ?: convertedPropertySwiftModels[this.original]
             ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.regularPropertySwiftModel: MutableKotlinRegularPropertySwiftModel
-        get() = regularPropertySwiftModels[this] ?: throwUnknownDescriptor()
+        get() = regularPropertySwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.convertedPropertySwiftModel: MutableKotlinConvertedPropertySwiftModel
-        get() = convertedPropertySwiftModels[this] ?: throwUnknownDescriptor()
+        get() = convertedPropertySwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val ClassDescriptor.swiftModel: MutableKotlinClassSwiftModel
-        get() = classSwiftModels[this] ?: throwUnknownDescriptor()
+        get() = classSwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
-        get() = enumEntrySwiftModels[this] ?: throwUnknownDescriptor()
+        get() = enumEntrySwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val SourceFile.swiftModel: MutableKotlinTypeSwiftModel
         get() = fileSwiftModels[this]
@@ -137,7 +135,7 @@ class DefaultSwiftModelScope(
     override fun FunctionDescriptor.getParameterType(
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
-        genericExportScope: SwiftGenericExportScope
+        genericExportScope: SwiftGenericExportScope,
     ): SwiftTypeModel {
         val exportScope = SwiftExportScope(genericExportScope, SwiftExportScope.Flags.Escaping)
         return when (bridge) {
@@ -168,8 +166,8 @@ class DefaultSwiftModelScope(
     private fun DeclarationDescriptor.throwUnknownDescriptor(): Nothing {
         throw IllegalArgumentException(
             "Cannot find SwiftModel for descriptor: $this. Possible reasons: " +
-            "Descriptor is not exposed and therefore does not have a SwiftModel. " +
-            "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty)."
+                "Descriptor is not exposed and therefore does not have a SwiftModel. " +
+                "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty)."
         )
     }
 
