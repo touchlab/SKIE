@@ -1,3 +1,3 @@
-if (AKt.foo_() == "0") {
+if (AKt.foo() == "0") {
     exit(AKt.foo)
 }

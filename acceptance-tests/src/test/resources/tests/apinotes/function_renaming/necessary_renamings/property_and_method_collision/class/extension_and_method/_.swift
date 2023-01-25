@@ -1,1 +1,1 @@
-exit(A().foo + A().foo_())
+exit(A().foo_ + A().foo())

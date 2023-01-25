@@ -2,8 +2,9 @@ package `tests`.`apinotes`.`function_renaming`.`necessary_renamings`.`property_a
 
 interface A
 
-fun A.foo(i: Int) = i
+val A.foo: Int
+    get() = 0
 
-fun A.foo(i: String) = i.toInt()
+fun A.foo() = 1
 
 class A1 : A

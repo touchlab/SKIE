@@ -4,5 +4,12 @@ interface A
 
 class A1 : A
 
-val A.foo: Int
-    get() = 0
+private var shared: Int = 10
+
+var A.foo: Int
+    get() = shared
+    set(value) {
+        shared = value
+    }
+
+

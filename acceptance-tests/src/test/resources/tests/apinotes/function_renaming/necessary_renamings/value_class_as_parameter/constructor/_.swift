@@ -1,1 +1,1 @@
-exit(A(a: 2, i: 0).value - A(a: 2, i_: 1).value)
+exit(A(a: 10, i: 1).value - A(10: 2, i_: 0).value)

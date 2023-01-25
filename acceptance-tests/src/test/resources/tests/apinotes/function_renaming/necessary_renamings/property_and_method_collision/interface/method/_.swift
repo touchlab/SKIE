@@ -1,1 +1,1 @@
-exit(A1().foo(i: 0) + A1().foo(i: "0"))
+exit(A1().foo + A1().foo_())
