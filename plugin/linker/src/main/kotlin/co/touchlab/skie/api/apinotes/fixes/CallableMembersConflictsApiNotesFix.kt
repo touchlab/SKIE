@@ -20,6 +20,8 @@ import org.jetbrains.kotlin.backend.common.descriptors.allParameters
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isOverridable
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.overriddenTreeAsSequence
 import org.jetbrains.kotlin.resolve.substitutedUnderlyingTypes
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
@@ -43,6 +45,7 @@ class CallableMembersConflictsApiNotesFix(
         this.sortedByDescending { it.collisionResolutionPriority }
 
     /**
+     * built in (is prioritized)
      * base vs inherited (base is prioritized)
      * true member vs extension (member is prioritized)
      * open vs final (open is prioritized)
@@ -58,6 +61,11 @@ class CallableMembersConflictsApiNotesFix(
         get() {
             var priority = 0L
 
+            if (this.descriptor.overriddenTreeAsSequence(true).any { it.fqNameSafe.asString().startsWith("kotlin.") }) {
+                priority += 1
+            }
+
+            priority = priority shl 1
             if (this.descriptor.overriddenDescriptors.isEmpty()) {
                 priority += 1
             }
@@ -77,8 +85,8 @@ class CallableMembersConflictsApiNotesFix(
                 priority += 1
             }
 
-            priority = priority shl 5
-            priority += 31 - this.descriptor.allParameters.sumOf { it.type.substitutedUnderlyingTypes().size }.coerceAtMost(31)
+            priority = priority shl 4
+            priority += 15 - this.descriptor.allParameters.sumOf { it.type.substitutedUnderlyingTypes().size }.coerceAtMost(15)
 
             priority = priority shl 5
             priority += 31 - this.descriptor.allParameters
