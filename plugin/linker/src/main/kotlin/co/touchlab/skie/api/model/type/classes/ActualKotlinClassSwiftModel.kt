@@ -13,6 +13,7 @@ import co.touchlab.skie.util.mutableLazy
 import co.touchlab.skie.util.swiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
@@ -37,7 +38,8 @@ class ActualKotlinClassSwiftModel(
 
     override val objCFqName: String = namer.getClassOrProtocolName(classDescriptor.original).objCName
 
-    override val swiftGenericExportScope: SwiftGenericExportScope = SwiftGenericExportScope.Class(classDescriptor, namer)
+    override val swiftGenericExportScope: SwiftGenericExportScope =
+        if (classDescriptor.kind.isInterface) SwiftGenericExportScope.None else SwiftGenericExportScope.Class(classDescriptor, namer)
 
     private val originalContainingType by lazy {
         with(swiftModelScope) {

@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 internal class ActualKotlinParameterSwiftModel(
     core: KotlinParameterSwiftModelCore,
     parameterDescriptor: ParameterDescriptor?,
-    private val getParameterType: () -> TypeSwiftModel,
+    getParameterType: () -> TypeSwiftModel,
 ) : MutableKotlinParameterSwiftModel {
 
     override val origin: Origin = core.getOrigin(parameterDescriptor)
@@ -23,6 +23,7 @@ internal class ActualKotlinParameterSwiftModel(
     override val isChanged: Boolean
         get() = argumentLabel != original.argumentLabel
 
-    override val type: TypeSwiftModel
-        get() = getParameterType()
+    override val type: TypeSwiftModel by lazy(getParameterType)
+
+    override fun toString(): String = origin.toString()
 }

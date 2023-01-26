@@ -58,7 +58,7 @@ class DefaultSwiftModelScope(
 
     private val parameterSwiftModels = (functionSwiftModels.values + convertedPropertySwiftModels.flatMap { it.value.accessors })
         .flatMap { it.parameters }
-        .mapNotNull { swiftModel -> swiftModel.descriptor?.original?.let { it to swiftModel } }
+        .mapNotNull { swiftModel -> swiftModel.descriptor?.let { it to swiftModel } }
         .toMap()
 
     private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.transitivelyExposedClasses)
@@ -78,7 +78,7 @@ class DefaultSwiftModelScope(
         get() = asyncFunctionSwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val ParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
-        get() = parameterSwiftModels[this.original] ?: throwUnknownDescriptor()
+        get() = parameterSwiftModels[this] ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.swiftModel: MutableKotlinPropertySwiftModel
         get() = regularPropertySwiftModels[this.original]
