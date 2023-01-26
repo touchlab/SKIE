@@ -80,7 +80,7 @@ class SwiftTypeTranslator(
             -> SwiftVoidTypeModel
             MethodBridge.ReturnValue.HashCode -> SwiftPrimitiveTypeModel.NSUInteger
             is MethodBridge.ReturnValue.Mapped -> mapType(method.returnType!!, swiftExportScope, returnBridge.bridge)
-            MethodBridge.ReturnValue.WithError.Success -> SwiftPrimitiveTypeModel.Bool
+            MethodBridge.ReturnValue.WithError.Success -> SwiftVoidTypeModel
             is MethodBridge.ReturnValue.WithError.ZeroForError -> {
                 val successReturnType = mapReturnType(returnBridge.successBridge, method, swiftExportScope)
 
