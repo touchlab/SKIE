@@ -6,7 +6,7 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.configuration.gradle.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
@@ -14,11 +14,8 @@ import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
-import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
-import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class SuspendGenerator(
     skieContext: SkieContext,
@@ -35,7 +32,7 @@ internal class SuspendGenerator(
         val kotlinDelegate = KotlinSuspendGeneratorDelegate(module, declarationBuilder, descriptorProvider)
         val swiftDelegate = SwiftSuspendGeneratorDelegate(module)
 
-        descriptorProvider.allSupportedFunctions(descriptorProvider).forEach { function ->
+        descriptorProvider.allSupportedFunctions.forEach { function ->
             val kotlinBridgingFunction = kotlinDelegate.generateKotlinBridgingFunction(function)
 
             swiftDelegate.generateSwiftBridgingFunction(function, kotlinBridgingFunction)
@@ -44,21 +41,11 @@ internal class SuspendGenerator(
         }
     }
 
-    private fun DescriptorProvider.allSupportedFunctions(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
-        this.allFunctions(descriptorProvider)
+    private val NativeDescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
+        get() = this.allExposedMembers.filterIsInstance<SimpleFunctionDescriptor>()
+            .filter { this.mapper.isBaseMethod(it) }
             .filter { it.isSupported }
             .filter { it.isInteropEnabled }
-
-    private fun DescriptorProvider.allFunctions(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
-        this.exposedTopLevelMembers.filterIsInstance<SimpleFunctionDescriptor>() +
-            this.exposedClasses.flatMap { it.allDeclaredMethods(descriptorProvider) } +
-            this.exposedCategoryMembers.filterIsInstance<SimpleFunctionDescriptor>()
-
-    private fun ClassDescriptor.allDeclaredMethods(descriptorProvider: NativeDescriptorProvider): List<SimpleFunctionDescriptor> =
-        this.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
-            .filterIsInstance<SimpleFunctionDescriptor>()
-            .filter { descriptorProvider.isExposed(it) }
-            .filter { descriptorProvider.mapper.isBaseMethod(it) }
 
     private val FunctionDescriptor.isSupported: Boolean
         get() = this.isSuspend && !this.belongsToSkieRuntime

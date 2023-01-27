@@ -149,6 +149,7 @@ internal class ExhaustiveEnumsGenerator(
                 val propertyTypeModel = swiftModel.type
                 addProperty(
                     PropertySpec.builder(
+                        // TODO swiftModel
                         property.name.asString(),
                         propertyTypeModel.stableSpec,
                     )

@@ -1,4 +1,3 @@
-# Skip
-# SwiftCompilationError(error: cannot convert value of type 'A<T>' to expected argument type 'A<KotlinInt>')
+# SwiftCompilationError(error: cannot convert value of type 'KotlinInt' to specified type 'String')
 
-let result: String = try! await A<KotlinInt>().foo(i: 1)
+let result: String = try! await AKt.foo(A<KotlinInt>(), i: 1)

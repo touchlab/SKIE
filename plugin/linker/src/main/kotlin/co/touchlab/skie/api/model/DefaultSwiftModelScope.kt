@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 class DefaultSwiftModelScope(
@@ -110,9 +109,9 @@ class DefaultSwiftModelScope(
 
         val exportScope = SwiftExportScope(SwiftGenericExportScope.None, SwiftExportScope.Flags.ReferenceType)
         return when {
-            categoryClass != null -> translator.mapReferenceType(categoryClass.defaultType, exportScope)
+            categoryClass != null -> translator.mapReferenceType(categoryClass.defaultType, exportScope.copy(genericScope = SwiftGenericExportScope.Class(categoryClass, namer)))
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
-            containingDeclaration is ClassDescriptor -> translator.mapReferenceType(containingDeclaration.defaultType, exportScope)
+            containingDeclaration is ClassDescriptor -> translator.mapReferenceType(containingDeclaration.defaultType, exportScope.copy(genericScope = SwiftGenericExportScope.Class(containingDeclaration, namer)))
             containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
             else -> error("Unsupported containing declaration for $this")
         }

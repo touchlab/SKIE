@@ -1,13 +1,13 @@
 package co.touchlab.skie.api.model.callable.property.regular
 
+import co.touchlab.skie.api.model.callable.swiftModelKind
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class ActualKotlinRegularPropertySwiftModel(
@@ -33,6 +33,8 @@ class ActualKotlinRegularPropertySwiftModel(
 
     override val isChanged: Boolean
         get() = identifier != original.identifier || visibility != original.visibility
+
+    override val kind: KotlinCallableMemberSwiftModel.Kind = descriptor.swiftModelKind
 
     override val type: TypeSwiftModel
         get() = with(swiftModelScope) {

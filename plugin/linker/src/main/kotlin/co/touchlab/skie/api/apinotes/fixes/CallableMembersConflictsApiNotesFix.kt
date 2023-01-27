@@ -172,8 +172,8 @@ class CallableMembersConflictsApiNotesFix(
     private object TryToFixSignatureCollisionVisitor : MutableKotlinCallableMemberSwiftModelVisitor.Unit {
 
         override fun visit(function: MutableKotlinFunctionSwiftModel) {
-            when (function.kind) {
-                KotlinFunctionSwiftModel.Kind.Constructor -> {
+            when (function.role) {
+                KotlinFunctionSwiftModel.Role.Constructor -> {
                     val lastParameter = function.parameters.lastOrNull()
                         ?: error("Constructor $function without parameters can never create a collision.")
 

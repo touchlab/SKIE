@@ -80,7 +80,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                                     }
                                     is FunctionDescriptor -> {
                                         val functionModel = descriptor.swiftModel
-                                        if (functionModel.kind == KotlinFunctionSwiftModel.Kind.Constructor) {
+                                        if (functionModel.role == KotlinFunctionSwiftModel.Role.Constructor) {
                                             return@forEach
                                         }
                                         addFunction(

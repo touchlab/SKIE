@@ -7,7 +7,6 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
@@ -15,13 +14,10 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createSecondary
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.getNamespace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
-import org.jetbrains.kotlin.backend.konan.objcexport.valueParametersAssociated
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irBlockBody
@@ -31,7 +27,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBody
 
 internal class ConstructorsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
-    private val descriptorProvider: NativeDescriptorProvider,
+    private val descriptorProvider: DescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
     collisionDetector: CollisionDetector,
@@ -41,7 +37,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
     override fun generate() {
         descriptorProvider.allSupportedClasses().forEach { classDescriptor ->
             classDescriptor.allSupportedConstructors(descriptorProvider).forEach {
-                generateOverloads(it, descriptorProvider.mapper)
+                generateOverloads(it)
             }
         }
     }
@@ -58,11 +54,9 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
             .filter { it.hasDefaultArguments }
             .filter { descriptorProvider.isExposed(it) }
 
-    private fun generateOverloads(constructor: ClassConstructorDescriptor, mapper: ObjCExportMapper) {
+    private fun generateOverloads(constructor: ClassConstructorDescriptor) {
         constructor.forEachNonCollidingDefaultArgumentOverload { overloadParameters ->
-            val overload = generateOverload(constructor, overloadParameters)
-
-            fixOverloadName(overload, mapper)
+            generateOverload(constructor, overloadParameters)
         }
     }
 
@@ -94,21 +88,4 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
             }
         }
     }
-
-    // TODO Remove
-    private fun fixOverloadName(overload: FunctionDescriptor, mapper: ObjCExportMapper) {
-        skieContext.module.configure {
-            val loweredValueParameters = overload.loweredValueParameters(mapper)
-            val parameterSwiftModels = overload.swiftModel.parameters
-
-            parameterSwiftModels.zip(loweredValueParameters).forEach { (parameterSwiftModel, descriptor) ->
-                if (descriptor != null) {
-                    parameterSwiftModel.argumentLabel = descriptor.name.identifier
-                }
-            }
-        }
-    }
-
-    private fun FunctionDescriptor.loweredValueParameters(mapper: ObjCExportMapper): List<ParameterDescriptor?> =
-        mapper.bridgeMethod(this).valueParametersAssociated(this).map { it.second }
 }

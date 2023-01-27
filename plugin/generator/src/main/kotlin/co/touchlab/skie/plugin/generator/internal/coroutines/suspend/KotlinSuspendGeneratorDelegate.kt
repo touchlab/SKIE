@@ -39,18 +39,14 @@ internal class KotlinSuspendGeneratorDelegate(
     fun generateKotlinBridgingFunction(functionDescriptor: FunctionDescriptor): FunctionDescriptor {
         val bridgingFunctionDescriptor = createBridgingFunction(functionDescriptor)
 
-        hideAndRenameBridgingFunction(bridgingFunctionDescriptor, functionDescriptor)
+        bridgingFunctionDescriptor.hide()
 
         return bridgingFunctionDescriptor
     }
 
-    private fun hideAndRenameBridgingFunction(
-        bridgingFunctionDescriptor: FunctionDescriptor,
-        originalFunctionDescriptor: FunctionDescriptor,
-    ) {
+    private fun FunctionDescriptor.hide() {
         module.configure {
-            bridgingFunctionDescriptor.swiftModel.visibility = SwiftModelVisibility.Hidden
-            bridgingFunctionDescriptor.swiftModel.identifier = originalFunctionDescriptor.suspendWrapperFunctionIdentifier
+            this.swiftModel.visibility = SwiftModelVisibility.Hidden
         }
     }
 

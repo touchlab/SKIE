@@ -5,7 +5,6 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.isReplaced
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
@@ -15,7 +14,7 @@ interface KotlinFunctionSwiftModel : KotlinCallableMemberSwiftModel {
 
     override val allBoundedSwiftModels: List<KotlinFunctionSwiftModel>
 
-    val kind: Kind
+    val role: Role
 
     val isChanged: Boolean
 
@@ -39,7 +38,7 @@ interface KotlinFunctionSwiftModel : KotlinCallableMemberSwiftModel {
     override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
         visitor.visit(this)
 
-    enum class Kind {
+    enum class Role {
         SimpleFunction, Constructor, ConvertedGetter, ConvertedSetter
     }
 }

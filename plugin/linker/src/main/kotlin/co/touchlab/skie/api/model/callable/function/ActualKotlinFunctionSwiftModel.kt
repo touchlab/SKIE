@@ -1,15 +1,14 @@
 package co.touchlab.skie.api.model.callable.function
 
 import co.touchlab.skie.api.model.callable.parameter.ActualKotlinParameterSwiftModel
+import co.touchlab.skie.api.model.callable.swiftModelKind
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
@@ -47,13 +46,15 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val objCSelector: String by core::objCSelector
 
-    override val kind: KotlinFunctionSwiftModel.Kind
+    override val role: KotlinFunctionSwiftModel.Role
         get() = when (descriptor) {
-            is ConstructorDescriptor -> KotlinFunctionSwiftModel.Kind.Constructor
-            is PropertyGetterDescriptor -> KotlinFunctionSwiftModel.Kind.ConvertedGetter
-            is PropertySetterDescriptor -> KotlinFunctionSwiftModel.Kind.ConvertedSetter
-            else -> KotlinFunctionSwiftModel.Kind.SimpleFunction
+            is ConstructorDescriptor -> KotlinFunctionSwiftModel.Role.Constructor
+            is PropertyGetterDescriptor -> KotlinFunctionSwiftModel.Role.ConvertedGetter
+            is PropertySetterDescriptor -> KotlinFunctionSwiftModel.Role.ConvertedSetter
+            else -> KotlinFunctionSwiftModel.Role.SimpleFunction
         }
+
+    override val kind: KotlinCallableMemberSwiftModel.Kind = descriptor.swiftModelKind
 
     override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
 

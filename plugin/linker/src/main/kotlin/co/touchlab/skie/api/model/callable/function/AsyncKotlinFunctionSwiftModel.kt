@@ -1,9 +1,6 @@
 package co.touchlab.skie.api.model.callable.function
 
-import co.touchlab.skie.api.model.callable.property.regular.ActualKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
-import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel

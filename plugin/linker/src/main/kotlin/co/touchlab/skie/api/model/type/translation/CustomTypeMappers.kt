@@ -31,15 +31,15 @@ object CustomTypeMappers {
         result += ListMapper
         result += Simple(ClassId.topLevel(mutableList), "NSMutableArray")
         result += SetMapper
-        result += Collection(mutableSet) { namer.mutableSetName.objCName }
+        result += Collection(mutableSet) { namer.mutableSetName.swiftName }
         result += MapMapper
-        result += Collection(mutableMap) { namer.mutableMapName.objCName }
+        result += Collection(mutableMap) { namer.mutableMapName.swiftName }
 
         NSNumberKind.values().forEach {
             // TODO: NSNumber seem to have different equality semantics.
             val classId = it.mappedKotlinClassId
             if (classId != null) {
-                result += Simple(classId) { namer.numberBoxName(classId).objCName }
+                result += Simple(classId) { namer.numberBoxName(classId).swiftName }
             }
         }
 

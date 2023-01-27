@@ -38,8 +38,7 @@ class ActualKotlinClassSwiftModel(
 
     override val objCFqName: String = namer.getClassOrProtocolName(classDescriptor.original).objCName
 
-    override val swiftGenericExportScope: SwiftGenericExportScope =
-        if (classDescriptor.kind.isInterface) SwiftGenericExportScope.None else SwiftGenericExportScope.Class(classDescriptor, namer)
+    override val swiftGenericExportScope: SwiftGenericExportScope = SwiftGenericExportScope.Class(classDescriptor, namer)
 
     private val originalContainingType by lazy {
         with(swiftModelScope) {

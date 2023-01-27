@@ -1,29 +1,17 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
-import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.reference
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.stableSpec
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeParameterUsageModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeRawUsageModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftInstanceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeProtocolTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftMetaClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftProtocolTypeModel
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
-import co.touchlab.skie.plugin.generator.internal.util.CallableMemberSwiftType
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
-import co.touchlab.skie.plugin.generator.internal.util.swiftKind
+import io.outfoxx.swiftpoet.ANY_OBJECT
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -31,11 +19,8 @@ import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassKind
+import io.outfoxx.swiftpoet.TypeVariableName
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
-import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 
 internal class SwiftSuspendGeneratorDelegate(
     private val module: SkieModule,
@@ -45,118 +30,110 @@ internal class SwiftSuspendGeneratorDelegate(
         originalFunctionDescriptor: FunctionDescriptor,
         kotlinBridgingFunctionDescriptor: FunctionDescriptor,
     ) {
-        if (originalFunctionDescriptor.isFromGenericClass) {
-            return
-        }
-
         module.generateCode(originalFunctionDescriptor) {
+            val bridgeModel = BridgeModel(
+                originalFunction = originalFunctionDescriptor.swiftModel,
+                asyncOriginalFunction = originalFunctionDescriptor.asyncSwiftModel,
+                kotlinBridgingFunction = kotlinBridgingFunctionDescriptor.swiftModel,
+            )
+
             addExtension(
-                ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(originalFunctionDescriptor.swiftModel.receiver.bridgedOrStableFqName))
+                ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(bridgeModel.extensionScopeNameForBridgingFunction))
                     .addModifiers(Modifier.PUBLIC)
-                    .addSwiftBridgingFunction(originalFunctionDescriptor, kotlinBridgingFunctionDescriptor)
+                    .addSwiftBridgingFunction(bridgeModel)
                     .build()
             )
         }
     }
 
-    private val FunctionDescriptor.isFromGenericClass: Boolean
+    private val BridgeModel.extensionScopeNameForBridgingFunction: String
+        get() =
+            if (this.isFromGenericClass) {
+                this.kotlinBridgingFunction.receiver.bridgedOrStableFqName
+            } else {
+                this.originalFunction.receiver.bridgedOrStableFqName
+            }
+
+    private val BridgeModel.isFromGenericClass: Boolean
+        get() = (this.originalFunction.receiver as? SwiftKotlinTypeClassTypeModel)?.typeArguments?.isNotEmpty() ?: false
+
+    private val BridgeModel.typeParameterNames: List<String>
         get() {
-            val classifier = this.dispatchReceiverParameter?.type?.constructor?.declarationDescriptor
+            val receiver = this.originalFunction.receiver as? SwiftKotlinTypeClassTypeModel ?: return emptyList()
 
-            if (classifier !is ClassDescriptor) return false
-
-            return classifier.kind == ClassKind.CLASS && classifier.declaredTypeParameters.isNotEmpty()
+            return receiver.typeArguments.filterIsInstance<SwiftGenericTypeUsageModel>().map { it.typeName }
         }
 
-    context(SwiftModelScope)
-    private fun ExtensionSpec.Builder.addSwiftBridgingFunction(
-        originalFunctionDescriptor: FunctionDescriptor,
-        kotlinBridgingFunctionDescriptor: FunctionDescriptor,
-    ): ExtensionSpec.Builder =
+    private fun ExtensionSpec.Builder.addSwiftBridgingFunction(bridgeModel: BridgeModel): ExtensionSpec.Builder =
         this.apply {
             addFunction(
-                FunctionSpec.builder(originalFunctionDescriptor.suspendWrapperFunctionIdentifier)
-                    .setScope(originalFunctionDescriptor)
+                FunctionSpec.builder(bridgeModel.originalFunction.identifier)
+                    .setScope(bridgeModel)
                     .addAttribute(AttributeSpec.available("iOS" to "13", "macOS" to "10.15", "watchOS" to "6", "tvOS" to "13", "*" to ""))
                     .async(true)
                     .throws(true)
-                    .addValueParameters(originalFunctionDescriptor)
-                    .addReturnType(originalFunctionDescriptor)
-                    .addFunctionBody(originalFunctionDescriptor, kotlinBridgingFunctionDescriptor)
+                    .addTypeParameters(bridgeModel)
+                    .addValueParameters(bridgeModel)
+                    .addReturnType(bridgeModel)
+                    .addFunctionBody(bridgeModel)
                     .build()
             )
         }
 
-    private fun FunctionSpec.Builder.setScope(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.setScope(bridgeModel: BridgeModel): FunctionSpec.Builder =
         this.apply {
-            if (originalFunctionDescriptor.swiftKind == CallableMemberSwiftType.Function ||
-                originalFunctionDescriptor.swiftKind == CallableMemberSwiftType.Extension.Interface
-            ) {
+            if (bridgeModel.originalFunction.scope == KotlinCallableMemberSwiftModel.Scope.Static || bridgeModel.isFromGenericClass) {
                 this.addModifiers(Modifier.STATIC)
             }
         }
 
-    context(SwiftModelScope)
-    private fun FunctionSpec.Builder.addValueParameters(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.addTypeParameters(bridgeModel: BridgeModel): FunctionSpec.Builder =
         this.apply {
-            addReceiversParameters(originalFunctionDescriptor)
+            val typeVariables = bridgeModel.typeParameterNames
+                .map { TypeVariableName.typeVariable(it, TypeVariableName.Bound(ANY_OBJECT)) }
 
-            originalFunctionDescriptor.valueParameters.forEach {
+            addTypeVariables(typeVariables)
+        }
+
+    private fun FunctionSpec.Builder.addValueParameters(bridgeModel: BridgeModel): FunctionSpec.Builder =
+        this.apply {
+            if (bridgeModel.isFromGenericClass) {
+                addDispatchReceiverParameterForGenericClass(bridgeModel)
+            }
+
+            bridgeModel.bridgedParameters.forEach {
                 addValueParameter(it)
             }
         }
 
-    context(SwiftModelScope)
-    private fun FunctionSpec.Builder.addReceiversParameters(originalFunctionDescriptor: FunctionDescriptor) {
-        when (originalFunctionDescriptor.swiftKind) {
-            CallableMemberSwiftType.Extension.Interface -> {
-                addReceiver(originalFunctionDescriptor.swiftReceiverParameterName, originalFunctionDescriptor.extensionReceiverParameter!!)
-            }
-            is CallableMemberSwiftType.Method -> {
-                originalFunctionDescriptor.extensionReceiverParameter?.let {
-                    addReceiver(originalFunctionDescriptor.swiftReceiverParameterName, it)
-                }
-            }
-            else -> {}
-        }
-    }
+    private val BridgeModel.bridgedParameters: List<KotlinParameterSwiftModel>
+        get() = this.originalFunction.parameters.filter { it.origin != KotlinParameterSwiftModel.Origin.SuspendCompletion }
 
-    private val FunctionDescriptor.swiftReceiverParameterName: String
-        get() = "receiver".collisionFreeIdentifier(this.valueParameters).identifier
-
-    context(SwiftModelScope)
-    private fun FunctionSpec.Builder.addReceiver(parameterName: String, receiverParameter: ReceiverParameterDescriptor) {
-        val receiverSwiftModel = receiverParameter.swiftModel
+    private fun FunctionSpec.Builder.addDispatchReceiverParameterForGenericClass(bridgeModel: BridgeModel) {
+        val receiverSwiftModel = bridgeModel.originalFunction.receiver
 
         addParameter(
-            ParameterSpec.builder("_", parameterName, receiverSwiftModel.type.stableSpec)
+            ParameterSpec.builder("_", bridgeModel.genericClassDispatchReceiverParameterName, receiverSwiftModel.stableSpec)
                 .build()
         )
     }
 
-    context(SwiftModelScope)
-    private fun FunctionSpec.Builder.addValueParameter(valueParameter: ValueParameterDescriptor) {
-        val parameterSwiftModel = valueParameter.swiftModel
-        val parameterType = parameterSwiftModel.type
+    private val BridgeModel.genericClassDispatchReceiverParameterName: String
+        get() = "dispatchReceiver".collisionFreeIdentifier(originalFunction.parameters.map { it.argumentLabel })
 
+    private fun FunctionSpec.Builder.addValueParameter(parameter: KotlinParameterSwiftModel) {
         addParameter(
-            ParameterSpec.builder(parameterSwiftModel.argumentLabel, parameterSwiftModel.parameterName, parameterType.stableSpec)
+            ParameterSpec.builder(parameter.argumentLabel, parameter.parameterName, parameter.type.stableSpec)
                 .build()
         )
     }
 
-    context(SwiftModelScope)
-    private fun FunctionSpec.Builder.addReturnType(originalFunctionDescriptor: FunctionDescriptor): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.addReturnType(bridgeModel: BridgeModel): FunctionSpec.Builder =
         this.apply {
-            val asyncSwiftModel = originalFunctionDescriptor.asyncSwiftModel
-            returns(asyncSwiftModel.returnType.stableSpec)
+            returns(bridgeModel.asyncOriginalFunction.returnType.stableSpec)
         }
 
-    context(SwiftModelScope)
-    private fun FunctionSpec.Builder.addFunctionBody(
-        originalFunctionDescriptor: FunctionDescriptor,
-        kotlinBridgingFunction: FunctionDescriptor,
-    ): FunctionSpec.Builder =
+    private fun FunctionSpec.Builder.addFunctionBody(bridgeModel: BridgeModel): FunctionSpec.Builder =
         this.apply {
             addCode(
                 CodeBlock.builder()
@@ -164,10 +141,10 @@ internal class SwiftSuspendGeneratorDelegate(
                     .indent()
                     .apply {
                         addStatement(
-                            "%N.%N(${originalFunctionDescriptor.valueParametersPlaceholders})",
-                            kotlinBridgingFunction.swiftModel.receiver.stableFqName,
-                            kotlinBridgingFunction.swiftModel.reference,
-                            *originalFunctionDescriptor.argumentsForBridgingCall.toTypedArray(),
+                            "%N.%N(${bridgeModel.valueParametersPlaceholders})",
+                            bridgeModel.kotlinBridgingFunction.receiver.stableFqName,
+                            bridgeModel.kotlinBridgingFunction.reference,
+                            *bridgeModel.argumentsForBridgingCall.toTypedArray(),
                         )
                     }
                     .unindent()
@@ -176,40 +153,39 @@ internal class SwiftSuspendGeneratorDelegate(
             )
         }
 
-    context(SwiftModelScope)
-    private val FunctionDescriptor.valueParametersPlaceholders: String
+    private val BridgeModel.valueParametersPlaceholders: String
         get() = (this.argumentsForBridgingCall.map { "%N" } + "$0").joinToString(", ")
 
-    context(SwiftModelScope)
-    private val FunctionDescriptor.argumentsForBridgingCall: List<String>
+    private val BridgeModel.argumentsForBridgingCall: List<String>
         get() {
             val arguments = mutableListOf<String>()
 
-            arguments.addReceiversArguments(this)
+            arguments.addDispatchReceiver(this)
 
-            this.valueParameters.forEach {
-                arguments.add(it.swiftModel.parameterName)
+            this.bridgedParameters.forEach {
+                arguments.add(it.parameterName)
             }
 
             return arguments
         }
 
-    context(SwiftModelScope)
-    private fun MutableList<String>.addReceiversArguments(originalFunctionDescriptor: FunctionDescriptor) {
-        when (originalFunctionDescriptor.swiftKind) {
-            CallableMemberSwiftType.Extension.Class, CallableMemberSwiftType.Extension.Enum -> {
-                add("self")
-            }
-            CallableMemberSwiftType.Extension.Interface -> {
-                add(originalFunctionDescriptor.swiftReceiverParameterName)
-            }
-            is CallableMemberSwiftType.Method -> {
-                add("self")
-                originalFunctionDescriptor.extensionReceiverParameter?.let {
-                    add(originalFunctionDescriptor.swiftReceiverParameterName)
-                }
-            }
-            CallableMemberSwiftType.Function -> {}
+    private fun MutableList<String>.addDispatchReceiver(bridgeModel: BridgeModel) {
+        if (bridgeModel.originalFunction.scope == KotlinCallableMemberSwiftModel.Scope.Static) {
+            return
+        }
+
+        if (bridgeModel.isFromGenericClass) {
+            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.parameters.first().type.stableFqName
+
+            add(bridgeModel.genericClassDispatchReceiverParameterName + " as! " + dispatchReceiverErasedType)
+        } else {
+            add("self")
         }
     }
+
+    private data class BridgeModel(
+        val originalFunction: KotlinFunctionSwiftModel,
+        val asyncOriginalFunction: KotlinFunctionSwiftModel,
+        val kotlinBridgingFunction: KotlinFunctionSwiftModel,
+    )
 }
