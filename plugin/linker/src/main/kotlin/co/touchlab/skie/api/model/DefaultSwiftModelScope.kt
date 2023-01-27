@@ -91,6 +91,9 @@ class DefaultSwiftModelScope(
     override val PropertyDescriptor.convertedPropertySwiftModel: MutableKotlinConvertedPropertySwiftModel
         get() = convertedPropertySwiftModels[this.original] ?: throwUnknownDescriptor()
 
+    override val ClassDescriptor.hasSwiftModel: Boolean
+        get() = classSwiftModels.containsKey(this.original)
+
     override val ClassDescriptor.swiftModel: MutableKotlinClassSwiftModel
         get() = classSwiftModels[this.original] ?: throwUnknownDescriptor()
 

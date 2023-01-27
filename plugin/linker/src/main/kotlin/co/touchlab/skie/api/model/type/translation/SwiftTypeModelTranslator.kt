@@ -172,12 +172,16 @@ class SwiftTypeTranslator(
             when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
                 else -> {
-                    val model = translateClassOrInterfaceName(classDescriptor, swiftExportScope)
-                    if (model is KotlinTypeSwiftModel) {
-                        SwiftKotlinTypeProtocolTypeModel(model)
-                    } else {
-                        SwiftProtocolTypeModel(model.stableFqName)
-                    }
+                    translateClassOrInterfaceName(
+                        descriptor = classDescriptor,
+                        exportScope = swiftExportScope,
+                        ifKotlinType = { SwiftKotlinTypeProtocolTypeModel(it) },
+                        ifSwiftBridge = {
+                            // TODO: This mapping won't probably work very well
+                            SwiftProtocolTypeModel(it.stableFqName)
+                        },
+                        ifSwiftType = { SwiftProtocolTypeModel(it) },
+                    )
                 }
             }
         } else {
@@ -190,12 +194,13 @@ class SwiftTypeTranslator(
                 }
             }
 
-            val model = translateClassOrInterfaceName(classDescriptor, swiftExportScope)
-            if (model is KotlinTypeSwiftModel) {
-                SwiftKotlinTypeClassTypeModel(model, typeArgs)
-            } else {
-                SwiftClassTypeModel(model.stableFqName, typeArgs)
-            }
+            translateClassOrInterfaceName(
+                descriptor = classDescriptor,
+                exportScope = swiftExportScope,
+                ifKotlinType = { SwiftKotlinTypeClassTypeModel(it, typeArgs) },
+                ifSwiftBridge = { SwiftClassTypeModel(it.stableFqName, typeArgs) },
+                ifSwiftType = { SwiftClassTypeModel(it, typeArgs) },
+            )
         }
     }
 
@@ -306,23 +311,34 @@ class SwiftTypeTranslator(
     }
 
     context(SwiftModelScope)
-    private fun translateClassOrInterfaceName(descriptor: ClassDescriptor, exportScope: SwiftExportScope): TypeSwiftModel {
+    private fun translateClassOrInterfaceName(
+        descriptor: ClassDescriptor,
+        exportScope: SwiftExportScope,
+        ifKotlinType: (KotlinTypeSwiftModel) -> SwiftNonNullReferenceTypeModel,
+        ifSwiftBridge: (TypeSwiftModel) -> SwiftNonNullReferenceTypeModel,
+        ifSwiftType: (String) -> SwiftNonNullReferenceTypeModel,
+    ): SwiftNonNullReferenceTypeModel {
         assert(descriptorProvider.isTransitivelyExposed(descriptor)) { "Shouldn't be exposed: $descriptor" }
 
         if (ErrorUtils.isError(descriptor)) {
             return SwiftErrorTypeModel
         }
-        val swiftModel = descriptor.swiftModel
-        val bridge = swiftModel.bridge
 
-        return when {
-            exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> swiftModel
-            exportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> if (bridge is SwiftTypeSwiftModel && bridge.isHashable) {
-                bridge
-            } else {
-                swiftModel
+        return if (descriptor.hasSwiftModel) {
+            val swiftModel = descriptor.swiftModel
+            val bridge = swiftModel.bridge
+
+            when {
+                exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> ifKotlinType(swiftModel)
+                exportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> if (bridge is SwiftTypeSwiftModel && bridge.isHashable) {
+                    ifSwiftBridge(bridge)
+                } else {
+                    ifKotlinType(swiftModel)
+                }
+                else -> swiftModel.bridge?.let(ifSwiftBridge) ?: swiftModel.let(ifKotlinType)
             }
-            else -> swiftModel.bridge ?: swiftModel
+        } else {
+            ifSwiftType(namer.getClassOrProtocolName(descriptor).swiftName)
         }
     }
 }

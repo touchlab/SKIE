@@ -38,6 +38,8 @@ interface SwiftModelScope {
 
     val PropertyDescriptor.convertedPropertySwiftModel: KotlinConvertedPropertySwiftModel
 
+    val ClassDescriptor.hasSwiftModel: Boolean
+
     val ClassDescriptor.swiftModel: KotlinTypeSwiftModel
 
     val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
