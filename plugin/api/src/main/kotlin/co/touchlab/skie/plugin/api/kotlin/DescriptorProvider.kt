@@ -53,4 +53,5 @@ fun DescriptorProvider.getAllExposedMembers(classDescriptor: ClassDescriptor): L
 
 val DescriptorProvider.allExposedMembers: List<CallableMemberDescriptor>
     get() = (this.exposedFiles.flatMap { this.getExposedStaticMembers(it) } +
-        this.exposedClasses.flatMap { this.getAllExposedMembers(it) })
+        this.exposedClasses.flatMap { this.getExposedClassMembers(it) + this.getExposedConstructors(it) }) +
+        this.exposedCategoryMembers

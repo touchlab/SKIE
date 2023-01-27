@@ -135,7 +135,6 @@ kotlin {
             api("io.ktor:ktor-client-core:2.2.2")
             api("com.squareup.sqldelight:gradle-plugin:1.5.4")
             api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-            api("io.ktor:ktor-client-core:2.2.2")
             api("io.github.aakira:napier:2.6.1")
             api("com.apollographql.apollo3:apollo-runtime:3.7.3")
             api("com.juul.kable:core:0.20.1")
