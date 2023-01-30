@@ -9,6 +9,8 @@ Skie is a compiler plugin that generates Swift wrappers of the Objective-C heade
 
 SKIE currently supports the following features:
 
+- Suspend interop
+- Fixing unnecessarily mangled function names
 - Sealed classes/interfaces
 - Exhaustive enums
 - Default arguments
@@ -20,11 +22,7 @@ production project.*
 
 ## Supported features
 
-### Coroutine Interop
-
-SKIE adds support for using Kotlin coroutines in Swift's structured concurrency model. Although Kotlin produces API for `suspend` functions that can be called from Swift, it loses support for cooperative cancellation. Additionally, SKIE's coroutine interop maps `Flow`, `StateFlow` and `SharedFlow` (and their mutable counterparts) to structures usable from Swift.
-
-#### Suspend wrappers
+### Suspend Interop
 
 SKIE generates Kotlin functions for each `suspend fun` declaration that'd be visible from Swift. Additionally, SKIE generates a Swift function that replaces the original `suspend fun` declaration. The signature of the Swift function matches the original Kotlin function, for example:
 
@@ -40,9 +38,55 @@ func helloWorld(input: String) throws async -> String
 
 Your Swift code would then call the `hellWorld(input:)` Swift function, as the original gets hidden by SKIE.
 
-#### Flows, StateFlows and SharedFlows
+### Fixing unnecessarily mangled function names
 
-TODO: When implemented.
+Kotlin, ObjC and Swift each have a different level of support for function overloading.
+Kotlin distinguishes overloads by their parameter types.
+ObjC uses argument labels (parameter names in Kotlin) but does not use the parameter types.
+Swift combines these two approaches and allows for overloads to have the same parameters types if some argument labels are different.
+
+The Kotlin compiler solves these differences by adding `_` at the end of the function identifier (or at the end of the last argument label).
+The problem, that Skie addresses, is that the Kotlin compiler uses the same conflict detection rules for both ObjC and Swift.
+As a result Swift function names are in many occasions unnecessarily mangled. For example:
+
+```kotlin
+fun foo(i: Int)
+
+fun foo(i: String)
+```
+
+would translate to: `foo(i:)` and `foo(i_:)` - even-though the underscore is not necessary for Swift to call the correct function.
+
+Skie implements its own conflict resolution algorithm that removes these unnecessary underscores.
+
+However, there are still some occasions where these underscore are necessary (meaning Skie cannot remove them):
+
+*Non-exposed classes used as parameter type* - Some types (like Value classes) are not exposed to ObjC.
+Instead, the compiler replaces these types with some other supported type (in case of value classes it's the wrapped type).
+For this reason some functions might end up with the same signature in Swift (even-though they have different signatures in Kotlin).
+For example:
+
+```kotlin
+value class V(val value: Int)
+
+fun foo(v: V)
+
+fun foo(v: Int)
+```
+
+*Properties and parameterless functions* - In Kotlin it's completely fine to have a property with the same name as a parameterless functions.
+For example:
+
+```kotlin
+fun foo(): Int
+
+val foo: Int
+```
+
+The problem is that Swift cannot distinguish these two declarations.
+This is not an issue you would notice without using Skie because the Kotlin compiler uses a different workaround.
+Unfortunately, this workaround cannot be used by Skie because it only works due to the Swift-ObjC interop.
+Skie generates true Swift code, and therefore, Skie has no option but to add these underscores.
 
 ### Sealed classes/interfaces
 
