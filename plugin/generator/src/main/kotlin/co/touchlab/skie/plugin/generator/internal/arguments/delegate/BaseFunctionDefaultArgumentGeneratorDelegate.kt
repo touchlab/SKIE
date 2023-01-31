@@ -5,7 +5,8 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
+import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
@@ -34,9 +35,8 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     private val descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
-    collisionDetector: CollisionDetector,
     private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration, collisionDetector) {
+) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
 
     override fun generate() {
         descriptorProvider.allSupportedFunctions()
@@ -52,7 +52,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     protected abstract fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor>
 
     private fun generateOverloads(function: SimpleFunctionDescriptor) {
-        function.forEachNonCollidingDefaultArgumentOverload { overloadParameters ->
+        function.forEachDefaultArgumentOverload { overloadParameters ->
             generateOverload(function, overloadParameters)
         }
     }
@@ -71,7 +71,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         parameters: List<ValueParameterDescriptor>,
     ): FunctionDescriptor =
         declarationBuilder.createFunction(
-            name = "Skie_DefaultArguments__${sharedCounter.next()}__${function.name.identifier}",
+            name = "${function.name.identifier}${uniqueNameSubstring}${sharedCounter.next()}",
             namespace = declarationBuilder.getNamespace(function),
             annotations = function.annotations,
         ) {
@@ -109,6 +109,10 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     private fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
         skieContext.module.configure {
             overloadDescriptor.swiftModel.identifier = function.swiftModel.identifier
+
+            val numberOfDefaultArguments = function.valueParameters.size - overloadDescriptor.valueParameters.size
+
+            overloadDescriptor.swiftModel.collisionResolutionStrategy = CollisionResolutionStrategy.Remove(numberOfDefaultArguments)
         }
     }
 }

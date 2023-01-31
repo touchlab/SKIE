@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.function.reference
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageModel

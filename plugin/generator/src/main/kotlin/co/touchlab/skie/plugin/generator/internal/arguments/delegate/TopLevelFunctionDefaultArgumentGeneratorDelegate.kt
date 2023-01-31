@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
@@ -15,14 +14,12 @@ internal class TopLevelFunctionDefaultArgumentGeneratorDelegate(
     descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
-    collisionDetector: CollisionDetector,
     sharedCounter: SharedCounter,
 ) : BaseFunctionDefaultArgumentGeneratorDelegate(
     skieContext = skieContext,
     descriptorProvider = descriptorProvider,
     declarationBuilder = declarationBuilder,
     configuration = configuration,
-    collisionDetector = collisionDetector,
     sharedCounter = sharedCounter,
 ) {
 

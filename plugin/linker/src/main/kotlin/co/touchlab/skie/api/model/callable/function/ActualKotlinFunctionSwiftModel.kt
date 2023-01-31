@@ -5,6 +5,7 @@ import co.touchlab.skie.api.model.callable.swiftModelKind
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
@@ -56,10 +57,13 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val kind: KotlinCallableMemberSwiftModel.Kind = descriptor.swiftModelKind
 
+    override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
+
     override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
 
     override val isChanged: Boolean
-        get() = identifier != original.identifier || visibility != original.visibility || parameters.any { it.isChanged }
+        get() = identifier != original.identifier || visibility != original.visibility || parameters.any { it.isChanged } ||
+            collisionResolutionStrategy != original.collisionResolutionStrategy
 
     override val returnType: TypeSwiftModel
         get() = with(swiftModelScope) {

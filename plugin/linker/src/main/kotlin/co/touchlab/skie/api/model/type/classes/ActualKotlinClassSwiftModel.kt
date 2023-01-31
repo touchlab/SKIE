@@ -13,7 +13,6 @@ import co.touchlab.skie.util.mutableLazy
 import co.touchlab.skie.util.swiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 

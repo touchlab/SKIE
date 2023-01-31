@@ -109,9 +109,15 @@ class DefaultSwiftModelScope(
 
         val exportScope = SwiftExportScope(SwiftGenericExportScope.None, SwiftExportScope.Flags.ReferenceType)
         return when {
-            categoryClass != null -> translator.mapReferenceType(categoryClass.defaultType, exportScope.copy(genericScope = SwiftGenericExportScope.Class(categoryClass, namer)))
+            categoryClass != null -> translator.mapReferenceType(
+                categoryClass.defaultType,
+                exportScope.copy(genericScope = SwiftGenericExportScope.Class(categoryClass, namer))
+            )
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
-            containingDeclaration is ClassDescriptor -> translator.mapReferenceType(containingDeclaration.defaultType, exportScope.copy(genericScope = SwiftGenericExportScope.Class(containingDeclaration, namer)))
+            containingDeclaration is ClassDescriptor -> translator.mapReferenceType(
+                containingDeclaration.defaultType,
+                exportScope.copy(genericScope = SwiftGenericExportScope.Class(containingDeclaration, namer))
+            )
             containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
             else -> error("Unsupported containing declaration for $this")
         }
@@ -133,7 +139,7 @@ class DefaultSwiftModelScope(
 
     override fun FunctionDescriptor.asyncReturnTypeModel(
         genericExportScope: SwiftGenericExportScope,
-        bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion
+        bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion,
     ): SwiftTypeModel {
         val exportScope = SwiftExportScope(genericExportScope)
         return if (bridge.useUnitCompletion) {

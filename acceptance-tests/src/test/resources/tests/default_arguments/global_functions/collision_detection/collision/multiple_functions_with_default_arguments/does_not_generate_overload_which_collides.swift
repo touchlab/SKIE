@@ -1,4 +1,4 @@
-# Skip
+# SwiftCompilationError(error: missing argument for parameter 'm' in call)
 
 let r0 = AKt.foo(i: 0)
 let r1 = AKt.foo()

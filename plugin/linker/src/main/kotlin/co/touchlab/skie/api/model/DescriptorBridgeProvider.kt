@@ -6,23 +6,24 @@ import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
+import co.touchlab.skie.plugin.reflection.reflectors.mapper
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge as InternalMethodBridge
-import org.jetbrains.kotlin.backend.konan.objcexport.TypeBridge as InternalTypeBridge
-import org.jetbrains.kotlin.backend.konan.objcexport.ReferenceBridge as InternalReferenceBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.BlockPointerBridge as InternalBlockPointerBridge
-import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge as InternalValueTypeBridge
+import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge as InternalMethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeReceiver as InternalMethodBridgeReceiver
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter as InternalMethodBridgeValueParameter
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCValueType as InternalObjCValueType
-import co.touchlab.skie.plugin.reflection.reflectors.mapper
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
+import org.jetbrains.kotlin.backend.konan.objcexport.ReferenceBridge as InternalReferenceBridge
+import org.jetbrains.kotlin.backend.konan.objcexport.TypeBridge as InternalTypeBridge
+import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge as InternalValueTypeBridge
 
 class DescriptorBridgeProvider internal constructor(
     private val mapper: ObjCExportMapper,
 ) {
-    constructor(namer: ObjCExportNamer): this(namer.mapper)
+
+    constructor(namer: ObjCExportNamer) : this(namer.mapper)
 
     internal fun bridgeMethod(descriptor: FunctionDescriptor): MethodBridge {
         return mapper.bridgeMethod(descriptor).toMethodBridge()

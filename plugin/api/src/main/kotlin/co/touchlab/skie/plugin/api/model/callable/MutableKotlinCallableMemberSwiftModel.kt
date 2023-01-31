@@ -8,5 +8,7 @@ interface MutableKotlinCallableMemberSwiftModel : KotlinCallableMemberSwiftModel
 
     override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>
 
+    override val directlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
+
     fun <OUT> accept(visitor: MutableKotlinCallableMemberSwiftModelVisitor<OUT>): OUT
 }

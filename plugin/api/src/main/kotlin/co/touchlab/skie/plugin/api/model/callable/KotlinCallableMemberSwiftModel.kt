@@ -7,6 +7,8 @@ interface KotlinCallableMemberSwiftModel {
 
     val descriptor: CallableMemberDescriptor
 
+    val original: KotlinCallableMemberSwiftModel
+
     val receiver: TypeSwiftModel
 
     val kind: Kind
@@ -15,6 +17,8 @@ interface KotlinCallableMemberSwiftModel {
         get() = if (kind in listOf(Kind.Global, Kind.Extension.Interface)) Scope.Static else Scope.Member
 
     val allBoundedSwiftModels: List<KotlinCallableMemberSwiftModel>
+
+    val directlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
 
     fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT
 

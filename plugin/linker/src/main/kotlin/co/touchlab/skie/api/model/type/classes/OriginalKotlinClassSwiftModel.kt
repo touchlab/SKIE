@@ -2,7 +2,6 @@ package co.touchlab.skie.api.model.type.classes
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 
 class OriginalKotlinClassSwiftModel(

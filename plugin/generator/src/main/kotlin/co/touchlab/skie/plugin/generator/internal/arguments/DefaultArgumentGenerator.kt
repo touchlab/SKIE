@@ -1,10 +1,7 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.plugin.generator.internal.arguments
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ClassMethodsDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ConstructorsDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ExtensionFunctionDefaultArgumentGeneratorDelegate
@@ -25,15 +22,12 @@ internal class DefaultArgumentGenerator(
 
     private val sharedCounter = SharedCounter()
 
-    private val collisionDetector = CollisionDetector(descriptorProvider)
-
     private val delegates = listOf(
         ClassMethodsDefaultArgumentGeneratorDelegate(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
             configuration = configuration,
-            collisionDetector = collisionDetector,
             sharedCounter = sharedCounter,
         ),
         ConstructorsDefaultArgumentGeneratorDelegate(
@@ -41,7 +35,6 @@ internal class DefaultArgumentGenerator(
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
             configuration = configuration,
-            collisionDetector = collisionDetector,
             sharedCounter = sharedCounter
         ),
         TopLevelFunctionDefaultArgumentGeneratorDelegate(
@@ -49,7 +42,6 @@ internal class DefaultArgumentGenerator(
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
             configuration = configuration,
-            collisionDetector = collisionDetector,
             sharedCounter = sharedCounter
         ),
         ExtensionFunctionDefaultArgumentGeneratorDelegate(
@@ -57,7 +49,6 @@ internal class DefaultArgumentGenerator(
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
             configuration = configuration,
-            collisionDetector = collisionDetector,
             sharedCounter = sharedCounter
         ),
     )

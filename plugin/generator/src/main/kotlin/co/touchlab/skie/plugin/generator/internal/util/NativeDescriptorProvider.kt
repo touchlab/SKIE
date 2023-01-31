@@ -12,8 +12,8 @@ import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
@@ -138,7 +138,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     override fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
         mutableExposedCategoryMembers[classDescriptor] ?: emptyList()
 
-    override fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ConstructorDescriptor> =
+    override fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ClassConstructorDescriptor> =
         classDescriptor.constructors.filter { isExposed(it) }
 
     override fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor> =

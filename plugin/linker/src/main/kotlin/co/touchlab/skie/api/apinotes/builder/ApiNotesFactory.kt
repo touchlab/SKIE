@@ -6,10 +6,8 @@ import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.function.name
 import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.callable.property.regular.name
 import co.touchlab.skie.plugin.api.model.isHidden
 import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.isReplaced

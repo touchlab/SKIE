@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.enums
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.type.simpleName
 import co.touchlab.skie.plugin.api.module.stableSpec
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock

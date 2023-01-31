@@ -3,8 +3,6 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.DefaultArgumentInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.generator.internal.arguments.collision.CollisionDetector
-import co.touchlab.skie.plugin.generator.internal.arguments.collision.toFunctionSignature
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -22,8 +20,9 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
     protected val skieContext: SkieContext,
     protected val declarationBuilder: DeclarationBuilder,
     override val configuration: Configuration,
-    private val collisionDetector: CollisionDetector,
 ) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
+
+    protected val uniqueNameSubstring = "__Skie_DefaultArguments__"
 
     protected val FunctionDescriptor.hasDefaultArguments: Boolean
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
@@ -37,20 +36,7 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
     private val FunctionDescriptor.defaultArgumentCount: Int
         get() = this.valueParameters.count { it.declaresOrInheritsDefaultValue() }
 
-    protected fun FunctionDescriptor.forEachNonCollidingDefaultArgumentOverload(
-        action: (overloadParameters: List<ValueParameterDescriptor>) -> Unit,
-    ) {
-        this.forEachDefaultArgumentOverload { overloadParameters ->
-            val overloadSignature = this.toFunctionSignature().copy(overloadParameters)
-
-            val createsCollision = collisionDetector.createsCollision(overloadSignature)
-            if (!createsCollision) {
-                action(overloadParameters)
-            }
-        }
-    }
-
-    private fun FunctionDescriptor.forEachDefaultArgumentOverload(
+    protected fun FunctionDescriptor.forEachDefaultArgumentOverload(
         action: (overloadParameters: List<ValueParameterDescriptor>) -> Unit,
     ) {
         val parametersWithDefaultValues = this.valueParameters.filter { it.declaresOrInheritsDefaultValue() }
@@ -94,6 +80,6 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
         }
     }
 
-    private fun IrFunction.indexOfValueParameterByName(name: Name): Int =
+    protected open fun IrFunction.indexOfValueParameterByName(name: Name): Int =
         this.valueParameters.indexOfFirst { it.name == name }
 }

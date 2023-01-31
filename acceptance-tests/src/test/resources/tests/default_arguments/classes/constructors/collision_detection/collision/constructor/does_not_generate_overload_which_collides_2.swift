@@ -1,3 +1,3 @@
-# SwiftCompilationError(incorrect labels for candidate (have: '(i_:)', expected: '(i:)'))
+# SwiftCompilationError(error: 'init()' is unavailable)
 
-exit(A(i_: 0).value)
+A()

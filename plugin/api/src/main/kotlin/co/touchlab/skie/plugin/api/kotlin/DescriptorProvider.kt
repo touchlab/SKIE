@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.api.kotlin
 
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -39,7 +40,7 @@ interface DescriptorProvider {
      */
     fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor>
 
-    fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ConstructorDescriptor>
+    fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ClassConstructorDescriptor>
 
     fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor>
 

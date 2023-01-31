@@ -1,4 +1,4 @@
-package co.touchlab.skie.api.apinotes.fixes
+package co.touchlab.skie.api.apinotes.fixes.memberconflicts
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers

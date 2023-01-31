@@ -15,6 +15,7 @@ import co.touchlab.skie.api.model.type.files.ActualKotlinFileSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
@@ -80,7 +81,7 @@ class SwiftModelFactory(
     private fun createBoundedRegularProperties(
         group: List<PropertyDescriptor>,
     ): Map<CallableMemberDescriptor, MutableKotlinRegularPropertySwiftModel> {
-        val allBoundedSwiftModels = mutableListOf<MutableKotlinCallableMemberSwiftModel>()
+        val allBoundedSwiftModels = mutableListOf<MutableKotlinDirectlyCallableMemberSwiftModel>()
 
         val core = KotlinRegularPropertySwiftModelCore(group.representative, namer)
 
@@ -166,5 +167,4 @@ class SwiftModelFactory(
                     .map { it.descriptor to it }
             }
             .toMap()
-
 }

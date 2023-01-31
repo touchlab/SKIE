@@ -1,5 +1,3 @@
-# Skip
-
 let b = B()
 
 let r0 = b.foo(i: 0)

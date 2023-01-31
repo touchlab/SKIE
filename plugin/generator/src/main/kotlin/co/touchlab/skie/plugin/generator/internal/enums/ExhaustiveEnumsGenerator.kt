@@ -8,9 +8,7 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.callable.function.reference
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.callable.property.regular.reference
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
 import co.touchlab.skie.plugin.api.model.type.packageName

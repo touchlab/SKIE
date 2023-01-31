@@ -7,9 +7,7 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class ActualKotlinConvertedPropertySwiftModel(
@@ -39,9 +37,6 @@ class ActualKotlinConvertedPropertySwiftModel(
     override val original: KotlinConvertedPropertySwiftModel = OriginalKotlinConvertedPropertySwiftModel(this)
 
     override val kind: KotlinCallableMemberSwiftModel.Kind = descriptor.swiftModelKind
-
-    override val type: TypeSwiftModel
-        get() = TODO("Not yet implemented")
 
     override fun toString(): String = descriptor.toString()
 }
