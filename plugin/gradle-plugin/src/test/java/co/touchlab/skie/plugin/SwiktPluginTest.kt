@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin
 
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Test
+import kotlin.test.Test
 
 class SwiktPluginTest {
 
