@@ -104,20 +104,16 @@ class DefaultSwiftModelScope(
             ?: throw IllegalArgumentException("File $this is not exposed and therefore does not have a SwiftModel.")
 
     override fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel {
-        val categoryClass = descriptorProvider.getClassIfCategory(this)
+        val receiverClassDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(this)
         val containingDeclaration = containingDeclaration
 
         val exportScope = SwiftExportScope(SwiftGenericExportScope.None, SwiftExportScope.Flags.ReferenceType)
         return when {
-            categoryClass != null -> translator.mapReferenceType(
-                categoryClass.defaultType,
-                exportScope.copy(genericScope = SwiftGenericExportScope.Class(categoryClass, namer))
+            receiverClassDescriptor != null -> translator.mapReferenceType(
+                receiverClassDescriptor.defaultType,
+                exportScope.copy(genericScope = SwiftGenericExportScope.Class(receiverClassDescriptor, namer))
             )
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
-            containingDeclaration is ClassDescriptor -> translator.mapReferenceType(
-                containingDeclaration.defaultType,
-                exportScope.copy(genericScope = SwiftGenericExportScope.Class(containingDeclaration, namer))
-            )
             containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
             else -> error("Unsupported containing declaration for $this")
         }

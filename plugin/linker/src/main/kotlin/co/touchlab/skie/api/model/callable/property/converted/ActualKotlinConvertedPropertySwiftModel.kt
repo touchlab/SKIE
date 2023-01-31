@@ -3,7 +3,9 @@ package co.touchlab.skie.api.model.callable.property.converted
 import co.touchlab.skie.api.model.callable.swiftModelKind
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
@@ -39,4 +41,10 @@ class ActualKotlinConvertedPropertySwiftModel(
     override val kind: KotlinCallableMemberSwiftModel.Kind = descriptor.swiftModelKind
 
     override fun toString(): String = descriptor.toString()
+
+    override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
+        visitor.visit(this)
+
+    override fun <OUT> accept(visitor: MutableKotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
+        visitor.visit(this)
 }

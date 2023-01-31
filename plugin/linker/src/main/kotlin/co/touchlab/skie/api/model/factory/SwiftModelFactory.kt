@@ -5,9 +5,11 @@ package co.touchlab.skie.api.model.factory
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.callable.function.ActualKotlinFunctionSwiftModel
 import co.touchlab.skie.api.model.callable.function.AsyncKotlinFunctionSwiftModel
+import co.touchlab.skie.api.model.callable.function.HiddenOverrideKotlinFunctionSwiftModel
 import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelCore
 import co.touchlab.skie.api.model.callable.property.converted.ActualKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.api.model.callable.property.regular.ActualKotlinRegularPropertySwiftModel
+import co.touchlab.skie.api.model.callable.property.regular.HiddenOverrideKotlinRegularPropertySwiftModel
 import co.touchlab.skie.api.model.callable.property.regular.KotlinRegularPropertySwiftModelCore
 import co.touchlab.skie.api.model.type.classes.ActualKotlinClassSwiftModel
 import co.touchlab.skie.api.model.type.enumentry.ActualKotlinEnumEntrySwiftModel
@@ -16,6 +18,7 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
@@ -40,6 +43,8 @@ class SwiftModelFactory(
     private val namer: ObjCExportNamer,
     private val bridgeProvider: DescriptorBridgeProvider,
 ) {
+
+    private val exposedClassChildrenCache = ExposedClassChildrenCache(descriptorProvider)
 
     fun createMembers(descriptors: List<CallableMemberDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> {
         val disjointSet = MultiRootDisjointSet<CallableMemberDescriptor> { descriptor ->
@@ -69,6 +74,21 @@ class SwiftModelFactory(
         return group
             .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }
             .also { allBoundedSwiftModels.addAll(it.values) }
+            .also { allBoundedSwiftModels.addHiddenOverrides(group, it.values.first()) }
+    }
+
+    private fun MutableList<MutableKotlinFunctionSwiftModel>.addHiddenOverrides(
+        group: List<FunctionDescriptor>,
+        representativeModel: MutableKotlinFunctionSwiftModel,
+    ) {
+        if (representativeModel.role == KotlinFunctionSwiftModel.Role.Constructor) {
+            return
+        }
+
+        val hiddenOverrides = group.getMissingChildClasses()
+            .map { HiddenOverrideKotlinFunctionSwiftModel(representativeModel, it, swiftModelScope) }
+
+        this.addAll(hiddenOverrides)
     }
 
     private fun createBoundedProperties(group: List<PropertyDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
@@ -88,10 +108,28 @@ class SwiftModelFactory(
         return group
             .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }
             .also { allBoundedSwiftModels.addAll(it.values) }
+            .also { allBoundedSwiftModels.addHiddenOverrides(group, it.values.first()) }
             .mapKeys {
                 @Suppress("USELESS_CAST")
                 it.key as CallableMemberDescriptor
             }
+    }
+
+    private fun MutableList<MutableKotlinDirectlyCallableMemberSwiftModel>.addHiddenOverrides(
+        group: List<PropertyDescriptor>,
+        representativeModel: MutableKotlinRegularPropertySwiftModel,
+    ) {
+        val hiddenOverrides = group.getMissingChildClasses()
+            .map { HiddenOverrideKotlinRegularPropertySwiftModel(representativeModel, it, swiftModelScope) }
+
+        this.addAll(hiddenOverrides)
+    }
+
+    private fun List<CallableMemberDescriptor>.getMissingChildClasses(): Set<ClassDescriptor> {
+        val allBaseClasses = this.mapNotNull { descriptorProvider.getReceiverClassDescriptorOrNull(it) }
+        val allChildrenClasses = allBaseClasses.flatMap { exposedClassChildrenCache.getExposedChildren(it) }
+
+        return allChildrenClasses.toSet() - allBaseClasses.toSet()
     }
 
     private fun createBoundedConvertedProperties(

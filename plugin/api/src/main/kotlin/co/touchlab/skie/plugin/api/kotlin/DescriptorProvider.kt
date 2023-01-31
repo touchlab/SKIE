@@ -43,7 +43,7 @@ interface DescriptorProvider {
 
     fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor>
 
-    fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor?
+    fun getReceiverClassDescriptorOrNull(descriptor: CallableMemberDescriptor): ClassDescriptor?
 }
 
 fun DescriptorProvider.getAllExposedMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =

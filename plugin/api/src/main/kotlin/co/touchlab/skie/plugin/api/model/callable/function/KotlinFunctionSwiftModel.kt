@@ -1,9 +1,7 @@
 package co.touchlab.skie.plugin.api.model.callable.function
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -33,12 +31,6 @@ interface KotlinFunctionSwiftModel : KotlinDirectlyCallableMemberSwiftModel {
 
     override val name: String
         get() = if (parameters.isEmpty()) "$identifierAfterVisibilityChanges()" else reference
-
-    override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
-        visitor.visit(this)
-
-    override fun <OUT> accept(visitor: KotlinDirectlyCallableMemberSwiftModelVisitor<OUT>): OUT =
-        visitor.visit(this)
 
     enum class Role {
         SimpleFunction, Constructor, ConvertedGetter, ConvertedSetter

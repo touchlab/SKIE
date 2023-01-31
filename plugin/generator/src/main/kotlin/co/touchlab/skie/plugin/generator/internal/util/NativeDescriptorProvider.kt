@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
+import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
@@ -144,7 +146,21 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     override fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor> =
         mutableTopLevel[file] ?: emptyList()
 
-    override fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor? {
-        return mapper.getClassIfCategory(descriptor)
+    override fun getReceiverClassDescriptorOrNull(descriptor: CallableMemberDescriptor): ClassDescriptor? {
+        val categoryClass = mapper.getClassIfCategory(descriptor)
+        val containingDeclaration = descriptor.containingDeclaration
+
+        return when {
+            categoryClass != null -> categoryClass
+            descriptor is PropertyAccessorDescriptor -> {
+                if (mapper.isObjCProperty(descriptor.correspondingProperty)) {
+                    getReceiverClassDescriptorOrNull(descriptor.correspondingProperty)
+                } else {
+                    null
+                }
+            }
+            containingDeclaration is ClassDescriptor -> containingDeclaration
+            else -> null
+        }
     }
 }

@@ -1,9 +1,7 @@
 package co.touchlab.skie.plugin.api.model.callable.property.regular
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 
@@ -27,10 +25,4 @@ interface KotlinRegularPropertySwiftModel : KotlinPropertySwiftModel, KotlinDire
      */
     override val name: String
         get() = reference
-
-    override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
-        visitor.visit(this)
-
-    override fun <OUT> accept(visitor: KotlinDirectlyCallableMemberSwiftModelVisitor<OUT>): OUT =
-        visitor.visit(this)
 }
