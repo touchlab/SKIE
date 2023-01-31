@@ -7,11 +7,14 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+
 interface SwiftGenericExportScope {
+
     fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor?): SwiftGenericTypeUsageModel?
 
-    class Class(container: DeclarationDescriptor, val namer: ObjCExportNamer): SwiftGenericExportScope {
-        private val typeNames = if(container is ClassDescriptor && !container.isInterface) {
+    class Class(container: DeclarationDescriptor, val namer: ObjCExportNamer) : SwiftGenericExportScope {
+
+        private val typeNames = if (container is ClassDescriptor && !container.isInterface) {
             container.typeConstructor.parameters
         } else {
             emptyList<TypeParameterDescriptor>()
@@ -31,7 +34,8 @@ interface SwiftGenericExportScope {
         }
     }
 
-    object None: SwiftGenericExportScope {
+    object None : SwiftGenericExportScope {
+
         override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor?): SwiftGenericTypeUsageModel? = null
     }
 }
@@ -40,6 +44,7 @@ data class SwiftExportScope(
     val genericScope: SwiftGenericExportScope,
     val flags: Set<Flags>,
 ) {
+
     constructor(
         genericScope: SwiftGenericExportScope,
         vararg flags: Flags,

@@ -2,7 +2,8 @@ package co.touchlab.skie.plugin.api.model.type.translation
 
 sealed class SwiftPrimitiveTypeModel(
     val name: String,
-): SwiftTypeModel {
+) : SwiftTypeModel {
+
     object NSUInteger : SwiftPrimitiveTypeModel("NSUInteger")
     object Bool : SwiftPrimitiveTypeModel("Bool")
     object unichar : SwiftPrimitiveTypeModel("unichar")

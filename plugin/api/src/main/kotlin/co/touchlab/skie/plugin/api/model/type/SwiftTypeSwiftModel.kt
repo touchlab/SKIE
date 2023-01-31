@@ -1,8 +1,6 @@
 package co.touchlab.skie.plugin.api.model.type
 
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 data class SwiftTypeSwiftModel(
     override val containingType: TypeSwiftModel?,

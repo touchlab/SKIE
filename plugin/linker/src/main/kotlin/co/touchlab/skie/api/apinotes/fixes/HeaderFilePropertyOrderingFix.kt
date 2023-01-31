@@ -64,5 +64,4 @@ class HeaderFilePropertyOrderingFix {
 
     private val String.isInterfaceDeclarationEnd: Boolean
         get() = this.startsWith("@end")
-
 }

@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.api.model.type.translation
 
-object SwiftErrorTypeModel: SwiftNonNullReferenceTypeModel {
+object SwiftErrorTypeModel : SwiftNonNullReferenceTypeModel {
+
     override val stableFqName: String
         get() = "ERROR"
 }

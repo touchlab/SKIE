@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.ir.util.allParameters
 data class MethodBridge(
     val returnBridge: ReturnValue,
     val receiver: MethodBridgeParameter.Receiver,
-    val valueParameters: List<MethodBridgeParameter.ValueParameter>
+    val valueParameters: List<MethodBridgeParameter.ValueParameter>,
 ) {
 
     sealed class ReturnValue {
@@ -34,20 +34,21 @@ data class MethodBridge(
         listOf(receiver) + MethodBridgeParameter.Selector + valueParameters
 
     // TODO: it is not exactly true in potential future cases.
-    val isInstance: Boolean get() = when (receiver) {
-        MethodBridgeParameter.Receiver.Static,
-        MethodBridgeParameter.Receiver.Factory
-        -> false
+    val isInstance: Boolean
+        get() = when (receiver) {
+            MethodBridgeParameter.Receiver.Static,
+            MethodBridgeParameter.Receiver.Factory,
+            -> false
 
-        MethodBridgeParameter.Receiver.Instance -> true
-    }
+            MethodBridgeParameter.Receiver.Instance -> true
+        }
 
     val returnsError: Boolean
         get() = returnBridge is ReturnValue.WithError
 }
 
 fun MethodBridge.valueParametersAssociated(
-    descriptor: FunctionDescriptor
+    descriptor: FunctionDescriptor,
 ): List<Pair<MethodBridgeParameter.ValueParameter, ParameterDescriptor?>> {
     val kotlinParameters = descriptor.allParameters.iterator()
     val skipFirstKotlinParameter = when (this.receiver) {
@@ -63,14 +64,14 @@ fun MethodBridge.valueParametersAssociated(
             is MethodBridgeParameter.ValueParameter.Mapped -> it to kotlinParameters.next()
 
             is MethodBridgeParameter.ValueParameter.SuspendCompletion,
-            is MethodBridgeParameter.ValueParameter.ErrorOutParameter
+            is MethodBridgeParameter.ValueParameter.ErrorOutParameter,
             -> it to null
         }
     }.also { assert(!kotlinParameters.hasNext()) }
 }
 
 fun MethodBridge.parametersAssociated(
-    irFunction: IrFunction
+    irFunction: IrFunction,
 ): List<Pair<MethodBridgeParameter, IrValueParameter?>> {
     val kotlinParameters = irFunction.allParameters.iterator()
 
@@ -80,7 +81,7 @@ fun MethodBridge.parametersAssociated(
                 it to kotlinParameters.next()
 
             is MethodBridgeParameter.ValueParameter.SuspendCompletion,
-            MethodBridgeParameter.Receiver.Static, MethodBridgeParameter.Selector, MethodBridgeParameter.ValueParameter.ErrorOutParameter
+            MethodBridgeParameter.Receiver.Static, MethodBridgeParameter.Selector, MethodBridgeParameter.ValueParameter.ErrorOutParameter,
             ->
                 it to null
 

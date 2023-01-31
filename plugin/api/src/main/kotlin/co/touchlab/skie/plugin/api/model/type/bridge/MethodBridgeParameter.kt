@@ -8,7 +8,6 @@ sealed class MethodBridgeParameter {
         object Instance : Receiver()
     }
 
-
     object Selector : MethodBridgeParameter()
 
     sealed class ValueParameter : MethodBridgeParameter() {

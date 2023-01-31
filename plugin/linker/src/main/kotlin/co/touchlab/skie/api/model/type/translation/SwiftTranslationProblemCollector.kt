@@ -13,17 +13,20 @@ import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.resolve.source.getPsi
 
 interface SwiftTranslationProblemCollector {
+
     fun reportWarning(text: String)
     fun reportWarning(method: FunctionDescriptor, text: String)
     fun reportException(throwable: Throwable)
 
     object SILENT : SwiftTranslationProblemCollector {
+
         override fun reportWarning(text: String) {}
         override fun reportWarning(method: FunctionDescriptor, text: String) {}
         override fun reportException(throwable: Throwable) {}
     }
 
     class Default(val context: CommonBackendContext) : SwiftTranslationProblemCollector {
+
         override fun reportWarning(text: String) {
             context.reportCompilationWarning(text)
         }

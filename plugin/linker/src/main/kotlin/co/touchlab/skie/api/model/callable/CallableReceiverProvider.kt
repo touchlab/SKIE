@@ -2,17 +2,6 @@
 
 package co.touchlab.skie.api.model.callable
 
-import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
-import co.touchlab.skie.plugin.reflection.reflectors.mapper
-import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
-
 // context(MutableSwiftModelScope)
 // private fun CallableMemberDescriptor.getReceiverSwiftModel(namer: ObjCExportNamer): MutableKotlinTypeSwiftModel {
 //     val categoryClass = namer.mapper.getClassIfCategory(this)

@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.api.model.type
 
-import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.isReplaced
 

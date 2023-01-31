@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.api.model.callable
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.*
 
 interface KotlinDirectlyCallableMemberSwiftModel : KotlinCallableMemberSwiftModel {
 

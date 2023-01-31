@@ -3,10 +3,10 @@
 package co.touchlab.skie.api.model.callable.function
 
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
-import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.api.model.callable.parameter.KotlinParameterSwiftModelCore
-import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
+import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
@@ -16,6 +16,7 @@ internal class KotlinFunctionSwiftModelCore(
     private val namer: ObjCExportNamer,
     bridgeProvider: DescriptorBridgeProvider,
 ) {
+
     val methodBridge by lazy { bridgeProvider.bridgeMethod(descriptor) }
 
     private val swiftFunctionName = run {

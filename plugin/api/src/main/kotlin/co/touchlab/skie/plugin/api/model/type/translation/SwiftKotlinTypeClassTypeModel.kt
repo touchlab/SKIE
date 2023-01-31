@@ -7,7 +7,8 @@ import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 data class SwiftKotlinTypeClassTypeModel(
     val model: KotlinTypeSwiftModel,
     val typeArguments: List<SwiftNonNullReferenceTypeModel> = emptyList(),
-): SwiftNonNullReferenceTypeModel, KotlinTypeSwiftModel by model {
+) : SwiftNonNullReferenceTypeModel, KotlinTypeSwiftModel by model {
+
     override val stableFqName: String
         get() = if (typeArguments.isEmpty()) {
             model.stableFqName

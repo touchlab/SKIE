@@ -6,7 +6,8 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 data class SwiftGenericTypeParameterUsageModel(
     val typeParameterDescriptor: TypeParameterDescriptor,
     val namer: ObjCExportNamer,
-): SwiftGenericTypeUsageModel {
+) : SwiftGenericTypeUsageModel {
+
     override val typeName: String
         get() = namer.getTypeParameterName(typeParameterDescriptor)
 

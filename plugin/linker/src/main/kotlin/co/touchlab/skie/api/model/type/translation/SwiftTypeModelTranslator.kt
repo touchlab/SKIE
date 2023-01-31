@@ -2,14 +2,14 @@
 
 package co.touchlab.skie.api.model.type.translation
 
-import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
-import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
+import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
@@ -65,7 +65,6 @@ fun SwiftTypeModel.makeNullableIfReferenceOrPointer(): SwiftTypeModel = when (th
 internal tailrec fun KotlinType.getErasedTypeClass(): ClassDescriptor =
     TypeUtils.getClassDescriptor(this) ?: this.constructor.supertypes.first().getErasedTypeClass()
 
-
 class SwiftTypeTranslator(
     private val descriptorProvider: DescriptorProvider,
     val namer: ObjCExportNamer,
@@ -73,10 +72,14 @@ class SwiftTypeTranslator(
 ) {
 
     context(SwiftModelScope)
-    internal fun mapReturnType(returnBridge: MethodBridge.ReturnValue, method: FunctionDescriptor, swiftExportScope: SwiftExportScope): SwiftTypeModel {
+    internal fun mapReturnType(
+        returnBridge: MethodBridge.ReturnValue,
+        method: FunctionDescriptor,
+        swiftExportScope: SwiftExportScope,
+    ): SwiftTypeModel {
         return when (returnBridge) {
             MethodBridge.ReturnValue.Suspend,
-            MethodBridge.ReturnValue.Void
+            MethodBridge.ReturnValue.Void,
             -> SwiftVoidTypeModel
             MethodBridge.ReturnValue.HashCode -> SwiftPrimitiveTypeModel.NSUInteger
             is MethodBridge.ReturnValue.Mapped -> mapType(method.returnType!!, swiftExportScope, returnBridge.bridge)
@@ -85,8 +88,10 @@ class SwiftTypeTranslator(
                 val successReturnType = mapReturnType(returnBridge.successBridge, method, swiftExportScope)
 
                 if (!returnBridge.successMayBeZero) {
-                    check(successReturnType is SwiftNonNullReferenceTypeModel
-                        || (successReturnType is SwiftPointerTypeModel && !successReturnType.nullable)) {
+                    check(
+                        successReturnType is SwiftNonNullReferenceTypeModel
+                            || (successReturnType is SwiftPointerTypeModel && !successReturnType.nullable)
+                    ) {
                         "Unexpected return type: $successReturnType in $method"
                     }
                 }
@@ -94,7 +99,7 @@ class SwiftTypeTranslator(
                 successReturnType.makeNullableIfReferenceOrPointer()
             }
             MethodBridge.ReturnValue.Instance.InitResult,
-            MethodBridge.ReturnValue.Instance.FactoryResult
+            MethodBridge.ReturnValue.Instance.FactoryResult,
             -> SwiftInstanceTypeModel
         }
     }
@@ -134,7 +139,8 @@ class SwiftTypeTranslator(
 
             problemCollector.reportWarning(
                 "Exposed type '$kotlinType' is '$firstType' and '$secondType' at the same time. " +
-                    "This most likely wouldn't work as expected.")
+                    "This most likely wouldn't work as expected."
+            )
         }
 
         mostSpecificMatches.firstOrNull()?.let {
@@ -145,13 +151,13 @@ class SwiftTypeTranslator(
             when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> return SwiftAnyHashableTypeModel
                 else -> {
-                    val genericTypeUsage = swiftExportScope.genericScope.getGenericTypeUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
+                    val genericTypeUsage =
+                        swiftExportScope.genericScope.getGenericTypeUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
                     if (genericTypeUsage != null) {
                         return genericTypeUsage
                     }
                 }
             }
-
         }
 
         val classDescriptor = kotlinType.getErasedTypeClass()
@@ -259,7 +265,10 @@ class SwiftTypeTranslator(
             if (returnsVoid) {
                 SwiftVoidTypeModel
             } else {
-                mapReferenceType(functionType.getReturnTypeFromFunctionType(), swiftExportScope.removingFlags(SwiftExportScope.Flags.Escaping))
+                mapReferenceType(
+                    functionType.getReturnTypeFromFunctionType(),
+                    swiftExportScope.removingFlags(SwiftExportScope.Flags.Escaping)
+                )
             },
             parameterTypes.map { mapReferenceType(it, swiftExportScope.addingFlags(SwiftExportScope.Flags.Escaping)) },
             isEscaping = swiftExportScope.hasFlag(SwiftExportScope.Flags.Escaping) && !functionType.binaryRepresentationIsNullable(),

@@ -7,8 +7,13 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.types.KotlinType
 
 interface CustomTypeMapper {
+
     val mappedClassId: ClassId
 
     context(SwiftModelScope)
-    fun mapType(mappedSuperType: KotlinType, translator: SwiftTypeTranslator, swiftExportScope: SwiftExportScope): SwiftNonNullReferenceTypeModel
+    fun mapType(
+        mappedSuperType: KotlinType,
+        translator: SwiftTypeTranslator,
+        swiftExportScope: SwiftExportScope,
+    ): SwiftNonNullReferenceTypeModel
 }

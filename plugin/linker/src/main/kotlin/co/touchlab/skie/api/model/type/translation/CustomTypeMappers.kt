@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 
 object CustomTypeMappers {
+
     /**
      * Custom type mappers.
      *
@@ -90,7 +91,7 @@ object CustomTypeMappers {
         "kotlin.collections.MutableIterable"
     ).map { ClassId.topLevel(FqName(it)) }.toSet()
 
-    private object StringMapper: CustomTypeMapper {
+    private object StringMapper : CustomTypeMapper {
 
         override val mappedClassId: ClassId = ClassId.topLevel(StandardNames.FqNames.string.toSafe())
 
@@ -98,7 +99,7 @@ object CustomTypeMappers {
         override fun mapType(
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
-            swiftExportScope: SwiftExportScope
+            swiftExportScope: SwiftExportScope,
         ): SwiftNonNullReferenceTypeModel {
             return SwiftClassTypeModel(
                 when {
@@ -109,14 +110,15 @@ object CustomTypeMappers {
         }
     }
 
-    private object ListMapper: CustomTypeMapper {
+    private object ListMapper : CustomTypeMapper {
+
         override val mappedClassId: ClassId = ClassId.topLevel(StandardNames.FqNames.list)
 
         context(SwiftModelScope)
         override fun mapType(
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
-            swiftExportScope: SwiftExportScope
+            swiftExportScope: SwiftExportScope,
         ): SwiftNonNullReferenceTypeModel {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
@@ -135,12 +137,11 @@ object CustomTypeMappers {
                     SwiftClassTypeModel("Array", typeArguments)
                 }
             }
-
-
         }
     }
 
-    private object SetMapper: CustomTypeMapper {
+    private object SetMapper : CustomTypeMapper {
+
         override val mappedClassId: ClassId = ClassId.topLevel(StandardNames.FqNames.set)
 
         context(SwiftModelScope)
@@ -158,7 +159,10 @@ object CustomTypeMappers {
                             // Kotlin `null` keys and values are represented as `NSNull` singleton.
                             SwiftAnyHashableTypeModel
                         } else {
-                            translator.mapReferenceTypeIgnoringNullability(argument, swiftExportScope.addingFlags(SwiftExportScope.Flags.Hashable))
+                            translator.mapReferenceTypeIgnoringNullability(
+                                argument,
+                                swiftExportScope.addingFlags(SwiftExportScope.Flags.Hashable)
+                            )
                         }
                     }
 
@@ -168,7 +172,8 @@ object CustomTypeMappers {
         }
     }
 
-    private object MapMapper: CustomTypeMapper {
+    private object MapMapper : CustomTypeMapper {
+
         override val mappedClassId: ClassId = ClassId.topLevel(StandardNames.FqNames.map)
 
         context(SwiftModelScope)
@@ -209,27 +214,31 @@ object CustomTypeMappers {
 
     private class Simple(
         override val mappedClassId: ClassId,
-        private val getObjCClassName: SwiftTypeTranslator.() -> String
+        private val getObjCClassName: SwiftTypeTranslator.() -> String,
     ) : CustomTypeMapper {
 
         constructor(
             mappedClassId: ClassId,
-            objCClassName: String
+            objCClassName: String,
         ) : this(mappedClassId, { objCClassName })
 
         context(SwiftModelScope)
-        override fun mapType(mappedSuperType: KotlinType, translator: SwiftTypeTranslator, swiftExportScope: SwiftExportScope): SwiftNonNullReferenceTypeModel =
+        override fun mapType(
+            mappedSuperType: KotlinType,
+            translator: SwiftTypeTranslator,
+            swiftExportScope: SwiftExportScope,
+        ): SwiftNonNullReferenceTypeModel =
             SwiftClassTypeModel(translator.getObjCClassName())
     }
 
     private class Collection(
         mappedClassFqName: FqName,
-        private val getObjCClassName: SwiftTypeTranslator.() -> String
+        private val getObjCClassName: SwiftTypeTranslator.() -> String,
     ) : CustomTypeMapper {
 
         constructor(
             mappedClassFqName: FqName,
-            objCClassName: String
+            objCClassName: String,
         ) : this(mappedClassFqName, { objCClassName })
 
         override val mappedClassId = ClassId.topLevel(mappedClassFqName)
@@ -246,7 +255,10 @@ object CustomTypeMappers {
                     // Kotlin `null` keys and values are represented as `NSNull` singleton.
                     SwiftAnyObjectTypeModel
                 } else {
-                    translator.mapReferenceTypeIgnoringNullability(argument, swiftExportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType))
+                    translator.mapReferenceTypeIgnoringNullability(
+                        argument,
+                        swiftExportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType)
+                    )
                 }
             }
 
@@ -255,6 +267,7 @@ object CustomTypeMappers {
     }
 
     private class Function(private val parameterCount: Int) : CustomTypeMapper {
+
         override val mappedClassId: ClassId
             get() = StandardNames.getFunctionClassId(parameterCount)
 
@@ -262,7 +275,7 @@ object CustomTypeMappers {
         override fun mapType(
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
-            swiftExportScope: SwiftExportScope
+            swiftExportScope: SwiftExportScope,
         ): SwiftNonNullReferenceTypeModel {
             return translator.mapFunctionTypeIgnoringNullability(mappedSuperType, swiftExportScope, returnsVoid = false)
         }

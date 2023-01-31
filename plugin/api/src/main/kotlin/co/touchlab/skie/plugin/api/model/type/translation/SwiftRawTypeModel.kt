@@ -4,7 +4,8 @@ import io.outfoxx.swiftpoet.DeclaredTypeName
 
 data class SwiftRawTypeModel(
     val type: DeclaredTypeName,
-): SwiftTypeModel {
+) : SwiftTypeModel {
+
     override val stableFqName: String
         get() = TODO("Not yet implemented")
 }

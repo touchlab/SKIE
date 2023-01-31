@@ -6,7 +6,8 @@ import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 
 data class SwiftKotlinTypeProtocolTypeModel(
     val model: KotlinTypeSwiftModel,
-): SwiftNonNullReferenceTypeModel, KotlinTypeSwiftModel by model {
+) : SwiftNonNullReferenceTypeModel, KotlinTypeSwiftModel by model {
+
     override val bridgedOrStableFqName: String
         get() = model.bridgedOrStableFqName
     override val isSwiftSymbol: Boolean

@@ -3,7 +3,8 @@ package co.touchlab.skie.plugin.api.model.type.translation
 data class SwiftNullableReferenceTypeModel(
     val nonNullType: SwiftNonNullReferenceTypeModel,
     val isNullableResult: Boolean = false,
-): SwiftReferenceTypeModel {
+) : SwiftReferenceTypeModel {
+
     override val stableFqName: String
         get() = if (nonNullType is SwiftLambdaTypeModel) {
             "(${nonNullType.stableFqName})?"

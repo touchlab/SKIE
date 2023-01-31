@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.backend.konan.llvm.LlvmParameterAttribute
 enum class ObjCValueType(val encoding: String, val defaultParameterAttributes: List<LlvmParameterAttribute> = emptyList()) {
     BOOL("c", listOf(LlvmParameterAttribute.SignExt)),
     UNICHAR("S", listOf(LlvmParameterAttribute.ZeroExt)),
+
     // TODO: Switch to explicit SIGNED_CHAR
     CHAR("c", listOf(LlvmParameterAttribute.SignExt)),
     SHORT("s", listOf(LlvmParameterAttribute.SignExt)),

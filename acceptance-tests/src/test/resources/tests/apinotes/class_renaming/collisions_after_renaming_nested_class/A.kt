@@ -1,4 +1,4 @@
-package tests.apinotes.class_renaming.collisions_after_renaming_nested_class
+package `tests`.`apinotes`.`class_renaming`.`collisions_after_renaming_nested_class`
 
 @JvmInline
 value class V(val value: Int) {
