@@ -5,7 +5,7 @@ package co.touchlab.skie.test
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.function.reference
+import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.intercept.PhaseListener
@@ -21,8 +21,6 @@ import io.outfoxx.swiftpoet.parameterizedBy
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 internal class SwiftKotlinAccessGenerator: PhaseListener {
@@ -64,29 +62,30 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                             .filter {
                                 !DescriptorUtils.isMethodOfAny(it)
                             }
-                            .forEach { descriptor ->
-                                when (descriptor) {
-                                    is PropertyDescriptor -> {
-                                        val propertyModel = descriptor.swiftModel
+                            .flatMap {
+                                it.swiftModel.directlyCallableMembers
+                            }
+                            .forEach { swiftModel ->
+                                when (swiftModel) {
+                                    is KotlinRegularPropertySwiftModel -> {
                                         addProperty(
-                                            PropertySpec.builder(descriptor.name.identifier, propertyModel.type.stableSpec)
+                                            PropertySpec.builder(swiftModel.identifier, swiftModel.type.stableSpec)
                                                 .getter(
                                                     FunctionSpec.getterBuilder()
-                                                        .addStatement("kotlinClass.%L", descriptor.name.identifier)
+                                                        .addStatement("kotlinClass.%L", swiftModel.reference)
                                                         .build()
                                                 )
                                                 .build()
                                         )
                                     }
-                                    is FunctionDescriptor -> {
-                                        val functionModel = descriptor.swiftModel
-                                        if (functionModel.role == KotlinFunctionSwiftModel.Role.Constructor) {
+                                    is KotlinFunctionSwiftModel -> {
+                                        if (swiftModel.role == KotlinFunctionSwiftModel.Role.Constructor) {
                                             return@forEach
                                         }
                                         addFunction(
-                                            FunctionSpec.builder(functionModel.identifier)
+                                            FunctionSpec.builder(swiftModel.identifier)
                                                 .addParameters(
-                                                    functionModel.parameters.map { parameter ->
+                                                    swiftModel.parameters.map { parameter ->
                                                         ParameterSpec.builder(
                                                             parameter.argumentLabel,
                                                             parameter.parameterName,
@@ -94,11 +93,11 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                                                         ).build()
                                                     }
                                                 )
-                                                .returns(functionModel.returnType.stableSpec)
+                                                .returns(swiftModel.returnType.stableSpec)
                                                 .addCode(
                                                     "kotlinClass.%N(%L)",
-                                                    functionModel.reference,
-                                                    functionModel.parameters.map { parameter ->
+                                                    swiftModel.reference,
+                                                    swiftModel.parameters.map { parameter ->
                                                         CodeBlock.of("%N", parameter.parameterName)
                                                     }.joinToCode(),
                                                 )

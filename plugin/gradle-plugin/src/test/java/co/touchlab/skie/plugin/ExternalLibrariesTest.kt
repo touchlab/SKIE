@@ -69,7 +69,7 @@ class ExternalLibrariesTest {
 
         taskOutcomes.forEach { (index, item) ->
             val (library, outcome) = item
-            println("[${outcome}] for $library")
+            println("[${outcome}] for $library ($index)")
         }
 
         val failures = taskOutcomes.filter { (_, item) ->

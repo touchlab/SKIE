@@ -19,7 +19,7 @@ class AsyncKotlinFunctionSwiftModel(
 ) : MutableKotlinFunctionSwiftModel by delegate {
 
     private val delegateCore = requireNotNull((delegate as? ActualKotlinFunctionSwiftModel)?.core) {
-        "Delegate must be an instance of ActualKotlinFunctionSwiftModel to access its `core`'s parameter bridge"
+        "Delegate must be an instance of ActualKotlinFunctionSwiftModel to access its `core`'s parameter bridge. Was: $delegate"
     }
 
     override val directlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
