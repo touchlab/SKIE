@@ -26,11 +26,9 @@ import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReference
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftPrimitiveTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftProtocolTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftRawTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftReferenceTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidTypeModel
-import co.touchlab.skie.plugin.api.util.isInterface
 import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
 import org.jetbrains.kotlin.backend.konan.isInlined
@@ -46,6 +44,7 @@ import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
 import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
@@ -59,7 +58,7 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 fun SwiftTypeModel.makeNullableIfReferenceOrPointer(): SwiftTypeModel = when (this) {
     is SwiftPointerTypeModel -> SwiftPointerTypeModel(pointee, nullable = true)
     is SwiftNonNullReferenceTypeModel -> SwiftNullableReferenceTypeModel(this)
-    is SwiftNullableReferenceTypeModel, is SwiftRawTypeModel, is SwiftPrimitiveTypeModel, SwiftVoidTypeModel, SwiftErrorTypeModel -> this
+    is SwiftNullableReferenceTypeModel, is SwiftPrimitiveTypeModel, SwiftVoidTypeModel, SwiftErrorTypeModel -> this
 }
 
 internal tailrec fun KotlinType.getErasedTypeClass(): ClassDescriptor =
@@ -174,7 +173,7 @@ class SwiftTypeTranslator(
             return idType(swiftExportScope)
         }
 
-        return if (classDescriptor.isInterface) {
+        return if (classDescriptor.kind.isInterface) {
             when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
                 else -> {
@@ -218,7 +217,7 @@ class SwiftTypeTranslator(
         if (descriptor.isObjCProtocolClass()) return foreignClassType("Protocol")
 
         if (descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration()) {
-            return if (descriptor.isInterface) {
+            return if (descriptor.kind.isInterface) {
                 val name = descriptor.name.asString().removeSuffix("Protocol")
                 foreignProtocolType(name)
             } else {

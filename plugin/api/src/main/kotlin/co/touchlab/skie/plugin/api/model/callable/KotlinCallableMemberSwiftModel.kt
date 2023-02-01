@@ -11,10 +11,10 @@ interface KotlinCallableMemberSwiftModel {
 
     val receiver: TypeSwiftModel
 
-    val kind: Kind
+    val origin: Origin
 
     val scope: Scope
-        get() = if (kind in listOf(Kind.Global, Kind.Extension.Interface)) Scope.Static else Scope.Member
+        get() = if (origin in listOf(Origin.Global, Origin.Extension.Interface)) Scope.Static else Scope.Member
 
     val allBoundedSwiftModels: List<KotlinCallableMemberSwiftModel>
 
@@ -22,11 +22,13 @@ interface KotlinCallableMemberSwiftModel {
 
     fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT
 
-    sealed interface Kind {
+    sealed interface Origin {
 
-        object Global : Kind
+        sealed interface FromEnum : Origin
 
-        sealed interface Member : Kind {
+        object Global : Origin
+
+        sealed interface Member : Origin {
 
             object Class : Member
 
@@ -35,7 +37,7 @@ interface KotlinCallableMemberSwiftModel {
             object Interface : Member
         }
 
-        sealed interface Extension : Kind {
+        sealed interface Extension : Origin {
 
             object Class : Extension
 
@@ -43,8 +45,6 @@ interface KotlinCallableMemberSwiftModel {
 
             object Interface : Extension
         }
-
-        sealed interface FromEnum : Kind
     }
 
     enum class Scope {

@@ -60,7 +60,7 @@ internal class SwiftSuspendGeneratorDelegate(
         get() {
             val receiver = this.originalFunction.receiver as? SwiftKotlinTypeClassTypeModel ?: return emptyList()
 
-            return receiver.typeArguments.filterIsInstance<SwiftGenericTypeUsageModel>().map { it.typeName }
+            return receiver.typeArguments.filterIsInstance<SwiftGenericTypeUsageModel>().map { it.stableFqName }
         }
 
     private fun ExtensionSpec.Builder.addSwiftBridgingFunction(bridgeModel: BridgeModel): ExtensionSpec.Builder =

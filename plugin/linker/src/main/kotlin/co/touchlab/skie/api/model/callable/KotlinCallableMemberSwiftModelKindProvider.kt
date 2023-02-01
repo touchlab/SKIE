@@ -5,25 +5,25 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.types.typeUtil.isEnum
 import org.jetbrains.kotlin.types.typeUtil.isInterface
 
-val CallableMemberDescriptor.swiftModelKind: KotlinCallableMemberSwiftModel.Kind
+val CallableMemberDescriptor.swiftModelOrigin: KotlinCallableMemberSwiftModel.Origin
     get() = when {
-        dispatchReceiverParameter == null && extensionReceiverParameter == null -> KotlinCallableMemberSwiftModel.Kind.Global
+        dispatchReceiverParameter == null && extensionReceiverParameter == null -> KotlinCallableMemberSwiftModel.Origin.Global
         dispatchReceiverParameter != null -> {
             if (this.dispatchReceiverParameter?.type?.isInterface() == true) {
-                KotlinCallableMemberSwiftModel.Kind.Member.Interface
+                KotlinCallableMemberSwiftModel.Origin.Member.Interface
             } else if (this.dispatchReceiverParameter?.type?.isEnum() == true) {
-                KotlinCallableMemberSwiftModel.Kind.Member.Enum
+                KotlinCallableMemberSwiftModel.Origin.Member.Enum
             } else {
-                KotlinCallableMemberSwiftModel.Kind.Member.Class
+                KotlinCallableMemberSwiftModel.Origin.Member.Class
             }
         }
         extensionReceiverParameter != null -> {
             if (this.extensionReceiverParameter?.type?.isInterface() == true) {
-                KotlinCallableMemberSwiftModel.Kind.Extension.Interface
+                KotlinCallableMemberSwiftModel.Origin.Extension.Interface
             } else if (this.extensionReceiverParameter?.type?.isEnum() == true) {
-                KotlinCallableMemberSwiftModel.Kind.Extension.Enum
+                KotlinCallableMemberSwiftModel.Origin.Extension.Enum
             } else {
-                KotlinCallableMemberSwiftModel.Kind.Extension.Class
+                KotlinCallableMemberSwiftModel.Origin.Extension.Class
             }
         }
         else -> error("All cases should be covered.")

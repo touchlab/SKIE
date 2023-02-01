@@ -1,7 +1,7 @@
 package co.touchlab.skie.api.model.callable.function
 
 import co.touchlab.skie.api.model.callable.parameter.ActualKotlinParameterSwiftModel
-import co.touchlab.skie.api.model.callable.swiftModelKind
+import co.touchlab.skie.api.model.callable.swiftModelOrigin
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
@@ -59,7 +59,7 @@ internal class ActualKotlinFunctionSwiftModel(
             else -> KotlinFunctionSwiftModel.Role.SimpleFunction
         }
 
-    override val kind: KotlinCallableMemberSwiftModel.Kind = descriptor.swiftModelKind
+    override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
 
     override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
 

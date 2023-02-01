@@ -1,6 +1,6 @@
 package co.touchlab.skie.api.model.callable.property.regular
 
-import co.touchlab.skie.api.model.callable.swiftModelKind
+import co.touchlab.skie.api.model.callable.swiftModelOrigin
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
@@ -41,7 +41,7 @@ class ActualKotlinRegularPropertySwiftModel(
     override val isChanged: Boolean
         get() = identifier != original.identifier || visibility != original.visibility
 
-    override val kind: KotlinCallableMemberSwiftModel.Kind = descriptor.swiftModelKind
+    override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
 
     override val type: TypeSwiftModel
         get() = with(swiftModelScope) {

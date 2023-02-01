@@ -6,6 +6,7 @@ sealed class SwiftPrimitiveTypeModel(
 
     object NSUInteger : SwiftPrimitiveTypeModel("NSUInteger")
     object Bool : SwiftPrimitiveTypeModel("Bool")
+    @Suppress("ClassName")
     object unichar : SwiftPrimitiveTypeModel("unichar")
     object Int8 : SwiftPrimitiveTypeModel("Int8")
     object Int16 : SwiftPrimitiveTypeModel("Int16")

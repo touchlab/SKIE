@@ -29,6 +29,7 @@ interface DescriptorProvider {
 
     fun getFileModule(file: SourceFile): ModuleDescriptor
 
+    // TODO Cannot be used to retrieve SwiftModels, add extra functions to SwiftModelScope
     /**
      * Functions/properties without extensions and constructors (including overridden ones)
      */
