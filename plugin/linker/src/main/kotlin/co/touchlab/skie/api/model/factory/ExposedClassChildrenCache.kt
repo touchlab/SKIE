@@ -12,9 +12,11 @@ class ExposedClassChildrenCache(descriptorProvider: DescriptorProvider) {
 
     init {
         childrenByClass.keys.forEach { classDescriptor ->
-            classDescriptor.getAllSuperClassifiers().forEach { parent ->
-                childrenByClass[parent]?.add(classDescriptor)
-            }
+            // No need to filter only exposed classes because they are not present in the map
+            classDescriptor.getAllSuperClassifiers()
+                .forEach { parent ->
+                    childrenByClass[parent]?.add(classDescriptor)
+                }
         }
     }
 

@@ -22,7 +22,7 @@ internal class AsyncKotlinFunctionSwiftModel(
         get() = delegate.directlyCallableMembers
 
     override val valueParameters: List<MutableKotlinValueParameterSwiftModel>
-        get() = delegate.valueParameters.filter { it.origin == KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
+        get() = delegate.valueParameters.filter { it.origin != KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
 
     override val returnType: TypeSwiftModel
         get() = with(swiftModelScope) {

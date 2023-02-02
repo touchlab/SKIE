@@ -6,14 +6,6 @@ class ApiNotes(
     private val protocols: List<ApiNotesType>,
 ) {
 
-    // TODO Remove
-    fun withoutBridging(): ApiNotes =
-        ApiNotes(
-            moduleName = moduleName,
-            classes = classes.map { it.withoutBridging() },
-            protocols = protocols.map { it.withoutBridging() },
-        )
-
     fun createApiNotesFileContent(): String = SmartStringBuilder {
         +"Name: \"$moduleName\""
 

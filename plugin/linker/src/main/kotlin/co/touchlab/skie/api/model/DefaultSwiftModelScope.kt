@@ -117,11 +117,10 @@ class DefaultSwiftModelScope(
         val receiverClassDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(this)
         val containingDeclaration = containingDeclaration
 
-        val exportScope = SwiftExportScope(SwiftGenericExportScope.None, SwiftExportScope.Flags.ReferenceType)
         return when {
             receiverClassDescriptor != null -> translator.mapReferenceType(
                 receiverClassDescriptor.defaultType,
-                exportScope.copy(genericScope = SwiftGenericExportScope.Class(receiverClassDescriptor, namer))
+                SwiftExportScope(SwiftGenericExportScope.Class(receiverClassDescriptor, namer), SwiftExportScope.Flags.ReferenceType)
             )
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
             containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel

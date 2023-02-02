@@ -22,6 +22,7 @@ interface KotlinCallableMemberSwiftModel {
 
     fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT
 
+    // TODO Remove? - probably not needed anymore
     sealed interface Origin {
 
         sealed interface FromEnum : Origin

@@ -12,17 +12,6 @@ class ApiNotesType(
     private val methods: List<ApiNotesMethod>,
 ) {
 
-    fun withoutBridging(): ApiNotesType =
-        ApiNotesType(
-            objCFqName = objCFqName,
-            bridgeFqName = null,
-            swiftFqName = swiftFqName,
-            isHidden = isHidden,
-            isRemoved = isRemoved,
-            properties = properties,
-            methods = methods,
-        )
-
     context(SmartStringBuilder)
     fun appendApiNote() {
         +"- Name: \"$objCFqName\""
