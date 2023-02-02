@@ -29,6 +29,13 @@ class ExternalLibrariesTest {
             }
             .filter { onlyIndices.isEmpty() || it.first in onlyIndices }
 
+        testTmpDir.resolve("tested-libraries.log").writeText(
+            librariesToTest.joinToString("\n") { (index, item) ->
+                val (library, _) = item
+                "library-$index: $library"
+            }
+        )
+
         val rootDir = prepareRootDir()
 
         librariesToTest.forEach { (index, item) ->
@@ -46,6 +53,7 @@ class ExternalLibrariesTest {
             GradleRunner.create()
                 .withProjectDir(rootDir)
                 .withTestKitDir(testTmpDir.resolve("testkit"))
+                .forwardOutput()
                 .withArguments(
                     "linkDebugFrameworkIosArm64",
                     "--stacktrace",
@@ -59,7 +67,7 @@ class ExternalLibrariesTest {
             e.buildResult
         }
 
-        rootDir.resolve("run.log").writeText(result.output)
+        testTmpDir.resolve("run.log").writeText(result.output)
 
         val taskOutcomes = librariesToTest.map { (index, item) ->
             val (library, _) = item
@@ -67,9 +75,12 @@ class ExternalLibrariesTest {
             index to (library to outcome)
         }
 
-        taskOutcomes.forEach { (index, item) ->
+        taskOutcomes.joinToString("\n") { (index, item) ->
             val (library, outcome) = item
-            println("[${outcome}] for $library ($index)")
+            "[${outcome}] for $library (library-$index)"
+        }.also {
+            println(it)
+            testTmpDir.resolve("library-outcomes.log").writeText(it)
         }
 
         val failures = taskOutcomes.filter { (_, item) ->
@@ -204,6 +215,16 @@ class ExternalLibrariesTest {
                         sourceSets {
                             val commonMain by getting {
                                 dependencies {
+                                    api("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+                                        version {
+                                            strictly("1.6.4")
+                                        }
+                                    }
+                                    api("org.jetbrains.kotlinx:kotlinx-datetime") {
+                                        version {
+                                            strictly("0.4.0")
+                                        }
+                                    }
                                     api("$library")
                                 }
                             }

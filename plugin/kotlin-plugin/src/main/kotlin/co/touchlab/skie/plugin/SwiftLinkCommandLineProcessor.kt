@@ -17,6 +17,7 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         Options.generatedSwiftDir,
         Options.disableWildcardExport,
         Options.swiftGenConfigPath,
+        Options.swiftLinkLogFile,
     )
     private val optionsMap = options.associateBy { it.optionName }
     override val pluginOptions: Collection<AbstractCliOption> = options.map { it.toCliOption() }
@@ -42,6 +43,10 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
                 val swiftGenConfiguration = Configuration.deserialize(config)
 
                 configuration.put(SwiftGenConfigurationKeys.swiftGenConfiguration, swiftGenConfiguration)
+            }
+
+            Options.swiftLinkLogFile -> {
+                configuration.putIfNotNull(ConfigurationKeys.swiftLinkLogFile, Options.swiftLinkLogFile.deserialize(value))
             }
         }
     }

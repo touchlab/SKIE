@@ -9,6 +9,7 @@ class DefaultSkieContext(
     override val module: SkieModule,
     override val swiftSourceFiles: List<File>,
     override val expandedSwiftDir: File,
+    override val swiftLinkLogFile: File,
     override val frameworkLayout: FrameworkLayout,
     override val disableWildcardExport: Boolean,
 ) : SkieContext

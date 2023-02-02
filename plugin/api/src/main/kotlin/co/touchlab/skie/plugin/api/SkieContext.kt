@@ -9,6 +9,7 @@ interface SkieContext {
     val module: SkieModule
     val swiftSourceFiles: List<File>
     val expandedSwiftDir: File
+    val swiftLinkLogFile: File
 
     val frameworkLayout: FrameworkLayout
     val disableWildcardExport: Boolean

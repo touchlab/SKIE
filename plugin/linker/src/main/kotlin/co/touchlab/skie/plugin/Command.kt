@@ -17,6 +17,7 @@ package co.touchlab.skie.plugin
 
 import org.jetbrains.kotlin.konan.KonanExternalToolFailure
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.nio.file.Files
 
@@ -70,23 +71,11 @@ open class Command(initialCommand: List<String>) {
         return exitCode
     }
 
-    open fun execute() {
-        log()
-        val code = runProcess()
-        handleExitCode(code, stdError)
-    }
-
-    /**
-     * If withErrors is true then output from error stream will be added
-     */
-    fun getOutputLines(withErrors: Boolean = false): List<String> =
-        getResult(withErrors, handleError = true).outputLines
-
-    fun getResult(withErrors: Boolean, handleError: Boolean = false): Result {
+    fun execute(withErrors: Boolean = true, handleError: Boolean = true, logFile: File? = null): Result {
         log()
 
-        val outputFile = Files.createTempFile(null, null).toFile()
-        outputFile.deleteOnExit()
+        val outputFile = logFile ?: Files.createTempFile(null, null).toFile().also { it.deleteOnExit() }
+        outputFile.appendText(command.joinToString(" ", postfix = "\n\n\n"))
 
         try {
             val builder = ProcessBuilder(command)
@@ -106,7 +95,9 @@ open class Command(initialCommand: List<String>) {
 
             return Result(code, outputFile.readLines())
         } finally {
-            outputFile.delete()
+            if (logFile == null) {
+                outputFile.delete()
+            }
         }
     }
 
@@ -128,6 +119,6 @@ open class Command(initialCommand: List<String>) {
     }
 
     private fun log() {
-        if (logger != null) logger!! { command.joinToString(" ") }
+        logger?.let { it { command.joinToString(" ") } }
     }
 }

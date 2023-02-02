@@ -21,6 +21,7 @@ class SwiftLinkComponentRegistrar : ComponentRegistrar {
                 module = DefaultSkieModule(),
                 swiftSourceFiles = configuration.getList(ConfigurationKeys.swiftSourceFiles),
                 expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.generatedSwiftDir),
+                swiftLinkLogFile = configuration.getNotNull(ConfigurationKeys.swiftLinkLogFile),
                 frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
                 disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
             )

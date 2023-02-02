@@ -42,6 +42,10 @@ class SwiftLinkCompilePhase(
             return emptyList()
         }
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
+        skieContext.swiftLinkLogFile.apply {
+            parentFile.mkdirs()
+            delete()
+        }
         val swiftSourcesDir = skieContext.expandedSwiftDir.also {
             it.deleteRecursively()
             it.mkdirs()
@@ -148,7 +152,7 @@ class SwiftLinkCompilePhase(
 
             workingDirectory = swiftObjectsDir
 
-            execute()
+            execute(logFile = skieContext.swiftLinkLogFile)
         }
     }
 

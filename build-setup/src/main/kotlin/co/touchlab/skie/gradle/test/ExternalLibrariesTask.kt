@@ -113,6 +113,16 @@ abstract class ExternalLibrariesTask: DefaultTask() {
             }
 
             project.dependencies {
+                configuration("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+                    version {
+                        strictly("1.6.4")
+                    }
+                }
+                configuration("org.jetbrains.kotlinx:kotlinx-datetime") {
+                    version {
+                        strictly("0.4.0")
+                    }
+                }
                 configuration(
                     group = library.group,
                     name = library.name,

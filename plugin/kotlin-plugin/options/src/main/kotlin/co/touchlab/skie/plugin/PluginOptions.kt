@@ -42,5 +42,14 @@ object SkiePlugin {
             serialize = File::getAbsolutePath,
             deserialize = ::File,
         )
+
+        val swiftLinkLogFile = PluginOption(
+            optionName = "swiftLinkLogFile",
+            valueDescription = "<absolute path>",
+            description = "Path to log file for Swift compiler.",
+            isRequired = true,
+            serialize = File::getAbsolutePath,
+            deserialize = ::File,
+        )
     }
 }
