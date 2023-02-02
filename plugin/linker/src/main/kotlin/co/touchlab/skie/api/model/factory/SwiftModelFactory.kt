@@ -181,7 +181,7 @@ class SwiftModelFactory(
             .map { it.original }
             .filter { it.kind.isEnumClass }
             .flatMap { it.enumEntries }
-            .associateWith { ActualKotlinEnumEntrySwiftModel(it, namer) }
+            .associateWith { ActualKotlinEnumEntrySwiftModel(it, namer, swiftModelScope) }
 
     fun createFiles(files: List<SourceFile>): Map<SourceFile, MutableKotlinTypeSwiftModel> =
         files.associateWith { file ->
@@ -189,6 +189,8 @@ class SwiftModelFactory(
                 file = file,
                 module = descriptorProvider.getFileModule(file),
                 namer = namer,
+                swiftModelScope = swiftModelScope,
+                descriptorProvider = descriptorProvider,
             )
         }
 

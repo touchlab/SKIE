@@ -1,3 +1,8 @@
 package co.touchlab.skie.plugin.api.model.type
 
-interface MutableKotlinClassSwiftModel : KotlinClassSwiftModel, MutableKotlinTypeSwiftModel
+interface MutableKotlinClassSwiftModel : KotlinClassSwiftModel, MutableKotlinTypeSwiftModel {
+
+    override val companionObject: MutableKotlinClassSwiftModel?
+
+    override val nestedClasses: List<MutableKotlinClassSwiftModel>
+}

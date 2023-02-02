@@ -1,7 +1,11 @@
 package co.touchlab.skie.api.model.type.files
 
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
@@ -14,9 +18,11 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 class ActualKotlinFileSwiftModel(
-    file: SourceFile,
+    private val file: SourceFile,
     module: ModuleDescriptor,
     namer: ObjCExportNamer,
+    private val swiftModelScope: MutableSwiftModelScope,
+    private val descriptorProvider: DescriptorProvider,
 ) : MutableKotlinTypeSwiftModel {
 
     override val descriptorHolder: ClassOrFileDescriptorHolder.File = ClassOrFileDescriptorHolder.File(file)
@@ -24,6 +30,14 @@ class ActualKotlinFileSwiftModel(
     override var containingType: MutableKotlinClassSwiftModel? = null
 
     override var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
+
+    override val allAccessibleDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
+        get() = with(swiftModelScope) {
+            descriptorProvider.getExposedStaticMembers(file)
+                .map { it.swiftModel }
+                .flatMap { it.directlyCallableMembers }
+                .filterNot { it.visibility.isRemoved }
+        }
 
     private val fileClassName = namer.getFileClassName(file)
 

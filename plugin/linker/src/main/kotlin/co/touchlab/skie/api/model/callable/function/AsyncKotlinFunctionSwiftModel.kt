@@ -7,8 +7,8 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 
@@ -25,8 +25,8 @@ class AsyncKotlinFunctionSwiftModel(
     override val directlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
         get() = delegate.directlyCallableMembers
 
-    override val parameters: List<MutableKotlinParameterSwiftModel>
-        get() = delegate.parameters.filter { it.origin == KotlinParameterSwiftModel.Origin.SuspendCompletion }
+    override val valueParameters: List<MutableKotlinValueParameterSwiftModel>
+        get() = delegate.valueParameters.filter { it.origin == KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
 
     override val returnType: TypeSwiftModel
         get() = with(swiftModelScope) {

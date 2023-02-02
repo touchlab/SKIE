@@ -85,7 +85,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                                         addFunction(
                                             FunctionSpec.builder(swiftModel.identifier)
                                                 .addParameters(
-                                                    swiftModel.parameters.map { parameter ->
+                                                    swiftModel.valueParameters.map { parameter ->
                                                         ParameterSpec.builder(
                                                             parameter.argumentLabel,
                                                             parameter.parameterName,
@@ -97,7 +97,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                                                 .addCode(
                                                     "kotlinClass.%N(%L)",
                                                     swiftModel.reference,
-                                                    swiftModel.parameters.map { parameter ->
+                                                    swiftModel.valueParameters.map { parameter ->
                                                         CodeBlock.of("%N", parameter.parameterName)
                                                     }.joinToCode(),
                                                 )

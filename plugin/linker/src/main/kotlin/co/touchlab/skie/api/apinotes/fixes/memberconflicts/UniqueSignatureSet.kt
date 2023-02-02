@@ -144,7 +144,7 @@ class UniqueSignatureSet {
                 override fun visit(function: MutableKotlinFunctionSwiftModel) {
                     when (function.role) {
                         KotlinFunctionSwiftModel.Role.Constructor -> {
-                            val lastParameter = function.parameters.lastOrNull()
+                            val lastParameter = function.valueParameters.lastOrNull()
                                 ?: error("Class ${function.receiver} has multiple constructors without parameters.")
 
                             lastParameter.argumentLabel += "_"

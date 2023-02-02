@@ -132,7 +132,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
 
     private fun fixOverloadLastParameterName(overloadDescriptor: FunctionDescriptor) {
         skieContext.module.configure {
-            val lastParameter = overloadDescriptor.swiftModel.parameters.lastOrNull() ?: return@configure
+            val lastParameter = overloadDescriptor.swiftModel.valueParameters.lastOrNull() ?: return@configure
 
             lastParameter.argumentLabel = lastParameter.argumentLabel.dropUniqueParameterMangling()
         }

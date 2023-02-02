@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.api.model.callable.function
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
@@ -18,19 +18,23 @@ interface KotlinFunctionSwiftModel : KotlinDirectlyCallableMemberSwiftModel {
 
     val returnType: TypeSwiftModel
 
-    val parameters: List<KotlinParameterSwiftModel>
+    val valueParameters: List<KotlinValueParameterSwiftModel>
 
     val objCSelector: String
 
+    val isSuspend: Boolean
+
+    val isThrowing: Boolean
+
     override val reference: String
-        get() = if (parameters.isEmpty()) {
+        get() = if (valueParameters.isEmpty()) {
             identifierAfterVisibilityChanges
         } else {
-            "$identifierAfterVisibilityChanges(${parameters.joinToString("") { "${it.argumentLabel}:" }})"
+            "$identifierAfterVisibilityChanges(${valueParameters.joinToString("") { "${it.argumentLabel}:" }})"
         }
 
     override val name: String
-        get() = if (parameters.isEmpty()) "$identifierAfterVisibilityChanges()" else reference
+        get() = if (valueParameters.isEmpty()) "$identifierAfterVisibilityChanges()" else reference
 
     enum class Role {
         SimpleFunction, Constructor, ConvertedGetter, ConvertedSetter

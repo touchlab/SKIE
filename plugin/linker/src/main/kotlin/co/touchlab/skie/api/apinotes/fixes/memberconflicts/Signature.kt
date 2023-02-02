@@ -3,7 +3,7 @@ package co.touchlab.skie.api.apinotes.fixes.memberconflicts
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 
 data class Signature(
@@ -58,11 +58,11 @@ data class Signature(
             Signature(
                 receiver = function.receiver.stableFqName,
                 identifier = function.identifier,
-                parameters = function.parameters.map { it.toSignatureParameter() },
+                parameters = function.valueParameters.map { it.toSignatureParameter() },
                 returnType = ReturnType.Specific(function.returnType.stableFqName),
             )
 
-        private fun KotlinParameterSwiftModel.toSignatureParameter(): Parameter =
+        private fun KotlinValueParameterSwiftModel.toSignatureParameter(): Parameter =
             Parameter(
                 argumentLabel = this.argumentLabel,
                 type = this.type.stableFqName,

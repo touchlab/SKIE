@@ -1,6 +1,6 @@
 package co.touchlab.skie.api.model.callable.function
 
-import co.touchlab.skie.api.model.callable.parameter.ActualKotlinParameterSwiftModel
+import co.touchlab.skie.api.model.callable.parameter.ActualKotlinValueParameterSwiftModel
 import co.touchlab.skie.api.model.callable.swiftModelOrigin
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -12,7 +12,7 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -28,9 +28,9 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override var identifier: String by core::identifier
 
-    override val parameters: List<MutableKotlinParameterSwiftModel> by lazy {
+    override val valueParameters: List<MutableKotlinValueParameterSwiftModel> by lazy {
         core.getParameterCoresWithDescriptors(descriptor).map { (core, parameterDescriptor) ->
-            ActualKotlinParameterSwiftModel(
+            ActualKotlinValueParameterSwiftModel(
                 core,
                 parameterDescriptor,
             ) {
@@ -51,6 +51,10 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val objCSelector: String by core::objCSelector
 
+    override val isSuspend: Boolean = descriptor.isSuspend
+
+    override val isThrowing: Boolean by core::isThrowing
+
     override val role: KotlinFunctionSwiftModel.Role
         get() = when (descriptor) {
             is ConstructorDescriptor -> KotlinFunctionSwiftModel.Role.Constructor
@@ -66,7 +70,7 @@ internal class ActualKotlinFunctionSwiftModel(
     override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
 
     override val isChanged: Boolean
-        get() = identifier != original.identifier || visibility != original.visibility || parameters.any { it.isChanged } ||
+        get() = identifier != original.identifier || visibility != original.visibility || valueParameters.any { it.isChanged } ||
             collisionResolutionStrategy != original.collisionResolutionStrategy
 
     override val returnType: TypeSwiftModel

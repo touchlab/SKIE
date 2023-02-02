@@ -4,7 +4,7 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.module.SkieModule
 
@@ -26,12 +26,12 @@ class KonanManglingApiNotesFix(
         override fun visit(function: MutableKotlinFunctionSwiftModel) {
             function.identifier = function.identifier.stripMangling(function.descriptor.name.asString())
 
-            function.parameters.forEach {
+            function.valueParameters.forEach {
                 it.resetName()
             }
         }
 
-        private fun MutableKotlinParameterSwiftModel.resetName() {
+        private fun MutableKotlinValueParameterSwiftModel.resetName() {
             this.argumentLabel = this.argumentLabel.stripMangling(this.parameterName)
         }
 

@@ -1,14 +1,18 @@
 package co.touchlab.skie.api.model.type.classes
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.util.mutableLazy
 import co.touchlab.skie.util.swiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -26,6 +30,29 @@ class ActualKotlinClassSwiftModel(
     override val descriptorHolder: ClassOrFileDescriptorHolder.Class = ClassOrFileDescriptorHolder.Class(classDescriptor)
 
     override var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
+
+    override val allAccessibleDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
+        get() = with(swiftModelScope) {
+            descriptorProvider.getAllExposedMembers(classDescriptor)
+                .map { it.swiftModel }
+                .flatMap { it.directlyCallableMembers }
+                .filterNot { it.visibility.isRemoved }
+        }
+
+    override val companionObject: MutableKotlinClassSwiftModel?
+        get() = with(swiftModelScope) {
+            descriptorProvider.getExposedCompanionObject(classDescriptor)?.swiftModel
+        }
+
+    override val enumEntries: List<KotlinEnumEntrySwiftModel>
+        get() = with(swiftModelScope) {
+            descriptorProvider.getExposedEnumEntries(classDescriptor).map { it.enumEntrySwiftModel }
+        }
+
+    override val nestedClasses: List<MutableKotlinClassSwiftModel>
+        get() = with(swiftModelScope) {
+            descriptorProvider.getExposedNestedClasses(classDescriptor).map { it.swiftModel }
+        }
 
     private val swiftName = classDescriptor.swiftName
 

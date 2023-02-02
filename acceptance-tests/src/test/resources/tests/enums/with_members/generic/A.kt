@@ -4,8 +4,6 @@ enum class A {
     A1,
     A2;
 
-    val <T> T.a: T get() = this
-
     fun <T> foo(t: T) = t
 }
 

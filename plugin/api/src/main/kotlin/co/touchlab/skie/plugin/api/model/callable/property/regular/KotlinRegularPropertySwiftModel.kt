@@ -9,6 +9,10 @@ interface KotlinRegularPropertySwiftModel : KotlinPropertySwiftModel, KotlinDire
 
     override val original: KotlinRegularPropertySwiftModel
 
+    val getter: KotlinRegularPropertyGetterSwiftModel
+
+    val setter: KotlinRegularPropertySetterSwiftModel?
+
     val type: TypeSwiftModel
 
     val objCName: String

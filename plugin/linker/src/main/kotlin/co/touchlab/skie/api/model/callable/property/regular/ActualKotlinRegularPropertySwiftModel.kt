@@ -10,6 +10,8 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
+import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertyGetterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
@@ -47,6 +49,10 @@ class ActualKotlinRegularPropertySwiftModel(
         get() = with(swiftModelScope) {
             core.descriptor.propertyTypeModel(receiver.swiftGenericExportScope)
         }
+
+    override val getter: KotlinRegularPropertyGetterSwiftModel by core::getter
+
+    override val setter: KotlinRegularPropertySetterSwiftModel? by core::setter
 
     override fun toString(): String = descriptor.toString()
 

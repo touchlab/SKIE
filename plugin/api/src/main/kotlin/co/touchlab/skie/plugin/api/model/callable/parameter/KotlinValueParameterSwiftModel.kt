@@ -5,14 +5,14 @@ import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 
-interface KotlinParameterSwiftModel {
+interface KotlinValueParameterSwiftModel {
 
     val descriptor: ParameterDescriptor?
         get() = origin.descriptor
 
     val origin: Origin
 
-    val original: KotlinParameterSwiftModel
+    val original: KotlinValueParameterSwiftModel
 
     val isChanged: Boolean
 

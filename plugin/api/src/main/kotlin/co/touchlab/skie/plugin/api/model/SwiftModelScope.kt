@@ -2,10 +2,11 @@ package co.touchlab.skie.plugin.api.model
 
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
@@ -21,13 +22,19 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface SwiftModelScope {
 
+    val transitivelyExposedClasses: List<KotlinClassSwiftModel>
+
+    val exposedClasses: List<KotlinClassSwiftModel>
+
+    val exposedFiles: List<KotlinTypeSwiftModel>
+
     val CallableMemberDescriptor.swiftModel: KotlinCallableMemberSwiftModel
 
     val FunctionDescriptor.swiftModel: KotlinFunctionSwiftModel
 
     val FunctionDescriptor.asyncSwiftModel: KotlinFunctionSwiftModel
 
-    val ParameterDescriptor.swiftModel: KotlinParameterSwiftModel
+    val ParameterDescriptor.swiftModel: KotlinValueParameterSwiftModel
 
     val PropertyDescriptor.swiftModel: KotlinPropertySwiftModel
 
@@ -37,7 +44,7 @@ interface SwiftModelScope {
 
     val ClassDescriptor.hasSwiftModel: Boolean
 
-    val ClassDescriptor.swiftModel: KotlinTypeSwiftModel
+    val ClassDescriptor.swiftModel: KotlinClassSwiftModel
 
     val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
 

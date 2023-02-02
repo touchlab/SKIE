@@ -1,6 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.module.stableSpec
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -61,6 +63,20 @@ internal interface SwiftPoetExtensionContainer {
         codeBuilder: context(SwiftModelScope) FileSpec.Builder.() -> Unit,
     ) {
         this.file(declaration.kotlinName, contents = codeBuilder)
+    }
+
+    fun SkieModule.generateCode(
+        swiftModel: KotlinCallableMemberSwiftModel,
+        codeBuilder: context(SwiftModelScope) FileSpec.Builder.() -> Unit,
+    ) {
+        generateCode(swiftModel.descriptor, codeBuilder)
+    }
+
+    fun SkieModule.generateCode(
+        swiftModel: KotlinClassSwiftModel,
+        codeBuilder: context(SwiftModelScope) FileSpec.Builder.() -> Unit,
+    ) {
+        generateCode(swiftModel.classDescriptor, codeBuilder)
     }
 
     companion object {

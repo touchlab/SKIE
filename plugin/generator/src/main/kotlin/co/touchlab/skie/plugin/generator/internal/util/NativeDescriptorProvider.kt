@@ -15,12 +15,15 @@ import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class NativeDescriptorProvider(private val context: CommonBackendContext) : DescriptorProvider {
@@ -77,11 +80,19 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
         objCExport.reflectedExportedInterface
     }
 
+    @get:JvmName("isExposedExtension")
+    private val CallableMemberDescriptor.isExposed: Boolean
+        get() = mapper.shouldBeExposed(this) && this.isExported
+
+    @get:JvmName("isExposedExtension")
+    private val ClassDescriptor.isExposed: Boolean
+        get() = mapper.shouldBeExposed(this) && this.isExported
+
     override fun isExposed(descriptor: CallableMemberDescriptor): Boolean =
-        mapper.shouldBeExposed(descriptor) && descriptor.isExported
+        descriptor.isExposed
 
     override fun isExposed(descriptor: ClassDescriptor): Boolean =
-        mapper.shouldBeExposed(descriptor) && descriptor.isExported
+        descriptor.isExposed
 
     override fun isTransitivelyExposed(descriptor: ClassDescriptor): Boolean =
         mapper.shouldBeExposed(descriptor)
@@ -104,7 +115,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     }
 
     private fun registerDescriptor(descriptor: CallableMemberDescriptor) {
-        if (!isExposed(descriptor)) {
+        if (!descriptor.isExposed) {
             return
         }
 
@@ -135,13 +146,13 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
         classDescriptor.unsubstitutedMemberScope
             .getDescriptorsFiltered()
             .filterIsInstance<CallableMemberDescriptor>()
-            .filter { isExposed(it) }
+            .filter { it.isExposed }
 
     override fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
         mutableExposedCategoryMembers[classDescriptor] ?: emptyList()
 
     override fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ClassConstructorDescriptor> =
-        classDescriptor.constructors.filter { isExposed(it) }
+        classDescriptor.constructors.filter { it.isExposed }
 
     override fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor> =
         mutableTopLevel[file] ?: emptyList()
@@ -163,4 +174,20 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
             else -> null
         }
     }
+
+    override fun getExposedCompanionObject(classDescriptor: ClassDescriptor): ClassDescriptor? =
+        classDescriptor.companionObjectDescriptor?.takeIf { it.isExposed }
+
+    override fun getExposedNestedClasses(classDescriptor: ClassDescriptor): List<ClassDescriptor> =
+        classDescriptor.unsubstitutedInnerClassesScope
+            .getDescriptorsFiltered(DescriptorKindFilter.CLASSIFIERS)
+            .filterIsInstance<ClassDescriptor>()
+            .filter { it.kind == ClassKind.CLASS || it.kind == ClassKind.OBJECT }
+            .filter { it.isExposed }
+
+    override fun getExposedEnumEntries(classDescriptor: ClassDescriptor): List<ClassDescriptor> =
+        classDescriptor.unsubstitutedInnerClassesScope
+            .getDescriptorsFiltered(DescriptorKindFilter.CLASSIFIERS)
+            .filterIsInstance<ClassDescriptor>()
+            .filter { it.kind == ClassKind.ENUM_ENTRY }
 }

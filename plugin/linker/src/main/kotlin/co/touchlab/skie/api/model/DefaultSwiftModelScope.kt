@@ -10,7 +10,7 @@ import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
@@ -56,13 +56,22 @@ class DefaultSwiftModelScope(
     private val convertedPropertySwiftModels = members.filterIsInstance<PropertyDescriptor, MutableKotlinConvertedPropertySwiftModel>()
 
     private val parameterSwiftModels = (functionSwiftModels.values + convertedPropertySwiftModels.flatMap { it.value.accessors })
-        .flatMap { it.parameters }
+        .flatMap { it.valueParameters }
         .mapNotNull { swiftModel -> swiftModel.descriptor?.let { it to swiftModel } }
         .toMap()
 
     private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.transitivelyExposedClasses)
     private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.transitivelyExposedClasses)
     private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
+
+    override val transitivelyExposedClasses: List<MutableKotlinClassSwiftModel> =
+        descriptorProvider.transitivelyExposedClasses.map { it.swiftModel }
+
+    override val exposedClasses: List<MutableKotlinClassSwiftModel> =
+        descriptorProvider.exposedClasses.map { it.swiftModel }
+
+    override val exposedFiles: List<MutableKotlinTypeSwiftModel> =
+        descriptorProvider.exposedFiles.map { it.swiftModel }
 
     override val CallableMemberDescriptor.swiftModel: MutableKotlinCallableMemberSwiftModel
         get() = functionSwiftModels[this.original]
@@ -76,7 +85,7 @@ class DefaultSwiftModelScope(
     override val FunctionDescriptor.asyncSwiftModel: KotlinFunctionSwiftModel
         get() = asyncFunctionSwiftModels[this.original] ?: throwUnknownDescriptor()
 
-    override val ParameterDescriptor.swiftModel: MutableKotlinParameterSwiftModel
+    override val ParameterDescriptor.swiftModel: MutableKotlinValueParameterSwiftModel
         get() = parameterSwiftModels[this] ?: throwUnknownDescriptor()
 
     override val PropertyDescriptor.swiftModel: MutableKotlinPropertySwiftModel

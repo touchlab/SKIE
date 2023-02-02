@@ -45,6 +45,12 @@ interface DescriptorProvider {
     fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor>
 
     fun getReceiverClassDescriptorOrNull(descriptor: CallableMemberDescriptor): ClassDescriptor?
+
+    fun getExposedCompanionObject(classDescriptor: ClassDescriptor): ClassDescriptor?
+
+    fun getExposedNestedClasses(classDescriptor: ClassDescriptor): List<ClassDescriptor>
+
+    fun getExposedEnumEntries(classDescriptor: ClassDescriptor): List<ClassDescriptor>
 }
 
 fun DescriptorProvider.getAllExposedMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =

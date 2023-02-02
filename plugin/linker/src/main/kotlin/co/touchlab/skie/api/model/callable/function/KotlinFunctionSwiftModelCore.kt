@@ -10,6 +10,8 @@ import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
+import co.touchlab.skie.plugin.reflection.reflectors.mapper
+import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
 
 internal class KotlinFunctionSwiftModelCore(
     val descriptor: FunctionDescriptor,
@@ -59,6 +61,8 @@ internal class KotlinFunctionSwiftModelCore(
             .filterNot { it.first is MethodBridgeParameter.ValueParameter.ErrorOutParameter }
 
     val objCSelector: String = namer.getSelector(descriptor.original)
+
+    val isThrowing: Boolean = namer.mapper.doesThrow(descriptor)
 
     private data class SwiftFunctionName(val identifier: String, val argumentLabels: List<String>)
 

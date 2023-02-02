@@ -1,7 +1,7 @@
 package co.touchlab.skie.api.model.callable.parameter
 
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
-import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel.Origin
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel.Origin
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.util.toValidSwiftIdentifier
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor

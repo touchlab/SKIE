@@ -3,7 +3,8 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
@@ -30,6 +31,10 @@ internal class SwiftSuspendGeneratorDelegate(
         kotlinBridgingFunctionDescriptor: FunctionDescriptor,
     ) {
         module.generateCode(originalFunctionDescriptor) {
+            if (originalFunctionDescriptor.swiftModel.visibility.isRemoved || kotlinBridgingFunctionDescriptor.swiftModel.visibility.isRemoved) {
+                return@generateCode
+            }
+
             val bridgeModel = BridgeModel(
                 originalFunction = originalFunctionDescriptor.swiftModel,
                 asyncOriginalFunction = originalFunctionDescriptor.asyncSwiftModel,
@@ -105,8 +110,8 @@ internal class SwiftSuspendGeneratorDelegate(
             }
         }
 
-    private val BridgeModel.bridgedParameters: List<KotlinParameterSwiftModel>
-        get() = this.originalFunction.parameters.filter { it.origin != KotlinParameterSwiftModel.Origin.SuspendCompletion }
+    private val BridgeModel.bridgedParameters: List<KotlinValueParameterSwiftModel>
+        get() = this.originalFunction.valueParameters.filter { it.origin != KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
 
     private fun FunctionSpec.Builder.addDispatchReceiverParameterForGenericClass(bridgeModel: BridgeModel) {
         val receiverSwiftModel = bridgeModel.originalFunction.receiver
@@ -118,9 +123,9 @@ internal class SwiftSuspendGeneratorDelegate(
     }
 
     private val BridgeModel.genericClassDispatchReceiverParameterName: String
-        get() = "dispatchReceiver".collisionFreeIdentifier(originalFunction.parameters.map { it.argumentLabel })
+        get() = "dispatchReceiver".collisionFreeIdentifier(originalFunction.valueParameters.map { it.argumentLabel })
 
-    private fun FunctionSpec.Builder.addValueParameter(parameter: KotlinParameterSwiftModel) {
+    private fun FunctionSpec.Builder.addValueParameter(parameter: KotlinValueParameterSwiftModel) {
         addParameter(
             ParameterSpec.builder(parameter.argumentLabel, parameter.parameterName, parameter.type.stableSpec)
                 .build()
@@ -174,7 +179,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
         if (bridgeModel.isFromGenericClass) {
-            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.parameters.first().type.stableFqName
+            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.valueParameters.first().type.stableFqName
 
             add(bridgeModel.genericClassDispatchReceiverParameterName + " as! " + dispatchReceiverErasedType)
         } else {

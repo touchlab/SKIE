@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.api.model.type
 
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.isReplaced
 
 interface KotlinTypeSwiftModel : TypeSwiftModel {
@@ -12,6 +13,11 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
     val original: KotlinTypeSwiftModel
 
     val visibility: SwiftModelVisibility
+
+    /**
+     * All non-removed directly callable members of this type.
+     */
+    val allAccessibleDirectlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
 
     override val containingType: KotlinClassSwiftModel?
 
