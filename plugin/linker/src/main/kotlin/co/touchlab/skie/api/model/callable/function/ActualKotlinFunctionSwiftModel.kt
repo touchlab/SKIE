@@ -11,7 +11,6 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
@@ -21,10 +20,10 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 
 internal class ActualKotlinFunctionSwiftModel(
     override val descriptor: FunctionDescriptor,
-    override val allBoundedSwiftModels: List<MutableKotlinFunctionSwiftModel>,
-    val core: KotlinFunctionSwiftModelCore,
+    override val allBoundedSwiftModels: List<KotlinFunctionSwiftModelWithCore>,
+    override val core: KotlinFunctionSwiftModelCore,
     private val swiftModelScope: MutableSwiftModelScope,
-) : MutableKotlinFunctionSwiftModel {
+) : KotlinFunctionSwiftModelWithCore {
 
     override var identifier: String by core::identifier
 

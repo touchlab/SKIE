@@ -7,15 +7,14 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
-class HiddenOverrideKotlinFunctionSwiftModel(
-    private val baseModel: MutableKotlinFunctionSwiftModel,
+internal class HiddenOverrideKotlinFunctionSwiftModel(
+    private val baseModel: KotlinFunctionSwiftModelWithCore,
     receiverDescriptor: ClassDescriptor,
     private val swiftModelScope: MutableSwiftModelScope,
-) : MutableKotlinFunctionSwiftModel by baseModel {
+) : KotlinFunctionSwiftModelWithCore by baseModel {
 
     override val directlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel> = listOf(this)
 

@@ -7,6 +7,7 @@ import co.touchlab.skie.api.model.callable.function.ActualKotlinFunctionSwiftMod
 import co.touchlab.skie.api.model.callable.function.AsyncKotlinFunctionSwiftModel
 import co.touchlab.skie.api.model.callable.function.HiddenOverrideKotlinFunctionSwiftModel
 import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelCore
+import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelWithCore
 import co.touchlab.skie.api.model.callable.property.converted.ActualKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.api.model.callable.property.regular.ActualKotlinRegularPropertySwiftModel
 import co.touchlab.skie.api.model.callable.property.regular.HiddenOverrideKotlinRegularPropertySwiftModel
@@ -67,7 +68,7 @@ class SwiftModelFactory(
         } as Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel>
 
     private fun createBoundedFunctions(group: List<FunctionDescriptor>): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> {
-        val allBoundedSwiftModels = mutableListOf<MutableKotlinFunctionSwiftModel>()
+        val allBoundedSwiftModels = mutableListOf<KotlinFunctionSwiftModelWithCore>()
 
         val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider)
 
@@ -77,9 +78,9 @@ class SwiftModelFactory(
             .also { allBoundedSwiftModels.addHiddenOverrides(group, it.values.first()) }
     }
 
-    private fun MutableList<MutableKotlinFunctionSwiftModel>.addHiddenOverrides(
+    private fun MutableList<KotlinFunctionSwiftModelWithCore>.addHiddenOverrides(
         group: List<FunctionDescriptor>,
-        representativeModel: MutableKotlinFunctionSwiftModel,
+        representativeModel: KotlinFunctionSwiftModelWithCore,
     ) {
         if (representativeModel.role == KotlinFunctionSwiftModel.Role.Constructor) {
             return
@@ -194,7 +195,9 @@ class SwiftModelFactory(
             )
         }
 
-    fun createAsyncFunctions(models: Collection<MutableKotlinFunctionSwiftModel>): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> =
+    internal fun createAsyncFunctions(
+        models: Collection<KotlinFunctionSwiftModelWithCore>,
+    ): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> =
         models.filter { it.descriptor.isSuspend }
             .map { it.allBoundedSwiftModels.toSet() }
             .distinct()

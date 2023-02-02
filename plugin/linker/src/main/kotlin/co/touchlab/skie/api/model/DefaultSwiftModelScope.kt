@@ -1,5 +1,6 @@
 package co.touchlab.skie.api.model
 
+import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelWithCore
 import co.touchlab.skie.api.model.factory.SwiftModelFactory
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
@@ -50,7 +51,7 @@ class DefaultSwiftModelScope(
 
     private val members = swiftModelFactory.createMembers(descriptorProvider.allExposedMembers)
 
-    private val functionSwiftModels = members.filterIsInstance<FunctionDescriptor, MutableKotlinFunctionSwiftModel>()
+    private val functionSwiftModels = members.filterIsInstance<FunctionDescriptor, KotlinFunctionSwiftModelWithCore>()
     private val asyncFunctionSwiftModels = swiftModelFactory.createAsyncFunctions(functionSwiftModels.values)
     private val regularPropertySwiftModels = members.filterIsInstance<PropertyDescriptor, MutableKotlinRegularPropertySwiftModel>()
     private val convertedPropertySwiftModels = members.filterIsInstance<PropertyDescriptor, MutableKotlinConvertedPropertySwiftModel>()
