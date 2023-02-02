@@ -1,9 +1,9 @@
 import Foundation
 
 @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-public struct SwiftCoroutineDispatcher {
+struct SwiftCoroutineDispatcher {
 
-    public static func dispatch<T>(
+    static func dispatch<T>(
         coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void
     ) async throws -> T {
         let cancellationHandler = Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler()

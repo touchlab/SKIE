@@ -10,8 +10,7 @@ plugins {
 
 skie {
     features {
-        suspendInterop.set(true)
-        fqNames.set(true)
+//        fqNames.set(true)
     }
     configuration {
         group {

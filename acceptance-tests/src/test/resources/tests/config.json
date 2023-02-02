@@ -2,8 +2,7 @@
     "enabledFeatures": {
         "features": [
             "SuspendInterop",
-            "SwiftRuntime",
-            "FqNames"
+            "SwiftRuntime"
         ]
     },
     "groups": [
