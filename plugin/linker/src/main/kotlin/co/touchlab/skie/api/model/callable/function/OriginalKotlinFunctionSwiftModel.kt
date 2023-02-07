@@ -6,8 +6,8 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 
-class OriginalKotlinFunctionSwiftModel(
-    delegate: KotlinFunctionSwiftModel,
+internal class OriginalKotlinFunctionSwiftModel(
+    private val delegate: KotlinFunctionSwiftModelWithCore,
 ) : KotlinFunctionSwiftModel by delegate {
 
     override val visibility: SwiftModelVisibility = delegate.visibility
@@ -17,6 +17,12 @@ class OriginalKotlinFunctionSwiftModel(
     override val collisionResolutionStrategy: CollisionResolutionStrategy = delegate.collisionResolutionStrategy
 
     override val isChanged: Boolean = false
+
+    override val reference: String
+        get() = delegate.core.reference(this)
+
+    override val name: String
+        get() = delegate.core.name(this)
 
     override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
         visitor.visit(this)

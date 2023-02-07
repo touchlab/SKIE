@@ -1,11 +1,13 @@
 package co.touchlab.skie.api.model.type.classes
 
+import co.touchlab.skie.api.model.callable.function.FakeObjcConstructorKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
@@ -18,6 +20,7 @@ import co.touchlab.skie.util.swiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class ActualKotlinClassSwiftModel(
@@ -32,11 +35,28 @@ class ActualKotlinClassSwiftModel(
     override var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
 
     override val allAccessibleDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
+        get() = allDirectlyCallableMembers.filterNot { it.visibility.isRemoved }
+
+    override val allDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel> by lazy {
+        actualDirectlyCallableMembers + fakeObjcConstructors
+    }
+
+    private val actualDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
         get() = with(swiftModelScope) {
             descriptorProvider.getAllExposedMembers(classDescriptor)
                 .map { it.swiftModel }
                 .flatMap { it.directlyCallableMembers }
-                .filterNot { it.visibility.isRemoved }
+        }
+
+    private val fakeObjcConstructors: List<MutableKotlinFunctionSwiftModel>
+        get() = with(swiftModelScope) {
+            classDescriptor.getSuperClassNotAny()
+                ?.swiftModelOrNull
+                ?.allDirectlyCallableMembers
+                ?.flatMap { it.allBoundedSwiftModels }
+                ?.filterIsInstance<FakeObjcConstructorKotlinFunctionSwiftModel>()
+                ?.filter { it.receiver == this@ActualKotlinClassSwiftModel }
+                ?: emptyList()
         }
 
     override val companionObject: MutableKotlinClassSwiftModel?

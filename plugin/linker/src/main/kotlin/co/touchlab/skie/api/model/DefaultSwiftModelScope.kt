@@ -106,6 +106,9 @@ class DefaultSwiftModelScope(
     override val ClassDescriptor.swiftModel: MutableKotlinClassSwiftModel
         get() = classSwiftModels[this.original] ?: throwUnknownDescriptor()
 
+    override val ClassDescriptor.swiftModelOrNull: MutableKotlinClassSwiftModel?
+        get() = classSwiftModels[this.original]
+
     override val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
         get() = enumEntrySwiftModels[this.original] ?: throwUnknownDescriptor()
 

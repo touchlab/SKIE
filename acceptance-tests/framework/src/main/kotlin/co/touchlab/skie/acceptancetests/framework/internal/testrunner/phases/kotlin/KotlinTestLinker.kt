@@ -48,6 +48,7 @@ internal class KotlinTestLinker(
 
         PluginRegistrar.configure.set {
             put(SwiftLinkConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
+            put(SwiftLinkConfigurationKeys.swiftLinkLogFile, tempFileSystem.createFile("swiftlink.log").toFile())
             put(SwiftGenConfigurationKeys.swiftGenConfiguration, Configuration.deserialize(configuration.readText()))
         }
 

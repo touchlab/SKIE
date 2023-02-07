@@ -19,6 +19,8 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
      */
     val allAccessibleDirectlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
 
+    val allDirectlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
+
     override val containingType: KotlinClassSwiftModel?
 
     /**

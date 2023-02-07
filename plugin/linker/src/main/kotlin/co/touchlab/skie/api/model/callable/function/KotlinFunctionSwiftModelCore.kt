@@ -3,15 +3,17 @@
 package co.touchlab.skie.api.model.callable.function
 
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
+import co.touchlab.skie.api.model.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.api.model.callable.parameter.KotlinParameterSwiftModelCore
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
+import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
-import co.touchlab.skie.plugin.reflection.reflectors.mapper
-import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
 
 internal class KotlinFunctionSwiftModelCore(
     val descriptor: FunctionDescriptor,
@@ -35,6 +37,16 @@ internal class KotlinFunctionSwiftModelCore(
     var identifier: String = swiftFunctionName.identifier
 
     var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
+
+    fun reference(swiftModel: KotlinFunctionSwiftModel): String =
+        if (swiftModel.valueParameters.isEmpty()) {
+            swiftModel.identifierAfterVisibilityChanges
+        } else {
+            "${swiftModel.identifierAfterVisibilityChanges}(${swiftModel.valueParameters.joinToString("") { "${it.argumentLabel}:" }})"
+        }
+
+    fun name(swiftModel: KotlinFunctionSwiftModel): String =
+        if (swiftModel.valueParameters.isEmpty()) "${swiftModel.identifierAfterVisibilityChanges}()" else reference(swiftModel)
 
     fun getParameterCoresWithDescriptors(
         functionDescriptor: FunctionDescriptor,

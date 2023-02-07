@@ -32,11 +32,14 @@ class ActualKotlinFileSwiftModel(
     override var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
 
     override val allAccessibleDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
+        get() = allDirectlyCallableMembers
+            .filterNot { it.visibility.isRemoved }
+
+    override val allDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
         get() = with(swiftModelScope) {
             descriptorProvider.getExposedStaticMembers(file)
                 .map { it.swiftModel }
                 .flatMap { it.directlyCallableMembers }
-                .filterNot { it.visibility.isRemoved }
         }
 
     private val fileClassName = namer.getFileClassName(file)

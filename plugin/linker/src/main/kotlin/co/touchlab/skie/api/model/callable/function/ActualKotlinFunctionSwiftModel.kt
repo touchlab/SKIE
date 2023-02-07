@@ -54,6 +54,12 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val isThrowing: Boolean by core::isThrowing
 
+    override val reference: String
+        get() = core.reference(this)
+
+    override val name: String
+        get() = core.name(this)
+
     override val role: KotlinFunctionSwiftModel.Role
         get() = when (descriptor) {
             is ConstructorDescriptor -> KotlinFunctionSwiftModel.Role.Constructor

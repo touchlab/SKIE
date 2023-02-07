@@ -1,5 +1,6 @@
 package co.touchlab.skie.api.model.callable.property.regular
 
+import co.touchlab.skie.api.model.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
@@ -14,6 +15,12 @@ class OriginalKotlinRegularPropertySwiftModel(
     override var visibility: SwiftModelVisibility = delegate.visibility
 
     override var identifier: String = delegate.identifier
+
+    override val reference: String
+        get() = identifierAfterVisibilityChanges
+
+    override val name: String
+        get() = reference
 
     override val collisionResolutionStrategy: CollisionResolutionStrategy = delegate.collisionResolutionStrategy
 

@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConve
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
@@ -45,6 +46,8 @@ interface SwiftModelScope {
     val ClassDescriptor.hasSwiftModel: Boolean
 
     val ClassDescriptor.swiftModel: KotlinClassSwiftModel
+
+    val ClassDescriptor.swiftModelOrNull: KotlinClassSwiftModel?
 
     val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
 

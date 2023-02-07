@@ -37,5 +37,7 @@ interface MutableSwiftModelScope : SwiftModelScope {
 
     override val ClassDescriptor.swiftModel: MutableKotlinClassSwiftModel
 
+    override val ClassDescriptor.swiftModelOrNull: MutableKotlinClassSwiftModel?
+
     override val SourceFile.swiftModel: MutableKotlinTypeSwiftModel
 }

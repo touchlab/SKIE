@@ -9,6 +9,8 @@ interface MutableKotlinTypeSwiftModel : KotlinTypeSwiftModel {
 
     override val allAccessibleDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
 
+    override val allDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
+
     override var containingType: MutableKotlinClassSwiftModel?
 
     override var identifier: String

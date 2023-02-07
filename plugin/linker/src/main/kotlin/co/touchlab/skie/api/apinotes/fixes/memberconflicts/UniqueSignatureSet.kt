@@ -61,7 +61,7 @@ class UniqueSignatureSet {
         return if (!existingModel.visibility.isRemoved) {
             when (newModelStrategy) {
                 is Remove -> when (existingModelStrategy) {
-                    is Remove -> if (existingModelStrategy.hasRemovePriority(newModelStrategy)) RemoveExisting(existingModel) else RemoveNew
+                    is Remove -> if (existingModelStrategy.shouldBeRemovedBefore(newModelStrategy)) RemoveExisting(existingModel) else RemoveNew
                     Rename -> RemoveNew
                 }
                 Rename -> when (existingModelStrategy) {
@@ -70,9 +70,10 @@ class UniqueSignatureSet {
                 }
             }
         } else {
+            // The existingModel is already removed so there is no collision, but it might be required to also remove the new model if they both have the same remove priority.
             when (newModelStrategy) {
                 is Remove -> when (existingModelStrategy) {
-                    is Remove -> if (newModelStrategy.hasRemovePriority(existingModelStrategy)) RemoveNew else null
+                    is Remove -> if (newModelStrategy.shouldBeRemovedBefore(existingModelStrategy)) RemoveNew else null
                     Rename -> null
                 }
                 Rename -> null
@@ -80,7 +81,7 @@ class UniqueSignatureSet {
         }
     }
 
-    private fun Remove.hasRemovePriority(other: Remove): Boolean =
+    private fun Remove.shouldBeRemovedBefore(other: Remove): Boolean =
         this.priority >= other.priority
 
     private fun addToSignatureMap(representative: MutableKotlinCallableMemberSwiftModel) {
@@ -108,7 +109,7 @@ class UniqueSignatureSet {
                 check(newModelStrategy is Remove)
                 check(existingModelStrategy is Remove)
 
-                if (existingModelStrategy.hasRemovePriority(newModelStrategy)) {
+                if (existingModelStrategy.shouldBeRemovedBefore(newModelStrategy)) {
                     putNewModelIntoSignatureMap()
                 }
             }

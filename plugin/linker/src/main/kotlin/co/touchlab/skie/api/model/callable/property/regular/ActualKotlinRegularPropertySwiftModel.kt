@@ -1,5 +1,6 @@
 package co.touchlab.skie.api.model.callable.property.regular
 
+import co.touchlab.skie.api.model.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.api.model.callable.swiftModelOrigin
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -10,10 +11,13 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
+import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertyGetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
@@ -35,6 +39,12 @@ class ActualKotlinRegularPropertySwiftModel(
     override var visibility: SwiftModelVisibility by core::visibility
 
     override val objCName: String by core::objCName
+
+    override val reference: String
+        get() = identifierAfterVisibilityChanges
+
+    override val name: String
+        get() = reference
 
     override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
 
