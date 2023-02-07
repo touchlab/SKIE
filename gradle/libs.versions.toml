@@ -4,6 +4,7 @@ kotlin = "1.7.20"
 pluginPublish = "1.0.0"
 kotest = "5.4.0"
 buildconfig = "3.1.0"
+ktor = "2.2.3"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -24,6 +25,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
 swiftPoet = { module = "co.touchlab.fork.swiftpoet:swiftpoet", version = "1.5.0-touchlab" }
 kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.12.0" }
+ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }

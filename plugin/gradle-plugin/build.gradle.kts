@@ -56,21 +56,17 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-val externalLibraries = tasks.register<ExternalLibrariesTask>("externalLibraries") {
+val updateExternalLibrariesLockfile = tasks.register<ExternalLibrariesTask>("updateExternalLibrariesLockfile") {
     group = "verification"
     description = "Loads external libraries"
 
-    externalLibrariesDir.set(layout.buildDirectory.dir("external-libraries"))
-}
-
-sourceSets.test {
-    resources.srcDir(externalLibraries.flatMap { it.externalLibrariesDir })
+    mavenSearchCache.set(layout.buildDirectory.file("tmp/maven-search-cache.json"))
+    librariesToTestFile.set(layout.projectDirectory.file("src/test/resources/libraries-to-test.json"))
 }
 
 tasks.named<Test>("test").configure {
     systemProperty("testTmpDir", layout.buildDirectory.dir("external-libraries-tests").get().asFile.absolutePath)
 
-    dependsOn(externalLibraries)
     dependsOn(rootProject.subprojects.mapNotNull {
         if (it.name == "gradle-plugin" || it.tasks.findByName("publishToMavenLocal") == null) {
             null

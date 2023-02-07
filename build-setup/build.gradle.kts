@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.plugin.kotlin.gradle.api)
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
+    implementation(libs.ktor.client.java)
 }
 
 gradlePlugin {
