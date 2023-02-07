@@ -120,7 +120,7 @@ internal object ObjectiveCBridgeable {
         )
 
     private val KotlinEnumEntrySwiftModel.variableWithEntryCastedToSwiftType: CodeBlock
-        get() = CodeBlock.of("let objc__%N = %T.%N as %T", this.identifier, this.enum.stableSpec, this.identifier, this.enum.stableSpec)
+        get() = CodeBlock.of("let objc__%L = %T.%N as %T", this.identifier, this.enum.stableSpec, this.identifier, this.enum.stableSpec)
 
     private fun CodeBlock.Builder.addFromObjectiveCCases(classSwiftModel: KotlinClassSwiftModel): CodeBlock.Builder =
         this.add(
@@ -128,5 +128,5 @@ internal object ObjectiveCBridgeable {
         )
 
     private val KotlinEnumEntrySwiftModel.objectiveCBridgeCase: CodeBlock
-        get() = CodeBlock.of("case objc__%N?: return .%N", this.identifier, this.identifier)
+        get() = CodeBlock.of("case objc__%L?: return .%N", this.identifier, this.identifier)
 }
