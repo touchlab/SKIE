@@ -16,6 +16,7 @@ import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.Con
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
+import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -24,6 +25,7 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 internal class DeclarationBuilderImpl(
@@ -62,13 +64,18 @@ internal class DeclarationBuilderImpl(
             DeserializedClassNamespace(classDescriptor, descriptorProvider)
         }
 
-    override fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor> {
+    override fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor>? {
         val packageFragment = existingMember.findPackage()
+
+        if (packageFragment !is DeserializedPackageFragment) return null
 
         return packageNamespacesByDescriptor.getOrPut(packageFragment) {
             DeserializedPackageNamespace(existingMember, descriptorProvider)
         }
     }
+
+    override fun getPackageNamespaceOrCustom(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor> =
+        getPackageNamespace(existingMember) ?: getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
 
     override fun createFunction(
         name: Name,

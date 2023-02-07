@@ -55,7 +55,7 @@ internal class KotlinSuspendGeneratorDelegate(
     ): FunctionDescriptor =
         declarationBuilder.createFunction(
             name = "Skie_Suspend__${nextBridgingFunctionIndex++}__${functionDescriptor.name.identifier}",
-            namespace = declarationBuilder.getPackageNamespace(functionDescriptor),
+            namespace = declarationBuilder.getPackageNamespaceOrCustom(functionDescriptor),
             annotations = Annotations.EMPTY,
         ) {
             valueParameters = functionDescriptor.createValueParametersForBridgingFunction(descriptor)
