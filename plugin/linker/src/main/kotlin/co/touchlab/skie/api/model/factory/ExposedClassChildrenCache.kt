@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
 
 class ExposedClassChildrenCache(descriptorProvider: DescriptorProvider) {
 
-    private val childrenByClass = descriptorProvider.transitivelyExposedClasses
+    private val childrenByClass = descriptorProvider.exposedClasses
         .map { it.original }
         .associateWith { mutableSetOf<ClassDescriptor>() }
 

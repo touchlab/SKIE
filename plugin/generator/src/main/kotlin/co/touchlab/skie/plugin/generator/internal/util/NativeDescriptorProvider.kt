@@ -4,7 +4,6 @@ package co.touchlab.skie.plugin.generator.internal.util
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ObjCExportReflector
-import co.touchlab.skie.plugin.getAllExportedModuleDescriptors
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
@@ -20,7 +19,6 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
-import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
@@ -28,21 +26,15 @@ import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class NativeDescriptorProvider(private val context: CommonBackendContext) : DescriptorProvider {
 
-    private val mutableTransitivelyExposedClasses by lazy {
-        exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableList()
-    }
-
-    override val transitivelyExposedClasses: List<ClassDescriptor> by ::mutableTransitivelyExposedClasses
-
     private val mutableExposedClasses by lazy {
-        transitivelyExposedClasses.filter { it.isExported }.toMutableList()
+        exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableList()
     }
 
     override val exposedClasses: List<ClassDescriptor> by ::mutableExposedClasses
 
     private val mutableTopLevel by lazy {
         exportedInterface.topLevel
-            .mapValues { it.value.filter { descriptor -> descriptor.isExported }.toMutableList() }
+            .mapValues { it.value.toMutableList() }
             .filter { it.value.isNotEmpty() }
             .toMutableMap()
     }
@@ -52,7 +44,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
 
     private val mutableExposedCategoryMembers by lazy {
         exportedInterface.categoryMembers
-            .mapValues { it.value.filter { descriptor -> descriptor.isExported }.toMutableList() }
+            .mapValues { it.value.toMutableList() }
             .filter { it.value.isNotEmpty() }
             .toMutableMap()
     }
@@ -67,32 +59,30 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
         exportedInterface.mapper
     }
 
-    private val exportedModules: List<ModuleDescriptor> by lazy {
-        context.getAllExportedModuleDescriptors()
-    }
-
-    private val DeclarationDescriptor.isExported: Boolean
-        get() = this.module in exportedModules
-
     private val exportedInterface by lazy {
         val objCExport = ObjCExportReflector.new(context)
 
         objCExport.reflectedExportedInterface
     }
 
-    @get:JvmName("isExposedExtension")
-    private val CallableMemberDescriptor.isExposed: Boolean
-        get() = mapper.shouldBeExposed(this) && this.isExported
+    private val CallableMemberDescriptor.isExposable: Boolean
+        get() = mapper.shouldBeExposed(this)
 
     @get:JvmName("isExposedExtension")
-    private val ClassDescriptor.isExposed: Boolean
-        get() = mapper.shouldBeExposed(this) && this.isExported
+    private val CallableMemberDescriptor.isExposed: Boolean
+        get() = this in exposedTopLevelMembers ||
+            this in exposedCategoryMembers ||
+            (this.containingDeclaration in exposedClasses && this.isExposable)
+
+    @get:JvmName("isExposedExtension")
+    private val ClassDescriptor.isExposable: Boolean
+        get() = mapper.shouldBeExposed(this)
 
     override fun isExposed(descriptor: CallableMemberDescriptor): Boolean =
         descriptor.isExposed
 
     override fun isExposed(descriptor: ClassDescriptor): Boolean =
-        descriptor.isExposed
+        descriptor.isExposable
 
     override fun isTransitivelyExposed(descriptor: ClassDescriptor): Boolean =
         mapper.shouldBeExposed(descriptor)
@@ -106,16 +96,15 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     }
 
     private fun registerDescriptor(descriptor: ClassDescriptor) {
-        if (!isExposed(descriptor)) {
+        if (!descriptor.isExposable) {
             return
         }
 
-        mutableTransitivelyExposedClasses.add(descriptor)
         mutableExposedClasses.add(descriptor)
     }
 
     private fun registerDescriptor(descriptor: CallableMemberDescriptor) {
-        if (!descriptor.isExposed) {
+        if (!descriptor.isExposable) {
             return
         }
 
@@ -176,14 +165,14 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     }
 
     override fun getExposedCompanionObject(classDescriptor: ClassDescriptor): ClassDescriptor? =
-        classDescriptor.companionObjectDescriptor?.takeIf { it.isExposed }
+        classDescriptor.companionObjectDescriptor?.takeIf { it.isExposable }
 
     override fun getExposedNestedClasses(classDescriptor: ClassDescriptor): List<ClassDescriptor> =
         classDescriptor.unsubstitutedInnerClassesScope
             .getDescriptorsFiltered(DescriptorKindFilter.CLASSIFIERS)
             .filterIsInstance<ClassDescriptor>()
             .filter { it.kind == ClassKind.CLASS || it.kind == ClassKind.OBJECT }
-            .filter { it.isExposed }
+            .filter { it.isExposable }
 
     override fun getExposedEnumEntries(classDescriptor: ClassDescriptor): List<ClassDescriptor> =
         classDescriptor.unsubstitutedInnerClassesScope

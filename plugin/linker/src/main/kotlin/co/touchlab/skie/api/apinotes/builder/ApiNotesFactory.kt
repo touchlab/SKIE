@@ -29,12 +29,12 @@ internal class ApiNotesFactory(
 
     context(SwiftModelScope)
     private val DescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
-        get() = this.transitivelyExposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
+        get() = this.exposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
             this.exposedFiles.map { it.swiftModel }
 
     context(SwiftModelScope)
     private val DescriptorProvider.swiftModelsForInterfaces: List<KotlinTypeSwiftModel>
-        get() = this.transitivelyExposedClasses.filter { it.kind.isInterface }.map { it.swiftModel }
+        get() = this.exposedClasses.filter { it.kind.isInterface }.map { it.swiftModel }
 
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
@@ -44,24 +44,24 @@ internal class ApiNotesFactory(
             swiftFqName = this.fqName,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,
-            methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote() },
-            properties = this.allDirectlyCallableMembers.filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote() },
+            methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote(this) },
+            properties = this.allDirectlyCallableMembers.filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote(this) },
         )
 
-    private fun KotlinFunctionSwiftModel.toApiNote(): ApiNotesMethod {
+    private fun KotlinFunctionSwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesMethod {
         return ApiNotesMethod(
             objCSelector = this.objCSelector,
-            kind = (this.receiver as? KotlinTypeSwiftModel)?.kind?.toMemberKind() ?: error("$this does not belong to exposed KotlinType."),
+            kind = owner.kind.toMemberKind(),
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,
         )
     }
 
-    private fun KotlinRegularPropertySwiftModel.toApiNote(): ApiNotesProperty {
+    private fun KotlinRegularPropertySwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesProperty {
         return ApiNotesProperty(
             objCName = this.objCName,
-            kind = (this.receiver as? KotlinTypeSwiftModel)?.kind?.toMemberKind() ?: error("$this does not belong to exposed KotlinType."),
+            kind = owner.kind.toMemberKind(),
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             isRemoved = this.visibility.isRemoved,

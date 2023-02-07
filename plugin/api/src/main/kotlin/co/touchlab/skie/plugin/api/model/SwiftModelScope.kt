@@ -23,8 +23,6 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface SwiftModelScope {
 
-    val transitivelyExposedClasses: List<KotlinClassSwiftModel>
-
     val exposedClasses: List<KotlinClassSwiftModel>
 
     val exposedFiles: List<KotlinTypeSwiftModel>

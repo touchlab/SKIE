@@ -18,7 +18,7 @@ class ClassesConflictsApiNotesFix(
 
     fun fixNames() {
         skieModule.configure(SkieModule.Ordering.Last) {
-            val allModels = descriptorProvider.transitivelyExposedClasses.map { it.swiftModel } +
+            val allModels = descriptorProvider.exposedClasses.map { it.swiftModel } +
                 descriptorProvider.exposedFiles.map { it.swiftModel }
 
             val sortedModels = allModels.sortedByCollisionResolutionPriority()

@@ -9,8 +9,6 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface DescriptorProvider {
 
-    val transitivelyExposedClasses: List<ClassDescriptor>
-
     val exposedClasses: List<ClassDescriptor>
 
     val exposedFiles: List<SourceFile>
@@ -19,6 +17,7 @@ interface DescriptorProvider {
 
     val exposedTopLevelMembers: List<CallableMemberDescriptor>
 
+    // TODO Remove these exposed functions
     fun isExposed(descriptor: CallableMemberDescriptor): Boolean
 
     fun isExposed(descriptor: ClassDescriptor): Boolean
@@ -29,7 +28,6 @@ interface DescriptorProvider {
 
     fun getFileModule(file: SourceFile): ModuleDescriptor
 
-    // TODO Cannot be used to retrieve SwiftModels, add extra functions to SwiftModelScope
     /**
      * Functions/properties without extensions and constructors (including overridden ones)
      */

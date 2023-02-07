@@ -17,8 +17,6 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface MutableSwiftModelScope : SwiftModelScope {
 
-    override val transitivelyExposedClasses: List<MutableKotlinClassSwiftModel>
-
     override val exposedClasses: List<MutableKotlinClassSwiftModel>
 
     override val exposedFiles: List<MutableKotlinTypeSwiftModel>

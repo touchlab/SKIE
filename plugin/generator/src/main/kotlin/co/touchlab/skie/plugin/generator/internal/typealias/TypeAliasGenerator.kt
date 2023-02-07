@@ -56,7 +56,7 @@ internal class TypeAliasGenerator(
 
     context(SwiftModelScope)
     private fun TypeSpec.Builder.addClassTypeAliases(descriptorProvider: DescriptorProvider) {
-        descriptorProvider.transitivelyExposedClasses.forEach {
+        descriptorProvider.exposedClasses.forEach {
             addTypeAlias(it.swiftModel)
         }
     }

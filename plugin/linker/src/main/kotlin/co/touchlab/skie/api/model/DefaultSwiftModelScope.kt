@@ -61,12 +61,9 @@ class DefaultSwiftModelScope(
         .mapNotNull { swiftModel -> swiftModel.descriptor?.let { it to swiftModel } }
         .toMap()
 
-    private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.transitivelyExposedClasses)
-    private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.transitivelyExposedClasses)
+    private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.exposedClasses)
+    private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.exposedClasses)
     private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
-
-    override val transitivelyExposedClasses: List<MutableKotlinClassSwiftModel> =
-        descriptorProvider.transitivelyExposedClasses.map { it.swiftModel }
 
     override val exposedClasses: List<MutableKotlinClassSwiftModel> =
         descriptorProvider.exposedClasses.map { it.swiftModel }

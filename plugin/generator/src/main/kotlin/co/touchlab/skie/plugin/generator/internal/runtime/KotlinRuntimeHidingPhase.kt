@@ -14,7 +14,7 @@ internal class KotlinRuntimeHidingPhase(
 
     override fun execute() {
         skieContext.module.configure {
-            descriptorProvider.transitivelyExposedClasses
+            descriptorProvider.exposedClasses
                 .filter { it.belongsToSkieRuntime }
                 .forEach {
                     it.swiftModel.visibility = SwiftModelVisibility.Hidden

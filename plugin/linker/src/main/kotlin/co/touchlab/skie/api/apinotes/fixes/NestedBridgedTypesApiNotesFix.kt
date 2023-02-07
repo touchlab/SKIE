@@ -39,11 +39,11 @@ class NestedBridgedTypesApiNotesFix(
 
     context(SwiftModelScope)
     private val DescriptorProvider.allExposedTypesSwiftModels: List<KotlinTypeSwiftModel>
-        get() = this.transitivelyExposedClasses.map { it.swiftModel } + this.exposedFiles.map { it.swiftModel }
+        get() = this.exposedClasses.map { it.swiftModel } + this.exposedFiles.map { it.swiftModel }
 
     context(MutableSwiftModelScope)
     private val DescriptorProvider.allExposedTypesSwiftModels: List<MutableKotlinTypeSwiftModel>
-        get() = this.transitivelyExposedClasses.map { it.swiftModel } + this.exposedFiles.map { it.swiftModel }
+        get() = this.exposedClasses.map { it.swiftModel } + this.exposedFiles.map { it.swiftModel }
 
     private val KotlinTypeSwiftModel.needsTypeAliasForBridging: Boolean
         get() = bridge?.fqName != bridge?.fqNameSafeForBridging

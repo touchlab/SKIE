@@ -1,10 +1,11 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ModuleDescriptorImplReflector
-import co.touchlab.skie.plugin.moduleDescriptorOrNull
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -24,6 +25,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
 internal class NewFileNamespace private constructor(
     name: FqName,
@@ -82,7 +84,7 @@ internal class NewFileNamespace private constructor(
         private val descriptorProvider: DescriptorProvider,
     ) {
 
-        private val moduleDescriptor = requireNotNull(context.moduleDescriptorOrNull) { "Context must have a module descriptor." }
+        private val moduleDescriptor = requireNotNull((context as? KonanContext)?.moduleDescriptor) { "Context must have a module descriptor." }
 
         private val namespaceContext = Context(moduleDescriptor, mainIrModuleFragment)
 
