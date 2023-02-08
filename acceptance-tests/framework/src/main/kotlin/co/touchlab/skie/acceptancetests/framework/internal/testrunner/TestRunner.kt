@@ -19,6 +19,7 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.createFile
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.time.Duration
 
 internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFactory) {
 
@@ -148,6 +149,7 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     private fun TestResult.withLogs(testLogger: TestLogger): TestResultWithLogs =
         TestResultWithLogs(
             this,
+            Duration.ZERO,
             testLogger.toString(),
         )
 

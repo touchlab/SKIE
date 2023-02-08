@@ -1,3 +1,9 @@
 package co.touchlab.skie.acceptancetests.framework
 
-data class TestResultWithLogs(val testResult: TestResult, val logs: String)
+import kotlin.time.Duration
+
+data class TestResultWithLogs(
+    val testResult: TestResult,
+    val duration: Duration,
+    val logs: String,
+)

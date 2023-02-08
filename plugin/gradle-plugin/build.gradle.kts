@@ -1,6 +1,5 @@
 import co.touchlab.skie.gradle.publish.dependencyName
 import co.touchlab.skie.gradle.publish.mavenArtifactId
-import co.touchlab.skie.gradle.test.ExternalLibrariesTask
 
 plugins {
     id("skie-jvm")
@@ -54,14 +53,6 @@ tasks.withType<PluginUnderTestMetadata>().configureEach {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-}
-
-val updateExternalLibrariesLockfile = tasks.register<ExternalLibrariesTask>("updateExternalLibrariesLockfile") {
-    group = "verification"
-    description = "Loads external libraries"
-
-    mavenSearchCache.set(layout.buildDirectory.file("tmp/maven-search-cache.json"))
-    librariesToTestFile.set(layout.projectDirectory.file("src/test/resources/libraries-to-test.json"))
 }
 
 tasks.named<Test>("test").configure {

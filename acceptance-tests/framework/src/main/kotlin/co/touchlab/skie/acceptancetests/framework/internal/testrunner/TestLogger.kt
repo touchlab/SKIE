@@ -1,6 +1,6 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner
 
-internal class TestLogger {
+class TestLogger {
 
     private val builder = StringBuilder()
 

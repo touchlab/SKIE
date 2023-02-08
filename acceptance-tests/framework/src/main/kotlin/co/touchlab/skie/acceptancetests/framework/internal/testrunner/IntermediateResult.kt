@@ -2,7 +2,7 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner
 
 import co.touchlab.skie.acceptancetests.framework.TestResult
 
-internal sealed interface IntermediateResult<out T> {
+sealed interface IntermediateResult<out T> {
 
     fun <R> map(action: (T) -> R): IntermediateResult<R>
 

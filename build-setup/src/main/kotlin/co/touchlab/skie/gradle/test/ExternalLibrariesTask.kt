@@ -12,16 +12,22 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedConfiguration
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.exclude
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.konan.target.KonanTarget
-import org.jetbrains.kotlin.util.removeSuffixIfPresent
 
 data class VersionedLibrary(
     val library: Library,
@@ -53,6 +59,12 @@ abstract class ExternalLibrariesTask: DefaultTask() {
     @get:OutputFile
     abstract val librariesToTestFile: RegularFileProperty
 
+    @get:Input
+    abstract val acceptableKotlinPrefixes: SetProperty<String>
+
+    @get:Input
+    abstract val platformSuffix: Property<String>
+
     @TaskAction
     fun downloadAndStoreLibraries() {
         val libraries = loadOrPopulateMavenCache()
@@ -60,16 +72,13 @@ abstract class ExternalLibrariesTask: DefaultTask() {
 
         val versionedLibrariesToTest = getVersionedLibrariesToTest(librariesToTest)
 
-        val json = versionedLibrariesToTest.associate { library ->
-            library.dependencyString to listOf(library.dependencyString)
-        }
-
         librariesToTestFile.get().asFile.writeText(
-            JsonOutput.toJson(json),
+            versionedLibrariesToTest.map { it.dependencyString }.sorted().joinToString("\n")
         )
     }
 
     private fun getAllLibrariesToTest(libraries: List<Library>): Set<Library> {
+        val platformSuffix = platformSuffix.get()
         val allResolvedDependencies = libraries.flatMapIndexed { index, library ->
             logger.info("Resolving {}", library.moduleName)
             val configuration = createNativeConfiguration("library-test-configuration-$index")
@@ -82,27 +91,15 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                 )
             }
 
-            val resolvedConfiguration = configuration.resolvedConfiguration
-            resolvedConfiguration.errorIfExists?.let {
-                logger.warn("Error resolving {}", library.moduleName, it)
-                return@flatMapIndexed emptyList()
-            }
-
-            val unsupportedKotlinVersions = unsupportedKotlinVersions(resolvedConfiguration, library)
-            if (unsupportedKotlinVersions.isNotEmpty()) {
-                // TODO: Print info - which kotlin version is used
-                logger.warn("Wrong kotlin version {} for {}", unsupportedKotlinVersions.joinToString(), library.moduleName)
-                return@flatMapIndexed emptyList()
-            }
-
-            fun Set<ResolvedDependency>.flatten(): Set<ResolvedDependency> = flatMap { listOf(it) + it.children.flatten() }.toSet()
-
-            resolvedConfiguration.firstLevelModuleDependencies.flatten()
+            configuration.resolvedConfiguration.lenientConfiguration.allModuleDependencies
         }.associateBy { it.module.id.module.toString().toLowerCase() }
 
         return allResolvedDependencies
+            .filterKeys {
+                it != "org.jetbrains.kotlin:kotlin-stdlib-common"
+            }
             .filterKeys { key ->
-                !key.endsWith(platformSuffix) || !allResolvedDependencies.containsKey(key.removeSuffixIfPresent(platformSuffix))
+                key.endsWith(platformSuffix) || !allResolvedDependencies.containsKey(key + platformSuffix)
             }
             .values
             .map {
@@ -116,19 +113,31 @@ abstract class ExternalLibrariesTask: DefaultTask() {
 
     private fun getVersionedLibrariesToTest(librariesToTest: Set<Library>) =
         librariesToTest.mapIndexedNotNull { index, library ->
-            val configuration = createNativeConfiguration("library-test-configuration-single-$index")
+            val configurationWithKotlin = createNativeConfiguration("library-test-configuration-single-$index-kotlin")
+            val configuration = createNativeConfiguration("library-test-configuration-single-$index") {
+                exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+            }
 
             project.dependencies {
-                configuration(
-                    group = library.group,
-                    name = library.name,
-                    version = "+",
-                )
+                listOf(configurationWithKotlin, configuration).forEach {
+                    it(
+                        group = library.group,
+                        name = library.name,
+                        version = "+",
+                    )
+                }
             }
 
             val resolvedConfiguration = configuration.resolvedConfiguration
             resolvedConfiguration.errorIfExists?.let {
                 logger.warn("Error resolving {}", library.moduleName, it)
+                return@mapIndexedNotNull null
+            }
+
+            val unsupportedKotlinVersions = unsupportedKotlinVersions(configurationWithKotlin.resolvedConfiguration, library)
+            if (unsupportedKotlinVersions.isNotEmpty()) {
+                // TODO: Print info - which kotlin version is used
+                logger.warn("Wrong kotlin version {} for {}", unsupportedKotlinVersions.joinToString(), library.moduleName)
                 return@mapIndexedNotNull null
             }
 
@@ -154,7 +163,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
             }
         } else {
             val downloadedLibraries = loadAll("*$platformSuffix").map {
-                it.copy(name = it.name.removeSuffix(platformSuffix).removeSuffix("-iosArm64"))
+                it.copy(name = it.name)
             }
 
             val librariesJson = JsonOutput.toJson(
@@ -205,17 +214,21 @@ abstract class ExternalLibrariesTask: DefaultTask() {
         }
     }
 
-    private fun createNativeConfiguration(name: String): Configuration {
+    private fun createNativeConfiguration(name: String, configure: Configuration.() -> Unit = { }): Configuration {
         return project.configurations.create(name) {
             isCanBeConsumed = false
             isCanBeResolved = true
 
-            attributes.attribute(
-                KotlinPlatformType.attribute,
-                KotlinPlatformType.native,
-            )
-            attributes.attribute(KotlinNativeTarget.konanTargetAttribute, KonanTarget.IOS_ARM64.name)
-            attributes.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+            attributes {
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+                attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category::class.java, Category.LIBRARY))
+                attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, project.objects.named(TargetJvmEnvironment::class.java, "non-jvm"))
+                attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+                attribute(KotlinNativeTarget.konanTargetAttribute, KonanTarget.IOS_ARM64.name)
+                attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "org.jetbrains.kotlin.klib")
+            }
+
+            configure()
         }
     }
 
@@ -228,7 +241,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
             logger.warn("No Kotlin version found for {}", library.moduleName)
         }
         return kotlinVersions.filter { kotlinVersion ->
-            allowedKotlinPrefixes.none { kotlinVersion.startsWith(it) }
+            acceptableKotlinPrefixes.get().none { kotlinVersion.startsWith(it) }
         }.toSet()
     }
 
@@ -248,13 +261,9 @@ abstract class ExternalLibrariesTask: DefaultTask() {
     private val ResolvedConfiguration.errorIfExists: Throwable?
         get() = try {
             rethrowFailure()
+            files
             null
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e
         }
-
-    companion object {
-        private val allowedKotlinPrefixes = setOf("1.7.", "1.6.", "1.5.", "1.4.")
-        private val platformSuffix = "-iosarm64"
-    }
 }
