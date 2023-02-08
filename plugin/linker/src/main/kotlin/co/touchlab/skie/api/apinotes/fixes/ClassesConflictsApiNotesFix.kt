@@ -16,6 +16,24 @@ class ClassesConflictsApiNotesFix(
     private val descriptorProvider: DescriptorProvider,
 ) {
 
+    private val reservedNames = listOf(
+        "KotlinBase",
+        "KotlinMutableSet",
+        "KotlinDictionary",
+        "KotlinNumber",
+        "KotlinByte",
+        "KotlinUByte",
+        "KotlinShort",
+        "KotlinUShort",
+        "KotlinInt",
+        "KotlinUInt",
+        "KotlinLong",
+        "KotlinULong",
+        "KotlinFloat",
+        "KotlinDouble",
+        "KotlinBoolean",
+    )
+
     fun fixNames() {
         skieModule.configure(SkieModule.Ordering.Last) {
             val allModels = descriptorProvider.exposedClasses.map { it.swiftModel } +
@@ -74,7 +92,7 @@ class ClassesConflictsApiNotesFix(
         }
 
     private fun buildUniqueSignatureSet(models: List<MutableKotlinTypeSwiftModel>) {
-        val existingFqNames = mutableSetOf<String>()
+        val existingFqNames = reservedNames.toMutableSet()
 
         models.forEach { model ->
             while (model.fqName in existingFqNames) {

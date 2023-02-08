@@ -12,7 +12,7 @@
         <list>
           <option value=":plugin:gradle-plugin:test" />
           <option value="--tests" />
-          <option value="&quot;co.touchlab.skie.plugin.ExternalLibrariesTest.testExternalLibraries&quot;" />
+          <option value="co.touchlab.skie.plugin.libraries.ExternalLibrariesTest" />
         </list>
       </option>
       <option name="vmOptions" />
