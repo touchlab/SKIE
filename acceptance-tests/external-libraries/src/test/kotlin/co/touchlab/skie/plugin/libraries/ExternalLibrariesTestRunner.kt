@@ -12,6 +12,7 @@ import co.touchlab.skie.external_libraries.BuildConfig
 import io.kotest.core.spec.style.FunSpec
 import kotlinx.coroutines.channels.Channel
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 import kotlin.io.path.Path
 import kotlin.io.path.writeText
@@ -38,11 +39,13 @@ class ExternalLibrariesTestRunner(
         val tempSourceFile = tempDirectory.resolve("KotlinFile.kt")
 
         scope.test("Evaluation") {
-            val results = tests
+            val testCompletionTracking = AtomicInteger(0)
+            val filteredTests = tests
                 .filter { testFilter.shouldBeEvaluated(it) }
+            val results = filteredTests
                 .parallelStream()
                 .map {
-                    val result = runTest(it)
+                    val result = runTest(it) { "${testCompletionTracking.incrementAndGet()}/${filteredTests.size}" }
                     it to result
                 }
                 .collect(Collectors.toList())
@@ -60,7 +63,7 @@ class ExternalLibrariesTestRunner(
     }
 
     @OptIn(ExperimentalTime::class)
-    fun runTest(test: ExternalLibraryTest): TestResultWithLogs {
+    fun runTest(test: ExternalLibraryTest, positionProvider: () -> String): TestResultWithLogs {
         val tempDirectory = test.outputPath
         tempDirectory.toFile().deleteRecursively()
         tempDirectory.toFile().mkdirs()
@@ -105,7 +108,7 @@ class ExternalLibrariesTestRunner(
 
         val testResultWithLogs = testResult.withLogsAndDuration(testLogger, measuredTest.duration)
         writeResult(test, testResultWithLogs)
-        reportResult(test, testResultWithLogs)
+        reportResult(test, testResultWithLogs, positionProvider)
         return testResultWithLogs
     }
 
@@ -115,7 +118,7 @@ class ExternalLibrariesTestRunner(
         test.resultPath.writeText(resultAsText)
     }
 
-    private fun reportResult(test: ExternalLibraryTest, result: TestResultWithLogs) {
+    private fun reportResult(test: ExternalLibraryTest, result: TestResultWithLogs, positionProvider: () -> String) {
         val color = if (test.expectedResult.hasSucceeded(result)) {
             "\u001b[32m"
         } else {
@@ -123,7 +126,7 @@ class ExternalLibrariesTestRunner(
         }
         val colorReset = "\u001b[0m"
 
-        val line = "${test.fullName}: ${test.expectedResult.hasSucceededAsString(result)} (took ${result.duration.toString(DurationUnit.SECONDS, 2)})"
+        val line = "${test.fullName}: ${test.expectedResult.hasSucceededAsString(result)} (${positionProvider()}, took ${result.duration.toString(DurationUnit.SECONDS, 2)})"
 
         println(color + line + colorReset)
     }
