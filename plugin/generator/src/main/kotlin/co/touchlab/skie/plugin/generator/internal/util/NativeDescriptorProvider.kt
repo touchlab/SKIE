@@ -27,10 +27,10 @@ import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 internal class NativeDescriptorProvider(private val context: CommonBackendContext) : DescriptorProvider {
 
     private val mutableExposedClasses by lazy {
-        exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableList()
+        exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableSet()
     }
 
-    override val exposedClasses: List<ClassDescriptor> by ::mutableExposedClasses
+    override val exposedClasses: Set<ClassDescriptor> by ::mutableExposedClasses
 
     private val mutableTopLevel by lazy {
         exportedInterface.topLevel
@@ -39,8 +39,8 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
             .toMutableMap()
     }
 
-    override val exposedFiles: List<SourceFile>
-        get() = mutableTopLevel.keys.toList()
+    override val exposedFiles: Set<SourceFile>
+        get() = mutableTopLevel.keys.toSet()
 
     private val mutableExposedCategoryMembers by lazy {
         exportedInterface.categoryMembers
@@ -49,11 +49,11 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
             .toMutableMap()
     }
 
-    override val exposedCategoryMembers: List<CallableMemberDescriptor>
-        get() = mutableExposedCategoryMembers.values.flatten()
+    override val exposedCategoryMembers: Set<CallableMemberDescriptor>
+        get() = mutableExposedCategoryMembers.values.flatten().toSet()
 
-    override val exposedTopLevelMembers: List<CallableMemberDescriptor>
-        get() = mutableTopLevel.values.flatten()
+    override val exposedTopLevelMembers: Set<CallableMemberDescriptor>
+        get() = mutableTopLevel.values.flatten().toSet()
 
     val mapper: ObjCExportMapper by lazy {
         exportedInterface.mapper
@@ -68,24 +68,13 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     private val CallableMemberDescriptor.isExposable: Boolean
         get() = mapper.shouldBeExposed(this)
 
-    @get:JvmName("isExposedExtension")
     private val CallableMemberDescriptor.isExposed: Boolean
         get() = this in exposedTopLevelMembers ||
             this in exposedCategoryMembers ||
             (this.containingDeclaration in exposedClasses && this.isExposable)
 
-    @get:JvmName("isExposedExtension")
     private val ClassDescriptor.isExposable: Boolean
         get() = mapper.shouldBeExposed(this)
-
-    override fun isExposed(descriptor: CallableMemberDescriptor): Boolean =
-        descriptor.isExposed
-
-    override fun isExposed(descriptor: ClassDescriptor): Boolean =
-        descriptor.isExposable
-
-    override fun isTransitivelyExposed(descriptor: ClassDescriptor): Boolean =
-        mapper.shouldBeExposed(descriptor)
 
     override fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
         when (descriptor) {

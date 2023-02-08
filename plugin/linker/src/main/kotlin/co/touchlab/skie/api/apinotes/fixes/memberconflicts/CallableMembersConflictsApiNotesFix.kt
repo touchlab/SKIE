@@ -83,7 +83,7 @@ class CallableMembersConflictsApiNotesFix(
                 .count { parameterDescriptor ->
                     val parameterClassDescriptor = parameterDescriptor.type.constructor.declarationDescriptor as? ClassDescriptor
 
-                    parameterClassDescriptor?.let { descriptorProvider.isExposed(it) } != true
+                    parameterClassDescriptor?.let { it in descriptorProvider.exposedClasses } != true
                 }
                 .coerceAtMost(31)
 

@@ -13,5 +13,11 @@ interface KotlinClassSwiftModel : KotlinTypeSwiftModel {
 
     val enumEntries: List<KotlinEnumEntrySwiftModel>
 
+    val isSealed: Boolean
+
+    val hasUnexposedSealedSubclasses: Boolean
+
+    val exposedSealedSubclasses: List<KotlinClassSwiftModel>
+
     override val original: KotlinClassSwiftModel
 }

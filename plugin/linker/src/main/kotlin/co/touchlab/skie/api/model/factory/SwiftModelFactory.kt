@@ -35,7 +35,7 @@ class SwiftModelFactory(
     fun createMembers(descriptors: List<CallableMemberDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
         membersDelegate.createMembers(descriptors)
 
-    fun createClasses(descriptors: List<ClassDescriptor>): Map<ClassDescriptor, MutableKotlinClassSwiftModel> =
+    fun createClasses(descriptors: Set<ClassDescriptor>): Map<ClassDescriptor, MutableKotlinClassSwiftModel> =
         descriptors
             .map { it.original }
             .associateWith { classDescriptor ->
@@ -47,14 +47,14 @@ class SwiftModelFactory(
                 )
             }
 
-    fun createEnumEntries(descriptors: List<ClassDescriptor>): Map<ClassDescriptor, KotlinEnumEntrySwiftModel> =
+    fun createEnumEntries(descriptors: Set<ClassDescriptor>): Map<ClassDescriptor, KotlinEnumEntrySwiftModel> =
         descriptors
             .map { it.original }
             .filter { it.kind.isEnumClass }
             .flatMap { it.enumEntries }
             .associateWith { ActualKotlinEnumEntrySwiftModel(it, namer, swiftModelScope) }
 
-    fun createFiles(files: List<SourceFile>): Map<SourceFile, MutableKotlinTypeSwiftModel> =
+    fun createFiles(files: Set<SourceFile>): Map<SourceFile, MutableKotlinTypeSwiftModel> =
         files.associateWith { file ->
             ActualKotlinFileSwiftModel(
                 file = file,

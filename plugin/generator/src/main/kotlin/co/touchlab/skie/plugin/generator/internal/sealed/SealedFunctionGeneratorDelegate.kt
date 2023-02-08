@@ -2,9 +2,8 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
-import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FileSpec
@@ -12,71 +11,65 @@ import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedFunctionGeneratorDelegate(
-    override val descriptorProvider: DescriptorProvider,
     override val configuration: Configuration,
 ) : SealedGeneratorExtensionContainer, SwiftPoetExtensionContainer {
 
-    context(SwiftModelScope)
-    fun generate(declaration: ClassDescriptor, enumType: TypeName, fileBuilder: FileSpec.Builder) {
-        val enumGenericTypeParameter = declaration.enumGenericTypeParameter
+    fun generate(swiftModel: KotlinClassSwiftModel, enumType: TypeName, fileBuilder: FileSpec.Builder) {
+        val enumGenericTypeParameter = swiftModel.enumGenericTypeParameter
 
         fileBuilder.addFunction(
-            FunctionSpec.builder(declaration.enumConstructorFunctionName)
+            FunctionSpec.builder(swiftModel.enumConstructorFunctionName)
                 .addModifiers(Modifier.PUBLIC)
-                .addTypeVariables(declaration.swiftTypeVariablesNames + enumGenericTypeParameter)
+                .addTypeVariables(swiftModel.swiftTypeVariablesNames + enumGenericTypeParameter)
                 .addParameter(
-                    label = declaration.enumConstructorArgumentLabel,
-                    name = declaration.enumConstructorParameterName,
+                    label = swiftModel.enumConstructorArgumentLabel,
+                    name = swiftModel.enumConstructorParameterName,
                     type = enumGenericTypeParameter,
                 )
                 .returns(enumType)
-                .addExhaustivelyFunctionBody(declaration, enumType)
+                .addExhaustivelyFunctionBody(swiftModel, enumType)
                 .build()
         )
     }
 
-    private val ClassDescriptor.enumConstructorFunctionName: String
+    private val KotlinClassSwiftModel.enumConstructorFunctionName: String
         get() = this.getConfiguration(SealedInterop.Function.Name)
 
-    private val ClassDescriptor.enumConstructorArgumentLabel: String
+    private val KotlinClassSwiftModel.enumConstructorArgumentLabel: String
         get() = this.getConfiguration(SealedInterop.Function.ArgumentLabel)
 
-    private val ClassDescriptor.enumConstructorParameterName: String
+    private val KotlinClassSwiftModel.enumConstructorParameterName: String
         get() = this.getConfiguration(SealedInterop.Function.ParameterName)
 
-    context(SwiftModelScope)
-    private val ClassDescriptor.enumGenericTypeParameter: TypeVariableName
+    private val KotlinClassSwiftModel.enumGenericTypeParameter: TypeVariableName
         get() {
             val otherTypeNames = this.swiftTypeVariablesNames.map { it.name }
 
             val typeName = "SEALED".collisionFreeIdentifier(otherTypeNames)
 
-            return TypeVariableName.typeVariable(typeName).withBounds(TypeVariableName.bound(swiftNameWithTypeParameters(this)))
+            return TypeVariableName.typeVariable(typeName).withBounds(TypeVariableName.bound(this.swiftNameWithTypeParameters))
         }
 
-    context(SwiftModelScope)
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
-        declaration: ClassDescriptor,
+        swiftModel: KotlinClassSwiftModel,
         enumType: TypeName,
     ): FunctionSpec.Builder = addCode(
         CodeBlock.builder()
-            .addExhaustivelyCaseBranches(declaration, enumType)
-            .addExhaustivelyFunctionEnd(declaration, enumType)
+            .addExhaustivelyCaseBranches(swiftModel, enumType)
+            .addExhaustivelyFunctionEnd(swiftModel, enumType)
             .build()
     )
 
-    context(SwiftModelScope)
     private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
-        declaration: ClassDescriptor,
+        swiftModel: KotlinClassSwiftModel,
         enumType: TypeName,
     ): CodeBlock.Builder {
-        declaration.explicitSealedSubclasses
+        swiftModel.visibleSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
-                val parameterName = declaration.enumConstructorParameterName
-                val subclassName = with(subclassSymbol) { swiftNameWithTypeParametersForSealedCase(declaration).canonicalName }
+                val parameterName = swiftModel.enumConstructorParameterName
+                val subclassName = with(subclassSymbol) { swiftNameWithTypeParametersForSealedCase(swiftModel).canonicalName }
 
                 val condition = "let $parameterName = $parameterName as? $subclassName"
 
@@ -92,35 +85,33 @@ internal class SealedFunctionGeneratorDelegate(
         return this
     }
 
-    context(SwiftModelScope)
     private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(
-        declaration: ClassDescriptor,
+        swiftModel: KotlinClassSwiftModel,
         enumType: TypeName,
     ): CodeBlock.Builder {
-        if (declaration.hasAnyVisibleSealedSubclasses) {
-            addExhaustivelyElseBranch(declaration, enumType)
+        if (swiftModel.hasAnyVisibleSealedSubclasses) {
+            addExhaustivelyElseBranch(swiftModel, enumType)
         } else {
-            addReturnElse(declaration, enumType)
+            addReturnElse(swiftModel, enumType)
         }
 
         return this
     }
 
-    private val ClassDescriptor.hasAnyVisibleSealedSubclasses: Boolean
-        get() = this.sealedSubclasses.any { it.isExplicitSealedSubclass }
+    private val KotlinClassSwiftModel.hasAnyVisibleSealedSubclasses: Boolean
+        get() = this.visibleSealedSubclasses.isNotEmpty()
 
-    context(SwiftModelScope)
-    private fun CodeBlock.Builder.addExhaustivelyElseBranch(declaration: ClassDescriptor, enumType: TypeName) {
+    private fun CodeBlock.Builder.addExhaustivelyElseBranch(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
         nextControlFlow("else")
 
-        if (declaration.hasElseCase) {
-            addReturnElse(declaration, enumType)
+        if (swiftModel.hasElseCase) {
+            addReturnElse(swiftModel, enumType)
         } else {
             add(
                 "fatalError(" +
                     "\"Unknown subtype. " +
                     "This error should not happen under normal circumstances " +
-                    "since ${declaration.swiftModel.bridgedOrStableFqName} is sealed." +
+                    "since ${swiftModel.bridgedOrStableFqName} is sealed." +
                     "\")\n"
             )
         }
@@ -128,7 +119,7 @@ internal class SealedFunctionGeneratorDelegate(
         endControlFlow("else")
     }
 
-    private fun CodeBlock.Builder.addReturnElse(declaration: ClassDescriptor, enumType: TypeName) {
-        add("return ${enumType.canonicalName}.${declaration.elseCaseName}\n")
+    private fun CodeBlock.Builder.addReturnElse(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
+        add("return ${enumType.canonicalName}.${swiftModel.elseCaseName}\n")
     }
 }

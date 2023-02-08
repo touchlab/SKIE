@@ -1,55 +1,50 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedEnumGeneratorDelegate(
-    override val descriptorProvider: DescriptorProvider,
     override val configuration: Configuration,
 ) : SealedGeneratorExtensionContainer {
 
     private val enumName = "Enum"
 
-    context(SwiftModelScope)
-    fun generate(declaration: ClassDescriptor, classNamespace: DeclaredTypeName, fileBuilder: FileSpec.Builder): TypeName {
+    fun generate(swiftModel: KotlinClassSwiftModel, classNamespace: DeclaredTypeName, fileBuilder: FileSpec.Builder): TypeName {
         fileBuilder.addExtension(
             ExtensionSpec.builder(classNamespace)
                 .addModifiers(Modifier.PUBLIC)
                 .addType(
                     TypeSpec.enumBuilder(enumName)
                         .addAttribute("frozen")
-                        .addTypeVariables(declaration.swiftTypeVariablesNames)
-                        .addSealedEnumCases(declaration)
+                        .addTypeVariables(swiftModel.swiftTypeVariablesNames)
+                        .addSealedEnumCases(swiftModel)
                         .build()
                 )
                 .build()
         )
 
-        return classNamespace.nestedType(enumName).withTypeParameters(declaration)
+        return classNamespace.nestedType(enumName).withTypeParameters(swiftModel)
     }
 
-    context(SwiftModelScope)
-    private fun TypeSpec.Builder.addSealedEnumCases(declaration: ClassDescriptor): TypeSpec.Builder {
-        declaration.explicitSealedSubclasses
+    private fun TypeSpec.Builder.addSealedEnumCases(swiftModel: KotlinClassSwiftModel): TypeSpec.Builder {
+        swiftModel.visibleSealedSubclasses
             .forEach { sealedSubclass ->
                 addEnumCase(
                     sealedSubclass.enumCaseName,
                     with(sealedSubclass) {
-                        swiftNameWithTypeParametersForSealedCase(declaration)
+                        swiftNameWithTypeParametersForSealedCase(swiftModel)
                     },
                 )
             }
 
-        if (declaration.hasElseCase) {
-            addEnumCase(declaration.elseCaseName)
+        if (swiftModel.hasElseCase) {
+            addEnumCase(swiftModel.elseCaseName)
         }
 
         return this

@@ -9,20 +9,13 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface DescriptorProvider {
 
-    val exposedClasses: List<ClassDescriptor>
+    val exposedClasses: Set<ClassDescriptor>
 
-    val exposedFiles: List<SourceFile>
+    val exposedFiles: Set<SourceFile>
 
-    val exposedCategoryMembers: List<CallableMemberDescriptor>
+    val exposedCategoryMembers: Set<CallableMemberDescriptor>
 
-    val exposedTopLevelMembers: List<CallableMemberDescriptor>
-
-    // TODO Remove these exposed functions
-    fun isExposed(descriptor: CallableMemberDescriptor): Boolean
-
-    fun isExposed(descriptor: ClassDescriptor): Boolean
-
-    fun isTransitivelyExposed(descriptor: ClassDescriptor): Boolean
+    val exposedTopLevelMembers: Set<CallableMemberDescriptor>
 
     fun registerExposedDescriptor(descriptor: DeclarationDescriptor)
 

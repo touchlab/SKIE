@@ -1,9 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.gradle.SealedInterop
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.module.stableSpec
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
@@ -14,50 +13,40 @@ import org.jetbrains.kotlin.descriptors.isInterface
 
 internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, SwiftPoetExtensionContainer {
 
-    val descriptorProvider: DescriptorProvider
-
-    val ClassDescriptor.elseCaseName: String
+    val KotlinClassSwiftModel.elseCaseName: String
         get() = this.getConfiguration(SealedInterop.ElseName)
 
-    val ClassDescriptor.enumCaseName: String
+    val KotlinClassSwiftModel.enumCaseName: String
         get() {
             val configuredName = this.getConfiguration(SealedInterop.Case.Name)
 
-            return configuredName ?: this.name.identifier
+            return configuredName ?: this.classDescriptor.name.identifier
         }
 
-    val ClassDescriptor.hasElseCase: Boolean
-        get() = this.sealedSubclasses.any { !it.isExplicitSealedSubclass } || this.sealedSubclasses.isEmpty()
+    val KotlinClassSwiftModel.hasElseCase: Boolean
+        get() = this.hasUnexposedSealedSubclasses ||
+            this.exposedSealedSubclasses.size != this.visibleSealedSubclasses.size ||
+            this.visibleSealedSubclasses.isEmpty()
 
-    val ClassDescriptor.explicitSealedSubclasses: List<ClassDescriptor>
-        get() = this.sealedSubclasses.filter { it.isExplicitSealedSubclass }
+    val KotlinClassSwiftModel.visibleSealedSubclasses: List<KotlinClassSwiftModel>
+        get() = this.exposedSealedSubclasses.filter { it.getConfiguration(SealedInterop.Case.Visible) }
 
-    val ClassDescriptor.isExplicitSealedSubclass: Boolean
-        get() {
-            val isVisible = descriptorProvider.isExposed(this)
-
-            val isEnabled = this.getConfiguration(SealedInterop.Case.Visible)
-
-            return isVisible && isEnabled
-        }
-
-    context(ClassDescriptor, SwiftModelScope)
-    fun swiftNameWithTypeParametersForSealedCase(parent: ClassDescriptor): TypeName {
+    fun KotlinClassSwiftModel.swiftNameWithTypeParametersForSealedCase(parent: KotlinClassSwiftModel): TypeName {
         if (kind.isInterface) {
-            return this@ClassDescriptor.stableSpec
+            return this.stableSpec
         }
 
-        val typeParameters = declaredTypeParameters.map {
-            val indexInParent = it.indexInParent(this@ClassDescriptor, parent)
+        val typeParameters = this.classDescriptor.declaredTypeParameters.map {
+            val indexInParent = it.indexInParent(this.classDescriptor, parent.classDescriptor)
 
             if (indexInParent != null) {
-                parent.declaredTypeParameters[indexInParent].swiftName
+                parent.classDescriptor.declaredTypeParameters[indexInParent].swiftName
             } else {
                 TYPE_VARIABLE_BASE_BOUND_NAME
             }
         }
 
-        return this@ClassDescriptor.stableSpec.withTypeParameters(typeParameters)
+        return this.stableSpec.withTypeParameters(typeParameters)
     }
 
     private fun TypeParameterDescriptor.indexInParent(child: ClassDescriptor, parent: ClassDescriptor): Int? {

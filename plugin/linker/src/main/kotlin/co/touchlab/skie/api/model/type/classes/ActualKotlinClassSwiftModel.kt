@@ -19,6 +19,8 @@ import co.touchlab.skie.util.mutableLazy
 import co.touchlab.skie.util.swiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.isInterface
+import org.jetbrains.kotlin.descriptors.isSealed
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -59,20 +61,37 @@ class ActualKotlinClassSwiftModel(
                 ?: emptyList()
         }
 
-    override val companionObject: MutableKotlinClassSwiftModel?
-        get() = with(swiftModelScope) {
+    override val companionObject: MutableKotlinClassSwiftModel? by lazy {
+        with(swiftModelScope) {
             descriptorProvider.getExposedCompanionObject(classDescriptor)?.swiftModel
         }
+    }
 
-    override val enumEntries: List<KotlinEnumEntrySwiftModel>
-        get() = with(swiftModelScope) {
+    override val enumEntries: List<KotlinEnumEntrySwiftModel> by lazy {
+        with(swiftModelScope) {
             descriptorProvider.getExposedEnumEntries(classDescriptor).map { it.enumEntrySwiftModel }
         }
+    }
 
-    override val nestedClasses: List<MutableKotlinClassSwiftModel>
-        get() = with(swiftModelScope) {
+    override val nestedClasses: List<MutableKotlinClassSwiftModel> by lazy {
+        with(swiftModelScope) {
             descriptorProvider.getExposedNestedClasses(classDescriptor).map { it.swiftModel }
         }
+    }
+
+    override val isSealed: Boolean = classDescriptor.isSealed()
+
+    override val hasUnexposedSealedSubclasses: Boolean by lazy {
+        with(swiftModelScope) {
+            classDescriptor.sealedSubclasses.any { it.swiftModelOrNull == null }
+        }
+    }
+
+    override val exposedSealedSubclasses: List<KotlinClassSwiftModel> by lazy {
+        with(swiftModelScope) {
+            classDescriptor.sealedSubclasses.mapNotNull { it.swiftModelOrNull }
+        }
+    }
 
     private val swiftName = classDescriptor.swiftName
 
@@ -80,7 +99,8 @@ class ActualKotlinClassSwiftModel(
 
     override var bridge: TypeSwiftModel? = null
 
-    override val kind: KotlinTypeSwiftModel.Kind = KotlinTypeSwiftModel.Kind.Class
+    override val kind: KotlinTypeSwiftModel.Kind =
+        if (classDescriptor.kind.isInterface) KotlinTypeSwiftModel.Kind.Interface else KotlinTypeSwiftModel.Kind.Class
 
     override val objCFqName: String = namer.getClassOrProtocolName(classDescriptor.original).objCName
 
@@ -128,7 +148,7 @@ class ActualKotlinClassSwiftModel(
 
         val containingClass = this.getContainingClassNamed(containingClassName)
 
-        return if (descriptorProvider.isExposed(containingClass)) {
+        return if (containingClass in descriptorProvider.exposedClasses) {
             SwiftName(containingClassName, identifier)
         } else {
             val concatenatedIdentifier = containingClassName + identifier.replaceFirstChar(Char::uppercaseChar)
@@ -144,6 +164,8 @@ class ActualKotlinClassSwiftModel(
 
         return if (containingClassName == name) containingClass else containingClass.getContainingClassNamed(name)
     }
+
+    override fun toString(): String = classDescriptor.toString()
 
     private class SwiftName(val containingClassName: String?, val identifier: String)
 }

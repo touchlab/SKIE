@@ -1,9 +1,9 @@
 package co.touchlab.skie.plugin.generator.internal.validation.rules.sealed
 
-import co.touchlab.skie.plugin.generator.internal.util.isSealed
 import co.touchlab.skie.plugin.generator.internal.validation.rules.AnnotationApplicabilityRule
 import co.touchlab.skie.plugin.generator.internal.validation.rules.ClassBaseValidationRule
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
 import kotlin.reflect.KClass
 
 internal class SealedClassAnnotationApplicabilityRule(
@@ -14,5 +14,5 @@ internal class SealedClassAnnotationApplicabilityRule(
         "Annotation '${targetAnnotation.qualifiedName}' can be applied only to sealed classes / interfaces."
 
     override fun isAnnotationApplicable(descriptor: ClassDescriptor): Boolean =
-        descriptor.isSealed
+        descriptor.modality == Modality.SEALED
 }

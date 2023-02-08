@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class ClassMethodsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
-    descriptorProvider: NativeDescriptorProvider,
+    private val descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     configuration: Configuration,
     sharedCounter: SharedCounter,
@@ -42,7 +42,7 @@ internal class ClassMethodsDefaultArgumentGeneratorDelegate(
         } && !this.belongsToSkieRuntime
 
     private fun ClassDescriptor.allSupportedMethods(): List<SimpleFunctionDescriptor> =
-        this.unsubstitutedMemberScope.getDescriptorsFiltered(DescriptorKindFilter.FUNCTIONS)
+        descriptorProvider.getExposedClassMembers(this)
             .filterIsInstance<SimpleFunctionDescriptor>()
             .filter { it.isSupported }
 

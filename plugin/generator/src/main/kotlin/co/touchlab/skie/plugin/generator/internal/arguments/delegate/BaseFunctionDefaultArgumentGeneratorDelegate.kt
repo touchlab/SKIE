@@ -5,7 +5,6 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
@@ -42,7 +41,6 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
-            .filter { descriptorProvider.isExposed(it) }
             .filter { descriptorProvider.mapper.isBaseMethod(it) }
             .forEach {
                 generateOverloads(it)

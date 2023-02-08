@@ -3,17 +3,14 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
-import co.touchlab.skie.plugin.generator.internal.util.isSealed
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class SealedInteropGenerator(
     skieContext: SkieContext,
-    override val descriptorProvider: DescriptorProvider,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
     private val reporter: Reporter,
@@ -21,39 +18,41 @@ internal class SealedInteropGenerator(
 
     override val isActive: Boolean = true
 
-    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(descriptorProvider, configuration)
-    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(descriptorProvider, configuration)
+    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
+    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
 
     override fun execute() {
-        descriptorProvider.exposedClasses
-            .filter { it.shouldHaveSealedInterop }
-            .forEach {
-                generate(it)
-            }
+        module.configure {
+            exposedClasses
+                .filter { it.isSupported }
+                .forEach {
+                    generate(it)
+                }
+        }
     }
 
-    private val ClassDescriptor.shouldHaveSealedInterop: Boolean
+    private val KotlinClassSwiftModel.isSupported: Boolean
         get() = this.isSealed && this.isSealedInteropEnabled && !this.belongsToSkieRuntime
 
-    private val ClassDescriptor.isSealedInteropEnabled: Boolean
+    private val KotlinClassSwiftModel.isSealedInteropEnabled: Boolean
         get() = this.getConfiguration(SealedInterop.Enabled)
 
-    private fun generate(declaration: ClassDescriptor) {
-        if (!verifyUniqueCaseNames(declaration)) {
+    private fun generate(swiftModel: KotlinClassSwiftModel) {
+        if (!verifyUniqueCaseNames(swiftModel)) {
             return
         }
 
-        module.generateCode(declaration) {
-            val classNamespace = addNamespace(swiftGenNamespace, declaration.kotlinName)
+        module.generateCode(swiftModel) {
+            val classNamespace = addNamespace(swiftGenNamespace, swiftModel.stableFqName)
 
-            val enumType = sealedEnumGeneratorDelegate.generate(declaration, classNamespace, this)
+            val enumType = sealedEnumGeneratorDelegate.generate(swiftModel, classNamespace, this)
 
-            sealedFunctionGeneratorDelegate.generate(declaration, enumType, this)
+            sealedFunctionGeneratorDelegate.generate(swiftModel, enumType, this)
         }
     }
 
-    private fun verifyUniqueCaseNames(declaration: ClassDescriptor): Boolean {
-        val conflictingDeclarations = declaration.explicitSealedSubclasses
+    private fun verifyUniqueCaseNames(swiftModel: KotlinClassSwiftModel): Boolean {
+        val conflictingDeclarations = swiftModel.visibleSealedSubclasses
             .groupBy { it.enumCaseName }
             .filter { it.value.size > 1 }
             .values
@@ -66,7 +65,7 @@ internal class SealedInteropGenerator(
         return conflictingDeclarations.isEmpty()
     }
 
-    private fun reportConflictingDeclaration(subclass: ClassDescriptor) {
+    private fun reportConflictingDeclaration(subclass: KotlinClassSwiftModel) {
         val message = "SKIE cannot generate sealed interop for this declaration. " +
             "There are multiple sealed class/interface children with the same name " +
             "`${subclass.enumCaseName}` for the enum case. " +
@@ -75,7 +74,7 @@ internal class SealedInteropGenerator(
         reporter.report(
             severity = Reporter.Severity.Error,
             message = message,
-            declaration = subclass,
+            declaration = subclass.classDescriptor,
         )
     }
 }

@@ -59,6 +59,15 @@ interface KotlinTypeSwiftModel : TypeSwiftModel {
     }
 
     enum class Kind {
-        Class, File
+        Class, Interface, File;
+
+        val isClass: Boolean
+            get() = this == Class
+
+        val isInterface: Boolean
+            get() = this == Interface
+
+        val isFile: Boolean
+            get() = this == File
     }
 }

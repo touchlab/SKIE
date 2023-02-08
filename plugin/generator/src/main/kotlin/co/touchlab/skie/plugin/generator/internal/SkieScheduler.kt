@@ -42,7 +42,6 @@ internal class SkieScheduler(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
             configuration = configuration,
-            descriptorProvider = descriptorProvider,
             reporter = reporter,
         ),
         DefaultArgumentGenerator(

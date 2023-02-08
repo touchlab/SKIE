@@ -4,7 +4,6 @@ import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
 import co.touchlab.skie.api.apinotes.fixes.memberconflicts.CallableMembersConflictsApiNotesFix
-import co.touchlab.skie.api.apinotes.fixes.ClassInsideNonExportedClassApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.ClassesConflictsApiNotesFix
 import co.touchlab.skie.api.apinotes.fixes.HeaderFilePropertyOrderingFix
 import co.touchlab.skie.api.apinotes.fixes.memberconflicts.KonanManglingApiNotesFix
@@ -70,7 +69,6 @@ class SwiftLinkCompilePhase(
         CallableMembersConflictsApiNotesFix(skieModule, context.descriptorProvider).fixNames()
         ClassesConflictsApiNotesFix(skieModule, context.descriptorProvider).fixNames()
         NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()
-        ClassInsideNonExportedClassApiNotesFix(skieModule, context.descriptorProvider).renameProblematicClasses()
         HeaderFilePropertyOrderingFix().reorderHeaderFile(framework.kotlinHeader)
 
         skieModule.consumeConfigureBlocks(swiftModelScope)

@@ -169,7 +169,7 @@ class SwiftTypeTranslator(
             return mapObjCObjectReferenceTypeIgnoringNullability(classDescriptor, swiftExportScope)
         }
 
-        if (!descriptorProvider.isTransitivelyExposed(classDescriptor)) {
+        if (classDescriptor !in descriptorProvider.exposedClasses) {
             return idType(swiftExportScope)
         }
 
@@ -326,7 +326,7 @@ class SwiftTypeTranslator(
         ifSwiftBridge: (TypeSwiftModel) -> SwiftNonNullReferenceTypeModel,
         ifSwiftType: (String) -> SwiftNonNullReferenceTypeModel,
     ): SwiftNonNullReferenceTypeModel {
-        assert(descriptorProvider.isTransitivelyExposed(descriptor)) { "Shouldn't be exposed: $descriptor" }
+        assert(descriptor in descriptorProvider.exposedClasses) { "Shouldn't be exposed: $descriptor" }
 
         if (ErrorUtils.isError(descriptor)) {
             return SwiftErrorTypeModel

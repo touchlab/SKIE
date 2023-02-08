@@ -73,7 +73,7 @@ internal class ApiNotesFactory(
 
     private fun KotlinTypeSwiftModel.Kind.toMemberKind(): ApiNotesTypeMemberKind =
         when (this) {
-            KotlinTypeSwiftModel.Kind.Class -> ApiNotesTypeMemberKind.Instance
+            KotlinTypeSwiftModel.Kind.Class, KotlinTypeSwiftModel.Kind.Interface -> ApiNotesTypeMemberKind.Instance
             KotlinTypeSwiftModel.Kind.File -> ApiNotesTypeMemberKind.Class
         }
 }
