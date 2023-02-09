@@ -1,22 +1,23 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin
 
-import org.jetbrains.kotlin.com.intellij.mock.MockProject
-import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
+import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-internal class PluginRegistrar : ComponentRegistrar {
+class PluginRegistrar : CompilerPluginRegistrar() {
 
-    override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-        configure.get().invoke(configuration, project)
+    override val supportsK2: Boolean = false
+
+    override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
+        configure.get().invoke(configuration)
 
         plugins.get().forEach {
-            it.registerProjectComponents(project, configuration)
+            it.invoke(this, configuration)
         }
     }
 
     companion object {
 
-        val plugins: ThreadLocal<List<ComponentRegistrar>> = ThreadLocal()
-        val configure: ThreadLocal<CompilerConfiguration.(project: MockProject) -> Unit> = ThreadLocal()
+        val plugins: ThreadLocal<List<ExtensionStorage.(configuration: CompilerConfiguration) -> Unit>> = ThreadLocal()
+        val configure: ThreadLocal<CompilerConfiguration.() -> Unit> = ThreadLocal()
     }
 }

@@ -6,13 +6,14 @@ import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.PluginRegistrar
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.external_libraries.BuildConfig
 import co.touchlab.skie.plugin.ConfigurationKeys
-import co.touchlab.skie.plugin.SwiftLinkComponentRegistrar
+import co.touchlab.skie.plugin.SkieComponentRegistrar
 import org.jetbrains.kotlin.cli.bc.K2Native
-import org.jetbrains.kotlin.cli.bc.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.ExitCode
+import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.config.Services
@@ -52,9 +53,11 @@ internal class KotlinTestLinker(
         }
 
         PluginRegistrar.plugins.set(
-            listOf(
-                SwiftLinkComponentRegistrar(),
-            )
+            listOf {
+                with (SkieComponentRegistrar()) {
+                    registerExtensions(it)
+                }
+            }
         )
     }
 

@@ -8,13 +8,13 @@ import co.touchlab.skie.plugin.generator.internal.SwiftGenIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
-import org.jetbrains.kotlin.com.intellij.mock.MockProject
-import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
+import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-class SwiftLinkComponentRegistrar : ComponentRegistrar {
+class SkieComponentRegistrar: CompilerPluginRegistrar() {
+    override val supportsK2: Boolean = false
 
-    override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
+    override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         configuration.put(
             SkieContextKey,
             DefaultSkieContext(
@@ -27,7 +27,7 @@ class SwiftLinkComponentRegistrar : ComponentRegistrar {
             )
         )
 
-        IrGenerationExtension.registerExtension(project, SwiftGenIrGenerationExtension(configuration))
+        IrGenerationExtension.registerExtension(SwiftGenIrGenerationExtension(configuration))
 
         PhaseInterceptor.setupPhaseListeners(configuration)
     }

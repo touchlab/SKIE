@@ -31,7 +31,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
 
         val descriptorProvider = context.descriptorProvider
 
-        val kotlinClass = descriptorProvider.transitivelyExposedClasses.first {
+        val kotlinClass = descriptorProvider.exposedClasses.first {
             it.name.identifier == "KotlinFile"
         }
 
