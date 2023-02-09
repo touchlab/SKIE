@@ -17,7 +17,7 @@ class ExternalLibrariesTestResultProcessor(
         }.forEach { (test, result) ->
             scope.test("[${test.index}]: ${test.library}") {
                 println(result.logs)
-                result.testResult shouldBe TestResult.Success
+                test.expectedResult.shouldBe(result)
 
                 this.projectContext.print()
             }

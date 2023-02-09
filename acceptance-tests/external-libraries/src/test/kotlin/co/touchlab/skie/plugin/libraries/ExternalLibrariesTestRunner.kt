@@ -12,6 +12,7 @@ import co.touchlab.skie.external_libraries.BuildConfig
 import io.kotest.core.spec.style.FunSpec
 import kotlinx.coroutines.channels.Channel
 import java.io.File
+import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 import kotlin.io.path.Path
@@ -30,13 +31,6 @@ class ExternalLibrariesTestRunner(
     fun runTests(scope: FunSpec, tests: List<ExternalLibraryTest>) {
         val channel = Channel<Map<ExternalLibraryTest, TestResultWithLogs>>()
         scope.concurrency = 2
-
-        val tempDirectory = Path(BuildConfig.BUILD).resolve("test-temp")
-        tempDirectory.toFile().deleteRecursively()
-        tempDirectory.toFile().mkdirs()
-
-        val tempFileSystem = TempFileSystem(tempDirectory)
-        val tempSourceFile = tempDirectory.resolve("KotlinFile.kt")
 
         scope.test("Evaluation") {
             val testCompletionTracking = AtomicInteger(0)
@@ -69,9 +63,7 @@ class ExternalLibrariesTestRunner(
         tempDirectory.toFile().mkdirs()
 
         val tempFileSystem = TempFileSystem(tempDirectory)
-        val tempSourceFile = tempDirectory.resolve("KotlinFile.kt").apply {
-            writeText("")
-        }
+        val sourceFiles = produceSourceFilesIn(tempDirectory)
 
         val testLogger = TestLogger()
 
@@ -89,7 +81,7 @@ class ExternalLibrariesTestRunner(
                 .flatMap {
                     val compiler = KotlinTestCompiler(tempFileSystem, testLogger)
                     compiler.compile(
-                        kotlinFiles = listOf(tempSourceFile),
+                        kotlinFiles = sourceFiles,
                         compilerConfiguration = compilerConfiguration,
                     )
                 }
@@ -134,7 +126,7 @@ class ExternalLibrariesTestRunner(
     private fun TestLogger.prependTestInfo(test: ExternalLibraryTest) {
         prependLine(
             """
-                Test: ${test.library} ([${test.index}])
+                Test: ${test.library} [${test.index}]
                 To run only this test add env variable: libraryTest=${test.library.replace(".", "\\.")}
             """.trimIndent()
         )
@@ -150,4 +142,33 @@ class ExternalLibrariesTestRunner(
     private fun ExpectedTestResult.hasSucceededAsString(result: TestResultWithLogs): String =
         if (this.hasSucceeded(result)) ExpectedTestResult.SUCCESS else ExpectedTestResult.FAILURE
 
+    private fun produceSourceFilesIn(tempDirectory: Path): List<Path> = listOf(
+        tempDirectory.resolve("Experimental.kt").apply {
+            writeText("""
+                package kotlin
+
+                import kotlin.annotation.AnnotationRetention.SOURCE
+                import kotlin.annotation.AnnotationRetention.BINARY
+                import kotlin.annotation.AnnotationTarget.*
+                import kotlin.reflect.KClass
+
+                @Target(ANNOTATION_CLASS)
+                @Retention(BINARY)
+                public annotation class Experimental(val level: Level = Level.ERROR) {
+                    public enum class Level {
+                        WARNING,
+                        ERROR,
+                    }
+                }
+
+                @Target(
+                    CLASS, PROPERTY, LOCAL_VARIABLE, VALUE_PARAMETER, CONSTRUCTOR, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER, EXPRESSION, FILE, TYPEALIAS
+                )
+                @Retention(SOURCE)
+                public annotation class UseExperimental(
+                    vararg val markerClass: KClass<out Annotation>
+                )
+            """.trimIndent())
+        },
+    )
 }

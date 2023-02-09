@@ -125,15 +125,16 @@ sealed interface ExpectedTestResult {
         }
     }
 
-    data class KotlinLinkingError(val error: String?) : ExpectedTestResult {
+    data class KotlinLinkingError(val errors: List<String>) : ExpectedTestResult {
+        constructor(error: String?): this(listOfNotNull(error))
 
         override fun shouldBe(testResult: TestResult, logs: String) {
-            if (error != null) {
-                if (testResult is TestResult.KotlinLinkingError && testResult.error.contains(error)) {
+            if (errors.isNotEmpty()) {
+                if (testResult is TestResult.KotlinLinkingError && errors.all { testResult.error.contains(it) }) {
                     return
                 }
 
-                failTest(testResult, "Kotlin linking ended with an error containing: $error")
+                failTest(testResult, "Kotlin linking ended with an error containing all of: ${errors.joinToString("\n")}")
             } else {
                 if (testResult is TestResult.KotlinLinkingError) {
                     return

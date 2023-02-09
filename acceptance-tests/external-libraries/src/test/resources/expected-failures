@@ -1,0 +1,14 @@
+# There are still 4 unbound symbols after generation of IR module
+# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/WidgetVersion.<get-WidgetVersion>
+# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposeContent.into
+# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposition.setContent
+# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/CompositionLocal.current.<get-current>
+app.cash.redwood:redwood-compose-iosarm64
+
+# There is still an unbound symbol after generation of IR module
+# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposition.setContent
+app.cash.redwood:redwood-protocol-compose-iosarm64
+
+# There is still an unbound symbol after generation of IR module
+# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.widget.compose/ComposeWidgetChildren.render
+app.cash.redwood:redwood-widget-compose-iosarm64
