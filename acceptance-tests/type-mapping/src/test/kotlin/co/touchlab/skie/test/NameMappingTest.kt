@@ -19,6 +19,7 @@ import kotlin.io.path.writer
 
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeVariableName
+import io.mockk.InternalPlatformDsl.toArray
 import org.jetbrains.kotlin.konan.file.File
 import java.nio.file.Path
 import java.time.LocalDateTime
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.writeText
+import kotlin.math.ceil
 import kotlin.streams.toList
 import kotlin.test.fail
 import kotlin.time.Duration
@@ -49,17 +51,19 @@ class NameMappingTest {
             exportedDependencies = BuildConfig.EXPORTED_DEPENDENCIES.toList(),
         )
 
-        val splitTypes = TestedType.ALL.sortedBy { it.safeName }.windowed(size = 100, step = 100, partialWindows = true)
+        val splitTypes = TestedType.ALL.sortedBy { it.safeName }.chunked(2000)
 
         val onlyIndices = setOf<Int>(
+            // *(0..31).toList().toTypedArray()
             // 126, 128, 129, 130, 131, 145, 336, 337, 339, 340, 341, 356
         )
 
         val testCompletionTracking = AtomicInteger(0)
-
-        val failures = splitTypes
+        val testsToRun = splitTypes
             .mapIndexed { index, testedTypes -> index to testedTypes }
             .filter { onlyIndices.isEmpty() || onlyIndices.contains(it.first) }
+
+        val failures = testsToRun
             .parallelStream()
             .map { (index, types) ->
                 val testTime = measureTimedValue {
@@ -70,7 +74,7 @@ class NameMappingTest {
                     )
                 }
                 val result = testTime.value
-                println("[${if (result is TestResult.Success) "PASS" else "FAIL"}] Finished test $index (${testCompletionTracking.incrementAndGet()}/${splitTypes.size}) in ${testTime.duration.toString(DurationUnit.SECONDS, 2)} seconds")
+                println("[${if (result is TestResult.Success) "PASS" else "FAIL"}] Finished test $index (${testCompletionTracking.incrementAndGet()}/${testsToRun.size}) in ${testTime.duration.toString(DurationUnit.SECONDS, 2)} seconds")
                 index to result
             }
             .filter { it.second !is TestResult.Success }

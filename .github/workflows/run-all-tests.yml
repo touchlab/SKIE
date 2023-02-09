@@ -1,0 +1,93 @@
+name: Run All Tests
+
+on:
+  push:
+    branches:
+      - main
+  workflow_call:
+    inputs:
+      release-version:
+        description: 'The version being released'
+        type: string
+        required: true
+        default: "1.0.0-SNAPSHOT"
+    secrets:
+      SWIFTPOET_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+  checks: write
+
+env:
+  RELEASE_VERSION: ${{ inputs.release-version }}
+
+jobs:
+  acceptance-tests:
+    name: Acceptance Tests
+    concurrency: ci-acceptance-tests-${{ github.ref }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Acceptance Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:test'
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: 'acceptance-tests/build/test-results/test/TEST-*.xml'
+          require_tests: true
+
+  type-mapping-tests:
+    name: Type Mapping Tests
+    concurrency: ci-type-mapping-tests-${{ github.ref }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Type Mapping Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:type-mapping:test'
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
+          require_tests: true
+
+  external-libraries-tests:
+    name: External Libraries Tests
+    concurrency: ci-external-libraries-tests-${{ github.ref }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:external-libraries:test'
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: 'acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
+          require_tests: true

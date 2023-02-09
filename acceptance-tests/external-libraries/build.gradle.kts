@@ -16,6 +16,22 @@ skieJvm {
     areContextReceiversEnabled.set(true)
 }
 
+val acceptanceTestDependencies: Configuration = configurations.create("acceptanceTestDependencies") {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+
+    attributes {
+        attribute(
+            KotlinPlatformType.attribute,
+            KotlinPlatformType.native
+        )
+        attribute(KotlinNativeTarget.konanTargetAttribute, KonanTarget.IOS_ARM64.name)
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+    }
+}
+
 dependencies {
     testImplementation(projects.acceptanceTests.framework)
     testImplementation("co.touchlab.skie:configuration-annotations")
@@ -28,6 +44,10 @@ dependencies {
     testImplementation("co.touchlab.skie:kotlin-plugin")
     testImplementation("co.touchlab.skie:api")
     testImplementation("co.touchlab.skie:spi")
+
+    // Workaround for these dependencies not being built before running tests
+    acceptanceTestDependencies("co.touchlab.skie:configuration-annotations")
+    acceptanceTestDependencies("co.touchlab.skie:kotlin")
 }
 
 val librariesToTestLockfile = layout.projectDirectory.file("libraries.lock")
@@ -106,10 +126,16 @@ val prepareTestClasspaths = tasks.register("prepareTestClasspaths") {
 }
 
 tasks.test {
+    dependsOn(acceptanceTestDependencies.buildDependencies)
+    dependsOn(prepareTestClasspaths)
+
     systemProperty("testTmpDir", layout.buildDirectory.dir("external-libraries-tests").get().asFile.absolutePath)
 
-    maxHeapSize = "24g"
-    dependsOn(prepareTestClasspaths)
+    maxHeapSize = "12g"
+
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 

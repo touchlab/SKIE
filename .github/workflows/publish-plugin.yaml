@@ -8,7 +8,7 @@ on:
 
 jobs:
   gradle:
-    runs-on: macos-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
@@ -20,14 +20,6 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SWIFTPOET_TOKEN }}
-      - name: Cache Gradle Caches
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/**.gradle*', '**/gradle/wrapper/gradle-wrapper.properties', '**/libs.versions.toml') }}
       - uses: actions/setup-java@v2
         with:
           distribution: adopt

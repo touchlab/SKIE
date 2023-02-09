@@ -53,7 +53,11 @@ dependencies {
 tasks.test {
     dependsOn(acceptanceTestDependencies.buildDependencies)
 
-    maxHeapSize = "16g"
+    maxHeapSize = "12g"
+
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 buildConfig {

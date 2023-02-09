@@ -1,0 +1,16 @@
+name: Prepare Job Worker
+description: Prepares a job worker for running Gradle tasks on SKIE project
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      env:
+        GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: 'true'
+      with:
+        cache-disabled: true
