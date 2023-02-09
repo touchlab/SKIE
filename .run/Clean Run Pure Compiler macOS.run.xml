@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Manual external libraries tests" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Clean Run Pure Compiler macOS" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests/manual-external-libraries" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -10,7 +10,8 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="test" />
+          <option value=":dev-support:pure-compiler:framework:clean" />
+          <option value=":dev-support:pure-compiler:framework:linkDebugFrameworkMacosArm64" />
         </list>
       </option>
       <option name="vmOptions" />

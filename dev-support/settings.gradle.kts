@@ -31,4 +31,6 @@ include(
     ":playground:kotlin:library",
     ":playground:kotlin:framework",
     ":playground:swift",
+    ":pure-compiler:library",
+    ":pure-compiler:framework",
 )
