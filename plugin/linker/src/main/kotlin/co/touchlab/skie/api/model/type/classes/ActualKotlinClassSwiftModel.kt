@@ -17,6 +17,7 @@ import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.util.mutableLazy
 import co.touchlab.skie.util.swiftIdentifier
+import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
@@ -118,7 +119,7 @@ class ActualKotlinClassSwiftModel(
 
     override val stableFqName: String =
         TypeSwiftModel.StableFqNameNamespace +
-            ("class__${classDescriptor.module.swiftIdentifier}__${classDescriptor.fqNameSafe.asString()}").replace(".", "_")
+            ("class__${classDescriptor.module.swiftIdentifier}__${classDescriptor.fqNameSafe.asString().toValidSwiftIdentifier()}")
 
     override val isChanged: Boolean
         get() = identifier != original.identifier ||

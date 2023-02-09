@@ -12,7 +12,7 @@ import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.util.swiftIdentifier
-import co.touchlab.skie.util.toValidSwiftIdentifier
+import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile

@@ -3,6 +3,7 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ModuleDescriptorImplReflector
@@ -120,10 +121,15 @@ internal class NewFileNamespace private constructor(
         }
 
         private fun createDummyPackageDescriptors(fqName: FqName): List<PackageFragmentDescriptor> =
-            fqName.asString().split(".").scan(emptyList(), List<String>::plus)
+            fqName.asString()
+                .split(".")
+                .asSequence()
+                .map { it.toValidSwiftIdentifier() }
+                .scan(emptyList(), List<String>::plus)
                 .filter { it.isNotEmpty() }
                 .map { it.joinToString(".") }
                 .map { MutablePackageFragmentDescriptor(moduleDescriptor, FqName(it)) }
+                .toList()
     }
 
     private class Context(val moduleDescriptor: ModuleDescriptor, mainIrModuleFragment: Lazy<IrModuleFragment>) {
