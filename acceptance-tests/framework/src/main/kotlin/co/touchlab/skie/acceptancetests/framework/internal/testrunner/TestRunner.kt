@@ -20,28 +20,36 @@ import kotlin.io.path.createFile
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFactory) {
 
+    @OptIn(ExperimentalTime::class)
     fun runTest(test: TestNode.Test): TestResultWithLogs {
         val tempFileSystem = tempFileSystemFactory.create(test)
         val testLogger = TestLogger()
 
-        val testResult = with(tempFileSystem) {
-            with(testLogger) {
-                IntermediateResult.Value(test.kotlinFiles)
-                    .map { withJvmInlineAnnotation(it) }
-                    .flatMap { compileKotlin(it, test.compilerConfiguration) }
-                    .zip { generateConfiguration(test.configFiles) }
-                    .flatMap { linkKotlin(it.first, it.second, test.compilerConfiguration) }
-                    .pairWith { enhanceSwiftCode(test.swiftCode) }
-                    .flatMap { compileSwift(it.first, it.second) }
-                    .finalize { runSwift(it) }
-                    .also { testLogger.prependTestInfo(test, tempFileSystem) }
+        val measuredTest = measureTimedValue {
+            with(tempFileSystem) {
+                with(testLogger) {
+                    IntermediateResult.Value(test.kotlinFiles)
+                        .map { withJvmInlineAnnotation(it) }
+                        .flatMap { compileKotlin(it, test.compilerConfiguration) }
+                        .zip { generateConfiguration(test.configFiles) }
+                        .flatMap { linkKotlin(it.first, it.second, test.compilerConfiguration) }
+                        .pairWith { enhanceSwiftCode(test.swiftCode) }
+                        .flatMap { compileSwift(it.first, it.second) }
+                        .finalize { runSwift(it) }
+                        .also { testLogger.prependTestInfo(test, tempFileSystem) }
+                }
             }
         }
+        val testResult = measuredTest.value
 
-        val testResultWithLogs = testResult.withLogs(testLogger)
+        val testResultWithLogs = testResult.withLogsAndDuration(testLogger, measuredTest.duration)
+        testLogger.prependLine(testResultLine(test, testResultWithLogs))
 
         writeResult(test, testResultWithLogs)
         reportResult(test, testResultWithLogs)
@@ -114,6 +122,7 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         val resultAsText = test.expectedResult.hasSucceededAsString(result)
 
         test.resultPath.writeText(resultAsText)
+        test.logPath.writeText(result.logs)
     }
 
     private fun reportResult(test: TestNode.Test, result: TestResultWithLogs) {
@@ -123,10 +132,14 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
             print("\u001b[31m")
         }
 
-        print("${test.fullName}: ${test.expectedResult.hasSucceededAsString(result)}")
+        print(testResultLine(test, result))
 
         println("\u001b[0m")
     }
+
+    private fun testResultLine(test: TestNode.Test, result: TestResultWithLogs): String =
+        "${test.fullName}: ${test.expectedResult.hasSucceededAsString(result)} (took ${result.duration.toString(DurationUnit.SECONDS, 2)})"
+
 
     private fun TestLogger.prependTestInfo(test: TestNode.Test, tempFileSystem: TempFileSystem) {
         val createdFilesDescription = tempFileSystem.describeCreatedFiles(CreatedFilesDescriptionFilter)
@@ -146,10 +159,10 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     private fun TestNode.Test.describeTestFiles(): String =
         (listOf(this.path) + this.kotlinFiles).joinToString("\n") { it.absolutePathString() }
 
-    private fun TestResult.withLogs(testLogger: TestLogger): TestResultWithLogs =
+    private fun TestResult.withLogsAndDuration(testLogger: TestLogger, duration: Duration): TestResultWithLogs =
         TestResultWithLogs(
             this,
-            Duration.ZERO,
+            duration,
             testLogger.toString(),
         )
 

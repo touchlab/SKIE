@@ -2,7 +2,7 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.sw
 
 import java.util.concurrent.TimeUnit
 
-internal data class CommandResult(val exitCode: Int, val stdOut: String, val stdErr: String)
+internal data class CommandResult(val exitCode: Int, val stdOut: String)
 
 internal fun String.execute(): CommandResult {
     val command = this.split("\\s".toRegex())
@@ -10,6 +10,7 @@ internal fun String.execute(): CommandResult {
     val process = ProcessBuilder(*command.toTypedArray())
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectError(ProcessBuilder.Redirect.PIPE)
+        .redirectErrorStream(true)
         .start()
 
     process.waitFor(1, TimeUnit.MINUTES)
@@ -17,6 +18,5 @@ internal fun String.execute(): CommandResult {
     return CommandResult(
         exitCode = process.exitValue(),
         stdOut = process.inputStream.bufferedReader().readText(),
-        stdErr = process.errorStream.bufferedReader().readText(),
     )
 }

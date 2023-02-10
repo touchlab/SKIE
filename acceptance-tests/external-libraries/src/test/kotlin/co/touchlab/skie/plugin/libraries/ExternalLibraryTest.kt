@@ -14,6 +14,9 @@ data class ExternalLibraryTest(
     val resultPath: Path
         get() = outputPath.resolve("result.txt")
 
+    val logPath: Path
+        get() = outputPath.resolve("run.log")
+
     val fullName: String
         get() = "[$index]: $library"
 }

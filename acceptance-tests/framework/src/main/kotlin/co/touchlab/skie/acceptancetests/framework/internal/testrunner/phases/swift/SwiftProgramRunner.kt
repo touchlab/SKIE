@@ -20,11 +20,11 @@ internal class SwiftProgramRunner(private val testLogger: TestLogger) {
     private fun interpretResult(result: CommandResult): TestResult =
         if (result.exitCode == 0) {
             TestResult.Success
-        } else if (result.stdErr.isEmpty()) {
+        } else if (result.stdOut.isEmpty()) {
             TestResult.IncorrectOutput(result.exitCode)
-        } else if (result.stdErr.contains(TestResult.MissingExit.ERROR_MESSAGE)) {
+        } else if (result.stdOut.contains(TestResult.MissingExit.ERROR_MESSAGE)) {
             TestResult.MissingExit
         } else {
-            TestResult.RuntimeError(result.stdErr)
+            TestResult.RuntimeError(result.stdOut)
         }
 }

@@ -47,6 +47,6 @@ internal class SwiftTestCompiler(
         if (result.exitCode == 0) {
             IntermediateResult.Value(output)
         } else {
-            IntermediateResult.Error(TestResult.SwiftCompilationError(result.stdErr))
+            IntermediateResult.Error(TestResult.SwiftCompilationError(result.stdOut))
         }
 }

@@ -108,14 +108,12 @@ internal class KotlinTestLinker(
         result: ExitCode,
         outputFile: Path,
         outputStream: OutputStream,
-    ): TestResult = when (result) {
-        ExitCode.OK -> {
-            testLogger.appendSection("Kotlin linker", outputStream.toString())
-
-            TestResult.Success
-        }
-        else -> {
-            TestResult.KotlinLinkingError(outputStream.toString())
+    ): TestResult {
+        val output = outputStream.toString()
+        testLogger.appendSection("Kotlin linker", output)
+        return when (result) {
+            ExitCode.OK -> TestResult.Success
+            else -> TestResult.KotlinLinkingError(output)
         }
     }
 }

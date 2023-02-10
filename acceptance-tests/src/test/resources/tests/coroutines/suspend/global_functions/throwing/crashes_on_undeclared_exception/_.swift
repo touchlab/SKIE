@@ -1,4 +1,4 @@
-# IncorrectOutput(134)
+# RuntimeError(Uncaught Kotlin exception: kotlin.IllegalStateException: Undeclared exception)
 
 let result = await Task.detached {
     try! await AKt.foo()

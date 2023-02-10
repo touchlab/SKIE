@@ -98,9 +98,12 @@ class ExternalLibrariesTestRunner(
 
         testLogger.prependTestInfo(test)
 
+        val position = positionProvider()
         val testResultWithLogs = testResult.withLogsAndDuration(testLogger, measuredTest.duration)
+        testLogger.prependLine(testResultLine(test, testResultWithLogs, position))
+
         writeResult(test, testResultWithLogs)
-        reportResult(test, testResultWithLogs, positionProvider)
+        reportResult(test, testResultWithLogs, position)
         return testResultWithLogs
     }
 
@@ -108,9 +111,10 @@ class ExternalLibrariesTestRunner(
         val resultAsText = test.expectedResult.hasSucceededAsString(result)
 
         test.resultPath.writeText(resultAsText)
+        test.logPath.writeText(result.logs)
     }
 
-    private fun reportResult(test: ExternalLibraryTest, result: TestResultWithLogs, positionProvider: () -> String) {
+    private fun reportResult(test: ExternalLibraryTest, result: TestResultWithLogs, position: String) {
         val color = if (test.expectedResult.hasSucceeded(result)) {
             "\u001b[32m"
         } else {
@@ -118,9 +122,11 @@ class ExternalLibrariesTestRunner(
         }
         val colorReset = "\u001b[0m"
 
-        val line = "${test.fullName}: ${test.expectedResult.hasSucceededAsString(result)} (${positionProvider()}, took ${result.duration.toString(DurationUnit.SECONDS, 2)})"
+        println(color + testResultLine(test, result, position) + colorReset)
+    }
 
-        println(color + line + colorReset)
+    private fun testResultLine(test: ExternalLibraryTest, result: TestResultWithLogs, position: String): String {
+        return "${test.fullName}: ${test.expectedResult.hasSucceededAsString(result)} (${position}, took ${result.duration.toString(DurationUnit.SECONDS, 2)})"
     }
 
     private fun TestLogger.prependTestInfo(test: ExternalLibraryTest) {

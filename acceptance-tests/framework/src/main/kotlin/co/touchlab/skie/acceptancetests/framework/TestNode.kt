@@ -61,6 +61,9 @@ sealed class TestNode {
         val resultPath: Path
             get() = outputPath.resolve("result.txt")
 
+        val logPath: Path
+            get() = outputPath.resolve("run.log")
+
         private val fileLines = path.readLines()
 
         val isActive: Boolean

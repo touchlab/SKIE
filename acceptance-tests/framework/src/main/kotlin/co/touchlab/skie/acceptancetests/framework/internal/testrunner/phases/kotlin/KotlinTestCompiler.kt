@@ -71,15 +71,12 @@ internal class KotlinTestCompiler(
         result: ExitCode,
         klibFile: Path,
         outputStream: OutputStream,
-    ): IntermediateResult<Path> = when (result) {
-        ExitCode.OK -> {
-            testLogger.appendSection("Kotlin compiler", outputStream.toString())
-
-            IntermediateResult.Value(klibFile)
-        }
-
-        else -> {
-            IntermediateResult.Error(TestResult.SwiftCompilationError(outputStream.toString()))
+    ): IntermediateResult<Path> {
+        val output = outputStream.toString()
+        testLogger.appendSection("Kotlin compiler", output)
+        return when (result) {
+            ExitCode.OK -> IntermediateResult.Value(klibFile)
+            else -> IntermediateResult.Error(TestResult.SwiftCompilationError(output))
         }
     }
 }
