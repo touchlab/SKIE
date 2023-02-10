@@ -3,6 +3,8 @@ package `tests`.`sealed`.`interfaces`.`collision`.`nested_and_outer`.`child`.`wi
 sealed interface A {
 
     class A1 : A
+
+    class AA1 : A
 }
 
 class A1 : A

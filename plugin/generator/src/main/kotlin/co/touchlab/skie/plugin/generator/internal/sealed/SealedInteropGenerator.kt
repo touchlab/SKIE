@@ -13,7 +13,6 @@ internal class SealedInteropGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
     configuration: Configuration,
-    private val reporter: Reporter,
 ) : BaseGenerator(skieContext, namespaceProvider, configuration), SealedGeneratorExtensionContainer {
 
     override val isActive: Boolean = true
@@ -38,10 +37,6 @@ internal class SealedInteropGenerator(
         get() = this.getConfiguration(SealedInterop.Enabled)
 
     private fun generate(swiftModel: KotlinClassSwiftModel) {
-        if (!verifyUniqueCaseNames(swiftModel)) {
-            return
-        }
-
         module.generateCode(swiftModel) {
             val classNamespace = addNamespace(swiftGenNamespace, swiftModel.stableFqName)
 
@@ -49,32 +44,5 @@ internal class SealedInteropGenerator(
 
             sealedFunctionGeneratorDelegate.generate(swiftModel, enumType, this)
         }
-    }
-
-    private fun verifyUniqueCaseNames(swiftModel: KotlinClassSwiftModel): Boolean {
-        val conflictingDeclarations = swiftModel.visibleSealedSubclasses
-            .groupBy { it.enumCaseName }
-            .filter { it.value.size > 1 }
-            .values
-            .flatten()
-
-        conflictingDeclarations.forEach {
-            reportConflictingDeclaration(it)
-        }
-
-        return conflictingDeclarations.isEmpty()
-    }
-
-    private fun reportConflictingDeclaration(subclass: KotlinClassSwiftModel) {
-        val message = "SKIE cannot generate sealed interop for this declaration. " +
-            "There are multiple sealed class/interface children with the same name " +
-            "`${subclass.enumCaseName}` for the enum case. " +
-            "Consider resolving this conflict using configuration `${SealedInterop.Case.Name::class.qualifiedName}` or associated annotation."
-
-        reporter.report(
-            severity = Reporter.Severity.Error,
-            message = message,
-            declaration = subclass.classDescriptor,
-        )
     }
 }

@@ -33,10 +33,12 @@ internal class SealedEnumGeneratorDelegate(
     }
 
     private fun TypeSpec.Builder.addSealedEnumCases(swiftModel: KotlinClassSwiftModel): TypeSpec.Builder {
+        val preferredNamesCollide = swiftModel.enumCaseNamesBasedOnKotlinIdentifiersCollide
+
         swiftModel.visibleSealedSubclasses
             .forEach { sealedSubclass ->
                 addEnumCase(
-                    sealedSubclass.enumCaseName,
+                    sealedSubclass.enumCaseName(preferredNamesCollide),
                     with(sealedSubclass) {
                         swiftNameWithTypeParametersForSealedCase(swiftModel)
                     },

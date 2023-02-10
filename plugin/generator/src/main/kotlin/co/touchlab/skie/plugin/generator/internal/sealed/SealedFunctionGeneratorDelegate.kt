@@ -66,6 +66,8 @@ internal class SealedFunctionGeneratorDelegate(
         swiftModel: KotlinClassSwiftModel,
         enumType: TypeName,
     ): CodeBlock.Builder {
+        val preferredNamesCollide = swiftModel.enumCaseNamesBasedOnKotlinIdentifiersCollide
+
         swiftModel.visibleSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
                 val parameterName = swiftModel.enumConstructorParameterName
@@ -79,7 +81,7 @@ internal class SealedFunctionGeneratorDelegate(
                     nextControlFlow("else if", condition)
                 }
 
-                add("return ${enumType.canonicalName}.${subclassSymbol.enumCaseName}($parameterName)\n")
+                add("return ${enumType.canonicalName}.${subclassSymbol.enumCaseName(preferredNamesCollide)}($parameterName)\n")
             }
 
         return this

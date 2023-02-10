@@ -2,7 +2,9 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.model.type.stableSpec
+import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer.Companion.TYPE_VARIABLE_BASE_BOUND_NAME
@@ -16,11 +18,28 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
     val KotlinClassSwiftModel.elseCaseName: String
         get() = this.getConfiguration(SealedInterop.ElseName)
 
-    val KotlinClassSwiftModel.enumCaseName: String
+    fun KotlinClassSwiftModel.enumCaseName(preferredNamesCollide: Boolean): String =
+        if (preferredNamesCollide) this.enumCaseNameBasedOnSwiftIdentifier else this.enumCaseNameBasedOnKotlinIdentifier
+
+    val KotlinClassSwiftModel.enumCaseNamesBasedOnKotlinIdentifiersCollide: Boolean
+        get() {
+            val names = this.visibleSealedSubclasses.map { it.enumCaseNameBasedOnKotlinIdentifier }
+
+            return names.size != names.distinct().size
+        }
+
+    val KotlinClassSwiftModel.enumCaseNameBasedOnKotlinIdentifier: String
         get() {
             val configuredName = this.getConfiguration(SealedInterop.Case.Name)
 
             return configuredName ?: this.classDescriptor.name.identifier
+        }
+
+    val KotlinClassSwiftModel.enumCaseNameBasedOnSwiftIdentifier: String
+        get() {
+            val configuredName = this.getConfiguration(SealedInterop.Case.Name)
+
+            return configuredName ?: this.fqName.toValidSwiftIdentifier()
         }
 
     val KotlinClassSwiftModel.hasElseCase: Boolean
