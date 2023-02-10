@@ -1,9 +1,11 @@
 package co.touchlab.skie.api.apinotes.fixes.memberconflicts
 
+import co.touchlab.skie.api.apinotes.fixes.memberconflicts.UniqueSignatureSet.Collision.Group
 import co.touchlab.skie.api.apinotes.fixes.memberconflicts.UniqueSignatureSet.Collision.RemoveExisting
 import co.touchlab.skie.api.apinotes.fixes.memberconflicts.UniqueSignatureSet.Collision.RemoveNew
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy.Remove
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy.Rename
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
@@ -18,6 +20,7 @@ class UniqueSignatureSet {
 
     private val alreadyAdded = mutableSetOf<KotlinCallableMemberSwiftModel>()
     private val signatureMap = mutableMapOf<Signature, MutableKotlinDirectlyCallableMemberSwiftModel>()
+    private val removedSignaturesWithRemoveStrategy = mutableMapOf<Signature, Remove>()
 
     fun addGroup(representative: MutableKotlinCallableMemberSwiftModel) {
         if (representative in alreadyAdded) {
@@ -29,7 +32,7 @@ class UniqueSignatureSet {
             val collision = findHighestPriorityCollision(representative)
 
             if (collision != null) {
-                collision.resolve(representative)
+                collision.resolve(representative) { this.remove() }
             } else {
                 addToSignatureMap(representative)
                 return
@@ -51,75 +54,88 @@ class UniqueSignatureSet {
             .maxByOrNull { it.priority }
 
     private fun DirectlyCallableSwiftModelWithSignature.findCollisionIfExists(): Collision? {
-        val existingModel = signatureMap[this.signature] ?: return null
+        if (!this.model.isExposed) return null
 
-        if (this.model.visibility.isRemoved) return null
+        if (this.needsToBeRemovedBecauseOfCollisionWithAlreadyRemovedSignature) return RemoveNew
 
+        val existingModel = getExposedModelForSignatureOrNull(this.signature) ?: return null
+
+        return this.determineCollisionWithExposedDeclaration(existingModel)
+    }
+
+    private val DirectlyCallableSwiftModelWithSignature.needsToBeRemovedBecauseOfCollisionWithAlreadyRemovedSignature: Boolean
+        get() {
+            val collisionResolutionStrategy = this.model.collisionResolutionStrategy
+
+            if (collisionResolutionStrategy !is Remove) return false
+            val strategyOfConflictingRemovedSignature = removedSignaturesWithRemoveStrategy[this.signature] ?: return false
+
+            return collisionResolutionStrategy.shouldBeRemovedBefore(strategyOfConflictingRemovedSignature)
+        }
+
+    private fun DirectlyCallableSwiftModelWithSignature.determineCollisionWithExposedDeclaration(
+        existingModel: MutableKotlinDirectlyCallableMemberSwiftModel,
+    ): Collision {
         val newModelStrategy = this.model.collisionResolutionStrategy
         val existingModelStrategy = existingModel.collisionResolutionStrategy
 
-        return if (!existingModel.visibility.isRemoved) {
-            when (newModelStrategy) {
-                is Remove -> when (existingModelStrategy) {
-                    is Remove -> if (existingModelStrategy.shouldBeRemovedBefore(newModelStrategy)) RemoveExisting(existingModel) else RemoveNew
-                    Rename -> RemoveNew
-                }
-                Rename -> when (existingModelStrategy) {
-                    is Remove -> RemoveExisting(existingModel)
-                    Rename -> Collision.Rename
-                }
+        return when (newModelStrategy) {
+            Rename -> when (existingModelStrategy) {
+                Rename -> Collision.Rename
+                is Remove -> RemoveExisting(existingModel)
             }
-        } else {
-            // The existingModel is already removed so there is no collision, but it might be required to also remove the new model if they both have the same remove priority.
-            when (newModelStrategy) {
-                is Remove -> when (existingModelStrategy) {
-                    is Remove -> if (newModelStrategy.shouldBeRemovedBefore(existingModelStrategy)) RemoveNew else null
-                    Rename -> null
-                }
-                Rename -> null
+            is Remove -> when (existingModelStrategy) {
+                Rename -> RemoveNew
+                is Remove -> Group(
+                    listOfNotNull(
+                        RemoveNew.takeIf { newModelStrategy.shouldBeRemovedBefore(existingModelStrategy) },
+                        RemoveExisting(existingModel).takeIf { existingModelStrategy.shouldBeRemovedBefore(newModelStrategy) },
+                    )
+                )
             }
         }
     }
+
+    private val KotlinDirectlyCallableMemberSwiftModel.isExposed: Boolean
+        get() = !this.visibility.isRemoved
+
+    private fun getExposedModelForSignatureOrNull(signature: Signature): MutableKotlinDirectlyCallableMemberSwiftModel? =
+        signatureMap[signature]?.takeIf { it.isExposed }
 
     private fun Remove.shouldBeRemovedBefore(other: Remove): Boolean =
         this.priority >= other.priority
 
     private fun addToSignatureMap(representative: MutableKotlinCallableMemberSwiftModel) {
-        representative.allGroupMembersWithSignatures.forEach {
-            addToSignatureMap(it)
-        }
-    }
+        representative.allGroupMembersWithSignatures
+            .filter { it.model.isExposed }
+            .distinctBy { it.signature }
+            .forEach { (model, signature) ->
+                check(getExposedModelForSignatureOrNull(signature) == null)
 
-    private fun addToSignatureMap(newModelWithSignature: DirectlyCallableSwiftModelWithSignature) {
-        fun putNewModelIntoSignatureMap() {
-            signatureMap[newModelWithSignature.signature] = newModelWithSignature.model
-        }
-
-        val existingModel = signatureMap[newModelWithSignature.signature]
-        val newModel = newModelWithSignature.model
-
-        when {
-            existingModel == null -> putNewModelIntoSignatureMap()
-            !existingModel.visibility.isRemoved -> check(newModel.visibility.isRemoved || newModel in existingModel.allBoundedSwiftModels)
-            !newModel.visibility.isRemoved -> putNewModelIntoSignatureMap()
-            else -> {
-                val newModelStrategy = newModelWithSignature.model.collisionResolutionStrategy
-                val existingModelStrategy = existingModel.collisionResolutionStrategy
-
-                check(newModelStrategy is Remove)
-                check(existingModelStrategy is Remove)
-
-                if (existingModelStrategy.shouldBeRemovedBefore(newModelStrategy)) {
-                    putNewModelIntoSignatureMap()
-                }
+                signatureMap[signature] = model
             }
-        }
     }
 
     private val MutableKotlinCallableMemberSwiftModel.allGroupMembersWithSignatures: List<DirectlyCallableSwiftModelWithSignature>
         get() = this.directlyCallableMembers
             .flatMap { it.allBoundedSwiftModels }
             .map { DirectlyCallableSwiftModelWithSignature(it, it.signature) }
+
+    private fun MutableKotlinDirectlyCallableMemberSwiftModel.remove() {
+        this.visibility = SwiftModelVisibility.Removed
+
+        this.addToRemovedSignaturesMap()
+    }
+
+    private fun MutableKotlinDirectlyCallableMemberSwiftModel.addToRemovedSignaturesMap() {
+        val removeStrategy = this.collisionResolutionStrategy as? Remove ?: return
+
+        val existingRemovedSignature = removedSignaturesWithRemoveStrategy[this.signature]
+
+        if (existingRemovedSignature == null || existingRemovedSignature.shouldBeRemovedBefore(removeStrategy)) {
+            removedSignaturesWithRemoveStrategy[this.signature] = removeStrategy
+        }
+    }
 
     private data class DirectlyCallableSwiftModelWithSignature(
         val model: MutableKotlinDirectlyCallableMemberSwiftModel,
@@ -130,13 +146,16 @@ class UniqueSignatureSet {
 
         val priority: Int
 
-        fun resolve(representative: MutableKotlinCallableMemberSwiftModel)
+        fun resolve(representative: MutableKotlinCallableMemberSwiftModel, remove: MutableKotlinDirectlyCallableMemberSwiftModel.() -> Unit)
 
         object Rename : Collision {
 
-            override val priority: Int = 2
+            override val priority: Int = 1
 
-            override fun resolve(representative: MutableKotlinCallableMemberSwiftModel) {
+            override fun resolve(
+                representative: MutableKotlinCallableMemberSwiftModel,
+                remove: MutableKotlinDirectlyCallableMemberSwiftModel.() -> Unit,
+            ) {
                 representative.accept(RenameCollisionVisitor)
             }
 
@@ -162,21 +181,40 @@ class UniqueSignatureSet {
 
         class RemoveExisting(private val oldConflictingMember: MutableKotlinDirectlyCallableMemberSwiftModel) : Collision {
 
-            override val priority: Int = 1
+            override val priority: Int = 0
 
-            override fun resolve(representative: MutableKotlinCallableMemberSwiftModel) {
-                oldConflictingMember.visibility = SwiftModelVisibility.Removed
+            override fun resolve(
+                representative: MutableKotlinCallableMemberSwiftModel,
+                remove: MutableKotlinDirectlyCallableMemberSwiftModel.() -> Unit,
+            ) {
+                oldConflictingMember.remove()
             }
         }
 
         object RemoveNew : Collision {
 
-            // Old models must be removed first (to make sure they are all removed), only then can be the new models removed.
             override val priority: Int = 0
 
-            override fun resolve(representative: MutableKotlinCallableMemberSwiftModel) {
+            override fun resolve(
+                representative: MutableKotlinCallableMemberSwiftModel,
+                remove: MutableKotlinDirectlyCallableMemberSwiftModel.() -> Unit,
+            ) {
                 representative.directlyCallableMembers.forEach {
-                    it.visibility = SwiftModelVisibility.Removed
+                    it.remove()
+                }
+            }
+        }
+
+        class Group(val collisions: List<Collision>) : Collision {
+
+            override val priority: Int = collisions.maxOf { it.priority }
+
+            override fun resolve(
+                representative: MutableKotlinCallableMemberSwiftModel,
+                remove: MutableKotlinDirectlyCallableMemberSwiftModel.() -> Unit,
+            ) {
+                collisions.forEach {
+                    it.resolve(representative, remove)
                 }
             }
         }
