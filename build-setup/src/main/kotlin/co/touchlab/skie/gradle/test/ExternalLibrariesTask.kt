@@ -162,7 +162,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                 )
             }
         } else {
-            val downloadedLibraries = loadAll("*$platformSuffix").map {
+            val downloadedLibraries = loadAll("*${platformSuffix.get()}").map {
                 it.copy(name = it.name)
             }
 
