@@ -25,6 +25,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 import kotlin.io.path.deleteIfExists
+import kotlin.io.path.writeText
 import kotlin.streams.toList
 import kotlin.test.fail
 import kotlin.time.Duration
@@ -220,6 +221,9 @@ class NameMappingTest {
                     skieConfiguration,
                     compilerConfiguration,
                 )
+            }
+            .also {
+                tempDirectory.resolve("run.log").writeText(testLogger.toString())
             }
     }
 }
