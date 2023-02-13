@@ -92,7 +92,7 @@ internal class KotlinTestLinker(
             bundleId = "Kotlin"
             target = "ios_arm64"
 
-            pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.TEST_RESOURCES)
+            pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(co.touchlab.skie.framework.BuildConfig.RESOURCES)
 
             libraries = compilerConfiguration.dependencies.toTypedArray()
             exportedLibraries = compilerConfiguration.exportedDependencies.toTypedArray()

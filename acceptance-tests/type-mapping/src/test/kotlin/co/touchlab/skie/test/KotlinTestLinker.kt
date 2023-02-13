@@ -98,7 +98,7 @@ internal class KotlinTestLinker(
                 "LinkBitcodeDependencies",
                 "BitcodePostprocessing",
             )
-            pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.TEST_RESOURCES)
+            pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(co.touchlab.skie.framework.BuildConfig.RESOURCES)
 
             libraries = compilerConfiguration.dependencies.toTypedArray()
             exportedLibraries = compilerConfiguration.exportedDependencies.toTypedArray()

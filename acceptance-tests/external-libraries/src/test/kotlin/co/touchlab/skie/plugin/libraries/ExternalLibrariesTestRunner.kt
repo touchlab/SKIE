@@ -8,6 +8,8 @@ import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.features.SkieFeatureSet
 import co.touchlab.skie.external_libraries.BuildConfig
 import io.kotest.core.spec.style.FunSpec
 import kotlinx.coroutines.channels.Channel
@@ -67,9 +69,7 @@ class ExternalLibrariesTestRunner(
 
         val testLogger = TestLogger()
 
-        val skieConfiguration = Configuration {
-
-        }
+        val skieConfiguration = Configuration(SkieFeatureSet(setOf(SkieFeature.SuspendInterop, SkieFeature.SwiftRuntime)), emptyList())
 
         val compilerConfiguration = CompilerConfiguration(
             dependencies = test.input.files,
