@@ -48,6 +48,7 @@ internal class KotlinTestLinker(
 
         PluginRegistrar.configure.set {
             put(ConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
+            put(ConfigurationKeys.swiftLinkLogFile, tempFileSystem.createFile("swiftlink.log").toFile())
             put(co.touchlab.skie.plugin.generator.ConfigurationKeys.swiftGenConfiguration, configuration)
         }
 
