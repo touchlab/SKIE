@@ -21,6 +21,8 @@ skie {
 kotlin {
     ios()
 
+    val testedLibrary = "co.touchlab:kmmworker-iosarm64:0.1.1"
+
     targets.withType<KotlinNativeTarget> {
         binaries {
             framework {
@@ -28,6 +30,7 @@ kotlin {
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 
+                export(testedLibrary)
             }
         }
     }
@@ -39,13 +42,8 @@ kotlin {
                     strictly("1.6.4")
                 }
             }
-            api("org.jetbrains.kotlinx:kotlinx-datetime") {
-                version {
-                    strictly("0.4.0")
-                }
-            }
 
-
+            api(testedLibrary)
         }
     }
 }
@@ -68,14 +66,4 @@ tasks.register("dependenciesForExport") {
             println("export(\"$it\")")
         }
     }
-}
-
-val test by tasks.registering {
-    group = "verification"
-
-    dependsOn("linkDebugFrameworkIosArm64")
-}
-
-tasks.named("allTests") {
-    dependsOn(test)
 }

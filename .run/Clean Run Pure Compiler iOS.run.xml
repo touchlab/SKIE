@@ -11,7 +11,7 @@
       <option name="taskNames">
         <list>
           <option value=":dev-support:pure-compiler:framework:clean" />
-          <option value=":dev-support:pure-compiler:framework:linkDebugFrameworkIosArm64" />
+          <option value=":dev-support:pure-compiler:framework:linkReleaseFrameworkIosArm64" />
         </list>
       </option>
       <option name="vmOptions" />

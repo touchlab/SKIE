@@ -10,12 +10,16 @@ kotlin {
     macosX64()
     macosArm64()
 
+    val testedLibrary = "co.touchlab:kmmworker-iosarm64:0.1.1"
+
     targets.withType<KotlinNativeTarget> {
         binaries {
             framework {
                 isStatic = true
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
+
+                export(testedLibrary)
             }
         }
     }
@@ -23,6 +27,8 @@ kotlin {
     val commonMain by sourceSets.getting {
         dependencies {
             implementation(projects.devSupport.pureCompiler.library)
+
+            api(testedLibrary)
         }
     }
 }

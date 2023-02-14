@@ -10,7 +10,8 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="test" />
+          <option value="clean" />
+          <option value="linkReleaseFrameworkIosArm64" />
         </list>
       </option>
       <option name="vmOptions" />
