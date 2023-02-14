@@ -14,20 +14,26 @@ class AsyncStreamDispatcherDelegate: Skie.class__co_touchlab_skie_kotlin__co_tou
     }
 
     func dispatch(block: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable) {
-        lock.withLock {
-            if !isActive {
-                fatalError("Cannot dispatch block after dispatcher is stopped. This error might have happened by leaking the dispatcher from the original job.")
-            }
-
-            continuation.yield(block)
+        lock.lock()
+        defer {
+            lock.unlock()
         }
+
+        if !isActive {
+            fatalError("Cannot dispatch block after dispatcher is stopped. This error might have happened by leaking the dispatcher from the original job.")
+        }
+
+        continuation.yield(block)
     }
 
     func stop() {
-        lock.withLock {
-            isActive = false
-
-            continuation.finish()
+        lock.lock()
+        defer {
+            lock.unlock()
         }
+
+        isActive = false
+
+        continuation.finish()
     }
 }
