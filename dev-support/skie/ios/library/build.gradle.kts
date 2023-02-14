@@ -4,8 +4,6 @@ plugins {
 
 kotlin {
     ios()
-    macosX64()
-    macosArm64()
 
     val commonMain by sourceSets.getting {
         dependencies {

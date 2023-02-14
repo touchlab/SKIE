@@ -1,17 +1,17 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Clean Run Pure Compiler iOS" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Skie/iOS/Release" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/dev-support/skie/ios" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="" />
+      <option name="scriptParameters" value="--stacktrace" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
         <list>
-          <option value=":dev-support:pure-compiler:framework:clean" />
-          <option value=":dev-support:pure-compiler:framework:linkReleaseFrameworkIosArm64" />
+          <option value="clean" />
+          <option value="buildIosRelease" />
         </list>
       </option>
       <option name="vmOptions" />

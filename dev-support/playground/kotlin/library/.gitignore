@@ -1,4 +1,0 @@
-src/commonMain/kotlin/*
-src/macosMain/kotlin/*
-src/macosArm64Main/kotlin/*
-src/macosX64Main/kotlin/*

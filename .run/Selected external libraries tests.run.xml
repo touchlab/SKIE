@@ -1,8 +1,13 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Manual external libraries tests" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Selected external libraries tests" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="libraryTest" value="co.touchlab:kmmworker-iosarm64" />
+        </map>
+      </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests/manual-external-libraries" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests/external-libraries" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -10,8 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="clean" />
-          <option value="linkReleaseFrameworkIosArm64" />
+          <option value="test" />
         </list>
       </option>
       <option name="vmOptions" />

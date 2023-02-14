@@ -27,10 +27,14 @@ includeBuild("../plugin")
 
 include(
     ":ir-inspector",
-    ":playground",
-    ":playground:kotlin:library",
-    ":playground:kotlin:framework",
-    ":playground:swift",
+    ":skie:mac",
+    ":skie:mac:framework",
+    ":skie:mac:library",
+    ":skie:mac:swift",
+    ":skie:ios",
+    ":skie:ios:framework",
+    ":skie:ios:library",
+    ":pure-compiler",
     ":pure-compiler:library",
     ":pure-compiler:framework",
 )

@@ -31,7 +31,7 @@ val createSwiftMain by tasks.registering {
 val build by tasks.registering(Exec::class) {
     group = "build"
 
-    val linkTask = tasks.getByPath(":playground:kotlin:framework:linkDebugFramework${architecture.kotlinGradleName.capitalized()}")
+    val linkTask = tasks.getByPath(":skie:mac:framework:linkDebugFramework${architecture.kotlinGradleName.capitalized()}")
 
     inputs.files(linkTask.outputs)
     inputs.files(createSwiftMain.map { it.outputs })

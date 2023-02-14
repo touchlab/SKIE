@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
+import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 
 plugins {
     id("skie-multiplatform")
@@ -10,7 +11,7 @@ kotlin {
     macosX64()
     macosArm64()
 
-    val testedLibrary = "co.touchlab:kmmworker-iosarm64:0.1.1"
+    val exportedLibrary = "co.touchlab:kmmworker-iosarm64:0.1.1"
 
     targets.withType<KotlinNativeTarget> {
         binaries {
@@ -19,16 +20,20 @@ kotlin {
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 
-                export(testedLibrary)
+                export(projects.devSupport.pureCompiler.library)
+
+//                export(exportedLibrary)
             }
         }
     }
 
     val commonMain by sourceSets.getting {
         dependencies {
-            implementation(projects.devSupport.pureCompiler.library)
+            implementation("co.touchlab.skie:configuration-annotations")
 
-            api(testedLibrary)
+            api(projects.devSupport.pureCompiler.library)
+
+//            api(exportedLibrary)
         }
     }
 }
@@ -44,6 +49,19 @@ tasks.withType<KotlinNativeLink>().configureEach {
                 "-c",
                 "echo \"import Kotlin\\n:type lookup Kotlin\" | swift repl -F \"${frameworkDirectory.absolutePath}\" > \"${apiFile.absolutePath}\"",
             )
+        }
+    }
+}
+
+tasks.register("dependenciesForExport") {
+    doLast {
+        val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent().kotlinGradleName + "Api")
+
+        val dependencies = configuration.incoming.resolutionResult.allComponents.map { it.toString() }
+        val externalDependencies = dependencies.filterNot { it.startsWith("project :") }
+
+        externalDependencies.forEach {
+            println("export(\"$it\")")
         }
     }
 }

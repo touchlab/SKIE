@@ -1,5 +1,7 @@
+import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 plugins {
     id("skie-multiplatform")
@@ -9,19 +11,19 @@ plugins {
 
 skie {
     features {
-//        fqNames.set(true)
     }
     configuration {
         group {
-//            ExperimentalFeatures.Enabled(true)
+            ExperimentalFeatures.Enabled(true)
         }
     }
 }
 
 kotlin {
-    ios()
+    macosX64()
+    macosArm64()
 
-    val testedLibrary = "co.touchlab:kmmworker-iosarm64:0.1.1"
+    val exportedLibrary = "tz.co.asoft:result-core:0.0.50"
 
     targets.withType<KotlinNativeTarget> {
         binaries {
@@ -30,21 +32,33 @@ kotlin {
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 
-                export(testedLibrary)
+                export(projects.skie.mac.library)
+
+//                export(exportedLibrary)
             }
         }
     }
 
     val commonMain by sourceSets.getting {
         dependencies {
-            api("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
-                version {
-                    strictly("1.6.4")
-                }
-            }
+            implementation("co.touchlab.skie:configuration-annotations")
 
-            api(testedLibrary)
+            api(projects.skie.mac.library)
+
+//            api(exportedLibrary)
         }
+    }
+
+    val macosMain by sourceSets.creating {
+        dependsOn(commonMain)
+    }
+
+    val macosArm64Main by sourceSets.getting {
+        dependsOn(macosMain)
+    }
+
+    val macosX64Main by sourceSets.getting {
+        dependsOn(macosMain)
     }
 }
 
@@ -52,6 +66,21 @@ configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("co.touchlab.skie:skie-kotlin-plugin")).using(module("co.touchlab.skie:kotlin-plugin:${version}"))
         substitute(module("co.touchlab.skie:skie-runtime-kotlin")).using(module("co.touchlab.skie:kotlin:${version}"))
+    }
+}
+
+tasks.withType<KotlinNativeLink>().configureEach {
+    doLast {
+        val frameworkDirectory = outputs.files.toList().first()
+        val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
+
+        exec {
+            commandLine(
+                "zsh",
+                "-c",
+                "echo \"import Kotlin\\n:type lookup Kotlin\" | swift repl -F \"${frameworkDirectory.absolutePath}\" > \"${apiFile.absolutePath}\"",
+            )
+        }
     }
 }
 

@@ -1,0 +1,11 @@
+src/commonMain/kotlin/*
+!src/commonMain/kotlin/.gitkeep
+
+src/macosMain/kotlin/*
+!src/macosMain/kotlin/.gitkeep
+
+src/macosArm64Main/kotlin/*
+!src/macosArm64Main/kotlin/.gitkeep
+
+src/macosX64Main/kotlin/*
+!src/macosX64Main/kotlin/.gitkeep
