@@ -12,7 +12,6 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
-import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
@@ -55,7 +54,7 @@ internal class KotlinSuspendGeneratorDelegate(
     ): FunctionDescriptor =
         declarationBuilder.createFunction(
             name = "Skie_Suspend__${nextBridgingFunctionIndex++}__${functionDescriptor.name.identifier}",
-            namespace = declarationBuilder.getPackageNamespaceOrCustom(functionDescriptor),
+            namespace = declarationBuilder.getPackageNamespace(functionDescriptor),
             annotations = Annotations.EMPTY,
         ) {
             valueParameters = functionDescriptor.createValueParametersForBridgingFunction(descriptor)
@@ -162,6 +161,6 @@ internal class KotlinSuspendGeneratorDelegate(
             isCrossinline = false,
             isNoinline = false,
             varargElementType = null,
-            source = SourceElement.NO_SOURCE,
+            source = owner.source,
         )
 }

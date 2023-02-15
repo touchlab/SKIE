@@ -24,31 +24,35 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.resolve.source.PsiSourceFile
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
 internal class NewFileNamespace private constructor(
-    name: FqName,
+    private val sourceFile: SourceFile,
     private val context: Context,
     descriptorProvider: DescriptorProvider,
 ) : BaseNamespace<PackageFragmentDescriptor>(descriptorProvider) {
+
+    private constructor(
+        fileName: String,
+        context: Context,
+        descriptorProvider: DescriptorProvider,
+    ) : this(SourceFile { fileName }, context, descriptorProvider)
 
     private val packageContent = mutableListOf<DeclarationDescriptor>()
 
     override val descriptor: PackageFragmentDescriptor = object : PackageFragmentDescriptorImpl(
         module = context.moduleDescriptor,
-        fqName = name,
+        fqName = FqName("$basePackage.${sourceFile.nameOrError.removeSuffix(".kt")}"),
     ) {
 
         private val memberScope = SimpleMemberScope(packageContent)
 
         override fun getMemberScope(): MemberScope = memberScope
     }
-
-    private val fileName = name.asString().split(".").joinToString("/") + ".kt"
-
-    private val sourceFile = SourceFile { fileName }
 
     override val sourceElement: SourceElement = SourceElement { sourceFile }
 
@@ -57,7 +61,7 @@ internal class NewFileNamespace private constructor(
     }
 
     override fun generateNamespaceIr(generatorContext: GeneratorContext): IrDeclarationContainer {
-        val fileEntry = DummyIrFileEntry(fileName)
+        val fileEntry = DummyIrFileEntry(sourceFile.nameOrError)
 
         val file = IrFileImpl(fileEntry, descriptor, context.mainIrModuleFragment)
 
@@ -85,7 +89,8 @@ internal class NewFileNamespace private constructor(
         private val descriptorProvider: DescriptorProvider,
     ) {
 
-        private val moduleDescriptor = requireNotNull((context as? KonanContext)?.moduleDescriptor) { "Context must have a module descriptor." }
+        private val moduleDescriptor =
+            requireNotNull((context as? KonanContext)?.moduleDescriptor) { "Context must have a module descriptor." }
 
         private val namespaceContext = Context(moduleDescriptor, mainIrModuleFragment)
 
@@ -103,9 +108,15 @@ internal class NewFileNamespace private constructor(
         }
 
         fun create(name: String): NewFileNamespace {
-            val fqName = FqName("$basePackage.$name")
+            val namespace = NewFileNamespace(name, namespaceContext, descriptorProvider)
 
-            val namespace = NewFileNamespace(fqName, namespaceContext, descriptorProvider)
+            addPackageDescriptor(namespace.descriptor)
+
+            return namespace
+        }
+
+        fun create(sourceFile: SourceFile): NewFileNamespace {
+            val namespace = NewFileNamespace(sourceFile, namespaceContext, descriptorProvider)
 
             addPackageDescriptor(namespace.descriptor)
 
@@ -145,3 +156,14 @@ internal class NewFileNamespace private constructor(
         private const val basePackage: String = "co.touchlab.skie.generated"
     }
 }
+
+// From ObjCExportNamer.getFileClassName - ensures that this code crashes in the same cases.
+private val SourceFile.nameOrError: String
+    get() = when (this) {
+        is PsiSourceFile -> {
+            val psiFile = psiFile
+            val ktFile = psiFile as? KtFile ?: error("PsiFile '$psiFile' is not KtFile")
+            ktFile.name
+        }
+        else -> name ?: error("$this has no name")
+    }

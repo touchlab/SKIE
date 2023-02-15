@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.ir
 
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
-import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
@@ -23,5 +22,5 @@ internal fun ValueParameterDescriptor.copyWithoutDefaultValue(
     isCrossinline = this.isCrossinline,
     isNoinline = this.isNoinline,
     varargElementType = this.varargElementType,
-    source = SourceElement.NO_SOURCE,
+    source = newOwner.source,
 )

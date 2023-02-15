@@ -14,9 +14,7 @@ internal interface DeclarationBuilder {
 
     fun getClassNamespace(classDescriptor: ClassDescriptor): Namespace<ClassDescriptor>
 
-    fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor>?
-
-    fun getPackageNamespaceOrCustom(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor>
+    fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor>
 
     fun createFunction(
         name: Name,
@@ -36,7 +34,7 @@ internal interface DeclarationBuilder {
 internal fun DeclarationBuilder.getNamespace(function: FunctionDescriptor): Namespace<*> =
     when (val containingDeclaration = function.containingDeclaration) {
         is ClassDescriptor -> getClassNamespace(containingDeclaration)
-        is PackageFragmentDescriptor -> getPackageNamespaceOrCustom(function)
+        is PackageFragmentDescriptor -> getPackageNamespace(function)
         else -> throw UnsupportedDeclarationDescriptorException(containingDeclaration)
     }
 

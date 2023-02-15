@@ -10,8 +10,6 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuil
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
-import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
-import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class ClassMethodsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,

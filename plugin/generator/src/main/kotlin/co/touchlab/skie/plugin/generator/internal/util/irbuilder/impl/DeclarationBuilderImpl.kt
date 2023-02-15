@@ -17,14 +17,18 @@ import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.source.PsiSourceFile
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
@@ -41,13 +45,15 @@ internal class DeclarationBuilderImpl(
 
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
-    private val packageNamespacesByDescriptor = mutableMapOf<PackageFragmentDescriptor, DeserializedPackageNamespace>()
+    private val originalPackageNamespacesByFile = mutableMapOf<SourceFile, DeserializedPackageNamespace>()
+    private val newPackageNamespacesByFile = mutableMapOf<SourceFile, NewFileNamespace>()
 
     private val allNamespaces: List<Namespace<*>>
         get() = listOf(
             newFileNamespacesByName,
             classNamespacesByDescriptor,
-            packageNamespacesByDescriptor,
+            originalPackageNamespacesByFile,
+            newPackageNamespacesByFile,
         ).flatMap { it.values }
 
     override fun getCustomNamespace(name: String): Namespace<PackageFragmentDescriptor> =
@@ -64,18 +70,29 @@ internal class DeclarationBuilderImpl(
             DeserializedClassNamespace(classDescriptor, descriptorProvider)
         }
 
-    override fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor>? {
-        val packageFragment = existingMember.findPackage()
+    override fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor> {
+        val sourceFile = existingMember.findSourceFileOrNull()
 
-        if (packageFragment !is DeserializedPackageFragment) return null
+        val hasOriginalPackage = existingMember.findPackage() is DeserializedPackageFragment &&
+            sourceFile in descriptorProvider.exposedFiles &&
+            sourceFile !in newPackageNamespacesByFile
 
-        return packageNamespacesByDescriptor.getOrPut(packageFragment) {
-            DeserializedPackageNamespace(existingMember, descriptorProvider)
+        return when {
+            sourceFile == null -> getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
+            hasOriginalPackage -> originalPackageNamespacesByFile.getOrPut(sourceFile) {
+                DeserializedPackageNamespace(existingMember, descriptorProvider)
+            }
+            else -> newPackageNamespacesByFile.getOrPut(sourceFile) {
+                newFileNamespaceFactory.create(sourceFile)
+            }
         }
     }
 
-    override fun getPackageNamespaceOrCustom(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor> =
-        getPackageNamespace(existingMember) ?: getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
+    private fun CallableMemberDescriptor.findSourceFileOrNull(): SourceFile? = try {
+        this.findSourceFile()
+    } catch (_: Throwable) {
+        null
+    }
 
     override fun createFunction(
         name: Name,

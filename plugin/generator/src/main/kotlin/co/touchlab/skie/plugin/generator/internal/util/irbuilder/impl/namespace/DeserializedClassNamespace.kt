@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.findSourceFile
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.UnsupportedDeclarationDescriptorException
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
 import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.DeserializedClassMemberScopeReflector
@@ -19,8 +20,7 @@ internal class DeserializedClassNamespace(
     descriptorProvider: DescriptorProvider,
 ) : BaseDeserializedNamespace<ClassDescriptor>(descriptorProvider) {
 
-    override val sourceElement: SourceElement
-        get() = descriptor.source
+    override val sourceElement: SourceElement = SourceElement { descriptor.findSourceFile() }
 
     override fun addDescriptorIntoDescriptorHierarchy(declarationDescriptor: DeclarationDescriptor) {
         when (declarationDescriptor) {
