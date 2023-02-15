@@ -54,11 +54,11 @@ class UniqueSignatureSet {
             .maxByOrNull { it.priority }
 
     private fun DirectlyCallableSwiftModelWithSignature.findCollisionIfExists(): Collision? {
-        if (!this.model.isExposed) return null
+        if (!this.model.isNotRemoved) return null
 
         if (this.needsToBeRemovedBecauseOfCollisionWithAlreadyRemovedSignature) return RemoveNew
 
-        val existingModel = getExposedModelForSignatureOrNull(this.signature) ?: return null
+        val existingModel = getNonRemovedModelForSignatureOrNull(this.signature) ?: return null
 
         return this.determineCollisionWithExposedDeclaration(existingModel)
     }
@@ -96,21 +96,21 @@ class UniqueSignatureSet {
         }
     }
 
-    private val KotlinDirectlyCallableMemberSwiftModel.isExposed: Boolean
+    private val KotlinDirectlyCallableMemberSwiftModel.isNotRemoved: Boolean
         get() = !this.visibility.isRemoved
 
-    private fun getExposedModelForSignatureOrNull(signature: Signature): MutableKotlinDirectlyCallableMemberSwiftModel? =
-        signatureMap[signature]?.takeIf { it.isExposed }
+    private fun getNonRemovedModelForSignatureOrNull(signature: Signature): MutableKotlinDirectlyCallableMemberSwiftModel? =
+        signatureMap[signature]?.takeIf { it.isNotRemoved }
 
     private fun Remove.shouldBeRemovedBefore(other: Remove): Boolean =
         this.priority >= other.priority
 
     private fun addToSignatureMap(representative: MutableKotlinCallableMemberSwiftModel) {
         representative.allGroupMembersWithSignatures
-            .filter { it.model.isExposed }
+            .filter { it.model.isNotRemoved }
             .distinctBy { it.signature }
             .forEach { (model, signature) ->
-                check(getExposedModelForSignatureOrNull(signature) == null)
+                check(getNonRemovedModelForSignatureOrNull(signature) == null) { "$model has signature ($signature) that is already added." }
 
                 signatureMap[signature] = model
             }

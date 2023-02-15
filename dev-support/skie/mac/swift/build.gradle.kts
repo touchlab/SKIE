@@ -28,19 +28,28 @@ val createSwiftMain by tasks.registering {
     }
 }
 
-val build by tasks.registering(Exec::class) {
+val buildDebug by tasks.registering(Exec::class) {
+    configureBuild("debug")
+}
+
+val buildRelease by tasks.registering(Exec::class) {
+    configureBuild("release")
+}
+
+fun Exec.configureBuild(mode: String) {
     group = "build"
 
-    val linkTask = tasks.getByPath(":skie:mac:framework:linkDebugFramework${architecture.kotlinGradleName.capitalized()}")
+    val linkTask = tasks.getByPath(":skie:mac:framework:link${mode.capitalized()}Framework${architecture.kotlinGradleName.capitalized()}")
 
     inputs.files(linkTask.outputs)
     inputs.files(createSwiftMain.map { it.outputs })
 
-    val output = layout.buildDirectory.file("main").get().asFile
+    val outputDirectory = layout.buildDirectory.dir(mode)
+    val output = outputDirectory.map { it.file("main") }
     outputs.file(output)
 
     doFirst {
-        mkdir(layout.buildDirectory)
+        outputDirectory.get().asFile.mkdirs()
     }
     doFirst {
         println("---------------- Swift compilation ----------------")
@@ -54,7 +63,7 @@ val build by tasks.registering(Exec::class) {
             "-F",
             linkTask.outputs.files.first().absolutePath,
             "-o",
-            output.absolutePath,
+            output.get().asFile.absolutePath,
             // Workaround for https://github.com/apple/swift/issues/55127
             "-parse-as-library",
             // Workaround for missing symbol when compiling with Coroutines for MacosArm64
@@ -64,7 +73,15 @@ val build by tasks.registering(Exec::class) {
     }
 }
 
-tasks.register<Exec>("run") {
+tasks.register<Exec>("runDebug") {
+    configureRun(buildDebug)
+}
+
+tasks.register<Exec>("runRelease") {
+    configureRun(buildRelease)
+}
+
+fun Exec.configureRun(build: TaskProvider<Exec>) {
     group = "build"
 
     inputs.files(build.map { it.outputs })

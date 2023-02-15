@@ -32,7 +32,7 @@ kotlin {
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 
-                export(projects.skie.mac.library)
+                export(projects.skie.mac.dependency)
 
 //                export(exportedLibrary)
             }
@@ -43,7 +43,7 @@ kotlin {
         dependencies {
             implementation("co.touchlab.skie:configuration-annotations")
 
-            api(projects.skie.mac.library)
+            api(projects.skie.mac.dependency)
 
 //            api(exportedLibrary)
         }

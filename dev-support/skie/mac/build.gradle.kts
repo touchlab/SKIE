@@ -1,5 +1,5 @@
 val clean by tasks.registering {
-    dependsOn(":skie:mac:library:clean")
+    dependsOn(":skie:mac:dependency:clean")
     dependsOn(":skie:mac:framework:clean")
     dependsOn(":skie:mac:swift:clean")
 }
@@ -12,6 +12,18 @@ val buildMacRelease by tasks.registering {
     dependsOn(":skie:mac:framework:linkReleaseFrameworkMacosArm64")
 }
 
-val runSwift by tasks.registering {
-    dependsOn(":skie:mac:swift:run")
+val buildSwiftDebug by tasks.registering {
+    dependsOn(":skie:mac:swift:buildDebug")
+}
+
+val buildSwiftRelease by tasks.registering {
+    dependsOn(":skie:mac:swift:buildRelease")
+}
+
+val runSwiftDebug by tasks.registering {
+    dependsOn(":skie:mac:swift:runDebug")
+}
+
+val runSwiftRelease by tasks.registering {
+    dependsOn(":skie:mac:swift:runRelease")
 }

@@ -1,5 +1,5 @@
 val clean by tasks.registering {
-    dependsOn(":pure-compiler:library:clean")
+    dependsOn(":pure-compiler:dependency:clean")
     dependsOn(":pure-compiler:framework:clean")
 }
 

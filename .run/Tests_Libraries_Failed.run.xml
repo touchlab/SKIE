@@ -1,8 +1,13 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Type mapping tests" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Tests/Libraries/Failed" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="failedOnly" value="" />
+        </map>
+      </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests/external-libraries" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -10,14 +15,12 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:type-mapping:test" />
-          <option value="--tests" />
-          <option value="&quot;co.touchlab.skie.test.NameMappingTest.runTest&quot;" />
+          <option value="test" />
         </list>
       </option>
       <option name="vmOptions" />
     </ExternalSystemSettings>
-    <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
     <method v="2" />

@@ -1,13 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Selected Acceptance tests" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Tests/Libraries/All" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
-      <option name="env">
-        <map>
-          <entry key="acceptanceTest" value="sealed" />
-        </map>
-      </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests/external-libraries" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -15,12 +10,12 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:test" />
+          <option value="test" />
         </list>
       </option>
       <option name="vmOptions" />
     </ExternalSystemSettings>
-    <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
     <method v="2" />
