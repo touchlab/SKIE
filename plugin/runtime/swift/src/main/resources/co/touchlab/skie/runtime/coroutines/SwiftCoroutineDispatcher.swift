@@ -4,7 +4,7 @@ import Foundation
 struct SwiftCoroutineDispatcher {
 
     static func dispatch<T>(
-        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void
+        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Swift.Void
     ) async throws -> T {
         let cancellationHandler = Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler()
 
@@ -16,7 +16,7 @@ struct SwiftCoroutineDispatcher {
     }
 
     private static func dispatchCancellable<T>(
-        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void,
+        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Swift.Void,
         cancellationHandler: Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler
     ) async throws -> T {
         var result: Swift.Result<T, Swift.Error>? = nil
@@ -31,18 +31,18 @@ struct SwiftCoroutineDispatcher {
     }
 
     private static func createDispatcher<T>(
-        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Void,
+        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler) -> Swift.Void,
         cancellationHandler: Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_CancellationHandler,
-        onResult: @escaping (Swift.Result<T, Swift.Error>) -> Void
-    ) -> AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> {
-        return AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> { continuation in
+        onResult: @escaping (Swift.Result<T, Swift.Error>) -> Swift.Void
+    ) -> _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> {
+        return _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> { continuation in
             let dispatcherDelegate = AsyncStreamDispatcherDelegate(continuation: continuation)
 
             let suspendHandler = Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_Skie_SuspendHandler(
                 cancellationHandler: cancellationHandler,
                 dispatcherDelegate: dispatcherDelegate,
                 onResult: { suspendResult in
-                    let result: Result<T, Swift.Error> = convertToResult(suspendResult: suspendResult)
+                    let result: Swift.Result<T, Swift.Error> = convertToResult(suspendResult: suspendResult)
 
                     onResult(result)
 
@@ -72,7 +72,7 @@ struct SwiftCoroutineDispatcher {
         }
     }
 
-    private static func executeWithoutCancellation(dispatcher: AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable>) async {
+    private static func executeWithoutCancellation(dispatcher: _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable>) async {
         await Task {
             for await block in dispatcher {
                 block.run()
