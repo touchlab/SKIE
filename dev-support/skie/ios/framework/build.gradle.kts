@@ -21,7 +21,9 @@ skie {
 kotlin {
     ios()
 
-    val exportedLibrary = "tz.co.asoft:result-core-iosarm64:0.0.50"
+    val exportedLibraries = listOf<String>(
+
+    )
 
     targets.withType<KotlinNativeTarget> {
         binaries {
@@ -32,7 +34,9 @@ kotlin {
 
                 export(projects.devSupport.skie.ios.dependency)
 
-//                export(exportedLibrary)
+                exportedLibraries.forEach {
+                    export(it)
+                }
             }
         }
     }
@@ -43,7 +47,9 @@ kotlin {
 
             api(projects.devSupport.skie.ios.dependency)
 
-//            api(exportedLibrary)
+            exportedLibraries.forEach {
+                api(it)
+            }
         }
     }
 }

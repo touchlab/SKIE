@@ -23,7 +23,9 @@ kotlin {
     macosX64()
     macosArm64()
 
-    val exportedLibrary = "tz.co.asoft:result-core:0.0.50"
+    val exportedLibraries = listOf<String>(
+
+    )
 
     targets.withType<KotlinNativeTarget> {
         binaries {
@@ -34,7 +36,9 @@ kotlin {
 
                 export(projects.skie.mac.dependency)
 
-//                export(exportedLibrary)
+                exportedLibraries.forEach {
+                    export(it)
+                }
             }
         }
     }
@@ -45,7 +49,9 @@ kotlin {
 
             api(projects.skie.mac.dependency)
 
-//            api(exportedLibrary)
+            exportedLibraries.forEach {
+                api(it)
+            }
         }
     }
 

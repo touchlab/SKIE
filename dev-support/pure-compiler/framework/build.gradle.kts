@@ -11,7 +11,9 @@ kotlin {
     macosX64()
     macosArm64()
 
-    val exportedLibrary = "co.touchlab:kmmworker-iosarm64:0.1.1"
+    val exportedLibraries = listOf<String>(
+
+    )
 
     targets.withType<KotlinNativeTarget> {
         binaries {
@@ -22,7 +24,9 @@ kotlin {
 
                 export(projects.devSupport.pureCompiler.dependency)
 
-//                export(exportedLibrary)
+                exportedLibraries.forEach {
+                    export(it)
+                }
             }
         }
     }
@@ -33,7 +37,9 @@ kotlin {
 
             api(projects.devSupport.pureCompiler.dependency)
 
-//            api(exportedLibrary)
+            exportedLibraries.forEach {
+                api(it)
+            }
         }
     }
 }
