@@ -5,6 +5,7 @@ import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
@@ -31,7 +32,7 @@ import java.io.File
 
 const val EXTENSION_NAME = "skie"
 
-const val SWIFT_LINK_PLUGIN_CONFIGURATION_NAME = "skiePlugin"
+const val SKIE_PLUGIN_CONFIGURATION_NAME = "skiePlugin"
 
 // We need to use an anonymous class instead of lambda to keep execution optimizations.
 // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
@@ -52,20 +53,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java)
         val createSwiftGenConfigTask = createSwiftGenConfiguration(project)
 
-        val swiftLinkPluginConfiguration = configurations.maybeCreate(SWIFT_LINK_PLUGIN_CONFIGURATION_NAME).apply {
-            isCanBeResolved = true
-            isCanBeConsumed = false
-            isVisible = false
-            isTransitive = true
-
-            exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
-
-            attributes {
-                it.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-                it.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-                it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-            }
-        }
+        val swiftLinkPluginConfiguration = createConfigurationForSkiePlugins()
 
         // WORKAROUND: Fix fat framework name for CocoaPods plugin.
         pluginManager.withPlugin("kotlin-native-cocoapods") {
@@ -81,6 +69,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         }
 
         afterEvaluate {
+            if (!extension.isEnabled.get()) { return@afterEvaluate }
             val swiftKtCompilerPluginConfiguration = configurations.create("swiftKtCompilerPlugin") {
                 it.isCanBeConsumed = false
                 it.isCanBeResolved = true
@@ -100,11 +89,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             swiftLinkSubplugins.forEach { it.configureDependencies(project, swiftLinkPluginConfiguration) }
 
             val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
-            val appleTargets = kotlin.targets
-                .mapNotNull { it as? KotlinNativeTarget }
-                .filter { it.konanTarget.family.isAppleFamily }
-
-            appleTargets.forEach { target ->
+            kotlin.appleTargets.forEach { target ->
                 target.registerRuntime(extension)
 
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
@@ -167,58 +152,14 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                 }
             }
 
-            tasks.withType<FatFrameworkTask>().configureEach { task ->
-                task.doLast(object : Action<Task> {
-                    override fun execute(p0: Task) {
-                        val target = FrameworkLayout(task.fatFramework, true)
-
-                        val frameworksByArchs = task.frameworks.associateBy { it.target.architecture }
-                        target.swiftHeader.writer().use { writer ->
-                            val swiftHeaderContents = frameworksByArchs.mapValues { (_, framework) ->
-                                framework.files.swiftHeader.readText()
-                            }
-
-                            if (swiftHeaderContents.values.distinct().size == 1) {
-                                writer.write(swiftHeaderContents.values.first())
-                            } else {
-                                swiftHeaderContents.toList().forEachIndexed { i, (arch, content) ->
-                                    val macro = arch.clangMacro
-                                    if (i == 0) {
-                                        writer.appendLine("#if defined($macro)\n")
-                                    } else {
-                                        writer.appendLine("#elif defined($macro)\n")
-                                    }
-                                    writer.appendLine(content)
-                                }
-                                writer.appendLine(
-                                    """
-                                    #else
-                                    #error Unsupported platform
-                                    #endif
-                                    """.trimIndent()
-                                )
-                            }
-                        }
-
-                        target.swiftModuleDir.mkdirs()
-
-                        frameworksByArchs.toList().forEach { (_, framework) ->
-                            it.copy {
-                                it.from(framework.files.apiNotes)
-                                it.into(target.headerDir)
-                            }
-                            framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
-                                it.copy {
-                                    it.from(swiftmoduleFile)
-                                    it.into(target.swiftModuleDir)
-                                }
-                            }
-                        }
-                    }
-                })
-            }
+            configureFatFrameworkPatching()
         }
     }
+
+    private val KotlinMultiplatformExtension.appleTargets: List<KotlinNativeTarget>
+        get() = targets
+            .mapNotNull { it as? KotlinNativeTarget }
+            .filter { it.konanTarget.family.isAppleFamily }
 
     private fun KotlinNativeTarget.registerRuntime(skieExtension: SkieExtension) {
         if (!skieExtension.features.suspendInterop.get()) {
@@ -242,6 +183,76 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         return objects.sourceDirectorySet(swiftSourceSetName, swiftSourceSetName).apply {
             filter.include("**/*.swift")
             srcDirs(kotlinSourceSet.swiftSourceDirectory)
+        }
+    }
+
+    private fun Project.createConfigurationForSkiePlugins(): Configuration {
+        return configurations.maybeCreate(SKIE_PLUGIN_CONFIGURATION_NAME).apply {
+            isCanBeResolved = true
+            isCanBeConsumed = false
+            isVisible = false
+            isTransitive = true
+
+            exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+
+            attributes {
+                it.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                it.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+            }
+        }
+    }
+
+    private fun Project.configureFatFrameworkPatching() {
+        tasks.withType<FatFrameworkTask>().configureEach { task ->
+            task.doLast(object : Action<Task> {
+                override fun execute(p0: Task) {
+                    val target = FrameworkLayout(task.fatFramework, true)
+
+                    val frameworksByArchs = task.frameworks.associateBy { it.target.architecture }
+                    target.swiftHeader.writer().use { writer ->
+                        val swiftHeaderContents = frameworksByArchs.mapValues { (_, framework) ->
+                            framework.files.swiftHeader.readText()
+                        }
+
+                        if (swiftHeaderContents.values.distinct().size == 1) {
+                            writer.write(swiftHeaderContents.values.first())
+                        } else {
+                            swiftHeaderContents.toList().forEachIndexed { i, (arch, content) ->
+                                val macro = arch.clangMacro
+                                if (i == 0) {
+                                    writer.appendLine("#if defined($macro)\n")
+                                } else {
+                                    writer.appendLine("#elif defined($macro)\n")
+                                }
+                                writer.appendLine(content)
+                            }
+                            writer.appendLine(
+                                """
+                                    #else
+                                    #error Unsupported platform
+                                    #endif
+                                    """.trimIndent()
+                            )
+                        }
+                    }
+
+                    target.swiftModuleDir.mkdirs()
+
+                    frameworksByArchs.toList().forEach { (_, framework) ->
+                        copy {
+                            it.from(framework.files.apiNotes)
+                            it.into(target.headerDir)
+                        }
+                        framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
+                            copy {
+                                it.from(swiftmoduleFile)
+                                it.into(target.swiftModuleDir)
+                            }
+                        }
+                    }
+                }
+            })
         }
     }
 
