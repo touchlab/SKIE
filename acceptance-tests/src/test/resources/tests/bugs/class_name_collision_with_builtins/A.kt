@@ -1,4 +1,4 @@
-package tests.bugs.class_name_collision_with_builtins
+package `tests`.`bugs`.`class_name_collision_with_builtins`
 
 class KotlinBase
 class KotlinMutableSet

@@ -20,11 +20,14 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irDelegatingConstructorCall
+import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
+import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 
@@ -125,9 +128,17 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
 
         return irBlockBody {
             +irDelegatingConstructorCall(originalConstructorSymbol.owner).apply {
+                passDispatchReceiverParameterIfPresent(overloadIr)
                 passArgumentsWithMatchingNames(overloadIr)
             }
         }
+    }
+
+    context(IrBuilderWithScope)
+    private fun IrDelegatingConstructorCall.passDispatchReceiverParameterIfPresent(from: IrFunction) {
+        val dispatchReceiverParameter = from.dispatchReceiverParameter ?: return
+
+        this.dispatchReceiver = irGet(dispatchReceiverParameter)
     }
 
     private fun fixOverloadLastParameterName(overloadDescriptor: FunctionDescriptor) {

@@ -1,4 +1,4 @@
-package tests.bugs.default_arguments_collision_in_larger_hierarchy
+package `tests`.`bugs`.`default_arguments_collision_in_larger_hierarchy`
 
 open class A(val i: Int)
 

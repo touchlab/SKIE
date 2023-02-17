@@ -1,4 +1,4 @@
-package tests.bugs.name_collisions_in_swift_runtime
+package `tests`.`bugs`.`name_collisions_in_swift_runtime`
 
 class Result
 class AsyncStream

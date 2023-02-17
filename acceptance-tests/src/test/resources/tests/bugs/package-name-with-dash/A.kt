@@ -1,3 +1,3 @@
-package tests.bugs.`package-name-with-dash`
+package `tests`.`bugs`.`package-name-with-dash`
 
 class A

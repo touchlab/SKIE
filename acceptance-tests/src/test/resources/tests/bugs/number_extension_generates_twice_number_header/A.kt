@@ -1,3 +1,3 @@
-package tests.bugs.class_name_collision_with_builtins
+package `tests`.`bugs`.`number_extension_generates_twice_number_header`
 
 fun Number.foo(): Int = 0

@@ -1,4 +1,4 @@
-package tests.bugs.transitively_exposed_method_with_collision
+package `tests`.`bugs`.`transitively_exposed_renamed_method`
 
 class A : Appendable {
 
