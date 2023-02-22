@@ -12,7 +12,7 @@ internal class KotlinRuntimeHidingPhase(
 
     override val isActive: Boolean = true
 
-    override fun execute() {
+    override fun runObjcPhase() {
         skieContext.module.configure {
             descriptorProvider.exposedClasses
                 .filter { it.belongsToSkieRuntime }

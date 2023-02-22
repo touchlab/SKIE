@@ -53,7 +53,7 @@ internal class DefaultArgumentGenerator(
         ),
     )
 
-    override fun execute() {
+    override fun runObjcPhase() {
         delegates.forEach {
             it.generate()
         }

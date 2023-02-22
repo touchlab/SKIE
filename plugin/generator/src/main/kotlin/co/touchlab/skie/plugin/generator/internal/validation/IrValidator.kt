@@ -20,7 +20,7 @@ internal class IrValidator(
     private val classRules: List<ValidationRule<ClassDescriptor>> =
         SealedInteropRules.all
 
-    override fun execute() {
+    override fun runObjcPhase() {
         with(reporter) {
             with(configuration) {
                 descriptorProvider.exposedClasses.forEach {

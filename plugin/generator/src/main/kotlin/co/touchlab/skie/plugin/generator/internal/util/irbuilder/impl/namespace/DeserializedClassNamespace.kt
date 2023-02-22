@@ -3,8 +3,8 @@ package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.findSourceFile
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.UnsupportedDeclarationDescriptorException
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.DeserializedClassMemberScopeReflector
+import co.touchlab.skie.plugin.reflection.reflectedBy
+import co.touchlab.skie.plugin.reflection.reflectors.DeserializedClassMemberScopeReflector
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor

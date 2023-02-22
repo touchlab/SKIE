@@ -7,8 +7,9 @@ import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import co.touchlab.skie.configuration.Configuration as ConfigurationType
+import co.touchlab.skie.plugin.generator.internal.SkieScheduler as SkieSchedulerType
 
-internal sealed class SwiftGenCompilerConfigurationKey<T : Any>(name: String) {
+internal sealed class SkieCompilerConfigurationKey<T : Any>(name: String) {
 
     private val key: CompilerConfigurationKey<T> = CompilerConfigurationKey(name)
 
@@ -25,15 +26,20 @@ internal sealed class SwiftGenCompilerConfigurationKey<T : Any>(name: String) {
     fun getOrNull(configuration: CompilerConfiguration): T? =
         configuration.get(key)
 
-    object Configuration : SwiftGenCompilerConfigurationKey<ConfigurationType>("Configuration")
+    object Configuration : SkieCompilerConfigurationKey<ConfigurationType>("Configuration")
 
-    object DeclarationBuilder : SwiftGenCompilerConfigurationKey<DeclarationBuilderImpl>("DeclarationBuilder")
+    object DeclarationBuilder : SkieCompilerConfigurationKey<DeclarationBuilderImpl>("DeclarationBuilder")
 
-    object DescriptorProvider : SwiftGenCompilerConfigurationKey<NativeDescriptorProvider>("Descriptor Provider")
+    object DescriptorProvider : SkieCompilerConfigurationKey<NativeDescriptorProvider>("Descriptor Provider")
+
+    object SkieScheduler : SkieCompilerConfigurationKey<SkieSchedulerType>("Skie Scheduler")
 }
 
 internal val CommonBackendContext.skieDeclarationBuilder: DeclarationBuilder
-    get() = SwiftGenCompilerConfigurationKey.DeclarationBuilder.get(configuration)
+    get() = SkieCompilerConfigurationKey.DeclarationBuilder.get(configuration)
 
 internal val CommonBackendContext.skieDescriptorProvider: NativeDescriptorProvider
-    get() = SwiftGenCompilerConfigurationKey.DescriptorProvider.get(configuration)
+    get() = SkieCompilerConfigurationKey.DescriptorProvider.get(configuration)
+
+internal val CommonBackendContext.skieScheduler: SkieSchedulerType
+    get() = SkieCompilerConfigurationKey.SkieScheduler.get(configuration)

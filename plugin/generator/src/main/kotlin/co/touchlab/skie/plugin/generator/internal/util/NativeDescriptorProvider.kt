@@ -3,7 +3,7 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ObjCExportReflector
+import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper

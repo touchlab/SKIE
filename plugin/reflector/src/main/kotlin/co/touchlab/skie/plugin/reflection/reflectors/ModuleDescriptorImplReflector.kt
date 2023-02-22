@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.CompositePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 
-internal class ModuleDescriptorImplReflector(
+class ModuleDescriptorImplReflector(
     override val instance: ModuleDescriptor,
 ) : Reflector(ModuleDescriptorImpl::class) {
 

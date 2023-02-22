@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 
-internal class SwiftGenObjcPhaseListener : PhaseListener {
+internal class SkieObjcPhaseListener : PhaseListener {
 
     override val phase: PhaseListener.Phase = PhaseListener.Phase.OBJC_EXPORT
 
@@ -26,7 +26,9 @@ internal class SwiftGenObjcPhaseListener : PhaseListener {
             reporter = Reporter(context.configuration),
         )
 
-        skieScheduler.process()
+        SkieCompilerConfigurationKey.SkieScheduler.put(skieScheduler, context.configuration)
+
+        skieScheduler.runObjcPhases()
     }
 
     private val CommonBackendContext.pluginConfiguration: Configuration

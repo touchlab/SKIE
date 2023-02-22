@@ -1,6 +1,6 @@
-package co.touchlab.skie.runtime.coroutines.internal
+package co.touchlab.skie.runtime.coroutines.suspend.internal
 
-import co.touchlab.skie.runtime.coroutines.Skie_DispatcherDelegate
+import co.touchlab.skie.runtime.coroutines.suspend.Skie_DispatcherDelegate
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Runnable
 import kotlin.coroutines.CoroutineContext

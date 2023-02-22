@@ -44,7 +44,7 @@ internal class ExhaustiveEnumsGenerator(
 
     override val isActive: Boolean = true
 
-    override fun execute() {
+    override fun runObjcPhase() {
         module.configure {
             exposedClasses
                 .filter { it.isSupported }

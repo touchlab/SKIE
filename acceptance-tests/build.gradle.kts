@@ -45,6 +45,7 @@ val acceptanceTestDependencies: Configuration = configurations.create("acceptanc
 dependencies {
     testImplementation(projects.acceptanceTests.framework)
     testImplementation("co.touchlab.skie:configuration-annotations")
+    testImplementation(libs.kotlinx.coroutines.core)
 
     acceptanceTestDependencies("co.touchlab.skie:configuration-annotations")
     acceptanceTestDependencies("co.touchlab.skie:kotlin")

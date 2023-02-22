@@ -12,8 +12,8 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.NewFileNamespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.FunctionTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.SecondaryConstructorTemplate
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.ContextReflector
+import co.touchlab.skie.plugin.reflection.reflectedBy
+import co.touchlab.skie.plugin.reflection.reflectors.ContextReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.findPackage

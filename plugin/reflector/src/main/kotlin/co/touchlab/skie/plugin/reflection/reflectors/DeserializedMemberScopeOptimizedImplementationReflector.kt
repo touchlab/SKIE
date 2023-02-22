@@ -1,12 +1,12 @@
-package co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors
+package co.touchlab.skie.plugin.reflection.reflectors
 
-import co.touchlab.skie.plugin.generator.internal.util.reflection.Reflector
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
+import co.touchlab.skie.plugin.reflection.Reflector
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.storage.MemoizedFunctionToNotNull
+import co.touchlab.skie.plugin.reflection.reflectedBy
 
-internal class DeserializedMemberScopeOptimizedImplementationReflector(
+class DeserializedMemberScopeOptimizedImplementationReflector(
     override val instance: Any,
 ) : Reflector("org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberScope\$OptimizedImplementation") {
 

@@ -19,7 +19,7 @@ internal class SealedInteropGenerator(
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
 
-    override fun execute() {
+    override fun runObjcPhase() {
         module.configure {
             exposedClasses
                 .filter { it.isSupported }

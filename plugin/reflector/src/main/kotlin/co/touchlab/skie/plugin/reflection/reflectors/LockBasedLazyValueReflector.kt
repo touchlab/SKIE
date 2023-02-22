@@ -1,9 +1,9 @@
-package co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors
+package co.touchlab.skie.plugin.reflection.reflectors
 
-import co.touchlab.skie.plugin.generator.internal.util.reflection.Reflector
+import co.touchlab.skie.plugin.reflection.Reflector
 import org.jetbrains.kotlin.com.intellij.openapi.util.NotNullLazyValue
 
-internal class LockBasedLazyValueReflector(
+class LockBasedLazyValueReflector(
     override val instance: NotNullLazyValue<*>,
 ) : Reflector("org.jetbrains.kotlin.storage.LockBasedStorageManager\$LockBasedLazyValue") {
 

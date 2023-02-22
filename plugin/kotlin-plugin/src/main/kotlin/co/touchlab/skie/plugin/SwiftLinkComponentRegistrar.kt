@@ -4,7 +4,7 @@ import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import co.touchlab.skie.plugin.generator.internal.SwiftGenIrGenerationExtension
+import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
@@ -27,7 +27,7 @@ class SkieComponentRegistrar: CompilerPluginRegistrar() {
             )
         )
 
-        IrGenerationExtension.registerExtension(SwiftGenIrGenerationExtension(configuration))
+        IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
 
         PhaseInterceptor.setupPhaseListeners(configuration)
     }

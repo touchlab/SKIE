@@ -1,7 +1,8 @@
-package co.touchlab.skie.runtime.coroutines
+package co.touchlab.skie.runtime.coroutines.suspend
 
-import co.touchlab.skie.runtime.coroutines.internal.CoroutineDispatcherWithDelegate
-import co.touchlab.skie.runtime.coroutines.internal.toNSError
+import co.touchlab.skie.runtime.coroutines.suspend.Skie_CancellationHandler
+import co.touchlab.skie.runtime.coroutines.suspend.internal.CoroutineDispatcherWithDelegate
+import co.touchlab.skie.runtime.coroutines.suspend.internal.toNSError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel

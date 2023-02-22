@@ -30,7 +30,7 @@ internal class TypeAliasGenerator(
 
     private val publicTypeAliasContainerName = TypeSwiftModel.StableFqNameNamespace.removeSuffix(".")
 
-    override fun execute() {
+    override fun runObjcPhase() {
         skieContext.module.file("SkieTypeAliases") {
             addTypeAliasContainer(descriptorProvider)
             addBaseTypeAliasContainerTypeAlias()

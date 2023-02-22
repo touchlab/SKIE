@@ -1,4 +1,4 @@
-package co.touchlab.skie.runtime.coroutines
+package co.touchlab.skie.runtime.coroutines.suspend
 
 import platform.Foundation.NSError
 

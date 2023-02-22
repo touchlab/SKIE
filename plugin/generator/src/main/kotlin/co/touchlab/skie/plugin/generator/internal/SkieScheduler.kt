@@ -14,6 +14,8 @@ import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 internal class SkieScheduler(
     skieContext: SkieContext,
@@ -69,9 +71,15 @@ internal class SkieScheduler(
         ),
     )
 
-    fun process() {
+    fun runObjcPhases() {
         compilationPhases
             .filter { it.isActive }
-            .forEach { it.execute() }
+            .forEach { it.runObjcPhase() }
+    }
+
+    fun runIrPhases(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+        compilationPhases
+            .filter { it.isActive }
+            .forEach { it.runIrPhase(moduleFragment, pluginContext) }
     }
 }

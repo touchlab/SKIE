@@ -1,10 +1,10 @@
-package co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors
+package co.touchlab.skie.plugin.reflection.reflectors
 
-import co.touchlab.skie.plugin.generator.internal.util.reflection.Reflector
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
+import co.touchlab.skie.plugin.reflection.Reflector
+import co.touchlab.skie.plugin.reflection.reflectedBy
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 
-internal class DeserializedMemberScopeReflector(
+class DeserializedMemberScopeReflector(
     override val instance: MemberScope,
 ) : Reflector("org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberScope") {
 

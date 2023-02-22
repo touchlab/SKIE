@@ -4,8 +4,8 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.Namespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.SecondaryConstructorBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrConstructor
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.IrRebindableConstructorPublicSymbol
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectedBy
-import co.touchlab.skie.plugin.generator.internal.util.reflection.reflectors.DeclarationDescriptorImplReflector
+import co.touchlab.skie.plugin.reflection.reflectedBy
+import co.touchlab.skie.plugin.reflection.reflectors.DeclarationDescriptorImplReflector
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor

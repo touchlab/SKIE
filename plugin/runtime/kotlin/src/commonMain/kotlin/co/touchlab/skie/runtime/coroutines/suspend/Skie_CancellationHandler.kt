@@ -1,6 +1,6 @@
-package co.touchlab.skie.runtime.coroutines
+package co.touchlab.skie.runtime.coroutines.suspend
 
-import co.touchlab.skie.runtime.coroutines.internal.withLock
+import co.touchlab.skie.runtime.coroutines.suspend.internal.withLock
 import platform.Foundation.NSLock
 
 @Suppress("ClassName")

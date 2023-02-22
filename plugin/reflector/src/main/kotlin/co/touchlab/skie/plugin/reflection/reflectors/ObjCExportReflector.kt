@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.IdSignatureComposer
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
-internal class ObjCExportReflector(
+class ObjCExportReflector(
     override val instance: Any,
 ) : Reflector(fqName) {
 

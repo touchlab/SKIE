@@ -31,7 +31,7 @@ internal class KotlinSuspendGeneratorDelegate(
 
     private val suspendHandlerDescriptor: ClassDescriptor =
         descriptorProvider.exposedClasses
-            .single { it.fqNameSafe == FqName("co.touchlab.skie.runtime.coroutines.Skie_SuspendHandler") }
+            .single { it.fqNameSafe == FqName("co.touchlab.skie.runtime.coroutines.suspend.Skie_SuspendHandler") }
 
     private val bodyGenerator = SuspendKotlinBridgeBodyGenerator(suspendHandlerDescriptor)
 

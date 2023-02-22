@@ -14,7 +14,7 @@ internal class SwiftRuntimeGenerator(
         // TODO change to per package filter
         && SkieFeature.SuspendInterop in configuration.enabledFeatures
 
-    override fun execute() {
+    override fun runObjcPhase() {
         getSwiftRuntimeFiles().forEach {
             skieContext.module.file(it.swiftFileName, it.readText())
         }

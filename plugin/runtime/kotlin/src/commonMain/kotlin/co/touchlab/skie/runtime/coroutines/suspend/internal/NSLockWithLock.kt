@@ -1,4 +1,4 @@
-package co.touchlab.skie.runtime.coroutines.internal
+package co.touchlab.skie.runtime.coroutines.suspend.internal
 
 import platform.Foundation.NSLock
 

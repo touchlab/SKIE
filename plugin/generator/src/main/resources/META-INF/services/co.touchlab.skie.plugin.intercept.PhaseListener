@@ -1,2 +1,2 @@
-co.touchlab.skie.plugin.generator.internal.SwiftGenObjcPhaseListener
-co.touchlab.skie.plugin.generator.internal.SwiftGenSymbolTablePhaseListener
+co.touchlab.skie.plugin.generator.internal.SkieObjcPhaseListener
+co.touchlab.skie.plugin.generator.internal.SkieSymbolTablePhaseListener

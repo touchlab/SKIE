@@ -17,6 +17,7 @@ dependencies {
     compileOnly(libs.kotlin.native.compiler.embeddable)
     implementation(projects.api)
     implementation(projects.spi)
+    implementation(projects.reflector)
     api(projects.configurationApi)
     implementation(projects.generator.configurationAnnotations)
     implementation(projects.generator.configurationGradle)

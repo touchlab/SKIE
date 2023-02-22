@@ -12,14 +12,13 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
-// context()
-internal class ObjCExportMapperReflector(override val instance: Any) : Reflector(
+class ObjCExportMapperReflector(override val instance: Any) : Reflector(
     "org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper"
 ) {
 
     private val extensionClass = "org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapperKt"
 
-    val getCustomTypeMapper by declaredMethod1<ClassDescriptor, CustomTypeMapper?>()
+    internal val getCustomTypeMapper by declaredMethod1<ClassDescriptor, CustomTypeMapper?>()
 
     val isBaseMethod by extensionFunction1<FunctionDescriptor, Boolean>(extensionClass)
 
@@ -33,9 +32,9 @@ internal class ObjCExportMapperReflector(override val instance: Any) : Reflector
 
     private val shouldBeExposedClass by extensionFunction1<ClassDescriptor, Boolean>(extensionClass, "shouldBeExposed")
 
-    val bridgeMethod by declaredMethod1<FunctionDescriptor, MethodBridge>()
+    internal val bridgeMethod by declaredMethod1<FunctionDescriptor, MethodBridge>()
 
-    val bridgeType by extensionFunction1<KotlinType, TypeBridge>(extensionClass)
+    internal val bridgeType by extensionFunction1<KotlinType, TypeBridge>(extensionClass)
 
     fun shouldBeExposed(descriptor: CallableMemberDescriptor): Boolean {
         return shouldBeExposedMember(descriptor)
@@ -45,23 +44,3 @@ internal class ObjCExportMapperReflector(override val instance: Any) : Reflector
         return shouldBeExposedClass(descriptor)
     }
 }
-
-// context(MethodBridge)
-// val receiver: MethodBridgeReceiver by Test()
-//
-// private val OptimizedImplementation.test: String
-//     get() = "test"
-//
-// // context(MethodBridge)
-// internal class Test<T: Any, R>: PropertyDelegateProvider<Nothing?, ReadOnlyProperty<T, R>> {
-//     override fun provideDelegate(thisRef: Nothing?, property: KProperty<*>): ReadOnlyProperty<T, R> {
-//         return object: ReadOnlyProperty<T, R> {
-//             override fun getValue(thisRef: T, property: KProperty<*>): R {
-//                 thisRef.javaClass.getMethod(property.getter.name).apply {
-//                     isAccessible = true
-//                     return invoke(thisRef) as R
-//                 }
-//             }
-//         }
-//     }
-// }
