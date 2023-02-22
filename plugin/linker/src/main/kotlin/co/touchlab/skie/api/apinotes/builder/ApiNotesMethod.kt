@@ -1,23 +1,24 @@
 package co.touchlab.skie.api.apinotes.builder
 
-import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class ApiNotesMethod(
-    private val objCSelector: String,
-    private val kind: ApiNotesTypeMemberKind,
-    private val swiftName: String?,
-    private val isHidden: Boolean,
-    private val isRemoved: Boolean,
-) {
-
-    context(SmartStringBuilder)
-    fun append() {
-        +"- Selector: \"${objCSelector}\""
-        indented {
-            +"MethodKind: ${kind.apiNotesRepresentation}"
-            swiftName?.let { +"SwiftName: \"$it\"" }
-            isHidden.ifTrue { +"SwiftPrivate: true" }
-            isRemoved.ifTrue { +"Availability: nonswift" }
-        }
-    }
-}
+@Serializable
+data class ApiNotesMethod(
+    @SerialName("Selector")
+    val objCSelector: String,
+    @SerialName("MethodKind")
+    val kind: ApiNotesTypeMemberKind,
+    @SerialName("SwiftName")
+    val swiftName: String? = null,
+    @SerialName("SwiftPrivate")
+    val isHidden: Boolean = false,
+    @SerialName("Availability")
+    val availability: ApiNotesAvailabilityMode = ApiNotesAvailabilityMode.Available,
+    @SerialName("AvailabilityMsg")
+    val availabilityMessage: String = "",
+    @SerialName("ResultType")
+    val resultType: String = "",
+    @SerialName("Parameters")
+    val parameters: List<ApiNotesParameter> = emptyList(),
+)

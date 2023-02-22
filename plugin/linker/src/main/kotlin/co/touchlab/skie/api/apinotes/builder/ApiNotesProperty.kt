@@ -1,24 +1,22 @@
 package co.touchlab.skie.api.apinotes.builder
 
-import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class ApiNotesProperty(
-    private val objCName: String,
-    private val kind: ApiNotesTypeMemberKind,
-    private val swiftName: String?,
-    private val isHidden: Boolean,
-    private val isRemoved: Boolean,
-) {
-
-    context(SmartStringBuilder)
-    fun append() {
-        +"- Name: $objCName"
-
-        indented {
-            +"PropertyKind: ${kind.apiNotesRepresentation}"
-            swiftName?.let { +"SwiftName: $it" }
-            isHidden.ifTrue { +"SwiftPrivate: true" }
-            isRemoved.ifTrue { +"Availability: nonswift" }
-        }
-    }
-}
+@Serializable
+data class ApiNotesProperty(
+    @SerialName("Name")
+    val objCName: String,
+    @SerialName("PropertyKind")
+    val kind: ApiNotesTypeMemberKind? = null,
+    @SerialName("SwiftName")
+    val swiftName: String? = null,
+    @SerialName("SwiftPrivate")
+    val isHidden: Boolean = false,
+    @SerialName("Availability")
+    val availability: ApiNotesAvailabilityMode = ApiNotesAvailabilityMode.Available,
+    @SerialName("AvailabilityMsg")
+    val availabilityMessage: String = "",
+    @SerialName("Type")
+    val type: String = ""
+)

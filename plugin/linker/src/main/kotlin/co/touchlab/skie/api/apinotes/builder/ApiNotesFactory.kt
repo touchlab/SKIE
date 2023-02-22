@@ -43,7 +43,7 @@ internal class ApiNotesFactory(
             bridgeFqName = this.bridge?.fqNameSafeForBridging,
             swiftFqName = this.fqName,
             isHidden = this.visibility.isHiddenOrReplaced,
-            isRemoved = this.visibility.isRemoved,
+            availability = this.visibility.availability,
             methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote(this) },
             properties = this.allDirectlyCallableMembers.filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote(this) },
         )
@@ -54,7 +54,7 @@ internal class ApiNotesFactory(
             kind = owner.kind.toMemberKind(),
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
-            isRemoved = this.visibility.isRemoved,
+            availability = this.visibility.availability,
         )
     }
 
@@ -64,12 +64,15 @@ internal class ApiNotesFactory(
             kind = owner.kind.toMemberKind(),
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
-            isRemoved = this.visibility.isRemoved,
+            availability = this.visibility.availability,
         )
     }
 
     private val SwiftModelVisibility.isHiddenOrReplaced: Boolean
         get() = this.isHidden || this.isReplaced
+
+    private val SwiftModelVisibility.availability: ApiNotesAvailabilityMode
+        get() = if (this.isRemoved) ApiNotesAvailabilityMode.NonSwift else ApiNotesAvailabilityMode.Available
 
     private fun KotlinTypeSwiftModel.Kind.toMemberKind(): ApiNotesTypeMemberKind =
         when (this) {
