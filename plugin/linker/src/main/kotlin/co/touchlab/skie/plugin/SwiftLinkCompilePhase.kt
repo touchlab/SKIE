@@ -10,6 +10,7 @@ import co.touchlab.skie.api.apinotes.fixes.memberconflicts.KonanManglingApiNotes
 import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
+import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvider
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.descriptorProvider
@@ -56,6 +57,7 @@ class SwiftLinkCompilePhase(
             descriptorProvider = context.descriptorProvider,
             namer = namer,
             problemCollector = SwiftTranslationProblemCollector.Default(context),
+            builtinSwiftBridgeableProvider = BuiltinSwiftBridgeableProvider(configurables.absoluteTargetSysRoot),
         )
         val swiftModelScope = DefaultSwiftModelScope(
             namer = namer,

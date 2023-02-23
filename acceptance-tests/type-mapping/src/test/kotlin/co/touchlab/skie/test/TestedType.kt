@@ -95,6 +95,20 @@ sealed interface TestedType {
             get() = name
     }
 
+    data class Platform(
+        val module: String,
+        val typeName: String,
+    ): TestedType {
+
+        override val kotlinType: TypeName
+            get() = ClassName("platform.$module", typeName)
+
+        override val safeName: String
+            get() = "${module}__$typeName"
+    }
+
+
+
     enum class PrimitiveArray(
         override val kotlinType: TypeName,
     ): TestedType {
@@ -389,8 +403,22 @@ sealed interface TestedType {
             }
         }
 
+        val PLATFORM_TYPES: List<TestedType> by lazy {
+            listOf(
+                Platform("Foundation", "NSString"),
+                Platform("Foundation", "NSArray"),
+                Platform("Foundation", "NSMutableArray"),
+                Platform("Foundation", "NSSet"),
+                Platform("Foundation", "NSMutableSet"),
+                Platform("Foundation", "NSDictionary"),
+                Platform("Foundation", "NSMutableDictionary"),
+                Platform("Foundation", "NSValue"),
+                Platform("Foundation", "NSNumber"),
+            )
+        }
+
         val BASIC by lazy<List<TestedType>> {
-            listOf(Primitive.values(), PrimitiveArray.values(), Builtin.values()).flatMap { it.toList() }
+            listOf(Primitive.values(), PrimitiveArray.values(), Builtin.values()).flatMap { it.toList() } + PLATFORM_TYPES
         }
 
         val CLASS_TYPE_SPECIFIC_BOUNDS by lazy<List<TestedType>> {
@@ -514,6 +542,7 @@ sealed interface TestedType {
                 // suspend_function_lambda_Map_Boolean_NULLABLE_CHAR_Map_Boolean_NULLABLE_CHAR
             ) //+ CLASS_TYPE_PARAMS + level(CLASS_TYPE_PARAMS) +
 
+            // PLATFORM_TYPES
             // BASIC
         }
 

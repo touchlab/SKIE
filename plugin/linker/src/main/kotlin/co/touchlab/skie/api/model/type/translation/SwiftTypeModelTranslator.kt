@@ -46,6 +46,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.types.KotlinType
@@ -68,8 +69,8 @@ class SwiftTypeTranslator(
     private val descriptorProvider: DescriptorProvider,
     val namer: ObjCExportNamer,
     private val problemCollector: SwiftTranslationProblemCollector,
+    private val builtinSwiftBridgeableProvider: BuiltinSwiftBridgeableProvider,
 ) {
-
     context(SwiftModelScope)
     internal fun mapReturnType(
         returnBridge: MethodBridge.ReturnValue,
@@ -217,7 +218,8 @@ class SwiftTypeTranslator(
         if (descriptor.isObjCProtocolClass()) return foreignClassType("Protocol")
 
         if (descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration()) {
-            return if (descriptor.kind.isInterface) {
+            val bridge = builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe)
+            return bridge ?: if (descriptor.kind.isInterface) {
                 val name = descriptor.name.asString().removeSuffix("Protocol")
                 foreignProtocolType(name)
             } else {
@@ -334,7 +336,7 @@ class SwiftTypeTranslator(
 
         return if (descriptor.hasSwiftModel) {
             val swiftModel = descriptor.swiftModel
-            val bridge = swiftModel.bridge
+            val bridge = swiftModel.bridge ?: builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe)
 
             when {
                 exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> ifKotlinType(swiftModel)
