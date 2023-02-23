@@ -21,7 +21,7 @@ class BuiltinSwiftBridgeableProvider(
         val bridge = builtinBridges[fqName] ?: return null
         return when {
             swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> null
-            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) && bridge.className == "Swift.Array" -> SwiftAnyHashableTypeModel
+            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) && bridge.className in nonHashableTypes -> SwiftAnyHashableTypeModel
             else -> bridge
         }
     }
@@ -68,9 +68,9 @@ class BuiltinSwiftBridgeableProvider(
         return SwiftClassTypeModel(
             className = swiftFqName,
             typeArguments = when (swiftFqName) {
-                "Swift.Array" -> listOf(SwiftAnyTypeModel)
-                "Swift.Dictionary" -> listOf(SwiftAnyHashableTypeModel, SwiftAnyTypeModel)
-                "Swift.Set" -> listOf(SwiftAnyHashableTypeModel)
+                swiftArray -> listOf(SwiftAnyTypeModel)
+                swiftDictionary -> listOf(SwiftAnyHashableTypeModel, SwiftAnyTypeModel)
+                swiftSet -> listOf(SwiftAnyHashableTypeModel)
                 else -> emptyList()
             }
         )
@@ -83,4 +83,14 @@ class BuiltinSwiftBridgeableProvider(
     }
 
     private fun getKotlinFqName(module: String, type: String): FqName = FqName("platform.${module}.${type}")
+
+    companion object {
+        private val swiftArray = "Swift.Array"
+        private val swiftDictionary = "Swift.Dictionary"
+        private val swiftSet = "Swift.Set"
+
+        private val nonHashableTypes = setOf(
+            swiftArray, swiftDictionary
+        )
+    }
 }
