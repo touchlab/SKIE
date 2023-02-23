@@ -166,8 +166,19 @@ internal class SwiftSuspendGeneratorDelegate(
 
             arguments.addDispatchReceiver(this)
 
-            this.bridgedParameters.forEach {
-                arguments.add(it.parameterName)
+            this.bridgedParameters.forEachIndexed { index, parameter ->
+                if (isFromGenericClass) {
+                    val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.stableFqName
+
+                    arguments.add(
+                        listOfNotNull(
+                            parameter.parameterName,
+                            " as! $erasedParameterType".takeIf { parameter.type.stableFqName != erasedParameterType },
+                        ).joinToString("")
+                    )
+                } else {
+                    arguments.add(parameter.parameterName)
+                }
             }
 
             return arguments
