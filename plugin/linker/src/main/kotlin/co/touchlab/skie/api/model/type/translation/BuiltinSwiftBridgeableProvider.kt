@@ -2,9 +2,11 @@ package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.plugin.Command
+import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
 import org.jetbrains.kotlin.name.FqName
 import java.io.File
 
@@ -15,7 +17,14 @@ class BuiltinSwiftBridgeableProvider(
         getAllBuiltinBridges()
     }
 
-    fun bridgeFor(fqName: FqName): SwiftClassTypeModel? = builtinBridges[fqName]
+    fun bridgeFor(fqName: FqName, swiftExportScope: SwiftExportScope): SwiftNonNullReferenceTypeModel? {
+        val bridge = builtinBridges[fqName] ?: return null
+        return when {
+            swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> null
+            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) && bridge.className == "Swift.Array" -> SwiftAnyHashableTypeModel
+            else -> bridge
+        }
+    }
 
     private fun getAllBuiltinBridges(): Map<FqName, SwiftClassTypeModel> {
         val apiNotesFiles = getAllApiNotesFiles()

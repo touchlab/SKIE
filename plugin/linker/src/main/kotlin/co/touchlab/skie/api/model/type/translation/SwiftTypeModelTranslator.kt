@@ -218,7 +218,7 @@ class SwiftTypeTranslator(
         if (descriptor.isObjCProtocolClass()) return foreignClassType("Protocol")
 
         if (descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration()) {
-            val bridge = builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe)
+            val bridge = builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe, swiftExportScope)
             return bridge ?: if (descriptor.kind.isInterface) {
                 val name = descriptor.name.asString().removeSuffix("Protocol")
                 foreignProtocolType(name)
@@ -336,7 +336,7 @@ class SwiftTypeTranslator(
 
         return if (descriptor.hasSwiftModel) {
             val swiftModel = descriptor.swiftModel
-            val bridge = swiftModel.bridge ?: builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe)
+            val bridge = swiftModel.bridge
 
             when {
                 exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> ifKotlinType(swiftModel)

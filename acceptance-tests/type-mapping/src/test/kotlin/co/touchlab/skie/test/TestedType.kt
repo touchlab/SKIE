@@ -404,6 +404,7 @@ sealed interface TestedType {
         }
 
         val PLATFORM_TYPES: List<TestedType> by lazy {
+            // TODO: Run `BuiltinSwiftBridgeableProvider` here to get list of all bridged types to try - some might work differently
             listOf(
                 Platform("Foundation", "NSString"),
                 Platform("Foundation", "NSArray"),
