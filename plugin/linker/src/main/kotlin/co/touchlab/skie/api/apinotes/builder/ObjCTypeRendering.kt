@@ -35,26 +35,26 @@ fun ObjCType.renderWithExplicitNullability(attrsAndName: String, hasNullableAttr
             nonNullType.renderWithExplicitNullability(" $attribute".withAttrsAndName(attrsAndName), true)
         }
         is ObjCBlockPointerType ->
-            returnType.renderWithExplicitNullability("", false) + buildString {
+            returnType.renderWithExplicitNullability(buildString {
                 append("(^")
-                append(attrsAndName.withExplicitNullability(hasNullableAttribute))
+                append(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
                 append(")(")
                 if (parameterTypes.isEmpty()) append("void")
                 parameterTypes.joinTo(this) { it.renderWithExplicitNullability("", false) }
                 append(')')
-            }
-        is ObjCProtocolType -> render(attrsAndName.withExplicitNullability(hasNullableAttribute))
-        ObjCIdType -> render(attrsAndName.withExplicitNullability(hasNullableAttribute))
-        is ObjCGenericTypeUsage -> render(attrsAndName.withExplicitNullability(hasNullableAttribute))
-        is ObjCClassType -> render(attrsAndName.withExplicitNullability(hasNullableAttribute))
-        ObjCInstanceType -> render(attrsAndName.withExplicitNullability(hasNullableAttribute))
-        ObjCMetaClassType -> render(attrsAndName.withExplicitNullability(hasNullableAttribute))
+            }, false)
+        is ObjCProtocolType -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+        ObjCIdType -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+        is ObjCGenericTypeUsage -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+        is ObjCClassType -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+        ObjCInstanceType -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+        ObjCMetaClassType -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
     }
 
 private fun String.withAttrsAndName(attrsAndName: String) =
     if (attrsAndName.isEmpty()) this else "$this ${attrsAndName.trimStart()}"
 
-private fun String.withExplicitNullability(hasNullableAttribute: Boolean) =
-    if (hasNullableAttribute) this else "$this $objcNonnullAttribute"
+private fun String.withPrependedExplicitNullability(hasNullableAttribute: Boolean) =
+    if (hasNullableAttribute) this else "$objcNonnullAttribute $this"
 
 private const val objcNonnullAttribute = "_Nonnull"
