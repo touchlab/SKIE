@@ -11,14 +11,12 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
-import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertyGetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class ActualKotlinRegularPropertySwiftModel(
@@ -59,6 +57,10 @@ class ActualKotlinRegularPropertySwiftModel(
         get() = with(swiftModelScope) {
             core.descriptor.propertyTypeModel(receiver.swiftGenericExportScope)
         }
+
+    override val objCType: ObjCType by lazy {
+        core.getObjCType(descriptor)
+    }
 
     override val getter: KotlinRegularPropertyGetterSwiftModel by core::getter
 

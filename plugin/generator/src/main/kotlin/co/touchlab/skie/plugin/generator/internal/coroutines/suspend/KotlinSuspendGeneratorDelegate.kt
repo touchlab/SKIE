@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
@@ -93,6 +94,8 @@ internal class KotlinSuspendGeneratorDelegate(
                 type = dispatchReceiver.type
             )
 
+            dispatchReceiverParameter.disableTypeSubstitution()
+
             this.add(dispatchReceiverParameter)
         }
     }
@@ -109,7 +112,15 @@ internal class KotlinSuspendGeneratorDelegate(
                 type = extensionReceiver.type
             )
 
+            extensionReceiverParameter.disableTypeSubstitution()
+
             this.add(extensionReceiverParameter)
+        }
+    }
+
+    private fun ValueParameterDescriptor.disableTypeSubstitution() {
+        module.configure {
+            this.swiftModel.isTypeSubstitutionEnabled = false
         }
     }
 

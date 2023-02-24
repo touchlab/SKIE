@@ -5,23 +5,33 @@ package co.touchlab.skie.api.model.callable.function
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.api.model.callable.parameter.KotlinParameterSwiftModelCore
+import co.touchlab.skie.api.model.factory.ObjCTypeProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 
 internal class KotlinFunctionSwiftModelCore(
     val descriptor: FunctionDescriptor,
     private val namer: ObjCExportNamer,
-    bridgeProvider: DescriptorBridgeProvider,
+    private val bridgeProvider: DescriptorBridgeProvider,
+    private val objCTypeProvider: ObjCTypeProvider,
 ) {
 
-    val methodBridge by lazy { bridgeProvider.bridgeMethod(descriptor) }
+    fun getMethodBridge(functionDescriptor: FunctionDescriptor): MethodBridge =
+        if (functionDescriptor is ConstructorDescriptor) {
+            bridgeProvider.bridgeMethod(functionDescriptor)
+        } else {
+            bridgeProvider.bridgeMethod(descriptor)
+        }
 
     private val swiftFunctionName = run {
         val swiftName = namer.getSwiftName(descriptor.original)
@@ -51,12 +61,9 @@ internal class KotlinFunctionSwiftModelCore(
     fun getParameterCoresWithDescriptors(
         functionDescriptor: FunctionDescriptor,
     ): List<Pair<KotlinParameterSwiftModelCore, ParameterDescriptor?>> =
-        functionDescriptor.getParameterBridgesWithDescriptors()
-            .zip(parameterCores)
-            .map { it.second to it.first.second }
-
-    private val parameterCores: List<KotlinParameterSwiftModelCore> =
-        descriptor.getParameterBridgesWithDescriptors()
+        getMethodBridge(functionDescriptor)
+            .valueParametersAssociated(functionDescriptor)
+            .filterNot { it.first is MethodBridgeParameter.ValueParameter.ErrorOutParameter }
             .zip(swiftFunctionName.argumentLabels)
             .map { (parameterBridgeWithDescriptor, argumentLabel) ->
                 KotlinParameterSwiftModelCore(
@@ -64,17 +71,23 @@ internal class KotlinFunctionSwiftModelCore(
                     parameterBridge = parameterBridgeWithDescriptor.first,
                     baseParameterDescriptor = parameterBridgeWithDescriptor.second,
                     allArgumentLabels = swiftFunctionName.argumentLabels,
-                )
+                    getObjCType = { functionDescriptor, parameterDescriptor, isTypeSubstitutionEnabled ->
+                        objCTypeProvider.getFunctionParameterType(
+                            function = functionDescriptor,
+                            parameter = parameterDescriptor,
+                            bridge = parameterBridgeWithDescriptor.first,
+                            isTypeSubstitutionEnabled = isTypeSubstitutionEnabled,
+                        )
+                    }
+                ) to parameterBridgeWithDescriptor.second
             }
-
-    private fun FunctionDescriptor.getParameterBridgesWithDescriptors(): List<Pair<MethodBridgeParameter.ValueParameter, ParameterDescriptor?>> =
-        methodBridge
-            .valueParametersAssociated(this)
-            .filterNot { it.first is MethodBridgeParameter.ValueParameter.ErrorOutParameter }
 
     val objCSelector: String = namer.getSelector(descriptor.original)
 
     val isThrowing: Boolean = namer.mapper.doesThrow(descriptor)
+
+    fun getObjCReturnType(functionDescriptor: FunctionDescriptor): ObjCType? =
+        if (descriptor !is ConstructorDescriptor) objCTypeProvider.getFunctionReturnType(descriptor, functionDescriptor) else null
 
     private data class SwiftFunctionName(val identifier: String, val argumentLabels: List<String>)
 

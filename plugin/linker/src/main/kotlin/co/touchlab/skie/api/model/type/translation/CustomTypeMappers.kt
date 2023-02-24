@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeMo
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
 import org.jetbrains.kotlin.backend.konan.objcexport.NSNumberKind
 import org.jetbrains.kotlin.backend.konan.objcexport.isMappedFunctionClass
@@ -17,7 +18,9 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.TypeUtils
+import org.jetbrains.kotlin.types.isNullable
 
 object CustomTypeMappers {
 
@@ -29,6 +32,7 @@ object CustomTypeMappers {
     private val predefined: Map<ClassId, CustomTypeMapper> = with(StandardNames.FqNames) {
         val result = mutableListOf<CustomTypeMapper>()
 
+        result += FlowMapper
         result += ListMapper
         result += Simple(ClassId.topLevel(mutableList), "NSMutableArray")
         result += SetMapper
@@ -58,10 +62,10 @@ object CustomTypeMappers {
         return false
     }
 
-    fun getMapper(descriptor: ClassDescriptor): CustomTypeMapper? {
+    fun getMapper(descriptor: ClassDescriptor, isTypeSubstitutionEnabled: Boolean): CustomTypeMapper? {
         val classId = descriptor.classId
 
-        predefined[classId]?.let { return it }
+        predefined[classId]?.takeIf { !it.isTypeSubstitution || isTypeSubstitutionEnabled }?.let { return it }
 
         if (descriptor.isMappedFunctionClass()) {
             // TODO: somewhat hacky, consider using FunctionClassDescriptor.arity later.
@@ -107,6 +111,42 @@ object CustomTypeMappers {
                     else -> "String"
                 }
             )
+        }
+    }
+
+    private object FlowMapper : CustomTypeMapper {
+
+        override val isTypeSubstitution: Boolean = true
+
+        override val mappedClassId: ClassId = ClassId.topLevel(FqName("kotlinx.coroutines.flow.Flow"))
+
+        context(SwiftModelScope)
+        override fun mapType(
+            mappedSuperType: KotlinType,
+            translator: SwiftTypeTranslator,
+            swiftExportScope: SwiftExportScope,
+        ): SwiftNonNullReferenceTypeModel {
+            return when {
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> {
+                    val typeArguments = mappedSuperType.arguments.map {
+                        translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope)
+                    }
+
+                    SwiftKotlinTypeClassTypeModel(builtIns.skieFlow, typeArguments)
+                }
+                else -> {
+                    val hasNullableTypeArgument = mappedSuperType.arguments.any { it.type.isNullable() }
+
+                    val skieFlow = if (hasNullableTypeArgument) builtIns.skieOptionalFlow else builtIns.skieFlow
+
+                    val skieFlowType = KotlinTypeFactory.simpleType(
+                        skieFlow.classDescriptor.defaultType,
+                        arguments = mappedSuperType.arguments,
+                    )
+
+                    translator.mapReferenceTypeIgnoringNullabilitySkippingPredefined(skieFlowType, swiftExportScope)
+                }
+            }
         }
     }
 
@@ -161,7 +201,7 @@ object CustomTypeMappers {
                         } else {
                             translator.mapReferenceTypeIgnoringNullability(
                                 argument,
-                                swiftExportScope.addingFlags(SwiftExportScope.Flags.Hashable)
+                                swiftExportScope.addingFlags(SwiftExportScope.Flags.Hashable),
                             )
                         }
                     }

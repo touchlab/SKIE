@@ -24,6 +24,7 @@ data class ApiNotes(
             configuration = YamlConfiguration(
                 encodeDefaults = false,
                 strictMode = false,
+                breakScalarsAt = Int.MAX_VALUE,
             )
         )
 

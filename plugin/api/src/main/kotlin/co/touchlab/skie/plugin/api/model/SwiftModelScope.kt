@@ -8,7 +8,6 @@ import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConve
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
@@ -22,6 +21,8 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface SwiftModelScope {
+
+    val builtIns: SwiftModelBuiltIns
 
     val exposedClasses: List<KotlinClassSwiftModel>
 
@@ -66,5 +67,6 @@ interface SwiftModelScope {
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
+        isTypeSubstitutionEnabled: Boolean,
     ): SwiftTypeModel
 }

@@ -82,7 +82,11 @@ class SwiftTypeTranslator(
             MethodBridge.ReturnValue.Void,
             -> SwiftVoidTypeModel
             MethodBridge.ReturnValue.HashCode -> SwiftPrimitiveTypeModel.NSUInteger
-            is MethodBridge.ReturnValue.Mapped -> mapType(method.returnType!!, swiftExportScope, returnBridge.bridge)
+            is MethodBridge.ReturnValue.Mapped -> mapType(
+                method.returnType!!,
+                swiftExportScope,
+                returnBridge.bridge,
+            )
             MethodBridge.ReturnValue.WithError.Success -> SwiftVoidTypeModel
             is MethodBridge.ReturnValue.WithError.ZeroForError -> {
                 val successReturnType = mapReturnType(returnBridge.successBridge, method, swiftExportScope)
@@ -105,22 +109,24 @@ class SwiftTypeTranslator(
     }
 
     context(SwiftModelScope)
-    internal fun mapReferenceType(kotlinType: KotlinType, swiftExportScope: SwiftExportScope): SwiftReferenceTypeModel =
-        mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope).withNullabilityOf(kotlinType)
-
-    private fun SwiftNonNullReferenceTypeModel.withNullabilityOf(kotlinType: KotlinType): SwiftReferenceTypeModel =
-        if (kotlinType.binaryRepresentationIsNullable()) SwiftNullableReferenceTypeModel(this) else this
+    internal fun mapReferenceType(
+        kotlinType: KotlinType,
+        swiftExportScope: SwiftExportScope,
+        isTypeSubstitutionEnabled: Boolean = true,
+    ): SwiftReferenceTypeModel =
+        mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope, isTypeSubstitutionEnabled).withNullabilityOf(kotlinType)
 
     context(SwiftModelScope)
     internal fun mapReferenceTypeIgnoringNullability(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
+        isTypeSubstitutionEnabled: Boolean = true,
     ): SwiftNonNullReferenceTypeModel {
         class TypeMappingMatch(val type: KotlinType, val descriptor: ClassDescriptor, val mapper: CustomTypeMapper)
 
         val typeMappingMatches = (listOf(kotlinType) + kotlinType.supertypes()).mapNotNull { type ->
             (type.constructor.declarationDescriptor as? ClassDescriptor)?.let { descriptor ->
-                CustomTypeMappers.getMapper(descriptor)?.let { mapper ->
+                CustomTypeMappers.getMapper(descriptor, isTypeSubstitutionEnabled)?.let { mapper ->
                     TypeMappingMatch(type, descriptor, mapper)
                 }
             }
@@ -147,6 +153,14 @@ class SwiftTypeTranslator(
             return it.mapper.mapType(it.type, this, swiftExportScope)
         }
 
+        return mapReferenceTypeIgnoringNullabilitySkippingPredefined(kotlinType, swiftExportScope)
+    }
+
+    context(SwiftModelScope)
+    internal fun mapReferenceTypeIgnoringNullabilitySkippingPredefined(
+        kotlinType: KotlinType,
+        swiftExportScope: SwiftExportScope,
+    ): SwiftNonNullReferenceTypeModel {
         if (kotlinType.isTypeParameter()) {
             when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> return SwiftAnyHashableTypeModel
@@ -300,8 +314,9 @@ class SwiftTypeTranslator(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         typeBridge: NativeTypeBridge,
+        isTypeSubstitutionEnabled: Boolean = true,
     ): SwiftTypeModel = when (typeBridge) {
-        NativeTypeBridge.Reference -> mapReferenceType(kotlinType, swiftExportScope)
+        NativeTypeBridge.Reference -> mapReferenceType(kotlinType, swiftExportScope, isTypeSubstitutionEnabled)
         is NativeTypeBridge.BlockPointer -> mapFunctionType(kotlinType, swiftExportScope, typeBridge)
         is NativeTypeBridge.ValueType -> when (typeBridge.objCValueType) {
             ObjCValueType.BOOL -> SwiftPrimitiveTypeModel.Bool
@@ -352,3 +367,6 @@ class SwiftTypeTranslator(
         }
     }
 }
+
+fun SwiftNonNullReferenceTypeModel.withNullabilityOf(kotlinType: KotlinType): SwiftReferenceTypeModel =
+    if (kotlinType.binaryRepresentationIsNullable()) SwiftNullableReferenceTypeModel(this) else this

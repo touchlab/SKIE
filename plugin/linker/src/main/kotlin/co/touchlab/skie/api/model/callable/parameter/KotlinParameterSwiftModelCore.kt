@@ -4,6 +4,8 @@ import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel.Origin
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
@@ -14,7 +16,15 @@ internal class KotlinParameterSwiftModelCore(
     val parameterBridge: MethodBridgeParameter.ValueParameter,
     baseParameterDescriptor: ParameterDescriptor?,
     allArgumentLabels: List<String>,
+    private val getObjCType: (FunctionDescriptor, ParameterDescriptor?, isTypeSubstitutionEnabled: Boolean) -> ObjCType,
 ) {
+
+    fun getObjCType(
+        functionDescriptor: FunctionDescriptor,
+        parameterDescriptor: ParameterDescriptor?,
+        isTypeSubstitutionEnabled: Boolean,
+    ): ObjCType =
+        this.getObjCType.invoke(functionDescriptor, parameterDescriptor, isTypeSubstitutionEnabled)
 
     fun getOrigin(parameterDescriptor: ParameterDescriptor?): Origin = when (parameterBridge) {
         is MethodBridgeParameter.ValueParameter.Mapped -> {
@@ -30,11 +40,11 @@ internal class KotlinParameterSwiftModelCore(
     }
 
     /*
-            Makes certain assumptions about the inner workings of method bridging.
-                - Assumes that each function has at most one explicit receiver parameter
-                - And that label of that parameter is "_"
-            As a result it's safe for now to use argumentLabels as existingNames
-        */
+                Makes certain assumptions about the inner workings of method bridging.
+                    - Assumes that each function has at most one explicit receiver parameter
+                    - And that label of that parameter is "_"
+                As a result it's safe for now to use argumentLabels as existingNames
+            */
     val parameterName: String = when (val origin = getOrigin(baseParameterDescriptor)) {
         is Origin.Receiver -> {
             origin.descriptor.name.asStringStripSpecialMarkers().toValidSwiftIdentifier().collisionFreeIdentifier(allArgumentLabels)

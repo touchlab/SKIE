@@ -30,6 +30,16 @@ abstract class Reflector {
             DeclaredMethod1(it, P1::class.java, R::class.java)
         }
 
+    protected inline fun <reified P1, reified P2, reified R> declaredMethod2() =
+        Provider {
+            DeclaredMethod2(it, P1::class.java, P2::class.java, R::class.java)
+        }
+
+    protected inline fun <reified P1, reified P2, reified P3, reified R> declaredMethod3() =
+        Provider {
+            DeclaredMethod3(it, P1::class.java, P2::class.java, P3::class.java, R::class.java)
+        }
+
     protected inline fun <reified P1, reified R : Reflector> reflectedDeclaredMethod1() =
         Provider {
             ReflectedMethod<(P1) -> Any, (P1) -> R>(DeclaredMethod1(it, P1::class.java, Any::class.java)) { invoke ->
@@ -94,6 +104,31 @@ abstract class Reflector {
 
         override fun getValue(thisRef: Reflector, property: KProperty<*>): (P1) -> R = {
             invoke(arrayOf(it))
+        }
+    }
+
+    protected inner class DeclaredMethod2<P1, P2, R>(
+        name: String,
+        param1: Class<P1>,
+        param2: Class<P2>,
+        returnType: Class<R>,
+    ) : DeclaredMethod<(P1, P2) -> R, R>(name, returnType, arrayOf(param1, param2)) {
+
+        override fun getValue(thisRef: Reflector, property: KProperty<*>): (P1, P2) -> R = { p1, p2 ->
+            invoke(arrayOf(p1, p2))
+        }
+    }
+
+    protected inner class DeclaredMethod3<P1, P2, P3, R>(
+        name: String,
+        param1: Class<P1>,
+        param2: Class<P2>,
+        param3: Class<P3>,
+        returnType: Class<R>,
+    ) : DeclaredMethod<(P1, P2, P3) -> R, R>(name, returnType, arrayOf(param1, param2, param3)) {
+
+        override fun getValue(thisRef: Reflector, property: KProperty<*>): (P1, P2, P3) -> R = { p1, p2, p3 ->
+            invoke(arrayOf(p1, p2, p3))
         }
     }
 

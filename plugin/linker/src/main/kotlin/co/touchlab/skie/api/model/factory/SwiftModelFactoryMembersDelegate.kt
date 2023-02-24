@@ -40,6 +40,8 @@ class SwiftModelFactoryMembersDelegate(
 
     private val exposedClassChildrenCache = ExposedClassChildrenCache(descriptorProvider)
 
+    private val objCTypeProvider = ObjCTypeProvider(descriptorProvider, namer)
+
     fun createMembers(descriptors: List<CallableMemberDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> {
         val disjointSet = MultiRootDisjointSet(::getDirectParents)
 
@@ -70,7 +72,7 @@ class SwiftModelFactoryMembersDelegate(
     private fun createBoundedFunctions(group: List<FunctionDescriptor>): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> {
         val allBoundedSwiftModels = mutableListOf<KotlinFunctionSwiftModelWithCore>()
 
-        val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider)
+        val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider, objCTypeProvider)
 
         return group
             .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }
@@ -119,7 +121,7 @@ class SwiftModelFactoryMembersDelegate(
     ): Map<CallableMemberDescriptor, MutableKotlinRegularPropertySwiftModel> {
         val allBoundedSwiftModels = mutableListOf<MutableKotlinDirectlyCallableMemberSwiftModel>()
 
-        val core = KotlinRegularPropertySwiftModelCore(group.representative, namer)
+        val core = KotlinRegularPropertySwiftModelCore(group.representative, namer, objCTypeProvider)
 
         return group
             .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }

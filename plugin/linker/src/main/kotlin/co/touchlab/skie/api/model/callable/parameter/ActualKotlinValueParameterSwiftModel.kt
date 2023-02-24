@@ -4,12 +4,16 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameter
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel.Origin
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 
 internal class ActualKotlinValueParameterSwiftModel(
-    core: KotlinParameterSwiftModelCore,
-    parameterDescriptor: ParameterDescriptor?,
-    getParameterType: () -> TypeSwiftModel,
+    private val core: KotlinParameterSwiftModelCore,
+    private val functionDescriptor: FunctionDescriptor,
+    private val parameterDescriptor: ParameterDescriptor?,
+    override val position: Int,
+    private val getParameterType: (isTypeSubstitutionEnabled: Boolean) -> TypeSwiftModel,
 ) : MutableKotlinValueParameterSwiftModel {
 
     override val origin: Origin = core.getOrigin(parameterDescriptor)
@@ -21,9 +25,15 @@ internal class ActualKotlinValueParameterSwiftModel(
     override val original: KotlinValueParameterSwiftModel = OriginalKotlinValueParameterSwiftModel(this)
 
     override val isChanged: Boolean
-        get() = argumentLabel != original.argumentLabel
+        get() = argumentLabel != original.argumentLabel || isTypeSubstitutionEnabled != original.isTypeSubstitutionEnabled
 
-    override val type: TypeSwiftModel by lazy(getParameterType)
+    override val type: TypeSwiftModel
+        get() = getParameterType(isTypeSubstitutionEnabled)
+
+    override val objCType: ObjCType
+        get() = core.getObjCType(functionDescriptor, parameterDescriptor, isTypeSubstitutionEnabled)
+
+    override var isTypeSubstitutionEnabled: Boolean = true
 
     override fun toString(): String = origin.toString()
 }

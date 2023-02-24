@@ -8,5 +8,7 @@ class OriginalKotlinValueParameterSwiftModel(
 
     override val argumentLabel: String = delegate.argumentLabel
 
+    override val isTypeSubstitutionEnabled: Boolean = delegate.isTypeSubstitutionEnabled
+
     override val isChanged: Boolean = false
 }

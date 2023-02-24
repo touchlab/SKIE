@@ -4,6 +4,7 @@ import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 
 interface KotlinValueParameterSwiftModel {
 
@@ -21,6 +22,12 @@ interface KotlinValueParameterSwiftModel {
     val parameterName: String
 
     val type: TypeSwiftModel
+
+    val objCType: ObjCType
+
+    val position: Int
+
+    val isTypeSubstitutionEnabled: Boolean
 
     sealed interface Origin {
 

@@ -5,6 +5,7 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.isHidden
 import co.touchlab.skie.plugin.api.model.isRemoved
@@ -48,25 +49,32 @@ internal class ApiNotesFactory(
             properties = this.allDirectlyCallableMembers.filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote(this) },
         )
 
-    private fun KotlinFunctionSwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesMethod {
-        return ApiNotesMethod(
+    private fun KotlinFunctionSwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesMethod =
+        ApiNotesMethod(
             objCSelector = this.objCSelector,
             kind = owner.kind.toMemberKind(),
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
+            resultType = this.objCReturnType?.renderWithExplicitNullability() ?: "",
+            parameters = this.valueParameters.map { it.toApiNote() },
         )
-    }
 
-    private fun KotlinRegularPropertySwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesProperty {
-        return ApiNotesProperty(
+    private fun KotlinValueParameterSwiftModel.toApiNote(): ApiNotesParameter =
+        ApiNotesParameter(
+            position = this.position,
+            type = this.objCType.renderWithExplicitNullability(),
+        )
+
+    private fun KotlinRegularPropertySwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesProperty =
+        ApiNotesProperty(
             objCName = this.objCName,
             kind = owner.kind.toMemberKind(),
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
+            type = this.objCType.renderWithExplicitNullability(),
         )
-    }
 
     private val SwiftModelVisibility.isHiddenOrReplaced: Boolean
         get() = this.isHidden || this.isReplaced

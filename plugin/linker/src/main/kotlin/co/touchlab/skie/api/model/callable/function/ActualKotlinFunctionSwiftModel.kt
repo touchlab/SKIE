@@ -13,6 +13,7 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableM
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
@@ -28,13 +29,20 @@ internal class ActualKotlinFunctionSwiftModel(
     override var identifier: String by core::identifier
 
     override val valueParameters: List<MutableKotlinValueParameterSwiftModel> by lazy {
-        core.getParameterCoresWithDescriptors(descriptor).map { (core, parameterDescriptor) ->
+        core.getParameterCoresWithDescriptors(descriptor).mapIndexed { index, (core, parameterDescriptor) ->
             ActualKotlinValueParameterSwiftModel(
                 core,
+                descriptor,
                 parameterDescriptor,
-            ) {
+                index,
+            ) { isTypeSubstitutionEnabled ->
                 with(swiftModelScope) {
-                    descriptor.getParameterType(parameterDescriptor, core.parameterBridge, receiver.swiftGenericExportScope)
+                    descriptor.getParameterType(
+                        parameterDescriptor,
+                        core.parameterBridge,
+                        receiver.swiftGenericExportScope,
+                        isTypeSubstitutionEnabled,
+                    )
                 }
             }
         }
@@ -80,8 +88,12 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val returnType: TypeSwiftModel
         get() = with(swiftModelScope) {
-            core.descriptor.returnTypeModel(receiver.swiftGenericExportScope, core.methodBridge.returnBridge)
+            core.descriptor.returnTypeModel(receiver.swiftGenericExportScope, core.getMethodBridge(descriptor).returnBridge)
         }
+
+    override val objCReturnType: ObjCType? by lazy {
+        core.getObjCReturnType(descriptor)
+    }
 
     override fun toString(): String = descriptor.toString()
 

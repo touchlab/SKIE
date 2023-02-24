@@ -8,6 +8,7 @@ import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
+import co.touchlab.skie.plugin.api.model.SwiftModelBuiltIns
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
@@ -65,6 +66,10 @@ class DefaultSwiftModelScope(
     private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.exposedClasses)
     private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
 
+    override val builtIns: SwiftModelBuiltIns by lazy {
+        DefaultSwiftModelBuiltIns(this)
+    }
+
     override val exposedClasses: List<MutableKotlinClassSwiftModel> =
         descriptorProvider.exposedClasses.map { it.swiftModel }
 
@@ -120,7 +125,8 @@ class DefaultSwiftModelScope(
         return when {
             receiverClassDescriptor != null -> translator.mapReferenceType(
                 receiverClassDescriptor.defaultType,
-                SwiftExportScope(SwiftGenericExportScope.Class(receiverClassDescriptor, namer), SwiftExportScope.Flags.ReferenceType)
+                SwiftExportScope(SwiftGenericExportScope.Class(receiverClassDescriptor, namer), SwiftExportScope.Flags.ReferenceType),
+                false,
             )
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
             containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
@@ -158,17 +164,22 @@ class DefaultSwiftModelScope(
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
+        isTypeSubstitutionEnabled: Boolean,
     ): SwiftTypeModel {
         val exportScope = SwiftExportScope(genericExportScope, SwiftExportScope.Flags.Escaping)
         return when (bridge) {
-            is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge)
+            is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge, isTypeSubstitutionEnabled)
             MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
                 SwiftPointerTypeModel(SwiftNullableReferenceTypeModel(SwiftClassTypeModel("Error")), nullable = true)
             is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
                 val resultType = if (bridge.useUnitCompletion) {
                     null
                 } else {
-                    when (val it = translator.mapReferenceType(returnType!!, exportScope.removingFlags(SwiftExportScope.Flags.Escaping))) {
+                    when (val it = translator.mapReferenceType(
+                        returnType!!,
+                        exportScope.removingFlags(SwiftExportScope.Flags.Escaping),
+                        isTypeSubstitutionEnabled
+                    )) {
                         is SwiftNonNullReferenceTypeModel -> SwiftNullableReferenceTypeModel(it, isNullableResult = false)
                         is SwiftNullableReferenceTypeModel -> SwiftNullableReferenceTypeModel(it.nonNullType, isNullableResult = true)
                     }

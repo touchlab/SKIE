@@ -1,14 +1,17 @@
 package co.touchlab.skie.api.model.callable.property.regular
 
+import co.touchlab.skie.api.model.factory.ObjCTypeProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertyGetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class KotlinRegularPropertySwiftModelCore(
     val descriptor: PropertyDescriptor,
     namer: ObjCExportNamer,
+    private val objCTypeProvider: ObjCTypeProvider,
 ) {
 
     var identifier: String = namer.getPropertyName(descriptor.original).swiftName
@@ -23,4 +26,7 @@ class KotlinRegularPropertySwiftModelCore(
     val setter: KotlinRegularPropertySetterSwiftModel? = descriptor.setter?.let { DefaultKotlinRegularPropertySetterSwiftModel(it, namer) }
 
     val objCName: String = namer.getPropertyName(descriptor.original).objCName
+
+    fun getObjCType(propertyDescriptor: PropertyDescriptor): ObjCType =
+        objCTypeProvider.getPropertyType(descriptor, propertyDescriptor)
 }

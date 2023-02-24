@@ -8,6 +8,9 @@ import org.jetbrains.kotlin.types.KotlinType
 
 interface CustomTypeMapper {
 
+    val isTypeSubstitution: Boolean
+        get() = false
+
     val mappedClassId: ClassId
 
     context(SwiftModelScope)
