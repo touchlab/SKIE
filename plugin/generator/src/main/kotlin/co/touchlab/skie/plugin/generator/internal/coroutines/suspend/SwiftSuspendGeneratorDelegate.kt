@@ -185,7 +185,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
     private fun MutableList<String>.addDispatchReceiver(bridgeModel: BridgeModel) {
-        if (bridgeModel.originalFunction.scope == KotlinCallableMemberSwiftModel.Scope.Static) {
+        if (bridgeModel.originalFunction.scope != KotlinCallableMemberSwiftModel.Scope.Member) {
             return
         }
 

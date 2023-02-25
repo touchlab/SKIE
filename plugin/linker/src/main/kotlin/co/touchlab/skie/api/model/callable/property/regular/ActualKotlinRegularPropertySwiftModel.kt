@@ -2,6 +2,7 @@ package co.touchlab.skie.api.model.callable.property.regular
 
 import co.touchlab.skie.api.model.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.api.model.callable.swiftModelOrigin
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
@@ -24,6 +25,7 @@ class ActualKotlinRegularPropertySwiftModel(
     override val allBoundedSwiftModels: List<MutableKotlinDirectlyCallableMemberSwiftModel>,
     private val core: KotlinRegularPropertySwiftModelCore,
     private val swiftModelScope: MutableSwiftModelScope,
+    descriptorProvider: DescriptorProvider,
 ) : MutableKotlinRegularPropertySwiftModel {
 
     override val receiver: TypeSwiftModel by lazy {
@@ -52,6 +54,12 @@ class ActualKotlinRegularPropertySwiftModel(
         get() = identifier != original.identifier || visibility != original.visibility
 
     override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
+
+    override val scope: KotlinCallableMemberSwiftModel.Scope = if (descriptorProvider.getReceiverClassDescriptorOrNull(descriptor) == null) {
+        KotlinCallableMemberSwiftModel.Scope.Static
+    } else {
+        KotlinCallableMemberSwiftModel.Scope.Member
+    }
 
     override val type: TypeSwiftModel
         get() = with(swiftModelScope) {

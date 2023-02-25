@@ -75,7 +75,7 @@ class SwiftModelFactoryMembersDelegate(
         val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider, objCTypeProvider)
 
         return group
-            .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }
+            .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, swiftModelScope, descriptorProvider) }
             .also { allBoundedSwiftModels.addAll(it.values) }
             .also { allBoundedSwiftModels.addFakeObjcConstructors(group, it.values.first()) }
             .also { allBoundedSwiftModels.addHiddenOverrides(group, it.values.first()) }
@@ -124,7 +124,7 @@ class SwiftModelFactoryMembersDelegate(
         val core = KotlinRegularPropertySwiftModelCore(group.representative, namer, objCTypeProvider)
 
         return group
-            .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, swiftModelScope) }
+            .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, swiftModelScope, descriptorProvider) }
             .also { allBoundedSwiftModels.addAll(it.values) }
             .also { allBoundedSwiftModels.addHiddenOverrides(group, it.values.first()) }
             .mapKeys {

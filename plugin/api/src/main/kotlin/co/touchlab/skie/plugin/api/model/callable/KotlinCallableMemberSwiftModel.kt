@@ -14,7 +14,6 @@ interface KotlinCallableMemberSwiftModel {
     val origin: Origin
 
     val scope: Scope
-        get() = if (origin in listOf(Origin.Global, Origin.Extension.Interface)) Scope.Static else Scope.Member
 
     val allBoundedSwiftModels: List<KotlinCallableMemberSwiftModel>
 

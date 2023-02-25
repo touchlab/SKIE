@@ -2,6 +2,7 @@ package co.touchlab.skie.api.model.callable.function
 
 import co.touchlab.skie.api.model.callable.parameter.ActualKotlinValueParameterSwiftModel
 import co.touchlab.skie.api.model.callable.swiftModelOrigin
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
@@ -24,6 +25,7 @@ internal class ActualKotlinFunctionSwiftModel(
     override val allBoundedSwiftModels: List<KotlinFunctionSwiftModelWithCore>,
     override val core: KotlinFunctionSwiftModelCore,
     private val swiftModelScope: MutableSwiftModelScope,
+    descriptorProvider: DescriptorProvider,
 ) : KotlinFunctionSwiftModelWithCore {
 
     override var identifier: String by core::identifier
@@ -74,6 +76,12 @@ internal class ActualKotlinFunctionSwiftModel(
             is PropertyGetterDescriptor -> KotlinFunctionSwiftModel.Role.ConvertedGetter
             is PropertySetterDescriptor -> KotlinFunctionSwiftModel.Role.ConvertedSetter
             else -> KotlinFunctionSwiftModel.Role.SimpleFunction
+        }
+
+    override val scope: KotlinCallableMemberSwiftModel.Scope = if (descriptorProvider.getReceiverClassDescriptorOrNull(descriptor) == null) {
+            KotlinCallableMemberSwiftModel.Scope.Static
+        } else {
+            KotlinCallableMemberSwiftModel.Scope.Member
         }
 
     override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin

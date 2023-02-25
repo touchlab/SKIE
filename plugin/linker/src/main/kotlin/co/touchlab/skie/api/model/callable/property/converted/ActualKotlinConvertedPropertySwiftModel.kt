@@ -40,6 +40,8 @@ class ActualKotlinConvertedPropertySwiftModel(
 
     override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
 
+    override val scope: KotlinCallableMemberSwiftModel.Scope = KotlinCallableMemberSwiftModel.Scope.Static
+
     override fun toString(): String = descriptor.toString()
 
     override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
