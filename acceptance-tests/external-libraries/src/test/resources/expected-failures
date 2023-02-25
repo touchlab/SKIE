@@ -1,14 +1,84 @@
-# There are still 4 unbound symbols after generation of IR module
-# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/WidgetVersion.<get-WidgetVersion>
-# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposeContent.into
-# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposition.setContent
-# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/CompositionLocal.current.<get-current>
+# Exporting modules with public `@Composable` declarations doesn't work with K/N
+> There are still 4 unbound symbols after generation of IR module
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/WidgetVersion.<get-WidgetVersion>
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposeContent.into
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposition.setContent
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/CompositionLocal.current.<get-current>
 app.cash.redwood:redwood-compose-iosarm64
 
-# There is still an unbound symbol after generation of IR module
-# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposition.setContent
+# Exporting modules with public `@Composable` declarations doesn't work with K/N
+> There is still an unbound symbol after generation of IR module
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.compose/RedwoodComposition.setContent
 app.cash.redwood:redwood-protocol-compose-iosarm64
 
-# There is still an unbound symbol after generation of IR module
-# Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.widget.compose/ComposeWidgetChildren.render
+# Exporting modules with public `@Composable` declarations doesn't work with K/N
+> There is still an unbound symbol after generation of IR module
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: app.cash.redwood.widget.compose/ComposeWidgetChildren.render
 app.cash.redwood:redwood-widget-compose-iosarm64
+
+
+
+
+
+# Probably declares a function called `nil` in Kotlin, which the K/N doesn't ignore/rename.
+> error: expected selector for Objective-C method
+> - (KotlinField *)nil __attribute__((swift_name("nil()")));
+org.chiachat:kbls-iosarm64
+
+# SKIE brings in kotlinx.atomicfu (through coroutines) leading into a conflict with declarations in this library
+> e: Compilation failed: IrClassPublicSymbolImpl for kotlinx.atomicfu/TraceFormat|null[0] is already bound: CLASS CLASS name:TraceFormat modality:OPEN visibility:public superTypes:[kotlin.Any]
+org.danbrough.kotlinx:atomicfu-iosarm64
+
+# SKIE brings in kotlinx.atomicfu (through coroutines) leading into a conflict with declarations in this library
+> e: Compilation failed: IrPropertyPublicSymbolImpl for kotlinx.atomicfu/traceFormatDefault|-8401884562309329500[0] is already bound: PROPERTY name:traceFormatDefault visibility:public modality:FINAL [val]
+org.danbrough.kotlinx:kotlinx-coroutines-core-iosarm64
+org.danbrough.kotlinx:kotlinx-coroutines-test-iosarm64
+org.danbrough.sqldelight:async-extensions-iosarm64
+org.danbrough.sqldelight:coroutines-extensions-iosarm64
+
+# Exporting modules with public `@Composable` declarations doesn't work with K/N
+> e: There are still 2 unbound symbols after generation of IR module
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime.saveable/SaveableStateHolder.SaveableStateProvider
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/CompositionLocal.current.<get-current>
+org.jetbrains.compose.runtime:runtime-saveable-uikitarm64
+
+# Exporting modules with public `@Composable` declarations doesn't work with K/N
+> e: There are still 8 unbound symbols after generation of IR module
+> Unbound public symbol IrConstructorPublicSymbolImpl: androidx.compose.runtime/MovableContent.<init>
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/currentComposer.<get-currentComposer>
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/currentCompositeKeyHash.<get-currentCompositeKeyHash>
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/currentCompositionLocalContext.<get-currentCompositionLocalContext>
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/currentRecomposeScope.<get-currentRecomposeScope>
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/Composition.setContent
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/CompositionLocal.current.<get-current>
+> Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/ControlledComposition.composeContent
+org.jetbrains.compose.runtime:runtime-uikitarm64
+
+> e: Could not find "org.jetbrains.compose.runtime:runtime"
+com.adeo.libres:libres-compose-iosarm64
+
+> error: duplicate definition of method '-[KotlinVerificationBuilder threwBlock:]'
+org.kodein.mock:mockmp-runtime-iosarm64
+
+> error: duplicate definition of method '-[KotlinMockmp_runtimeVerificationBuilder threwBlock:]'
+org.kodein.mock:mockmp-test-helper-junit5-iosarm64
+org.kodein.mock:mockmp-test-helper-iosarm64
+
+# K/N generates invalid header when a property name is `NULL`
+> error: expected member name or ';' after declaration specifiers
+> @property KotlinFormattingTuple *NULL __attribute__((swift_name("NULL")));
+ru.mobiledev:slf4k-api-1.7-iosarm64
+
+# K/N generates invalid header when a parameter name is `nil`
+> error: expected identifier
+> - (double)maxOrElseNil:(double)nil __attribute__((swift_name("maxOrElse(nil:)")));
+> error: expected identifier
+> - (double)minOrElseNil:(double)nil __attribute__((swift_name("minOrElse(nil:)")));
+com.soywiz.korlibs.korma:korma-iosarm64
+
+# K/N generates invalid header when a property name is `FALSE` or `TRUE`
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) int32_t FALSE __attribute__((swift_name("FALSE")));
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) int32_t TRUE __attribute__((swift_name("TRUE")));
+com.soywiz.korlibs.luak:luak-iosarm64

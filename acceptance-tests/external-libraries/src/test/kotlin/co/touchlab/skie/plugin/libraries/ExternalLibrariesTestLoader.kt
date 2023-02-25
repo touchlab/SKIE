@@ -34,14 +34,14 @@ class ExternalLibrariesTestLoader(private val testTmpDir: File) {
         expectedFailuresFile.readText().split("\n").forEach { untrimmedLine ->
             val line = untrimmedLine.trim()
             when {
-                line.startsWith("#") -> {
+                line.startsWith(">") -> {
                     if (clearOnNextExpectedError) {
                         expectedErrorsAccumulator.clear()
                         clearOnNextExpectedError = false
                     }
                     expectedErrorsAccumulator.add(line.drop(1).trim())
                 }
-                line.isEmpty() -> return@forEach
+                line.startsWith("#") || line.isEmpty() -> return@forEach
                 else -> {
                     expectedFailures.add(ExpectedLinkFailure(line.toRegex(), expectedErrorsAccumulator.toList()))
                     clearOnNextExpectedError = true
