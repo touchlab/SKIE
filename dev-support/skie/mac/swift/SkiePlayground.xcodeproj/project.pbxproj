@@ -1,0 +1,397 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		181F4A1C29AA6864004B07AB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F4A1B29AA6864004B07AB /* main.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		181F4A0F29AA66B3004B07AB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		181F4A1129AA66B3004B07AB /* SkiePlayground */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkiePlayground; sourceTree = BUILT_PRODUCTS_DIR; };
+		181F4A1B29AA6864004B07AB /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		181F4A1F29AA6D86004B07AB /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		181F4A3729AA7264004B07AB /* macosArm64Main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosArm64Main; path = ../framework/src/macosArm64Main; sourceTree = "<group>"; };
+		181F4A3829AA7264004B07AB /* macosX64Main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosX64Main; path = ../framework/src/macosX64Main; sourceTree = "<group>"; };
+		181F4A3929AA7264004B07AB /* macosMain */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosMain; path = ../framework/src/macosMain; sourceTree = "<group>"; };
+		181F4A3A29AA7264004B07AB /* commonMain */ = {isa = PBXFileReference; lastKnownFileType = folder; name = commonMain; path = ../framework/src/commonMain; sourceTree = "<group>"; };
+		181F4A3B29AA72C9004B07AB /* macosArm64Main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosArm64Main; path = ../dependency/src/macosArm64Main; sourceTree = "<group>"; };
+		181F4A3C29AA72C9004B07AB /* commonMain */ = {isa = PBXFileReference; lastKnownFileType = folder; name = commonMain; path = ../dependency/src/commonMain; sourceTree = "<group>"; };
+		181F4A3D29AA72C9004B07AB /* macosMain */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosMain; path = ../dependency/src/macosMain; sourceTree = "<group>"; };
+		181F4A3E29AA72C9004B07AB /* macosX64Main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosX64Main; path = ../dependency/src/macosX64Main; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		181F4A0E29AA66B3004B07AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		181F4A0829AA66B3004B07AB = {
+			isa = PBXGroup;
+			children = (
+				181F4A2529AA7201004B07AB /* kotlin */,
+				181F4A2229AA71DE004B07AB /* swift */,
+				181F4A1229AA66B3004B07AB /* Products */,
+				181F4A1E29AA6D86004B07AB /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		181F4A1229AA66B3004B07AB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				181F4A1129AA66B3004B07AB /* SkiePlayground */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		181F4A1E29AA6D86004B07AB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				181F4A1F29AA6D86004B07AB /* Accelerate.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		181F4A2229AA71DE004B07AB /* swift */ = {
+			isa = PBXGroup;
+			children = (
+				181F4A1B29AA6864004B07AB /* main.swift */,
+			);
+			name = swift;
+			sourceTree = "<group>";
+		};
+		181F4A2529AA7201004B07AB /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				181F4A2829AA7213004B07AB /* framework */,
+				181F4A2729AA720F004B07AB /* dependency */,
+			);
+			name = kotlin;
+			sourceTree = "<group>";
+		};
+		181F4A2729AA720F004B07AB /* dependency */ = {
+			isa = PBXGroup;
+			children = (
+				181F4A3C29AA72C9004B07AB /* commonMain */,
+				181F4A3B29AA72C9004B07AB /* macosArm64Main */,
+				181F4A3D29AA72C9004B07AB /* macosMain */,
+				181F4A3E29AA72C9004B07AB /* macosX64Main */,
+			);
+			name = dependency;
+			sourceTree = "<group>";
+		};
+		181F4A2829AA7213004B07AB /* framework */ = {
+			isa = PBXGroup;
+			children = (
+				181F4A3A29AA7264004B07AB /* commonMain */,
+				181F4A3729AA7264004B07AB /* macosArm64Main */,
+				181F4A3929AA7264004B07AB /* macosMain */,
+				181F4A3829AA7264004B07AB /* macosX64Main */,
+			);
+			name = framework;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		181F4A1029AA66B3004B07AB /* SkiePlayground */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 181F4A1829AA66B3004B07AB /* Build configuration list for PBXNativeTarget "SkiePlayground" */;
+			buildPhases = (
+				181F4A1D29AA68AB004B07AB /* Compile Kotlin */,
+				181F4A0D29AA66B3004B07AB /* Sources */,
+				181F4A0E29AA66B3004B07AB /* Frameworks */,
+				181F4A0F29AA66B3004B07AB /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SkiePlayground;
+			productName = SkiePlayground;
+			productReference = 181F4A1129AA66B3004B07AB /* SkiePlayground */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		181F4A0929AA66B3004B07AB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					181F4A1029AA66B3004B07AB = {
+						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1420;
+					};
+				};
+			};
+			buildConfigurationList = 181F4A0C29AA66B3004B07AB /* Build configuration list for PBXProject "SkiePlayground" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 181F4A0829AA66B3004B07AB;
+			productRefGroup = 181F4A1229AA66B3004B07AB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				181F4A1029AA66B3004B07AB /* SkiePlayground */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		181F4A1D29AA68AB004B07AB /* Compile Kotlin */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Compile Kotlin";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "DEV_SUPPORT_ROOT=../../../\n#\"$DEV_SUPPORT_ROOT/gradlew\" :skie:mac:framework:syncFramework \\\n#  -Pkotlin.native.cocoapods.target=\"$KOTLIN_TARGET\" \\\n#  -Pkotlin.native.cocoapods.configuration=\"$KOTLIN_CONFIGURATION\" \\\n#  -Pkotlin.native.cocoapods.cflags=\"$OTHER_CFLAGS\" \\\n#  -Pkotlin.native.cocoapods.paths.headers=\"$HEADER_SEARCH_PATH\" \\\n#  -Pkotlin.native.cocoapods.paths.frameworks=\"$FRAMEWORK_SEARCH_PATHS\"\n\n\"$DEV_SUPPORT_ROOT/gradlew\" :skie:mac:framework:embedAndSignAppleFrameworkForXcode\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		181F4A0D29AA66B3004B07AB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				181F4A1C29AA6864004B07AB /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		181F4A1629AA66B3004B07AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		181F4A1729AA66B3004B07AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		181F4A1929AA66B3004B07AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORKS_FOLDER_PATH = Frameworks;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../framework/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+					"$(inherited)",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					Kotlin,
+				);
+				OTHER_SWIFT_FLAGS = "-parse-as-library";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		181F4A1A29AA66B3004B07AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORKS_FOLDER_PATH = Frameworks;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../framework/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+					"$(inherited)",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					Kotlin,
+				);
+				OTHER_SWIFT_FLAGS = "-parse-as-library";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		181F4A0C29AA66B3004B07AB /* Build configuration list for PBXProject "SkiePlayground" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				181F4A1629AA66B3004B07AB /* Debug */,
+				181F4A1729AA66B3004B07AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		181F4A1829AA66B3004B07AB /* Build configuration list for PBXNativeTarget "SkiePlayground" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				181F4A1929AA66B3004B07AB /* Debug */,
+				181F4A1A29AA66B3004B07AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 181F4A0929AA66B3004B07AB /* Project object */;
+}
