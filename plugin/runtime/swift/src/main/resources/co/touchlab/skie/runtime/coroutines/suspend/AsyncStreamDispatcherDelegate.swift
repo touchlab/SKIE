@@ -20,7 +20,7 @@ class AsyncStreamDispatcherDelegate: Skie.class__co_touchlab_skie_kotlin__co_tou
         }
 
         if !isActive {
-            fatalError("Cannot dispatch block after dispatcher is stopped. This error might have happened by leaking the dispatcher from the original job.")
+            Swift.fatalError("Cannot dispatch block after dispatcher is stopped. This error might have happened by leaking the dispatcher from the original job.")
         }
 
         continuation.yield(block)

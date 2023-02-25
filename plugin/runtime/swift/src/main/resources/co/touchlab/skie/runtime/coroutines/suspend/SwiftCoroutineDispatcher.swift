@@ -8,7 +8,7 @@ struct SwiftCoroutineDispatcher {
     ) async throws -> T {
         let cancellationHandler = Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_CancellationHandler()
 
-        return try await withTaskCancellationHandler(operation: {
+        return try await _Concurrency.withTaskCancellationHandler(operation: {
             try await dispatchCancellable(coroutine: coroutine, cancellationHandler: cancellationHandler)
         }, onCancel: {
             cancellationHandler.cancel()
@@ -73,7 +73,7 @@ struct SwiftCoroutineDispatcher {
     }
 
     private static func executeWithoutCancellation(dispatcher: _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable>) async {
-        await Task {
+        await _Concurrency.Task {
             for await block in dispatcher {
                 block.run()
             }
