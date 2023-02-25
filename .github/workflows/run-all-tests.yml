@@ -43,6 +43,7 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
+          check_name: "Test Reports - Acceptance Tests"
           report_paths: 'acceptance-tests/build/test-results/test/TEST-*.xml'
           require_tests: true
 
@@ -66,6 +67,7 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
+          check_name: "Test Reports - Type Mapping Tests"
           report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
           require_tests: true
 
@@ -89,5 +91,6 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
+          check_name: "Test Reports - External Libraries Tests"
           report_paths: 'acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
           require_tests: true
