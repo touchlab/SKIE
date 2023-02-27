@@ -38,4 +38,5 @@ include(
     ":pure-compiler",
     ":pure-compiler:dependency",
     ":pure-compiler:framework",
+    ":pure-compiler:swift",
 )

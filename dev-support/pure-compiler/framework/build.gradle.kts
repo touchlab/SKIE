@@ -8,6 +8,7 @@ plugins {
 
 kotlin {
     ios()
+    iosSimulatorArm64()
     macosX64()
     macosArm64()
 
@@ -44,13 +45,23 @@ kotlin {
             }
         }
     }
+
+    val iosMain by sourceSets.getting
+    val iosTest by sourceSets.getting
+
+    val iosSimulatorArm64Main by sourceSets.getting {
+        dependsOn(iosMain)
+    }
+    val iosSimulatorArm64Test by sourceSets.getting {
+        dependsOn(iosTest)
+    }
 }
 
 tasks.withType<KotlinNativeLink>().configureEach {
     doLast {
+        if (binary.target.konanTarget.family != org.jetbrains.kotlin.konan.target.Family.OSX) { return@doLast }
         val frameworkDirectory = outputs.files.toList().first()
         val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
-
         exec {
             commandLine(
                 "zsh",
