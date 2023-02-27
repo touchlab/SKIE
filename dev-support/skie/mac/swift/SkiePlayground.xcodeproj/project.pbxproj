@@ -184,7 +184,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DEV_SUPPORT_ROOT=../../../\n#\"$DEV_SUPPORT_ROOT/gradlew\" :skie:mac:framework:syncFramework \\\n#  -Pkotlin.native.cocoapods.target=\"$KOTLIN_TARGET\" \\\n#  -Pkotlin.native.cocoapods.configuration=\"$KOTLIN_CONFIGURATION\" \\\n#  -Pkotlin.native.cocoapods.cflags=\"$OTHER_CFLAGS\" \\\n#  -Pkotlin.native.cocoapods.paths.headers=\"$HEADER_SEARCH_PATH\" \\\n#  -Pkotlin.native.cocoapods.paths.frameworks=\"$FRAMEWORK_SEARCH_PATHS\"\n\n\"$DEV_SUPPORT_ROOT/gradlew\" :skie:mac:framework:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "DEV_SUPPORT_ROOT=../../../\n\n\"$DEV_SUPPORT_ROOT/gradlew\" :skie:mac:framework:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
