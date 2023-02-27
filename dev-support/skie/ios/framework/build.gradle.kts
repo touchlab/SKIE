@@ -20,6 +20,7 @@ skie {
 
 kotlin {
     ios()
+    iosSimulatorArm64()
 
     val exportedLibraries = listOf<String>(
 
@@ -54,6 +55,17 @@ kotlin {
             }
         }
     }
+
+    val iosMain by sourceSets.getting
+    val iosTest by sourceSets.getting
+
+    val iosSimulatorArm64Main by sourceSets.getting {
+        dependsOn(iosMain)
+    }
+    val iosSimulatorArm64Test by sourceSets.getting {
+        dependsOn(iosTest)
+    }
+
 }
 
 configurations.all {

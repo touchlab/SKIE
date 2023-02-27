@@ -34,6 +34,7 @@ include(
     ":skie:ios",
     ":skie:ios:framework",
     ":skie:ios:dependency",
+    ":skie:ios:swift",
     ":pure-compiler",
     ":pure-compiler:dependency",
     ":pure-compiler:framework",
