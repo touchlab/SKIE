@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		184E1D7729AC51810028CB08 /* SkiePlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkiePlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		184E1D7729AC51810028CB08 /* SkiePlayground_ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkiePlayground_ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184E1D8929AC52120028CB08 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -37,7 +37,7 @@
 		184E1D7829AC51810028CB08 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				184E1D7729AC51810028CB08 /* SkiePlayground.app */,
+				184E1D7729AC51810028CB08 /* SkiePlayground_ios.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -53,9 +53,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		184E1D7629AC51810028CB08 /* SkiePlayground */ = {
+		184E1D7629AC51810028CB08 /* SkiePlayground_ios */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 184E1D8529AC51820028CB08 /* Build configuration list for PBXNativeTarget "SkiePlayground" */;
+			buildConfigurationList = 184E1D8529AC51820028CB08 /* Build configuration list for PBXNativeTarget "SkiePlayground_ios" */;
 			buildPhases = (
 				184E1D8B29AC528A0028CB08 /* Compile Kotlin */,
 				184E1D7329AC51810028CB08 /* Sources */,
@@ -66,9 +66,9 @@
 			);
 			dependencies = (
 			);
-			name = SkiePlayground;
+			name = SkiePlayground_ios;
 			productName = SkiePlayground;
-			productReference = 184E1D7729AC51810028CB08 /* SkiePlayground.app */;
+			productReference = 184E1D7729AC51810028CB08 /* SkiePlayground_ios.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -87,7 +87,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 184E1D7229AC51810028CB08 /* Build configuration list for PBXProject "SkiePlayground" */;
+			buildConfigurationList = 184E1D7229AC51810028CB08 /* Build configuration list for PBXProject "SkiePlayground_ios" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -100,7 +100,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				184E1D7629AC51810028CB08 /* SkiePlayground */,
+				184E1D7629AC51810028CB08 /* SkiePlayground_ios */,
 			);
 		};
 /* End PBXProject section */
@@ -344,7 +344,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		184E1D7229AC51810028CB08 /* Build configuration list for PBXProject "SkiePlayground" */ = {
+		184E1D7229AC51810028CB08 /* Build configuration list for PBXProject "SkiePlayground_ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				184E1D8329AC51820028CB08 /* Debug */,
@@ -353,7 +353,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		184E1D8529AC51820028CB08 /* Build configuration list for PBXNativeTarget "SkiePlayground" */ = {
+		184E1D8529AC51820028CB08 /* Build configuration list for PBXNativeTarget "SkiePlayground_ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				184E1D8629AC51820028CB08 /* Debug */,
