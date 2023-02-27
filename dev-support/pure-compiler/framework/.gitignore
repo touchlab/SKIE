@@ -1,2 +1,3 @@
 src/commonMain/kotlin/*
 !src/commonMain/kotlin/.gitkeep
+!src/commonMain/kotlin/EmptyFile.kt
