@@ -25,7 +25,6 @@
 /* Begin PBXFileReference section */
 		181F4A1129AA66B3004B07AB /* SkiePlayground_mac */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkiePlayground_mac; sourceTree = BUILT_PRODUCTS_DIR; };
 		181F4A1B29AA6864004B07AB /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		181F4A1F29AA6D86004B07AB /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		181F4A3729AA7264004B07AB /* macosArm64Main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosArm64Main; path = ../framework/src/macosArm64Main; sourceTree = "<group>"; };
 		181F4A3829AA7264004B07AB /* macosX64Main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosX64Main; path = ../framework/src/macosX64Main; sourceTree = "<group>"; };
 		181F4A3929AA7264004B07AB /* macosMain */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosMain; path = ../framework/src/macosMain; sourceTree = "<group>"; };
@@ -68,7 +67,6 @@
 		181F4A1E29AA6D86004B07AB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				181F4A1F29AA6D86004B07AB /* Accelerate.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -84,8 +82,8 @@
 		181F4A2529AA7201004B07AB /* kotlin */ = {
 			isa = PBXGroup;
 			children = (
-				181F4A2829AA7213004B07AB /* framework */,
 				181F4A2729AA720F004B07AB /* dependency */,
+				181F4A2829AA7213004B07AB /* framework */,
 			);
 			name = kotlin;
 			sourceTree = "<group>";

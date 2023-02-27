@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/tadeaskriz/Developer/Sources/Touchlab/SKIE/dev-support/skie/mac/swift/SkiePlayground_mac.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>

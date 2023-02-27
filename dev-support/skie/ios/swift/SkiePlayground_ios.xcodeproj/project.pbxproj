@@ -13,6 +13,8 @@
 /* Begin PBXFileReference section */
 		184E1D7729AC51810028CB08 /* SkiePlayground_ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkiePlayground_ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184E1D8929AC52120028CB08 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		184E1D8F29AC57350028CB08 /* commonMain */ = {isa = PBXFileReference; lastKnownFileType = folder; name = commonMain; path = ../dependency/src/commonMain; sourceTree = "<group>"; };
+		184E1D9129AC574B0028CB08 /* commonMain */ = {isa = PBXFileReference; lastKnownFileType = folder; name = commonMain; path = ../framework/src/commonMain; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +31,7 @@
 		184E1D6E29AC51810028CB08 = {
 			isa = PBXGroup;
 			children = (
+				184E1D8C29AC57060028CB08 /* kotlin */,
 				184E1D8829AC52060028CB08 /* swift */,
 				184E1D7829AC51810028CB08 /* Products */,
 			);
@@ -48,6 +51,31 @@
 				184E1D8929AC52120028CB08 /* main.swift */,
 			);
 			name = swift;
+			sourceTree = "<group>";
+		};
+		184E1D8C29AC57060028CB08 /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				184E1D8E29AC57140028CB08 /* dependency */,
+				184E1D8D29AC570D0028CB08 /* framework */,
+			);
+			name = kotlin;
+			sourceTree = "<group>";
+		};
+		184E1D8D29AC570D0028CB08 /* framework */ = {
+			isa = PBXGroup;
+			children = (
+				184E1D9129AC574B0028CB08 /* commonMain */,
+			);
+			name = framework;
+			sourceTree = "<group>";
+		};
+		184E1D8E29AC57140028CB08 /* dependency */ = {
+			isa = PBXGroup;
+			children = (
+				184E1D8F29AC57350028CB08 /* commonMain */,
+			);
+			name = dependency;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
