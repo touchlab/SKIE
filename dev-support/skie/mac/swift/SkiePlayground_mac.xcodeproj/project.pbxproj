@@ -23,7 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		181F4A1129AA66B3004B07AB /* SkiePlayground */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkiePlayground; sourceTree = BUILT_PRODUCTS_DIR; };
+		181F4A1129AA66B3004B07AB /* SkiePlayground_mac */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkiePlayground_mac; sourceTree = BUILT_PRODUCTS_DIR; };
 		181F4A1B29AA6864004B07AB /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		181F4A1F29AA6D86004B07AB /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		181F4A3729AA7264004B07AB /* macosArm64Main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = macosArm64Main; path = ../framework/src/macosArm64Main; sourceTree = "<group>"; };
@@ -60,7 +60,7 @@
 		181F4A1229AA66B3004B07AB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				181F4A1129AA66B3004B07AB /* SkiePlayground */,
+				181F4A1129AA66B3004B07AB /* SkiePlayground_mac */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -115,9 +115,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		181F4A1029AA66B3004B07AB /* SkiePlayground */ = {
+		181F4A1029AA66B3004B07AB /* SkiePlayground_mac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 181F4A1829AA66B3004B07AB /* Build configuration list for PBXNativeTarget "SkiePlayground" */;
+			buildConfigurationList = 181F4A1829AA66B3004B07AB /* Build configuration list for PBXNativeTarget "SkiePlayground_mac" */;
 			buildPhases = (
 				181F4A1D29AA68AB004B07AB /* Compile Kotlin */,
 				181F4A0D29AA66B3004B07AB /* Sources */,
@@ -128,9 +128,9 @@
 			);
 			dependencies = (
 			);
-			name = SkiePlayground;
+			name = SkiePlayground_mac;
 			productName = SkiePlayground;
-			productReference = 181F4A1129AA66B3004B07AB /* SkiePlayground */;
+			productReference = 181F4A1129AA66B3004B07AB /* SkiePlayground_mac */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -149,7 +149,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 181F4A0C29AA66B3004B07AB /* Build configuration list for PBXProject "SkiePlayground" */;
+			buildConfigurationList = 181F4A0C29AA66B3004B07AB /* Build configuration list for PBXProject "SkiePlayground_mac" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -162,7 +162,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				181F4A1029AA66B3004B07AB /* SkiePlayground */,
+				181F4A1029AA66B3004B07AB /* SkiePlayground_mac */,
 			);
 		};
 /* End PBXProject section */
@@ -373,7 +373,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		181F4A0C29AA66B3004B07AB /* Build configuration list for PBXProject "SkiePlayground" */ = {
+		181F4A0C29AA66B3004B07AB /* Build configuration list for PBXProject "SkiePlayground_mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				181F4A1629AA66B3004B07AB /* Debug */,
@@ -382,7 +382,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		181F4A1829AA66B3004B07AB /* Build configuration list for PBXNativeTarget "SkiePlayground" */ = {
+		181F4A1829AA66B3004B07AB /* Build configuration list for PBXNativeTarget "SkiePlayground_mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				181F4A1929AA66B3004B07AB /* Debug */,
