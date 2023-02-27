@@ -1,6 +1,5 @@
 src/commonMain/kotlin/*
 !src/commonMain/kotlin/.gitkeep
-!src/commonMain/kotlin/EmptyFile.kt
 
 src/macosMain/kotlin/*
 !src/macosMain/kotlin/.gitkeep
