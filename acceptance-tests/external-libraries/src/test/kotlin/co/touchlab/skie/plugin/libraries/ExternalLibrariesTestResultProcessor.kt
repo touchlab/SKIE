@@ -28,8 +28,8 @@ class ExternalLibrariesTestResultProcessor(
         }
         // TODO: Generate "fake tests" for each library, so that we can see which ones failed in the test report.
         if (failures.isNotEmpty()) {
-            println("To run only failed tests:")
-            println(failures.joinToString(", ") { "${it.first.index}" })
+            println("To run only failed tests add env variable:")
+            println("onlyIndices=" + failures.joinToString(",") { "${it.first.index}" })
             println("${failures.size} failed out of ${results.size}")
         }
     }

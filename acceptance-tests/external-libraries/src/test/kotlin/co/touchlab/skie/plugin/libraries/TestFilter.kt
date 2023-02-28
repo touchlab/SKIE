@@ -26,6 +26,10 @@ interface TestFilter {
         }
     }
 
+    data class Indices(private val indices: Set<Int>): TestFilter {
+        override fun shouldBeEvaluated(test: ExternalLibraryTest): Boolean = test.index in indices
+    }
+
     object Empty : TestFilter {
 
         override fun shouldBeEvaluated(test: ExternalLibraryTest): Boolean = true

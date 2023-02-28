@@ -29,6 +29,12 @@ private fun buildTestFilter(): TestFilter {
         testFilter += TestFilter.Regex(regex)
     }
 
+    val rawIndices = System.getenv("onlyIndices")
+    if (rawIndices != null) {
+        val indices = rawIndices.split(',').map { it.trim() }.filter { it.isNotBlank() }.map { it.toInt() }.toSet()
+        testFilter += TestFilter.Indices(indices)
+    }
+
     if ("failedOnly" in System.getenv()) {
         testFilter += TestFilter.FailedOnly
     }
