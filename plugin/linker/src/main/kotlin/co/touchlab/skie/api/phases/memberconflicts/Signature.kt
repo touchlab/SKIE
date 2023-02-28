@@ -1,4 +1,4 @@
-package co.touchlab.skie.api.apinotes.fixes.memberconflicts
+package co.touchlab.skie.api.phases.memberconflicts
 
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor

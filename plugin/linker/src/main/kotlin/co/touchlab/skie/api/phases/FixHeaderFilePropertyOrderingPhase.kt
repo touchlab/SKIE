@@ -1,20 +1,11 @@
-package co.touchlab.skie.api.apinotes.fixes
+package co.touchlab.skie.api.phases
 
+import co.touchlab.skie.api.phases.header.BaseHeaderModificationPhase
 import java.io.File
 
-class HeaderFilePropertyOrderingFix {
+class FixHeaderFilePropertyOrderingPhase(headerFile: File) : BaseHeaderModificationPhase(headerFile) {
 
-    fun reorderHeaderFile(headerFile: File) {
-        val content = headerFile.readLines()
-
-        val reorderedContent = reorderHeaderContent(content)
-
-        val mergedContent = reorderedContent.dropLastWhile { it.isBlank() }.joinToString("\n", postfix = "\n")
-
-        headerFile.writeText(mergedContent)
-    }
-
-    private fun reorderHeaderContent(content: List<String>): List<String> {
+    override fun modifyHeaderContent(content: List<String>): List<String> {
         val reorderedContent = mutableListOf<String>()
 
         val iterator = content.iterator()

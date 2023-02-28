@@ -1,5 +1,6 @@
-package co.touchlab.skie.api.apinotes.fixes.memberconflicts
+package co.touchlab.skie.api.phases.memberconflicts
 
+import co.touchlab.skie.api.phases.SkieLinkingPhase
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
@@ -15,12 +16,12 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.overriddenTreeAsSequence
 import org.jetbrains.kotlin.resolve.substitutedUnderlyingTypes
 
-class CallableMembersConflictsApiNotesFix(
+class FixCallableMembersConflictsPhase(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
-) {
+) : SkieLinkingPhase {
 
-    fun fixNames() {
+    override fun execute() {
         skieModule.configure(SkieModule.Ordering.Last) {
             val allMembers = descriptorProvider.allExposedMembers.map { it.swiftModel }
 

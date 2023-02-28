@@ -1,6 +1,7 @@
 package co.touchlab.skie.api.apinotes.builder
 
-import co.touchlab.skie.api.apinotes.fixes.fqNameSafeForBridging
+import co.touchlab.skie.api.phases.fqNameSafeForBridging
+import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -18,6 +19,7 @@ internal class ApiNotesFactory(
     private val moduleName: String,
     private val descriptorProvider: DescriptorProvider,
     private val swiftModelScope: SwiftModelScope,
+    private val objCTypeRenderer: ObjCTypeRenderer,
 ) {
 
     fun create(): ApiNotes = with(swiftModelScope) {
@@ -56,14 +58,14 @@ internal class ApiNotesFactory(
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
-            resultType = this.objCReturnType?.renderWithExplicitNullability() ?: "",
+            resultType = this.objCReturnType?.let { objCTypeRenderer.render(it) } ?: "",
             parameters = this.valueParameters.map { it.toApiNote() },
         )
 
     private fun KotlinValueParameterSwiftModel.toApiNote(): ApiNotesParameter =
         ApiNotesParameter(
             position = this.position,
-            type = this.objCType.renderWithExplicitNullability(),
+            type = objCTypeRenderer.render(this.objCType),
         )
 
     private fun KotlinRegularPropertySwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesProperty =
@@ -73,7 +75,7 @@ internal class ApiNotesFactory(
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
-            type = this.objCType.renderWithExplicitNullability(),
+            type = objCTypeRenderer.render(this.objCType),
         )
 
     private val SwiftModelVisibility.isHiddenOrReplaced: Boolean

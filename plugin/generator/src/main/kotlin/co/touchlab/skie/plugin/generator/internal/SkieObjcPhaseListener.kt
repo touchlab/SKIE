@@ -17,7 +17,7 @@ internal class SkieObjcPhaseListener : PhaseListener {
     override fun beforePhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
         super.beforePhase(phaseConfig, phaserState, context)
 
-        val skieScheduler = SkieScheduler(
+        val skieScheduler = SkieCompilationScheduler(
             skieContext = context.skieContext,
             descriptorProvider = context.skieDescriptorProvider,
             declarationBuilder = context.skieDeclarationBuilder,

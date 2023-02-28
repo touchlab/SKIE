@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
-import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
@@ -10,17 +9,15 @@ import co.touchlab.skie.plugin.generator.internal.util.ir.copy
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.util.createValueParameter
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.types.KotlinType
 
 internal class KotlinSuspendGeneratorDelegate(
     private val module: SkieModule,
@@ -154,24 +151,5 @@ internal class KotlinSuspendGeneratorDelegate(
             index = index,
             type = suspendHandlerDescriptor.defaultType,
         )
-
-    private fun createValueParameter(
-        owner: FunctionDescriptor,
-        name: Name,
-        index: Int,
-        type: KotlinType,
-    ): ValueParameterDescriptor =
-        ValueParameterDescriptorImpl(
-            containingDeclaration = owner,
-            original = null,
-            index = index,
-            annotations = Annotations.EMPTY,
-            name = name,
-            outType = type,
-            declaresDefaultValue = false,
-            isCrossinline = false,
-            isNoinline = false,
-            varargElementType = null,
-            source = owner.source,
-        )
 }
+

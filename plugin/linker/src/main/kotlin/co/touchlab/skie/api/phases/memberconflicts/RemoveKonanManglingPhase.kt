@@ -1,5 +1,6 @@
-package co.touchlab.skie.api.apinotes.fixes.memberconflicts
+package co.touchlab.skie.api.phases.memberconflicts
 
+import co.touchlab.skie.api.phases.SkieLinkingPhase
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
@@ -8,12 +9,12 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValuePa
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.module.SkieModule
 
-class KonanManglingApiNotesFix(
+class RemoveKonanManglingPhase(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
-) {
+) : SkieLinkingPhase {
 
-    fun resetNames() {
+    override fun execute() {
         skieModule.configure(SkieModule.Ordering.First) {
             descriptorProvider.allExposedMembers
                 .map { it.swiftModel }

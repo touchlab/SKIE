@@ -1,8 +1,8 @@
-package co.touchlab.skie.api.apinotes.fixes.memberconflicts
+package co.touchlab.skie.api.phases.memberconflicts
 
-import co.touchlab.skie.api.apinotes.fixes.memberconflicts.UniqueSignatureSet.Collision.Group
-import co.touchlab.skie.api.apinotes.fixes.memberconflicts.UniqueSignatureSet.Collision.RemoveExisting
-import co.touchlab.skie.api.apinotes.fixes.memberconflicts.UniqueSignatureSet.Collision.RemoveNew
+import co.touchlab.skie.api.phases.memberconflicts.UniqueSignatureSet.Collision.Group
+import co.touchlab.skie.api.phases.memberconflicts.UniqueSignatureSet.Collision.RemoveExisting
+import co.touchlab.skie.api.phases.memberconflicts.UniqueSignatureSet.Collision.RemoveNew
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel

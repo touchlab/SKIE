@@ -1,4 +1,4 @@
-package co.touchlab.skie.api.apinotes.fixes
+package co.touchlab.skie.api.phases
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
@@ -14,12 +14,12 @@ import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeAliasSpec
 
-class NestedBridgedTypesApiNotesFix(
+class FixNestedBridgedTypesPhase(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
-) {
+) : SkieLinkingPhase {
 
-    fun createTypeAliasesForBridgingFile() {
+    override fun execute() {
         skieModule.configure {
             descriptorProvider.allExposedTypesSwiftModels
                 .filter { it.needsTypeAliasForBridging }

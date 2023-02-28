@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import co.touchlab.skie.configuration.Configuration as ConfigurationType
-import co.touchlab.skie.plugin.generator.internal.SkieScheduler as SkieSchedulerType
+import co.touchlab.skie.plugin.generator.internal.SkieCompilationScheduler as SkieSchedulerType
 
 internal sealed class SkieCompilerConfigurationKey<T : Any>(name: String) {
 

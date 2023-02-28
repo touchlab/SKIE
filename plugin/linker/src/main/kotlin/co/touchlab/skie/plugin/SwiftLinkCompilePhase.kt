@@ -1,13 +1,6 @@
 package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieModule
-import co.touchlab.skie.api.apinotes.builder.ApiNotes
-import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
-import co.touchlab.skie.api.apinotes.fixes.memberconflicts.CallableMembersConflictsApiNotesFix
-import co.touchlab.skie.api.apinotes.fixes.ClassesConflictsApiNotesFix
-import co.touchlab.skie.api.apinotes.fixes.HeaderFilePropertyOrderingFix
-import co.touchlab.skie.api.apinotes.fixes.memberconflicts.KonanManglingApiNotesFix
-import co.touchlab.skie.api.apinotes.fixes.NestedBridgedTypesApiNotesFix
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvider
@@ -67,13 +60,8 @@ class SwiftLinkCompilePhase(
         )
         val skieModule = skieContext.module as DefaultSkieModule
 
-        KonanManglingApiNotesFix(skieModule, context.descriptorProvider).resetNames()
-        CallableMembersConflictsApiNotesFix(skieModule, context.descriptorProvider).fixNames()
-        ClassesConflictsApiNotesFix(skieModule, context.descriptorProvider).fixNames()
-        NestedBridgedTypesApiNotesFix(skieModule, context.descriptorProvider).createTypeAliasesForBridgingFile()
-        HeaderFilePropertyOrderingFix().reorderHeaderFile(framework.kotlinHeader)
+        SkieLinkingPhaseScheduler(skieModule, context, framework, swiftModelScope).runLinkingPhases()
 
-        skieModule.consumeConfigureBlocks(swiftModelScope)
         val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftModelScope)
         val swiftTextFiles = skieModule.produceTextFiles()
 
@@ -88,10 +76,6 @@ class SwiftLinkCompilePhase(
         }
 
         val sourceFiles = skieContext.swiftSourceFiles + newFiles
-
-        val apiNotes = ApiNotesFactory(framework.moduleName, context.descriptorProvider, swiftModelScope).create()
-
-        apiNotes.createApiNotesFile(framework)
 
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
             val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
@@ -110,14 +94,6 @@ class SwiftLinkCompilePhase(
         disableWildcardExportIfNeeded(framework)
 
         return swiftObjectPaths
-    }
-
-    private fun ApiNotes.createApiNotesFile(framework: FrameworkLayout) {
-        val content = this.createApiNotesFileContent()
-
-        val apiNotesFile = framework.headersDir.resolve("${framework.moduleName}.apinotes")
-
-        apiNotesFile.writeText(content)
     }
 
     private fun compileSwift(

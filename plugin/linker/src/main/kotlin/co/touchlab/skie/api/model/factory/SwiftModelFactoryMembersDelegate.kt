@@ -90,7 +90,7 @@ class SwiftModelFactoryMembersDelegate(
         }
 
         val hiddenOverrides = group.getMissingChildClasses()
-            .map { FakeObjcConstructorKotlinFunctionSwiftModel(representativeModel, it, swiftModelScope) }
+            .map { FakeObjcConstructorKotlinFunctionSwiftModel(representativeModel, it, swiftModelScope, objCTypeProvider) }
 
         this.addAll(hiddenOverrides)
     }

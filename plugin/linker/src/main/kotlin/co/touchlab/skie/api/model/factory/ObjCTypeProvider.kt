@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
+import co.touchlab.skie.plugin.api.util.isFlow
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportTranslatorImplReflector
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
@@ -30,7 +31,6 @@ import org.jetbrains.kotlin.backend.konan.objcexport.TypeBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.makeNullableIfReferenceOrPointer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -72,33 +72,30 @@ class ObjCTypeProvider(
         parameter: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         isTypeSubstitutionEnabled: Boolean,
-    ): ObjCType {
-        val genericExportScope = createGenericExportScope(function)
-
-        return when (bridge) {
-            is MethodBridgeParameter.ValueParameter.Mapped -> {
-                mapType(parameter!!.type, bridge.bridge.toKotlinVersion(), genericExportScope, isTypeSubstitutionEnabled)
-            }
-            MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
-                ObjCPointerType(ObjCNullableReferenceType(ObjCClassType("NSError")), nullable = true)
-            is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
-                val resultType = if (bridge.useUnitCompletion) {
-                    null
-                } else {
-                    when (val it =
-                        translator.mapReferenceType(function.returnType!!.substituteTypes(isTypeSubstitutionEnabled), genericExportScope)) {
-                        is ObjCNonNullReferenceType -> ObjCNullableReferenceType(it, isNullableResult = false)
-                        is ObjCNullableReferenceType -> ObjCNullableReferenceType(it.nonNullType, isNullableResult = true)
-                    }
+        genericExportScope: ObjCExportScope = createGenericExportScope(function)
+    ): ObjCType = when (bridge) {
+        is MethodBridgeParameter.ValueParameter.Mapped -> {
+            mapType(parameter!!.type, bridge.bridge.toKotlinVersion(), genericExportScope, isTypeSubstitutionEnabled)
+        }
+        MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
+            ObjCPointerType(ObjCNullableReferenceType(ObjCClassType("NSError")), nullable = true)
+        is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
+            val resultType = if (bridge.useUnitCompletion) {
+                null
+            } else {
+                when (val it =
+                    translator.mapReferenceType(function.returnType!!.substituteTypes(isTypeSubstitutionEnabled), genericExportScope)) {
+                    is ObjCNonNullReferenceType -> ObjCNullableReferenceType(it, isNullableResult = false)
+                    is ObjCNullableReferenceType -> ObjCNullableReferenceType(it.nonNullType, isNullableResult = true)
                 }
-                ObjCBlockPointerType(
-                    returnType = ObjCVoidType,
-                    parameterTypes = listOfNotNull(
-                        resultType,
-                        ObjCNullableReferenceType(ObjCClassType("NSError"))
-                    )
-                )
             }
+            ObjCBlockPointerType(
+                returnType = ObjCVoidType,
+                parameterTypes = listOfNotNull(
+                    resultType,
+                    ObjCNullableReferenceType(ObjCClassType("NSError"))
+                )
+            )
         }
     }
 
@@ -189,13 +186,6 @@ class ObjCTypeProvider(
             }
             is TypeProjection -> this
             else -> error("Unsupported type argument $this.")
-        }
-
-    private val KotlinType.isFlow: Boolean
-        get() {
-            val classDescriptor = constructor.declarationDescriptor as? ClassDescriptor ?: return false
-
-            return classDescriptor.fqNameSafe.asString() == "kotlinx.coroutines.flow.Flow"
         }
 }
 

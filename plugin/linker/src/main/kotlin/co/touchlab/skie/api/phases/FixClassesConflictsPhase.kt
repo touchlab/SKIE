@@ -1,4 +1,4 @@
-package co.touchlab.skie.api.apinotes.fixes
+package co.touchlab.skie.api.phases
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
@@ -11,10 +11,10 @@ import co.touchlab.skie.plugin.api.module.SkieModule
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 // TODO Currently does not take into account bridging and generated Swift code in general
-class ClassesConflictsApiNotesFix(
+class FixClassesConflictsPhase(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
-) {
+) : SkieLinkingPhase {
 
     private val reservedNames = listOf(
         "KotlinBase",
@@ -34,7 +34,7 @@ class ClassesConflictsApiNotesFix(
         "KotlinBoolean",
     )
 
-    fun fixNames() {
+    override fun execute() {
         skieModule.configure(SkieModule.Ordering.Last) {
             val allModels = descriptorProvider.exposedClasses.map { it.swiftModel } +
                 descriptorProvider.exposedFiles.map { it.swiftModel }

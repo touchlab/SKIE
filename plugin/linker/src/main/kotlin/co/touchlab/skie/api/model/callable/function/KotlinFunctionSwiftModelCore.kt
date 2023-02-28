@@ -33,7 +33,7 @@ internal class KotlinFunctionSwiftModelCore(
             bridgeProvider.bridgeMethod(descriptor)
         }
 
-    private val swiftFunctionName = run {
+    val swiftFunctionName: SwiftFunctionName = run {
         val swiftName = namer.getSwiftName(descriptor.original)
 
         val (identifier, argumentLabelsString) = swiftNameComponentsRegex.matchEntire(swiftName)?.destructured
@@ -89,7 +89,7 @@ internal class KotlinFunctionSwiftModelCore(
     fun getObjCReturnType(functionDescriptor: FunctionDescriptor): ObjCType? =
         if (descriptor !is ConstructorDescriptor) objCTypeProvider.getFunctionReturnType(descriptor, functionDescriptor) else null
 
-    private data class SwiftFunctionName(val identifier: String, val argumentLabels: List<String>)
+    data class SwiftFunctionName(val identifier: String, val argumentLabels: List<String>)
 
     private companion object {
 
