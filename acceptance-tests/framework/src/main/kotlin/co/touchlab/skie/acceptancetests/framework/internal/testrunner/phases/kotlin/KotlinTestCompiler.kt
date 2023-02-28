@@ -76,7 +76,7 @@ internal class KotlinTestCompiler(
         testLogger.appendSection("Kotlin compiler", output)
         return when (result) {
             ExitCode.OK -> IntermediateResult.Value(klibFile)
-            else -> IntermediateResult.Error(TestResult.SwiftCompilationError(output))
+            else -> IntermediateResult.Error(TestResult.KotlinCompilationError(output))
         }
     }
 }
