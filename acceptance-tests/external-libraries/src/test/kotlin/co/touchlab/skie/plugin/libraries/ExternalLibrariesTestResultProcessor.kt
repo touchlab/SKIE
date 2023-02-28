@@ -23,8 +23,8 @@ class ExternalLibrariesTestResultProcessor(
             }
         }
 
-        val failures = results.toList().filter { (_, result) ->
-            result.testResult !is TestResult.Success
+        val failures = results.toList().filter { (test, result) ->
+            !test.expectedResult.hasSucceeded(result)
         }
         // TODO: Generate "fake tests" for each library, so that we can see which ones failed in the test report.
         if (failures.isNotEmpty()) {
