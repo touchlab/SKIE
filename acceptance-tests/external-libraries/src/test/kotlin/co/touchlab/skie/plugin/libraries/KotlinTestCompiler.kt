@@ -79,7 +79,9 @@ internal class KotlinTestCompiler(
         testLogger.appendSection("Kotlin compiler", output)
         return when (result) {
             ExitCode.OK -> IntermediateResult.Value(klibFile)
-            else -> IntermediateResult.Error(TestResult.SwiftCompilationError(output))
+            /* FIXME: We're using `KotlinLinkingError` here, because we don't care whether the error is in compile or linking.
+             *    it's a workaround for expected results not supporting `or` combination. */
+            else -> IntermediateResult.Error(TestResult.KotlinLinkingError(output))
         }
     }
 }

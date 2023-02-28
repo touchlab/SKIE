@@ -56,6 +56,9 @@ org.jetbrains.compose.runtime:runtime-uikitarm64
 
 > e: Could not find "org.jetbrains.compose.runtime:runtime"
 com.adeo.libres:libres-compose-iosarm64
+io.github.skeptick.libres:libres-compose-iosarm64
+moe.tlaster:precompose-molecule-iosarm64
+org.kodein.di:kodein-di-framework-compose-iosarm64
 
 > error: duplicate definition of method '-[KotlinVerificationBuilder threwBlock:]'
 org.kodein.mock:mockmp-runtime-iosarm64
@@ -82,3 +85,24 @@ com.soywiz.korlibs.korma:korma-iosarm64
 > error: expected member name or ';' after declaration specifiers
 > @property (readonly) int32_t TRUE __attribute__((swift_name("TRUE")));
 com.soywiz.korlibs.luak:luak-iosarm64
+
+# K/N generates invalid header when a property name is `typeof`
+> error: expected '(' after 'typeof'
+> @property (class, readonly) KotlinAbcOpcode *typeof __attribute__((swift_name("typeof")));
+com.soywiz.korlibs.korge2:korge-swf-iosarm64
+
+# TODO: Verify this is K/N issue
+# K/N has trouble accessing something from UIKit, probably compiled against old Kotlin?
+> e: Module "dev.icerock.moko:widgets" has a reference to symbol platform.UIKit/UIButton.titleEdgeInsets.<set-titleEdgeInsets>
+dev.icerock.moko:widgets-iosarm64
+
+# TODO: Verify if we can do anything about it (and whether the comment below is true)
+# SKIE brings in newer version of coroutines than the one this library was compiled against
+> e: The symbol of unexpected type encountered during IR deserialization: IrTypeAliasPublicSymbolImpl, kotlinx.coroutines/CancellationException|null[0]. IrClassifierSymbol is expected.
+com.gu.kotlin:multiplatform-ophan-iosarm64
+io.github.tyczj:tweedle-iosarm64
+net.pearx.kpastebin:kpastebin-iosarm64
+
+# TODO: Verify if we can do anything about it
+> e: Could not find "Premo:premo"
+me.dmdev.premo:premo-navigation-iosarm64
