@@ -30,56 +30,58 @@ class ObjCTypeRenderer {
 
     val mappedProtocols: Set<String> by ::mutableMappedProtocols
 
-    fun render(type: ObjCType): String =
-        type.render("", false)
+    fun render(type: ObjCType, reservedIdentifiers: List<String>): String =
+        type.render("", false, reservedIdentifiers.toSet())
 
-    private fun ObjCType.render(attrsAndName: String, hasNullableAttribute: Boolean): String =
+    private fun ObjCType.render(attrsAndName: String, hasNullableAttribute: Boolean, reservedIdentifiers: Set<String>): String =
         when (this) {
             is ObjCPointerType -> {
                 val nullabilityAttribute = if (nullable) objcNullableAttribute else objcNonnullAttribute
 
-                pointee.render("* ${nullabilityAttribute.withAttrsAndName(attrsAndName)}", true)
+                pointee.render("* ${nullabilityAttribute.withAttrsAndName(attrsAndName)}", true, reservedIdentifiers)
             }
-            is ObjCPrimitiveType -> render().asTypeDef().withAttrsAndName(attrsAndName)
-            is ObjCRawType -> render().asTypeDef().withAttrsAndName(attrsAndName)
-            ObjCVoidType -> render().asTypeDef().withAttrsAndName(attrsAndName)
             is ObjCNullableReferenceType -> {
                 val attribute = if (isNullableResult) objcNullableResultAttribute else objcNullableAttribute
 
-                nonNullType.render(" $attribute".withAttrsAndName(attrsAndName), true)
+                nonNullType.render(" $attribute".withAttrsAndName(attrsAndName), true, reservedIdentifiers)
             }
             is ObjCBlockPointerType ->
                 returnType.render(buildString {
                     append("(^")
                     append(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
                     append(")(")
-                    if (parameterTypes.isEmpty()) append("void".asTypeDef())
-                    parameterTypes.joinTo(this) { it.render("", false) }
+                    if (parameterTypes.isEmpty()) append("void".asTypeDefIfNeeded(reservedIdentifiers))
+                    parameterTypes.joinTo(this) { it.render("", false, reservedIdentifiers) }
                     append(')')
-                }, false)
+                }, false, reservedIdentifiers)
             is ObjCProtocolType -> {
                 mutableMappedProtocols.add(protocolName)
 
-                render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+                render().asTypeDefIfNeeded(reservedIdentifiers)
+                    .withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             }
-            ObjCIdType -> render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             is ObjCGenericTypeUsage -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             is ObjCClassType -> {
                 mutableMappedClasses.add(className)
 
                 buildString {
-                    append(className.asTypeDef())
+                    append(className.asTypeDefIfNeeded(reservedIdentifiers))
                     if (typeArguments.isNotEmpty()) {
                         append("<")
-                        typeArguments.joinTo(this) { it.render("", true) }
+                        typeArguments.joinTo(this) { it.render("", true, reservedIdentifiers) }
                         append(">")
                     }
                     append(" *")
                     append(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
                 }
             }
-            ObjCInstanceType -> render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
-            ObjCMetaClassType -> render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+            is ObjCPrimitiveType, is ObjCRawType, ObjCVoidType -> {
+                render().asTypeDefIfNeeded(reservedIdentifiers).withAttrsAndName(attrsAndName)
+            }
+            ObjCIdType, ObjCInstanceType, ObjCMetaClassType -> {
+                render().asTypeDefIfNeeded(reservedIdentifiers)
+                    .withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+            }
         }
 
     private fun String.withAttrsAndName(attrsAndName: String) =
@@ -88,8 +90,12 @@ class ObjCTypeRenderer {
     private fun String.withPrependedExplicitNullability(hasNullableAttribute: Boolean) =
         if (hasNullableAttribute) this else "$objcNonnullAttribute $this"
 
-    private fun String.asTypeDef(): String =
-        typedefsMap.getOrPut(this) { "Skie__TypeDef__${typedefsMap.size}__" + this.toValidSwiftIdentifier() }
+    private fun String.asTypeDefIfNeeded(reservedIdentifiers: Set<String>): String =
+        if (this in reservedIdentifiers) {
+            typedefsMap.getOrPut(this) { "Skie__TypeDef__${typedefsMap.size}__" + this.toValidSwiftIdentifier() }
+        } else {
+            this
+        }
 
     private val objcNonnullAttribute = "_Nonnull"
 

@@ -58,14 +58,14 @@ internal class ApiNotesFactory(
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
-            resultType = this.objCReturnType?.let { objCTypeRenderer.render(it) } ?: "",
-            parameters = this.valueParameters.map { it.toApiNote() },
+            resultType = this.objCReturnType?.let { objCTypeRenderer.render(it, this.reservedIdentifierInApiNotes) } ?: "",
+            parameters = this.valueParameters.map { it.toApiNote(this) },
         )
 
-    private fun KotlinValueParameterSwiftModel.toApiNote(): ApiNotesParameter =
+    private fun KotlinValueParameterSwiftModel.toApiNote(owner: KotlinFunctionSwiftModel): ApiNotesParameter =
         ApiNotesParameter(
             position = this.position,
-            type = objCTypeRenderer.render(this.objCType),
+            type = objCTypeRenderer.render(this.objCType, owner.reservedIdentifierInApiNotes),
         )
 
     private fun KotlinRegularPropertySwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesProperty =
@@ -75,7 +75,7 @@ internal class ApiNotesFactory(
             swiftName = this.name,
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
-            type = objCTypeRenderer.render(this.objCType),
+            type = objCTypeRenderer.render(this.objCType, emptyList()),
         )
 
     private val SwiftModelVisibility.isHiddenOrReplaced: Boolean
@@ -90,3 +90,6 @@ internal class ApiNotesFactory(
             KotlinTypeSwiftModel.Kind.File -> ApiNotesTypeMemberKind.Class
         }
 }
+
+private val KotlinFunctionSwiftModel.reservedIdentifierInApiNotes: List<String>
+    get() = valueParameters.map { it.parameterName }
