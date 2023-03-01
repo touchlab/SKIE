@@ -152,9 +152,11 @@ class ObjCTypeProvider(
     }
 
     private fun KotlinType.substituteFlows(isFlowMappingEnabled: Boolean): KotlinType {
-        if (!isFlowMappingEnabled) return this
+        val supportedFlow = SupportedFlow.from(this)
 
-        val supportedFlow = SupportedFlow.from(this) ?: return this.withSubstitutedArgumentsForFlow()
+        if (!isFlowMappingEnabled || supportedFlow == null) {
+            return this.withSubstitutedArgumentsForFlow()
+        }
 
         return supportedFlow.createType(this)
     }
