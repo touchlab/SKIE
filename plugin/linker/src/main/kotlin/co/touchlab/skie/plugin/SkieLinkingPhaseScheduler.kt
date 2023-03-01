@@ -33,7 +33,7 @@ class SkieLinkingPhaseScheduler(
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
         SkieModuleConfigurationPhase(skieModule, swiftModelScope),
         ApiNotesGenerationPhase(swiftModelScope, objCTypeRenderer, context, framework),
-        AddForwardDeclarationsPhase(framework.kotlinHeader),
+        AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
         AddTypeDefPhase(framework.kotlinHeader, objCTypeRenderer),
     )
 

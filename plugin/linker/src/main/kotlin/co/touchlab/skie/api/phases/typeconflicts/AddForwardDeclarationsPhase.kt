@@ -5,13 +5,14 @@ import java.io.File
 
 class AddForwardDeclarationsPhase(
     headerFile: File,
+    private val objCTypeRenderer: ObjCTypeRenderer,
 ) : BaseHeaderInsertionPhase(headerFile) {
 
     private val classRegex = "^@interface ([^ <,]+(<[^>]*>)?).*".toRegex()
     private val protocolRegex = "^@protocol ([^ ,]+).*".toRegex()
 
-    private lateinit var classes: List<String>
-    private lateinit var protocols: List<String>
+    private lateinit var classes: Set<String>
+    private lateinit var protocols: Set<String>
 
     override val insertedContent: List<String>
         get() {
@@ -23,8 +24,11 @@ class AddForwardDeclarationsPhase(
         }
 
     override fun modifyHeaderContent(content: List<String>): List<String> {
-        classes = classRegex.parseDeclarations(content)
-        protocols = protocolRegex.parseDeclarations(content)
+        val classesFromHeader = classRegex.parseDeclarations(content)
+        val protocolsFromHeader = protocolRegex.parseDeclarations(content)
+
+        classes = (classesFromHeader + objCTypeRenderer.mappedClasses.filterExistingClasses(classesFromHeader)).toSet()
+        protocols = (protocolsFromHeader + objCTypeRenderer.mappedProtocols).toSet()
 
         return super.modifyHeaderContent(content)
     }
@@ -33,8 +37,14 @@ class AddForwardDeclarationsPhase(
         line.startsWith("NS_ASSUME_NONNULL_BEGIN")
 }
 
+private fun Collection<String>.filterExistingClasses(classes: List<String>): List<String> =
+    (this - classes.map { it.stripTypeParameters() }.toSet())
+
+private fun String.stripTypeParameters(): String =
+    substringBefore("<")
+
 private fun Regex.parseDeclarations(content: List<String>): List<String> =
-    content.mapNotNull { parseDeclaration(it) }.distinct()
+    content.mapNotNull { parseDeclaration(it) }
 
 private fun Regex.parseDeclaration(line: String): String? =
     matchEntire(line)?.groupValues?.get(1)
