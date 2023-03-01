@@ -3,10 +3,11 @@
 package co.touchlab.skie.api.model.factory
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
-import co.touchlab.skie.plugin.api.util.isFlow
+import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportTranslatorImplReflector
 import co.touchlab.skie.plugin.reflection.reflectors.mapper
@@ -34,11 +35,8 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
-import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.replaceArguments
@@ -48,18 +46,9 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCValueType as KotlinObjC
 
 class ObjCTypeProvider(
     private val descriptorProvider: DescriptorProvider,
+    private val swiftModelScope: SwiftModelScope,
     namer: ObjCExportNamer,
 ) {
-
-    private val skieFlowType: SimpleType =
-        descriptorProvider.exposedClasses
-            .single { it.fqNameSafe == FqName("co.touchlab.skie.runtime.coroutines.flow.SkieFlow") }
-            .defaultType
-
-    private val skieOptionalFlowType: SimpleType =
-        descriptorProvider.exposedClasses
-            .single { it.fqNameSafe == FqName("co.touchlab.skie.runtime.coroutines.flow.SkieOptionalFlow") }
-            .defaultType
 
     private val mapper = namer.mapper
 
@@ -71,11 +60,11 @@ class ObjCTypeProvider(
         function: FunctionDescriptor,
         parameter: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
-        isTypeSubstitutionEnabled: Boolean,
-        genericExportScope: ObjCExportScope = createGenericExportScope(function)
+        isFlowMappingEnabled: Boolean,
+        genericExportScope: ObjCExportScope = createGenericExportScope(function),
     ): ObjCType = when (bridge) {
         is MethodBridgeParameter.ValueParameter.Mapped -> {
-            mapType(parameter!!.type, bridge.bridge.toKotlinVersion(), genericExportScope, isTypeSubstitutionEnabled)
+            mapType(parameter!!.type, bridge.bridge.toKotlinVersion(), genericExportScope, isFlowMappingEnabled)
         }
         MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
             ObjCPointerType(ObjCNullableReferenceType(ObjCClassType("NSError")), nullable = true)
@@ -84,7 +73,7 @@ class ObjCTypeProvider(
                 null
             } else {
                 when (val it =
-                    translator.mapReferenceType(function.returnType!!.substituteTypes(isTypeSubstitutionEnabled), genericExportScope)) {
+                    translator.mapReferenceType(function.returnType!!.substituteFlows(isFlowMappingEnabled), genericExportScope)) {
                     is ObjCNonNullReferenceType -> ObjCNullableReferenceType(it, isNullableResult = false)
                     is ObjCNullableReferenceType -> ObjCNullableReferenceType(it.nonNullType, isNullableResult = true)
                 }
@@ -155,32 +144,38 @@ class ObjCTypeProvider(
         kotlinType: KotlinType,
         typeBridge: TypeBridge,
         objCExportScope: ObjCExportScope,
-        isTypeSubstitutionEnabled: Boolean,
+        isFlowMappingEnabled: Boolean,
     ): ObjCType {
-        val substitutedType = kotlinType.substituteTypes(isTypeSubstitutionEnabled)
+        val substitutedType = kotlinType.substituteFlows(isFlowMappingEnabled)
 
         return reflectedTranslator.mapType.invoke(substitutedType, typeBridge, objCExportScope)
     }
 
-    private fun KotlinType.substituteTypes(isTypeSubstitutionEnabled: Boolean): KotlinType =
-        if (!isTypeSubstitutionEnabled) {
-            this
-        } else if (isFlow) {
-            val substitutedArguments = arguments.map { it.substituteTypes() }
+    private fun KotlinType.substituteFlows(isFlowMappingEnabled: Boolean): KotlinType {
+        if (!isFlowMappingEnabled) return this
 
-            val hasNullableTypeArgument = arguments.any { it.type.isNullable() }
-            val substitute = if (hasNullableTypeArgument) skieOptionalFlowType else skieFlowType
+        val supportedFlow = SupportedFlow.from(this) ?: return this.withSubstitutedArgumentsForFlow()
 
-            KotlinTypeFactory.simpleType(substitute, arguments = substitutedArguments)
-                .makeNullableAsSpecified(isNullable())
-        } else {
-            replaceArguments { it.substituteTypes() } as KotlinType
-        }
+        return supportedFlow.createType(this)
+    }
 
-    private fun TypeArgumentMarker.substituteTypes(): TypeProjection =
+    private fun SupportedFlow.createType(originalType: KotlinType): KotlinType {
+        val substitutedArguments = originalType.arguments.map { it.substituteFlows() }
+
+        val hasNullableTypeArgument = originalType.arguments.any { it.type.isNullable() }
+        val substituteFqName = if (hasNullableTypeArgument) this.toOptionalFqName else this.toNonOptionalFqName
+        val substitute = swiftModelScope.referenceClass(substituteFqName).classDescriptor.defaultType
+
+        return KotlinTypeFactory.simpleType(substitute, arguments = substitutedArguments).makeNullableAsSpecified(originalType.isNullable())
+    }
+
+    private fun KotlinType.withSubstitutedArgumentsForFlow(): KotlinType =
+        replaceArguments { it.substituteFlows() } as KotlinType
+
+    private fun TypeArgumentMarker.substituteFlows(): TypeProjection =
         when (this) {
             is TypeProjectionImpl -> {
-                val substitutedType = type.substituteTypes(true)
+                val substitutedType = type.substituteFlows(true)
 
                 if (this.type != substitutedType) TypeProjectionImpl(projectionKind, substitutedType) else this
             }

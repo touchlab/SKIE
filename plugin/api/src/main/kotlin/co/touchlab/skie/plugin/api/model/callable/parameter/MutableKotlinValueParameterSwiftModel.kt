@@ -4,5 +4,5 @@ interface MutableKotlinValueParameterSwiftModel : KotlinValueParameterSwiftModel
 
     override var argumentLabel: String
 
-    override var isTypeSubstitutionEnabled: Boolean
+    override var isFlowMappingEnabled: Boolean
 }

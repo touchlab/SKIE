@@ -32,7 +32,6 @@ object CustomTypeMappers {
     private val predefined: Map<ClassId, CustomTypeMapper> = with(StandardNames.FqNames) {
         val result = mutableListOf<CustomTypeMapper>()
 
-        result += FlowMapper
         result += ListMapper
         result += Simple(ClassId.topLevel(mutableList), "NSMutableArray")
         result += SetMapper
@@ -62,10 +61,10 @@ object CustomTypeMappers {
         return false
     }
 
-    fun getMapper(descriptor: ClassDescriptor, isTypeSubstitutionEnabled: Boolean): CustomTypeMapper? {
+    fun getMapper(descriptor: ClassDescriptor): CustomTypeMapper? {
         val classId = descriptor.classId
 
-        predefined[classId]?.takeIf { !it.isTypeSubstitution || isTypeSubstitutionEnabled }?.let { return it }
+        predefined[classId]?.let { return it }
 
         if (descriptor.isMappedFunctionClass()) {
             // TODO: somewhat hacky, consider using FunctionClassDescriptor.arity later.
@@ -111,42 +110,6 @@ object CustomTypeMappers {
                     else -> "String"
                 }
             )
-        }
-    }
-
-    private object FlowMapper : CustomTypeMapper {
-
-        override val isTypeSubstitution: Boolean = true
-
-        override val mappedClassId: ClassId = ClassId.topLevel(FqName("kotlinx.coroutines.flow.Flow"))
-
-        context(SwiftModelScope)
-        override fun mapType(
-            mappedSuperType: KotlinType,
-            translator: SwiftTypeTranslator,
-            swiftExportScope: SwiftExportScope,
-        ): SwiftNonNullReferenceTypeModel {
-            return when {
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> {
-                    val typeArguments = mappedSuperType.arguments.map {
-                        translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope)
-                    }
-
-                    SwiftKotlinTypeClassTypeModel(builtIns.skieFlow, typeArguments)
-                }
-                else -> {
-                    val hasNullableTypeArgument = mappedSuperType.arguments.any { it.type.isNullable() }
-
-                    val skieFlow = if (hasNullableTypeArgument) builtIns.skieOptionalFlow else builtIns.skieFlow
-
-                    val skieFlowType = KotlinTypeFactory.simpleType(
-                        skieFlow.classDescriptor.defaultType,
-                        arguments = mappedSuperType.arguments,
-                    )
-
-                    translator.mapReferenceTypeIgnoringNullabilitySkippingPredefined(skieFlowType, swiftExportScope)
-                }
-            }
         }
     }
 

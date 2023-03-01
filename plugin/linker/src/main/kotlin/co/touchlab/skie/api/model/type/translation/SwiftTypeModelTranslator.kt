@@ -112,21 +112,28 @@ class SwiftTypeTranslator(
     internal fun mapReferenceType(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
-        isTypeSubstitutionEnabled: Boolean = true,
+        isFlowMappingEnabled: Boolean = true,
     ): SwiftReferenceTypeModel =
-        mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope, isTypeSubstitutionEnabled).withNullabilityOf(kotlinType)
+        mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope, isFlowMappingEnabled).withNullabilityOf(kotlinType)
 
     context(SwiftModelScope)
     internal fun mapReferenceTypeIgnoringNullability(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
-        isTypeSubstitutionEnabled: Boolean = true,
+        isFlowMappingEnabled: Boolean = true,
     ): SwiftNonNullReferenceTypeModel {
         class TypeMappingMatch(val type: KotlinType, val descriptor: ClassDescriptor, val mapper: CustomTypeMapper)
 
+        if (isFlowMappingEnabled) {
+            val flowMapper = FlowTypeMappers.getMapperOrNull(kotlinType)
+            if (flowMapper != null) {
+                return flowMapper.mapType(kotlinType, this, swiftExportScope)
+            }
+        }
+
         val typeMappingMatches = (listOf(kotlinType) + kotlinType.supertypes()).mapNotNull { type ->
             (type.constructor.declarationDescriptor as? ClassDescriptor)?.let { descriptor ->
-                CustomTypeMappers.getMapper(descriptor, isTypeSubstitutionEnabled)?.let { mapper ->
+                CustomTypeMappers.getMapper(descriptor)?.let { mapper ->
                     TypeMappingMatch(type, descriptor, mapper)
                 }
             }
@@ -314,9 +321,9 @@ class SwiftTypeTranslator(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         typeBridge: NativeTypeBridge,
-        isTypeSubstitutionEnabled: Boolean = true,
+        isFlowMappingEnabled: Boolean = true,
     ): SwiftTypeModel = when (typeBridge) {
-        NativeTypeBridge.Reference -> mapReferenceType(kotlinType, swiftExportScope, isTypeSubstitutionEnabled)
+        NativeTypeBridge.Reference -> mapReferenceType(kotlinType, swiftExportScope, isFlowMappingEnabled)
         is NativeTypeBridge.BlockPointer -> mapFunctionType(kotlinType, swiftExportScope, typeBridge)
         is NativeTypeBridge.ValueType -> when (typeBridge.objCValueType) {
             ObjCValueType.BOOL -> SwiftPrimitiveTypeModel.Bool

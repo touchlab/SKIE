@@ -20,9 +20,15 @@ import org.jetbrains.kotlin.backend.konan.objcexport.objcNullableResultAttribute
 class ObjCTypeRenderer {
 
     private val typedefsMap = mutableMapOf<String, String>()
+    private val mutableMappedClasses = mutableSetOf<String>()
+    private val mutableMappedProtocols = mutableSetOf<String>()
 
     val typedefs: List<Mapping>
         get() = typedefsMap.map { Mapping(it.key, it.value) }
+
+    val mappedClasses: Set<String> by ::mutableMappedClasses
+
+    val mappedProtocols: Set<String> by ::mutableMappedProtocols
 
     fun render(type: ObjCType): String =
         type.render("", false)
@@ -52,19 +58,25 @@ class ObjCTypeRenderer {
                     append(')')
                 }, false)
             is ObjCProtocolType -> {
+                mutableMappedProtocols.add(protocolName)
+
                 render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             }
             ObjCIdType -> render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             is ObjCGenericTypeUsage -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
-            is ObjCClassType -> buildString {
-                append(className.asTypeDef())
-                if (typeArguments.isNotEmpty()) {
-                    append("<")
-                    typeArguments.joinTo(this) { it.render("", true) }
-                    append(">")
+            is ObjCClassType -> {
+                mutableMappedClasses.add(className)
+
+                buildString {
+                    append(className.asTypeDef())
+                    if (typeArguments.isNotEmpty()) {
+                        append("<")
+                        typeArguments.joinTo(this) { it.render("", true) }
+                        append(">")
+                    }
+                    append(" *")
+                    append(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
                 }
-                append(" *")
-                append(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             }
             ObjCInstanceType -> render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             ObjCMetaClassType -> render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))

@@ -37,13 +37,13 @@ internal class ActualKotlinFunctionSwiftModel(
                 descriptor,
                 parameterDescriptor,
                 index,
-            ) { isTypeSubstitutionEnabled ->
+            ) { isFlowMappingEnabled ->
                 with(swiftModelScope) {
                     descriptor.getParameterType(
                         parameterDescriptor,
                         core.parameterBridge,
                         receiver.swiftGenericExportScope,
-                        isTypeSubstitutionEnabled,
+                        isFlowMappingEnabled,
                     )
                 }
             }

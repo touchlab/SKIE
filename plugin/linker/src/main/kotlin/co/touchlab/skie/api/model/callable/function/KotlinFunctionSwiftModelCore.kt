@@ -71,12 +71,12 @@ internal class KotlinFunctionSwiftModelCore(
                     parameterBridge = parameterBridgeWithDescriptor.first,
                     baseParameterDescriptor = parameterBridgeWithDescriptor.second,
                     allArgumentLabels = swiftFunctionName.argumentLabels,
-                    getObjCType = { functionDescriptor, parameterDescriptor, isTypeSubstitutionEnabled ->
+                    getObjCType = { functionDescriptor, parameterDescriptor, isFlowMappingEnabled ->
                         objCTypeProvider.getFunctionParameterType(
                             function = functionDescriptor,
                             parameter = parameterDescriptor,
                             bridge = parameterBridgeWithDescriptor.first,
-                            isTypeSubstitutionEnabled = isTypeSubstitutionEnabled,
+                            isFlowMappingEnabled = isFlowMappingEnabled,
                         )
                     }
                 ) to parameterBridgeWithDescriptor.second

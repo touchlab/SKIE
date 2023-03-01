@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
+import co.touchlab.skie.plugin.api.model.callable.isStatic
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
@@ -91,7 +92,9 @@ internal class KotlinSuspendGeneratorDelegate(
                 type = dispatchReceiver.type
             )
 
-            dispatchReceiverParameter.disableTypeSubstitution()
+            module.configure {
+                dispatchReceiverParameter.swiftModel.isFlowMappingEnabled = false
+            }
 
             this.add(dispatchReceiverParameter)
         }
@@ -109,15 +112,12 @@ internal class KotlinSuspendGeneratorDelegate(
                 type = extensionReceiver.type
             )
 
-            extensionReceiverParameter.disableTypeSubstitution()
+            module.configure {
+                extensionReceiverParameter.swiftModel.isFlowMappingEnabled =
+                    originalFunctionDescriptor.swiftModel.scope.isStatic || originalFunctionDescriptor.dispatchReceiverParameter != null
+            }
 
             this.add(extensionReceiverParameter)
-        }
-    }
-
-    private fun ValueParameterDescriptor.disableTypeSubstitution() {
-        module.configure {
-            this.swiftModel.isTypeSubstitutionEnabled = false
         }
     }
 

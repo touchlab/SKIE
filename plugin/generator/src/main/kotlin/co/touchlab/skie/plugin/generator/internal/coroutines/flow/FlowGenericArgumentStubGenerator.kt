@@ -4,7 +4,7 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.util.isFlow
+import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
@@ -91,7 +91,7 @@ private fun KotlinType.getAllFlowArgumentClasses(visitedTypes: Set<KotlinType> =
 
     val nextVisitedTypes = visitedTypes + this
 
-    return if (isFlow) {
+    return if (isSupportedFlow) {
         arguments.flatMap { it.type.getAllReferencedClasses(nextVisitedTypes) }
     } else {
         arguments.flatMap { it.type.getAllFlowArgumentClasses(nextVisitedTypes) }
@@ -107,3 +107,6 @@ private fun KotlinType.getAllReferencedClasses(visitedTypes: Set<KotlinType> = e
 
     return thisClass + arguments.flatMap { it.type.getAllReferencedClasses(nextVisitedTypes) }
 }
+
+private val KotlinType.isSupportedFlow: Boolean
+    get() = SupportedFlow.from(this) != null

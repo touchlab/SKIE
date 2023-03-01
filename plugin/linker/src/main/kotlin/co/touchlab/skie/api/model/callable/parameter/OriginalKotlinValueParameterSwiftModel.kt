@@ -8,7 +8,7 @@ class OriginalKotlinValueParameterSwiftModel(
 
     override val argumentLabel: String = delegate.argumentLabel
 
-    override val isTypeSubstitutionEnabled: Boolean = delegate.isTypeSubstitutionEnabled
+    override val isFlowMappingEnabled: Boolean = delegate.isFlowMappingEnabled
 
     override val isChanged: Boolean = false
 }

@@ -27,7 +27,7 @@ interface KotlinValueParameterSwiftModel {
 
     val position: Int
 
-    val isTypeSubstitutionEnabled: Boolean
+    val isFlowMappingEnabled: Boolean
 
     sealed interface Origin {
 

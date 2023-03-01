@@ -16,15 +16,15 @@ internal class KotlinParameterSwiftModelCore(
     val parameterBridge: MethodBridgeParameter.ValueParameter,
     baseParameterDescriptor: ParameterDescriptor?,
     allArgumentLabels: List<String>,
-    private val getObjCType: (FunctionDescriptor, ParameterDescriptor?, isTypeSubstitutionEnabled: Boolean) -> ObjCType,
+    private val getObjCType: (FunctionDescriptor, ParameterDescriptor?, isFlowMappingEnabled: Boolean) -> ObjCType,
 ) {
 
     fun getObjCType(
         functionDescriptor: FunctionDescriptor,
         parameterDescriptor: ParameterDescriptor?,
-        isTypeSubstitutionEnabled: Boolean,
+        isFlowMappingEnabled: Boolean,
     ): ObjCType =
-        this.getObjCType.invoke(functionDescriptor, parameterDescriptor, isTypeSubstitutionEnabled)
+        this.getObjCType.invoke(functionDescriptor, parameterDescriptor, isFlowMappingEnabled)
 
     fun getOrigin(parameterDescriptor: ParameterDescriptor?): Origin = when (parameterBridge) {
         is MethodBridgeParameter.ValueParameter.Mapped -> {

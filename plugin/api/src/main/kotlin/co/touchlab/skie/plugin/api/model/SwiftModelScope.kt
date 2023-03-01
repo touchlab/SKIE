@@ -22,11 +22,11 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface SwiftModelScope {
 
-    val builtIns: SwiftModelBuiltIns
-
     val exposedClasses: List<KotlinClassSwiftModel>
 
     val exposedFiles: List<KotlinTypeSwiftModel>
+
+    fun referenceClass(classFqName: String): KotlinClassSwiftModel
 
     val CallableMemberDescriptor.swiftModel: KotlinCallableMemberSwiftModel
 
@@ -67,6 +67,6 @@ interface SwiftModelScope {
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
-        isTypeSubstitutionEnabled: Boolean,
+        isFlowMappingEnabled: Boolean,
     ): SwiftTypeModel
 }

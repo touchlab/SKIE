@@ -16,6 +16,7 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValuePa
 import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
@@ -40,6 +41,8 @@ import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 class DefaultSwiftModelScope(
     private val namer: ObjCExportNamer,
@@ -66,9 +69,12 @@ class DefaultSwiftModelScope(
     private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.exposedClasses)
     private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
 
-    override val builtIns: SwiftModelBuiltIns by lazy {
-        DefaultSwiftModelBuiltIns(this)
-    }
+    private val classByFqNameCache = mutableMapOf<String, KotlinClassSwiftModel>()
+
+    override fun referenceClass(classFqName: String): KotlinClassSwiftModel =
+        classByFqNameCache.getOrPut(classFqName) {
+            classSwiftModels.values.single { it.classDescriptor.fqNameSafe == FqName(classFqName) }
+        }
 
     override val exposedClasses: List<MutableKotlinClassSwiftModel> =
         descriptorProvider.exposedClasses.map { it.swiftModel }
@@ -164,11 +170,11 @@ class DefaultSwiftModelScope(
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
-        isTypeSubstitutionEnabled: Boolean,
+        isFlowMappingEnabled: Boolean,
     ): SwiftTypeModel {
         val exportScope = SwiftExportScope(genericExportScope, SwiftExportScope.Flags.Escaping)
         return when (bridge) {
-            is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge, isTypeSubstitutionEnabled)
+            is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge, isFlowMappingEnabled)
             MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
                 SwiftPointerTypeModel(SwiftNullableReferenceTypeModel(SwiftClassTypeModel("Error")), nullable = true)
             is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
@@ -178,7 +184,7 @@ class DefaultSwiftModelScope(
                     when (val it = translator.mapReferenceType(
                         returnType!!,
                         exportScope.removingFlags(SwiftExportScope.Flags.Escaping),
-                        isTypeSubstitutionEnabled
+                        isFlowMappingEnabled
                     )) {
                         is SwiftNonNullReferenceTypeModel -> SwiftNullableReferenceTypeModel(it, isNullableResult = false)
                         is SwiftNullableReferenceTypeModel -> SwiftNullableReferenceTypeModel(it.nonNullType, isNullableResult = true)

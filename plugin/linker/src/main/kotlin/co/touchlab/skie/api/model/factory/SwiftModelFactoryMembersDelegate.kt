@@ -40,7 +40,7 @@ class SwiftModelFactoryMembersDelegate(
 
     private val exposedClassChildrenCache = ExposedClassChildrenCache(descriptorProvider)
 
-    private val objCTypeProvider = ObjCTypeProvider(descriptorProvider, namer)
+    private val objCTypeProvider = ObjCTypeProvider(descriptorProvider, swiftModelScope, namer)
 
     fun createMembers(descriptors: List<CallableMemberDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> {
         val disjointSet = MultiRootDisjointSet(::getDirectParents)

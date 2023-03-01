@@ -51,3 +51,9 @@ interface KotlinCallableMemberSwiftModel {
         Static, Member
     }
 }
+
+val KotlinCallableMemberSwiftModel.Scope.isStatic: Boolean
+    get() = this == KotlinCallableMemberSwiftModel.Scope.Static
+
+val KotlinCallableMemberSwiftModel.Scope.isMember: Boolean
+    get() = this == KotlinCallableMemberSwiftModel.Scope.Member

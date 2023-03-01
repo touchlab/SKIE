@@ -13,7 +13,7 @@ internal class ActualKotlinValueParameterSwiftModel(
     private val functionDescriptor: FunctionDescriptor,
     private val parameterDescriptor: ParameterDescriptor?,
     override val position: Int,
-    private val getParameterType: (isTypeSubstitutionEnabled: Boolean) -> TypeSwiftModel,
+    private val getParameterType: (isFlowMappingEnabled: Boolean) -> TypeSwiftModel,
 ) : MutableKotlinValueParameterSwiftModel {
 
     override val origin: Origin = core.getOrigin(parameterDescriptor)
@@ -25,15 +25,15 @@ internal class ActualKotlinValueParameterSwiftModel(
     override val original: KotlinValueParameterSwiftModel = OriginalKotlinValueParameterSwiftModel(this)
 
     override val isChanged: Boolean
-        get() = argumentLabel != original.argumentLabel || isTypeSubstitutionEnabled != original.isTypeSubstitutionEnabled
+        get() = argumentLabel != original.argumentLabel || isFlowMappingEnabled != original.isFlowMappingEnabled
 
     override val type: TypeSwiftModel
-        get() = getParameterType(isTypeSubstitutionEnabled)
+        get() = getParameterType(isFlowMappingEnabled)
 
     override val objCType: ObjCType
-        get() = core.getObjCType(functionDescriptor, parameterDescriptor, isTypeSubstitutionEnabled)
+        get() = core.getObjCType(functionDescriptor, parameterDescriptor, isFlowMappingEnabled)
 
-    override var isTypeSubstitutionEnabled: Boolean = true
+    override var isFlowMappingEnabled: Boolean = true
 
     override fun toString(): String = origin.toString()
 }
