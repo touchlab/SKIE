@@ -91,7 +91,7 @@ class ObjCTypeRenderer {
         if (hasNullableAttribute) this else "$objcNonnullAttribute $this"
 
     private fun String.asTypeDefIfNeeded(reservedIdentifiers: Set<String>): String =
-        if (this in reservedIdentifiers) {
+        if (this.substringBefore("<") in reservedIdentifiers) {
             typedefsMap.getOrPut(this) { "Skie__TypeDef__${typedefsMap.size}__" + this.toValidSwiftIdentifier() }
         } else {
             this
