@@ -29,7 +29,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ':acceptance-tests:external-libraries:comparePureAndSkie'
+          arguments: ':acceptance-tests:external-libraries:comparePureAndSkie --continue'
         env:
           onlyIndices: ${{ github.event.inputs.onlyIndices }}
       - name: Publish Test Report
@@ -40,7 +40,7 @@ jobs:
           report_paths: 'acceptance-tests/external-libraries/build/test-results/comparePureAndSkie/TEST-*.xml'
           require_tests: true
           include_passed: true
+          commit: ${{ github.sha }}
           update_check: true
-#          annotate_only: true
+          annotate_only: true
           detailed_summary: true
-          annotate_notice: true

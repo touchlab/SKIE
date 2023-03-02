@@ -18,10 +18,29 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
+class GitHubSummary(
+    private val summaryFile: File?,
+) {
+    fun appendLine(message: String) {
+        summaryFile?.appendText(message + "\n")
+        println(message)
+    }
+
+    companion object {
+        fun createIfAvailable(): GitHubSummary {
+            return System.getenv("GITHUB_STEP_SUMMARY")
+                ?.let(::File)
+                ?.takeIf { it.exists() }
+                .let(::GitHubSummary)
+        }
+    }
+}
+
 class CompareResultsTest: FunSpec({
     val onlyIndices = System.getenv("onlyIndices")?.split(",")?.map { it.toInt() }?.toSet()
     val pureDir = File(System.getProperty("pureTestDir"))
     val skieDir = File(System.getProperty("skieTestDir"))
+    val summary = GitHubSummary.createIfAvailable()
 
     val pureLibraries = pureDir.listFiles().orEmpty()
         .filter { onlyIndices == null || it.name.substringBefore('-').toInt() in onlyIndices }
@@ -90,27 +109,29 @@ class CompareResultsTest: FunSpec({
         } to libraries.fold(Duration.ZERO) { accumulator, comparison ->
             accumulator + comparison.skie.duration
         }
-        println("Total pure time: ${totalPureTime.toString(DurationUnit.SECONDS, decimals = 2)}")
-        println("Total SKIE time: ${totalSkieTime.toString(DurationUnit.SECONDS, decimals = 2)}")
-        println("Total difference: ${differenceInSeconds(totalSkieTime, totalPureTime)}")
+        summary.appendLine("### Stats")
+        summary.appendLine("- Total pure time: ${totalPureTime.toString(DurationUnit.SECONDS, decimals = 2)}")
+        summary.appendLine("- Total SKIE time: ${totalSkieTime.toString(DurationUnit.SECONDS, decimals = 2)}")
+        summary.appendLine("- Total difference: ${differenceInSeconds(totalSkieTime, totalPureTime)}")
 
         val relativeDifference = ((totalSkieTime - totalPureTime) / totalPureTime).times(100).roundToInt()
-        println("Relative difference: $relativeDifference%")
+        summary.appendLine("- Relative difference: **$relativeDifference%**")
+        summary.appendLine("")
     }
 
-    val (pureFails, skieFails) = libraries.fold(0 to 0) { (pureFails, skieFails), comparison ->
-        val (_, pure, skie) = comparison
-        when {
-            pure.result == skie.result -> pureFails to skieFails
-            pure.result == Comparison.Result.Failure -> pureFails + 1 to skieFails
-            skie.result == Comparison.Result.Failure -> pureFails to skieFails + 1
-            else -> pureFails to skieFails
-        }
-    }
+    val (pureFails, skieFails) = libraries
+        .filter { it.pure.result == it.skie.result }
+        .partition { it.skie.result == Comparison.Result.Success }
 
     test("Failures") {
-        println("Pure-only failures: $pureFails")
-        println("SKIE-only failures: $skieFails")
+        summary.appendLine("### Pure-only failures (${pureFails.size}):")
+        pureFails.forEach { comparison ->
+            summary.appendLine("- ${comparison.library}")
+        }
+        summary.appendLine("### SKIE-only failures (${skieFails.size}):")
+        skieFails.forEach { comparison ->
+            summary.appendLine("- ${comparison.library}")
+        }
     }
 })
 
