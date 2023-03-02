@@ -37,5 +37,8 @@ jobs:
         if: always()
         with:
           check_name: "Comparison Report"
-          report_paths: 'acceptance-tests/external-libraries/build/test-results/*/TEST-*.xml'
+          report_paths: 'acceptance-tests/external-libraries/build/test-results/comparePureAndSkie/TEST-*.xml'
           require_tests: true
+          include_passed: true
+          annotate_only: true
+          detailed_summary: true
