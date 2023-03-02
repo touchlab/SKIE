@@ -316,7 +316,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8UD86646U9;
+				DEVELOPMENT_TEAM = 92429JCQ4Z;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORKS_FOLDER_PATH = Frameworks;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -329,9 +329,11 @@
 					"@loader_path/../Frameworks",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Kotlin,
+					"-dead_strip",
 				);
 				OTHER_SWIFT_FLAGS = "-parse-as-library";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -345,7 +347,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8UD86646U9;
+				DEVELOPMENT_TEAM = 92429JCQ4Z;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORKS_FOLDER_PATH = Frameworks;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -358,9 +360,11 @@
 					"@loader_path/../Frameworks",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Kotlin,
+					"-dead_strip",
 				);
 				OTHER_SWIFT_FLAGS = "-parse-as-library";
 				PRODUCT_NAME = "$(TARGET_NAME)";
