@@ -16,6 +16,10 @@ skie {
             ExperimentalFeatures.Enabled(true)
         }
     }
+
+    debug {
+        dumpSwiftApiAt.addAll(BeforeApiNotes, AfterApiNotes)
+    }
 }
 
 kotlin {

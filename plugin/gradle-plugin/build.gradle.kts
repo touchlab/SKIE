@@ -38,7 +38,6 @@ dependencies {
     implementation(projects.generator.configurationGradle)
     implementation(projects.kotlinPlugin.options)
 
-    testImplementation("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.7.20")
     testImplementation(gradleApi())
     testImplementation(gradleKotlinDsl())
     testImplementation(gradleTestKit())

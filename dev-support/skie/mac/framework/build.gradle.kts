@@ -17,6 +17,9 @@ skie {
             ExperimentalFeatures.Enabled(true)
         }
     }
+    debug {
+        dumpSwiftApiAt.addAll(BeforeApiNotes, AfterApiNotes)
+    }
 }
 
 kotlin {
@@ -74,21 +77,6 @@ configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("co.touchlab.skie:skie-kotlin-plugin")).using(module("co.touchlab.skie:kotlin-plugin:${version}"))
         substitute(module("co.touchlab.skie:skie-runtime-kotlin")).using(module("co.touchlab.skie:kotlin:${version}"))
-    }
-}
-
-tasks.withType<KotlinNativeLink>().configureEach {
-    doLast {
-        val frameworkDirectory = outputs.files.toList().first()
-        val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
-
-        exec {
-            commandLine(
-                "zsh",
-                "-c",
-                "echo \"import Kotlin\\n:type lookup Kotlin\" | swift repl -F \"${frameworkDirectory.absolutePath}\" > \"${apiFile.absolutePath}\"",
-            )
-        }
     }
 }
 

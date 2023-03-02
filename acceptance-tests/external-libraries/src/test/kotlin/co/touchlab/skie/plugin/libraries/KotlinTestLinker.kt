@@ -11,6 +11,8 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.external_libraries.BuildConfig
 import co.touchlab.skie.plugin.ConfigurationKeys
 import co.touchlab.skie.plugin.SkieComponentRegistrar
+import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
+import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
@@ -48,7 +50,8 @@ internal class KotlinTestLinker(
 
         PluginRegistrar.configure.set {
             put(ConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
-            put(ConfigurationKeys.swiftLinkLogFile, tempFileSystem.createFile("swiftlink.log").toFile())
+            put(ConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
+            put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.values().toSet())
             put(co.touchlab.skie.plugin.generator.ConfigurationKeys.swiftGenConfiguration, configuration)
         }
 

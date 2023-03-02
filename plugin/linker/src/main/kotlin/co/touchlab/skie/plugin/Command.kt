@@ -33,7 +33,7 @@ open class Command(initialCommand: List<String>) {
     val args: List<String>
         get() = command.drop(1)
 
-    var workingDirectory: java.io.File? = null
+    var workingDirectory: File? = null
 
     operator fun String.unaryPlus(): Command {
         command += this
@@ -47,57 +47,46 @@ open class Command(initialCommand: List<String>) {
 
     var logger: ((() -> String) -> Unit)? = null
 
-    private var stdError: List<String> = emptyList()
-
     fun logWith(newLogger: ((() -> String) -> Unit)): Command {
         logger = newLogger
         return this
     }
 
-    open fun runProcess(): Int {
-        stdError = emptyList()
-        val builder = ProcessBuilder(command)
-
-        builder.directory(workingDirectory)
-        builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        builder.redirectInput(ProcessBuilder.Redirect.INHERIT)
-
-        val process = builder.start()
-
-        val reader = BufferedReader(InputStreamReader(process.errorStream))
-        stdError = reader.readLines()
-
-        val exitCode = process.waitFor()
-        return exitCode
-    }
-
-    fun execute(withErrors: Boolean = true, handleError: Boolean = true, logFile: File? = null): Result {
+    fun execute(
+        withErrors: Boolean = true,
+        handleError: Boolean = true,
+        logFile: File? = null,
+    ): Result {
         log()
 
-        val outputFile = logFile ?: Files.createTempFile(null, null).toFile().also { it.deleteOnExit() }
-        outputFile.appendText(command.joinToString(" ", postfix = "\n\n\n"))
+        // Note: getting process output could be done without redirecting to temporary file,
+        // however this would require managing a thread to read `process.inputStream` because
+        // it may have limited capacity.
+        val tempOutputFile = Files.createTempFile(null, null).toFile().also { it.deleteOnExit() }
+        logFile?.apply {
+            // FIXME: This doesn't put quotes around arguments with spaces
+            appendText(command.joinToString(" ", postfix = "\n\n\n"))
+        }
 
         try {
             val builder = ProcessBuilder(command)
-
-            builder.directory(workingDirectory)
-            builder.redirectInput(ProcessBuilder.Redirect.INHERIT)
-            builder.redirectError(ProcessBuilder.Redirect.INHERIT)
-            builder.redirectOutput(ProcessBuilder.Redirect.to(outputFile))
+                .directory(workingDirectory)
+                .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                .redirectError(ProcessBuilder.Redirect.INHERIT)
+                .redirectOutput(ProcessBuilder.Redirect.appendTo(tempOutputFile))
                 .redirectErrorStream(withErrors)
-            // Note: getting process output could be done without redirecting to temporary file,
-            // however this would require managing a thread to read `process.inputStream` because
-            // it may have limited capacity.
-
             val process = builder.start()
             val code = process.waitFor()
-            if (handleError) handleExitCode(code, outputFile.readLines())
+            val result = tempOutputFile.readLines()
 
-            return Result(code, outputFile.readLines())
-        } finally {
-            if (logFile == null) {
-                outputFile.delete()
+            if (handleError) {
+                handleExitCode(code, result)
             }
+
+            return Result(code, result)
+        } finally {
+            logFile?.apply { appendText(tempOutputFile.readText()) }
+            tempOutputFile.delete()
         }
     }
 
@@ -110,12 +99,6 @@ open class Command(initialCommand: List<String>) {
             output:
             """.trimIndent() + "\n${output.joinToString("\n")}", command[0]
         )
-        // Show warnings in case of success linkage.
-        if (stdError.isNotEmpty()) {
-            stdError.joinToString("\n").also { message ->
-                logger?.let { it { message } } ?: println(message)
-            }
-        }
     }
 
     private fun log() {

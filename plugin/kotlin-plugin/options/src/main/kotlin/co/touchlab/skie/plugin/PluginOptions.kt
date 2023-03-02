@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin
 
 import java.io.File
+import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 
 object SkiePlugin {
 
@@ -43,13 +44,28 @@ object SkiePlugin {
             deserialize = ::File,
         )
 
-        val swiftLinkLogFile = PluginOption(
-            optionName = "swiftLinkLogFile",
-            valueDescription = "<absolute path>",
-            description = "Path to log file for Swift compiler.",
-            isRequired = true,
-            serialize = File::getAbsolutePath,
-            deserialize = ::File,
-        )
+        object Debug {
+            val infoDirectory = PluginOption(
+                optionName = "debugInfoDirectory",
+                valueDescription = "<absolute path>",
+                description = "Path where logs and other debug outputs will be stored",
+                isRequired = true,
+                serialize = File::getAbsolutePath,
+                deserialize = ::File,
+            )
+
+            val dumpSwiftApiAt = PluginOption(
+                optionName = "debugDumpSwiftApiAt",
+                valueDescription = "BeforeApiNotes|AfterApiNotes",
+                description = "Where to dump Swift API",
+                isRequired = false,
+                allowMultipleOccurrences = true,
+                serialize = { it.name },
+                deserialize = { value ->
+                    DumpSwiftApiPoint.values().find { it.name.equals(value, ignoreCase = true) } ?: error("Invalid Swift API dump point ${value}")
+                }
+            )
+        }
+
     }
 }

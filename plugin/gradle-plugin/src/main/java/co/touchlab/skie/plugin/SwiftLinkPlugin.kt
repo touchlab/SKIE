@@ -131,10 +131,16 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         )
 
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.swiftLinkLogFile.subpluginOption(
-                                layout.buildDirectory.file("${BuildConfig.KOTLIN_PLUGIN_ID}/${framework.name}/${framework.target.targetName}/swiftlink.log").get().asFile
+                            SkiePlugin.id, SkiePlugin.Options.Debug.infoDirectory.subpluginOption(
+                                layout.buildDirectory.file("${BuildConfig.KOTLIN_PLUGIN_ID}/${framework.name}/${framework.target.targetName}").get().asFile
                             )
                         )
+
+                        extension.debug.dumpSwiftApiAt.get().forEach {
+                            linkTask.compilerPluginOptions.addPluginArgument(
+                                SkiePlugin.id, SkiePlugin.Options.Debug.dumpSwiftApiAt.subpluginOption(it)
+                            )
+                        }
 
                         swiftSources.forEach { swiftFile ->
                             linkTask.compilerPluginOptions.addPluginArgument(

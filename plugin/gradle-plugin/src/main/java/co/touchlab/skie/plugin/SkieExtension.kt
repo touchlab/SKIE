@@ -2,11 +2,15 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.builder.ConfigurationBuilder
+import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.setProperty
 import javax.inject.Inject
 
 open class SkieExtension @Inject constructor(objects: ObjectFactory) {
@@ -33,6 +37,20 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         action.execute(features)
     }
 
+    @get:Nested
+    val debug: DebugConfiguration = objects.newInstance(DebugConfiguration::class.java)
+
+    fun debug(action: Action<in DebugConfiguration>) {
+        action.execute(debug)
+    }
+
     val DependencyHandlerScope.skiePlugin: String
         get() = SKIE_PLUGIN_CONFIGURATION_NAME
+
+    open class DebugConfiguration @Inject constructor(objects: ObjectFactory)  {
+        val dumpSwiftApiAt: SetProperty<DumpSwiftApiPoint> = objects.setProperty<DumpSwiftApiPoint>().convention(emptySet())
+
+        val BeforeApiNotes = DumpSwiftApiPoint.BeforeApiNotes
+        val AfterApiNotes = DumpSwiftApiPoint.AfterApiNotes
+    }
 }

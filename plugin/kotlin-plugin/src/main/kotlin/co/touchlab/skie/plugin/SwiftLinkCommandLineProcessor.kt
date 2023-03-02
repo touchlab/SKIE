@@ -2,10 +2,12 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.SkiePlugin.Options
+import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.util.toCliOption
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import co.touchlab.skie.plugin.generator.ConfigurationKeys as SwiftGenConfigurationKeys
 
 class SwiftLinkCommandLineProcessor : CommandLineProcessor {
@@ -17,7 +19,8 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         Options.generatedSwiftDir,
         Options.disableWildcardExport,
         Options.swiftGenConfigPath,
-        Options.swiftLinkLogFile,
+        Options.Debug.infoDirectory,
+        Options.Debug.dumpSwiftApiAt,
     )
     private val optionsMap = options.associateBy { it.optionName }
     override val pluginOptions: Collection<AbstractCliOption> = options.map { it.toCliOption() }
@@ -45,9 +48,21 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
                 configuration.put(SwiftGenConfigurationKeys.swiftGenConfiguration, swiftGenConfiguration)
             }
 
-            Options.swiftLinkLogFile -> {
-                configuration.putIfNotNull(ConfigurationKeys.swiftLinkLogFile, Options.swiftLinkLogFile.deserialize(value))
+            Options.Debug.infoDirectory -> {
+                configuration.putIfNotNull(
+                    ConfigurationKeys.Debug.infoDirectory,
+                    DebugInfoDirectory(Options.Debug.infoDirectory.deserialize(value)),
+                )
+            }
+
+            Options.Debug.dumpSwiftApiAt -> {
+                configuration.addToSet(ConfigurationKeys.Debug.dumpSwiftApiPoints, Options.Debug.dumpSwiftApiAt.deserialize(value))
             }
         }
+    }
+
+    private fun <T> CompilerConfiguration.addToSet(option: CompilerConfigurationKey<Set<T>>, values: T) {
+        val paths = get(option) ?: emptySet()
+        put(option, paths + values)
     }
 }

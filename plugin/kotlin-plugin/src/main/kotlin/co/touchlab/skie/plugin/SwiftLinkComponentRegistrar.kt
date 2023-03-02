@@ -21,9 +21,10 @@ class SkieComponentRegistrar: CompilerPluginRegistrar() {
                 module = DefaultSkieModule(),
                 swiftSourceFiles = configuration.getList(ConfigurationKeys.swiftSourceFiles),
                 expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.generatedSwiftDir),
-                swiftLinkLogFile = configuration.getNotNull(ConfigurationKeys.swiftLinkLogFile),
+                debugInfoDirectory = configuration.getNotNull(ConfigurationKeys.Debug.infoDirectory),
                 frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
                 disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
+                dumpSwiftApiPoints = configuration.get(ConfigurationKeys.Debug.dumpSwiftApiPoints) ?: emptySet(),
             )
         )
 

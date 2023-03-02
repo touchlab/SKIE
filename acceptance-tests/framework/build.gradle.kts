@@ -29,5 +29,6 @@ dependencies {
 
     implementation("co.touchlab.skie:configuration-api")
     implementation("co.touchlab.skie:generator")
+    implementation("co.touchlab.skie:api")
     implementation("co.touchlab.skie:kotlin-plugin")
 }

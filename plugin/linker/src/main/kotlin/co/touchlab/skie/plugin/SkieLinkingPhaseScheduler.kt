@@ -6,11 +6,13 @@ import co.touchlab.skie.api.phases.FixClassesConflictsPhase
 import co.touchlab.skie.api.phases.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.api.phases.FixNestedBridgedTypesPhase
 import co.touchlab.skie.api.phases.SkieModuleConfigurationPhase
+import co.touchlab.skie.api.phases.debug.DumpSwiftApiPhase
 import co.touchlab.skie.api.phases.memberconflicts.FixCallableMembersConflictsPhase
 import co.touchlab.skie.api.phases.memberconflicts.RemoveKonanManglingPhase
 import co.touchlab.skie.api.phases.typeconflicts.AddForwardDeclarationsPhase
 import co.touchlab.skie.api.phases.typeconflicts.AddTypeDefPhase
 import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
+import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
@@ -26,6 +28,7 @@ class SkieLinkingPhaseScheduler(
     private val objCTypeRenderer = ObjCTypeRenderer()
 
     private val linkingPhases = listOf(
+        DumpSwiftApiPhase(DumpSwiftApiPoint.BeforeApiNotes, context, framework),
         RemoveKonanManglingPhase(skieModule, context.descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, context.descriptorProvider),
         FixClassesConflictsPhase(skieModule, context.descriptorProvider),
@@ -35,11 +38,14 @@ class SkieLinkingPhaseScheduler(
         ApiNotesGenerationPhase(swiftModelScope, objCTypeRenderer, context, framework),
         AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
         AddTypeDefPhase(framework.kotlinHeader, objCTypeRenderer),
+        DumpSwiftApiPhase(DumpSwiftApiPoint.AfterApiNotes, context, framework),
     )
 
     fun runLinkingPhases() {
-        linkingPhases.forEach {
-            it.execute()
-        }
+        linkingPhases
+            .filter { it.isActive }
+            .forEach {
+                it.execute()
+            }
     }
 }
