@@ -16,6 +16,12 @@ skieJvm {
     areContextReceiversEnabled.set(true)
 }
 
+val compareTestsSourceSet = sourceSets.create("compareTests") {
+    java.srcDir("src/compareTests/java")
+    kotlin.srcDir("src/compareTests/kotlin")
+    resources.srcDir("src/compareTests/resources")
+}
+
 val acceptanceTestDependencies: Configuration = configurations.create("acceptanceTestDependencies") {
     isCanBeConsumed = false
     isCanBeResolved = true
@@ -32,6 +38,8 @@ val acceptanceTestDependencies: Configuration = configurations.create("acceptanc
     }
 }
 
+val compareTestsImplementation by configurations.getting
+
 dependencies {
     testImplementation(projects.acceptanceTests.framework)
     testImplementation("co.touchlab.skie:configuration-annotations")
@@ -44,6 +52,9 @@ dependencies {
     testImplementation("co.touchlab.skie:kotlin-plugin")
     testImplementation("co.touchlab.skie:api")
     testImplementation("co.touchlab.skie:spi")
+
+    compareTestsImplementation(libs.bundles.testing.jvm)
+    compareTestsImplementation(projects.acceptanceTests.framework)
 
     // Workaround for these dependencies not being built before running tests
     acceptanceTestDependencies("co.touchlab.skie:configuration-annotations")
@@ -125,11 +136,19 @@ val prepareTestClasspaths = tasks.register("prepareTestClasspaths") {
     }
 }
 
-tasks.test {
+fun Test.configureExternalLibraryTest(isSkieEnabled: Boolean) {
     dependsOn(acceptanceTestDependencies.buildDependencies)
     dependsOn(prepareTestClasspaths)
 
-    systemProperty("testTmpDir", layout.buildDirectory.dir("external-libraries-tests").get().asFile.absolutePath)
+    val dirSuffix = if (isSkieEnabled) {
+        ""
+    } else {
+        "-no-skie"
+    }
+    if (!isSkieEnabled) {
+        systemProperty("disableSkie", "")
+    }
+    systemProperty("testTmpDir", layout.buildDirectory.dir("external-libraries-tests${dirSuffix}").get().asFile.absolutePath)
 
     maxHeapSize = "12g"
 
@@ -138,6 +157,36 @@ tasks.test {
     }
 }
 
+tasks.test {
+    configureExternalLibraryTest(isSkieEnabled = true)
+}
+
+val pureTest = task<Test>("pureTest") {
+    description = "Runs library tests without SKIE"
+    group = "verification"
+
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+
+    useJUnitPlatform()
+
+    configureExternalLibraryTest(isSkieEnabled = false)
+}
+
+task<Test>("comparePureAndSkie") {
+    dependsOn(tasks.test, pureTest)
+
+    systemProperty("pureTestDir", layout.buildDirectory.dir("external-libraries-tests-no-skie").get().asFile.absolutePath)
+    systemProperty("skieTestDir", layout.buildDirectory.dir("external-libraries-tests").get().asFile.absolutePath)
+
+    description = "Compares library tests with and without SKIE"
+    group = "verification"
+
+    testClassesDirs = compareTestsSourceSet.output.classesDirs
+    classpath = compareTestsSourceSet.runtimeClasspath
+
+    useJUnitPlatform()
+}
 
 buildConfig {
     fun Collection<File>.toListString(): String =

@@ -1,0 +1,41 @@
+name: Compare Pure and SKIE
+
+on:
+  workflow_dispatch:
+    inputs:
+      onlyIndices:
+        description: 'Only run tests for the given indices (comma-separated)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  run-comparison:
+    name: Compare Pure and SKIE
+    concurrency: ci-compare-tests-${{ github.ref }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:external-libraries:comparePureAndSkie'
+        env:
+          onlyIndices: ${{ github.event.inputs.onlyIndices }}
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          check_name: "Comparison Report"
+          report_paths: 'acceptance-tests/external-libraries/build/test-results/*/TEST-*.xml'
+          require_tests: true

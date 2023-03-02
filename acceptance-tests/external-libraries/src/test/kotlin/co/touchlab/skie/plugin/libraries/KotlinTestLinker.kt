@@ -31,11 +31,11 @@ internal class KotlinTestLinker(
     private val testLogger: TestLogger,
 ) {
 
-    fun link(klib: Path, configuration: Configuration, compilerConfiguration: CompilerConfiguration): TestResult {
+    fun link(klib: Path, configuration: Configuration?, compilerConfiguration: CompilerConfiguration): TestResult {
         val tempDirectory = tempFileSystem.createDirectory("kotlin-linker")
         val outputFile = tempFileSystem.createDirectory("Kotlin.framework")
 
-        configureSwiftKt(configuration)
+        configuration?.let { configureSwiftKt(it) }
 
         val (messageCollector, outputStream) = createCompilerOutputStream()
 

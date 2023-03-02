@@ -8,9 +8,9 @@ class PluginRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = false
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
-        configure.get().invoke(configuration)
+        configure.get()?.invoke(configuration)
 
-        plugins.get().forEach {
+        plugins.get()?.forEach {
             it.invoke(this, configuration)
         }
     }

@@ -28,13 +28,15 @@ import kotlin.time.measureTimedValue
 class ExternalLibrariesTestRunner(
     private val testTmpDir: File,
     private val testFilter: TestFilter,
+    private val skieConfiguration: Configuration?,
+    private val scopeSuffix: String,
 ) {
     @OptIn(ExperimentalTime::class)
     fun runTests(scope: FunSpec, tests: List<ExternalLibraryTest>) {
         val channel = Channel<Map<ExternalLibraryTest, TestResultWithLogs>>()
         scope.concurrency = 2
 
-        scope.test("Evaluation") {
+        scope.test("Evaluation${scopeSuffix}") {
             val testCompletionTracking = AtomicInteger(0)
             val filteredTests = tests
                 .filter { testFilter.shouldBeEvaluated(it) }
@@ -51,7 +53,7 @@ class ExternalLibrariesTestRunner(
             channel.close()
         }
 
-        scope.context("Results") {
+        scope.context("Results${scopeSuffix}") {
             val testResult = channel.receive()
             val resultProcessor = ExternalLibrariesTestResultProcessor(testTmpDir = testTmpDir)
             resultProcessor.processResult(this, testResult)
@@ -68,8 +70,6 @@ class ExternalLibrariesTestRunner(
         val sourceFiles = produceSourceFilesIn(tempDirectory)
 
         val testLogger = TestLogger()
-
-        val skieConfiguration = Configuration(SkieFeatureSet(setOf(SkieFeature.SuspendInterop, SkieFeature.SwiftRuntime)), emptyList())
 
         val compilerConfiguration = CompilerConfiguration(
             dependencies = test.input.files,
@@ -111,6 +111,7 @@ class ExternalLibrariesTestRunner(
         val resultAsText = test.expectedResult.hasSucceededAsString(result)
 
         test.resultPath.writeText(resultAsText)
+        test.durationPath.writeText(result.duration.toIsoString())
         test.logPath.writeText(result.logs)
     }
 
