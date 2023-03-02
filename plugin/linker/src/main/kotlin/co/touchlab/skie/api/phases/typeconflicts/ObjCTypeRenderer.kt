@@ -57,8 +57,11 @@ class ObjCTypeRenderer {
             is ObjCProtocolType -> {
                 mutableMappedProtocols.add(protocolName)
 
-                render().asTypeDefIfNeeded(reservedIdentifiers)
-                    .withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+                if ("id" in reservedIdentifiers || protocolName in reservedIdentifiers) {
+                    render().asTypeDef().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+                } else {
+                    render().withAttrsAndName(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+                }
             }
             is ObjCGenericTypeUsage -> render(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
             is ObjCClassType -> {
@@ -91,11 +94,14 @@ class ObjCTypeRenderer {
         if (hasNullableAttribute) this else "$objcNonnullAttribute $this"
 
     private fun String.asTypeDefIfNeeded(reservedIdentifiers: Set<String>): String =
-        if (this.substringBefore("<") in reservedIdentifiers) {
-            typedefsMap.getOrPut(this) { "Skie__TypeDef__${typedefsMap.size}__" + this.toValidSwiftIdentifier() }
+        if (this in reservedIdentifiers) {
+            this.asTypeDef()
         } else {
             this
         }
+
+    private fun String.asTypeDef(): String =
+        typedefsMap.getOrPut(this) { "Skie__TypeDef__${typedefsMap.size}__" + this.toValidSwiftIdentifier() }
 
     private val objcNonnullAttribute = "_Nonnull"
 

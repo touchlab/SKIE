@@ -141,6 +141,12 @@ internal class DeclarationBuilderImpl(
         }
     }
 
+    /**
+     * This fixes a bug in klibs produced by Konan <= 1.5.
+     * (We don't know for sure because we don't know what is different about the klib, but we don't have a different type of reproducer.)
+     * The affected klibs behave differently during IR deserialization - exposed type parameters are deserialized without public symbols.
+     * This fix registers these missing symbols manually.
+     */
     private fun fixPrivateTypeParametersSymbolsFromOldKLibs() {
         symbolTable.allExposedTypeParameters(descriptorProvider)
             .filter { it.symbol !is IrTypeParameterPublicSymbolImpl }

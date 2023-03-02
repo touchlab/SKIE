@@ -33,7 +33,7 @@ class AddForwardDeclarationsPhase(
         return super.modifyHeaderContent(content)
     }
 
-    override fun isInsertionPoint(line: String): Boolean =
+    override fun insertImmediatelyBefore(line: String): Boolean =
         line.startsWith("NS_ASSUME_NONNULL_BEGIN")
 }
 

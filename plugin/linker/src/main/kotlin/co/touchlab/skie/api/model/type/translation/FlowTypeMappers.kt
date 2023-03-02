@@ -16,15 +16,13 @@ object FlowTypeMappers {
     fun getMapperOrNull(type: KotlinType): FlowTypeMapper? {
         val supportedFlow = SupportedFlow.from(type) ?: return null
 
-        val targetFlowSwiftModel = TargetFlowSwiftModel(
-            nonOptional = referenceClass(supportedFlow.toNonOptionalFqName),
-            optional = referenceClass(supportedFlow.toOptionalFqName),
+        return FlowMapper(
+            nonOptionalFlow = referenceClass(supportedFlow.toNonOptionalFqName),
+            optionalFlow = referenceClass(supportedFlow.toOptionalFqName),
         )
-
-        return FlowMapper(targetFlowSwiftModel)
     }
 
-    private class FlowMapper(private val targetFlowSwiftModel: TargetFlowSwiftModel) : FlowTypeMapper {
+    private class FlowMapper(val nonOptionalFlow: KotlinClassSwiftModel, val optionalFlow: KotlinClassSwiftModel) : FlowTypeMapper {
 
         context(SwiftModelScope)
         override fun mapType(
@@ -38,12 +36,12 @@ object FlowTypeMappers {
                         translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope)
                     }
 
-                    SwiftKotlinTypeClassTypeModel(targetFlowSwiftModel.nonOptional, typeArguments)
+                    SwiftKotlinTypeClassTypeModel(nonOptionalFlow, typeArguments)
                 }
                 else -> {
                     val hasNullableTypeArgument = type.arguments.any { it.type.isNullable() }
 
-                    val skieFlow = if (hasNullableTypeArgument) targetFlowSwiftModel.optional else targetFlowSwiftModel.nonOptional
+                    val skieFlow = if (hasNullableTypeArgument) optionalFlow else nonOptionalFlow
 
                     val skieFlowType = KotlinTypeFactory.simpleType(
                         skieFlow.classDescriptor.defaultType,
@@ -55,6 +53,4 @@ object FlowTypeMappers {
             }
         }
     }
-
-    private data class TargetFlowSwiftModel(val nonOptional: KotlinClassSwiftModel, val optional: KotlinClassSwiftModel)
 }

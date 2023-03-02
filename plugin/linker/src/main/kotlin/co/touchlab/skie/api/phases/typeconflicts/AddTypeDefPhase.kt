@@ -11,7 +11,7 @@ class AddTypeDefPhase(
     override val insertedContent: List<String>
         get() = objCTypeMapper.typedefs.map { it.createTypeDef() }
 
-    override fun isInsertionPoint(line: String): Boolean =
+    override fun insertImmediatelyBefore(line: String): Boolean =
         line.startsWith("NS_ASSUME_NONNULL_BEGIN")
 }
 

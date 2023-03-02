@@ -8,7 +8,6 @@ import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
-import co.touchlab.skie.plugin.api.model.SwiftModelBuiltIns
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
