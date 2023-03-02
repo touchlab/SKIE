@@ -41,6 +41,6 @@ jobs:
           require_tests: true
           include_passed: true
           update_check: true
-          annotate_only: true
+#          annotate_only: true
           detailed_summary: true
           annotate_notice: true
