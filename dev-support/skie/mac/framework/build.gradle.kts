@@ -80,6 +80,21 @@ configurations.all {
     }
 }
 
+tasks.withType<KotlinNativeLink>().configureEach {
+    doLast {
+        val frameworkDirectory = outputs.files.toList().first()
+        val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
+
+        exec {
+            commandLine(
+                "zsh",
+                "-c",
+                "echo \"import Kotlin\\n:type lookup Kotlin\" | swift repl -F \"${frameworkDirectory.absolutePath}\" > \"${apiFile.absolutePath}\"",
+            )
+        }
+    }
+}
+
 tasks.register("dependenciesForExport") {
     doLast {
         val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent().kotlinGradleName + "Api")
