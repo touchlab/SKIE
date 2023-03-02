@@ -3,6 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
+          <entry key="debugDumpSwiftApiAt" value="" />
           <entry key="failedOnly" value="" />
         </map>
       </option>

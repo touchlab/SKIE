@@ -3,6 +3,7 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.ko
 import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TestResult
+import co.touchlab.skie.acceptancetests.framework.fromTestEnv
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.configuration.Configuration
@@ -52,7 +53,7 @@ internal class KotlinTestLinker(
         PluginRegistrar.configure.set {
             put(SwiftLinkConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
             put(SwiftLinkConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
-            put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.values().toSet())
+            put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.fromTestEnv())
             put(SwiftGenConfigurationKeys.swiftGenConfiguration, Configuration.deserialize(configuration.readText()))
         }
 

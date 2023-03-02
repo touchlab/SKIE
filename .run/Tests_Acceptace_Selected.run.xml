@@ -4,6 +4,7 @@
       <option name="env">
         <map>
           <entry key="acceptanceTest" value="sealed" />
+          <entry key="debugDumpSwiftApiAt" value="" />
         </map>
       </option>
       <option name="executionName" />
