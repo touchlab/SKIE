@@ -162,6 +162,9 @@ tasks.test {
 }
 
 val pureTest = tasks.register<Test>("pureTest") {
+    // We don't want to run them in parallel, because they are both heavily parallelized internally
+    mustRunAfter(tasks.test)
+
     description = "Runs library tests without SKIE"
     group = "verification"
 

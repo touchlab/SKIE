@@ -40,7 +40,6 @@ jobs:
           report_paths: 'acceptance-tests/external-libraries/build/test-results/comparePureAndSkie/TEST-*.xml'
           require_tests: true
           include_passed: true
-          commit: ${{ github.sha }}
           update_check: true
           annotate_only: true
           detailed_summary: true
