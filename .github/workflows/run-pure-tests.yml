@@ -1,0 +1,45 @@
+name: Run Pure Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      onlyIndices:
+        description: 'Only run tests for the given indices (comma-separated)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  run-comparison:
+    name: Run libraries tests with SKIE disabled
+    concurrency: ci-pure-tests-${{ github.ref }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:external-libraries:pureTest'
+        env:
+          onlyIndices: ${{ github.event.inputs.onlyIndices }}
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          check_name: "Test Reports - SKIE Disabled"
+          report_paths: 'acceptance-tests/external-libraries/build/test-results/pureTest/TEST-*.xml'
+          require_tests: true
+          include_passed: true
+          update_check: true
+          annotate_only: true
+          detailed_summary: true
