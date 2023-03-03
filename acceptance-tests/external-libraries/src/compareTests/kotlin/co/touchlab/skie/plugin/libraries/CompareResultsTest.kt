@@ -37,7 +37,7 @@ class GitHubSummary(
 }
 
 class CompareResultsTest: FunSpec({
-    val onlyIndices = System.getenv("onlyIndices")?.split(",")?.map { it.toInt() }?.toSet()
+    val onlyIndices = System.getenv("onlyIndices")?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() }?.map { it.toInt() }?.toSet()?.takeIf { it.isNotEmpty() }
     val pureDir = File(System.getProperty("pureTestDir"))
     val skieDir = File(System.getProperty("skieTestDir"))
     val summary = GitHubSummary.createIfAvailable()
