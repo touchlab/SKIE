@@ -120,7 +120,7 @@ class CompareResultsTest: FunSpec({
     }
 
     val (pureFails, skieFails) = libraries
-        .filter { it.pure.result == it.skie.result }
+        .filter { it.pure.result != it.skie.result }
         .partition { it.skie.result == Comparison.Result.Success }
 
     test("Failures") {
