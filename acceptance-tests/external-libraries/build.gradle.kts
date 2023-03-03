@@ -161,7 +161,7 @@ tasks.test {
     configureExternalLibraryTest(isSkieEnabled = true)
 }
 
-val pureTest = task<Test>("pureTest") {
+val pureTest = tasks.register<Test>("pureTest") {
     description = "Runs library tests without SKIE"
     group = "verification"
 
@@ -173,8 +173,8 @@ val pureTest = task<Test>("pureTest") {
     configureExternalLibraryTest(isSkieEnabled = false)
 }
 
-task<Test>("comparePureAndSkie") {
-    dependsOn(tasks.test, pureTest)
+tasks.register<Test>("comparePureAndSkie") {
+    mustRunAfter(tasks.test, pureTest)
 
     systemProperty("pureTestDir", layout.buildDirectory.dir("external-libraries-tests-no-skie").get().asFile.absolutePath)
     systemProperty("skieTestDir", layout.buildDirectory.dir("external-libraries-tests").get().asFile.absolutePath)

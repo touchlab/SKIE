@@ -29,7 +29,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ':acceptance-tests:external-libraries:comparePureAndSkie --continue'
+          arguments: ':acceptance-tests:external-libraries:test :acceptance-tests:external-libraries:pureTest :acceptance-tests:external-libraries:comparePureAndSkie --continue'
         env:
           onlyIndices: ${{ github.event.inputs.onlyIndices }}
       - name: Publish Test Report
