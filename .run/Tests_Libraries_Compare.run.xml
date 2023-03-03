@@ -1,0 +1,30 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Tests/Libraries/Compare" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="debugDumpSwiftApiAt" value="" />
+        </map>
+      </option>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value=":acceptance-tests:external-libraries:pureTest" />
+          <option value=":acceptance-tests:external-libraries:test" />
+          <option value=":acceptance-tests:external-libraries:comparePureAndSkie" />
+        </list>
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <DebugAllEnabled>false</DebugAllEnabled>
+    <method v="2" />
+  </configuration>
+</component>

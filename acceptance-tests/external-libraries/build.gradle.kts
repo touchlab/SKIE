@@ -157,14 +157,7 @@ fun Test.configureExternalLibraryTest(isSkieEnabled: Boolean) {
     }
 }
 
-tasks.test {
-    configureExternalLibraryTest(isSkieEnabled = true)
-}
-
 val pureTest = tasks.register<Test>("pureTest") {
-    // We don't want to run them in parallel, because they are both heavily parallelized internally
-    mustRunAfter(tasks.test)
-
     description = "Runs library tests without SKIE"
     group = "verification"
 
@@ -174,6 +167,14 @@ val pureTest = tasks.register<Test>("pureTest") {
     useJUnitPlatform()
 
     configureExternalLibraryTest(isSkieEnabled = false)
+}
+
+tasks.test {
+    // We don't want to run them in parallel, because they are both heavily parallelized internally
+    // Also, running SKIE tests after pure tests in case the VM needs to warm up.
+    mustRunAfter(pureTest)
+
+    configureExternalLibraryTest(isSkieEnabled = true)
 }
 
 tasks.register<Test>("comparePureAndSkie") {
