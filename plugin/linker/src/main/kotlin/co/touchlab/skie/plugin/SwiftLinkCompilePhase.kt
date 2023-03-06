@@ -154,7 +154,7 @@ class SwiftLinkCompilePhase(
             File(configurables.absoluteTargetSysRoot, "usr/lib/swift"),
         ).flatMap { listOf("-L", it.absolutePath) }
         val otherLinkerFlags = listOf(
-            "-rpath", "/usr/lib/swift"
+            "-rpath", "/usr/lib/swift", "-dead_strip",
         )
 
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
