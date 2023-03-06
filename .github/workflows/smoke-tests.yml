@@ -11,5 +11,5 @@ permissions:
 
 jobs:
   run-all-tests:
-    uses: ./.github/workflows/reusable/all-tests.yml
+    uses: ./.github/workflows/all-tests.yml
     secrets: inherit
