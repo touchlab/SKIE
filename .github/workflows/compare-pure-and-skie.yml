@@ -34,14 +34,12 @@ jobs:
           onlyIndices: ${{ github.event.inputs.onlyIndices }}
           GITHUB_RUN_ID: ${{ github.run_id }}
       - name: Upload Comparison Report (S3)
-        uses: shallwefootball/s3-upload-action@master
         if: always()
-        with:
-          aws_key_id: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
-          aws_secret_access_key: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
-          aws_bucket: 'skie-data'
-          source_dir: 'acceptance-tests/external-libraries/build/reports/comparison'
-          destination_dir: 'comparison-reports'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
+        run: |
+          aws s3 sync acceptance-tests/external-libraries/build/reports/comparison s3://skie-data/comparison-reports
       - name: Upload Comparison Report (GitHub artifact)
         uses: actions/upload-artifact@v3
         if: always()
