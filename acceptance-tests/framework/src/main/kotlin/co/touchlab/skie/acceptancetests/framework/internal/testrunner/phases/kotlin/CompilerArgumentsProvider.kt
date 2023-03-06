@@ -5,11 +5,12 @@ import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.reflect.full.companionObject
 
 class CompilerArgumentsProvider(
     private val dependencies: List<String> = EnvDefaults.dependencies ?: emptyList(),
     private val exportedDependencies: List<String> = EnvDefaults.exportedDependencies ?: emptyList(),
-    private val staticFramework: Boolean = EnvDefaults.staticFramework ?: false,
+    private val linkMode: LinkMode = EnvDefaults.linkMode ?: LinkMode.Static,
     private val buildConfiguration: BuildConfiguration = EnvDefaults.buildConfiguration ?: BuildConfiguration.Debug,
     private val target: Target? = EnvDefaults.target,
 ) {
@@ -52,7 +53,7 @@ class CompilerArgumentsProvider(
             memoryModel = "experimental"
 
             produce = "framework"
-            staticFramework = this@CompilerArgumentsProvider.staticFramework
+            staticFramework = linkMode == LinkMode.Static
 
             temporaryFilesDir = tempDirectory.absolutePathString()
             outputName = outputFile.absolutePathString()
@@ -94,17 +95,22 @@ class CompilerArgumentsProvider(
         ;
     }
 
+    enum class LinkMode {
+        Dynamic,
+        Static,
+    }
+
     companion object {
         fun createPreferringEnvValues(
             dependencies: List<String>,
             exportedDependencies: List<String>,
-            staticFramework: Boolean,
+            linkMode: LinkMode,
             buildConfiguration: BuildConfiguration,
             target: Target?,
         ): CompilerArgumentsProvider = CompilerArgumentsProvider(
             dependencies = EnvDefaults.dependencies ?: dependencies,
             exportedDependencies = EnvDefaults.exportedDependencies ?: exportedDependencies,
-            staticFramework = EnvDefaults.staticFramework ?: staticFramework,
+            linkMode = EnvDefaults.linkMode ?: linkMode,
             buildConfiguration = EnvDefaults.buildConfiguration ?: buildConfiguration,
             target = target,
         )
@@ -113,15 +119,17 @@ class CompilerArgumentsProvider(
     object EnvDefaults {
         val dependencies: List<String>? = listFromEnv("KOTLIN_DEPENDENCIES")
         val exportedDependencies: List<String>? = listFromEnv("KOTLIN_EXPORTED_DEPENDENCIES")
-        val staticFramework: Boolean? = System.getenv("KOTLIN_STATIC_FRAMEWORK")?.toBooleanLenient()
-        val buildConfiguration: BuildConfiguration? = System.getenv("KOTLIN_BUILD_CONFIGURATION")?.let { value ->
-            BuildConfiguration.values().find { it.name.equals(value, ignoreCase = true) } ?: error("Unknown build configuration: $value")
-        }
-        val target: Target? = System.getenv("KOTLIN_TARGET")?.let {
-            Target.valueOf(it)
-        }
+        val linkMode: LinkMode? = enumFromEnv("KOTLIN_LINK_MODE", LinkMode.values())
+        val buildConfiguration: BuildConfiguration? = enumFromEnv("KOTLIN_BUILD_CONFIGURATION", BuildConfiguration.values())
+        val target: Target? = enumFromEnv("KOTLIN_TARGET", Target.values())
         private fun listFromEnv(name: String): List<String>? {
             return System.getenv(name)?.split(',')?.map { it.trim() }?.filter { it.isNotBlank() }
+        }
+
+        private fun <T: Enum<T>> enumFromEnv(name: String, values: Array<T>): T? {
+            return System.getenv(name)?.let { value ->
+                values.find { it.name.equals(value, ignoreCase = true) } ?: error("Unknown value for $name: $value")
+            }
         }
     }
 }

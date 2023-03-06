@@ -13,11 +13,11 @@ on:
         type: string
         required: false
         default: '["ios_arm64"]'
-      matrix-static:
+      matrix-linkage:
         description: 'JSON Array with booleans - static framework or not (all jobs)'
         type: string
         required: false
-        default: '[true]'
+        default: '["Static"]'
       matrix-configuration:
         description: 'JSON Array with build configurations (all jobs)'
         type: string
@@ -37,12 +37,12 @@ env:
 jobs:
   acceptance-tests:
     name: Acceptance Tests
-    concurrency: ci-acceptance-tests-${{ github.ref }}
     runs-on: self-hosted
     strategy:
       matrix:
-        static: ${{ fromJson(inputs.matrix-static) }}
+        linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
+    concurrency: ci-acceptance-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -56,7 +56,7 @@ jobs:
         with:
           arguments: ':acceptance-tests:test'
         env:
-          KOTLIN_STATIC_FRAMEWORK: ${{ matrix.static }}
+          KOTLIN_LINK_MODE: ${{ matrix.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
@@ -68,13 +68,13 @@ jobs:
 
   type-mapping-tests:
     name: Type Mapping Tests
-    concurrency: ci-type-mapping-tests-${{ github.ref }}
     runs-on: self-hosted
     strategy:
       matrix:
         target: ${{ fromJson(inputs.matrix-targets) }}
-        static: ${{ fromJson(inputs.matrix-static) }}
+        linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
+    concurrency: ci-type-mapping-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}-${{ matrix.target }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -88,7 +88,7 @@ jobs:
         with:
           arguments: ':acceptance-tests:type-mapping:test'
         env:
-          KOTLIN_STATIC_FRAMEWORK: ${{ matrix.static }}
+          KOTLIN_LINK_MODE: ${{ matrix.linkage }}
           KOTLIN_TARGET: ${{ matrix.target }}
           KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
       - name: Publish Test Report
@@ -101,12 +101,12 @@ jobs:
 
   external-libraries-tests:
     name: External Libraries Tests
-    concurrency: ci-external-libraries-tests-${{ github.ref }}
     runs-on: self-hosted
     strategy:
       matrix:
-        static: ${{ fromJson(inputs.matrix-static) }}
+        linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
+    concurrency: ci-external-libraries-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -120,7 +120,7 @@ jobs:
         with:
           arguments: ':acceptance-tests:external-libraries:test'
         env:
-          KOTLIN_STATIC_FRAMEWORK: ${{ matrix.static }}
+          KOTLIN_LINK_MODE: ${{ matrix.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
