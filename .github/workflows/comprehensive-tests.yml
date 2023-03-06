@@ -11,6 +11,11 @@ permissions:
     checks: write
 
 jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - name: Yo
+        run: echo "Yo"
   run-all-tests:
     uses: ./.github/workflows/reusable/all-tests.yml
     with:
