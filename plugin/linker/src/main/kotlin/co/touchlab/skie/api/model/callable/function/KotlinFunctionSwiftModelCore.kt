@@ -8,6 +8,7 @@ import co.touchlab.skie.api.model.callable.parameter.KotlinParameterSwiftModelCo
 import co.touchlab.skie.api.model.factory.ObjCTypeProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
@@ -71,12 +72,12 @@ internal class KotlinFunctionSwiftModelCore(
                     parameterBridge = parameterBridgeWithDescriptor.first,
                     baseParameterDescriptor = parameterBridgeWithDescriptor.second,
                     allArgumentLabels = swiftFunctionName.argumentLabels,
-                    getObjCType = { functionDescriptor, parameterDescriptor, isFlowMappingEnabled ->
+                    getObjCType = { functionDescriptor, parameterDescriptor, flowMappingStrategy ->
                         objCTypeProvider.getFunctionParameterType(
                             function = functionDescriptor,
                             parameter = parameterDescriptor,
                             bridge = parameterBridgeWithDescriptor.first,
-                            isFlowMappingEnabled = isFlowMappingEnabled,
+                            flowMappingStrategy = flowMappingStrategy,
                         )
                     }
                 ) to parameterBridgeWithDescriptor.second
@@ -86,8 +87,12 @@ internal class KotlinFunctionSwiftModelCore(
 
     val isThrowing: Boolean = namer.mapper.doesThrow(descriptor)
 
-    fun getObjCReturnType(functionDescriptor: FunctionDescriptor): ObjCType? =
-        if (descriptor !is ConstructorDescriptor) objCTypeProvider.getFunctionReturnType(descriptor, functionDescriptor) else null
+    fun getObjCReturnType(functionDescriptor: FunctionDescriptor, flowMappingStrategy: FlowMappingStrategy): ObjCType? =
+        if (descriptor !is ConstructorDescriptor) {
+            objCTypeProvider.getFunctionReturnType(descriptor, functionDescriptor, flowMappingStrategy)
+        } else {
+            null
+        }
 
     data class SwiftFunctionName(val identifier: String, val argumentLabels: List<String>)
 

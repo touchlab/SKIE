@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValuePa
 import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -20,6 +21,10 @@ interface MutableSwiftModelScope : SwiftModelScope {
     override val exposedClasses: List<MutableKotlinClassSwiftModel>
 
     override val exposedFiles: List<MutableKotlinTypeSwiftModel>
+
+    override val allExposedMembers: List<MutableKotlinCallableMemberSwiftModel>
+
+    override fun referenceClass(classFqName: String): MutableKotlinClassSwiftModel
 
     override val CallableMemberDescriptor.swiftModel: MutableKotlinCallableMemberSwiftModel
 

@@ -5,6 +5,7 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 
 internal class OriginalKotlinFunctionSwiftModel(
     private val delegate: KotlinFunctionSwiftModelWithCore,
@@ -15,6 +16,8 @@ internal class OriginalKotlinFunctionSwiftModel(
     override val identifier: String = delegate.identifier
 
     override val collisionResolutionStrategy: CollisionResolutionStrategy = delegate.collisionResolutionStrategy
+
+    override val returnTypeFlowMappingStrategy: FlowMappingStrategy = delegate.returnTypeFlowMappingStrategy
 
     override val isChanged: Boolean = false
 

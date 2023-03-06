@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameter
 import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
@@ -25,6 +26,8 @@ interface SwiftModelScope {
     val exposedClasses: List<KotlinClassSwiftModel>
 
     val exposedFiles: List<KotlinTypeSwiftModel>
+
+    val allExposedMembers: List<KotlinCallableMemberSwiftModel>
 
     fun referenceClass(classFqName: String): KotlinClassSwiftModel
 
@@ -54,19 +57,27 @@ interface SwiftModelScope {
 
     fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel
 
-    fun PropertyDescriptor.propertyTypeModel(genericExportScope: SwiftGenericExportScope): SwiftTypeModel
+    fun PropertyDescriptor.propertyTypeModel(
+        genericExportScope: SwiftGenericExportScope,
+        flowMappingStrategy: FlowMappingStrategy,
+    ): SwiftTypeModel
 
-    fun FunctionDescriptor.returnTypeModel(genericExportScope: SwiftGenericExportScope, bridge: MethodBridge.ReturnValue): SwiftTypeModel
+    fun FunctionDescriptor.returnTypeModel(
+        genericExportScope: SwiftGenericExportScope,
+        bridge: MethodBridge.ReturnValue,
+        flowMappingStrategy: FlowMappingStrategy,
+    ): SwiftTypeModel
 
     fun FunctionDescriptor.asyncReturnTypeModel(
         genericExportScope: SwiftGenericExportScope,
         bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftTypeModel
 
     fun FunctionDescriptor.getParameterType(
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
-        isFlowMappingEnabled: Boolean,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftTypeModel
 }

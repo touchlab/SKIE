@@ -5,6 +5,7 @@ package co.touchlab.skie.api.model.type.translation
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
@@ -71,11 +72,13 @@ class SwiftTypeTranslator(
     private val problemCollector: SwiftTranslationProblemCollector,
     private val builtinSwiftBridgeableProvider: BuiltinSwiftBridgeableProvider,
 ) {
+
     context(SwiftModelScope)
     internal fun mapReturnType(
         returnBridge: MethodBridge.ReturnValue,
         method: FunctionDescriptor,
         swiftExportScope: SwiftExportScope,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftTypeModel {
         return when (returnBridge) {
             MethodBridge.ReturnValue.Suspend,
@@ -86,10 +89,11 @@ class SwiftTypeTranslator(
                 method.returnType!!,
                 swiftExportScope,
                 returnBridge.bridge,
+                flowMappingStrategy,
             )
             MethodBridge.ReturnValue.WithError.Success -> SwiftVoidTypeModel
             is MethodBridge.ReturnValue.WithError.ZeroForError -> {
-                val successReturnType = mapReturnType(returnBridge.successBridge, method, swiftExportScope)
+                val successReturnType = mapReturnType(returnBridge.successBridge, method, swiftExportScope, flowMappingStrategy)
 
                 if (!returnBridge.successMayBeZero) {
                     check(
@@ -112,19 +116,19 @@ class SwiftTypeTranslator(
     internal fun mapReferenceType(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
-        isFlowMappingEnabled: Boolean = true,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftReferenceTypeModel =
-        mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope, isFlowMappingEnabled).withNullabilityOf(kotlinType)
+        mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope, flowMappingStrategy).withNullabilityOf(kotlinType)
 
     context(SwiftModelScope)
     internal fun mapReferenceTypeIgnoringNullability(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
-        isFlowMappingEnabled: Boolean = true,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftNonNullReferenceTypeModel {
         class TypeMappingMatch(val type: KotlinType, val descriptor: ClassDescriptor, val mapper: CustomTypeMapper)
 
-        if (isFlowMappingEnabled) {
+        if (flowMappingStrategy == FlowMappingStrategy.Full) {
             val flowMapper = FlowTypeMappers.getMapperOrNull(kotlinType)
             if (flowMapper != null) {
                 return flowMapper.mapType(kotlinType, this, swiftExportScope)
@@ -157,16 +161,17 @@ class SwiftTypeTranslator(
         }
 
         mostSpecificMatches.firstOrNull()?.let {
-            return it.mapper.mapType(it.type, this, swiftExportScope)
+            return it.mapper.mapType(it.type, this, swiftExportScope, flowMappingStrategy)
         }
 
-        return mapReferenceTypeIgnoringNullabilitySkippingPredefined(kotlinType, swiftExportScope)
+        return mapReferenceTypeIgnoringNullabilitySkippingPredefined(kotlinType, swiftExportScope, flowMappingStrategy)
     }
 
     context(SwiftModelScope)
     internal fun mapReferenceTypeIgnoringNullabilitySkippingPredefined(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftNonNullReferenceTypeModel {
         if (kotlinType.isTypeParameter()) {
             when {
@@ -217,7 +222,7 @@ class SwiftTypeTranslator(
                 if (typeProjection.isStarProjection) {
                     idType(typeParamScope)
                 } else {
-                    mapReferenceTypeIgnoringNullability(typeProjection.type, typeParamScope)
+                    mapReferenceTypeIgnoringNullability(typeProjection.type, typeParamScope, flowMappingStrategy.forGenerics())
                 }
             }
 
@@ -279,6 +284,7 @@ class SwiftTypeTranslator(
         functionType: KotlinType,
         swiftExportScope: SwiftExportScope,
         returnsVoid: Boolean,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftLambdaTypeModel {
         val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
             functionType.getValueParameterTypesFromFunctionType().map { it.type }
@@ -289,10 +295,17 @@ class SwiftTypeTranslator(
             } else {
                 mapReferenceType(
                     functionType.getReturnTypeFromFunctionType(),
-                    swiftExportScope.removingFlags(SwiftExportScope.Flags.Escaping)
+                    swiftExportScope.removingFlags(SwiftExportScope.Flags.Escaping),
+                    flowMappingStrategy.forGenerics(),
                 )
             },
-            parameterTypes.map { mapReferenceType(it, swiftExportScope.addingFlags(SwiftExportScope.Flags.Escaping)) },
+            parameterTypes.map {
+                mapReferenceType(
+                    it,
+                    swiftExportScope.addingFlags(SwiftExportScope.Flags.Escaping),
+                    flowMappingStrategy.forGenerics(),
+                )
+            },
             isEscaping = swiftExportScope.hasFlag(SwiftExportScope.Flags.Escaping) && !functionType.binaryRepresentationIsNullable(),
         )
     }
@@ -302,6 +315,7 @@ class SwiftTypeTranslator(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         typeBridge: NativeTypeBridge.BlockPointer,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftReferenceTypeModel {
         val expectedDescriptor = kotlinType.builtIns.getFunction(typeBridge.numberOfParameters)
 
@@ -312,7 +326,7 @@ class SwiftTypeTranslator(
                 ?: expectedDescriptor.defaultType // Should not happen though.
         }
 
-        return mapFunctionTypeIgnoringNullability(functionType, swiftExportScope, typeBridge.returnsVoid)
+        return mapFunctionTypeIgnoringNullability(functionType, swiftExportScope, typeBridge.returnsVoid, flowMappingStrategy)
             .withNullabilityOf(kotlinType)
     }
 
@@ -321,10 +335,10 @@ class SwiftTypeTranslator(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         typeBridge: NativeTypeBridge,
-        isFlowMappingEnabled: Boolean = true,
+        flowMappingStrategy: FlowMappingStrategy,
     ): SwiftTypeModel = when (typeBridge) {
-        NativeTypeBridge.Reference -> mapReferenceType(kotlinType, swiftExportScope, isFlowMappingEnabled)
-        is NativeTypeBridge.BlockPointer -> mapFunctionType(kotlinType, swiftExportScope, typeBridge)
+        NativeTypeBridge.Reference -> mapReferenceType(kotlinType, swiftExportScope, flowMappingStrategy)
+        is NativeTypeBridge.BlockPointer -> mapFunctionType(kotlinType, swiftExportScope, typeBridge, flowMappingStrategy)
         is NativeTypeBridge.ValueType -> when (typeBridge.objCValueType) {
             ObjCValueType.BOOL -> SwiftPrimitiveTypeModel.Bool
             ObjCValueType.UNICHAR -> SwiftPrimitiveTypeModel.unichar

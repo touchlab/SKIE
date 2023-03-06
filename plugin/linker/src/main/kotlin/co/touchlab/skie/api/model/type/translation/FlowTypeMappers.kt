@@ -2,6 +2,7 @@ package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
@@ -33,7 +34,7 @@ object FlowTypeMappers {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> {
                     val typeArguments = type.arguments.map {
-                        translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope)
+                        translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope, FlowMappingStrategy.Full)
                     }
 
                     SwiftKotlinTypeClassTypeModel(nonOptionalFlow, typeArguments)
@@ -48,7 +49,11 @@ object FlowTypeMappers {
                         arguments = type.arguments,
                     )
 
-                    translator.mapReferenceTypeIgnoringNullabilitySkippingPredefined(skieFlowType, swiftExportScope)
+                    translator.mapReferenceTypeIgnoringNullabilitySkippingPredefined(
+                        skieFlowType,
+                        swiftExportScope,
+                        FlowMappingStrategy.Full,
+                    )
                 }
             }
         }

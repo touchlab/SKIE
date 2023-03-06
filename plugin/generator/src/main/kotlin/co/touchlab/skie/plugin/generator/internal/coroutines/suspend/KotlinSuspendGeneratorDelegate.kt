@@ -3,7 +3,8 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.api.model.callable.isStatic
+import co.touchlab.skie.plugin.api.model.callable.isMember
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
@@ -93,7 +94,7 @@ internal class KotlinSuspendGeneratorDelegate(
             )
 
             module.configure {
-                dispatchReceiverParameter.swiftModel.isFlowMappingEnabled = false
+                dispatchReceiverParameter.swiftModel.flowMappingStrategy = FlowMappingStrategy.GenericsOnly
             }
 
             this.add(dispatchReceiverParameter)
@@ -112,12 +113,20 @@ internal class KotlinSuspendGeneratorDelegate(
                 type = extensionReceiver.type
             )
 
-            module.configure {
-                extensionReceiverParameter.swiftModel.isFlowMappingEnabled =
-                    originalFunctionDescriptor.swiftModel.scope.isStatic || originalFunctionDescriptor.dispatchReceiverParameter != null
-            }
+            extensionReceiverParameter.configureExtensionReceiverFlowMapping(originalFunctionDescriptor)
 
             this.add(extensionReceiverParameter)
+        }
+    }
+
+    private fun ValueParameterDescriptor.configureExtensionReceiverFlowMapping(originalFunctionDescriptor: FunctionDescriptor) {
+        module.configure {
+            val isExtensionReceiverUsedAsSwiftReceiver = originalFunctionDescriptor.swiftModel.scope.isMember &&
+                originalFunctionDescriptor.dispatchReceiverParameter == null
+
+            if (isExtensionReceiverUsedAsSwiftReceiver) {
+                this.swiftModel.flowMappingStrategy = FlowMappingStrategy.GenericsOnly
+            }
         }
     }
 

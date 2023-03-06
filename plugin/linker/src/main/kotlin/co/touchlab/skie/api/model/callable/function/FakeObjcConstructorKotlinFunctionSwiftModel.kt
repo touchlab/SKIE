@@ -40,12 +40,12 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
                     parameterBridge = parameterBridgeWithDescriptor.first,
                     baseParameterDescriptor = parameterBridgeWithDescriptor.second,
                     allArgumentLabels = core.swiftFunctionName.argumentLabels,
-                    getObjCType = { functionDescriptor, parameterDescriptor, isFlowMappingEnabled ->
+                    getObjCType = { functionDescriptor, parameterDescriptor, flowMappingStrategy ->
                         objCTypeProvider.getFunctionParameterType(
                             function = functionDescriptor,
                             parameter = parameterDescriptor,
                             bridge = parameterBridgeWithDescriptor.first,
-                            isFlowMappingEnabled = isFlowMappingEnabled,
+                            flowMappingStrategy = flowMappingStrategy,
                             genericExportScope = ObjCNoneExportScope,
                         )
                     }
@@ -57,13 +57,13 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
                     descriptor,
                     parameterDescriptor,
                     index,
-                ) { isFlowMappingEnabled ->
+                ) { flowMappingStrategy ->
                     with(swiftModelScope) {
                         descriptor.getParameterType(
                             parameterDescriptor,
                             core.parameterBridge,
                             receiver.swiftGenericExportScope,
-                            isFlowMappingEnabled,
+                            flowMappingStrategy,
                         )
                     }
                 }

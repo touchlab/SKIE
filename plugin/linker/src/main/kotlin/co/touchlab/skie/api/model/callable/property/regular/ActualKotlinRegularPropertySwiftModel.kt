@@ -16,6 +16,7 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegular
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -51,24 +52,27 @@ class ActualKotlinRegularPropertySwiftModel(
     override val original: KotlinRegularPropertySwiftModel = OriginalKotlinRegularPropertySwiftModel(this)
 
     override val isChanged: Boolean
-        get() = identifier != original.identifier || visibility != original.visibility
+        get() = identifier != original.identifier || visibility != original.visibility ||
+            flowMappingStrategy != original.flowMappingStrategy || collisionResolutionStrategy != original.collisionResolutionStrategy
 
     override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
 
-    override val scope: KotlinCallableMemberSwiftModel.Scope = if (descriptorProvider.getReceiverClassDescriptorOrNull(descriptor) == null) {
-        KotlinCallableMemberSwiftModel.Scope.Static
-    } else {
-        KotlinCallableMemberSwiftModel.Scope.Member
-    }
+    override val scope: KotlinCallableMemberSwiftModel.Scope =
+        if (descriptorProvider.getReceiverClassDescriptorOrNull(descriptor) == null) {
+            KotlinCallableMemberSwiftModel.Scope.Static
+        } else {
+            KotlinCallableMemberSwiftModel.Scope.Member
+        }
 
     override val type: TypeSwiftModel
         get() = with(swiftModelScope) {
-            core.descriptor.propertyTypeModel(receiver.swiftGenericExportScope)
+            core.descriptor.propertyTypeModel(receiver.swiftGenericExportScope, flowMappingStrategy)
         }
 
-    override val objCType: ObjCType by lazy {
-        core.getObjCType(descriptor)
-    }
+    override var flowMappingStrategy: FlowMappingStrategy = FlowMappingStrategy.None
+
+    override val objCType: ObjCType
+        get() = core.getObjCType(descriptor, flowMappingStrategy)
 
     override val getter: KotlinRegularPropertyGetterSwiftModel by core::getter
 

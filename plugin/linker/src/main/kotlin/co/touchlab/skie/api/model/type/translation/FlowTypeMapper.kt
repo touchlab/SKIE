@@ -2,6 +2,7 @@ package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
 import org.jetbrains.kotlin.types.KotlinType
 

@@ -7,6 +7,7 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 
 class OriginalKotlinRegularPropertySwiftModel(
     private val delegate: KotlinRegularPropertySwiftModel,
@@ -23,6 +24,8 @@ class OriginalKotlinRegularPropertySwiftModel(
         get() = reference
 
     override val collisionResolutionStrategy: CollisionResolutionStrategy = delegate.collisionResolutionStrategy
+
+    override val flowMappingStrategy: FlowMappingStrategy = delegate.flowMappingStrategy
 
     override val isChanged: Boolean = false
 

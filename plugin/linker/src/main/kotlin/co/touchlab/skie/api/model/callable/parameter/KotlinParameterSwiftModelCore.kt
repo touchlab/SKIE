@@ -2,6 +2,7 @@ package co.touchlab.skie.api.model.callable.parameter
 
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel.Origin
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
@@ -16,15 +17,15 @@ internal class KotlinParameterSwiftModelCore(
     val parameterBridge: MethodBridgeParameter.ValueParameter,
     baseParameterDescriptor: ParameterDescriptor?,
     allArgumentLabels: List<String>,
-    private val getObjCType: (FunctionDescriptor, ParameterDescriptor?, isFlowMappingEnabled: Boolean) -> ObjCType,
+    private val getObjCType: (FunctionDescriptor, ParameterDescriptor?, flowMappingStrategy: FlowMappingStrategy) -> ObjCType,
 ) {
 
     fun getObjCType(
         functionDescriptor: FunctionDescriptor,
         parameterDescriptor: ParameterDescriptor?,
-        isFlowMappingEnabled: Boolean,
+        flowMappingStrategy: FlowMappingStrategy,
     ): ObjCType =
-        this.getObjCType.invoke(functionDescriptor, parameterDescriptor, isFlowMappingEnabled)
+        this.getObjCType.invoke(functionDescriptor, parameterDescriptor, flowMappingStrategy)
 
     fun getOrigin(parameterDescriptor: ParameterDescriptor?): Origin = when (parameterBridge) {
         is MethodBridgeParameter.ValueParameter.Mapped -> {

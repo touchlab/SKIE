@@ -4,11 +4,11 @@ package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
 import org.jetbrains.kotlin.backend.konan.objcexport.NSNumberKind
 import org.jetbrains.kotlin.backend.konan.objcexport.isMappedFunctionClass
@@ -18,9 +18,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.TypeUtils
-import org.jetbrains.kotlin.types.isNullable
 
 object CustomTypeMappers {
 
@@ -103,6 +101,7 @@ object CustomTypeMappers {
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceTypeModel {
             return SwiftClassTypeModel(
                 when {
@@ -122,6 +121,7 @@ object CustomTypeMappers {
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceTypeModel {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
@@ -133,7 +133,7 @@ object CustomTypeMappers {
                             // Kotlin `null` keys and values are represented as `NSNull` singleton.
                             SwiftAnyTypeModel
                         } else {
-                            translator.mapReferenceTypeIgnoringNullability(argument, swiftExportScope)
+                            translator.mapReferenceTypeIgnoringNullability(argument, swiftExportScope, flowMappingStrategy.forGenerics())
                         }
                     }
 
@@ -152,6 +152,7 @@ object CustomTypeMappers {
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceTypeModel {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftClassTypeModel("NSSet")
@@ -165,6 +166,7 @@ object CustomTypeMappers {
                             translator.mapReferenceTypeIgnoringNullability(
                                 argument,
                                 swiftExportScope.addingFlags(SwiftExportScope.Flags.Hashable),
+                                flowMappingStrategy.forGenerics(),
                             )
                         }
                     }
@@ -184,6 +186,7 @@ object CustomTypeMappers {
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceTypeModel {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
@@ -204,7 +207,7 @@ object CustomTypeMappers {
                             } else {
                                 swiftExportScope
                             }
-                            translator.mapReferenceTypeIgnoringNullability(argument, argumentScope)
+                            translator.mapReferenceTypeIgnoringNullability(argument, argumentScope, flowMappingStrategy.forGenerics())
                         }
                     }
 
@@ -230,6 +233,7 @@ object CustomTypeMappers {
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceTypeModel =
             SwiftClassTypeModel(translator.getObjCClassName())
     }
@@ -251,6 +255,7 @@ object CustomTypeMappers {
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceTypeModel {
             val typeArguments = mappedSuperType.arguments.map {
                 val argument = it.type
@@ -260,7 +265,8 @@ object CustomTypeMappers {
                 } else {
                     translator.mapReferenceTypeIgnoringNullability(
                         argument,
-                        swiftExportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType)
+                        swiftExportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType),
+                        flowMappingStrategy.forGenerics(),
                     )
                 }
             }
@@ -279,8 +285,14 @@ object CustomTypeMappers {
             mappedSuperType: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceTypeModel {
-            return translator.mapFunctionTypeIgnoringNullability(mappedSuperType, swiftExportScope, returnsVoid = false)
+            return translator.mapFunctionTypeIgnoringNullability(
+                mappedSuperType,
+                swiftExportScope,
+                returnsVoid = false,
+                flowMappingStrategy.forGenerics(),
+            )
         }
     }
 }

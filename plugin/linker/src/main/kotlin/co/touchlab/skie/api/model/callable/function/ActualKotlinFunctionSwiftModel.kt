@@ -13,6 +13,7 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
@@ -78,7 +79,8 @@ internal class ActualKotlinFunctionSwiftModel(
             else -> KotlinFunctionSwiftModel.Role.SimpleFunction
         }
 
-    override val scope: KotlinCallableMemberSwiftModel.Scope = if (descriptorProvider.getReceiverClassDescriptorOrNull(descriptor) == null) {
+    override val scope: KotlinCallableMemberSwiftModel.Scope =
+        if (descriptorProvider.getReceiverClassDescriptorOrNull(descriptor) == null) {
             KotlinCallableMemberSwiftModel.Scope.Static
         } else {
             KotlinCallableMemberSwiftModel.Scope.Member
@@ -92,16 +94,21 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val isChanged: Boolean
         get() = identifier != original.identifier || visibility != original.visibility || valueParameters.any { it.isChanged } ||
-            collisionResolutionStrategy != original.collisionResolutionStrategy
+            collisionResolutionStrategy != original.collisionResolutionStrategy || returnTypeFlowMappingStrategy != original.returnTypeFlowMappingStrategy
 
     override val returnType: TypeSwiftModel
         get() = with(swiftModelScope) {
-            core.descriptor.returnTypeModel(receiver.swiftGenericExportScope, core.getMethodBridge(descriptor).returnBridge)
+            core.descriptor.returnTypeModel(
+                receiver.swiftGenericExportScope,
+                core.getMethodBridge(descriptor).returnBridge,
+                returnTypeFlowMappingStrategy,
+            )
         }
 
-    override val objCReturnType: ObjCType? by lazy {
-        core.getObjCReturnType(descriptor)
-    }
+    override var returnTypeFlowMappingStrategy: FlowMappingStrategy = FlowMappingStrategy.None
+
+    override val objCReturnType: ObjCType?
+        get() = core.getObjCReturnType(descriptor, returnTypeFlowMappingStrategy)
 
     override fun toString(): String = descriptor.toString()
 

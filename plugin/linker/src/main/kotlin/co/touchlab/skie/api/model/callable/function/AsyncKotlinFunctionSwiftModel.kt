@@ -28,7 +28,8 @@ internal class AsyncKotlinFunctionSwiftModel(
         get() = with(swiftModelScope) {
             descriptor.asyncReturnTypeModel(
                 receiver.swiftGenericExportScope,
-                delegate.core.getMethodBridge(descriptor).paramBridges.firstNotNullOf { it as? MethodBridgeParameter.ValueParameter.SuspendCompletion }
+                delegate.core.getMethodBridge(descriptor).paramBridges.firstNotNullOf { it as? MethodBridgeParameter.ValueParameter.SuspendCompletion },
+                returnTypeFlowMappingStrategy,
             )
         }
 

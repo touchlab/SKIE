@@ -4,6 +4,7 @@ import co.touchlab.skie.api.model.factory.ObjCTypeProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertyGetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -27,6 +28,6 @@ class KotlinRegularPropertySwiftModelCore(
 
     val objCName: String = namer.getPropertyName(descriptor.original).objCName
 
-    fun getObjCType(propertyDescriptor: PropertyDescriptor): ObjCType =
-        objCTypeProvider.getPropertyType(descriptor, propertyDescriptor)
+    fun getObjCType(propertyDescriptor: PropertyDescriptor, flowMappingStrategy: FlowMappingStrategy): ObjCType =
+        objCTypeProvider.getPropertyType(descriptor, propertyDescriptor, flowMappingStrategy)
 }

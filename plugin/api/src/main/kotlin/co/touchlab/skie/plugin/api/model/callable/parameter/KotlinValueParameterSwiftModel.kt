@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.api.model.callable.parameter
 
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
@@ -27,7 +28,7 @@ interface KotlinValueParameterSwiftModel {
 
     val position: Int
 
-    val isFlowMappingEnabled: Boolean
+    val flowMappingStrategy: FlowMappingStrategy
 
     sealed interface Origin {
 

@@ -4,6 +4,7 @@ package co.touchlab.skie.api.model.factory
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
@@ -60,11 +61,11 @@ class ObjCTypeProvider(
         function: FunctionDescriptor,
         parameter: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
-        isFlowMappingEnabled: Boolean,
+        flowMappingStrategy: FlowMappingStrategy,
         genericExportScope: ObjCExportScope = createGenericExportScope(function),
     ): ObjCType = when (bridge) {
         is MethodBridgeParameter.ValueParameter.Mapped -> {
-            mapType(parameter!!.type, bridge.bridge.toKotlinVersion(), genericExportScope, isFlowMappingEnabled)
+            mapType(parameter!!.type, bridge.bridge.toKotlinVersion(), genericExportScope, flowMappingStrategy)
         }
         MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
             ObjCPointerType(ObjCNullableReferenceType(ObjCClassType("NSError")), nullable = true)
@@ -73,7 +74,7 @@ class ObjCTypeProvider(
                 null
             } else {
                 when (val it =
-                    translator.mapReferenceType(function.returnType!!.substituteFlows(isFlowMappingEnabled), genericExportScope)) {
+                    translator.mapReferenceType(function.returnType!!.substituteFlows(flowMappingStrategy), genericExportScope)) {
                     is ObjCNonNullReferenceType -> ObjCNullableReferenceType(it, isNullableResult = false)
                     is ObjCNullableReferenceType -> ObjCNullableReferenceType(it.nonNullType, isNullableResult = true)
                 }
@@ -88,20 +89,28 @@ class ObjCTypeProvider(
         }
     }
 
-    fun getFunctionReturnType(baseFunction: FunctionDescriptor, function: FunctionDescriptor): ObjCType {
+    fun getFunctionReturnType(
+        baseFunction: FunctionDescriptor,
+        function: FunctionDescriptor,
+        flowMappingStrategy: FlowMappingStrategy,
+    ): ObjCType {
         val bridge = mapper.bridgeMethod(baseFunction)
 
         val genericExportScope = createGenericExportScope(function)
 
-        return mapReturnType(bridge.returnBridge, function, genericExportScope)
+        return mapReturnType(bridge.returnBridge, function, flowMappingStrategy, genericExportScope)
     }
 
-    fun getPropertyType(baseProperty: PropertyDescriptor, property: PropertyDescriptor): ObjCType {
+    fun getPropertyType(
+        baseProperty: PropertyDescriptor,
+        property: PropertyDescriptor,
+        flowMappingStrategy: FlowMappingStrategy,
+    ): ObjCType {
         val getterBridge = mapper.bridgeMethod(baseProperty.getter!!)
 
         val genericExportScope = createGenericExportScope(property)
 
-        return mapReturnType(getterBridge.returnBridge, property.getter!!, genericExportScope)
+        return mapReturnType(getterBridge.returnBridge, property.getter!!, flowMappingStrategy, genericExportScope)
     }
 
     private fun createGenericExportScope(descriptor: CallableMemberDescriptor): ObjCExportScope =
@@ -112,16 +121,17 @@ class ObjCTypeProvider(
     private fun mapReturnType(
         returnBridge: MethodBridge.ReturnValue,
         method: FunctionDescriptor,
+        flowMappingStrategy: FlowMappingStrategy,
         objCExportScope: ObjCExportScope,
     ): ObjCType = when (returnBridge) {
         MethodBridge.ReturnValue.Suspend,
         MethodBridge.ReturnValue.Void,
         -> ObjCVoidType
         MethodBridge.ReturnValue.HashCode -> ObjCPrimitiveType.NSUInteger
-        is MethodBridge.ReturnValue.Mapped -> mapType(method.returnType!!, returnBridge.bridge, objCExportScope, true)
+        is MethodBridge.ReturnValue.Mapped -> mapType(method.returnType!!, returnBridge.bridge, objCExportScope, flowMappingStrategy)
         MethodBridge.ReturnValue.WithError.Success -> ObjCPrimitiveType.BOOL
         is MethodBridge.ReturnValue.WithError.ZeroForError -> {
-            val successReturnType = mapReturnType(returnBridge.successBridge, method, objCExportScope)
+            val successReturnType = mapReturnType(returnBridge.successBridge, method, flowMappingStrategy, objCExportScope)
 
             if (!returnBridge.successMayBeZero) {
                 check(
@@ -144,22 +154,23 @@ class ObjCTypeProvider(
         kotlinType: KotlinType,
         typeBridge: TypeBridge,
         objCExportScope: ObjCExportScope,
-        isFlowMappingEnabled: Boolean,
+        flowMappingStrategy: FlowMappingStrategy,
     ): ObjCType {
-        val substitutedType = kotlinType.substituteFlows(isFlowMappingEnabled)
+        val substitutedType = kotlinType.substituteFlows(flowMappingStrategy)
 
         return reflectedTranslator.mapType.invoke(substitutedType, typeBridge, objCExportScope)
     }
 
-    private fun KotlinType.substituteFlows(isFlowMappingEnabled: Boolean): KotlinType {
-        val supportedFlow = SupportedFlow.from(this)
+    private fun KotlinType.substituteFlows(flowMappingStrategy: FlowMappingStrategy): KotlinType =
+        when (flowMappingStrategy) {
+            FlowMappingStrategy.Full -> {
+                val supportedFlow = SupportedFlow.from(this)
 
-        if (!isFlowMappingEnabled || supportedFlow == null) {
-            return this.withSubstitutedArgumentsForFlow()
+                supportedFlow?.createType(this) ?: this.withSubstitutedArgumentsForFlow()
+            }
+            FlowMappingStrategy.GenericsOnly -> this.withSubstitutedArgumentsForFlow()
+            FlowMappingStrategy.None -> this
         }
-
-        return supportedFlow.createType(this)
-    }
 
     private fun SupportedFlow.createType(originalType: KotlinType): KotlinType {
         val substitutedArguments = originalType.arguments.map { it.substituteFlows() }
@@ -177,7 +188,7 @@ class ObjCTypeProvider(
     private fun TypeArgumentMarker.substituteFlows(): TypeProjection =
         when (this) {
             is TypeProjectionImpl -> {
-                val substitutedType = type.substituteFlows(true)
+                val substitutedType = type.substituteFlows(FlowMappingStrategy.Full)
 
                 if (this.type != substitutedType) TypeProjectionImpl(projectionKind, substitutedType) else this
             }
