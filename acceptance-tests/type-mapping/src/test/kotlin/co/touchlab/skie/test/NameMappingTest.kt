@@ -2,36 +2,30 @@
 
 package co.touchlab.skie.test
 
-import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.CompilerArgumentsProvider
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestLinker
+import co.touchlab.skie.acceptancetests.framework.testStream
+import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.type_mapping.BuildConfig
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.TypeSpec
-import org.junit.jupiter.api.Test
-import kotlin.io.path.Path
-import co.touchlab.skie.configuration.Configuration
-import com.squareup.kotlinpoet.PropertySpec
-import kotlin.io.path.writer
-
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
-import io.mockk.InternalPlatformDsl.toArray
-import org.jetbrains.kotlin.konan.file.File
+import org.junit.jupiter.api.Test
 import java.nio.file.Path
-import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
-import kotlin.io.path.deleteIfExists
+import kotlin.io.path.Path
 import kotlin.io.path.writeText
-import kotlin.math.ceil
-import kotlin.streams.toList
+import kotlin.io.path.writer
 import kotlin.test.fail
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -46,7 +40,7 @@ class NameMappingTest {
         tempDirectory.toFile().deleteRecursively()
         tempDirectory.toFile().mkdirs()
 
-        val compilerConfiguration = CompilerConfiguration(
+        val compilerArgumentsProvider = CompilerArgumentsProvider(
             dependencies = BuildConfig.DEPENDENCIES.toList(),
             exportedDependencies = BuildConfig.EXPORTED_DEPENDENCIES.toList(),
         )
@@ -64,13 +58,13 @@ class NameMappingTest {
             .filter { onlyIndices.isEmpty() || onlyIndices.contains(it.first) }
 
         val failures = testsToRun
-            .parallelStream()
+            .testStream()
             .map { (index, types) ->
                 val testTime = measureTimedValue {
                     runTestForTypes(
                         types = types,
                         tempDirectory = tempDirectory.resolve("test-$index"),
-                        compilerConfiguration = compilerConfiguration,
+                        compilerArgumentsProvider = compilerArgumentsProvider,
                     )
                 }
                 val result = testTime.value
@@ -110,7 +104,7 @@ class NameMappingTest {
     private fun runTestForTypes(
         types: List<TestedType>,
         tempDirectory: Path,
-        compilerConfiguration: CompilerConfiguration,
+        compilerArgumentsProvider: CompilerArgumentsProvider,
     ): TestResult {
         val tempFileSystem = TempFileSystem(tempDirectory)
         val tempSourceFile = tempDirectory.resolve("KotlinFile.kt")
@@ -215,16 +209,19 @@ class NameMappingTest {
                 val compiler = KotlinTestCompiler(tempFileSystem, testLogger)
                 compiler.compile(
                     listOf(tempSourceFile),
-                    compilerConfiguration,
+                    compilerArgumentsProvider,
                 )
             }
-            .finalize {
+            .flatMap {
                 val linker = KotlinTestLinker(tempFileSystem, testLogger)
                 linker.link(
                     it,
                     skieConfiguration,
-                    compilerConfiguration,
+                    compilerArgumentsProvider,
                 )
+            }
+            .finalize {
+                TestResult.Success
             }
             .also {
                 tempDirectory.resolve("run.log").writeText(testLogger.toString())

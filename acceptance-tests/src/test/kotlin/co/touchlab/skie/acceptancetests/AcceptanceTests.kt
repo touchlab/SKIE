@@ -2,10 +2,10 @@ package co.touchlab.skie.acceptancetests
 
 import co.touchlab.skie.acceptance_tests.BuildConfig
 import co.touchlab.skie.acceptancetests.framework.AcceptanceTestsRunner
-import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.skie.acceptancetests.framework.TestFilter
 import co.touchlab.skie.acceptancetests.framework.TestNode
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.CompilerArgumentsProvider
 import co.touchlab.skie.acceptancetests.framework.plus
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
@@ -16,12 +16,14 @@ class AcceptanceTests : FunSpec({
     val testsDirectory = Path(BuildConfig.RESOURCES).resolve("tests")
     val tempDirectory = Path(BuildConfig.BUILD).resolve("test-temp")
 
-    val compilerConfiguration = CompilerConfiguration(
+    val compilerArgumentsProvider = CompilerArgumentsProvider(
         dependencies = BuildConfig.DEPENDENCIES.toList(),
         exportedDependencies = BuildConfig.EXPORTED_DEPENDENCIES.toList(),
+        // Null here, because we want to explicitly only test the same target we're running on
+        target = null,
     )
 
-    val tests = TestNode(testsDirectory, tempDirectory, compilerConfiguration)
+    val tests = TestNode(testsDirectory, tempDirectory, compilerArgumentsProvider)
 
     val tempFileSystemFactory = TempFileSystemFactory()
     val testFilter = buildTestFilter()

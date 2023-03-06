@@ -1,23 +1,22 @@
 package co.touchlab.skie.plugin.libraries
 
-import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.ExpectedTestResult
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.CompilerArgumentsProvider
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestLinker
+import co.touchlab.skie.acceptancetests.framework.testStream
 import co.touchlab.skie.configuration.Configuration
-import co.touchlab.skie.configuration.features.SkieFeature
-import co.touchlab.skie.configuration.features.SkieFeatureSet
-import co.touchlab.skie.external_libraries.BuildConfig
 import io.kotest.core.spec.style.FunSpec
 import kotlinx.coroutines.channels.Channel
 import java.io.File
 import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
-import kotlin.io.path.Path
 import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -31,7 +30,6 @@ class ExternalLibrariesTestRunner(
     private val skieConfiguration: Configuration?,
     private val scopeSuffix: String,
 ) {
-    @OptIn(ExperimentalTime::class)
     fun runTests(scope: FunSpec, tests: List<ExternalLibraryTest>) {
         val channel = Channel<Map<ExternalLibraryTest, TestResultWithLogs>>()
         scope.concurrency = 2
@@ -41,7 +39,7 @@ class ExternalLibrariesTestRunner(
             val filteredTests = tests
                 .filter { testFilter.shouldBeEvaluated(it) }
             val results = filteredTests
-                .parallelStream()
+                .testStream()
                 .map {
                     val result = runTest(it) { "${testCompletionTracking.incrementAndGet()}/${filteredTests.size}" }
                     it to result
@@ -71,9 +69,10 @@ class ExternalLibrariesTestRunner(
 
         val testLogger = TestLogger()
 
-        val compilerConfiguration = CompilerConfiguration(
+        val compilerArgumentsProvider = CompilerArgumentsProvider(
             dependencies = test.input.files,
             exportedDependencies = test.input.exportedFiles,
+            target = CompilerArgumentsProvider.Target.IOS_ARM64,
         )
 
         val measuredTest = measureTimedValue {
@@ -82,16 +81,19 @@ class ExternalLibrariesTestRunner(
                     val compiler = KotlinTestCompiler(tempFileSystem, testLogger)
                     compiler.compile(
                         kotlinFiles = sourceFiles,
-                        compilerConfiguration = compilerConfiguration,
+                        compilerArgumentsProvider = compilerArgumentsProvider,
                     )
                 }
-                .finalize {
+                .flatMap {
                     val linker = KotlinTestLinker(tempFileSystem, testLogger)
                     linker.link(
                         it,
                         skieConfiguration,
-                        compilerConfiguration,
+                        compilerArgumentsProvider,
                     )
+                }
+                .finalize {
+                    TestResult.Success
                 }
         }
         val testResult = measuredTest.value

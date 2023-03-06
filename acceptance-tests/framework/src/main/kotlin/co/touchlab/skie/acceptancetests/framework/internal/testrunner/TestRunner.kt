@@ -1,12 +1,12 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner
 
-import co.touchlab.skie.acceptancetests.framework.CompilerConfiguration
 import co.touchlab.skie.acceptancetests.framework.ExpectedTestResult
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TempFileSystemFactory
 import co.touchlab.skie.acceptancetests.framework.TestNode
 import co.touchlab.skie.acceptancetests.framework.TestResult
 import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.CompilerArgumentsProvider
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestLinker
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.PluginConfigurationGenerator
@@ -14,9 +14,9 @@ import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swi
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.SwiftProgramRunner
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.SwiftTestCompiler
 import co.touchlab.skie.acceptancetests.framework.internal.util.CreatedFilesDescriptionFilter
+import co.touchlab.skie.configuration.Configuration
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.createFile
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.time.Duration
@@ -36,9 +36,9 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
                 with(testLogger) {
                     IntermediateResult.Value(test.kotlinFiles)
                         .map { withJvmInlineAnnotation(it) }
-                        .flatMap { compileKotlin(it, test.compilerConfiguration) }
+                        .flatMap { compileKotlin(it, test.compilerArgumentsProvider) }
                         .zip { generateConfiguration(test.configFiles) }
-                        .flatMap { linkKotlin(it.first, it.second, test.compilerConfiguration) }
+                        .flatMap { linkKotlin(it.first, Configuration.deserialize(it.second.readText()), test.compilerArgumentsProvider) }
                         .pairWith { enhanceSwiftCode(test.swiftCode) }
                         .flatMap { compileSwift(it.first, it.second) }
                         .finalize { runSwift(it) }
@@ -85,9 +85,9 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     context(TempFileSystem, TestLogger)
     private fun compileKotlin(
         kotlinFiles: List<Path>,
-        compilerConfiguration: CompilerConfiguration,
+        compilerArgumentsProvider: CompilerArgumentsProvider,
     ): IntermediateResult<Path> =
-        KotlinTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFiles, compilerConfiguration)
+        KotlinTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFiles, compilerArgumentsProvider)
 
     context(TempFileSystem)
     private fun generateConfiguration(
@@ -98,10 +98,10 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     context(TempFileSystem, TestLogger)
     private fun linkKotlin(
         klib: Path,
-        configuration: Path,
-        compilerConfiguration: CompilerConfiguration,
+        configuration: Configuration,
+        compilerArgumentsProvider: CompilerArgumentsProvider,
     ): IntermediateResult<Path> =
-        KotlinTestLinker(this@TempFileSystem, this@TestLogger).link(klib, configuration, compilerConfiguration)
+        KotlinTestLinker(this@TempFileSystem, this@TestLogger).link(klib, configuration, compilerArgumentsProvider)
 
     context(TempFileSystem)
     private fun enhanceSwiftCode(swiftCode: String): Path =

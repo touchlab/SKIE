@@ -1,9 +1,6 @@
 name: Run All Tests
 
 on:
-  push:
-    branches:
-      - main
   workflow_call:
     inputs:
       release-version:
@@ -11,6 +8,21 @@ on:
         type: string
         required: true
         default: "1.0.0-SNAPSHOT"
+      matrix-targets:
+        description: 'JSON Array with targets (type mapping only)'
+        type: string
+        required: false
+        default: '["ios_arm64"]'
+      matrix-static:
+        description: 'JSON Array with booleans - static framework or not (all jobs)'
+        type: string
+        required: false
+        default: '[true]'
+      matrix-configuration:
+        description: 'JSON Array with build configurations (all jobs)'
+        type: string
+        required: false
+        default: '["release"]'
     secrets:
       SWIFTPOET_TOKEN:
         required: true
@@ -27,6 +39,10 @@ jobs:
     name: Acceptance Tests
     concurrency: ci-acceptance-tests-${{ github.ref }}
     runs-on: self-hosted
+    strategy:
+      matrix:
+        static: ${{ fromJson(inputs.matrix-static) }}
+        configuration: ${{ fromJson(inputs.matrix-configuration) }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -39,6 +55,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:test'
+        env:
+          KOTLIN_STATIC_FRAMEWORK: ${{ matrix.static }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()
@@ -51,6 +70,11 @@ jobs:
     name: Type Mapping Tests
     concurrency: ci-type-mapping-tests-${{ github.ref }}
     runs-on: self-hosted
+    strategy:
+      matrix:
+        target: ${{ fromJson(inputs.matrix-targets) }}
+        static: ${{ fromJson(inputs.matrix-static) }}
+        configuration: ${{ fromJson(inputs.matrix-configuration) }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -63,6 +87,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:type-mapping:test'
+        env:
+          KOTLIN_STATIC_FRAMEWORK: ${{ matrix.static }}
+          KOTLIN_TARGET: ${{ matrix.target }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()
@@ -75,6 +103,10 @@ jobs:
     name: External Libraries Tests
     concurrency: ci-external-libraries-tests-${{ github.ref }}
     runs-on: self-hosted
+    strategy:
+      matrix:
+        static: ${{ fromJson(inputs.matrix-static) }}
+        configuration: ${{ fromJson(inputs.matrix-configuration) }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -87,6 +119,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:external-libraries:test'
+        env:
+          KOTLIN_STATIC_FRAMEWORK: ${{ matrix.static }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()

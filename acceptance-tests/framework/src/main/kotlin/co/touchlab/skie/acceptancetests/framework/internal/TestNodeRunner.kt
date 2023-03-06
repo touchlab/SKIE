@@ -5,6 +5,7 @@ import co.touchlab.skie.acceptancetests.framework.TestFilter
 import co.touchlab.skie.acceptancetests.framework.TestNode
 import co.touchlab.skie.acceptancetests.framework.TestResultWithLogs
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestRunner
+import co.touchlab.skie.acceptancetests.framework.testStream
 import kotlin.streams.toList
 
 internal class TestNodeRunner(
@@ -35,7 +36,7 @@ internal class TestNodeRunner(
 
     private fun runTests(tests: List<TestNode.Test>): Map<TestNode.Test, TestResultWithLogs> =
         tests
-            .parallelStream()
+            .testStream()
             .map { it to testRunner.runTest(it) }
             .toList()
             .toMap()

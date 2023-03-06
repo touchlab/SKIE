@@ -1,0 +1,15 @@
+name: Smoke Tests on Push
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  run-all-tests:
+    uses: ./.github/workflows/reusable/all-tests.yml
+    secrets: inherit

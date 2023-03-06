@@ -1,0 +1,20 @@
+name: Comprehensive Tests
+
+on:
+  schedule:
+    # Every saturday at 2am EST
+    - cron: '0 7 * * SAT'
+  workflow_dispatch:
+
+permissions:
+    contents: read
+    checks: write
+
+jobs:
+  run-all-tests:
+    uses: ./.github/workflows/reusable/all-tests.yml
+    with:
+      matrix-targets: '["ios_arm64", "ios_x64", "ios_simulator_arm64", "macos_arm64", "macos_x64"]'
+      matrix-static: '[true, false]'
+      matrix-configuration: '["release", "debug"]'
+    secrets: inherit

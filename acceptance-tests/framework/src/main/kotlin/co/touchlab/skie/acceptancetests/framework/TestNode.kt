@@ -1,6 +1,7 @@
 package co.touchlab.skie.acceptancetests.framework
 
 import co.touchlab.skie.acceptancetests.framework.internal.TestCodeParser
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.CompilerArgumentsProvider
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
@@ -29,14 +30,14 @@ sealed class TestNode {
 
         private const val fullNameSeparator = "/"
 
-        operator fun invoke(path: Path, outputPath: Path, compilerConfiguration: CompilerConfiguration): TestNode =
-            Container(path, outputPath, null, compilerConfiguration)
+        operator fun invoke(path: Path, outputPath: Path, compilerArgumentsProvider: CompilerArgumentsProvider): TestNode =
+            Container(path, outputPath, null, compilerArgumentsProvider)
 
-        operator fun invoke(path: Path, outputPath: Path, parent: Container, compilerConfiguration: CompilerConfiguration): TestNode =
+        operator fun invoke(path: Path, outputPath: Path, parent: Container, compilerArgumentsProvider: CompilerArgumentsProvider): TestNode =
             if (path.isRegularFile()) {
-                Test(path, outputPath, parent, compilerConfiguration)
+                Test(path, outputPath, parent, compilerArgumentsProvider)
             } else {
-                Container(path, outputPath, parent, compilerConfiguration)
+                Container(path, outputPath, parent, compilerArgumentsProvider)
             }
 
         fun testName(path: Path): String =
@@ -47,7 +48,7 @@ sealed class TestNode {
         public override val path: Path,
         override val outputPath: Path,
         override val parent: Container,
-        val compilerConfiguration: CompilerConfiguration,
+        val compilerArgumentsProvider: CompilerArgumentsProvider,
     ) : TestNode() {
 
         override val directChildren: List<TestNode> = emptyList()
@@ -95,13 +96,13 @@ sealed class TestNode {
         override val path: Path,
         override val outputPath: Path,
         override val parent: Container?,
-        private val compilerConfiguration: CompilerConfiguration,
+        private val compilerArgumentsProvider: CompilerArgumentsProvider,
     ) : TestNode() {
 
         override val directChildren: List<TestNode> by lazy {
             path.listDirectoryEntries()
                 .filter { it.isDirectChildren }
-                .map { TestNode(it, outputPath.resolve(testName(it)), this, compilerConfiguration) }
+                .map { TestNode(it, outputPath.resolve(testName(it)), this, compilerArgumentsProvider) }
         }
 
         val kotlinFiles: List<Path> by lazy {
