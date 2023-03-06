@@ -182,7 +182,7 @@ tasks.register<Test>("comparePureAndSkie") {
 
     systemProperty("pureTestDir", layout.buildDirectory.dir("external-libraries-tests-no-skie").get().asFile.absolutePath)
     systemProperty("skieTestDir", layout.buildDirectory.dir("external-libraries-tests").get().asFile.absolutePath)
-    systemProperty("csvOutput", layout.buildDirectory.file("reports/comparison-report.csv").get().asFile.absolutePath)
+    systemProperty("csvOutputDir", layout.buildDirectory.dir("reports/comparison").get().asFile.absolutePath)
 
     description = "Compares library tests with and without SKIE"
     group = "verification"
