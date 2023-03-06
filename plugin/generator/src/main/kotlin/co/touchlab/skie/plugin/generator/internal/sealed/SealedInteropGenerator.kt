@@ -4,7 +4,6 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 
@@ -30,7 +29,7 @@ internal class SealedInteropGenerator(
     }
 
     private val KotlinClassSwiftModel.isSupported: Boolean
-        get() = this.isSealed && this.isSealedInteropEnabled && !this.belongsToSkieRuntime
+        get() = this.isSealed && this.isSealedInteropEnabled
 
     private val KotlinClassSwiftModel.isSealedInteropEnabled: Boolean
         get() = this.getConfiguration(SealedInterop.Enabled)

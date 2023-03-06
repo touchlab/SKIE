@@ -8,7 +8,6 @@ import co.touchlab.skie.configuration.gradle.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
@@ -48,7 +47,7 @@ internal class SuspendGenerator(
             .filter { it.isInteropEnabled }
 
     private val FunctionDescriptor.isSupported: Boolean
-        get() = this.isSuspend && !this.belongsToSkieRuntime
+        get() = this.isSuspend
 
     private val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.getConfiguration(SuspendInterop.Enabled)

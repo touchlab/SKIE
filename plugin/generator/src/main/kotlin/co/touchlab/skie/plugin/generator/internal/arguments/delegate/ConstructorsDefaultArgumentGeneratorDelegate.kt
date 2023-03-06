@@ -6,7 +6,6 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
@@ -51,7 +50,7 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
         get() = this.exposedClasses.filter { it.isSupported }
 
     private val ClassDescriptor.isSupported: Boolean
-        get() = this.kind == ClassKind.CLASS && !this.belongsToSkieRuntime
+        get() = this.kind == ClassKind.CLASS
 
     private val ClassDescriptor.allSupportedConstructors: List<ClassConstructorDescriptor>
         get() = descriptorProvider.getExposedConstructors(this)

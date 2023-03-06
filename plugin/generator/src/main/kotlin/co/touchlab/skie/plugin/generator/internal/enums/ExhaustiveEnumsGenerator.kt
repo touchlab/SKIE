@@ -16,7 +16,6 @@ import co.touchlab.skie.plugin.api.model.type.packageName
 import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
@@ -56,8 +55,7 @@ internal class ExhaustiveEnumsGenerator(
 
     private val KotlinClassSwiftModel.isSupported: Boolean
         get() = this.classDescriptor.kind.isEnumClass &&
-            this.classDescriptor.isEnumInteropEnabled &&
-            !this.classDescriptor.belongsToSkieRuntime
+            this.classDescriptor.isEnumInteropEnabled
 
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
         get() = getConfiguration(EnumInterop.Enabled)
