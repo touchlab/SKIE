@@ -34,7 +34,10 @@ Therefore, the Kotlin compiler exposes suspend functions as callbacks.
 This approach has the following problems:
 
 - It has an ugly syntax that leads to callback hell (which is what suspend functions were meant to solve in the first place).
-- Suspend function can be only called from Swift from the main thread (otherwise it results in a runtime crash).
+- Suspend function can be by default only called from Swift from the main thread (otherwise it results in a runtime crash).
+  - Kotlin 1.7.20 added a compiler flag that enables this feature.
+  - However, it only works with the regular (non `native-mt`) version of Coroutines.
+  - See [KT-51297](https://youtrack.jetbrains.com/issue/KT-51297/Native-allow-calling-Kotlin-suspend-functions-on-non-main-thread-from-Swift) for more information.
 - It's not possible to cancel execution of such function from Swift.
 
 The ugly syntax was already solved when Swift 5.5 added `async`/`await` with interop for legacy ObjC functions.
@@ -71,7 +74,7 @@ SKIE does the same thing for suspend functions of generic classes (both for memb
 For example:
 
 ```kotlin title=A.kt
-class A {
+class A<T> {
 
     suspend fun foo(): Int = 0
 }
@@ -80,11 +83,13 @@ class A {
 Which can be called like so:
 
 ```swift
-try await AKt.foo(A())
+try await AKt.foo(A<NSString>())
 ```
 
 Another limitation is that the generated wrappers cannot be directly overridden (they are just extensions).
-Instead, you need to override the original suspend method.
+Instead, you have to override the original suspend method.
+However, doing that might cause the cancellation support to not work properly.
+
 SKIE hides the original methods by prefixing them with `__`.
 Therefore, it's possible to override that method using it's prefixed name.
 For example:
