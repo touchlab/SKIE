@@ -39,14 +39,14 @@ jobs:
           aws_key_id: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
           aws_secret_access_key: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
           aws_bucket: 'us-east-2'
-          source_dir: 'acceptance-tests/external-libraries/build/report/comparison-report.csv'
+          source_dir: 'acceptance-tests/external-libraries/build/reports/comparison-report.csv'
           destination_dir: 'comparison-reports/report-${{ github.run_id }}.csv'
       - name: Upload Comparison Report (GitHub artifact)
         uses: actions/upload-artifact@v3
         if: always()
         with:
           name: 'Comparison Report'
-          path: acceptance-tests/external-libraries/build/report/comparison-report.csv
+          path: 'acceptance-tests/external-libraries/build/reports/comparison-report.csv'
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()
