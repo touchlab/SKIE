@@ -1,9 +1,9 @@
 name: Comprehensive Tests
 
 on:
-  schedule:
+#  schedule:
     # Every saturday at 2am EST
-    - cron: '0 7 * * SAT'
+#    - cron: '0 7 * * SAT'
   workflow_dispatch:
 
 permissions:

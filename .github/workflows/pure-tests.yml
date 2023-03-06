@@ -1,4 +1,4 @@
-name: Run Pure Tests
+name: Pure Tests
 
 on:
   workflow_dispatch:

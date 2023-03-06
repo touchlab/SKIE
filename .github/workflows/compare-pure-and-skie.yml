@@ -34,7 +34,7 @@ jobs:
           onlyIndices: ${{ github.event.inputs.onlyIndices }}
           GITHUB_RUN_ID: ${{ github.run_id }}
           DISABLE_PARALLEL_TESTS: true
-          KOTLIN_STATIC_FRAMEWORK: false
+          KOTLIN_STATIC_FRAMEWORK: true
           KOTLIN_BUILD_CONFIGURATION: release
       - name: Upload Comparison Report (S3)
         if: always()
