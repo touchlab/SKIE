@@ -65,7 +65,7 @@ class CompareResultsTest: FunSpec({
         val (pureFails, skieFails) = report.partitionedFails()
 
         summary.appendSection("## Notable comparisons") {
-            report.notableComparisons.forEach { notableComparison ->
+            report.notableComparisons.sortedByDescending { it.comparison.absoluteDifference }.forEach { notableComparison ->
                 val (comparison, reasons) = notableComparison
                 val (library, pure, skie) = comparison
                 +"- ${library.name}"

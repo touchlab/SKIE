@@ -27,13 +27,13 @@ class CsvReporter private constructor(
 
     private fun writeAbsoluteDiffReport(libraries: List<Comparison>) {
         reportFile("sorted-by-absolute-diff").writeReport(
-            libraries.sortedByDescending { abs(it.absoluteDifference.toDouble(DurationUnit.SECONDS)) }
+            libraries.sortedByDescending { it.absoluteDifference }
         )
     }
 
     private fun writeRelativeDiffReport(libraries: List<Comparison>) {
         reportFile("sorted-by-relative-diff").writeReport(
-            libraries.sortedByDescending { abs(it.relativeDifference) }
+            libraries.sortedByDescending { it.relativeDifference }
         )
     }
 
