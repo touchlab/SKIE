@@ -6,7 +6,7 @@ on:
       release-version:
         description: 'The version being released'
         type: string
-        required: true
+        required: false
         default: "1.0.0-SNAPSHOT"
       matrix-targets:
         description: 'JSON Array with targets (type mapping only)'
