@@ -5,35 +5,19 @@ class AsyncStreamDispatcherDelegate: Skie.class__co_touchlab_skie_kotlin__co_tou
 
     private let continuation: _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable>.Continuation
 
-    private let lock = Foundation.NSLock()
-
-    private var isActive = true
-
     init(continuation: _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable>.Continuation) {
         self.continuation = continuation
     }
 
     func dispatch(block: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable) {
-        lock.lock()
-        defer {
-            lock.unlock()
-        }
+        let result = continuation.yield(block)
 
-        if !isActive {
-            Swift.fatalError("Cannot dispatch block after dispatcher is stopped. This error might have happened by leaking the dispatcher from the original job.")
+        if case .terminated = result {
+            Swift.fatalError("Cannot dispatch blocks after the dispatcher is stopped. This error might have happened by leaking the dispatcher from the original job.")
         }
-
-        continuation.yield(block)
     }
 
     func stop() {
-        lock.lock()
-        defer {
-            lock.unlock()
-        }
-
-        isActive = false
-
         continuation.finish()
     }
 }
