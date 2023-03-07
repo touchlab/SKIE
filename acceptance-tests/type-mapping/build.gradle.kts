@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
+import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
     id("skie-jvm")
@@ -21,7 +22,7 @@ skieJvm {
     areContextReceiversEnabled.set(true)
 }
 
-val acceptanceTestDependencies: Configuration = configurations.create("acceptanceTestDependencies") {
+fun Configuration.configure() {
     isCanBeConsumed = false
     isCanBeResolved = true
 
@@ -31,23 +32,19 @@ val acceptanceTestDependencies: Configuration = configurations.create("acceptanc
         KotlinPlatformType.attribute,
         KotlinPlatformType.native
     )
-    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, MacOsCpuArchitecture.getCurrent().konanTarget)
+    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, System.getenv("KOTLIN_TARGET") ?: MacOsCpuArchitecture.getCurrent().konanTarget)
     attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+}
+
+val acceptanceTestDependencies: Configuration = configurations.create("acceptanceTestDependencies") {
+    configure()
 }
 
 val acceptanceTestExportedDependencies: Configuration = configurations.create("acceptanceTestExportedDependencies") {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-
-    exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
-
-    attributes.attribute(
-        KotlinPlatformType.attribute,
-        KotlinPlatformType.native
-    )
-    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, MacOsCpuArchitecture.getCurrent().konanTarget)
-    attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+    configure()
 }
+
+
 
 dependencies {
     testImplementation(projects.acceptanceTests.framework)
