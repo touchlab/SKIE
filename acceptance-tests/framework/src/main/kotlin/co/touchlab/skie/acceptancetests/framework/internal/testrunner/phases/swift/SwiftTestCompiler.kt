@@ -33,6 +33,8 @@ internal class SwiftTestCompiler(
         swiftFile.absolutePathString(),
         "-F",
         kotlinFramework.parent.absolutePathString(),
+        // Adds rpath so that the binary can find the framework when linking dynamically
+        "-Xlinker", "-rpath", "-Xlinker", "@executable_path",
         "-v",
         // "-driver-time-compilation",
         // "-print-educational-notes",
