@@ -17,6 +17,7 @@ jobs:
   run-comparison:
     name: Compare Pure and SKIE
     concurrency: ci-compare-tests-${{ github.ref }}
+    timeout-minutes: 600
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
