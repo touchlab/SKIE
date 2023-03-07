@@ -39,6 +39,7 @@ jobs:
     name: Acceptance Tests
     runs-on: self-hosted
     strategy:
+      fail-fast: false
       matrix:
         linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
@@ -70,6 +71,7 @@ jobs:
     name: Type Mapping Tests
     runs-on: self-hosted
     strategy:
+      fail-fast: false
       matrix:
         target: ${{ fromJson(inputs.matrix-targets) }}
         linkage: ${{ fromJson(inputs.matrix-linkage) }}
@@ -103,6 +105,7 @@ jobs:
     name: External Libraries Tests
     runs-on: self-hosted
     strategy:
+      fail-fast: false
       matrix:
         linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
