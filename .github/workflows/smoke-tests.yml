@@ -12,4 +12,6 @@ permissions:
 jobs:
   run-all-tests:
     uses: ./.github/workflows/all-tests.yml
+    with:
+      concurrency-id: smoke
     secrets: inherit

@@ -1,4 +1,4 @@
-name: Run All Tests
+name: All Tests
 
 on:
   workflow_call:
@@ -8,6 +8,10 @@ on:
         type: string
         required: false
         default: "1.0.0-SNAPSHOT"
+      concurrency-id:
+        description: 'The ID to use for concurrency'
+        type: string
+        required: true
       matrix-targets:
         description: 'JSON Array with targets (type mapping only)'
         type: string
@@ -43,7 +47,7 @@ jobs:
       matrix:
         linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
-    concurrency: ci-acceptance-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
+    concurrency: ci-${{ inputs.concurrency-id }}-acceptance-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -76,7 +80,7 @@ jobs:
         target: ${{ fromJson(inputs.matrix-targets) }}
         linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
-    concurrency: ci-type-mapping-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}-${{ matrix.target }}
+    concurrency: ci-${{ inputs.concurrency-id }}-type-mapping-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}-${{ matrix.target }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -109,7 +113,7 @@ jobs:
       matrix:
         linkage: ${{ fromJson(inputs.matrix-linkage) }}
         configuration: ${{ fromJson(inputs.matrix-configuration) }}
-    concurrency: ci-external-libraries-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
+    concurrency: ci-${{ inputs.concurrency-id }}-external-libraries-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3

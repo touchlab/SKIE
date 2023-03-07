@@ -14,6 +14,7 @@ jobs:
   run-all-tests:
     uses: ./.github/workflows/all-tests.yml
     with:
+      concurrency-id: comprehensive
       matrix-targets: '["ios_arm64", "ios_x64", "ios_simulator_arm64", "macos_arm64", "macos_x64"]'
       matrix-linkage: '["static", "dynamic"]'
       matrix-configuration: '["release", "debug"]'
