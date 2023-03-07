@@ -1,3 +1,5 @@
+# Skip
+
 func sum(flow: SkieFlow<KotlinInt>) async throws -> Int32 {
     return try await SumKt.sum(flow: flow).int32Value
 }

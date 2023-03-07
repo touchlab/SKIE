@@ -1,12 +1,11 @@
 {
-    "enabledFeatures": {
-    },
+    "enabledFeatures": {},
     "groups": [
         {
-            "target": "tests.",
+            "target": "co.touchlab.skie.runtime",
             "overridesAnnotations": false,
             "items": {
-                "SuspendInterop.Enabled": "false"
+                "SealedInterop.Enabled": "false"
             }
         }
     ]
