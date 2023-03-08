@@ -54,6 +54,7 @@ org.jetbrains.compose.runtime:runtime-saveable-uikitarm64
 > Unbound public symbol IrSimpleFunctionPublicSymbolImpl: androidx.compose.runtime/ControlledComposition.composeContent
 org.jetbrains.compose.runtime:runtime-uikitarm64
 
+# TODO: Check if this is just a problem with how we compile Kotlin/Native in tests
 > e: Could not find "org.jetbrains.compose.runtime:runtime"
 com.adeo.libres:libres-compose-iosarm64
 io.github.skeptick.libres:libres-compose-iosarm64
@@ -103,6 +104,14 @@ com.gu.kotlin:multiplatform-ophan-iosarm64
 io.github.tyczj:tweedle-iosarm64
 net.pearx.kpastebin:kpastebin-iosarm64
 
-# TODO: Verify if we can do anything about it
+# TODO: Check if we can do anything about it
 > e: Could not find "Premo:premo"
 me.dmdev.premo:premo-navigation-iosarm64
+
+# TODO: Check if we can do anything about it
+> Caused by: java.lang.StackOverflowError
+com.github.rnett.krosstalk:krosstalk-base-iosarm64
+
+# TODO: Check if we can do anything about it
+> Caused by: java.lang.AssertionError: Shouldn't be exposed: deserialized class XmlChildrenName
+io.github.pdvrieze.xmlutil:serialization-iosarm64

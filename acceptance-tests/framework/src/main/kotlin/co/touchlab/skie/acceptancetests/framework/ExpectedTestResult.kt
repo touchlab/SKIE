@@ -163,6 +163,27 @@ sealed interface ExpectedTestResult {
             }
         }
     }
+
+    data class KotlinAnyError(val errors: List<String>): ExpectedTestResult {
+        override fun shouldBe(testResult: TestResult, logs: String) {
+            if (errors.isNotEmpty()) {
+                if (testResult is TestResult.KotlinCompilationError && errors.all { testResult.error.contains(it) }) {
+                    return
+                }
+                if (testResult is TestResult.KotlinLinkingError && errors.all { testResult.error.contains(it) }) {
+                    return
+                }
+
+                failTest(testResult, "Kotlin linking ended with an error containing all of: ${errors.joinToString("\n")}")
+            } else {
+                if (testResult is TestResult.KotlinCompilationError || testResult is TestResult.KotlinLinkingError) {
+                    return
+                }
+
+                failTest(testResult, "Kotlin linking ended with any error.")
+            }
+        }
+    }
 }
 
 private fun failTest(result: TestResult, expected: String) {
