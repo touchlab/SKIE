@@ -3,7 +3,9 @@ package co.touchlab.skie.plugin.generator.internal
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
+import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowGenericArgumentStubGenerator
+import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowMappingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.SuspendGenerator
 import co.touchlab.skie.plugin.generator.internal.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.plugin.generator.internal.runtime.KotlinRuntimeHidingPhase
@@ -36,6 +38,12 @@ internal class SkieCompilationScheduler(
         KotlinRuntimeHidingPhase(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
+        ),
+        FlowBridgingConfigurator(
+            skieContext = skieContext,
+        ),
+        FlowMappingConfigurator(
+            skieContext = skieContext,
         ),
         FlowGenericArgumentStubGenerator(
             skieContext = skieContext,

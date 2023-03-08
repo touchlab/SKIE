@@ -1,3 +1,3 @@
-# SwiftCompilationError(cannot convert value of type 'SkieFlow<KotlinInt>' to expected argument type 'SkieFlow<String>')
+# SwiftCompilationError(cannot convert value of type 'SkieSwiftFlow<KotlinInt>' to expected argument type 'SkieSwiftFlow<String>')
 
 A().foo(flow: AKt.flow())

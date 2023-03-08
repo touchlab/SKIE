@@ -4,4 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 
-fun foo(): Pair<Pair<Flow<Int>, Unit>, Unit> = flowOf(1, 2, 3) to Unit to Unit
+class A<T>(val value: T)
+
+fun foo(): A<A<Flow<Int>>> = A(A(flowOf(1, 2, 3)))

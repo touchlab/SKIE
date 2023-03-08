@@ -1,9 +1,7 @@
-# Skip
-
-func sum(flow: SkieFlow<KotlinInt>) async throws -> Int32 {
+func sum(flow: SkieSwiftFlow<KotlinInt>) async throws -> Int32 {
     return try await SumKt.sum(flow: flow).int32Value
 }
 
-let result = try! await sum(flow: AKt.foo().first!.first!)
+let result = try! await sum(flow: SkieSwiftFlow(AKt.foo().value!.value!))
 
 exit(result - 6)

@@ -7,8 +7,8 @@ import org.jetbrains.kotlin.types.KotlinType
 enum class SupportedFlow(val fromFqName: String, val toNonOptionalFqName: String, val toOptionalFqName: String) {
     Flow(
         "kotlinx.coroutines.flow.Flow",
-        "co.touchlab.skie.runtime.coroutines.flow.SkieFlow",
-        "co.touchlab.skie.runtime.coroutines.flow.SkieOptionalFlow",
+        "co.touchlab.skie.runtime.coroutines.flow.SkieKotlinFlow",
+        "co.touchlab.skie.runtime.coroutines.flow.SkieOptionalKotlinFlow",
     );
 
     companion object {
