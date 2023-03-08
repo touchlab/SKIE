@@ -115,3 +115,9 @@ com.github.rnett.krosstalk:krosstalk-base-iosarm64
 # TODO: Check if we can do anything about it
 > Caused by: java.lang.AssertionError: Shouldn't be exposed: deserialized class XmlChildrenName
 io.github.pdvrieze.xmlutil:serialization-iosarm64
+
+> e: Compilation failed: Linking globals named 'OBJC_CLASS_$_KotlinFloat': symbol multiply defined!
+org.jetbrains.kotlin-wrappers:kotlin-css-iosarm64
+
+> e: Could not find "dev.icerock.moko:resources-cinterop-pluralizedString"
+ru.astrainteractive.mobilex:uitext-mr-iosarm64
