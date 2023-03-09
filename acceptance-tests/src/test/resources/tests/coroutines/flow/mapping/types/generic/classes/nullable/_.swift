@@ -1,4 +1,4 @@
-func sum(flow: SkieOptionalSwiftFlow<KotlinInt>) async throws -> Int32 {
+func sum(flow: SkieSwiftOptionalFlow<KotlinInt>) async throws -> Int32 {
     return try await SumKt.sum(flow: flow).int32Value
 }
 

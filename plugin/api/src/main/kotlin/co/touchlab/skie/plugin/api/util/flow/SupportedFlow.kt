@@ -8,7 +8,12 @@ enum class SupportedFlow(val fromFqName: String, val toNonOptionalFqName: String
     Flow(
         "kotlinx.coroutines.flow.Flow",
         "co.touchlab.skie.runtime.coroutines.flow.SkieKotlinFlow",
-        "co.touchlab.skie.runtime.coroutines.flow.SkieOptionalKotlinFlow",
+        "co.touchlab.skie.runtime.coroutines.flow.SkieKotlinOptionalFlow",
+    ),
+    SharedFlow(
+        "kotlinx.coroutines.flow.SharedFlow",
+        "co.touchlab.skie.runtime.coroutines.flow.shared.SkieKotlinSharedFlow",
+        "co.touchlab.skie.runtime.coroutines.flow.shared.SkieKotlinOptionalSharedFlow",
     );
 
     companion object {
