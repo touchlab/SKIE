@@ -3,7 +3,6 @@ package co.touchlab.skie.api.model.type.translation
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
@@ -17,13 +16,10 @@ object FlowTypeMappers {
     fun getMapperOrNull(type: KotlinType): FlowTypeMapper? {
         val supportedFlow = SupportedFlow.from(type) ?: return null
 
-        return FlowMapper(
-            nonOptionalFlow = referenceClass(supportedFlow.toNonOptionalFqName),
-            optionalFlow = referenceClass(supportedFlow.toOptionalFqName),
-        )
+        return FlowMapper(supportedFlow)
     }
 
-    private class FlowMapper(val nonOptionalFlow: KotlinClassSwiftModel, val optionalFlow: KotlinClassSwiftModel) : FlowTypeMapper {
+    private class FlowMapper(val supportedFlow: SupportedFlow) : FlowTypeMapper {
 
         context(SwiftModelScope)
         override fun mapType(
@@ -37,15 +33,15 @@ object FlowTypeMappers {
                         translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope, FlowMappingStrategy.Full)
                     }
 
-                    SwiftKotlinTypeClassTypeModel(nonOptionalFlow, typeArguments)
+                    SwiftKotlinTypeClassTypeModel(supportedFlow.requiredVariant.kotlinFlowModel, typeArguments)
                 }
                 else -> {
                     val hasNullableTypeArgument = type.arguments.any { it.type.isNullable() }
 
-                    val skieFlow = if (hasNullableTypeArgument) optionalFlow else nonOptionalFlow
+                    val flowVariant = if (hasNullableTypeArgument) supportedFlow.optionalVariant else supportedFlow.requiredVariant
 
                     val skieFlowType = KotlinTypeFactory.simpleType(
-                        skieFlow.classDescriptor.defaultType,
+                        flowVariant.kotlinFlowModel.classDescriptor.defaultType,
                         arguments = type.arguments,
                     )
 

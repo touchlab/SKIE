@@ -4,9 +4,8 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
-import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
@@ -27,15 +26,8 @@ internal class FlowBridgingConfigurator(
     }
 
     private fun MutableSwiftModelScope.configureFlowBridging(supportedFlow: SupportedFlow) {
-        configureFlowBridging(supportedFlow.toNonOptionalFqName)
-        configureFlowBridging(supportedFlow.toOptionalFqName)
-    }
-
-    private fun MutableSwiftModelScope.configureFlowBridging(toFqName: String) {
-        val flowModel = referenceClass(toFqName)
-
-        val bridgeIdentifier = toFqName.substringAfterLast(".").replace("Kotlin", "Swift")
-
-        flowModel.bridge = SwiftTypeSwiftModel(null, bridgeIdentifier, false)
+        supportedFlow.variants.forEach {
+            it.kotlinFlowModel.bridge = it.swiftFlowModel
+        }
     }
 }

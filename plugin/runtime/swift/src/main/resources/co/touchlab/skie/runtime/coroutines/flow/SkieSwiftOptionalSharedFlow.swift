@@ -8,34 +8,22 @@ public final class SkieSwiftOptionalSharedFlow<T: Swift.AnyObject>: _Concurrency
 
     public typealias _ObjectiveCType = SkieKotlinOptionalSharedFlow<Swift.AnyObject>
 
-    internal let coroutinesFlow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_SharedFlow
+    internal let delegate: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_SharedFlow
 
-    private init(_ flow: SkieKotlinOptionalSharedFlow<Swift.AnyObject>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieKotlinSharedFlow<T>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieKotlinOptionalSharedFlow<T>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieSwiftSharedFlow<T>) {
-        coroutinesFlow = flow.coroutinesFlow
+    internal init(_ flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_SharedFlow) {
+        delegate = flow
     }
 
     public var replayCache: [T?] {
-        return coroutinesFlow.replayCache as! [T?]
+        return delegate.replayCache as! [T?]
     }
 
     public func makeAsyncIterator() -> SkieSwiftOptionalFlow<T>.Iterator {
-        return SkieSwiftOptionalFlow<T>.Iterator(flow: coroutinesFlow)
+        return SkieSwiftOptionalFlow<T>.Iterator(flow: delegate)
     }
 
     public func _bridgeToObjectiveC() -> _ObjectiveCType {
-        return SkieKotlinOptionalSharedFlow(coroutinesFlow)
+        return SkieKotlinOptionalSharedFlow(delegate)
     }
 
     public static func _forceBridgeFromObjectiveC(_ source: _ObjectiveCType, result: inout SkieSwiftOptionalSharedFlow<T>?) {

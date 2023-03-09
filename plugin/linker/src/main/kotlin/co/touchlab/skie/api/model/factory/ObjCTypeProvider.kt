@@ -176,8 +176,8 @@ class ObjCTypeProvider(
         val substitutedArguments = originalType.arguments.map { it.substituteFlows() }
 
         val hasNullableTypeArgument = originalType.arguments.any { it.type.isNullable() }
-        val substituteFqName = if (hasNullableTypeArgument) this.toOptionalFqName else this.toNonOptionalFqName
-        val substitute = swiftModelScope.referenceClass(substituteFqName).classDescriptor.defaultType
+        val flowVariant = if (hasNullableTypeArgument) this.optionalVariant else this.requiredVariant
+        val substitute = with (swiftModelScope) { flowVariant.kotlinFlowModel }.classDescriptor.defaultType
 
         return KotlinTypeFactory.simpleType(substitute, arguments = substitutedArguments).makeNullableAsSpecified(originalType.isNullable())
     }

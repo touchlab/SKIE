@@ -8,46 +8,18 @@ public final class SkieSwiftOptionalFlow<T: Swift.AnyObject>: _Concurrency.Async
 
     public typealias _ObjectiveCType = SkieKotlinOptionalFlow<Swift.AnyObject>
 
-    internal let coroutinesFlow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow
+    internal let delegate: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow
 
-    private init(_ flow: SkieKotlinOptionalFlow<Swift.AnyObject>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieKotlinFlow<T>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieKotlinOptionalFlow<T>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieKotlinSharedFlow<T>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieKotlinOptionalSharedFlow<T>) {
-        coroutinesFlow = flow
-    }
-
-    public init(_ flow: SkieSwiftFlow<T>) {
-        coroutinesFlow = flow.coroutinesFlow
-    }
-
-    public init(_ flow: SkieSwiftSharedFlow<T>) {
-        coroutinesFlow = flow.coroutinesFlow
-    }
-
-    public init(_ flow: SkieSwiftOptionalSharedFlow<T>) {
-        coroutinesFlow = flow.coroutinesFlow
+    internal init(_ flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow) {
+        delegate = flow
     }
 
     public func makeAsyncIterator() -> SkieSwiftOptionalFlow<T>.Iterator {
-        return SkieSwiftOptionalFlow<T>.Iterator(flow: coroutinesFlow)
+        return SkieSwiftOptionalFlow<T>.Iterator(flow: delegate)
     }
 
     public func _bridgeToObjectiveC() -> _ObjectiveCType {
-        return SkieKotlinOptionalFlow(coroutinesFlow)
+        return SkieKotlinOptionalFlow(delegate)
     }
 
     public static func _forceBridgeFromObjectiveC(_ source: _ObjectiveCType, result: inout SkieSwiftOptionalFlow<T>?) {

@@ -1,4 +1,4 @@
-package co.touchlab.skie.runtime.coroutines.flow.shared
+package co.touchlab.skie.runtime.coroutines.flow
 
 import kotlinx.coroutines.flow.SharedFlow
 import kotlin.experimental.ExperimentalObjCName
