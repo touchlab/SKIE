@@ -1,4 +1,4 @@
-package tests.bugs.generic_fake_objc_constructor
+package `tests`.`bugs`.`generic_fake_objc_constructor`
 
 abstract class A<T>(i: T)
 

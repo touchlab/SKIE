@@ -1,10 +1,13 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 
+import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
+import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
@@ -22,11 +25,13 @@ import org.jetbrains.kotlin.types.KotlinType
 
 internal class FlowGenericArgumentStubGenerator(
     private val skieContext: SkieContext,
+    configuration: Configuration,
     private val descriptorProvider: DescriptorProvider,
     private val declarationBuilder: DeclarationBuilder,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = true
+    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures &&
+        SkieFeature.SwiftRuntime in configuration.enabledFeatures
 
     override fun runObjcPhase() {
         val allFlowArguments = descriptorProvider.allExposedMembers.flatMap { it.getAllFlowArgumentClasses() } +

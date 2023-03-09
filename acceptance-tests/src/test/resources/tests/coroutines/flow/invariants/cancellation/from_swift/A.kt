@@ -1,4 +1,4 @@
-package tests.coroutines.flow.invariants.cancellation.from_swift
+package `tests`.`coroutines`.`flow`.`invariants`.`cancellation`.`from_swift`
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package tests.coroutines.flow.invariants.cold_flow.is_copied
+package `tests`.`coroutines`.`flow`.`invariants`.`cold_flow`.`is_copied`
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

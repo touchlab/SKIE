@@ -1,43 +1,54 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 
+import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.gradle.FlowInterop
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
+import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class FlowMappingConfigurator(
     private val skieContext: SkieContext,
-) : SkieCompilationPhase {
+    override val configuration: Configuration,
+) : SkieCompilationPhase, ConfigurationContainer {
 
-    override val isActive: Boolean = true
+    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures &&
+        SkieFeature.SwiftRuntime in configuration.enabledFeatures
+
+    private val callableMemberConfigurator = CallableMemberConfigurator()
 
     override fun runObjcPhase() {
         skieContext.module.configure {
             allExposedMembers.forEach {
-                it.accept(CallableMemberConfigurator)
+                it.accept(callableMemberConfigurator)
             }
         }
     }
 
-    private object CallableMemberConfigurator : MutableKotlinCallableMemberSwiftModelVisitor.Unit {
+    private inner class CallableMemberConfigurator : MutableKotlinCallableMemberSwiftModelVisitor.Unit {
 
         override fun visit(function: MutableKotlinFunctionSwiftModel) {
-            val strategy = if (function.descriptor.belongsToSkieRuntime) FlowMappingStrategy.None else FlowMappingStrategy.Full
-
             function.valueParameters.forEach {
-                it.flowMappingStrategy = strategy
+                it.flowMappingStrategy = function.getTargetFlowMappingStrategy()
             }
 
-            function.returnTypeFlowMappingStrategy = strategy
+            function.returnTypeFlowMappingStrategy = function.getTargetFlowMappingStrategy()
         }
 
         override fun visit(regularProperty: MutableKotlinRegularPropertySwiftModel) {
-            val strategy = if (regularProperty.descriptor.belongsToSkieRuntime) FlowMappingStrategy.None else FlowMappingStrategy.Full
-
-            regularProperty.flowMappingStrategy = strategy
+            regularProperty.flowMappingStrategy = regularProperty.getTargetFlowMappingStrategy()
         }
+
+        private fun KotlinCallableMemberSwiftModel.getTargetFlowMappingStrategy(): FlowMappingStrategy =
+            if (this.isInteropEnabled) FlowMappingStrategy.Full else FlowMappingStrategy.None
+
+        private val KotlinCallableMemberSwiftModel.isInteropEnabled: Boolean
+            get() = this.descriptor.getConfiguration(FlowInterop.Enabled) && !this.descriptor.belongsToSkieRuntime
     }
 }

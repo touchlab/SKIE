@@ -1,4 +1,4 @@
-package tests.coroutines.flow.invariants.cold_flow.starts_after_collect
+package `tests`.`coroutines`.`flow`.`invariants`.`cold_flow`.`starts_after_collect`
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

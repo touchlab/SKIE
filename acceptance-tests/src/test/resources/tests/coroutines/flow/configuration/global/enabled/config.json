@@ -1,0 +1,13 @@
+{
+    "enabledFeatures": {
+    },
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "FlowInterop.Enabled": "true"
+            }
+        }
+    ]
+}

@@ -1,4 +1,4 @@
-package `tests`.`coroutines`.`flow`.`mapping`.`types`.`generic`.`classes`
+package `tests`.`coroutines`.`flow`.`mapping`.`types`.`generic`.`classes`.`nonnull`
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

@@ -1,4 +1,4 @@
-package tests.coroutines.flow.invariants.cancellation.from_kotlin
+package `tests`.`coroutines`.`flow`.`invariants`.`cancellation`.`from_kotlin`
 
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope

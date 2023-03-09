@@ -41,12 +41,15 @@ internal class SkieCompilationScheduler(
         ),
         FlowBridgingConfigurator(
             skieContext = skieContext,
+            configuration = configuration,
         ),
         FlowMappingConfigurator(
             skieContext = skieContext,
+            configuration = configuration,
         ),
         FlowGenericArgumentStubGenerator(
             skieContext = skieContext,
+            configuration = configuration,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
         ),

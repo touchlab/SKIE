@@ -1,4 +1,4 @@
-package tests.coroutines.flow.mapping.types.generic.classes.nullable
+package `tests`.`coroutines`.`flow`.`mapping`.`types`.`generic`.`classes`.`nullable`
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

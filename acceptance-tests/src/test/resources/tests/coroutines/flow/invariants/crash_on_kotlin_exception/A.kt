@@ -1,4 +1,4 @@
-package tests.coroutines.flow.invariants.crash_on_kotlin_exception
+package `tests`.`coroutines`.`flow`.`invariants`.`crash_on_kotlin_exception`
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

@@ -1,4 +1,4 @@
-package tests.bugs.type_and_parameter_name_collision_in_api_notes.classes
+package `tests`.`bugs`.`type_and_parameter_name_collision_in_api_notes`.`classes`
 
 fun foo(id: Any) {
 }

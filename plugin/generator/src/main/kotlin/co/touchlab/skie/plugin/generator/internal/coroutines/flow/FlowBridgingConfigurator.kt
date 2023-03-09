@@ -1,5 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 
+import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
@@ -10,9 +12,11 @@ import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class FlowBridgingConfigurator(
     private val skieContext: SkieContext,
+    configuration: Configuration,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = true
+    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures &&
+        SkieFeature.SwiftRuntime in configuration.enabledFeatures
 
     override fun runObjcPhase() {
         skieContext.module.configure {

@@ -1,4 +1,4 @@
-package tests.coroutines.suspend.interfaces.extensions.generics.function.receiver
+package `tests`.`coroutines`.`suspend`.`interfaces`.`extensions`.`generics`.`function`.`receiver`
 
 interface A
 
