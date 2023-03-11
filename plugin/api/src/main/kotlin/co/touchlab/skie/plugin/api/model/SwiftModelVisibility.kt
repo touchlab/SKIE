@@ -15,3 +15,10 @@ val SwiftModelVisibility.isReplaced: Boolean
 
 val SwiftModelVisibility.isRemoved: Boolean
     get() = this == SwiftModelVisibility.Removed
+
+fun String.applyVisibility(visibility: SwiftModelVisibility): String {
+    return when (visibility) {
+        SwiftModelVisibility.Visible, SwiftModelVisibility.Hidden, SwiftModelVisibility.Removed -> this
+        SwiftModelVisibility.Replaced -> "__$this"
+    }
+}

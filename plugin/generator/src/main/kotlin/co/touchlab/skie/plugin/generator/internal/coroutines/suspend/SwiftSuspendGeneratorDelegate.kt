@@ -5,16 +5,14 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.isRemoved
-import co.touchlab.skie.plugin.api.model.type.stableSpec
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageSirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.api.module.SkieModule
-import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
-import io.outfoxx.swiftpoet.ANY_OBJECT
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
@@ -42,7 +40,7 @@ internal class SwiftSuspendGeneratorDelegate(
             )
 
             addExtension(
-                ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(bridgeModel.extensionScopeNameForBridgingFunction))
+                ExtensionSpec.builder(bridgeModel.extensionScopeForBridgingFunction.internalName.toSwiftPoetName())
                     .addModifiers(Modifier.PUBLIC)
                     .addSwiftBridgingFunction(bridgeModel)
                     .build()
@@ -50,22 +48,24 @@ internal class SwiftSuspendGeneratorDelegate(
         }
     }
 
-    private val BridgeModel.extensionScopeNameForBridgingFunction: String
+    private val BridgeModel.extensionScopeForBridgingFunction: SwiftIrExtensibleDeclaration
         get() =
             if (this.isFromGenericClass) {
-                this.kotlinBridgingFunction.receiver.bridgedOrStableFqName
+                this.kotlinBridgingFunction.owner
             } else {
-                this.originalFunction.receiver.bridgedOrStableFqName
+                this.originalFunction.owner
             }
 
     private val BridgeModel.isFromGenericClass: Boolean
-        get() = (this.originalFunction.receiver as? SwiftKotlinTypeClassTypeModel)?.typeArguments?.isNotEmpty() ?: false
+        get() = (this.originalFunction.owner as? SwiftIrTypeDeclaration)?.typeParameters.isNullOrEmpty().not()
 
-    private val BridgeModel.typeParameterNames: List<String>
+    private val BridgeModel.typeParameterNames: List<TypeVariableName>
         get() {
-            val receiver = this.originalFunction.receiver as? SwiftKotlinTypeClassTypeModel ?: return emptyList()
+            val receiver = this.originalFunction.receiver as? SwiftClassSirType ?: return emptyList()
 
-            return receiver.typeArguments.filterIsInstance<SwiftGenericTypeUsageModel>().map { it.stableFqName }
+            return receiver.typeArguments.mapNotNull {
+                (it as? SwiftGenericTypeUsageSirType)?.declaration?.toInternalSwiftPoetVariable()
+            }
         }
 
     private fun ExtensionSpec.Builder.addSwiftBridgingFunction(bridgeModel: BridgeModel): ExtensionSpec.Builder =
@@ -93,10 +93,7 @@ internal class SwiftSuspendGeneratorDelegate(
 
     private fun FunctionSpec.Builder.addTypeParameters(bridgeModel: BridgeModel): FunctionSpec.Builder =
         this.apply {
-            val typeVariables = bridgeModel.typeParameterNames
-                .map { TypeVariableName.typeVariable(it, TypeVariableName.Bound(ANY_OBJECT)) }
-
-            addTypeVariables(typeVariables)
+            addTypeVariables(bridgeModel.typeParameterNames)
         }
 
     private fun FunctionSpec.Builder.addValueParameters(bridgeModel: BridgeModel): FunctionSpec.Builder =
@@ -114,10 +111,10 @@ internal class SwiftSuspendGeneratorDelegate(
         get() = this.originalFunction.valueParameters.filter { it.origin != KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
 
     private fun FunctionSpec.Builder.addDispatchReceiverParameterForGenericClass(bridgeModel: BridgeModel) {
-        val receiverSwiftModel = bridgeModel.originalFunction.receiver
+        val receiver = bridgeModel.originalFunction.receiver
 
         addParameter(
-            ParameterSpec.builder("_", bridgeModel.genericClassDispatchReceiverParameterName, receiverSwiftModel.stableSpec)
+            ParameterSpec.builder("_", bridgeModel.genericClassDispatchReceiverParameterName, receiver.toSwiftPoetUsage())
                 .build()
         )
     }
@@ -127,14 +124,14 @@ internal class SwiftSuspendGeneratorDelegate(
 
     private fun FunctionSpec.Builder.addValueParameter(parameter: KotlinValueParameterSwiftModel) {
         addParameter(
-            ParameterSpec.builder(parameter.argumentLabel, parameter.parameterName, parameter.type.stableSpec)
+            ParameterSpec.builder(parameter.argumentLabel, parameter.parameterName, parameter.type.toSwiftPoetUsage())
                 .build()
         )
     }
 
     private fun FunctionSpec.Builder.addReturnType(bridgeModel: BridgeModel): FunctionSpec.Builder =
         this.apply {
-            returns(bridgeModel.asyncOriginalFunction.returnType.stableSpec)
+            returns(bridgeModel.asyncOriginalFunction.returnType.toSwiftPoetUsage())
         }
 
     private fun FunctionSpec.Builder.addFunctionBody(bridgeModel: BridgeModel): FunctionSpec.Builder =
@@ -145,8 +142,8 @@ internal class SwiftSuspendGeneratorDelegate(
                     .indent()
                     .apply {
                         addStatement(
-                            "%N.%N(${bridgeModel.valueParametersPlaceholders})",
-                            bridgeModel.kotlinBridgingFunction.receiver.stableFqName,
+                            "%T.%N(${bridgeModel.valueParametersPlaceholders})",
+                            bridgeModel.kotlinBridgingFunction.receiver.toSwiftPoetUsage(),
                             bridgeModel.kotlinBridgingFunction.reference,
                             *bridgeModel.argumentsForBridgingCall.toTypedArray(),
                         )
@@ -168,12 +165,12 @@ internal class SwiftSuspendGeneratorDelegate(
 
             this.bridgedParameters.forEachIndexed { index, parameter ->
                 if (isFromGenericClass) {
-                    val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.stableFqName
+                    val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.toSwiftPoetUsage()
 
                     arguments.add(
                         listOfNotNull(
                             parameter.parameterName,
-                            " as! $erasedParameterType".takeIf { parameter.type.stableFqName != erasedParameterType },
+                            " as! $erasedParameterType".takeIf { parameter.type.toSwiftPoetUsage() != erasedParameterType },
                         ).joinToString("")
                     )
                 } else {
@@ -190,7 +187,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
         if (bridgeModel.isFromGenericClass) {
-            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.valueParameters.first().type.stableFqName
+            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.valueParameters.first().type.toSwiftPoetUsage()
 
             add(bridgeModel.genericClassDispatchReceiverParameterName + " as! " + dispatchReceiverErasedType)
         } else {

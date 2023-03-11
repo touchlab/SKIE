@@ -1,10 +1,10 @@
 package co.touchlab.skie.plugin.api.model.callable
 
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
 
 interface MutableKotlinCallableMemberSwiftModel : KotlinCallableMemberSwiftModel {
 
-    override val receiver: TypeSwiftModel
+    override val receiver: SirType
 
     override val allBoundedSwiftModels: List<MutableKotlinCallableMemberSwiftModel>
 

@@ -4,9 +4,11 @@ import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvider
+import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.descriptorProvider
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -42,21 +44,38 @@ class SwiftLinkCompilePhase(
 
         val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
         val bridgeProvider = DescriptorBridgeProvider(namer)
+        val swiftIrDeclarationRegistry = SwiftIrDeclarationRegistry(
+            namer = namer,
+        )
+        val builtinSwiftBridgeableProvider = BuiltinSwiftBridgeableProvider(
+            sdkPath = configurables.absoluteTargetSysRoot,
+            declarationRegistry = swiftIrDeclarationRegistry,
+        )
+        val builtinKotlinDeclarations = BuiltinDeclarations.Kotlin(namer)
         val translator = SwiftTypeTranslator(
             descriptorProvider = context.descriptorProvider,
             namer = namer,
             problemCollector = SwiftTranslationProblemCollector.Default(context),
-            builtinSwiftBridgeableProvider = BuiltinSwiftBridgeableProvider(configurables.absoluteTargetSysRoot),
+            builtinSwiftBridgeableProvider = builtinSwiftBridgeableProvider,
+            builtinKotlinDeclarations = builtinKotlinDeclarations,
+            swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
         )
         val swiftModelScope = DefaultSwiftModelScope(
             namer = namer,
             descriptorProvider = context.descriptorProvider,
             bridgeProvider = bridgeProvider,
             translator = translator,
+            declarationRegistry = swiftIrDeclarationRegistry,
         )
         val skieModule = skieContext.module as DefaultSkieModule
 
-        SkieLinkingPhaseScheduler(skieModule, context, framework, swiftModelScope).runLinkingPhases()
+        SkieLinkingPhaseScheduler(
+            skieModule = skieModule,
+            context = context,
+            framework = framework,
+            swiftModelScope = swiftModelScope,
+            builtinKotlinDeclarations = builtinKotlinDeclarations,
+        ).runLinkingPhases()
 
         val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftModelScope)
         val swiftTextFiles = skieModule.produceTextFiles()

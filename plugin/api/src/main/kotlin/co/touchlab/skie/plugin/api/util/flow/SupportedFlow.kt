@@ -4,7 +4,9 @@ import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
@@ -28,9 +30,11 @@ enum class SupportedFlow(val directParent: SupportedFlow?) {
 
         val owner: SupportedFlow
 
+        val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType
+
         val kotlinFlowFqName: String
 
-        val swiftFlowFqName: String
+        // val swiftFlowFqName: String
 
         context (SwiftModelScope)
         val kotlinFlowModel: KotlinClassSwiftModel
@@ -40,15 +44,25 @@ enum class SupportedFlow(val directParent: SupportedFlow?) {
         val kotlinFlowModel: MutableKotlinClassSwiftModel
             get() = referenceClass(kotlinFlowFqName)
 
-        val swiftFlowModel: SwiftTypeSwiftModel
-            get() = SwiftTypeSwiftModel(null, swiftFlowFqName, false)
-
         fun isCastableTo(variant: Variant): Boolean
 
         class Required(override val owner: SupportedFlow) : Variant {
 
             override val kotlinFlowFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlin${owner.name}"
-            override val swiftFlowFqName: String = "SkieSwift${owner.name}"
+
+            override val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType = SwiftIrTypeDeclaration.Local.SwiftType(
+                swiftName = "SkieSwift${owner.name}",
+                typeParameters = listOf(
+                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = listOf(BuiltinDeclarations.Swift.AnyObject)),
+                ),
+                superTypes = listOf(
+                    // TODO: Verify if this is enough, or we should have a separate `SwiftIrReferenceDeclaration` for classes
+                    // This is how we tell when it's a class, or a reference protocol
+                    BuiltinDeclarations.Swift.AnyObject,
+                    // TODO: We don't use these supertypes yet, will we need them?
+                    // "_Concurrency.AsyncSequence", "Swift._ObjectiveCBridgeable"
+                ),
+            )
 
             override fun isCastableTo(variant: Variant): Boolean {
                 return owner.isSelfOrChildOf(variant.owner)
@@ -58,7 +72,20 @@ enum class SupportedFlow(val directParent: SupportedFlow?) {
         class Optional(override val owner: SupportedFlow) : Variant {
 
             override val kotlinFlowFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlinOptional${owner.name}"
-            override val swiftFlowFqName: String = "SkieSwiftOptional${owner.name}"
+
+            override val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType = SwiftIrTypeDeclaration.Local.SwiftType(
+                swiftName = "SkieSwiftOptional${owner.name}",
+                typeParameters = listOf(
+                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = listOf(BuiltinDeclarations.Swift.AnyObject)),
+                ),
+                superTypes = listOf(
+                    // TODO: Verify if this is enough, or we should have a separate `SwiftIrReferenceDeclaration` for classes
+                    // This is how we tell when it's a class, or a reference protocol
+                    BuiltinDeclarations.Swift.AnyObject,
+                    // TODO: We don't use these supertypes yet, will we need them?
+                    // "_Concurrency.AsyncSequence", "Swift._ObjectiveCBridgeable"
+                ),
+            )
 
             override fun isCastableTo(variant: Variant): Boolean {
                 if (variant is Required) return false

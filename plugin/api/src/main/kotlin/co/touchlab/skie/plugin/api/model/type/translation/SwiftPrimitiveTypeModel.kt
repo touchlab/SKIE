@@ -1,24 +1,36 @@
 package co.touchlab.skie.plugin.api.model.type.translation
 
-sealed class SwiftPrimitiveTypeModel(
-    val name: String,
-) : SwiftTypeModel {
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
+import io.outfoxx.swiftpoet.TypeName
 
-    object NSUInteger : SwiftPrimitiveTypeModel("NSUInteger")
-    object Bool : SwiftPrimitiveTypeModel("Bool")
+// sealed class SwiftPrimitiveTypeModel(
+//     override val stableFqName: SwiftFqName,
+// ) : SwiftTypeModel {
+//
+
+//
+// }
+
+// TODO: Doesn't need to be its own type
+sealed class SwiftPrimitiveSirType(
+    override val declaration: SwiftIrTypeDeclaration.External,
+) : SirType {
+
+    object NSUInteger : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.UInt)
+    object Bool : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Bool)
     @Suppress("ClassName")
-    object unichar : SwiftPrimitiveTypeModel("unichar")
-    object Int8 : SwiftPrimitiveTypeModel("Int8")
-    object Int16 : SwiftPrimitiveTypeModel("Int16")
-    object Int32 : SwiftPrimitiveTypeModel("Int32")
-    object Int64 : SwiftPrimitiveTypeModel("Int64")
-    object UInt8 : SwiftPrimitiveTypeModel("UInt8")
-    object UInt16 : SwiftPrimitiveTypeModel("UInt16")
-    object UInt32 : SwiftPrimitiveTypeModel("UInt32")
-    object UInt64 : SwiftPrimitiveTypeModel("UInt64")
-    object Float : SwiftPrimitiveTypeModel("Float")
-    object Double : SwiftPrimitiveTypeModel("Double")
+    object unichar : SwiftPrimitiveSirType(BuiltinDeclarations.Foundation.unichar)
+    object Int8 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Int8)
+    object Int16 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Int16)
+    object Int32 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Int32)
+    object Int64 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Int64)
+    object UInt8 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.UInt8)
+    object UInt16 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.UInt16)
+    object UInt32 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.UInt32)
+    object UInt64 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.UInt64)
+    object Float : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Float)
+    object Double : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Double)
 
-    override val stableFqName: String
-        get() = name
+    override fun toSwiftPoetUsage(): TypeName = declaration.internalName.toSwiftPoetName()
 }

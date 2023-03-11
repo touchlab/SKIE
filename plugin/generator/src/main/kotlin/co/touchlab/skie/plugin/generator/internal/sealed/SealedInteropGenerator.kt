@@ -36,7 +36,7 @@ internal class SealedInteropGenerator(
 
     private fun generate(swiftModel: KotlinClassSwiftModel) {
         module.generateCode(swiftModel) {
-            val classNamespace = addNamespace(swiftGenNamespace, swiftModel.stableFqName)
+            val classNamespace = addNamespace(swiftGenNamespace, swiftModel.identifier)
 
             val enumType = sealedEnumGeneratorDelegate.generate(swiftModel, classNamespace, this)
 

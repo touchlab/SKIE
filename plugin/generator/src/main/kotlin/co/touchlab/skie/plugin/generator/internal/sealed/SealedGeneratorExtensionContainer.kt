@@ -2,8 +2,6 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.fqName
-import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
@@ -39,7 +37,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
         get() {
             val configuredName = this.getConfiguration(SealedInterop.Case.Name)
 
-            return configuredName ?: this.fqName.toValidSwiftIdentifier()
+            return configuredName ?: this.nonBridgedDeclaration.publicName.asString().toValidSwiftIdentifier()
         }
 
     val KotlinClassSwiftModel.hasElseCase: Boolean
@@ -52,7 +50,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
 
     fun KotlinClassSwiftModel.swiftNameWithTypeParametersForSealedCase(parent: KotlinClassSwiftModel): TypeName {
         if (kind.isInterface) {
-            return this.stableSpec
+            return this.nonBridgedDeclaration.internalName.toSwiftPoetName()
         }
 
         val typeParameters = this.classDescriptor.declaredTypeParameters.map {
@@ -65,7 +63,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
             }
         }
 
-        return this.stableSpec.withTypeParameters(typeParameters)
+        return this.nonBridgedDeclaration.internalName.toSwiftPoetName().withTypeParameters(typeParameters)
     }
 
     private fun TypeParameterDescriptor.indexInParent(child: ClassDescriptor, parent: ClassDescriptor): Int? {

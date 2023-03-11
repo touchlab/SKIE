@@ -3,7 +3,7 @@ package co.touchlab.skie.plugin.api.model.callable.function
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
@@ -15,9 +15,9 @@ interface KotlinFunctionSwiftModel : KotlinDirectlyCallableMemberSwiftModel {
 
     val role: Role
 
-    override val original: KotlinFunctionSwiftModel
+    // override val original: KotlinFunctionSwiftModel
 
-    val returnType: TypeSwiftModel
+    val returnType: SirType
 
     val returnTypeFlowMappingStrategy: FlowMappingStrategy
 

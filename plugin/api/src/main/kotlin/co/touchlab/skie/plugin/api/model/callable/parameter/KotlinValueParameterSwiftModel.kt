@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.api.model.callable.parameter
 
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -14,15 +14,15 @@ interface KotlinValueParameterSwiftModel {
 
     val origin: Origin
 
-    val original: KotlinValueParameterSwiftModel
+    // val original: KotlinValueParameterSwiftModel
 
-    val isChanged: Boolean
+    // val isChanged: Boolean
 
     val argumentLabel: String
 
     val parameterName: String
 
-    val type: TypeSwiftModel
+    val type: SirType
 
     val objCType: ObjCType
 

@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.generator.internal.util
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.module.SkieModule
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
@@ -18,7 +17,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 internal interface SwiftPoetExtensionContainer {
 
     val KotlinClassSwiftModel.swiftNameWithTypeParameters: TypeName
-        get() = this.stableSpec.withTypeParameters(this)
+        // TODO: Is this needed?
+        get() = this.nonBridgedDeclaration.internalName.toSwiftPoetName().withTypeParameters(this)
 
     fun DeclaredTypeName.withTypeParameters(swiftModel: KotlinClassSwiftModel): TypeName =
         this.withTypeParameters(swiftModel.swiftTypeVariablesNames)

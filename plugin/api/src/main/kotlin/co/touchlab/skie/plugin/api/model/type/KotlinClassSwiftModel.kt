@@ -19,5 +19,7 @@ interface KotlinClassSwiftModel : KotlinTypeSwiftModel {
 
     val exposedSealedSubclasses: List<KotlinClassSwiftModel>
 
-    override val original: KotlinClassSwiftModel
+    // override val stableFqName: SwiftFqName.NominalType
+
+    // override val original: KotlinClassSwiftModel
 }

@@ -10,11 +10,10 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameter
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.bridgedOrStableSpec
-import co.touchlab.skie.plugin.api.model.type.packageName
-import co.touchlab.skie.plugin.api.model.type.stableSpec
-import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
+import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.generator.internal.enums.ObjectiveCBridgeable.addObjcBridgeableImplementation
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
@@ -77,10 +76,14 @@ internal class ExhaustiveEnumsGenerator(
 
     private fun MutableKotlinClassSwiftModel.configureBridging() {
         this.visibility = SwiftModelVisibility.Replaced
-        this.bridge = SwiftTypeSwiftModel(
-            containingType = this.original.containingType,
-            identifier = this.original.identifier,
-            isHashable = true,
+        this.bridge = ObjcSwiftBridge.FromSKIE(
+            SwiftIrTypeDeclaration.Local.SwiftType(
+                containingDeclaration = this.containingType?.swiftIrDeclaration as? SwiftIrTypeDeclaration.Local,
+                swiftName = this.identifier,
+                superTypes = listOf(
+                    BuiltinDeclarations.Swift.Hashable,
+                )
+            )
         )
     }
 
@@ -88,11 +91,10 @@ internal class ExhaustiveEnumsGenerator(
         val classSwiftModel = this
 
         module.generateCode(this) {
-            if (classSwiftModel.bridge!!.packageName.isNotBlank()) {
-                addNestedBridge(classSwiftModel)
-            } else {
-                addTopLevelBridge(classSwiftModel)
-            }
+            // if (classSwiftModel.bridge!!.packageName.isNotBlank()) {
+            classSwiftModel.bridge!!.declaration.containingDeclaration?.let {
+                addNestedBridge(classSwiftModel, it)
+            } ?: addTopLevelBridge(classSwiftModel)
         }
     }
 
@@ -100,16 +102,16 @@ internal class ExhaustiveEnumsGenerator(
         addType(classSwiftModel.generateBridgingEnum())
     }
 
-    private fun FileSpec.Builder.addNestedBridge(classSwiftModel: KotlinClassSwiftModel) {
+    private fun FileSpec.Builder.addNestedBridge(classSwiftModel: KotlinClassSwiftModel, containingDeclaration: SwiftIrExtensibleDeclaration) {
         addExtension(
-            ExtensionSpec.builder(DeclaredTypeName.qualifiedLocalTypeName(classSwiftModel.bridge!!.packageName))
+            ExtensionSpec.builder(containingDeclaration.internalName.toSwiftPoetName())
                 .addType(classSwiftModel.generateBridgingEnum())
                 .build()
         )
     }
 
     private fun KotlinClassSwiftModel.generateBridgingEnum(): TypeSpec =
-        TypeSpec.enumBuilder(bridge!!.identifier)
+        TypeSpec.enumBuilder(bridge!!.declaration.publicName.toSwiftPoetName())
             .addAttribute("frozen")
             .addModifiers(Modifier.PUBLIC)
             .addSuperType(STRING)
@@ -140,7 +142,8 @@ internal class ExhaustiveEnumsGenerator(
         this.apply {
             classSwiftModel.nestedClasses.forEach {
                 addType(
-                    TypeAliasSpec.builder(it.identifier, it.stableSpec)
+                    // TODO: Should this be originalDeclaration or swiftIrDeclaration?
+                    TypeAliasSpec.builder(it.identifier, it.nonBridgedDeclaration.internalName.toSwiftPoetName())
                         .addModifiers(Modifier.PUBLIC)
                         .build()
                 )
@@ -159,7 +162,7 @@ internal class ExhaustiveEnumsGenerator(
                     .addModifiers(Modifier.PUBLIC)
                     .addFunctionValueParameters(function)
                     .throws(function.isThrowing)
-                    .returns(function.returnType.stableSpec)
+                    .returns(function.returnType.toSwiftPoetUsage())
                     .addFunctionBody(function)
                     .build()
             )
@@ -183,7 +186,7 @@ internal class ExhaustiveEnumsGenerator(
                 ParameterSpec.builder(
                     valueParameter.argumentLabel,
                     valueParameter.parameterName,
-                    valueParameter.type.stableSpec,
+                    valueParameter.type.toSwiftPoetUsage(),
                 ).build()
             )
 
@@ -197,7 +200,7 @@ internal class ExhaustiveEnumsGenerator(
 
         override fun visit(regularProperty: KotlinRegularPropertySwiftModel) {
             builder.addProperty(
-                PropertySpec.builder(regularProperty.identifier, regularProperty.type.stableSpec)
+                PropertySpec.builder(regularProperty.identifier, regularProperty.type.toSwiftPoetUsage())
                     .addModifiers(Modifier.PUBLIC)
                     .addGetter(regularProperty)
                     .addSetterIfPresent(regularProperty)
@@ -223,7 +226,7 @@ internal class ExhaustiveEnumsGenerator(
                 setter(
                     FunctionSpec.setterBuilder()
                         .addModifiers(Modifier.NONMUTATING)
-                        .addParameter("value", regularProperty.type.stableSpec)
+                        .addParameter("value", regularProperty.type.toSwiftPoetUsage())
                         .addStatement(
                             "%L(self as _ObjectiveCType).%N = value",
                             if (setter.isThrowing) "try " else "",
@@ -239,7 +242,7 @@ internal class ExhaustiveEnumsGenerator(
             val companion = classSwiftModel.companionObject ?: return@apply
 
             addProperty(
-                PropertySpec.builder("companion", companion.bridgedOrStableSpec)
+                PropertySpec.builder("companion", companion.swiftIrDeclaration.internalName.toSwiftPoetName())
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .getter(
                         FunctionSpec.getterBuilder()

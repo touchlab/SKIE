@@ -1,14 +1,24 @@
 package co.touchlab.skie.plugin.api.model.type.translation
 
-data class SwiftNullableReferenceTypeModel(
-    val nonNullType: SwiftNonNullReferenceTypeModel,
-    val isNullableResult: Boolean = false,
-) : SwiftReferenceTypeModel {
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
+import io.outfoxx.swiftpoet.TypeName
 
-    override val stableFqName: String
-        get() = if (nonNullType is SwiftLambdaTypeModel) {
-            "(${nonNullType.stableFqName})?"
-        } else {
-            "${nonNullType.stableFqName}?"
-        }
+// data class SwiftNullableReferenceTypeModel(
+//     val nonNullType: SwiftNonNullReferenceTypeModel,
+//     val isNullableResult: Boolean = false,
+// ) : SwiftReferenceTypeModel {
+//
+//     override val stableFqName: SwiftFqName
+//         get() = SwiftFqName.Optional(nonNullType.stableFqName)
+// }
+
+data class SwiftNullableReferenceSirType(
+    val nonNullType: SwiftNonNullReferenceSirType,
+    val isNullableResult: Boolean = false,
+) : SwiftReferenceSirType {
+    override val declaration: SwiftIrDeclaration
+        get() = nonNullType.declaration
+
+
+    override fun toSwiftPoetUsage(): TypeName = nonNullType.toSwiftPoetUsage().makeOptional()
 }

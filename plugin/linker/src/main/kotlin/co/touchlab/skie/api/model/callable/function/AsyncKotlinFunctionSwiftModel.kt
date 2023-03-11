@@ -9,8 +9,8 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableM
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
 
 internal class AsyncKotlinFunctionSwiftModel(
     private val delegate: KotlinFunctionSwiftModelWithCore,
@@ -24,10 +24,10 @@ internal class AsyncKotlinFunctionSwiftModel(
     override val valueParameters: List<MutableKotlinValueParameterSwiftModel>
         get() = delegate.valueParameters.filter { it.origin != KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
 
-    override val returnType: TypeSwiftModel
+    override val returnType: SirType
         get() = with(swiftModelScope) {
-            descriptor.asyncReturnTypeModel(
-                receiver.swiftGenericExportScope,
+            descriptor.asyncReturnType(
+                owner.swiftGenericExportScope,
                 delegate.core.getMethodBridge(descriptor).paramBridges.firstNotNullOf { it as? MethodBridgeParameter.ValueParameter.SuspendCompletion },
                 returnTypeFlowMappingStrategy,
             )

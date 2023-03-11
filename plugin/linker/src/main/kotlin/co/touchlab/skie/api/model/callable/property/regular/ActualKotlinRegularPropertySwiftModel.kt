@@ -17,7 +17,8 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegular
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
@@ -29,9 +30,15 @@ class ActualKotlinRegularPropertySwiftModel(
     descriptorProvider: DescriptorProvider,
 ) : MutableKotlinRegularPropertySwiftModel {
 
-    override val receiver: TypeSwiftModel by lazy {
+    override val owner: SwiftIrExtensibleDeclaration by lazy {
         with(swiftModelScope) {
-            descriptor.receiverTypeModel()
+            descriptor.owner()
+        }
+    }
+
+    override val receiver: SirType by lazy {
+        with(swiftModelScope) {
+            descriptor.receiverType()
         }
     }
 
@@ -49,11 +56,11 @@ class ActualKotlinRegularPropertySwiftModel(
 
     override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
 
-    override val original: KotlinRegularPropertySwiftModel = OriginalKotlinRegularPropertySwiftModel(this)
+    // override val original: KotlinRegularPropertySwiftModel = OriginalKotlinRegularPropertySwiftModel(this)
 
-    override val isChanged: Boolean
-        get() = identifier != original.identifier || visibility != original.visibility ||
-            flowMappingStrategy != original.flowMappingStrategy || collisionResolutionStrategy != original.collisionResolutionStrategy
+    // override val isChanged: Boolean
+    //     get() = identifier != original.identifier || visibility != original.visibility ||
+    //         flowMappingStrategy != original.flowMappingStrategy || collisionResolutionStrategy != original.collisionResolutionStrategy
 
     override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
 
@@ -64,9 +71,9 @@ class ActualKotlinRegularPropertySwiftModel(
             KotlinCallableMemberSwiftModel.Scope.Member
         }
 
-    override val type: TypeSwiftModel
+    override val type: SirType
         get() = with(swiftModelScope) {
-            core.descriptor.propertyTypeModel(receiver.swiftGenericExportScope, flowMappingStrategy)
+            core.descriptor.propertyType(owner.swiftGenericExportScope, flowMappingStrategy)
         }
 
     override var flowMappingStrategy: FlowMappingStrategy = FlowMappingStrategy.None

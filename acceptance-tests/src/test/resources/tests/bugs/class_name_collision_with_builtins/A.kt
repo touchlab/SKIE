@@ -2,7 +2,7 @@ package `tests`.`bugs`.`class_name_collision_with_builtins`
 
 class KotlinBase
 class KotlinMutableSet
-class KotlinDictionary
+class KotlinMutableDictionary
 class KotlinNumber
 class KotlinByte
 class KotlinUByte

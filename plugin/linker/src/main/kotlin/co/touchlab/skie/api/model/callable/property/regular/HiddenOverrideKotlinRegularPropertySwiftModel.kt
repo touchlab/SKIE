@@ -7,7 +7,8 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 class HiddenOverrideKotlinRegularPropertySwiftModel(
@@ -18,13 +19,15 @@ class HiddenOverrideKotlinRegularPropertySwiftModel(
 
     override val directlyCallableMembers: List<MutableKotlinRegularPropertySwiftModel> = listOf(this)
 
-    override val receiver: TypeSwiftModel by lazy {
+    override val receiver: SirType by lazy {
         with(swiftModelScope) {
-            receiverDescriptor.swiftModel
+            // TODO("How to get the receiver type?")
+            SwiftClassSirType(receiverDescriptor.swiftModel.swiftIrDeclaration)
+            // receiverDescriptor.swiftModel
         }
     }
 
-    override val original: KotlinRegularPropertySwiftModel = OriginalKotlinRegularPropertySwiftModel(this)
+    // override val original: KotlinRegularPropertySwiftModel = OriginalKotlinRegularPropertySwiftModel(this)
 
     override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
         visitor.visit(this)

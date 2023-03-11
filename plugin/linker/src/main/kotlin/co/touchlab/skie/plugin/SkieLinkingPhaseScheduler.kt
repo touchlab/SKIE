@@ -15,6 +15,7 @@ import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 
@@ -23,6 +24,7 @@ class SkieLinkingPhaseScheduler(
     context: CommonBackendContext,
     framework: FrameworkLayout,
     swiftModelScope: MutableSwiftModelScope,
+    builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
 ) {
 
     private val objCTypeRenderer = ObjCTypeRenderer()
@@ -31,7 +33,7 @@ class SkieLinkingPhaseScheduler(
         DumpSwiftApiPhase(DumpSwiftApiPoint.BeforeApiNotes, context, framework),
         RemoveKonanManglingPhase(skieModule, context.descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, context.descriptorProvider),
-        FixClassesConflictsPhase(skieModule, context.descriptorProvider),
+        FixClassesConflictsPhase(skieModule, context.descriptorProvider, builtinKotlinDeclarations),
         FixNestedBridgedTypesPhase(skieModule, context.descriptorProvider),
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
         SkieModuleConfigurationPhase(skieModule, swiftModelScope),

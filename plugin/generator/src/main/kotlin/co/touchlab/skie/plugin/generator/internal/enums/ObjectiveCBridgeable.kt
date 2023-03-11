@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.generator.internal.enums
 
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.plugin.api.model.type.stableSpec
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -27,7 +26,7 @@ internal object ObjectiveCBridgeable {
 
     private fun TypeSpec.Builder.addObjectiveCTypeAlias(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
         this.addType(
-            TypeAliasSpec.builder("_ObjectiveCType", classSwiftModel.stableSpec)
+            TypeAliasSpec.builder("_ObjectiveCType", classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
@@ -36,7 +35,7 @@ internal object ObjectiveCBridgeable {
         this.addFunction(
             FunctionSpec.builder("_forceBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", classSwiftModel.stableSpec)
+                .addParameter("_", "source", classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                 .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
                 .addStatement("result = fromObjectiveC(source)")
                 .build()
@@ -46,7 +45,7 @@ internal object ObjectiveCBridgeable {
         this.addFunction(
             FunctionSpec.builder("_conditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", classSwiftModel.stableSpec)
+                .addParameter("_", "source", classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                 .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
                 .addStatement("result = fromObjectiveC(source)")
                 .addStatement("return true")
@@ -58,7 +57,7 @@ internal object ObjectiveCBridgeable {
         this.addFunction(
             FunctionSpec.builder("_unconditionallyBridgeFromObjectiveC")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter("_", "source", classSwiftModel.stableSpec.makeOptional())
+                .addParameter("_", "source", classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName().makeOptional())
                 .addStatement("return fromObjectiveC(source)")
                 .returns(SelfTypeName.INSTANCE)
                 .build()
@@ -68,7 +67,7 @@ internal object ObjectiveCBridgeable {
         this.addFunction(
             FunctionSpec.builder("_bridgeToObjectiveC")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(classSwiftModel.stableSpec)
+                .returns(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                 .addBridgeToObjectiveCBody(classSwiftModel)
                 .build()
         )
@@ -88,16 +87,16 @@ internal object ObjectiveCBridgeable {
         get() = CodeBlock.of(
             "case .%N: return %T.%N as %T",
             this.identifier,
-            this.enum.stableSpec,
+            this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(),
             this.identifier,
-            this.enum.stableSpec,
+            this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(),
         )
 
     private fun TypeSpec.Builder.addFromObjectiveC(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
         this.addFunction(
             FunctionSpec.builder("fromObjectiveC")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                .addParameter("_", "source", classSwiftModel.stableSpec.makeOptional())
+                .addParameter("_", "source", classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName().makeOptional())
                 .returns(SelfTypeName.INSTANCE)
                 .addFromObjectiveCBody(classSwiftModel)
                 .build()
@@ -120,7 +119,7 @@ internal object ObjectiveCBridgeable {
         )
 
     private val KotlinEnumEntrySwiftModel.variableWithEntryCastedToSwiftType: CodeBlock
-        get() = CodeBlock.of("let objc__%L = %T.%N as %T", this.identifier, this.enum.stableSpec, this.identifier, this.enum.stableSpec)
+        get() = CodeBlock.of("let objc__%L = %T.%N as %T", this.identifier, this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(), this.identifier, this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName())
 
     private fun CodeBlock.Builder.addFromObjectiveCCases(classSwiftModel: KotlinClassSwiftModel): CodeBlock.Builder =
         this.add(

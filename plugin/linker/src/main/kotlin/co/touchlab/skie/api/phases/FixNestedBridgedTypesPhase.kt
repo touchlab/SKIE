@@ -5,11 +5,9 @@ import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.fqName
+import co.touchlab.skie.plugin.api.model.type.SwiftFqName
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.module.SkieModule
-import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
-import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeAliasSpec
@@ -46,7 +44,7 @@ class FixNestedBridgedTypesPhase(
         get() = this.exposedClasses.map { it.swiftModel } + this.exposedFiles.map { it.swiftModel }
 
     private val KotlinTypeSwiftModel.needsTypeAliasForBridging: Boolean
-        get() = bridge?.fqName != bridge?.fqNameSafeForBridging
+        get() = bridge?.declaration?.publicName?.asString() != bridge?.declaration?.publicName?.safeForBridging
 
     // Moves the class outside its parent class and renames it to avoid name collisions.
     // This is a workaround for `typealias` thinking that it's recursive (probably a bug in Swift compiler).
@@ -66,13 +64,14 @@ class FixNestedBridgedTypesPhase(
     private fun KotlinTypeSwiftModel.appendTypeAliasForBridging() {
         val bridge = bridge ?: error("Type $this does not have a bridge.")
 
+        // TODO: The second parameter should be `SirType` and not `Declaration`. This will work until we need generic typealias.
         addType(
-            TypeAliasSpec.builder(bridge.fqNameSafeForBridging, DeclaredTypeName.qualifiedLocalTypeName(bridge.fqName))
+            TypeAliasSpec.builder(bridge.declaration.publicName.safeForBridging, bridge.declaration.internalName.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
     }
 }
 
-val TypeSwiftModel.fqNameSafeForBridging: String
-    get() = fqName.replace(".", "__")
+val SwiftFqName.safeForBridging: String
+    get() = asString().replace(".", "__")

@@ -7,29 +7,29 @@ import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.SwiftTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftErrorTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftInstanceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeProtocolTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftMetaClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftPrimitiveTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftProtocolTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.ObjcProtocolSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnySirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftErrorSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftInstanceSirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftMetaClassSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReferenceSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftPrimitiveSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftProtocolSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftReferenceSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidSirType
+import co.touchlab.skie.plugin.api.sir.declaration.isHashable
 import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
 import org.jetbrains.kotlin.backend.konan.isInlined
@@ -45,6 +45,7 @@ import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
 import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -57,10 +58,10 @@ import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
-fun SwiftTypeModel.makeNullableIfReferenceOrPointer(): SwiftTypeModel = when (this) {
-    is SwiftPointerTypeModel -> SwiftPointerTypeModel(pointee, nullable = true)
-    is SwiftNonNullReferenceTypeModel -> SwiftNullableReferenceTypeModel(this)
-    is SwiftNullableReferenceTypeModel, is SwiftPrimitiveTypeModel, SwiftVoidTypeModel, SwiftErrorTypeModel -> this
+fun SirType.makeNullableIfReferenceOrPointer(): SirType = when (this) {
+    is SwiftPointerSirType -> SwiftPointerSirType(pointee, nullable = true)
+    is SwiftNonNullReferenceSirType -> SwiftNullableReferenceSirType(this)
+    is SwiftNullableReferenceSirType, is SwiftPrimitiveSirType, SwiftVoidSirType, SwiftErrorSirType -> this
 }
 
 internal tailrec fun KotlinType.getErasedTypeClass(): ClassDescriptor =
@@ -69,9 +70,17 @@ internal tailrec fun KotlinType.getErasedTypeClass(): ClassDescriptor =
 class SwiftTypeTranslator(
     private val descriptorProvider: DescriptorProvider,
     val namer: ObjCExportNamer,
-    private val problemCollector: SwiftTranslationProblemCollector,
-    private val builtinSwiftBridgeableProvider: BuiltinSwiftBridgeableProvider,
+    val problemCollector: SwiftTranslationProblemCollector,
+    val builtinSwiftBridgeableProvider: BuiltinSwiftBridgeableProvider,
+    val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
+    val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
 ) {
+
+    context(SwiftModelScope)
+    internal fun mapFileType(sourceFile: SourceFile): SirType {
+        val fileModel = sourceFile.swiftModel
+        return SwiftClassSirType(fileModel.swiftIrDeclaration)
+    }
 
     context(SwiftModelScope)
     internal fun mapReturnType(
@@ -79,26 +88,26 @@ class SwiftTypeTranslator(
         method: FunctionDescriptor,
         swiftExportScope: SwiftExportScope,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel {
+    ): SirType {
         return when (returnBridge) {
             MethodBridge.ReturnValue.Suspend,
             MethodBridge.ReturnValue.Void,
-            -> SwiftVoidTypeModel
-            MethodBridge.ReturnValue.HashCode -> SwiftPrimitiveTypeModel.NSUInteger
+            -> SwiftVoidSirType
+            MethodBridge.ReturnValue.HashCode -> SwiftPrimitiveSirType.NSUInteger
             is MethodBridge.ReturnValue.Mapped -> mapType(
                 method.returnType!!,
                 swiftExportScope,
                 returnBridge.bridge,
                 flowMappingStrategy,
             )
-            MethodBridge.ReturnValue.WithError.Success -> SwiftVoidTypeModel
+            MethodBridge.ReturnValue.WithError.Success -> SwiftVoidSirType
             is MethodBridge.ReturnValue.WithError.ZeroForError -> {
                 val successReturnType = mapReturnType(returnBridge.successBridge, method, swiftExportScope, flowMappingStrategy)
 
                 if (!returnBridge.successMayBeZero) {
                     check(
-                        successReturnType is SwiftNonNullReferenceTypeModel
-                            || (successReturnType is SwiftPointerTypeModel && !successReturnType.nullable)
+                        successReturnType is SwiftNonNullReferenceSirType
+                            || (successReturnType is SwiftPointerSirType && !successReturnType.nullable)
                     ) {
                         "Unexpected return type: $successReturnType in $method"
                     }
@@ -108,7 +117,7 @@ class SwiftTypeTranslator(
             }
             MethodBridge.ReturnValue.Instance.InitResult,
             MethodBridge.ReturnValue.Instance.FactoryResult,
-            -> SwiftInstanceTypeModel
+            -> SwiftInstanceSirType
         }
     }
 
@@ -117,7 +126,7 @@ class SwiftTypeTranslator(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftReferenceTypeModel =
+    ): SwiftReferenceSirType =
         mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope, flowMappingStrategy).withNullabilityOf(kotlinType)
 
     context(SwiftModelScope)
@@ -125,7 +134,7 @@ class SwiftTypeTranslator(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftNonNullReferenceTypeModel {
+    ): SwiftNonNullReferenceSirType {
         class TypeMappingMatch(val type: KotlinType, val descriptor: ClassDescriptor, val mapper: CustomTypeMapper)
 
         if (flowMappingStrategy == FlowMappingStrategy.Full) {
@@ -172,10 +181,10 @@ class SwiftTypeTranslator(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftNonNullReferenceTypeModel {
+    ): SwiftNonNullReferenceSirType {
         if (kotlinType.isTypeParameter()) {
             when {
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> return SwiftAnyHashableTypeModel
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> return SwiftAnyHashableSirType
                 else -> {
                     val genericTypeUsage =
                         swiftExportScope.genericScope.getGenericTypeUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
@@ -202,17 +211,13 @@ class SwiftTypeTranslator(
 
         return if (classDescriptor.kind.isInterface) {
             when {
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableSirType
                 else -> {
                     translateClassOrInterfaceName(
                         descriptor = classDescriptor,
                         exportScope = swiftExportScope,
-                        ifKotlinType = { SwiftKotlinTypeProtocolTypeModel(it) },
-                        ifSwiftBridge = {
-                            // TODO: This mapping won't probably work very well
-                            SwiftProtocolTypeModel(it.stableFqName)
-                        },
-                        ifSwiftType = { SwiftProtocolTypeModel(it) },
+                        typeArgs = emptyList(),
+                        ifKotlinType = { SwiftProtocolSirType(it.nonBridgedDeclaration as SwiftIrProtocolDeclaration) },
                     )
                 }
             }
@@ -229,9 +234,8 @@ class SwiftTypeTranslator(
             translateClassOrInterfaceName(
                 descriptor = classDescriptor,
                 exportScope = swiftExportScope,
-                ifKotlinType = { SwiftKotlinTypeClassTypeModel(it, typeArgs) },
-                ifSwiftBridge = { SwiftClassTypeModel(it.stableFqName, typeArgs) },
-                ifSwiftType = { SwiftClassTypeModel(it, typeArgs) },
+                typeArgs = typeArgs,
+                ifKotlinType = { SwiftClassSirType(it.nonBridgedDeclaration, typeArgs) },
             )
         }
     }
@@ -239,18 +243,38 @@ class SwiftTypeTranslator(
     private tailrec fun mapObjCObjectReferenceTypeIgnoringNullability(
         descriptor: ClassDescriptor,
         swiftExportScope: SwiftExportScope,
-    ): SwiftNonNullReferenceTypeModel {
-        if (descriptor.isObjCMetaClass()) return SwiftMetaClassTypeModel
-        if (descriptor.isObjCProtocolClass()) return foreignClassType("Protocol")
+    ): SwiftNonNullReferenceSirType {
+        if (descriptor.isObjCMetaClass()) return SwiftMetaClassSirType
+        if (descriptor.isObjCProtocolClass()) return ObjcProtocolSirType
 
         if (descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration()) {
             val bridge = builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe, swiftExportScope)
-            return bridge ?: if (descriptor.kind.isInterface) {
-                val name = descriptor.name.asString().removeSuffix("Protocol")
-                foreignProtocolType(name)
+            return if (bridge != null) {
+                bridge
             } else {
-                val name = descriptor.name.asString()
-                foreignClassType(name)
+                val moduleName = "TODO: MODULE PLEASE"
+                if (descriptor.kind.isInterface) {
+                    TODO("Get from registry")
+                    // val name = SwiftFqName.External(
+                    //     module = moduleName,
+                    //     name = descriptor.name.asString().removeSuffix("Protocol"),
+                    // )
+                    // SwiftProtocolSirType(
+                    //     SwiftIrProtocolDeclaration(
+                    //         name,
+                    //         superTypes = listOf(BuiltinSwiftDeclarations.nsObject),
+                    //     ),
+                    // )
+                } else {
+                    TODO("Get from registry")
+                    // val name = SwiftFqName.External(moduleName, descriptor.name.asString())
+                    // SwiftClassSirType(
+                    //     SwiftIrTypeDeclaration(
+                    //         name = name,
+                    //         superTypes = listOf(BuiltinSwiftDeclarations.nsObject),
+                    //     ),
+                    // )
+                }
             }
         }
 
@@ -261,21 +285,11 @@ class SwiftTypeTranslator(
         return idType(swiftExportScope)
     }
 
-    private fun foreignProtocolType(name: String): SwiftProtocolTypeModel {
-        // generator?.referenceProtocol(name)
-        return SwiftProtocolTypeModel(name)
-    }
-
-    private fun foreignClassType(name: String): SwiftClassTypeModel {
-        // generator?.referenceClass(ObjCClassForwardDeclaration(name))
-        return SwiftClassTypeModel(name)
-    }
-
-    private fun idType(swiftExportScope: SwiftExportScope): SwiftNonNullReferenceTypeModel {
+    private fun idType(swiftExportScope: SwiftExportScope): SwiftNonNullReferenceSirType {
         return when {
-            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
-            swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftAnyObjectTypeModel
-            else -> SwiftAnyTypeModel
+            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableSirType
+            swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftAnyObjectSirType
+            else -> SwiftAnySirType
         }
     }
 
@@ -285,13 +299,13 @@ class SwiftTypeTranslator(
         swiftExportScope: SwiftExportScope,
         returnsVoid: Boolean,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftLambdaTypeModel {
+    ): SwiftLambdaSirType {
         val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
             functionType.getValueParameterTypesFromFunctionType().map { it.type }
 
-        return SwiftLambdaTypeModel(
+        return SwiftLambdaSirType(
             if (returnsVoid) {
-                SwiftVoidTypeModel
+                SwiftVoidSirType
             } else {
                 mapReferenceType(
                     functionType.getReturnTypeFromFunctionType(),
@@ -316,7 +330,7 @@ class SwiftTypeTranslator(
         swiftExportScope: SwiftExportScope,
         typeBridge: NativeTypeBridge.BlockPointer,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftReferenceTypeModel {
+    ): SwiftReferenceSirType {
         val expectedDescriptor = kotlinType.builtIns.getFunction(typeBridge.numberOfParameters)
 
         val functionType = if (TypeUtils.getClassDescriptor(kotlinType) == expectedDescriptor) {
@@ -336,23 +350,23 @@ class SwiftTypeTranslator(
         swiftExportScope: SwiftExportScope,
         typeBridge: NativeTypeBridge,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel = when (typeBridge) {
+    ): SirType = when (typeBridge) {
         NativeTypeBridge.Reference -> mapReferenceType(kotlinType, swiftExportScope, flowMappingStrategy)
         is NativeTypeBridge.BlockPointer -> mapFunctionType(kotlinType, swiftExportScope, typeBridge, flowMappingStrategy)
         is NativeTypeBridge.ValueType -> when (typeBridge.objCValueType) {
-            ObjCValueType.BOOL -> SwiftPrimitiveTypeModel.Bool
-            ObjCValueType.UNICHAR -> SwiftPrimitiveTypeModel.unichar
-            ObjCValueType.CHAR -> SwiftPrimitiveTypeModel.Int8
-            ObjCValueType.SHORT -> SwiftPrimitiveTypeModel.Int16
-            ObjCValueType.INT -> SwiftPrimitiveTypeModel.Int32
-            ObjCValueType.LONG_LONG -> SwiftPrimitiveTypeModel.Int64
-            ObjCValueType.UNSIGNED_CHAR -> SwiftPrimitiveTypeModel.UInt8
-            ObjCValueType.UNSIGNED_SHORT -> SwiftPrimitiveTypeModel.UInt16
-            ObjCValueType.UNSIGNED_INT -> SwiftPrimitiveTypeModel.UInt32
-            ObjCValueType.UNSIGNED_LONG_LONG -> SwiftPrimitiveTypeModel.UInt64
-            ObjCValueType.FLOAT -> SwiftPrimitiveTypeModel.Float
-            ObjCValueType.DOUBLE -> SwiftPrimitiveTypeModel.Double
-            ObjCValueType.POINTER -> SwiftPointerTypeModel(SwiftVoidTypeModel, kotlinType.binaryRepresentationIsNullable())
+            ObjCValueType.BOOL -> SwiftPrimitiveSirType.Bool
+            ObjCValueType.UNICHAR -> SwiftPrimitiveSirType.unichar
+            ObjCValueType.CHAR -> SwiftPrimitiveSirType.Int8
+            ObjCValueType.SHORT -> SwiftPrimitiveSirType.Int16
+            ObjCValueType.INT -> SwiftPrimitiveSirType.Int32
+            ObjCValueType.LONG_LONG -> SwiftPrimitiveSirType.Int64
+            ObjCValueType.UNSIGNED_CHAR -> SwiftPrimitiveSirType.UInt8
+            ObjCValueType.UNSIGNED_SHORT -> SwiftPrimitiveSirType.UInt16
+            ObjCValueType.UNSIGNED_INT -> SwiftPrimitiveSirType.UInt32
+            ObjCValueType.UNSIGNED_LONG_LONG -> SwiftPrimitiveSirType.UInt64
+            ObjCValueType.FLOAT -> SwiftPrimitiveSirType.Float
+            ObjCValueType.DOUBLE -> SwiftPrimitiveSirType.Double
+            ObjCValueType.POINTER -> SwiftPointerSirType(SwiftVoidSirType, kotlinType.binaryRepresentationIsNullable())
         }
     }
 
@@ -360,14 +374,13 @@ class SwiftTypeTranslator(
     private fun translateClassOrInterfaceName(
         descriptor: ClassDescriptor,
         exportScope: SwiftExportScope,
-        ifKotlinType: (KotlinTypeSwiftModel) -> SwiftNonNullReferenceTypeModel,
-        ifSwiftBridge: (TypeSwiftModel) -> SwiftNonNullReferenceTypeModel,
-        ifSwiftType: (String) -> SwiftNonNullReferenceTypeModel,
-    ): SwiftNonNullReferenceTypeModel {
+        typeArgs: List<SwiftNonNullReferenceSirType>,
+        ifKotlinType: (KotlinTypeSwiftModel) -> SwiftNonNullReferenceSirType,
+    ): SwiftNonNullReferenceSirType {
         assert(descriptor in descriptorProvider.exposedClasses) { "Shouldn't be exposed: $descriptor" }
 
         if (ErrorUtils.isError(descriptor)) {
-            return SwiftErrorTypeModel
+            return SwiftErrorSirType
         }
 
         return if (descriptor.hasSwiftModel) {
@@ -376,18 +389,28 @@ class SwiftTypeTranslator(
 
             when {
                 exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> ifKotlinType(swiftModel)
-                exportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> if (bridge is SwiftTypeSwiftModel && bridge.isHashable) {
-                    ifSwiftBridge(bridge)
+                exportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> if (bridge != null && bridge.declaration.isHashable()) {
+                    SwiftClassSirType(bridge.declaration, typeArgs)
                 } else {
                     ifKotlinType(swiftModel)
                 }
-                else -> swiftModel.bridge?.let(ifSwiftBridge) ?: swiftModel.let(ifKotlinType)
+                else -> swiftModel.bridge?.let { SwiftClassSirType(it.declaration, typeArgs) } ?: swiftModel.let(ifKotlinType)
             }
         } else {
-            ifSwiftType(namer.getClassOrProtocolName(descriptor).swiftName)
+            if (descriptor.kind.isInterface) {
+                SwiftProtocolSirType(
+                    swiftIrDeclarationRegistry.declarationForInterface(descriptor),
+                )
+            } else {
+                SwiftClassSirType(
+                    swiftIrDeclarationRegistry.declarationForClass(descriptor),
+                    typeArgs,
+                )
+            }
+            // TODO: ifSwiftType(SwiftFqName.Local.SwiftType(namer.getClassOrProtocolName(descriptor).swiftName))
         }
     }
 }
 
-fun SwiftNonNullReferenceTypeModel.withNullabilityOf(kotlinType: KotlinType): SwiftReferenceTypeModel =
-    if (kotlinType.binaryRepresentationIsNullable()) SwiftNullableReferenceTypeModel(this) else this
+fun SwiftNonNullReferenceSirType.withNullabilityOf(kotlinType: KotlinType): SwiftReferenceSirType =
+    if (kotlinType.binaryRepresentationIsNullable()) SwiftNullableReferenceSirType(this) else this

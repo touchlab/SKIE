@@ -1,6 +1,6 @@
 KotlinBase_()
 KotlinMutableSet_()
-KotlinDictionary_()
+KotlinMutableDictionary_()
 KotlinNumber_()
 KotlinByte_()
 KotlinUByte_()

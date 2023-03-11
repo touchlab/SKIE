@@ -3,7 +3,9 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="libraryTest" value="co.touchlab:kmmworker-iosarm64" />
+          <entry key="debugDumpSwiftApiAt" value="" />
+          <entry key="libraryTest" value="" />
+          <entry key="onlyIndices" value="" />
         </map>
       </option>
       <option name="executionName" />

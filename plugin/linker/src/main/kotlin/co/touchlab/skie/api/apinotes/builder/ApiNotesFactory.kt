@@ -1,6 +1,6 @@
 package co.touchlab.skie.api.apinotes.builder
 
-import co.touchlab.skie.api.phases.fqNameSafeForBridging
+import co.touchlab.skie.api.phases.safeForBridging
 import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
@@ -12,7 +12,6 @@ import co.touchlab.skie.plugin.api.model.isHidden
 import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.isReplaced
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.fqName
 import org.jetbrains.kotlin.descriptors.isInterface
 
 internal class ApiNotesFactory(
@@ -42,9 +41,9 @@ internal class ApiNotesFactory(
     context(SwiftModelScope)
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
         ApiNotesType(
-            objCFqName = this.objCFqName,
-            bridgeFqName = this.bridge?.fqNameSafeForBridging,
-            swiftFqName = this.fqName,
+            objCFqName = this.objCFqName.asString(),
+            bridgeFqName = this.bridge?.declaration?.publicName?.safeForBridging,
+            swiftFqName = this.nonBridgedDeclaration.publicName.asString(),
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
             methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote(this) },

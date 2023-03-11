@@ -3,8 +3,8 @@ package co.touchlab.skie.api.model.type.translation
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftKotlinTypeClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
@@ -26,14 +26,14 @@ object FlowTypeMappers {
             type: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
-        ): SwiftNonNullReferenceTypeModel {
+        ): SwiftNonNullReferenceSirType {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> {
                     val typeArguments = type.arguments.map {
                         translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope, FlowMappingStrategy.Full)
                     }
 
-                    SwiftKotlinTypeClassTypeModel(supportedFlow.requiredVariant.kotlinFlowModel, typeArguments)
+                    SwiftClassSirType(supportedFlow.requiredVariant.kotlinFlowModel.nonBridgedDeclaration, typeArguments)
                 }
                 else -> {
                     val hasNullableTypeArgument = type.arguments.any { it.type.isNullable() }

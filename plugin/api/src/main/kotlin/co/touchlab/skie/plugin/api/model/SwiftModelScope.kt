@@ -9,11 +9,11 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegular
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -55,29 +55,31 @@ interface SwiftModelScope {
 
     val SourceFile.swiftModel: KotlinTypeSwiftModel
 
-    fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel
+    fun CallableMemberDescriptor.owner(): SwiftIrExtensibleDeclaration
 
-    fun PropertyDescriptor.propertyTypeModel(
+    fun CallableMemberDescriptor.receiverType(): SirType
+
+    fun PropertyDescriptor.propertyType(
         genericExportScope: SwiftGenericExportScope,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel
+    ): SirType
 
-    fun FunctionDescriptor.returnTypeModel(
+    fun FunctionDescriptor.returnType(
         genericExportScope: SwiftGenericExportScope,
         bridge: MethodBridge.ReturnValue,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel
+    ): SirType
 
-    fun FunctionDescriptor.asyncReturnTypeModel(
+    fun FunctionDescriptor.asyncReturnType(
         genericExportScope: SwiftGenericExportScope,
         bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel
+    ): SirType
 
     fun FunctionDescriptor.getParameterType(
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel
+    ): SirType
 }

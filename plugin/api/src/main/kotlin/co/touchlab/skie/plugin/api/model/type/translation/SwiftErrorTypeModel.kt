@@ -1,7 +1,13 @@
 package co.touchlab.skie.plugin.api.model.type.translation
 
-object SwiftErrorTypeModel : SwiftNonNullReferenceTypeModel {
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
+import io.outfoxx.swiftpoet.TypeName
 
-    override val stableFqName: String
-        get() = "ERROR"
+object SwiftErrorSirType: SwiftNonNullReferenceSirType {
+    override val declaration: SwiftIrDeclaration
+        get() = TODO("Not yet implemented")
+
+    override fun toSwiftPoetUsage(): TypeName {
+        TODO("Not yet implemented")
+    }
 }

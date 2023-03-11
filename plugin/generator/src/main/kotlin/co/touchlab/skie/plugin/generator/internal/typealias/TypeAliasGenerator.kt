@@ -6,11 +6,8 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.fqName
-import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
-import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeAliasSpec
@@ -28,8 +25,6 @@ internal class TypeAliasGenerator(
 
     private val baseTypeAliasContainerName = "Skie"
 
-    private val publicTypeAliasContainerName = TypeSwiftModel.StableFqNameNamespace.removeSuffix(".")
-
     override fun runObjcPhase() {
         skieContext.module.file("SkieTypeAliases") {
             addTypeAliasContainer(descriptorProvider)
@@ -40,7 +35,7 @@ internal class TypeAliasGenerator(
     context(SwiftModelScope)
     private fun FileSpec.Builder.addTypeAliasContainer(descriptorProvider: DescriptorProvider) {
         addType(
-            TypeSpec.enumBuilder(DeclaredTypeName.qualifiedLocalTypeName(publicTypeAliasContainerName))
+            TypeSpec.enumBuilder(KotlinTypeSwiftModel.StableFqNameNamespace.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeAliases(descriptorProvider)
                 .build()
@@ -69,33 +64,33 @@ internal class TypeAliasGenerator(
     }
 
     context(SwiftModelScope)
-    private fun TypeSpec.Builder.addTypeAlias(swiftModel: TypeSwiftModel) {
+    private fun TypeSpec.Builder.addTypeAlias(swiftModel: KotlinTypeSwiftModel) {
+        addTypeAliasIfLocalClass(swiftModel.nonBridgedDeclaration)
+        swiftModel.bridge?.declaration?.let { addTypeAliasIfLocalClass(it) }
+    }
+
+    private fun TypeSpec.Builder.addTypeAliasIfLocalClass(declaration: SwiftIrExtensibleDeclaration) {
+        if (declaration is SwiftIrExtensibleDeclaration.Local) {
+            addTypeAlias(declaration)
+        }
+    }
+
+    private fun TypeSpec.Builder.addTypeAlias(localClass: SwiftIrExtensibleDeclaration.Local) {
         addType(
             TypeAliasSpec.builder(
-                name = swiftModel.stableFqName.removePrefix(TypeSwiftModel.StableFqNameNamespace),
-                type = DeclaredTypeName.qualifiedLocalTypeName(swiftModel.fqName),
+                name = localClass.typealiasName,
+                type = localClass.publicName.toSwiftPoetName(),
             )
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
-
-        (swiftModel as? KotlinTypeSwiftModel)?.bridge?.let { bridge ->
-            addType(
-                TypeAliasSpec.builder(
-                    name = bridge.stableFqName.removePrefix(TypeSwiftModel.StableFqNameNamespace),
-                    type = DeclaredTypeName.qualifiedLocalTypeName(bridge.fqName),
-                )
-                    .addModifiers(Modifier.PUBLIC)
-                    .build()
-            )
-        }
     }
 
     context(SwiftModelScope)
     private fun FileSpec.Builder.addBaseTypeAliasContainerTypeAlias() {
         val builder = TypeAliasSpec.builder(
             name = baseTypeAliasContainerName,
-            type = DeclaredTypeName.qualifiedLocalTypeName(publicTypeAliasContainerName),
+            type = KotlinTypeSwiftModel.StableFqNameNamespace.toSwiftPoetName(),
         )
 
         if (areTypeAliasesExported) {

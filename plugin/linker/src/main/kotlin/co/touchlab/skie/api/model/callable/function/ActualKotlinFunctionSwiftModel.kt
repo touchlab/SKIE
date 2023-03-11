@@ -14,7 +14,8 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableM
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -43,7 +44,7 @@ internal class ActualKotlinFunctionSwiftModel(
                     descriptor.getParameterType(
                         parameterDescriptor,
                         core.parameterBridge,
-                        receiver.swiftGenericExportScope,
+                        owner.swiftGenericExportScope,
                         isFlowMappingEnabled,
                     )
                 }
@@ -53,9 +54,14 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override var visibility: SwiftModelVisibility by core::visibility
 
-    override val receiver: TypeSwiftModel by lazy {
+    override val owner: SwiftIrExtensibleDeclaration
+        get() = with(swiftModelScope) {
+            descriptor.owner()
+        }
+
+    override val receiver: SirType by lazy {
         with(swiftModelScope) {
-            descriptor.receiverTypeModel()
+            descriptor.receiverType()
         }
     }
 
@@ -90,16 +96,16 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
 
-    override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
+    // override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
 
-    override val isChanged: Boolean
-        get() = identifier != original.identifier || visibility != original.visibility || valueParameters.any { it.isChanged } ||
-            collisionResolutionStrategy != original.collisionResolutionStrategy || returnTypeFlowMappingStrategy != original.returnTypeFlowMappingStrategy
+    // override val isChanged: Boolean
+    //     get() = identifier != original.identifier || visibility != original.visibility || valueParameters.any { it.isChanged } ||
+    //         collisionResolutionStrategy != original.collisionResolutionStrategy || returnTypeFlowMappingStrategy != original.returnTypeFlowMappingStrategy
 
-    override val returnType: TypeSwiftModel
+    override val returnType: SirType
         get() = with(swiftModelScope) {
-            core.descriptor.returnTypeModel(
-                receiver.swiftGenericExportScope,
+            core.descriptor.returnType(
+                owner.swiftGenericExportScope,
                 core.getMethodBridge(descriptor).returnBridge,
                 returnTypeFlowMappingStrategy,
             )

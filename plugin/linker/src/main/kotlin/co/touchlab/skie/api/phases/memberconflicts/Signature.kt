@@ -56,21 +56,21 @@ data class Signature(
 
         override fun visit(function: KotlinFunctionSwiftModel): Signature =
             Signature(
-                receiver = function.receiver.stableFqName,
+                receiver = function.receiver.toSwiftPoetUsage().toString(), //.stableFqName,
                 identifier = function.identifier,
                 parameters = function.valueParameters.map { it.toSignatureParameter() },
-                returnType = ReturnType.Specific(function.returnType.stableFqName),
+                returnType = ReturnType.Specific(function.returnType.toSwiftPoetUsage().toString() /*.stableFqName*/),
             )
 
         private fun KotlinValueParameterSwiftModel.toSignatureParameter(): Parameter =
             Parameter(
                 argumentLabel = this.argumentLabel,
-                type = this.type.stableFqName,
+                type = this.type.toSwiftPoetUsage().toString(), //stableFqName,
             )
 
         override fun visit(regularProperty: KotlinRegularPropertySwiftModel): Signature =
             Signature(
-                receiver = regularProperty.receiver.stableFqName,
+                receiver = regularProperty.receiver.toSwiftPoetUsage().toString(), //.stableFqName,
                 identifier = regularProperty.identifier,
                 parameters = emptyList(),
                 returnType = ReturnType.Any,

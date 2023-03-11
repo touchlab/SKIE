@@ -5,11 +5,13 @@ package co.touchlab.skie.api.model.type.translation
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnySirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
 import org.jetbrains.kotlin.backend.konan.objcexport.NSNumberKind
 import org.jetbrains.kotlin.backend.konan.objcexport.isMappedFunctionClass
 import org.jetbrains.kotlin.builtins.StandardNames
@@ -19,6 +21,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
+
 
 object CustomTypeMappers {
 
@@ -31,17 +34,17 @@ object CustomTypeMappers {
         val result = mutableListOf<CustomTypeMapper>()
 
         result += ListMapper
-        result += Simple(ClassId.topLevel(mutableList), "NSMutableArray")
+        result += Simple(ClassId.topLevel(mutableList), BuiltinDeclarations.Foundation.NSMutableArray)
         result += SetMapper
-        result += Collection(mutableSet) { namer.mutableSetName.swiftName }
+        result += Collection(mutableSet) { builtinKotlinDeclarations.MutableSet }
         result += MapMapper
-        result += Collection(mutableMap) { namer.mutableMapName.swiftName }
+        result += Collection(mutableMap) { builtinKotlinDeclarations.MutableMap }
 
         NSNumberKind.values().forEach {
             // TODO: NSNumber seem to have different equality semantics.
             val classId = it.mappedKotlinClassId
             if (classId != null) {
-                result += Simple(classId) { namer.numberBoxName(classId).swiftName }
+                result += Simple(classId) { builtinKotlinDeclarations.nsNumberDeclarations.getValue(classId) }
             }
         }
 
@@ -102,11 +105,11 @@ object CustomTypeMappers {
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
             flowMappingStrategy: FlowMappingStrategy,
-        ): SwiftNonNullReferenceTypeModel {
-            return SwiftClassTypeModel(
+        ): SwiftNonNullReferenceSirType {
+            return SwiftClassSirType(
                 when {
-                    swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> "NSString"
-                    else -> "String"
+                    swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> BuiltinDeclarations.Foundation.NSString
+                    else -> BuiltinDeclarations.Swift.String
                 }
             )
         }
@@ -122,22 +125,22 @@ object CustomTypeMappers {
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
             flowMappingStrategy: FlowMappingStrategy,
-        ): SwiftNonNullReferenceTypeModel {
+        ): SwiftNonNullReferenceSirType {
             return when {
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftClassTypeModel("NSArray")
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableSirType
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftClassSirType(BuiltinDeclarations.Foundation.NSArray)
                 else -> {
                     val typeArguments = mappedSuperType.arguments.map {
                         val argument = it.type
                         if (TypeUtils.isNullableType(argument)) {
                             // Kotlin `null` keys and values are represented as `NSNull` singleton.
-                            SwiftAnyTypeModel
+                            SwiftAnySirType
                         } else {
                             translator.mapReferenceTypeIgnoringNullability(argument, swiftExportScope, flowMappingStrategy.forGenerics())
                         }
                     }
 
-                    SwiftClassTypeModel("Array", typeArguments)
+                    SwiftClassSirType(BuiltinDeclarations.Swift.Array, typeArguments)
                 }
             }
         }
@@ -153,15 +156,15 @@ object CustomTypeMappers {
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
             flowMappingStrategy: FlowMappingStrategy,
-        ): SwiftNonNullReferenceTypeModel {
+        ): SwiftNonNullReferenceSirType {
             return when {
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftClassTypeModel("NSSet")
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftClassSirType(BuiltinDeclarations.Foundation.NSSet)
                 else -> {
                     val typeArguments = mappedSuperType.arguments.map {
                         val argument = it.type
                         if (TypeUtils.isNullableType(argument)) {
                             // Kotlin `null` keys and values are represented as `NSNull` singleton.
-                            SwiftAnyHashableTypeModel
+                            SwiftAnyHashableSirType
                         } else {
                             translator.mapReferenceTypeIgnoringNullability(
                                 argument,
@@ -171,7 +174,7 @@ object CustomTypeMappers {
                         }
                     }
 
-                    SwiftClassTypeModel("Set", typeArguments)
+                    SwiftClassSirType(BuiltinDeclarations.Swift.Set, typeArguments)
                 }
             }
         }
@@ -187,19 +190,19 @@ object CustomTypeMappers {
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
             flowMappingStrategy: FlowMappingStrategy,
-        ): SwiftNonNullReferenceTypeModel {
+        ): SwiftNonNullReferenceSirType {
             return when {
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableTypeModel
-                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftClassTypeModel("NSDictionary")
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> SwiftAnyHashableSirType
+                swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> SwiftClassSirType(BuiltinDeclarations.Foundation.NSDictionary)
                 else -> {
                     val typeArguments = mappedSuperType.arguments.mapIndexed { index, typeProjection ->
                         val argument = typeProjection.type
                         if (TypeUtils.isNullableType(argument)) {
                             // Kotlin `null` keys and values are represented as `NSNull` singleton.
                             if (index == 0) {
-                                SwiftAnyHashableTypeModel
+                                SwiftAnyHashableSirType
                             } else {
-                                SwiftAnyTypeModel
+                                SwiftAnySirType
                             }
                         } else {
                             val argumentScope = if (index == 0) {
@@ -211,7 +214,7 @@ object CustomTypeMappers {
                         }
                     }
 
-                    SwiftClassTypeModel("Dictionary", typeArguments)
+                    SwiftClassSirType(BuiltinDeclarations.Swift.Dictionary, typeArguments)
                 }
 
             }
@@ -220,12 +223,12 @@ object CustomTypeMappers {
 
     private class Simple(
         override val mappedClassId: ClassId,
-        private val getObjCClassName: SwiftTypeTranslator.() -> String,
+        private val getObjCClassName: SwiftTypeTranslator.() -> SwiftIrExtensibleDeclaration,
     ) : CustomTypeMapper {
 
         constructor(
             mappedClassId: ClassId,
-            objCClassName: String,
+            objCClassName: SwiftIrExtensibleDeclaration,
         ) : this(mappedClassId, { objCClassName })
 
         context(SwiftModelScope)
@@ -234,19 +237,19 @@ object CustomTypeMappers {
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
             flowMappingStrategy: FlowMappingStrategy,
-        ): SwiftNonNullReferenceTypeModel =
-            SwiftClassTypeModel(translator.getObjCClassName())
+        ): SwiftNonNullReferenceSirType =
+            SwiftClassSirType(translator.getObjCClassName())
     }
 
     private class Collection(
         mappedClassFqName: FqName,
-        private val getObjCClassName: SwiftTypeTranslator.() -> String,
+        private val getDeclaration: SwiftTypeTranslator.() -> SwiftIrExtensibleDeclaration,
     ) : CustomTypeMapper {
 
         constructor(
             mappedClassFqName: FqName,
-            objCClassName: String,
-        ) : this(mappedClassFqName, { objCClassName })
+            declaration: SwiftIrExtensibleDeclaration,
+        ) : this(mappedClassFqName, { declaration })
 
         override val mappedClassId = ClassId.topLevel(mappedClassFqName)
 
@@ -256,12 +259,12 @@ object CustomTypeMappers {
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
             flowMappingStrategy: FlowMappingStrategy,
-        ): SwiftNonNullReferenceTypeModel {
+        ): SwiftNonNullReferenceSirType {
             val typeArguments = mappedSuperType.arguments.map {
                 val argument = it.type
                 if (TypeUtils.isNullableType(argument)) {
                     // Kotlin `null` keys and values are represented as `NSNull` singleton.
-                    SwiftAnyObjectTypeModel
+                    SwiftAnyObjectSirType
                 } else {
                     translator.mapReferenceTypeIgnoringNullability(
                         argument,
@@ -271,7 +274,7 @@ object CustomTypeMappers {
                 }
             }
 
-            return SwiftClassTypeModel(translator.getObjCClassName(), typeArguments)
+            return SwiftClassSirType(translator.getDeclaration(), typeArguments)
         }
     }
 
@@ -286,7 +289,7 @@ object CustomTypeMappers {
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
             flowMappingStrategy: FlowMappingStrategy,
-        ): SwiftNonNullReferenceTypeModel {
+        ): SwiftNonNullReferenceSirType {
             return translator.mapFunctionTypeIgnoringNullability(
                 mappedSuperType,
                 swiftExportScope,

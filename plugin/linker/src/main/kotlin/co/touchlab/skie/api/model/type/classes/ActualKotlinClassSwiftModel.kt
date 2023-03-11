@@ -13,16 +13,21 @@ import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.ObjcFqName
+import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
+import co.touchlab.skie.plugin.api.model.type.SwiftFqName
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.util.mutableLazy
 import co.touchlab.skie.util.swiftIdentifier
-import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.descriptors.isSealed
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
@@ -58,7 +63,7 @@ class ActualKotlinClassSwiftModel(
                 ?.allDirectlyCallableMembers
                 ?.flatMap { it.allBoundedSwiftModels }
                 ?.filterIsInstance<FakeObjcConstructorKotlinFunctionSwiftModel>()
-                ?.filter { it.receiver == this@ActualKotlinClassSwiftModel }
+                ?.filter { it.receiver.declaration == this@ActualKotlinClassSwiftModel.swiftIrDeclaration }
                 ?: emptyList()
         }
 
@@ -96,20 +101,27 @@ class ActualKotlinClassSwiftModel(
 
     private val swiftName = classDescriptor.swiftName
 
-    override var identifier: String = swiftName.identifier
+    override var identifier: String = swiftName.name
+    override val originalIdentifier: String
+        // Needs to be recalculated because the `identifier` is changed if the class is nested inside a non-exported class.
+        = namer.getClassOrProtocolName(classDescriptor.original).swiftName.substringAfter(".")
 
-    override var bridge: TypeSwiftModel? = null
+
+    override var bridge: ObjcSwiftBridge? = null
 
     override val kind: KotlinTypeSwiftModel.Kind =
         if (classDescriptor.kind.isInterface) KotlinTypeSwiftModel.Kind.Interface else KotlinTypeSwiftModel.Kind.Class
 
-    override val objCFqName: String = namer.getClassOrProtocolName(classDescriptor.original).objCName
+    override val objCFqName: ObjcFqName = ObjcFqName(namer.getClassOrProtocolName(classDescriptor.original).objCName)
 
     override val swiftGenericExportScope: SwiftGenericExportScope = SwiftGenericExportScope.Class(classDescriptor, namer)
 
-    private val originalContainingType by lazy {
+    private val originalContainingType: MutableKotlinClassSwiftModel? by lazy {
         with(swiftModelScope) {
-            swiftName.containingClassName?.let { classDescriptor.getContainingClassNamed(it).swiftModel }
+            when (swiftName) {
+                is SwiftFqName.Local.Nested -> classDescriptor.getContainingClassNamed(swiftName.parent.asString()).swiftModel
+                is SwiftFqName.Local.TopLevel -> null
+            }
         }
     }
 
@@ -117,44 +129,81 @@ class ActualKotlinClassSwiftModel(
         originalContainingType
     }
 
-    override val stableFqName: String =
-        TypeSwiftModel.StableFqNameNamespace +
-            ("class__${classDescriptor.module.swiftIdentifier}__${classDescriptor.fqNameSafe.asString().toValidSwiftIdentifier()}")
+    // val stableFqName: SwiftFqName =
+    //     TypeSwiftModel.StableFqNameNamespace +
+    //         ("class__${classDescriptor.module.swiftIdentifier}__${classDescriptor.fqNameSafe.asString().toValidSwiftIdentifier()}")
 
-    override val isChanged: Boolean
-        get() = identifier != original.identifier ||
-            containingType?.isChanged == true ||
-            containingType != original.containingType ||
-            visibility != original.visibility ||
-            bridge != original.bridge
+    // override val isChanged: Boolean
+    //     get() = identifier != original.identifier ||
+    //         containingType?.isChanged == true ||
+    //         containingType != original.containingType ||
+    //         visibility != original.visibility ||
+    //         bridge != original.bridge
 
-    override val original: KotlinClassSwiftModel = OriginalKotlinClassSwiftModel(
-        delegate = this,
-        // Needs to be recalculated because the `identifier` is changed if the class is nested inside a non-exported class.
-        identifier = namer.getClassOrProtocolName(classDescriptor.original).swiftName.substringAfter("."),
-        // Original containing type cannot point to non-exported class (it does not have a SwiftModel).
-        containingType = lazy { originalContainingType },
-    )
+    // override val original: KotlinClassSwiftModel = run {
+    //     OriginalKotlinClassSwiftModel(
+    //         delegate = this,
+    //         // Needs to be recalculated because the `identifier` is changed if the class is nested inside a non-exported class.
+    //         identifier = namer.getClassOrProtocolName(classDescriptor.original).swiftName.substringAfter("."),
+    //         // Original containing type cannot point to non-exported class (it does not have a SwiftModel).
+    //         containingType = lazy { originalContainingType },
+    //         swiftIrDeclaration = lazy {
+    //             if (kind.isInterface) {
+    //                 SwiftIrProtocolDeclaration.Local.KotlinInterface.Immutable(
+    //                     kotlinModule = classDescriptor.module.swiftIdentifier,
+    //                     kotlinFqName = classDescriptor.fqNameSafe,
+    //                     swiftName = identifier,
+    //                     // TODO: Decide what protocols to include here.
+    //                     superTypes = emptyList(),
+    //                 )
+    //             } else {
+    //                 TODO()
+    //                 // SwiftIrTypeDeclaration.Local.KotlinClass.Immutable(
+    //                 //
+    //                 // )
+    //             }
+    //         }
+    //     )
+    // }
 
-    private val ClassDescriptor.swiftName: SwiftName
+    override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration by lazy {
+        if (kind.isInterface) {
+            SwiftIrProtocolDeclaration.Local.KotlinInterface.Modeled(this)
+        } else {
+            SwiftIrTypeDeclaration.Local.KotlinClass.Modeled(this)
+        }
+    }
+
+    private val ClassDescriptor.swiftName: SwiftFqName.Local
         get() {
             val fullName = namer.getClassOrProtocolName(this.original).swiftName
 
-            return if (fullName.contains(".")) this.getNestedClassSwiftName(fullName) else SwiftName(null, fullName)
+            return if (fullName.contains(".")) this.getNestedClassSwiftName(fullName) else getTopLevelClassSwiftName(fullName)
         }
 
-    private fun ClassDescriptor.getNestedClassSwiftName(fullName: String): SwiftName {
+    private fun ClassDescriptor.getTopLevelClassSwiftName(fullName: String): SwiftFqName.Local.TopLevel {
+        return SwiftFqName.Local.TopLevel(
+            name = fullName,
+        )
+    }
+
+    private fun ClassDescriptor.getNestedClassSwiftName(fullName: String): SwiftFqName.Local {
         val containingClassName = fullName.substringBefore(".")
         val identifier = fullName.substringAfter(".")
 
         val containingClass = this.getContainingClassNamed(containingClassName)
 
         return if (containingClass in descriptorProvider.exposedClasses) {
-            SwiftName(containingClassName, identifier)
+            SwiftFqName.Local.Nested(
+                parent = containingClass.swiftName,
+                name = identifier,
+            )
         } else {
             val concatenatedIdentifier = containingClassName + identifier.replaceFirstChar(Char::uppercaseChar)
 
-            SwiftName(null, concatenatedIdentifier)
+            SwiftFqName.Local.TopLevel(
+                name = concatenatedIdentifier,
+            )
         }
     }
 
@@ -167,6 +216,4 @@ class ActualKotlinClassSwiftModel(
     }
 
     override fun toString(): String = classDescriptor.toString()
-
-    private class SwiftName(val containingClassName: String?, val identifier: String)
 }

@@ -9,7 +9,8 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.KotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class ActualKotlinConvertedPropertySwiftModel(
@@ -18,9 +19,15 @@ class ActualKotlinConvertedPropertySwiftModel(
     swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinConvertedPropertySwiftModel {
 
-    override val receiver: TypeSwiftModel by lazy {
+    override val owner: SwiftIrExtensibleDeclaration by lazy {
         with(swiftModelScope) {
-            descriptor.receiverTypeModel()
+            descriptor.owner()
+        }
+    }
+
+    override val receiver: SirType by lazy {
+        with(swiftModelScope) {
+            descriptor.receiverType()
         }
     }
 
@@ -36,7 +43,7 @@ class ActualKotlinConvertedPropertySwiftModel(
         }
     }
 
-    override val original: KotlinConvertedPropertySwiftModel = OriginalKotlinConvertedPropertySwiftModel(this)
+    // override val original: KotlinConvertedPropertySwiftModel = OriginalKotlinConvertedPropertySwiftModel(this)
 
     override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
 

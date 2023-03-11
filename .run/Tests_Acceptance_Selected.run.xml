@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tests/Acceptace/Selected" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Tests/Acceptance/Selected" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="env">
         <map>

@@ -15,5 +15,5 @@ interface MutableKotlinTypeSwiftModel : KotlinTypeSwiftModel {
 
     override var identifier: String
 
-    override var bridge: TypeSwiftModel?
+    override var bridge: ObjcSwiftBridge?
 }

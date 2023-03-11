@@ -113,7 +113,7 @@ internal class SealedFunctionGeneratorDelegate(
                 "fatalError(" +
                     "\"Unknown subtype. " +
                     "This error should not happen under normal circumstances " +
-                    "since ${swiftModel.bridgedOrStableFqName} is sealed." +
+                    "since ${swiftModel.swiftIrDeclaration} is sealed." +
                     "\")\n"
             )
         }

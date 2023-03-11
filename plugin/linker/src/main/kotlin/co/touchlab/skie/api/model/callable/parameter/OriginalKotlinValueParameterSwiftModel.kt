@@ -11,5 +11,5 @@ class OriginalKotlinValueParameterSwiftModel(
 
     override val flowMappingStrategy: FlowMappingStrategy = delegate.flowMappingStrategy
 
-    override val isChanged: Boolean = false
+    // override val isChanged: Boolean = false
 }

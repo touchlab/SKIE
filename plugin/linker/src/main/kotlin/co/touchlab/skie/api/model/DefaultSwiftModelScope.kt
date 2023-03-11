@@ -2,6 +2,7 @@ package co.touchlab.skie.api.model
 
 import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelWithCore
 import co.touchlab.skie.api.model.factory.SwiftModelFactory
+import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
@@ -16,20 +17,20 @@ import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinProperty
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.TypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReferenceTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftTypeModel
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidTypeModel
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftNullableReferenceSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftPointerSirType
+import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidSirType
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -48,7 +49,8 @@ class DefaultSwiftModelScope(
     private val namer: ObjCExportNamer,
     private val descriptorProvider: DescriptorProvider,
     private val bridgeProvider: DescriptorBridgeProvider,
-    private var translator: SwiftTypeTranslator,
+    private val declarationRegistry: SwiftIrDeclarationRegistry,
+    private val translator: SwiftTypeTranslator,
 ) : MutableSwiftModelScope {
 
     private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider)
@@ -127,8 +129,21 @@ class DefaultSwiftModelScope(
         get() = fileSwiftModels[this]
             ?: throw IllegalArgumentException("File $this is not exposed and therefore does not have a SwiftModel.")
 
-    override fun CallableMemberDescriptor.receiverTypeModel(): TypeSwiftModel {
+    override fun CallableMemberDescriptor.owner(): SwiftIrExtensibleDeclaration {
         val receiverClassDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(this)
+        val containingDeclaration = containingDeclaration
+
+        return when {
+            receiverClassDescriptor != null -> declarationRegistry.declarationForClass(receiverClassDescriptor) // receiverClassDescriptor.swiftModel.swiftIrDeclaration
+            this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.owner
+            containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel.swiftIrDeclaration
+            else -> error("Unsupported containing declaration for $this")
+        }
+    }
+
+    override fun CallableMemberDescriptor.receiverType(): SirType {
+        val receiverClassDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(this)
+        val receiverClassModel = receiverClassDescriptor
         val containingDeclaration = containingDeclaration
 
         return when {
@@ -138,37 +153,37 @@ class DefaultSwiftModelScope(
                 FlowMappingStrategy.GenericsOnly,
             )
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
-            containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
+            containingDeclaration is PackageFragmentDescriptor -> translator.mapFileType(this.findSourceFile())
             else -> error("Unsupported containing declaration for $this")
         }
     }
 
-    override fun PropertyDescriptor.propertyTypeModel(
+    override fun PropertyDescriptor.propertyType(
         genericExportScope: SwiftGenericExportScope,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel {
+    ): SirType {
         val getterBridge = bridgeProvider.bridgeMethod(getter!!)
         val exportScope = SwiftExportScope(genericExportScope)
         return translator.mapReturnType(getterBridge.returnBridge, getter!!, exportScope, flowMappingStrategy)
     }
 
-    override fun FunctionDescriptor.returnTypeModel(
+    override fun FunctionDescriptor.returnType(
         genericExportScope: SwiftGenericExportScope,
         bridge: MethodBridge.ReturnValue,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftTypeModel {
+    ): SirType {
         val exportScope = SwiftExportScope(genericExportScope)
         return translator.mapReturnType(bridge, this, exportScope, flowMappingStrategy)
     }
 
-    override fun FunctionDescriptor.asyncReturnTypeModel(
+    override fun FunctionDescriptor.asyncReturnType(
         genericExportScope: SwiftGenericExportScope,
         bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion,
         flowMappingStrategy: FlowMappingStrategy
-    ): SwiftTypeModel {
+    ): SirType {
         val exportScope = SwiftExportScope(genericExportScope)
         return if (bridge.useUnitCompletion) {
-            SwiftVoidTypeModel
+            SwiftVoidSirType
         } else {
             translator.mapReferenceType(returnType!!, exportScope, flowMappingStrategy)
         }
@@ -179,12 +194,12 @@ class DefaultSwiftModelScope(
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
         flowMappingStrategy: FlowMappingStrategy
-    ): SwiftTypeModel {
+    ): SirType {
         val exportScope = SwiftExportScope(genericExportScope, SwiftExportScope.Flags.Escaping)
         return when (bridge) {
             is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge, flowMappingStrategy)
             MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
-                SwiftPointerTypeModel(SwiftNullableReferenceTypeModel(SwiftClassTypeModel("Error")), nullable = true)
+                SwiftPointerSirType(SwiftNullableReferenceSirType(SwiftClassSirType(BuiltinDeclarations.Swift.Error)), nullable = true)
             is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
                 val resultType = if (bridge.useUnitCompletion) {
                     null
@@ -194,15 +209,15 @@ class DefaultSwiftModelScope(
                         exportScope.removingFlags(SwiftExportScope.Flags.Escaping),
                         flowMappingStrategy,
                     )) {
-                        is SwiftNonNullReferenceTypeModel -> SwiftNullableReferenceTypeModel(it, isNullableResult = false)
-                        is SwiftNullableReferenceTypeModel -> SwiftNullableReferenceTypeModel(it.nonNullType, isNullableResult = true)
+                        is SwiftNonNullReferenceSirType -> SwiftNullableReferenceSirType(it, isNullableResult = false)
+                        is SwiftNullableReferenceSirType -> SwiftNullableReferenceSirType(it.nonNullType, isNullableResult = true)
                     }
                 }
-                SwiftLambdaTypeModel(
-                    returnType = SwiftVoidTypeModel,
+                SwiftLambdaSirType(
+                    returnType = SwiftVoidSirType,
                     parameterTypes = listOfNotNull(
                         resultType,
-                        SwiftNullableReferenceTypeModel(SwiftClassTypeModel("Error"))
+                        SwiftNullableReferenceSirType(SwiftClassSirType(BuiltinDeclarations.Swift.Error))
                     ),
                     isEscaping = true
                 )

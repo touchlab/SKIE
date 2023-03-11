@@ -19,7 +19,7 @@ internal class OriginalKotlinFunctionSwiftModel(
 
     override val returnTypeFlowMappingStrategy: FlowMappingStrategy = delegate.returnTypeFlowMappingStrategy
 
-    override val isChanged: Boolean = false
+    // override val isChanged: Boolean = false
 
     override val reference: String
         get() = delegate.core.reference(this)

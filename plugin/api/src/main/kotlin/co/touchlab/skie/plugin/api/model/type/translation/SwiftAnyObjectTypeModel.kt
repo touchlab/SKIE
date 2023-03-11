@@ -1,7 +1,10 @@
 package co.touchlab.skie.plugin.api.model.type.translation
 
-object SwiftAnyObjectTypeModel : SwiftNonNullReferenceTypeModel {
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 
-    override val stableFqName: String
-        get() = "Swift.AnyObject"
+
+object SwiftAnyObjectSirType: SwiftNonNullReferenceSirType {
+    override val declaration = BuiltinDeclarations.Swift.AnyObject
+
+    override fun toSwiftPoetUsage() = declaration.internalName.toSwiftPoetName()
 }

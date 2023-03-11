@@ -4,7 +4,6 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import io.outfoxx.swiftpoet.AttributeSpec
@@ -47,7 +46,7 @@ private fun SupportedFlow.Variant.generateConversions() {
 context (SwiftModelScope)
 private fun FileSpec.Builder.generateKotlinClassConversions(variant: SupportedFlow.Variant) {
     addExtension(
-        ExtensionSpec.builder(variant.kotlinFlowModel.stableSpec)
+        ExtensionSpec.builder(variant.kotlinFlowModel.nonBridgedDeclaration.publicName.toSwiftPoetName())
             .addModifiers(Modifier.PUBLIC)
             .addConversions(variant) { index, from -> addSwiftToKotlinConversion(index, from) }
             .build()
@@ -57,7 +56,7 @@ private fun FileSpec.Builder.generateKotlinClassConversions(variant: SupportedFl
 context (SwiftModelScope)
 private fun FileSpec.Builder.generateSwiftClassConversions(variant: SupportedFlow.Variant) {
     addExtension(
-        ExtensionSpec.builder(variant.swiftFlowModel.stableSpec)
+        ExtensionSpec.builder(variant.swiftFlowDeclaration.publicName.toSwiftPoetName())
             .addModifiers(Modifier.PUBLIC)
             .addConversions(variant) { _, from -> addKotlinToSwiftConversion(from) }
             .addConversions(variant) { _, from -> addSwiftToSwiftConversion(from) }
@@ -89,7 +88,7 @@ private fun ExtensionSpec.Builder.addSwiftToKotlinConversion(index: Int, from: S
         FunctionSpec.constructorBuilder()
             .addModifiers(Modifier.CONVENIENCE)
             .addAttribute(AttributeSpec.builder("objc(initWithO${index}:)").build())
-            .addParameter("_", "flow", from.swiftFlowModel.stableSpec.parameterizedBy(TypeVariableName("T")))
+            .addParameter("_", "flow", from.swiftFlowDeclaration.internalName.toSwiftPoetName().parameterizedBy(TypeVariableName("T")))
             .addStatement("self.init(%L)", "flow.delegate")
             .build()
     )
@@ -99,7 +98,7 @@ private fun ExtensionSpec.Builder.addSwiftToSwiftConversion(from: SupportedFlow.
     addFunction(
         FunctionSpec.constructorBuilder()
             .addModifiers(Modifier.CONVENIENCE)
-            .addParameter("_", "flow", from.swiftFlowModel.stableSpec.parameterizedBy(TypeVariableName("T")))
+            .addParameter("_", "flow", from.swiftFlowDeclaration.internalName.toSwiftPoetName().parameterizedBy(TypeVariableName("T")))
             .addStatement("self.init(%L)", "flow.delegate")
             .build()
     )
@@ -110,7 +109,7 @@ private fun ExtensionSpec.Builder.addKotlinToSwiftConversion(from: SupportedFlow
     addFunction(
         FunctionSpec.constructorBuilder()
             .addModifiers(Modifier.CONVENIENCE)
-            .addParameter("_", "flow", from.kotlinFlowModel.stableSpec.parameterizedBy(TypeVariableName("T")))
+            .addParameter("_", "flow", from.kotlinFlowModel.nonBridgedDeclaration.internalName.toSwiftPoetName().parameterizedBy(TypeVariableName("T")))
             .addStatement("self.init(%L)", "flow")
             .build()
     )

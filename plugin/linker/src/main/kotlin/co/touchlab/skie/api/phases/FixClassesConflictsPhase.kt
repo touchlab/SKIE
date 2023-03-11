@@ -6,33 +6,20 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.fqName
 import co.touchlab.skie.plugin.api.module.SkieModule
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 // TODO Currently does not take into account bridging and generated Swift code in general
 class FixClassesConflictsPhase(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
+    private val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
 ) : SkieLinkingPhase {
 
-    private val reservedNames = listOf(
-        "KotlinBase",
-        "KotlinMutableSet",
-        "KotlinDictionary",
-        "KotlinNumber",
-        "KotlinByte",
-        "KotlinUByte",
-        "KotlinShort",
-        "KotlinUShort",
-        "KotlinInt",
-        "KotlinUInt",
-        "KotlinLong",
-        "KotlinULong",
-        "KotlinFloat",
-        "KotlinDouble",
-        "KotlinBoolean",
-    )
+    private val reservedNames by lazy {
+        builtinKotlinDeclarations.allDeclarations.map { it.publicName }
+    }
 
     override fun execute() {
         skieModule.configure(SkieModule.Ordering.Last) {
@@ -47,7 +34,7 @@ class FixClassesConflictsPhase(
 
     context(SwiftModelScope)
     private fun List<MutableKotlinTypeSwiftModel>.sortedByCollisionResolutionPriority(): List<MutableKotlinTypeSwiftModel> =
-        this.sortedByDescending { it.collisionResolutionPriority }
+        this.map { it to it.collisionResolutionPriority }.sortedByDescending { it.second }.map { it.first }
 
     /**
      * nested classes are renamed first so that their fqName is not changed before their renaming is resolved
@@ -65,7 +52,7 @@ class FixClassesConflictsPhase(
             }
 
             priority = priority shl 1
-            if (this.identifier == this.original.identifier) {
+            if (this.identifier == this.originalIdentifier) {
                 priority += 1
             }
 
@@ -95,12 +82,11 @@ class FixClassesConflictsPhase(
         val existingFqNames = reservedNames.toMutableSet()
 
         models.forEach { model ->
-            while (model.fqName in existingFqNames) {
+            while (model.nonBridgedDeclaration.publicName in existingFqNames) {
                 model.identifier += "_"
             }
 
-            existingFqNames.add(model.fqName)
+            existingFqNames.add(model.nonBridgedDeclaration.publicName)
         }
     }
 }
-
