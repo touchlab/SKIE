@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.backend.konan.isObjCMetaClass
 import org.jetbrains.kotlin.backend.konan.isObjCProtocolClass
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
@@ -83,8 +84,24 @@ class SwiftIrDeclarationRegistry(
         descriptor.isObjCMetaClass() -> BuiltinDeclarations.AnyClass
         descriptor.isObjCProtocolClass() -> BuiltinDeclarations.Protocol
         descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration() -> {
+            val module = referenceModule(descriptor.fqNameSafe.pathSegments()[1].asString())
+            if (descriptor.kind.isInterface) {
+                SwiftIrProtocolDeclaration.External(
+                    module = module,
+                    name = descriptor.name.asString().removeSuffix("Protocol"),
+                    superTypes = listOf(BuiltinDeclarations.Foundation.NSObject),
+                )
+            } else {
+                SwiftIrTypeDeclaration.External(
+                    module = module,
+                    name = descriptor.name.asString(),
+                    superTypes = listOf(BuiltinDeclarations.Foundation.NSObject),
+                )
+
+            }
+
             // val bridge = builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe, )
-            TODO()
+            // TODO()
         }
 
 

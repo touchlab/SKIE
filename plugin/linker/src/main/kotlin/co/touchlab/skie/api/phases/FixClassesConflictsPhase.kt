@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.SwiftFqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -18,7 +19,9 @@ class FixClassesConflictsPhase(
 ) : SkieLinkingPhase {
 
     private val reservedNames by lazy {
-        builtinKotlinDeclarations.allDeclarations.map { it.publicName }
+        builtinKotlinDeclarations.allDeclarations.map { it.publicName } +
+            // TODO: Unfortunate hack to avoid name collision with Swift's Any keyword
+            SwiftFqName.Local.TopLevel("Any")
     }
 
     override fun execute() {

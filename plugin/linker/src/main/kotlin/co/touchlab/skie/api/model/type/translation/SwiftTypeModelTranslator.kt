@@ -240,6 +240,7 @@ class SwiftTypeTranslator(
         }
     }
 
+    context(SwiftModelScope)
     private tailrec fun mapObjCObjectReferenceTypeIgnoringNullability(
         descriptor: ClassDescriptor,
         swiftExportScope: SwiftExportScope,
@@ -254,7 +255,8 @@ class SwiftTypeTranslator(
             } else {
                 val moduleName = "TODO: MODULE PLEASE"
                 if (descriptor.kind.isInterface) {
-                    TODO("Get from registry")
+
+                    // TODO("Get from registry")
                     // val name = SwiftFqName.External(
                     //     module = moduleName,
                     //     name = descriptor.name.asString().removeSuffix("Protocol"),
@@ -265,8 +267,16 @@ class SwiftTypeTranslator(
                     //         superTypes = listOf(BuiltinSwiftDeclarations.nsObject),
                     //     ),
                     // )
+
+                    SwiftProtocolSirType(
+                        swiftIrDeclarationRegistry.declarationForInterface(descriptor),
+                    )
                 } else {
-                    TODO("Get from registry")
+                    SwiftClassSirType(
+                        swiftIrDeclarationRegistry.declarationForClass(descriptor),
+                    )
+
+                    // TODO("Get from registry")
                     // val name = SwiftFqName.External(moduleName, descriptor.name.asString())
                     // SwiftClassSirType(
                     //     SwiftIrTypeDeclaration(
