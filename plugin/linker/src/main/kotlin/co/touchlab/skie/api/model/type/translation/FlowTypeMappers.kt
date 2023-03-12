@@ -32,8 +32,10 @@ object FlowTypeMappers {
                     val typeArguments = type.arguments.map {
                         translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope, FlowMappingStrategy.Full)
                     }
+                    val hasNullableTypeArgument = type.arguments.any { it.type.isNullable() }
+                    val flowVariant = if (hasNullableTypeArgument) supportedFlow.optionalVariant else supportedFlow.requiredVariant
 
-                    SwiftClassSirType(supportedFlow.requiredVariant.kotlinFlowModel.nonBridgedDeclaration, typeArguments)
+                    SwiftClassSirType(flowVariant.kotlinFlowModel.nonBridgedDeclaration, typeArguments)
                 }
                 else -> {
                     val hasNullableTypeArgument = type.arguments.any { it.type.isNullable() }
