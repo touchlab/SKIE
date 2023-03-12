@@ -10,7 +10,7 @@ public final class SkieSwiftSharedFlow<T: Swift.AnyObject>: _Concurrency.AsyncSe
 
     internal let delegate: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_SharedFlow
 
-    internal init(_ flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_SharedFlow) {
+    internal init(internal flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_SharedFlow) {
         delegate = flow
     }
 
@@ -40,6 +40,6 @@ public final class SkieSwiftSharedFlow<T: Swift.AnyObject>: _Concurrency.AsyncSe
     }
 
     private static func fromObjectiveC(_ source: _ObjectiveCType?) -> SkieSwiftSharedFlow<T> {
-        return SkieSwiftSharedFlow(source!)
+        return SkieSwiftSharedFlow(internal: source!)
     }
 }

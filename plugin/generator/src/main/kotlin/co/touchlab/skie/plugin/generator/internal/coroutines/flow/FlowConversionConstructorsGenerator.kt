@@ -99,7 +99,7 @@ private fun ExtensionSpec.Builder.addSwiftToSwiftConversion(from: SupportedFlow.
         FunctionSpec.constructorBuilder()
             .addModifiers(Modifier.CONVENIENCE)
             .addParameter("_", "flow", from.swiftFlowDeclaration.internalName.toSwiftPoetName().parameterizedBy(TypeVariableName("T")))
-            .addStatement("self.init(%L)", "flow.delegate")
+            .addStatement("self.init(internal: %L)", "flow.delegate")
             .build()
     )
 }
@@ -110,7 +110,7 @@ private fun ExtensionSpec.Builder.addKotlinToSwiftConversion(from: SupportedFlow
         FunctionSpec.constructorBuilder()
             .addModifiers(Modifier.CONVENIENCE)
             .addParameter("_", "flow", from.kotlinFlowModel.nonBridgedDeclaration.internalName.toSwiftPoetName().parameterizedBy(TypeVariableName("T")))
-            .addStatement("self.init(%L)", "flow")
+            .addStatement("self.init(internal: %L)", "flow")
             .build()
     )
 }

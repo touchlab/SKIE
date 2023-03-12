@@ -10,7 +10,7 @@ public final class SkieSwiftOptionalFlow<T: Swift.AnyObject>: _Concurrency.Async
 
     internal let delegate: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow
 
-    internal init(_ flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow) {
+    internal init(internal flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow) {
         delegate = flow
     }
 
@@ -36,7 +36,7 @@ public final class SkieSwiftOptionalFlow<T: Swift.AnyObject>: _Concurrency.Async
     }
 
     private static func fromObjectiveC(_ source: _ObjectiveCType?) -> SkieSwiftOptionalFlow<T> {
-        return SkieSwiftOptionalFlow(source!)
+        return SkieSwiftOptionalFlow(internal: source!)
     }
 
     public class Iterator: AsyncIteratorProtocol {
