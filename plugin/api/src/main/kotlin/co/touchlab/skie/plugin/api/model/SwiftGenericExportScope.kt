@@ -12,15 +12,15 @@ import org.jetbrains.kotlin.descriptors.isInterface
 
 interface SwiftGenericExportScope {
 
-    fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor?): SwiftGenericTypeUsageSirType?
+    fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType?
 
     class FromTypeDeclaration(
         val declaration: SwiftIrTypeDeclaration,
     ): SwiftGenericExportScope {
-        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor?): SwiftGenericTypeUsageSirType? {
+        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType? {
             val localTypeParam = declaration.typeParameters.firstOrNull {
                 // TODO: We don't really want to cast, but here we're only resolving Kotlin type params anyway
-                typeParameterDescriptor != null && ((it as? SwiftIrTypeParameterDeclaration.KotlinTypeParameter)?.descriptor == typeParameterDescriptor /* || (it.isCapturedFromOuterDeclaration && it.original == typeParameterDescriptor) */)
+                (it as? SwiftIrTypeParameterDeclaration.KotlinTypeParameter)?.descriptor == typeParameterDescriptor /* || (it.isCapturedFromOuterDeclaration && it.original == typeParameterDescriptor) */
             }
 
             return localTypeParam?.let {
@@ -37,10 +37,9 @@ interface SwiftGenericExportScope {
             emptyList<TypeParameterDescriptor>()
         }
 
-        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor?): SwiftGenericTypeUsageSirType? {
+        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType? {
             val localTypeParam = typeNames.firstOrNull {
-                typeParameterDescriptor != null &&
-                    (it == typeParameterDescriptor || (it.isCapturedFromOuterDeclaration && it.original == typeParameterDescriptor))
+                it == typeParameterDescriptor || (it.isCapturedFromOuterDeclaration && it.original == typeParameterDescriptor)
             }
 
             return if (localTypeParam == null) {
@@ -60,6 +59,6 @@ interface SwiftGenericExportScope {
 
     object None : SwiftGenericExportScope {
 
-        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor?): SwiftGenericTypeUsageSirType? = null
+        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType? = null
     }
 }

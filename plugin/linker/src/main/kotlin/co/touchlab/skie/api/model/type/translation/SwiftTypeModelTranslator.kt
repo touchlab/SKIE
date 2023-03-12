@@ -9,7 +9,6 @@ import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
 import co.touchlab.skie.plugin.api.model.type.translation.ObjcProtocolSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SirType
@@ -19,7 +18,6 @@ import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnySirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftErrorSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftInstanceSirType
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftLambdaSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftMetaClassSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
@@ -29,6 +27,8 @@ import co.touchlab.skie.plugin.api.model.type.translation.SwiftPrimitiveSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftProtocolSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftReferenceSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftVoidSirType
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.isHashable
 import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
@@ -53,9 +53,13 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
+import org.jetbrains.kotlin.types.checker.intersectWrappedTypes
 import org.jetbrains.kotlin.types.error.ErrorUtils
 import org.jetbrains.kotlin.types.typeUtil.builtIns
+import org.jetbrains.kotlin.types.typeUtil.hasTypeParameterRecursiveBounds
+import org.jetbrains.kotlin.types.typeUtil.immediateSupertypes
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
+import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 fun SirType.makeNullableIfReferenceOrPointer(): SirType = when (this) {
@@ -64,8 +68,8 @@ fun SirType.makeNullableIfReferenceOrPointer(): SirType = when (this) {
     is SwiftNullableReferenceSirType, is SwiftPrimitiveSirType, SwiftVoidSirType, SwiftErrorSirType -> this
 }
 
-internal tailrec fun KotlinType.getErasedTypeClass(): ClassDescriptor =
-    TypeUtils.getClassDescriptor(this) ?: this.constructor.supertypes.first().getErasedTypeClass()
+internal tailrec fun KotlinType.getErasedTypeClass(): Pair<KotlinType, ClassDescriptor> =
+    TypeUtils.getClassDescriptor(this)?.let { this to it } ?: this.constructor.supertypes.first().getErasedTypeClass()
 
 class SwiftTypeTranslator(
     private val descriptorProvider: DescriptorProvider,
@@ -186,16 +190,31 @@ class SwiftTypeTranslator(
             when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> return SwiftAnyHashableSirType
                 else -> {
-                    val genericTypeUsage =
-                        swiftExportScope.genericScope.getGenericTypeUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
-                    if (genericTypeUsage != null) {
-                        return genericTypeUsage
+                    TypeUtils.getTypeParameterDescriptorOrNull(kotlinType)?.let { typeParameterDescriptor ->
+                        val genericTypeUsage = swiftExportScope.genericScope.getGenericTypeUsage(typeParameterDescriptor)
+                        if (genericTypeUsage != null) {
+                            return genericTypeUsage
+                        } else if (hasTypeParameterRecursiveBounds(typeParameterDescriptor)) {
+                            val erasedType = intersectWrappedTypes(kotlinType.immediateSupertypes().map {
+                                /* The commented out code below keeps more type information, but because that information is dropped by
+                                    a probably missing functionallity in the Kotlin compiler, we have to erase it all to a star projection anyway. */
+                                it.replaceArgumentsWithStarProjections()
+                                // it.replace(newArguments = it.constructor.parameters.zip(it.arguments) { parameter, argument ->
+                                //     if (argument.type.constructor == kotlinType.constructor) {
+                                //         StarProjectionImpl(parameter)
+                                //     } else {
+                                //         argument
+                                //     }
+                                // })
+                            })
+                            return mapReferenceTypeIgnoringNullability(erasedType, swiftExportScope, flowMappingStrategy.forGenerics())
+                        }
                     }
                 }
             }
         }
 
-        val classDescriptor = kotlinType.getErasedTypeClass()
+        val (kotlinType, classDescriptor) = kotlinType.getErasedTypeClass()
 
         if (KotlinBuiltIns.isAny(classDescriptor) || classDescriptor.classId in CustomTypeMappers.hiddenTypes || classDescriptor.isInlined()) {
             return idType(swiftExportScope)
