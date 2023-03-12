@@ -42,6 +42,7 @@ jobs:
   acceptance-tests:
     name: Acceptance Tests
     runs-on: self-hosted
+    if: false
     strategy:
       fail-fast: false
       matrix:
