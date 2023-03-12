@@ -46,20 +46,23 @@ class SwiftIrDeclarationRegistry(
         }
     }
 
-    fun referenceExternalTypeDeclaration(fqName: SwiftFqName.External): SwiftIrTypeDeclaration.External {
+    fun referenceExternalTypeDeclaration(fqName: SwiftFqName.External, defaultSupertypes: List<SwiftIrTypeDeclaration> = emptyList()): SwiftIrTypeDeclaration.External {
         return externalTypeDeclarations.getOrPut(fqName) {
             when (fqName) {
                 is SwiftFqName.External.Nested -> {
+                    // We don't pass the default supertypes here, because it might be nested in a whole different unknown type.
                     val containingDeclaration = referenceExternalTypeDeclaration(fqName.parent)
                     SwiftIrTypeDeclaration.External(
                         module = containingDeclaration.module,
                         name = fqName.name,
                         containingDeclaration = containingDeclaration,
+                        superTypes = defaultSupertypes,
                     )
                 }
                 is SwiftFqName.External.TopLevel -> SwiftIrTypeDeclaration.External(
                     module = referenceModule(fqName.module),
                     name = fqName.name,
+                    superTypes = defaultSupertypes,
                 )
             }
 

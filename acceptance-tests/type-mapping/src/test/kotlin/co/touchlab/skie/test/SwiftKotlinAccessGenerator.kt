@@ -6,7 +6,6 @@ import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
-import co.touchlab.skie.plugin.api.model.type.stableSpec
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import io.outfoxx.swiftpoet.ANY_OBJECT
@@ -140,9 +139,9 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                             TypeVariableName(typeParameter.name.identifier, TypeVariableName.bound(ANY_OBJECT))
                         }
                         val parametrizedKotlinClass = if (typeVariables.isNotEmpty()) {
-                            kotlinClass.swiftModel.stableSpec.parameterizedBy(*typeVariables.toTypedArray())
+                            kotlinClass.swiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName().parameterizedBy(typeVariables)
                         } else {
-                            kotlinClass.swiftModel.stableSpec
+                            kotlinClass.swiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName()
                         }
 
                         addProperty(
@@ -166,8 +165,8 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                                 when (swiftModel) {
                                     is KotlinRegularPropertySwiftModel -> {
                                         addProperty(
-                                            PropertySpec.builder(swiftModel.identifier, swiftModel.type.stableSpec)
-                                                .addAttribute(CodeBlock.of("VerifyReturnType<%T>", swiftModel.type.stableSpec).toString())
+                                            PropertySpec.builder(swiftModel.identifier, swiftModel.type.toSwiftPoetUsage())
+                                                .addAttribute(CodeBlock.of("VerifyReturnType<%T>", swiftModel.type.toSwiftPoetUsage()).toString())
                                                 .getter(
                                                     FunctionSpec.getterBuilder()
                                                         .addStatement("kotlinClass.%L", swiftModel.reference)
@@ -182,20 +181,20 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                                         }
                                         addFunction(
                                             FunctionSpec.builder(swiftModel.identifier)
-                                                .addAttribute(CodeBlock.of("VerifyReturnType<%T>", swiftModel.returnType.stableSpec).toString())
+                                                .addAttribute(CodeBlock.of("VerifyReturnType<%T>", swiftModel.returnType.toSwiftPoetUsage()).toString())
                                                 .addParameters(
                                                     swiftModel.valueParameters.map { parameter ->
                                                         ParameterSpec
                                                             .builder(
                                                                 parameter.argumentLabel,
                                                                 parameter.parameterName,
-                                                                parameter.type.stableSpec,
+                                                                parameter.type.toSwiftPoetUsage(),
                                                             )
                                                             .addAttribute("VerifyParamType")
                                                             .build()
                                                     }
                                                 )
-                                                .returns(swiftModel.returnType.stableSpec)
+                                                .returns(swiftModel.returnType.toSwiftPoetUsage())
                                                 .addCode(
                                                     """
                                                         let functionVerification = verify(function: kotlinClass.%N)

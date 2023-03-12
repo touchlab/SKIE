@@ -25,7 +25,7 @@ class BuiltinSwiftBridgeableProvider(
         val bridge = builtinBridges[fqName] ?: return null
         return when {
             swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> null
-            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) && bridge.declaration.isHashable() -> SwiftAnyHashableSirType
+            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) && !bridge.declaration.isHashable() -> SwiftAnyHashableSirType
             else -> bridge
         }
     }
@@ -70,7 +70,7 @@ class BuiltinSwiftBridgeableProvider(
 
     private fun getSwiftModelFor(swiftFqName: SwiftFqName.External): SwiftClassSirType {
         return SwiftClassSirType(
-            declaration = declarationRegistry.referenceExternalTypeDeclaration(swiftFqName),
+            declaration = declarationRegistry.referenceExternalTypeDeclaration(swiftFqName, defaultSupertypes = listOf(BuiltinDeclarations.Foundation.NSObject)),
             typeArguments = when (swiftFqName) {
                 BuiltinDeclarations.Swift.Array.publicName -> listOf(SwiftAnySirType)
                 BuiltinDeclarations.Swift.Dictionary.publicName -> listOf(SwiftAnyHashableSirType, SwiftAnySirType)

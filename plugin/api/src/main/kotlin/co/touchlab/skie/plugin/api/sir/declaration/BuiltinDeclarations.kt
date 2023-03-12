@@ -28,7 +28,7 @@ object BuiltinDeclarations {
         val module = SwiftIrModule("Swift")
 
         val Hashable = "Hashable"()
-        val AnyHashable = "AnyHashable"()
+        val AnyHashable = "AnyHashable"(superTypes = listOf(Hashable))
 
         // TODO: Check if AnyObject isn't a special type
         val AnyObject = "AnyObject"()
@@ -37,21 +37,23 @@ object BuiltinDeclarations {
         val Error = "Error"()
 
         // MARK:- Primitive Types
-        val Int = "Int"()
-        val UInt = "UInt"()
-        val Bool = "Bool"()
-        val Int8 = "Int8"()
-        val UInt8 = "UInt8"()
-        val Int16 = "Int16"()
-        val UInt16 = "UInt16"()
-        val Int32 = "Int32"()
-        val UInt32 = "UInt32"()
-        val Int64 = "Int64"()
-        val UInt64 = "UInt64"()
-        val Float = "Float"()
-        val Double = "Double"()
+        val Int = "Int"(superTypes = listOf(Hashable))
+        val UInt = "UInt"(superTypes = listOf(Hashable))
+        val Bool = "Bool"(superTypes = listOf(Hashable))
+        val Int8 = "Int8"(superTypes = listOf(Hashable))
+        val UInt8 = "UInt8"(superTypes = listOf(Hashable))
+        val Int16 = "Int16"(superTypes = listOf(Hashable))
+        val UInt16 = "UInt16"(superTypes = listOf(Hashable))
+        val Int32 = "Int32"(superTypes = listOf(Hashable))
+        val UInt32 = "UInt32"(superTypes = listOf(Hashable))
+        val Int64 = "Int64"(superTypes = listOf(Hashable))
+        val UInt64 = "UInt64"(superTypes = listOf(Hashable))
+        val Float = "Float"(superTypes = listOf(Hashable))
+        val Double = "Double"(superTypes = listOf(Hashable))
 
-        val String = "String"()
+        val String = "String"(
+            superTypes = listOf(Hashable),
+        )
         val Array = "Array"(
             typeParameters = listOf(
                 SwiftIrTypeParameterDeclaration.SwiftTypeParameter(
@@ -79,14 +81,18 @@ object BuiltinDeclarations {
                     bounds = listOf(Hashable),
                 )
             ),
+            superTypes = listOf(Hashable),
         )
 
         private operator fun String.invoke(
             typeParameters: List<SwiftIrTypeParameterDeclaration> = emptyList(),
+            superTypes: List<SwiftIrTypeDeclaration> = emptyList(),
         ): SwiftIrTypeDeclaration.External {
             return SwiftIrTypeDeclaration.External(
                 module = module,
                 name = this,
+                typeParameters = typeParameters,
+                superTypes = superTypes,
             )
         }
     }
@@ -95,7 +101,7 @@ object BuiltinDeclarations {
 
         val module = SwiftIrModule("Foundation")
 
-        val NSObject = "NSObject"()
+        val NSObject = "NSObject"(superTypes = listOf(Swift.Hashable, Swift.AnyObject))
         val unichar = "unichar"()
         val NSString = "NSString"()
         val NSArray = "NSArray"()
@@ -103,10 +109,13 @@ object BuiltinDeclarations {
         val NSDictionary = "NSDictionary"()
         val NSSet = "NSSet"()
 
-        private operator fun String.invoke(): SwiftIrTypeDeclaration.External {
+        private operator fun String.invoke(
+            superTypes: List<SwiftIrTypeDeclaration> = emptyList(),
+        ): SwiftIrTypeDeclaration.External {
             return SwiftIrTypeDeclaration.External(
                 module = module,
                 name = this,
+                superTypes = superTypes,
             )
         }
     }

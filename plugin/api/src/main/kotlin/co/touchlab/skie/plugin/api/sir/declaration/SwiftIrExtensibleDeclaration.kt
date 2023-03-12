@@ -29,8 +29,5 @@ sealed interface SwiftIrExtensibleDeclaration: SwiftIrDeclaration {
 
 // TODO: This is a bad implementation of `isHashable`. We need to be able to look into the hierarchy of the type
 fun SwiftIrExtensibleDeclaration.isHashable(): Boolean {
-    return this == BuiltinDeclarations.Swift.Hashable ||
-        this == BuiltinDeclarations.Swift.AnyHashable ||
-        this.superTypes.contains(BuiltinDeclarations.Swift.Hashable) ||
-        this.superTypes.contains(BuiltinDeclarations.Swift.AnyHashable)
+    return this == BuiltinDeclarations.Swift.Hashable || this.superTypes.any { it.isHashable() }
 }
