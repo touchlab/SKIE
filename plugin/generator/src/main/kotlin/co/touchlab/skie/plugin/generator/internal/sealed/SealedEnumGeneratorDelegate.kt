@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.model.type.SwiftFqName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
@@ -15,9 +16,9 @@ internal class SealedEnumGeneratorDelegate(
 
     private val enumName = "Enum"
 
-    fun generate(swiftModel: KotlinClassSwiftModel, classNamespace: DeclaredTypeName, fileBuilder: FileSpec.Builder): TypeName {
+    fun generate(swiftModel: KotlinClassSwiftModel, classNamespace: SwiftFqName.Local, fileBuilder: FileSpec.Builder): TypeName {
         fileBuilder.addExtension(
-            ExtensionSpec.builder(classNamespace)
+            ExtensionSpec.builder(classNamespace.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .addType(
                     TypeSpec.enumBuilder(enumName)
@@ -29,7 +30,7 @@ internal class SealedEnumGeneratorDelegate(
                 .build()
         )
 
-        return classNamespace.nestedType(enumName).withTypeParameters(swiftModel)
+        return classNamespace.nested(enumName).toSwiftPoetName().withTypeParameters(swiftModel)
     }
 
     private fun TypeSpec.Builder.addSealedEnumCases(swiftModel: KotlinClassSwiftModel): TypeSpec.Builder {

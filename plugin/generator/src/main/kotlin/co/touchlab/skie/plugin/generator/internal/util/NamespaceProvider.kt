@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.SwiftFqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -13,81 +14,64 @@ internal class NamespaceProvider(
     private val module: SkieModule,
 ) {
 
-    val swiftGenNamespace: DeclaredTypeName =
-        DeclaredTypeName.qualifiedLocalTypeName("__SwiftGen")
+    private val swiftGenNamespace: SwiftFqName.Local.TopLevel = SwiftFqName.Local.TopLevel("__SwiftGen")
 
     private fun withFileBuilder(block: context(SwiftModelScope) FileSpec.Builder.() -> Unit) {
-        module.file(swiftGenNamespace.simpleName, contents = block)
+        module.file(swiftGenNamespace.name, contents = block)
     }
 
-    private val existingNamespaces = mutableSetOf<String>()
+    private val existingNamespaces = mutableSetOf<SwiftFqName>()
 
     init {
-        addNamespace(swiftGenNamespace)
+        addSingleNamespace(swiftGenNamespace)
     }
 
-    fun addNamespace(namespace: DeclaredTypeName) {
-        val nameComponents = namespace.simpleNames
+    fun addNamespaceFor(fqName: SwiftFqName): SwiftFqName.Local {
+        val namespace = if (fqName.root == swiftGenNamespace) {
+            // If someone already nests their type into our top level namespace, we don't want to nest it again.
+            fqName as SwiftFqName.Local
+        } else {
+            swiftGenNamespace.nested(fqName)
+        }
+        namespace.components.forEach { component ->
+            addSingleNamespace(component)
+        }
+        return namespace
+    }
 
-        val baseNamespace = DeclaredTypeName.qualifiedLocalTypeName(nameComponents.first())
-        addSingleNamespace(baseNamespace)
+    private fun addSingleNamespace(namespace: SwiftFqName.Local) {
+        if (namespace in existingNamespaces) {
+            return
+        }
+        existingNamespaces.add(namespace)
 
-        nameComponents.drop(1).fold(baseNamespace) { acc, nameComponent ->
-            addSingleNamespace(acc, nameComponent)
+        when (namespace) {
+            is SwiftFqName.Local.TopLevel -> addTopLevelNamespace(namespace)
+            is SwiftFqName.Local.Nested -> addNestedNamespace(namespace)
         }
     }
 
-    fun addNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName {
-        val knownNamespaces = base.canonicalName
-            .split(".")
-            .scan(emptyList(), List<String>::plus)
-            .map { it.joinToString(".") }
-
-        existingNamespaces.addAll(knownNamespaces)
-
-        val fullNamespace = name.split(".").fold(base, DeclaredTypeName::nestedType)
-
-        addNamespace(fullNamespace)
-
-        return fullNamespace
-    }
-
-    private fun addSingleNamespace(namespace: DeclaredTypeName): DeclaredTypeName {
-        if (namespace.canonicalName in existingNamespaces) {
-            return namespace
-        }
-        existingNamespaces.add(namespace.canonicalName)
-
+    private fun addTopLevelNamespace(namespace: SwiftFqName.Local.TopLevel) {
         withFileBuilder {
             addType(
-                TypeSpec.enumBuilder(namespace)
+                TypeSpec.enumBuilder(namespace.toSwiftPoetName())
                     .addModifiers(Modifier.PUBLIC)
                     .build()
             )
         }
-
-        return namespace
     }
 
-    private fun addSingleNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName {
-        val namespace = base.nestedType(name)
-        if (namespace.canonicalName in existingNamespaces) {
-            return namespace
-        }
-        existingNamespaces.add(namespace.canonicalName)
-
+    private fun addNestedNamespace(namespace: SwiftFqName.Local.Nested) {
         withFileBuilder {
             addExtension(
-                ExtensionSpec.builder(base)
+                ExtensionSpec.builder(namespace.parent.toSwiftPoetName())
                     .addModifiers(Modifier.PUBLIC)
                     .addType(
-                        TypeSpec.enumBuilder(name)
+                        TypeSpec.enumBuilder(namespace.name)
                             .build()
                     )
                     .build()
             )
         }
-
-        return namespace
     }
 }

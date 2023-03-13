@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.util
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.model.type.SwiftFqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -15,9 +16,6 @@ internal abstract class BaseGenerator(
     protected val module: SkieModule
         get() = skieContext.module
 
-    protected val swiftGenNamespace: DeclaredTypeName
-        get() = namespaceProvider.swiftGenNamespace
-
-    protected fun addNamespace(base: DeclaredTypeName, name: String): DeclaredTypeName =
-        namespaceProvider.addNamespace(base, name)
+    protected fun addNamespaceFor(name: SwiftFqName): SwiftFqName.Local =
+        namespaceProvider.addNamespaceFor(name)
 }
