@@ -12,11 +12,14 @@ import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
 
-internal object ObjectiveCBridgeable {
+internal object ObjCBridgeable {
+
+    val type: DeclaredTypeName = DeclaredTypeName("Swift", "_ObjectiveCBridgeable")
+    val bridgedObjCTypeAlias: String = "_ObjectiveCType"
 
     fun TypeSpec.Builder.addObjcBridgeableImplementation(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
         this
-            .addSuperType(DeclaredTypeName("Swift", "_ObjectiveCBridgeable"))
+            .addSuperType(type)
             .addObjectiveCTypeAlias(classSwiftModel)
             .addForceBridgeFromObjectiveC(classSwiftModel)
             .addConditionallyBridgeFromObjectiveC(classSwiftModel)
@@ -26,7 +29,7 @@ internal object ObjectiveCBridgeable {
 
     private fun TypeSpec.Builder.addObjectiveCTypeAlias(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
         this.addType(
-            TypeAliasSpec.builder("_ObjectiveCType", classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
+            TypeAliasSpec.builder(bridgedObjCTypeAlias, classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .build()
         )
@@ -119,7 +122,13 @@ internal object ObjectiveCBridgeable {
         )
 
     private val KotlinEnumEntrySwiftModel.variableWithEntryCastedToSwiftType: CodeBlock
-        get() = CodeBlock.of("let objc__%L = %T.%N as %T", this.identifier, this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(), this.identifier, this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName())
+        get() = CodeBlock.of(
+            "let objc__%L = %T.%N as %T",
+            this.identifier,
+            this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(),
+            this.identifier,
+            this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName()
+        )
 
     private fun CodeBlock.Builder.addFromObjectiveCCases(classSwiftModel: KotlinClassSwiftModel): CodeBlock.Builder =
         this.add(

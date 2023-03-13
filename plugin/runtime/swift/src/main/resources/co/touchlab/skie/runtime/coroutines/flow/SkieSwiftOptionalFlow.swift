@@ -1,8 +1,8 @@
 import Foundation
 
-public final class SkieSwiftOptionalFlow<T: Swift.AnyObject>: _Concurrency.AsyncSequence, Swift._ObjectiveCBridgeable {
+public final class SkieSwiftOptionalFlow<T>: _Concurrency.AsyncSequence, Swift._ObjectiveCBridgeable {
 
-    public typealias AsyncIterator = SkieSwiftOptionalFlow<T>.Iterator
+    public typealias AsyncIterator = SkieSwiftFlowIterator<T?>
 
     public typealias Element = T?
 
@@ -14,8 +14,8 @@ public final class SkieSwiftOptionalFlow<T: Swift.AnyObject>: _Concurrency.Async
         delegate = flow
     }
 
-    public func makeAsyncIterator() -> SkieSwiftOptionalFlow<T>.Iterator {
-        return SkieSwiftOptionalFlow<T>.Iterator(flow: delegate)
+    public func makeAsyncIterator() -> SkieSwiftFlowIterator<T?> {
+        return SkieSwiftFlowIterator(flow: delegate)
     }
 
     public func _bridgeToObjectiveC() -> _ObjectiveCType {
@@ -37,30 +37,5 @@ public final class SkieSwiftOptionalFlow<T: Swift.AnyObject>: _Concurrency.Async
 
     private static func fromObjectiveC(_ source: _ObjectiveCType?) -> SkieSwiftOptionalFlow<T> {
         return SkieSwiftOptionalFlow(internal: source!)
-    }
-
-    public class Iterator: AsyncIteratorProtocol {
-
-        public typealias Element = T?
-
-        private let iterator: SkieColdFlowIterator<T>
-
-        init(flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow) {
-            iterator = SkieColdFlowIterator(flow: flow)
-        }
-
-        deinit {
-            iterator.cancel()
-        }
-
-        public func next() async -> Element? {
-            let hasNext = try? await SkieColdFlowIteratorKt.hasNext(iterator)
-
-            if (hasNext?.boolValue ?? false) {
-                return .some(iterator.next())
-            } else {
-                return nil
-            }
-        }
     }
 }

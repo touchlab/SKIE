@@ -1,8 +1,8 @@
 import Foundation
 
-public final class SkieSwiftSharedFlow<T: Swift.AnyObject>: _Concurrency.AsyncSequence, Swift._ObjectiveCBridgeable {
+public final class SkieSwiftSharedFlow<T>: _Concurrency.AsyncSequence, Swift._ObjectiveCBridgeable {
 
-    public typealias AsyncIterator = SkieSwiftFlow<T>.Iterator
+    public typealias AsyncIterator = SkieSwiftFlowIterator<T>
 
     public typealias Element = T
 
@@ -18,8 +18,8 @@ public final class SkieSwiftSharedFlow<T: Swift.AnyObject>: _Concurrency.AsyncSe
         return delegate.replayCache as! [T]
     }
 
-    public func makeAsyncIterator() -> SkieSwiftFlow<T>.Iterator {
-        return SkieSwiftFlow<T>.Iterator(flow: delegate)
+    public func makeAsyncIterator() -> SkieSwiftFlowIterator<T> {
+        return SkieSwiftFlowIterator(flow: delegate)
     }
 
     public func _bridgeToObjectiveC() -> _ObjectiveCType {
