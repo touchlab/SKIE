@@ -11,9 +11,10 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
 
-enum class SupportedFlow(val directParent: SupportedFlow?) {
+enum class SupportedFlow(private val directParent: SupportedFlow?) {
     Flow(null),
     SharedFlow(Flow),
+    MutableSharedFlow(SharedFlow),
     StateFlow(SharedFlow);
 
     val coroutinesFlowFqName: String = "kotlinx.coroutines.flow.${name}"
@@ -23,10 +24,6 @@ enum class SupportedFlow(val directParent: SupportedFlow?) {
 
     val variants: List<Variant> = listOf(requiredVariant, optionalVariant)
 
-    context (SwiftModelScope)
-    val coroutinesFlowModel: KotlinClassSwiftModel
-        get() = referenceClass(coroutinesFlowFqName)
-
     sealed interface Variant {
 
         val owner: SupportedFlow
@@ -34,8 +31,6 @@ enum class SupportedFlow(val directParent: SupportedFlow?) {
         val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType
 
         val kotlinFlowFqName: String
-
-        // val swiftFlowFqName: String
 
         context (SwiftModelScope)
         val kotlinFlowModel: KotlinClassSwiftModel
