@@ -15,7 +15,8 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
     Flow(null),
     SharedFlow(Flow),
     MutableSharedFlow(SharedFlow),
-    StateFlow(SharedFlow);
+    StateFlow(SharedFlow),
+    MutableStateFlow(StateFlow);
 
     val coroutinesFlowFqName: String = "kotlinx.coroutines.flow.${name}"
 

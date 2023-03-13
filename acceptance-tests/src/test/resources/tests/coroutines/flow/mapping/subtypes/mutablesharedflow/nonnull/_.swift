@@ -10,7 +10,7 @@ try! await AKt.flow.emit(value: KotlinInt(2))
 
 let sum2 = try! await sum(flow: AKt.flow)
 
-AKt.flow.tryEmit(value: KotlinInt(3))
+let emitResult = AKt.flow.tryEmit(value: KotlinInt(3))
 
 let sum3 = try! await sum(flow: AKt.flow)
 
@@ -22,6 +22,6 @@ let cacheSumAfterReset = AKt.flow.replayCache.map { $0.intValue }.reduce(0, +)
 
 let subscriptionCount = AKt.flow.subscriptionCount.value
 
-if sum1 == 1 && sum2 == 2 && sum3 == 3 && cacheSum == 3 && cacheSumAfterReset == 0 && subscriptionCount == 0 {
+if sum1 == 1 && sum2 == 2 && sum3 == 3 && cacheSum == 3 && cacheSumAfterReset == 0 && subscriptionCount == 0 && emitResult {
     exit(0)
 }
