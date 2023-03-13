@@ -115,14 +115,6 @@ internal class NewFileNamespace private constructor(
             return namespace
         }
 
-        fun create(sourceFile: SourceFile): NewFileNamespace {
-            val namespace = NewFileNamespace(sourceFile, namespaceContext, descriptorProvider)
-
-            addPackageDescriptor(namespace.descriptor)
-
-            return namespace
-        }
-
         private fun addPackageDescriptor(packageDescriptor: PackageFragmentDescriptor) {
             createDummyPackageDescriptors(packageDescriptor.fqName).forEach {
                 packagesByName.putIfAbsent(it.fqName, it)
@@ -158,7 +150,7 @@ internal class NewFileNamespace private constructor(
 }
 
 // From ObjCExportNamer.getFileClassName - ensures that this code crashes in the same cases.
-private val SourceFile.nameOrError: String
+val SourceFile.nameOrError: String
     get() = when (this) {
         is PsiSourceFile -> {
             val psiFile = psiFile

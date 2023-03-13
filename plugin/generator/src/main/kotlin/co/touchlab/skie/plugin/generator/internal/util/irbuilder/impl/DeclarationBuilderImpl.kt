@@ -10,6 +10,7 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.SecondaryConstr
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.DeserializedClassNamespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.DeserializedPackageNamespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.NewFileNamespace
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.nameOrError
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.FunctionTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.SecondaryConstructorTemplate
 import co.touchlab.skie.plugin.reflection.reflectedBy
@@ -52,14 +53,14 @@ internal class DeclarationBuilderImpl(
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
     private val originalPackageNamespacesByFile = mutableMapOf<SourceFile, DeserializedPackageNamespace>()
-    private val newPackageNamespacesByFile = mutableMapOf<SourceFile, NewFileNamespace>()
+
+    private val originalExposedFiles = descriptorProvider.exposedFiles.toSet()
 
     private val allNamespaces: List<Namespace<*>>
         get() = listOf(
             newFileNamespacesByName,
             classNamespacesByDescriptor,
             originalPackageNamespacesByFile,
-            newPackageNamespacesByFile,
         ).flatMap { it.values }
 
     override fun getCustomNamespace(name: String): Namespace<PackageFragmentDescriptor> =
@@ -80,17 +81,14 @@ internal class DeclarationBuilderImpl(
         val sourceFile = existingMember.findSourceFileOrNull()
 
         val hasOriginalPackage = existingMember.findPackage() is DeserializedPackageFragment &&
-            sourceFile in descriptorProvider.exposedFiles &&
-            sourceFile !in newPackageNamespacesByFile
+            sourceFile in originalExposedFiles
 
         return when {
             sourceFile == null -> getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
             hasOriginalPackage -> originalPackageNamespacesByFile.getOrPut(sourceFile) {
                 DeserializedPackageNamespace(existingMember, descriptorProvider)
             }
-            else -> newPackageNamespacesByFile.getOrPut(sourceFile) {
-                newFileNamespaceFactory.create(sourceFile)
-            }
+            else -> getCustomNamespace(sourceFile.nameOrError)
         }
     }
 
