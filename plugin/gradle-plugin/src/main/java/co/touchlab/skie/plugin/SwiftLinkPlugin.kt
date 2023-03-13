@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Architecture
+import org.jetbrains.kotlin.konan.target.Family
 import java.io.File
 
 const val EXTENSION_NAME = "skie"
@@ -213,7 +214,10 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         tasks.withType<FatFrameworkTask>().configureEach { task ->
             task.doLast(object : Action<Task> {
                 override fun execute(p0: Task) {
-                    val target = FrameworkLayout(task.fatFramework, true)
+                    val target = FrameworkLayout(
+                        rootDir = task.fatFramework,
+                        isMacosFramework = task.frameworks.first().target.family == Family.OSX,
+                    )
 
                     val frameworksByArchs = task.frameworks.associateBy { it.target.architecture }
                     target.swiftHeader.writer().use { writer ->
