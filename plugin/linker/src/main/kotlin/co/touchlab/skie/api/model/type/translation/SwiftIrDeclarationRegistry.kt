@@ -79,8 +79,6 @@ class SwiftIrDeclarationRegistry(
         resolveDeclaration(descriptor)
     } as SwiftIrProtocolDeclaration
 
-
-
     context(SwiftModelScope)
     private fun resolveDeclaration(descriptor: ClassDescriptor): SwiftIrDeclaration = when {
         descriptor.hasSwiftModel -> descriptor.swiftModel.swiftIrDeclaration
@@ -118,7 +116,9 @@ class SwiftIrDeclarationRegistry(
                         descriptor = it,
                         name = namer.getTypeParameterName(it),
                         bounds = it.upperBounds.map { bound ->
-                            TODO()
+                            bound.constructor.declarationDescriptor?.let {
+                                declarationForClass(it as ClassDescriptor)
+                            } ?: TODO()
                         }
                     )
                 },
