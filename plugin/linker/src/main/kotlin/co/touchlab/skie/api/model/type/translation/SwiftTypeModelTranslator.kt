@@ -235,26 +235,29 @@ class SwiftTypeTranslator(
                     translateClassOrInterfaceName(
                         descriptor = classDescriptor,
                         exportScope = swiftExportScope,
-                        typeArgs = emptyList(),
-                        ifKotlinType = { SwiftProtocolSirType(it.nonBridgedDeclaration as SwiftIrProtocolDeclaration) },
+                        typeArgs = { emptyList() },
+                        ifKotlinType = { model, _ ->
+                            SwiftProtocolSirType(model.nonBridgedDeclaration as SwiftIrProtocolDeclaration)
+                        },
                     )
                 }
             }
         } else {
-            val typeParamScope = swiftExportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType)
-            val typeArgs = kotlinType.arguments.map { typeProjection ->
-                if (typeProjection.isStarProjection) {
-                    idType(typeParamScope)
-                } else {
-                    mapReferenceTypeIgnoringNullability(typeProjection.type, typeParamScope, flowMappingStrategy.forGenerics())
-                }
-            }
-
             translateClassOrInterfaceName(
                 descriptor = classDescriptor,
                 exportScope = swiftExportScope,
-                typeArgs = typeArgs,
-                ifKotlinType = { SwiftClassSirType(it.nonBridgedDeclaration, typeArgs) },
+                typeArgs = { typeParamScope ->
+                    kotlinType.arguments.map { typeProjection ->
+                        if (typeProjection.isStarProjection) {
+                            idType(typeParamScope)
+                        } else {
+                            mapReferenceTypeIgnoringNullability(typeProjection.type, typeParamScope, flowMappingStrategy.forGenerics())
+                        }
+                    }
+                },
+                ifKotlinType = { model, typeArgs ->
+                    SwiftClassSirType(model.nonBridgedDeclaration, typeArgs)
+                },
             )
         }
     }
@@ -403,8 +406,8 @@ class SwiftTypeTranslator(
     private fun translateClassOrInterfaceName(
         descriptor: ClassDescriptor,
         exportScope: SwiftExportScope,
-        typeArgs: List<SwiftNonNullReferenceSirType>,
-        ifKotlinType: (KotlinTypeSwiftModel) -> SwiftNonNullReferenceSirType,
+        typeArgs: (SwiftExportScope) -> List<SwiftNonNullReferenceSirType>,
+        ifKotlinType: (model: KotlinTypeSwiftModel, typeArgs: List<SwiftNonNullReferenceSirType>) -> SwiftNonNullReferenceSirType,
     ): SwiftNonNullReferenceSirType {
         assert(descriptor in descriptorProvider.exposedClasses) { "Shouldn't be exposed: $descriptor" }
 
@@ -412,18 +415,23 @@ class SwiftTypeTranslator(
             return SwiftErrorSirType
         }
 
+        fun swiftTypeArgs(): List<SwiftNonNullReferenceSirType> = typeArgs(exportScope)
+        fun referenceTypeArgs(): List<SwiftNonNullReferenceSirType> = typeArgs(exportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType))
+
         return if (descriptor.hasSwiftModel) {
             val swiftModel = descriptor.swiftModel
             val bridge = swiftModel.bridge
 
             when {
-                exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> ifKotlinType(swiftModel)
+                exportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> ifKotlinType(swiftModel, referenceTypeArgs())
                 exportScope.hasFlag(SwiftExportScope.Flags.Hashable) -> if (bridge != null && bridge.declaration.isHashable()) {
-                    SwiftClassSirType(bridge.declaration, typeArgs)
+                    SwiftClassSirType(bridge.declaration, swiftTypeArgs())
                 } else {
-                    ifKotlinType(swiftModel)
+                    ifKotlinType(swiftModel, referenceTypeArgs())
                 }
-                else -> swiftModel.bridge?.let { SwiftClassSirType(it.declaration, typeArgs) } ?: swiftModel.let(ifKotlinType)
+                else -> swiftModel.bridge?.let {
+                    SwiftClassSirType(it.declaration, swiftTypeArgs())
+                } ?: ifKotlinType(swiftModel, referenceTypeArgs())
             }
         } else {
             if (descriptor.kind.isInterface) {
@@ -433,10 +441,10 @@ class SwiftTypeTranslator(
             } else {
                 SwiftClassSirType(
                     swiftIrDeclarationRegistry.declarationForClass(descriptor),
-                    typeArgs,
+                    // TODO: We don't know if this is an ObjC or a Swift Type, so the type args are probably not correct.
+                    referenceTypeArgs(),
                 )
             }
-            // TODO: ifSwiftType(SwiftFqName.Local.SwiftType(namer.getClassOrProtocolName(descriptor).swiftName))
         }
     }
 }

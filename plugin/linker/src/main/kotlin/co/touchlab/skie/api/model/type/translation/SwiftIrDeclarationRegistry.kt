@@ -47,6 +47,7 @@ class SwiftIrDeclarationRegistry(
     }
 
     fun referenceExternalTypeDeclaration(fqName: SwiftFqName.External, defaultSupertypes: List<SwiftIrTypeDeclaration> = emptyList()): SwiftIrTypeDeclaration.External {
+        // TODO: Check if `defaultSupertypes` equal to the existing declaration's supertypes.
         return externalTypeDeclarations.getOrPut(fqName) {
             when (fqName) {
                 is SwiftFqName.External.Nested -> {
@@ -81,6 +82,7 @@ class SwiftIrDeclarationRegistry(
 
     context(SwiftModelScope)
     private fun resolveDeclaration(descriptor: ClassDescriptor): SwiftIrDeclaration = when {
+        // TODO: Remove these special cases, handle just the default one.
         descriptor.hasSwiftModel -> descriptor.swiftModel.swiftIrDeclaration
         descriptor.isObjCMetaClass() -> BuiltinDeclarations.AnyClass
         descriptor.isObjCProtocolClass() -> BuiltinDeclarations.Protocol
@@ -98,13 +100,8 @@ class SwiftIrDeclarationRegistry(
                     name = descriptor.name.asString(),
                     superTypes = listOf(BuiltinDeclarations.Foundation.NSObject),
                 )
-
             }
-
-            // val bridge = builtinSwiftBridgeableProvider.bridgeFor(descriptor.fqNameSafe, )
-            // TODO()
         }
-
 
         else -> declarationsByDescriptor.getOrPut(descriptor) {
             SwiftIrTypeDeclaration.Local.KotlinClass.Immutable(
