@@ -13,7 +13,8 @@ import org.jetbrains.kotlin.types.KotlinType
 
 enum class SupportedFlow(val directParent: SupportedFlow?) {
     Flow(null),
-    SharedFlow(Flow);
+    SharedFlow(Flow),
+    StateFlow(SharedFlow);
 
     val coroutinesFlowFqName: String = "kotlinx.coroutines.flow.${name}"
 
