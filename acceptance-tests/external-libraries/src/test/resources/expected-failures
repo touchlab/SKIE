@@ -121,3 +121,13 @@ org.jetbrains.kotlin-wrappers:kotlin-css-iosarm64
 
 > e: Could not find "dev.icerock.moko:resources-cinterop-pluralizedString"
 ru.astrainteractive.mobilex:uitext-mr-iosarm64
+
+# We correctly generated the import, but the module isn't available, and that's okay
+> error: no such module 'AppAuth'
+> import AppAuth
+dev.gitlive:appauth-kotlin-iosarm64
+
+# We correctly generated the import, but the module isn't available, and that's okay
+> no such module 'FirebaseDatabase'
+> import FirebaseDatabase
+dev.gitlive:firebase-database-iosarm64
