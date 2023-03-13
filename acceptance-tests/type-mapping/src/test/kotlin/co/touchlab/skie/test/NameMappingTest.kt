@@ -12,9 +12,11 @@ import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kot
 import co.touchlab.skie.acceptancetests.framework.testStream
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.type_mapping.BuildConfig
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
@@ -118,6 +120,18 @@ class NameMappingTest {
                 TypeSpec.classBuilder("SingleTypeParamClass")
                     // TODO: Add `T: Any`
                     .addTypeVariable(TypeVariableName("T"))
+                    .build()
+            )
+            .addType(
+                TypeSpec.interfaceBuilder("RecursiveGenericsInterface")
+                    .addTypeVariable(
+                        TypeVariableName(
+                            name = "T",
+                            ClassName("co.touchlab.skie.test", "RecursiveGenericsInterface").parameterizedBy(
+                                TypeVariableName("T")
+                            ),
+                        )
+                    )
                     .build()
             )
             .addType(

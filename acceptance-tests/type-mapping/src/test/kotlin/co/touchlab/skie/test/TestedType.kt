@@ -218,12 +218,79 @@ sealed interface TestedType {
         override val kotlinType: TypeName get() = STAR
     }
 
-    data class TypeParam(val bounds: List<TestedType>): TestedType {
-        override val safeName: String
-            get() = bounds.joinToString("_") { it.safeName.uppercase() }
+    sealed class TypeParam: TestedType {
+        abstract override val kotlinType: TypeVariableName
+        abstract val bounds: List<TestedType>
 
-        override val kotlinType: TypeVariableName
-            get() = TypeVariableName(safeName, bounds.map { it.kotlinType })
+        companion object {
+            operator fun invoke(bounds: List<TestedType>): TypeParam = Simple { bounds }
+
+            operator fun invoke(boundsFactory: (TypeParam) -> List<TestedType>): TypeParam = Simple(boundsFactory)
+        }
+
+        class Simple(
+            boundsFactory: (TypeParam) -> List<TestedType>,
+        ): TypeParam() {
+            override val bounds = boundsFactory(Usage(this))
+
+            override val kotlinType: TypeVariableName
+
+            init {
+                val mutableBounds = mutableListOf<TypeName>()
+                kotlinType = TypeVariableName(safeName, mutableBounds)
+                mutableBounds += bounds.map { it.kotlinType }
+            }
+
+
+
+            override val safeName: String
+                get() = bounds.joinToString("_") {
+                    it.safeName.uppercase()
+                }
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+
+                if (other !is TypeParam) return false
+
+                if (safeName != other.safeName) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                return safeName.hashCode()
+            }
+        }
+
+        class Usage(
+            private val param: TypeParam
+        ): TypeParam() {
+            override val bounds: List<TestedType>
+                get() = param.bounds
+
+            override val safeName: String
+                get() = "SELF"
+
+            override val kotlinType: TypeVariableName
+                get() = param.kotlinType
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+
+                return when (other) {
+                    is Usage -> param == other.param
+                    is Simple -> param == other
+                    else -> false
+                }
+            }
+
+            override fun hashCode(): Int {
+                return safeName.hashCode()
+            }
+
+
+        }
     }
 
     data class Lambda(
@@ -255,6 +322,11 @@ sealed interface TestedType {
         fun SingleTypeParamClass(param: TestedType) = WithTypeParameters(
             type = ClassName("co.touchlab.skie.test", "SingleTypeParamClass"),
             typeParameters = listOf(param),
+        )
+
+        fun RecursiveGenericsInterface(param: TestedType?) = WithTypeParameters(
+            type = ClassName("co.touchlab.skie.test", "RecursiveGenericsInterface"),
+            typeParameters = listOf(param ?: Star),
         )
 
         fun ExportedTypes(param: TestedType): List<TestedType> {
@@ -457,7 +529,14 @@ sealed interface TestedType {
                 Nullable(Lambda(false, null, listOf(Builtin.String), Builtin.String)),
                 List(Star),
                 SingleTypeParamClass(Star),
+                SingleTypeParamClass(Star),
                 Map(Star, Star),
+                RecursiveGenericsInterface(Star),
+                TypeParam {
+                    listOf(
+                        RecursiveGenericsInterface(it),
+                    )
+                }
             )
         }
 
@@ -550,7 +629,7 @@ sealed interface TestedType {
         val ENABLED_FILTER: (TestedType) -> Boolean = { outerType ->
             fun hasLambdaTypeParam(type: TestedType): Boolean = when (type) {
                 is WithTypeParameters -> type.typeParameters.any { it is Lambda || hasLambdaTypeParam(it) }
-                is TypeParam -> type.bounds.any { it is Lambda || hasLambdaTypeParam(it) }
+                is TypeParam.Simple-> type.bounds.any { it is Lambda || hasLambdaTypeParam(it) }
                 is Nullable -> type.wrapped is Lambda || hasLambdaTypeParam(type.wrapped)
                 is Lambda -> hasLambdaTypeParam(type.returnType) || type.parameterTypes.any { hasLambdaTypeParam(it) }
                 else -> false
