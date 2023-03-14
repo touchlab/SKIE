@@ -10,8 +10,84 @@ permissions:
   checks: write
 
 jobs:
-  run-all-tests:
-    uses: ./.github/workflows/all-tests.yml
-    with:
-      concurrency-id: smoke
-    secrets: inherit
+  acceptance-tests:
+    name: Acceptance Tests (macOS, Static, Release)
+    runs-on: self-hosted
+    concurrency: ci-smoke-acceptance-tests-${{ github.ref }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Acceptance Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:test'
+        env:
+          KOTLIN_LINK_MODE: 'static'
+          KOTLIN_BUILD_CONFIGURATION: 'debug'
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          check_name: "Smoke Test Reports - Acceptance Tests"
+          report_paths: 'acceptance-tests/build/test-results/test/TEST-*.xml'
+          require_tests: true
+
+  type-mapping-tests:
+    name: Type Mapping Tests (ios_arm64, Static, Debug)
+    runs-on: self-hosted
+    concurrency: ci-smoke-type-mapping-tests-${{ github.ref }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Type Mapping Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:type-mapping:test'
+        env:
+          KOTLIN_LINK_MODE: 'static'
+          KOTLIN_TARGET: 'ios_arm64'
+          KOTLIN_BUILD_CONFIGURATION: 'debug'
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          check_name: "Smoke Test Reports - Type Mapping Tests"
+          report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
+          require_tests: true
+
+  external-libraries-tests:
+    name: External Libraries Tests (ios_arm64, Static, Debug)
+    runs-on: self-hosted
+    concurrency: ci-smoke-external-libraries-tests-${{ github.ref }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SWIFTPOET_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2
+        env:
+          KOTLIN_LINK_MODE: 'static'
+          KOTLIN_BUILD_CONFIGURATION: 'debug'
+        with:
+          arguments: ':acceptance-tests:external-libraries:test'
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          check_name: "Smoke Test Reports - External Libraries Tests"
+          report_paths: 'acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
+          require_tests: true
