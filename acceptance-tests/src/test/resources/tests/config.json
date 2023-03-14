@@ -1,7 +1,7 @@
 {
     "enabledFeatures": {
         "features": [
-            "SuspendInterop"
+            "CoroutinesInterop"
         ]
     },
     "groups": [
