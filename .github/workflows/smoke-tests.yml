@@ -9,11 +9,13 @@ permissions:
   contents: read
   checks: write
 
+concurrency:
+  group: ci-smoke-tests-${{ github.ref }}
+
 jobs:
   acceptance-tests:
     name: Acceptance Tests (macOS, Static, Release)
     runs-on: self-hosted
-    concurrency: ci-smoke-acceptance-tests-${{ github.ref }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -39,8 +41,8 @@ jobs:
 
   type-mapping-tests:
     name: Type Mapping Tests (ios_arm64, Static, Debug)
+    needs: [acceptance-tests]
     runs-on: self-hosted
-    concurrency: ci-smoke-type-mapping-tests-${{ github.ref }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -67,8 +69,8 @@ jobs:
 
   external-libraries-tests:
     name: External Libraries Tests (ios_arm64, Static, Debug)
+    needs: [acceptance-tests, type-mapping-tests]
     runs-on: self-hosted
-    concurrency: ci-smoke-external-libraries-tests-${{ github.ref }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
