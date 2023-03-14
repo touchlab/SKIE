@@ -3,8 +3,8 @@ package co.touchlab.skie.api.model.type.translation
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory

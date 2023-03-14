@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.api.model.callable
 
-import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.type.SirType
 
 interface MutableKotlinCallableMemberSwiftModel : KotlinCallableMemberSwiftModel {
 

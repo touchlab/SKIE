@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.api.sir.declaration
 
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
-import co.touchlab.skie.plugin.api.model.type.SwiftFqName
+import co.touchlab.skie.plugin.api.sir.SwiftFqName
 
 sealed interface SwiftIrExtensibleDeclaration: SwiftIrDeclaration {
     val superTypes: List<SwiftIrExtensibleDeclaration>

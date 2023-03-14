@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.api.model.type.translation
+package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import io.outfoxx.swiftpoet.AnyTypeName

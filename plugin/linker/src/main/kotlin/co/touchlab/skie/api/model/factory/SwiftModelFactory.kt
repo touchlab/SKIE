@@ -5,9 +5,9 @@ package co.touchlab.skie.api.model.factory
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.callable.function.AsyncKotlinFunctionSwiftModel
 import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelWithCore
-import co.touchlab.skie.api.model.type.classes.ActualKotlinClassSwiftModel
-import co.touchlab.skie.api.model.type.enumentry.ActualKotlinEnumEntrySwiftModel
-import co.touchlab.skie.api.model.type.files.ActualKotlinFileSwiftModel
+import co.touchlab.skie.api.model.type.ActualKotlinClassSwiftModel
+import co.touchlab.skie.api.model.type.ActualKotlinEnumEntrySwiftModel
+import co.touchlab.skie.api.model.type.ActualKotlinFileSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel

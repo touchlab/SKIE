@@ -1,16 +1,8 @@
-package co.touchlab.skie.plugin.api.model.type.translation
+package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import io.outfoxx.swiftpoet.TypeName
-
-// sealed class SwiftPrimitiveTypeModel(
-//     override val stableFqName: SwiftFqName,
-// ) : SwiftTypeModel {
-//
-
-//
-// }
 
 // TODO: Doesn't need to be its own type
 sealed class SwiftPrimitiveSirType(

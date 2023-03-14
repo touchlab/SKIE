@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.api.model
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer

@@ -14,7 +14,7 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableM
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
@@ -95,12 +95,6 @@ internal class ActualKotlinFunctionSwiftModel(
     override val origin: KotlinCallableMemberSwiftModel.Origin = descriptor.swiftModelOrigin
 
     override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
-
-    // override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
-
-    // override val isChanged: Boolean
-    //     get() = identifier != original.identifier || visibility != original.visibility || valueParameters.any { it.isChanged } ||
-    //         collisionResolutionStrategy != original.collisionResolutionStrategy || returnTypeFlowMappingStrategy != original.returnTypeFlowMappingStrategy
 
     override val returnType: SirType
         get() = with(swiftModelScope) {

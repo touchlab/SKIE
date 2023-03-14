@@ -1,4 +1,4 @@
-package co.touchlab.skie.api.model.type.classes
+package co.touchlab.skie.api.model.type
 
 import co.touchlab.skie.api.model.callable.function.FakeObjcConstructorKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
@@ -15,21 +15,17 @@ import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.ObjcFqName
 import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
-import co.touchlab.skie.plugin.api.model.type.SwiftFqName
+import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.util.mutableLazy
-import co.touchlab.skie.util.swiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.descriptors.isSealed
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class ActualKotlinClassSwiftModel(
     override val classDescriptor: ClassDescriptor,
@@ -128,43 +124,6 @@ class ActualKotlinClassSwiftModel(
     override var containingType: MutableKotlinClassSwiftModel? by mutableLazy {
         originalContainingType
     }
-
-    // val stableFqName: SwiftFqName =
-    //     TypeSwiftModel.StableFqNameNamespace +
-    //         ("class__${classDescriptor.module.swiftIdentifier}__${classDescriptor.fqNameSafe.asString().toValidSwiftIdentifier()}")
-
-    // override val isChanged: Boolean
-    //     get() = identifier != original.identifier ||
-    //         containingType?.isChanged == true ||
-    //         containingType != original.containingType ||
-    //         visibility != original.visibility ||
-    //         bridge != original.bridge
-
-    // override val original: KotlinClassSwiftModel = run {
-    //     OriginalKotlinClassSwiftModel(
-    //         delegate = this,
-    //         // Needs to be recalculated because the `identifier` is changed if the class is nested inside a non-exported class.
-    //         identifier = namer.getClassOrProtocolName(classDescriptor.original).swiftName.substringAfter("."),
-    //         // Original containing type cannot point to non-exported class (it does not have a SwiftModel).
-    //         containingType = lazy { originalContainingType },
-    //         swiftIrDeclaration = lazy {
-    //             if (kind.isInterface) {
-    //                 SwiftIrProtocolDeclaration.Local.KotlinInterface.Immutable(
-    //                     kotlinModule = classDescriptor.module.swiftIdentifier,
-    //                     kotlinFqName = classDescriptor.fqNameSafe,
-    //                     swiftName = identifier,
-    //                     // TODO: Decide what protocols to include here.
-    //                     superTypes = emptyList(),
-    //                 )
-    //             } else {
-    //                 TODO()
-    //                 // SwiftIrTypeDeclaration.Local.KotlinClass.Immutable(
-    //                 //
-    //                 // )
-    //             }
-    //         }
-    //     )
-    // }
 
     override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration by lazy {
         if (kind.isInterface) {

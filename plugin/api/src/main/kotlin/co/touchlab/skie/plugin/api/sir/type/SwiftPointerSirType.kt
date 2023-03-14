@@ -1,18 +1,7 @@
-package co.touchlab.skie.plugin.api.model.type.translation
+package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import io.outfoxx.swiftpoet.TypeName
-
-// data class SwiftPointerTypeModel(
-//     val pointee: SwiftTypeModel,
-//     val nullable: Boolean = false,
-// ) : SwiftTypeModel {
-//
-//     override val stableFqName: SwiftFqName
-//         get() = SwiftFqName.External.Swift("UnsafeMutableRawPointer").let {
-//             if (nullable) SwiftFqName.Optional(it) else it
-//         }
-// }
 
 data class SwiftPointerSirType(
     val pointee: SirType,

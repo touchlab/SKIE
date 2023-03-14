@@ -5,8 +5,8 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.isRemoved
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration

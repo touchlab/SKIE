@@ -10,7 +10,7 @@ import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunction
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
-import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.type.SirType
 
 internal class AsyncKotlinFunctionSwiftModel(
     private val delegate: KotlinFunctionSwiftModelWithCore,

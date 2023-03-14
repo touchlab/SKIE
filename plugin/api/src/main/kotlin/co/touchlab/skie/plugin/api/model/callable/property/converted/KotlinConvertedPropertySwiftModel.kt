@@ -6,8 +6,6 @@ import co.touchlab.skie.plugin.api.model.callable.property.KotlinPropertySwiftMo
 
 interface KotlinConvertedPropertySwiftModel : KotlinPropertySwiftModel {
 
-    // override val original: KotlinConvertedPropertySwiftModel
-
     override val directlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
         get() = accessors
 

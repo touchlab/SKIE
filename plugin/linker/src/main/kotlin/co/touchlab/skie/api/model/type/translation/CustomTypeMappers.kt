@@ -6,12 +6,12 @@ import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableSirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyObjectSirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnySirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftAnyObjectSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftAnySirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
 import org.jetbrains.kotlin.backend.konan.objcexport.NSNumberKind
 import org.jetbrains.kotlin.backend.konan.objcexport.isMappedFunctionClass
 import org.jetbrains.kotlin.builtins.StandardNames

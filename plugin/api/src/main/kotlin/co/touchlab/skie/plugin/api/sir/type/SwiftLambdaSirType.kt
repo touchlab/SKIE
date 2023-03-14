@@ -1,20 +1,10 @@
-package co.touchlab.skie.plugin.api.model.type.translation
+package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.TypeName
-
-// data class SwiftLambdaTypeModel(
-//     val returnType: SwiftTypeModel,
-//     val parameterTypes: List<SwiftReferenceTypeModel>,
-//     val isEscaping: Boolean,
-// ) : SwiftNonNullReferenceTypeModel {
-//
-//     override val stableFqName: SwiftFqName
-//         get() = SwiftFqName.Lambda(parameterTypes.map { it.stableFqName }, returnType.stableFqName, isEscaping)
-// }
 
 data class SwiftLambdaSirType(
     val returnType: SirType,

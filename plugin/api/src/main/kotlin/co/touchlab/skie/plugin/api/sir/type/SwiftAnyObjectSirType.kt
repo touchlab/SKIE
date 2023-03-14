@@ -1,7 +1,6 @@
-package co.touchlab.skie.plugin.api.model.type.translation
+package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-
 
 object SwiftAnyObjectSirType: SwiftNonNullReferenceSirType {
     override val declaration = BuiltinDeclarations.Swift.AnyObject

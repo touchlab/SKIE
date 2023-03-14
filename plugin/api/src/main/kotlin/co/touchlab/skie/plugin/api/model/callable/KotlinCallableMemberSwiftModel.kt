@@ -1,14 +1,12 @@
 package co.touchlab.skie.plugin.api.model.callable
 
-import co.touchlab.skie.plugin.api.model.type.translation.SirType
+import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 
 interface KotlinCallableMemberSwiftModel {
 
     val descriptor: CallableMemberDescriptor
-
-    // val original: KotlinCallableMemberSwiftModel
 
     // TODO: Probably needs a different interface than ExtensibleDeclaration
     val owner: SwiftIrExtensibleDeclaration

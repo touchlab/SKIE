@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.api.model.type.translation
+package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
 import io.outfoxx.swiftpoet.TypeName

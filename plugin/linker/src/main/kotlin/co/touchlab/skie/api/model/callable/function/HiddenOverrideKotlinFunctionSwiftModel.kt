@@ -6,9 +6,8 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
-import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.plugin.api.model.type.translation.SirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.type.SirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class HiddenOverrideKotlinFunctionSwiftModel(
@@ -21,13 +20,10 @@ internal class HiddenOverrideKotlinFunctionSwiftModel(
 
     override val receiver: SirType by lazy {
         with(swiftModelScope) {
-            // TODO("How to get the receiver type?")
-            // receiverDescriptor.swiftModel
+            // TODO: This is wrong, we shouldn't create a SirType here!
             SwiftClassSirType(receiverDescriptor.swiftModel.swiftIrDeclaration)
         }
     }
-
-    // override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
 
     override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
         visitor.visit(this)

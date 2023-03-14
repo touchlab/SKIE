@@ -12,12 +12,11 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
-import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
-import co.touchlab.skie.plugin.api.model.type.translation.SirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.type.SirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNoneExportScope
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
@@ -73,11 +72,8 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
 
     override val receiver: SirType by lazy {
         with(swiftModelScope) {
-            // TODO: This is wrong, we can't create a SirType here!
+            // TODO: This is wrong, we shouldn't create a SirType here!
             SwiftClassSirType(receiverDescriptor.swiftModel.swiftIrDeclaration)
-            // descriptor.receiverType()
-            // TODO("How to get it?")
-            // receiverDescriptor.swiftModel
         }
     }
 
@@ -90,8 +86,6 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
 
     override val name: String
         get() = baseModel.core.name(baseModel)
-
-    // override val original: KotlinFunctionSwiftModel = OriginalKotlinFunctionSwiftModel(this)
 
     override fun <OUT> accept(visitor: KotlinCallableMemberSwiftModelVisitor<OUT>): OUT =
         visitor.visit(this)

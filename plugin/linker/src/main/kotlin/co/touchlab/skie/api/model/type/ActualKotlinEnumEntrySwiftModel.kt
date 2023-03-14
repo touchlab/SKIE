@@ -1,4 +1,4 @@
-package co.touchlab.skie.api.model.type.enumentry
+package co.touchlab.skie.api.model.type
 
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel

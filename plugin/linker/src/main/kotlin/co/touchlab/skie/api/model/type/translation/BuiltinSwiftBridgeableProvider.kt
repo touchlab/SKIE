@@ -3,12 +3,12 @@ package co.touchlab.skie.api.model.type.translation
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.plugin.Command
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
-import co.touchlab.skie.plugin.api.model.type.SwiftFqName
+import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnyHashableSirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftAnySirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
-import co.touchlab.skie.plugin.api.model.type.translation.SwiftNonNullReferenceSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftAnySirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
 import co.touchlab.skie.plugin.api.sir.declaration.isHashable
 import org.jetbrains.kotlin.name.FqName
 import java.io.File

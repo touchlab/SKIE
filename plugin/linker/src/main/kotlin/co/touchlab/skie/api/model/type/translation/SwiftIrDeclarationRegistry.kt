@@ -1,7 +1,7 @@
 package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
-import co.touchlab.skie.plugin.api.model.type.SwiftFqName
+import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration

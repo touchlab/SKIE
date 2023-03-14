@@ -4,14 +4,10 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 
 interface KotlinDirectlyCallableMemberSwiftModel : KotlinCallableMemberSwiftModel {
 
-    // override val original: KotlinDirectlyCallableMemberSwiftModel
-
     override val allBoundedSwiftModels: List<KotlinDirectlyCallableMemberSwiftModel>
 
     override val directlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
         get() = listOf(this)
-
-    // val isChanged: Boolean
 
     val visibility: SwiftModelVisibility
 
