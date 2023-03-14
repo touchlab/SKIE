@@ -69,7 +69,7 @@ jobs:
 
   external-libraries-tests:
     name: External Libraries Tests (ios_arm64, Static, Debug)
-    needs: [acceptance-tests, type-mapping-tests]
+    needs: [type-mapping-tests]
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
