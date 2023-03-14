@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
+import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 
 class SwiftModelFactoryMembersDelegate(
     private val swiftModelScope: MutableSwiftModelScope,
@@ -51,7 +52,7 @@ class SwiftModelFactoryMembersDelegate(
     }
 
     private fun getDirectParents(descriptor: CallableMemberDescriptor): List<CallableMemberDescriptor> =
-        if (descriptor is ConstructorDescriptor) getDirectParents(descriptor) else descriptor.overriddenDescriptors.map { it.original }
+        if (descriptor is ConstructorDescriptor) getDirectParents(descriptor) else descriptor.overriddenDescriptors.map { it.original }.filter { namer.mapper.shouldBeExposed(it) }
 
     private fun getDirectParents(descriptor: ConstructorDescriptor): List<CallableMemberDescriptor> =
         descriptor.constructedClass
