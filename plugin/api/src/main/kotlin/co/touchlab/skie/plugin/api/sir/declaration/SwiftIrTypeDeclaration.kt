@@ -2,14 +2,11 @@ package co.touchlab.skie.plugin.api.sir.declaration
 
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.applyVisibility
-import co.touchlab.skie.plugin.api.model.isReplaced
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinFileSwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.SwiftFqName
-import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
-import io.outfoxx.swiftpoet.DeclaredTypeName
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -50,7 +47,7 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                         model.containingType?.nonBridgedDeclaration?.publicName?.nested(name) ?: SwiftFqName.Local.TopLevel(name)
                     }
 
-                override val typeParameters: List<SwiftIrTypeParameterDeclaration> = model.classDescriptor.declaredTypeParameters.map {
+                override val typeParameters: List<SwiftIrTypeParameterDeclaration> = model.classDescriptor.typeConstructor.parameters.map {
                     SwiftIrTypeParameterDeclaration.KotlinTypeParameter(
                         descriptor = it,
                         name = it.name.asString(),

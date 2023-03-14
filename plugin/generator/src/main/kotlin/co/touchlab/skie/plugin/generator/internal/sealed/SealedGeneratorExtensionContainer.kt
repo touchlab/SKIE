@@ -53,7 +53,8 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
             return this.nonBridgedDeclaration.internalName.toSwiftPoetName()
         }
 
-        val typeParameters = this.classDescriptor.declaredTypeParameters.map {
+        // TODO: This should use the new declaration API:
+        val typeParameters = this.classDescriptor.typeConstructor.parameters.map {
             val indexInParent = it.indexInParent(this.classDescriptor, parent.classDescriptor)
 
             if (indexInParent != null) {
