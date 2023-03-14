@@ -1,32 +1,11 @@
 name: All Tests
 
 on:
+  schedule:
+    # Every saturday at 2am EST
+    - cron: '0 7 * * SAT'
+  workflow_dispatch:
   workflow_call:
-    inputs:
-      release-version:
-        description: 'The version being released'
-        type: string
-        required: false
-        default: "1.0.0-SNAPSHOT"
-      concurrency-id:
-        description: 'The ID to use for concurrency'
-        type: string
-        required: true
-      matrix-targets:
-        description: 'JSON Array with targets (type mapping only)'
-        type: string
-        required: false
-        default: '["ios_arm64"]'
-      matrix-linkage:
-        description: 'JSON Array with booleans - static framework or not (all jobs)'
-        type: string
-        required: false
-        default: '["Static"]'
-      matrix-configuration:
-        description: 'JSON Array with build configurations (all jobs)'
-        type: string
-        required: false
-        default: '["release"]'
     secrets:
       SWIFTPOET_TOKEN:
         required: true
@@ -35,9 +14,6 @@ permissions:
   contents: read
   checks: write
 
-env:
-  RELEASE_VERSION: ${{ inputs.release-version }}
-
 jobs:
   acceptance-tests:
     name: Acceptance Tests
@@ -45,9 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        linkage: ${{ fromJson(inputs.matrix-linkage) }}
-        configuration: ${{ fromJson(inputs.matrix-configuration) }}
-    concurrency: ci-${{ inputs.concurrency-id }}-acceptance-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
+        linkage: [static, dynamic]
+        configuration: [release, debug]
+    concurrency: ci-all-acceptance-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -67,7 +43,7 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          check_name: "Test Reports - Acceptance Tests"
+          check_name: "Test Reports - Acceptance Tests (${{ matrix.linkage }}, ${{ matrix.configuration }})"
           report_paths: 'acceptance-tests/build/test-results/test/TEST-*.xml'
           require_tests: true
 
@@ -77,10 +53,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ${{ fromJson(inputs.matrix-targets) }}
-        linkage: ${{ fromJson(inputs.matrix-linkage) }}
-        configuration: ${{ fromJson(inputs.matrix-configuration) }}
-    concurrency: ci-${{ inputs.concurrency-id }}-type-mapping-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}-${{ matrix.target }}
+        target: [ios_arm64, ios_x64, ios_simulator_arm64, macos_arm64, macos_x64]
+        linkage: [static, dynamic]
+        configuration: [release, debug]
+    concurrency: ci-all-type-mapping-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}-${{ matrix.target }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -101,7 +77,7 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          check_name: "Test Reports - Type Mapping Tests"
+          check_name: "Test Reports - Type Mapping Tests (${{target}}, ${{ matrix.linkage }}, ${{ matrix.configuration }})"
           report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
           require_tests: true
 
@@ -111,9 +87,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        linkage: ${{ fromJson(inputs.matrix-linkage) }}
-        configuration: ${{ fromJson(inputs.matrix-configuration) }}
-    concurrency: ci-${{ inputs.concurrency-id }}-external-libraries-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
+        linkage: [static, dynamic]
+        configuration: [release, debug]
+    concurrency: ci-all-external-libraries-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -133,6 +109,6 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          check_name: "Test Reports - External Libraries Tests"
+          check_name: "Test Reports - External Libraries Tests (${{ matrix.linkage }}, ${{ matrix.configuration }})"
           report_paths: 'acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
           require_tests: true
