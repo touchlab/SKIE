@@ -1,21 +1,17 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
-import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
+import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class FlowBridgingConfigurator(
     private val skieContext: SkieContext,
-    configuration: Configuration,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures &&
-        SkieFeature.SwiftRuntime in configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieContext.configuration.enabledFeatures
 
     override fun runObjcPhase() {
         skieContext.module.configure {

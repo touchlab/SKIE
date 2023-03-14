@@ -3,13 +3,17 @@ package co.touchlab.skie.plugin.generator.internal.configuration
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.ConfigurationKey
 import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
+import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import co.touchlab.skie.plugin.generator.internal.configuration.getConfiguration as getConfigurationWithConfiguration
 
 interface ConfigurationContainer {
 
+    val skieContext: SkieContext
+
     val configuration: Configuration
+        get() = skieContext.configuration
 
     fun <T> DeclarationDescriptor.getConfiguration(key: ConfigurationKey<T>): T =
         with(configuration) { this@getConfiguration.getConfigurationWithConfiguration(key) }

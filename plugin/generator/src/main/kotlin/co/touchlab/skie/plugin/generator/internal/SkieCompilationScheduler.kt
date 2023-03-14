@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
@@ -26,14 +25,13 @@ internal class SkieCompilationScheduler(
     descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     namespaceProvider: NamespaceProvider,
-    configuration: Configuration,
     reporter: Reporter,
 ) {
 
     private val compilationPhases = listOf(
         IrValidator(
+            skieContext = skieContext,
             reporter = reporter,
-            configuration = configuration,
             descriptorProvider = descriptorProvider,
         ),
         KotlinRuntimeHidingPhase(
@@ -42,54 +40,44 @@ internal class SkieCompilationScheduler(
         ),
         FlowBridgingConfigurator(
             skieContext = skieContext,
-            configuration = configuration,
         ),
         FlowConversionConstructorsGenerator(
             skieContext = skieContext,
-            configuration = configuration,
         ),
         FlowMappingConfigurator(
             skieContext = skieContext,
-            configuration = configuration,
         ),
         FlowGenericArgumentStubGenerator(
             skieContext = skieContext,
-            configuration = configuration,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
         ),
         SwiftRuntimeGenerator(
             skieContext = skieContext,
-            configuration = configuration
         ),
         SealedInteropGenerator(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
-            configuration = configuration,
         ),
         DefaultArgumentGenerator(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-            configuration = configuration,
         ),
         ExhaustiveEnumsGenerator(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
-            configuration = configuration,
             reporter = reporter,
         ),
         SuspendGenerator(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
-            configuration = configuration,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
         ),
         TypeAliasGenerator(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
-            configuration = configuration,
         ),
     )
 

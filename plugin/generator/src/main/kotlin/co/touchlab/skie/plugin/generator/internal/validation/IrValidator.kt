@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.validation
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
@@ -10,9 +10,9 @@ import co.touchlab.skie.plugin.generator.internal.validation.rules.validate
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class IrValidator(
+    private val skieContext: SkieContext,
     private val descriptorProvider: DescriptorProvider,
     private val reporter: Reporter,
-    private val configuration: Configuration,
 ) : SkieCompilationPhase {
 
     override val isActive: Boolean = true
@@ -22,7 +22,7 @@ internal class IrValidator(
 
     override fun runObjcPhase() {
         with(reporter) {
-            with(configuration) {
+            with(skieContext.configuration) {
                 descriptorProvider.exposedClasses.forEach {
                     classRules.validate(it)
                 }

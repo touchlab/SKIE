@@ -7,9 +7,9 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameter
 import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftClassSirType
 import co.touchlab.skie.plugin.api.model.type.translation.SwiftGenericTypeUsageSirType
+import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
-import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock

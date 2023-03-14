@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.configuration.gradle.FlowInterop
 import co.touchlab.skie.plugin.api.SkieContext
@@ -14,12 +13,10 @@ import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class FlowMappingConfigurator(
-    private val skieContext: SkieContext,
-    override val configuration: Configuration,
+    override val skieContext: SkieContext,
 ) : SkieCompilationPhase, ConfigurationContainer {
 
-    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures &&
-        SkieFeature.SwiftRuntime in configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.CoroutinesInterop in configuration.enabledFeatures
 
     private val callableMemberConfigurator = CallableMemberConfigurator()
 

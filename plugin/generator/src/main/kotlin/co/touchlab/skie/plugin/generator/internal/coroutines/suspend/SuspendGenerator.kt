@@ -2,7 +2,6 @@
 
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.configuration.gradle.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
@@ -19,13 +18,11 @@ import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 internal class SuspendGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
-    configuration: Configuration,
     private val descriptorProvider: NativeDescriptorProvider,
     private val declarationBuilder: DeclarationBuilder,
-) : BaseGenerator(skieContext, namespaceProvider, configuration) {
+) : BaseGenerator(skieContext, namespaceProvider) {
 
-    override val isActive: Boolean = SkieFeature.SuspendInterop in configuration.enabledFeatures &&
-        SkieFeature.SwiftRuntime in configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.CoroutinesInterop in configuration.enabledFeatures
 
     override fun runObjcPhase() {
         val kotlinDelegate = KotlinSuspendGeneratorDelegate(module, declarationBuilder, descriptorProvider)

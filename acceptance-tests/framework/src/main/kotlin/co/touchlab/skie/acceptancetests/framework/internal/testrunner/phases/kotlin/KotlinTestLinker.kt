@@ -19,9 +19,6 @@ import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Path
-import kotlin.io.path.readText
-import co.touchlab.skie.plugin.ConfigurationKeys as SwiftLinkConfigurationKeys
-import co.touchlab.skie.plugin.generator.ConfigurationKeys as SwiftGenConfigurationKeys
 
 class KotlinTestLinker(
     private val tempFileSystem: TempFileSystem,
@@ -51,15 +48,15 @@ class KotlinTestLinker(
         val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
 
         PluginRegistrar.configure.set {
-            put(SwiftLinkConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
-            put(SwiftLinkConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
+            put(ConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
+            put(ConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
             put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.fromTestEnv())
-            put(SwiftGenConfigurationKeys.swiftGenConfiguration, configuration)
+            put(ConfigurationKeys.skieConfiguration, configuration)
         }
 
         PluginRegistrar.plugins.set(
             listOf {
-                with (SkieComponentRegistrar()) {
+                with(SkieComponentRegistrar()) {
                     registerExtensions(it)
                 }
             }

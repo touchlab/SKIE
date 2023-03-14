@@ -35,10 +35,10 @@ object SkiePlugin {
             deserialize = String::toBooleanStrict,
         )
 
-        val swiftGenConfigPath = PluginOption(
-            optionName = "swiftGenConfigPath",
+        val skieConfigurationPath = PluginOption(
+            optionName = "skieConfigurationPath",
             valueDescription = "<absolute path>",
-            description = "Path to JSON file with SwiftGen configuration.",
+            description = "Path to JSON file with SKIE configuration.",
             isRequired = true,
             serialize = File::getAbsolutePath,
             deserialize = ::File,

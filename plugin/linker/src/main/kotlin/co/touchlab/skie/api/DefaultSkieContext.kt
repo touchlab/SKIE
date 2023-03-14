@@ -1,5 +1,6 @@
 package co.touchlab.skie.api
 
+import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
@@ -9,6 +10,7 @@ import java.io.File
 
 class DefaultSkieContext(
     override val module: SkieModule,
+    override val configuration: Configuration,
     override val swiftSourceFiles: List<File>,
     override val expandedSwiftDir: File,
     override val debugInfoDirectory: DebugInfoDirectory,

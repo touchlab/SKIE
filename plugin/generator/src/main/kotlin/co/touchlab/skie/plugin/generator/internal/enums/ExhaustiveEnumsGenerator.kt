@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.enums
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -36,9 +35,8 @@ import org.jetbrains.kotlin.descriptors.isEnumClass
 internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
-    configuration: Configuration,
     private val reporter: Reporter,
-) : BaseGenerator(skieContext, namespaceProvider, configuration) {
+) : BaseGenerator(skieContext, namespaceProvider) {
 
     override val isActive: Boolean = true
 
@@ -102,7 +100,10 @@ internal class ExhaustiveEnumsGenerator(
         addType(classSwiftModel.generateBridgingEnum())
     }
 
-    private fun FileSpec.Builder.addNestedBridge(classSwiftModel: KotlinClassSwiftModel, containingDeclaration: SwiftIrExtensibleDeclaration) {
+    private fun FileSpec.Builder.addNestedBridge(
+        classSwiftModel: KotlinClassSwiftModel,
+        containingDeclaration: SwiftIrExtensibleDeclaration,
+    ) {
         addExtension(
             ExtensionSpec.builder(containingDeclaration.internalName.toSwiftPoetName())
                 .addType(classSwiftModel.generateBridgingEnum())

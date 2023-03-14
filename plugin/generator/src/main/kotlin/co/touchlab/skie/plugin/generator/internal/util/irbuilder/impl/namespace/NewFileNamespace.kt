@@ -4,9 +4,9 @@ package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
+import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.plugin.reflection.reflectors.ModuleDescriptorImplReflector
-import co.touchlab.skie.plugin.reflection.reflectedBy
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor

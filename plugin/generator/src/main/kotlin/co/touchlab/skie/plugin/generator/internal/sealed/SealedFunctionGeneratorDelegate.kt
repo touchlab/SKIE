@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
+import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
@@ -13,7 +13,7 @@ import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
 
 internal class SealedFunctionGeneratorDelegate(
-    override val configuration: Configuration,
+    override val skieContext: SkieContext,
 ) : SealedGeneratorExtensionContainer, SwiftPoetExtensionContainer {
 
     fun generate(swiftModel: KotlinClassSwiftModel, enumType: TypeName, fileBuilder: FileSpec.Builder) {

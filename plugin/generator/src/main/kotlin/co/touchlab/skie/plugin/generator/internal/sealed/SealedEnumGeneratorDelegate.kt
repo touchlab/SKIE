@@ -1,9 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.SwiftFqName
-import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.Modifier
@@ -11,7 +10,7 @@ import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
 
 internal class SealedEnumGeneratorDelegate(
-    override val configuration: Configuration,
+    override val skieContext: SkieContext,
 ) : SealedGeneratorExtensionContainer {
 
     private val enumName = "Enum"

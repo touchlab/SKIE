@@ -67,7 +67,6 @@ class CompilerArgumentsProvider(
 
             libraries = dependencies.toTypedArray()
             exportedLibraries = exportedDependencies.toTypedArray()
-            overrideKonanProperties = (overrideKonanProperties ?: emptyArray()) + "osVersionMin.ios_arm64=13"
 
             target = this@CompilerArgumentsProvider.target?.kotlinName
 

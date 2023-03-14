@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.DefaultArgumentInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
@@ -17,9 +16,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.declaresOrInheritsDefaultValue
 
 internal abstract class BaseDefaultArgumentGeneratorDelegate(
-    protected val skieContext: SkieContext,
+    override val skieContext: SkieContext,
     protected val declarationBuilder: DeclarationBuilder,
-    override val configuration: Configuration,
 ) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
 
     protected val uniqueNameSubstring = "__Skie_DefaultArguments__"

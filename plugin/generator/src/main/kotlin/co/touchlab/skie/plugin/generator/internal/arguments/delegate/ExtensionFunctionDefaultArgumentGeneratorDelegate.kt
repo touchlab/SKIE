@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
@@ -12,13 +11,11 @@ internal class ExtensionFunctionDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
     descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
-    configuration: Configuration,
     sharedCounter: SharedCounter,
 ) : BaseFunctionDefaultArgumentGeneratorDelegate(
     skieContext = skieContext,
     descriptorProvider = descriptorProvider,
     declarationBuilder = declarationBuilder,
-    configuration = configuration,
     sharedCounter = sharedCounter
 ) {
 

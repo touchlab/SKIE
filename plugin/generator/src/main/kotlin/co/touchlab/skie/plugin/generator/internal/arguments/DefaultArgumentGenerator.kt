@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.arguments
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ClassMethodsDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.plugin.generator.internal.arguments.delegate.ConstructorsDefaultArgumentGeneratorDelegate
@@ -15,7 +14,6 @@ internal class DefaultArgumentGenerator(
     descriptorProvider: NativeDescriptorProvider,
     skieContext: SkieContext,
     declarationBuilder: DeclarationBuilder,
-    configuration: Configuration,
 ) : SkieCompilationPhase {
 
     override val isActive: Boolean = true
@@ -27,28 +25,24 @@ internal class DefaultArgumentGenerator(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-            configuration = configuration,
             sharedCounter = sharedCounter,
         ),
         ConstructorsDefaultArgumentGeneratorDelegate(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-            configuration = configuration,
             sharedCounter = sharedCounter
         ),
         TopLevelFunctionDefaultArgumentGeneratorDelegate(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-            configuration = configuration,
             sharedCounter = sharedCounter
         ),
         ExtensionFunctionDefaultArgumentGeneratorDelegate(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-            configuration = configuration,
             sharedCounter = sharedCounter
         ),
     )

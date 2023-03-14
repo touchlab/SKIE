@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.`typealias`
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
@@ -16,12 +15,11 @@ import io.outfoxx.swiftpoet.TypeSpec
 internal class TypeAliasGenerator(
     private val skieContext: SkieContext,
     private val descriptorProvider: DescriptorProvider,
-    configuration: Configuration,
 ) : SkieCompilationPhase {
 
     override val isActive: Boolean = true
 
-    private val areTypeAliasesExported = SkieFeature.FqNames in configuration.enabledFeatures
+    private val areTypeAliasesExported = SkieFeature.FqNames in skieContext.configuration.enabledFeatures
 
     private val baseTypeAliasContainerName = "Skie"
 

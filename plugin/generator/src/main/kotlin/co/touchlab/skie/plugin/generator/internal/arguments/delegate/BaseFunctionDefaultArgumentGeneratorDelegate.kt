@@ -2,7 +2,6 @@
 
 package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
@@ -33,9 +32,8 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
     private val descriptorProvider: NativeDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
-    configuration: Configuration,
     private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder, configuration) {
+) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder) {
 
     override fun generate() {
         descriptorProvider.allSupportedFunctions()

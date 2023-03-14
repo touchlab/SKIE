@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
@@ -10,6 +11,7 @@ object ConfigurationKeys {
     val swiftSourceFiles = CompilerConfigurationKey<List<File>>("Swift source files")
     val generatedSwiftDir = CompilerConfigurationKey<File>("generated Swift directory")
     val disableWildcardExport = CompilerConfigurationKey<Boolean>("disable wildcard export")
+    val skieConfiguration = CompilerConfigurationKey<Configuration>("SKIE configuration")
 
     object Debug {
         val infoDirectory = CompilerConfigurationKey<DebugInfoDirectory>("Directory with logs and other debug outputs")

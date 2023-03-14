@@ -128,7 +128,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         )
 
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.swiftGenConfigPath.subpluginOption(createSwiftGenConfigTask.get().configFile)
+                            SkiePlugin.id, SkiePlugin.Options.skieConfigurationPath.subpluginOption(createSwiftGenConfigTask.get().configFile)
                         )
 
                         linkTask.compilerPluginOptions.addPluginArgument(
@@ -169,7 +169,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             .filter { it.konanTarget.family.isAppleFamily }
 
     private fun KotlinNativeTarget.registerRuntime(skieExtension: SkieExtension) {
-        if (!skieExtension.features.suspendInterop.get()) {
+        if (!skieExtension.features.coroutinesInterop.get()) {
             return
         }
 

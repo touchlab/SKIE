@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
@@ -10,13 +9,12 @@ import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 internal class SealedInteropGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
-    configuration: Configuration,
-) : BaseGenerator(skieContext, namespaceProvider, configuration), SealedGeneratorExtensionContainer {
+) : BaseGenerator(skieContext, namespaceProvider), SealedGeneratorExtensionContainer {
 
     override val isActive: Boolean = true
 
-    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(configuration)
-    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(configuration)
+    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(skieContext)
+    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(skieContext)
 
     override fun runObjcPhase() {
         module.configure {

@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
-import co.touchlab.skie.plugin.generator.ConfigurationKeys as SwiftGenConfigurationKeys
 
 class SwiftLinkCommandLineProcessor : CommandLineProcessor {
 
@@ -18,7 +17,7 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         Options.swiftSourceFile,
         Options.generatedSwiftDir,
         Options.disableWildcardExport,
-        Options.swiftGenConfigPath,
+        Options.skieConfigurationPath,
         Options.Debug.infoDirectory,
         Options.Debug.dumpSwiftApiAt,
     )
@@ -41,11 +40,11 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
                 configuration.putIfNotNull(ConfigurationKeys.disableWildcardExport, Options.disableWildcardExport.deserialize(value))
             }
 
-            Options.swiftGenConfigPath -> {
-                val config = Options.swiftGenConfigPath.deserialize(value).readText()
-                val swiftGenConfiguration = Configuration.deserialize(config)
+            Options.skieConfigurationPath -> {
+                val config = Options.skieConfigurationPath.deserialize(value).readText()
+                val skieConfiguration = Configuration.deserialize(config)
 
-                configuration.put(SwiftGenConfigurationKeys.swiftGenConfiguration, swiftGenConfiguration)
+                configuration.put(ConfigurationKeys.skieConfiguration, skieConfiguration)
             }
 
             Options.Debug.infoDirectory -> {

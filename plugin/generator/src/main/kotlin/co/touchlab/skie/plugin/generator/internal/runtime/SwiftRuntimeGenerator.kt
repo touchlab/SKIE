@@ -1,18 +1,14 @@
 package co.touchlab.skie.plugin.generator.internal.runtime
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class SwiftRuntimeGenerator(
     private val skieContext: SkieContext,
-    configuration: Configuration,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = SkieFeature.SwiftRuntime in configuration.enabledFeatures
-        // TODO change to per package filter
-        && SkieFeature.SuspendInterop in configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieContext.configuration.enabledFeatures
 
     override fun runObjcPhase() {
         getSwiftRuntimeFiles().forEach {

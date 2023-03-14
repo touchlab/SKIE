@@ -1,16 +1,13 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.type.SwiftFqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
-import io.outfoxx.swiftpoet.DeclaredTypeName
 
 internal abstract class BaseGenerator(
-    private val skieContext: SkieContext,
+    override val skieContext: SkieContext,
     private val namespaceProvider: NamespaceProvider,
-    override val configuration: Configuration,
 ) : SkieCompilationPhase, ConfigurationContainer, SwiftPoetExtensionContainer {
 
     protected val module: SkieModule
