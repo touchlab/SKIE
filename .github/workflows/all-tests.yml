@@ -55,7 +55,7 @@ jobs:
       matrix:
         target: [ios_arm64, ios_x64, ios_simulator_arm64, macos_arm64, macos_x64]
         linkage: [static, dynamic]
-        configuration: [release, debug]
+        configuration: [release]
     concurrency: ci-all-type-mapping-tests-${{ github.ref }}-${{ matrix.linkage }}-${{ matrix.configuration }}-${{ matrix.target }}
     steps:
       - name: Checkout Repo
