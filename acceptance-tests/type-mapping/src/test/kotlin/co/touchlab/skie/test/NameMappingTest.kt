@@ -45,6 +45,7 @@ class NameMappingTest {
         val compilerArgumentsProvider = CompilerArgumentsProvider(
             dependencies = BuildConfig.DEPENDENCIES.toList(),
             exportedDependencies = BuildConfig.EXPORTED_DEPENDENCIES.toList(),
+            buildConfiguration = CompilerArgumentsProvider.EnvDefaults.buildConfiguration ?: CompilerArgumentsProvider.BuildConfiguration.Release,
         )
 
         val splitTypes = TestedType.ALL.sortedBy { it.safeName }.chunked(2000)
