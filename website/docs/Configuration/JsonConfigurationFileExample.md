@@ -12,7 +12,7 @@ SKIE can also be configured using JSON files which can then be imported in Gradl
 {
     "enabledFeatures": {
         "features": [
-            "SuspendInterop"
+            "CoroutinesInterop"
         ]
     },
     "groups": [

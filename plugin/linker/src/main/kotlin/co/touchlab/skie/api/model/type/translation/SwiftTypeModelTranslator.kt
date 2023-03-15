@@ -10,6 +10,9 @@ import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.NativeTypeBridge
 import co.touchlab.skie.plugin.api.model.type.translation.ObjCValueType
+import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
+import co.touchlab.skie.plugin.api.sir.declaration.isHashable
 import co.touchlab.skie.plugin.api.sir.type.ObjcProtocolSirType
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
@@ -27,9 +30,6 @@ import co.touchlab.skie.plugin.api.sir.type.SwiftPrimitiveSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftProtocolSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftReferenceSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftVoidSirType
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.isHashable
 import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
 import org.jetbrains.kotlin.backend.konan.isInlined
@@ -111,7 +111,7 @@ class SwiftTypeTranslator(
                 if (!returnBridge.successMayBeZero) {
                     check(
                         successReturnType is SwiftNonNullReferenceSirType
-                            || (successReturnType is SwiftPointerSirType && !successReturnType.nullable)
+                            || (successReturnType is SwiftPointerSirType && !successReturnType.nullable),
                     ) {
                         "Unexpected return type: $successReturnType in $method"
                     }
@@ -144,7 +144,7 @@ class SwiftTypeTranslator(
         if (flowMappingStrategy == FlowMappingStrategy.Full) {
             val flowMapper = FlowTypeMappers.getMapperOrNull(kotlinType)
             if (flowMapper != null) {
-                return flowMapper.mapType(kotlinType, this, swiftExportScope)
+                return flowMapper.mapType(kotlinType, this, swiftExportScope, flowMappingStrategy)
             }
         }
 
@@ -169,7 +169,7 @@ class SwiftTypeTranslator(
 
             problemCollector.reportWarning(
                 "Exposed type '$kotlinType' is '$firstType' and '$secondType' at the same time. " +
-                    "This most likely wouldn't work as expected."
+                    "This most likely wouldn't work as expected.",
             )
         }
 
@@ -195,19 +195,25 @@ class SwiftTypeTranslator(
                         if (genericTypeUsage != null) {
                             return genericTypeUsage
                         } else if (hasTypeParameterRecursiveBounds(typeParameterDescriptor)) {
-                            val erasedType = intersectWrappedTypes(kotlinType.immediateSupertypes().map {
-                                /* The commented out code below keeps more type information, but because that information is dropped by
-                                    a probably missing functionallity in the Kotlin compiler, we have to erase it all to a star projection anyway. */
-                                it.replaceArgumentsWithStarProjections()
-                                // it.replace(newArguments = it.constructor.parameters.zip(it.arguments) { parameter, argument ->
-                                //     if (argument.type.constructor == kotlinType.constructor) {
-                                //         StarProjectionImpl(parameter)
-                                //     } else {
-                                //         argument
-                                //     }
-                                // })
-                            })
-                            return mapReferenceTypeIgnoringNullability(erasedType, swiftExportScope, flowMappingStrategy.forGenerics())
+                            val erasedType = intersectWrappedTypes(
+                                kotlinType.immediateSupertypes().map {
+                                    /* The commented out code below keeps more type information, but because that information is dropped by
+                                        a probably missing functionallity in the Kotlin compiler, we have to erase it all to a star projection anyway. */
+                                    it.replaceArgumentsWithStarProjections()
+                                    // it.replace(newArguments = it.constructor.parameters.zip(it.arguments) { parameter, argument ->
+                                    //     if (argument.type.constructor == kotlinType.constructor) {
+                                    //         StarProjectionImpl(parameter)
+                                    //     } else {
+                                    //         argument
+                                    //     }
+                                    // })
+                                },
+                            )
+                            return mapReferenceTypeIgnoringNullability(
+                                erasedType,
+                                swiftExportScope,
+                                flowMappingStrategy.forTypeArgumentsOf(kotlinType),
+                            )
                         }
                     }
                 }
@@ -251,7 +257,11 @@ class SwiftTypeTranslator(
                         if (typeProjection.isStarProjection) {
                             idType(typeParamScope)
                         } else {
-                            mapReferenceTypeIgnoringNullability(typeProjection.type, typeParamScope, flowMappingStrategy.forGenerics())
+                            mapReferenceTypeIgnoringNullability(
+                                typeProjection.type,
+                                typeParamScope,
+                                flowMappingStrategy.forTypeArgumentsOf(kotlinType),
+                            )
                         }
                     }
                 },
@@ -342,14 +352,14 @@ class SwiftTypeTranslator(
                 mapReferenceType(
                     functionType.getReturnTypeFromFunctionType(),
                     swiftExportScope.removingFlags(SwiftExportScope.Flags.Escaping),
-                    flowMappingStrategy.forGenerics(),
+                    flowMappingStrategy.forTypeArgumentsOf(functionType),
                 )
             },
             parameterTypes.map {
                 mapReferenceType(
                     it,
                     swiftExportScope.addingFlags(SwiftExportScope.Flags.Escaping),
-                    flowMappingStrategy.forGenerics(),
+                    flowMappingStrategy.forTypeArgumentsOf(functionType),
                 )
             },
             isEscaping = swiftExportScope.hasFlag(SwiftExportScope.Flags.Escaping) && !functionType.binaryRepresentationIsNullable(),

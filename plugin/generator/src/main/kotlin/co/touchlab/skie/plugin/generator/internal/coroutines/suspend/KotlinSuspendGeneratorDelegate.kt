@@ -94,7 +94,7 @@ internal class KotlinSuspendGeneratorDelegate(
             )
 
             module.configure {
-                dispatchReceiverParameter.swiftModel.flowMappingStrategy = FlowMappingStrategy.GenericsOnly
+                dispatchReceiverParameter.swiftModel.flowMappingStrategy = FlowMappingStrategy.TypeArgumentsOnly
             }
 
             this.add(dispatchReceiverParameter)
@@ -125,7 +125,7 @@ internal class KotlinSuspendGeneratorDelegate(
                 originalFunctionDescriptor.dispatchReceiverParameter == null
 
             if (isExtensionReceiverUsedAsSwiftReceiver) {
-                this.swiftModel.flowMappingStrategy = FlowMappingStrategy.GenericsOnly
+                this.swiftModel.flowMappingStrategy = FlowMappingStrategy.TypeArgumentsOnly
             }
         }
     }

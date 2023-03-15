@@ -83,8 +83,8 @@ class ObjCTypeProvider(
                 returnType = ObjCVoidType,
                 parameterTypes = listOfNotNull(
                     resultType,
-                    ObjCNullableReferenceType(ObjCClassType("NSError"))
-                )
+                    ObjCNullableReferenceType(ObjCClassType("NSError")),
+                ),
             )
         }
     }
@@ -136,7 +136,7 @@ class ObjCTypeProvider(
             if (!returnBridge.successMayBeZero) {
                 check(
                     successReturnType is ObjCNonNullReferenceType
-                        || (successReturnType is ObjCPointerType && !successReturnType.nullable)
+                        || (successReturnType is ObjCPointerType && !successReturnType.nullable),
                 ) {
                     "Unexpected return type: $successReturnType in $method"
                 }
@@ -161,34 +161,38 @@ class ObjCTypeProvider(
         return reflectedTranslator.mapType.invoke(substitutedType, typeBridge, objCExportScope)
     }
 
-    private fun KotlinType.substituteFlows(flowMappingStrategy: FlowMappingStrategy): KotlinType =
-        when (flowMappingStrategy) {
+    private fun KotlinType.substituteFlows(flowMappingStrategy: FlowMappingStrategy): KotlinType {
+        val flowMappingStrategyForTypeArguments = flowMappingStrategy.forTypeArgumentsOf(this)
+
+        return when (flowMappingStrategy) {
             FlowMappingStrategy.Full -> {
                 val supportedFlow = SupportedFlow.from(this)
 
-                supportedFlow?.createType(this) ?: this.withSubstitutedArgumentsForFlow()
+                supportedFlow?.createType(this, flowMappingStrategyForTypeArguments)
+                    ?: this.withSubstitutedArgumentsForFlow(flowMappingStrategyForTypeArguments)
             }
-            FlowMappingStrategy.GenericsOnly -> this.withSubstitutedArgumentsForFlow()
+            FlowMappingStrategy.TypeArgumentsOnly -> this.withSubstitutedArgumentsForFlow(flowMappingStrategyForTypeArguments)
             FlowMappingStrategy.None -> this
         }
+    }
 
-    private fun SupportedFlow.createType(originalType: KotlinType): KotlinType {
-        val substitutedArguments = originalType.arguments.map { it.substituteFlows() }
+    private fun SupportedFlow.createType(originalType: KotlinType, flowMappingStrategyForTypeArguments: FlowMappingStrategy): KotlinType {
+        val substitutedArguments = originalType.arguments.map { it.substituteFlows(flowMappingStrategyForTypeArguments) }
 
         val hasNullableTypeArgument = originalType.arguments.any { it.type.isNullable() }
         val flowVariant = if (hasNullableTypeArgument) this.optionalVariant else this.requiredVariant
-        val substitute = with (swiftModelScope) { flowVariant.kotlinFlowModel }.classDescriptor.defaultType
+        val substitute = with(swiftModelScope) { flowVariant.kotlinFlowModel }.classDescriptor.defaultType
 
         return KotlinTypeFactory.simpleType(substitute, arguments = substitutedArguments).makeNullableAsSpecified(originalType.isNullable())
     }
 
-    private fun KotlinType.withSubstitutedArgumentsForFlow(): KotlinType =
-        replaceArguments { it.substituteFlows() } as KotlinType
+    private fun KotlinType.withSubstitutedArgumentsForFlow(flowMappingStrategy: FlowMappingStrategy): KotlinType =
+        replaceArguments { it.substituteFlows(flowMappingStrategy) } as KotlinType
 
-    private fun TypeArgumentMarker.substituteFlows(): TypeProjection =
+    private fun TypeArgumentMarker.substituteFlows(flowMappingStrategy: FlowMappingStrategy): TypeProjection =
         when (this) {
             is TypeProjectionImpl -> {
-                val substitutedType = type.substituteFlows(FlowMappingStrategy.Full)
+                val substitutedType = type.substituteFlows(flowMappingStrategy)
 
                 if (this.type != substitutedType) TypeProjectionImpl(projectionKind, substitutedType) else this
             }

@@ -99,7 +99,6 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         fun from(classDescriptor: ClassDescriptor): SupportedFlow? {
             val classFqName = classDescriptor.fqNameSafe.asString()
-            classDescriptor.typeConstructor
 
             return values().firstOrNull { it.coroutinesFlowFqName == classFqName }
         }

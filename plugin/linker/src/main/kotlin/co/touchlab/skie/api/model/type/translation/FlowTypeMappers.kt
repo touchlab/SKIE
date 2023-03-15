@@ -26,11 +26,12 @@ object FlowTypeMappers {
             type: KotlinType,
             translator: SwiftTypeTranslator,
             swiftExportScope: SwiftExportScope,
+            flowMappingStrategy: FlowMappingStrategy,
         ): SwiftNonNullReferenceSirType {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> {
                     val typeArguments = type.arguments.map {
-                        translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope, FlowMappingStrategy.Full)
+                        translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope, flowMappingStrategy.forTypeArgumentsOf(type))
                     }
                     val hasNullableTypeArgument = type.arguments.any { it.type.isNullable() }
                     val flowVariant = if (hasNullableTypeArgument) supportedFlow.optionalVariant else supportedFlow.requiredVariant
@@ -50,7 +51,7 @@ object FlowTypeMappers {
                     translator.mapReferenceTypeIgnoringNullabilitySkippingPredefined(
                         skieFlowType,
                         swiftExportScope,
-                        FlowMappingStrategy.Full,
+                        flowMappingStrategy.forTypeArgumentsOf(type),
                     )
                 }
             }

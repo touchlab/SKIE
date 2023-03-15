@@ -6,11 +6,11 @@ import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyObjectSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnySirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
 import org.jetbrains.kotlin.backend.konan.objcexport.NSNumberKind
 import org.jetbrains.kotlin.backend.konan.objcexport.isMappedFunctionClass
@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
-
 
 object CustomTypeMappers {
 
@@ -92,7 +91,7 @@ object CustomTypeMappers {
         "kotlin.collections.Collection",
         "kotlin.collections.Iterable",
         "kotlin.collections.MutableCollection",
-        "kotlin.collections.MutableIterable"
+        "kotlin.collections.MutableIterable",
     ).map { ClassId.topLevel(FqName(it)) }.toSet()
 
     private object StringMapper : CustomTypeMapper {
@@ -110,7 +109,7 @@ object CustomTypeMappers {
                 when {
                     swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> BuiltinDeclarations.Foundation.NSString
                     else -> BuiltinDeclarations.Swift.String
-                }
+                },
             )
         }
     }
@@ -136,7 +135,11 @@ object CustomTypeMappers {
                             // Kotlin `null` keys and values are represented as `NSNull` singleton.
                             SwiftAnySirType
                         } else {
-                            translator.mapReferenceTypeIgnoringNullability(argument, swiftExportScope, flowMappingStrategy.forGenerics())
+                            translator.mapReferenceTypeIgnoringNullability(
+                                argument,
+                                swiftExportScope,
+                                flowMappingStrategy.forTypeArgumentsOf(mappedSuperType),
+                            )
                         }
                     }
 
@@ -169,7 +172,7 @@ object CustomTypeMappers {
                             translator.mapReferenceTypeIgnoringNullability(
                                 argument,
                                 swiftExportScope.addingFlags(SwiftExportScope.Flags.Hashable),
-                                flowMappingStrategy.forGenerics(),
+                                flowMappingStrategy.forTypeArgumentsOf(mappedSuperType),
                             )
                         }
                     }
@@ -210,7 +213,12 @@ object CustomTypeMappers {
                             } else {
                                 swiftExportScope
                             }
-                            translator.mapReferenceTypeIgnoringNullability(argument, argumentScope, flowMappingStrategy.forGenerics())
+
+                            translator.mapReferenceTypeIgnoringNullability(
+                                argument,
+                                argumentScope,
+                                flowMappingStrategy.forTypeArgumentsOf(mappedSuperType),
+                            )
                         }
                     }
 
@@ -269,7 +277,7 @@ object CustomTypeMappers {
                     translator.mapReferenceTypeIgnoringNullability(
                         argument,
                         swiftExportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType),
-                        flowMappingStrategy.forGenerics(),
+                        flowMappingStrategy.forTypeArgumentsOf(mappedSuperType),
                     )
                 }
             }
@@ -294,7 +302,7 @@ object CustomTypeMappers {
                 mappedSuperType,
                 swiftExportScope,
                 returnsVoid = false,
-                flowMappingStrategy.forGenerics(),
+                flowMappingStrategy.forTypeArgumentsOf(mappedSuperType),
             )
         }
     }

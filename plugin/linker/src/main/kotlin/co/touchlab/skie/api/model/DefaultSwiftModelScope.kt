@@ -150,7 +150,7 @@ class DefaultSwiftModelScope(
             receiverClassDescriptor != null -> translator.mapReferenceType(
                 receiverClassDescriptor.defaultType,
                 SwiftExportScope(SwiftGenericExportScope.Class(receiverClassDescriptor, namer), SwiftExportScope.Flags.ReferenceType),
-                FlowMappingStrategy.GenericsOnly,
+                FlowMappingStrategy.TypeArgumentsOnly,
             )
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
             containingDeclaration is PackageFragmentDescriptor -> translator.mapFileType(this.findSourceFile())
