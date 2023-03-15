@@ -5,18 +5,20 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.plugin.api.model.isRemoved
-import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
+import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
+import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
+import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
@@ -166,6 +168,8 @@ internal class SwiftSuspendGeneratorDelegate(
             this.bridgedParameters.forEachIndexed { index, parameter ->
                 if (isFromGenericClass) {
                     val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.toSwiftPoetUsage()
+                        // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
+                        .removingEscapingAttribute()
 
                     arguments.add(
                         listOfNotNull(
@@ -200,4 +204,11 @@ internal class SwiftSuspendGeneratorDelegate(
         val asyncOriginalFunction: KotlinFunctionSwiftModel,
         val kotlinBridgingFunction: KotlinFunctionSwiftModel,
     )
+
+    private fun TypeName.removingEscapingAttribute(): TypeName {
+        return when (this) {
+            is FunctionTypeName -> this.copy(attributes = this.attributes - AttributeSpec.ESCAPING)
+            else -> this
+        }
+    }
 }

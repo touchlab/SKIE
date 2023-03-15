@@ -14,10 +14,6 @@ interface KotlinValueParameterSwiftModel {
 
     val origin: Origin
 
-    // val original: KotlinValueParameterSwiftModel
-
-    // val isChanged: Boolean
-
     val argumentLabel: String
 
     val parameterName: String
