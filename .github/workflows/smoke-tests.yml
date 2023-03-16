@@ -7,6 +7,38 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      linkage:
+        type: choice
+        options:
+          - static
+          - dynamic
+        required: true
+        default: static
+        description:
+          'The linkage mode to use for the tests. "static" will produce static frameworks, "dynamic" will produce dynamic frameworks.'
+      configuration:
+        type: choice
+        options:
+          - release
+          - debug
+        required: true
+        default: release
+        description:
+          'The configuration to use for the tests. "release" will produce release builds, "debug" will produce debug builds (and skip type mapping tests for now).'
+      target:
+        type: choice
+        options:
+          - ios_arm64
+          - ios_x64
+          - ios_simulator_arm64
+          - macos_arm64
+          - macos_x64
+        required: true
+        default: ios_arm64
+        description:
+          'The target to use for the type mapping tests.'
 
 permissions:
   contents: read
@@ -31,6 +63,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:test'
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()
@@ -43,6 +78,7 @@ jobs:
     name: Type Mapping Tests
     needs: [acceptance-tests]
     runs-on: self-hosted
+    if: ${{ inputs.configuration != 'debug' }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -55,6 +91,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:type-mapping:test'
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_TARGET: ${{ inputs.target }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()
@@ -79,6 +119,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:external-libraries:test'
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()
