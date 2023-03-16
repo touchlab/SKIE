@@ -60,6 +60,7 @@ interface SwiftModelScope {
     fun CallableMemberDescriptor.receiverType(): SirType
 
     fun PropertyDescriptor.propertyType(
+        baseDescriptor: PropertyDescriptor,
         genericExportScope: SwiftGenericExportScope,
         flowMappingStrategy: FlowMappingStrategy,
     ): SirType

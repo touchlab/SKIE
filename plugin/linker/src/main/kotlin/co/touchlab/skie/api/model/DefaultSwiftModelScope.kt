@@ -159,10 +159,11 @@ class DefaultSwiftModelScope(
     }
 
     override fun PropertyDescriptor.propertyType(
+        baseDescriptor: PropertyDescriptor,
         genericExportScope: SwiftGenericExportScope,
         flowMappingStrategy: FlowMappingStrategy,
     ): SirType {
-        val getterBridge = bridgeProvider.bridgeMethod(getter!!)
+        val getterBridge = bridgeProvider.bridgeMethod(baseDescriptor.getter!!)
         val exportScope = SwiftExportScope(genericExportScope)
         return translator.mapReturnType(getterBridge.returnBridge, getter!!, exportScope, flowMappingStrategy)
     }

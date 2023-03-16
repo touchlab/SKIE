@@ -98,9 +98,9 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val returnType: SirType
         get() = with(swiftModelScope) {
-            core.descriptor.returnType(
+            descriptor.returnType(
                 owner.swiftGenericExportScope,
-                core.getMethodBridge(descriptor).returnBridge,
+                core.getMethodBridge(core.descriptor).returnBridge,
                 returnTypeFlowMappingStrategy,
             )
         }

@@ -66,7 +66,7 @@ class ActualKotlinRegularPropertySwiftModel(
 
     override val type: SirType
         get() = with(swiftModelScope) {
-            core.descriptor.propertyType(owner.swiftGenericExportScope, flowMappingStrategy)
+            descriptor.propertyType(core.descriptor, owner.swiftGenericExportScope, flowMappingStrategy)
         }
 
     override var flowMappingStrategy: FlowMappingStrategy = FlowMappingStrategy.None
