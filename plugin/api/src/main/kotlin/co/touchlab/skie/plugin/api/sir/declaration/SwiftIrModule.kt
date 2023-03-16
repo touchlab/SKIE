@@ -4,5 +4,5 @@ class SwiftIrModule(
     val name: String,
 ): SwiftIrDeclaration {
 
-    override fun toString(): String = name
+    override fun toString(): String = "module: $name"
 }

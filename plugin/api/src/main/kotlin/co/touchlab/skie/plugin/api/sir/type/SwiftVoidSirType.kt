@@ -10,4 +10,5 @@ object SwiftVoidSirType: SirType {
 
     override fun toSwiftPoetUsage(): TypeName = DeclaredTypeName.qualifiedTypeName("Swift.Void")
 
+    override fun toString(): String = asString()
 }

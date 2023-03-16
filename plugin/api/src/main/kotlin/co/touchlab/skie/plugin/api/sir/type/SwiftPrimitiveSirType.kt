@@ -25,4 +25,6 @@ sealed class SwiftPrimitiveSirType(
     object Double : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Double)
 
     override fun toSwiftPoetUsage(): TypeName = declaration.internalName.toSwiftPoetName()
+
+    override fun toString(): String = asString()
 }

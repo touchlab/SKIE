@@ -9,4 +9,6 @@ object SwiftMetaClassSirType: SwiftNonNullReferenceSirType {
     override val declaration = BuiltinDeclarations.AnyClass
 
     override fun toSwiftPoetUsage(): TypeName = DeclaredTypeName.qualifiedTypeName("Swift.AnyClass")
+
+    override fun toString(): String = asString()
 }

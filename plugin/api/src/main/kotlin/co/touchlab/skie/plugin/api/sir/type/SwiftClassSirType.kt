@@ -17,4 +17,6 @@ data class SwiftClassSirType(
             declaration.internalName.toSwiftPoetName().parameterizedBy(typeArguments.map { it.toSwiftPoetUsage() })
         }
     }
+
+    override fun toString(): String = asString()
 }

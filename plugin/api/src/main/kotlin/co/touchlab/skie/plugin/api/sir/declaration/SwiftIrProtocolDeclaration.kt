@@ -24,6 +24,8 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
         override val internalName: SwiftFqName.Local.Nested
             get() = KotlinTypeSwiftModel.StableFqNameNamespace.nested(typealiasName)
 
+        override fun toString(): String = "local protocol: $publicName"
+
         sealed class KotlinInterface: Local() {
             protected abstract val kotlinModule: String
             protected abstract val kotlinFqName: FqName
@@ -60,18 +62,8 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
             override val publicName: SwiftFqName.Local.TopLevel,
             override val superTypes: List<SwiftIrExtensibleDeclaration>,
         ): Local() {
-            // override val publicName: SwiftFqName.Local.TopLevel = SwiftFqName.Local.TopLevel(swiftName)
-
             override val typealiasName: String = "swift__${publicName.asString("_")}"
         }
-
-        // override fun toInternalSwiftPoetName(): DeclaredTypeName {
-        //     return DeclaredTypeName.qualifiedLocalTypeName("${KotlinTypeSwiftModel.StableFqNameNamespace}${typealiasName}")
-        // }
-        //
-        // fun toOriginalSwiftPoetName(): DeclaredTypeName {
-        //     return DeclaredTypeName.qualifiedLocalTypeName(swiftName)
-        // }
     }
 
     class External(
@@ -83,5 +75,7 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
         override val publicName: SwiftFqName.External.TopLevel = SwiftFqName.External.TopLevel(module.name, name)
 
         override val internalName: SwiftFqName.External.TopLevel = publicName
+
+        override fun toString(): String = "external protocol: $publicName"
     }
 }

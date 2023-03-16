@@ -10,4 +10,6 @@ object ObjcProtocolSirType: SwiftNonNullReferenceSirType {
     override val declaration: SwiftIrDeclaration = BuiltinDeclarations.Protocol
 
     override fun toSwiftPoetUsage(): TypeName = DeclaredTypeName.qualifiedLocalTypeName("Protocol")
+
+    override fun toString(): String = asString()
 }

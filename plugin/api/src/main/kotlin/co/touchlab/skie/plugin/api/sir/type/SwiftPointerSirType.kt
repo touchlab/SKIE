@@ -15,4 +15,6 @@ data class SwiftPointerSirType(
     } else {
         declaration.internalName.toSwiftPoetName()
     }
+
+    override fun toString(): String = asString()
 }

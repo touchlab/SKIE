@@ -10,4 +10,6 @@ object SwiftInstanceSirType: SwiftNonNullReferenceSirType {
         get() = TODO()
 
     override fun toSwiftPoetUsage(): TypeName = SelfTypeName.INSTANCE
+
+    override fun toString(): String = asString()
 }

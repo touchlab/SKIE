@@ -8,4 +8,6 @@ object SwiftAnySirType: SwiftNonNullReferenceSirType {
     override val declaration = BuiltinDeclarations.Any
 
     override fun toSwiftPoetUsage(): TypeName = AnyTypeName.INSTANCE
+
+    override fun toString(): String = asString()
 }

@@ -10,4 +10,6 @@ object SwiftErrorSirType: SwiftNonNullReferenceSirType {
     override fun toSwiftPoetUsage(): TypeName {
         TODO("Not yet implemented")
     }
+
+    override fun toString(): String = asString()
 }

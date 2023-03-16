@@ -12,19 +12,18 @@ sealed interface SwiftIrTypeParameterDeclaration: SwiftIrDeclaration {
         bounds.map { TypeVariableName.Bound(it.internalName.toSwiftPoetName()) },
     )
 
-    // fun toSwiftPoetVariable(): TypeVariableName = TypeVariableName.typeVariable(
-    //     name,
-    //     bounds.map { TypeVariableName.Bound(it.toInternalSwiftPoetName()) },
-    // )
-
     class KotlinTypeParameter(
         val descriptor: TypeParameterDescriptor,
         override val name: String,
         override val bounds: List<SwiftIrExtensibleDeclaration>,
-    ): SwiftIrTypeParameterDeclaration
+    ): SwiftIrTypeParameterDeclaration {
+        override fun toString(): String = "type parameter: $name : ${bounds.joinToString("&")}>"
+    }
 
     class SwiftTypeParameter(
         override val name: String,
         override val bounds: List<SwiftIrExtensibleDeclaration>,
-    ): SwiftIrTypeParameterDeclaration
+    ): SwiftIrTypeParameterDeclaration {
+        override fun toString(): String = "type parameter: $name : ${bounds.joinToString("&")}>"
+    }
 }

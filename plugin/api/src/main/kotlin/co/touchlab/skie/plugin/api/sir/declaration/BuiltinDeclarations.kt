@@ -7,21 +7,21 @@ import org.jetbrains.kotlin.name.FqName
 object BuiltinDeclarations {
 
     object Any: SwiftIrDeclaration {
-
+        override fun toString(): String = "Any"
     }
 
     // TODO: This should be a typealias declaration to ()
     object Void: SwiftIrDeclaration {
-
+        override fun toString(): String = "Swift.Void"
     }
 
     // TODO: This should be a typealias declaration to AnyObject.Type
     object AnyClass: SwiftIrDeclaration {
-
+        override fun toString(): String = "Swift.AnyClass"
     }
 
     object Protocol: SwiftIrDeclaration {
-
+        override fun toString(): String = "Protocol"
     }
 
     object Swift {

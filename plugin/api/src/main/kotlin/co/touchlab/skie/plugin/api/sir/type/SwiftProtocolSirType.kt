@@ -7,4 +7,6 @@ data class SwiftProtocolSirType(
     override val declaration: SwiftIrProtocolDeclaration,
 ) : SwiftNonNullReferenceSirType {
     override fun toSwiftPoetUsage(): DeclaredTypeName = declaration.internalName.toSwiftPoetName()
+
+    override fun toString(): String = asString()
 }

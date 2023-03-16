@@ -27,6 +27,8 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
         override val internalName: SwiftFqName.Local
             get() = KotlinTypeSwiftModel.StableFqNameNamespace.nested(typealiasName)
 
+        override fun toString(): String = "local type: $publicName"
+
         sealed class KotlinClass: Local() {
             protected abstract val kotlinModule: String
             protected abstract val kotlinFqName: FqName
@@ -173,5 +175,7 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
         } ?: SwiftFqName.External.TopLevel(module.name, name)
 
         override val internalName: SwiftFqName.External = publicName
+
+        override fun toString(): String = "external type: $publicName"
     }
 }

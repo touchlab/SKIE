@@ -24,4 +24,6 @@ data class SwiftLambdaSirType(
             emptyList()
         }
     )
+
+    override fun toString(): String = asString()
 }

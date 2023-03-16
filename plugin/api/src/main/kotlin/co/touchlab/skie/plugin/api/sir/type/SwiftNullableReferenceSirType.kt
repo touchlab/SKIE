@@ -12,4 +12,6 @@ data class SwiftNullableReferenceSirType(
 
 
     override fun toSwiftPoetUsage(): TypeName = nonNullType.toSwiftPoetUsage().makeOptional()
+
+    override fun toString(): String = asString()
 }

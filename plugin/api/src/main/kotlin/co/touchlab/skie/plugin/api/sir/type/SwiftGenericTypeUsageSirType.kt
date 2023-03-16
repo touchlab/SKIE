@@ -9,4 +9,6 @@ data class SwiftGenericTypeUsageSirType(
 ) : SwiftNonNullReferenceSirType {
 
     override fun toSwiftPoetUsage(): TypeName = TypeVariableName(declaration.name)
+
+    override fun toString(): String = asString()
 }
