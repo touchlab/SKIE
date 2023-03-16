@@ -20,24 +20,47 @@ To see how to add SKIE to your project, check out the [Installation doc](/docs/I
 *Please note that SKIE is still under active development, has not been publicly released, and should not be used in any
 production project.*
 
-## Supported features
-
-### Coroutines Interop
+## Coroutines Interop
 
 While it's possible to use Kotlin Coroutines in KMM, the support is far from complete.
+Both `suspend` functions and `Flows` have some limitations that make their usage from Swift cumbersome.
 One of the main goals of SKIE is to change that.
 
-Currently, SKIE has support for `suspend` functions and support for `Flows` is underway.
+The interop utilizes Swift Async API which was added in Swift 5.5.
+SKIE automatically adjusts the min OS version of the produced Frameworks to ensure that the Swift Async API is available.
+As a result, with coroutines interop enabled you cannot target older OS versions - for example, anything older than iOS 13.
+If you need to target older OS versions, you must disable the interop as described below.
+
+### Enabling coroutines interop
+
+SKIE's coroutines interop is enabled by default.
+However, consider disabling it if you are not using coroutines in your exported code.
+Reason being is that, if enabled, SKIE adds dependency on `kotlinx-coroutines` and SKIE runtime library.
+And if those libraries are not needed, including them would (albeit slightly) increase binary size and compilation time.
+
+To disable the interop use the following Gradle configuration:
+
+```kotlin title=build.gradle.kts
+skie {
+    features {
+        coroutinesInterop.set(false)
+    }
+}
+```
+
+(You can learn more about the Gradle configuration [here](/docs/Configuration/Configuration.md)).
+
+### Suspend functions
 
 The problem with suspend functions is that ObjC has no such concept.
 Therefore, the Kotlin compiler exposes suspend functions as callbacks.
-This approach has the following problems:
+This approach has the following drawbacks:
 
 - It has an ugly syntax that leads to callback hell (which is what suspend functions were meant to solve in the first place).
 - Suspend function can be by default only called from Swift from the main thread (otherwise it results in a runtime crash).
-  - Kotlin 1.7.20 added a compiler flag that enables this feature.
-  - However, it only works with the regular (non `native-mt`) version of Coroutines.
-  - See [KT-51297](https://youtrack.jetbrains.com/issue/KT-51297/Native-allow-calling-Kotlin-suspend-functions-on-non-main-thread-from-Swift) for more information.
+  - Note: Kotlin 1.7.20 added a compiler flag that enables this feature.
+    However, it only works with the regular (non `native-mt`) version of Coroutines.
+    See [KT-51297](https://youtrack.jetbrains.com/issue/KT-51297/Native-allow-calling-Kotlin-suspend-functions-on-non-main-thread-from-Swift) for more information.
 - It's not possible to cancel execution of such function from Swift.
 
 The ugly syntax was already solved when Swift 5.5 added `async`/`await` with interop for legacy ObjC functions.
@@ -112,7 +135,182 @@ class B: A {
 
 But make sure to not call suspend functions by the prefixed name - use the generated wrapper instead. (Otherwise you would lose the benefits that SKIE brings.)
 
-### Fixing unnecessarily mangled function names
+### Flows
+
+Kotlin compiler does not have any specific support for Flows - they are treated as regular interfaces.
+There are two main problems with this approach:
+- Flows are exposed to Swift without generics (because they are interfaces and not classes).
+- There is no easy way to consume Flows directly from Swift.
+
+While it's technically possible to call the `collect` method from Swift, it's very verbose.
+The root cause is that passing `suspend` lambda functions to Kotlin code cannot be done using regular Swift lambdas.
+And even if this wasn't the case, it would still not be ideal, because the API wouldn't be intuitive to Swift developers.
+
+Swift has its own version of Flows called `AsyncSequence`.
+This API is very similar to Flows, however there are some important syntactical differences.
+For example, in Swift the `collect` method is implemented as a special case of the `for` statement:
+
+```kotlin
+flow.collect {
+    println(it)
+}
+```
+
+vs.
+
+```swift
+for await it in asyncSequence {
+    print(it)
+}
+```
+
+Also, Swift libraries frequently use `AsyncSequence` (and they can't know anything about `Flows`).
+Therefore, developers would have to constantly convert between these two types manually.
+
+SKIE solves these problems by automatically converting `Flow` to a class that implements `AsyncSequence`.
+Thanks to this conversion, you can use `Flow` with any function that expects `AsyncSequence` including Swift higher-order functions like `map(_:)` or `filter(_:)`.
+The conversion is transparent in most cases (with exceptions explained below), and looks like this:
+
+```kotlin
+class A {
+
+    fun flow(): Flow<Int> = flow(1, 2, 3)
+}
+```
+
+```swift
+// You can omit the explicit type
+let flow: SkieSwiftFlow<KotlinInt> = A().flow()
+
+for await it in flow {
+    // No type cast (`it as! KotlinInt`) is needed because the generic type is preserved.
+    let number: KotlinInt = it
+
+    print(number)
+}
+```
+
+Note: The above example showcased only function return types, but SKIE also supports properties and function parameters.
+
+Conversion from `AsyncSequence` to `Flow` is not yet supported.
+However, this direction is far less frequently needed for developing iOS applications with shared KMM code.
+
+Due to implementation reasons, it's not possible to automatically support all types of Flows.
+Each type must be explicitly implemented in SKIE (because it needs to be converted to its own class).
+There are multiple frequently used flow types in the `kotlinx-coroutines` library - those are all supported.
+However, custom types cannot be supported.
+Note: The determining factor (to decide if the conversion can happen automatically) is the declared type not the actual/runtime type of the passed object.
+
+Currently supported types are:
+- `Flow` -> `SkieSwiftFlow`
+- `SharedFlow` -> `SkieSwiftSharedFlow`
+- `MutableSharedFlow` -> `SkieSwiftMutableSharedFlow`
+- `StateFlow` -> `SkieSwiftStateFlow`
+- `MutableStateFlow` -> `SkieSwiftMutableStateFlow`
+
+Examples:
+
+```kotlin
+class CustomFlow<T> : Flow<T> { ... }
+
+fun a(): Flow<Int> = flowOf(1, 2, 3) // -> SkieSwiftFlow<Int>
+
+fun b(): Flow<Int> = CustomFlow<Int>() // -> SkieSwiftFlow<Int>
+
+fun c(): StateFlow<Int> = MutableStateFlow<Int>(1) // -> SkieSwiftStateFlow<Int>
+
+fun d(): CustomFlow<T> = CustomFlow<Int>() // -> CustomFlow<T> (which does not implement `AsyncSequence`)
+```
+
+All `SkieSwift*Flow` classes have implementations for all public methods from their corresponding interfaces.
+However, they do not directly implement those interfaces.
+The method signatures are in some cases changed, to better match Swift style.
+For example, you can set the value of MutableStateFlow like so: `mutableStateFlow.value = 1`
+(Without SKIE the `value` property setter is exposed as a method `setValue(_:)`.)
+
+All `SkieSwift*Flow` classes also have their `SkieSwiftOptional*Flow` counterparts.
+The only difference between them is whether the `Flow` elements are nullable or not.
+So for example: `Flow<Int>` is mapped to `SkieSwiftFlow<Int>`, while `Flow<Int?>` is mapped to `SkieSwiftOptionalFlow<Int>`.
+This distinction is necessary because of limitations in ObjC generics.
+
+There are also `SkieKotlin*Flow` variants of all previously mentioned `SkieSwift*Flow` classes (as well as their optional counterparts).
+These classes do implement the `Flow` interfaces, however they cannot implement the `AsyncSequence` protocol.
+Internally, these classes are used as a stepping stone between `*Flow` and `SkieSwift*Flow`.
+However, these Kotlin types are exposed to developers if the `Flow` occurs as a type argument.
+For example:
+
+```kotlin
+class Wrapper<T>(val value: T)
+
+fun wrappedFlow(): Wrapper<Flow<Int>> // -> Wrapper<SkieKotlinFlow<Int>>
+```
+
+All SKIE Flow types have conversion constructors.
+For example, you can convert:
+- `Flow` to `SkieKotlinFlow<T>` by `SkieKotlinFlow<Int>(flow)` (the generic type needs to be explicitly specified and is not checked even at runtime - make sure you are passing a compatible type)
+- `SkieKotlinFlow<T>` to `SkieSwiftFlow<T>` by `SkieKotlinFlow(skieKotlinFlow)` (it's not possible to directly convert between `Flow` and `SkieSwiftFlow`)
+- `SkieSwiftFlow<T>` to `SkieSwiftOptionalFlow<T>` by `SkieSwiftOptionalFlow(skieKotlinFlow)`
+- `SkieKotlinFlow<T>` to `Flow` does not have to be converted because `SkieKotlinFlow` implements `Flow`.
+
+`Skie*Flow` classes do not inherit from each other, unlike their corresponding interfaces.
+Therefore, if you need to use for example `SkieSwiftStateFlow` as `SkieSwiftFlow`, you need to convert the object using the conversion constructors.
+
+Warning: Avoid using `as!`, `as?` or `is` with `SkieKotlin*Flow` it may result in unpredictable behavior or a runtime crash.
+The only exception (when it is safe and might be required) is right after calling one of the `SkieKotlin*Flow` constructors.
+So for example, you can write `SkieKotlinFlow<KotlinInt>(swiftFlow) as! SkieKotlinFlow<KotlinNumber>` to change the generic argument (which is not possible with `SkieSwift*Flow`).
+However, you cannot safely do `KotlinA().flow() as! SkieKotlinFlow<KotlinInt>`.
+
+The reason is that in some situations, the target object is not of type `SkieKotlin*Flow` in runtime.
+SKIE cannot always modify the object runtime type, and in such situations it modifies only the compile-time type.
+If you try to force cast such object, you will get approximately this runtime error `Expected xyz but found Kotlin_kobjcc0`.
+
+You may run into this type of issue if you use a Swift generic container that internally uses force cast on the contained object, for example: `Swift.Array`.
+To avoid this issue SKIE does not translate `Flow` types used as type arguments of known problematic declarations.
+For example:
+- `List<Flow<*>>`
+- `Map<*, Flow<*>>`
+- `Flow<Flow<*>>`
+
+In such cases you can still use the conversion constructors: `listOfFlows.map { SkieSwiftFlow(SkieKotlinFlow<KotlinInt>($0)) }`
+
+Because `SkieSwift*Flow` are Swift classes, their type parameters don't have to conform to `AnyObject`.
+This fact allows us to better support ObjC types that are bridged to Swift types (by the Swift compiler).
+One such class is `NSString`, which is bridged to `String`.
+Usually `Kotlin.String` is exposed as `NSString` if it's used as type argument.
+With `SkieSwift*Flow` you can utilize the following syntax to avoid manual casting:
+
+```kotlin
+class A {
+
+    fun flow(): Flow<String> = flow("1", "2", "3")
+}
+```
+
+```swift
+// In this case the explicit type forces Swift to use String (by default the type would be infered to SkieSwiftFlow<NSString>)
+let flow: SkieSwiftFlow<String> = A().flow()
+
+for await it in flow {
+    // No type cast (`it as! String`) is needed because the generic type is preserved.
+    let number: String = it
+
+    print(number)
+}
+```
+
+Alternatively:
+
+```swift
+// In this case Swift infers correct type from the variable type
+for await it: String in A().flow() {
+    // No type cast (`it as! String`) is needed because the generic type is preserved.
+    let number: String = it
+
+    print(number)
+}
+```
+
+## Fixing unnecessarily mangled function names
 
 Kotlin, ObjC and Swift each have a different level of support for function overloading.
 Kotlin distinguishes overloads by their parameter types.
@@ -162,7 +360,7 @@ This is not an issue you would notice without using SKIE because the Kotlin comp
 Unfortunately, this workaround cannot be used by SKIE because it only works due to the Swift-ObjC interop.
 SKIE generates true Swift code, and therefore, SKIE has no option but to add these underscores.
 
-### Sealed classes/interfaces
+## Sealed classes/interfaces
 
 SKIE allows you to exhaustively switch on sealed Kotlin hierarchies from Swift. For example, consider the following Kotlin code:
 
@@ -241,7 +439,7 @@ case .Loading:
 }
 ```
 
-### Exhaustive enums
+## Exhaustive enums
 
 The Kotlin compiler (without SKIE) generates Kotlin enums as Objective-C classes (albeit with restricted subclassing). As a result, Swift code cannot leverage some of its language features in regards to enums (mainly exhaustive switching).
 
@@ -275,7 +473,7 @@ warning: default will never be executed
 default: print("Unknown")
 ```
 
-### Default arguments/parameters
+## Default arguments/parameters
 
 Default arguments (or parameters) are a feature in both [Kotlin](https://kotlinlang.org/docs/functions.html#default-arguments) and [Swift](https://docs.swift.org/swift-book/LanguageGuide/Functions.html#ID169) that allows caller functions to omit arguments when the missing arguments are provided by the called function. Unfortunately, Objective-C does not support default arguments in any way. Therefore, Swift must always specify all arguments when calling Kotlin functions.
 
@@ -308,7 +506,7 @@ SKIE generates additional Kotlin overloads, that are visible from Swift under th
 
 These overloads allow Swift to call `copy` method as if the default arguments were directly supported.
 
-#### Limitations
+### Limitations
 
 While this approach to default arguments is completely transparent from Swift, it has some drawbacks:
 

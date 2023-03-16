@@ -151,6 +151,50 @@ object DefaultArgumentInterop {
 }
 ```
 
+## Suspend functions
+
+```kotlin
+object SuspendInterop {
+
+    /**
+     * If true, the interop code is generated for the given suspend function.
+     */
+    object Enabled : ConfigurationKey.Boolean {
+
+        override val defaultValue: Boolean = true
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            when {
+                configurationTarget.hasAnnotation<SuspendInterop.Enabled>() -> true
+                configurationTarget.hasAnnotation<SuspendInterop.Disabled>() -> false
+                else -> null
+            }
+    }
+}
+```
+
+## Flows
+
+```kotlin
+object FlowInterop {
+
+    /**
+     * If true, the interop code is generated for the given flow.
+     */
+    object Enabled : ConfigurationKey.Boolean {
+
+        override val defaultValue: Boolean = true
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            when {
+                configurationTarget.hasAnnotation<FlowInterop.Enabled>() -> true
+                configurationTarget.hasAnnotation<FlowInterop.Disabled>() -> false
+                else -> null
+            }
+    }
+}
+```
+
 ## Experimental features
 
 ```kotlin

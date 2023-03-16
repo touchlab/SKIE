@@ -116,6 +116,36 @@ object DefaultArgumentInterop {
 }
 ```
 
+## Suspend functions
+
+```kotlin
+object SuspendInterop {
+
+    @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Enabled
+
+    @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Disabled
+}
+```
+
+## Flows
+
+```kotlin
+object FlowInterop {
+
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Enabled
+
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Disabled
+}
+```
+
 ## Experimental features
 
 ```kotlin
