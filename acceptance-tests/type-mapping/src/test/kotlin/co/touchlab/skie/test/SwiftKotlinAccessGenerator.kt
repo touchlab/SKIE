@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import io.outfoxx.swiftpoet.ANY_OBJECT
@@ -31,7 +32,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
     override fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
         super.afterPhase(phaseConfig, phaserState, context)
 
-        val descriptorProvider = context.descriptorProvider
+        val descriptorProvider = context.mutableDescriptorProvider
 
         val kotlinClass = descriptorProvider.exposedClasses.first {
             it.name.identifier == "KotlinFile"
