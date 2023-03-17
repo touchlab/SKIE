@@ -1,6 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
+import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.Namespace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -13,10 +15,11 @@ import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-internal abstract class BaseNamespace<D : DeclarationDescriptor>(private val descriptorProvider: DescriptorProvider) : Namespace<D> {
+internal abstract class BaseNamespace<D : DeclarationDescriptor>() : Namespace<D> {
 
     private val templates = mutableListOf<DeclarationTemplate<*>>()
 
+    context(DescriptorRegistrationScope)
     override fun addTemplate(declarationTemplate: DeclarationTemplate<*>, symbolTable: SymbolTable) {
         templates.add(declarationTemplate)
 
@@ -25,13 +28,15 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor>(private val des
         registerDescriptorProvider(declarationTemplate.descriptor)
     }
 
+    context(DescriptorRegistrationScope)
     private fun registerDescriptorProvider(declarationDescriptor: DeclarationDescriptor) {
         addDescriptorIntoDescriptorHierarchy(declarationDescriptor)
         addDescriptorIntoDescriptorProvider(declarationDescriptor)
     }
 
+    context(DescriptorRegistrationScope)
     private fun addDescriptorIntoDescriptorProvider(declarationDescriptor: DeclarationDescriptor) {
-        descriptorProvider.registerExposedDescriptor(declarationDescriptor)
+        registerExposedDescriptor(declarationDescriptor)
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)

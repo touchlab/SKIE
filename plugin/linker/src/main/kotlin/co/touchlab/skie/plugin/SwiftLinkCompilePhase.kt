@@ -8,8 +8,10 @@ import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.descriptorProvider
+import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.skieContext
+import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
@@ -52,6 +54,9 @@ class SwiftLinkCompilePhase(
             declarationRegistry = swiftIrDeclarationRegistry,
         )
         val builtinKotlinDeclarations = BuiltinDeclarations.Kotlin(namer)
+
+        finalizeDescriptorProvider()
+
         val translator = SwiftTypeTranslator(
             descriptorProvider = context.descriptorProvider,
             namer = namer,
@@ -109,6 +114,11 @@ class SwiftLinkCompilePhase(
         disableWildcardExportIfNeeded(framework)
 
         return swiftObjectPaths
+    }
+
+    private fun finalizeDescriptorProvider() {
+        val finalizedDescriptorProvider = context.mutableDescriptorProvider.preventFurtherMutations()
+        context.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
     }
 
     private fun compileSwift(

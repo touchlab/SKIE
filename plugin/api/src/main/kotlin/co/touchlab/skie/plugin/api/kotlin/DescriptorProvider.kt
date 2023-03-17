@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.api.kotlin
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
@@ -16,8 +15,6 @@ interface DescriptorProvider {
     val exposedCategoryMembers: Set<CallableMemberDescriptor>
 
     val exposedTopLevelMembers: Set<CallableMemberDescriptor>
-
-    fun registerExposedDescriptor(descriptor: DeclarationDescriptor)
 
     fun getFileModule(file: SourceFile): ModuleDescriptor
 

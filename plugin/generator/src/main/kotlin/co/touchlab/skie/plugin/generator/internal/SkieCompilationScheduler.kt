@@ -13,7 +13,7 @@ import co.touchlab.skie.plugin.generator.internal.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
 import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 internal class SkieCompilationScheduler(
     skieContext: SkieContext,
-    descriptorProvider: NativeDescriptorProvider,
+    descriptorProvider: NativeMutableDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     namespaceProvider: NamespaceProvider,
     reporter: Reporter,

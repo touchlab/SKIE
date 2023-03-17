@@ -4,7 +4,9 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
+import co.touchlab.skie.plugin.generator.internal.util.InternalDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
@@ -30,7 +32,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
 
 internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
-    private val descriptorProvider: NativeDescriptorProvider,
+    private val descriptorProvider: InternalDescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder) {

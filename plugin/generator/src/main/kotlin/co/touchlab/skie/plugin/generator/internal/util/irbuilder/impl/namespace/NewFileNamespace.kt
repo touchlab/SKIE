@@ -33,14 +33,12 @@ import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 internal class NewFileNamespace private constructor(
     private val sourceFile: SourceFile,
     private val context: Context,
-    descriptorProvider: DescriptorProvider,
-) : BaseNamespace<PackageFragmentDescriptor>(descriptorProvider) {
+) : BaseNamespace<PackageFragmentDescriptor>() {
 
     private constructor(
         fileName: String,
         context: Context,
-        descriptorProvider: DescriptorProvider,
-    ) : this(SourceFile { fileName }, context, descriptorProvider)
+    ) : this(SourceFile { fileName }, context)
 
     private val packageContent = mutableListOf<DeclarationDescriptor>()
 
@@ -86,7 +84,6 @@ internal class NewFileNamespace private constructor(
     class Factory(
         context: CommonBackendContext,
         mainIrModuleFragment: Lazy<IrModuleFragment>,
-        private val descriptorProvider: DescriptorProvider,
     ) {
 
         private val moduleDescriptor =
@@ -108,7 +105,7 @@ internal class NewFileNamespace private constructor(
         }
 
         fun create(name: String): NewFileNamespace {
-            val namespace = NewFileNamespace(name, namespaceContext, descriptorProvider)
+            val namespace = NewFileNamespace(name, namespaceContext)
 
             addPackageDescriptor(namespace.descriptor)
 

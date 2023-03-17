@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder
 
+import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
@@ -11,6 +12,7 @@ internal interface Namespace<D : DeclarationDescriptor> {
 
     val sourceElement: SourceElement
 
+    context(DescriptorRegistrationScope)
     fun addTemplate(declarationTemplate: DeclarationTemplate<*>, symbolTable: SymbolTable)
 
     fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable)

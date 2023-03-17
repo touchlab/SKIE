@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
@@ -23,7 +24,7 @@ import org.jetbrains.kotlin.types.KotlinType
 
 internal class FlowGenericArgumentStubGenerator(
     private val skieContext: SkieContext,
-    private val descriptorProvider: DescriptorProvider,
+    private val descriptorProvider: MutableDescriptorProvider,
     private val declarationBuilder: DeclarationBuilder,
 ) : SkieCompilationPhase {
 

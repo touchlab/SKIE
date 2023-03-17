@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal
 
 import co.touchlab.skie.plugin.api.DescriptorProviderKey
-import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
+import co.touchlab.skie.plugin.api.MutableDescriptorProviderKey
+import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import co.touchlab.skie.plugin.reflection.reflectors.ContextReflector
@@ -30,12 +30,12 @@ internal class SkieSymbolTablePhaseListener : PhaseListener {
     }
 
     override fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
-        val descriptorProvider = NativeDescriptorProvider(context)
+        val descriptorProvider = NativeMutableDescriptorProvider(context)
 
         val declarationBuilder = DeclarationBuilderImpl(context, descriptorProvider)
 
-        context.configuration.put(DescriptorProviderKey, descriptorProvider)
-        SkieCompilerConfigurationKey.DescriptorProvider.put(descriptorProvider, context.configuration)
+        context.configuration.put(MutableDescriptorProviderKey, descriptorProvider)
+        SkieCompilerConfigurationKey.MutableDescriptorProvider.put(descriptorProvider, context.configuration)
         SkieCompilerConfigurationKey.DeclarationBuilder.put(declarationBuilder, context.configuration)
     }
 }

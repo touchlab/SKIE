@@ -17,8 +17,7 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 
 internal class DeserializedClassNamespace(
     override val descriptor: DeserializedClassDescriptor,
-    descriptorProvider: DescriptorProvider,
-) : BaseDeserializedNamespace<ClassDescriptor>(descriptorProvider) {
+) : BaseDeserializedNamespace<ClassDescriptor>() {
 
     override val sourceElement: SourceElement = SourceElement { descriptor.findSourceFile() }
 

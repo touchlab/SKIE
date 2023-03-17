@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl
 
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationTemplate
@@ -41,20 +42,26 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 
 internal class DeclarationBuilderImpl(
     context: CommonBackendContext,
-    private val descriptorProvider: DescriptorProvider,
+    private val mutableDescriptorProvider: MutableDescriptorProvider,
 ) : DeclarationBuilder {
 
     private val symbolTable = context.reflectedBy<ContextReflector>().symbolTable
 
     private lateinit var mainIrModuleFragment: IrModuleFragment
 
-    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mainIrModuleFragment }, descriptorProvider)
+    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mainIrModuleFragment })
 
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
     private val originalPackageNamespacesByFile = mutableMapOf<SourceFile, DeserializedPackageNamespace>()
 
-    private val originalExposedFiles = descriptorProvider.exposedFiles.toSet()
+    private var originalExposedFiles: Set<SourceFile> = mutableDescriptorProvider.exposedFiles.toSet()
+
+    init {
+        mutableDescriptorProvider.onMutated {
+            originalExposedFiles = mutableDescriptorProvider.exposedFiles.toSet()
+        }
+    }
 
     private val allNamespaces: List<Namespace<*>>
         get() = listOf(
@@ -74,7 +81,7 @@ internal class DeclarationBuilderImpl(
                 "Only DeserializedClassDescriptor is currently supported. Was: $classDescriptor"
             }
 
-            DeserializedClassNamespace(classDescriptor, descriptorProvider)
+            DeserializedClassNamespace(classDescriptor)
         }
 
     override fun getPackageNamespace(existingMember: FunctionDescriptor): Namespace<PackageFragmentDescriptor> {
@@ -86,7 +93,7 @@ internal class DeclarationBuilderImpl(
         return when {
             sourceFile == null -> getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
             hasOriginalPackage -> originalPackageNamespacesByFile.getOrPut(sourceFile) {
-                DeserializedPackageNamespace(existingMember, descriptorProvider)
+                DeserializedPackageNamespace(existingMember)
             }
             else -> getCustomNamespace(sourceFile.nameOrError)
         }
@@ -120,7 +127,9 @@ internal class DeclarationBuilderImpl(
     ): D {
         val declarationTemplate = templateBuilder()
 
-        namespace.addTemplate(declarationTemplate, symbolTable)
+        mutableDescriptorProvider.mutate {
+            namespace.addTemplate(declarationTemplate, symbolTable)
+        }
 
         return declarationTemplate.descriptor
     }
@@ -146,7 +155,7 @@ internal class DeclarationBuilderImpl(
      * This fix registers these missing symbols manually.
      */
     private fun fixPrivateTypeParametersSymbolsFromOldKLibs() {
-        symbolTable.allExposedTypeParameters(descriptorProvider)
+        symbolTable.allExposedTypeParameters(mutableDescriptorProvider)
             .filter { it.symbol !is IrTypeParameterPublicSymbolImpl }
             .forEach {
                 symbolTable.declarePrivateTypeParameterAsPublic(it)

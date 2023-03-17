@@ -2,7 +2,6 @@
 
 package co.touchlab.skie.plugin.generator.internal.util
 
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
@@ -24,7 +23,7 @@ import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
-internal class NativeDescriptorProvider(private val context: CommonBackendContext) : DescriptorProvider {
+internal class NativeDescriptorProvider(private val context: CommonBackendContext) : InternalDescriptorProvider {
 
     private val mutableExposedClasses by lazy {
         exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableSet()
@@ -55,7 +54,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     override val exposedTopLevelMembers: Set<CallableMemberDescriptor>
         get() = mutableTopLevel.values.flatten().toSet()
 
-    val mapper: ObjCExportMapper by lazy {
+    override val mapper: ObjCExportMapper by lazy {
         exportedInterface.mapper
     }
 
@@ -76,7 +75,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     private val ClassDescriptor.isExposable: Boolean
         get() = mapper.shouldBeExposed(this)
 
-    override fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
+    internal fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
         when (descriptor) {
             is ClassDescriptor -> registerDescriptor(descriptor)
             is CallableMemberDescriptor -> registerDescriptor(descriptor)
