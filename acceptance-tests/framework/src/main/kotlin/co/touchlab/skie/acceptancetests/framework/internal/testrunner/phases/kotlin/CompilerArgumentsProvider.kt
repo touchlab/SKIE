@@ -128,9 +128,8 @@ class CompilerArgumentsProvider(
         }
 
         private fun <T: Enum<T>> enumFromEnv(name: String, values: Array<T>): T? {
-            return System.getenv(name)?.let { value ->
-                values.find { it.name.equals(value, ignoreCase = true) } ?: error("Unknown value for $name: $value")
-            }
+            val envValue = System.getenv(name)?.trim()?.takeIf { it.isNotBlank() } ?: return null
+            return values.find { it.name.equals(envValue, ignoreCase = true) } ?: error("Unknown value for $name: $envValue")
         }
     }
 }
