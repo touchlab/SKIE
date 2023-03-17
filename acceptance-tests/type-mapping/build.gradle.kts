@@ -32,7 +32,7 @@ fun Configuration.configure() {
         KotlinPlatformType.attribute,
         KotlinPlatformType.native
     )
-    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, System.getenv("KOTLIN_TARGET") ?: MacOsCpuArchitecture.getCurrent().konanTarget)
+    attributes.attribute(KotlinNativeTarget.konanTargetAttribute, System.getenv("KOTLIN_TARGET")?.trim()?.takeIf { it.isNotBlank() } ?: MacOsCpuArchitecture.getCurrent().konanTarget)
     attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
 }
 
