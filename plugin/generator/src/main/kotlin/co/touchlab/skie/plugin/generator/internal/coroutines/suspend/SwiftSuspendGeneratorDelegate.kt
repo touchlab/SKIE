@@ -20,6 +20,7 @@ import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
+import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 internal class SwiftSuspendGeneratorDelegate(
@@ -144,10 +145,10 @@ internal class SwiftSuspendGeneratorDelegate(
                     .indent()
                     .apply {
                         addStatement(
-                            "%T.%N(${bridgeModel.valueParametersPlaceholders})",
+                            "%T.%N(%L)",
                             bridgeModel.kotlinBridgingFunction.receiver.toSwiftPoetUsage(),
                             bridgeModel.kotlinBridgingFunction.reference,
-                            *bridgeModel.argumentsForBridgingCall.toTypedArray(),
+                            bridgeModel.argumentsForBridgingCall,
                         )
                     }
                     .unindent()
@@ -156,12 +157,9 @@ internal class SwiftSuspendGeneratorDelegate(
             )
         }
 
-    private val BridgeModel.valueParametersPlaceholders: String
-        get() = (this.argumentsForBridgingCall.map { "%N" } + "$0").joinToString(", ")
-
-    private val BridgeModel.argumentsForBridgingCall: List<String>
+    private val BridgeModel.argumentsForBridgingCall: CodeBlock
         get() {
-            val arguments = mutableListOf<String>()
+            val arguments = mutableListOf<CodeBlock>()
 
             arguments.addDispatchReceiver(this)
 
@@ -171,21 +169,22 @@ internal class SwiftSuspendGeneratorDelegate(
                         // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
                         .removingEscapingAttribute()
 
-                    arguments.add(
-                        listOfNotNull(
-                            parameter.parameterName,
-                            " as! $erasedParameterType".takeIf { parameter.type.toSwiftPoetUsage() != erasedParameterType },
-                        ).joinToString("")
-                    )
+                    if (parameter.type.toSwiftPoetUsage() != erasedParameterType) {
+                        arguments.add(CodeBlock.of("%N as! %T", parameter.parameterName, erasedParameterType))
+                    } else {
+                        arguments.add(CodeBlock.of("%N", parameter.parameterName))
+                    }
                 } else {
-                    arguments.add(parameter.parameterName)
+                    arguments.add(CodeBlock.of("%N", parameter.parameterName))
                 }
             }
 
-            return arguments
+            arguments.addSuspendHandlerParameter()
+
+            return arguments.joinToCode()
         }
 
-    private fun MutableList<String>.addDispatchReceiver(bridgeModel: BridgeModel) {
+    private fun MutableList<CodeBlock>.addDispatchReceiver(bridgeModel: BridgeModel) {
         if (bridgeModel.originalFunction.scope != KotlinCallableMemberSwiftModel.Scope.Member) {
             return
         }
@@ -193,11 +192,13 @@ internal class SwiftSuspendGeneratorDelegate(
         if (bridgeModel.isFromGenericClass) {
             val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.valueParameters.first().type.toSwiftPoetUsage()
 
-            add(bridgeModel.genericClassDispatchReceiverParameterName + " as! " + dispatchReceiverErasedType)
+            add(CodeBlock.of("%N as! %T", bridgeModel.genericClassDispatchReceiverParameterName, dispatchReceiverErasedType))
         } else {
-            add("self")
+            add(CodeBlock.of("self"))
         }
     }
+
+    private fun MutableList<CodeBlock>.addSuspendHandlerParameter() = add(CodeBlock.of("$0"))
 
     private data class BridgeModel(
         val originalFunction: KotlinFunctionSwiftModel,
