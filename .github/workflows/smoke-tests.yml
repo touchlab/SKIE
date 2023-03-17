@@ -1,4 +1,4 @@
-name: Smoke Tests on Push
+name: Smoke Tests
 
 on:
   push:
@@ -68,7 +68,7 @@ jobs:
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
-        if: always()
+        if: ${{ failure() || success() }}
         with:
           check_name: "Smoke Test Reports - Acceptance Tests"
           report_paths: 'acceptance-tests/build/test-results/test/TEST-*.xml'
@@ -78,7 +78,6 @@ jobs:
     name: Type Mapping Tests
     needs: [acceptance-tests]
     runs-on: self-hosted
-    if: ${{ inputs.configuration != 'debug' }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -89,6 +88,8 @@ jobs:
         uses: ./.github/actions/prepare-worker
       - name: Run Type Mapping Tests
         uses: gradle/gradle-build-action@v2
+        id: run-tests
+        if: ${{ inputs.configuration != 'debug' }}
         with:
           arguments: ':acceptance-tests:type-mapping:test'
         env:
@@ -97,7 +98,7 @@ jobs:
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
-        if: always()
+        if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
         with:
           check_name: "Smoke Test Reports - Type Mapping Tests"
           report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
@@ -124,7 +125,7 @@ jobs:
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
-        if: always()
+        if: ${{ failure() || success() }}
         with:
           check_name: "Smoke Test Reports - External Libraries Tests"
           report_paths: 'acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
