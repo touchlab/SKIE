@@ -77,7 +77,7 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          check_name: "Test Reports - Type Mapping Tests (${{target}}, ${{ matrix.linkage }}, ${{ matrix.configuration }})"
+          check_name: "Test Reports - Type Mapping Tests (${{ matrix.target }}, ${{ matrix.linkage }}, ${{ matrix.configuration }})"
           report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
           require_tests: true
 
