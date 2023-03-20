@@ -4,18 +4,17 @@ package co.touchlab.skie.osversion
 
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.skieContext
-import co.touchlab.skie.plugin.intercept.PhaseListener
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
-import org.jetbrains.kotlin.backend.common.phaser.PhaserState
-import org.jetbrains.kotlin.backend.konan.Context
+import co.touchlab.skie.plugin.intercept.PhaseInterceptor
+import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
+import org.jetbrains.kotlin.backend.konan.driver.phases.PsiToIrContext
+import org.jetbrains.kotlin.backend.konan.driver.phases.PsiToIrInput
+import org.jetbrains.kotlin.backend.konan.driver.phases.PsiToIrOutput
 import org.jetbrains.kotlin.konan.properties.KonanPropertiesLoader
 
-// TODO Should be SKIE phase
-class MinOSVersionConfigurator : PhaseListener {
+internal class MinOSVersionConfigurator : PhaseInterceptor<PsiToIrContext, PsiToIrInput, PsiToIrOutput> {
 
-    // Originally OBJC_EXPORT, moved to PSI_TO_IR to ensure statistics are collected first
-    override val phase: PhaseListener.Phase = PhaseListener.Phase.PSI_TO_IR
+    // Originally OBJC_EXPORT, moved to PSI_TO_IR to ensure statistics are collected first}
+    override val phase = PhaseInterceptor.Phase.PsiToIr
 
     private val coroutinesMinOsVersionMap = mutableMapOf(
         "osVersionMin.ios_arm32" to "13.0",
@@ -35,9 +34,18 @@ class MinOSVersionConfigurator : PhaseListener {
         "osVersionMin.watchos_x86" to "6.0",
     )
 
-    override fun beforePhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
-        if (context !is Context) return
-        if (SkieFeature.CoroutinesInterop !in context.skieContext.configuration.enabledFeatures) return
+    override fun intercept(
+        context: PsiToIrContext,
+        input: PsiToIrInput,
+        next: (PsiToIrContext, PsiToIrInput) -> PsiToIrOutput,
+    ): PsiToIrOutput {
+        updateMinOsVersionIfNeeded(context)
+
+        return next(context, input)
+    }
+
+    private fun updateMinOsVersionIfNeeded(context: PhaseContext) {
+        if (SkieFeature.CoroutinesInterop !in context.config.skieContext.configuration.enabledFeatures) return
         val properties = (context.config.platform.configurables as? KonanPropertiesLoader)?.properties ?: return
 
         coroutinesMinOsVersionMap.forEach { (key, requiredMinVersion) ->
