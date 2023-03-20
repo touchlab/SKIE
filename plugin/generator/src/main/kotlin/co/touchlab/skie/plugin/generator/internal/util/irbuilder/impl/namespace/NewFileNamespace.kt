@@ -82,12 +82,12 @@ internal class NewFileNamespace private constructor(
     }
 
     class Factory(
-        context: CommonBackendContext,
+        private val moduleDescriptor: ModuleDescriptor,
         mainIrModuleFragment: Lazy<IrModuleFragment>,
     ) {
 
-        private val moduleDescriptor =
-            requireNotNull((context as? KonanContext)?.moduleDescriptor) { "Context must have a module descriptor." }
+        // private val moduleDescriptor =
+        //     requireNotNull((context as? KonanContext)?.moduleDescriptor) { "Context must have a module descriptor." }
 
         private val namespaceContext = Context(moduleDescriptor, mainIrModuleFragment)
 
@@ -101,6 +101,7 @@ internal class NewFileNamespace private constructor(
             val compositePackageProvider = packageProvider.reflectedBy<CompositePackageFragmentProviderReflector>()
             val composedProviders = compositePackageProvider.providers
 
+            // TODO: Do we need the synthetic package provider with the new compiler phases?
             composedProviders.add(syntheticPackageProvider)
         }
 

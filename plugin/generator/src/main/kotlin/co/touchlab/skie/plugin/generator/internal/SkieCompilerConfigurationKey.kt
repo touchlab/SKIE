@@ -5,6 +5,7 @@ import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorPr
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import co.touchlab.skie.configuration.Configuration as ConfigurationType
@@ -36,11 +37,11 @@ internal sealed class SkieCompilerConfigurationKey<T : Any>(name: String) {
     object SkieScheduler : SkieCompilerConfigurationKey<SkieSchedulerType>("Skie Scheduler")
 }
 
-internal val CommonBackendContext.skieDeclarationBuilder: DeclarationBuilderImpl
+internal val KonanConfig.skieDeclarationBuilder: DeclarationBuilderImpl
     get() = SkieCompilerConfigurationKey.DeclarationBuilder.get(configuration)
 
-internal val CommonBackendContext.skieInternalMutableDescriptorProvider: NativeMutableDescriptorProvider
+internal val KonanConfig.skieInternalMutableDescriptorProvider: NativeMutableDescriptorProvider
     get() = SkieCompilerConfigurationKey.MutableDescriptorProvider.get(configuration)
 
-internal val CommonBackendContext.skieScheduler: SkieSchedulerType
+internal val KonanConfig.skieScheduler: SkieSchedulerType
     get() = SkieCompilerConfigurationKey.SkieScheduler.get(configuration)
