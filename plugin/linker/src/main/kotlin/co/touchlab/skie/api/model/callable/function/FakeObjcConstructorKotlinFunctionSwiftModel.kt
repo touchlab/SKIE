@@ -17,7 +17,7 @@ import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNoneExportScope
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportScope
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class FakeObjcConstructorKotlinFunctionSwiftModel(
@@ -26,6 +26,7 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
     private val swiftModelScope: MutableSwiftModelScope,
     objCTypeProvider: ObjCTypeProvider,
 ) : KotlinFunctionSwiftModelWithCore by baseModel {
+    object ObjCNoneExportScope: ObjCExportScope
 
     override val directlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel> = listOf(this)
 

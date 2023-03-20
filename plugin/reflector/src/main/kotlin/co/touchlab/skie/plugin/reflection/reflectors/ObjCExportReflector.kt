@@ -35,7 +35,7 @@ class ObjCExportReflector(
         private fun createSymbolTable(): SymbolTable =
             SymbolTable(DummySignaturer(), IrFactoryImpl)
 
-        private class DummySignaturer : IdSignatureComposer {
+        class DummySignaturer : IdSignatureComposer {
 
             override fun composeAnonInitSignature(descriptor: ClassDescriptor): IdSignature? = null
 
