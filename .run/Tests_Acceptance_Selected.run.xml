@@ -3,6 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
+          <entry key="DEVELOPER_DIR" value="/Applications/Xcode-14.2.0.app/Contents/Developer" />
           <entry key="acceptanceTest" value="sealed" />
           <entry key="debugDumpSwiftApiAt" value="" />
         </map>
@@ -10,7 +11,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="" />
+      <option name="scriptParameters" value="--info" />
       <option name="taskDescriptions">
         <list />
       </option>
@@ -24,6 +25,7 @@
     <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
+    <ForceTestExec>false</ForceTestExec>
     <method v="2" />
   </configuration>
 </component>

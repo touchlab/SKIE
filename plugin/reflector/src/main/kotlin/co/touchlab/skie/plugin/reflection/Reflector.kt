@@ -1,10 +1,13 @@
 package co.touchlab.skie.plugin.reflection
 
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
+import kotlin.reflect.jvm.jvmName
 
 abstract class Reflector {
 
@@ -52,8 +55,8 @@ abstract class Reflector {
     protected inline fun <reified T> declaredProperty() =
         Provider { DeclaredProperty(it, T::class.java) }
 
-    protected inline fun <reified T> declaredField() =
-        Provider { DeclaredField(it, T::class.java) }
+    protected inline fun <reified T> declaredField(nameOverride: String? = null) =
+        Provider { DeclaredField(nameOverride ?: it, T::class.java) }
 
     protected inline fun <reified R> extensionFunction0(extensionClassFqName: String) =
         Provider { ExtensionFunction0(it, extensionClassFqName, R::class.java) }
