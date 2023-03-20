@@ -16,6 +16,7 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.F
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.SecondaryConstructorTemplate
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.ContextReflector
+import co.touchlab.skie.plugin.reflection.reflectors.SymbolTableReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
@@ -25,6 +26,7 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
@@ -41,15 +43,17 @@ import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFra
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 internal class DeclarationBuilderImpl(
-    context: CommonBackendContext,
+    // TODO: Do we need to edit the symbol table with the new compiler phases?
+    private val symbolTable: SymbolTable,
+    moduleDescriptor: ModuleDescriptor,
     private val mutableDescriptorProvider: MutableDescriptorProvider,
 ) : DeclarationBuilder {
 
-    private val symbolTable = context.reflectedBy<ContextReflector>().symbolTable
+    // private val symbolTable = context.reflectedBy<ContextReflector>().symbolTable
 
     private lateinit var mainIrModuleFragment: IrModuleFragment
 
-    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mainIrModuleFragment })
+    private val newFileNamespaceFactory = NewFileNamespace.Factory(moduleDescriptor, lazy { mainIrModuleFragment })
 
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()

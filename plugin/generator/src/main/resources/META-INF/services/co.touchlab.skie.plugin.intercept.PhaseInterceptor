@@ -1,0 +1,3 @@
+co.touchlab.skie.plugin.generator.internal.SkieProduceObjCExportInterfaceInterceptor
+co.touchlab.skie.plugin.generator.internal.SkieSymbolTablePhaseListener
+co.touchlab.skie.plugin.generator.internal.SkiePsiToIrPhaseInterceptor
