@@ -28,7 +28,7 @@ typealias OriginalPhaseBody<Context, Input, Output> = (Context, Input) -> Output
 typealias ErasedPhaseInterceptor<Context, Input, Output> = (Context, Input, OriginalPhaseBody<Context, Input, Output>) -> Output
 
 object PhaseInterceptorRegistrar {
-    fun setupPhaseListeners(configuration: CompilerConfiguration) {
+    fun setupPhaseInterceptors(configuration: CompilerConfiguration) {
         val phaseInterceptors =
             (this::class.java.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations(it) }
                 ?: ServiceLoader.load(PhaseInterceptor::class.java)
@@ -66,7 +66,7 @@ object PhaseInterceptorRegistrar {
                 val interceptedPhase = InterceptedSameTypeCompilerPhaseReflector(currentPhase)
                 interceptedPhase.originalPhase to interceptedPhase.interceptorKey
             } else {
-                currentPhase to CompilerConfigurationKey.create("phaseListeners")
+                currentPhase to CompilerConfigurationKey.create("phaseInterceptor for phase $phase")
             }
 
             configuration.put(interceptorKey, chain)
