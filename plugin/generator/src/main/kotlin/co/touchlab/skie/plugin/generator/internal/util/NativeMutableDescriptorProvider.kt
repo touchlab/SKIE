@@ -6,7 +6,7 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
 import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -18,7 +18,8 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 import java.util.concurrent.atomic.AtomicReference
 
 internal class NativeMutableDescriptorProvider(
-    private val context: CommonBackendContext,
+    private val moduleDescriptor: ModuleDescriptor,
+    private val config: KonanConfig,
     initialExportedInterface: ObjCExportedInterface,
 ): MutableDescriptorProvider, InternalDescriptorProvider {
     enum class State {
@@ -27,7 +28,7 @@ internal class NativeMutableDescriptorProvider(
         IMMUTABLE,
     }
 
-    private var realProvider = NativeDescriptorProvider(context, initialExportedInterface.reflectedBy())
+    private var realProvider = NativeDescriptorProvider(moduleDescriptor, config, initialExportedInterface.reflectedBy())
 
     private val mutationListeners = mutableListOf<() -> Unit>()
     private val mutationScope = object: DescriptorRegistrationScope, DescriptorProvider by realProvider {
@@ -57,7 +58,7 @@ internal class NativeMutableDescriptorProvider(
             State.MUTABLE -> {
                 mutationListeners.clear()
                 // Create a fresh provider with all the descriptors we've seen so far.
-                realProvider = NativeDescriptorProvider(context, newExportedInterface.reflectedBy())
+                realProvider = NativeDescriptorProvider(moduleDescriptor, config, newExportedInterface.reflectedBy())
             }
             // We were already mutable, nothing to do.
             State.IMMUTABLE -> {}
