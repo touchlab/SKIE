@@ -1,3 +1,5 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieModule
@@ -20,11 +22,16 @@ import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.ObjectFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import org.jetbrains.kotlin.konan.TempFiles
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.platformName
 import org.jetbrains.kotlin.konan.target.withOSVersion
 import java.io.File
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
+
+val KonanConfig.tempFiles: TempFiles
+    get() = this.configuration.get(KonanConfigKeys.TEMPORARY_FILES_DIR).let { TempFiles(outputPath, it) }
 
 class SwiftLinkCompilePhase(
     private val config: KonanConfig,
@@ -45,7 +52,9 @@ class SwiftLinkCompilePhase(
             it.mkdirs()
         }
 
-        val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
+        val konanContext = context as KonanContext
+
+        val framework = FrameworkLayout(konanContext.generationState.outputFile).also { it.cleanSkie() }
         val bridgeProvider = DescriptorBridgeProvider(namer)
         val swiftIrDeclarationRegistry = SwiftIrDeclarationRegistry(
             namer = namer,
