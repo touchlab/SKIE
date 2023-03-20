@@ -43,8 +43,6 @@ import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFra
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 internal class DeclarationBuilderImpl(
-    // TODO: Do we need to edit the symbol table with the new compiler phases?
-    private val symbolTable: SymbolTable,
     moduleDescriptor: ModuleDescriptor,
     private val mutableDescriptorProvider: MutableDescriptorProvider,
 ) : DeclarationBuilder {
@@ -132,16 +130,22 @@ internal class DeclarationBuilderImpl(
         val declarationTemplate = templateBuilder()
 
         mutableDescriptorProvider.mutate {
-            namespace.addTemplate(declarationTemplate, symbolTable)
+            namespace.addTemplate(declarationTemplate)
         }
 
         return declarationTemplate.descriptor
     }
 
-    fun generateIr(mairIrModuleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+    fun declareSymbols(symbolTable: SymbolTable) {
+        allNamespaces.forEach {
+            it.registerSymbols(symbolTable)
+        }
+    }
+
+    fun generateIr(mairIrModuleFragment: IrModuleFragment, pluginContext: IrPluginContext, symbolTable: SymbolTable) {
         this.mainIrModuleFragment = mairIrModuleFragment
 
-        fixPrivateTypeParametersSymbolsFromOldKLibs()
+        fixPrivateTypeParametersSymbolsFromOldKLibs(symbolTable)
 
         allNamespaces.forEach {
             it.generateIrDeclarations(pluginContext, symbolTable)
@@ -158,7 +162,7 @@ internal class DeclarationBuilderImpl(
      * The affected klibs behave differently during IR deserialization - exposed type parameters are deserialized without public symbols.
      * This fix registers these missing symbols manually.
      */
-    private fun fixPrivateTypeParametersSymbolsFromOldKLibs() {
+    private fun fixPrivateTypeParametersSymbolsFromOldKLibs(symbolTable: SymbolTable) {
         symbolTable.allExposedTypeParameters(mutableDescriptorProvider)
             .filter { it.symbol !is IrTypeParameterPublicSymbolImpl }
             .forEach {
