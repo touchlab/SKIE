@@ -8,7 +8,7 @@ import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftMo
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
-import co.touchlab.skie.plugin.intercept.PhaseListener
+import co.touchlab.skie.plugin.intercept.PhaseInterceptor
 import io.outfoxx.swiftpoet.ANY_OBJECT
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
@@ -24,21 +24,26 @@ import io.outfoxx.swiftpoet.parameterizedBy
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
+import org.jetbrains.kotlin.backend.konan.driver.phases.PsiToIrContext
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportCodeSpec
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
-internal class SwiftKotlinAccessGenerator: PhaseListener {
-    override val phase: PhaseListener.Phase = PhaseListener.Phase.OBJC_EXPORT
+internal class SwiftKotlinAccessGenerator: PhaseInterceptor<PsiToIrContext, ObjCExportedInterface, ObjCExportCodeSpec> {
+    override val phase = PhaseInterceptor.Phase.CreateObjCExportCodeSpec
 
-    override fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
-        super.afterPhase(phaseConfig, phaserState, context)
-
-        val descriptorProvider = context.mutableDescriptorProvider
+    override fun intercept(
+        context: PsiToIrContext,
+        input: ObjCExportedInterface,
+        next: (PsiToIrContext, ObjCExportedInterface) -> ObjCExportCodeSpec
+    ): ObjCExportCodeSpec {
+        val descriptorProvider = context.config.configuration.descriptorProvider
 
         val kotlinClass = descriptorProvider.exposedClasses.first {
             it.name.identifier == "KotlinFile"
         }
 
-        context.skieContext.module.file(
+        context.config.skieContext.module.file(
             "TypeVerification",
             """
                 @resultBuilder
@@ -72,7 +77,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
                 }
             """.trimIndent())
 
-        context.skieContext.module.file("TypeVerification+verify") {
+        context.config.skieContext.module.file("TypeVerification+verify") {
             val parameterCounts = descriptorProvider.getAllExposedMembers(kotlinClass)
                 .filter {
                     !DescriptorUtils.isMethodOfAny(it)
@@ -132,7 +137,7 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
             }
         }
 
-        context.skieContext.module.file("KotlinFile_access") {
+        context.config.skieContext.module.file("KotlinFile_access") {
             addType(
                 TypeSpec.classBuilder("KotlinFileWrapper")
                     .apply {
@@ -216,5 +221,6 @@ internal class SwiftKotlinAccessGenerator: PhaseListener {
             )
         }
 
+        return next(context, input)
     }
 }

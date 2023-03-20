@@ -21,21 +21,6 @@ import org.jetbrains.kotlin.backend.konan.driver.phases.CreateObjCFrameworkInput
 import org.jetbrains.kotlin.backend.konan.driver.phases.FrontendPhaseOutput
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
-interface PhaseListener {
-    val phase: Phase
-
-    fun beforePhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {}
-
-    fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {}
-
-    enum class Phase {
-        CREATE_SYMBOL_TABLE,
-        OBJC_EXPORT,
-        PSI_TO_IR,
-        OBJECT_FILES,
-    }
-}
-
 interface PhaseInterceptor<Context, Input, Output> where Context: LoggingContext, Context: ConfigChecks {
     val phase: Phase<Context, Input, Output>
 
