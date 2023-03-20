@@ -7,13 +7,11 @@ import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.kotlin_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
-import co.touchlab.skie.plugin.api.SkieComponentContainerKey
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
-import co.touchlab.skie.plugin.generator.internal.registerGeneratorComponents
 import co.touchlab.skie.plugin.intercept.PhaseInterceptorRegistrar
 import co.touchlab.skie.plugin.license.SkieLicenseProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
@@ -27,9 +25,6 @@ import org.jetbrains.kotlin.cli.common.messages.GroupingMessageCollector
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.container.composeContainer
-import org.jetbrains.kotlin.container.useImpl
-import org.jetbrains.kotlin.container.useInstance
 
 class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
@@ -86,7 +81,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         configuration.put(SkieContextKey, skieContext)
 
         IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
-        PhaseInterceptorRegistrar.setupPhaseListeners(configuration)
+        PhaseInterceptorRegistrar.setupPhaseInterceptors(configuration)
     }
 
     private fun registerErrorAnalytics(configuration: CompilerConfiguration, analyticsCollector: AnalyticsCollector) {
@@ -128,7 +123,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 }
 
 sealed interface SkiePhase {
+
     val name: String
-
-
 }
