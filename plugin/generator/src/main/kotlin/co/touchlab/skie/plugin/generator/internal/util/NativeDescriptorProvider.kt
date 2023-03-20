@@ -26,7 +26,10 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
-internal class NativeDescriptorProvider(private val exportedInterface: ObjcExportedInterfaceReflector) : InternalDescriptorProvider {
+internal class NativeDescriptorProvider(
+    private val context: CommonBackendContext,
+    private val exportedInterface: ObjcExportedInterfaceReflector,
+) : InternalDescriptorProvider {
 
     override val exposedModules: Set<ModuleDescriptor> by lazy {
         check(context is KonanContext) { "Context is not KonanContext. Was: ${context.javaClass.canonicalName}"}

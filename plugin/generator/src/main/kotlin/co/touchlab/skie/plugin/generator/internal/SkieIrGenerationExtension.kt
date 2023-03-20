@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 import org.jetbrains.kotlin.backend.konan.serialization.KonanIrLinker
 
 class SkieIrGenerationExtension(private val configuration: CompilerConfiguration) : IrGenerationExtension {
