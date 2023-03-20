@@ -72,17 +72,15 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
         )
 
-        configuration.put(SkieContextKey, skieContext)
-
         registerErrorAnalytics(configuration, skieContext.analyticsCollector)
 
-        val skieContainer = composeContainer("Skie") {
-            useInstance(skieContext)
-            useImpl<DefaultSkieModule>()
-
-            registerGeneratorComponents()
-        }
-        configuration.put(SkieComponentContainerKey, skieContainer)
+        // val skieContainer = composeContainer("Skie") {
+        //     useInstance(skieContext)
+        //     useImpl<DefaultSkieModule>()
+        //
+        //     registerGeneratorComponents()
+        // }
+        // configuration.put(SkieComponentContainerKey, skieContainer)
 
         // TODO: Should this be accessible only from container?
         configuration.put(SkieContextKey, skieContext)
