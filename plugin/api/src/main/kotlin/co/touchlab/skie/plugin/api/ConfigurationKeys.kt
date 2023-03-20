@@ -29,7 +29,10 @@ val CompilerConfiguration.skieContext: SkieContext
     get() = getNotNull(SkieContextKey)
 
 val CommonBackendContext.descriptorProvider: DescriptorProvider
-    get() = configuration.getNotNull(DescriptorProviderKey)
+    get() = configuration.descriptorProvider
+
+val CompilerConfiguration.descriptorProvider: DescriptorProvider
+    get() = getNotNull(DescriptorProviderKey)
 
 val CommonBackendContext.mutableDescriptorProvider: MutableDescriptorProvider
     get() = configuration.getNotNull(MutableDescriptorProviderKey)
