@@ -65,8 +65,6 @@ class SwiftLinkCompilePhase(
         )
         val builtinKotlinDeclarations = BuiltinDeclarations.Kotlin(namer)
 
-        finalizeDescriptorProvider()
-
         val translator = SwiftTypeTranslator(
             descriptorProvider = context.descriptorProvider,
             namer = namer,
@@ -124,11 +122,6 @@ class SwiftLinkCompilePhase(
         disableWildcardExportIfNeeded(framework)
 
         return swiftObjectPaths
-    }
-
-    private fun finalizeDescriptorProvider() {
-        val finalizedDescriptorProvider = context.mutableDescriptorProvider.preventFurtherMutations()
-        context.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
     }
 
     private fun compileSwift(
