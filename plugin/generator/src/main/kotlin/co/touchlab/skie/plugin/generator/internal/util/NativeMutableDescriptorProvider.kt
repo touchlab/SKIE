@@ -6,7 +6,6 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
 import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
-import co.touchlab.skie.plugin.reflection.reflectors.ObjcExportedInterfaceReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
@@ -19,8 +18,8 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 import java.util.concurrent.atomic.AtomicReference
 
 internal class NativeMutableDescriptorProvider(
+    private val context: CommonBackendContext,
     initialExportedInterface: ObjCExportedInterface,
-    val exportedInterfaceProvider: () -> ObjCExportedInterface,
 ): MutableDescriptorProvider, InternalDescriptorProvider {
     enum class State {
         MUTABLE,
@@ -28,7 +27,7 @@ internal class NativeMutableDescriptorProvider(
         IMMUTABLE,
     }
 
-    private var realProvider = NativeDescriptorProvider(initialExportedInterface.reflectedBy())
+    private var realProvider = NativeDescriptorProvider(context, initialExportedInterface.reflectedBy())
 
     private val mutationListeners = mutableListOf<() -> Unit>()
     private val mutationScope = object: DescriptorRegistrationScope, DescriptorProvider by realProvider {
@@ -52,13 +51,13 @@ internal class NativeMutableDescriptorProvider(
         }
     }
 
-    override fun preventFurtherMutations(): InternalDescriptorProvider {
+    fun preventFurtherMutations(newExportedInterface: ObjCExportedInterface): InternalDescriptorProvider {
         when (val witnessState = state.compareAndExchange(State.MUTABLE, State.IMMUTABLE)) {
             // No more mutations can occur, so we can clear listeners.
             State.MUTABLE -> {
                 mutationListeners.clear()
                 // Create a fresh provider with all the descriptors we've seen so far.
-                realProvider = NativeDescriptorProvider(exportedInterfaceProvider().reflectedBy())
+                realProvider = NativeDescriptorProvider(context, newExportedInterface.reflectedBy())
             }
             // We were already mutable, nothing to do.
             State.IMMUTABLE -> {}
