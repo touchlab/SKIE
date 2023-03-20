@@ -42,7 +42,7 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor>() : Namespace<D
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable) {
         val generatorContext = GeneratorContext(
-            Psi2IrConfiguration(ignoreErrors = false, allowUnboundSymbols = false),
+            Psi2IrConfiguration(ignoreErrors = false, partialLinkageEnabled = false/* allowUnboundSymbols = false*/),
             descriptor.module,
             pluginContext.bindingContext,
             pluginContext.languageVersionSettings,

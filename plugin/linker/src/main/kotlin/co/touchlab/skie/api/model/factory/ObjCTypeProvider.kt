@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.api.model.factory
 
+import co.touchlab.skie.api.model.callable.function.FakeObjcConstructorKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
@@ -22,7 +23,6 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportScope
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportTranslatorImpl
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCInstanceType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNonNullReferenceType
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNoneExportScope
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNullableReferenceType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCPointerType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCPrimitiveType
@@ -116,7 +116,7 @@ class ObjCTypeProvider(
     private fun createGenericExportScope(descriptor: CallableMemberDescriptor): ObjCExportScope =
         descriptorProvider.getReceiverClassDescriptorOrNull(descriptor)?.let {
             translator.createGenericExportScope(it)
-        } ?: ObjCNoneExportScope
+        } ?: FakeObjcConstructorKotlinFunctionSwiftModel.ObjCNoneExportScope
 
     private fun mapReturnType(
         returnBridge: MethodBridge.ReturnValue,
