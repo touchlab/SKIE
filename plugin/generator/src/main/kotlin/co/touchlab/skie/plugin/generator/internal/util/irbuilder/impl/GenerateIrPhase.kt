@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.util.SymbolTable
 
 internal class GenerateIrPhase(
     private val declarationBuilder: DeclarationBuilderImpl,
@@ -11,6 +12,6 @@ internal class GenerateIrPhase(
     override val isActive: Boolean = true
 
     override fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
-        declarationBuilder.generateIr(moduleFragment, pluginContext)
+        declarationBuilder.generateIr(moduleFragment, pluginContext, pluginContext.symbolTable as SymbolTable)
     }
 }

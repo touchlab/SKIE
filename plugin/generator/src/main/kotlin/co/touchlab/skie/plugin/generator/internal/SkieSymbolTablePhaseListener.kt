@@ -2,17 +2,16 @@
 
 package co.touchlab.skie.plugin.generator.internal
 
+import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.MutableDescriptorProviderKey
+import co.touchlab.skie.plugin.api.mutableDescriptorProvider
+import co.touchlab.skie.plugin.api.skieContext
+import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
-import co.touchlab.skie.plugin.intercept.PhaseListener
-import co.touchlab.skie.plugin.reflection.reflectedBy
-import co.touchlab.skie.plugin.reflection.reflectors.ContextReflector
-import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
-import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.phases.FrontendPhaseOutput
 import org.jetbrains.kotlin.backend.konan.driver.phases.PsiToIrContext
@@ -42,16 +41,33 @@ internal class SkieSymbolTablePhaseListener : PhaseInterceptor<PhaseContext, Fro
             }
         }
 
-        val exportedInferface = next(context, input)
+        val exportedInterface = next(context, input)
 
-        val descriptorProvider = NativeMutableDescriptorProvider(exportedInferface) {
-            produceObjCExportInterface(context, input.moduleDescriptor, input.frontendServices)
-        }
+        val descriptorProvider = NativeMutableDescriptorProvider(context as CommonBackendContext, exportedInterface)
 
         context.config.configuration.put(MutableDescriptorProviderKey, descriptorProvider)
         SkieCompilerConfigurationKey.MutableDescriptorProvider.put(descriptorProvider, context.config.configuration)
 
-        return exportedInferface
+        val declarationBuilder = DeclarationBuilderImpl(input.moduleDescriptor, descriptorProvider)
+        SkieCompilerConfigurationKey.DeclarationBuilder.put(declarationBuilder, context.config.configuration)
+
+        val skieScheduler = SkieCompilationScheduler(
+            config = context.config,
+            skieContext = context.config.skieContext,
+            descriptorProvider = descriptorProvider,
+            declarationBuilder = declarationBuilder,
+            namespaceProvider = NamespaceProvider(context.config.skieContext.module),
+            reporter = Reporter(context.config.configuration),
+        )
+        SkieCompilerConfigurationKey.SkieScheduler.put(skieScheduler, context.config.configuration)
+
+        skieScheduler.runObjcPhases()
+
+        val newExportedInterface = produceObjCExportInterface(context, input.moduleDescriptor, input.frontendServices)
+        val finalizedDescriptorProvider = descriptorProvider.preventFurtherMutations(newExportedInterface)
+        context.config.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
+
+        return newExportedInterface
     }
 }
 
