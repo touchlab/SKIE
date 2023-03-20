@@ -2,10 +2,8 @@
 
 package co.touchlab.skie.plugin.intercept
 
-import co.touchlab.skie.plugin.reflection.PropertyField
 import co.touchlab.skie.plugin.reflection.Reflector
 import org.jetbrains.kotlin.backend.common.LoggingContext
-import org.jetbrains.kotlin.backend.common.phaser.CompilerPhase
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfigurationService
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.backend.common.phaser.SameTypeCompilerPhase
@@ -24,9 +22,6 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.util.ServiceLoaderLite
 import java.net.URLClassLoader
 import java.util.ServiceLoader
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
-import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
 typealias OriginalPhaseBody<Context, Input, Output> = (Context, Input) -> Output
@@ -65,7 +60,7 @@ object PhaseInterceptorRegistrar {
         val namedPhase = phase.reflector
         val chain = ErasedPhaseInterceptorChain(interceptors)
 
-        synchronized(namedPhase) {
+        synchronized(phase.kotlinPhase) {
             val currentPhase = namedPhase.lower
             val (originalPhase, interceptorKey) = if (currentPhase.isIntercepted()) {
                 val interceptedPhase = InterceptedSameTypeCompilerPhaseReflector(currentPhase)
@@ -88,7 +83,7 @@ object PhaseInterceptorRegistrar {
     ) where Context: LoggingContext, Context: ConfigChecks {
         val namedPhase = phase.reflector
         val chain = ErasedPhaseInterceptorChain(interceptors)
-        synchronized(namedPhase) {
+        synchronized(phase.kotlinPhase) {
             val currentPhaseBody = namedPhase.phaseBody
             val (originalPhaseBody, interceptorKey) = if (currentPhaseBody.isIntercepted()) {
                 val interceptedPhaseBody = InterceptedPhaseBodyReflector(currentPhaseBody)
@@ -108,25 +103,25 @@ object PhaseInterceptorRegistrar {
     }
 
     @Suppress("UNCHECKED_CAST")
+    private val <Context, Data> PhaseInterceptor.Phase.SameTypeNamed<Context, Data>.kotlinPhase: SameTypeNamedCompilerPhase<Context, Data> where Context: LoggingContext, Context: ConfigChecks
+        get() = when (this) {
+            PhaseInterceptor.Phase.ObjectFiles -> objectFilesPhase
+        } as SameTypeNamedCompilerPhase<Context, Data>
+
     private val <Context, Data> PhaseInterceptor.Phase.SameTypeNamed<Context, Data>.reflector: SameTypeNamedCompilerPhaseReflector<Context, Data> where Context: LoggingContext, Context: ConfigChecks
-        get() {
-            val phase = when (this) {
-                PhaseInterceptor.Phase.ObjectFiles -> objectFilesPhase
-            } as SameTypeNamedCompilerPhase<Context, Data>
-            return SameTypeNamedCompilerPhaseReflector(phase)
-        }
+        get() = SameTypeNamedCompilerPhaseReflector(kotlinPhase)
 
     @Suppress("UNCHECKED_CAST")
+    private val <Context, Input, Output> PhaseInterceptor.Phase.SimpleNamed<Context, Input, Output>.kotlinPhase: SimpleNamedCompilerPhase<Context, Input, Output> where Context: LoggingContext, Context: ConfigChecks
+        get() = when (this) {
+            PhaseInterceptor.Phase.CreateObjCExportCodeSpec -> CreateObjCExportCodeSpecPhase
+            PhaseInterceptor.Phase.CreateObjCFramework -> CreateObjCFrameworkPhase
+            PhaseInterceptor.Phase.ProduceObjCExportInterface -> ProduceObjCExportInterfacePhase
+            PhaseInterceptor.Phase.PsiToIr -> PsiToIrPhase
+        } as SimpleNamedCompilerPhase<Context, Input, Output>
+
     private val <Context, Input, Output> PhaseInterceptor.Phase.SimpleNamed<Context, Input, Output>.reflector: SimpleNamedCompilerPhaseReflector<Context, Input, Output> where Context: LoggingContext, Context: ConfigChecks
-        get() {
-            val phase = when (this) {
-                PhaseInterceptor.Phase.CreateObjCExportCodeSpec -> CreateObjCExportCodeSpecPhase
-                PhaseInterceptor.Phase.CreateObjCFramework -> CreateObjCFrameworkPhase
-                PhaseInterceptor.Phase.ProduceObjCExportInterface -> ProduceObjCExportInterfacePhase
-                PhaseInterceptor.Phase.PsiToIr -> PsiToIrPhase
-            } as SimpleNamedCompilerPhase<Context, Input, Output>
-            return SimpleNamedCompilerPhaseReflector(phase)
-        }
+        get() = SimpleNamedCompilerPhaseReflector(kotlinPhase)
 }
 
 infix fun <Context, Input, Output> ErasedPhaseInterceptor<Context, Input, Output>.then(
