@@ -4,14 +4,12 @@ package co.touchlab.skie.plugin.generator.internal
 
 import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.MutableDescriptorProviderKey
-import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.phases.FrontendPhaseOutput
 import org.jetbrains.kotlin.backend.konan.driver.phases.PsiToIrContext
@@ -43,7 +41,7 @@ internal class SkieSymbolTablePhaseListener : PhaseInterceptor<PhaseContext, Fro
 
         val exportedInterface = next(context, input)
 
-        val descriptorProvider = NativeMutableDescriptorProvider(context as CommonBackendContext, exportedInterface)
+        val descriptorProvider = NativeMutableDescriptorProvider(input.moduleDescriptor, context.config, exportedInterface)
 
         context.config.configuration.put(MutableDescriptorProviderKey, descriptorProvider)
         SkieCompilerConfigurationKey.MutableDescriptorProvider.put(descriptorProvider, context.config.configuration)
