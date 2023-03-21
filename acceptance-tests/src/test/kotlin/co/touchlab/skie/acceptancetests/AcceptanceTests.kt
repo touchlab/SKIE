@@ -19,8 +19,6 @@ class AcceptanceTests : FunSpec({
     val compilerArgumentsProvider = CompilerArgumentsProvider(
         dependencies = BuildConfig.DEPENDENCIES.toList(),
         exportedDependencies = BuildConfig.EXPORTED_DEPENDENCIES.toList(),
-        // Null here, because we want to explicitly only test the same target we're running on
-        target = null,
     )
 
     val tests = TestNode(testsDirectory, tempDirectory, compilerArgumentsProvider)
