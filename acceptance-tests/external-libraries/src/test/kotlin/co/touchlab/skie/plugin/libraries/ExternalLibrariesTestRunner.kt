@@ -9,6 +9,7 @@ import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.CompilerArgumentsProvider
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestCompiler
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin.KotlinTestLinker
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.SwiftTestCompiler
 import co.touchlab.skie.acceptancetests.framework.testStream
 import co.touchlab.skie.configuration.Configuration
 import io.kotest.core.spec.style.FunSpec
@@ -17,6 +18,7 @@ import java.io.File
 import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
+import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -74,6 +76,7 @@ class ExternalLibrariesTestRunner(
             exportedDependencies = test.input.exportedFiles,
             target = CompilerArgumentsProvider.Target.IOS_ARM64,
         )
+        val swiftMainFile = javaClass.classLoader.getResource("main.swift")!!.toURI().toPath()
 
         val measuredTest = measureTimedValue {
             IntermediateResult.Value(Unit)
@@ -91,6 +94,10 @@ class ExternalLibrariesTestRunner(
                         skieConfiguration,
                         compilerArgumentsProvider,
                     )
+                }
+                .flatMap {
+                    val swiftCompiler = SwiftTestCompiler(tempFileSystem, testLogger, compilerArgumentsProvider.target)
+                    swiftCompiler.compile(it, swiftMainFile)
                 }
                 .finalize {
                     TestResult.Success

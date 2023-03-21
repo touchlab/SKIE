@@ -40,7 +40,7 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
                         .zip { generateConfiguration(test.configFiles) }
                         .flatMap { linkKotlin(it.first, Configuration.deserialize(it.second.readText()), test.compilerArgumentsProvider) }
                         .pairWith { enhanceSwiftCode(test.swiftCode) }
-                        .flatMap { compileSwift(it.first, it.second) }
+                        .flatMap { compileSwift(it.first, it.second, test.compilerArgumentsProvider) }
                         .finalize { runSwift(it) }
                         .also { testLogger.prependTestInfo(test, tempFileSystem) }
                 }
@@ -111,8 +111,9 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
     private fun compileSwift(
         kotlinFramework: Path,
         swiftFile: Path,
+        compilerArgumentsProvider: CompilerArgumentsProvider,
     ): IntermediateResult<Path> =
-        SwiftTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFramework, swiftFile)
+        SwiftTestCompiler(this@TempFileSystem, this@TestLogger, compilerArgumentsProvider.target).compile(kotlinFramework, swiftFile)
 
     context(TestLogger)
     private fun runSwift(binary: Path): TestResult =

@@ -1,18 +1,20 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.kotlin
 
+import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.execute
 import co.touchlab.skie.framework.BuildConfig
 import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
+import org.jetbrains.kotlin.konan.target.TargetTriple
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.reflect.full.companionObject
 
 class CompilerArgumentsProvider(
-    private val dependencies: List<String> = EnvDefaults.dependencies ?: emptyList(),
-    private val exportedDependencies: List<String> = EnvDefaults.exportedDependencies ?: emptyList(),
-    private val linkMode: LinkMode = EnvDefaults.linkMode ?: LinkMode.Static,
-    private val buildConfiguration: BuildConfiguration = EnvDefaults.buildConfiguration ?: BuildConfiguration.Debug,
-    private val target: Target? = EnvDefaults.target,
+    val dependencies: List<String> = EnvDefaults.dependencies ?: emptyList(),
+    val exportedDependencies: List<String> = EnvDefaults.exportedDependencies ?: emptyList(),
+    val linkMode: LinkMode = EnvDefaults.linkMode ?: LinkMode.Static,
+    val buildConfiguration: BuildConfiguration = EnvDefaults.buildConfiguration ?: BuildConfiguration.Debug,
+    val target: Target = EnvDefaults.target ?: Target.current,
 ) {
     fun compile(
         sourcePaths: List<Path>,
@@ -94,27 +96,41 @@ class CompilerArgumentsProvider(
         MACOS_ARM64("macos_arm64"),
         MACOS_X64("macos_x64"),
         ;
+
+        val sdk: String
+            get() = when (this) {
+                IOS_ARM64 -> "iphoneos"
+                IOS_X64 -> "iphonesimulator"
+                IOS_SIMULATOR_ARM64 -> "iphonesimulator"
+                MACOS_ARM64 -> "macosx"
+                MACOS_X64 -> "macosx"
+            }
+
+        val targetTriple: TargetTriple
+            get() = when (this) {
+                IOS_ARM64 -> TargetTriple("arm64", "apple", "ios13.0", null)
+                IOS_X64 -> TargetTriple("x86_64", "apple", "ios13.0", null)
+                IOS_SIMULATOR_ARM64 -> TargetTriple("arm64", "apple", "ios13.0", "simulator")
+                MACOS_ARM64 -> TargetTriple("arm64", "apple", "macos10.15", null)
+                MACOS_X64 -> TargetTriple("x86_64", "apple", "macos10.15", null)
+            }
+
+        companion object {
+            val current: Target by lazy {
+                val possibleTargets = mapOf(
+                    "arm64" to MACOS_ARM64,
+                    "x86_64" to MACOS_X64,
+                )
+                val systemName = "uname -m".execute().stdOut.trim()
+
+                possibleTargets[systemName] ?: error("Unsupported architecture: $systemName")
+            }
+        }
     }
 
     enum class LinkMode {
         Dynamic,
         Static,
-    }
-
-    companion object {
-        fun createPreferringEnvValues(
-            dependencies: List<String>,
-            exportedDependencies: List<String>,
-            linkMode: LinkMode,
-            buildConfiguration: BuildConfiguration,
-            target: Target?,
-        ): CompilerArgumentsProvider = CompilerArgumentsProvider(
-            dependencies = EnvDefaults.dependencies ?: dependencies,
-            exportedDependencies = EnvDefaults.exportedDependencies ?: exportedDependencies,
-            linkMode = EnvDefaults.linkMode ?: linkMode,
-            buildConfiguration = EnvDefaults.buildConfiguration ?: buildConfiguration,
-            target = target,
-        )
     }
 
     object EnvDefaults {

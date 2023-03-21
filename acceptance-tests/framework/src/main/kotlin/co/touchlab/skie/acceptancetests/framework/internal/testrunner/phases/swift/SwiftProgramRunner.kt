@@ -5,7 +5,7 @@ import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
-internal class SwiftProgramRunner(private val testLogger: TestLogger) {
+class SwiftProgramRunner(private val testLogger: TestLogger) {
 
     fun runProgram(binary: Path): TestResult {
         val command = binary.absolutePathString()
