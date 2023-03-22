@@ -14,6 +14,7 @@ class SwiftTestCompiler(
     private val tempFileSystem: TempFileSystem,
     private val testLogger: TestLogger,
     private val target: CompilerArgumentsProvider.Target,
+    private val additionalSwiftCompilerFlags: List<String> = emptyList(),
 ) {
 
     fun compile(kotlinFramework: Path, swiftFile: Path): IntermediateResult<Path> {
@@ -32,7 +33,7 @@ class SwiftTestCompiler(
         kotlinFramework: Path,
         swiftFile: Path,
         output: Path,
-    ): String = listOf(
+    ): String = (listOf(
         "/usr/bin/xcrun",
         "-sdk", target.sdk,
         "swiftc",
@@ -50,7 +51,7 @@ class SwiftTestCompiler(
         output.absolutePathString(),
         // Workaround for https://github.com/apple/swift/issues/55127
         "-parse-as-library",
-    ).joinToString(" ")
+    ) + additionalSwiftCompilerFlags).joinToString(" ")
 
     private fun interpretResult(result: CommandResult, output: Path): IntermediateResult<Path> =
         if (result.exitCode == 0) {

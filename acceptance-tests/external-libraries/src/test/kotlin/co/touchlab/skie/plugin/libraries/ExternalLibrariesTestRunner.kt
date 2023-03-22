@@ -25,7 +25,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-
 class ExternalLibrariesTestRunner(
     private val testTmpDir: File,
     private val testFilter: TestFilter,
@@ -96,7 +95,11 @@ class ExternalLibrariesTestRunner(
                     )
                 }
                 .flatMap {
-                    val swiftCompiler = SwiftTestCompiler(tempFileSystem, testLogger, compilerArgumentsProvider.target)
+                    val additionalSwiftArguments = listOf(
+                        "-Xlinker", "-lsqlite3",
+                        "-framework", "AVFoundation",
+                    ) + expectedMissingSymbols.flatMap { listOf("-Xlinker", "-U", "-Xlinker", it) }
+                    val swiftCompiler = SwiftTestCompiler(tempFileSystem, testLogger, compilerArgumentsProvider.target, additionalSwiftArguments)
                     swiftCompiler.compile(it, swiftMainFile)
                 }
                 .finalize {
