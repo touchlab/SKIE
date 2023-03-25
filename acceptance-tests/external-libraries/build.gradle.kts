@@ -10,16 +10,23 @@ plugins {
     id("skie-jvm")
     id("skie-buildconfig")
     alias(libs.plugins.kotlin.plugin.serialization)
+    idea
 }
 
 skieJvm {
     areContextReceiversEnabled.set(true)
 }
 
+val stdlibTestsSourceSet = sourceSets.create("stdlibTests") {
+    idea.module.testSources.from(kotlin.srcDirs)
+    idea.module.testSources.from(java.srcDirs)
+    idea.module.testResources.from(resources.srcDirs)
+}
+
 val compareTestsSourceSet = sourceSets.create("compareTests") {
-    java.srcDir("src/compareTests/java")
-    kotlin.srcDir("src/compareTests/kotlin")
-    resources.srcDir("src/compareTests/resources")
+    idea.module.testSources.from(kotlin.srcDirs)
+    idea.module.testSources.from(java.srcDirs)
+    idea.module.testResources.from(resources.srcDirs)
 }
 
 val acceptanceTestDependencies: Configuration = configurations.create("acceptanceTestDependencies") {
@@ -38,6 +45,7 @@ val acceptanceTestDependencies: Configuration = configurations.create("acceptanc
     }
 }
 
+val stdlibTestsImplementation by configurations.getting
 val compareTestsImplementation by configurations.getting
 
 dependencies {
@@ -53,8 +61,19 @@ dependencies {
     testImplementation("co.touchlab.skie:api")
     testImplementation("co.touchlab.skie:spi")
 
+    stdlibTestsImplementation("co.touchlab.skie:configuration-api")
+    stdlibTestsImplementation("co.touchlab.skie:generator")
+    stdlibTestsImplementation("co.touchlab.skie:kotlin-plugin")
+    stdlibTestsImplementation("co.touchlab.skie:api")
+    stdlibTestsImplementation("co.touchlab.skie:spi")
+    stdlibTestsImplementation(libs.kotlin.native.compiler.embeddable)
+    stdlibTestsImplementation(libs.kotlinPoet)
+    stdlibTestsImplementation(libs.bundles.testing.jvm)
+    stdlibTestsImplementation(projects.acceptanceTests.framework)
+
     compareTestsImplementation(libs.bundles.testing.jvm)
     compareTestsImplementation(projects.acceptanceTests.framework)
+
 
     // Workaround for these dependencies not being built before running tests
     acceptanceTestDependencies("co.touchlab.skie:configuration-annotations")
@@ -189,6 +208,18 @@ tasks.register<Test>("comparePureAndSkie") {
 
     testClassesDirs = compareTestsSourceSet.output.classesDirs
     classpath = compareTestsSourceSet.runtimeClasspath
+
+    useJUnitPlatform()
+}
+
+val stdlibTest = tasks.register<Test>("stdlibTest") {
+    description = "Runs SKIE for stdlib symbols"
+    group = "verification"
+
+    testClassesDirs = stdlibTestsSourceSet.output.classesDirs
+    classpath = stdlibTestsSourceSet.runtimeClasspath
+
+    systemProperty("testTmpDir", layout.buildDirectory.dir("stdlib-tests").get().asFile.absolutePath)
 
     useJUnitPlatform()
 }

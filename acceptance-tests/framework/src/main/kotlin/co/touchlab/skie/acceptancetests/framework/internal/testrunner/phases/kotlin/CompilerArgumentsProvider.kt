@@ -3,11 +3,9 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.ko
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift.execute
 import co.touchlab.skie.framework.BuildConfig
 import org.jetbrains.kotlin.cli.common.arguments.K2NativeCompilerArguments
-import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.konan.target.TargetTriple
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
-import kotlin.reflect.full.companionObject
 
 class CompilerArgumentsProvider(
     val dependencies: List<String> = EnvDefaults.dependencies ?: emptyList(),
@@ -15,9 +13,11 @@ class CompilerArgumentsProvider(
     val linkMode: LinkMode = EnvDefaults.linkMode ?: LinkMode.Static,
     val buildConfiguration: BuildConfiguration = EnvDefaults.buildConfiguration ?: BuildConfiguration.Debug,
     val target: Target = EnvDefaults.target ?: Target.current,
+    val optIn: List<String> = emptyList(),
 ) {
     fun compile(
         sourcePaths: List<Path>,
+        commonSourcePaths: List<Path>,
         outputFile: Path,
         tempDirectory: Path,
     ): K2NativeCompilerArguments {
@@ -35,8 +35,10 @@ class CompilerArgumentsProvider(
             noendorsedlibs = true
 
             libraries = dependencies.toTypedArray()
+            optIn = this@CompilerArgumentsProvider.optIn.toTypedArray()
 
             freeArgs += sourcePaths.map { it.absolutePathString() }
+            commonSources = commonSourcePaths.map { it.absolutePathString() }.toTypedArray()
 
             temporaryFilesDir = tempDirectory.absolutePathString()
             outputName = outputFile.absolutePathString()

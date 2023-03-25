@@ -19,7 +19,11 @@ class KotlinTestCompiler(
     private val testLogger: TestLogger,
 ) {
 
-    fun compile(kotlinFiles: List<Path>, compilerArgumentsProvider: CompilerArgumentsProvider): IntermediateResult<Path> {
+    fun compile(
+        kotlinFiles: List<Path>,
+        compilerArgumentsProvider: CompilerArgumentsProvider,
+        commonKotlinFiles: List<Path> = emptyList(),
+    ): IntermediateResult<Path> {
         val tempDirectory = tempFileSystem.createDirectory("kotlin-compiler")
         val outputFile = tempFileSystem.createFile("kotlin.klib")
 
@@ -27,6 +31,7 @@ class KotlinTestCompiler(
 
         val arguments = compilerArgumentsProvider.compile(
             sourcePaths = kotlinFiles,
+            commonSourcePaths = commonKotlinFiles,
             tempDirectory = tempDirectory,
             outputFile = outputFile,
         )
