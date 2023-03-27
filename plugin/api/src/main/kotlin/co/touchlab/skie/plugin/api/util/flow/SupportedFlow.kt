@@ -50,7 +50,7 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
             override val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType = SwiftIrTypeDeclaration.Local.SwiftType(
                 swiftName = "SkieSwift${owner.name}",
                 typeParameters = listOf(
-                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = listOf(BuiltinDeclarations.Swift.AnyObject)),
+                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = emptyList()),
                 ),
                 superTypes = listOf(
                     // TODO: Verify if this is enough, or we should have a separate `SwiftIrReferenceDeclaration` for classes
@@ -73,7 +73,7 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
             override val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType = SwiftIrTypeDeclaration.Local.SwiftType(
                 swiftName = "SkieSwiftOptional${owner.name}",
                 typeParameters = listOf(
-                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = listOf(BuiltinDeclarations.Swift.AnyObject)),
+                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = emptyList()),
                 ),
                 superTypes = listOf(
                     // TODO: Verify if this is enough, or we should have a separate `SwiftIrReferenceDeclaration` for classes
