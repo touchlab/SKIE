@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 
@@ -30,7 +31,7 @@ internal class SealedInteropGenerator(
         get() = this.isSealed && this.isSealedInteropEnabled
 
     private val KotlinClassSwiftModel.isSealedInteropEnabled: Boolean
-        get() = this.getConfiguration(SealedInterop.Enabled)
+        get() = this.getConfiguration(SealedInterop.Enabled) || this.belongsToSkieRuntime
 
     private fun generate(swiftModel: KotlinClassSwiftModel) {
         module.generateCode(swiftModel) {
