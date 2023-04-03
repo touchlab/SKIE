@@ -18,6 +18,8 @@ tasks.wrapper {
 }
 
 tasks.register("cleanAll") {
-    dependsOn(gradle.includedBuilds.map { it.task(":cleanAll") })
+    val ignoredIncludedBuilds = listOf("swiftpoet")
+
+    dependsOn(gradle.includedBuilds.filter { it.name !in ignoredIncludedBuilds }.map { it.task(":cleanAll") })
     dependsOn(allprojects.mapNotNull { it.tasks.findByName("clean") })
 }
