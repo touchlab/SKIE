@@ -3,7 +3,6 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="DEVELOPER_DIR" value="/Applications/Xcode-14.2.0.app/Contents/Developer" />
           <entry key="acceptanceTest" value="sealed" />
           <entry key="debugDumpSwiftApiAt" value="" />
         </map>
@@ -25,7 +24,6 @@
     <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
-    <ForceTestExec>false</ForceTestExec>
     <method v="2" />
   </configuration>
 </component>
