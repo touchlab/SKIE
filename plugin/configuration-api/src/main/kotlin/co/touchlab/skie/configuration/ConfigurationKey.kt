@@ -18,6 +18,8 @@ interface ConfigurationKey<T> {
 
     val defaultValue: T
 
+    val skieRuntimeValue: T
+
     fun getAnnotationValue(configurationTarget: ConfigurationTarget): T?
 
     fun deserialize(value: kotlin.String?): T

@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.configuration
 
 import co.touchlab.skie.configuration.ConfigurationTarget
+import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.findAnnotation
 import co.touchlab.skie.plugin.generator.internal.util.hasAnnotation
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -10,6 +11,8 @@ import kotlin.reflect.KClass
 class DeclarationDescriptorConfigurationTarget(private val declarationDescriptor: DeclarationDescriptor) : ConfigurationTarget {
 
     override val fqName: String = declarationDescriptor.fqNameSafe.asString()
+
+    override val belongsToSkieRuntime: Boolean = declarationDescriptor.belongsToSkieRuntime
 
     override fun <T : Annotation> hasAnnotation(kClass: KClass<T>): Boolean =
         declarationDescriptor.hasAnnotation(kClass)

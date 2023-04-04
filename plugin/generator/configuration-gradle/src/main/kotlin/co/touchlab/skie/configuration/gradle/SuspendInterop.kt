@@ -14,6 +14,8 @@ object SuspendInterop {
 
         override val defaultValue: Boolean = true
 
+        override val skieRuntimeValue: Boolean = true
+
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<SuspendInterop.Enabled>() -> true

@@ -1,4 +1,4 @@
-# SwiftCompilationError(error: global function 'onEnum(of:)' requires that 'B' inherit from 'A')
+# SwiftCompilationError(error: no exact matches in call to global function 'onEnum')
 
 let b: B = B1()
 

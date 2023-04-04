@@ -1,4 +1,4 @@
-# SwiftCompilationError(extraneous argument label)
+# SwiftCompilationError(error: global function 'onEnum(of:)' requires that 'any A' inherit from 'Skie_SuspendResult')
 
 func test(a: A) {
     switch onEnum(of: a) {

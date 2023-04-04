@@ -15,6 +15,10 @@ data class Configuration(
 ) {
 
     operator fun <T> get(target: ConfigurationTarget, key: ConfigurationKey<T>): T {
+        if (target.belongsToSkieRuntime) {
+            return key.skieRuntimeValue
+        }
+
         val group = findGroup(target, key)
 
         val configurationValue = group?.findValue(key) ?: key.defaultValue

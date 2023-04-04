@@ -1,4 +1,4 @@
-# SwiftCompilationError(cannot find 'onEnum' in scope)
+# SwiftCompilationError(error: global function 'onEnum(of:)' requires that 'A' inherit from 'Skie_SuspendResult')
 
 func test(a: A) {
     switch onEnum(of: a) {

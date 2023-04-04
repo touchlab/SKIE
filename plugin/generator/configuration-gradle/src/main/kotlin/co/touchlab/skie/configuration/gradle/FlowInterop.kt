@@ -14,6 +14,8 @@ object FlowInterop {
 
         override val defaultValue: Boolean = true
 
+        override val skieRuntimeValue: Boolean = false
+
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<FlowInterop.Enabled>() -> true

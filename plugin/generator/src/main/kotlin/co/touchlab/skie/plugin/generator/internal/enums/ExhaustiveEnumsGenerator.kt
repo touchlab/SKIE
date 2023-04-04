@@ -14,7 +14,6 @@ import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.generator.internal.enums.ObjCBridgeable.addObjcBridgeableImplementation
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
@@ -56,7 +55,7 @@ internal class ExhaustiveEnumsGenerator(
             this.classDescriptor.isEnumInteropEnabled
 
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
-        get() = getConfiguration(EnumInterop.Enabled) || this.belongsToSkieRuntime
+        get() = getConfiguration(EnumInterop.Enabled)
 
     private fun generate(classSwiftModel: MutableKotlinClassSwiftModel) {
         if (classSwiftModel.enumEntries.isEmpty()) {

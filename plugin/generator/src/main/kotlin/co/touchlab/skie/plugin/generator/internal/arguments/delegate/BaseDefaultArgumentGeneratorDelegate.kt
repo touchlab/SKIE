@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 import co.touchlab.skie.configuration.gradle.DefaultArgumentInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -27,7 +26,7 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
 
     protected val FunctionDescriptor.isInteropEnabled: Boolean
-        get() = (this.getConfiguration(DefaultArgumentInterop.Enabled) && this.satisfiesMaximumDefaultArgumentCount) || this.belongsToSkieRuntime
+        get() = this.getConfiguration(DefaultArgumentInterop.Enabled) && this.satisfiesMaximumDefaultArgumentCount
 
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean
         get() = this.defaultArgumentCount <= this.getConfiguration(DefaultArgumentInterop.MaximumDefaultArgumentCount)

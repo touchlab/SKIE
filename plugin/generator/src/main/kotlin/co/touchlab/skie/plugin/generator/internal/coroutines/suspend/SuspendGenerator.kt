@@ -7,11 +7,9 @@ import co.touchlab.skie.configuration.gradle.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.InternalDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
@@ -50,7 +48,7 @@ internal class SuspendGenerator(
         get() = this.isSuspend
 
     private val FunctionDescriptor.isInteropEnabled: Boolean
-        get() = this.getConfiguration(SuspendInterop.Enabled) || this.belongsToSkieRuntime
+        get() = this.getConfiguration(SuspendInterop.Enabled)
 
     private fun markOriginalFunctionAsReplaced(originalFunctionDescriptor: SimpleFunctionDescriptor) {
         module.configure {

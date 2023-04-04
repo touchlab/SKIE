@@ -14,6 +14,8 @@ object ExperimentalFeatures {
 
         override val defaultValue: Boolean = false
 
+        override val skieRuntimeValue: Boolean = true
+
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<ExperimentalFeatures.Enabled>() -> true

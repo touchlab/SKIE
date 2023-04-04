@@ -1,4 +1,4 @@
-# SwiftCompilationError(cannot find 'onEnum' in scope)
+# SwiftCompilationError(error: cannot find type 'A' in scope)
 
 func test(a: A) {
     onEnum(of: a)

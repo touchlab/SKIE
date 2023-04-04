@@ -9,7 +9,6 @@ import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunction
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
-import co.touchlab.skie.plugin.generator.internal.runtime.belongsToSkieRuntime
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 
 internal class FlowMappingConfigurator(
@@ -46,6 +45,6 @@ internal class FlowMappingConfigurator(
             if (this.isInteropEnabled) FlowMappingStrategy.Full else FlowMappingStrategy.None
 
         private val KotlinCallableMemberSwiftModel.isInteropEnabled: Boolean
-            get() = this.descriptor.getConfiguration(FlowInterop.Enabled) && !this.descriptor.belongsToSkieRuntime
+            get() = this.descriptor.getConfiguration(FlowInterop.Enabled)
     }
 }

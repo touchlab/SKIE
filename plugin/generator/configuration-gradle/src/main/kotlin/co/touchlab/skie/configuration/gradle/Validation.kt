@@ -14,6 +14,8 @@ object Validation {
 
         override val defaultValue: ValidationSeverity = ValidationSeverity.Error
 
+        override val skieRuntimeValue: ValidationSeverity = ValidationSeverity.Error
+
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): ValidationSeverity? =
             null
 

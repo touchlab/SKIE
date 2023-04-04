@@ -3,7 +3,7 @@
     },
     "groups": [
         {
-            "target": "tests.",
+            "target": "",
             "overridesAnnotations": false,
             "items": {
                 "SuspendInterop.Enabled": "false"

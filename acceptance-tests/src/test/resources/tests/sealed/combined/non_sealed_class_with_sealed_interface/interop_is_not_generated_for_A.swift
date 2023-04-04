@@ -1,4 +1,4 @@
-# SwiftCompilationError(error: global function 'onEnum(of:)' requires that 'A' conform to 'I')
+# SwiftCompilationError(candidate requires that 'A' conform to 'I' (requirement specified as 'SEALED' : 'I'))
 
 func test(a: A) {
     switch onEnum(of: a) {

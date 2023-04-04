@@ -6,6 +6,8 @@ interface ConfigurationTarget {
 
     val fqName: String
 
+    val belongsToSkieRuntime: Boolean
+
     fun <T : Annotation> hasAnnotation(kClass: KClass<T>): Boolean
 
     fun <T : Annotation> findAnnotation(kClass: KClass<T>): T?
