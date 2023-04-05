@@ -123,14 +123,6 @@ dev.gitlive:appauth-kotlin-iosarm64
 > import FirebaseDatabase
 dev.gitlive:firebase-database-iosarm64
 
-# Undefined symbols - Swift linker throws the same kind of error even without SKIE (just with different symbols).
-> "_kfun:com.adeo.kviewmodel.compose#observeAsState__Skie_DefaultArguments__
-com.adeo:kviewmodel-compose-iosarm64
-
-# Undefined symbols - Swift linker throws the same kind of error even without SKIE (just with different symbols).
-> "_kfun:com.episode6.redux.compose#collectAsState__Skie_DefaultArguments__
-com.episode6.redux:compose-iosarm64
-
 # Bug in the compiler - it's not possible to call suspend function with suspend lambda parameter with default argument from another module.
 > Suspend functions should be lowered out at this point, but FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (it:kotlin.Pair<com.soywiz.korio.file.VfsFile, com.soywiz.korio.file.VfsFile>) returnType:kotlin.Unit [suspend] is still here
 com.adamratzman:spotify-api-kotlin-iosarm64
