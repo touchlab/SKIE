@@ -53,7 +53,11 @@ class ExternalLibrariesTestLoader(private val testTmpDir: File) {
 
     private fun expectedTestResult(library: String, expectedFailures: List<ExpectedLinkFailure>): ExpectedTestResult {
         return expectedFailures.find { it.regex.containsMatchIn(library) }?.let { expectedFailure ->
-            ExpectedTestResult.KotlinAnyError(expectedFailure.expectedErrors)
+            ExpectedTestResult.Union(
+                ExpectedTestResult.KotlinCompilationError(expectedFailure.expectedErrors),
+                ExpectedTestResult.KotlinLinkingError(expectedFailure.expectedErrors),
+                ExpectedTestResult.SwiftCompilationError(expectedFailure.expectedErrors),
+            )
         } ?: ExpectedTestResult.Success
     }
 

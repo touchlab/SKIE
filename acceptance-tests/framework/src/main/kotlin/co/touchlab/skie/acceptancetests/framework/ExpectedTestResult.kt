@@ -8,15 +8,24 @@ sealed interface ExpectedTestResult {
         shouldBe(testResultWithLogs.testResult, testResultWithLogs.logs)
     }
 
-    fun shouldBe(testResult: TestResult, logs: String)
+    fun shouldBe(testResult: TestResult, logs: String) {
+        if (!hasSucceeded(testResult, logs)) {
+            val errorMessage = """
+                Test failed:
+                    Expected: $messageForExpectedError
+                    Actual: ${testResult.actualErrorMessage}
+                """.trimIndent()
 
-    fun hasSucceeded(testResultWithLogs: TestResultWithLogs): Boolean = try {
-        shouldBe(testResultWithLogs)
-
-        true
-    } catch (_: Throwable) {
-        false
+            fail(errorMessage)
+        }
     }
+
+    fun hasSucceeded(testResultWithLogs: TestResultWithLogs): Boolean =
+        hasSucceeded(testResultWithLogs.testResult, testResultWithLogs.logs)
+
+    fun hasSucceeded(testResult: TestResult, logs: String): Boolean
+
+    val messageForExpectedError: String
 
     companion object {
 
@@ -26,173 +35,133 @@ sealed interface ExpectedTestResult {
 
     object Success : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (testResult is TestResult.Success) {
-                return
-            }
+        override val messageForExpectedError: String
+            get() = TestResult.Success.ERROR_MESSAGE
 
-            failTest(testResult, TestResult.Success.ERROR_MESSAGE)
-        }
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.Success
     }
 
     data class SuccessWithWarning(val warning: String) : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (testResult is TestResult.Success && logs.contains(warning)) {
-                return
-            }
+        override val messageForExpectedError: String
+            get() = "Tested program ended successfully by explicitly calling exit(0) and produced warning: $warning"
 
-            failTest(testResult, "Tested program ended successfully by explicitly calling exit(0) and produced warning: $warning")
-        }
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.Success && logs.contains(warning)
     }
 
     data class SuccessWithoutWarning(val warning: String) : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (testResult is TestResult.Success && !logs.contains(warning)) {
-                return
-            }
+        override val messageForExpectedError: String
+            get() = "Tested program ended successfully by explicitly calling exit(0) and did not produce warning: $warning"
 
-            failTest(testResult, "Tested program ended successfully by explicitly calling exit(0) and did not produce warning: $warning")
-        }
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.Success && !logs.contains(warning)
     }
 
     object MissingExit : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (testResult is TestResult.MissingExit) {
-                return
-            }
+        override val messageForExpectedError: String
+            get() = TestResult.MissingExit.ERROR_MESSAGE
 
-            failTest(testResult, TestResult.MissingExit.ERROR_MESSAGE)
-        }
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.MissingExit
     }
 
     data class IncorrectOutput(val exitCode: Int?) : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (exitCode != null) {
-                if (testResult is TestResult.IncorrectOutput && testResult.exitCode == exitCode) {
-                    return
-                }
-
-                failTest(testResult, TestResult.IncorrectOutput.errorMessage(exitCode))
+        override val messageForExpectedError: String
+            get() = if (exitCode != null) {
+                TestResult.IncorrectOutput.errorMessage(exitCode)
             } else {
-                if (testResult is TestResult.IncorrectOutput) {
-                    return
-                }
-
-                failTest(testResult, "Tested program ended with any exit code other than 0.")
+                "Tested program ended with any exit code other than 0."
             }
-        }
+
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.IncorrectOutput && (exitCode == null || testResult.exitCode == exitCode)
     }
 
-    data class RuntimeError(val error: String?) : ExpectedTestResult {
+    data class RuntimeError(val errors: Collection<String>) : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (error != null) {
-                if (testResult is TestResult.RuntimeError && testResult.error.contains(error)) {
-                    return
-                }
-
-                failTest(testResult, "Tested program ended with an error containing: $error")
+        override val messageForExpectedError: String
+            get() = if (errors.isNotEmpty()) {
+                "Tested program ended with an error containing: ${errors.joinToString("\n")}"
             } else {
-                if (testResult is TestResult.RuntimeError) {
-                    return
-                }
-
-                failTest(testResult, "Tested program ended with any error.")
+                "Tested program ended with any error."
             }
-        }
+
+        constructor(vararg errors: String) : this(errors.toList())
+
+        constructor(error: String?) : this(listOfNotNull(error))
+
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.RuntimeError && errors.all { testResult.error.contains(it) }
     }
 
-    data class SwiftCompilationError(val error: String?) : ExpectedTestResult {
+    data class SwiftCompilationError(val errors: Collection<String>) : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (error != null) {
-                if (testResult is TestResult.SwiftCompilationError && testResult.error.contains(error)) {
-                    return
-                }
-
-                failTest(testResult, "Swift compilation ended with an error containing: $error")
+        override val messageForExpectedError: String
+            get() = if (errors.isNotEmpty()) {
+                "Swift compilation ended with an error containing: ${errors.joinToString("\n")}"
             } else {
-                if (testResult is TestResult.SwiftCompilationError) {
-                    return
-                }
-
-                failTest(testResult, "Swift compilation ended with any error.")
+                "Swift compilation ended with any error."
             }
-        }
+
+        constructor(vararg errors: String) : this(errors.toList())
+
+        constructor(error: String?) : this(listOfNotNull(error))
+
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.SwiftCompilationError && errors.all { testResult.error.contains(it) }
     }
 
-    data class KotlinLinkingError(val errors: List<String>) : ExpectedTestResult {
-        constructor(error: String?): this(listOfNotNull(error))
+    data class KotlinLinkingError(val errors: Collection<String>) : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (errors.isNotEmpty()) {
-                if (testResult is TestResult.KotlinLinkingError && errors.all { testResult.error.contains(it) }) {
-                    return
-                }
-
-                failTest(testResult, "Kotlin linking ended with an error containing all of: ${errors.joinToString("\n")}")
+        override val messageForExpectedError: String
+            get() = if (errors.isNotEmpty()) {
+                "Kotlin linking ended with an error containing all of: ${errors.joinToString("\n")}"
             } else {
-                if (testResult is TestResult.KotlinLinkingError) {
-                    return
-                }
-
-                failTest(testResult, "Kotlin linking ended with any error.")
+                "Kotlin linking ended with any error."
             }
-        }
+
+        constructor(vararg errors: String) : this(errors.toList())
+
+        constructor(error: String?) : this(listOfNotNull(error))
+
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.KotlinLinkingError && errors.all { testResult.error.contains(it) }
     }
 
-    data class KotlinCompilationError(val error: String?) : ExpectedTestResult {
+    data class KotlinCompilationError(val errors: Collection<String>) : ExpectedTestResult {
 
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (error != null) {
-                if (testResult is TestResult.KotlinCompilationError && testResult.error.contains(error)) {
-                    return
-                }
-
-                failTest(testResult, "Kotlin compilation ended with an error containing: $error")
+        override val messageForExpectedError: String
+            get() = if (errors.isNotEmpty()) {
+                "Kotlin compilation ended with an error containing: ${errors.joinToString("\n")}"
             } else {
-                if (testResult is TestResult.KotlinCompilationError) {
-                    return
-                }
-
-                failTest(testResult, "Kotlin compilation ended with any error.")
+                "Kotlin compilation ended with any error."
             }
-        }
+
+        constructor(vararg errors: String) : this(errors.toList())
+
+        constructor(error: String?) : this(listOfNotNull(error))
+
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            testResult is TestResult.KotlinCompilationError && errors.all { testResult.error.contains(it) }
     }
 
-    data class KotlinAnyError(val errors: List<String>): ExpectedTestResult {
-        override fun shouldBe(testResult: TestResult, logs: String) {
-            if (errors.isNotEmpty()) {
-                if (testResult is TestResult.KotlinCompilationError && errors.all { testResult.error.contains(it) }) {
-                    return
-                }
-                if (testResult is TestResult.KotlinLinkingError && errors.all { testResult.error.contains(it) }) {
-                    return
-                }
+    data class Union(val expectedTestResults: Collection<ExpectedTestResult>) : ExpectedTestResult {
 
-                failTest(testResult, "Kotlin linking ended with an error containing all of: ${errors.joinToString("\n")}")
-            } else {
-                if (testResult is TestResult.KotlinCompilationError || testResult is TestResult.KotlinLinkingError) {
-                    return
-                }
+        override val messageForExpectedError: String
+            get() = "Test ended with one of the following options: [${expectedTestResults.joinToString { it.messageForExpectedError }}]"
 
-                failTest(testResult, "Kotlin linking ended with any error.")
-            }
+        constructor(vararg expectedTestResults: ExpectedTestResult) : this(expectedTestResults.toList())
+
+        init {
+            require(expectedTestResults.isNotEmpty()) { "There must be at least one expectedTestResult." }
         }
+
+        override fun hasSucceeded(testResult: TestResult, logs: String): Boolean =
+            expectedTestResults.any { it.hasSucceeded(testResult, logs) }
     }
-}
-
-private fun failTest(result: TestResult, expected: String) {
-    val errorMessage =
-        """
-        Test failed:
-            Expected: $expected
-            Actual: ${result.actualErrorMessage}
-        """.trimIndent()
-
-    fail(errorMessage)
 }
