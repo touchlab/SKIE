@@ -45,4 +45,10 @@ kotlin {
     mingwX86()
 
     wasm32()
+
+    @Suppress("OPT_IN_USAGE")
+    wasm {
+        browser()
+        nodejs()
+    }
 }
