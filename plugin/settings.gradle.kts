@@ -32,6 +32,7 @@ includeBuild("../swiftpoet")
 
 include(
     ":api",
+    ":api:air",
     ":spi",
     ":configuration-api",
     ":linker",
