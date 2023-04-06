@@ -28,28 +28,31 @@ Kotlin compiler plugins are generally not stable and break with almost every rel
 
 **Before you do anything else, check that your project compiles (especially if you had to change Gradle and/or Kotlin versions).**
 
-SKIE is deployed in a private Touchlab Maven repository. To access artifacts from that repository, you will need an API key from Touchlab, which we will happily provide upon request. If you do not know how to contact us, you can [do so here](https://touchlab.co/contact-us/).
+Add the following to your `settings.gradle.kts` file:
 
-Once you have your API key, you will then need to add the following code in `settings.gradle.kts` with your API key substituting for "YOUR_API_KEY_HERE":
+```kotlin
+plugins {
+    id("co.touchlab.faktory.access").version("0.9.6")
+}
+```
+
+SKIE is deployed in a private Touchlab Maven repository. To access artifacts from that repository, you will need an API key from Touchlab.
+
+:::info
+
+You should have a key to access SKIE, but if not, [reach out](https://touchlab.co/contact-us/).
+
+:::
+
+You API key should have been sent through email. Once you have your API key, you will then need to add the following code in `gradle.properties`:
 
 <ApiKeyInterpolatedCodeBlock
-    language="kotlin"
-    title="settings.gradle.kts">
-{`pluginManagement {
-    repositories {
-        // Previously present repositories like mavenCentral()
-        // ...
-        maven("https://api.touchlab.dev/mvn/{API_KEY}")
-    }
-}\n
-dependencyResolutionManagement {
-    repositories {
-        // Previously present repositories like mavenCentral()
-        // ...
-        maven("https://api.touchlab.dev/mvn/{API_KEY}")
-    }
-}`}
+    language="properties"
+    title="gradle.properties">
+{`touchlab.key={API_KEY}`}
 </ApiKeyInterpolatedCodeBlock>
+
+With those values set, you should be able to access our private maven repo and binaries.
 
 To enable SKIE, add the plugin in `build.gradle.kts` of the module that builds the native framework:
 
@@ -59,6 +62,6 @@ plugins {
 }
 ```
 
-SKIE should not be applied to other modules - it automatically works with all of the code in every module (including 3rd party dependencies).
+SKIE should only be applied to modules that export your Xcode Frameworks. It automatically works on dependent project modules and 3rd party dependencies.
 
 That is the totality of what's required to integrate SKIE! Below is a list of features that SKIE supports. If you find that you want or need to customize SKIE's behavior, then check out the [Configuration doc](/docs/Configuration/Configuration.md).
