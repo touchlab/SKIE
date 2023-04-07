@@ -36,7 +36,7 @@ internal sealed class SkieCompilerConfigurationKey<T : Any>(name: String) {
     object SkieScheduler : SkieCompilerConfigurationKey<SkieSchedulerType>("Skie Scheduler")
 }
 
-internal val CommonBackendContext.skieDeclarationBuilder: DeclarationBuilder
+internal val CommonBackendContext.skieDeclarationBuilder: DeclarationBuilderImpl
     get() = SkieCompilerConfigurationKey.DeclarationBuilder.get(configuration)
 
 internal val CommonBackendContext.skieInternalMutableDescriptorProvider: NativeMutableDescriptorProvider

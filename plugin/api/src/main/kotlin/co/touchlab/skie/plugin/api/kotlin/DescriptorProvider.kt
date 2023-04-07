@@ -16,6 +16,8 @@ interface DescriptorProvider {
 
     val exposedTopLevelMembers: Set<CallableMemberDescriptor>
 
+    fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean
+
     fun getFileModule(file: SourceFile): ModuleDescriptor
 
     /**

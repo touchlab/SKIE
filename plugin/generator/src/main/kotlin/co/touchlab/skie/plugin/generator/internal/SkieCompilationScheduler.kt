@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal
 
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.generator.internal.analytics.AnalyticsPhase
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowConversionConstructorsGenerator
@@ -15,7 +16,8 @@ import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
-import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -23,12 +25,18 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 internal class SkieCompilationScheduler(
     skieContext: SkieContext,
     descriptorProvider: NativeMutableDescriptorProvider,
-    declarationBuilder: DeclarationBuilder,
+    declarationBuilder: DeclarationBuilderImpl,
     namespaceProvider: NamespaceProvider,
     reporter: Reporter,
 ) {
 
     private val compilationPhases = listOf(
+        AnalyticsPhase(
+            descriptorProvider = descriptorProvider,
+        ),
+        GenerateIrPhase(
+            declarationBuilder = declarationBuilder,
+        ),
         IrValidator(
             skieContext = skieContext,
             reporter = reporter,
@@ -87,9 +95,9 @@ internal class SkieCompilationScheduler(
             .forEach { it.runObjcPhase() }
     }
 
-    fun runIrPhases(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+    fun runIrPhases(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
         compilationPhases
             .filter { it.isActive }
-            .forEach { it.runIrPhase(moduleFragment, pluginContext) }
+            .forEach { it.runIrPhase(moduleFragment, pluginContext, allModules) }
     }
 }

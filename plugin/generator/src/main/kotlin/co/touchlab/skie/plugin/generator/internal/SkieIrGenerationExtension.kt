@@ -1,17 +1,20 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.plugin.generator.internal
 
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
+import org.jetbrains.kotlin.backend.konan.serialization.KonanIrLinker
 
 class SkieIrGenerationExtension(private val configuration: CompilerConfiguration) : IrGenerationExtension {
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-        val declarationBuilder = SkieCompilerConfigurationKey.DeclarationBuilder.getOrNull(configuration)
+        val linker = (pluginContext as? IrPluginContextImpl)?.linker as? KonanIrLinker ?: return
 
-        declarationBuilder?.generateIr(moduleFragment, pluginContext)
-
-        SkieCompilerConfigurationKey.SkieScheduler.get(configuration).runIrPhases(moduleFragment, pluginContext)
+        SkieCompilerConfigurationKey.SkieScheduler.get(configuration).runIrPhases(moduleFragment, pluginContext, linker.modules)
     }
 }

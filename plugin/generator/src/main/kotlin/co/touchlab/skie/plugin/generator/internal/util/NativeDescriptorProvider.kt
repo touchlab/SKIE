@@ -58,6 +58,9 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
         exportedInterface.mapper
     }
 
+    override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
+        callableMemberDescriptor.isExposed
+
     private val exportedInterface by lazy {
         val objCExport = ObjCExportReflector.new(context)
 
@@ -67,6 +70,7 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
     private val CallableMemberDescriptor.isExposable: Boolean
         get() = mapper.shouldBeExposed(this)
 
+    @get:JvmName("isExposedExtension")
     private val CallableMemberDescriptor.isExposed: Boolean
         get() = this in exposedTopLevelMembers ||
             this in exposedCategoryMembers ||

@@ -10,6 +10,6 @@ internal interface SkieCompilationPhase {
     fun runObjcPhase() {
     }
 
-    fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+    fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
     }
 }

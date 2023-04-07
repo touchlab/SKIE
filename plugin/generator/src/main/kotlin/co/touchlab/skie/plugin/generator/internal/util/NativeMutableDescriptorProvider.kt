@@ -75,6 +75,9 @@ internal class NativeMutableDescriptorProvider(
     override val exposedCategoryMembers: Set<CallableMemberDescriptor> get() = realProvider.exposedCategoryMembers
     override val exposedTopLevelMembers: Set<CallableMemberDescriptor> get() = realProvider.exposedTopLevelMembers
 
+    override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
+        realProvider.isExposed(callableMemberDescriptor)
+
     override fun getFileModule(file: SourceFile): ModuleDescriptor = realProvider.getFileModule(file)
 
     override fun getExposedClassMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =

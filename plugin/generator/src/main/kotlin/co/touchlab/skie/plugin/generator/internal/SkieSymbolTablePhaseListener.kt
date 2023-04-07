@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal
 
-import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.MutableDescriptorProviderKey
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
