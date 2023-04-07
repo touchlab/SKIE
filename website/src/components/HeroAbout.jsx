@@ -4,26 +4,30 @@ import HeroImage from '@site/static/componentimg/hero.jpg';
 
 export default function HeroAbout() {
     return (
-        <section className="relative">
-
-            {/* Background image */}
-            <div className="absolute inset-0">
-                <img className="w-full h-full object-cover" src={HeroImage} width="1440" height="394" alt="About"/>
-                <div className="absolute inset-0 bg-blue-900 opacity-50" aria-hidden="true"></div>
-            </div>
+        <section className="relative bg-slate-100 dark:bg-slate-800">
+            {/*<div className="absolute inset-0">*/}
+            {/*    <img className="w-full h-full object-cover" src={HeroImage} width="1440" height="394" alt="About"/>*/}
+            {/*    <div className="absolute inset-0 bg-blue-900 opacity-50" aria-hidden="true"></div>*/}
+            {/*</div>*/}
 
             {/* Hero content */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-                <div className="pt-32 pb-12 md:pt-52 md:pb-28">
-                    <div className="max-w-3xl mx-auto text-center">
-                        <h1 className="h1 mb-4 drop-shadow-lg text-white" data-aos="fade-up">SKIE</h1>
-                        <h2 className="h2 mb-4 drop-shadow-lg text-white" data-aos="fade-up">Swift/Kotlin Interface Extender</h2>
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 relative text-start">
+                <div className="pt-8 pb-12 md:pt-24 md:pb-28">
+                    <div className="max-w-5xl mx-auto mb-8">
+                        <h1 className="h1 font-normal md:text-7xl md:leading-none" data-aos="fade-up">
+                            Elevate your KMM<br/> experience with SKIE
+                        </h1>
                     </div>
-                    <div className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center">
-                        <div data-aos="fade-up" data-aos-delay="400">
-                            <a className="btn text-white bg-cyan-600 hover:bg-cyan-700 w-full mb-4 sm:w-auto sm:mb-0 drop-shadow-lg"
-                               href="intro">Get Started</a>
-                        </div>
+                    {/* Section header */}
+                    <div className="max-w-5xl mx-auto mb-8 md:mb-16 ">
+                        <h4 className="h4 max-w-3xl mb-4">A Swift-friendly API Generator for Kotlin Multiplatform Mobile</h4>
+                        <p className="max-w-3xl text-xl text-gray-700 dark:text-gray-400">Don’t let the lack of proper Swift interop hamper your Kotlin Multiplatform adoption. With SKIE, you can restore the expressiveness of modern languages and enjoy a&nbsp;superior iOS developer experience.</p>
+                    </div>
+                    <div className="max-w-xs mx-auto sm:max-w-none flex justify-start sm:flex-col md:flex-row sm:space-y-4 md:space-y-0 md:space-x-4" data-aos="fade-up" data-aos-delay="400">
+                        <a className="btn text-white bg-cyan-600 hover:bg-cyan-700 sm:w-auto drop-shadow-lg no-underline"
+                           href="#">Book a Demo</a>
+
+                        <a className="btn border-2 border-solid border-cyan-600 hover:bg-cyan-600 hover:text-white box-border no-underline" href="intro">Explore Docs</a>
                     </div>
                 </div>
             </div>

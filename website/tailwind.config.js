@@ -1,7 +1,12 @@
 /** @type {import('tailwindcss').Config} */
+const autoprefixer = require("autoprefixer");
 module.exports = {
     content: ["./src/**/*.{js,jsx,ts,tsx}"],
     darkMode: ['class', '[data-theme="dark"]'], // hooks into docusaurus' dark mode settigns
+    corePlugins: {
+        preflight: false,
+    },
+    important: '.tailwind',
     theme: {
         extend: {
             colors: {
@@ -26,7 +31,7 @@ module.exports = {
                     700: '#4B4ACF',
                     800: '#38379C',
                     900: '#262668',
-                },
+                }
             },
             spacing: {
                 '9/16': '56.25%',

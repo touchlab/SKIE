@@ -10,6 +10,6 @@ tasks.register("cleanAll") {
     dependsOn(allprojects.mapNotNull { it.tasks.findByName("clean") })
 }
 
-docusaurusOss{
+docusaurusOss {
     destination.set(projectDir)
 }

@@ -13,48 +13,57 @@ function FeatureBlock(name, description, svgBody) {
 
 function FeaturesBlocks() {
     return (
-        <section>
-
-            <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                <div className="border-t border-gray-800">
-                    {/* Section header */}
-                    <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="h2 mb-4">Critical features for the KMM iOS developer experience.</h2>
-                    </div>
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:px-6 border-0 border-solid border-t border-slate-100">
+            <div>
+                {/* Section header */}
+                <div className="max-w-3xl mx-auto text-center">
+                    <h2 className="h2 mb-4">Critical features for the KMM iOS developer experience.</h2>
                 </div>
+            </div>
 
-                <div className="pb-12 md:pb-20 border-t border-gray-800 pt-4">
+            <div className="pt-4">
 
-                    {/* Items */}
-                    <div
-                        className="max-w-sm mx-auto grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-16 items-start md:max-w-2xl lg:max-w-none"
-                        data-aos-id-blocks>
+                {/* Items */}
+                <div
+                    className="max-w-sm mx-auto grid gap-8 md:grid-cols-3 lg:gap-16 items-start md:max-w-2xl lg:max-w-none"
+                    data-aos-id-blocks>
 
-                        {FeatureBlock(
-                            "Transparent Enums",
-                            "Kotlin enums are transparently converted to proper Swift enums. This allows for exhaustive operations on the Swift side.",
-                            Geometry
-                        )}
+                    {FeatureBlock(
+                        "Direct Linking",
+                        "The generated Swift and augmented interface are compiled and linked directly to the Xcode Framework. No extra deployment config required.",
+                        Link
+                    )}
 
-                        {FeatureBlock(
-                            "Sealed Classes",
-                            "Sealed Class handling allows you to exhaustively switch on sealed Kotlin hierarchies from Swift.",
-                            PillBottle
-                        )}
+                    {FeatureBlock(
+                        "Flows",
+                        "Use any Flow as an AsyncSequence from Swift, keeping the element type intact. Safe and smart.",
+                        Geometry
+                    )}
 
-                        {FeatureBlock(
-                            "Default Parameters",
-                            "Overloaded methods are added to the exposed Swift interface to allow for calling methods without needing to specify every argument.",
-                            NetworkConnection
-                        )}
+                    {FeatureBlock(
+                        "Suspend Interop",
+                        "Call Kotlin suspend functions the same way as Swift's async functions, with cancelation and background thread support.",
+                        Geometry
+                    )}
 
-                        {FeatureBlock(
-                            "Direct Linking",
-                            "The generated Swift and augmented interface are compiled and linked directly to the Xcode Framework. No extra deployment config required.",
-                            Link
-                        )}
+                    {FeatureBlock(
+                        "Transparent Enums",
+                        "Kotlin enums are transparently converted to proper Swift enums. This allows for exhaustive operations on the Swift side.",
+                        Geometry
+                    )}
 
-                    </div>
+                    {FeatureBlock(
+                        "Sealed Classes",
+                        "Sealed Class handling allows you to exhaustively switch on sealed Kotlin hierarchies from Swift.",
+                        PillBottle
+                    )}
+
+                    {FeatureBlock(
+                        "Default Parameters",
+                        "Overloaded methods are added to the exposed Swift interface to allow for calling methods without needing to specify every argument.",
+                        NetworkConnection
+                    )}
+
                 </div>
             </div>
         </section>

@@ -149,7 +149,7 @@ export default function FeaturesZigzag() {
         )
     }
     return (
-        <section>
+        <section id="features" className="py-8 md:py-24">
             <div className="hidden text-lime-600"></div>
             <div className="hidden text-lime-500"></div>
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -189,7 +189,7 @@ export default function FeaturesZigzag() {
                 </div>
             </div>
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
-                <div className="pb-12 md:pb-20 border-t border-gray-800">
+                <div className="border-t border-gray-800">
 
                     {/* Items */}
                     <div className="">

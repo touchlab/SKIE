@@ -42,6 +42,7 @@ const config = {
                 name: "docusaurus-tailwindcss-omg",
                 configurePostCss(postcssOptions) {
                     // Appends TailwindCSS and AutoPrefixer.
+                    postcssOptions.plugins.push(require("tailwindcss/nesting"));
                     postcssOptions.plugins.push(require("tailwindcss"));
                     postcssOptions.plugins.push(require("autoprefixer"));
                     return postcssOptions;
@@ -75,7 +76,7 @@ const config = {
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
-                },
+                }
             }),
         ],
     ],
@@ -86,7 +87,10 @@ const config = {
         ({
 
             colorMode: {
-                defaultMode: 'dark',
+                defaultMode: 'light',
+                disableSwitch: true,
+                // This way we'd switch based on user's preferences
+                respectPrefersColorScheme: false,
             },
             metadata: [{name: 'robots', content: 'noindex,follow'}],
             navbar: {
@@ -104,14 +108,10 @@ const config = {
                         label: 'Docs',
                     },
                     {
-                        href: 'https://touchlab.co/',
-                        label: 'Touchlab Site',
+                        to: '#',
+                        label: 'Book a Demo',
                         position: 'right',
-                    },
-                    {
-                        href: `https://github.com/${touchlabConfig.docusaurusConfig.organizationName}/${touchlabConfig.docusaurusConfig.projectName}`,
-                        label: 'GitHub',
-                        position: 'right',
+                        className: 'button button--secondary button--lg'
                     },
                 ],
             },

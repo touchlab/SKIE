@@ -4,14 +4,14 @@ import {AndroidOnly, AppleOnly, DecisionProcessOnly} from "./FeatureIcons";
 function ToggleBlock(currentBlock, blockName, setBlock, title, svgBody) {
     return (
         <div
-            className={`flex flex-row justify-center items-center font-medium py-2 px-4 m-2 bg-gray-100 dark:bg-gray-800 rounded-full group transition duration-200 ${currentBlock !== blockName && 'opacity-50 hover:opacity-75 cursor-pointer'}`}
+            className={`flex flex-row justify-center items-center font-medium py-2 px-4 bg-slate-200 dark:bg-gray-800 rounded-full group transition duration-200 cursor-default space-x-2 ${currentBlock !== blockName && 'opacity-50 hover:opacity-75 !cursor-pointer'} ${currentBlock === blockName && 'outline outline-2 outline-offset-2 outline-slate-500'}`}
             onClick={() => {
                 setBlock(blockName);
             }}
         >
-            <span className="mr-2 p-0 -mb-1">{svgBody()}</span>
+            <span className="p-0 -mb-1">{svgBody()}</span>
             <span
-                className="text-gray-600 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-200 transition-colors duration-150 ease-in-out">{title}</span>
+                className={`text-gray-600 dark:text-gray-400 dark:group-hover:text-gray-200 transition-colors duration-150 ease-in-out ${currentBlock !== blockName && 'group-hover:text-gray-800 '}`}>{title}</span>
         </div>
     )
 }
@@ -21,7 +21,7 @@ function DetailBlock(title, subTitle, descriptionBlock) {
         <div className="bg-gray-100 dark:bg-gray-800 px-4 md:px-12 md:pt-8 pt-4 md:pb-4 pb-2">
             <h3 className="h4 md:h3 mb-3">{title}</h3>
             <div className="font-architects-daughter text-xl text-cyan-800 dark:text-cyan-300 mb-2">{subTitle}</div>
-            <p className="md:text-xl text-lg text-gray-900 dark:text-gray-200">
+            <p className="md:text-xl text-lg text-gray-900 dark:text-gray-200 text-justify">
                 {descriptionBlock()}
             </p>
         </div>
@@ -32,15 +32,15 @@ export default function StakeholderValue() {
     const [block, setBlock] = useState("android");
 
     return (
-        <section>
+        <section id="why-skie" className="bg-slate-50 pt-16 pb-20">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                <div className="border-t border-gray-800">
+                <div>
                     {/* Section header */}
                     <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="h2 mb-4">Better APIs are valuable for everybody.</h2>
+                        <h2 className="h2 mb-4">Better APIs are valuable for everybody</h2>
                     </div>
                 </div>
-                <div className="flex flex-wrap justify-center -m-2 my-8">
+                <div className="flex flex-wrap justify-center -m-2 my-8 space-x-4">
 
                     {ToggleBlock(
                         block,
@@ -64,16 +64,19 @@ export default function StakeholderValue() {
                         DecisionProcessOnly
                     )}
                 </div>
-                <div className="pb-10 md:pb-16 border-t border-gray-800">
+                <div className="border-t border-gray-800">
 
                     {block === "android" &&
                         <>
                             {DetailBlock("Android Developers", 'No API Anxiety', () => {
-                                return (<>Most Kotlin developers have little experience with Swift, and don't know what
-                                    the KMP API surface will look like when called from Swift. SKIE significantly reduces these issues.
-                                    Kotlin code can be written with
-                                    expressive, modern features, and developers can be confident that when called from Swift, the
-                                    interface will feel native.</>)
+                                return (<>
+                                    <p>
+                                        Kotlin Multiplatform enables Android developers to write code that can be shared with their iOS colleagues. However, doing so results in a loss of many Kotlin language features even though both Kotlin and Swift support them. That makes it difficult for Android developers to judge how their code will look like from Swift.
+                                    </p>
+                                    <p>
+                                        However, with SKIE, Kotlin developers don’t have to worry about these complexities of cross-platform development. Their Kotlin code will retain its modern and expressive features and will seamlessly integrate with Swift. That way, developers can focus on more meaningful and engaging tasks.
+                                    </p>
+                                </>)
                             })}
                         </>
                     }
@@ -81,12 +84,14 @@ export default function StakeholderValue() {
                     {block === "ios" &&
                         <>
                             {DetailBlock("iOS Developers", 'Swift-native API surface', () => {
-                                return (<>Most iOS teams have spent the past few years adopting Swift at scale.
-                                    While Swift interops with Objective-C fairly well, pushing Kotlin through an Objective-C lens strips
-                                    most modern language
-                                    features that both Kotlin and Swift support. The stock API surface from KMM is not just unpleasant:
-                                    these modern language
-                                    features exist to make development safer and more productive.</>)
+                                return (<>
+                                    <p>
+                                        Kotlin Multiplatform can be a powerful tool for mobile teams who want to share code across platforms. However, the API Kotlin exposes to Swift lacks many language features that both Kotlin and Swift support. As a result, iOS developers may be hesitant to adopt this technology.
+                                    </p>
+                                    <p>
+                                        Fortunately, SKIE offers a solution that restores the expressiveness of modern languages, allowing developers to focus on their work without worrying about these limitations. This enables a smoother and more efficient development process, while also reducing maintenance costs and decreasing the likelihood of bugs.
+                                    </p>
+                                </>)
                             })}
                         </>
                     }
@@ -94,18 +99,10 @@ export default function StakeholderValue() {
                     {block === "managers" &&
                         <>
                             {DetailBlock("Engineering Managers", 'Better team collaboration', () => {
-                                return (<>Sharing code, when done well, results in better development efficiency, lower maintenance
-                                    costs, less potential for bugs, and of course, more consistent feature parity. When teams start with
-                                    KMM,
-                                    the development tends to come from the Android side, because the language and tooling is familiar. Over
-                                    time,
-                                    encouraging "iOS" and "Android" developers to become a team of "Mobile" developers improves all of these
-                                    metrics.
-                                    An Objective-C interface, with "lowest common denominator" language features, doesn't often send a
-                                    positive
-                                    message to the iOS team members, and that often results in a hands-off approach. Investing in a premium
-                                    iOS
-                                    developer experience will have significant ROI.</>)
+                                return (<>
+                                    <p>When adopting Kotlin Multiplatform, the Android team usually takes the lead. However, for a successful implementation of this cross-platform technology, the participation of all team members is essential. One potential challenge is that the API Kotlin exposes to Swift lacks many important language features. As a result, Kotlin Multiplatform may not resonate well with iOS developers, resulting in a hands-off approach.</p>
+                                    <p>To ensure that your team can leverage the full potential of Kotlin Multiplatform, it is therefore crucial to invest in a premium iOS developer experience. By doing so, you can empower your team to effectively collaborate and produce high-quality KMM-enabled apps.</p>
+                                </>)
                             })}
                         </>
                     }

@@ -4,7 +4,7 @@ import React from 'react';
 function CircleBlock(svgBody) {
     return (
         <svg className="w-16 h-16 mb-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <rect className="fill-current text-amber-500 dark:text-amber-600" width="64" height="64" rx="32"/>
+            <rect className="fill-current text-amber-300 dark:text-amber-400" width="64" height="64" rx="32"/>
             {svgBody()}
         </svg>
     )
@@ -114,12 +114,12 @@ export function NetworkConnection() {
                 <g transform="translate(19 20)" stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
                    className="nc-icon-wrapper" stroke-miterlimit="10">
                     <line data-cap="butt" x1="8.6" y1="10.2" x2="15.4" y2="6.8" stroke-linecap="butt"
-                          className="stroke-current text-amber-100"></line>
+                          className="stroke-current text-amber-600"></line>
                     <line data-cap="butt" x1="8.6" y1="13.7" x2="15.4" y2="17.1" stroke-linecap="butt"
-                          className="stroke-current text-amber-100"></line>
-                    <circle cx="5" cy="12" r="4" className="stroke-current text-amber-300"></circle>
-                    <circle cx="19" cy="5" r="4" className="stroke-current text-amber-300"></circle>
-                    <circle cx="19" cy="19" r="4" className="stroke-current text-amber-300"></circle>
+                          className="stroke-current text-amber-600"></line>
+                    <circle cx="5" cy="12" r="4" className="stroke-current text-amber-900"></circle>
+                    <circle cx="19" cy="5" r="4" className="stroke-current text-amber-900"></circle>
+                    <circle cx="19" cy="19" r="4" className="stroke-current text-amber-900"></circle>
                 </g>
             )
         })}</>
@@ -133,9 +133,9 @@ export function Geometry() {
                 <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
                    className="nc-icon-wrapper" stroke-miterlimit="10">
                     <g transform="translate(20 20)">
-                        <circle cx="18.5" cy="8.5" r="4.5" className="stroke-current text-amber-100"></circle>
-                        <rect x="6" y="15" width="7" height="7" className="stroke-current text-amber-100"></rect>
-                        <polygon points="2 10 6 3 10 10 2 10" className="stroke-current text-amber-300"></polygon>
+                        <circle cx="18.5" cy="8.5" r="4.5" className="stroke-current text-amber-600"></circle>
+                        <rect x="6" y="15" width="7" height="7" className="stroke-current text-amber-600"></rect>
+                        <polygon points="2 10 6 3 10 10 2 10" className="stroke-current text-amber-900"></polygon>
                     </g>
                 </g>
             )
@@ -150,13 +150,13 @@ export function PillBottle() {
                 <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
                    className="nc-icon-wrapper" stroke-miterlimit="10">
                     <g transform="translate(19 20)">
-                        <rect x="1" y="1" width="22" height="5" className="stroke-current text-amber-100"></rect>
-                        <polyline points="21,6 21,23 3,23 3,6 " className="stroke-current text-amber-300"></polyline>
-                        <rect x="7" y="11" width="10" height="6" className="stroke-current text-amber-100"></rect>
-                        <line x1="6" y1="6" x2="6" y2="4" className="stroke-current text-amber-100"></line>
-                        <line x1="10" y1="6" x2="10" y2="4" className="stroke-current text-amber-100"></line>
-                        <line x1="14" y1="6" x2="14" y2="4" className="stroke-current text-amber-100"></line>
-                        <line x1="18" y1="6" x2="18" y2="4" className="stroke-current text-amber-100"></line>
+                        <rect x="1" y="1" width="22" height="5" className="stroke-current text-amber-600"></rect>
+                        <polyline points="21,6 21,23 3,23 3,6 " className="stroke-current text-amber-900"></polyline>
+                        <rect x="7" y="11" width="10" height="6" className="stroke-current text-amber-600"></rect>
+                        <line x1="6" y1="6" x2="6" y2="4" className="stroke-current text-amber-600"></line>
+                        <line x1="10" y1="6" x2="10" y2="4" className="stroke-current text-amber-600"></line>
+                        <line x1="14" y1="6" x2="14" y2="4" className="stroke-current text-amber-600"></line>
+                        <line x1="18" y1="6" x2="18" y2="4" className="stroke-current text-amber-600"></line>
                     </g>
                 </g>
             )
@@ -173,10 +173,10 @@ export function Link() {
                     <g transform="translate(20 20)">
                         <path
                             d="M13.4,10.6 L13.4,10.6c2,2,2,5.1,0,7.1l-2.8,2.8c-2,2-5.1,2-7.1,0l0,0c-2-2-2-5.1,0-7.1L6,11"
-                            className="stroke-current text-amber-300"></path>
+                            className="stroke-current text-amber-900"></path>
                         <path
                             d="M10.6,13.4L10.6,13.4 c-2-2-2-5.1,0-7.1l2.8-2.8c2-2,5.1-2,7.1,0l0,0c2,2,2,5.1,0,7.1L18,13"
-                            className="stroke-current text-amber-100"></path>
+                            className="stroke-current text-amber-600"></path>
                     </g>
                 </g>
             )
@@ -365,4 +365,3 @@ export function ThumbDownTab() {
         </g>
     </svg>)
 }
-
