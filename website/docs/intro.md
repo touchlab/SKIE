@@ -52,7 +52,7 @@ skie {
 
 The problem with suspend functions is that ObjC has no equivalent feature.
 Therefore, when the Kotlin compiler generates ObjC it must expose suspend functions as callbacks.
-This approach has the several significant drawbacks:
+This approach has several significant drawbacks:
 
 - It has an ugly syntax that leads to callback hell (which is what suspend functions were meant to solve in the first place).
 - Suspend function can be by default only called from Swift from the main thread (otherwise it results in a runtime crash).
