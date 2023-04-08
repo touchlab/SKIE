@@ -5322,6 +5322,11 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
+node-email-validation@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.npmjs.org/node-email-validation/-/node-email-validation-1.0.4.tgz"
+  integrity sha512-lzH6b0HqyQ/eSiCqpGf1S/xx6y+1KiW6Oo/rmPKx3gQZXaDPodW0Eb3mF2N7LSBWU39SbuhosqcLmbx+Y67aog==
+
 node-emoji@^1.10.0:
   version "1.11.0"
   resolved "https://registry.npmjs.org/node-emoji/-/node-emoji-1.11.0.tgz"
