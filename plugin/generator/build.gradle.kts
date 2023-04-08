@@ -22,5 +22,5 @@ dependencies {
     implementation(projects.generator.configurationAnnotations)
     implementation(projects.generator.configurationGradle)
     implementation(projects.runtime.swift)
-    implementation(projects.analytics)
+    implementation(projects.analytics.collector)
 }
