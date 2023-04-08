@@ -2,7 +2,7 @@
 
 ## Tools
 
-You'll need Node.js and some kind of editor.
+You'll need Node.js and Microsoft Visual Studio Code.
 
 ### Install Node
 
@@ -18,27 +18,9 @@ Click the big blue button
 
 ![](big_blue_button.png)
 
-Open VSCode. Open `File > Open Folder`, then find where the SKIE code is, and open the `website` folder.
+Open VSCode.
 
-### Run Preview
 
-In VSCode, go to `View > Terminal`.
-
-In terminal, run:
-
-```shell
-npm install
-```
-
-That will take a bit.
-
-Then run:
-
-```shell
-npm run start
-```
-
-That will run for a bit, then should open [http://localhost:3000](http://localhost:3000). That is the whole site.
 
 ### Edit Code
 
