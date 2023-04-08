@@ -17,7 +17,7 @@ function FeaturesBlocks() {
             <div>
                 {/* Section header */}
                 <div className="max-w-3xl mx-auto text-center">
-                    <h2 className="h2 mb-4">Critical features for the KMM iOS developer experience.</h2>
+                    <h2 className="h2 mb-4">Critical features? for the KMM iOS developer experience.</h2>
                 </div>
             </div>
 
