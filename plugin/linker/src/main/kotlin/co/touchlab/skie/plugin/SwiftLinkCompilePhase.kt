@@ -13,6 +13,7 @@ import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
+import co.touchlab.skie.plugin.util.Command
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
 import org.jetbrains.kotlin.backend.konan.KonanConfig

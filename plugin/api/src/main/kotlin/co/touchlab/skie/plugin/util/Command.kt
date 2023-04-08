@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin
+package co.touchlab.skie.plugin.util
 /*
  * Copyright 2010-2017 JetBrains s.r.o.
  *
@@ -16,9 +16,7 @@ package co.touchlab.skie.plugin
  */
 
 import org.jetbrains.kotlin.konan.KonanExternalToolFailure
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
 import java.nio.file.Files
 
 open class Command(initialCommand: List<String>) {

@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AirProject(
-    val name: Name,
     val modules: List<AirModule>,
 ) : AirElement {
 
@@ -15,7 +14,4 @@ data class AirProject(
     override fun <D> acceptChildren(visitor: AirElementVisitor<Unit, D>, data: D) {
         modules.forEach { it.accept(visitor, data) }
     }
-
-    @Serializable
-    data class Name(val name: String)
 }

@@ -15,6 +15,7 @@ skieJvm {
 
 dependencies {
     compileOnly(libs.kotlin.native.compiler.embeddable)
+    implementation(libs.kotlinx.serialization.json)
     implementation(projects.api)
     implementation(projects.spi)
     implementation(projects.reflector)
@@ -22,5 +23,6 @@ dependencies {
     implementation(projects.generator.configurationAnnotations)
     implementation(projects.generator.configurationGradle)
     implementation(projects.runtime.swift)
-    implementation(projects.analytics.collector)
+    implementation(projects.analytics.analyticsApi)
+    implementation(projects.analytics.producer)
 }

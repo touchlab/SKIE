@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.analytics.collector
+package co.touchlab.skie.plugin.generator.internal.analytics
 
 import co.touchlab.skie.plugin.analytics.air.element.AirAnonymousInitializer
 import co.touchlab.skie.plugin.analytics.air.element.AirClass
@@ -88,10 +88,9 @@ import org.jetbrains.kotlin.types.Variance
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 class AirAnalyticsCollector(private val descriptorProvider: DescriptorProvider) {
 
-    fun collectAnalytics(projectName: String, modules: Collection<IrModuleFragment>): AirProject =
+    fun collectAnalytics(modules: Collection<IrModuleFragment>): AirProject =
         with(Context()) {
             AirProject(
-                name = AirProject.Name(projectName),
                 modules = modules.map { it.toAir() },
             )
         }

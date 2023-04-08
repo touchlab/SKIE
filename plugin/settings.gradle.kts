@@ -33,7 +33,7 @@ includeBuild("../swiftpoet")
 include(
     ":api",
     ":analytics:analytics-api",
-    ":analytics:collector",
+    ":analytics:producer",
     ":spi",
     ":configuration-api",
     ":linker",
