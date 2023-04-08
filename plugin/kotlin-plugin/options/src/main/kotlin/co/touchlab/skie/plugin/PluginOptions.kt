@@ -44,6 +44,24 @@ object SkiePlugin {
             deserialize = ::File,
         )
 
+        val buildId = PluginOption(
+            optionName = "buildId",
+            valueDescription = "string",
+            description = "SKIE build ID",
+            isRequired = true,
+            serialize = { it },
+            deserialize = { it },
+        )
+
+        val analyticsDir = PluginOption(
+            optionName = "analyticsDir",
+            valueDescription = "<absolute path>",
+            description = "Path to directory with SKIE analytics.",
+            isRequired = true,
+            serialize = File::getAbsolutePath,
+            deserialize = ::File,
+        )
+
         object Debug {
             val infoDirectory = PluginOption(
                 optionName = "debugInfoDirectory",

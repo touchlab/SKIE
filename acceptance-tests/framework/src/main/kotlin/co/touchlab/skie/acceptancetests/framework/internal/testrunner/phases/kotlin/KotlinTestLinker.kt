@@ -46,12 +46,15 @@ class KotlinTestLinker(
 
     private fun configureSwiftKt(configuration: Configuration) {
         val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
+        val analyticsDirectory = tempFileSystem.createDirectory("analytics")
 
         PluginRegistrar.configure.set {
             put(ConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
             put(ConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
             put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.fromTestEnv())
             put(ConfigurationKeys.skieConfiguration, configuration)
+            put(ConfigurationKeys.buildId, "test-UUID")
+            put(ConfigurationKeys.analyticsDir, analyticsDirectory.toFile())
         }
 
         PluginRegistrar.plugins.set(

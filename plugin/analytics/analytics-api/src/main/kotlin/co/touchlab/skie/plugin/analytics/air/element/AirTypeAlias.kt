@@ -28,6 +28,5 @@ data class AirTypeAlias(
     data class Name(val name: String)
 
     @Serializable
-    @JvmInline
-    value class Symbol(val id: Int)
+    data class Symbol(val id: Int)
 }

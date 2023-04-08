@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
@@ -28,7 +29,11 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
                 disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
                 dumpSwiftApiPoints = configuration.get(ConfigurationKeys.Debug.dumpSwiftApiPoints) ?: emptySet(),
-            )
+                analyticsCollector = AnalyticsCollector(
+                    analyticsDirectory = configuration.getNotNull(ConfigurationKeys.analyticsDir).toPath(),
+                    buildId = configuration.getNotNull(ConfigurationKeys.buildId),
+                ),
+            ),
         )
 
         IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))

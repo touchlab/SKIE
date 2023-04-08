@@ -27,6 +27,5 @@ data class AirTypeParameter(
     data class Name(val name: String)
 
     @Serializable
-    @JvmInline
-    value class Symbol(val id: Int) : AirTypeDeclaration.Symbol
+    data class Symbol(val id: Int) : AirTypeDeclaration.Symbol
 }

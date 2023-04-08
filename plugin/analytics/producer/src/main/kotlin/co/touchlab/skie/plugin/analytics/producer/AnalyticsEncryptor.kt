@@ -38,14 +38,13 @@ object AnalyticsEncryptor {
         val cipher = Cipher.getInstance(symmetricCipherWithMode)
 
         val symmetricKey = generateSymmetricCipherKey()
-        val iv = cipher.generateIv()
 
-        cipher.init(Cipher.ENCRYPT_MODE, symmetricKey, IvParameterSpec(iv))
+        cipher.init(Cipher.ENCRYPT_MODE, symmetricKey, cipher.zeroIv())
 
         val encryptedKey = encryptKey(symmetricKey)
         val encryptedData = cipher.doFinal(data)
 
-        return DataWithHeader(encryptedKey, iv, encryptedData).toByteArrayWithHeader()
+        return DataWithHeader(encryptedKey, encryptedData).toByteArrayWithHeader()
     }
 
     private fun generateSymmetricCipherKey(): Key {
@@ -72,7 +71,8 @@ object AnalyticsEncryptor {
         val symmetricKey = decryptKey(dataWithHeader.key, privateKey)
 
         val cipher = Cipher.getInstance(symmetricCipherWithMode)
-        cipher.init(Cipher.DECRYPT_MODE, symmetricKey, IvParameterSpec(dataWithHeader.iv))
+
+        cipher.init(Cipher.DECRYPT_MODE, symmetricKey, cipher.zeroIv())
 
         return cipher.doFinal(dataWithHeader.data)
     }
@@ -100,16 +100,14 @@ object AnalyticsEncryptor {
         assert(String(decrypted) == text)
     }
 
-    private class DataWithHeader(val key: ByteArray, val iv: ByteArray, val data: ByteArray) {
+    private class DataWithHeader(val key: ByteArray, val data: ByteArray) {
 
-        // key_size: Int, IV_size: Int, key: ByteArray, IV: ByteArray, data: ByteArray
+        // key_size: Int, key: ByteArray, data: ByteArray
         fun toByteArrayWithHeader(): ByteArray {
-            val buffer = ByteBuffer.allocate(2 * Int.SIZE_BYTES + key.size + iv.size + data.size)
+            val buffer = ByteBuffer.allocate(Int.SIZE_BYTES + key.size + data.size)
 
             buffer.putInt(key.size)
-            buffer.putInt(iv.size)
             buffer.put(key)
-            buffer.put(iv)
             buffer.put(data)
 
             return buffer.array()
@@ -121,16 +119,14 @@ object AnalyticsEncryptor {
                 val buffer = ByteBuffer.wrap(byteArrayWithHeader)
 
                 val keySize = buffer.int
-                val ivSize = buffer.int
                 val key = ByteArray(keySize).also { buffer.get(it) }
-                val iv = ByteArray(ivSize).also { buffer.get(it) }
-                val data = ByteArray(byteArrayWithHeader.size - keySize - ivSize - 2 * Int.SIZE_BYTES).also { buffer.get(it) }
+                val data = ByteArray(byteArrayWithHeader.size - keySize - Int.SIZE_BYTES).also { buffer.get(it) }
 
-                return DataWithHeader(key, iv, data)
+                return DataWithHeader(key, data)
             }
         }
     }
 }
 
-private fun Cipher.generateIv(): ByteArray =
-    ByteArray(blockSize).also { SecureRandom().nextBytes(it) }
+private fun Cipher.zeroIv(): IvParameterSpec =
+    IvParameterSpec(ByteArray(blockSize))

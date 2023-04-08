@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -30,6 +31,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Architecture
 import org.jetbrains.kotlin.konan.target.Family
 import java.io.File
+import java.util.UUID
+import java.nio.file.Path
 
 const val EXTENSION_NAME = "skie"
 
@@ -99,6 +102,9 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         subplugin.getOptions(project, framework)
                     }
 
+                    // TODO cannot be in configure block
+                    configureAnalytics(framework.linkTaskProvider.get())
+
                     framework.linkTaskProvider.configure { linkTask ->
                         val defaultSwiftSourceSet = configureSwiftSourceSet(framework.compilation.defaultSourceSet)
                         val allSwiftSourceSets = (framework.compilation.allKotlinSourceSets - framework.compilation.defaultSourceSet)
@@ -129,6 +135,14 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
                         linkTask.compilerPluginOptions.addPluginArgument(
                             SkiePlugin.id, SkiePlugin.Options.skieConfigurationPath.subpluginOption(createSwiftGenConfigTask.get().configFile)
+                        )
+
+                        linkTask.compilerPluginOptions.addPluginArgument(
+                            SkiePlugin.id, SkiePlugin.Options.buildId.subpluginOption(generateBuildId())
+                        )
+
+                        linkTask.compilerPluginOptions.addPluginArgument(
+                            SkiePlugin.id, SkiePlugin.Options.analyticsDir.subpluginOption(analyticsDir)
                         )
 
                         linkTask.compilerPluginOptions.addPluginArgument(
@@ -275,6 +289,29 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         }
         return this
     }
+
+    private val analyticsDir: File
+        get() {
+            val directory = Path.of(System.getProperty("user.home")).resolve("Library/Application Support/SKIE").toFile()
+
+            directory.mkdir()
+
+            return directory
+        }
+
+    // TODO Finish and refactor analytics
+    private fun Project.configureAnalytics(linkTask: KotlinNativeLink) {
+        val task = tasks.register(linkTask.name + "Analytics") {
+            it.doLast {
+                AnalyticsUploader.sendAllIfPossible(analyticsDir.toPath())
+            }
+        }
+
+        linkTask.finalizedBy(task)
+    }
+
+    private fun generateBuildId(): String =
+        UUID.randomUUID().toString()
 }
 
 private val FrameworkLayout.frameworkName: String

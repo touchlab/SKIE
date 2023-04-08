@@ -86,9 +86,9 @@ import org.jetbrains.kotlin.ir.util.isVararg
 import org.jetbrains.kotlin.types.Variance
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
-class AirAnalyticsCollector(private val descriptorProvider: DescriptorProvider) {
+class IrToAirTransformer(private val descriptorProvider: DescriptorProvider) {
 
-    fun collectAnalytics(modules: Collection<IrModuleFragment>): AirProject =
+    fun transformToAir(modules: Collection<IrModuleFragment>): AirProject =
         with(Context()) {
             AirProject(
                 modules = modules.map { it.toAir() },

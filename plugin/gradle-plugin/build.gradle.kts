@@ -35,6 +35,7 @@ dependencies {
     testableCompileOnly(libs.plugin.kotlin.gradle.api)
 
     implementation(projects.configurationApi)
+    implementation(projects.analytics.producer)
     implementation(projects.generator.configurationGradle)
     implementation(projects.kotlinPlugin.options)
 

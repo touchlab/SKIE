@@ -1,17 +1,15 @@
 package co.touchlab.skie.plugin.analytics.producer
 
 import co.touchlab.skie.plugin.analytics.producer.collectors.produceSafely
+import co.touchlab.skie.plugin.analytics.producer.compressor.AnalyticsCompressor
+import co.touchlab.skie.plugin.analytics.producer.compressor.EfficientAnalyticsCompressor
+import co.touchlab.skie.plugin.analytics.producer.compressor.FastAnalyticsCompressor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.apache.commons.compress.compressors.CompressorOutputStream
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
-import org.apache.commons.compress.compressors.deflate.DeflateCompressorOutputStream
-import java.io.ByteArrayOutputStream
-import java.io.OutputStream
 import java.nio.file.Path
 import kotlin.io.path.writeBytes
 
@@ -37,12 +35,12 @@ class AnalyticsCollector(
     }
 
     private fun collectUsingDeflate(analyticsResult: AnalyticsProducer.Result) {
-        collect(analyticsResult, { DeflateCompressorOutputStream(it) }, "1")
+        collect(analyticsResult, FastAnalyticsCompressor, 1)
     }
 
     private fun collectUsingBZip2(analyticsResult: AnalyticsProducer.Result) {
         val betterCompressionJob = backgroundScope.launch {
-            collect(analyticsResult, { BZip2CompressorOutputStream(it) }, "2")
+            collect(analyticsResult, EfficientAnalyticsCompressor, 2)
         }
 
         backgroundJobs.add(betterCompressionJob)
@@ -50,14 +48,14 @@ class AnalyticsCollector(
 
     private fun collect(
         analyticsResult: AnalyticsProducer.Result,
-        compressorFactory: (OutputStream) -> CompressorOutputStream,
-        fileSuffix: String,
+        compressor: AnalyticsCompressor,
+        fileVersion: Int,
     ) {
         try {
-            val fileName = "$buildId.${analyticsResult.name}.$fileSuffix"
+            val fileName = FileWithMultipleVersions.addVersion("$buildId.${analyticsResult.name}", fileVersion)
             val file = analyticsDirectory.resolve(fileName)
 
-            val compressedData = compress(analyticsResult.data, compressorFactory)
+            val compressedData = compressor.compress(analyticsResult.data)
 
             val encryptedData = encrypt(compressedData)
 
@@ -65,18 +63,6 @@ class AnalyticsCollector(
         } catch (_: Throwable) {
             // TODO Log to bugsnag
         }
-    }
-
-    private fun compress(data: ByteArray, compressorFactory: (OutputStream) -> CompressorOutputStream): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-
-        val compressor = compressorFactory(outputStream)
-
-        compressor.use {
-            it.write(data)
-        }
-
-        return outputStream.toByteArray()
     }
 
     private fun encrypt(data: ByteArray): ByteArray =

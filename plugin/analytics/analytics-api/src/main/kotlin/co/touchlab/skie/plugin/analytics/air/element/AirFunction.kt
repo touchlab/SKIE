@@ -28,6 +28,5 @@ sealed interface AirFunction : AirDeclaration, AirStatementContainer {
     }
 
     @Serializable
-    @JvmInline
-    value class Symbol(val id: Int)
+    data class Symbol(val id: Int)
 }

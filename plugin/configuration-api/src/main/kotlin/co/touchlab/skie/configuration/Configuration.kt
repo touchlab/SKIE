@@ -9,6 +9,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+@Serializable
 data class Configuration(
     val enabledFeatures: SkieFeatureSet,
     private val groups: List<Group>,

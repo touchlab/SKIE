@@ -1,6 +1,7 @@
 package co.touchlab.skie.api
 
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
@@ -17,4 +18,5 @@ class DefaultSkieContext(
     override val frameworkLayout: FrameworkLayout,
     override val disableWildcardExport: Boolean,
     override val dumpSwiftApiPoints: Set<DumpSwiftApiPoint>,
+    override val analyticsCollector: AnalyticsCollector,
 ) : SkieContext

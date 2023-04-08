@@ -18,6 +18,8 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         Options.generatedSwiftDir,
         Options.disableWildcardExport,
         Options.skieConfigurationPath,
+        Options.buildId,
+        Options.analyticsDir,
         Options.Debug.infoDirectory,
         Options.Debug.dumpSwiftApiAt,
     )
@@ -45,6 +47,14 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
                 val skieConfiguration = Configuration.deserialize(config)
 
                 configuration.put(ConfigurationKeys.skieConfiguration, skieConfiguration)
+            }
+
+            Options.buildId -> {
+                configuration.put(ConfigurationKeys.buildId, Options.buildId.deserialize(value))
+            }
+
+            Options.analyticsDir -> {
+                configuration.put(ConfigurationKeys.analyticsDir, Options.analyticsDir.deserialize(value))
             }
 
             Options.Debug.infoDirectory -> {
