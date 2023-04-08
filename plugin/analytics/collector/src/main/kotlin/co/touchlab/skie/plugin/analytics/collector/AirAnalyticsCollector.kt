@@ -61,6 +61,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConstantObject
 import org.jetbrains.kotlin.ir.expressions.IrConstantPrimitive
 import org.jetbrains.kotlin.ir.expressions.IrConstantValue
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrErrorExpression
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetEnumValue
 import org.jetbrains.kotlin.ir.expressions.IrSpreadElement
@@ -363,7 +364,7 @@ class AirAnalyticsCollector(private val descriptorProvider: DescriptorProvider) 
             is IrVararg -> this.toAirConstant()
             is IrGetEnumValue -> this.toAirConstant()
             is IrClassReference -> this.toAirConstant()
-            null -> AirConstantErased
+            is IrErrorExpression, null -> AirConstantErased
             else -> error("Expression is not constant: $this")
         }
 
