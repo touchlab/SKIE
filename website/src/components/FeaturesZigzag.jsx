@@ -1,13 +1,9 @@
 import React, {useState} from 'react';
 import {AndroidOnly, ThumbDownTab, ThumbUpTab} from "./FeatureIcons";
 
-import enumKotlin from '@site/static/samples/enum/kotlin.png';
-import enumSwiftBefore from '@site/static/samples/enum/swiftbefore.png';
-import enumSwiftAfter from '@site/static/samples/enum/swiftafter.png';
-import sealedKotlin from '@site/static/samples/sealed-class/kotlin.png';
-import sealedSwiftBefore from '@site/static/samples/sealed-class/swiftbefore.png';
-import sealedSwiftAfter from '@site/static/samples/sealed-class/swiftafter.png';
-import sealedSwiftAfterComplete from '@site/static/samples/sealed-class/swiftaftercomplete.png';
+import FlowInterop from './features/FlowInterop';
+import SuspendInterop from './features/SuspendInterop';
+import SealedClasses from "./features/SealedClasses";
 
 function labelImage(label, imgObj) {
     return (imgObj instanceof Array) ? labelImageScroller(label, imgObj) : labelImageScroller(label, [imgObj])
@@ -89,8 +85,31 @@ function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter) {
 
     return (
         <>
+            <div className="relative max-w-4xl mx-auto text-center">
+                <img className="absolute invisible top-0 left-0" src={imgK}
+                     alt="Features 01"/>
+                {/* Image */}
+                {block === "kotlin" &&
+                    <>
+                        <MacOSWindow tabs={[
+                            { title: "Kotlin", content: labelImage("Kotlin", imgK) }
+                        ]}/>
+                    </>
+                }
+                {block === "noskie" &&
+                    <>
+                        {labelImage("Without SKIE ❌", imgS)}
+                    </>
+                }
+                {block === "withskie" &&
+                    <>
+                        {labelImage("With SKIE ✅", imgSAfter)}
+                    </>
+                }
+
+            </div>
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                <div className="flex flex-wrap justify-center -m-2 my-8">
+                <div className="flex flex-wrap justify-center -m-2 my-2">
                     {ToggleBlock(
                         block,
                         "kotlin",
@@ -115,27 +134,6 @@ function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter) {
 
                 </div>
             </div>
-            <div className="relative max-w-4xl mx-auto text-center lg:h-[465px]">
-                <img className="absolute invisible top-0 left-0" src={imgK}
-                     alt="Features 01"/>
-                {/* Image */}
-                {block === "kotlin" &&
-                    <>
-                        {labelImage("Kotlin", imgK)}
-                    </>
-                }
-                {block === "noskie" &&
-                    <>
-                        {labelImage("Without SKIE ❌", imgS)}
-                    </>
-                }
-                {block === "withskie" &&
-                    <>
-                        {labelImage("With SKIE ✅", imgSAfter)}
-                    </>
-                }
-
-            </div>
         </>
     )
 }
@@ -149,78 +147,26 @@ export default function FeaturesZigzag() {
         )
     }
     return (
-        <section id="features" className="py-8 md:py-24">
+        <section id="features" className="pt-8 md:pt-16">
             <div className="hidden text-lime-600"></div>
             <div className="hidden text-lime-500"></div>
-            <div className="max-w-5xl mx-auto px-4 sm:px-6">
-                <div className="pb-12 md:pb-20 border-t border-gray-800">
-
+            <div className="max-w-5xl mx-auto">
+                <div className="border-t border-gray-800">
                     {/*border-gray-800 border-solid border-t border-b-0 border-x-0*/}
                     <div className="max-w-3xl mx-auto text-center">
                         <h2 className="h2 mb-4">Kotlin to Swift Code Transformations</h2>
+                        <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">
+                            SKIE improves interoperability between Kotlin and Swift by generating Swift wrappers for Objective-C headers created by the Kotlin compiler. It recreates features supported by both languages but lost in the translation from Kotlin to Objective-C to Swift.
+                        </p>
                     </div>
 
                     {/* Items */}
-                    <div className="">
-
-                        <div className="items-center">
-                            <div className="font-architects-daughter text-xl text-lime-700 dark:text-lime-300 mb-2">Exhaustive enums</div>
-                            <h3 className="h3 mb-3">Kotlin to Enum Transform</h3>
-                            <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Kotlin enums are automatically and transparently
-                                converted to Swift enums.</p>
-                            <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2">
-                                <li className="flex items-center mb-2">
-                                    {checkMark("lime")}
-                                    <span>Proper compile-time checking</span>
-                                </li>
-                                <li className="flex items-center mb-2">
-                                    {checkMark("lime")}
-                                    <span>Swift-native ergonomics</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {/* 1st item */}
-
-                        {ShowKotlinSwiftFriends(enumKotlin, enumSwiftBefore, enumSwiftAfter)}
-
-                    </div>
-
+                    <FlowInterop/>
+                    <SuspendInterop/>
+                    <SealedClasses/>
                 </div>
             </div>
-            <div className="max-w-5xl mx-auto px-4 sm:px-6">
-                <div className="border-t border-gray-800">
 
-                    {/* Items */}
-                    <div className="">
-
-                        <div className="items-center">
-                            <div className="font-architects-daughter text-xl text-lime-700 dark:text-lime-300 mb-2">Sealed class support
-                            </div>
-                            <h3 className="h3 mb-3">Sealed class wrapped as an enum</h3>
-                            <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Sealed classes are unchanged, but an associated
-                                enum is
-                                generated, as well as a wrapper function to use for switch statements.</p>
-                            <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2">
-                                <li className="flex items-center mb-2">
-                                    {checkMark("lime")}
-                                    <span>Sealed classes can be exhaustively checked</span>
-                                </li>
-                                <li className="flex items-center mb-2">
-                                    {checkMark("lime")}
-                                    <span>Similar semantics to enums with associated values</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {/* 1st item */}
-
-                        {ShowKotlinSwiftFriends(sealedKotlin, sealedSwiftBefore, [sealedSwiftAfter, sealedSwiftAfterComplete])}
-
-                    </div>
-
-                </div>
-            </div>
         </section>
     );
 }

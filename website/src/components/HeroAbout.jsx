@@ -23,11 +23,11 @@ export default function HeroAbout() {
                         <h4 className="h4 max-w-3xl mb-4">A Swift-friendly API Generator for Kotlin Multiplatform Mobile</h4>
                         <p className="max-w-3xl text-xl text-gray-700 dark:text-gray-400">Don’t let the lack of proper Swift interop hamper your Kotlin Multiplatform adoption. With SKIE, you can restore the expressiveness of modern languages and enjoy a&nbsp;superior iOS developer experience.</p>
                     </div>
-                    <div className="max-w-xs mx-auto sm:max-w-none flex justify-start sm:flex-col md:flex-row sm:space-y-4 md:space-y-0 md:space-x-4" data-aos="fade-up" data-aos-delay="400">
-                        <a className="btn text-white bg-cyan-600 hover:bg-cyan-700 sm:w-auto drop-shadow-lg no-underline"
+                    <div className="max-w-xs mx-auto sm:max-w-none flex justify-start flex-col md:flex-row gap-4" data-aos="fade-up" data-aos-delay="400">
+                        <a className="btn font-semibold text-lg text-gray-700 bg-amber-300 hover:bg-amber-200 sm:w-auto drop-shadow-lg no-underline"
                            href="#">Book a Demo</a>
 
-                        <a className="btn border-2 border-solid border-cyan-600 hover:bg-cyan-600 hover:text-white box-border no-underline" href="intro">Explore Docs</a>
+                        <a className="btn border-2 font-semibold text-lg border-solid border-cyan-600 hover:bg-cyan-600 hover:text-white box-border no-underline" href="intro">Explore Docs</a>
                     </div>
                 </div>
             </div>

@@ -11,10 +11,7 @@ export default function Roadmap() {
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="h2 mb-4">There's more!</h1>
                         <p className="text-xl text-gray-700 dark:text-gray-400">
-                            The current feature-set is only the beginning. But we need your feedback, become a customer now and tells us what ails you the most.
-                        </p>
-                        <p className="text-xl text-gray-700 dark:text-gray-400">
-                            Are we missing a feature that's crucial for you? Let us know, we can chat.
+                            Our existing feature-set is merely scratching the surface of what’s possible. As we continuously explore new ideas and possibilities, we invite you to join us on our journey and take part in shaping our future direction.
                         </p>
                         <a className="btn text-white bg-cyan-600 hover:bg-cyan-700 sm:w-auto drop-shadow-lg no-underline"
                            href="#">I wish SKIE could &hellip;</a>

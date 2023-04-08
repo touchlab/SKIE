@@ -4,7 +4,7 @@ import {AndroidOnly, AppleOnly, DecisionProcessOnly} from "./FeatureIcons";
 function ToggleBlock(currentBlock, blockName, setBlock, title, svgBody) {
     return (
         <div
-            className={`flex flex-row justify-center items-center font-medium py-2 px-4 bg-slate-200 dark:bg-gray-800 rounded-full group transition duration-200 cursor-default space-x-2 ${currentBlock !== blockName && 'opacity-50 hover:opacity-75 !cursor-pointer'} ${currentBlock === blockName && 'outline outline-2 outline-offset-2 outline-slate-500'}`}
+            className={`flex flex-row justify-center items-center font-medium py-2 px-4 bg-slate-200 dark:bg-gray-800 rounded-full group transition duration-200 cursor-default space-x-2 relative ${currentBlock !== blockName && 'opacity-50 hover:opacity-75 !cursor-pointer'} ${currentBlock === blockName && "before:absolute before:content-[''] before:rounded-full before:-inset-1 before:border-2 before:border-solid before:border-slate-500"}`}
             onClick={() => {
                 setBlock(blockName);
             }}

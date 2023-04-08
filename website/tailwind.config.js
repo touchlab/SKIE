@@ -38,6 +38,10 @@ module.exports = {
                 '3/4': '75%',
                 '1/1': '100%',
             },
+            gridTemplateColumns: {
+                'feature-left': '1fr 2fr',
+                'feature-right': '2fr 1fr',
+            },
             fontFamily: {
                 inter: ['Inter', 'sans-serif'],
                 'architects-daughter': ['"Architects Daughter"', 'sans-serif']

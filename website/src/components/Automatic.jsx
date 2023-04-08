@@ -9,7 +9,7 @@ export default function Automatic() {
                 {/* Section header */}
                 <div className="max-w-3xl mx-auto text-center pb-8 md:pb-12">
                     <h2 className="h2 mb-4" data-aos="fade-up">Zero-Effort Integration</h2>
-                    <p className="text-xl text-gray-700" data-aos="fade-up" data-aos-delay="200">SKIE does not require extra development effort or training. The tool looks at your code and modifies the API surface automatically.</p>
+                    <p className="text-xl text-gray-700" data-aos="fade-up" data-aos-delay="200">With SKIE, there's no need for additional development effort or training. This powerful tool automatically analyzes your code and modifies the API surface to streamline your workflow. Getting started is as easy as following three simple steps.</p>
                 </div>
 
                 {/* Items */}
