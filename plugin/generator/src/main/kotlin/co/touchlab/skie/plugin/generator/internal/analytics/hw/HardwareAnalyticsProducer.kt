@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.analytics.hw
 
 import co.touchlab.skie.plugin.analytics.hw.HardwareAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
-import co.touchlab.skie.plugin.util.Command
+import co.touchlab.skie.util.Command
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

@@ -40,6 +40,7 @@ dependencies {
     implementation(projects.analytics.producer)
     implementation(projects.generator.configurationGradle)
     implementation(projects.kotlinPlugin.options)
+    implementation(projects.util)
 
     testImplementation(gradleApi())
     testImplementation(gradleKotlinDsl())

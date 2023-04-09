@@ -47,6 +47,7 @@ include(
     ":kotlin-plugin:options",
     ":runtime:kotlin",
     ":runtime:swift",
+    ":util",
 )
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

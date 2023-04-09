@@ -1,6 +1,8 @@
 package co.touchlab.skie.plugin
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.analytics.PerformanceAnalyticsProducer
+import co.touchlab.skie.plugin.analytics.GradleAnalyticsProducer
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
 import org.gradle.api.Action
@@ -319,6 +321,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         val analyticsCollector = AnalyticsCollector(analyticsDir.toPath(), buildId)
 
         configurePerformanceAnalytics(linkTask, analyticsCollector)
+        collectGradleAnalytics(linkTask, analyticsCollector)
         configureAnalyticsUpload(linkTask, analyticsCollector)
     }
 
@@ -344,6 +347,18 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                     )
                 }
             },
+        )
+    }
+
+    private fun Project.collectGradleAnalytics(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
+        linkTask.doFirst(
+            object : Action<Task> {
+                override fun execute(t: Task) {
+                    analyticsCollector.collect(
+                        GradleAnalyticsProducer(this@collectGradleAnalytics)
+                    )
+                }
+            }
         )
     }
 

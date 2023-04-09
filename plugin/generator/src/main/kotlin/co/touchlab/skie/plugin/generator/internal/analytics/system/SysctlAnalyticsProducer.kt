@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.system
 
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
-import co.touchlab.skie.plugin.util.Command
+import co.touchlab.skie.util.Command
 
 object SysctlAnalyticsProducer : AnalyticsProducer {
 

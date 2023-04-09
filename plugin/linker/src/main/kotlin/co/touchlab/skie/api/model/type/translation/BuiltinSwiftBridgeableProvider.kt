@@ -1,7 +1,7 @@
 package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
-import co.touchlab.skie.plugin.util.Command
+import co.touchlab.skie.util.Command
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations

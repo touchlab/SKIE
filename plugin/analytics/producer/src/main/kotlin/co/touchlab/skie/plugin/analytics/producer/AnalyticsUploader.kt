@@ -26,6 +26,7 @@ object AnalyticsUploader {
     private fun sendAll(directory: Path) {
         directory.listDirectoryEntries()
             .groupVersions()
+            .parallelStream()
             .forEach {
                 uploadAndDelete(it)
             }

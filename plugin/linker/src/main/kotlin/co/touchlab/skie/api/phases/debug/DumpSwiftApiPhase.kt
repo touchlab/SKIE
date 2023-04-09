@@ -1,7 +1,7 @@
 package co.touchlab.skie.api.phases.debug
 
 import co.touchlab.skie.api.phases.SkieLinkingPhase
-import co.touchlab.skie.plugin.util.Command
+import co.touchlab.skie.util.Command
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout

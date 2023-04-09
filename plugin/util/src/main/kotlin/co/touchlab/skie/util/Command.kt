@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.util
+package co.touchlab.skie.util
 /*
  * Copyright 2010-2017 JetBrains s.r.o.
  *
@@ -15,7 +15,6 @@ package co.touchlab.skie.plugin.util
  * limitations under the License.
  */
 
-import org.jetbrains.kotlin.konan.KonanExternalToolFailure
 import java.io.File
 import java.nio.file.Files
 
@@ -91,11 +90,11 @@ open class Command(initialCommand: List<String>) {
     class Result(val exitCode: Int, val outputLines: List<String>)
 
     private fun handleExitCode(code: Int, output: List<String> = emptyList()) {
-        if (code != 0) throw KonanExternalToolFailure(
+        if (code != 0) error(
             """
             The ${command[0]} command returned non-zero exit code: $code.
             output:
-            """.trimIndent() + "\n${output.joinToString("\n")}", command[0]
+            """.trimIndent() + "\n${output.joinToString("\n")}"
         )
     }
 
