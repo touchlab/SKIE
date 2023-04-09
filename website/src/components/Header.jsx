@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // import Dropdown from '../utils/Dropdown';
 
-function Header({menuLinkList, children}) {
+function Header({menuLinkList, rightContent: content}) {
 
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -50,17 +50,15 @@ function Header({menuLinkList, children}) {
         <header className={`sticky top-0 w-full z-30 bg-slate-100 ${scrollPosition > 0 ? 'shadow' : 'shadow-none'}`}>
             <div className="max-w-5xl mx-auto px-4 lg:px-0">
                 <div className="flex items-center justify-between h-20">
-
-                    {/* Site branding */}
-                    <div className="shrink-0 mr-4">
-                        {/* Logo */}
-                        <Link to="/" className="block h-8" aria-label="Touchlab">
-                            <img className="h-8 fill-current" src="img/Touchlab_Gradient.png"/>
-                        </Link>
-                    </div>
-
                     {/* Desktop navigation */}
                     <nav className="hidden md:flex md:grow">
+                        {/* Site branding */}
+                        <div className="shrink-0 mr-4">
+                            {/* Logo */}
+                            <Link to="/" className="block h-8" aria-label="Touchlab">
+                                <img className="h-8 fill-current" src="img/Touchlab_Gradient.png"/>
+                            </Link>
+                        </div>
 
                         {/* Desktop menu links */}
                         <ul className="flex grow justify-center flex-wrap items-center list-none m-0">
@@ -73,12 +71,18 @@ function Header({menuLinkList, children}) {
                             ))}
                         </ul>
 
-                        {children}
-
+                        {content && content(scrollPosition)}
                     </nav>
 
                     {/* Mobile menu */}
                     <div className="md:hidden">
+                        {/* Site branding */}
+                        <div className="shrink-0 mr-4">
+                            {/* Logo */}
+                            <Link to="/" className="block h-8" aria-label="Touchlab">
+                                <img className="h-8 fill-current" src="img/Touchlab_Gradient.png"/>
+                            </Link>
+                        </div>
 
                         {/* Hamburger button */}
                         <button ref={trigger} className={`hamburger ${mobileNavOpen && 'active'}`} aria-controls="mobile-nav" aria-expanded={mobileNavOpen} onClick={() => setMobileNavOpen(!mobileNavOpen)}>
@@ -99,7 +103,7 @@ function Header({menuLinkList, children}) {
                                     </li>
                                 ))}
 
-                                <li> {children}</li>
+                                <li>{content && content(scrollPosition)}</li>
                             </ul>
 
                         </nav>

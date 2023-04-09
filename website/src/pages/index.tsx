@@ -17,10 +17,13 @@ import {useColorMode} from '@docusaurus/theme-common';
 import {Link} from "react-router-dom";
 
 // Uncomment for animations
+// import AOS from 'aos';
+
+// Uncomment for animations
 // import 'aos/dist/aos.css';
 
 export default function Home(): JSX.Element {
-// Uncomment for animations
+    // Uncomment for animations
     /*useEffect(() => {
       AOS.init({
         once: true,
@@ -40,33 +43,24 @@ export default function Home(): JSX.Element {
 
 function TailwindPage(): JSX.Element {
 
-    const [scrollPosition, setScrollPosition] = useState(0);
-
-    useEffect(() => {
-        const updatePosition = () => {
-            setScrollPosition(window.pageYOffset)
-        }
-
-        window.addEventListener('scroll', updatePosition)
-
-        updatePosition()
-
-        return () => window.removeEventListener('scroll', updatePosition)
-    }, []);
-
-    const theList = [['Home', '/'],
+    const menuLinks = [
+        ['Home', '/'],
         ['Features', '#features'],
-        ['Why', '#why-skie']];
+        ['Why', '#why-skie']
+    ];
 
     return (
         <div>
-            <Header menuLinkList={theList}>
-                <div className="flex grow justify-end flex-wrap items-center">
-                    <Link to="#demo" className={`btn-sm font-semibold text-lg ml-3 ${scrollPosition > 0 ? 'text-gray-700 bg-amber-300 hover:bg-amber-200 no-underline' : ''}`}>
-                        Book a Demo
-                    </Link>
-                </div>
-            </Header>
+            <Header
+                menuLinkList={menuLinks}
+                rightContent={(scrollPosition) => (
+                    <div className="flex grow justify-end flex-wrap items-center">
+                        <Link to="#demo" className={`btn-sm font-semibold text-lg ml-3 ${scrollPosition > 0 ? 'text-gray-700 bg-amber-300 hover:bg-amber-200 no-underline' : ''}`}>
+                            Book a Demo
+                        </Link>
+                    </div>
+                )}
+            />
             <HeroAbout/>
             <FeaturesZigzag/>
             <Automatic/>
