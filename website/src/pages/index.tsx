@@ -61,7 +61,7 @@ function TailwindPage(): JSX.Element {
         <div>
             <Header menuLinkList={theList}>
                 <div className="flex grow justify-end flex-wrap items-center">
-                    <Link to="/signup" className={`btn-sm font-semibold text-lg ml-3 ${scrollPosition > 0 ? 'text-gray-700 bg-amber-300 hover:bg-amber-200 no-underline' : ''}`}>
+                    <Link to="#demo" className={`btn-sm font-semibold text-lg ml-3 ${scrollPosition > 0 ? 'text-gray-700 bg-amber-300 hover:bg-amber-200 no-underline' : ''}`}>
                         Book a Demo
                     </Link>
                 </div>

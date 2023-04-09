@@ -25,7 +25,7 @@ export default function HeroAbout() {
                     </div>
                     <div className="max-w-xs mx-auto sm:max-w-none flex justify-start flex-col md:flex-row gap-4" data-aos="fade-up" data-aos-delay="400">
                         <a className="btn font-semibold text-lg text-gray-700 bg-amber-300 hover:bg-amber-200 sm:w-auto drop-shadow-lg no-underline"
-                           href="#">Book a Demo</a>
+                           href="#demo">Book a Demo</a>
 
                         <a className="btn border-2 font-semibold text-lg border-solid border-cyan-600 hover:bg-cyan-600 hover:text-white box-border no-underline" href="intro">Explore Docs</a>
                     </div>
