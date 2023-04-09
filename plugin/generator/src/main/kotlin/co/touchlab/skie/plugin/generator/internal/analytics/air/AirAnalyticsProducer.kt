@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.generator.internal.analytics
+package co.touchlab.skie.plugin.generator.internal.analytics.air
 
 import co.touchlab.skie.plugin.analytics.air.element.AirProject
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
@@ -6,8 +6,6 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import java.nio.file.Path
-import kotlin.io.path.writeBytes
 
 class AirAnalyticsProducer(
     private val descriptorProvider: DescriptorProvider,

@@ -301,6 +301,10 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
     // TODO Finish and refactor analytics
     private fun Project.configureAnalytics(linkTask: KotlinNativeLink) {
+        configureAnalyticsUpload(linkTask)
+    }
+
+    private fun Project.configureAnalyticsUpload(linkTask: KotlinNativeLink) {
         val task = tasks.register(linkTask.name + "Analytics") {
             it.doLast {
                 AnalyticsUploader.sendAllIfPossible(analyticsDir.toPath())

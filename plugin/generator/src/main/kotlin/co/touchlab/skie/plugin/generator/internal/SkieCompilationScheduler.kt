@@ -1,8 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal
 
-import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.generator.internal.analytics.AirAnalyticsPhase
+import co.touchlab.skie.plugin.generator.internal.analytics.AnalyticsPhase
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowConversionConstructorsGenerator
@@ -32,9 +31,9 @@ internal class SkieCompilationScheduler(
 ) {
 
     private val compilationPhases = listOf(
-        AirAnalyticsPhase(
+        AnalyticsPhase(
+            skieContext = skieContext,
             descriptorProvider = descriptorProvider,
-            analyticsCollector = skieContext.analyticsCollector,
         ),
         GenerateIrPhase(
             declarationBuilder = declarationBuilder,

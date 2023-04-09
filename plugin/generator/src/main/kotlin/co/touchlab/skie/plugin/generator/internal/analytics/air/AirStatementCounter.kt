@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.generator.internal.analytics
+package co.touchlab.skie.plugin.generator.internal.analytics.air
 
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
