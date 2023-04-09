@@ -217,7 +217,7 @@ export default function TrialSignup() {
                         </div>
 
                         <div className="mb-4">
-                            <a className={`btn text-white bg-cyan-600 hover:bg-cyan-700 sm:w-auto drop-shadow-lg no-underline${okToSend ? '' : ' opacity-50 cursor-not-allowed'}`}
+                            <a className={`btn font-semibold text-lg text-gray-700 bg-amber-300 hover:bg-amber-200 sm:w-auto drop-shadow-lg no-underline${okToSend ? '' : ' opacity-50 cursor-not-allowed'}`}
                                disabled={!okToSend}
                                onClick={requestTrial}
                                href="#">Setup Trial</a>

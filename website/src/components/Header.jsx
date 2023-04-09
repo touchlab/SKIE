@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // import Dropdown from '../utils/Dropdown';
 
-function Header() {
+function Header({menuLinkList, children}) {
 
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -44,11 +44,7 @@ function Header() {
         return () => window.removeEventListener('scroll', updatePosition)
     }, []);
 
-    const menuLinks = [
-        ['Home', '/'],
-        ['Features', '#features'],
-        ['Why', '#why-skie'],
-    ]
+    const menuLinks = menuLinkList ? menuLinkList : []
 
     return (
         <header className={`sticky top-0 w-full z-30 bg-slate-100 ${scrollPosition > 0 ? 'shadow' : 'shadow-none'}`}>
@@ -77,12 +73,7 @@ function Header() {
                             ))}
                         </ul>
 
-                        {/* Desktop sign in links */}
-                        <div className="flex grow justify-end flex-wrap items-center">
-                            <Link to="/signup" className={`btn-sm font-semibold text-lg ml-3 ${scrollPosition > 0 ? 'text-gray-700 bg-amber-300 hover:bg-amber-200 no-underline' : ''}`}>
-                                Book a Demo
-                            </Link>
-                        </div>
+                        {children}
 
                     </nav>
 

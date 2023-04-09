@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import HeroThanks from '@site/src/components/HeroThanks';
 import Header from '@site/src/components/Header';

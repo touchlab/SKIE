@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '@theme/Layout';
 import HeroAbout from '@site/src/components/HeroAbout';
 import FeaturesBlocks from '@site/src/components/FeaturesBlocks';
@@ -13,6 +13,7 @@ import Header from '@site/src/components/Header';
 import Footer from '@site/src/components/Footer';
 import {HtmlClassNameProvider} from '@docusaurus/theme-common';
 import {useColorMode} from '@docusaurus/theme-common';
+import {Link} from "react-router-dom";
 
 // Uncomment for animations
 // import 'aos/dist/aos.css';
@@ -38,11 +39,33 @@ export default function Home(): JSX.Element {
 
 function TailwindPage(): JSX.Element {
 
-    // const {colorMode} = useColorMode();
+    const [scrollPosition, setScrollPosition] = useState(0);
+
+    useEffect(() => {
+        const updatePosition = () => {
+            setScrollPosition(window.pageYOffset)
+        }
+
+        window.addEventListener('scroll', updatePosition)
+
+        updatePosition()
+
+        return () => window.removeEventListener('scroll', updatePosition)
+    }, []);
+
+    const theList = [['Home', '/'],
+        ['Features', '#features'],
+        ['Why', '#why-skie']];
 
     return (
         <div>
-            <Header/>
+            <Header menuLinkList={theList}>
+                <div className="flex grow justify-end flex-wrap items-center">
+                    <Link to="/signup" className={`btn-sm font-semibold text-lg ml-3 ${scrollPosition > 0 ? 'text-gray-700 bg-amber-300 hover:bg-amber-200 no-underline' : ''}`}>
+                        Book a Demo
+                    </Link>
+                </div>
+            </Header>
             <HeroAbout/>
             <FeaturesZigzag/>
             <Automatic/>
