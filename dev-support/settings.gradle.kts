@@ -26,6 +26,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 includeBuild("../plugin")
 
 include(
+    ":analytics",
     ":ir-inspector",
     ":skie:mac",
     ":skie:mac:framework",

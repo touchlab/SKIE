@@ -8,6 +8,8 @@ class ErrorAnalyticsProducer(
 ) : AnalyticsProducer {
 
     override fun produce(): AnalyticsProducer.Result {
+        // TODO If development crash instead
+
         // TODO Log to bugsnag
 
         return AnalyticsProducer.Result(name, throwable.stackTraceToString().toByteArray())
