@@ -294,7 +294,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         get() {
             val directory = Path.of(System.getProperty("user.home")).resolve("Library/Application Support/SKIE").toFile()
 
-            directory.mkdir()
+            directory.mkdirs()
 
             return directory
         }

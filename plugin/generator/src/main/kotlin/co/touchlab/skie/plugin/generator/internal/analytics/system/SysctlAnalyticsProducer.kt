@@ -12,7 +12,7 @@ object SysctlAnalyticsProducer : AnalyticsProducer {
                 "sh",
                 "-c",
                 """sysctl -ae | grep -v kern.hostname"""
-            ).execute().outputLines.joinToString(System.lineSeparator()).also { println(it) }.toByteArray()
+            ).execute().outputLines.joinToString(System.lineSeparator()).toByteArray()
         }
     )
 }

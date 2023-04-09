@@ -4,6 +4,7 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.analytics.air.AirAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.configuration.SkieConfigurationAnalyticsProducer
+import co.touchlab.skie.plugin.generator.internal.analytics.hw.HardwareAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.system.SysctlAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -20,6 +21,7 @@ internal class AnalyticsPhase(
         val producers = listOf(
             SkieConfigurationAnalyticsProducer(skieContext.configuration),
             SysctlAnalyticsProducer,
+            HardwareAnalyticsProducer,
         )
 
         skieContext.analyticsCollector.collectAll(producers)

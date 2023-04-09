@@ -15,7 +15,7 @@ private val resources = Path.of(BuildConfig.RESOURCES)
 fun main() {
 }
 
-private fun loadFile(file: String, privateKeyPath: Path): ByteArray {
+private fun loadByteArray(file: String, privateKeyPath: Path): ByteArray {
     val path = resources.resolve(file)
     val data = path.readBytes()
 
@@ -30,20 +30,16 @@ private fun loadFile(file: String, privateKeyPath: Path): ByteArray {
     return decompressor.decompress(decryptedData)
 }
 
-
-private fun loadAir(file: String, privateKeyPath: Path) {
-    val data = loadFile(file, privateKeyPath)
+private fun loadAir(file: String, privateKeyPath: Path): AirProject {
+    val data = loadByteArray(file, privateKeyPath)
 
     val json = Json { classDiscriminator = "jsonType" }
 
-    val result = json.decodeFromString<AirProject>(String(data))
-
-    return
+    return json.decodeFromString(String(data))
 }
 
-
-private fun loadAnalyticsError(file: String, privateKeyPath: Path): String {
-    val data = loadFile(file, privateKeyPath)
+private fun loadString(file: String, privateKeyPath: Path): String {
+    val data = loadByteArray(file, privateKeyPath)
 
     return String(data)
 }
