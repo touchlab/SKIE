@@ -4,7 +4,7 @@ export function Circle({colors, children}) {
     return (
         <svg className="w-16 h-16 mb-4 origin-center" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <rect className={`fill-current ${colors.background}`} width="64" height="64" rx="32"/>
-            <g className={`${colors.primary} origin-center`} stroke-linecap="round" stroke-linejoin="round" stroke-width="4" fill="none">
+            <g className={`${colors.primary} origin-center`} strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" fill="none">
             {children}
             </g>
         </svg>
@@ -122,11 +122,11 @@ export function NetworkConnection() {
     return (
         <>{CircleBlock(() => {
             return (
-                <g transform="translate(19 20)" stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                   className="nc-icon-wrapper" stroke-miterlimit="10">
-                    <line data-cap="butt" x1="8.6" y1="10.2" x2="15.4" y2="6.8" stroke-linecap="butt"
+                <g transform="translate(19 20)" strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                   className="nc-icon-wrapper" strokeMiterlimit="10">
+                    <line data-cap="butt" x1="8.6" y1="10.2" x2="15.4" y2="6.8" strokeLinecap="butt"
                           className="stroke-current text-amber-600"></line>
-                    <line data-cap="butt" x1="8.6" y1="13.7" x2="15.4" y2="17.1" stroke-linecap="butt"
+                    <line data-cap="butt" x1="8.6" y1="13.7" x2="15.4" y2="17.1" strokeLinecap="butt"
                           className="stroke-current text-amber-600"></line>
                     <circle cx="5" cy="12" r="4" className="stroke-current text-amber-900"></circle>
                     <circle cx="19" cy="5" r="4" className="stroke-current text-amber-900"></circle>
@@ -141,8 +141,8 @@ export function Geometry() {
     return (
         <>{CircleBlock(() => {
             return (
-                <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                   className="nc-icon-wrapper" stroke-miterlimit="10">
+                <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                   className="nc-icon-wrapper" strokeMiterlimit="10">
                     <g transform="translate(20 20)">
                         <circle cx="18.5" cy="8.5" r="4.5" className="stroke-current text-amber-600"></circle>
                         <rect x="6" y="15" width="7" height="7" className="stroke-current text-amber-600"></rect>
@@ -158,8 +158,8 @@ export function PillBottle() {
     return (
         <>{CircleBlock(() => {
             return (
-                <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                   className="nc-icon-wrapper" stroke-miterlimit="10">
+                <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                   className="nc-icon-wrapper" strokeMiterlimit="10">
                     <g transform="translate(19 20)">
                         <rect x="1" y="1" width="22" height="5" className="stroke-current text-amber-600"></rect>
                         <polyline points="21,6 21,23 3,23 3,6 " className="stroke-current text-amber-900"></polyline>
@@ -179,8 +179,8 @@ export function Link() {
     return (
         <>{CircleBlock(() => {
             return (
-                <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                   className="nc-icon-wrapper" stroke-miterlimit="10">
+                <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                   className="nc-icon-wrapper" strokeMiterlimit="10">
                     <g transform="translate(20 20)">
                         <path
                             d="M13.4,10.6 L13.4,10.6c2,2,2,5.1,0,7.1l-2.8,2.8c-2,2-5.1,2-7.1,0l0,0c-2-2-2-5.1,0-7.1L6,11"
@@ -200,8 +200,8 @@ export function FilterOrganization() {
         <>{CircleBlock(() => {
             return (
 
-                <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                   className="nc-icon-wrapper" stroke-miterlimit="10">
+                <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                   className="nc-icon-wrapper" strokeMiterlimit="10">
                     <g transform="translate(20 20)">
                         <line x1="3" y1="13" x2="10" y2="13" className="stroke-current text-amber-100"></line>
                         <line x1="3" y1="5" x2="10" y2="5" className="stroke-current text-amber-100"></line>
@@ -224,8 +224,8 @@ export function Apple() {
         <>{WhiteCircleBlock(() => {
             if (big) {
                 return (
-                    <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                       className="nc-icon-wrapper" stroke-miterlimit="10">
+                    <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                       className="nc-icon-wrapper" strokeMiterlimit="10">
                         <g transform="translate(16 13)">
                             <path className="stroke-current text-amber-100"
                                   d="M28,23.697 c-0.656,1.427-0.969,2.064-1.815,3.325c-1.177,1.761-2.839,3.954-4.897,3.973c-1.829,0.017-2.299-1.168-4.781-1.155 s-3,1.176-4.829,1.159c-2.058-0.018-3.631-1.999-4.81-3.761c-3.295-4.925-3.639-10.704-1.607-13.776 c1.444-2.184,3.723-3.461,5.865-3.461c2.181,0,3.552,1.174,5.356,1.174c1.75,0,2.815-1.176,5.338-1.176 c1.906,0,3.926,1.019,5.365,2.78C22.47,15.318,23.236,21.929,28,23.697L28,23.697z"></path>
@@ -238,14 +238,14 @@ export function Apple() {
                 )
             } else {
                 return (
-                    <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                       className="nc-icon-wrapper" stroke-miterlimit="10">
+                    <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                       className="nc-icon-wrapper" strokeMiterlimit="10">
                         <g transform="translate(20 18)">
                             <path className="stroke-current text-gray-700"
                                   d="M21,17.423 c-0.492,1.09-0.727,1.576-1.361,2.54c-0.883,1.345-2.129,3.02-3.673,3.034c-1.372,0.013-1.724-0.892-3.586-0.882 c-1.861,0.01-2.25,0.898-3.622,0.885c-1.544-0.014-2.723-1.526-3.608-2.872C2.68,16.366,2.422,11.952,3.946,9.606 c1.083-1.668,2.792-2.643,4.399-2.643c1.636,0,2.664,0.897,4.017,0.897c1.312,0,2.112-0.898,4.003-0.898 c1.43,0,2.944,0.778,4.024,2.123C16.853,11.023,17.427,16.072,21,17.423L21,17.423z"></path>
                             <path
                                 d="M15.1,3.45c0.65-0.834,1.143-2.011,0.964-3.214 c-1.062,0.073-2.302,0.748-3.027,1.628c-0.658,0.799-1.201,1.983-0.99,3.135C13.205,5.035,14.404,4.343,15.1,3.45L15.1,3.45z"
-                                stroke-linejoin="miter" stroke="none" className="stroke-current text-cyan-600"></path>
+                                strokeLinejoin="miter" stroke="none" className="stroke-current text-cyan-600"></path>
                         </g>
                     </g>
                 )
@@ -259,8 +259,8 @@ export function Android() {
         <>{WhiteCircleBlock(() => {
             if (big) {
                 return (
-                    <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                       className="nc-icon-wrapper" stroke-miterlimit="10">
+                    <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                       className="nc-icon-wrapper" strokeMiterlimit="10">
                         <g transform="translate(16 15)">
                             <path d="M31,23A15.154,15.154,0,0,0,1,23Z" className="stroke-current text-gray-700"></path>
                             <line x1="6" y1="6" x2="8.88" y2="11.76" className="stroke-current text-cyan-600"></line>
@@ -272,8 +272,8 @@ export function Android() {
                 )
             } else {
                 return (
-                    <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                       className="nc-icon-wrapper" stroke-miterlimit="10">
+                    <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                       className="nc-icon-wrapper" strokeMiterlimit="10">
                         <g transform="translate(20 19)">
                             <path d="M22.95,17a11,11,0,0,0-21.9,0Z" className="stroke-current text-gray-700"></path>
                             <line x1="5" y1="4" x2="7.404" y2="8.006" className="stroke-current text-cyan-600"></line>
@@ -293,8 +293,8 @@ export function DecisionProcess() {
     return (
         <>{WhiteCircleBlock(() => {
             return (
-                <g stroke-linecap="square" stroke-width="2" fill="none" stroke-linejoin="miter"
-                   className="nc-icon-wrapper" stroke-miterlimit="10">
+                <g strokeLinecap="square" strokeWidth="2" fill="none" strokeLinejoin="miter"
+                   className="nc-icon-wrapper" strokeMiterlimit="10">
                     <g transform="translate(22 20)">
                         <rect x="2" y="2" width="8" height="4" className="stroke-current text-cyan-600"></rect>
                         <rect x="2" y="18" width="8" height="4" className="stroke-current text-cyan-600"></rect>

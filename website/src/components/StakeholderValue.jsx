@@ -21,9 +21,9 @@ function DetailBlock(title, subTitle, descriptionBlock) {
         <div className="bg-gray-100 dark:bg-gray-800 px-4 md:px-12 md:pt-8 pt-4 md:pb-4 pb-2">
             <h3 className="h4 md:h3 mb-3">{title}</h3>
             <div className="font-architects-daughter text-xl text-cyan-800 dark:text-cyan-300 mb-2">{subTitle}</div>
-            <p className="md:text-xl text-lg text-gray-900 dark:text-gray-200 text-justify">
+            <div className="md:text-xl text-lg text-gray-900 dark:text-gray-200 text-justify">
                 {descriptionBlock()}
-            </p>
+            </div>
         </div>
     </div>)
 }

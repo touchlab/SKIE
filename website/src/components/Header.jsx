@@ -65,7 +65,7 @@ function Header({menuLinkList, children}) {
                         {/* Desktop menu links */}
                         <ul className="flex grow justify-center flex-wrap items-center list-none m-0">
                             {menuLinks.map(([title, url]) => (
-                                <li>
+                                <li key={url}>
                                     <Link to={url} className="text-gray-500 hover:text-gray-900 px-4 py-2 flex items-center transition duration-150 ease-in-out hover:no-underline">
                                         {title}
                                     </Link>
@@ -94,19 +94,14 @@ function Header({menuLinkList, children}) {
                         <nav id="mobile-nav" ref={mobileNav} className="absolute top-full z-20 left-0 w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out" style={mobileNavOpen ? { maxHeight: mobileNav.current.scrollHeight, opacity: 1 } : { maxHeight: 0, opacity: .8 } }>
                             <ul className="bg-gray-800 px-4 py-2">
                                 {menuLinks.map(([title, url]) => (
-                                    <li>
+                                    <li key={url}>
                                         <Link to={url} onClick={() => setMobileNavOpen(!mobileNavOpen)} className="flex text-gray-300 hover:text-gray-200 py-2">{title}</Link>
                                     </li>
                                 ))}
-                                <li>
-                                    <Link to="/signin" className="flex font-medium w-full text-purple-600 hover:text-gray-200 py-2 justify-center">Sign in</Link>
-                                </li>
-                                <li>
-                                    <Link to="/signup" className="font-medium w-full inline-flex items-center justify-center border border-transparent px-4 py-2 my-2 rounded-sm text-white bg-purple-600 hover:bg-purple-700 transition duration-150 ease-in-out">
-                                        Book a Demo
-                                    </Link>
-                                </li>
+
+                                <li> {children}</li>
                             </ul>
+
                         </nav>
 
                     </div>

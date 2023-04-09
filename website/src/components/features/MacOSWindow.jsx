@@ -18,6 +18,7 @@ export default function MacOSWindow({ tabs, aspectRatio }) {
                     const activeStateClasses = isActive ? 'bg-gray-100 cursor-default' : 'hover:text-gray-900 hover:bg-gray-200 cursor-pointer before:border-t';
 
                     return <button
+                        key={index}
                         className={`${commonClasses} ${positionClasses} ${activeStateClasses}`}
                         onClick={() => setActiveTab(tab)}>
                         <div className="flex justify-center align-middle items-center gap-2.5">
