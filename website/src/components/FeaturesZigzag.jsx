@@ -166,7 +166,6 @@ export default function FeaturesZigzag() {
                     <SealedClasses/>
                 </div>
             </div>
-
         </section>
     );
 }

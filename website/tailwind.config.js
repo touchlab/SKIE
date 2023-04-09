@@ -31,6 +31,13 @@ module.exports = {
                     700: '#4B4ACF',
                     800: '#38379C',
                     900: '#262668',
+                },
+                touchlab: {
+                    blue: '#0FCDE2',
+                    yellow: '#F9E32E',
+                    emerald: '#6CD28C',
+                    turquoise: '#20D2B9',
+                    green: '#A8D23F',
                 }
             },
             spacing: {
