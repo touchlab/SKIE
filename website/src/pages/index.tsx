@@ -11,6 +11,7 @@ import Automatic from '@site/src/components/Automatic';
 import Roadmap from '@site/src/components/Roadmap';
 import Header from '@site/src/components/Header';
 import Footer from '@site/src/components/Footer';
+import Typeform from '@site/src/components/Typeform';
 import {HtmlClassNameProvider} from '@docusaurus/theme-common';
 import {useColorMode} from '@docusaurus/theme-common';
 import {Link} from "react-router-dom";
@@ -73,7 +74,9 @@ function TailwindPage(): JSX.Element {
             <Roadmap/>
             <StakeholderValue/>
             <TrustBlocks/>
-            <Footer/>
+            <Footer>
+                <Typeform/>
+            </Footer>
         </div>
     );
 }

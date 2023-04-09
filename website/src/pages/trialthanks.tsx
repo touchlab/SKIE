@@ -2,7 +2,7 @@ import React from 'react';
 
 import HeroThanks from '@site/src/components/HeroThanks';
 import Header from '@site/src/components/Header';
-import FooterBlank from '@site/src/components/FooterBlank';
+import Footer from '@site/src/components/Footer';
 
 export default function TrialsignupPage(): JSX.Element {
     return (
@@ -10,7 +10,7 @@ export default function TrialsignupPage(): JSX.Element {
             <div>
                 <Header/>
                 <HeroThanks/>
-                <FooterBlank/>
+                <Footer/>
             </div>
         </div>
     );
