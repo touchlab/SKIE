@@ -11,6 +11,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.io.path.writeBytes
 
 class AnalyticsCollector(
@@ -20,7 +21,7 @@ class AnalyticsCollector(
 
     private val backgroundScope = CoroutineScope(Dispatchers.Default)
 
-    private val backgroundJobs = mutableListOf<Job>()
+    private val backgroundJobs = CopyOnWriteArrayList<Job>()
 
     private var isFinalized = false
 
@@ -28,6 +29,23 @@ class AnalyticsCollector(
     fun collect(producer: AnalyticsProducer) {
         checkIfNotFinalized()
 
+        collectWithoutCheck(producer)
+    }
+
+    @Synchronized
+    fun collectAll(producers: List<AnalyticsProducer>) {
+        checkIfNotFinalized()
+
+        producers.parallelStream().forEach {
+            collectWithoutCheck(it)
+        }
+    }
+
+    fun collectAll(vararg producers: AnalyticsProducer) {
+        collectAll(producers.toList())
+    }
+
+    private fun collectWithoutCheck(producer: AnalyticsProducer) {
         val analyticsResult = producer.produceSafely()
 
         collectUsingDeflate(analyticsResult)
@@ -35,18 +53,18 @@ class AnalyticsCollector(
     }
 
     private fun collectUsingDeflate(analyticsResult: AnalyticsProducer.Result) {
-        collect(analyticsResult, FastAnalyticsCompressor, 1)
+        collectUsingCompressor(analyticsResult, FastAnalyticsCompressor, 1)
     }
 
     private fun collectUsingBZip2(analyticsResult: AnalyticsProducer.Result) {
         val betterCompressionJob = backgroundScope.launch {
-            collect(analyticsResult, EfficientAnalyticsCompressor, 2)
+            collectUsingCompressor(analyticsResult, EfficientAnalyticsCompressor, 2)
         }
 
         backgroundJobs.add(betterCompressionJob)
     }
 
-    private fun collect(
+    private fun collectUsingCompressor(
         analyticsResult: AnalyticsProducer.Result,
         compressor: AnalyticsCompressor,
         fileVersion: Int,

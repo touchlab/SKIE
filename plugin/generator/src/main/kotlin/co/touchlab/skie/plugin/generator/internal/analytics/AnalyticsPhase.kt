@@ -4,6 +4,7 @@ import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.analytics.air.AirAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.configuration.SkieConfigurationAnalyticsProducer
+import co.touchlab.skie.plugin.generator.internal.analytics.system.SysctlAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -16,14 +17,19 @@ internal class AnalyticsPhase(
     override val isActive: Boolean = true
 
     override fun runObjcPhase() {
-        val skieConfigurationAnalyticsProducer = SkieConfigurationAnalyticsProducer(skieContext.configuration)
+        val producers = listOf(
+            SkieConfigurationAnalyticsProducer(skieContext.configuration),
+            SysctlAnalyticsProducer,
+        )
 
-        skieContext.analyticsCollector.collect(skieConfigurationAnalyticsProducer)
+        skieContext.analyticsCollector.collectAll(producers)
     }
 
     override fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
-        val airAnalyticsProducer = AirAnalyticsProducer(descriptorProvider, allModules.values.toList())
+        val producers = listOf(
+            AirAnalyticsProducer(descriptorProvider, allModules.values.toList()),
+        )
 
-        skieContext.analyticsCollector.collect(airAnalyticsProducer)
+        skieContext.analyticsCollector.collectAll(producers)
     }
 }
