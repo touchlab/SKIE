@@ -48,7 +48,6 @@ function Header() {
         ['Home', '/'],
         ['Features', '#features'],
         ['Why', '#why-skie'],
-        ['Docs', '/intro'],
     ]
 
     return (

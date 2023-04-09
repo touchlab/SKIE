@@ -39,8 +39,8 @@ module.exports = {
                 '1/1': '100%',
             },
             gridTemplateColumns: {
-                'feature-left': '1fr 2fr',
-                'feature-right': '2fr 1fr',
+                'feature-left': '3fr 5fr',
+                'feature-right': '5fr 3fr',
             },
             fontFamily: {
                 inter: ['Inter', 'sans-serif'],

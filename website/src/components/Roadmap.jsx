@@ -14,7 +14,7 @@ export default function Roadmap() {
                             Our existing feature-set is merely scratching the surface of what’s possible. As we continuously explore new ideas and possibilities, we invite you to join us on our journey and take part in shaping our future direction.
                         </p>
                         <a className="btn text-white bg-cyan-600 hover:bg-cyan-700 sm:w-auto drop-shadow-lg no-underline"
-                           href="#">I wish SKIE could &hellip;</a>
+                           href="#">Become a Customer</a>
                     </div>
 
                 </div>

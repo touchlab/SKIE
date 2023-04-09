@@ -19,7 +19,10 @@ export default function TrustBlocks() {
                 <div className="border-t border-gray-800">
                     {/* Section header */}
                     <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="h2 mb-4">__ Confidence/trust copy __</h2>
+                        <h2 className="h2 mb-4">Risk Mitigation</h2>
+                        <p className="text-xl text-gray-700 dark:text-gray-400">
+                            Adopting Kotlin Multiplatform can be challenging and introducing a new tool to your team might be daunting.
+                        </p>
                     </div>
                 </div>
 
@@ -32,13 +35,13 @@ export default function TrustBlocks() {
 
                         {TrustBlock(
                             "Comprehensive Testing",
-                            <>We test SKIE against a <strong>thousand</strong> public KMM libraries along with <strong>hundreds</strong> of hand-written tests.<br/><br/>(TODO: 1000 or thousand, 100s or hundreds?)</>,
+                            <>We test SKIE against a <strong>thousand</strong> public KMM libraries along with <strong>hundreds</strong> of hand-written tests.</>,
                             Link
                         )}
 
                         {TrustBlock(
-                            "No Vendor Lock-in",
-                            "Flexibility and _risk aversion_ is paramount to us, we gotchu fam. TODO: We care about this too, we built it in from day one.",
+                            "Immense Flexibility",
+                            "No two projects are the same. SKIE has granular configurability, letting your team decide what to enhance.",
                             Geometry
                         )}
 
