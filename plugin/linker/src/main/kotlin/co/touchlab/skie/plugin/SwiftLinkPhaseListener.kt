@@ -31,6 +31,6 @@ class SwiftLinkPhaseListener : PhaseListener {
 
         context.compilerOutput += swiftObjectFiles
 
-        context.skieContext.analyticsCollector.finalize()
+        context.skieContext.analyticsCollector.waitForBackgroundTasks()
     }
 }

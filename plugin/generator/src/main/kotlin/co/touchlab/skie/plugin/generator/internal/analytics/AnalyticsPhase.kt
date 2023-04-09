@@ -24,7 +24,7 @@ internal class AnalyticsPhase(
             HardwareAnalyticsProducer,
         )
 
-        skieContext.analyticsCollector.collectAll(producers)
+        skieContext.analyticsCollector.collect(producers)
     }
 
     override fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
@@ -32,6 +32,6 @@ internal class AnalyticsPhase(
             AirAnalyticsProducer(descriptorProvider, allModules.values.toList()),
         )
 
-        skieContext.analyticsCollector.collectAll(producers)
+        skieContext.analyticsCollector.collect(producers)
     }
 }

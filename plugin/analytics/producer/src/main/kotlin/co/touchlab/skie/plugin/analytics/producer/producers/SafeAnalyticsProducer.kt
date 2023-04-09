@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.analytics.producer.collectors
+package co.touchlab.skie.plugin.analytics.producer.producers
 
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 

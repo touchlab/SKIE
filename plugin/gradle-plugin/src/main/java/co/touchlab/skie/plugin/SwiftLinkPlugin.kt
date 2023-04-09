@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -31,8 +32,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Architecture
 import org.jetbrains.kotlin.konan.target.Family
 import java.io.File
-import java.util.UUID
 import java.nio.file.Path
+import java.util.UUID
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 const val EXTENSION_NAME = "skie"
 
@@ -63,17 +67,21 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         pluginManager.withPlugin("kotlin-native-cocoapods") {
             tasks.withType<FatFrameworkTask>().matching { it.name == "fatFramework" }.configureEach { task ->
                 // Unfortunately has to be done in `doFirst` to make sure the task is already configured by the plugin when we run our code
-                task.doFirst(object : Action<Task> {
-                    override fun execute(p0: Task) {
-                        val commonFrameworkName = task.frameworks.map { it.name }.distinct().singleOrNull() ?: return
-                        task.baseName = commonFrameworkName
-                    }
-                })
+                task.doFirst(
+                    object : Action<Task> {
+                        override fun execute(p0: Task) {
+                            val commonFrameworkName = task.frameworks.map { it.name }.distinct().singleOrNull() ?: return
+                            task.baseName = commonFrameworkName
+                        }
+                    },
+                )
             }
         }
 
         afterEvaluate {
-            if (!extension.isEnabled.get()) { return@afterEvaluate }
+            if (!extension.isEnabled.get()) {
+                return@afterEvaluate
+            }
             val swiftKtCompilerPluginConfiguration = configurations.create("swiftKtCompilerPlugin") {
                 it.isCanBeConsumed = false
                 it.isCanBeResolved = true
@@ -85,7 +93,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                 swiftKtCompilerPluginConfiguration(
                     group = BuildConfig.KOTLIN_PLUGIN_GROUP,
                     name = BuildConfig.KOTLIN_PLUGIN_NAME,
-                    version = BuildConfig.KOTLIN_PLUGIN_VERSION
+                    version = BuildConfig.KOTLIN_PLUGIN_VERSION,
                 )
             }
 
@@ -102,8 +110,10 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         subplugin.getOptions(project, framework)
                     }
 
+                    val buildId = generateBuildId()
+
                     // TODO cannot be in configure block
-                    configureAnalytics(framework.linkTaskProvider.get())
+                    configureAnalytics(framework.linkTaskProvider.get(), buildId)
 
                     framework.linkTaskProvider.configure { linkTask ->
                         val defaultSwiftSourceSet = configureSwiftSourceSet(framework.compilation.defaultSourceSet)
@@ -119,48 +129,51 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                         linkTask.compilerPluginClasspath = listOfNotNull(
                             linkTask.compilerPluginClasspath,
                             swiftKtCompilerPluginConfiguration,
-                            swiftLinkPluginConfiguration
+                            swiftLinkPluginConfiguration,
                         ).reduce(FileCollection::plus)
 
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.generatedSwiftDir.subpluginOption(
-                                layout.buildDirectory.dir("generated/swift/${framework.name}/${framework.target.targetName}").get().asFile
-                            )
+                            SkiePlugin.id,
+                            SkiePlugin.Options.generatedSwiftDir.subpluginOption(
+                                layout.buildDirectory.dir("generated/swift/${framework.name}/${framework.target.targetName}").get().asFile,
+                            ),
                         )
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.disableWildcardExport.subpluginOption(
-                                extension.isWildcardExportPrevented.get()
-                            )
-                        )
-
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.skieConfigurationPath.subpluginOption(createSwiftGenConfigTask.get().configFile)
+                            SkiePlugin.id,
+                            SkiePlugin.Options.disableWildcardExport.subpluginOption(
+                                extension.isWildcardExportPrevented.get(),
+                            ),
                         )
 
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.buildId.subpluginOption(generateBuildId())
+                            SkiePlugin.id, SkiePlugin.Options.skieConfigurationPath.subpluginOption(createSwiftGenConfigTask.get().configFile),
                         )
 
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.analyticsDir.subpluginOption(analyticsDir)
+                            SkiePlugin.id, SkiePlugin.Options.buildId.subpluginOption(buildId),
                         )
 
                         linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.Debug.infoDirectory.subpluginOption(
-                                layout.buildDirectory.file("${BuildConfig.KOTLIN_PLUGIN_ID}/${framework.name}/${framework.target.targetName}").get().asFile
-                            )
+                            SkiePlugin.id, SkiePlugin.Options.analyticsDir.subpluginOption(analyticsDir),
+                        )
+
+                        linkTask.compilerPluginOptions.addPluginArgument(
+                            SkiePlugin.id,
+                            SkiePlugin.Options.Debug.infoDirectory.subpluginOption(
+                                layout.buildDirectory.file("${BuildConfig.KOTLIN_PLUGIN_ID}/${framework.name}/${framework.target.targetName}").get().asFile,
+                            ),
                         )
 
                         extension.debug.dumpSwiftApiAt.get().forEach {
                             linkTask.compilerPluginOptions.addPluginArgument(
-                                SkiePlugin.id, SkiePlugin.Options.Debug.dumpSwiftApiAt.subpluginOption(it)
+                                SkiePlugin.id, SkiePlugin.Options.Debug.dumpSwiftApiAt.subpluginOption(it),
                             )
                         }
 
                         swiftSources.forEach { swiftFile ->
                             linkTask.compilerPluginOptions.addPluginArgument(
                                 SkiePlugin.id,
-                                SkiePlugin.Options.swiftSourceFile.subpluginOption(swiftFile)
+                                SkiePlugin.Options.swiftSourceFile.subpluginOption(swiftFile),
                             )
                         }
 
@@ -226,57 +239,59 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
     private fun Project.configureFatFrameworkPatching() {
         tasks.withType<FatFrameworkTask>().configureEach { task ->
-            task.doLast(object : Action<Task> {
-                override fun execute(p0: Task) {
-                    val target = FrameworkLayout(
-                        rootDir = task.fatFramework,
-                        isMacosFramework = task.frameworks.first().target.family == Family.OSX,
-                    )
+            task.doLast(
+                object : Action<Task> {
+                    override fun execute(p0: Task) {
+                        val target = FrameworkLayout(
+                            rootDir = task.fatFramework,
+                            isMacosFramework = task.frameworks.first().target.family == Family.OSX,
+                        )
 
-                    val frameworksByArchs = task.frameworks.associateBy { it.target.architecture }
-                    target.swiftHeader.writer().use { writer ->
-                        val swiftHeaderContents = frameworksByArchs.mapValues { (_, framework) ->
-                            framework.files.swiftHeader.readText()
-                        }
-
-                        if (swiftHeaderContents.values.distinct().size == 1) {
-                            writer.write(swiftHeaderContents.values.first())
-                        } else {
-                            swiftHeaderContents.toList().forEachIndexed { i, (arch, content) ->
-                                val macro = arch.clangMacro
-                                if (i == 0) {
-                                    writer.appendLine("#if defined($macro)\n")
-                                } else {
-                                    writer.appendLine("#elif defined($macro)\n")
-                                }
-                                writer.appendLine(content)
+                        val frameworksByArchs = task.frameworks.associateBy { it.target.architecture }
+                        target.swiftHeader.writer().use { writer ->
+                            val swiftHeaderContents = frameworksByArchs.mapValues { (_, framework) ->
+                                framework.files.swiftHeader.readText()
                             }
-                            writer.appendLine(
-                                """
+
+                            if (swiftHeaderContents.values.distinct().size == 1) {
+                                writer.write(swiftHeaderContents.values.first())
+                            } else {
+                                swiftHeaderContents.toList().forEachIndexed { i, (arch, content) ->
+                                    val macro = arch.clangMacro
+                                    if (i == 0) {
+                                        writer.appendLine("#if defined($macro)\n")
+                                    } else {
+                                        writer.appendLine("#elif defined($macro)\n")
+                                    }
+                                    writer.appendLine(content)
+                                }
+                                writer.appendLine(
+                                    """
                                     #else
                                     #error Unsupported platform
                                     #endif
-                                    """.trimIndent()
-                            )
+                                    """.trimIndent(),
+                                )
+                            }
                         }
-                    }
 
-                    target.swiftModuleDir.mkdirs()
+                        target.swiftModuleDir.mkdirs()
 
-                    frameworksByArchs.toList().forEach { (_, framework) ->
-                        copy {
-                            it.from(framework.files.apiNotes)
-                            it.into(target.headerDir)
-                        }
-                        framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
+                        frameworksByArchs.toList().forEach { (_, framework) ->
                             copy {
-                                it.from(swiftmoduleFile)
-                                it.into(target.swiftModuleDir)
+                                it.from(framework.files.apiNotes)
+                                it.into(target.headerDir)
+                            }
+                            framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
+                                copy {
+                                    it.from(swiftmoduleFile)
+                                    it.into(target.swiftModuleDir)
+                                }
                             }
                         }
                     }
-                }
-            })
+                },
+            )
         }
     }
 
@@ -300,13 +315,43 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         }
 
     // TODO Finish and refactor analytics
-    private fun Project.configureAnalytics(linkTask: KotlinNativeLink) {
-        configureAnalyticsUpload(linkTask)
+    private fun Project.configureAnalytics(linkTask: KotlinNativeLink, buildId: String) {
+        val analyticsCollector = AnalyticsCollector(analyticsDir.toPath(), buildId)
+
+        configurePerformanceAnalytics(linkTask, analyticsCollector)
+        configureAnalyticsUpload(linkTask, analyticsCollector)
     }
 
-    private fun Project.configureAnalyticsUpload(linkTask: KotlinNativeLink) {
+    @OptIn(ExperimentalTime::class)
+    private fun configurePerformanceAnalytics(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
+        lateinit var mark: TimeMark
+
+        linkTask.doFirst(
+            object : Action<Task> {
+                override fun execute(t: Task) {
+                    mark = TimeSource.Monotonic.markNow()
+                }
+            },
+        )
+
+        linkTask.doLast(
+            object : Action<Task> {
+                override fun execute(t: Task) {
+                    val linkTaskDuration = mark.elapsedNow()
+
+                    analyticsCollector.collect(
+                        PerformanceAnalyticsProducer(linkTaskDuration),
+                    )
+                }
+            },
+        )
+    }
+
+    private fun Project.configureAnalyticsUpload(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
         val task = tasks.register(linkTask.name + "Analytics") {
             it.doLast {
+                analyticsCollector.waitForBackgroundTasks()
+
                 AnalyticsUploader.sendAllIfPossible(analyticsDir.toPath())
             }
         }

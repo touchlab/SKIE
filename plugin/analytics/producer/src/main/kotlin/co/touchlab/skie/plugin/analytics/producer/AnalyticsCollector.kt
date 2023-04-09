@@ -1,15 +1,9 @@
 package co.touchlab.skie.plugin.analytics.producer
 
-import co.touchlab.skie.plugin.analytics.producer.collectors.produceSafely
+import co.touchlab.skie.plugin.analytics.producer.producers.produceSafely
 import co.touchlab.skie.plugin.analytics.producer.compressor.AnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.EfficientAnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.FastAnalyticsCompressor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.io.path.writeBytes
@@ -19,33 +13,21 @@ class AnalyticsCollector(
     private val buildId: String,
 ) {
 
-    private val backgroundScope = CoroutineScope(Dispatchers.Default)
-
-    private val backgroundJobs = CopyOnWriteArrayList<Job>()
-
-    private var isFinalized = false
+    private val backgroundTasks = CopyOnWriteArrayList<Thread>()
 
     @Synchronized
-    fun collect(producer: AnalyticsProducer) {
-        checkIfNotFinalized()
-
-        collectWithoutCheck(producer)
-    }
-
-    @Synchronized
-    fun collectAll(producers: List<AnalyticsProducer>) {
-        checkIfNotFinalized()
-
+    fun collect(producers: List<AnalyticsProducer>) {
         producers.parallelStream().forEach {
-            collectWithoutCheck(it)
+            collectWithoutSynchronization(it)
         }
     }
 
-    fun collectAll(vararg producers: AnalyticsProducer) {
-        collectAll(producers.toList())
+    @Synchronized
+    fun collect(vararg producers: AnalyticsProducer) {
+        collect(producers.toList())
     }
 
-    private fun collectWithoutCheck(producer: AnalyticsProducer) {
+    private fun collectWithoutSynchronization(producer: AnalyticsProducer) {
         val analyticsResult = producer.produceSafely()
 
         collectUsingDeflate(analyticsResult)
@@ -57,11 +39,13 @@ class AnalyticsCollector(
     }
 
     private fun collectUsingBZip2(analyticsResult: AnalyticsProducer.Result) {
-        val betterCompressionJob = backgroundScope.launch {
+        val betterCompressionTask = Thread {
             collectUsingCompressor(analyticsResult, EfficientAnalyticsCompressor, 2)
         }
 
-        backgroundJobs.add(betterCompressionJob)
+        betterCompressionTask.start()
+
+        backgroundTasks.add(betterCompressionTask)
     }
 
     private fun collectUsingCompressor(
@@ -87,18 +71,9 @@ class AnalyticsCollector(
         AnalyticsEncryptor.encrypt(data)
 
     @Synchronized
-    fun finalize() {
-        checkIfNotFinalized()
-        isFinalized = true
-
-        runBlocking {
-            backgroundJobs.joinAll()
-        }
-    }
-
-    private fun checkIfNotFinalized() {
-        if (isFinalized) {
-            throw IllegalStateException("AnalyticsCollector was already finalized.")
+    fun waitForBackgroundTasks() {
+        backgroundTasks.forEach {
+            it.join()
         }
     }
 }
