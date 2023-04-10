@@ -11,12 +11,12 @@ import java.util.Base64
 
 object HardwareAnalyticsProducer : AnalyticsProducer {
 
+    override val name: String = "hw"
+
     private val json = Json { ignoreUnknownKeys = true }
 
-    override fun produce(): AnalyticsProducer.Result = AnalyticsProducer.Result(
-        name = "hw",
-        data = Json.encodeToString(getHwAnalytics()).toByteArray(),
-    )
+    override fun produce(): ByteArray =
+        Json.encodeToString(getHwAnalytics()).toByteArray()
 
     private fun getHwAnalytics(): HardwareAnalytics {
         val hwData = queryHwData()

@@ -21,10 +21,10 @@ import org.jetbrains.kotlin.utils.ResolvedDependency
 
 class CompilerAnalyticsProducer(private val context: CommonBackendContext) : AnalyticsProducer {
 
-    override fun produce(): AnalyticsProducer.Result = AnalyticsProducer.Result(
-        name = "compiler",
-        data = Json.encodeToString(getCompilerAnalytics()).toByteArray(),
-    )
+    override val name: String = "compiler"
+
+    override fun produce(): ByteArray =
+        Json.encodeToString(getCompilerAnalytics()).toByteArray()
 
     private fun getCompilerAnalytics(): CompilerAnalytics {
         check(context is Context) { "Context is not of type konan.Context. Was: ${context.javaClass.canonicalName}." }

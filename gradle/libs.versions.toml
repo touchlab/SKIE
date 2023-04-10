@@ -28,6 +28,8 @@ swiftPoet = { module = "co.touchlab.fork.swiftpoet:swiftpoet", version = "1.5.6-
 kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.12.0" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 apache-compress = { module = "org.apache.commons:commons-compress", version = "1.22" }
+bugsnag = { module = "com.bugsnag:bugsnag", version = "3.6.4" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.4.6" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }

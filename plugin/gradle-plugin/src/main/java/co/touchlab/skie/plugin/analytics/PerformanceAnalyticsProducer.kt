@@ -8,12 +8,12 @@ import kotlin.time.Duration
 
 internal class PerformanceAnalyticsProducer(private val linkTaskDuration: Duration) : AnalyticsProducer {
 
-    override fun produce(): AnalyticsProducer.Result = AnalyticsProducer.Result(
-        name = "performance",
-        data = PerformanceAnalytics(
+    override val name: String = "performance"
+
+    override fun produce(): ByteArray =
+        PerformanceAnalytics(
             linkTaskDurationInSeconds = linkTaskDuration.inWholeMilliseconds / 1000.0,
         ).encode()
-    )
 }
 
 private fun PerformanceAnalytics.encode(): ByteArray =

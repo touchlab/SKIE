@@ -12,13 +12,12 @@ class AirAnalyticsProducer(
     private val modules: Collection<IrModuleFragment>,
 ) : AnalyticsProducer {
 
+    override val name: String = "air"
+
     private val json = Json { classDiscriminator = "jsonType" }
 
-    override fun produce(): AnalyticsProducer.Result =
-        AnalyticsProducer.Result(
-            name = "air",
-            data = IrToAirTransformer(descriptorProvider).transformToAir(modules).serialize(),
-        )
+    override fun produce(): ByteArray =
+        IrToAirTransformer(descriptorProvider).transformToAir(modules).serialize()
 
     private fun AirProject.serialize(): ByteArray =
         json.encodeToString(this).toByteArray()

@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
-import co.touchlab.skie.plugin.analytics.PerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsProducer
+import co.touchlab.skie.plugin.analytics.PerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
 import org.gradle.api.Action
@@ -317,11 +317,18 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         }
 
     private fun Project.configureAnalytics(linkTask: KotlinNativeLink, buildId: String) {
-        val analyticsCollector = AnalyticsCollector(analyticsDir.toPath(), buildId)
+        val analyticsCollector = AnalyticsCollector(
+            analyticsDirectory = analyticsDir.toPath(),
+            buildId = buildId,
+            skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
+            type = AnalyticsCollector.Type.Gradle,
+            // TODO
+            environment = AnalyticsCollector.Environment.Production,
+        )
 
         configurePerformanceAnalytics(linkTask, analyticsCollector)
         collectGradleAnalytics(linkTask, analyticsCollector)
-        configureAnalyticsUpload(linkTask, analyticsCollector)
+        configureAnalyticsTask(linkTask, analyticsCollector)
     }
 
     @OptIn(ExperimentalTime::class)
@@ -354,23 +361,40 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             object : Action<Task> {
                 override fun execute(t: Task) {
                     analyticsCollector.collect(
-                        GradleAnalyticsProducer(this@collectGradleAnalytics)
+                        GradleAnalyticsProducer(this@collectGradleAnalytics),
                     )
                 }
-            }
+            },
         )
     }
 
-    private fun Project.configureAnalyticsUpload(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
+    private fun Project.configureAnalyticsTask(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
         val task = tasks.register(linkTask.name + "SKIE") {
-            it.doLast {
-                analyticsCollector.waitForBackgroundTasks()
-
-                AnalyticsUploader.sendAllIfPossible(analyticsDir.toPath())
-            }
+            configureExceptionReporting(it, linkTask, analyticsCollector)
+            configureAnalyticsUpload(it, analyticsCollector)
         }
 
         linkTask.finalizedBy(task)
+    }
+
+    private fun configureExceptionReporting(
+        analyticsTask: Task,
+        linkTask: KotlinNativeLink,
+        analyticsCollector: AnalyticsCollector,
+    ) {
+        analyticsTask.doFirst {
+            linkTask.state.failure?.let {
+                analyticsCollector.logException(it)
+            }
+        }
+    }
+
+    private fun configureAnalyticsUpload(it: Task, analyticsCollector: AnalyticsCollector) {
+        it.doLast {
+            analyticsCollector.waitForBackgroundTasks()
+
+            AnalyticsUploader.sendAllIfPossible(analyticsDir.toPath())
+        }
     }
 
     private fun generateBuildId(): String =

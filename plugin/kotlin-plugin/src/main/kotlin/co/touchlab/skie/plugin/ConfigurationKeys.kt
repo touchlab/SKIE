@@ -9,6 +9,7 @@ import java.io.File
 object ConfigurationKeys {
 
     val buildId = CompilerConfigurationKey<String>("SKIE build ID")
+    // TODO Add license
     val swiftSourceFiles = CompilerConfigurationKey<List<File>>("Swift source files")
     val generatedSwiftDir = CompilerConfigurationKey<File>("generated Swift directory")
     val disableWildcardExport = CompilerConfigurationKey<Boolean>("disable wildcard export")

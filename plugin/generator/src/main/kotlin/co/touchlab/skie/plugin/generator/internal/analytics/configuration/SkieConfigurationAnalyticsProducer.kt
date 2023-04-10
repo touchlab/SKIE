@@ -5,8 +5,8 @@ import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 
 class SkieConfigurationAnalyticsProducer(private val configuration: Configuration) : AnalyticsProducer {
 
-    override fun produce(): AnalyticsProducer.Result = AnalyticsProducer.Result(
-        name = "skie-configuration",
-        data = configuration.serialize().toByteArray(),
-    )
+    override val name: String = "skie-configuration"
+
+    override fun produce(): ByteArray =
+        configuration.serialize().toByteArray()
 }

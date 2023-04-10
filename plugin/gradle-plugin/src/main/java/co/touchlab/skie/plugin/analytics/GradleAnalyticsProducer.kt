@@ -13,9 +13,10 @@ internal class GradleAnalyticsProducer(
     private val project: Project,
 ) : AnalyticsProducer {
 
-    override fun produce(): AnalyticsProducer.Result = AnalyticsProducer.Result(
-        name = "gradle",
-        data = GradleAnalytics(
+    override val name: String = "gradle"
+
+    override fun produce(): ByteArray =
+        GradleAnalytics(
             rootProjectName = project.rootProject.name,
             projectPath = project.path,
             // TODO
@@ -25,8 +26,7 @@ internal class GradleAnalyticsProducer(
             kotlinVersion = project.getKotlinPluginVersion(),
             stdlibVersion = project.kotlinExtension.coreLibrariesVersion,
             isCI = isCI(),
-        ).encode(),
-    )
+        ).encode()
 
     private fun isCI(): Boolean =
         !System.getenv("CI").isNullOrBlank()

@@ -3,13 +3,22 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.kotlin_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
+import co.touchlab.skie.plugin.reflection.reflectedBy
+import co.touchlab.skie.plugin.reflection.reflectors.GroupingMessageCollectorReflector
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
+import org.jetbrains.kotlin.cli.common.messages.GradleStyleMessageRenderer
+import org.jetbrains.kotlin.cli.common.messages.GroupingMessageCollector
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
@@ -18,26 +27,68 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = false
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
-        configuration.put(
-            SkieContextKey,
-            DefaultSkieContext(
-                module = DefaultSkieModule(),
-                configuration = configuration.get(ConfigurationKeys.skieConfiguration, Configuration {}),
-                swiftSourceFiles = configuration.getList(ConfigurationKeys.swiftSourceFiles),
-                expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.generatedSwiftDir),
-                debugInfoDirectory = configuration.getNotNull(ConfigurationKeys.Debug.infoDirectory),
-                frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
-                disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
-                dumpSwiftApiPoints = configuration.get(ConfigurationKeys.Debug.dumpSwiftApiPoints) ?: emptySet(),
-                analyticsCollector = AnalyticsCollector(
-                    analyticsDirectory = configuration.getNotNull(ConfigurationKeys.analyticsDir).toPath(),
-                    buildId = configuration.getNotNull(ConfigurationKeys.buildId),
-                ),
+        val skieContext = DefaultSkieContext(
+            module = DefaultSkieModule(),
+            configuration = configuration.get(ConfigurationKeys.skieConfiguration, Configuration {}),
+            swiftSourceFiles = configuration.getList(ConfigurationKeys.swiftSourceFiles),
+            expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.generatedSwiftDir),
+            debugInfoDirectory = configuration.getNotNull(ConfigurationKeys.Debug.infoDirectory),
+            frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
+            disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
+            dumpSwiftApiPoints = configuration.get(ConfigurationKeys.Debug.dumpSwiftApiPoints) ?: emptySet(),
+            analyticsCollector = AnalyticsCollector(
+                analyticsDirectory = configuration.getNotNull(ConfigurationKeys.analyticsDir).toPath(),
+                buildId = configuration.getNotNull(ConfigurationKeys.buildId),
+                skieVersion = BuildConfig.SKIE_VERSION,
+                type = AnalyticsCollector.Type.Compiler,
+                // TODO Read from license
+                environment = AnalyticsCollector.Environment.Production,
             ),
         )
+
+        configuration.put(SkieContextKey, skieContext)
+
+        registerErrorAnalytics(configuration, skieContext.analyticsCollector)
 
         IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
 
         PhaseInterceptor.setupPhaseListeners(configuration)
+    }
+
+    private fun registerErrorAnalytics(configuration: CompilerConfiguration, analyticsCollector: AnalyticsCollector) {
+        val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY) ?: MessageCollector.NONE
+
+        if (messageCollector is GroupingMessageCollector) {
+            val reflector = messageCollector.reflectedBy<GroupingMessageCollectorReflector>()
+
+            val delegate = reflector.delegate
+
+            reflector.delegate = MessageCollectorWithSkieAnalytics(analyticsCollector, delegate)
+        } else {
+            val messageCollectorWithSkieAnalytics = MessageCollectorWithSkieAnalytics(analyticsCollector, messageCollector)
+
+            configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollectorWithSkieAnalytics)
+        }
+    }
+
+    private class MessageCollectorWithSkieAnalytics(
+        private val analyticsCollector: AnalyticsCollector,
+        private val delegate: MessageCollector,
+    ) : MessageCollector {
+
+        override fun clear() {
+            delegate.clear()
+        }
+
+        override fun hasErrors(): Boolean =
+            delegate.hasErrors()
+
+        override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
+            if (severity.isError) {
+                analyticsCollector.logException(message)
+            }
+
+            delegate.report(severity, message, location)
+        }
     }
 }

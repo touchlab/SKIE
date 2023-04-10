@@ -5,14 +5,16 @@ import co.touchlab.skie.util.Command
 
 object SysctlAnalyticsProducer : AnalyticsProducer {
 
-    override fun produce(): AnalyticsProducer.Result = AnalyticsProducer.Result(
-        name = "sys",
-        data = run {
-            Command(
-                "sh",
-                "-c",
-                """sysctl -ae | grep -v kern.hostname"""
-            ).execute().outputLines.joinToString(System.lineSeparator()).toByteArray()
-        }
-    )
+    override val name: String = "sys"
+
+    override fun produce(): ByteArray =
+        Command(
+            "sh",
+            "-c",
+            """sysctl -ae | grep -v kern.hostname""",
+        )
+            .execute()
+            .outputLines
+            .joinToString(System.lineSeparator())
+            .toByteArray()
 }
