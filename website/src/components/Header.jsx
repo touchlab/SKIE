@@ -47,7 +47,7 @@ function Header({menuLinkList, rightContent: content}) {
     const menuLinks = menuLinkList ? menuLinkList : []
 
     return (
-        <header className={`sticky top-0 w-full z-30 bg-slate-100 ${scrollPosition > 0 ? 'shadow' : 'shadow-none'}`}>
+        <header className={`fixed top-0 w-full z-30 bg-slate-100 ${scrollPosition > 0 ? 'shadow' : 'shadow-none'}`}>
             <div className="max-w-5xl mx-auto px-4 lg:px-0">
                 <div className="flex h-20">
                     {/* Desktop navigation */}
@@ -105,7 +105,7 @@ function Header({menuLinkList, rightContent: content}) {
                                     </li>
                                 ))}
 
-                                <li className="grow py-2 !border-0">{content && content(scrollPosition)}</li>
+                                <li className="grow py-2 !border-0">{content && content(scrollPosition, () => setMobileNavOpen(!mobileNavOpen))}</li>
                             </ul>
 
                         </nav>

@@ -33,7 +33,7 @@ export default function StakeholderValue() {
 
     return (
         <section id="why-skie" className="bg-slate-50 pt-16 pb-20">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="max-w-6xl mx-auto">
                 <div>
                     {/* Section header */}
                     <div className="max-w-3xl mx-auto text-center">

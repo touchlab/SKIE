@@ -53,9 +53,9 @@ function TailwindPage(): JSX.Element {
         <div>
             <Header
                 menuLinkList={menuLinks}
-                rightContent={(scrollPosition) => (
+                rightContent={(scrollPosition, closeMobileMenu) => (
                     <div className="flex grow items-center">
-                        <Link to="#demo" className={`btn-sm grow md:grow-0 font-semibold text-lg text-gray-700 bg-amber-300 hover:bg-amber-200 hover:md:bg-amber-400 no-underline ${scrollPosition > 0 ? '' : 'md:text-cyan-600 hover:md:text-cyan-800 md:bg-transparent hover:md:bg-transparent'}`}>
+                        <Link to="#demo" onClick={closeMobileMenu} className={`btn-sm grow md:grow-0 font-semibold text-lg text-gray-700 bg-amber-300 hover:bg-amber-200 hover:md:bg-amber-400 no-underline ${scrollPosition > 0 ? '' : 'md:text-cyan-600 hover:md:text-cyan-800 md:bg-transparent hover:md:bg-transparent'}`}>
                             Book a Demo
                         </Link>
                     </div>

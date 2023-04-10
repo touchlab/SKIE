@@ -1,4 +1,3 @@
-import {AndroidOnly, ThumbDownTab, ThumbUpTab} from "../FeatureIcons";
 import React from "react";
 import MacOSWindow from "./MacOSWindow";
 
@@ -8,10 +7,34 @@ import after_skie from '@site/static/samples/flows/after_skie@2x.png';
 import {checkMark} from "./Icons";
 import {idea, xcode} from "./CodeBackgrounds";
 
+const tabs = [
+    {
+        icon: "🧑‍💻",
+        title: "Kotlin",
+        contentImage: kotlin,
+        background: idea,
+        description: "No changes on Kotlin side"
+    },
+    {
+        icon: "😭",
+        title: "Without SKIE",
+        contentImage: before_skie,
+        background: xcode,
+        description: "Flow API is lost",
+    },
+    {
+        icon: "🎉",
+        title: "With SKIE",
+        contentImage: after_skie,
+        background: xcode,
+        description: "Native async sequence behavior!",
+    },
+]
+
 export default function FlowInterop() {
     return (<div className="py-16 mx-auto grid md:grid-cols-feature-left items-center gap-8">
 
-        <div className="items-center">
+        <div className="items-center px-4 sm:px-6">
             <h3 className="h3 mb-3">Flow Support</h3>
             <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Kotlin Flows are automatically and transparently
                 converted to Swift AsyncSequences.</p>
@@ -34,29 +57,7 @@ export default function FlowInterop() {
         {/* 1st item */}
 
         <div className="pt-2">
-            <MacOSWindow tabs={[
-                {
-                    icon: "🧑‍💻",
-                    title: "Kotlin",
-                    contentImage: kotlin,
-                    background: idea,
-                    description: "No changes on Kotlin side"
-                },
-                {
-                    icon: "😭",
-                    title: "Without SKIE",
-                    contentImage: before_skie,
-                    background: xcode,
-                    description: "Flow API is lost",
-                },
-                {
-                    icon: "🎉",
-                    title: "With SKIE",
-                    contentImage: after_skie,
-                    background: xcode,
-                    description: "Native async sequence behavior!",
-                },
-            ]}/>
+            <MacOSWindow tabs={tabs}/>
         </div>
     </div>)
 }

@@ -9,7 +9,7 @@ function Footer({children}) {
                     {/* Bottom area */}
                     <div className="md:flex md:items-center md:justify-center">
                         {/* Copyrights note */}
-                        <div className="text-gray-400 text-sm"><span>&copy; 2011-2023 All Rights Reserved.</span> <span>Touchlab&reg; is a registered trademark of Touchlab Inc.</span></div>
+                        <div className="text-gray-400 text-sm text-center"><span>&copy; 2011-2023 All Rights Reserved.</span> <br className='sm:hidden'/><span>Touchlab&reg; is a registered trademark of Touchlab Inc.</span></div>
 
                     </div>
 

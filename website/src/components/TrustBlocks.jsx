@@ -11,12 +11,9 @@ const colors = {
 function ComprehensiveTesting() {
     return (
         <Circle colors={colors}>
-            <g className='origin-center' transform="scale(0.55)">
-                <path d="M26,15V31L11.86,53.325A5,5,0,0,0,16.084,61h31.83a5,5,0,0,0,4.224-7.676L38,31V15" fill="none" />
-                <rect height="7" width="28" fill="none" x="18" y="3"/>
-                <circle className={colors.secondary} cx="26" cy="51" fill="none" r="4" />
-                <circle className={colors.secondary} cx="33" cy="40" fill="none" r="3" />
-                <circle className={colors.secondary} cx="40" cy="52" fill="none" r="2" />
+            <g transform="translate(19, 19)">
+                <path className={colors.secondary} d="M18,5V1H6V5Z"/>
+                <path d="M9,8v5L4.249,18.938A2.5,2.5,0,0,0,6.2,23H17.8a2.5,2.5,0,0,0,1.953-4.062L15,13V8"/>
             </g>
         </Circle>
     )
@@ -25,16 +22,16 @@ function ComprehensiveTesting() {
 function ImmenseFlexibility() {
     return (
         <Circle colors={colors}>
-            <g className='origin-center' transform="scale(0.55)">
-                <line x1="12" y1="30" x2="12" y2="3"/>
-                <line x1="12" y1="61" x2="12" y2="52"/>
-                <circle className={colors.secondary} cx="12" cy="44" r="8"/>
-                <line x1="52" y1="30" x2="52" y2="3"/>
-                <line x1="52" y1="61" x2="52" y2="52"/>
-                <circle className={colors.secondary} cx="52" cy="44" r="8"/>
-                <line x1="32" y1="61" x2="32" y2="34"/>
-                <line x1="32" y1="12" x2="32" y2="3"/>
-                <circle className={colors.secondary} cx="32" cy="20" r="8"/>
+            <g transform="translate(20, 20)">
+                <line x1="4" y1="10" x2="4" y2="1"/>
+                <line x1="4" y1="23" x2="4" y2="20"/>
+                <line className={colors.secondary} x1="12" y1="2" x2="12" y2="1"/>
+                <line className={colors.secondary} x1="12" y1="23" x2="12" y2="12"/>
+                <line x1="20" y1="10" x2="20" y2="1"/>
+                <line x1="20" y1="23" x2="20" y2="20"/>
+                <circle cx="4" cy="17" r="3"/>
+                <circle className={colors.secondary} cx="12" cy="9" r="3"/>
+                <circle cx="20" cy="17" r="3"/>
             </g>
         </Circle>
     )
@@ -43,17 +40,16 @@ function ImmenseFlexibility() {
 function MadeByTouchlab() {
     return (
         <Circle colors={colors}>
-            <g className='origin-center' transform="scale(0.55)">
-                <path className={colors.secondary} d="M48.044,38.171l3.809,3.808a3.929,3.929,0,0,1,0,5.554h0a3.928,3.928,0,0,1-5.555,0l-3.807-3.806"/>
-                <path className={colors.secondary} d="M36.974,49.244l1.787,1.788a3.9,3.9,0,0,1,0,5.515h0A3.888,3.888,0,0,1,36,57.689"/>
-                <polyline className={colors.secondary} points="7 29 7 23 3 19 17 5 20 8 25 8"/>
-                <rect x="10.254" y="39.731" width="9.312" height="7.855" rx="3.928" ry="3.928" transform="translate(-26.504 23.331) rotate(-45)"/>
-                <rect x="22.565" y="49.937" width="8.544" height="7.8" rx="3.9" ry="3.9" transform="translate(-30.208 34.745) rotate(-45)"/>
-                <path d="M12.631,40.383l-.58.58a3.794,3.794,0,0,1-5.5-.136h0a3.8,3.8,0,0,1,.092-5.195l.58-.593a3.8,3.8,0,0,1,5.343-.091h0A3.8,3.8,0,0,1,12.631,40.383Z"/>
-                <rect x="16.731" y="44.906" width="8.212" height="7.8" rx="3.9" ry="3.9" transform="translate(-28.408 29.029) rotate(-45)"/>
-                <path className={colors.secondary} d="M45.537,46.776a3.9,3.9,0,0,1,0,5.516h0a3.9,3.9,0,0,1-5.515,0L38.73,51"/>
-                <path className={colors.secondary} d="M50.776,40.9a3.8,3.8,0,0,0,5.5-.136h0a3.8,3.8,0,0,0-.092-5.195L43.476,22.51"/>
-                <path d="M57,29V23l4-4L47,5,44,8H37.447a12.067,12.067,0,0,0-8.534,3.535l-9.206,9.571a3.4,3.4,0,0,0,4.349,5.185l9.8-6.318a8.908,8.908,0,0,0,13.483-.14"/>
+            <g className='origin-center' transform="scale(0.9) translate(16, 19)">
+                <path className={colors.secondary} d="M19.5,21.5l2.25,2.25a2.476,2.476,0,0,1,0,3.5h0" />
+                <path className={colors.secondary} d="M1,14V2H11.1a7.081,7.081,0,0,1,.9.058" />
+                <rect x="2.422" y="15.775" width="5.657" height="4.95" rx="2.475" ry="2.475" transform="translate(-11.367 9.058) rotate(-45)"/>
+                <rect x="5.727" y="19.275" width="6.046" height="4.95" rx="2.475" ry="2.475" transform="translate(-12.817 12.558) rotate(-45)"/>
+                <rect x="9.286" y="22.911" width="5.657" height="4.95" rx="2.475" ry="2.475" transform="translate(-14.402 16.001) rotate(-45)"/>
+                <rect x="12.905" y="26.485" width="4.977" height="4.243" rx="2.121" ry="2.121" transform="translate(-15.719 19.264) rotate(-45)"/>
+                <path className={colors.secondary} d="M23,18l3.025,3.025a2.474,2.474,0,0,1,0,3.5h0a2.474,2.474,0,0,1-3.5,0" />
+                <path className={colors.secondary} d="M25.75,20.75a2.476,2.476,0,0,0,3.5,0h0a2.476,2.476,0,0,0,0-3.5L20,8" strokeLinecap="butt" />
+                <path d="M20,8l-6.9,5.173a2.232,2.232,0,0,1-2.336.211h0a2.23,2.23,0,0,1-.579-3.572L15.95,4.05A7,7,0,0,1,20.9,2H31V14"/>
             </g>
         </Circle>
     )

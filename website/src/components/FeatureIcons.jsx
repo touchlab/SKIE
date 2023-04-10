@@ -3,8 +3,8 @@ import React from 'react';
 export function Circle({colors, children}) {
     return (
         <svg className="w-16 h-16 mb-4 origin-center" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <rect className={`fill-current ${colors.background}`} width="64" height="64" rx="32"/>
-            <g className={`${colors.primary} origin-center`} strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" fill="none">
+            <rect className={`${colors.background}`} width="64" height="64" rx="32"/>
+            <g className={`${colors.primary} origin-center`} strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" fill="none" strokeMiterlimit="10">
             {children}
             </g>
         </svg>
