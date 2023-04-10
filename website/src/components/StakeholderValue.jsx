@@ -34,7 +34,7 @@ export default function StakeholderValue() {
     const [block, setBlock] = useState("android");
 
     return (
-        <CenteringSection background='bg-slate-50'>
+        <CenteringSection id='why-skie' background='bg-slate-50'>
             <SectionHeader title="Better APIs are valuable for everybody" />
 
             <div className="flex flex-wrap justify-center -m-2 my-8 gap-4">

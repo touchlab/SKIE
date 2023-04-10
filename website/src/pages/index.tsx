@@ -34,10 +34,11 @@ export default function Home(): JSX.Element {
     });*/
 
 
+
     return (
-        <div className="tailwind">
+        <HtmlClassNameProvider className='tailwind'>
             <TailwindPage/>
-        </div>
+        </HtmlClassNameProvider>
     );
 }
 

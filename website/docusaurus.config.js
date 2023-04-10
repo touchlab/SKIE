@@ -92,7 +92,6 @@ const config = {
                 // This way we'd switch based on user's preferences
                 respectPrefersColorScheme: false,
             },
-            metadata: [{name: 'robots', content: 'noindex,follow'}],
             navbar: {
                 title: touchlabConfig.docusaurusConfig.title,
                 // style: 'dark',

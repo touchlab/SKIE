@@ -116,7 +116,7 @@ html[data-theme='dark'] .language-swift .punctuation + .class-name {
     margin: 0 3px 0 5px;
 }
 
-html:has(.tailwind) {
+html.tailwind {
     scroll-padding-top: 4rem;
 }
 
