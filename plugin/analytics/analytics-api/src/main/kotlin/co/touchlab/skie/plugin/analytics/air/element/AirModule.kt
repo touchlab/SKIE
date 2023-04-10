@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 data class AirModule(
     val name: Name,
     val files: List<AirFile>,
+    val isExported: Boolean,
 ) : AirElement {
 
     override fun <R, D> accept(visitor: AirElementVisitor<R, D>, data: D): R =

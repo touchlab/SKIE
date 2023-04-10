@@ -100,6 +100,7 @@ class IrToAirTransformer(private val descriptorProvider: DescriptorProvider) {
         AirModule(
             name = AirModule.Name(this.name.asString()),
             files = this.files.map { it.toAir() },
+            isExported = this.descriptor in descriptorProvider.exposedModules,
         )
 
     context(Context)

@@ -19,10 +19,12 @@ import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
+import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 internal class SkieCompilationScheduler(
+    context: CommonBackendContext,
     skieContext: SkieContext,
     descriptorProvider: NativeMutableDescriptorProvider,
     declarationBuilder: DeclarationBuilderImpl,
@@ -32,6 +34,7 @@ internal class SkieCompilationScheduler(
 
     private val compilationPhases = listOf(
         AnalyticsPhase(
+            context = context,
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
         ),

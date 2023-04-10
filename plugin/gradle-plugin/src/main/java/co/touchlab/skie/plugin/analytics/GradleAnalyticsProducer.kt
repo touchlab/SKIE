@@ -7,6 +7,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 
 internal class GradleAnalyticsProducer(
     private val project: Project,
@@ -22,6 +23,7 @@ internal class GradleAnalyticsProducer(
             skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
             gradleVersion = project.gradle.gradleVersion,
             kotlinVersion = project.getKotlinPluginVersion(),
+            stdlibVersion = project.kotlinExtension.coreLibrariesVersion,
             isCI = isCI(),
         ).encode(),
     )

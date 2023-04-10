@@ -8,6 +8,8 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface DescriptorProvider {
 
+    val exposedModules: Set<ModuleDescriptor>
+
     val exposedClasses: Set<ClassDescriptor>
 
     val exposedFiles: Set<SourceFile>

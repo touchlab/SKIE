@@ -10,5 +10,6 @@ data class GradleAnalytics(
     val skieVersion: String,
     val gradleVersion: String,
     val kotlinVersion: String,
+    val stdlibVersion: String,
     val isCI: Boolean,
 )

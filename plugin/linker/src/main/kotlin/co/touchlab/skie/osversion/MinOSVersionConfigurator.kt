@@ -11,9 +11,11 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.backend.konan.Context
 import org.jetbrains.kotlin.konan.properties.KonanPropertiesLoader
 
+// TODO Should be SKIE phase
 class MinOSVersionConfigurator : PhaseListener {
 
-    override val phase: PhaseListener.Phase = PhaseListener.Phase.OBJC_EXPORT
+    // Originally OBJC_EXPORT, moved to PSI_TO_IR to ensure statistics are collected first
+    override val phase: PhaseListener.Phase = PhaseListener.Phase.PSI_TO_IR
 
     private val coroutinesMinOsVersionMap = mutableMapOf(
         "osVersionMin.ios_arm32" to "13.0",

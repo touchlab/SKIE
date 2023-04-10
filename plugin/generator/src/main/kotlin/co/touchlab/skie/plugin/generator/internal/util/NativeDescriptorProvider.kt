@@ -5,6 +5,7 @@ package co.touchlab.skie.plugin.generator.internal.util
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
+import org.jetbrains.kotlin.backend.konan.getExportedDependencies
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
@@ -22,8 +23,15 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
 internal class NativeDescriptorProvider(private val context: CommonBackendContext) : InternalDescriptorProvider {
+
+    override val exposedModules: Set<ModuleDescriptor> by lazy {
+        check(context is KonanContext) { "Context is not KonanContext. Was: ${context.javaClass.canonicalName}"}
+
+        setOf(context.moduleDescriptor) + context.getExportedDependencies()
+    }
 
     private val mutableExposedClasses by lazy {
         exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableSet()

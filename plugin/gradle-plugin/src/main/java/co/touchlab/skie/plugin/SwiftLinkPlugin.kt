@@ -316,7 +316,6 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             return directory
         }
 
-    // TODO Finish and refactor analytics
     private fun Project.configureAnalytics(linkTask: KotlinNativeLink, buildId: String) {
         val analyticsCollector = AnalyticsCollector(analyticsDir.toPath(), buildId)
 
@@ -363,7 +362,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
     }
 
     private fun Project.configureAnalyticsUpload(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
-        val task = tasks.register(linkTask.name + "Analytics") {
+        val task = tasks.register(linkTask.name + "SKIE") {
             it.doLast {
                 analyticsCollector.waitForBackgroundTasks()
 

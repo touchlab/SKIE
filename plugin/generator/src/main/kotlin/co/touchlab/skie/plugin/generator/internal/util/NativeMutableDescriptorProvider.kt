@@ -70,6 +70,7 @@ internal class NativeMutableDescriptorProvider(
 
     // MARK:- DescriptorProvider delegation
     override val mapper: ObjCExportMapper get() = realProvider.mapper
+    override val exposedModules: Set<ModuleDescriptor> get() = realProvider.exposedModules
     override val exposedClasses: Set<ClassDescriptor> get() = realProvider.exposedClasses
     override val exposedFiles: Set<SourceFile> get() = realProvider.exposedFiles
     override val exposedCategoryMembers: Set<CallableMemberDescriptor> get() = realProvider.exposedCategoryMembers
