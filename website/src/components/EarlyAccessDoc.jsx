@@ -1,9 +1,10 @@
 import React from 'react';
+import {TypeformPopupButton} from "./Typeform";
 
 export default function EarlyAccessDoc() {
     return (
-        <section>
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12 md:pb-20">
+        <section className='tailwind'>
+            <div className="max-w-6xl grow pb-12 md:pb-20">
 
                 {/* CTA box */}
                 <div>&nbsp;</div>
@@ -25,12 +26,13 @@ export default function EarlyAccessDoc() {
                         </svg>
                     </div>
 
-                    <div className="relative flex flex-col xl:flex-row justify-between items-center">
+                    <div className="relative flex flex-col lg:flex-row justify-between items-center">
 
                         {/* CTA content */}
-                        <h4 className="h4 text-white xl:mb-0 text-center">Request Early Access</h4>
-                        <a className="btn text-teal-600 bg-teal-100 hover:bg-white shadow text-xl"
-                           href="https://form.typeform.com/to/XjtmUzbs">Request</a>
+                        <h4 className="h4 text-white lg:mb-0 text-center">Book a Free Demo Today</h4>
+                        <TypeformPopupButton>
+                            Book Now
+                        </TypeformPopupButton>
 
                     </div>
 

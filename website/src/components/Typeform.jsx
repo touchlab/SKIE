@@ -1,5 +1,5 @@
 import React from 'react';
-import {Widget} from "@typeform/embed-react";
+import {Widget, PopupButton} from "@typeform/embed-react";
 import SectionHeader from "./base/SectionHeader";
 
 export default function Typeform() {
@@ -19,5 +19,16 @@ export default function Typeform() {
                 iframeProps={{style: "border-radius: 0 !important"}}
             />
         </div>
+    )
+}
+
+export function TypeformPopupButton({children}) {
+    return (
+        <PopupButton
+            id="uOxsjmLK"
+            className="btn text-teal-600 bg-teal-100 hover:bg-white shadow text-xl font-sans font-medium cursor-pointer"
+        >
+            {children}
+        </PopupButton>
     )
 }
