@@ -23,14 +23,14 @@ const tabs = [
         title: "Without SKIE",
         contentImage: sealedSwiftBefore,
         background: xcode,
-        description: "Compile-time safety missing"
+        description: "No compile-time exhaustive checking"
     },
     {
         icon: "🎉",
         title: "With SKIE",
         contentImage: sealedSwiftAfter,
         background: xcode,
-        description: "Xcode knows which cases are missing",
+        description: "Xcode now knows which cases are missing",
     },
     /*{
         icon: "🎉",

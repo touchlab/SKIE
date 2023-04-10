@@ -16,7 +16,7 @@ const tabs = [
         title: "Kotlin",
         contentImage: kotlin,
         background: idea,
-        description: "No changes on Kotlin side"
+        description: "A regular suspend function"
     },
     {
         icon: "💥",
