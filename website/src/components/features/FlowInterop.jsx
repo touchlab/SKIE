@@ -43,9 +43,7 @@ export default function FlowInterop() {
                 "Flow, StateFlow and MutableStateFlow",
             ]}
         >
-            <div className="pt-2">
-                <MacOSWindow tabs={tabs}/>
-            </div>
+            <MacOSWindow tabs={tabs}/>
         </FeatureSubsection>
     )
 }

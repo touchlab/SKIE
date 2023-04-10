@@ -19,9 +19,9 @@ export default function FeatureSubsection({title, description, benefits, content
             <div className={`max-sm:mx-6 items-center ${titlePosition}`}>
                 <h3 className="h3 mb-3">{title}</h3>
                 <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">{description}</p>
-                <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2 p-0">
+                <ul className="text-lg text-gray-700 dark:text-gray-400 m-0 p-0 space-y-2">
                     {benefits.map((benefit, index) => (
-                        <li key={index} className="flex items-center mb-2">
+                        <li key={index} className="flex items-center p-0">
                             <CheckMark/>
                             <span>{benefit}</span>
                         </li>

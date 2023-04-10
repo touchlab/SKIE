@@ -26,19 +26,19 @@ const tabs = [
         description: "Compile-time safety missing"
     },
     {
-        icon: "😊",
+        icon: "🎉",
         title: "With SKIE",
         contentImage: sealedSwiftAfter,
         background: xcode,
-        description: "Sealed classes as enums with exhaustive checking ..",
+        description: "Xcode knows which cases are missing",
     },
-    {
+    /*{
         icon: "🎉",
         title: "With SKIE",
         contentImage: sealedSwiftAfterComplete,
         background: xcode,
         description: "... and Xcode missing cases support.",
-    },
+    },*/
 ]
 
 export default function SealedClasses() {

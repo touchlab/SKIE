@@ -4,14 +4,15 @@ export default function CenteringSection({id, outerPadding, innerMargin, backgro
     const outerPaddingOrDefault = outerPadding || 'py-8 md:py-16'
     const backgroundOrDefault = background || ''
     const innerMarginOrDefault = innerMargin || 'centering-section-inner-margins'
-    const dividerOrDefault = divider ? 'section-divider' : ''
-    return (
-        <section id={id} className={`${outerPaddingOrDefault} ${backgroundOrDefault} ${dividerOrDefault}`}>
+
+    return <>
+        {divider && <div className={backgroundOrDefault}><div className={`max-w-5xl grow section-divider mx-auto`}/></div>}
+        <section id={id} className={`${outerPaddingOrDefault} ${backgroundOrDefault}`}>
             <div className='flex justify-center'>
-                <div className={`max-w-5xl ${innerMarginOrDefault}`}>
+                <div className={`max-w-5xl grow ${innerMarginOrDefault}`}>
                     {children}
                 </div>
             </div>
         </section>
-    )
+    </>
 }
