@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.Architecture
 import org.jetbrains.kotlin.konan.target.Family
+import org.jetbrains.kotlin.konan.target.presetName
 import java.io.File
 import java.nio.file.Path
 import java.util.UUID
@@ -103,7 +104,14 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             swiftLinkSubplugins.forEach { it.configureDependencies(project, swiftLinkPluginConfiguration) }
 
             val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
+
+            logger.warn(
+                "w: SKIE does not yet support Kotlin Native caching. Compilation time in debug mode might be increased as a result."
+            )
+
             kotlin.appleTargets.forEach { target ->
+                disableCaching(target)
+
                 target.registerRuntime(extension)
 
                 val frameworks = target.binaries.mapNotNull { it as? Framework }
@@ -395,6 +403,10 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
             AnalyticsUploader.sendAllIfPossible(analyticsDir.toPath())
         }
+    }
+
+    private fun Project.disableCaching(target: KotlinNativeTarget) {
+        project.extensions.extraProperties.set("kotlin.native.cacheKind.${target.konanTarget.presetName}", "none")
     }
 
     private fun generateBuildId(): String =
