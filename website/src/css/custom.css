@@ -162,3 +162,21 @@ html:has(.tailwind) {
 .tailwind p {
     margin: 0;
 }
+
+@layer components {
+    .centering-section-inner-margins {
+        @apply mx-6
+    }
+
+    .centering-section-inner-margins-reset {
+        @apply -mx-6 lg:mx-0
+    }
+
+    .section-divider {
+        @apply border-0 border-solid border-t border-slate-200
+    }
+
+    .subsection-divider {
+        @apply section-divider centering-section-inner-margins-reset
+    }
+}

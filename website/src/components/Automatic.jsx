@@ -1,5 +1,7 @@
 import React from 'react';
 import {Circle} from "./FeatureIcons";
+import CenteringSection from "./base/CenteringSection";
+import SectionHeader from "./base/SectionHeader";
 
 const colors = {
     background: 'fill-blue-600',
@@ -47,46 +49,39 @@ function Profit() {
 }
 
 export default function Automatic() {
-
     return (
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-16 border-0 border-solid border-t border-slate-200">
-            <div>
+        <CenteringSection divider={true}>
+            <SectionHeader title="Zero-Effort Integration">
+                With SKIE, there's no need for additional development effort or training. This powerful tool automatically analyzes your code and modifies the API surface to streamline your workflow. Getting started is as easy as following three simple steps.
+            </SectionHeader>
 
-                {/* Section header */}
-                <div className="max-w-3xl mx-auto text-center pb-8 md:pb-10">
-                    <h2 className="h2 mb-4" data-aos="fade-up">Zero-Effort Integration</h2>
-                    <p className="text-xl text-gray-700" data-aos="fade-up" data-aos-delay="200">With SKIE, there's no need for additional development effort or training. This powerful tool automatically analyzes your code and modifies the API surface to streamline your workflow. Getting started is as easy as following three simple steps.</p>
+
+            {/* Items */}
+            <div className="max-w-sm mx-auto grid gap-8 md:grid-cols-3 lg:gap-16 items-start md:max-w-none">
+
+                {/* 1st item */}
+                <div className="relative flex flex-col items-center" data-aos="fade-up">
+                    <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-blue-400 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="200"></div>
+                    <License/>
+                    <h4 className="h4 mb-2"><span className="text-gray-400">1.</span> License</h4>
+                    <p className="text-lg text-gray-700 text-center">Apply Touchlab's licensing plugin in your Gradle Settings file and give it your access key.</p>
                 </div>
 
-                {/* Items */}
-                <div className="max-w-sm mx-auto grid gap-8 md:grid-cols-3 lg:gap-16 items-start md:max-w-none">
-
-                    {/* 1st item */}
-                    <div className="relative flex flex-col items-center" data-aos="fade-up">
-                        <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-blue-400 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="200"></div>
-                        <License/>
-                        <h4 className="h4 mb-2"><span className="text-gray-400">1.</span> License</h4>
-                        <p className="text-lg text-gray-700 text-center">Apply Touchlab's licensing plugin in your Gradle Settings file and give it your access key.</p>
-                    </div>
-
-                    {/* 2nd item */}
-                    <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="200">
-                        <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-blue-400 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="400"></div>
-                        <Plugin/>
-                        <h4 className="h4 mb-2"><span className="text-gray-400">2.</span> Plugin</h4>
-                        <p className="text-lg text-gray-700 text-center">Add SKIE Gradle plugin to your shared module, that produces a framework for iOS.</p>
-                    </div>
-
-                    {/* 3rd item */}
-                    <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="400">
-                        <Profit/>
-                        <h4 className="h4 mb-2"><span className="text-gray-400">3.</span> Profit</h4>
-                        <p className="text-lg text-gray-700 text-center">You and your team are ready to enjoy Swift-friendly and compile-time safe APIs.</p>
-                    </div>
-
+                {/* 2nd item */}
+                <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="200">
+                    <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-blue-400 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="400"></div>
+                    <Plugin/>
+                    <h4 className="h4 mb-2"><span className="text-gray-400">2.</span> Plugin</h4>
+                    <p className="text-lg text-gray-700 text-center">Add SKIE Gradle plugin to your shared module, that produces a framework for iOS.</p>
                 </div>
 
+                {/* 3rd item */}
+                <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="400">
+                    <Profit/>
+                    <h4 className="h4 mb-2"><span className="text-gray-400">3.</span> Profit</h4>
+                    <p className="text-lg text-gray-700 text-center">You and your team are ready to enjoy Swift-friendly and compile-time safe APIs.</p>
+                </div>
             </div>
-        </section>
-    );
+        </CenteringSection>
+    )
 }

@@ -8,6 +8,7 @@ import before_skie from '@site/static/samples/suspend/before_skie@2x.png';
 import after_skie from '@site/static/samples/suspend/after_skie@2x.png';
 import {checkMark} from "./Icons";
 import {idea, xcode} from "./CodeBackgrounds";
+import FeatureSubsection from "./FeatureSubsection";
 
 const tabs = [
     {
@@ -34,30 +35,20 @@ const tabs = [
 ]
 
 export default function SuspendInterop() {
-    return <div className="py-16 border-0 border-t border-solid border-slate-200">
-        <div className="mx-auto grid md:grid-cols-feature-right items-center gap-8">
+    return (
+        <FeatureSubsection
+            title="Suspend Interop"
+            description="Kotlin suspend functions are converted to Swift's native async functions."
+            benefits={[
+                "Cancellation support",
+                "Callable from any thread",
+                "No wrapping necessary",
+            ]}
+            contentLeft={true}
+        >
             <div className="pt-2">
                 <MacOSWindow tabs={tabs}/>
             </div>
-
-            <div className="items-center">
-                <h3 className="h3 mb-3">Suspend Interop</h3>
-                <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Kotlin suspend functions are converted to Swift's native async functions.</p>
-                <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2 p-0">
-                    <li className="flex items-center mb-2">
-                        {checkMark("lime")}
-                        <span>Cancellation support</span>
-                    </li>
-                    <li className="flex items-center mb-2">
-                        {checkMark("lime")}
-                        <span>Callable from any thread</span>
-                    </li>
-                    <li className="flex items-center mb-2">
-                        {checkMark("lime")}
-                        <span>No wrapping necessary</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+        </FeatureSubsection>
+    )
 }

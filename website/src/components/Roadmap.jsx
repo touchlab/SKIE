@@ -1,22 +1,15 @@
 import React from 'react';
+import Subsection from "./base/Subsection";
+import SectionHeader from "./base/SectionHeader";
+import CenteringSection from "./base/CenteringSection";
 
 export default function Roadmap() {
 
     return (
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-0 border-solid border-t border-slate-200">
-            <div>
-                <div>
-
-                    {/* Section header */}
-                    <div className="max-w-3xl mx-auto text-center">
-                        <h1 className="h2 mb-4">There's more!</h1>
-                        <p className="text-xl text-gray-700 dark:text-gray-400">
-                            Our existing feature-set is merely scratching the surface of what’s possible. As we continuously explore new ideas and possibilities, we invite you to join us on our journey and take part in shaping our future direction.
-                        </p>
-                    </div>
-
-                </div>
-            </div>
-        </section>
+        <CenteringSection divider={true}>
+            <SectionHeader title="There's more!" includeMargin={false}>
+                Our existing feature-set is merely scratching the surface of what’s possible. As we continuously explore new ideas and possibilities, we invite you to join us on our journey and take part in shaping our future direction.
+            </SectionHeader>
+        </CenteringSection>
     );
 }

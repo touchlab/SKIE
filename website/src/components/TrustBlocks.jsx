@@ -1,6 +1,8 @@
 import React from 'react';
 import {Circle, Geometry, Link, NetworkConnection, PillBottle} from "./FeatureIcons";
 import ImageTitleBlock from "./ImageTitleBlock";
+import CenteringSection from "./base/CenteringSection";
+import SectionHeader from "./base/SectionHeader";
 
 const colors = {
     background: "fill-touchlab-emerald",
@@ -57,40 +59,28 @@ function MadeByTouchlab() {
 
 export default function TrustBlocks() {
     return (
-        <section className="bg-slate-50">
+        <CenteringSection divider={true} background="bg-slate-50">
+            <SectionHeader title="Risk Mitigation">
+                Adopting Kotlin Multiplatform can be challenging and introducing a new tool to your team might be daunting. Low entry barrier has been part of SKIE from the beginning.
+            </SectionHeader>
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-0 border-solid border-t border-slate-200">
-                <div>
-                    {/* Section header */}
-                    <div className="max-w-3xl mx-auto text-center mb-10">
-                        <h2 className="h2 mb-4">Risk Mitigation</h2>
-                        <p className="text-xl text-gray-700 dark:text-gray-400">
-                            Adopting Kotlin Multiplatform can be challenging and introducing a new tool to your team might be daunting. Low entry barrier has been part of SKIE from the beginning.
-                        </p>
-                    </div>
-                </div>
+            <div
+                className="max-w-sm mx-auto grid gap-8 md:grid-cols-3 lg:gap-16 items-start md:max-w-2xl lg:max-w-none"
+                data-aos-id-blocks>
 
-                <div>
-                    {/* Items */}
-                    <div
-                        className="max-w-sm mx-auto grid gap-8 md:grid-cols-3 lg:gap-16 items-start md:max-w-2xl lg:max-w-none"
-                        data-aos-id-blocks>
+                <ImageTitleBlock image={<ComprehensiveTesting/>} title="Comprehensive Testing">
+                    We test SKIE against a <strong>thousand</strong> public KMM libraries along
+                    with <strong>hundreds</strong> of hand-written tests.
+                </ImageTitleBlock>
 
-                        <ImageTitleBlock image={<ComprehensiveTesting/>} title="Comprehensive Testing">
-                            We test SKIE against a <strong>thousand</strong> public KMM libraries along
-                            with <strong>hundreds</strong> of hand-written tests.
-                        </ImageTitleBlock>
+                <ImageTitleBlock image={<ImmenseFlexibility/>} title="Immense Flexibility">
+                    No two projects are the same. SKIE has granular configurability, letting your team decide what to enhance.
+                </ImageTitleBlock>
 
-                        <ImageTitleBlock image={<ImmenseFlexibility/>} title="Immense Flexibility">
-                            No two projects are the same. SKIE has granular configurability, letting your team decide what to enhance.
-                        </ImageTitleBlock>
-
-                        <ImageTitleBlock image={<MadeByTouchlab/>} title="Made by Touchlab">
-                            Touchlab has years of experience with Kotlin Multiplatform in production. We built SKIE to solve our problems, let it solve yours too.
-                        </ImageTitleBlock>
-                    </div>
-                </div>
+                <ImageTitleBlock image={<MadeByTouchlab/>} title="Made by Touchlab">
+                    Touchlab has years of experience with Kotlin Multiplatform in production. We built SKIE to solve our problems, let it solve yours too.
+                </ImageTitleBlock>
             </div>
-        </section>
-    );
+        </CenteringSection>
+    )
 }

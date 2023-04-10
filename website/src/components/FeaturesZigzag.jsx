@@ -4,6 +4,9 @@ import {AndroidOnly, ThumbDownTab, ThumbUpTab} from "./FeatureIcons";
 import FlowInterop from './features/FlowInterop';
 import SuspendInterop from './features/SuspendInterop';
 import SealedClasses from "./features/SealedClasses";
+import CenteringSection from "./base/CenteringSection";
+import SectionHeader from "./base/SectionHeader";
+import Subsection from "./base/Subsection";
 
 function labelImage(label, imgObj) {
     return (imgObj instanceof Array) ? labelImageScroller(label, imgObj) : labelImageScroller(label, [imgObj])
@@ -139,31 +142,30 @@ function ShowKotlinSwiftFriends(imgK, imgS, imgSAfter) {
 }
 
 export default function FeaturesZigzag() {
-    const checkMark = (color) => {
-        return (
-            <svg className={`w-3 h-3 fill-current text-${color}-500 mr-2 shrink-0" viewBox="0 0 12 12`} xmlns="http://www.w3.org/2000/svg">
-                <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z"/>
-            </svg>
-        )
-    }
-    return (
-        <section id="features" className="pt-8 md:pt-16">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 ">
-                <div className="border-t border-gray-800">
-                    {/*border-gray-800 border-solid border-t border-b-0 border-x-0*/}
-                    <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="h2 mb-4">Kotlin to Swift Code Transformations</h2>
-                        <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">
-                            SKIE improves interoperability between Kotlin and Swift by generating Swift wrappers for Objective-C headers created by the Kotlin compiler. It recreates features supported by both languages but lost in the translation from Kotlin to Objective-C to Swift.
-                        </p>
-                    </div>
+    const features = [
+        <FlowInterop/>,
+        <SuspendInterop/>,
+        <SealedClasses/>,
+    ]
 
-                    {/* Items */}
-                    <FlowInterop/>
-                    <SuspendInterop/>
-                    <SealedClasses/>
-                </div>
-            </div>
-        </section>
+    return (
+        <CenteringSection id='features'>
+            <SectionHeader title='Kotlin to Swift Code Transformations'>
+                SKIE improves interoperability between Kotlin and Swift by generating Swift wrappers for Objective-C headers created by the Kotlin compiler. It recreates features supported by both languages but lost in the translation from Kotlin to Objective-C to Swift.
+            </SectionHeader>
+
+            {/* Items */}
+            {features.map((feature, index) => {
+                return (
+                    <Subsection
+                        divider={index !== 0}
+                        padding={index === 0 ? 'pt-4 md:pt-8 pb-8 md:pb-16' : undefined}
+                        contentClassName="max-sm:centering-section-inner-margins-reset"
+                    >
+                        {feature}
+                    </Subsection>
+                )
+            })}
+        </CenteringSection>
     );
 }

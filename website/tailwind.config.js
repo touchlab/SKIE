@@ -9,6 +9,9 @@ module.exports = {
     important: '.tailwind',
     theme: {
         extend: {
+            backgroundImage: {
+                'touchlab-logo': "url('/img/Touchlab_Gradient.png')"
+            },
             colors: {
                 gray: {
                     100: '#EBF1F5',
@@ -44,10 +47,6 @@ module.exports = {
                 '9/16': '56.25%',
                 '3/4': '75%',
                 '1/1': '100%',
-            },
-            gridTemplateColumns: {
-                'feature-left': '3fr 5fr',
-                'feature-right': '5fr 3fr',
             },
             fontFamily: {
                 inter: ['Inter', 'sans-serif'],

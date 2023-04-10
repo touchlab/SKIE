@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import {AndroidOnly, AppleOnly, DecisionProcessOnly} from "./FeatureIcons";
+import CenteringSection from "./base/CenteringSection";
+import SectionHeader from "./base/SectionHeader";
 
 function ToggleBlock(currentBlock, blockName, setBlock, title, svgBody) {
     return (
@@ -32,82 +34,76 @@ export default function StakeholderValue() {
     const [block, setBlock] = useState("android");
 
     return (
-        <section id="why-skie" className="bg-slate-50 pt-16 pb-20">
-            <div className="max-w-6xl mx-auto">
-                <div>
-                    {/* Section header */}
-                    <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="h2 mb-4">Better APIs are valuable for everybody</h2>
-                    </div>
-                </div>
-                <div className="flex flex-wrap justify-center -m-2 my-8 space-x-4">
+        <CenteringSection background='bg-slate-50'>
+            <SectionHeader title="Better APIs are valuable for everybody" />
 
-                    {ToggleBlock(
-                        block,
-                        "android",
-                        setBlock,
-                        "Android Devs",
-                        AndroidOnly
-                    )}
-                    {ToggleBlock(
-                        block,
-                        "ios",
-                        setBlock,
-                        "iOS Devs",
-                        AppleOnly
-                    )}
-                    {ToggleBlock(
-                        block,
-                        "managers",
-                        setBlock,
-                        "Engineering Managers",
-                        DecisionProcessOnly
-                    )}
-                </div>
-                <div>
+            <div className="flex flex-wrap justify-center -m-2 my-8 gap-4">
 
-                    {block === "android" &&
-                        <>
-                            {DetailBlock("Android Developers", 'No API Anxiety', () => {
-                                return (<>
-                                    <p>
-                                        Kotlin Multiplatform enables Android developers to write code that can be shared with their iOS colleagues. However, doing so results in a loss of many Kotlin language features even though both Kotlin and Swift support them. That makes it difficult for Android developers to judge how their code will look like from Swift.
-                                    </p>
-                                    <p>
-                                        However, with SKIE, Kotlin developers don’t have to worry about these complexities of cross-platform development. Their Kotlin code will retain its modern and expressive features and will seamlessly integrate with Swift. That way, developers can focus on more meaningful and engaging tasks.
-                                    </p>
-                                </>)
-                            })}
-                        </>
-                    }
-
-                    {block === "ios" &&
-                        <>
-                            {DetailBlock("iOS Developers", 'Swift-native API surface', () => {
-                                return (<>
-                                    <p>
-                                        Kotlin Multiplatform can be a powerful tool for mobile teams who want to share code across platforms. However, the API Kotlin exposes to Swift lacks many language features that both Kotlin and Swift support. As a result, iOS developers may be hesitant to adopt this technology.
-                                    </p>
-                                    <p>
-                                        Fortunately, SKIE offers a solution that restores the expressiveness of modern languages, allowing developers to focus on their work without worrying about these limitations. This enables a smoother and more efficient development process, while also reducing maintenance costs and decreasing the likelihood of bugs.
-                                    </p>
-                                </>)
-                            })}
-                        </>
-                    }
-
-                    {block === "managers" &&
-                        <>
-                            {DetailBlock("Engineering Managers", 'Better team collaboration', () => {
-                                return (<>
-                                    <p>When adopting Kotlin Multiplatform, the Android team usually takes the lead. However, for a successful implementation of this cross-platform technology, the participation of all team members is essential. One potential challenge is that the API Kotlin exposes to Swift lacks many important language features. As a result, Kotlin Multiplatform may not resonate well with iOS developers, resulting in a hands-off approach.</p>
-                                    <p>To ensure that your team can leverage the full potential of Kotlin Multiplatform, it is therefore crucial to invest in a premium iOS developer experience. By doing so, you can empower your team to effectively collaborate and produce high-quality KMM-enabled apps.</p>
-                                </>)
-                            })}
-                        </>
-                    }
-                </div>
+                {ToggleBlock(
+                    block,
+                    "android",
+                    setBlock,
+                    "Android Devs",
+                    AndroidOnly
+                )}
+                {ToggleBlock(
+                    block,
+                    "ios",
+                    setBlock,
+                    "iOS Devs",
+                    AppleOnly
+                )}
+                {ToggleBlock(
+                    block,
+                    "managers",
+                    setBlock,
+                    "Engineering Managers",
+                    DecisionProcessOnly
+                )}
             </div>
-        </section>
-    );
+            <div className='centering-section-inner-margins-reset'>
+
+                {block === "android" &&
+                    <>
+                        {DetailBlock("Android Developers", 'No API Anxiety', () => {
+                            return (<>
+                                <p>
+                                    Kotlin Multiplatform enables Android developers to write code that can be shared with their iOS colleagues. However, doing so results in a loss of many Kotlin language features even though both Kotlin and Swift support them. That makes it difficult for Android developers to judge how their code will look like from Swift.
+                                </p>
+                                <p>
+                                    However, with SKIE, Kotlin developers don’t have to worry about these complexities of cross-platform development. Their Kotlin code will retain its modern and expressive features and will seamlessly integrate with Swift. That way, developers can focus on more meaningful and engaging tasks.
+                                </p>
+                            </>)
+                        })}
+                    </>
+                }
+
+                {block === "ios" &&
+                    <>
+                        {DetailBlock("iOS Developers", 'Swift-native API surface', () => {
+                            return (<>
+                                <p>
+                                    Kotlin Multiplatform can be a powerful tool for mobile teams who want to share code across platforms. However, the API Kotlin exposes to Swift lacks many language features that both Kotlin and Swift support. As a result, iOS developers may be hesitant to adopt this technology.
+                                </p>
+                                <p>
+                                    Fortunately, SKIE offers a solution that restores the expressiveness of modern languages, allowing developers to focus on their work without worrying about these limitations. This enables a smoother and more efficient development process, while also reducing maintenance costs and decreasing the likelihood of bugs.
+                                </p>
+                            </>)
+                        })}
+                    </>
+                }
+
+                {block === "managers" &&
+                    <>
+                        {DetailBlock("Engineering Managers", 'Better team collaboration', () => {
+                            return (<>
+                                <p>When adopting Kotlin Multiplatform, the Android team usually takes the lead. However, for a successful implementation of this cross-platform technology, the participation of all team members is essential. One potential challenge is that the API Kotlin exposes to Swift lacks many important language features. As a result, Kotlin Multiplatform may not resonate well with iOS developers, resulting in a hands-off approach.</p>
+                                <p>To ensure that your team can leverage the full potential of Kotlin Multiplatform, it is therefore crucial to invest in a premium iOS developer experience. By doing so, you can empower your team to effectively collaborate and produce high-quality KMM-enabled apps.</p>
+                            </>)
+                        })}
+                    </>
+                }
+            </div>
+        </CenteringSection>
+    )
 }

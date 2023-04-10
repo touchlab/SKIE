@@ -7,6 +7,8 @@ import sealedKotlin from '@site/static/samples/sealed/kotlin@2x.png';
 import sealedSwiftBefore from '@site/static/samples/sealed/before_skie@2x.png';
 import sealedSwiftAfter from '@site/static/samples/sealed/after_skie@2x.png';
 import sealedSwiftAfterComplete from '@site/static/samples/sealed/after_skie_complete@2x.png';
+import Subsection from "../base/Subsection";
+import FeatureSubsection from "./FeatureSubsection";
 
 const tabs = [
     {
@@ -40,27 +42,18 @@ const tabs = [
 ]
 
 export default function SealedClasses() {
-    return <div className="py-16 border-0 border-t border-solid border-slate-200">
-        <div className="mx-auto grid gap-8 md:grid-cols-feature-left items-center">
-            <div className="items-center">
-                <h3 className="h3 mb-3">Sealed class wrapped as an enum</h3>
-                <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Sealed classes are unchanged, but an associated
-                    enum is generated, as well as a wrapper function to use in switch statements.</p>
-                <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2 p-0">
-                    <li className="flex items-center mb-2">
-                        {checkMark("lime")}
-                        <span>Exhaustively checked sealed classes</span>
-                    </li>
-                    <li className="flex items-center mb-2">
-                        {checkMark("lime")}
-                        <span>Similar to enums with associated values</span>
-                    </li>
-                </ul>
-            </div>
-
+    return (
+        <FeatureSubsection
+            title="Sealed class wrapped as an enum"
+            description="Sealed classes are unchanged, but an associated enum is generated, as well as a wrapper function to use in switch statements."
+            benefits={[
+                "Exhaustively checked sealed classes",
+                "Similar to enums with associated values",
+            ]}
+        >
             <div className="pt-2">
                 <MacOSWindow tabs={tabs}/>
             </div>
-        </div>
-    </div>
+        </FeatureSubsection>
+    )
 }
