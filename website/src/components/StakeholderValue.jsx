@@ -64,7 +64,7 @@ export default function StakeholderValue() {
                         DecisionProcessOnly
                     )}
                 </div>
-                <div className="border-t border-gray-800">
+                <div>
 
                     {block === "android" &&
                         <>

@@ -3,7 +3,7 @@ import React from 'react';
 export default function Roadmap() {
 
     return (
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:px-6 border-0 border-solid border-t border-slate-100">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-0 border-solid border-t border-slate-200">
             <div>
                 <div>
 

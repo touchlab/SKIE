@@ -34,7 +34,7 @@ const tabs = [
 export default function FlowInterop() {
     return (<div className="py-16 mx-auto grid md:grid-cols-feature-left items-center gap-8">
 
-        <div className="items-center px-4 sm:px-6">
+        <div className="items-center">
             <h3 className="h3 mb-3">Flow Support</h3>
             <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Kotlin Flows are automatically and transparently
                 converted to Swift AsyncSequences.</p>

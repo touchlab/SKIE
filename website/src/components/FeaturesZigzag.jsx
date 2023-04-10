@@ -148,12 +148,10 @@ export default function FeaturesZigzag() {
     }
     return (
         <section id="features" className="pt-8 md:pt-16">
-            <div className="hidden text-lime-600"></div>
-            <div className="hidden text-lime-500"></div>
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 ">
                 <div className="border-t border-gray-800">
                     {/*border-gray-800 border-solid border-t border-b-0 border-x-0*/}
-                    <div className="max-w-3xl mx-auto text-center px-4 sm:px-6">
+                    <div className="max-w-3xl mx-auto text-center">
                         <h2 className="h2 mb-4">Kotlin to Swift Code Transformations</h2>
                         <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">
                             SKIE improves interoperability between Kotlin and Swift by generating Swift wrappers for Objective-C headers created by the Kotlin compiler. It recreates features supported by both languages but lost in the translation from Kotlin to Objective-C to Swift.

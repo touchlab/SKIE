@@ -48,7 +48,7 @@ function Header({menuLinkList, rightContent: content}) {
 
     return (
         <header className={`fixed top-0 w-full z-30 bg-slate-100 ${scrollPosition > 0 ? 'shadow' : 'shadow-none'}`}>
-            <div className="max-w-5xl mx-auto px-4 lg:px-0">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6">
                 <div className="flex h-20">
                     {/* Desktop navigation */}
                     <nav className="hidden md:flex md:grow items-center relative">

@@ -49,7 +49,7 @@ function Profit() {
 export default function Automatic() {
 
     return (
-        <section className="max-w-5xl mx-auto px-4 pt-16 pb-16 sm:px-6 border-0 border-solid border-t border-slate-100">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-16 border-0 border-solid border-t border-slate-200">
             <div>
 
                 {/* Section header */}
@@ -63,7 +63,7 @@ export default function Automatic() {
 
                     {/* 1st item */}
                     <div className="relative flex flex-col items-center" data-aos="fade-up">
-                        <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-gray-300 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="200"></div>
+                        <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-blue-400 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="200"></div>
                         <License/>
                         <h4 className="h4 mb-2"><span className="text-gray-400">1.</span> License</h4>
                         <p className="text-lg text-gray-700 text-center">Apply Touchlab's licensing plugin in your Gradle Settings file and give it your access key.</p>
@@ -71,7 +71,7 @@ export default function Automatic() {
 
                     {/* 2nd item */}
                     <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="200">
-                        <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-gray-300 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="400"></div>
+                        <div aria-hidden="true" className="absolute h-1 border-0 border-t border-dashed border-blue-400 hidden md:block" style={{ width: 'calc(100% - 32px)', left: 'calc(50% + 48px)', top: '32px' }} data-aos="fade-in" data-aos-delay="400"></div>
                         <Plugin/>
                         <h4 className="h4 mb-2"><span className="text-gray-400">2.</span> Plugin</h4>
                         <p className="text-lg text-gray-700 text-center">Add SKIE Gradle plugin to your shared module, that produces a framework for iOS.</p>

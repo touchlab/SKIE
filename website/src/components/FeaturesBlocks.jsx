@@ -59,10 +59,10 @@ function FeatureBlock({name, description, image}) {
 
 export default function FeaturesBlocks() {
     return (
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:px-6 border-0 border-solid border-t border-slate-100">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-0 border-solid border-t border-slate-200">
             <div>
                 {/* Section header */}
-                <div className="max-w-3xl mx-auto text-center">
+                <div className="max-w-3xl mx-auto text-center mb-10">
                     <h2 className="h2 mb-4">Critical features for the KMM iOS developer experience</h2>
                     <p className="text-xl text-gray-700" data-aos="fade-up" data-aos-delay="200">
                         SKIE is packed with features that make Kotlin Multiplatform frameworks feel like native Swift. We carefully designed each feature to be intuitive, while staying consistent throughout many use-cases.

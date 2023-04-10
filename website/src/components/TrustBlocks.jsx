@@ -59,10 +59,10 @@ export default function TrustBlocks() {
     return (
         <section className="bg-slate-50">
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:px-6 border-0 border-solid border-t border-slate-100">
-                <div className="border-t border-gray-800">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-0 border-solid border-t border-slate-200">
+                <div>
                     {/* Section header */}
-                    <div className="max-w-3xl mx-auto text-center">
+                    <div className="max-w-3xl mx-auto text-center mb-10">
                         <h2 className="h2 mb-4">Risk Mitigation</h2>
                         <p className="text-xl text-gray-700 dark:text-gray-400">
                             Adopting Kotlin Multiplatform can be challenging and introducing a new tool to your team might be daunting. Low entry barrier has been part of SKIE from the beginning.
@@ -70,8 +70,7 @@ export default function TrustBlocks() {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 pt-4">
-
+                <div>
                     {/* Items */}
                     <div
                         className="max-w-sm mx-auto grid gap-8 md:grid-cols-3 lg:gap-16 items-start md:max-w-2xl lg:max-w-none"

@@ -40,9 +40,9 @@ const tabs = [
 ]
 
 export default function SealedClasses() {
-    return <div className="py-16 border-0 border-t border-solid border-slate-100">
+    return <div className="py-16 border-0 border-t border-solid border-slate-200">
         <div className="mx-auto grid gap-8 md:grid-cols-feature-left items-center">
-            <div className="items-center px-4 sm:px-6">
+            <div className="items-center">
                 <h3 className="h3 mb-3">Sealed class wrapped as an enum</h3>
                 <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Sealed classes are unchanged, but an associated
                     enum is generated, as well as a wrapper function to use in switch statements.</p>

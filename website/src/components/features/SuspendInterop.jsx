@@ -34,13 +34,13 @@ const tabs = [
 ]
 
 export default function SuspendInterop() {
-    return <div className="py-16 border-0 border-t border-solid border-slate-100">
+    return <div className="py-16 border-0 border-t border-solid border-slate-200">
         <div className="mx-auto grid md:grid-cols-feature-right items-center gap-8">
             <div className="pt-2">
                 <MacOSWindow tabs={tabs}/>
             </div>
 
-            <div className="items-center px-4 sm:px-6">
+            <div className="items-center">
                 <h3 className="h3 mb-3">Suspend Interop</h3>
                 <p className="text-xl text-gray-700 dark:text-gray-400 mb-4">Kotlin suspend functions are converted to Swift's native async functions.</p>
                 <ul className="text-lg text-gray-700 dark:text-gray-400 -mb-2 p-0">
