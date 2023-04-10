@@ -19,15 +19,15 @@ function ToggleBlock(currentBlock, blockName, setBlock, title, svgBody) {
 }
 
 function DetailBlock(title, subTitle, descriptionBlock) {
-    return (<div className="max-w-5xl mx-auto">
-        <div className="bg-gray-100 dark:bg-gray-800 px-4 md:px-12 md:pt-8 pt-4 md:pb-4 pb-2">
+    return (
+        <div className="bg-gray-100 dark:bg-gray-800 px-6 md:px-10 lg:px-14 md:py-8 py-4">
             <h3 className="h4 md:h3 mb-3">{title}</h3>
             <div className="font-architects-daughter text-xl text-cyan-800 dark:text-cyan-300 mb-2">{subTitle}</div>
             <div className="md:text-xl text-lg text-gray-900 dark:text-gray-200 text-justify">
                 {descriptionBlock()}
             </div>
         </div>
-    </div>)
+    )
 }
 
 export default function StakeholderValue() {
