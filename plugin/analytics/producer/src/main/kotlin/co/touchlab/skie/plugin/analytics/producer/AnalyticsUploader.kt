@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.analytics.producer
 
-import com.bugsnag.Bugsnag
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.UnknownHostException
@@ -10,26 +9,23 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readBytes
 
-class AnalyticsUploader(private val bugsnag: Bugsnag) {
+class AnalyticsUploader(private val analyticsCollector: AnalyticsCollector) {
 
     fun sendAllIfPossible(directory: Path) {
         try {
             sendAll(directory)
         } catch (e: Throwable) {
-            if (e is UnknownHostException && !isInternetAvailable()) {
-                return
-            }
-
-            bugsnag.notify(e)
+            handleUploadError(e)
         }
     }
 
     private fun sendAll(directory: Path) {
         directory.listDirectoryEntries()
+            .filterNot { it.name.startsWith(".") }
             .groupVersions()
             .parallelStream()
             .forEach {
-                uploadAndDelete(it)
+                uploadAndDeleteSafely(it)
             }
     }
 
@@ -37,10 +33,14 @@ class AnalyticsUploader(private val bugsnag: Bugsnag) {
         this.groupBy { FileWithMultipleVersions.nameWithoutVersion(it) }
             .map { FileWithMultipleVersions(it.value) }
 
-    private fun uploadAndDelete(fileWithMultipleVersions: FileWithMultipleVersions) {
-        upload(fileWithMultipleVersions.newest)
+    private fun uploadAndDeleteSafely(fileWithMultipleVersions: FileWithMultipleVersions) {
+        try {
+            upload(fileWithMultipleVersions.newest)
 
-        fileWithMultipleVersions.deleteAll()
+            fileWithMultipleVersions.deleteAll()
+        } catch (e: Throwable) {
+            handleUploadError(e)
+        }
     }
 
     private fun upload(file: Path) {
@@ -58,6 +58,14 @@ class AnalyticsUploader(private val bugsnag: Bugsnag) {
         if (responseCode != HttpURLConnection.HTTP_OK) {
             throw UploadException("Cannot upload analytics. Error: $responseCode")
         }
+    }
+
+    private fun handleUploadError(e: Throwable) {
+        if (e is UnknownHostException && !isInternetAvailable()) {
+            return
+        }
+
+        analyticsCollector.logExceptionAndRethrowIfDev(e)
     }
 
     private fun isInternetAvailable(): Boolean =

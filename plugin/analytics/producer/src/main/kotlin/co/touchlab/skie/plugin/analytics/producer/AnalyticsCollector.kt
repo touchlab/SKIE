@@ -25,7 +25,8 @@ class AnalyticsCollector(
 
     override val featureType: KClass<AnalyticsFeature.CrashReporting> = AnalyticsFeature.CrashReporting::class
 
-    val bugsnag: Bugsnag = BugsnagFactory.create(skieVersion, type, license.environment)
+    private val bugsnag: Bugsnag =
+        BugsnagFactory.create(skieVersion, type, license.environment)
 
     private val backgroundTasks = CopyOnWriteArrayList<Thread>()
 
@@ -118,6 +119,13 @@ class AnalyticsCollector(
         val wrappingException = SkieThrowable(buildId, exception)
 
         sendExceptionLogIfEnabled(name, wrappingException)
+    }
+
+    @Synchronized
+    fun logExceptionAndRethrowIfDev(exception: Throwable) {
+        logException(exception)
+
+        rethrowIfDev(exception)
     }
 
     @Synchronized

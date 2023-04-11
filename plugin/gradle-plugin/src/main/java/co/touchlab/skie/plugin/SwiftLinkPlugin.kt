@@ -420,7 +420,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         it.doLast {
             analyticsCollector.waitForBackgroundTasks()
 
-            AnalyticsUploader(analyticsCollector.bugsnag).sendAllIfPossible(analyticsDir.toPath())
+            AnalyticsUploader(analyticsCollector).sendAllIfPossible(analyticsDir.toPath())
         }
     }
 

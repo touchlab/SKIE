@@ -14,5 +14,6 @@ data class GradleAnalytics(
     val gradleVersion: String,
     val kotlinVersion: String,
     val stdlibVersion: String,
+    val timestampInMs: Long,
     val isCI: Boolean,
 )

@@ -44,6 +44,7 @@ internal class GradleAnalyticsProducer(
         gradleVersion = project.gradle.gradleVersion,
         kotlinVersion = project.getKotlinPluginVersion(),
         stdlibVersion = project.kotlinExtension.coreLibrariesVersion,
+        timestampInMs = System.currentTimeMillis(),
         isCI = isCI(),
     )
 
