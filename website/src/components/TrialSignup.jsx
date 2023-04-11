@@ -157,15 +157,18 @@ export default function TrialSignup() {
                         </div>
                         <div className="mb-4">
 
-                            <label className="block text-xl font-medium mb-1" htmlFor="card-nr">Accept The <a
-                                href="" onClick={showTerms}>Software
-                                Evaluation License Agreement</a></label>
-                            <input
-                                className="bg-slate-400"
-                                type="checkbox"
-                                checked={checked}
-                                onChange={handleChange}
-                            />
+                            <label className="block text-xl font-medium mb-1" htmlFor="card-nr">Do you accept The <a
+                                href="" onClick={showTerms}>Software Evaluation License Agreement</a>?</label>
+                            <div className="flex flex-row items-center">
+                                <input
+                                    className="bg-slate-400"
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={handleChange}
+                                    id="acceptCheckbox"
+                                />
+                                <label htmlFor="acceptCheckbox" className="ml-2 text-xl font-medium"> I accept</label>
+                            </div>
                             <Modal id="modal" ariaLabel="modal-headline" show={termsModalOpen} handleClose={() => {setTermsModalOpen(false)}}>
                                 <div className="relative p-8 overflow-scroll h-full">
 <br/>
