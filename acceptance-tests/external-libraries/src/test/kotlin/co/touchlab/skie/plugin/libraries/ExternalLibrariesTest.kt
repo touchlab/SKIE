@@ -4,6 +4,7 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.configuration.features.SkieFeatureSet
 import co.touchlab.skie.external_libraries.BuildConfig
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import java.io.File
@@ -19,7 +20,7 @@ class ExternalLibrariesTest: FunSpec({
     val librariesToTest = testLoader.loadLibrariesToTest()
 
     val (skieConfiguration, scopeSuffix) = if (System.getProperty("disableSkie") == null) {
-        Configuration(SkieFeatureSet(setOf(SkieFeature.CoroutinesInterop)), emptyList()) to " (SKIE enabled)"
+        Configuration(SkieFeatureSet(setOf(SkieFeature.CoroutinesInterop)), emptyList(), AnalyticsConfiguration()) to " (SKIE enabled)"
     } else {
         null to " (SKIE disabled)"
     }
