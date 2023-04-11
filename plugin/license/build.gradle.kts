@@ -5,8 +5,8 @@ plugins {
 
 dependencies {
     api(libs.jjwt.api)
-    runtimeOnly(libs.jjwt.impl)
-    runtimeOnly(libs.jjwt.jackson)
+    implementation(libs.jjwt.impl)
+    implementation(libs.jjwt.jackson)
     implementation(projects.util)
 }
 
