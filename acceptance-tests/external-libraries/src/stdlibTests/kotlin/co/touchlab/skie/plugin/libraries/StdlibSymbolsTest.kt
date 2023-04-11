@@ -154,7 +154,7 @@ class StdlibSymbolsTest: KotestFunSpec({
                 )
             }
             .flatMap {
-                val linker = KotlinTestLinker(tempFileSystem, testLogger)
+                val linker = KotlinTestLinker(tempFileSystem, testLogger, true)
                 linker.link(
                     it,
                     skieConfiguration,

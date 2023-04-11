@@ -101,7 +101,7 @@ internal class TestRunner(private val tempFileSystemFactory: TempFileSystemFacto
         configuration: Configuration,
         compilerArgumentsProvider: CompilerArgumentsProvider,
     ): IntermediateResult<Path> =
-        KotlinTestLinker(this@TempFileSystem, this@TestLogger).link(klib, configuration, compilerArgumentsProvider)
+        KotlinTestLinker(this@TempFileSystem, this@TestLogger, true).link(klib, configuration, compilerArgumentsProvider)
 
     context(TempFileSystem)
     private fun enhanceSwiftCode(swiftCode: String): Path =

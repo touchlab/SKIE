@@ -6,7 +6,6 @@ import co.touchlab.skie.acceptancetests.framework.fromTestEnv
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.configuration.Configuration
-import co.touchlab.skie.configuration.features.SkieFeatureSet
 import co.touchlab.skie.plugin.ConfigurationKeys
 import co.touchlab.skie.plugin.SkieComponentRegistrar
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
@@ -27,6 +26,7 @@ import java.util.UUID
 class KotlinTestLinker(
     private val tempFileSystem: TempFileSystem,
     private val testLogger: TestLogger,
+    enableAirAnalytics: Boolean,
 ) {
 
     private val analyticsConfiguration = Configuration(
@@ -38,8 +38,8 @@ class KotlinTestLinker(
             AnalyticsFeature.Hardware(isEnabled = true),
             AnalyticsFeature.Performance(isEnabled = true),
             AnalyticsFeature.Sysctl(isEnabled = true),
-            AnalyticsFeature.Air(isEnabled = true, stripIdentifiers = false),
-        )
+            AnalyticsFeature.Air(isEnabled = enableAirAnalytics, stripIdentifiers = false),
+        ),
     )
 
     fun link(klib: Path, configuration: Configuration?, compilerArgumentsProvider: CompilerArgumentsProvider): IntermediateResult<Path> {
@@ -80,7 +80,7 @@ class KotlinTestLinker(
                 with(SkieComponentRegistrar()) {
                     registerExtensions(it)
                 }
-            }
+            },
         )
     }
 
