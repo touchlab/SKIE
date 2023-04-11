@@ -72,7 +72,7 @@ class KotlinTestLinker(
             put(ConfigurationKeys.skieConfiguration, configuration + analyticsConfiguration)
             put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
             put(ConfigurationKeys.jwtWithLicense, "foeman.aegis.lion.shirr.bide")
-            put(ConfigurationKeys.analyticsDir, Path.of("/Users/filip/Library/Application Support/SKIE").toFile())//analyticsDirectory.toFile())
+            put(ConfigurationKeys.analyticsDir, analyticsDirectory.toFile())
         }
 
         PluginRegistrar.plugins.set(
