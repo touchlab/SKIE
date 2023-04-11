@@ -6,6 +6,7 @@ plugins {
     id("java-gradle-plugin")
     id("skie-publish-gradle")
     id("skie-buildconfig")
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 buildConfig {
@@ -34,11 +35,14 @@ dependencies {
     testableCompileOnly(libs.plugin.kotlin.gradle)
     testableCompileOnly(libs.plugin.kotlin.gradle.api)
 
+    implementation(libs.touchlab.access.core)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.json)
     implementation(projects.configurationApi)
     implementation(projects.analytics.analyticsApi)
     implementation(projects.analytics.analyticsConfiguration)
     implementation(projects.analytics.producer)
+    implementation(projects.license)
     implementation(projects.generator.configurationGradle)
     implementation(projects.kotlinPlugin.options)
     implementation(projects.util)

@@ -8,6 +8,7 @@ data class GradleAnalytics(
     val projectPath: String,
     val projectFullNameHash: String,
     val rootProjectDiskLocationHash: String,
+    val organizationKey: String,
     val licenseKey: String,
     val skieVersion: String,
     val gradleVersion: String,

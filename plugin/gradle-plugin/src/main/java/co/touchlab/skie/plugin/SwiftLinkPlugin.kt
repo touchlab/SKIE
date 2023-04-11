@@ -3,8 +3,11 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsProducer
 import co.touchlab.skie.plugin.analytics.PerformanceAnalyticsProducer
+import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
+import co.touchlab.skie.plugin.license.SkieLicense
+import co.touchlab.skie.plugin.license.SkieLicenseProvider
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -61,142 +64,156 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
     }
 
     override fun apply(project: Project): Unit = with(project) {
-        val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java)
-        val createSwiftGenConfigTask = createSwiftGenConfiguration(project)
+        withErrorLogging {
+            val extension = extensions.create(EXTENSION_NAME, SkieExtension::class.java)
+            val createSwiftGenConfigTask = createSwiftGenConfiguration(project)
 
-        val swiftLinkPluginConfiguration = createConfigurationForSkiePlugins()
+            val swiftLinkPluginConfiguration = createConfigurationForSkiePlugins()
 
-        // WORKAROUND: Fix fat framework name for CocoaPods plugin.
-        pluginManager.withPlugin("kotlin-native-cocoapods") {
-            tasks.withType<FatFrameworkTask>().matching { it.name == "fatFramework" }.configureEach { task ->
-                // Unfortunately has to be done in `doFirst` to make sure the task is already configured by the plugin when we run our code
-                task.doFirst(
-                    object : Action<Task> {
-                        override fun execute(p0: Task) {
-                            val commonFrameworkName = task.frameworks.map { it.name }.distinct().singleOrNull() ?: return
-                            task.baseName = commonFrameworkName
-                        }
-                    },
-                )
-            }
-        }
-
-        afterEvaluate {
-            if (!extension.isEnabled.get()) {
-                return@afterEvaluate
-            }
-            val swiftKtCompilerPluginConfiguration = configurations.create("swiftKtCompilerPlugin") {
-                it.isCanBeConsumed = false
-                it.isCanBeResolved = true
-
-                it.exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
-            }
-
-            dependencies {
-                swiftKtCompilerPluginConfiguration(
-                    group = BuildConfig.KOTLIN_PLUGIN_GROUP,
-                    name = BuildConfig.KOTLIN_PLUGIN_NAME,
-                    version = BuildConfig.KOTLIN_PLUGIN_VERSION,
-                )
-            }
-
-            val swiftLinkSubplugins = plugins.withType<SwiftLinkSubplugin>()
-            swiftLinkSubplugins.forEach { it.configureDependencies(project, swiftLinkPluginConfiguration) }
-
-            val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
-
-            logger.warn(
-                "w: SKIE does not yet support Kotlin Native caching. Compilation time in debug mode might be increased as a result."
-            )
-
-            kotlin.appleTargets.forEach { target ->
-                disableCaching(target)
-
-                target.registerRuntime(extension)
-
-                val frameworks = target.binaries.mapNotNull { it as? Framework }
-                frameworks.forEach { framework ->
-                    val subpluginOptions = swiftLinkSubplugins.associateWith { subplugin ->
-                        subplugin.getOptions(project, framework)
-                    }
-
-                    val buildId = generateBuildId()
-
-                    // TODO cannot be in configure block
-                    configureAnalytics(framework.linkTaskProvider.get(), buildId)
-
-                    framework.linkTaskProvider.configure { linkTask ->
-                        val defaultSwiftSourceSet = configureSwiftSourceSet(framework.compilation.defaultSourceSet)
-                        val allSwiftSourceSets = (framework.compilation.allKotlinSourceSets - framework.compilation.defaultSourceSet)
-                            .map { configureSwiftSourceSet(it) } + listOf(defaultSwiftSourceSet)
-
-                        linkTask.dependsOn(createSwiftGenConfigTask)
-
-                        // TODO: linkTask.inputs
-
-                        val swiftSources = project.objects.fileCollection().from(allSwiftSourceSets)
-
-                        linkTask.compilerPluginClasspath = listOfNotNull(
-                            linkTask.compilerPluginClasspath,
-                            swiftKtCompilerPluginConfiguration,
-                            swiftLinkPluginConfiguration,
-                        ).reduce(FileCollection::plus)
-
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id,
-                            SkiePlugin.Options.generatedSwiftDir.subpluginOption(
-                                layout.buildDirectory.dir("generated/swift/${framework.name}/${framework.target.targetName}").get().asFile,
-                            ),
-                        )
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id,
-                            SkiePlugin.Options.disableWildcardExport.subpluginOption(
-                                extension.isWildcardExportPrevented.get(),
-                            ),
-                        )
-
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.skieConfigurationPath.subpluginOption(createSwiftGenConfigTask.get().configFile),
-                        )
-
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.buildId.subpluginOption(buildId),
-                        )
-
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id, SkiePlugin.Options.analyticsDir.subpluginOption(analyticsDir),
-                        )
-
-                        linkTask.compilerPluginOptions.addPluginArgument(
-                            SkiePlugin.id,
-                            SkiePlugin.Options.Debug.infoDirectory.subpluginOption(
-                                layout.buildDirectory.file("${BuildConfig.KOTLIN_PLUGIN_ID}/${framework.name}/${framework.target.targetName}").get().asFile,
-                            ),
-                        )
-
-                        extension.debug.dumpSwiftApiAt.get().forEach {
-                            linkTask.compilerPluginOptions.addPluginArgument(
-                                SkiePlugin.id, SkiePlugin.Options.Debug.dumpSwiftApiAt.subpluginOption(it),
-                            )
-                        }
-
-                        swiftSources.forEach { swiftFile ->
-                            linkTask.compilerPluginOptions.addPluginArgument(
-                                SkiePlugin.id,
-                                SkiePlugin.Options.swiftSourceFile.subpluginOption(swiftFile),
-                            )
-                        }
-
-                        subpluginOptions.forEach { (subplugin, options) ->
-                            options.get().forEach {
-                                linkTask.compilerPluginOptions.addPluginArgument(subplugin.compilerPluginId, it)
+            // WORKAROUND: Fix fat framework name for CocoaPods plugin.
+            pluginManager.withPlugin("kotlin-native-cocoapods") {
+                tasks.withType<FatFrameworkTask>().matching { it.name == "fatFramework" }.configureEach { task ->
+                    // Unfortunately has to be done in `doFirst` to make sure the task is already configured by the plugin when we run our code
+                    task.doFirst(
+                        object : Action<Task> {
+                            override fun execute(p0: Task) {
+                                val commonFrameworkName = task.frameworks.map { it.name }.distinct().singleOrNull() ?: return
+                                task.baseName = commonFrameworkName
                             }
-                        }
-                    }
+                        },
+                    )
                 }
             }
 
-            configureFatFrameworkPatching()
+            afterEvaluate {
+                withErrorLogging {
+
+                    if (!extension.isEnabled.get()) {
+                        return@afterEvaluate
+                    }
+                    val swiftKtCompilerPluginConfiguration = configurations.create("swiftKtCompilerPlugin") {
+                        it.isCanBeConsumed = false
+                        it.isCanBeResolved = true
+
+                        it.exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+                    }
+
+                    dependencies {
+                        swiftKtCompilerPluginConfiguration(
+                            group = BuildConfig.KOTLIN_PLUGIN_GROUP,
+                            name = BuildConfig.KOTLIN_PLUGIN_NAME,
+                            version = BuildConfig.KOTLIN_PLUGIN_VERSION,
+                        )
+                    }
+
+                    val swiftLinkSubplugins = plugins.withType<SwiftLinkSubplugin>()
+                    swiftLinkSubplugins.forEach { it.configureDependencies(project, swiftLinkPluginConfiguration) }
+
+                    val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
+
+                    logger.warn(
+                        "w: SKIE does not yet support Kotlin Native caching. Compilation time in debug mode might be increased as a result.",
+                    )
+
+                    val jwtWithLicense = FaktoryJwtWithLicenseProvider(project).getJwtWithLicense()
+
+                    kotlin.appleTargets.forEach { target ->
+                        disableCaching(target)
+
+                        target.registerRuntime(extension)
+
+                        val frameworks = target.binaries.mapNotNull { it as? Framework }
+                        frameworks.forEach { framework ->
+                            val subpluginOptions = swiftLinkSubplugins.associateWith { subplugin ->
+                                subplugin.getOptions(project, framework)
+                            }
+
+                            val buildId = generateBuildId()
+
+                            // TODO cannot be in configure block
+                            configureAnalytics(framework.linkTaskProvider.get(), buildId, jwtWithLicense)
+
+                            framework.linkTaskProvider.configure { linkTask ->
+                                withErrorLogging {
+                                    val defaultSwiftSourceSet = configureSwiftSourceSet(framework.compilation.defaultSourceSet)
+                                    val allSwiftSourceSets = (framework.compilation.allKotlinSourceSets - framework.compilation.defaultSourceSet)
+                                        .map { configureSwiftSourceSet(it) } + listOf(defaultSwiftSourceSet)
+
+                                    linkTask.dependsOn(createSwiftGenConfigTask)
+
+                                    // TODO: linkTask.inputs
+
+                                    val swiftSources = project.objects.fileCollection().from(allSwiftSourceSets)
+
+                                    linkTask.compilerPluginClasspath = listOfNotNull(
+                                        linkTask.compilerPluginClasspath,
+                                        swiftKtCompilerPluginConfiguration,
+                                        swiftLinkPluginConfiguration,
+                                    ).reduce(FileCollection::plus)
+
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id,
+                                        SkiePlugin.Options.generatedSwiftDir.subpluginOption(
+                                            layout.buildDirectory.dir("generated/swift/${framework.name}/${framework.target.targetName}").get().asFile,
+                                        ),
+                                    )
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id,
+                                        SkiePlugin.Options.disableWildcardExport.subpluginOption(
+                                            extension.isWildcardExportPrevented.get(),
+                                        ),
+                                    )
+
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id, SkiePlugin.Options.skieConfigurationPath.subpluginOption(createSwiftGenConfigTask.get().configFile),
+                                    )
+
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id, SkiePlugin.Options.buildId.subpluginOption(buildId),
+                                    )
+
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id, SkiePlugin.Options.jwtWithLicense.subpluginOption(jwtWithLicense),
+                                    )
+
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id, SkiePlugin.Options.analyticsDir.subpluginOption(analyticsDir),
+                                    )
+
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id,
+                                        SkiePlugin.Options.Debug.infoDirectory.subpluginOption(
+                                            layout.buildDirectory.file("${BuildConfig.KOTLIN_PLUGIN_ID}/${framework.name}/${framework.target.targetName}")
+                                                .get().asFile,
+                                        ),
+                                    )
+
+                                    extension.debug.dumpSwiftApiAt.get().forEach {
+                                        linkTask.compilerPluginOptions.addPluginArgument(
+                                            SkiePlugin.id, SkiePlugin.Options.Debug.dumpSwiftApiAt.subpluginOption(it),
+                                        )
+                                    }
+
+                                    swiftSources.forEach { swiftFile ->
+                                        linkTask.compilerPluginOptions.addPluginArgument(
+                                            SkiePlugin.id,
+                                            SkiePlugin.Options.swiftSourceFile.subpluginOption(swiftFile),
+                                        )
+                                    }
+
+                                    subpluginOptions.forEach { (subplugin, options) ->
+                                        options.get().forEach {
+                                            linkTask.compilerPluginOptions.addPluginArgument(subplugin.compilerPluginId, it)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    configureFatFrameworkPatching()
+                }
+            }
         }
     }
 
@@ -324,19 +341,20 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             return directory
         }
 
-    private fun Project.configureAnalytics(linkTask: KotlinNativeLink, buildId: String) {
+    private fun Project.configureAnalytics(linkTask: KotlinNativeLink, buildId: String, jwtWithLicense: String) {
+        val license = SkieLicenseProvider.getLicense(jwtWithLicense)
+
         val analyticsCollector = AnalyticsCollector(
             analyticsDirectory = analyticsDir.toPath(),
             buildId = buildId,
             skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
-            type = AnalyticsCollector.Type.Gradle,
-            // TODO
-            environment = AnalyticsCollector.Environment.Production,
+            type = BugsnagFactory.Type.Gradle,
+            license = license,
             configuration = CreateSwiftGenConfigTask.createConfiguration(this).analyticsConfiguration,
         )
 
         configurePerformanceAnalytics(linkTask, analyticsCollector)
-        collectGradleAnalytics(linkTask, analyticsCollector)
+        collectGradleAnalytics(linkTask, license, analyticsCollector)
         configureAnalyticsTask(linkTask, analyticsCollector)
     }
 
@@ -365,12 +383,12 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         )
     }
 
-    private fun Project.collectGradleAnalytics(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
+    private fun Project.collectGradleAnalytics(linkTask: KotlinNativeLink, license: SkieLicense, analyticsCollector: AnalyticsCollector) {
         linkTask.doFirst(
             object : Action<Task> {
                 override fun execute(t: Task) {
                     analyticsCollector.collect(
-                        GradleAnalyticsProducer(this@collectGradleAnalytics),
+                        GradleAnalyticsProducer(this@collectGradleAnalytics, license),
                     )
                 }
             },
@@ -412,6 +430,21 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
     private fun generateBuildId(): String =
         UUID.randomUUID().toString()
+
+    private inline fun <T> T.withErrorLogging(action: T.() -> Unit) {
+        try {
+            action()
+        } catch (e: Throwable) {
+            BugsnagFactory.create(
+                skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
+                type = BugsnagFactory.Type.Gradle,
+                // TODO Fix during refactoring of SwiftLinkPlugin
+                environment = if (BuildConfig.KOTLIN_PLUGIN_VERSION == "1.0.0-SNAPSHOT") SkieLicense.Environment.Dev else SkieLicense.Environment.Production,
+            )
+
+            throw e
+        }
+    }
 }
 
 private val FrameworkLayout.frameworkName: String

@@ -3,9 +3,11 @@ package co.touchlab.skie.plugin.analytics.producer
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfigurationTarget
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
+import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.compressor.AnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.EfficientAnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.FastAnalyticsCompressor
+import co.touchlab.skie.plugin.license.SkieLicense
 import com.bugsnag.Bugsnag
 import java.nio.file.Path
 import java.util.concurrent.CopyOnWriteArrayList
@@ -15,27 +17,19 @@ import kotlin.reflect.KClass
 class AnalyticsCollector(
     private val analyticsDirectory: Path,
     private val buildId: String,
-    private val skieVersion: String,
-    private val type: Type,
-    private val environment: Environment,
+    skieVersion: String,
+    type: BugsnagFactory.Type,
+    private val license: SkieLicense,
     private val configuration: AnalyticsConfiguration,
 ) : AnalyticsConfigurationTarget<AnalyticsFeature.CrashReporting> {
 
     override val featureType: KClass<AnalyticsFeature.CrashReporting> = AnalyticsFeature.CrashReporting::class
 
+    val bugsnag: Bugsnag = BugsnagFactory.create(skieVersion, type, license.environment)
+
     private val backgroundTasks = CopyOnWriteArrayList<Thread>()
 
-    val bugsnag: Bugsnag =
-        Bugsnag("", false)
-            .apply {
-                setAutoCaptureSessions(false)
-                setAppVersion(skieVersion)
-                setAppType(type.name)
-                setReleaseStage(environment.name)
-                setProjectPackages("co.touchlab.skie", "org.jetbrains.kotlin")
-
-                startSession()
-            }
+    private val environmentPrefix = license.environment.name
 
     @Synchronized
     fun collect(producers: List<AnalyticsProducer<*>>) {
@@ -97,7 +91,7 @@ class AnalyticsCollector(
         compressor: AnalyticsCompressor,
         fileVersion: Int,
     ) {
-        val fileName = FileWithMultipleVersions.addVersion("$buildId.$name", fileVersion)
+        val fileName = FileWithMultipleVersions.addVersion("$environmentPrefix.$buildId.$name", fileVersion)
         val file = analyticsDirectory.resolve(fileName)
 
         val compressedData = compressor.compress(analyticsResult)
@@ -114,6 +108,8 @@ class AnalyticsCollector(
         val wrappingException = SkieAnalyticsError(buildId, name, error)
 
         sendExceptionLogIfEnabled(name, wrappingException)
+
+        rethrowIfDev(error)
     }
 
     @Synchronized
@@ -151,6 +147,14 @@ class AnalyticsCollector(
             collectData(logName, encodedException)
         } catch (e: Throwable) {
             bugsnag.notify(e)
+
+            rethrowIfDev(e)
+        }
+    }
+
+    private fun rethrowIfDev(exception: Throwable) {
+        if (license.environment == SkieLicense.Environment.Dev) {
+            throw exception
         }
     }
 
@@ -174,12 +178,4 @@ class AnalyticsCollector(
         name: String,
         throwable: Throwable,
     ) : Throwable("SKIE analytics error in \"$name\", in build with id: $buildId.\n${throwable.stackTraceToString()}")
-
-    enum class Environment {
-        Production, Dev, CI,
-    }
-
-    enum class Type {
-        Gradle, Compiler
-    }
 }

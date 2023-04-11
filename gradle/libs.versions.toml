@@ -31,6 +31,12 @@ apache-compress = { module = "org.apache.commons:commons-compress", version = "1
 bugsnag = { module = "com.bugsnag:bugsnag", version = "3.6.4" }
 logback = { module = "ch.qos.logback:logback-classic", version = "1.4.6" }
 
+touchlab-access-core = { module = "co.touchlab.faktory:access-core", version = "0.9.8" }
+
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version = "0.11.5" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version = "0.11.5" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version = "0.11.5" }
+
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }

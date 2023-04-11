@@ -4,6 +4,7 @@ import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.analytics.gradle.GradleAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
+import co.touchlab.skie.plugin.license.SkieLicense
 import co.touchlab.skie.util.hashed
 import co.touchlab.skie.util.redacted
 import kotlinx.serialization.encodeToString
@@ -15,6 +16,7 @@ import kotlin.reflect.KClass
 
 internal class GradleAnalyticsProducer(
     private val project: Project,
+    private val license: SkieLicense,
 ) : AnalyticsProducer<AnalyticsFeature.Gradle> {
 
     override val featureType: KClass<AnalyticsFeature.Gradle> = AnalyticsFeature.Gradle::class
@@ -31,23 +33,19 @@ internal class GradleAnalyticsProducer(
             getFullGradleAnalytics()
         }
 
-    private fun getFullGradleAnalytics(): GradleAnalytics {
-        // TODO
-        val licenseKey = "TODO"
-
-        return GradleAnalytics(
-            rootProjectName = project.rootProject.name,
-            projectPath = project.path,
-            projectFullNameHash = "${project.rootProject.name}${project.path}".hashed(),
-            rootProjectDiskLocationHash = project.rootProject.projectDir.absolutePath.hashed(),
-            licenseKey = licenseKey,
-            skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
-            gradleVersion = project.gradle.gradleVersion,
-            kotlinVersion = project.getKotlinPluginVersion(),
-            stdlibVersion = project.kotlinExtension.coreLibrariesVersion,
-            isCI = isCI(),
-        )
-    }
+    private fun getFullGradleAnalytics(): GradleAnalytics = GradleAnalytics(
+        rootProjectName = project.rootProject.name,
+        projectPath = project.path,
+        projectFullNameHash = "${project.rootProject.name}${project.path}".hashed(),
+        rootProjectDiskLocationHash = project.rootProject.projectDir.absolutePath.hashed(),
+        organizationKey = license.organizationKey,
+        licenseKey = license.licenseKey,
+        skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
+        gradleVersion = project.gradle.gradleVersion,
+        kotlinVersion = project.getKotlinPluginVersion(),
+        stdlibVersion = project.kotlinExtension.coreLibrariesVersion,
+        isCI = isCI(),
+    )
 
     private fun isCI(): Boolean =
         !System.getenv("CI").isNullOrBlank()

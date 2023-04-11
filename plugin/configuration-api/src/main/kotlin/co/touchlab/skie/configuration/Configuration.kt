@@ -12,9 +12,9 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Configuration(
-    val enabledFeatures: SkieFeatureSet,
-    val groups: List<Group>,
-    val analyticsConfiguration: AnalyticsConfiguration,
+    val enabledFeatures: SkieFeatureSet = SkieFeatureSet(),
+    val groups: List<Group> = emptyList(),
+    val analyticsConfiguration: AnalyticsConfiguration = AnalyticsConfiguration(),
 ) {
 
     operator fun <T> get(target: ConfigurationTarget, key: ConfigurationKey<T>): T {

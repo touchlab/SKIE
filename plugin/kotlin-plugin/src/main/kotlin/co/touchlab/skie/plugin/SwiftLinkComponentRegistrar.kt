@@ -4,11 +4,13 @@ import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.kotlin_plugin.BuildConfig
+import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
+import co.touchlab.skie.plugin.license.SkieLicenseProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.GroupingMessageCollectorReflector
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -27,6 +29,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = false
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
+        val license = SkieLicenseProvider.getLicense(configuration.getNotNull(ConfigurationKeys.jwtWithLicense))
         val skieConfiguration = configuration.get(ConfigurationKeys.skieConfiguration, Configuration {})
 
         val skieContext = DefaultSkieContext(
@@ -42,9 +45,8 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 analyticsDirectory = configuration.getNotNull(ConfigurationKeys.analyticsDir).toPath(),
                 buildId = configuration.getNotNull(ConfigurationKeys.buildId),
                 skieVersion = BuildConfig.SKIE_VERSION,
-                type = AnalyticsCollector.Type.Compiler,
-                // TODO Read from license
-                environment = AnalyticsCollector.Environment.Production,
+                type = BugsnagFactory.Type.Compiler,
+                license = license,
                 configuration = skieConfiguration.analyticsConfiguration,
             ),
         )

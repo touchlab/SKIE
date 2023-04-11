@@ -38,6 +38,7 @@ include(
     ":spi",
     ":configuration-api",
     ":linker",
+    ":license",
     ":generator",
     ":generator:configuration-annotations",
     ":generator:configuration-gradle",

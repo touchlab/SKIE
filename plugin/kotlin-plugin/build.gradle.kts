@@ -20,6 +20,7 @@ dependencies {
     implementation(projects.interceptor)
     implementation(projects.generator)
     implementation(projects.linker)
+    implementation(projects.license)
     implementation(projects.reflector)
     implementation(projects.spi)
 }

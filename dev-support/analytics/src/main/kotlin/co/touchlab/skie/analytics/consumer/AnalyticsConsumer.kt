@@ -19,6 +19,9 @@ fun main() {
 
     val buildId = ""
 
+}
+
+private fun loadAll(buildId: String, privateKey: Path) {
     try {
         println(loadJson<CompilerAnalytics>("$buildId.compiler.2", privateKey))
         println("--------")

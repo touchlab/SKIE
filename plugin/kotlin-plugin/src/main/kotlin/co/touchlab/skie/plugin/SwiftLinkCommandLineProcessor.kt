@@ -19,6 +19,7 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         Options.disableWildcardExport,
         Options.skieConfigurationPath,
         Options.buildId,
+        Options.jwtWithLicense,
         Options.analyticsDir,
         Options.Debug.infoDirectory,
         Options.Debug.dumpSwiftApiAt,
@@ -51,6 +52,10 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
 
             Options.buildId -> {
                 configuration.put(ConfigurationKeys.buildId, Options.buildId.deserialize(value))
+            }
+
+            Options.jwtWithLicense -> {
+                configuration.put(ConfigurationKeys.jwtWithLicense, Options.jwtWithLicense.deserialize(value))
             }
 
             Options.analyticsDir -> {

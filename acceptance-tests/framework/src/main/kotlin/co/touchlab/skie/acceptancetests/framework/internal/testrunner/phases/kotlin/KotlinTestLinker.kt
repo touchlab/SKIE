@@ -6,8 +6,11 @@ import co.touchlab.skie.acceptancetests.framework.fromTestEnv
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.features.SkieFeatureSet
 import co.touchlab.skie.plugin.ConfigurationKeys
 import co.touchlab.skie.plugin.SkieComponentRegistrar
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import org.jetbrains.kotlin.cli.bc.K2Native
@@ -19,11 +22,25 @@ import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Path
+import java.util.UUID
 
 class KotlinTestLinker(
     private val tempFileSystem: TempFileSystem,
     private val testLogger: TestLogger,
 ) {
+
+    private val analyticsConfiguration = Configuration(
+        analyticsConfiguration = AnalyticsConfiguration(
+            AnalyticsFeature.CrashReporting(isEnabled = true),
+            AnalyticsFeature.Gradle(isEnabled = true, stripIdentifiers = false),
+            AnalyticsFeature.SkieConfiguration(isEnabled = true, stripIdentifiers = false),
+            AnalyticsFeature.Compiler(isEnabled = true, stripIdentifiers = false),
+            AnalyticsFeature.Hardware(isEnabled = true),
+            AnalyticsFeature.Performance(isEnabled = true),
+            AnalyticsFeature.Sysctl(isEnabled = true),
+            AnalyticsFeature.Air(isEnabled = true, stripIdentifiers = false),
+        )
+    )
 
     fun link(klib: Path, configuration: Configuration?, compilerArgumentsProvider: CompilerArgumentsProvider): IntermediateResult<Path> {
         val tempDirectory = tempFileSystem.createDirectory("kotlin-linker")
@@ -52,9 +69,10 @@ class KotlinTestLinker(
             put(ConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
             put(ConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
             put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.fromTestEnv())
-            put(ConfigurationKeys.skieConfiguration, configuration)
-            put(ConfigurationKeys.buildId, "test-UUID")
-            put(ConfigurationKeys.analyticsDir, analyticsDirectory.toFile())
+            put(ConfigurationKeys.skieConfiguration, configuration + analyticsConfiguration)
+            put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
+            put(ConfigurationKeys.jwtWithLicense, "foeman.aegis.lion.shirr.bide")
+            put(ConfigurationKeys.analyticsDir, Path.of("/Users/filip/Library/Application Support/SKIE").toFile())//analyticsDirectory.toFile())
         }
 
         PluginRegistrar.plugins.set(

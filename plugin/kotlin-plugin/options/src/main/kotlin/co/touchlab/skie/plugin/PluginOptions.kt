@@ -53,6 +53,15 @@ object SkiePlugin {
             deserialize = { it },
         )
 
+        val jwtWithLicense = PluginOption(
+            optionName = "jwtWithLicense",
+            valueDescription = "JWT",
+            description = "JWT with SKIE license",
+            isRequired = true,
+            serialize = { it },
+            deserialize = { it },
+        )
+
         val analyticsDir = PluginOption(
             optionName = "analyticsDir",
             valueDescription = "<absolute path>",
