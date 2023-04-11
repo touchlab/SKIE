@@ -27,9 +27,11 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = false
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
+        val skieConfiguration = configuration.get(ConfigurationKeys.skieConfiguration, Configuration {})
+
         val skieContext = DefaultSkieContext(
             module = DefaultSkieModule(),
-            configuration = configuration.get(ConfigurationKeys.skieConfiguration, Configuration {}),
+            configuration = skieConfiguration,
             swiftSourceFiles = configuration.getList(ConfigurationKeys.swiftSourceFiles),
             expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.generatedSwiftDir),
             debugInfoDirectory = configuration.getNotNull(ConfigurationKeys.Debug.infoDirectory),
@@ -43,6 +45,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 type = AnalyticsCollector.Type.Compiler,
                 // TODO Read from license
                 environment = AnalyticsCollector.Environment.Production,
+                configuration = skieConfiguration.analyticsConfiguration,
             ),
         )
 

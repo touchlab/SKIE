@@ -9,5 +9,8 @@
                 "EnumInterop.Enabled": "true"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

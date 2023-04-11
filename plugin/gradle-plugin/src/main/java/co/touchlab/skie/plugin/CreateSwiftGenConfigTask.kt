@@ -1,11 +1,13 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
+import org.gradle.api.Project
 
 abstract class CreateSwiftGenConfigTask : DefaultTask() {
 
@@ -20,9 +22,7 @@ abstract class CreateSwiftGenConfigTask : DefaultTask() {
     fun createConfig() {
         configFile.parentFile.mkdirs()
 
-        val extension = project.extensions.getByType<SkieExtension>()
-
-        val configuration = extension.buildConfiguration()
+        val configuration = createConfiguration(project)
 
         configFile.writeText(configuration.serialize())
     }
@@ -30,5 +30,11 @@ abstract class CreateSwiftGenConfigTask : DefaultTask() {
     companion object {
 
         const val name: String = "createSwiftGenConfig"
+
+        fun createConfiguration(project: Project): Configuration {
+            val extension = project.extensions.getByType<SkieExtension>()
+
+            return extension.buildConfiguration()
+        }
     }
 }

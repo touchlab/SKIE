@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 data class GradleAnalytics(
     val rootProjectName: String,
     val projectPath: String,
+    val projectFullNameHash: String,
+    val rootProjectDiskLocationHash: String,
     val licenseKey: String,
     val skieVersion: String,
     val gradleVersion: String,

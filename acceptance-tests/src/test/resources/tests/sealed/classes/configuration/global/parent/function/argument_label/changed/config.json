@@ -9,5 +9,8 @@
                 "SealedInterop.Function.ArgumentLabel": "a"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

@@ -1,5 +1,8 @@
 package co.touchlab.skie.plugin.analytics.producer
 
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfigurationTarget
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.analytics.producer.compressor.AnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.EfficientAnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.FastAnalyticsCompressor
@@ -7,7 +10,7 @@ import com.bugsnag.Bugsnag
 import java.nio.file.Path
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.io.path.writeBytes
-import kotlin.math.absoluteValue
+import kotlin.reflect.KClass
 
 class AnalyticsCollector(
     private val analyticsDirectory: Path,
@@ -15,11 +18,14 @@ class AnalyticsCollector(
     private val skieVersion: String,
     private val type: Type,
     private val environment: Environment,
-) {
+    private val configuration: AnalyticsConfiguration,
+) : AnalyticsConfigurationTarget<AnalyticsFeature.CrashReporting> {
+
+    override val featureType: KClass<AnalyticsFeature.CrashReporting> = AnalyticsFeature.CrashReporting::class
 
     private val backgroundTasks = CopyOnWriteArrayList<Thread>()
 
-    private val bugSnag: Bugsnag =
+    val bugsnag: Bugsnag =
         Bugsnag("", false)
             .apply {
                 setAutoCaptureSessions(false)
@@ -32,24 +38,33 @@ class AnalyticsCollector(
             }
 
     @Synchronized
-    fun collect(producers: List<AnalyticsProducer>) {
+    fun collect(producers: List<AnalyticsProducer<*>>) {
         producers.parallelStream().forEach {
             collectSafely(it)
         }
     }
 
     @Synchronized
-    fun collect(vararg producers: AnalyticsProducer) {
+    fun collect(vararg producers: AnalyticsProducer<*>) {
         collect(producers.toList())
     }
 
-    private fun collectSafely(producer: AnalyticsProducer) {
+    private fun collectSafely(producer: AnalyticsProducer<*>) {
         try {
-            val analyticsResult = producer.produce()
-
-            collectData(producer.name, analyticsResult)
+            produceAndCollectData(producer)
         } catch (e: Throwable) {
             reportAnalyticsError(producer.name, e)
+        }
+    }
+
+    private fun produceAndCollectData(producer: AnalyticsProducer<*>) {
+        val feature = configuration.getFeature(producer)
+
+        if (feature?.isEnabled == true) {
+            @Suppress("UNCHECKED_CAST")
+            val analyticsResult = (producer as AnalyticsProducer<AnalyticsFeature>).produce(feature)
+
+            collectData(producer.name, analyticsResult)
         }
     }
 
@@ -98,7 +113,7 @@ class AnalyticsCollector(
     private fun reportAnalyticsError(name: String, error: Throwable) {
         val wrappingException = SkieAnalyticsError(buildId, name, error)
 
-        sendExceptionLog(name, wrappingException)
+        sendExceptionLogIfEnabled(name, wrappingException)
     }
 
     @Synchronized
@@ -106,7 +121,7 @@ class AnalyticsCollector(
         val name = exception.stackTraceToString().hashCode().toString()
         val wrappingException = SkieThrowable(buildId, exception)
 
-        sendExceptionLog(name, wrappingException)
+        sendExceptionLogIfEnabled(name, wrappingException)
     }
 
     @Synchronized
@@ -114,20 +129,28 @@ class AnalyticsCollector(
         val name = exception.hashCode().toString()
         val wrappingException = SkieThrowable(buildId, exception)
 
-        sendExceptionLog(name, wrappingException)
+        sendExceptionLogIfEnabled(name, wrappingException)
+    }
+
+    private fun sendExceptionLogIfEnabled(name: String, exception: Throwable) {
+        val crashReportingConfiguration = configuration.getFeature(this)
+
+        if (crashReportingConfiguration?.isEnabled == true) {
+            sendExceptionLog(name, exception)
+        }
     }
 
     private fun sendExceptionLog(name: String, exception: Throwable) {
         val logName = "exception-$name"
 
-        bugSnag.notify(exception)
+        bugsnag.notify(exception)
 
         try {
             val encodedException = exception.stackTraceToString().toByteArray()
 
             collectData(logName, encodedException)
         } catch (e: Throwable) {
-            bugSnag.notify(e)
+            bugsnag.notify(e)
         }
     }
 

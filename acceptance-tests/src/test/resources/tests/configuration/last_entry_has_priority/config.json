@@ -16,5 +16,8 @@
                 "SealedInterop.Case.Name": "Y"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

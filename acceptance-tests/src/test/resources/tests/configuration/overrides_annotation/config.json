@@ -9,5 +9,8 @@
                 "SealedInterop.Case.Name": "X"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

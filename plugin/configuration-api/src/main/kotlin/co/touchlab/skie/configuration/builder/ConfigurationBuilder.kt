@@ -2,6 +2,7 @@ package co.touchlab.skie.configuration.builder
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeatureSet
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -38,7 +39,7 @@ class ConfigurationBuilder {
     }
 
     internal fun build(): Configuration =
-        builders.map { it.build() }.fold(Configuration(SkieFeatureSet(), emptyList()), Configuration::plus)
+        builders.map { it.build() }.fold(Configuration(SkieFeatureSet(), emptyList(), AnalyticsConfiguration(emptyList())), Configuration::plus)
 
     private sealed interface Builder {
 
@@ -47,7 +48,7 @@ class ConfigurationBuilder {
         class Group(val groupBuilder: ConfigurationGroupBuilder) : Builder {
 
             override fun build(): Configuration =
-                Configuration(SkieFeatureSet(), listOf(groupBuilder.build()))
+                Configuration(SkieFeatureSet(), listOf(groupBuilder.build()), AnalyticsConfiguration(emptyList()))
         }
 
         class File(val path: Path) : Builder {

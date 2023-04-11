@@ -9,17 +9,57 @@ import co.touchlab.skie.plugin.analytics.producer.compressor.FastAnalyticsCompre
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToStream
 import java.nio.file.Path
 import kotlin.io.path.readBytes
 
 private val resources = Path.of(BuildConfig.RESOURCES)
 
 fun main() {
-    val privateKey = Path.of("/Users/filip/private_key.der")
+    val privateKey = Path.of("")
 
-    println(loadJson<CompilerAnalytics>("d2d78262-6170-456d-be72-cbe385bf0bef.compiler.2", privateKey))
-    println(loadString("d2d78262-6170-456d-be72-cbe385bf0bef.gradle.2", privateKey))
+    val buildId = ""
+
+    try {
+        println(loadJson<CompilerAnalytics>("$buildId.compiler.2", privateKey))
+        println("--------")
+    } catch (_: Throwable) {
+    }
+
+    try {
+        println(loadString("$buildId.gradle.2", privateKey))
+        println("--------")
+    } catch (_: Throwable) {
+    }
+
+    try {
+        println(loadString("$buildId.hw.2", privateKey))
+        println("--------")
+    } catch (_: Throwable) {
+    }
+
+    try {
+        println(loadString("$buildId.performance.2", privateKey))
+        println("--------")
+    } catch (_: Throwable) {
+    }
+
+    try {
+        println(loadString("$buildId.skie-configuration.2", privateKey))
+        println("--------")
+    } catch (_: Throwable) {
+    }
+
+    try {
+        println(loadString("$buildId.sys.2", privateKey))
+        println("--------")
+    } catch (_: Throwable) {
+    }
+
+    try {
+        val air = loadAir("$buildId.air.2", privateKey)
+        return
+    } catch (_: Throwable) {
+    }
 }
 
 private fun loadByteArray(file: String, privateKeyPath: Path): ByteArray {

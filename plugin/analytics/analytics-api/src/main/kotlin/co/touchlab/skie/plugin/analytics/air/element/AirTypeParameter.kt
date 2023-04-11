@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.analytics.air.element
 
 import co.touchlab.skie.plugin.analytics.air.type.AirType
 import co.touchlab.skie.plugin.analytics.air.type.AirTypeVariance
+import co.touchlab.skie.plugin.analytics.air.visitor.AirElementTransformer
 import co.touchlab.skie.plugin.analytics.air.visitor.AirElementVisitor
 import kotlinx.serialization.Serializable
 
@@ -15,6 +16,9 @@ data class AirTypeParameter(
     val annotations: List<AirConstantObject>,
     val origin: AirOrigin,
 ) : AirElement {
+
+    override fun <D> transform(transformer: AirElementTransformer<D>, data: D): AirTypeParameter =
+        transformer.visitTypeParameter(this, data)
 
     override fun <R, D> accept(visitor: AirElementVisitor<R, D>, data: D): R =
         visitor.visitTypeParameter(this, data)

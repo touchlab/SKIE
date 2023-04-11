@@ -4,5 +4,8 @@
             "FqNames"
         ]
     },
-    "groups": []
+    "groups": [],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

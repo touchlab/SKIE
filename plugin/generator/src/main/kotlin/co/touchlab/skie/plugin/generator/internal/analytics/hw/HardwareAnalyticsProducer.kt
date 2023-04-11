@@ -1,21 +1,26 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.hw
 
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.analytics.hw.HardwareAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.util.Command
+import co.touchlab.skie.util.hashed
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.security.MessageDigest
 import java.util.Base64
+import kotlin.reflect.KClass
 
-object HardwareAnalyticsProducer : AnalyticsProducer {
+object HardwareAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.Hardware> {
+
+    override val featureType: KClass<AnalyticsFeature.Hardware> = AnalyticsFeature.Hardware::class
 
     override val name: String = "hw"
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    override fun produce(): ByteArray =
+    override fun produce(configuration: AnalyticsFeature.Hardware): ByteArray =
         Json.encodeToString(getHwAnalytics()).toByteArray()
 
     private fun getHwAnalytics(): HardwareAnalytics {
@@ -46,11 +51,3 @@ private fun SPHardwareData.toHardwareAnalytics(): HardwareAnalytics =
         physicalMemory = this.physicalMemory,
         hashedPlatformUUID = this.platformUUID.hashed(),
     )
-
-private fun String.hashed(): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-
-    val hash = digest.digest(toByteArray())
-
-    return Base64.getEncoder().encodeToString(hash)
-}

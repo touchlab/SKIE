@@ -9,5 +9,8 @@
                 "SealedInterop.Function.Name": "onEnum2"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

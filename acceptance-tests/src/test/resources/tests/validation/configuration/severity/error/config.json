@@ -9,5 +9,8 @@
                 "Validation.Severity": "Error"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

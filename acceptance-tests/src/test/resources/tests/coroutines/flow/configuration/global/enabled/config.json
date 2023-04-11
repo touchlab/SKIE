@@ -9,5 +9,8 @@
                 "FlowInterop.Enabled": "true"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

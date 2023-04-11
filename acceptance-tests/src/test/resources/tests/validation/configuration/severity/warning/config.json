@@ -9,5 +9,8 @@
                 "Validation.Severity": "Warning"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

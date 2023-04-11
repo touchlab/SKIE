@@ -9,5 +9,8 @@
                 "SealedInterop.Case.Name": "A3"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

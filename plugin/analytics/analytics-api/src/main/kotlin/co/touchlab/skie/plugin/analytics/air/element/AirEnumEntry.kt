@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.analytics.air.element
 
+import co.touchlab.skie.plugin.analytics.air.visitor.AirElementTransformer
 import co.touchlab.skie.plugin.analytics.air.visitor.AirElementVisitor
 import kotlinx.serialization.Serializable
 
@@ -12,6 +13,9 @@ data class AirEnumEntry(
     val annotations: List<AirConstantObject>,
     override val containedStatementSize: Int,
 ) : AirElement, AirStatementContainer {
+
+    override fun <D> transform(transformer: AirElementTransformer<D>, data: D): AirEnumEntry =
+        transformer.visitEnumEntry(this, data)
 
     override fun <R, D> accept(visitor: AirElementVisitor<R, D>, data: D): R =
         visitor.visitEnumEntry(this, data)

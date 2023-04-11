@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.analytics.air.element
 
 import co.touchlab.skie.plugin.analytics.air.type.AirType
+import co.touchlab.skie.plugin.analytics.air.visitor.AirElementTransformer
 import co.touchlab.skie.plugin.analytics.air.visitor.AirElementVisitor
 import kotlinx.serialization.Serializable
 
@@ -16,6 +17,9 @@ data class AirField(
     val isStatic: Boolean,
     override val containedStatementSize: Int,
 ) : AirDeclaration, AirStatementContainer {
+
+    override fun <D> transform(transformer: AirElementTransformer<D>, data: D): AirField =
+        transformer.visitField(this, data)
 
     override fun <R, D> accept(visitor: AirElementVisitor<R, D>, data: D): R =
         visitor.visitField(this, data)

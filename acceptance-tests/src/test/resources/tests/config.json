@@ -12,5 +12,8 @@
                 "ExperimentalFeatures.Enabled": "true"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

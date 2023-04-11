@@ -3,6 +3,7 @@ package co.touchlab.skie.configuration
 import co.touchlab.skie.configuration.builder.ConfigurationBuilder
 import co.touchlab.skie.configuration.features.SkieFeatureSet
 import co.touchlab.skie.configuration_api.BuildConfig
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -12,7 +13,8 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Configuration(
     val enabledFeatures: SkieFeatureSet,
-    private val groups: List<Group>,
+    val groups: List<Group>,
+    val analyticsConfiguration: AnalyticsConfiguration,
 ) {
 
     operator fun <T> get(target: ConfigurationTarget, key: ConfigurationKey<T>): T {
@@ -40,19 +42,15 @@ data class Configuration(
     fun serialize(): String {
         val json = Json { prettyPrint = true }
 
-        val wrapper = SerializationWrapper(enabledFeatures, groups)
-
-        return json.encodeToString(wrapper)
+        return json.encodeToString(this)
     }
 
     operator fun plus(other: Configuration): Configuration =
-        Configuration(enabledFeatures + other.enabledFeatures, groups + other.groups)
-
-    @Serializable
-    data class SerializationWrapper(
-        val enabledFeatures: SkieFeatureSet,
-        val groups: List<Group>,
-    )
+        Configuration(
+            enabledFeatures + other.enabledFeatures,
+            groups + other.groups,
+            analyticsConfiguration + other.analyticsConfiguration,
+        )
 
     @Serializable
     data class Group(
@@ -64,19 +62,13 @@ data class Configuration(
 
     companion object {
 
-        const val CliPluginId: String = BuildConfig.PLUGIN_ID
-        const val CliOptionKey: String = "config"
-
         operator fun invoke(builder: ConfigurationBuilder.() -> Unit): Configuration =
             ConfigurationBuilder().also(builder).build()
 
         operator fun invoke(builder: ConfigurationBuilder): Configuration =
             builder.build()
 
-        fun deserialize(string: String): Configuration {
-            val wrapper = Json.decodeFromString<SerializationWrapper>(string)
-
-            return Configuration(wrapper.enabledFeatures, wrapper.groups)
-        }
+        fun deserialize(string: String): Configuration =
+            Json.decodeFromString(string)
     }
 }

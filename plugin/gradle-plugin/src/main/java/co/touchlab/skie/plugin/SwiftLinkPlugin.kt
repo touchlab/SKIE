@@ -332,6 +332,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
             type = AnalyticsCollector.Type.Gradle,
             // TODO
             environment = AnalyticsCollector.Environment.Production,
+            configuration = CreateSwiftGenConfigTask.createConfiguration(this).analyticsConfiguration,
         )
 
         configurePerformanceAnalytics(linkTask, analyticsCollector)
@@ -401,7 +402,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         it.doLast {
             analyticsCollector.waitForBackgroundTasks()
 
-            AnalyticsUploader.sendAllIfPossible(analyticsDir.toPath())
+            AnalyticsUploader(analyticsCollector.bugsnag).sendAllIfPossible(analyticsDir.toPath())
         }
     }
 

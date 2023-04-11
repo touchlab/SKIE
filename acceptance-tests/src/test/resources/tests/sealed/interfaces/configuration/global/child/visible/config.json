@@ -9,5 +9,8 @@
                 "SealedInterop.Case.Visible": "true"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

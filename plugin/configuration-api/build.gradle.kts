@@ -8,6 +8,8 @@ plugins {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+    api(projects.analytics.analyticsConfiguration)
+    implementation(projects.util)
 }
 
 buildConfig {

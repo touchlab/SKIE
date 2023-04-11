@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.analytics.air.element
 
+import co.touchlab.skie.plugin.analytics.air.visitor.AirElementTransformer
 import co.touchlab.skie.plugin.analytics.air.visitor.AirElementVisitor
 import kotlinx.serialization.Serializable
 
@@ -27,6 +28,9 @@ data class AirProperty(
     val getter: AirSimpleFunction?,
     val setter: AirSimpleFunction?,
 ) : AirDeclaration {
+
+    override fun <D> transform(transformer: AirElementTransformer<D>, data: D): AirProperty =
+        transformer.visitProperty(this, data)
 
     override fun <R, D> accept(visitor: AirElementVisitor<R, D>, data: D): R =
         visitor.visitProperty(this, data)

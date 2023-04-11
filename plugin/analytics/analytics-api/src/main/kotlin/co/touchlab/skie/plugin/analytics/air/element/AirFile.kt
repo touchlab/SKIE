@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.analytics.air.element
 
+import co.touchlab.skie.plugin.analytics.air.visitor.AirElementTransformer
 import co.touchlab.skie.plugin.analytics.air.visitor.AirElementVisitor
 import kotlinx.serialization.Serializable
 
@@ -10,6 +11,9 @@ data class AirFile(
     val declarations: List<AirDeclaration>,
     val annotations: List<AirConstantObject>,
 ) : AirElement {
+
+    override fun <D> transform(transformer: AirElementTransformer<D>, data: D): AirFile =
+        transformer.visitFile(this, data)
 
     override fun <R, D> accept(visitor: AirElementVisitor<R, D>, data: D): R =
         visitor.visitFile(this, data)

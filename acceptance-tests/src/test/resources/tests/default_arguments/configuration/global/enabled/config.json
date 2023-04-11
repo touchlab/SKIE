@@ -9,5 +9,8 @@
                 "DefaultArgumentInterop.Enabled": "true"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

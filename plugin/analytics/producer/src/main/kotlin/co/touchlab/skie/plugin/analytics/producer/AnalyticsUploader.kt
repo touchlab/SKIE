@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.analytics.producer
 
+import com.bugsnag.Bugsnag
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.UnknownHostException
@@ -9,7 +10,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readBytes
 
-object AnalyticsUploader {
+class AnalyticsUploader(private val bugsnag: Bugsnag) {
 
     fun sendAllIfPossible(directory: Path) {
         try {
@@ -19,7 +20,7 @@ object AnalyticsUploader {
                 return
             }
 
-            // TODO Log to bugsnag
+            bugsnag.notify(e)
         }
     }
 

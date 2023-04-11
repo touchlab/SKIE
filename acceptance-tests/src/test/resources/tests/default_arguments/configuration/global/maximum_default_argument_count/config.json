@@ -9,5 +9,8 @@
                 "DefaultArgumentInterop.MaximumDefaultArgumentCount": "1"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

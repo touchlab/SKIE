@@ -28,8 +28,8 @@ interface AirElementVisitor<out R, in D> {
 
     fun visitElement(element: AirElement, data: D): R
 
-    fun visitProject(module: AirProject, data: D): R =
-        visitElement(module, data)
+    fun visitProject(project: AirProject, data: D): R =
+        visitElement(project, data)
 
     fun visitModule(module: AirModule, data: D): R =
         visitElement(module, data)

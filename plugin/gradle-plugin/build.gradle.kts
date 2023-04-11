@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(projects.configurationApi)
     implementation(projects.analytics.analyticsApi)
+    implementation(projects.analytics.analyticsConfiguration)
     implementation(projects.analytics.producer)
     implementation(projects.generator.configurationGradle)
     implementation(projects.kotlinPlugin.options)

@@ -13,14 +13,14 @@ data class CompilerAnalytics(
     val commonConfig: CommonConfig,
     val konanConfig: KonanConfig,
     val binaryConfig: BinaryConfig,
-    val mavenLibraries: List<Library>,
+    val mavenLibraries: List<Library>?,
     val cacheSupport: CacheSupport,
 ) {
 
     @Serializable
     data class CommonConfig(
         val disableInline: Boolean?,
-        val moduleName: String?, // *
+        val moduleName: String?,
         val reportOutputFiles: Boolean?,
         val metadataVersion: String?,
         val useFir: Boolean?,
@@ -35,7 +35,7 @@ data class CompilerAnalytics(
 
     @Serializable
     data class KonanConfig(
-        val bundleId: String?, // *
+        val bundleId: String?,
         val checkDependencies: Boolean?,
         val debug: Boolean?,
         val fakeOverrideValidator: Boolean?,
@@ -45,7 +45,7 @@ data class CompilerAnalytics(
         val enabledPhases: List<String>?,
         val entry: String?,
         val makePerFileCache: Boolean?,
-        val frameworkImportHeaders: List<String>?, // *
+        val frameworkImportHeaders: List<String>?,
         val generateTestRunner: String?,
         val lightDebug: Boolean?,
         val generateDebugTrampoline: Boolean?,
@@ -53,7 +53,7 @@ data class CompilerAnalytics(
         val listPhases: Boolean?,
         val listTargets: Boolean?,
         val metadataKlib: Boolean?,
-        val moduleName: String?, // *
+        val moduleName: String?,
         val noDefaultLibs: Boolean?,
         val noEndorsedLibs: Boolean?,
         val noMain: Boolean?,
@@ -71,7 +71,7 @@ data class CompilerAnalytics(
         val printLocations: Boolean?,
         val printFiles: Boolean?,
         val purgeUserLibs: Boolean?,
-        val shortModuleName: String?, // *
+        val shortModuleName: String?,
         val staticFramework: Boolean?,
         val target: String?,
         val verifyBitcode: Boolean?,
@@ -105,11 +105,11 @@ data class CompilerAnalytics(
         val gcSchedulerType: String?,
         val gcMarkSingleThreaded: Boolean?,
         val linkRuntime: String?,
-        val bundleId: String?, // *
-        val bundleShortVersionString: String?,  // *
-        val bundleVersion: String?, // *
-        val appStateTracking: String?, // *
-        val sanitizer: String?, // *
+        val bundleId: String?,
+        val bundleShortVersionString: String?,
+        val bundleVersion: String?,
+        val appStateTracking: String?,
+        val sanitizer: String?,
         val mimallocUseDefaultOptions: Boolean?,
     )
 

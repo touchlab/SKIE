@@ -9,5 +9,8 @@
                 "SealedInterop.Enabled": "false"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

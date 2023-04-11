@@ -16,5 +16,8 @@
                 "SealedInterop.ElseName": "Other"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }

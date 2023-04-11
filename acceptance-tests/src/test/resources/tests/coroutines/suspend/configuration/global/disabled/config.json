@@ -9,5 +9,8 @@
                 "SuspendInterop.Enabled": "false"
             }
         }
-    ]
+    ],
+    "analyticsConfiguration": {
+        "features": []
+    }
 }
