@@ -38,6 +38,6 @@ class FaktoryJwtWithLicenseProvider(private val project: Project) {
 
     private fun findJwtWithLicenseByLicenseKey(jwts: List<String>, licenseKey: String): String? =
         jwts.map { it to SkieLicenseProvider.parseJwtOrNull(it) }
-            .firstOrNull { it.second?.body?.get("licenseKey") == licenseKey }
+            .firstOrNull { it.second?.get("licenseKey")?.asString() == licenseKey }
             ?.first
 }

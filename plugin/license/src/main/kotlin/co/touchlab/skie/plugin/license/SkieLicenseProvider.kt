@@ -1,13 +1,11 @@
 package co.touchlab.skie.plugin.license
 
 import co.touchlab.skie.util.hashed
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jws
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.impl.DefaultJwtParser
-import io.jsonwebtoken.impl.DefaultJwtParserBuilder
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.Claim
 import java.security.KeyFactory
-import java.security.PublicKey
+import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
 
@@ -29,37 +27,42 @@ object SkieLicenseProvider {
     private fun parseLicense(jwt: String): SkieLicense {
         val claims = parseJwt(jwt)
 
-        check(claims.body["product"] == "Skie") { "Passed license is valid but for a different product." }
+        check(claims["product"]?.asString() == "Skie") { "Touchlab license is valid but for a different product." }
 
-        val organizationKey = claims.body["apiKey"] as String
-        val licenseKey = claims.body["licenseKey"] as String
+        val organizationKey = claims["apiKey"]?.asString() ?: error("SKIE License is malformatted.")
+        val licenseKey = claims["licenseKey"]?.asString() ?: error("SKIE License is malformatted.")
         val environment = if (licenseKey.hashed() == devLicenseHash) SkieLicense.Environment.Dev else SkieLicense.Environment.Production
 
         return SkieLicense(organizationKey, licenseKey, environment)
     }
 
-    // TODO Using Jwts.parserBuilder() leads to ClassCastException in real projects
-    fun parseJwt(jwt: String): Jws<Claims> =
-        DefaultJwtParserBuilder()
-            .setSigningKey(getPublicKey())
-            .build()
-            .parseClaimsJws(jwt)
+    fun parseJwt(jwt: String): Map<String, Claim> {
+        val key = getPublicKey()
 
-    fun parseJwtOrNull(jwt: String): Jws<Claims>? =
+        val algorithm = Algorithm.RSA256(key)
+
+        return  JWT.require(algorithm)
+            .withIssuer("admin@touchlab.co")
+            .build()
+            .verify(jwt)
+            .claims
+    }
+
+    fun parseJwtOrNull(jwt: String): Map<String, Claim>? =
         try {
             parseJwt(jwt)
         } catch (_: Throwable) {
             null
         }
 
-    private fun getPublicKey(): PublicKey {
+    private fun getPublicKey(): RSAPublicKey {
         val keyFactory = KeyFactory.getInstance("RSA")
 
         val publicKeyBytes = Base64.getDecoder().decode(publicKeyPem)
 
         val spec = X509EncodedKeySpec(publicKeyBytes)
 
-        return keyFactory.generatePublic(spec)
+        return keyFactory.generatePublic(spec) as RSAPublicKey
     }
 
     private val publicKeyPem: String

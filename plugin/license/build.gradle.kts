@@ -4,9 +4,7 @@ plugins {
 }
 
 dependencies {
-    api(libs.jjwt.api)
-    implementation(libs.jjwt.impl)
-    implementation(libs.jjwt.jackson)
+    api(libs.java.jwt)
     implementation(projects.util)
 }
 
