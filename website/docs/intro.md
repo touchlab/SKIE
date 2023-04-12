@@ -17,8 +17,6 @@ SKIE currently supports the following features:
 
 To see how to add SKIE to your project, check out the [Installation doc](/docs/Installation.mdx).
 
-*Please note that SKIE is still under active development, has not been publicly released, and it's use should be considered experimental.*
-
 ## Coroutines Interop
 
 While it's possible to use Kotlin Coroutines in KMP, the support is far from complete.
@@ -56,9 +54,9 @@ This approach has several significant drawbacks:
 
 - It has an ugly syntax that leads to callback hell (which is what suspend functions were meant to solve in the first place).
 - Suspend function can be by default only called from Swift from the main thread (otherwise it results in a runtime crash).
-  - Note: Kotlin 1.7.20 added a compiler flag that enables this feature.
-    However, it only works with the regular (non `native-mt`) version of Coroutines.
-    See [KT-51297](https://youtrack.jetbrains.com/issue/KT-51297/Native-allow-calling-Kotlin-suspend-functions-on-non-main-thread-from-Swift) for more information.
+    - Note: Kotlin 1.7.20 added a compiler flag that enables this feature.
+      However, it only works with the regular (non `native-mt`) version of Coroutines.
+      See [KT-51297](https://youtrack.jetbrains.com/issue/KT-51297/Native-allow-calling-Kotlin-suspend-functions-on-non-main-thread-from-Swift) for more information.
 - It's not possible to cancel execution of such function from Swift.
 
 The ugly syntax was already solved when Swift 5.5 added `async`/`await` with interop for legacy ObjC functions.
@@ -137,6 +135,7 @@ But make sure to not call suspend functions by the prefixed name - use the gener
 
 Kotlin compiler does not have any specific support for Flows - they are treated as regular interfaces.
 There are two main problems with this approach:
+
 - Flows are exposed to Swift without generics (because they are interfaces and not classes).
 - There is no easy way to consume Flows directly from Swift.
 
@@ -200,6 +199,7 @@ However, custom types cannot be supported.
 Note: The determining factor (to decide if the conversion can happen automatically) is the declared type not the actual/runtime type of the passed object.
 
 Currently supported types are:
+
 - `Flow` -> `SkieSwiftFlow`
 - `SharedFlow` -> `SkieSwiftSharedFlow`
 - `MutableSharedFlow` -> `SkieSwiftMutableSharedFlow`
@@ -245,6 +245,7 @@ fun wrappedFlow(): Wrapper<Flow<Int>> // -> Wrapper<SkieKotlinFlow<Int>>
 
 All SKIE Flow types have conversion constructors.
 For example, you can convert:
+
 - `Flow` to `SkieKotlinFlow<T>` by `SkieKotlinFlow<Int>(flow)` (the generic type needs to be explicitly specified and is not checked even at runtime - make sure you are passing a compatible type)
 - `SkieKotlinFlow<T>` to `SkieSwiftFlow<T>` by `SkieKotlinFlow(skieKotlinFlow)` (it's not possible to directly convert between `Flow` and `SkieSwiftFlow`)
 - `SkieSwiftFlow<T>` to `SkieSwiftOptionalFlow<T>` by `SkieSwiftOptionalFlow(skieKotlinFlow)`
@@ -265,6 +266,7 @@ If you try to force cast such object, you will get approximately this runtime er
 You may run into this type of issue if you use a Swift generic container that internally uses force cast on the contained object, for example: `Swift.Array`.
 To avoid this issue SKIE does not translate `Flow` types used as type arguments of known problematic declarations.
 For example:
+
 - `List<Flow<*>>`
 - `Map<*, Flow<*>>`
 - `Flow<Flow<*>>`
@@ -344,7 +346,8 @@ fun foo(v: V)
 fun foo(v: Int)
 ```
 
-*Properties and parameterless functions* - In Kotlin it's completely fine to have a property with the same name as a parameterless functions.
+*Properties and parameterless
+functions* - In Kotlin it's completely fine to have a property with the same name as a parameterless functions.
 For example:
 
 ```kotlin
@@ -406,8 +409,7 @@ func onEnum(of sealed: KotlinSealedInterface) -> SwiftWrapperEnum {
 
 The `onEnum(of:)` function wraps the Kotlin object in a Swift enum.
 
-SKIE leverages the fact that Swift `switch` statements **do not** always require a `default` case. A `default` is **not
-** required if every possible value of the type being considered is matched by one of the `switch` statement's cases (e.g. a `switch` that takes an enum and has a `case` for each and every `case` in that enum.)
+SKIE leverages the fact that Swift `switch` statements **do not** always require a `default` case. A `default` is **not** required if every possible value of the type being considered is matched by one of the `switch` statement's cases (e.g. a `switch` that takes an enum and has a `case` for each and every `case` in that enum.)
 
 To simulate Kotlin's smart-casting we use an enum with associated values.
 

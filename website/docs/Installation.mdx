@@ -24,7 +24,11 @@ export function ApiKeyInterpolatedCodeBlock({children, language, title}) {
 
 Installing SKIE involves small additions to just two gradle files. The Swift/Xcode side does not require any configuration changes.
 
-Kotlin compiler plugins are generally not stable and break with almost every release, so please make sure that your project uses exactly the same Kotlin compiler version as SKIE (1.7.20) and Gradle 7.3 or higher.
+Kotlin compiler plugins are generally not stable and break with almost every release, so please make sure that your project uses Kotlin version supported by SKIE.
+SKIE with version `0.4.3` and newer supports Kotlin 1.8.0 and 1.8.10.
+To use SKIE with Kotlin 1.8.20, add suffix "-preview.1.8.20" to the base version (for example: `0.4.3-preview.1.8.20`).
+
+Additionally, all SKIE versions require Gradle 7.3 or newer.
 
 **Before you do anything else, check that your project compiles (especially if you had to change Gradle and/or Kotlin versions).**
 
@@ -64,4 +68,4 @@ plugins {
 
 SKIE should only be applied to modules that export your Xcode Frameworks. It automatically works on dependent project modules and 3rd party dependencies.
 
-That is the totality of what's required to integrate SKIE! Below is a list of features that SKIE supports. If you find that you want or need to customize SKIE's behavior, then check out the [Configuration doc](/docs/Configuration/Configuration.md).
+That is the totality of what's required to integrate SKIE! You can read more about SKIE, and the features it supports, in [SKIE Intro](/docs/intro.md). If you find that you want or need to customize SKIE's behavior, then check out the [Configuration doc](/docs/Configuration/Configuration.md).
