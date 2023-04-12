@@ -4,6 +4,8 @@ import co.touchlab.skie.util.hashed
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.impl.DefaultJwtParser
+import io.jsonwebtoken.impl.DefaultJwtParserBuilder
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.spec.X509EncodedKeySpec
@@ -36,8 +38,9 @@ object SkieLicenseProvider {
         return SkieLicense(organizationKey, licenseKey, environment)
     }
 
+    // TODO Using Jwts.parserBuilder() leads to ClassCastException in real projects
     fun parseJwt(jwt: String): Jws<Claims> =
-        Jwts.parserBuilder()
+        DefaultJwtParserBuilder()
             .setSigningKey(getPublicKey())
             .build()
             .parseClaimsJws(jwt)
