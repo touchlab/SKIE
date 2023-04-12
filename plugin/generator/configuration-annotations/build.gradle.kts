@@ -1,7 +1,11 @@
+import co.touchlab.skie.gradle.publish.publishCode
+
 plugins {
     id("skie-multiplatform")
     id("skie-publish-multiplatform")
 }
+
+publishCode()
 
 kotlin {
     jvm()

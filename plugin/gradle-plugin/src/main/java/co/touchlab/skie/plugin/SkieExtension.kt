@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.builder.ConfigurationBuilder
-import co.touchlab.skie.plugin.analytics.AnalyticsTier
+import co.touchlab.skie.configuration.gradle.AnalyticsTier
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory

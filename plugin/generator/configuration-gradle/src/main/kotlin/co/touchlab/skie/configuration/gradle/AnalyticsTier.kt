@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.analytics
+package co.touchlab.skie.configuration.gradle
 
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
