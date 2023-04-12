@@ -4,7 +4,10 @@ sidebar_position: 3
 
 # Configuration
 
-SKIE is an opinionated plugin and makes choices that might not work for every use case, so it provides a way to change some of its default behavior. There are two different ways to change the configuration:
+SKIE has an opinionated default configuration designed to accommodate most use-cases.
+However, no single configuration can work well for everybody, so SKIE was designed with high configurability in mind.
+
+There are two different ways to change the configuration:
 
 - locally - using Kotlin annotations
 - globally - using Gradle extension provided by the SKIE Gradle plugin
