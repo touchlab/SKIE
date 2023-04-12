@@ -69,7 +69,7 @@ export default function TrustBlocks() {
                 data-aos-id-blocks>
 
                 <ImageTitleBlock image={<ComprehensiveTesting/>} title="Comprehensive Testing">
-                    We test SKIE against a <strong>thousand</strong> public KMM libraries along
+                    We test SKIE against a <strong>thousand</strong> public KMP libraries along
                     with <strong>hundreds</strong> of hand-written tests.
                 </ImageTitleBlock>
 

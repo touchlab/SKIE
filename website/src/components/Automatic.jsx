@@ -52,7 +52,7 @@ export default function Automatic() {
     return (
         <CenteringSection divider={true}>
             <SectionHeader title="Zero-Effort Integration">
-                With SKIE, there's no need for additional development effort or training. This powerful tool automatically analyzes your code and modifies the API surface to streamline your workflow. Getting started is as easy as following three simple steps.
+                With SKIE, there's no need for additional development effort or training. This powerful tool automatically analyzes your code and modifies the API surface to streamline your workflow. Getting started is as easy as following three simple steps:
             </SectionHeader>
 
 

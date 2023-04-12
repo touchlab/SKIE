@@ -22,7 +22,7 @@ production project.*
 
 ## Coroutines Interop
 
-While it's possible to use Kotlin Coroutines in KMM, the support is far from complete.
+While it's possible to use Kotlin Coroutines in KMP, the support is far from complete.
 Both `suspend` functions and `Flows` have some limitations that make their usage from Swift cumbersome.
 One of the main goals of SKIE is to change that.
 
@@ -193,7 +193,7 @@ for await it in flow {
 Note: The above example showcased only function return types, but SKIE also supports properties and function parameters.
 
 Conversion from `AsyncSequence` to `Flow` is not yet supported.
-However, this direction is far less frequently needed for developing iOS applications with shared KMM code.
+However, this direction is far less frequently needed for developing iOS applications with shared KMP code.
 
 Due to implementation reasons, it's not possible to automatically support all types of Flows.
 Each type must be explicitly implemented in SKIE (because it needs to be converted to its own class).

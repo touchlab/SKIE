@@ -3,7 +3,7 @@ const repoName = "SitePlayground";
 
 const docusaurusConfig = {
     title: "SKIE",
-    tagline: "Swift-friendly API generator for Kotlin Multiplatform Mobile",
+    tagline: "Swift-friendly API generator for Kotlin Multiplatform",
     url: `https://green-smoke-0862bf810.2.azurestaticapps.net/`,
     baseUrl: `/`,
     organizationName: orgName, // Usually your GitHub org/user name.

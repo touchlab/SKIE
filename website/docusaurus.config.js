@@ -107,7 +107,7 @@ const config = {
                         label: 'Docs',
                     },
                     {
-                        to: '#',
+                        to: 'https://form.typeform.com/to/uOxsjmLK',
                         label: 'Book a Demo',
                         position: 'right',
                         className: 'button button--secondary button--lg'

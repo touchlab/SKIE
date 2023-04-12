@@ -151,7 +151,7 @@ export default function FeaturesZigzag() {
     return (
         <CenteringSection id='features'>
             <SectionHeader title='Kotlin to Swift Code Transformations'>
-                SKIE improves interoperability between Kotlin and Swift by generating Swift wrappers for Objective-C headers created by the Kotlin compiler. It recreates features supported by both languages but lost in the translation from Kotlin to Objective-C to Swift.
+                SKIE improves interoperability between Kotlin and Swift by generating Swift wrappers for Objective-C headers created by the Kotlin compiler. It recreates features supported by both languages that are lost in the translation from Kotlin to Objective-C to Swift.
             </SectionHeader>
 
             {/* Items */}

@@ -44,7 +44,33 @@ function Header({menuLinkList, rightContent: content}) {
         return () => window.removeEventListener('scroll', updatePosition)
     }, []);
 
-    const menuLinks = menuLinkList ? menuLinkList : []
+    const desktopMenuLinks = menuLinkList ? menuLinkList.map(([title, url]) => {
+        const linkClasses = "text-gray-500 hover:text-gray-900 px-4 py-2 flex items-center transition duration-150 ease-in-out hover:no-underline"
+        let link
+        if (url.startsWith('https://')) {
+            link = <a href={url} target='_blank' className={linkClasses}>
+                {title}
+            </a>
+        } else {
+            link = <Link to={url} className={linkClasses}>
+                {title}
+            </Link>
+        }
+        return <li key={url} className='list-none m-0 p-0 border-0'>
+            {link}
+        </li>
+    }) : []
+    const mobileMenuLinks = menuLinkList ? menuLinkList.map(([title, url]) => {
+        let link
+        if (url.startsWith('https://')) {
+            link = <a href={url} onClick={() => setMobileNavOpen(!mobileNavOpen)} target='_blank' className="flex text-gray-300 hover:text-gray-200 py-2 hover:no-underline">{title}</a>
+        } else {
+            link = <Link to={url} onClick={() => setMobileNavOpen(!mobileNavOpen)} className="flex text-gray-300 hover:text-gray-200 py-2 hover:no-underline">{title}</Link>
+        }
+        return <li className='list-none m-0 p-0 border-0' key={url}>
+            {link}
+        </li>
+    }) : []
 
     return (
         <header className={`fixed top-0 w-full z-30 bg-slate-100 ${scrollPosition > 0 ? 'shadow' : 'shadow-none'}`}>
@@ -63,13 +89,7 @@ function Header({menuLinkList, rightContent: content}) {
 
                             {/* Desktop menu links */}
                             <ul className="flex absolute left-1/2 justify-center -translate-x-1/2 flex-wrap items-center list-none m-0 p-0">
-                                {menuLinks.map(([title, url]) => (
-                                    <li key={url}>
-                                        <Link to={url} className="text-gray-500 hover:text-gray-900 px-4 py-2 flex items-center transition duration-150 ease-in-out hover:no-underline">
-                                            {title}
-                                        </Link>
-                                    </li>
-                                ))}
+                                {desktopMenuLinks}
                             </ul>
 
                             <div className='ml-auto'>
@@ -102,13 +122,8 @@ function Header({menuLinkList, rightContent: content}) {
                             {/*Mobile navigation */}
                             <nav id="mobile-nav" ref={mobileNav} className="absolute top-full z-20 left-0 w-full overflow-hidden transition-all duration-300 ease-in-out" style={mobileNavOpen ? { maxHeight: mobileNav.current.scrollHeight, opacity: 1 } : { maxHeight: 0, opacity: .8 } }>
                                 <ul className="bg-gray-800 px-4 py-2 divide-y divide-gray-600 divide-solid">
-                                    {menuLinks.map(([title, url]) => (
-                                        <li className='list-none m-0 p-0 border-0 ' key={url}>
-                                            <Link to={url} onClick={() => setMobileNavOpen(!mobileNavOpen)} className="flex text-gray-300 hover:text-gray-200 py-2 hover:no-underline">{title}</Link>
-                                        </li>
-                                    ))}
-
-                                    <li className="grow py-2 !border-0">{content && content(scrollPosition, () => setMobileNavOpen(!mobileNavOpen))}</li>
+                                    {mobileMenuLinks}
+                                    <li className="grow list-none m-0 p-0 py-2 !border-0">{content && content(scrollPosition, () => setMobileNavOpen(!mobileNavOpen))}</li>
                                 </ul>
 
                             </nav>

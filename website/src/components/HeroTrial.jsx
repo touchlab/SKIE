@@ -9,14 +9,18 @@ export default function HeroTrial() {
         >
             <div className="max-w-5xl mx-auto mb-8">
                 <h1 className="h1 font-normal md:text-7xl md:leading-none" data-aos="fade-up">
-                    Free SKIE Trial<br/>for KotlinConf VIPs
+                    KotlinConf 2023<br/>Exclusive Trial of SKIE
                 </h1>
             </div>
             {/* Section header */}
             <div className="max-w-5xl mx-auto mb-8 md:mb-16 ">
                 {/*<h4 className="h4 max-w-3xl mb-4">It was great meeting you at KotlinConf this year and we’re so glad you were excited about SKIE. Enjoy your free trial, we’ll be in touch!</h4>*/}
-                <p className="max-w-3xl text-xl text-gray-700 dark:text-gray-400">It was great meeting you at KotlinConf this year and we’re
-                    so glad you were excited about SKIE. Enjoy your free trial, we’ll be in touch!</p>
+                <p className="max-w-3xl text-xl text-gray-700 dark:text-gray-400 mb-4">
+                    Thrilled to have met you at KotlinConf 2023!
+                </p>
+                <p className="max-w-3xl text-xl text-gray-700 dark:text-gray-400">
+                    Keep an eye out for our follow-up email to access your free trial. We look forward to supporting your journey with SKIE!
+                </p>
             </div>
         </CenteringSection>
     )

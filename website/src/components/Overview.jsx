@@ -9,7 +9,7 @@ export default function Overview() {
 
                     {/* Section header */}
                     <div className="max-w-3xl mx-auto text-center">
-                        <h1 className="h2 mb-4">A Swift-friendly API Generator for Kotlin Multiplatform Mobile</h1>
+                        <h1 className="h2 mb-4">A Swift-friendly API Generator for Kotlin Multiplatform</h1>
                         <p className="text-xl text-gray-700 dark:text-gray-400">Kotlin Multiplatform generates libraries for iOS, but the
                             interface is Objective-C, stripping your code of
                             modern language features. SKIE restores the expressiveness of modern languages and provides a better iOS

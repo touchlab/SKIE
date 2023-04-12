@@ -62,7 +62,7 @@ function FeatureBlock({name, description, image}) {
 export default function FeaturesBlocks() {
     return (
         <CenteringSection divider={true}>
-            <SectionHeader title="Critical features for the KMM iOS developer experience">
+            <SectionHeader title="Critical features for the KMP iOS developer experience">
                 SKIE is packed with features that make Kotlin Multiplatform frameworks feel like native Swift. We carefully designed each feature to be intuitive, while staying consistent throughout many use-cases.
             </SectionHeader>
 

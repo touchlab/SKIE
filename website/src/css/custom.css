@@ -116,6 +116,14 @@ html[data-theme='dark'] .language-swift .punctuation + .class-name {
     margin: 0 3px 0 5px;
 }
 
+.tailwind a[target="_blank"].mobile:after {
+    filter: invert(85%) sepia(10%) saturate(118%) hue-rotate(177deg) brightness(101%) contrast(89%)
+}
+
+.tailwind footer a[target="_blank"]:after {
+    filter: invert(26%) sepia(93%) saturate(813%) hue-rotate(142deg) brightness(97%) contrast(103%);
+}
+
 html.tailwind {
     scroll-padding-top: 4rem;
 }
