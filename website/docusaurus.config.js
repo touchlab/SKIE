@@ -141,7 +141,8 @@ const config = {
                     },
 
                 ],
-                copyright: `Copyright © ${new Date().getFullYear()} Touchlab`,
+
+                copyright: `Copyright © ${new Date().getFullYear()} Touchlab<br/><a href='https://docs.google.com/document/d/e/2PACX-1vQ8678ogvFVuGVNlsZsOyY5RWehCq4Ttuzy5Bvvd90rHL4D1d2p-DVQWSJlksg1NQ7VAXrYuokHAabl/pub' target='_blank'>Privacy Policy</a>`,
             },
             prism: {
                 // theme: require('./src/utils/DarkTheme').theme,
