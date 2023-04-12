@@ -35,6 +35,15 @@ Additionally, all SKIE versions require Gradle 7.3 or newer.
 Add the following to your `settings.gradle.kts` file:
 
 ```kotlin
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        // Add only if you need it for other plugins
+        // google()
+    }
+}
+
 plugins {
     id("co.touchlab.faktory.access").version("{{TOUCHLAB_ACCESS_VERSION}}")
 }
