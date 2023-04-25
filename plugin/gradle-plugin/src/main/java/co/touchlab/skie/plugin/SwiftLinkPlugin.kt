@@ -39,10 +39,8 @@ import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.presetName
 import java.io.File
 import java.nio.file.Path
+import java.time.Duration
 import java.util.UUID
-import kotlin.time.ExperimentalTime
-import kotlin.time.TimeMark
-import kotlin.time.TimeSource
 
 const val EXTENSION_NAME = "skie"
 
@@ -358,14 +356,13 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         configureAnalyticsTask(linkTask, analyticsCollector)
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun configurePerformanceAnalytics(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
-        lateinit var mark: TimeMark
+        lateinit var start: Long
 
         linkTask.doFirst(
             object : Action<Task> {
                 override fun execute(t: Task) {
-                    mark = TimeSource.Monotonic.markNow()
+                    start = System.currentTimeMillis()
                 }
             },
         )
@@ -373,7 +370,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         linkTask.doLast(
             object : Action<Task> {
                 override fun execute(t: Task) {
-                    val linkTaskDuration = mark.elapsedNow()
+                    val linkTaskDuration = Duration.ofMillis(System.currentTimeMillis() - start)
 
                     analyticsCollector.collect(
                         PerformanceAnalyticsProducer(linkTaskDuration),

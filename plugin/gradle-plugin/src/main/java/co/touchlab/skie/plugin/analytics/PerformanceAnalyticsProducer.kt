@@ -5,8 +5,8 @@ import co.touchlab.skie.plugin.analytics.performance.PerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.Duration
 import kotlin.reflect.KClass
-import kotlin.time.Duration
 
 internal class PerformanceAnalyticsProducer(
     private val linkTaskDuration: Duration,
@@ -18,7 +18,7 @@ internal class PerformanceAnalyticsProducer(
 
     override fun produce(configuration: AnalyticsFeature.Performance): ByteArray =
         PerformanceAnalytics(
-            linkTaskDurationInSeconds = linkTaskDuration.inWholeMilliseconds / 1000.0,
+            linkTaskDurationInSeconds = linkTaskDuration.toMillis().toDouble() / 1000.0,
         ).encode()
 }
 
