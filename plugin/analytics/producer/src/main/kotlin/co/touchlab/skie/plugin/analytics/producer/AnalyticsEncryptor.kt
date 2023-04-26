@@ -6,10 +6,9 @@ import java.security.Key
 import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.PublicKey
-import java.security.SecureRandom
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
-import java.util.Base64
+import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.IvParameterSpec
@@ -65,7 +64,15 @@ object AnalyticsEncryptor {
 
     fun decrypt(byteArrayWithHeader: ByteArray, privateKeyPath: Path): ByteArray {
         val privateKey = loadPrivateKey(privateKeyPath)
+        return decrypt(byteArrayWithHeader, privateKey)
+    }
 
+    fun decrypt(byteArrayWithHeader: ByteArray, privateKeyBytes: ByteArray): ByteArray {
+        val privateKey = loadPrivateKey(privateKeyBytes)
+        return decrypt(byteArrayWithHeader, privateKey)
+    }
+
+    private fun decrypt(byteArrayWithHeader: ByteArray, privateKey: PrivateKey): ByteArray {
         val dataWithHeader = DataWithHeader.parse(byteArrayWithHeader)
 
         val symmetricKey = decryptKey(dataWithHeader.key, privateKey)
@@ -79,6 +86,10 @@ object AnalyticsEncryptor {
 
     private fun loadPrivateKey(path: Path): PrivateKey {
         val keyBytes = path.readBytes()
+        return loadPrivateKey(keyBytes)
+    }
+
+    private fun loadPrivateKey(keyBytes: ByteArray): PrivateKey {
         val keySpec = PKCS8EncodedKeySpec(keyBytes)
         val keyFactory = KeyFactory.getInstance(asymmetricCipher)
         return keyFactory.generatePrivate(keySpec)

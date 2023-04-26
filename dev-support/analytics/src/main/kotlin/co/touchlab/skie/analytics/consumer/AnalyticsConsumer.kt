@@ -9,7 +9,6 @@ import co.touchlab.skie.plugin.analytics.producer.compressor.CompressionMethod
 import co.touchlab.skie.plugin.analytics.producer.compressor.EfficientAnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.FastAnalyticsCompressor
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.nio.file.Path
 import kotlin.io.path.listDirectoryEntries
@@ -111,10 +110,8 @@ private fun loadString(buildId: String, type: String, skieVersion: String, envir
 
 private val json = Json { prettyPrint = true }
 
-private inline fun <reified T> loadJson(buildId: String, type: String, skieVersion: String, environment: String, privateKey: Path): String {
+private inline fun <reified T> loadJson(buildId: String, type: String, skieVersion: String, environment: String, privateKey: Path): T {
     val data = loadByteArray(buildId, type, skieVersion, environment, privateKey)
 
-    val deserialized = Json.decodeFromString<T>(String(data))
-
-    return json.encodeToString(deserialized)
+    return Json.decodeFromString(String(data))
 }
