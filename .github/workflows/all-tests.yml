@@ -6,9 +6,6 @@ on:
     - cron: '0 7 * * SAT'
   workflow_dispatch:
   workflow_call:
-    secrets:
-      SWIFTPOET_TOKEN:
-        required: true
 
 permissions:
   contents: read

@@ -15,7 +15,6 @@ dependencyResolutionManagement {
         maven("https://api.touchlab.dev/public") {
             content {
                 includeModule("org.jetbrains.kotlin", "kotlin-native-compiler-embeddable")
-                includeModule("co.touchlab.fork.swiftpoet", "swiftpoet")
             }
         }
         mavenCentral()
