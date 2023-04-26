@@ -330,9 +330,23 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
         return this
     }
 
-    private val analyticsDir: File
+    private val skieDataDirectory: File
         get() {
             val directory = Path.of(System.getProperty("user.home")).resolve("Library/Application Support/SKIE").toFile()
+
+            // TODO Remove after the first trials are concluded - this code removes old analytics files so that they are not left on the computer forever.
+            if (!directory.resolve("Analytics").exists()) {
+                directory.deleteRecursively()
+            }
+
+            directory.mkdirs()
+
+            return directory
+        }
+
+    private val analyticsDir: File
+        get() {
+            val directory = skieDataDirectory.resolve("Analytics")
 
             directory.mkdirs()
 
