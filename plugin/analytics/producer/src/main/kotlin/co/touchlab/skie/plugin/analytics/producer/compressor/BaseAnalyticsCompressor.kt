@@ -7,6 +7,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 abstract class BaseAnalyticsCompressor(
+    override val method: CompressionMethod,
     private val compressorStreamFactory: (OutputStream) -> CompressorOutputStream,
     private val decompressorStreamFactory: (InputStream) -> CompressorInputStream,
 ) : AnalyticsCompressor {

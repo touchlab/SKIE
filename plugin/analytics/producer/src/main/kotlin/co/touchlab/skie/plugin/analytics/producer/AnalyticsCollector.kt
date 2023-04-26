@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 class AnalyticsCollector(
     private val analyticsDirectory: Path,
     private val buildId: String,
-    skieVersion: String,
+    private val skieVersion: String,
     type: BugsnagFactory.Type,
     private val license: SkieLicense,
     private val configuration: AnalyticsConfiguration,
@@ -29,8 +29,6 @@ class AnalyticsCollector(
         BugsnagFactory.create(skieVersion, type, license.environment)
 
     private val backgroundTasks = CopyOnWriteArrayList<Thread>()
-
-    private val environmentPrefix = license.environment.name
 
     @Synchronized
     fun collect(producers: List<AnalyticsProducer<*>>) {
@@ -63,21 +61,21 @@ class AnalyticsCollector(
         }
     }
 
-    private fun collectData(name: String, data: ByteArray) {
-        collectUsingDeflate(name, data)
-        collectUsingBZip2(name, data)
+    private fun collectData(analyticsType: String, data: ByteArray) {
+        collectUsingDeflate(analyticsType, data)
+        collectUsingBZip2(analyticsType, data)
     }
 
-    private fun collectUsingDeflate(name: String, analyticsResult: ByteArray) {
-        collectUsingCompressor(name, analyticsResult, FastAnalyticsCompressor, 1)
+    private fun collectUsingDeflate(analyticsType: String, analyticsResult: ByteArray) {
+        collectUsingCompressor(analyticsType, analyticsResult, FastAnalyticsCompressor)
     }
 
-    private fun collectUsingBZip2(name: String, analyticsResult: ByteArray) {
+    private fun collectUsingBZip2(analyticsType: String, analyticsResult: ByteArray) {
         val betterCompressionTask = Thread {
             try {
-                collectUsingCompressor(name, analyticsResult, EfficientAnalyticsCompressor, 2)
+                collectUsingCompressor(analyticsType, analyticsResult, EfficientAnalyticsCompressor)
             } catch (e: Throwable) {
-                reportAnalyticsError("$name-2", e)
+                reportAnalyticsError("$analyticsType-efficient-compressor", e)
             }
         }
 
@@ -87,19 +85,25 @@ class AnalyticsCollector(
     }
 
     private fun collectUsingCompressor(
-        name: String,
+        analyticsType: String,
         analyticsResult: ByteArray,
         compressor: AnalyticsCompressor,
-        fileVersion: Int,
     ) {
-        val fileName = FileWithMultipleVersions.addVersion("$environmentPrefix.$buildId.$name", fileVersion)
-        val file = analyticsDirectory.resolve(fileName)
+        val artifact = AnalyticsArtifact(
+            buildId = buildId,
+            type = analyticsType,
+            skieVersion = skieVersion,
+            environment = license.environment,
+            compressionMethod = compressor.method,
+        )
+
+        val artifactPath = artifact.path(analyticsDirectory)
 
         val compressedData = compressor.compress(analyticsResult)
 
         val encryptedData = encrypt(compressedData)
 
-        file.writeBytes(encryptedData)
+        artifactPath.writeBytes(encryptedData)
     }
 
     private fun encrypt(data: ByteArray): ByteArray =

@@ -4,6 +4,7 @@ import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStr
 import org.apache.commons.compress.compressors.deflate.DeflateCompressorOutputStream
 
 object FastAnalyticsCompressor : BaseAnalyticsCompressor(
+    method = CompressionMethod.Deflate,
     compressorStreamFactory = { DeflateCompressorOutputStream(it) },
     decompressorStreamFactory = { DeflateCompressorInputStream(it) },
 )

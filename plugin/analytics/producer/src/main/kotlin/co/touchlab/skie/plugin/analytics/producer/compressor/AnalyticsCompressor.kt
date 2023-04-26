@@ -1,6 +1,9 @@
 package co.touchlab.skie.plugin.analytics.producer.compressor
 
-interface AnalyticsCompressor {
+// TODO Refactor to enum
+sealed interface AnalyticsCompressor {
+
+    val method: CompressionMethod
 
     fun compress(data: ByteArray): ByteArray
 
