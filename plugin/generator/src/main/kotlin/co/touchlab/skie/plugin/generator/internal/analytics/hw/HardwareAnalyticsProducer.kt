@@ -18,7 +18,10 @@ object HardwareAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.Hardware> 
 
     override val name: String = "hw"
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
 
     override fun produce(configuration: AnalyticsFeature.Hardware): ByteArray =
         Json.encodeToString(getHwAnalytics()).toByteArray()
