@@ -32,7 +32,7 @@ Additionally, all SKIE versions require Gradle 7.3 or newer.
 
 **Before you do anything else, check that your project compiles (especially if you had to change Gradle and/or Kotlin versions).**
 
-Add the following to your `settings.gradle.kts` file:
+Add the Touchlab maven repos to your `settings.gradle.kts` file:
 
 ```kotlin
 pluginManagement {
@@ -41,15 +41,21 @@ pluginManagement {
         mavenCentral()
         // Add only if you need it for other plugins
         // google()
+        maven("https://api.touchlab.dev/public") // <-- Add this
     }
 }
 
-plugins {
-    id("co.touchlab.faktory.access").version("{{TOUCHLAB_ACCESS_VERSION}}")
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        // Add only if you need it for other plugins
+        // google()
+        maven("https://api.touchlab.dev/public") // <-- Add this
+    }
 }
 ```
 
-SKIE is deployed in a private Touchlab Maven repository. To access artifacts from that repository, you will need an API key from Touchlab.
+SKIE is currently deployed in a Touchlab Maven repository. These artifacts will eventually be published to "standard" repositories.
 
 :::info
 
@@ -65,7 +71,7 @@ Your API key should have been sent through email. Once you have your API key, yo
 {`touchlab.key={API_KEY}`}
 </ApiKeyInterpolatedCodeBlock>
 
-With those values set, you should be able to access our private maven repo and binaries.
+With those values set, you should be able to access our maven repo and binaries.
 
 To enable SKIE, add the plugin in `build.gradle.kts` of the module that builds the native framework:
 
