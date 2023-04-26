@@ -39,7 +39,8 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         action.execute(features)
     }
 
-    val analytics: Property<AnalyticsTier> = objects.property<AnalyticsTier>().convention(AnalyticsTier.Full)
+    // TODO Change back to public once the license supports trial tier.
+    private val analytics: Property<AnalyticsTier> = objects.property<AnalyticsTier>().convention(AnalyticsTier.Full)
 
     @get:Nested
     val debug: DebugConfiguration = objects.newInstance(DebugConfiguration::class.java)
