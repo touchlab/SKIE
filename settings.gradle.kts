@@ -29,7 +29,6 @@ includeBuild("example")
 includeBuild("plugin")
 includeBuild("dev-support")
 includeBuild("website")
-includeBuild("swiftpoet")
 
 include(
     ":acceptance-tests:framework",

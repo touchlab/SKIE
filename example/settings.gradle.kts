@@ -13,4 +13,3 @@ rootProject.name = "SkieDemo"
 enableFeaturePreview("VERSION_CATALOGS")
 
 includeBuild("../plugin")
-includeBuild("../swiftpoet")

@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.konan.target.presetName
 import java.io.File
 import java.nio.file.Path
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 const val EXTENSION_NAME = "skie"
 
@@ -357,7 +357,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
     }
 
     private fun configurePerformanceAnalytics(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
-        lateinit var start: Long
+        var start: Long = 0
 
         linkTask.doFirst(
             object : Action<Task> {
