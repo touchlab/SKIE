@@ -7,11 +7,11 @@ import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvide
 import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
-import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.DescriptorProviderKey
+import co.touchlab.skie.plugin.api.descriptorProvider
+import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.skieContext
-import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.util.Command
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -133,7 +133,8 @@ class SwiftLinkCompilePhase(
         Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
-            +listOf("-Xcc", "-fmodule-map-file=${framework.modulemapFile}")
+            +"-F"
+            +framework.parentDir.absolutePath
             +"-emit-module-interface-path"
             +framework.swiftModule.resolve("$targetTriple.swiftinterface").absolutePath
             +"-emit-module-path"

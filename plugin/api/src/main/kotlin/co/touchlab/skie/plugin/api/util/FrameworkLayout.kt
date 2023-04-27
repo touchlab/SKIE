@@ -5,6 +5,7 @@ import java.io.File
 class FrameworkLayout(val framework: File) {
     constructor(frameworkPath: String) : this(File(frameworkPath))
 
+    val parentDir by lazy { framework.parentFile }
     val moduleName by lazy { framework.name.removeSuffix(".framework") }
     val headersDir by lazy { framework.resolve("Headers") }
     val kotlinHeader by lazy { headersDir.resolve("$moduleName.h") }
