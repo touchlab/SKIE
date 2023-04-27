@@ -87,7 +87,7 @@ class ExternalLibrariesTestRunner(
                     )
                 }
                 .flatMap {
-                    val linker = KotlinTestLinker(tempFileSystem, testLogger, true)
+                    val linker = KotlinTestLinker(tempFileSystem, testLogger)
                     linker.link(
                         it,
                         skieConfiguration,

@@ -35,7 +35,7 @@ interface KotlinTypeSwiftModel {
 
     val bridge: ObjcSwiftBridge?
 
-    val nonBridgedDeclaration: SwiftIrExtensibleDeclaration
+    val nonBridgedDeclaration: SwiftIrExtensibleDeclaration.Local
 
     val kind: Kind
 

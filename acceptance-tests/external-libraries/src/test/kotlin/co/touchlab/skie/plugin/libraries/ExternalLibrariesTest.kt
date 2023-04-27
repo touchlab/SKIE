@@ -20,7 +20,7 @@ class ExternalLibrariesTest: FunSpec({
     val librariesToTest = testLoader.loadLibrariesToTest()
 
     val (skieConfiguration, scopeSuffix) = if (System.getProperty("disableSkie") == null) {
-        Configuration(SkieFeatureSet(setOf(SkieFeature.CoroutinesInterop)), emptyList(), AnalyticsConfiguration()) to " (SKIE enabled)"
+        Configuration(SkieFeatureSet(setOf(SkieFeature.CoroutinesInterop)), emptyList(), AnalyticsConfiguration.DISABLED) to " (SKIE enabled)"
     } else {
         null to " (SKIE disabled)"
     }

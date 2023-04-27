@@ -68,7 +68,7 @@ class ActualKotlinFileSwiftModel(
 
     // override val original: KotlinTypeSwiftModel = OriginalKotlinFileSwiftModel(this)
 
-    override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration by lazy {
+    override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration.Local by lazy {
         SwiftIrTypeDeclaration.Local.KotlinFile.Modeled(this, module.swiftIdentifier, fileClassName.swiftName)
     }
 

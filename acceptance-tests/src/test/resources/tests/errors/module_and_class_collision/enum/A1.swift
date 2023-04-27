@@ -1,4 +1,4 @@
-let k: Kotlin = KotlinKt.a()
+let k: Kotlin_ = KotlinKt.a()
 
 switch k {
 case .a:

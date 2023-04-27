@@ -24,6 +24,8 @@ sealed interface SwiftIrExtensibleDeclaration: SwiftIrDeclaration {
 
     sealed interface Local: SwiftIrExtensibleDeclaration {
         val typealiasName: String
+
+        override val publicName: SwiftFqName.Local
     }
 }
 

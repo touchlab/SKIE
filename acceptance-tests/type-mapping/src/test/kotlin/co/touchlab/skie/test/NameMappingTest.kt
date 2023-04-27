@@ -228,7 +228,7 @@ class NameMappingTest {
                 )
             }
             .flatMap {
-                val linker = KotlinTestLinker(tempFileSystem, testLogger, false)
+                val linker = KotlinTestLinker(tempFileSystem, testLogger)
                 linker.link(
                     it,
                     skieConfiguration,

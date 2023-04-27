@@ -1,4 +1,4 @@
-let a: Kotlin = Kotlin.A1()
+let a: Kotlin_ = Kotlin_.A1()
 
 switch onEnum(of: a) {
     case .A1(_):

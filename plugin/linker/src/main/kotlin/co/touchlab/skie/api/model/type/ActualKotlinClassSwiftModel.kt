@@ -15,8 +15,8 @@ import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.ObjcFqName
 import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
-import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
+import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
@@ -125,7 +125,7 @@ class ActualKotlinClassSwiftModel(
         originalContainingType
     }
 
-    override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration by lazy {
+    override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration.Local by lazy {
         if (kind.isInterface) {
             SwiftIrProtocolDeclaration.Local.KotlinInterface.Modeled(this)
         } else {

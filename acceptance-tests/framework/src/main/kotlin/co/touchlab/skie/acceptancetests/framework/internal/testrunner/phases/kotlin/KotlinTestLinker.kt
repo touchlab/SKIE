@@ -9,7 +9,6 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.ConfigurationKeys
 import co.touchlab.skie.plugin.SkieComponentRegistrar
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import org.jetbrains.kotlin.cli.bc.K2Native
@@ -26,20 +25,10 @@ import java.util.UUID
 class KotlinTestLinker(
     private val tempFileSystem: TempFileSystem,
     private val testLogger: TestLogger,
-    enableAirAnalytics: Boolean,
 ) {
 
     private val analyticsConfiguration = Configuration(
-        analyticsConfiguration = AnalyticsConfiguration(
-            AnalyticsFeature.CrashReporting(isEnabled = true),
-            AnalyticsFeature.Gradle(isEnabled = true, stripIdentifiers = false),
-            AnalyticsFeature.SkieConfiguration(isEnabled = true, stripIdentifiers = false),
-            AnalyticsFeature.Compiler(isEnabled = true, stripIdentifiers = false),
-            AnalyticsFeature.Hardware(isEnabled = true),
-            AnalyticsFeature.Performance(isEnabled = true),
-            AnalyticsFeature.Sysctl(isEnabled = true),
-            AnalyticsFeature.Air(isEnabled = enableAirAnalytics, stripIdentifiers = false),
-        ),
+        analyticsConfiguration = AnalyticsConfiguration.DISABLED,
     )
 
     fun link(klib: Path, configuration: Configuration?, compilerArgumentsProvider: CompilerArgumentsProvider): IntermediateResult<Path> {
@@ -73,6 +62,7 @@ class KotlinTestLinker(
             put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
             put(ConfigurationKeys.jwtWithLicense, "foeman.aegis.lion.shirr.bide")
             put(ConfigurationKeys.analyticsDir, analyticsDirectory.toFile())
+            put(ConfigurationKeys.disableWildcardExport, true)
         }
 
         PluginRegistrar.plugins.set(

@@ -22,7 +22,7 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
         get() = SwiftGenericExportScope.FromTypeDeclaration(this)
 
     sealed class Local(): SwiftIrTypeDeclaration, SwiftIrExtensibleDeclaration.Local {
-        abstract override val publicName: SwiftFqName
+        abstract override val publicName: SwiftFqName.Local
 
         override val internalName: SwiftFqName.Local
             get() = KotlinTypeSwiftModel.StableFqNameNamespace.nested(typealiasName)
@@ -44,7 +44,7 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                 override val kotlinFqName: FqName
                     get() = model.classDescriptor.fqNameSafe
 
-                override val publicName: SwiftFqName
+                override val publicName: SwiftFqName.Local
                     get() = model.identifier.applyVisibility(model.visibility).let { name ->
                         model.containingType?.nonBridgedDeclaration?.publicName?.nested(name) ?: SwiftFqName.Local.TopLevel(name)
                     }
@@ -57,9 +57,9 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                     )
                 }
 
-                override val containingDeclaration: SwiftIrTypeDeclaration?
+                override val containingDeclaration: SwiftIrTypeDeclaration.Local?
                     // TODO: Instead of runtime crash, it'd be nice if the compiler could catch this.
-                    get() = model.containingType?.nonBridgedDeclaration?.let { it as SwiftIrTypeDeclaration }
+                    get() = model.containingType?.nonBridgedDeclaration?.let { it as SwiftIrTypeDeclaration.Local }
 
                 override val superTypes: List<SwiftIrExtensibleDeclaration>
                     get() = TODO("Not yet implemented")
@@ -80,9 +80,9 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                 override val typeParameters: List<SwiftIrTypeParameterDeclaration> = emptyList(),
                 override val superTypes: List<SwiftIrExtensibleDeclaration> = emptyList(),
                 swiftName: String,
-                override val containingDeclaration: SwiftIrTypeDeclaration? = null,
+                override val containingDeclaration: SwiftIrTypeDeclaration.Local? = null,
             ): KotlinClass() {
-                override val publicName: SwiftFqName = containingDeclaration?.publicName?.nested(swiftName) ?: SwiftFqName.Local.TopLevel(swiftName)
+                override val publicName: SwiftFqName.Local = containingDeclaration?.publicName?.nested(swiftName) ?: SwiftFqName.Local.TopLevel(swiftName)
             }
         }
 
@@ -105,14 +105,14 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                 override val kotlinFileName: String,
             ): KotlinFile() {
 
-                override val publicName: SwiftFqName
+                override val publicName: SwiftFqName.Local
                     get() = model.identifier.applyVisibility(model.visibility).let { name ->
                         model.containingType?.nonBridgedDeclaration?.publicName?.nested(name) ?: SwiftFqName.Local.TopLevel(name)
                     }
 
-                override val containingDeclaration: SwiftIrTypeDeclaration?
+                override val containingDeclaration: SwiftIrTypeDeclaration.Local?
                     // TODO: Instead of runtime crash, it'd be nice if the compiler could catch this.
-                    get() = model.containingType?.nonBridgedDeclaration?.let { it as SwiftIrTypeDeclaration }
+                    get() = model.containingType?.nonBridgedDeclaration?.let { it as SwiftIrTypeDeclaration.Local }
 
                 fun toImmutable(): Immutable {
                     return Immutable(
@@ -128,9 +128,9 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                 override val kotlinModule: String,
                 override val kotlinFileName: String,
                 val swiftName: String,
-                override val containingDeclaration: SwiftIrTypeDeclaration? = null,
+                override val containingDeclaration: SwiftIrTypeDeclaration.Local? = null,
             ): KotlinFile() {
-                override val publicName: SwiftFqName
+                override val publicName: SwiftFqName.Local
                     get() = containingDeclaration?.publicName?.nested(swiftName) ?: SwiftFqName.Local.TopLevel(swiftName)
             }
         }
@@ -144,18 +144,31 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                 get() = error("Not supported!")
 
             override val internalName: SwiftFqName.Local = SwiftFqName.Local.TopLevel(swiftName)
-            override val publicName: SwiftFqName = internalName
+            override val publicName: SwiftFqName.Local = internalName
 
             override val containingDeclaration: SwiftIrTypeDeclaration? = null
         }
 
         class SwiftType(
-            private val swiftName: String,
+            val swiftName: String,
             override val typeParameters: List<SwiftIrTypeParameterDeclaration> = emptyList(),
             override val superTypes: List<SwiftIrExtensibleDeclaration> = emptyList(),
             override val containingDeclaration: Local? = null,
         ): Local() {
-            override val publicName: SwiftFqName
+            override val publicName: SwiftFqName.Local
+                get() = containingDeclaration?.publicName?.nested(swiftName) ?: SwiftFqName.Local.TopLevel(swiftName)
+
+            override val typealiasName: String
+                get() = "swift__${publicName.asString("_")}"
+        }
+
+        class SKIEGeneratedSwiftType(
+            var swiftName: String,
+            override val typeParameters: List<SwiftIrTypeParameterDeclaration> = emptyList(),
+            override val superTypes: List<SwiftIrExtensibleDeclaration> = emptyList(),
+            override val containingDeclaration: Local? = null,
+        ): Local() {
+            override val publicName: SwiftFqName.Local
                 get() = containingDeclaration?.publicName?.nested(swiftName) ?: SwiftFqName.Local.TopLevel(swiftName)
 
             override val typealiasName: String

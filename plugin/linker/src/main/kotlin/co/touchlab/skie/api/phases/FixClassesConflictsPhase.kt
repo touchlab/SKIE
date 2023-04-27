@@ -6,9 +6,12 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.sir.SwiftFqName
+import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
 import co.touchlab.skie.plugin.api.module.SkieModule
+import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
+import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 // TODO Currently does not take into account bridging and generated Swift code in general
@@ -16,12 +19,14 @@ class FixClassesConflictsPhase(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
     private val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
+    framework: FrameworkLayout,
 ) : SkieLinkingPhase {
 
     private val reservedNames by lazy {
         builtinKotlinDeclarations.allDeclarations.map { it.publicName } +
             // TODO: Unfortunate hack to avoid name collision with Swift's Any keyword
-            SwiftFqName.Local.TopLevel("Any")
+            SwiftFqName.Local.TopLevel("Any") +
+            SwiftFqName.Local.TopLevel(framework.moduleName)
     }
 
     override fun execute() {
@@ -88,8 +93,14 @@ class FixClassesConflictsPhase(
             while (model.nonBridgedDeclaration.publicName in existingFqNames) {
                 model.identifier += "_"
             }
-
             existingFqNames.add(model.nonBridgedDeclaration.publicName)
+
+            val existingBridge = model.bridge as? ObjcSwiftBridge.FromSKIE ?: return@forEach
+            val localBridgeDeclaration = existingBridge.declaration as? SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType ?: return@forEach
+            while (localBridgeDeclaration.publicName in existingFqNames) {
+                localBridgeDeclaration.swiftName += "_"
+            }
+            existingFqNames.add(localBridgeDeclaration.publicName)
         }
     }
 }

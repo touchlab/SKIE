@@ -1,3 +1,3 @@
-let kotlin = Kotlin()
+let kotlin = Kotlin_()
 
 exit(0)

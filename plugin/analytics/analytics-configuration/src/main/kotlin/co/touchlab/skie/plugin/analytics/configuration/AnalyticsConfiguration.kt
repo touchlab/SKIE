@@ -14,4 +14,8 @@ data class AnalyticsConfiguration(
 
     operator fun plus(other: AnalyticsConfiguration) : AnalyticsConfiguration =
         AnalyticsConfiguration(features + other.features)
+
+    companion object {
+        val DISABLED = AnalyticsConfiguration()
+    }
 }

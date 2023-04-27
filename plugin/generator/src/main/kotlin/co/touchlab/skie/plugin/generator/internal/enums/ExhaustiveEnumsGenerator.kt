@@ -75,7 +75,7 @@ internal class ExhaustiveEnumsGenerator(
     private fun MutableKotlinClassSwiftModel.configureBridging() {
         this.visibility = SwiftModelVisibility.Replaced
         this.bridge = ObjcSwiftBridge.FromSKIE(
-            SwiftIrTypeDeclaration.Local.SwiftType(
+            SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType(
                 containingDeclaration = this.containingType?.swiftIrDeclaration as? SwiftIrTypeDeclaration.Local,
                 swiftName = this.identifier,
                 superTypes = listOf(

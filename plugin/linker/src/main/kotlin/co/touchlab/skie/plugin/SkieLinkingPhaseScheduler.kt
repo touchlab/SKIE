@@ -33,7 +33,7 @@ class SkieLinkingPhaseScheduler(
         DumpSwiftApiPhase(DumpSwiftApiPoint.BeforeApiNotes, context, framework),
         RemoveKonanManglingPhase(skieModule, context.descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, context.descriptorProvider),
-        FixClassesConflictsPhase(skieModule, context.descriptorProvider, builtinKotlinDeclarations),
+        FixClassesConflictsPhase(skieModule, context.descriptorProvider, builtinKotlinDeclarations, framework),
         FixNestedBridgedTypesPhase(skieModule, context.descriptorProvider),
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
         SkieModuleConfigurationPhase(skieModule, swiftModelScope),
