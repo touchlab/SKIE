@@ -90,6 +90,9 @@ internal class ExhaustiveEnumsGenerator(
 
         module.generateCode(this) {
             // if (classSwiftModel.bridge!!.packageName.isNotBlank()) {
+
+            addImport("Foundation")
+
             classSwiftModel.bridge!!.declaration.containingDeclaration?.let {
                 addNestedBridge(classSwiftModel, it)
             } ?: addTopLevelBridge(classSwiftModel)
