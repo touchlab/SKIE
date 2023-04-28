@@ -98,8 +98,6 @@ class SwiftLinkCompilePhase(
 
         val sourceFiles = skieContext.swiftSourceFiles + newFiles
 
-        disableWildcardExportIfNeeded(framework)
-
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
             val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
 
@@ -113,6 +111,8 @@ class SwiftLinkCompilePhase(
         } else {
             emptyList()
         }
+
+        disableWildcardExportIfNeeded(framework)
 
         return swiftObjectPaths
     }
