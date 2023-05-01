@@ -108,33 +108,36 @@ internal object ObjCBridgeable {
     private fun FunctionSpec.Builder.addFromObjectiveCBody(classSwiftModel: KotlinClassSwiftModel): FunctionSpec.Builder =
         this.addCode(
             CodeBlock.builder()
-                .addFromObjectiveCEntriesVariables(classSwiftModel)
-                .beginControlFlow("switch", "source")
-                .addFromObjectiveCCases(classSwiftModel)
-                .addStatement("default: fatalError(\"Couldn't map value of \\(String(describing: source)) to ${classSwiftModel.identifier}\")")
-                .endControlFlow("switch")
+                .apply {
+                    if (classSwiftModel.enumEntries.isNotEmpty()) {
+                        addStatement("guard let source = source else { %L }", classSwiftModel.fatalErrorFromObjectiveC)
+                        classSwiftModel.enumEntries.forEachIndexed { index, entry ->
+                            val controlFlowCode = "source == %T.%N as %T"
+                            val controlFlowArguments = arrayOf(
+                                entry.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(),
+                                entry.identifier,
+                                entry.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(),
+                            )
+                            if (index == 0) {
+                                beginControlFlow("if", controlFlowCode, *controlFlowArguments)
+                            } else {
+                                nextControlFlow("else if", controlFlowCode, *controlFlowArguments)
+                            }
+                            addStatement("return .%N", entry.identifier)
+                        }
+                        nextControlFlow("else")
+                        addStatement("%L", classSwiftModel.fatalErrorFromObjectiveC)
+                        endControlFlow("if")
+                    } else {
+                        addCode(classSwiftModel.fatalErrorFromObjectiveC)
+                    }
+                }
                 .build()
         )
 
-    private fun CodeBlock.Builder.addFromObjectiveCEntriesVariables(classSwiftModel: KotlinClassSwiftModel): CodeBlock.Builder =
-        this.add(
-            classSwiftModel.enumEntries.map { it.variableWithEntryCastedToSwiftType }.joinToCode("\n", suffix = "\n")
-        )
+    private val KotlinClassSwiftModel.fatalErrorFromNil: CodeBlock
+        get() = CodeBlock.of("""fatalError("Couldn't map nil to $identifier")""")
 
-    private val KotlinEnumEntrySwiftModel.variableWithEntryCastedToSwiftType: CodeBlock
-        get() = CodeBlock.of(
-            "let objc__%L = %T.%N as %T",
-            this.identifier,
-            this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName(),
-            this.identifier,
-            this.enum.nonBridgedDeclaration.internalName.toSwiftPoetName()
-        )
-
-    private fun CodeBlock.Builder.addFromObjectiveCCases(classSwiftModel: KotlinClassSwiftModel): CodeBlock.Builder =
-        this.add(
-            classSwiftModel.enumEntries.map { it.objectiveCBridgeCase }.joinToCode("\n", suffix = "\n")
-        )
-
-    private val KotlinEnumEntrySwiftModel.objectiveCBridgeCase: CodeBlock
-        get() = CodeBlock.of("case objc__%L?: return .%N", this.identifier, this.identifier)
+    private val KotlinClassSwiftModel.fatalErrorFromObjectiveC: CodeBlock
+        get() = CodeBlock.of("""fatalError("Couldn't map value of \(String(describing: source)) to $identifier")""")
 }
