@@ -20,3 +20,7 @@ indent_size = 2
 [*.{md,mdx}]
 # Cannot be off because that defaults to editor settings
 max_line_length = 10000
+
+
+[**/io/outfoxx/swiftpoet/**/*.kt]
+indent_size = 2

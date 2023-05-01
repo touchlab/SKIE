@@ -1,5 +1,3 @@
-import Foundation
-
 class AsyncStreamDispatcherDelegate: Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_DispatcherDelegate {
 
     private let continuation: _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable>.Continuation

@@ -1,5 +1,3 @@
-import Foundation
-
 struct SwiftCoroutineDispatcher {
 
     static func dispatch<T>(

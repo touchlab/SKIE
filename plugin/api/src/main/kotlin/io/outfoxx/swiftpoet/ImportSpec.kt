@@ -38,7 +38,7 @@ class ImportSpec internal constructor(
       out.emit("\n")
     }
 
-    out.emitAttributes(attributes, suffix = "")
+    out.emitAttributes(attributes, suffix = " ")
     out.emit("import $name")
 
     if (guardTest.isNotEmpty()) {

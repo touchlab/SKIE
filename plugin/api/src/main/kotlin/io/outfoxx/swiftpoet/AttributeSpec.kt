@@ -72,5 +72,6 @@ class AttributeSpec internal constructor(
     val ESCAPING = builder("escaping").build()
     val CONVENTION_BLOCK = builder("convention").addArgument("block").build()
     val CONVENTION_C = builder("convention").addArgument("c").build()
+    val IMPLEMENTATION_ONLY = builder("_implementationOnly").build()
   }
 }

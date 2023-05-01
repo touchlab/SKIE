@@ -1,5 +1,3 @@
-import Foundation
-
 public class SkieSwiftFlowIterator<T>: _Concurrency.AsyncIteratorProtocol {
 
     public typealias Element = T
