@@ -32,11 +32,11 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
 
         when (optionsMap[option.optionName]) {
             Options.swiftSourceFile -> {
-                configuration.add(ConfigurationKeys.swiftSourceFiles, Options.swiftSourceFile.deserialize(value))
+                configuration.add(ConfigurationKeys.SwiftCompiler.sourceFiles, Options.swiftSourceFile.deserialize(value))
             }
 
             Options.generatedSwiftDir -> {
-                configuration.putIfNotNull(ConfigurationKeys.generatedSwiftDir, Options.generatedSwiftDir.deserialize(value))
+                configuration.putIfNotNull(ConfigurationKeys.SwiftCompiler.generatedDir, Options.generatedSwiftDir.deserialize(value))
             }
 
             Options.disableWildcardExport -> {

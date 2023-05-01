@@ -10,11 +10,17 @@ object ConfigurationKeys {
 
     val buildId = CompilerConfigurationKey<String>("SKIE build ID")
     val jwtWithLicense = CompilerConfigurationKey<String>("JWT with SKIE license")
-    val swiftSourceFiles = CompilerConfigurationKey<List<File>>("Swift source files")
-    val generatedSwiftDir = CompilerConfigurationKey<File>("generated Swift directory")
     val disableWildcardExport = CompilerConfigurationKey<Boolean>("disable wildcard export")
     val skieConfiguration = CompilerConfigurationKey<Configuration>("SKIE configuration")
     val analyticsDir = CompilerConfigurationKey<File>("Directory with SKIE analytics")
+
+    object SwiftCompiler {
+        val sourceFiles = CompilerConfigurationKey<List<File>>("Swift source files")
+        val generatedDir = CompilerConfigurationKey<File>("generated Swift directory")
+        val swiftVersion = CompilerConfigurationKey<String>("Swift version")
+        val parallelCompilation = CompilerConfigurationKey<Boolean>("Is Swift parallel compilation enabled")
+        val additionalFlags = CompilerConfigurationKey<List<String>>("Additional Swift compiler flags")
+    }
 
     object Debug {
         val infoDirectory = CompilerConfigurationKey<DebugInfoDirectory>("Directory with logs and other debug outputs")

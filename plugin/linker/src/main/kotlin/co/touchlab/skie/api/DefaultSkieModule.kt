@@ -34,7 +34,7 @@ class DefaultSkieModule : SkieModule {
         }
     }
 
-    fun produceSwiftPoetFiles(context: SwiftModelScope): List<FileSpec> {
+    fun produceSwiftPoetFiles(context: SwiftModelScope, moduleName: String): List<FileSpec> {
         val result = mutableMapOf<String, FileSpec.Builder>()
 
         do {
@@ -43,7 +43,7 @@ class DefaultSkieModule : SkieModule {
             consumedValues.forEach { (fileName, blocks) ->
                 blocks.forEach { block ->
                     with(context) {
-                        block(result.getOrPut(fileName) { FileSpec.builder(fileName) })
+                        block(result.getOrPut(fileName) { FileSpec.builder(moduleName, fileName) })
                     }
                 }
             }

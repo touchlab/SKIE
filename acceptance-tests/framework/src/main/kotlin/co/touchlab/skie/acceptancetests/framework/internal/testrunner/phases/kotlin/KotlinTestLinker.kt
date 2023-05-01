@@ -55,7 +55,8 @@ class KotlinTestLinker(
         val analyticsDirectory = tempFileSystem.createDirectory("analytics")
 
         PluginRegistrar.configure.set {
-            put(ConfigurationKeys.generatedSwiftDir, expandedSwiftDirectory.toFile())
+            put(ConfigurationKeys.SwiftCompiler.generatedDir, expandedSwiftDirectory.toFile())
+            put(ConfigurationKeys.SwiftCompiler.parallelCompilation, false)
             put(ConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
             put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.fromTestEnv())
             put(ConfigurationKeys.skieConfiguration, configuration + analyticsConfiguration)

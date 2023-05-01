@@ -81,7 +81,7 @@ class FileSpec private constructor(
 
     val importedTypeImports = codeWriter.importedTypes.map { ImportSpec.builder(it.value.moduleName).build() }
     val allImports = moduleImports + importedTypeImports
-    val imports = allImports.filter { it.name != "Swift" }
+    val imports = allImports.filter { it.name != "Swift" && it.name != moduleName }
 
     if (imports.isNotEmpty()) {
       for (import in imports.toSortedSet()) {

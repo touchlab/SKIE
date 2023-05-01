@@ -42,6 +42,11 @@ open class Command(initialCommand: List<String>) {
         return this@Command
     }
 
+    operator fun File.unaryPlus(): Command {
+        command += absolutePath
+        return this@Command
+    }
+
     var logger: ((() -> String) -> Unit)? = null
 
     fun logWith(newLogger: ((() -> String) -> Unit)): Command {

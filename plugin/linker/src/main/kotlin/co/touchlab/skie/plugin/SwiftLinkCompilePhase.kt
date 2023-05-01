@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.konan.target.AppleConfigurables
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.platformName
 import org.jetbrains.kotlin.konan.target.withOSVersion
-import org.jetbrains.kotlin.library.impl.javaFile
 import java.io.File
 
 class SwiftLinkCompilePhase(
@@ -34,13 +33,14 @@ class SwiftLinkCompilePhase(
 ) {
 
     private val skieContext = context.skieContext
+    private val compilerConfiguration = skieContext.swiftCompilerConfiguration
 
     fun process(): List<ObjectFile> {
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
             return emptyList()
         }
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
-        val swiftSourcesDir = skieContext.expandedSwiftDir.also {
+        val swiftSourcesDir = compilerConfiguration.expandedSourcesDir.also {
             it.deleteRecursively()
             it.mkdirs()
         }
@@ -83,7 +83,7 @@ class SwiftLinkCompilePhase(
             builtinKotlinDeclarations = builtinKotlinDeclarations,
         ).runLinkingPhases()
 
-        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftModelScope)
+        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftModelScope, framework.moduleName)
         val swiftTextFiles = skieModule.produceTextFiles()
 
         val newFiles = swiftFileSpecs.map { fileSpec ->
@@ -96,20 +96,22 @@ class SwiftLinkCompilePhase(
             file
         }
 
-        val sourceFiles = skieContext.swiftSourceFiles + newFiles
+        val sourceFiles = compilerConfiguration.sourceFiles + newFiles
 
         disableWildcardExportIfNeeded(framework)
 
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
-            val swiftObjectsDir = config.tempFiles.create("swift-object").also { it.mkdirs() }
+            val compileDirectory = SwiftCompileDirectory(framework.moduleName, config.tempFiles.create("swift-object"))
 
-            compileSwift(configurables, framework, sourceFiles, swiftObjectsDir.javaFile())
+            compileSwift(configurables, framework, sourceFiles, compileDirectory)
 
-            appendSwiftHeaderImportIfNeeded(framework)
+            copySwiftModuleFiles(configurables, compileDirectory, framework)
+
+            addSwiftSubmoduleToModuleMap(framework)
 
             addSwiftSpecificLinkerArgs(configurables)
 
-            swiftObjectsDir.listFilesOrEmpty.filter { it.extension == "o" }.map { it.absolutePath }
+            compileDirectory.objectFiles()
         } else {
             emptyList()
         }
@@ -122,11 +124,19 @@ class SwiftLinkCompilePhase(
         context.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
     }
 
+    private fun disableWildcardExportIfNeeded(framework: FrameworkLayout) {
+        if (skieContext.disableWildcardExport) {
+            framework.modulemapFile.writeText(
+                framework.modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
+            )
+        }
+    }
+
     private fun compileSwift(
         configurables: AppleConfigurables,
         framework: FrameworkLayout,
         sourceFiles: List<File>,
-        swiftObjectsDir: File,
+        compileDirectory: SwiftCompileDirectory,
     ) {
         val targetTriple = configurables.targetTriple
 
@@ -135,25 +145,32 @@ class SwiftLinkCompilePhase(
             +"-import-underlying-module"
             +"-F"
             +framework.parentDir.absolutePath
-            +"-emit-module-interface-path"
-            +framework.swiftModule.resolve("$targetTriple.swiftinterface").absolutePath
+            +"-emit-module"
             +"-emit-module-path"
-            +framework.swiftModule.resolve("$targetTriple.swiftmodule").absolutePath
+            +compileDirectory.swiftModule
+            +"-emit-module-interface-path"
+            +compileDirectory.swiftInterface
+            +"-emit-private-module-interface-path"
+            +compileDirectory.privateSwiftInterface
+            +"-emit-objc-header"
             +"-emit-objc-header-path"
-            +framework.swiftHeader.absolutePath
+            +compileDirectory.swiftHeader
             getSwiftcBitcodeArg()?.let { +it }
             +getSwiftcBuildTypeArgs()
             +"-emit-object"
             +"-enable-library-evolution"
             +"-parse-as-library"
             +"-g"
+            +"-swift-version"
+            +compilerConfiguration.swiftVersion
+            +parallelizationArgument()
             +"-sdk"
             +configurables.absoluteTargetSysRoot
             +"-target"
             +targetTriple.withOSVersion(configurables.osVersionMin).toString()
             +sourceFiles.map { it.absolutePath }
 
-            workingDirectory = swiftObjectsDir
+            workingDirectory = compileDirectory.workingDirectory
 
             execute(logFile = skieContext.debugInfoDirectory.logs.resolve("swiftc.log"))
         }
@@ -171,12 +188,32 @@ class SwiftLinkCompilePhase(
         listOf("-O", "-whole-module-optimization")
     }
 
-    private fun appendSwiftHeaderImportIfNeeded(framework: FrameworkLayout) {
-        if (framework.swiftHeader.exists()) {
-            // TODO: This line seems to fix the "warning: umbrella header for module 'ExampleKit' does not include header 'ExampleKit-Swift.h'",
-            // TODO: but not in all invocations, which is why it needs to be investigated (for example running link for both dynamic and static).
-            framework.kotlinHeader.appendText("\n#import \"${framework.swiftHeader.name}\"\n")
+    private fun copySwiftModuleFiles(
+        configurables: AppleConfigurables,
+        compileDirectory: SwiftCompileDirectory,
+        framework: FrameworkLayout,
+    ) {
+        val targetTriple = configurables.targetTriple
+        compileDirectory.swiftModule.copyTo(framework.swiftModule(targetTriple))
+
+        compileDirectory.swiftInterface.copyTo(framework.swiftInterface(targetTriple))
+
+        compileDirectory.privateSwiftInterface.copyTo(framework.privateSwiftInterface(targetTriple))
+    }
+
+    private fun addSwiftSubmoduleToModuleMap(framework: FrameworkLayout) {
+        if (!framework.swiftHeader.exists()) {
+            framework.swiftHeader.writeText("")
         }
+        framework.modulemapFile.appendText("""
+
+
+            module ${framework.moduleName}.Swift {
+                header "${framework.swiftHeader.name}"
+                requires objc
+            }
+            """.trimIndent()
+        )
     }
 
     private fun addSwiftSpecificLinkerArgs(configurables: AppleConfigurables) {
@@ -192,11 +229,11 @@ class SwiftLinkCompilePhase(
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
     }
 
-    private fun disableWildcardExportIfNeeded(framework: FrameworkLayout) {
-        if (skieContext.disableWildcardExport) {
-            framework.modulemapFile.writeText(
-                framework.modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
-            )
+    private fun parallelizationArgument(): String {
+        if (compilerConfiguration.parallelCompilation) {
+            return "-j${Runtime.getRuntime().availableProcessors()}"
+        } else {
+            return "-j1"
         }
     }
 }

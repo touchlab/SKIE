@@ -7,6 +7,7 @@ import co.touchlab.skie.kotlin_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
+import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
@@ -18,7 +19,6 @@ import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
-import org.jetbrains.kotlin.cli.common.messages.GradleStyleMessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.GroupingMessageCollector
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
@@ -32,11 +32,18 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         val license = SkieLicenseProvider.getLicense(configuration.getNotNull(ConfigurationKeys.jwtWithLicense))
         val skieConfiguration = configuration.get(ConfigurationKeys.skieConfiguration, Configuration {})
 
+        val swiftCompilerConfiguration = SwiftCompilerConfiguration(
+            sourceFiles = configuration.getList(ConfigurationKeys.SwiftCompiler.sourceFiles),
+            expandedSourcesDir = configuration.getNotNull(ConfigurationKeys.SwiftCompiler.generatedDir),
+            swiftVersion = configuration.get(ConfigurationKeys.SwiftCompiler.swiftVersion, "5"),
+            parallelCompilation = configuration.get(ConfigurationKeys.SwiftCompiler.parallelCompilation, true),
+            additionalFlags = configuration.getList(ConfigurationKeys.SwiftCompiler.additionalFlags),
+        )
+
         val skieContext = DefaultSkieContext(
             module = DefaultSkieModule(),
             configuration = skieConfiguration,
-            swiftSourceFiles = configuration.getList(ConfigurationKeys.swiftSourceFiles),
-            expandedSwiftDir = configuration.getNotNull(ConfigurationKeys.generatedSwiftDir),
+            swiftCompilerConfiguration = swiftCompilerConfiguration,
             debugInfoDirectory = configuration.getNotNull(ConfigurationKeys.Debug.infoDirectory),
             frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
             disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
