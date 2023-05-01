@@ -7,6 +7,7 @@ import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
+import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeAliasSpec
@@ -77,7 +78,9 @@ internal class TypeAliasGenerator(
         addType(
             TypeAliasSpec.builder(
                 name = localClass.typealiasName,
-                type = localClass.publicName.toSwiftPoetName(),
+                type = localClass.publicName.toSwiftPoetName().let {
+                    DeclaredTypeName.qualifiedTypeName("${skieContext.frameworkLayout.moduleName}.${it.simpleNames.joinToString(".")}")
+                },
             )
                 .addModifiers(Modifier.PUBLIC)
                 .build()
