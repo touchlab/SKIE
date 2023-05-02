@@ -16,6 +16,9 @@ class SwiftCompileDirectory(
     val swiftModule = workingDirectory.resolve("${moduleName}.swiftmodule")
     val swiftInterface = workingDirectory.resolve("${moduleName}.swiftinterface")
     val privateSwiftInterface = workingDirectory.resolve("${moduleName}.private.swiftinterface")
+    val swiftDoc = workingDirectory.resolve("${moduleName}.swiftdoc")
+    val abiJson = workingDirectory.resolve("${moduleName}.abi.json")
+    val swiftSourceInfo = workingDirectory.resolve("${moduleName}.swiftsourceinfo")
     val swiftHeader = workingDirectory.resolve("${moduleName}-Swift.h")
 
     fun objectFiles(): List<String> = root.listFilesOrEmpty.filter { it.extension == "o" }.map { it.absolutePath }

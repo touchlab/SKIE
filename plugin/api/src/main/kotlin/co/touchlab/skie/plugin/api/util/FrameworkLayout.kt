@@ -14,17 +14,17 @@ class FrameworkLayout(val framework: File) {
     val swiftModuleParent by lazy { framework.resolve("Modules").resolve("$moduleName.swiftmodule").also { it.mkdirs() } }
     val modulemapFile by lazy { framework.resolve("Modules/module.modulemap") }
 
-    fun swiftModule(targetTriple: TargetTriple): File {
-        return swiftModuleParent.resolve("$targetTriple.swiftmodule")
-    }
+    fun swiftModule(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.swiftmodule")
 
-    fun swiftInterface(targetTriple: TargetTriple): File {
-        return swiftModuleParent.resolve("$targetTriple.swiftinterface")
-    }
+    fun swiftInterface(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.swiftinterface")
 
-    fun privateSwiftInterface(targetTriple: TargetTriple): File {
-        return swiftModuleParent.resolve("$targetTriple.private.swiftinterface")
-    }
+    fun privateSwiftInterface(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.private.swiftinterface")
+
+    fun swiftDoc(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.swiftdoc")
+
+    fun abiJson(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.abi.json")
+
+    fun swiftSourceInfo(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.swiftsourceinfo")
 
     fun cleanSkie() {
         swiftHeader.delete()

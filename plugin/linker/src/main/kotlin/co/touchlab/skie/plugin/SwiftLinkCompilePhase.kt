@@ -164,6 +164,7 @@ class SwiftLinkCompilePhase(
             +"-swift-version"
             +compilerConfiguration.swiftVersion
             +parallelizationArgument()
+            // +"-use-frontend-parseable-output"
             +"-sdk"
             +configurables.absoluteTargetSysRoot
             +"-target"
@@ -194,11 +195,19 @@ class SwiftLinkCompilePhase(
         framework: FrameworkLayout,
     ) {
         val targetTriple = configurables.targetTriple
-        compileDirectory.swiftModule.copyTo(framework.swiftModule(targetTriple))
 
-        compileDirectory.swiftInterface.copyTo(framework.swiftInterface(targetTriple))
+        val copyFiles = mapOf(
+            compileDirectory.swiftModule to framework.swiftModule(targetTriple),
+            compileDirectory.swiftInterface to framework.swiftInterface(targetTriple),
+            compileDirectory.privateSwiftInterface to framework.privateSwiftInterface(targetTriple),
+            compileDirectory.swiftDoc to framework.swiftDoc(targetTriple),
+            compileDirectory.abiJson to framework.abiJson(targetTriple),
+            compileDirectory.swiftSourceInfo to framework.swiftSourceInfo(targetTriple),
+        )
 
-        compileDirectory.privateSwiftInterface.copyTo(framework.privateSwiftInterface(targetTriple))
+        copyFiles.forEach { (source, target) ->
+            source.copyTo(target, overwrite = true)
+        }
     }
 
     private fun addSwiftSubmoduleToModuleMap(framework: FrameworkLayout) {
