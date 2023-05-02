@@ -171,6 +171,7 @@ private val KEYWORDS = setOf(
   "operator",
   "private",
   "protocol",
+  "Protocol",
   "public",
   "static",
   "struct",
