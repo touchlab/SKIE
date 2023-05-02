@@ -17,7 +17,6 @@ import co.touchlab.skie.plugin.generator.internal.enums.ObjCBridgeable.addObjcBr
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
-import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -90,7 +89,7 @@ internal class ExhaustiveEnumsGenerator(
         val classSwiftModel = this
 
         module.generateCode(this) {
-            addImport("Foundation", AttributeSpec.IMPLEMENTATION_ONLY)
+            addImport("Foundation")
 
             classSwiftModel.bridge!!.declaration.containingDeclaration?.let {
                 addNestedBridge(classSwiftModel, it)

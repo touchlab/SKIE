@@ -1,3 +1,5 @@
+import Foundation
+
 public final class SkieSwiftOptionalMutableSharedFlow<T>: _Concurrency.AsyncSequence, Swift._ObjectiveCBridgeable {
 
     public typealias AsyncIterator = SkieSwiftFlowIterator<T?>

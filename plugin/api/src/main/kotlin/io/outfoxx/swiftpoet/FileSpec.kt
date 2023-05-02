@@ -84,7 +84,17 @@ class FileSpec private constructor(
     val imports = allImports.filter { it.name != "Swift" && it.name != moduleName }
 
     if (imports.isNotEmpty()) {
-      for (import in imports.toSortedSet()) {
+      val flattenedImports = imports.groupBy { it.name }.mapValues { (key, importGroup) ->
+        val needsFullImport = importGroup.any { !it.attributes.contains(AttributeSpec.IMPLEMENTATION_ONLY) }
+        val allAttributes = importGroup.flatMap { it.attributes }.toSet()
+        val attributesToUse = if (needsFullImport) allAttributes.filterNot { it == AttributeSpec.IMPLEMENTATION_ONLY } else allAttributes
+        ImportSpec.builder(key)
+          .apply {
+            attributesToUse.forEach { addAttribute(it) }
+          }
+          .build()
+      }
+      for (import in flattenedImports.values.sorted()) {
         import.emit(codeWriter)
         codeWriter.emit("\n")
       }
