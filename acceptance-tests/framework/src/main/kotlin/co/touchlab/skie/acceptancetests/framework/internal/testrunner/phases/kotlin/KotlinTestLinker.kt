@@ -57,6 +57,7 @@ class KotlinTestLinker(
         PluginRegistrar.configure.set {
             put(ConfigurationKeys.SwiftCompiler.generatedDir, expandedSwiftDirectory.toFile())
             put(ConfigurationKeys.SwiftCompiler.parallelCompilation, false)
+            add(ConfigurationKeys.SwiftCompiler.additionalFlags, "-verify-emitted-module-interface")
             put(ConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
             put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.fromTestEnv())
             put(ConfigurationKeys.skieConfiguration, configuration + analyticsConfiguration)
