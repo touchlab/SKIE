@@ -9,6 +9,7 @@ import co.touchlab.skie.api.phases.SkieModuleConfigurationPhase
 import co.touchlab.skie.api.phases.debug.DumpSwiftApiPhase
 import co.touchlab.skie.api.phases.memberconflicts.FixCallableMembersConflictsPhase
 import co.touchlab.skie.api.phases.memberconflicts.RemoveKonanManglingPhase
+import co.touchlab.skie.api.phases.memberconflicts.RenameEnumRawValuePhase
 import co.touchlab.skie.api.phases.typeconflicts.AddForwardDeclarationsPhase
 import co.touchlab.skie.api.phases.typeconflicts.AddTypeDefPhase
 import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
@@ -32,6 +33,7 @@ class SkieLinkingPhaseScheduler(
     private val linkingPhases = listOf(
         DumpSwiftApiPhase(DumpSwiftApiPoint.BeforeApiNotes, context, framework),
         RemoveKonanManglingPhase(skieModule, context.descriptorProvider),
+        RenameEnumRawValuePhase(skieModule, context.descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, context.descriptorProvider),
         FixClassesConflictsPhase(skieModule, context.descriptorProvider, builtinKotlinDeclarations, framework),
         FixNestedBridgedTypesPhase(skieModule, context.descriptorProvider),

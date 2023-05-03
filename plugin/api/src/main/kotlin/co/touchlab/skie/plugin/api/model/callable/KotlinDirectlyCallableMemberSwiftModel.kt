@@ -20,7 +20,7 @@ interface KotlinDirectlyCallableMemberSwiftModel : KotlinCallableMemberSwiftMode
 
     /**
      * Examples:
-     * foo
+     * foo (for functions and properties)
      * foo(param1:)
      * __foo(param1:) (visibility == Replaced)
      * __Skie_Removed__foo(param1:) (visibility == Removed)
@@ -30,8 +30,9 @@ interface KotlinDirectlyCallableMemberSwiftModel : KotlinCallableMemberSwiftMode
     val reference: String
 
     /**
-     * Examples:
-     * foo()
+     * Examples
+     * foo  (for properties)
+     * foo() (for functions)
      * foo(param1:)
      * __foo(param1:) (visibility == Replaced)
      * __Skie_Removed__foo(param1:) (visibility == Removed)
