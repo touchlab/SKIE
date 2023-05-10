@@ -19,22 +19,32 @@ export function ApiKeyInterpolatedCodeBlock({children, language, title}) {
     );
 }
 
+export const mainSkieVersion = "{{LATEST_GITHUB_VERSION}}".split("-")[0];
+export const previewSkieVersion = mainSkieVersion + "-preview.1.8.20";
 
 # Installation
 
-Installing SKIE involves small additions to just two gradle files. The Swift/Xcode side does not require any configuration changes.
+First, you need to choose a version of SKIE that is compatible with your project (see table below).
 
-First, make sure that your project uses Kotlin version supported by SKIE.
-SKIE with version `0.4.5` and newer supports Kotlin 1.8.0 and 1.8.10.
-To use SKIE with Kotlin 1.8.20, add suffix "-preview.1.8.20" to the base version (for example: `0.4.5-preview.1.8.20`).
+| SKIE                   | Kotlin         | Gradle |
+|------------------------|----------------|--------|
+| { mainSkieVersion }    | 1.8.0, 1.8.10  | >= 7.3 |
+| { previewSkieVersion } | 1.8.20, 1.8.21 | >= 7.3 |
 
-Additionally, all SKIE versions require Gradle 7.3 or newer.
+If your project uses older versions of Kotlin or Gradle, then you will need to upgrade them before you can use SKIE.
 
-**Before you do anything else, check that your project compiles (especially if you had to change Gradle and/or Kotlin versions).**
+:::caution
 
-Add the Touchlab maven repos to your `settings.gradle.kts` file:
+Before you continue, check that the project compiles (especially if you had to change Gradle and/or Kotlin versions).
 
-```kotlin
+:::
+
+SKIE is currently hosted in a private Maven repository, so you will need to register this repository in your Gradle configuration (both for Gradle plugins and for dependencies resolution).
+There are multiple ways to do so - depending on your project setup.
+
+One way is to add the following code to `settings.gradle.kts` file:
+
+```kotlin title=settings.gradle.kts
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -55,15 +65,7 @@ dependencyResolutionManagement {
 }
 ```
 
-SKIE is currently deployed in a Touchlab Maven repository. These artifacts will eventually be published to "standard" repositories.
-
-:::info
-
-You should have a key to access SKIE, but if not, [reach out](https://touchlab.co/contact-us/).
-
-:::
-
-Your API key should have been sent through email. Once you have your API key, you will then need to add the following code in `gradle.properties`:
+Next, add your API key to `gradle.properties`:
 
 <ApiKeyInterpolatedCodeBlock
     language="properties"
@@ -71,9 +73,15 @@ Your API key should have been sent through email. Once you have your API key, yo
 {`touchlab.key={API_KEY}`}
 </ApiKeyInterpolatedCodeBlock>
 
-With those values set, you should be able to access our maven repo and binaries.
+:::info
 
-To enable SKIE, add the plugin in `build.gradle.kts` of the module that builds the native framework:
+If you are a trial user, your API key can be found in the trial invitation email.
+
+If you can't find your API key or want to request a trial, [reach out](https://touchlab.co/contact-us/).
+
+:::
+
+Finally, to enable SKIE, add the SKIE plugin to `build.gradle.kts` of the module that builds the native framework:
 
 ```kotlin title=build.gradle.kts
 plugins {
@@ -81,6 +89,12 @@ plugins {
 }
 ```
 
+:::info
+
 SKIE should only be applied to modules that export your Xcode Frameworks. It automatically works on dependent project modules and 3rd party dependencies.
 
-That is the totality of what's required to integrate SKIE! You can read more about SKIE, and the features it supports, in [SKIE Intro](/docs/intro.md). If you find that you want or need to customize SKIE's behavior, then check out the [Configuration doc](/docs/Configuration/Configuration.md).
+:::
+
+That is the totality of what's required to integrate SKIE!
+You can read more about SKIE, and the features it supports, in [SKIE Intro](/docs/intro.md).
+If you find that you want or need to customize SKIE's behavior, then check out the [Configuration doc](/docs/Configuration/Configuration.md).
