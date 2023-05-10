@@ -24,12 +24,12 @@ export const previewSkieVersion = mainSkieVersion + "-preview.1.8.20";
 
 # Installation
 
-First, you need to choose a version of SKIE that is compatible with your project (see table below).
+First, you need to choose a version of SKIE that is compatible with your project (see the table below).
 
 | SKIE                   | Kotlin         | Gradle |
 |------------------------|----------------|--------|
-| { mainSkieVersion }    | 1.8.0, 1.8.10  | >= 7.3 |
-| { previewSkieVersion } | 1.8.20, 1.8.21 | >= 7.3 |
+| 0.4.7    | 1.8.0, 1.8.10  | >= 7.3 |
+| 0.4.7-preview.1.8.20 | 1.8.20, 1.8.21 | >= 7.3 |
 
 If your project uses older versions of Kotlin or Gradle, then you will need to upgrade them before you can use SKIE.
 
@@ -85,7 +85,11 @@ Finally, to enable SKIE, add the SKIE plugin to `build.gradle.kts` of the module
 
 ```kotlin title=build.gradle.kts
 plugins {
-    id("co.touchlab.skie") version "{{LATEST_GITHUB_VERSION}}"
+    // For Kotlin 1.8.0 and 1.8.10
+    id("co.touchlab.skie") version "0.4.7"
+
+    // For Kotlin 1.8.20 and 1.8.21
+    id("co.touchlab.skie") version "0.4.7-preview.1.8.20"
 }
 ```
 
