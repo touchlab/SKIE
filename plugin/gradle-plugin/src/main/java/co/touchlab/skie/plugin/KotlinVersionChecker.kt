@@ -6,8 +6,9 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 object KotlinVersionChecker {
 
     private val compatibleVersions = listOf(
-        "1.8.0",
-        "1.8.10",
+        "1.8.20",
+        "1.8.21",
+        "1.8.22",
     )
 
     fun ensureProjectUsesCompatibleKotlinVersion(project: Project) {

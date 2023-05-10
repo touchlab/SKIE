@@ -12,7 +12,7 @@ import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
-import co.touchlab.skie.plugin.intercept.PhaseInterceptor
+import co.touchlab.skie.plugin.intercept.PhaseInterceptorRegistrar
 import co.touchlab.skie.plugin.license.SkieLicenseProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.GroupingMessageCollectorReflector
@@ -47,6 +47,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         )
 
         val skieContext = DefaultSkieContext(
+            // TODO: Remove SkieModule from SkieContext
             module = DefaultSkieModule(),
             configuration = skieConfiguration,
             swiftCompilerConfiguration = swiftCompilerConfiguration,
@@ -66,13 +67,21 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
         )
 
-        configuration.put(SkieContextKey, skieContext)
-
         registerErrorAnalytics(configuration, skieContext.analyticsCollector)
 
-        IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
+        // val skieContainer = composeContainer("Skie") {
+        //     useInstance(skieContext)
+        //     useImpl<DefaultSkieModule>()
+        //
+        //     registerGeneratorComponents()
+        // }
+        // configuration.put(SkieComponentContainerKey, skieContainer)
 
-        PhaseInterceptor.setupPhaseListeners(configuration)
+        // TODO: Should this be accessible only from container?
+        configuration.put(SkieContextKey, skieContext)
+
+        IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
+        PhaseInterceptorRegistrar.setupPhaseInterceptors(configuration)
     }
 
     private fun registerErrorAnalytics(configuration: CompilerConfiguration, analyticsCollector: AnalyticsCollector) {
@@ -111,4 +120,9 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             delegate.report(severity, message, location)
         }
     }
+}
+
+sealed interface SkiePhase {
+
+    val name: String
 }

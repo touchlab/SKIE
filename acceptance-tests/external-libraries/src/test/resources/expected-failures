@@ -87,11 +87,6 @@ com.soywiz.korlibs.korma:korma-iosarm64
 > @property (readonly) int32_t TRUE __attribute__((swift_name("TRUE")));
 com.soywiz.korlibs.luak:luak-iosarm64
 
-# K/N generates invalid header when a property name is `typeof`
-> error: expected '(' after 'typeof'
-> @property (class, readonly) KotlinAbcOpcode *typeof __attribute__((swift_name("typeof")));
-com.soywiz.korlibs.korge2:korge-swf-iosarm64
-
 # TODO: Verify this is K/N issue
 # K/N has trouble accessing something from UIKit, probably compiled against old Kotlin?
 > e: Module "dev.icerock.moko:widgets" has a reference to symbol platform.UIKit/UIButton.titleEdgeInsets.<set-titleEdgeInsets>
@@ -109,11 +104,7 @@ net.pearx.kpastebin:kpastebin-iosarm64
 me.dmdev.premo:premo-navigation-iosarm64
 
 # TODO: Check if we can do anything about it
-> Caused by: java.lang.StackOverflowError
-com.github.rnett.krosstalk:krosstalk-base-iosarm64
-
-# TODO: Check if we can do anything about it
-> Caused by: java.lang.AssertionError: Shouldn't be exposed: deserialized class XmlChildrenName
+> e: java.lang.AssertionError: Shouldn't be exposed: deserialized class XmlChildrenName
 io.github.pdvrieze.xmlutil:serialization-iosarm64
 
 > e: Compilation failed: Linking globals named 'OBJC_CLASS_$_KotlinFloat': symbol multiply defined!
@@ -132,10 +123,29 @@ dev.gitlive:appauth-kotlin-iosarm64
 > import FirebaseDatabase
 dev.gitlive:firebase-database-iosarm64
 
-# Undefined symbols - Swift linker throws the same kind of error even without SKIE (just with different symbols).
-> "_kfun:com.adeo.kviewmodel.compose#observeAsState__Skie_DefaultArguments__
-com.adeo:kviewmodel-compose-iosarm64
+# Bug in the compiler - it's not possible to call suspend function with suspend lambda parameter with default argument from another module.
+> Suspend functions should be lowered out at this point, but FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (it:kotlin.Pair<com.soywiz.korio.file.VfsFile, com.soywiz.korio.file.VfsFile>) returnType:kotlin.Unit [suspend] is still here
+com.adamratzman:spotify-api-kotlin-iosarm64
+io.github.jan-tennert.discordkm:DiscordKM-iosarm64
+com.soywiz.korlibs.korvi:korvi-iosarm64
+com.soywiz.korlibs.korio:korio-iosarm64
+com.soywiz.korlibs.korim:korim-iosarm64
+com.soywiz.korlibs.korgw:korgw-iosarm64
+com.soywiz.korlibs.korge2:korge-swf-iosarm64
+com.soywiz.korlibs.korge2:korge-spine-iosarm64
+com.soywiz.korlibs.korge2:korge-iosarm64
+com.soywiz.korlibs.korge2:korge-dragonbones-iosarm64
+com.soywiz.korlibs.korge2:korge-box2d-iosarm64
+com.soywiz.korlibs.korau:korau-iosarm64
 
-# Undefined symbols - Swift linker throws the same kind of error even without SKIE (just with different symbols).
-> "_kfun:com.episode6.redux.compose#collectAsState__Skie_DefaultArguments__
-com.episode6.redux:compose-iosarm64
+# Depends on older compiler version (and not updated yet by maintainers)
+> e: Compilation failed: No file for app.cash.molecule/moleculeFlow
+app.cash.molecule:molecule-runtime-iosarm64
+> e: Compilation failed: No file for app.cash.redwood.layout.compose/Column
+app.cash.redwood:redwood-layout-compose-iosarm64
+> e: Compilation failed: No file for app.cash.redwood.treehouse.lazylayout.compose/LazyColumn
+app.cash.redwood:redwood-treehouse-lazylayout-compose-iosarm64
+> e: Compilation failed: No file for com.adeo.kviewmodel.compose/ViewModel
+com.adeo:kviewmodel-compose-iosarm64
+> e: Compilation failed: No file for com.episode6.redux.compose/collectAsState
+com.episode6.redux:compose-iosarm64:1.0.1

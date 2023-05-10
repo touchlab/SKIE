@@ -4,25 +4,19 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.skieContext
-import co.touchlab.skie.plugin.intercept.PhaseListener
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
-import org.jetbrains.kotlin.backend.common.phaser.PhaserState
+import co.touchlab.skie.plugin.intercept.PhaseInterceptor
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
-class SwiftLinkPhaseListener : PhaseListener {
+internal class SwiftLinkPhaseListener : PhaseInterceptor<KonanContext, Unit, Unit> {
 
-    override val phase: PhaseListener.Phase = PhaseListener.Phase.OBJECT_FILES
+    override val phase = PhaseInterceptor.Phase.ObjectFiles
 
-    override fun afterPhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
-        super.afterPhase(phaseConfig, phaserState, context)
-
-        if (context !is KonanContext) {
-            return
-        }
+    override fun intercept(context: KonanContext, input: Unit, next: (KonanContext, Unit) -> Unit) {
+        next(context, input)
 
         val config = context.config
-        val namer = context.objCExport.namer
+        val generationState = context.generationState
+        val namer = generationState.objCExport.namer
 
         val swiftObjectFiles = SwiftLinkCompilePhase(
             config,
@@ -30,7 +24,7 @@ class SwiftLinkPhaseListener : PhaseListener {
             namer,
         ).process()
 
-        context.compilerOutput += swiftObjectFiles
+        generationState.compilerOutput += swiftObjectFiles
 
         logSkiePerformance(context.skieContext)
         context.skieContext.analyticsCollector.waitForBackgroundTasks()

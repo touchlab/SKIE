@@ -13,7 +13,9 @@ internal interface Namespace<D : DeclarationDescriptor> {
     val sourceElement: SourceElement
 
     context(DescriptorRegistrationScope)
-    fun addTemplate(declarationTemplate: DeclarationTemplate<*>, symbolTable: SymbolTable)
+    fun addTemplate(declarationTemplate: DeclarationTemplate<*>)
+
+    fun registerSymbols(symbolTable: SymbolTable)
 
     fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable)
 
