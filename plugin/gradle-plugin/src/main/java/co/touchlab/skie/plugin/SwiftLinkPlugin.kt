@@ -109,6 +109,8 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
                     val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
 
+                    KotlinVersionChecker.ensureProjectUsesCompatibleKotlinVersion(project)
+
                     logger.warn(
                         "w: SKIE does not yet support Kotlin Native caching. Compilation time in debug mode might be increased as a result.",
                     )
