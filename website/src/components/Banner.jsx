@@ -40,13 +40,6 @@ function Banner({
     }
   };
 
-  const astring = "plugins {\n" +
-      "    // For Kotlin 1.8.0 and 1.8.10\n" +
-      "    id(\"co.touchlab.skie\") version \"{MAIN_SKIE_VERSION}\"\n" +
-      "\n" +
-      "    // For Kotlin 1.8.20 and 1.8.21\n" +
-      "    id(\"co.touchlab.skie\") version \"{PREVIEW_SKIE_VERSION}\"\n" +
-      "}"
   const typeColor = (type) => {
     switch (type) {
       case 'warning':

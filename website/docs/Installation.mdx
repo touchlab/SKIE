@@ -22,20 +22,6 @@ export function ApiKeyInterpolatedCodeBlock({children, language, title}) {
 export const mainSkieVersion = "{{LATEST_GITHUB_VERSION}}".split("-")[0];
 export const previewSkieVersion = mainSkieVersion + "-preview.1.8.20";
 
-export function PreviewVersionInterpolatedCodeBlock({children, language, title}) {
-    let apiKey = undefined;
-    if (useIsBrowser()) {
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        apiKey = urlParams.get('api_key')
-    }
-    return (
-        <CodeBlock language={language} title={title}>
-            {interpolate(interpolate(children, {MAIN_SKIE_VERSION: mainSkieVersion}),{PREVIEW_SKIE_VERSION: previewSkieVersion})}
-        </CodeBlock>
-    );
-}
-
 # Installation
 
 First, you need to choose a version of SKIE that is compatible with your project (see the table below).
@@ -97,17 +83,15 @@ If you can't find your API key or want to request a trial, [reach out](https://t
 
 Finally, to enable SKIE, add the SKIE plugin to `build.gradle.kts` of the module that builds the native framework:
 
-<PreviewVersionInterpolatedCodeBlock
-language="kotlin"
-title="build.gradle.kts">
-{"plugins {\n" +
-"    // For Kotlin 1.8.0 and 1.8.10\n" +
-"    id(\"co.touchlab.skie\") version \"{MAIN_SKIE_VERSION}\"\n" +
-"\n" +
-"    // For Kotlin 1.8.20 and 1.8.21\n" +
-"    id(\"co.touchlab.skie\") version \"{PREVIEW_SKIE_VERSION}\"\n" +
-"}"}
-</PreviewVersionInterpolatedCodeBlock>
+```kotlin title=build.gradle.kts
+plugins {
+    // For Kotlin 1.8.0 and 1.8.10
+    id("co.touchlab.skie") version "0.4.7"
+
+    // For Kotlin 1.8.20 and 1.8.21
+    id("co.touchlab.skie") version "0.4.7-preview.1.8.20"
+}
+```
 
 :::info
 
