@@ -35,15 +35,33 @@ Some examples:
 - constructor classes used for serialization (e.g. classes annotated by `@Serializable` from `kotlinx.serialization`)
   - Kotlin serialization encourages the use of default arguments to deal with optional fields.
 
-If you are experiencing this problem, please let us know, because that will help us find more situations where this happens and implement appropriate countermeasures.
+:::note Feedback needed
+
+If you are experiencing this problem, please let us know, because that will help us find more problematic situations and implement appropriate countermeasures.
+
+:::
 
 To mitigate this problem, you can for now use [Configuration](/docs/Configuration/Configuration.md) to decrease the number of generated overloads.
 Start by looking for problematic classes that are exported to Swift but whose methods are not being called from Swift (like the classes used for serialization).
 Right now, you can disable default arguments only by matching names of packages, classes and functions.
-However, we are actively working on a better configuration API that will make it easier to selectively disable default arguments based on types of functions (constructors, copy methods of data classes, etc.).
+However, we are working on a better configuration API that will make it easier to selectively disable default arguments based on types of functions (constructors, copy methods of data classes, etc.).
 
-:::info
+:::tip
 
 In general, we strongly recommend to limit the number of exported classes because that has negative impacts on compilation time and binary size even if you don't use SKIE.
+
+:::
+
+## Kotlin/Native compiler caching is disabled
+
+SKIE currently does not support Kotlin compiler caching of 3rd party dependencies.
+As a result you might notice a slightly longer compilation time for your debug builds of static frameworks.
+
+We are working on a proper solution for this problem for Kotlin 1.8.20 and upwards.
+(We are currently not considering to implement support for caching in Kotlin 1.8.0 and 1.8.10 because Kotlin 1.8.20 introduced a new caching mechanism that replaces the old one.)
+
+:::caution
+
+Based on our internal testing we do not expect a significant compilation performance hit - but if you run into problems with compilation time, please let us know.
 
 :::
