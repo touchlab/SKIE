@@ -3,8 +3,10 @@ sidebar_position: 2
 title: Installation
 ---
 
-import useIsBrowser from "@docusaurus/useIsBrowser";import CodeBlock from "@theme/CodeBlock";
+import useIsBrowser from "@docusaurus/useIsBrowser";
+import CodeBlock from "@theme/CodeBlock";
 import {interpolate} from "@docusaurus/Interpolate";
+
 export function ApiKeyInterpolatedCodeBlock({children, language, title}) {
     let apiKey = undefined;
     if (useIsBrowser()) {
@@ -19,17 +21,14 @@ export function ApiKeyInterpolatedCodeBlock({children, language, title}) {
     );
 }
 
-export const mainSkieVersion = "{{LATEST_GITHUB_VERSION}}".split("-")[0];
-export const previewSkieVersion = mainSkieVersion + "-preview.1.8.20";
-
 # Installation
 
 First, you need to choose a version of SKIE that is compatible with your project (see the table below).
 
-| SKIE                   | Kotlin         | Gradle |
-|------------------------|----------------|--------|
-| 0.4.7    | 1.8.0, 1.8.10  | >= 7.3 |
-| 0.4.7-preview.1.8.20 | 1.8.20, 1.8.21 | >= 7.3 |
+| SKIE                     | Kotlin         | Gradle |
+|--------------------------|----------------|--------|
+| {{SKIE_VERSION}}         | 1.8.0, 1.8.10  | >= 7.3 |
+| {{SKIE_VERSION_PREVIEW}} | 1.8.20, 1.8.21 | >= 7.3 |
 
 If your project uses older versions of Kotlin or Gradle, then you will need to upgrade them before you can use SKIE.
 
@@ -55,6 +54,7 @@ pluginManagement {
     }
 }
 
+// If you don't have a dependencyResolutionManagement block yet, it might be better to add the `repositories` block directly to the `build.gradle.kts` of the module that builds the native framework.
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
@@ -70,7 +70,7 @@ Next, add your API key to `gradle.properties`:
 <ApiKeyInterpolatedCodeBlock
     language="properties"
     title="gradle.properties">
-{`touchlab.key={API_KEY}`}
+    {`touchlab.key={API_KEY}`}
 </ApiKeyInterpolatedCodeBlock>
 
 :::info
@@ -86,10 +86,10 @@ Finally, to enable SKIE, add the SKIE plugin to `build.gradle.kts` of the module
 ```kotlin title=build.gradle.kts
 plugins {
     // For Kotlin 1.8.0 and 1.8.10
-    id("co.touchlab.skie") version "0.4.7"
+    id("co.touchlab.skie") version "{{SKIE_VERSION}}"
 
     // For Kotlin 1.8.20 and 1.8.21
-    id("co.touchlab.skie") version "0.4.7-preview.1.8.20"
+    id("co.touchlab.skie") version "{{SKIE_VERSION_PREVIEW}}"
 }
 ```
 
