@@ -65,3 +65,38 @@ We are working on a proper solution for this problem for Kotlin 1.8.20 and upwar
 Based on our internal testing we do not expect a significant compilation performance hit - but if you run into problems with compilation time, please let us know.
 
 :::
+
+## Lambda type as a type argument is not supported in generated Swift code
+
+SKIE cannot currently generate Swift code that contains types with lambdas used as a type argument for generic Kotlin classes.
+
+For example, the following code does not compile because it generates Swift enum class that contains a function with the problematic signature:
+
+```kotlin
+class A<T>
+
+enum class E {
+    Q;
+
+    fun foo(): A<() -> Unit> = TODO()
+}
+```
+
+In the above case you would receive the following error message:
+
+```
+error: 'A' requires that '() -> __Skie.class__stdlib__kotlin_Unit' (aka '() -> KotlinUnit') be a class type
+  public func foo() -> __Skie.class__A<() -> __Skie.class__stdlib__kotlin_Unit> {
+```
+
+:::note
+
+All other types can be used as type arguments.
+For example, changing the function signature to `fun foo(): A<Unit>` works as expected.
+It's only the lambda types that are causing this problem.
+
+:::
+
+The above example uses enums, but other SKIE features that rely on generating Swift code are also affected by this problem (for example, suspend functions).
+
+This issue is fundamentally caused by a bug in the Swift compiler, but we are investigating possible workarounds.
