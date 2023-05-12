@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HardwareAnalytics(
     val bootRomVersion: String,
-    val chipType: String,
+    val chipType: String? = null,
     val machineModel: String,
     val machineName: String,
     val numberOfProcessors: String,
