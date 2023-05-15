@@ -31,6 +31,7 @@ import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isEnumClass
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,
@@ -94,7 +95,9 @@ internal class ExhaustiveEnumsGenerator(
             classSwiftModel.bridge!!.declaration.containingDeclaration?.let {
                 addNestedBridge(classSwiftModel, it)
             } ?: addTopLevelBridge(classSwiftModel)
+        }
 
+        module.file(this.classDescriptor.fqNameSafe.asString() + "_conversions") {
             addConversionExtensions(classSwiftModel)
         }
     }
@@ -274,6 +277,7 @@ internal class ExhaustiveEnumsGenerator(
     private fun ExtensionSpec.Builder.addToKotlinConversionMethod(classSwiftModel: KotlinClassSwiftModel): ExtensionSpec.Builder =
         this.apply {
             addFunction(
+                // TODO After Sir: solve name collision
                 FunctionSpec.builder("toKotlinEnum")
                     .returns(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                     .addStatement("return _bridgeToObjectiveC()")
@@ -293,6 +297,7 @@ internal class ExhaustiveEnumsGenerator(
     private fun ExtensionSpec.Builder.addToSwiftConversionMethod(classSwiftModel: KotlinClassSwiftModel): ExtensionSpec.Builder =
         this.apply {
             addFunction(
+                // TODO After Sir: solve name collision
                 FunctionSpec.builder("toSwiftEnum")
                     .returns(classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
                     .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
