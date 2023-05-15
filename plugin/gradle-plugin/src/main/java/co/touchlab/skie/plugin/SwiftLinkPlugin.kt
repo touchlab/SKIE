@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.konan.target.presetName
 import java.io.File
 import java.nio.file.Path
 import java.time.Duration
+import org.gradle.api.BuildCancelledException
 import java.util.*
 
 const val EXTENSION_NAME = "skie"
@@ -424,10 +425,15 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
     ) {
         analyticsTask.doFirst {
             linkTask.state.failure?.let {
-                analyticsCollector.logException(it)
+                if (!it.isCausedByBuildCancelledException) {
+                    analyticsCollector.logException(it)
+                }
             }
         }
     }
+
+    private val Throwable.isCausedByBuildCancelledException: Boolean
+        get() = this is BuildCancelledException || cause?.isCausedByBuildCancelledException == true
 
     private fun configureAnalyticsUpload(it: Task, analyticsCollector: AnalyticsCollector) {
         it.doLast {
