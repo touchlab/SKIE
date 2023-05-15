@@ -94,6 +94,8 @@ internal class ExhaustiveEnumsGenerator(
             classSwiftModel.bridge!!.declaration.containingDeclaration?.let {
                 addNestedBridge(classSwiftModel, it)
             } ?: addTopLevelBridge(classSwiftModel)
+
+            addConversionExtensions(classSwiftModel)
         }
     }
 
@@ -254,4 +256,47 @@ internal class ExhaustiveEnumsGenerator(
                     .build()
             )
         }
+
+    private fun FileSpec.Builder.addConversionExtensions(classSwiftModel: KotlinClassSwiftModel) {
+        addToKotlinConversionExtension(classSwiftModel)
+        addToSwiftConversionExtension(classSwiftModel)
+    }
+
+    private fun FileSpec.Builder.addToKotlinConversionExtension(classSwiftModel: KotlinClassSwiftModel) {
+        addExtension(
+            ExtensionSpec.builder(classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
+                .addModifiers(Modifier.PUBLIC)
+                .addToKotlinConversionMethod(classSwiftModel)
+                .build()
+        )
+    }
+
+    private fun ExtensionSpec.Builder.addToKotlinConversionMethod(classSwiftModel: KotlinClassSwiftModel): ExtensionSpec.Builder =
+        this.apply {
+            addFunction(
+                FunctionSpec.builder("toKotlinEnum")
+                    .returns(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
+                    .addStatement("return _bridgeToObjectiveC()")
+                    .build()
+            )
+    }
+
+    private fun FileSpec.Builder.addToSwiftConversionExtension(classSwiftModel: KotlinClassSwiftModel) {
+        addExtension(
+            ExtensionSpec.builder(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
+                .addModifiers(Modifier.PUBLIC)
+                .addToSwiftConversionMethod(classSwiftModel)
+                .build()
+        )
+    }
+
+    private fun ExtensionSpec.Builder.addToSwiftConversionMethod(classSwiftModel: KotlinClassSwiftModel): ExtensionSpec.Builder =
+        this.apply {
+            addFunction(
+                FunctionSpec.builder("toSwiftEnum")
+                    .returns(classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
+                    .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
+                    .build()
+            )
+    }
 }

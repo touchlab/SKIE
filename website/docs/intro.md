@@ -1,3 +1,4 @@
+
 ---
 sidebar_position: 1
 title: SKIE Intro
@@ -470,6 +471,41 @@ However, with SKIE, the `default` case is no longer necessary. Instead, you will
 ```
 warning: default will never be executed
 default: print("Unknown")
+```
+
+This feature has one limitation: the generated enum cannot implement the interfaces implemented by the original enum.
+(Because Swift enums cannot conform to Obj-C protocols.)
+This issue mainly affects code that passes enums to functions that expect an interface.
+In such cases you will receive a compiler error similar to this one:
+
+```
+Argument type 'EnumName' does not conform to expected type 'InterfaceName'.
+```
+
+There are two possible workarounds for this problem:
+
+- Explicitly convert the Swift enum back to the Kotlin enum.
+- Disable the exhaustive enums feature for problematic enums (using [configuration](/docs/Configuration/Configuration.md)).
+
+The Swift enum can be explicitly converted to the original Kotlin enum using the `toKotlinEnum()` method.
+Similarly, it's possible to convert the Kotlin enum to the Swift enum using the `toSwiftEnum()` method.
+Alternatively, you can cast the object (in both directions) using the `as` keyword.
+Examples:
+
+```swift
+let direction = Direction.north
+
+
+// Conversion to Kotlin enum
+
+let kotlinEnum = direction.toKotlinEnum()
+let kotlinEnum = direction as __Direction // The original enum is prefixed with two underscores.
+
+
+// Conversion to Swift enum (direction == swiftEnum)
+
+let swiftEnum = kotlinEnum.toSwiftEnum()
+let swiftEnum = kotlinEnum as Direction
 ```
 
 ## Default arguments/parameters
