@@ -11,7 +11,6 @@ import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.generator.internal.enums.ObjCBridgeable.addObjcBridgeableImplementation
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
@@ -69,56 +68,66 @@ internal class ExhaustiveEnumsGenerator(
             return
         }
 
-        classSwiftModel.configureBridging()
-        classSwiftModel.generateBridge()
+        val bridge = classSwiftModel.configureBridging()
+        classSwiftModel.generateBridge(bridge)
     }
 
-    private fun MutableKotlinClassSwiftModel.configureBridging() {
-        this.visibility = SwiftModelVisibility.Replaced
-        this.bridge = ObjcSwiftBridge.FromSKIE(
-            SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType(
-                containingDeclaration = this.containingType?.swiftIrDeclaration as? SwiftIrTypeDeclaration.Local,
-                swiftName = this.identifier,
+    private fun MutableKotlinClassSwiftModel.configureBridging(): ObjcSwiftBridge.FromSKIE {
+        val localContainingDeclaration = this.containingType?.swiftIrDeclaration as? SwiftIrTypeDeclaration.Local
+        val name = if (localContainingDeclaration != null) {
+            "__" + localContainingDeclaration.publicName.nested(this.identifier).asString("__")
+        } else {
+            this.identifier
+        }
+
+        val bridge = ObjcSwiftBridge.FromSKIE(
+            nestedTypealiasName = localContainingDeclaration?.publicName?.nested(this.identifier),
+            declaration = SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType(
+                swiftName = name,
                 superTypes = listOf(
                     BuiltinDeclarations.Swift.Hashable,
                 )
             )
         )
+
+        this.visibility = SwiftModelVisibility.Replaced
+        this.bridge = bridge
+        return bridge
     }
 
-    private fun KotlinClassSwiftModel.generateBridge() {
+    private fun KotlinClassSwiftModel.generateBridge(bridge: ObjcSwiftBridge.FromSKIE) {
         val classSwiftModel = this
 
         module.generateCode(this) {
             addImport("Foundation")
 
-            classSwiftModel.bridge!!.declaration.containingDeclaration?.let {
-                addNestedBridge(classSwiftModel, it)
-            } ?: addTopLevelBridge(classSwiftModel)
+            addBridgingEnum(classSwiftModel, bridge)
         }
 
         module.file(this.classDescriptor.fqNameSafe.asString() + "_conversions") {
-            addConversionExtensions(classSwiftModel)
+            addConversionExtensions(classSwiftModel, bridge)
         }
     }
 
-    private fun FileSpec.Builder.addTopLevelBridge(classSwiftModel: KotlinClassSwiftModel) {
-        addType(classSwiftModel.generateBridgingEnum())
-    }
-
-    private fun FileSpec.Builder.addNestedBridge(
+    private fun FileSpec.Builder.addBridgingEnum(
         classSwiftModel: KotlinClassSwiftModel,
-        containingDeclaration: SwiftIrExtensibleDeclaration,
+        bridge: ObjcSwiftBridge.FromSKIE,
     ) {
-        addExtension(
-            ExtensionSpec.builder(containingDeclaration.internalName.toSwiftPoetName())
-                .addType(classSwiftModel.generateBridgingEnum())
-                .build()
-        )
+        addType(classSwiftModel.generateBridgingEnum(bridge))
+
+        bridge.nestedTypealiasName?.let { nestedTypealiasName ->
+            addExtension(
+                ExtensionSpec.builder(nestedTypealiasName.parent.toSwiftPoetName())
+                    .addType(
+                        TypeAliasSpec.builder(nestedTypealiasName.name, bridge.declaration.publicName.toSwiftPoetName()).build()
+                    )
+                    .build()
+            )
+        }
     }
 
-    private fun KotlinClassSwiftModel.generateBridgingEnum(): TypeSpec =
-        TypeSpec.enumBuilder(bridge!!.declaration.publicName.toSwiftPoetName())
+    private fun KotlinClassSwiftModel.generateBridgingEnum(bridge: ObjcSwiftBridge.FromSKIE): TypeSpec =
+        TypeSpec.enumBuilder(bridge.declaration.publicName.toSwiftPoetName())
             .addAttribute("frozen")
             .addModifiers(Modifier.PUBLIC)
             .addSuperType(STRING)
@@ -260,14 +269,14 @@ internal class ExhaustiveEnumsGenerator(
             )
         }
 
-    private fun FileSpec.Builder.addConversionExtensions(classSwiftModel: KotlinClassSwiftModel) {
-        addToKotlinConversionExtension(classSwiftModel)
-        addToSwiftConversionExtension(classSwiftModel)
+    private fun FileSpec.Builder.addConversionExtensions(classSwiftModel: KotlinClassSwiftModel, bridge: ObjcSwiftBridge.FromSKIE) {
+        addToKotlinConversionExtension(classSwiftModel, bridge)
+        addToSwiftConversionExtension(classSwiftModel, bridge)
     }
 
-    private fun FileSpec.Builder.addToKotlinConversionExtension(classSwiftModel: KotlinClassSwiftModel) {
+    private fun FileSpec.Builder.addToKotlinConversionExtension(classSwiftModel: KotlinClassSwiftModel, bridge: ObjcSwiftBridge.FromSKIE) {
         addExtension(
-            ExtensionSpec.builder(classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
+            ExtensionSpec.builder(bridge.declaration.publicName.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .addToKotlinConversionMethod(classSwiftModel)
                 .build()
@@ -285,22 +294,22 @@ internal class ExhaustiveEnumsGenerator(
             )
     }
 
-    private fun FileSpec.Builder.addToSwiftConversionExtension(classSwiftModel: KotlinClassSwiftModel) {
+    private fun FileSpec.Builder.addToSwiftConversionExtension(classSwiftModel: KotlinClassSwiftModel, bridge: ObjcSwiftBridge.FromSKIE) {
         addExtension(
             ExtensionSpec.builder(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
-                .addToSwiftConversionMethod(classSwiftModel)
+                .addToSwiftConversionMethod(bridge)
                 .build()
         )
     }
 
-    private fun ExtensionSpec.Builder.addToSwiftConversionMethod(classSwiftModel: KotlinClassSwiftModel): ExtensionSpec.Builder =
+    private fun ExtensionSpec.Builder.addToSwiftConversionMethod(bridge: ObjcSwiftBridge.FromSKIE): ExtensionSpec.Builder =
         this.apply {
             addFunction(
                 // TODO After Sir: solve name collision
                 FunctionSpec.builder("toSwiftEnum")
-                    .returns(classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
-                    .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", classSwiftModel.bridge!!.declaration.publicName.toSwiftPoetName())
+                    .returns(bridge.declaration.publicName.toSwiftPoetName())
+                    .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", bridge.declaration.publicName.toSwiftPoetName())
                     .build()
             )
     }
