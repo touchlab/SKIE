@@ -81,7 +81,7 @@ internal class ExhaustiveEnumsGenerator(
         }
 
         val bridge = ObjcSwiftBridge.FromSKIE(
-            nestedTypealiasName = localContainingDeclaration?.publicName?.nested(this.identifier),
+            nestedTypealiasName = localContainingDeclaration?.internalName?.nested(this.identifier),
             declaration = SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType(
                 swiftName = name,
                 superTypes = listOf(
