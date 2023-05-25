@@ -13,9 +13,16 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Configuration(
     val enabledFeatures: SkieFeatureSet = SkieFeatureSet(),
+    val disabledFeatures: SkieFeatureSet = SkieFeatureSet(),
     val groups: List<Group> = emptyList(),
     val analyticsConfiguration: AnalyticsConfiguration = AnalyticsConfiguration(),
 ) {
+
+    init {
+        require(enabledFeatures.intersect(disabledFeatures).isEmpty()) {
+            "A feature cannot be both enabled and disabled. Problem with: ${enabledFeatures.intersect(disabledFeatures)}"
+        }
+    }
 
     operator fun <T> get(target: ConfigurationTarget, key: ConfigurationKey<T>): T {
         if (target.belongsToSkieRuntime) {
@@ -47,7 +54,8 @@ data class Configuration(
 
     operator fun plus(other: Configuration): Configuration =
         Configuration(
-            enabledFeatures + other.enabledFeatures,
+            (enabledFeatures - other.disabledFeatures) + other.enabledFeatures,
+            other.disabledFeatures,
             groups + other.groups,
             analyticsConfiguration + other.analyticsConfiguration,
         )

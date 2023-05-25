@@ -33,7 +33,6 @@ class SwiftLinkPhaseListener : PhaseListener {
         context.compilerOutput += swiftObjectFiles
 
         logSkiePerformance(context.skieContext)
-        context.skieContext.analyticsCollector.waitForBackgroundTasks()
     }
 
     private fun logSkiePerformance(context: SkieContext) {

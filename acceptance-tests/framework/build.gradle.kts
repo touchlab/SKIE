@@ -16,6 +16,11 @@ buildConfig {
         name = "RESOURCES",
         value = "\"${layout.projectDirectory.dir("src/main/resources").asFile.absolutePath}\"",
     )
+    buildConfigField(
+        type = "java.nio.file.Path",
+        name = "LICENSE_PATH",
+        value = "Path.of(\"${rootProject.layout.projectDirectory.dir("licenses").file("tests.jwt").asFile.absolutePath}\")",
+    )
 }
 
 skieJvm {

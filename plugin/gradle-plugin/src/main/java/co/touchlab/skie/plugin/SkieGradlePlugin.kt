@@ -1,0 +1,139 @@
+package co.touchlab.skie.plugin
+
+import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
+import co.touchlab.skie.plugin.configuration.CreateSkieConfigurationTask
+import co.touchlab.skie.plugin.configuration.SkieExtension
+import co.touchlab.skie.plugin.configuration.skieExtension
+import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
+import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
+import co.touchlab.skie.plugin.dependencies.addDependencyOnSkieRuntime
+import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
+import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
+import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
+import co.touchlab.skie.plugin.util.appleTargets
+import co.touchlab.skie.plugin.util.frameworks
+import co.touchlab.skie.plugin.util.skieDirectories
+import co.touchlab.skie.plugin.util.subpluginOption
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
+import org.gradle.kotlin.dsl.findByType
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
+import org.jetbrains.kotlin.konan.target.presetName
+
+abstract class SkieGradlePlugin : Plugin<Project> {
+
+    override fun apply(project: Project) {
+        val licenseManager = GradleSkieLicenseManager(project)
+        val analyticsManager = GradleAnalyticsManager(project, licenseManager)
+
+        analyticsManager.withErrorLogging {
+            project.configureSkieGradlePlugin(licenseManager)
+        }
+
+        project.afterEvaluate {
+            analyticsManager.withErrorLogging {
+                project.configureSkieCompilerPlugin(analyticsManager)
+            }
+        }
+    }
+
+    private fun Project.configureSkieGradlePlugin(licenseManager: GradleSkieLicenseManager) {
+        licenseManager.configureLicensing()
+
+        SkieExtension.createExtension(project)
+
+        SkieSubPluginManager.configureDependenciesForSubPlugins(project)
+    }
+
+    private fun Project.configureSkieCompilerPlugin(
+        analyticsManager: GradleAnalyticsManager,
+    ) {
+        if (!isSkieEnabled) {
+            return
+        }
+
+        FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
+
+        configureEachKotlinFrameworkLinkTask(analyticsManager) {
+            configureSkieForLinkTask(analyticsManager)
+        }
+    }
+
+    private fun KotlinNativeLink.configureSkieForLinkTask(
+        analyticsManager: GradleAnalyticsManager,
+    ) {
+        analyticsManager.configureAnalytics(this)
+
+        binary.target.disableCaching()
+        binary.target.addDependencyOnSkieRuntime()
+
+        CreateSkieConfigurationTask.registerTask(this)
+
+        SwiftLinkingConfigurator.configureUserSwiftLinking(this)
+
+        SkieSubPluginManager.registerSubPlugins(this)
+
+        configureKotlinCompiler(analyticsManager)
+    }
+
+    private fun KotlinNativeLink.configureKotlinCompiler(
+        analyticsManager: GradleAnalyticsManager,
+    ) {
+        compilerPluginClasspath = listOfNotNull(
+            compilerPluginClasspath,
+            SkieCompilerPluginDependencyProvider.getOrCreateDependencyConfiguration(project),
+        ).reduce(FileCollection::plus)
+
+        compilerPluginOptions.addPluginArgument(
+            SkiePlugin.id,
+            SkiePlugin.Options.buildId.subpluginOption(analyticsManager.buildId),
+        )
+
+        compilerPluginOptions.addPluginArgument(
+            SkiePlugin.id,
+            SkiePlugin.Options.skieDirectories.subpluginOption(skieDirectories),
+        )
+
+        compilerPluginOptions.addPluginArgument(
+            SkiePlugin.id,
+            SkiePlugin.Options.skieBuildDir.subpluginOption(
+                project.layout.buildDirectory.file("skieBuild/${binary.name}/${binary.target.targetName}")
+                    .get().asFile,
+            ),
+        )
+    }
+}
+
+internal fun Project.configureEachKotlinFrameworkLinkTask(
+    analyticsManager: GradleAnalyticsManager,
+    configure: KotlinNativeLink.() -> Unit,
+) {
+    configureEachKotlinAppleTarget {
+        frameworks.forEach { framework ->
+            analyticsManager.withErrorLogging {
+                // Cannot use configure on linkTaskProvider because it's not possible to register new tasks in configure block of another task
+                configure(framework.linkTask)
+            }
+        }
+    }
+}
+
+internal fun Project.configureEachKotlinAppleTarget(
+    configure: KotlinNativeTarget.() -> Unit,
+) {
+    val kotlinExtension = extensions.findByType<KotlinMultiplatformExtension>() ?: return
+
+    kotlinExtension.appleTargets.forEach {
+        configure(it)
+    }
+}
+
+private fun KotlinNativeTarget.disableCaching() {
+    project.extensions.extraProperties.set("kotlin.native.cacheKind.${konanTarget.presetName}", "none")
+}
+
+private val Project.isSkieEnabled: Boolean
+    get() = project.skieExtension.isEnabled.get()

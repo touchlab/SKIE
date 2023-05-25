@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.analytics.crash
 
-import co.touchlab.skie.plugin.license.SkieLicense
+import co.touchlab.skie.util.Environment
 import com.bugsnag.Bugsnag
 
 object BugsnagFactory {
@@ -8,7 +8,7 @@ object BugsnagFactory {
     fun create(
         skieVersion: String,
         type: Type,
-        environment: SkieLicense.Environment,
+        environment: Environment,
     ): Bugsnag =
         Bugsnag("", false)
             .apply {

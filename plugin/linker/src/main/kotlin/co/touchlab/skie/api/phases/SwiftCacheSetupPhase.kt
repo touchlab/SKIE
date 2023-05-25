@@ -59,13 +59,13 @@ class SwiftCacheSetupPhase(
 }
 
 val SkieContext.swiftCacheDirectory: File
-    get() = skieBuildDirectory.resolve("swift-cache").also { it.mkdirs() }
+    get() = oldSkieBuildDirectory.resolve("swift-cache").also { it.mkdirs() }
 
 val SkieContext.cacheableKotlinFramework: FrameworkLayout
     get() = FrameworkLayout(cacheableKotlinFrameworkDirectory)
 
 val SkieContext.cacheableKotlinFrameworkDirectory: File
-    get() = skieBuildDirectory.resolve("kotlin-framework-dummy/${frameworkLayout.moduleName}.framework").also { it.mkdirs() }
+    get() = oldSkieBuildDirectory.resolve("kotlin-framework-dummy/${frameworkLayout.moduleName}.framework").also { it.mkdirs() }
 
 
 

@@ -1,11 +1,16 @@
 plugins {
     id("skie-jvm")
     id("skie-publish-jvm")
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 dependencies {
-    api(libs.java.jwt)
+    implementation(projects.configurationApi)
     implementation(projects.util)
+
+    implementation(libs.java.jwt)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.client.java)
 }
 
 skieJvm {

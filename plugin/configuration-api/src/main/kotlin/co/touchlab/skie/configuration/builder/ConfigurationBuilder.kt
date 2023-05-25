@@ -39,7 +39,7 @@ class ConfigurationBuilder {
     }
 
     internal fun build(): Configuration =
-        builders.map { it.build() }.fold(Configuration(SkieFeatureSet(), emptyList(), AnalyticsConfiguration(emptyList())), Configuration::plus)
+        builders.map { it.build() }.fold(Configuration(), Configuration::plus)
 
     private sealed interface Builder {
 
@@ -47,8 +47,7 @@ class ConfigurationBuilder {
 
         class Group(val groupBuilder: ConfigurationGroupBuilder) : Builder {
 
-            override fun build(): Configuration =
-                Configuration(SkieFeatureSet(), listOf(groupBuilder.build()), AnalyticsConfiguration(emptyList()))
+            override fun build(): Configuration = Configuration(groups = listOf(groupBuilder.build()))
         }
 
         class File(val path: Path) : Builder {

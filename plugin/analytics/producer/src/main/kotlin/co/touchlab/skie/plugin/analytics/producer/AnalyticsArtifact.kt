@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.analytics.producer
 
 import co.touchlab.skie.plugin.analytics.producer.compressor.CompressionMethod
-import co.touchlab.skie.plugin.license.SkieLicense
+import co.touchlab.skie.util.Environment
 import java.nio.file.Path
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.listDirectoryEntries
@@ -11,7 +11,7 @@ class AnalyticsArtifact(
     val buildId: String,
     val type: String,
     val skieVersion: String,
-    val environment: SkieLicense.Environment,
+    val environment: Environment,
     val compressionMethod: CompressionMethod,
 ) {
 
@@ -72,7 +72,7 @@ class AnalyticsArtifact(
                 buildId = nameComponents[0],
                 type = nameComponents[1],
                 skieVersion = decodeVersion(nameComponents[2]),
-                environment = SkieLicense.Environment.valueOf(nameComponents[3]),
+                environment = Environment.valueOf(nameComponents[3]),
                 compressionMethod = CompressionMethod.valueOf(nameComponents[4]),
             )
         }

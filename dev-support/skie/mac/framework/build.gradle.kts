@@ -18,7 +18,8 @@ skie {
         }
     }
     debug {
-        dumpSwiftApiAt.addAll(BeforeApiNotes, AfterApiNotes)
+        dumpSwiftApiBeforeApiNotes.set(true)
+        dumpSwiftApiAfterApiNotes.set(true)
     }
 }
 

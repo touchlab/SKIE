@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
-import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.kotlin_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
@@ -11,6 +10,7 @@ import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
+import co.touchlab.skie.plugin.configuration.SkieConfigurationProvider
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
 import co.touchlab.skie.plugin.license.SkieLicenseProvider
@@ -31,16 +31,19 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = false
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
-        val license = SkieLicenseProvider.getLicense(configuration.getNotNull(ConfigurationKeys.jwtWithLicense))
-        val skieConfiguration = configuration.get(ConfigurationKeys.skieConfiguration, Configuration {})
+        val skieDirectories = configuration.getNotNull(ConfigurationKeys.skieDirectories).also {
+            it.resetTemporaryDirectories()
+        }
+
+        val license = SkieLicenseProvider.loadLicense(skieDirectories)
+        val skieConfiguration = SkieConfigurationProvider.getConfiguration(skieDirectories)
 
         val swiftCompilerConfiguration = SwiftCompilerConfiguration(
-            sourceFiles = configuration.getList(ConfigurationKeys.SwiftCompiler.sourceFiles),
-            expandedSourcesDir = configuration.getNotNull(ConfigurationKeys.SwiftCompiler.generatedDir),
+            sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
             swiftVersion = configuration.get(ConfigurationKeys.SwiftCompiler.swiftVersion, "5"),
             parallelCompilation = configuration.get(
                 ConfigurationKeys.SwiftCompiler.parallelCompilation,
-                // TODO Refactor after rebasing licensing
+                // WIP Refactor after rebasing licensing
                 SkieFeature.ParallelSwiftCompilation in skieConfiguration.enabledFeatures
             ),
             additionalFlags = configuration.getList(ConfigurationKeys.SwiftCompiler.additionalFlags),
@@ -48,19 +51,18 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
         val skieContext = DefaultSkieContext(
             module = DefaultSkieModule(),
+            license = license,
             configuration = skieConfiguration,
             swiftCompilerConfiguration = swiftCompilerConfiguration,
-            debugInfoDirectory = configuration.getNotNull(ConfigurationKeys.Debug.infoDirectory),
-            skieBuildDirectory = configuration.getNotNull(ConfigurationKeys.skieBuildDir),
+            oldSkieBuildDirectory = configuration.getNotNull(ConfigurationKeys.skieBuildDir),
+            skieDirectories = skieDirectories,
             frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
-            disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
-            dumpSwiftApiPoints = configuration.get(ConfigurationKeys.Debug.dumpSwiftApiPoints) ?: emptySet(),
             analyticsCollector = AnalyticsCollector(
-                analyticsDirectory = configuration.getNotNull(ConfigurationKeys.analyticsDir).toPath(),
+                analyticsDirectories = skieDirectories.analyticsDirectories,
                 buildId = configuration.getNotNull(ConfigurationKeys.buildId),
                 skieVersion = BuildConfig.SKIE_VERSION,
                 type = BugsnagFactory.Type.Compiler,
-                license = license,
+                environment = license.environment,
                 configuration = skieConfiguration.analyticsConfiguration,
             ),
             skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),

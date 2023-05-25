@@ -35,8 +35,6 @@ dependencies {
     testableCompileOnly(libs.plugin.kotlin.gradle)
     testableCompileOnly(libs.plugin.kotlin.gradle.api)
 
-    implementation(libs.touchlab.access.core)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.json)
     implementation(projects.configurationApi)
     implementation(projects.analytics.analyticsApi)
@@ -52,7 +50,6 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(libs.plugin.kotlin.gradle)
     testImplementation(libs.plugin.kotlin.gradle.api)
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 }
 
 tasks.withType<PluginUnderTestMetadata>().configureEach {
@@ -87,7 +84,7 @@ gradlePlugin {
         create("co.touchlab.skie") {
             id = "co.touchlab.skie"
             displayName = "Swift and Kotlin, unified"
-            implementationClass = "co.touchlab.skie.plugin.SwiftLinkPlugin"
+            implementationClass = "co.touchlab.skie.plugin.SkieGradlePlugin"
             version = project.version
         }
     }

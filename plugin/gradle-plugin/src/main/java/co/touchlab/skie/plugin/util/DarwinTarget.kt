@@ -1,9 +1,9 @@
-package co.touchlab.skie.plugin
+package co.touchlab.skie.plugin.util
 
 import org.jetbrains.kotlin.gradle.tasks.FrameworkDescriptor
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
-data class DarwinTarget(
+internal data class DarwinTarget(
     val konanTarget: KonanTarget,
     val targetTriple: TargetTriple,
     val sdk: String,
@@ -36,8 +36,8 @@ data class DarwinTarget(
     }
 }
 
-val FrameworkDescriptor.darwinTarget: DarwinTarget
+internal val FrameworkDescriptor.darwinTarget: DarwinTarget
     get() = target.darwinTarget
 
-val KonanTarget.darwinTarget: DarwinTarget
+internal val KonanTarget.darwinTarget: DarwinTarget
     get() = DarwinTarget.allTargets[this] ?: error("Unknown konan target: $this")

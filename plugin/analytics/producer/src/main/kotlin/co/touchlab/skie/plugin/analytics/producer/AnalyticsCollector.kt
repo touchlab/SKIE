@@ -7,28 +7,27 @@ import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.compressor.AnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.EfficientAnalyticsCompressor
 import co.touchlab.skie.plugin.analytics.producer.compressor.FastAnalyticsCompressor
-import co.touchlab.skie.plugin.license.SkieLicense
+import co.touchlab.skie.util.Environment
+import co.touchlab.skie.util.directory.SkieAnalyticsDirectories
 import com.bugsnag.Bugsnag
-import java.nio.file.Path
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.io.path.writeBytes
 import kotlin.reflect.KClass
 
 class AnalyticsCollector(
-    private val analyticsDirectory: Path,
+    analyticsDirectories: SkieAnalyticsDirectories,
     private val buildId: String,
     private val skieVersion: String,
     type: BugsnagFactory.Type,
-    private val license: SkieLicense,
+    private val environment: Environment,
     private val configuration: AnalyticsConfiguration,
 ) : AnalyticsConfigurationTarget<AnalyticsFeature.CrashReporting> {
 
     override val featureType: KClass<AnalyticsFeature.CrashReporting> = AnalyticsFeature.CrashReporting::class
 
     private val bugsnag: Bugsnag =
-        BugsnagFactory.create(skieVersion, type, license.environment)
+        BugsnagFactory.create(skieVersion, type, environment)
 
-    private val backgroundTasks = CopyOnWriteArrayList<Thread>()
+    private val analyticsDirectories = analyticsDirectories.forEnvironment(environment).map { it.toPath() }
 
     @Synchronized
     fun collect(producers: List<AnalyticsProducer<*>>) {
@@ -80,8 +79,6 @@ class AnalyticsCollector(
         }
 
         betterCompressionTask.start()
-
-        backgroundTasks.add(betterCompressionTask)
     }
 
     private fun collectUsingCompressor(
@@ -93,17 +90,19 @@ class AnalyticsCollector(
             buildId = buildId,
             type = analyticsType,
             skieVersion = skieVersion,
-            environment = license.environment,
+            environment = environment,
             compressionMethod = compressor.method,
         )
-
-        val artifactPath = artifact.path(analyticsDirectory)
 
         val compressedData = compressor.compress(analyticsResult)
 
         val encryptedData = encrypt(compressedData)
 
-        artifactPath.writeBytes(encryptedData)
+        analyticsDirectories
+            .map { artifact.path(it) }
+            .forEach {
+                it.writeBytes(encryptedData)
+            }
     }
 
     private fun encrypt(data: ByteArray): ByteArray =
@@ -114,7 +113,7 @@ class AnalyticsCollector(
 
         sendExceptionLogIfEnabled(name, wrappingException)
 
-        rethrowIfDev(error)
+        rethrowIfNotProduction(error)
     }
 
     @Synchronized
@@ -126,10 +125,10 @@ class AnalyticsCollector(
     }
 
     @Synchronized
-    fun logExceptionAndRethrowIfDev(exception: Throwable) {
+    fun logExceptionAndRethrowIfNotProduction(exception: Throwable) {
         logException(exception)
 
-        rethrowIfDev(exception)
+        rethrowIfNotProduction(exception)
     }
 
     @Synchronized
@@ -160,20 +159,13 @@ class AnalyticsCollector(
         } catch (e: Throwable) {
             bugsnag.notify(e)
 
-            rethrowIfDev(e)
+            rethrowIfNotProduction(e)
         }
     }
 
-    private fun rethrowIfDev(exception: Throwable) {
-        if (license.environment == SkieLicense.Environment.Dev) {
+    private fun rethrowIfNotProduction(exception: Throwable) {
+        if (!environment.canBeProduction()) {
             throw exception
-        }
-    }
-
-    @Synchronized
-    fun waitForBackgroundTasks() {
-        backgroundTasks.forEach {
-            it.join()
         }
     }
 

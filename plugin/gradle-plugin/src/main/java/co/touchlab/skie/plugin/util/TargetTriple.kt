@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package co.touchlab.skie.plugin
+package co.touchlab.skie.plugin.util
 
 /**
  * Classical way to describe a target platform.
@@ -17,7 +17,7 @@ package co.touchlab.skie.plugin
  *
  * @see <a href="https://clang.llvm.org/docs/CrossCompilation.html#target-triple">Clang documentation for target triple</a>.
  */
-data class TargetTriple(
+internal data class TargetTriple(
     val architecture: String,
     val vendor: String,
     val os: String,
@@ -57,7 +57,7 @@ data class TargetTriple(
 /**
  * Check that given target is Apple simulator.
  */
-val TargetTriple.isSimulator: Boolean
+internal val TargetTriple.isSimulator: Boolean
     get() = environment == "simulator"
 
 /**
@@ -65,7 +65,7 @@ val TargetTriple.isSimulator: Boolean
  *
  * Useful for precise target specification in Clang and Swift.
  */
-fun TargetTriple.withOSVersion(osVersion: String): TargetTriple =
+internal fun TargetTriple.withOSVersion(osVersion: String): TargetTriple =
     copy(os = "${os}${osVersion}")
 
 /**
@@ -74,11 +74,11 @@ fun TargetTriple.withOSVersion(osVersion: String): TargetTriple =
  * TODO: Actually, this method should return [TargetTriple],
  *  but this class is not that flexible yet.
  */
-fun TargetTriple.withoutVendor(): String {
+internal fun TargetTriple.withoutVendor(): String {
     return "$architecture-${withoutVendorAndArch()}"
 }
 
-fun TargetTriple.withoutVendorAndArch(): String {
+internal fun TargetTriple.withoutVendorAndArch(): String {
     val envSuffix = environment?.let { "-$environment" }
         ?: ""
     return "$os$envSuffix"

@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api(projects.util)
+    api(projects.license)
     api(projects.configurationApi)
     api(projects.analytics.producer)
     api(projects.analytics.analyticsApi)

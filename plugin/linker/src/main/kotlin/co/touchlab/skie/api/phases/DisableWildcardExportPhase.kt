@@ -1,5 +1,6 @@
 package co.touchlab.skie.api.phases
 
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 
@@ -9,7 +10,7 @@ class DisableWildcardExportPhase(
 ) : SkieLinkingPhase {
 
     override val isActive: Boolean
-        get() = skieContext.disableWildcardExport
+        get() = SkieFeature.WildcardExport !in skieContext.configuration.enabledFeatures
 
     override fun execute() {
         framework.modulemapFile.writeText(

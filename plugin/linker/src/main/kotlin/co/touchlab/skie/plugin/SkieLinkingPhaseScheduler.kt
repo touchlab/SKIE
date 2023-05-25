@@ -16,7 +16,6 @@ import co.touchlab.skie.api.phases.typeconflicts.AddForwardDeclarationsPhase
 import co.touchlab.skie.api.phases.typeconflicts.AddTypeDefPhase
 import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
@@ -35,7 +34,7 @@ class SkieLinkingPhaseScheduler(
     private val objCTypeRenderer = ObjCTypeRenderer()
 
     private val linkingPhases = listOf(
-        DumpSwiftApiPhase(DumpSwiftApiPoint.BeforeApiNotes, context, framework),
+        DumpSwiftApiPhase.BeforeApiNotes(skieContext.configuration, context, framework),
         RemoveKonanManglingPhase(skieModule, context.descriptorProvider),
         RenameEnumRawValuePhase(skieModule, context.descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, context.descriptorProvider),
@@ -47,7 +46,7 @@ class SkieLinkingPhaseScheduler(
         AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
         AddTypeDefPhase(framework.kotlinHeader, objCTypeRenderer),
         DisableWildcardExportPhase(skieContext, framework),
-        DumpSwiftApiPhase(DumpSwiftApiPoint.AfterApiNotes, context, framework),
+        DumpSwiftApiPhase.AfterApiNotes(skieContext.configuration, context, framework),
         SwiftCacheSetupPhase(skieContext, framework),
     )
 

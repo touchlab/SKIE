@@ -1,9 +1,10 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.plugin.configuration.SkieExtension
 import org.gradle.testfixtures.ProjectBuilder
 import kotlin.test.Test
 
-class SwiktPluginTest {
+class SkieGradlePluginTest {
 
     @Test
     fun `plugin is applied correctly to the project`() {

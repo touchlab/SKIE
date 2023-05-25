@@ -13,6 +13,7 @@ import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.mutableDescriptorProvider
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.util.Command
@@ -35,7 +36,9 @@ class SwiftLinkCompilePhase(
 ) {
 
     private val skieContext = context.skieContext
+    private val skieModule = skieContext.module as DefaultSkieModule
     private val compilerConfiguration = skieContext.swiftCompilerConfiguration
+    private val skieBuildDirectory = skieContext.skieBuildDirectory
 
     // TODO Refactor to phases
     fun process(): List<ObjectFile> {
@@ -43,11 +46,6 @@ class SwiftLinkCompilePhase(
             return emptyList()
         }
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
-        val swiftSourcesDir = compilerConfiguration.expandedSourcesDir.also {
-            it.deleteRecursively()
-            it.mkdirs()
-        }
-
         val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
         val bridgeProvider = DescriptorBridgeProvider(namer)
         val swiftIrDeclarationRegistry = SwiftIrDeclarationRegistry(
@@ -76,7 +74,6 @@ class SwiftLinkCompilePhase(
             translator = translator,
             declarationRegistry = swiftIrDeclarationRegistry,
         )
-        val skieModule = skieContext.module as DefaultSkieModule
 
         SkieLinkingPhaseScheduler(
             skieContext = skieContext,
@@ -87,31 +84,49 @@ class SwiftLinkCompilePhase(
             builtinKotlinDeclarations = builtinKotlinDeclarations,
         ).runLinkingPhases()
 
-        val swiftFileSpecs = skieContext.skiePerformanceAnalyticsProducer.log("produceSwiftPoetFiles") {
+        generateSwiftCode(swiftModelScope, framework)
+
+        return compileSwiftCode(framework, configurables)
+    }
+
+    private fun generateSwiftCode(
+        swiftModelScope: DefaultSwiftModelScope,
+        framework: FrameworkLayout,
+    ) {
+        skieContext.skiePerformanceAnalyticsProducer.log("produceSwiftPoetFiles") {
             skieModule.produceSwiftPoetFiles(swiftModelScope, framework.moduleName)
+                .forEach { fileSpec ->
+                    val file = skieBuildDirectory.swift.generated.swiftFile(fileSpec.name)
+
+                    file.writeText(fileSpec.toString())
+                }
         }
-        val swiftTextFiles = skieContext.skiePerformanceAnalyticsProducer.log("produceTextFiles") {
+
+        skieContext.skiePerformanceAnalyticsProducer.log("produceTextFiles") {
             skieModule.produceTextFiles()
-        }
+                .forEach { textFile ->
+                    val file = skieBuildDirectory.swift.generated.swiftFile(textFile.name)
 
-        val newFiles = swiftFileSpecs.map { fileSpec ->
-            val file = swiftSourcesDir.resolve("${fileSpec.name}.swift")
-            fileSpec.toString().also { file.writeText(it) }
-            file
-        } + swiftTextFiles.map { textFile ->
-            val file = swiftSourcesDir.resolve("${textFile.name}.swift")
-            file.writeText(textFile.content)
-            file
+                    file.writeText(textFile.content)
+                }
         }
+    }
 
-        val sourceFiles = compilerConfiguration.sourceFiles + newFiles
+    private fun finalizeDescriptorProvider() {
+        val finalizedDescriptorProvider = context.mutableDescriptorProvider.preventFurtherMutations()
+        context.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
+    }
+
+    private fun compileSwiftCode(
+        framework: FrameworkLayout,
+        configurables: AppleConfigurables,
+    ): List<ObjectFile> {
+        val sourceFiles = skieBuildDirectory.swift.allSwiftFiles
 
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
             val compileDirectory = SwiftCompileDirectory(framework.moduleName, config.tempFiles.create("swift-object"))
 
-            skieContext.skiePerformanceAnalyticsProducer.log("compileSwift") {
-                compileSwift(configurables, framework, sourceFiles, compileDirectory)
-            }
+            callSwiftCompiler(configurables, framework, sourceFiles, compileDirectory)
 
             copySwiftModuleFiles(configurables, compileDirectory, framework)
 
@@ -127,12 +142,7 @@ class SwiftLinkCompilePhase(
         return swiftObjectPaths
     }
 
-    private fun finalizeDescriptorProvider() {
-        val finalizedDescriptorProvider = context.mutableDescriptorProvider.preventFurtherMutations()
-        context.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
-    }
-
-    private fun compileSwift(
+    private fun callSwiftCompiler(
         configurables: AppleConfigurables,
         framework: FrameworkLayout,
         sourceFiles: List<File>,
@@ -175,7 +185,9 @@ class SwiftLinkCompilePhase(
 
             workingDirectory = compileDirectory.workingDirectory
 
-            execute(logFile = skieContext.debugInfoDirectory.logs.resolve("swiftc.log"))
+            skieContext.skiePerformanceAnalyticsProducer.log("compileSwift") {
+                execute(logFile = skieBuildDirectory.debug.logs.swiftc)
+            }
         }
     }
 
@@ -223,7 +235,7 @@ class SwiftLinkCompilePhase(
                 header "${framework.swiftHeader.name}"
                 requires objc
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

@@ -3,7 +3,6 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="debugDumpSwiftApiAt" value="" />
           <entry key="libraryTest" value="" />
           <entry key="onlyIndices" value="" />
         </map>

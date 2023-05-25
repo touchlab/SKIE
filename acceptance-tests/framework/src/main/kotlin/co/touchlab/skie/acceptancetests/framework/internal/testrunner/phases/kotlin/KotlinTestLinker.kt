@@ -2,15 +2,16 @@ package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.ko
 
 import co.touchlab.skie.acceptancetests.framework.TempFileSystem
 import co.touchlab.skie.acceptancetests.framework.TestResult
-import co.touchlab.skie.acceptancetests.framework.fromTestEnv
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.IntermediateResult
 import co.touchlab.skie.acceptancetests.framework.internal.testrunner.TestLogger
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.features.SkieFeatureSet
+import co.touchlab.skie.framework.BuildConfig
 import co.touchlab.skie.plugin.ConfigurationKeys
 import co.touchlab.skie.plugin.SkieComponentRegistrar
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
-import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
-import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
+import co.touchlab.skie.util.directory.SkieDirectories
 import org.jetbrains.kotlin.cli.bc.K2Native
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
@@ -21,6 +22,7 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Path
 import java.util.UUID
+import kotlin.io.path.copyTo
 
 class KotlinTestLinker(
     private val tempFileSystem: TempFileSystem,
@@ -51,22 +53,18 @@ class KotlinTestLinker(
     }
 
     private fun configureSwiftKt(configuration: Configuration) {
-        val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
-        val analyticsDirectory = tempFileSystem.createDirectory("analytics")
         val skieBuildDirectory = tempFileSystem.createDirectory("skieBuild")
+        val buildDirectory = tempFileSystem.createDirectory("skie")
+        val skieDirectories = SkieDirectories(buildDirectory.toFile())
+
+        skieDirectories.initializeForTests(configuration)
 
         PluginRegistrar.configure.set {
-            put(ConfigurationKeys.SwiftCompiler.generatedDir, expandedSwiftDirectory.toFile())
+            put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
+            put(ConfigurationKeys.skieDirectories, skieDirectories)
             put(ConfigurationKeys.SwiftCompiler.parallelCompilation, false)
             add(ConfigurationKeys.SwiftCompiler.additionalFlags, "-verify-emitted-module-interface")
-            put(ConfigurationKeys.Debug.infoDirectory, DebugInfoDirectory(tempFileSystem.createDirectory("skie-debug-info").toFile()))
-            put(ConfigurationKeys.Debug.dumpSwiftApiPoints, DumpSwiftApiPoint.fromTestEnv())
-            put(ConfigurationKeys.skieConfiguration, configuration + analyticsConfiguration)
-            put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
-            put(ConfigurationKeys.jwtWithLicense, "foeman.aegis.lion.shirr.bide")
-            put(ConfigurationKeys.analyticsDir, analyticsDirectory.toFile())
             put(ConfigurationKeys.skieBuildDir, skieBuildDirectory.toFile())
-            put(ConfigurationKeys.disableWildcardExport, true)
         }
 
         PluginRegistrar.plugins.set(
@@ -77,6 +75,21 @@ class KotlinTestLinker(
             },
         )
     }
+
+    private fun SkieDirectories.initializeForTests(configuration: Configuration) {
+        val mergedConfiguration = configuration + analyticsConfiguration + getDumpSwiftApiConfiguration()
+        val serializedConfiguration = mergedConfiguration.serialize()
+        buildDirectory.skieConfiguration.writeText(serializedConfiguration)
+
+        BuildConfig.LICENSE_PATH.copyTo(buildDirectory.license.toPath())
+    }
+
+    private fun getDumpSwiftApiConfiguration(): Configuration =
+        if (System.getenv("debugDumpSwiftApi") != null) {
+            Configuration(enabledFeatures = SkieFeatureSet(SkieFeature.DumpSwiftApiBeforeApiNotes, SkieFeature.DumpSwiftApiAfterApiNotes))
+        } else {
+            Configuration()
+        }
 
     private fun createCompilerOutputStream(): Pair<PrintingMessageCollector, OutputStream> {
         val outputStream = ByteArrayOutputStream()

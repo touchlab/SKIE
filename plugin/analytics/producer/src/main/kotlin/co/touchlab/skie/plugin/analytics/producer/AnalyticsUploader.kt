@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.analytics.producer
 
+import co.touchlab.skie.util.directory.SkieDirectories
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.UnknownHostException
@@ -12,7 +13,9 @@ import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readBytes
 
-class AnalyticsUploader(private val analyticsCollector: AnalyticsCollector) {
+class AnalyticsUploader(
+    private val analyticsCollector: AnalyticsCollector,
+) {
 
     fun sendAllIfPossible(directory: Path) {
         try {
@@ -106,7 +109,7 @@ class AnalyticsUploader(private val analyticsCollector: AnalyticsCollector) {
             return
         }
 
-        analyticsCollector.logExceptionAndRethrowIfDev(e)
+        analyticsCollector.logExceptionAndRethrowIfNotProduction(e)
     }
 
     private fun isInternetAvailable(): Boolean =
