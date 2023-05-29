@@ -10,6 +10,8 @@ class SkieDirectories(
 
     val analyticsDirectories: SkieAnalyticsDirectories = SkieAnalyticsDirectories(buildDirectory)
 
+    val licensesDirectory: SkieLicensesDirectory = SkieLicensesDirectory
+
     fun resetTemporaryDirectories() {
         buildDirectory.resetTemporaryDirectories()
     }

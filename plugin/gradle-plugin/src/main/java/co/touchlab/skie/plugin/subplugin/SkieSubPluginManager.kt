@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 internal object SkieSubPluginManager {
 
-    const val subPluginConfigurationName: String = "skieSubPlugin"
+    private const val subPluginConfigurationName: String = "skieSubPlugin"
 
     fun configureDependenciesForSubPlugins(project: Project) {
         val subPluginConfiguration = project.configurations.create(subPluginConfigurationName).apply {

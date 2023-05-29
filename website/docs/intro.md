@@ -23,7 +23,7 @@ While it's possible to use Kotlin Coroutines in KMP, the support is far from com
 Both `suspend` functions and `Flows` have limitations that make their usage from Swift cumbersome.
 One of the main goals of SKIE is to change that by utilizing the Swift Async API which was added in Swift 5.5.
 
-### Enabling coroutines interop
+### Disabling coroutines interop
 
 SKIE's coroutines interop is enabled by default.
 However, consider disabling it if you are not using coroutines in your exported code.

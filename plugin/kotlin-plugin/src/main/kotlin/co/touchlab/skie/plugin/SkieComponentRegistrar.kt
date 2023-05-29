@@ -13,6 +13,8 @@ import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.configuration.SkieConfigurationProvider
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
+import co.touchlab.skie.plugin.license.SkieLicense
+import co.touchlab.skie.plugin.license.SkieLicenseError
 import co.touchlab.skie.plugin.license.SkieLicenseProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.GroupingMessageCollectorReflector
@@ -34,9 +36,13 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         val skieDirectories = configuration.getNotNull(ConfigurationKeys.skieDirectories).also {
             it.resetTemporaryDirectories()
         }
+        val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY) ?: MessageCollector.NONE
 
-        val license = SkieLicenseProvider.loadLicense(skieDirectories)
-        val skieConfiguration = SkieConfigurationProvider.getConfiguration(skieDirectories)
+        val license = SkieLicenseProvider.loadLicense(skieDirectories.buildDirectory)
+        license.printCompilerMessages(messageCollector)
+        license.validateWithoutFullContext()
+
+        val skieConfiguration = SkieConfigurationProvider.getConfiguration(skieDirectories.buildDirectory)
 
         val swiftCompilerConfiguration = SwiftCompilerConfiguration(
             sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
@@ -70,16 +76,18 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
         configuration.put(SkieContextKey, skieContext)
 
-        registerErrorAnalytics(configuration, skieContext.analyticsCollector)
+        registerErrorAnalytics(messageCollector, configuration, skieContext.analyticsCollector)
 
         IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
 
         PhaseInterceptor.setupPhaseListeners(configuration)
     }
 
-    private fun registerErrorAnalytics(configuration: CompilerConfiguration, analyticsCollector: AnalyticsCollector) {
-        val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY) ?: MessageCollector.NONE
-
+    private fun registerErrorAnalytics(
+        messageCollector: MessageCollector,
+        configuration: CompilerConfiguration,
+        analyticsCollector: AnalyticsCollector,
+    ) {
         if (messageCollector is GroupingMessageCollector) {
             val reflector = messageCollector.reflectedBy<GroupingMessageCollectorReflector>()
 
@@ -111,6 +119,22 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             }
 
             delegate.report(severity, message, location)
+        }
+    }
+
+    private fun SkieLicense.printCompilerMessages(messageCollector: MessageCollector) {
+        serverMessagesForCompiler.errors.forEach {
+            messageCollector.report(CompilerMessageSeverity.ERROR, it)
+        }
+        serverMessagesForCompiler.errors.forEach {
+            throw SkieLicenseError(it)
+        }
+
+        serverMessagesForCompiler.warnings.forEach {
+            messageCollector.report(CompilerMessageSeverity.WARNING, it)
+        }
+        serverMessagesForCompiler.info.forEach {
+            messageCollector.report(CompilerMessageSeverity.INFO, it)
         }
     }
 }

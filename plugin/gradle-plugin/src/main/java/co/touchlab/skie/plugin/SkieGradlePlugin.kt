@@ -30,18 +30,21 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         val analyticsManager = GradleAnalyticsManager(project, licenseManager)
 
         analyticsManager.withErrorLogging {
-            project.configureSkieGradlePlugin(licenseManager)
+            project.configureSkieGradlePlugin(licenseManager, analyticsManager)
         }
 
         project.afterEvaluate {
             analyticsManager.withErrorLogging {
-                project.configureSkieCompilerPlugin(analyticsManager)
+                project.configureSkieCompilerPlugin(licenseManager, analyticsManager)
             }
         }
     }
 
-    private fun Project.configureSkieGradlePlugin(licenseManager: GradleSkieLicenseManager) {
-        licenseManager.configureLicensing()
+    private fun Project.configureSkieGradlePlugin(
+        licenseManager: GradleSkieLicenseManager,
+        analyticsManager: GradleAnalyticsManager,
+    ) {
+        licenseManager.initializeLicensing(analyticsManager)
 
         SkieExtension.createExtension(project)
 
@@ -49,6 +52,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
     }
 
     private fun Project.configureSkieCompilerPlugin(
+        licenseManager: GradleSkieLicenseManager,
         analyticsManager: GradleAnalyticsManager,
     ) {
         if (!isSkieEnabled) {
@@ -58,21 +62,23 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
         configureEachKotlinFrameworkLinkTask(analyticsManager) {
-            configureSkieForLinkTask(analyticsManager)
+            configureSkieForLinkTask(licenseManager, analyticsManager)
         }
     }
 
     private fun KotlinNativeLink.configureSkieForLinkTask(
+        licenseManager: GradleSkieLicenseManager,
         analyticsManager: GradleAnalyticsManager,
     ) {
+        licenseManager.configureLicensing(this, analyticsManager)
         analyticsManager.configureAnalytics(this)
 
         binary.target.disableCaching()
         binary.target.addDependencyOnSkieRuntime()
 
-        CreateSkieConfigurationTask.registerTask(this)
+        CreateSkieConfigurationTask.registerTask(this, analyticsManager)
 
-        SwiftLinkingConfigurator.configureUserSwiftLinking(this)
+        SwiftLinkingConfigurator.configureUserSwiftLinking(this, analyticsManager)
 
         SkieSubPluginManager.registerSubPlugins(this)
 

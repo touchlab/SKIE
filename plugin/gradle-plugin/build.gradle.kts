@@ -11,6 +11,7 @@ plugins {
 
 buildConfig {
     val kotlinPlugin = projects.kotlinPlugin.dependencyProject
+    // TODO Rename to SKIE_GRADLE_PLUGIN
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${kotlinPlugin.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${kotlinPlugin.mavenArtifactId}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${kotlinPlugin.version}\"")
@@ -36,6 +37,7 @@ dependencies {
     testableCompileOnly(libs.plugin.kotlin.gradle.api)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.jgit)
     implementation(projects.configurationApi)
     implementation(projects.analytics.analyticsApi)
     implementation(projects.analytics.analyticsConfiguration)

@@ -2,26 +2,26 @@ package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
+import co.touchlab.skie.plugin.util.BaseSkieTask
 import co.touchlab.skie.plugin.util.skieDirectories
 import org.gradle.api.BuildCancelledException
-import org.gradle.api.DefaultTask
-import org.gradle.api.Task
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.Internal
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
-internal abstract class SkieFinalizeTask : DefaultTask() {
+internal abstract class SkieFinalizeTask : BaseSkieTask() {
 
+    @get:Internal
     abstract val linkTask: Property<KotlinNativeLink>
 
+    @get:Internal
     abstract val analyticsCollector: Property<AnalyticsCollector>
 
     init {
         doNotTrackState("Must always run after link task.")
     }
 
-    @TaskAction
-    fun runTask() {
+    override fun runTask() {
         reportErrors()
         uploadAnalytics()
     }

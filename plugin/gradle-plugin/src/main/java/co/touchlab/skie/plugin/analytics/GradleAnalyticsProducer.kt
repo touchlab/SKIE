@@ -37,7 +37,7 @@ internal class GradleAnalyticsProducer(
         rootProjectName = project.rootProject.name,
         projectPath = project.path,
         projectFullNameHash = "${project.rootProject.name}${project.path}".hashed(),
-        rootProjectDiskLocationHash = project.rootProject.projectDir.absolutePath.hashed(),
+        rootProjectDiskLocationHash = rootProjectDiskLocationHash(project),
         organizationKey = license.organizationId,
         licenseKey = license.licenseKey.value,
         skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
@@ -45,11 +45,17 @@ internal class GradleAnalyticsProducer(
         kotlinVersion = project.getKotlinPluginVersion(),
         stdlibVersion = project.kotlinExtension.coreLibrariesVersion,
         timestampInMs = System.currentTimeMillis(),
-        isCI = isCI(),
+        isCI = isCI,
     )
 
-    private fun isCI(): Boolean =
-        !System.getenv("CI").isNullOrBlank()
+    companion object {
+
+        val isCI: Boolean
+            get() = !System.getenv("CI").isNullOrBlank()
+
+        fun rootProjectDiskLocationHash(project: Project): String =
+            project.rootProject.projectDir.absolutePath.hashed()
+    }
 }
 
 private fun GradleAnalytics.encode(): ByteArray =

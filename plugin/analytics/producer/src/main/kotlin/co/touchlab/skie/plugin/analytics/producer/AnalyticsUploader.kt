@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.analytics.producer
 
-import co.touchlab.skie.util.directory.SkieDirectories
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.UnknownHostException

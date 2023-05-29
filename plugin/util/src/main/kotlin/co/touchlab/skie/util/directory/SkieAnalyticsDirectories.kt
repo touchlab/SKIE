@@ -11,7 +11,7 @@ class SkieAnalyticsDirectories(
     private val debug: File = skieBuildDirectory.debug.analytics.directory
 
     private val release: File =
-        SkieApplicationDataDirectory.directory
+        SkieUserDataDirectories.applicationSupport
             .resolve("analytics")
             .initializedDirectory()
 

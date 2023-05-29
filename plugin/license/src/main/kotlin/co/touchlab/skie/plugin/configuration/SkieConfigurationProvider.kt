@@ -3,22 +3,19 @@ package co.touchlab.skie.plugin.configuration
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.license.SkieLicense
 import co.touchlab.skie.plugin.license.SkieLicenseProvider
+import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 
 object SkieConfigurationProvider {
 
-    fun getConfiguration(skieDirectories: SkieDirectories): Configuration {
-        val license = SkieLicenseProvider.loadLicense(skieDirectories)
+    fun getConfiguration(skieBuildDirectory: SkieBuildDirectory): Configuration {
+        val license = SkieLicenseProvider.loadLicense(skieBuildDirectory)
 
-        return getConfiguration(skieDirectories, license)
-    }
-
-    fun getConfiguration(skieDirectories: SkieDirectories, skieLicense: SkieLicense): Configuration {
-        val serializedUserConfiguration = skieDirectories.buildDirectory.skieConfiguration.readText()
+        val serializedUserConfiguration = skieBuildDirectory.skieConfiguration.readText()
         val userConfiguration = Configuration.deserialize(serializedUserConfiguration)
 
-        val defaultConfiguration = skieLicense.configurationFromServer.defaultConfiguration
-        val enforcedConfiguration = skieLicense.configurationFromServer.enforcedConfiguration
+        val defaultConfiguration = license.configurationFromServer.defaultConfiguration
+        val enforcedConfiguration = license.configurationFromServer.enforcedConfiguration
 
         return defaultConfiguration + userConfiguration + enforcedConfiguration
     }

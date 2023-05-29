@@ -1,5 +1,7 @@
 package co.touchlab.skie.plugin.switflink
 
+import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
+import co.touchlab.skie.plugin.util.SkieTask
 import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
 import co.touchlab.skie.plugin.util.skieBuildDirectory
 import org.gradle.api.Project
@@ -11,13 +13,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 internal object SwiftLinkingConfigurator {
 
-    fun configureUserSwiftLinking(linkTask: KotlinNativeLink) {
+    fun configureUserSwiftLinking(linkTask: KotlinNativeLink, analyticsManager: GradleAnalyticsManager) {
         with(linkTask.project) {
             val swiftSourceSets = linkTask.binary.compilation.allKotlinSourceSets.map { createSwiftSourceSet(it) }
 
             val swiftSources = objects.fileCollection().from(swiftSourceSets)
 
-            registerCopyTask(linkTask, swiftSources)
+            registerCopyTask(linkTask, analyticsManager, swiftSources)
         }
     }
 
@@ -35,14 +37,21 @@ internal object SwiftLinkingConfigurator {
 
     private fun registerCopyTask(
         linkTask: KotlinNativeLink,
+        analyticsManager: GradleAnalyticsManager,
         swiftSources: ConfigurableFileCollection?,
     ) {
-        val syncTask = linkTask.registerSkieLinkBasedTask<Sync>("copySwift") {
+        val syncTask = linkTask.registerSkieLinkBasedTask<SkieSyncTask>("copySwift", analyticsManager) {
             from(swiftSources)
 
             into(linkTask.skieBuildDirectory.swift.custom.directory)
         }
 
         linkTask.inputs.files(syncTask.map { it.outputs.files })
+    }
+
+    abstract class SkieSyncTask : Sync(), SkieTask {
+
+        override fun runTask() {
+        }
     }
 }

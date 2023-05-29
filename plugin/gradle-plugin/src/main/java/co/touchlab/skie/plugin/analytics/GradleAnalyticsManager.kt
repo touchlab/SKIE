@@ -8,7 +8,9 @@ import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
 import co.touchlab.skie.plugin.util.doFirstOptimized
 import co.touchlab.skie.plugin.util.doLastOptimized
 import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
+import co.touchlab.skie.plugin.util.skieBuildDirectory
 import co.touchlab.skie.plugin.util.skieDirectories
+import co.touchlab.skie.plugin.license.license
 import co.touchlab.skie.util.Environment
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -23,9 +25,9 @@ internal class GradleAnalyticsManager(
 
     val buildId: String = UUID.randomUUID().toString()
 
-    fun withErrorLogging(action: () -> Unit) {
+    fun <T> withErrorLogging(action: () -> T): T {
         try {
-            action()
+            return action()
         } catch (e: Throwable) {
             BugsnagFactory.create(
                 skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
@@ -38,14 +40,14 @@ internal class GradleAnalyticsManager(
     }
 
     fun configureAnalytics(linkTask: KotlinNativeLink) {
-        val analyticsCollectorProvider = licenseManager.license.map { license ->
+        val analyticsCollectorProvider = linkTask.license.map { license ->
             AnalyticsCollector(
                 analyticsDirectories = linkTask.skieDirectories.analyticsDirectories,
                 buildId = buildId,
                 skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
                 type = BugsnagFactory.Type.Gradle,
                 environment = license.environment,
-                configuration = SkieConfigurationProvider.getConfiguration(linkTask.skieDirectories, license).analyticsConfiguration,
+                configuration = SkieConfigurationProvider.getConfiguration(linkTask.skieBuildDirectory).analyticsConfiguration,
             )
         }
 
@@ -79,13 +81,13 @@ internal class GradleAnalyticsManager(
     ) {
         linkTask.doFirstOptimized {
             analyticsCollectorProvider.get().collect(
-                GradleAnalyticsProducer(project, licenseManager.license.get()),
+                GradleAnalyticsProducer(project, linkTask.license.get()),
             )
         }
     }
 
     private fun configureAnalyticsTask(linkTask: KotlinNativeLink, analyticsCollectorProvider: Provider<AnalyticsCollector>) {
-        val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieFinalizeTask>("finalize") {
+        val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieFinalizeTask>("finalize", this) {
             this.linkTask.set(linkTask)
             analyticsCollector.set(analyticsCollectorProvider)
         }
