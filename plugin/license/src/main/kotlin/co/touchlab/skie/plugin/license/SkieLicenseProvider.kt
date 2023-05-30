@@ -1,9 +1,11 @@
 package co.touchlab.skie.plugin.license
 
+import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.license.util.JwtParser
 import co.touchlab.skie.plugin.license.util.LicenseWithPath
 import co.touchlab.skie.plugin.license.util.getLicensePaths
 import co.touchlab.skie.util.BuildConfig
+import co.touchlab.skie.util.Environment
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieLicensesDirectory
 import co.touchlab.skie.util.directory.util.initializedDirectory
@@ -14,6 +16,8 @@ import java.net.URL
 import java.nio.file.Path
 import java.time.Instant
 import javax.net.ssl.HttpsURLConnection
+import kotlin.io.path.createFile
+import kotlin.io.path.notExists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
@@ -26,6 +30,24 @@ object SkieLicenseProvider {
     }
 
     fun loadLicense(license: Path): SkieLicense {
+        return SkieLicense(
+            licenseKey = SkieLicense.Key(""),
+            organizationId = "",
+            licensedSkieVersion = "",
+            supportedKotlinVersions = Regex(".*"),
+            licensedHashedRootProjectDiskLocations = Regex(".*"),
+            licensedHashedPlatformUUID = "",
+            environment = Environment.Dev,
+            configurationFromServer = SkieLicense.ConfigurationFromServer(Configuration(), Configuration()),
+            serverMessagesForGradleConfig = SkieLicense.MessagesFromServer.ForGradleConfig(emptyList(), emptyList()),
+            serverMessagesForCompiler = SkieLicense.MessagesFromServer.ForCompiler(emptyList(), emptyList(), emptyList()),
+            issuedAt = Instant.now(),
+            expiresAt = Instant.now(),
+            renewAt = Instant.now(),
+        )
+
+        // WIP
+
         val fileContent = license.readText()
 
         return JwtParser.parseJwt(fileContent)
@@ -73,6 +95,14 @@ object SkieLicenseProvider {
     }
 
     fun renewLicense(requestData: SkieLicense.RequestData): Path {
+        return SkieLicensesDirectory.directory.resolve("foeman.aegis.lion.shirr.bide").resolve("license.jwt").toPath().also {
+            if (it.notExists()) {
+                it.createFile()
+            }
+        }
+
+        // WIP
+
         val endpoint = getRenewLicenseEndpoint()
 
         val connection = createConnectionToLicensingServer(endpoint)

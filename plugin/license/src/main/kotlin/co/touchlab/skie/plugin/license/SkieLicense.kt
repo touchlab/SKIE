@@ -47,6 +47,9 @@ class SkieLicense(
     }
 
     fun validateWithoutFullContext() {
+        // WIP
+        return
+
         verify(licensedSkieVersion == BuildConfig.SKIE_VERSION) {
             "License with key $licenseKey is not valid for this SKIE version (${BuildConfig.SKIE_VERSION}). " +
                 "Correct version: ${licensedSkieVersion}. " +
