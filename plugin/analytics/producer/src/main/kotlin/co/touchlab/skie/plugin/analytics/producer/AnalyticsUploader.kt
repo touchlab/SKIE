@@ -81,6 +81,7 @@ class AnalyticsUploader(
     }
 
     private fun getS3Url(analyticsArtifact: AnalyticsArtifact): String {
+        // TODO Move to some config file
         val endpoint = "https://api.touchlab.dev/skie/analytics/upload-url/${analyticsArtifact.environment.name}/${analyticsArtifact.fileName}"
 
         val connection = URL(endpoint).openConnection() as HttpsURLConnection

@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.license
 
+import co.touchlab.skie.plugin.license.util.SkieLicenseCleaner
 import co.touchlab.skie.plugin.util.BaseSkieTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -45,7 +46,7 @@ internal abstract class SkieVerifyLicenseTask : BaseSkieTask() {
 
     private fun deleteOldLicensesInBackground() {
         Thread {
-            SkieLicenseProvider.deleteOldLicenses()
+            SkieLicenseCleaner.deleteObsoleteLicenses()
         }.start()
     }
 }
