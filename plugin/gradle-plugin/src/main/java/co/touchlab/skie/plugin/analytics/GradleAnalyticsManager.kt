@@ -82,6 +82,7 @@ internal class GradleAnalyticsManager(
         linkTask.doFirstOptimized {
             analyticsCollectorProvider.get().collect(
                 GradleAnalyticsProducer(project, linkTask.license.get()),
+                OpenSourceAnalyticsProducer(project),
             )
         }
     }

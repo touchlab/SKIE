@@ -35,7 +35,9 @@ internal class GradleAnalyticsProducer(
 
     private fun getFullGradleAnalytics(): GradleAnalytics = GradleAnalytics(
         rootProjectName = project.rootProject.name,
+        rootProjectNameHash = project.rootProject.name.hashed(),
         projectPath = project.path,
+        projectFullName = "${project.rootProject.name}${project.path}",
         projectFullNameHash = "${project.rootProject.name}${project.path}".hashed(),
         rootProjectDiskLocationHash = rootProjectDiskLocationHash(project),
         organizationKey = license.organizationId,
@@ -64,5 +66,6 @@ private fun GradleAnalytics.encode(): ByteArray =
 private fun GradleAnalytics.redacted(): GradleAnalytics =
     copy(
         rootProjectName = rootProjectName.redacted(),
+        projectFullName = projectFullName.redacted(),
         projectPath = projectPath.redacted(),
     )

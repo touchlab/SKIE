@@ -1,18 +1,17 @@
 package co.touchlab.skie.plugin.license
 
-import org.eclipse.jgit.api.Git
-import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
-import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
-import co.touchlab.skie.plugin.util.skieDirectories
-import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
-import co.touchlab.skie.plugin.analytics.GradleAnalyticsProducer
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
+import co.touchlab.skie.plugin.analytics.GradleAnalyticsProducer
+import co.touchlab.skie.plugin.analytics.getGitRemotes
 import co.touchlab.skie.plugin.license.util.getHashedPlatformUUID
+import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
 import co.touchlab.skie.plugin.util.registerSkieTask
-import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
+import co.touchlab.skie.plugin.util.skieDirectories
 import co.touchlab.skie.util.hashed
-import java.io.File
+import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 internal class GradleSkieLicenseManager(private val project: Project) {
 
@@ -60,7 +59,7 @@ internal class GradleSkieLicenseManager(private val project: Project) {
             isCI = GradleAnalyticsProducer.isCI,
             hashedRootProjectDiskLocation = GradleAnalyticsProducer.rootProjectDiskLocationHash(project),
             hashedPlatformUUID = getHashedPlatformUUID(),
-            hashedGitRemotes = getHashedGitRemotes(),
+            hashedGitRemotes = project.getGitRemotes().map { it.hashed() },
         )
 
     private fun registerSkieResetLicenseTask(analyticsManager: GradleAnalyticsManager) {
@@ -88,18 +87,6 @@ internal class GradleSkieLicenseManager(private val project: Project) {
         linkTask.dependsOn(licenseTask)
     }
 
-    private fun getHashedGitRemotes(): List<String> {
-        val directoryWithGit = project.projectDir.findGitRoot() ?: return emptyList()
-
-        val git = Git.open(directoryWithGit)
-
-        return git.remoteList().call()
-            .flatMap { it.urIs }
-            .filter { it.isRemote }
-            .map { it.host + "/" + it.path }
-            .map { it.hashed() }
-    }
-
     private fun SkieLicense.printGradleMessages() {
         serverMessagesForGradleConfig.warnings.forEach {
             project.logger.warn(it)
@@ -109,6 +96,3 @@ internal class GradleSkieLicenseManager(private val project: Project) {
         }
     }
 }
-
-private tailrec fun File.findGitRoot(): File? =
-    if (resolve(".git").exists()) this else parentFile?.findGitRoot()

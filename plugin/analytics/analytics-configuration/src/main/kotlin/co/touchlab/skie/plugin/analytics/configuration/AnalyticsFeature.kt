@@ -33,4 +33,7 @@ sealed interface AnalyticsFeature {
 
     @Serializable
     data class CrashReporting(override val isEnabled: Boolean) : AnalyticsFeature
+
+    @Serializable
+    data class OpenSource(override val isEnabled: Boolean) : AnalyticsFeature
 }
