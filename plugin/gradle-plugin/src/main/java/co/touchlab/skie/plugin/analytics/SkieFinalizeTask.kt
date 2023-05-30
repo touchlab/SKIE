@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
-import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
 import co.touchlab.skie.plugin.util.BaseSkieTask
 import co.touchlab.skie.plugin.util.skieDirectories
 import org.gradle.api.BuildCancelledException
@@ -23,6 +22,7 @@ internal abstract class SkieFinalizeTask : BaseSkieTask() {
 
     override fun runTask() {
         reportErrors()
+
         uploadAnalytics()
     }
 
@@ -38,10 +38,8 @@ internal abstract class SkieFinalizeTask : BaseSkieTask() {
         get() = this is BuildCancelledException || cause?.isCausedByBuildCancelledException == true
 
     private fun uploadAnalytics() {
-        val analyticsCollector = analyticsCollector.get()
+        val analyticsDirectories = linkTask.get().skieDirectories.analyticsDirectories
 
-        val directoryForUpload = linkTask.get().skieDirectories.analyticsDirectories.directoryWithFilesToUpload.toPath()
-
-        AnalyticsUploader(analyticsCollector).sendAllIfPossible(directoryForUpload)
+        GradleAnalyticsManager.uploadAnalytics(analyticsCollector.get(), analyticsDirectories)
     }
 }
