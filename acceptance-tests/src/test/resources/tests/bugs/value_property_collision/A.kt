@@ -13,4 +13,4 @@ enum class B: A {
 }
 
 val Foo.value: String
-    get() = TODO()
+    get() = throw UnsupportedOperationException()

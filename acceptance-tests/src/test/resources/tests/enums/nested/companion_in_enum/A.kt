@@ -24,13 +24,13 @@ enum class B : EnumInterface {
     B2;
 
     override fun foo() {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 
     companion object : EnumCompanionInterface {
 
         override fun bar() {
-            TODO("Not yet implemented")
+            throw UnsupportedOperationException()
         }
     }
 }

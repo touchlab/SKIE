@@ -5,5 +5,5 @@ interface A<T> {
 }
 
 class B: A<B> {
-    override fun foo(): MutableList<B> = TODO()
+    override fun foo(): MutableList<B> = throw UnsupportedOperationException()
 }
