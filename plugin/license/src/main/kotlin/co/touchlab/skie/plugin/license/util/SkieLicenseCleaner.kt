@@ -28,18 +28,12 @@ object SkieLicenseCleaner {
     }
 
     private fun deleteOlderLicenses(directoryWithLicenses: Path) {
-        directoryWithLicenses
+        val licenses = directoryWithLicenses
             .getLicensePaths()
             .mapNotNull { path ->
                 JwtParser.tryParseJwt(path.readText())?.let { license -> LicenseWithPath(license, path) }
             }
-            .groupBy { it.license.licenseKey }
-            .forEach {
-                deleteOlderLicensesWithTheSameKey(it.value)
-            }
-    }
 
-    private fun deleteOlderLicensesWithTheSameKey(licenses: List<LicenseWithPath>) {
         val newestLicenseIssuedAt = licenses.maxOf { it.license.issuedAt }
 
         val threshold = newestLicenseIssuedAt.minus(1, ChronoUnit.HOURS)

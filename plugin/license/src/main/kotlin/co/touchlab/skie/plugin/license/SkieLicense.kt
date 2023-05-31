@@ -5,6 +5,7 @@ import co.touchlab.skie.plugin.license.util.getHashedPlatformUUID
 import co.touchlab.skie.util.BuildConfig
 import co.touchlab.skie.util.Environment
 import com.auth0.jwt.interfaces.Payload
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -148,7 +149,11 @@ class SkieLicense(
     companion object {
 
         operator fun invoke(jwt: Payload): SkieLicense {
-            val jwtBody = Json.decodeFromString<JwtBody>(jwt.getClaim("body").asString())
+            val body = jwt.getClaim("body").asMap()
+
+            val serializedBody = ObjectMapper().writeValueAsString(body)
+
+            val jwtBody = Json.decodeFromString<JwtBody>(serializedBody)
 
             return SkieLicense(
                 licenseKey = jwtBody.licenseKey,

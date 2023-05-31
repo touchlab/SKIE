@@ -117,7 +117,7 @@ object SkieLicenseProvider {
     private fun createConnectionToLicensingServer(endpoint: String): HttpsURLConnection {
         val connection = URL(endpoint).openConnection() as HttpsURLConnection
 
-        connection.requestMethod = "GET"
+        connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json")
         connection.doInput = true
         connection.doOutput = true
@@ -141,6 +141,7 @@ object SkieLicenseProvider {
             // WIP Correct error handling
             throw SkieLicenseError("SKIE license couldn't be renewed because of a server error: $responseCode - $responseBody")
         }
+
         return responseBody
     }
 

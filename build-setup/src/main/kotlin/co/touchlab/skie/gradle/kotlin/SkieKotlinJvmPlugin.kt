@@ -5,6 +5,8 @@ import co.touchlab.skie.gradle.util.testImplementation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
@@ -19,6 +21,8 @@ class SkieKotlinJvmPlugin : Plugin<Project> {
             configureTests()
             configureContextReceivers()
             configureOptIn()
+
+            // TODO Configure Java toolchain (https://docs.gradle.org/current/userguide/toolchains.html)
         }
     }
 

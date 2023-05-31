@@ -37,7 +37,6 @@ internal abstract class SkieVerifyLicenseTask : BaseSkieTask() {
         outputLicenseFile.writeBytes(licenseContent)
     }
 
-    // WIP Test if this doesn't delay the task anyway
     private fun renewLicenseInBackground(licenseRequestData: SkieLicense.RequestData) {
         Thread {
             SkieLicenseProvider.tryToRenewLicense(licenseRequestData)

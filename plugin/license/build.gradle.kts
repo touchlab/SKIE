@@ -10,6 +10,7 @@ dependencies {
 
     implementation(libs.java.jwt)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.jackson.databind)
     implementation(libs.ktor.client.java)
 }
 
