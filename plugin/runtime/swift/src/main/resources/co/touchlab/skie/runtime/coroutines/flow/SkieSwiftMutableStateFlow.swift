@@ -27,7 +27,9 @@ public final class SkieSwiftMutableStateFlow<T>: _Concurrency.AsyncSequence, Swi
     }
 
     public var subscriptionCount: SkieSwiftStateFlow<KotlinInt> {
-        return delegate.subscriptionCount
+        let kotlinFlow = SkieKotlinStateFlow(delegate.subscriptionCount) as! SkieKotlinStateFlow<AnyObject>
+
+        return SkieSwiftStateFlow<KotlinInt>._unconditionallyBridgeFromObjectiveC(kotlinFlow)
     }
 
     public var value: T {
