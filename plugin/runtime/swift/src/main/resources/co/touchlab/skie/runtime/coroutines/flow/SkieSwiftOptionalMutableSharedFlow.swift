@@ -27,9 +27,13 @@ public final class SkieSwiftOptionalMutableSharedFlow<T>: _Concurrency.AsyncSequ
     }
 
     public var subscriptionCount: SkieSwiftStateFlow<KotlinInt> {
-        let kotlinFlow = SkieKotlinStateFlow(delegate.subscriptionCount) as! SkieKotlinStateFlow<AnyObject>
+        if delegate.subscriptionCount is AnyObject {
+            let kotlinFlow = SkieKotlinStateFlow(delegate.subscriptionCount) as! SkieKotlinStateFlow<AnyObject>
 
-        return SkieSwiftStateFlow<KotlinInt>._unconditionallyBridgeFromObjectiveC(kotlinFlow)
+            return SkieSwiftStateFlow<KotlinInt>._unconditionallyBridgeFromObjectiveC(kotlinFlow)
+        } else {
+            return delegate.subscriptionCount as! SkieSwiftStateFlow<KotlinInt>
+        }
     }
 
     public func resetReplayCache() {
