@@ -7,4 +7,7 @@ let cacheSum = AKt.flow.replayCache.map { $0.intValue }.reduce(0, +)
 
 if resultSum == 5 && cacheSum == 5 {
     exit(0)
+} else {
+    print("resultSum: \(resultSum), cacheSum: \(cacheSum)")
+    exit(1)
 }
