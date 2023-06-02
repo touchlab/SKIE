@@ -3,6 +3,8 @@ package co.touchlab.skie.analytics.consumer
 import co.touchlab.skie.dev_support.analytics.BuildConfig
 import co.touchlab.skie.plugin.analytics.air.element.AirProject
 import co.touchlab.skie.plugin.analytics.compiler.CompilerAnalytics
+import co.touchlab.skie.plugin.analytics.gradle.GradleAnalytics
+import co.touchlab.skie.plugin.analytics.hw.HardwareAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsArtifact
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsEncryptor
 import co.touchlab.skie.plugin.analytics.producer.compressor.CompressionMethod
@@ -29,19 +31,19 @@ fun main() {
 
 private fun loadAll(buildId: String, skieVersion: String, environment: String, privateKey: Path) {
     try {
-        println(loadJson<CompilerAnalytics>(buildId, "compiler", skieVersion, environment, privateKey))
+        println(loadJsonAsString<CompilerAnalytics>(buildId, "compiler", skieVersion, environment, privateKey))
         println("--------")
     } catch (_: Throwable) {
     }
 
     try {
-        println(loadString(buildId, "gradle", skieVersion, environment, privateKey))
+        println(loadJsonAsString<GradleAnalytics>(buildId, "gradle", skieVersion, environment, privateKey))
         println("--------")
     } catch (_: Throwable) {
     }
 
     try {
-        println(loadString(buildId, "hw", skieVersion, environment, privateKey))
+        println(loadJsonAsString<HardwareAnalytics>(buildId, "hw", skieVersion, environment, privateKey))
         println("--------")
     } catch (_: Throwable) {
     }
@@ -120,4 +122,10 @@ private inline fun <reified T> loadJson(buildId: String, type: String, skieVersi
     val data = loadByteArray(buildId, type, skieVersion, environment, privateKey)
 
     return Json.decodeFromString(String(data))
+}
+
+private inline fun <reified T> loadJsonAsString(buildId: String, type: String, skieVersion: String, environment: String, privateKey: Path): String {
+    val value = loadJson<T>(buildId, type, skieVersion, environment, privateKey)
+
+    return json.encodeToString(value)
 }
