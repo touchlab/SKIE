@@ -10,11 +10,13 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
 
     val coroutinesInterop: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
     val fqNames: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val enableParallelSwiftCompilation: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
 
     internal fun buildFeatureSet(): SkieFeatureSet =
         setOfNotNull(
             SkieFeature.CoroutinesInterop takeIf coroutinesInterop,
             SkieFeature.FqNames takeIf fqNames,
+            SkieFeature.ParallelSwiftCompilation takeIf enableParallelSwiftCompilation
         ).let { SkieFeatureSet(it) }
 
     private infix fun SkieFeature.takeIf(property: Property<Boolean>): SkieFeature? =

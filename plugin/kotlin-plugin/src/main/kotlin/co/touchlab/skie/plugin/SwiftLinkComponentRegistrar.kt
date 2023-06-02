@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.kotlin_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
@@ -36,7 +37,11 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             sourceFiles = configuration.getList(ConfigurationKeys.SwiftCompiler.sourceFiles),
             expandedSourcesDir = configuration.getNotNull(ConfigurationKeys.SwiftCompiler.generatedDir),
             swiftVersion = configuration.get(ConfigurationKeys.SwiftCompiler.swiftVersion, "5"),
-            parallelCompilation = configuration.get(ConfigurationKeys.SwiftCompiler.parallelCompilation, true),
+            parallelCompilation = configuration.get(
+                ConfigurationKeys.SwiftCompiler.parallelCompilation,
+                // TODO Refactor after rebasing licensing
+                SkieFeature.ParallelSwiftCompilation in skieConfiguration.enabledFeatures
+            ),
             additionalFlags = configuration.getList(ConfigurationKeys.SwiftCompiler.additionalFlags),
         )
 

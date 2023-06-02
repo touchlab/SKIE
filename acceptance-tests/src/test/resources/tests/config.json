@@ -1,7 +1,8 @@
 {
     "enabledFeatures": {
         "features": [
-            "CoroutinesInterop"
+            "CoroutinesInterop",
+            "ParallelSwiftCompilation"
         ]
     },
     "groups": [
