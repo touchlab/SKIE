@@ -20,7 +20,10 @@ sealed interface AnalyticsFeature {
     data class Hardware(override val isEnabled: Boolean) : AnalyticsFeature
 
     @Serializable
-    data class Performance(override val isEnabled: Boolean) : AnalyticsFeature
+    data class GradlePerformance(override val isEnabled: Boolean) : AnalyticsFeature
+
+    @Serializable
+    data class SkiePerformance(override val isEnabled: Boolean) : AnalyticsFeature
 
     @Serializable
     data class SkieConfiguration(override val isEnabled: Boolean, val stripIdentifiers: Boolean) : AnalyticsFeature

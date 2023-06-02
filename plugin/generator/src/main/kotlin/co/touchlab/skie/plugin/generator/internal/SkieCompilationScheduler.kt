@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 internal class SkieCompilationScheduler(
     context: CommonBackendContext,
-    skieContext: SkieContext,
+    private val skieContext: SkieContext,
     descriptorProvider: NativeMutableDescriptorProvider,
     declarationBuilder: DeclarationBuilderImpl,
     namespaceProvider: NamespaceProvider,
@@ -96,12 +96,20 @@ internal class SkieCompilationScheduler(
     fun runObjcPhases() {
         compilationPhases
             .filter { it.isActive }
-            .forEach { it.runObjcPhase() }
+            .forEach {
+                skieContext.skiePerformanceAnalyticsProducer.log("ObjC Phase: ${it::class.simpleName}") {
+                    it.runObjcPhase()
+                }
+            }
     }
 
     fun runIrPhases(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
         compilationPhases
             .filter { it.isActive }
-            .forEach { it.runIrPhase(moduleFragment, pluginContext, allModules) }
+            .forEach {
+                skieContext.skiePerformanceAnalyticsProducer.log("IR Phase: ${it::class.simpleName}") {
+                    it.runIrPhase(moduleFragment, pluginContext, allModules)
+                }
+            }
     }
 }

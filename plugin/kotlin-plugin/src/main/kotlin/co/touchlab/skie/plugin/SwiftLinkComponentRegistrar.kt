@@ -9,6 +9,7 @@ import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
+import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptor
@@ -61,6 +62,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 license = license,
                 configuration = skieConfiguration.analyticsConfiguration,
             ),
+            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
         )
 
         configuration.put(SkieContextKey, skieContext)

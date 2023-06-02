@@ -35,6 +35,7 @@ class SwiftLinkCompilePhase(
     private val skieContext = context.skieContext
     private val compilerConfiguration = skieContext.swiftCompilerConfiguration
 
+    // TODO Refactor to phases
     fun process(): List<ObjectFile> {
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
             return emptyList()
@@ -76,6 +77,7 @@ class SwiftLinkCompilePhase(
         val skieModule = skieContext.module as DefaultSkieModule
 
         SkieLinkingPhaseScheduler(
+            skieContext = skieContext,
             skieModule = skieModule,
             context = context,
             framework = framework,
@@ -83,8 +85,12 @@ class SwiftLinkCompilePhase(
             builtinKotlinDeclarations = builtinKotlinDeclarations,
         ).runLinkingPhases()
 
-        val swiftFileSpecs = skieModule.produceSwiftPoetFiles(swiftModelScope, framework.moduleName)
-        val swiftTextFiles = skieModule.produceTextFiles()
+        val swiftFileSpecs = skieContext.skiePerformanceAnalyticsProducer.log("produceSwiftPoetFiles") {
+            skieModule.produceSwiftPoetFiles(swiftModelScope, framework.moduleName)
+        }
+        val swiftTextFiles = skieContext.skiePerformanceAnalyticsProducer.log("produceTextFiles") {
+            skieModule.produceTextFiles()
+        }
 
         val newFiles = swiftFileSpecs.map { fileSpec ->
             val file = swiftSourcesDir.resolve("${fileSpec.name}.swift")
@@ -103,7 +109,9 @@ class SwiftLinkCompilePhase(
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
             val compileDirectory = SwiftCompileDirectory(framework.moduleName, config.tempFiles.create("swift-object"))
 
-            compileSwift(configurables, framework, sourceFiles, compileDirectory)
+            skieContext.skiePerformanceAnalyticsProducer.log("compileSwift") {
+                compileSwift(configurables, framework, sourceFiles, compileDirectory)
+            }
 
             copySwiftModuleFiles(configurables, compileDirectory, framework)
 

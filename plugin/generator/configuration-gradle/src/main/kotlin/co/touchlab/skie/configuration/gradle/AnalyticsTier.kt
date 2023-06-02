@@ -16,7 +16,8 @@ enum class AnalyticsTier {
                 AnalyticsFeature.SkieConfiguration(isEnabled = true, stripIdentifiers = false),
                 AnalyticsFeature.Compiler(isEnabled = true, stripIdentifiers = false),
                 AnalyticsFeature.Hardware(isEnabled = true),
-                AnalyticsFeature.Performance(isEnabled = true),
+                AnalyticsFeature.SkiePerformance(isEnabled = true),
+                AnalyticsFeature.GradlePerformance(isEnabled = true),
                 AnalyticsFeature.Sysctl(isEnabled = true),
                 AnalyticsFeature.Air(isEnabled = true, stripIdentifiers = false),
             )
@@ -35,7 +36,8 @@ enum class AnalyticsTier {
                 AnalyticsFeature.SkieConfiguration(isEnabled = true, stripIdentifiers = true),
                 AnalyticsFeature.Compiler(isEnabled = true, stripIdentifiers = true),
                 AnalyticsFeature.Hardware(isEnabled = true),
-                AnalyticsFeature.Performance(isEnabled = true),
+                AnalyticsFeature.SkiePerformance(isEnabled = true),
+                AnalyticsFeature.GradlePerformance(isEnabled = true),
                 AnalyticsFeature.Sysctl(isEnabled = true),
                 AnalyticsFeature.Air(isEnabled = true, stripIdentifiers = true),
             )
@@ -52,7 +54,8 @@ enum class AnalyticsTier {
                 AnalyticsFeature.SkieConfiguration(isEnabled = true, stripIdentifiers = true),
                 AnalyticsFeature.Compiler(isEnabled = true, stripIdentifiers = true),
                 AnalyticsFeature.Hardware(isEnabled = true),
-                AnalyticsFeature.Performance(isEnabled = true),
+                AnalyticsFeature.SkiePerformance(isEnabled = true),
+                AnalyticsFeature.GradlePerformance(isEnabled = true),
                 AnalyticsFeature.Sysctl(isEnabled = true),
             )
     },
@@ -66,6 +69,8 @@ enum class AnalyticsTier {
             AnalyticsConfiguration(
                 AnalyticsFeature.CrashReporting(isEnabled = true),
                 AnalyticsFeature.Gradle(isEnabled = true, stripIdentifiers = true),
+                AnalyticsFeature.SkiePerformance(isEnabled = true),
+                AnalyticsFeature.GradlePerformance(isEnabled = true),
                 AnalyticsFeature.SkieConfiguration(isEnabled = true, stripIdentifiers = true),
                 AnalyticsFeature.Compiler(isEnabled = true, stripIdentifiers = true),
             )

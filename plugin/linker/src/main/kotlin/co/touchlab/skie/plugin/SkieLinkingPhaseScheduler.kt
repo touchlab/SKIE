@@ -13,6 +13,7 @@ import co.touchlab.skie.api.phases.memberconflicts.RenameEnumRawValuePhase
 import co.touchlab.skie.api.phases.typeconflicts.AddForwardDeclarationsPhase
 import co.touchlab.skie.api.phases.typeconflicts.AddTypeDefPhase
 import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
+import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
@@ -21,6 +22,7 @@ import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 
 class SkieLinkingPhaseScheduler(
+    private val skieContext: SkieContext,
     skieModule: DefaultSkieModule,
     context: CommonBackendContext,
     framework: FrameworkLayout,
@@ -49,7 +51,9 @@ class SkieLinkingPhaseScheduler(
         linkingPhases
             .filter { it.isActive }
             .forEach {
-                it.execute()
+                skieContext.skiePerformanceAnalyticsProducer.log("Linking Phase: ${it::class.simpleName}") {
+                    it.execute()
+                }
             }
     }
 }

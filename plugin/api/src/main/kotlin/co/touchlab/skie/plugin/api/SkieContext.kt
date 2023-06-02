@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.api
 
 import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
+import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import co.touchlab.skie.plugin.api.module.SkieModule
@@ -21,4 +22,5 @@ interface SkieContext {
     val dumpSwiftApiPoints: Set<DumpSwiftApiPoint>
 
     val analyticsCollector: AnalyticsCollector
+    val skiePerformanceAnalyticsProducer: SkiePerformanceAnalyticsProducer
 }

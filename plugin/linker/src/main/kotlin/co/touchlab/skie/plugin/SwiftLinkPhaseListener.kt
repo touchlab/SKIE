@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -31,6 +32,11 @@ class SwiftLinkPhaseListener : PhaseListener {
 
         context.compilerOutput += swiftObjectFiles
 
+        logSkiePerformance(context.skieContext)
         context.skieContext.analyticsCollector.waitForBackgroundTasks()
+    }
+
+    private fun logSkiePerformance(context: SkieContext) {
+        context.analyticsCollector.collect(context.skiePerformanceAnalyticsProducer)
     }
 }

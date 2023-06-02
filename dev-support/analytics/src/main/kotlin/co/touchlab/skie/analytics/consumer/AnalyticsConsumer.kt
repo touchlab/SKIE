@@ -47,7 +47,13 @@ private fun loadAll(buildId: String, skieVersion: String, environment: String, p
     }
 
     try {
-        println(loadString(buildId, "performance", skieVersion, environment, privateKey))
+        println(loadString(buildId, "gradle-performance", skieVersion, environment, privateKey))
+        println("--------")
+    } catch (_: Throwable) {
+    }
+
+    try {
+        println(loadString(buildId, "skie-performance", skieVersion, environment, privateKey))
         println("--------")
     } catch (_: Throwable) {
     }

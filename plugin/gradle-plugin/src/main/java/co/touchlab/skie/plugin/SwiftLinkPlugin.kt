@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsProducer
-import co.touchlab.skie.plugin.analytics.PerformanceAnalyticsProducer
+import co.touchlab.skie.plugin.analytics.GradlePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
@@ -390,7 +390,7 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
                     val linkTaskDuration = Duration.ofMillis(System.currentTimeMillis() - start)
 
                     analyticsCollector.collect(
-                        PerformanceAnalyticsProducer(linkTaskDuration),
+                        GradlePerformanceAnalyticsProducer(linkTaskDuration),
                     )
                 }
             },
