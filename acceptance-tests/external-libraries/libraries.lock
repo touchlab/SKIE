@@ -992,4 +992,4 @@ tz.co.asoft:viewmodel-test-core-iosarm64:1.5.3
 tz.co.asoft:viewmodel-test-expect-iosarm64:1.5.3
 tz.co.asoft:viewmodel-test-iosarm64:2.0.2
 xyz.metakeep.sdk:lib-iosarm64:2.0.0-beta.2
-io.arrow-kt:arrow-core:1.1.3
+io.arrow-kt:arrow-core-iosarm64:1.1.3
