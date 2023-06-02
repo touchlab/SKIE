@@ -7,6 +7,7 @@ import co.touchlab.skie.plugin.api.debug.DebugInfoDirectory
 import co.touchlab.skie.plugin.api.debug.DumpSwiftApiPoint
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
+import java.io.File
 
 interface SkieContext {
 
@@ -16,6 +17,7 @@ interface SkieContext {
     val swiftCompilerConfiguration: SwiftCompilerConfiguration
 
     val debugInfoDirectory: DebugInfoDirectory
+    val skieBuildDirectory: File
 
     val frameworkLayout: FrameworkLayout
     val disableWildcardExport: Boolean

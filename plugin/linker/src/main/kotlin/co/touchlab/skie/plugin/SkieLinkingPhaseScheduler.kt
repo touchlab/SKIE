@@ -2,10 +2,12 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.phases.ApiNotesGenerationPhase
+import co.touchlab.skie.api.phases.DisableWildcardExportPhase
 import co.touchlab.skie.api.phases.FixClassesConflictsPhase
 import co.touchlab.skie.api.phases.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.api.phases.FixNestedBridgedTypesPhase
 import co.touchlab.skie.api.phases.SkieModuleConfigurationPhase
+import co.touchlab.skie.api.phases.SwiftCacheSetupPhase
 import co.touchlab.skie.api.phases.debug.DumpSwiftApiPhase
 import co.touchlab.skie.api.phases.memberconflicts.FixCallableMembersConflictsPhase
 import co.touchlab.skie.api.phases.memberconflicts.RemoveKonanManglingPhase
@@ -44,7 +46,9 @@ class SkieLinkingPhaseScheduler(
         ApiNotesGenerationPhase(swiftModelScope, objCTypeRenderer, context, framework),
         AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
         AddTypeDefPhase(framework.kotlinHeader, objCTypeRenderer),
+        DisableWildcardExportPhase(skieContext, framework),
         DumpSwiftApiPhase(DumpSwiftApiPoint.AfterApiNotes, context, framework),
+        SwiftCacheSetupPhase(skieContext, framework),
     )
 
     fun runLinkingPhases() {

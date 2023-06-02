@@ -13,6 +13,7 @@ object ConfigurationKeys {
     val disableWildcardExport = CompilerConfigurationKey<Boolean>("disable wildcard export")
     val skieConfiguration = CompilerConfigurationKey<Configuration>("SKIE configuration")
     val analyticsDir = CompilerConfigurationKey<File>("Directory with SKIE analytics")
+    val skieBuildDir = CompilerConfigurationKey<File>("Directory with SKIE build")
 
     object SwiftCompiler {
         val sourceFiles = CompilerConfigurationKey<List<File>>("Swift source files")

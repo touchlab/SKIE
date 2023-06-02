@@ -183,6 +183,14 @@ abstract class SwiftLinkPlugin : Plugin<Project> {
 
                                     linkTask.compilerPluginOptions.addPluginArgument(
                                         SkiePlugin.id,
+                                        SkiePlugin.Options.skieBuildDir.subpluginOption(
+                                            layout.buildDirectory.file("skieBuild/${framework.name}/${framework.target.targetName}")
+                                                .get().asFile,
+                                        ),
+                                    )
+
+                                    linkTask.compilerPluginOptions.addPluginArgument(
+                                        SkiePlugin.id,
                                         SkiePlugin.Options.Debug.infoDirectory.subpluginOption(
                                             layout.buildDirectory.file("${BuildConfig.KOTLIN_PLUGIN_ID}/${framework.name}/${framework.target.targetName}")
                                                 .get().asFile,

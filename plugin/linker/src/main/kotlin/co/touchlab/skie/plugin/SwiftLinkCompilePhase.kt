@@ -7,6 +7,8 @@ import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvide
 import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
+import co.touchlab.skie.api.phases.cacheableKotlinFramework
+import co.touchlab.skie.api.phases.swiftCacheDirectory
 import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.mutableDescriptorProvider
@@ -104,8 +106,6 @@ class SwiftLinkCompilePhase(
 
         val sourceFiles = compilerConfiguration.sourceFiles + newFiles
 
-        disableWildcardExportIfNeeded(framework)
-
         val swiftObjectPaths = if (sourceFiles.isNotEmpty()) {
             val compileDirectory = SwiftCompileDirectory(framework.moduleName, config.tempFiles.create("swift-object"))
 
@@ -132,14 +132,6 @@ class SwiftLinkCompilePhase(
         context.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
     }
 
-    private fun disableWildcardExportIfNeeded(framework: FrameworkLayout) {
-        if (skieContext.disableWildcardExport) {
-            framework.modulemapFile.writeText(
-                framework.modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator())
-            )
-        }
-    }
-
     private fun compileSwift(
         configurables: AppleConfigurables,
         framework: FrameworkLayout,
@@ -152,7 +144,7 @@ class SwiftLinkCompilePhase(
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
             +"-F"
-            +framework.parentDir.absolutePath
+            +skieContext.cacheableKotlinFramework.parentDir.absolutePath
             +"-emit-module"
             +"-emit-module-path"
             +compileDirectory.swiftModule
@@ -169,6 +161,8 @@ class SwiftLinkCompilePhase(
             +"-enable-library-evolution"
             +"-parse-as-library"
             +"-g"
+            +"-module-cache-path"
+            +skieContext.swiftCacheDirectory.absolutePath
             +"-swift-version"
             +compilerConfiguration.swiftVersion
             +parallelizationArgument()

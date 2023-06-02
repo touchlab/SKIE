@@ -26,8 +26,6 @@ class ApiNotesGenerationPhase(
     private fun ApiNotes.createApiNotesFile() {
         val content = this.createApiNotesFileContent()
 
-        val apiNotesFile = framework.headersDir.resolve("${framework.moduleName}.apinotes")
-
-        apiNotesFile.writeText(content)
+        framework.apiNotes.writeText(content)
     }
 }

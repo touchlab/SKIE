@@ -51,6 +51,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             configuration = skieConfiguration,
             swiftCompilerConfiguration = swiftCompilerConfiguration,
             debugInfoDirectory = configuration.getNotNull(ConfigurationKeys.Debug.infoDirectory),
+            skieBuildDirectory = configuration.getNotNull(ConfigurationKeys.skieBuildDir),
             frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
             disableWildcardExport = configuration.getBoolean(ConfigurationKeys.disableWildcardExport),
             dumpSwiftApiPoints = configuration.get(ConfigurationKeys.Debug.dumpSwiftApiPoints) ?: emptySet(),

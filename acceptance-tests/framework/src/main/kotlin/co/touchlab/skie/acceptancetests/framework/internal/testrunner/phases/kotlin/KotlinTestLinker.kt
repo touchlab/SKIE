@@ -53,6 +53,7 @@ class KotlinTestLinker(
     private fun configureSwiftKt(configuration: Configuration) {
         val expandedSwiftDirectory = tempFileSystem.createDirectory("swiftpack-expanded")
         val analyticsDirectory = tempFileSystem.createDirectory("analytics")
+        val skieBuildDirectory = tempFileSystem.createDirectory("skieBuild")
 
         PluginRegistrar.configure.set {
             put(ConfigurationKeys.SwiftCompiler.generatedDir, expandedSwiftDirectory.toFile())
@@ -64,6 +65,7 @@ class KotlinTestLinker(
             put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
             put(ConfigurationKeys.jwtWithLicense, "foeman.aegis.lion.shirr.bide")
             put(ConfigurationKeys.analyticsDir, analyticsDirectory.toFile())
+            put(ConfigurationKeys.skieBuildDir, skieBuildDirectory.toFile())
             put(ConfigurationKeys.disableWildcardExport, true)
         }
 

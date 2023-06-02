@@ -21,6 +21,7 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         Options.buildId,
         Options.jwtWithLicense,
         Options.analyticsDir,
+        Options.skieBuildDir,
         Options.Debug.infoDirectory,
         Options.Debug.dumpSwiftApiAt,
     )
@@ -60,6 +61,10 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
 
             Options.analyticsDir -> {
                 configuration.put(ConfigurationKeys.analyticsDir, Options.analyticsDir.deserialize(value))
+            }
+
+            Options.skieBuildDir -> {
+                configuration.put(ConfigurationKeys.skieBuildDir, Options.skieBuildDir.deserialize(value))
             }
 
             Options.Debug.infoDirectory -> {
