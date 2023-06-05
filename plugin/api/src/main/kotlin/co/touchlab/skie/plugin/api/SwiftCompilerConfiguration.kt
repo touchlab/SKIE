@@ -5,6 +5,5 @@ import java.io.File
 data class SwiftCompilerConfiguration(
     val sourceFilesDirectory: File,
     val swiftVersion: String,
-    val parallelCompilation: Boolean,
     val additionalFlags: List<String>,
 )

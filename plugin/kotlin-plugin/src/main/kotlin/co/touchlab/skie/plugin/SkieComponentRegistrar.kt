@@ -47,11 +47,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         val swiftCompilerConfiguration = SwiftCompilerConfiguration(
             sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
             swiftVersion = configuration.get(ConfigurationKeys.SwiftCompiler.swiftVersion, "5"),
-            parallelCompilation = configuration.get(
-                ConfigurationKeys.SwiftCompiler.parallelCompilation,
-                // WIP Refactor after rebasing licensing
-                SkieFeature.ParallelSwiftCompilation in skieConfiguration.enabledFeatures
-            ),
             additionalFlags = configuration.getList(ConfigurationKeys.SwiftCompiler.additionalFlags),
         )
 

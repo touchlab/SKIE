@@ -9,6 +9,7 @@ import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollec
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.api.phases.cacheableKotlinFramework
 import co.touchlab.skie.api.phases.swiftCacheDirectory
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.mutableDescriptorProvider
@@ -252,11 +253,10 @@ class SwiftLinkCompilePhase(
         config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
     }
 
-    private fun parallelizationArgument(): String {
-        if (compilerConfiguration.parallelCompilation) {
-            return "-j${Runtime.getRuntime().availableProcessors()}"
-        } else {
-            return "-j1"
-        }
+    private fun parallelizationArgument(): String =
+        if (SkieFeature.ParallelSwiftCompilation in skieContext.configuration.enabledFeatures) {
+        "-j${Runtime.getRuntime().availableProcessors()}"
+    } else {
+        "-j1"
     }
 }

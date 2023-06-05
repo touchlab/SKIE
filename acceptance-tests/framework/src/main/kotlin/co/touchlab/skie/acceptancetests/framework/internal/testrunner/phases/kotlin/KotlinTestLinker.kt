@@ -62,7 +62,6 @@ class KotlinTestLinker(
         PluginRegistrar.configure.set {
             put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
             put(ConfigurationKeys.skieDirectories, skieDirectories)
-            put(ConfigurationKeys.SwiftCompiler.parallelCompilation, false)
             add(ConfigurationKeys.SwiftCompiler.additionalFlags, "-verify-emitted-module-interface")
             put(ConfigurationKeys.skieBuildDir, skieBuildDirectory.toFile())
         }

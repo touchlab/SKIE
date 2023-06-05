@@ -14,7 +14,6 @@ object ConfigurationKeys {
     object SwiftCompiler {
 
         val swiftVersion = CompilerConfigurationKey<String>("Swift version")
-        val parallelCompilation = CompilerConfigurationKey<Boolean>("Is Swift parallel compilation enabled")
         val additionalFlags = CompilerConfigurationKey<List<String>>("Additional Swift compiler flags")
     }
 }
