@@ -78,7 +78,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         CreateSkieConfigurationTask.registerTask(this, analyticsManager)
 
-        SwiftLinkingConfigurator.configureUserSwiftLinking(this, analyticsManager)
+        SwiftLinkingConfigurator.configureCustomSwiftLinking(this, analyticsManager)
 
         SkieSubPluginManager.registerSubPlugins(this)
 

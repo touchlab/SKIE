@@ -64,7 +64,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 environment = license.environment,
                 configuration = skieConfiguration.analyticsConfiguration,
             ),
-            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
+            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(license.environment),
         )
 
         configuration.put(SkieContextKey, skieContext)

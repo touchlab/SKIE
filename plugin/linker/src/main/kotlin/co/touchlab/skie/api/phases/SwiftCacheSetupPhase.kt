@@ -3,7 +3,7 @@ package co.touchlab.skie.api.phases
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import java.io.File
+import co.touchlab.skie.util.cache.copyFileToIfDifferent
 
 class SwiftCacheSetupPhase(
     private val skieContext: SkieContext,
@@ -29,22 +29,9 @@ class SwiftCacheSetupPhase(
         }
 
         // Must use `or` to prevent short circuit optimization.
-        return syncIfDifferent(framework.kotlinHeader, dummyFramework.kotlinHeader) or
-            syncIfDifferent(framework.modulemapFile, dummyFramework.modulemapFile) or
-            syncIfDifferent(framework.apiNotes, dummyFramework.apiNotes)
-    }
-
-    private fun syncIfDifferent(source: File, destination: File): Boolean {
-        val sourceContent = source.readText()
-        val destinationContent = if (destination.exists()) destination.readText() else null
-
-        if (sourceContent != destinationContent) {
-            destination.writeText(sourceContent)
-
-            return true
-        }
-
-        return false
+        return framework.kotlinHeader.copyFileToIfDifferent(dummyFramework.kotlinHeader) or
+            framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
+            framework.apiNotes.copyFileToIfDifferent(dummyFramework.apiNotes)
     }
 
     // Solves a bug in Swift compiler.
@@ -61,7 +48,3 @@ class SwiftCacheSetupPhase(
 
 val SkieContext.cacheableKotlinFramework: FrameworkLayout
     get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(frameworkLayout.moduleName))
-
-
-
-

@@ -16,19 +16,23 @@ class SkieBuildDirectory(
 
     val swift: Swift = Swift(this)
 
+    val temp: Temp = Temp(this)
+
+    val swiftCompiler: SwiftCompiler = SwiftCompiler(this)
+
     val skieConfiguration: File = directory.resolve("configuration.json")
 
     val license: File = directory.resolve("license.json")
 
     class Cache(parent: Directory) : PermanentDirectory(parent, "cache") {
 
-        val swiftModules: SwiftCompiler = SwiftCompiler(this)
+        val swiftModules: SwiftModules = SwiftModules(this)
 
         val cacheableKotlinFramework: CacheableKotlinFramework = CacheableKotlinFramework(this)
 
-        class SwiftCompiler(parent: Directory) : PermanentDirectory(parent, "swift-module-cache")
+        class SwiftModules(parent: Directory) : PermanentDirectory(parent, "swift-module-cache")
 
-        class CacheableKotlinFramework(parent: Directory) : PermanentDirectory(parent, "cacheable-framework") {
+        class CacheableKotlinFramework(parent: Directory) : PermanentDirectory(parent, "kotlin-framework") {
 
             fun framework(moduleName: String): File = directory.resolve("$moduleName.framework").also { it.mkdirs() }
         }
@@ -68,12 +72,56 @@ class SkieBuildDirectory(
 
         val custom: Custom = Custom(this)
 
-        class Generated(parent: Directory) : TemporaryDirectory(parent, "generated") {
+        class Generated(parent: Directory) : PermanentDirectory(parent, "generated") {
 
             fun swiftFile(baseName: String): File = directory.resolve("$baseName.swift")
         }
 
         class Custom(parent: Directory) : PermanentDirectory(parent, "custom")
+    }
+
+    class SwiftCompiler(parent: Directory) : PermanentDirectory(parent, "swift-compiler") {
+
+        val objectFiles: ObjectFiles = ObjectFiles(this)
+
+        fun moduleHeader(moduleName: String): ModuleHeader = ModuleHeader(this, moduleName)
+
+        class ObjectFiles(parent: Directory) : PermanentDirectory(parent, "object-files") {
+
+            val all: List<File>
+                get() = directory.walkTopDown()
+                    .filter { it.extension == "o" }
+                    .toList()
+        }
+
+        class ModuleHeader(parent: Directory, private val moduleName: String) : PermanentDirectory(parent, "headers") {
+
+            val swiftModule: File = directory.resolve("${moduleName}.swiftmodule")
+
+            val swiftInterface: File = directory.resolve("${moduleName}.swiftinterface")
+
+            val privateSwiftInterface: File = directory.resolve("${moduleName}.private.swiftinterface")
+
+            val swiftDoc: File = directory.resolve("${moduleName}.swiftdoc")
+
+            val abiJson: File = directory.resolve("${moduleName}.abi.json")
+
+            val swiftSourceInfo: File = directory.resolve("${moduleName}.swiftsourceinfo")
+
+            val swiftHeader: File = directory.resolve("${moduleName}-Swift.h")
+        }
+    }
+
+    class Temp(parent: Directory) : PermanentDirectory(parent, "temp") {
+
+        val gradle: Gradle = Gradle(this)
+
+        class Gradle(parent: Directory) : PermanentDirectory(parent, "gradle") {
+
+            val mergedCustomSwift: MergedCustomSwift = MergedCustomSwift(this)
+
+            class MergedCustomSwift(parent: Directory) : PermanentDirectory(parent, "merged-custom-swift")
+        }
     }
 }
 
