@@ -5,5 +5,5 @@ abstract class PermanentDirectory(
     name: String,
 ) : SubDirectory(parent, name) {
 
-        override val isTemporary: Boolean = false
+    override val isTemporary: Boolean = false
 }

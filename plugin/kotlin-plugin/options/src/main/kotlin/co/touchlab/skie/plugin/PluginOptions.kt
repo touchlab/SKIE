@@ -26,14 +26,5 @@ object SkiePlugin {
             serialize = { it.buildDirectory.directory.absolutePath },
             deserialize = { SkieDirectories(File(it)) },
         )
-
-        val skieBuildDir = PluginOption(
-            optionName = "skieBuildDir",
-            valueDescription = "<absolute path>",
-            description = "Path to SKIE build directory.",
-            isRequired = true,
-            serialize = File::getAbsolutePath,
-            deserialize = ::File,
-        )
     }
 }

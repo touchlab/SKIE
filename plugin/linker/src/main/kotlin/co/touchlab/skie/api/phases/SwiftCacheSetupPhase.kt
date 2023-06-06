@@ -1,6 +1,7 @@
 package co.touchlab.skie.api.phases
 
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import java.io.File
 
@@ -50,7 +51,7 @@ class SwiftCacheSetupPhase(
     // If the module cache is not deleted then all threads rebuild the same cache in series (the caching is done in a synchronized block).
     // This could lead to significant performance degradation if the Obj-C takes a long time to load.
     private fun deleteKotlinFrameworkCache() {
-        skieContext.swiftCacheDirectory.walkTopDown()
+        skieContext.skieBuildDirectory.cache.swiftModules.directory.walkTopDown()
             .filter { it.isFile && it.extension == "pcm" && it.name.startsWith(framework.moduleName + "-") }
             .forEach {
                 it.delete()
@@ -58,14 +59,8 @@ class SwiftCacheSetupPhase(
     }
 }
 
-val SkieContext.swiftCacheDirectory: File
-    get() = oldSkieBuildDirectory.resolve("swift-cache").also { it.mkdirs() }
-
 val SkieContext.cacheableKotlinFramework: FrameworkLayout
-    get() = FrameworkLayout(cacheableKotlinFrameworkDirectory)
-
-val SkieContext.cacheableKotlinFrameworkDirectory: File
-    get() = oldSkieBuildDirectory.resolve("kotlin-framework-dummy/${frameworkLayout.moduleName}.framework").also { it.mkdirs() }
+    get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(frameworkLayout.moduleName))
 
 
 

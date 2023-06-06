@@ -8,7 +8,6 @@ import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.api.phases.cacheableKotlinFramework
-import co.touchlab.skie.api.phases.swiftCacheDirectory
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.DescriptorProviderKey
 import co.touchlab.skie.plugin.api.descriptorProvider
@@ -173,7 +172,7 @@ class SwiftLinkCompilePhase(
             +"-parse-as-library"
             +"-g"
             +"-module-cache-path"
-            +skieContext.swiftCacheDirectory.absolutePath
+            +skieBuildDirectory.cache.swiftModules.directory.absolutePath
             +"-swift-version"
             +compilerConfiguration.swiftVersion
             +parallelizationArgument()

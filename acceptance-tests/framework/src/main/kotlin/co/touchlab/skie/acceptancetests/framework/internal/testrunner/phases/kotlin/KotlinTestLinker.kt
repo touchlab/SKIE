@@ -53,7 +53,6 @@ class KotlinTestLinker(
     }
 
     private fun configureSwiftKt(configuration: Configuration) {
-        val skieBuildDirectory = tempFileSystem.createDirectory("skieBuild")
         val buildDirectory = tempFileSystem.createDirectory("skie")
         val skieDirectories = SkieDirectories(buildDirectory.toFile())
 
@@ -63,7 +62,6 @@ class KotlinTestLinker(
             put(ConfigurationKeys.buildId, "tests-${UUID.randomUUID()}")
             put(ConfigurationKeys.skieDirectories, skieDirectories)
             add(ConfigurationKeys.SwiftCompiler.additionalFlags, "-verify-emitted-module-interface")
-            put(ConfigurationKeys.skieBuildDir, skieBuildDirectory.toFile())
         }
 
         PluginRegistrar.plugins.set(

@@ -4,9 +4,8 @@ import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.module.SkieModule
-import co.touchlab.skie.plugin.license.SkieLicense
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import java.io.File
+import co.touchlab.skie.plugin.license.SkieLicense
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 
@@ -19,8 +18,6 @@ interface SkieContext {
     val configuration: Configuration
 
     val swiftCompilerConfiguration: SwiftCompilerConfiguration
-
-    val oldSkieBuildDirectory: File
 
     val skieDirectories: SkieDirectories
 

@@ -102,14 +102,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
             SkiePlugin.id,
             SkiePlugin.Options.skieDirectories.subpluginOption(skieDirectories),
         )
-
-        compilerPluginOptions.addPluginArgument(
-            SkiePlugin.id,
-            SkiePlugin.Options.skieBuildDir.subpluginOption(
-                project.layout.buildDirectory.file("skieBuild/${binary.name}/${binary.target.targetName}")
-                    .get().asFile,
-            ),
-        )
     }
 }
 

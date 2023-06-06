@@ -12,7 +12,6 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
 
     private val options = listOf(
         Options.buildId,
-        Options.skieBuildDir,
         Options.skieDirectories,
     )
 
@@ -26,9 +25,6 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         when (optionsMap[option.optionName]) {
             Options.buildId -> {
                 configuration.put(ConfigurationKeys.buildId, Options.buildId.deserialize(value))
-            }
-            Options.skieBuildDir -> {
-                configuration.put(ConfigurationKeys.skieBuildDir, Options.skieBuildDir.deserialize(value))
             }
             Options.skieDirectories -> {
                 configuration.put(ConfigurationKeys.skieDirectories, Options.skieDirectories.deserialize(value))

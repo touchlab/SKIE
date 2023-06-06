@@ -10,6 +10,8 @@ class SkieBuildDirectory(
     rootDirectory: File,
 ) : RootDirectory(rootDirectory) {
 
+    val cache: Cache = Cache(this)
+
     val debug: Debug = Debug(this)
 
     val swift: Swift = Swift(this)
@@ -17,6 +19,20 @@ class SkieBuildDirectory(
     val skieConfiguration: File = directory.resolve("configuration.json")
 
     val license: File = directory.resolve("license.json")
+
+    class Cache(parent: Directory) : PermanentDirectory(parent, "cache") {
+
+        val swiftModules: SwiftCompiler = SwiftCompiler(this)
+
+        val cacheableKotlinFramework: CacheableKotlinFramework = CacheableKotlinFramework(this)
+
+        class SwiftCompiler(parent: Directory) : PermanentDirectory(parent, "swift-module-cache")
+
+        class CacheableKotlinFramework(parent: Directory) : PermanentDirectory(parent, "cacheable-framework") {
+
+            fun framework(moduleName: String): File = directory.resolve("$moduleName.framework").also { it.mkdirs() }
+        }
+    }
 
     class Debug(parent: Directory) : TemporaryDirectory(parent, "debug") {
 

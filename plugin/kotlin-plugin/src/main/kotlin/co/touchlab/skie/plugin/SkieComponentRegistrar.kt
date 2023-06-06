@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
-import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.kotlin_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
@@ -55,7 +54,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             license = license,
             configuration = skieConfiguration,
             swiftCompilerConfiguration = swiftCompilerConfiguration,
-            oldSkieBuildDirectory = configuration.getNotNull(ConfigurationKeys.skieBuildDir),
             skieDirectories = skieDirectories,
             frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
             analyticsCollector = AnalyticsCollector(
