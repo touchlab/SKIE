@@ -1,16 +1,20 @@
 package co.touchlab.skie.plugin.api.analytics
 
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
-import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.plugin.analytics.performance.SkiePerformanceAnalytics
+import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
+import co.touchlab.skie.util.Environment
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.reflect.KClass
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
-import kotlinx.serialization.json.Json
-import kotlin.time.DurationUnit
-import kotlinx.serialization.encodeToString
 
-class SkiePerformanceAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.SkiePerformance> {
+class SkiePerformanceAnalyticsProducer(
+    private val environment: Environment,
+) : AnalyticsProducer<AnalyticsFeature.SkiePerformance> {
 
     override val featureType: KClass<AnalyticsFeature.SkiePerformance> = AnalyticsFeature.SkiePerformance::class
 
@@ -28,10 +32,18 @@ class SkiePerformanceAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.Skie
             SkiePerformanceAnalytics.Entry(
                 name = name,
                 timeInSeconds = timedValue.duration.toDouble(DurationUnit.SECONDS),
-            )
+            ),
         )
 
+        printLogInDevEnvironment(name, timedValue.duration)
+
         return timedValue.value
+    }
+
+    private fun printLogInDevEnvironment(name: String, duration: Duration) {
+        if (environment == Environment.Dev) {
+            println("$name: ${duration.toDouble(DurationUnit.SECONDS)}s")
+        }
     }
 
     override fun produce(configuration: AnalyticsFeature.SkiePerformance): ByteArray =
