@@ -132,6 +132,7 @@ internal class ExhaustiveEnumsGenerator(
             .addModifiers(Modifier.PUBLIC)
             .addSuperType(STRING)
             .addSuperType(DeclaredTypeName.typeName("Swift.Hashable"))
+            .addSuperType(DeclaredTypeName.typeName("Swift.CaseIterable"))
             .addEnumCases(this)
             .addPassthroughForMembers(this)
             .addNestedClassTypeAliases(this)
