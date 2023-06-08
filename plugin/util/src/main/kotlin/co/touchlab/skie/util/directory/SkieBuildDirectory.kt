@@ -94,7 +94,11 @@ class SkieBuildDirectory(
                     .toList()
         }
 
-        class ModuleHeader(parent: Directory, private val moduleName: String) : PermanentDirectory(parent, "headers") {
+        class ModuleHeader(parent: Directory, moduleName: String) : PermanentDirectory(parent, "headers") {
+
+            init {
+                directory.mkdirs()
+            }
 
             val swiftModule: File = directory.resolve("${moduleName}.swiftmodule")
 

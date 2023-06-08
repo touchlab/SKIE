@@ -4,10 +4,11 @@ import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsProducer
 import co.touchlab.skie.plugin.analytics.getGitRemotes
+import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.license.util.getHashedPlatformUUID
 import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
 import co.touchlab.skie.plugin.util.registerSkieTask
-import co.touchlab.skie.plugin.util.skieDirectories
+import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.util.hashed
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
@@ -82,6 +83,8 @@ internal class GradleSkieLicenseManager(private val project: Project) {
         val licenseTask = linkTask.registerSkieLinkBasedTask<SkieVerifyLicenseTask>("verifyLicense", analyticsManager) {
             this.licenseRequestData.set(this@GradleSkieLicenseManager.licenseRequestData)
             outputLicenseFile.set(linkTask.skieDirectories.buildDirectory.license)
+
+            dependsOn(linkTask.createSkieBuildDirectoryTask)
         }
 
         linkTask.dependsOn(licenseTask)

@@ -10,9 +10,10 @@ import co.touchlab.skie.plugin.dependencies.addDependencyOnSkieRuntime
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
+import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.util.appleTargets
 import co.touchlab.skie.plugin.util.frameworks
-import co.touchlab.skie.plugin.util.skieDirectories
+import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.util.subpluginOption
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -70,6 +71,8 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         licenseManager: GradleSkieLicenseManager,
         analyticsManager: GradleAnalyticsManager,
     ) {
+        SkieDirectoriesManager.configureCreateSkieBuildDirectoryTask(this, analyticsManager)
+
         licenseManager.configureLicensing(this, analyticsManager)
         analyticsManager.configureAnalytics(this)
 

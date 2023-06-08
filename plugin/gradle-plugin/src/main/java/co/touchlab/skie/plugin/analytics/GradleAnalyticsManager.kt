@@ -5,12 +5,13 @@ import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
 import co.touchlab.skie.plugin.configuration.SkieConfigurationProvider
+import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
 import co.touchlab.skie.plugin.util.doFirstOptimized
 import co.touchlab.skie.plugin.util.doLastOptimized
 import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
-import co.touchlab.skie.plugin.util.skieBuildDirectory
-import co.touchlab.skie.plugin.util.skieDirectories
+import co.touchlab.skie.plugin.directory.skieBuildDirectory
+import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.license.license
 import co.touchlab.skie.util.Environment
 import co.touchlab.skie.util.directory.SkieAnalyticsDirectories
@@ -83,6 +84,8 @@ internal class GradleAnalyticsManager(
         val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieFinalizeTask>("finalize", this) {
             this.linkTask.set(linkTask)
             analyticsCollector.set(analyticsCollectorProvider)
+
+            dependsOn(linkTask.createSkieBuildDirectoryTask)
         }
 
         linkTask.finalizedBy(finalizeTask)

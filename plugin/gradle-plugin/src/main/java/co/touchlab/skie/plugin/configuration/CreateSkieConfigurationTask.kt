@@ -1,9 +1,10 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
+import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.util.BaseSkieTask
 import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
-import co.touchlab.skie.plugin.util.skieBuildDirectory
+import co.touchlab.skie.plugin.directory.skieBuildDirectory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.OutputFile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
@@ -34,6 +35,8 @@ internal abstract class CreateSkieConfigurationTask : BaseSkieTask() {
         fun registerTask(linkTask: KotlinNativeLink, analyticsManager: GradleAnalyticsManager) {
             val createConfiguration = linkTask.registerSkieLinkBasedTask<CreateSkieConfigurationTask>("createConfiguration", analyticsManager) {
                 configurationFile.set(linkTask.skieBuildDirectory.skieConfiguration)
+
+                dependsOn(linkTask.createSkieBuildDirectoryTask)
             }
 
             linkTask.inputs.files(createConfiguration.map { it.outputs })

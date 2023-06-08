@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.util.BaseSkieTask
-import co.touchlab.skie.plugin.util.skieDirectories
+import co.touchlab.skie.plugin.directory.skieDirectories
 import org.gradle.api.BuildCancelledException
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal

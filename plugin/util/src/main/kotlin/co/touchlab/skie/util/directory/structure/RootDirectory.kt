@@ -8,10 +8,16 @@ abstract class RootDirectory(
 
     override val isTemporary: Boolean = false
 
-    private val children: MutableList<Directory> = mutableListOf()
+    private val allChildren: MutableList<Directory> = mutableListOf()
+
+    fun createDirectories() {
+        allChildren.forEach {
+            it.directory.mkdirs()
+        }
+    }
 
     fun resetTemporaryDirectories() {
-        children
+        allChildren
             .filter { it.isTemporary }
             .forEach {
                 it.directory.deleteRecursively()
@@ -20,6 +26,6 @@ abstract class RootDirectory(
     }
 
     override fun addChild(child: Directory) {
-        children.add(child)
+        allChildren.add(child)
     }
 }

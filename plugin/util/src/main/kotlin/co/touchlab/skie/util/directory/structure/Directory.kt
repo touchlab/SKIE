@@ -12,8 +12,6 @@ abstract class Directory(
     init {
         @Suppress("LeakingThis")
         parent?.addChild(this)
-
-        directory.mkdirs()
     }
 
     abstract fun addChild(child: Directory)
