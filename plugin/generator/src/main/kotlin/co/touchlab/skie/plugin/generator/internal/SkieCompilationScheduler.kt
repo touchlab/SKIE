@@ -5,7 +5,7 @@ import co.touchlab.skie.plugin.generator.internal.analytics.AnalyticsPhase
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowConversionConstructorsGenerator
-import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowGenericArgumentStubGenerator
+import co.touchlab.skie.plugin.generator.internal.export.ExtraClassExportPhase
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowMappingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.suspend.SuspendGenerator
 import co.touchlab.skie.plugin.generator.internal.enums.ExhaustiveEnumsGenerator
@@ -38,6 +38,11 @@ internal class SkieCompilationScheduler(
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
         ),
+        ExtraClassExportPhase(
+            skieContext = skieContext,
+            descriptorProvider = descriptorProvider,
+            declarationBuilder = declarationBuilder,
+        ),
         GenerateIrPhase(
             declarationBuilder = declarationBuilder,
         ),
@@ -58,11 +63,6 @@ internal class SkieCompilationScheduler(
         ),
         FlowMappingConfigurator(
             skieContext = skieContext,
-        ),
-        FlowGenericArgumentStubGenerator(
-            skieContext = skieContext,
-            descriptorProvider = descriptorProvider,
-            declarationBuilder = declarationBuilder,
         ),
         SwiftRuntimeGenerator(
             skieContext = skieContext,

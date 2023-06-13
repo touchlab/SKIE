@@ -79,6 +79,9 @@ internal class NativeMutableDescriptorProvider(
     override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
         realProvider.isExposed(callableMemberDescriptor)
 
+    override fun isExposable(classDescriptor: ClassDescriptor): Boolean =
+        realProvider.isExposable(classDescriptor)
+
     override fun getFileModule(file: SourceFile): ModuleDescriptor = realProvider.getFileModule(file)
 
     override fun getExposedClassMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
