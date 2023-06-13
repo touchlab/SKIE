@@ -53,6 +53,24 @@ annotation class SealedInterop {
     annotation class ElseName(val elseName: String)
 
     @Target
+    annotation class EntireHierarchyExport {
+
+        /**
+         * If enabled, SKIE will export all sealed children of this class/interface to Obj-C even if they wouldn't be exported by Kotlin compiler.
+         */
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.BINARY)
+        annotation class Enabled
+
+        /**
+         * If enabled, SKIE will not modify the default export behavior.
+         */
+        @Target(AnnotationTarget.CLASS)
+        @Retention(AnnotationRetention.BINARY)
+        annotation class Disabled
+    }
+
+    @Target
     annotation class Case {
 
         /**

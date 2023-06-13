@@ -1,12 +1,14 @@
-package co.touchlab.skie.plugin.generator.internal.coroutines.flow
+package co.touchlab.skie.plugin.generator.internal.export
 
 import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.gradle.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
+import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
+import co.touchlab.skie.plugin.generator.internal.configuration.getConfiguration
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
@@ -16,44 +18,90 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.descriptors.isSealed
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.irUnit
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.KotlinType
 
-internal class FlowGenericArgumentStubGenerator(
-    private val skieContext: SkieContext,
+internal class ExtraClassExportPhase(
+    override val skieContext: SkieContext,
     private val descriptorProvider: MutableDescriptorProvider,
     private val declarationBuilder: DeclarationBuilder,
-) : SkieCompilationPhase {
+) : SkieCompilationPhase, ConfigurationContainer {
 
-    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieContext.configuration.enabledFeatures
+    override val isActive: Boolean = true
 
     override fun runObjcPhase() {
+        val additionallyExportedClasses = getAllAdditionallyExportedClasses()
+
+        val stubFunction = generateStubFunction(additionallyExportedClasses)
+
+        stubFunction.removeFromSwift()
+    }
+
+    private fun getAllAdditionallyExportedClasses(): Set<ClassDescriptor> {
+        val originallyExportedClasses = descriptorProvider.exposedClasses.toSet()
+        val allExportedClasses = originallyExportedClasses.toMutableSet()
+
+        do {
+            val lastIterationResult = allExportedClasses.toSet()
+
+            allExportedClasses.addClassesForExport()
+
+            val newlyDiscoveredClasses = allExportedClasses - lastIterationResult
+
+            descriptorProvider.registerExportedClasses(newlyDiscoveredClasses)
+        } while (newlyDiscoveredClasses.isNotEmpty())
+
+        return allExportedClasses - originallyExportedClasses
+    }
+
+    private fun MutableSet<ClassDescriptor>.addClassesForExport() {
+        addClassesForExportFromFlowArguments()
+        addClassesForExportFromSealedHierarchies()
+    }
+
+    private fun MutableSet<ClassDescriptor>.addClassesForExportFromFlowArguments() {
+        if (SkieFeature.CoroutinesInterop !in skieContext.configuration.enabledFeatures) {
+            return
+        }
+
         val allFlowArguments = descriptorProvider.allExposedMembers.flatMap { it.getAllFlowArgumentClasses() } +
             descriptorProvider.exposedClasses.flatMap { it.getAllFlowArgumentClasses() }
 
-        val nonExposedFlowArguments = allFlowArguments
-            .distinct()
-            .filter { it !in descriptorProvider.exposedClasses }
+        val allExposableFlowArguments = allFlowArguments.filter { descriptorProvider.isExposable(it) }
 
-        exposeClasses(nonExposedFlowArguments)
+        this.addAll(allExposableFlowArguments)
     }
 
-    private fun exposeClasses(classDescriptors: List<ClassDescriptor>) {
-        val dummyFunction = generateDummyFunction(classDescriptors)
+    private fun MutableSet<ClassDescriptor>.addClassesForExportFromSealedHierarchies() {
+        val allExportedSealedChildren = descriptorProvider.exposedClasses.getAllExportedSealedChildren()
 
-        dummyFunction.removeFromSwift()
+        this.addAll(allExportedSealedChildren)
     }
 
-    private fun generateDummyFunction(parameters: List<ClassDescriptor>): FunctionDescriptor =
+    private fun ClassDescriptor.getAllExportedSealedChildren(): List<ClassDescriptor> {
+        if (!this.getConfiguration(SealedInterop.ExportEntireHierarchy)) {
+            return emptyList()
+        }
+
+        val topLevelSealedChildren = sealedSubclasses.filter { descriptorProvider.isExposable(it) }
+
+        return topLevelSealedChildren + topLevelSealedChildren.getAllExportedSealedChildren()
+    }
+
+    private fun Collection<ClassDescriptor>.getAllExportedSealedChildren(): List<ClassDescriptor> =
+        this.flatMap { it.getAllExportedSealedChildren() }
+
+    private fun generateStubFunction(exportedClasses: Collection<ClassDescriptor>): FunctionDescriptor =
         declarationBuilder.createFunction(
-            name = "Skie_FlowGenericArgumentExports",
-            namespace = declarationBuilder.getCustomNamespace("Skie_FlowGenericArgumentExports"),
+            name = "skieTypeExports",
+            namespace = declarationBuilder.getCustomNamespace("SkieTypeExports"),
             annotations = Annotations.EMPTY,
         ) {
-            valueParameters = parameters.mapIndexed { index: Int, classDescriptor: ClassDescriptor ->
+            valueParameters = exportedClasses.mapIndexed { index: Int, classDescriptor: ClassDescriptor ->
                 createValueParameter(
                     owner = descriptor,
                     name = Name.identifier("p${index}"),
@@ -72,6 +120,14 @@ internal class FlowGenericArgumentStubGenerator(
     private fun FunctionDescriptor.removeFromSwift() {
         skieContext.module.configure {
             this.swiftModel.visibility = SwiftModelVisibility.Removed
+        }
+    }
+}
+
+private fun MutableDescriptorProvider.registerExportedClasses(exportedClasses: Collection<ClassDescriptor>) {
+    mutate {
+        exportedClasses.forEach {
+            registerExposedDescriptor(it)
         }
     }
 }

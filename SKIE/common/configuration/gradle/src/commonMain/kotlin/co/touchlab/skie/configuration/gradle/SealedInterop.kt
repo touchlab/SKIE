@@ -25,6 +25,24 @@ object SealedInterop {
             }
     }
 
+    /**
+     * If true, SKIE exports all sealed children of this class/interface to Obj-C even if they wouldn't be exported by Kotlin compiler.
+     * Otherwise, SKIE does not modify the default behavior.
+     */
+    object ExportEntireHierarchy : ConfigurationKey.Boolean {
+
+        override val defaultValue: Boolean = true
+
+        override val skieRuntimeValue: Boolean = true
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            when {
+                configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Enabled>() -> true
+                configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Disabled>() -> false
+                else -> null
+            }
+    }
+
     object Function {
 
         /**
