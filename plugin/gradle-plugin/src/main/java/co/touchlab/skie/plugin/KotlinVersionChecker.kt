@@ -8,6 +8,7 @@ object KotlinVersionChecker {
     private val compatibleVersions = listOf(
         "1.8.20",
         "1.8.21",
+        "1.8.22",
     )
 
     fun ensureProjectUsesCompatibleKotlinVersion(project: Project) {
