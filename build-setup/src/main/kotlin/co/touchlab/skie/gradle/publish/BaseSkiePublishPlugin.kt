@@ -1,5 +1,6 @@
 package co.touchlab.skie.gradle.publish
 
+import co.touchlab.skie.gradle.util.EnvironmentVariableProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.credentials.AwsCredentials
@@ -57,16 +58,4 @@ abstract class BaseSkiePublishPlugin : Plugin<Project> {
         }
     }
 
-    private class EnvironmentVariableProvider(private val name: String) {
-
-        private val value: String? = System.getenv(name)
-
-        val valueOrEmpty: String = value ?: ""
-
-        fun verifyWasSet() {
-            if (value == null) {
-                throw IllegalStateException("Missing environment variable \"$name\"")
-            }
-        }
-    }
 }

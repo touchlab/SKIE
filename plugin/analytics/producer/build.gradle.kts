@@ -6,8 +6,8 @@ plugins {
 dependencies {
     implementation(libs.apache.compress)
     api(libs.bugsnag)
-    implementation(projects.analytics.analyticsConfiguration)
-    implementation(projects.util)
+    implementation(projects.pluginAnalyticsAnalyticsConfiguration)
+    implementation(projects.pluginUtil)
 }
 
 skieJvm {

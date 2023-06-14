@@ -1,13 +1,13 @@
+
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
+import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
-import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
     id("skie-jvm")
-    id("skie-buildconfig")
+    id("dev.buildconfig")
 }
 
 buildConfig {

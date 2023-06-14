@@ -4,8 +4,9 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 
 plugins {
-    id("skie-jvm")
-    id("skie-buildconfig")
+    id("dev.jvm")
+    id("dev.buildconfig")
+    id("experimental.context-receivers")
 }
 
 val acceptanceTestsDirectory: File = layout.projectDirectory.dir("src/test/resources").asFile
@@ -22,10 +23,6 @@ buildConfig {
         name = "BUILD",
         value = "\"${layout.buildDirectory.get().asFile.absolutePath}\"",
     )
-}
-
-skieJvm {
-    areContextReceiversEnabled.set(true)
 }
 
 val acceptanceTestDependencies: Configuration = configurations.create("acceptanceTestDependencies") {

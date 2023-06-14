@@ -1,6 +1,7 @@
 plugins {
-    id("skie-jvm")
-    id("skie-buildconfig")
+    id("dev.jvm")
+    id("dev.buildconfig")
+    id("experimental.context-receivers")
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
@@ -54,10 +55,6 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.java)
-}
-
-skieJvm {
-    areContextReceiversEnabled.set(true)
 }
 
 val jar by tasks.getting

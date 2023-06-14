@@ -8,7 +8,7 @@ import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 
 plugins {
     id("skie-jvm")
-    id("skie-buildconfig")
+    id("dev.buildconfig")
     alias(libs.plugins.kotlin.plugin.serialization)
     idea
 }

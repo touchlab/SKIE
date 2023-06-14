@@ -2,18 +2,11 @@ rootProject.name = "dev-support"
 
 pluginManagement {
     includeBuild("../build-setup")
+    includeBuild("../build-setup-settings")
+    includeBuild("../skie-gradle")
 }
 
 dependencyResolutionManagement {
-    repositories {
-        maven("https://api.touchlab.dev/public") {
-            content {
-                includeModule("org.jetbrains.kotlin", "kotlin-native-compiler-embeddable")
-            }
-        }
-        mavenCentral()
-    }
-
     versionCatalogs {
         create("libs") {
             from(files("../gradle/libs.versions.toml"))
@@ -21,23 +14,23 @@ dependencyResolutionManagement {
     }
 }
 
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
-includeBuild("../plugin")
+plugins {
+    id("dev.settings")
+}
 
 include(
-    ":analytics",
-    ":ir-inspector",
+//    ":analytics",
+//    ":ir-inspector",
     ":skie:mac",
     ":skie:mac:framework",
     ":skie:mac:dependency",
     ":skie:mac:swift",
-    ":skie:ios",
-    ":skie:ios:framework",
-    ":skie:ios:dependency",
-    ":skie:ios:swift",
-    ":pure-compiler",
-    ":pure-compiler:dependency",
-    ":pure-compiler:framework",
-    ":pure-compiler:swift",
+//    ":skie:ios",
+//    ":skie:ios:framework",
+//    ":skie:ios:dependency",
+//    ":skie:ios:swift",
+//    ":pure-compiler",
+//    ":pure-compiler:dependency",
+//    ":pure-compiler:framework",
+//    ":pure-compiler:swift",
 )

@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
-    implementation(projects.configurationApi)
+    implementation(projects.pluginConfigurationApi)
 }
 
 skieJvm {

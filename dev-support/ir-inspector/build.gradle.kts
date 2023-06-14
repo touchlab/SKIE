@@ -2,8 +2,8 @@ import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 
 plugins {
     application
-    id("skie-jvm")
-    id("skie-buildconfig")
+    id("dev.jvm")
+    id("dev.buildconfig")
 }
 
 buildConfig {

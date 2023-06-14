@@ -10,6 +10,7 @@ trim_trailing_whitespace = true
 ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
+ij_any_line_comment_add_space = true
 max_line_length = 160
 ij_visual_guides = 140, 160
 

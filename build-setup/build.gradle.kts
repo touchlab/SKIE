@@ -8,9 +8,16 @@ repositories {
     gradlePluginPortal()
 }
 
+sourceSets {
+    main {
+        kotlin.srcDir("src/main/kotlin-compiler-attribute-local")
+    }
+}
+
 dependencies {
     implementation(libs.plugin.kotlin.gradle)
     implementation(libs.plugin.kotlin.gradle.api)
+    implementation(libs.plugin.kotlin.samWithReceiver)
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
     implementation(libs.ktor.client.java)
@@ -32,10 +39,6 @@ gradlePlugin {
     plugins.register("multiplatform") {
         id = "skie-multiplatform"
         implementationClass = "co.touchlab.skie.gradle.kotlin.SkieKotlinMultiplatformPlugin"
-    }
-    plugins.register("gradle-src-classpath-loader") {
-        id = "gradle-src-classpath-loader"
-        implementationClass = "co.touchlab.skie.gradle.loader.GradleSrcClasspathLoaderPlugin"
     }
     plugins.register("publish-jvm") {
         id = "skie-publish-jvm"
