@@ -52,6 +52,67 @@ gradlePlugin {
         id = "skie-publish-gradle"
         implementationClass = "co.touchlab.skie.gradle.publish.SkiePublishGradlePlugin"
     }
+
+
+    plugins.register("dev.buildconfig") {
+        id = "dev.buildconfig"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevBuildconfig"
+    }
+
+    plugins.register("dev.jvm") {
+        id = "dev.jvm"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevJvm"
+    }
+
+    plugins.register("dev.multiplatform") {
+        id = "dev.multiplatform"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevMultiplatform"
+    }
+
+    plugins.register("dev.root") {
+        id = "dev.root"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevRoot"
+    }
+
+    plugins.register("experimental.context-receivers") {
+        id = "experimental.context-receivers"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.ExperimentalContextReceivers"
+    }
+
+    plugins.register("skie.common") {
+        id = "skie.common"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieCommon"
+    }
+
+    plugins.register("skie.compiler") {
+        id = "skie.compiler"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieCompiler"
+    }
+
+    plugins.register("skie.gradle") {
+        id = "skie.gradle"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieGradle"
+    }
+
+    plugins.register("skie.publishable") {
+        id = "skie.publishable"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkiePublishable"
+    }
+
+    plugins.register("skie.runtime") {
+        id = "skie.runtime"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRuntime"
+    }
+
+    plugins.register("skie.server") {
+        id = "skie.server"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieServer"
+    }
+
+    plugins.register("skie.shim") {
+        id = "skie.shim"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieShim"
+    }
 }
 
 tasks.register("cleanAll") {

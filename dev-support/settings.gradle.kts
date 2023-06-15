@@ -3,6 +3,7 @@ rootProject.name = "dev-support"
 pluginManagement {
     includeBuild("../build-setup")
     includeBuild("../build-setup-settings")
+    includeBuild("../common")
     includeBuild("../skie-gradle")
 }
 

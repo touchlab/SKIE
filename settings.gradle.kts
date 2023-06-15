@@ -7,8 +7,8 @@ pluginManagement {
         google()
     }
 
-    includeBuild("build-setup")
     includeBuild("build-setup-settings")
+    includeBuild("build-setup")
 }
 
 plugins {

@@ -39,6 +39,11 @@ kotlin {
 
             dependencies {
                 implementation(projects.kotlinGradlePluginShim)
+
+                implementation("co.touchlab.skie:analytics:1.0.0-SNAPSHOT")
+                implementation("co.touchlab.skie:configuration:1.0.0-SNAPSHOT")
+                implementation("co.touchlab.skie:license:1.0.0-SNAPSHOT")
+                implementation("co.touchlab.skie:util:1.0.0-SNAPSHOT")
 //
 //                 implementation(projects.common.analytics)
 //                 implementation(projects.common.configuration)
