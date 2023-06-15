@@ -8,6 +8,5 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-//         classpath("co.touchlab.skie:kotlin-gradle-plugin-shim:1.0.0-SNAPSHOT")
     }
 }

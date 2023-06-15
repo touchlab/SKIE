@@ -1,11 +1,9 @@
 rootProject.name = "build-setup"
 
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("../gradle/libs.versions.toml"))
-        }
-    }
+pluginManagement {
+    includeBuild("../build-setup-settings")
 }
 
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+plugins {
+    id("dev.settings")
+}

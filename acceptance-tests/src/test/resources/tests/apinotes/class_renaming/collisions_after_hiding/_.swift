@@ -1,1 +1,0 @@
-exit(__A().value)

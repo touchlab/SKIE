@@ -26,6 +26,7 @@ object ToolingVersions {
         val `7․5` by version(Kotlin.`1․6․21`)
         val `7․6` by version(Kotlin.`1․7․10`)
         val `8․0` by version(Kotlin.`1․8․10`)
+        val `8․1` by version(Kotlin.`1․8․10`)
 
         fun version(kotlin: KotlinToolingVersion) = VersionProvider { gradle ->
             GradleApiVersion(GradleVersion.version(gradle), kotlin)

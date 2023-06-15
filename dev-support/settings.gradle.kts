@@ -3,21 +3,20 @@ rootProject.name = "dev-support"
 pluginManagement {
     includeBuild("../build-setup")
     includeBuild("../build-setup-settings")
-    includeBuild("../common")
-    includeBuild("../skie-gradle")
+    includeBuild("../SKIE")
 }
 
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("../gradle/libs.versions.toml"))
-        }
-    }
-}
+includeBuild("../SKIE")
 
 plugins {
     id("dev.settings")
 }
+
+// includeBuild("..") {
+//     dependencySubstitution {
+//         substitute(module("co.touchlab.skie:kotlin-gradle-plugin-shim-impl")).using(project(":gradle:kotlin-gradle-plugin-shim:kotlin-gradle-plugin-shim-impl"))
+//     }
+// }
 
 include(
 //    ":analytics",

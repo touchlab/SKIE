@@ -1,1 +1,0 @@
-exit(ACompanion.shared.foo())

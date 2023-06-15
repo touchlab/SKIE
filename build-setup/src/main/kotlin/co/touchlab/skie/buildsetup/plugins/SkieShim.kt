@@ -49,7 +49,8 @@ class SkieShim: Plugin<Project> {
 
                     addWeakDependency("dev.gradleplugins:gradle-api", configureVersion(gradleVersion))
 
-                    addWeakDependency("org.jetbrains.kotlin:kotlin-native-compiler-embeddable", configureVersion(kotlinToolingVersion))
+                    addWeakDependency("org.jetbrains.kotlin:kotlin-gradle-plugin-api", configureVersion(kotlinToolingVersion))
+                    addWeakDependency("org.jetbrains.kotlin:kotlin-gradle-plugin", configureVersion(kotlinToolingVersion))
 
                     kotlinSourceSet.relatedConfigurationNames.forEach {
                         project.configurations.named(it).configure {

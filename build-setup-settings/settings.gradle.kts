@@ -1,9 +1,2 @@
-rootProject.name = "build-setup"
+rootProject.name = "build-setup-settings"
 
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("../gradle/libs.versions.toml"))
-        }
-    }
-}
