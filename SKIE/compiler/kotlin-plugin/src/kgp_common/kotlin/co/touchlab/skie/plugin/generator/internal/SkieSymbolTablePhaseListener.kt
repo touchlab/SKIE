@@ -1,7 +1,10 @@
 package co.touchlab.skie.plugin.generator.internal
 
 import co.touchlab.skie.plugin.api.MutableDescriptorProviderKey
+import co.touchlab.skie.plugin.api.skieContext
+import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
+import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.intercept.PhaseListener
 import co.touchlab.skie.plugin.reflection.reflectors.ContextReflector
@@ -33,8 +36,20 @@ internal class SkieSymbolTablePhaseListener : PhaseListener {
 
         val declarationBuilder = DeclarationBuilderImpl(context, descriptorProvider)
 
+        val skieScheduler = SkieCompilationScheduler(
+            context = context,
+            skieContext = context.skieContext,
+            descriptorProvider = descriptorProvider,
+            declarationBuilder = declarationBuilder,
+            namespaceProvider = NamespaceProvider(context.skieContext.module),
+            reporter = Reporter(context.configuration),
+        )
+
+        skieScheduler.runClassExportingPhases()
+
+        descriptorProvider.reload()
+
         context.configuration.put(MutableDescriptorProviderKey, descriptorProvider)
-        SkieCompilerConfigurationKey.MutableDescriptorProvider.put(descriptorProvider, context.configuration)
-        SkieCompilerConfigurationKey.DeclarationBuilder.put(declarationBuilder, context.configuration)
+        SkieCompilerConfigurationKey.SkieScheduler.put(skieScheduler, context.configuration)
     }
 }

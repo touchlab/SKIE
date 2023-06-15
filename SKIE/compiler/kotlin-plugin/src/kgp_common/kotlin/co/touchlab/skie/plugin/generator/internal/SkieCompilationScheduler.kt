@@ -16,6 +16,7 @@ import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
@@ -92,6 +93,16 @@ internal class SkieCompilationScheduler(
             descriptorProvider = descriptorProvider,
         ),
     )
+
+    fun runClassExportingPhases() {
+        compilationPhases
+            .filter { it.isActive }
+            .forEach {
+                skieContext.skiePerformanceAnalyticsProducer.log("Class Exporting Phase: ${it::class.simpleName}") {
+                    it.runClassExportingPhase()
+                }
+            }
+    }
 
     fun runObjcPhases() {
         compilationPhases

@@ -24,15 +24,27 @@ internal class NativeMutableDescriptorProvider(
         IMMUTABLE,
     }
 
-    private var realProvider = NativeDescriptorProvider(context)
+    private lateinit var realProvider: NativeDescriptorProvider
+
+    private lateinit var mutationScope: DescriptorRegistrationScope
 
     private val mutationListeners = mutableListOf<() -> Unit>()
-    private val mutationScope = object: DescriptorRegistrationScope, DescriptorProvider by realProvider {
-        override fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
-            realProvider.registerExposedDescriptor(descriptor)
+
+    private val state = AtomicReference(State.MUTABLE)
+
+    init {
+        reload()
+    }
+
+    fun reload() {
+        realProvider = NativeDescriptorProvider(context)
+
+        mutationScope = object: DescriptorRegistrationScope, DescriptorProvider by realProvider {
+            override fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
+                realProvider.registerExposedDescriptor(descriptor)
+            }
         }
     }
-    private val state = AtomicReference(State.MUTABLE)
 
     override fun mutate(block: DescriptorRegistrationScope.() -> Unit) {
         if (!state.compareAndSet(State.MUTABLE, State.MUTATING)) {
@@ -54,7 +66,7 @@ internal class NativeMutableDescriptorProvider(
             State.MUTABLE -> {
                 mutationListeners.clear()
                 // Create a fresh provider with all the descriptors we've seen so far.
-                realProvider = NativeDescriptorProvider(context)
+                reload()
             }
             // We were already mutable, nothing to do.
             State.IMMUTABLE -> {}

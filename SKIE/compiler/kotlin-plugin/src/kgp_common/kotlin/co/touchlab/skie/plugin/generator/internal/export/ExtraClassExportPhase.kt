@@ -8,7 +8,6 @@ import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.util.flow.SupportedFlow
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
-import co.touchlab.skie.plugin.generator.internal.configuration.getConfiguration
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
@@ -18,7 +17,6 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.isSealed
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.irUnit
@@ -33,7 +31,7 @@ internal class ExtraClassExportPhase(
 
     override val isActive: Boolean = true
 
-    override fun runObjcPhase() {
+    override fun runClassExportingPhase() {
         val additionallyExportedClasses = getAllAdditionallyExportedClasses()
 
         val stubFunction = generateStubFunction(additionallyExportedClasses)

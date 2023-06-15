@@ -7,6 +7,9 @@ internal interface SkieCompilationPhase {
 
     val isActive: Boolean
 
+    fun runClassExportingPhase() {
+    }
+
     fun runObjcPhase() {
     }
 
