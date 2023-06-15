@@ -5,6 +5,8 @@ import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
+// TODO Merge with SkieCompilerConfigurationKey
+
 object SkieContextKey : CompilerConfigurationKey<SkieContext>("SkieContext")
 
 object MutableDescriptorProviderKey : CompilerConfigurationKey<MutableDescriptorProvider>("MutableDescriptorProvider")
