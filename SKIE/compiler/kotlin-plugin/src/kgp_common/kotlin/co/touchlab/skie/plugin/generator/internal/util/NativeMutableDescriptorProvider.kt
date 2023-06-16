@@ -44,6 +44,8 @@ internal class NativeMutableDescriptorProvider(
                 realProvider.registerExposedDescriptor(descriptor)
             }
         }
+
+        notifyMutationListeners()
     }
 
     override fun mutate(block: DescriptorRegistrationScope.() -> Unit) {
@@ -53,18 +55,20 @@ internal class NativeMutableDescriptorProvider(
         try {
             mutationScope.block()
         } finally {
-            mutationListeners.forEach { it() }
+            notifyMutationListeners()
             if (!state.compareAndSet(State.MUTATING, State.MUTABLE)) {
                 error("Expected state to be MUTATING, but was ${state.get()} (probably).")
             }
         }
     }
 
+    private fun notifyMutationListeners() {
+        mutationListeners.forEach { it() }
+    }
+
     override fun preventFurtherMutations(): InternalDescriptorProvider {
         when (val witnessState = state.compareAndExchange(State.MUTABLE, State.IMMUTABLE)) {
-            // No more mutations can occur, so we can clear listeners.
             State.MUTABLE -> {
-                mutationListeners.clear()
                 // Create a fresh provider with all the descriptors we've seen so far.
                 reload()
             }
