@@ -23,7 +23,7 @@ class SkieShim: Plugin<Project> {
 
         group = "co.touchlab.skie"
 
-        KotlinCompilerVersion.registerIn(project)
+        KotlinCompilerVersion.registerIn(project.dependencies)
 
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)

@@ -1,4 +1,4 @@
-// import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
+import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
 // import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
@@ -6,24 +6,22 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 plugins {
     id("skie-multiplatform")
 
-//     id("dev.co.touchlab.skie")
     id("co.touchlab.skie")
-//     id("co.touchlab.skie.shim")
 }
 
-// skie {
-//     features {
-//     }
-//     configuration {
-//         group {
-//             ExperimentalFeatures.Enabled(true)
-//         }
-//     }
-//     debug {
-//         dumpSwiftApiBeforeApiNotes.set(true)
-//         dumpSwiftApiAfterApiNotes.set(true)
-//     }
-// }
+skie {
+    features {
+    }
+    configuration {
+        group {
+            ExperimentalFeatures.Enabled(true)
+        }
+    }
+    debug {
+        dumpSwiftApiBeforeApiNotes.set(true)
+        dumpSwiftApiAfterApiNotes.set(true)
+    }
+}
 
 kotlin {
     macosX64()

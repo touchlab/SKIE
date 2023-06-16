@@ -80,11 +80,10 @@ buildSetup {
         val `kotlin-plugin` by module
     }
 
-    val gradle by module("skie-gradle") {
-        val `gradle-plugin` by module("plugin")
-        val `kotlin-gradle-plugin-shim` by module {
-            val `kotlin-gradle-plugin-shim-impl` by module("impl")
-        }
+    val gradle by group("skie-gradle") {
+        val plugin by module
+        val `plugin-api` by module
+        val `plugin-loader` by module
     }
 
 }

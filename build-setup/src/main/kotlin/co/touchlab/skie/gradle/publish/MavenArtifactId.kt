@@ -6,4 +6,4 @@ val Project.mavenArtifactId: String
     get() = "skie" + this.path.replace(":", "-")
 
 val Project.dependencyName: String
-    get() = "${this.group}:${this.mavenArtifactId}:${this.version}"
+    get() = "$group:$name:$version"
