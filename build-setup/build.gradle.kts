@@ -104,6 +104,16 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRuntime"
     }
 
+    plugins.register("skie.runtime.kotlin") {
+        id = "skie.runtime.kotlin"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRuntimeKotlin"
+    }
+
+    plugins.register("skie.runtime.swift") {
+        id = "skie.runtime.swift"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRuntimeSwift"
+    }
+
     plugins.register("skie.server") {
         id = "skie.server"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieServer"

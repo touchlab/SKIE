@@ -2,8 +2,9 @@ package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.util.libs
-import co.touchlab.skie.gradle.version.kotlinToolingVersions
-import co.touchlab.skie.gradle.version.setupSourceSets
+import co.touchlab.skie.gradle.version.*
+import co.touchlab.skie.gradle.version.target.MultiDimensionTargetExtension
+import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -17,6 +18,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 class SkieCompiler: Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         apply<KotlinMultiplatformPluginWrapper>()
+        apply<MultiDimensionTargetPlugin>()
 
         group = "co.touchlab.skie"
 
@@ -24,23 +26,26 @@ class SkieCompiler: Plugin<Project> {
 
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)
+        }
 
-            val kotlinVersions = project.kotlinToolingVersions()
-            setupSourceSets(
-                matrix = kotlinVersions,
-                configureTarget = { cell ->
+        extensions.configure<MultiDimensionTargetExtension> {
+            dimensions.add(kotlinToolingVersionDimension())
+
+            createTarget { target ->
+                jvm(target.name) {
                     attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(cell.toString()))
+                        attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
                     }
-                },
-                configureSourceSet = {
-                    val kotlinVersion = target.baseValue.toString()
+                }
+            }
 
-                    addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
-                    addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
-                    addWeakDependency("org.jetbrains.kotlin:kotlin-native-compiler-embeddable", configureVersion(kotlinVersion))
-                },
-            )
+            configureSourceSet { sourceSet ->
+                val kotlinVersion = sourceSet.kotlinToolingVersion.value
+
+                addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
+                addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
+                addWeakDependency("org.jetbrains.kotlin:kotlin-native-compiler-embeddable", configureVersion(kotlinVersion))
+            }
         }
 
         tasks.withType<KotlinCompilationTask<*>>().configureEach {

@@ -3,9 +3,9 @@ import Foundation
 struct SwiftCoroutineDispatcher {
 
     static func dispatch<T>(
-        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler) -> Swift.Void
+        coroutine: (Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler) -> Swift.Void
     ) async throws -> T {
-        let cancellationHandler = Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_CancellationHandler()
+        let cancellationHandler = Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_CancellationHandler()
 
         return try await _Concurrency.withTaskCancellationHandler(operation: {
             try await dispatchCancellable(coroutine: coroutine, cancellationHandler: cancellationHandler)
@@ -15,8 +15,8 @@ struct SwiftCoroutineDispatcher {
     }
 
     private static func dispatchCancellable<T>(
-        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler) -> Swift.Void,
-        cancellationHandler: Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_CancellationHandler
+        coroutine: (Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler) -> Swift.Void,
+        cancellationHandler: Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_CancellationHandler
     ) async throws -> T {
         var result: Swift.Result<T, Swift.Error>? = nil
 
@@ -30,14 +30,14 @@ struct SwiftCoroutineDispatcher {
     }
 
     private static func createDispatcher<T>(
-        coroutine: (Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler) -> Swift.Void,
-        cancellationHandler: Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_CancellationHandler,
+        coroutine: (Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler) -> Swift.Void,
+        cancellationHandler: Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_CancellationHandler,
         onResult: @escaping (Swift.Result<T, Swift.Error>) -> Swift.Void
     ) -> _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> {
         return _Concurrency.AsyncStream<Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_Runnable> { continuation in
             let dispatcherDelegate = AsyncStreamDispatcherDelegate(continuation: continuation)
 
-            let suspendHandler = Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler(
+            let suspendHandler = Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendHandler(
                 cancellationHandler: cancellationHandler,
                 dispatcherDelegate: dispatcherDelegate,
                 onResult: { suspendResult in
@@ -54,17 +54,17 @@ struct SwiftCoroutineDispatcher {
     }
 
     private static func convertToResult<T>(
-        suspendResult: Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult
+        suspendResult: Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult
     ) -> Swift.Result<T, Swift.Error> {
-        if let suspendResult = suspendResult as? Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult_Success {
+        if let suspendResult = suspendResult as? Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult_Success {
             if T.self == Swift.Void.self {
                 return .success(Swift.Void() as! T)
             } else {
                 return .success(suspendResult.value as! T)
             }
-        } else if let suspendResult = suspendResult as? Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult_Error {
+        } else if let suspendResult = suspendResult as? Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult_Error {
             return .failure(suspendResult.error)
-        } else if suspendResult is Skie.class__co_touchlab_skie_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult_Canceled {
+        } else if suspendResult is Skie.class__co_touchlab_skie_runtime_kotlin__co_touchlab_skie_runtime_coroutines_suspend_Skie_SuspendResult_Canceled {
             return .failure(_Concurrency.CancellationError())
         } else {
             fatalError("Unknown suspend result. This is most likely a bug in SKIE.")

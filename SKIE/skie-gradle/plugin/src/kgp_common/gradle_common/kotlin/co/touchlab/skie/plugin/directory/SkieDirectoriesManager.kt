@@ -7,10 +7,12 @@ import co.touchlab.skie.plugin.util.skieLinkTaskName
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.gradle.api.Task
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
+import javax.inject.Inject
 
 internal object SkieDirectoriesManager {
 
@@ -22,10 +24,14 @@ internal object SkieDirectoriesManager {
         }
     }
 
-    abstract class SkieCreateBuildDirectoryTask : BaseSkieTask() {
+    abstract class SkieCreateBuildDirectoryTask @Inject constructor(objects: ObjectFactory): BaseSkieTask() {
 
         @get:Internal
-        abstract val directory: Property<SkieBuildDirectory>
+        val directory: Property<SkieBuildDirectory> = objects.property(SkieBuildDirectory::class.java)
+
+        init {
+            outputs.dir(directory.map { it.directory })
+        }
 
         override fun runTask() {
             directory.get().createDirectories()

@@ -1,6 +1,6 @@
 plugins {
-    id("skie-jvm")
-    id("skie-publish-jvm")
+    id("skie.runtime.swift")
+    id("skie.publishable")
 }
 
 val createResourcesIndex by tasks.registering {

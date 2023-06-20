@@ -2,8 +2,9 @@ package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.SKIEGradlePluginPlugin
 import co.touchlab.skie.gradle.util.libs
-import co.touchlab.skie.gradle.version.gradleApiVersions
-import co.touchlab.skie.gradle.version.setupSourceSets
+import co.touchlab.skie.gradle.version.*
+import co.touchlab.skie.gradle.version.target.MultiDimensionTargetExtension
+import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.plugin.GradlePluginApiVersion
@@ -20,40 +21,41 @@ class SkieGradle: Plugin<Project> {
         apply<KotlinMultiplatformPluginWrapper>()
         apply<SamWithReceiverGradleSubplugin>()
         apply<SKIEGradlePluginPlugin>()
+        apply<MultiDimensionTargetPlugin>()
 
         group = "co.touchlab.skie"
 
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)
+        }
 
-            val gradleVersions = project.gradleApiVersions()
-            setupSourceSets(
-                matrix = gradleVersions,
-                configureTarget = { cell ->
+        extensions.configure<MultiDimensionTargetExtension> {
+            dimensions.add(gradleApiVersionDimension())
+
+            createTarget { target ->
+                jvm(target.name) {
                     attributes {
-                        println("Gradle version attribute: ${cell.gradleVersion.version}")
-                        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(cell.gradleVersion.version))
+                        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(target.gradleApiVersion.value))
                     }
-                },
-                configureSourceSet = {
-                    val gradleApi = target.baseValue
+                }
+            }
 
-                    val gradleVersion = gradleApi.gradleVersion.version
-                    val kotlinVersion = gradleApi.kotlinVersion.toString()
+            configureSourceSet { sourceSet ->
+                val gradleApiVersion = sourceSet.gradleApiVersion
 
-                    addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
-                    addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
-                    addWeakDependency("dev.gradleplugins:gradle-api", configureVersion(gradleVersion))
+                val gradleVersion = gradleApiVersion.value
+                val kotlinVersion = gradleApiVersion.version.kotlinVersion.toString()
 
-                    kotlinSourceSet.relatedConfigurationNames.forEach {
-                        project.configurations.named(it).configure {
-                            attributes {
-                                attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleVersion))
-                            }
-                        }
+                addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
+                addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
+                addWeakDependency("dev.gradleplugins:gradle-api", configureVersion(gradleVersion))
+
+                configureRelatedConfigurations {
+                    attributes {
+                        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersion.value))
                     }
-                },
-            )
+                }
+            }
         }
 
         extensions.configure<SamWithReceiverExtension> {

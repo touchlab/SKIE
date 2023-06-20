@@ -32,11 +32,11 @@ buildConfig {
     val kotlinPlugin = projects.compiler.kotlinPlugin.dependencyProject
     // TODO Rename to SKIE_GRADLE_PLUGIN
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${kotlinPlugin.group}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${kotlinPlugin.mavenArtifactId}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${kotlinPlugin.name}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${kotlinPlugin.version}\"")
 
-    val runtime = projects.runtime.runtimeKotlin.dependencyProject
-    buildConfigField("String", "RUNTIME_DEPENDENCY", "\"${runtime.dependencyName}\"")
+    val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject.dependencyName }
+    buildConfigField("String", "RUNTIME_DEPENDENCY", runtime.map { """"$it"""" })
 
     val pluginId: String by properties
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")

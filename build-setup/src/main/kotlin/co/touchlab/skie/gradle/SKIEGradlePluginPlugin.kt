@@ -1,9 +1,5 @@
 package co.touchlab.skie.gradle
 
-import co.touchlab.skie.gradle.version.DependencyMatrix
-import co.touchlab.skie.gradle.version.SourceSetScope
-import co.touchlab.skie.gradle.version.gradleApiVersions
-import co.touchlab.skie.gradle.version.setupSourceSets
 import org.gradle.api.*
 import org.gradle.api.attributes.plugin.GradlePluginApiVersion
 import org.gradle.api.file.FileCollection

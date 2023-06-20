@@ -12,12 +12,6 @@ plugins {
     id("dev.settings")
 }
 
-// includeBuild("..") {
-//     dependencySubstitution {
-//         substitute(module("co.touchlab.skie:kotlin-gradle-plugin-shim-impl")).using(project(":gradle:kotlin-gradle-plugin-shim:kotlin-gradle-plugin-shim-impl"))
-//     }
-// }
-
 include(
 //    ":analytics",
 //    ":ir-inspector",

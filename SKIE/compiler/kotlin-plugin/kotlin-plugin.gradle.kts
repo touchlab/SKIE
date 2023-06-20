@@ -17,10 +17,12 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-//                 implementation(projects.common.analytics)
-//                 implementation(projects.common.configuration)
-//                 implementation(projects.common.license)
-//                 implementation(projects.common.util)
+                implementation(projects.common.analytics)
+                implementation(projects.common.configuration)
+                implementation(projects.common.license)
+                implementation(projects.common.util)
+
+                implementation(projects.runtime.runtimeSwift)
 
                 implementation(libs.logback)
                 implementation(libs.kotlinx.serialization.json)

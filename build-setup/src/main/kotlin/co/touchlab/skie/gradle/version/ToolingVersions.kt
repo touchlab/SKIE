@@ -1,7 +1,9 @@
 package co.touchlab.skie.gradle.version
 
+import co.touchlab.skie.gradle.KotlinToolingVersion
+import co.touchlab.skie.gradle.version.target.*
+import co.touchlab.skie.gradle.version.target.Target
 import org.gradle.util.GradleVersion
-import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 
 // WARN: WE'RE USING A "ONE DOT LEADER" (U+2024 ․) IN THE VERSION NAMES BECAUSE WE CAN'T USE A PERIOD (U+002E) IN A PROPERTY NAME.
 @Suppress("NonAsciiCharacters")
@@ -16,8 +18,13 @@ object ToolingVersions {
 
         fun version() = VersionProvider(::KotlinToolingVersion)
 
-        fun dependencyAxisFrom(requestedIdentifiers: List<String>): KotlinToolingVersionAxis {
-            return KotlinToolingVersionAxis(resolve(requestedIdentifiers))
+        fun dimensionFrom(requestedIdentifiers: List<String>): Target.Dimension<KotlinToolingVersionComponent> {
+            return ComparableDimension(
+                name = "kgp",
+                commonName = "common",
+                components = resolve(requestedIdentifiers).map { KotlinToolingVersionComponent(it) }.toSet(),
+                aliases = emptyMap(),
+            )
         }
     }
 
@@ -32,8 +39,13 @@ object ToolingVersions {
             GradleApiVersion(GradleVersion.version(gradle), kotlin)
         }
 
-        fun dependencyAxisFrom(requestedIdentifiers: List<String>): GradleApiVersionAxis {
-            return GradleApiVersionAxis(resolve(requestedIdentifiers))
+        fun dimensionFrom(requestedIdentifiers: List<String>): Target.Dimension<GradleApiVersionComponent> {
+            return ComparableDimension(
+                name = "gradle",
+                commonName = "common",
+                components = resolve(requestedIdentifiers).map { GradleApiVersionComponent(it) }.toSet(),
+                aliases = emptyMap(),
+            )
         }
     }
 }

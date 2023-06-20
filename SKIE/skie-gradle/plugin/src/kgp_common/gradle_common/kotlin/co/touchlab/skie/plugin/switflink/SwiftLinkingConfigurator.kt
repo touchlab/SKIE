@@ -69,6 +69,7 @@ internal object SwiftLinkingConfigurator {
     abstract class SkieMergeCustomSwiftTask : Sync(), SkieTask {
 
         override fun runTask() {
+            // destinationDir.mkdirs()
         }
     }
 

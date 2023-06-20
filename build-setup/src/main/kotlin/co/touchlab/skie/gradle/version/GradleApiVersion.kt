@@ -1,7 +1,7 @@
 package co.touchlab.skie.gradle.version
 
+import co.touchlab.skie.gradle.KotlinToolingVersion
 import org.gradle.util.GradleVersion
-import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 
 data class GradleApiVersion(
     val gradleVersion: GradleVersion,
@@ -11,8 +11,3 @@ data class GradleApiVersion(
         return gradleVersion.compareTo(other.gradleVersion)
     }
 }
-
-data class KotlinPluginShimVersion(
-    val gradleApiVersion: GradleApiVersion,
-    val kotlinToolingVersion: KotlinToolingVersion,
-)

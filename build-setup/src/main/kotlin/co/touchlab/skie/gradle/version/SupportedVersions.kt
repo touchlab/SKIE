@@ -1,32 +1,48 @@
 package co.touchlab.skie.gradle.version
 
 import co.touchlab.skie.gradle.util.stringListProperty
+import co.touchlab.skie.gradle.version.target.DimensionWithAliases
+import co.touchlab.skie.gradle.version.target.Target
 import org.gradle.api.Project
-import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 
-private fun Project.kotlinToolingVersionsAxis(): KotlinToolingVersionAxis {
-    val requestedIdentifiers = project.stringListProperty("versionSupport.kotlinTooling")
-    return ToolingVersions.Kotlin.dependencyAxisFrom(requestedIdentifiers)
-}
-
-private fun Project.gradleApiVersionsAxis(): GradleApiVersionAxis {
+fun Project.gradleApiVersionDimension(): Target.Dimension<GradleApiVersionComponent> {
     val requestedIdentifiers = project.stringListProperty("versionSupport.gradleApi")
-    return ToolingVersions.Gradle.dependencyAxisFrom(requestedIdentifiers)
+    return ToolingVersions.Gradle.dimensionFrom(requestedIdentifiers)
 }
 
-fun Project.kotlinToolingVersions(): SingleAxisDependencyMatrix<KotlinToolingVersion> {
-    val axis = kotlinToolingVersionsAxis()
-    return SingleAxisDependencyMatrix(axis)
+fun Project.kotlinToolingVersionDimension(): Target.Dimension<KotlinToolingVersionComponent> {
+    val requestedIdentifiers = project.stringListProperty("versionSupport.kotlinTooling")
+    return ToolingVersions.Kotlin.dimensionFrom(requestedIdentifiers)
 }
 
-fun Project.gradleApiVersions(): SingleAxisDependencyMatrix<GradleApiVersion> {
-    val axis = gradleApiVersionsAxis()
-    return SingleAxisDependencyMatrix(axis)
-}
-
-fun Project.kotlinPluginShimVersions(): KotlinPluginShimDependencyMatrix {
-    return KotlinPluginShimDependencyMatrix(
-        kotlinToolingVersionsAxis(),
-        gradleApiVersionsAxis(),
+fun Project.darwinPlatformDimension(): Target.Dimension<DarwinPlatformComponent> {
+    return DimensionWithAliases(
+        name = null,
+        commonName = "darwin",
+        components = DarwinPlatformComponent.values().toSet(),
+        aliases = mapOf(
+            "ios" to setOf(
+                DarwinPlatformComponent.iosArm32,
+                DarwinPlatformComponent.iosArm64,
+                DarwinPlatformComponent.iosX64,
+                DarwinPlatformComponent.iosSimulatorArm64,
+            ),
+            "watchos" to setOf(
+                DarwinPlatformComponent.watchosArm32,
+                DarwinPlatformComponent.watchosArm64,
+                DarwinPlatformComponent.watchosX86,
+                DarwinPlatformComponent.watchosX64,
+                DarwinPlatformComponent.watchosSimulatorArm64,
+            ),
+            "tvos" to setOf(
+                DarwinPlatformComponent.tvosArm64,
+                DarwinPlatformComponent.tvosX64,
+                DarwinPlatformComponent.tvosSimulatorArm64,
+            ),
+            "macos" to setOf(
+                DarwinPlatformComponent.macosX64,
+                DarwinPlatformComponent.macosArm64,
+            ),
+        ),
     )
 }

@@ -1,13 +1,11 @@
 import co.touchlab.skie.gradle.kotlin.apple
 
 plugins {
-    id("skie-multiplatform")
-    id("skie-publish-multiplatform")
+    id("skie.runtime.kotlin")
+    id("skie.publishable")
 }
 
 kotlin {
-    apple()
-
     sourceSets.commonMain {
         dependencies {
             implementation(libs.kotlinx.coroutines.core)

@@ -1,8 +1,11 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyName
 import co.touchlab.skie.gradle.publish.mavenArtifactId
-import co.touchlab.skie.gradle.version.gradleApiVersions
-import co.touchlab.skie.gradle.version.kotlinToolingVersions
+import co.touchlab.skie.gradle.version.gradleApiVersionDimension
+import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
+
+// import co.touchlab.skie.gradle.version.gradleApiVersions
+// import co.touchlab.skie.gradle.version.kotlinToolingVersions
 
 plugins {
     id("skie.gradle")
@@ -24,7 +27,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             kotlin.srcDirs(
-                "src/common/kotlin-compiler-attribute",
+                "src/gradle_common/kotlin-compiler-attribute",
             )
 
             dependencies {
@@ -34,23 +37,23 @@ kotlin {
         }
     }
 
-    val gradleApiVersions = project.gradleApiVersions()
-    val kotlinToolingVersions = project.kotlinToolingVersions()
+    val gradleApiVersions = project.gradleApiVersionDimension()
+    val kotlinToolingVersions = project.kotlinToolingVersionDimension()
     targets.forEach { target ->
-        val gradleApiVersion = gradleApiVersions.findCell(target.name) ?: return@forEach
+        val gradleApiVersion = gradleApiVersions.parse(target.name).singleOrNull() ?: return@forEach
         tasks.named(target.artifactsTaskName) {
-            kotlinToolingVersions.cells.forEach { kotlinVersion ->
+            kotlinToolingVersions.components.forEach { kotlinVersion ->
                 val shimConfiguration = configurations.detachedConfiguration(
                     projects.gradle.gradlePlugin
                 ).apply {
                     attributes {
                         attribute(
                             KotlinCompilerVersion.attribute,
-                            objects.named(KotlinCompilerVersion::class.java, kotlinVersion.toString()),
+                            objects.named(KotlinCompilerVersion::class.java, kotlinVersion.value),
                         )
                         attribute(
                             GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-                            objects.named(GradlePluginApiVersion::class.java, gradleApiVersion.gradleVersion.version),
+                            objects.named(GradlePluginApiVersion::class.java, gradleApiVersion.value),
                         )
                     }
                 }
