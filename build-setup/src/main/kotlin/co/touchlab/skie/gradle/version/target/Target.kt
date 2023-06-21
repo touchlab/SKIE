@@ -21,7 +21,7 @@ class Target(
         val componentsWithDimension: Set<ComponentInDimension<COMPONENT>>
         val prefix: String
 
-        fun parse(string: String): Set<COMPONENT>
+        fun parse(string: String): SourceSet.ComponentSet<COMPONENT>?
     }
 
     interface Component {

@@ -14,9 +14,8 @@ import org.gradle.kotlin.dsl.maven
 
 class SkiePublishable: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
+        apply<SkieBase>()
         apply<MavenPublishPlugin>()
-
-        version = System.getenv("RELEASE_VERSION").orEmpty().ifBlank { "1.0.0-SNAPSHOT" }
 
         // Configure publishing to AWS S3
         val accessKeyProvider = EnvironmentVariableProvider("AWS_TOUCHLAB_DEPLOY_ACCESS")

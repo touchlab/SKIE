@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
 class SkieRuntime: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
+        apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()
 
         extensions.configure<KotlinMultiplatformExtension> {

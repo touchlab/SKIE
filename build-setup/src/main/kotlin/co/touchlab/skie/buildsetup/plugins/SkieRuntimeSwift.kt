@@ -12,9 +12,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 class SkieRuntimeSwift: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
+        apply<SkieBase>()
         apply<KotlinPluginWrapper>()
-
-        group = "co.touchlab.skie"
 
         extensions.configure<KotlinJvmProjectExtension> {
             jvmToolchain(libs.versions.java)

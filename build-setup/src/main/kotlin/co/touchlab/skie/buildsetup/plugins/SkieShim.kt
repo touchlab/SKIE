@@ -18,13 +18,10 @@ import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverGradleSubplugi
 
 class SkieShim: Plugin<Project> {
     override fun apply(project: Project) = with(project) {
+        apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()
         apply<SamWithReceiverGradleSubplugin>()
         apply<MultiDimensionTargetPlugin>()
-
-        group = "co.touchlab.skie"
-
-        KotlinCompilerVersion.registerIn(project.dependencies)
 
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)
@@ -50,6 +47,7 @@ class SkieShim: Plugin<Project> {
                 addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
                 addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
 
+                println("Adding gradleApiVersion: $gradleApiVersion to ${sourceSet.name}")
                 addWeakDependency("dev.gradleplugins:gradle-api", configureVersion(gradleApiVersion))
 
                 addWeakDependency("org.jetbrains.kotlin:kotlin-gradle-plugin-api", configureVersion(kotlinToolingVersion))

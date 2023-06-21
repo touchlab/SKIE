@@ -1,6 +1,5 @@
 package co.touchlab.skie.gradle.version
 
-import co.touchlab.skie.gradle.version.GradleApiVersion
 import co.touchlab.skie.gradle.version.target.Target
 import co.touchlab.skie.gradle.version.target.SourceSet
 
@@ -14,5 +13,10 @@ data class GradleApiVersionComponent(
 
 val Target.gradleApiVersion: GradleApiVersionComponent
     get() = component<GradleApiVersionComponent>()
+
 val SourceSet.gradleApiVersion: GradleApiVersionComponent
-    get() = components<GradleApiVersionComponent>().min()
+    get() = when (val componentSet = componentSet<GradleApiVersionComponent>()) {
+        is SourceSet.ComponentSet.Common -> componentSet.components.min()
+        is SourceSet.ComponentSet.Enumerated -> componentSet.components.min()
+        is SourceSet.ComponentSet.Specific -> componentSet.component
+    }

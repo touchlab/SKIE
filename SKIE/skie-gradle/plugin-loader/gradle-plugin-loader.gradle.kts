@@ -40,7 +40,7 @@ kotlin {
     val gradleApiVersions = project.gradleApiVersionDimension()
     val kotlinToolingVersions = project.kotlinToolingVersionDimension()
     targets.forEach { target ->
-        val gradleApiVersion = gradleApiVersions.parse(target.name).singleOrNull() ?: return@forEach
+        val gradleApiVersion = gradleApiVersions.parse(target.name)?.components?.singleOrNull() ?: return@forEach
         tasks.named(target.artifactsTaskName) {
             kotlinToolingVersions.components.forEach { kotlinVersion ->
                 val shimConfiguration = configurations.detachedConfiguration(

@@ -9,11 +9,11 @@ class ComparableDimension<COMPONENT>(
 
     private val sortedComponents = components.sorted()
 
-    override fun parse(string: String): Set<COMPONENT> {
+    override fun parse(string: String): SourceSet.ComponentSet<COMPONENT>? {
         return tryParseRange(string) ?: super.parse(string)
     }
 
-    private fun tryParseRange(string: String): Set<COMPONENT>? {
+    private fun tryParseRange(string: String): SourceSet.ComponentSet<COMPONENT>? {
         return regexes.range.matchEntire(string)?.let { match ->
             val (startValue, endValue) = match.destructured
             val startComponentIndex = checkNotNull(sortedComponents.indexOfFirst { it.value == startValue }.takeIf { it >= 0 }) {
@@ -23,7 +23,11 @@ class ComparableDimension<COMPONENT>(
                 "Could not find end component with value $endValue when parsing $string!"
             }
 
-            sortedComponents.subList(startComponentIndex, endLabel + 1).toSet()
+            SourceSet.ComponentSet.Enumerated(
+                name = string,
+                dimension = this,
+                components = sortedComponents.subList(startComponentIndex, endLabel + 1).toSet(),
+            )
         }
     }
 }

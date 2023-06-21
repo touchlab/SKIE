@@ -4,21 +4,111 @@ import kotlin.reflect.KClass
 
 data class SourceSet(
     val name: String,
-    val components: List<Set<Target.Component>>,
+    val components: List<ComponentSet<out Target.Component>>,
     val sourceDirs: List<RelativePath>,
     val isRoot: Boolean = false,
 ) {
     @PublishedApi
-    internal val componentsByType: Map<KClass<out Target.Component>, Set<Target.Component>> = components.associateBy { it.first()::class }
+    internal val componentsByType: Map<KClass<out Target.Component>, ComponentSet<*>> = components.associateBy { it.componentType }
         .also { check(it.size == components.size) { "Duplicate component types in $components!" } }
 
-    inline fun <reified COMPONENT: Target.Component> components(): Set<COMPONENT> {
-        return componentsByType[COMPONENT::class] as Set<COMPONENT>
+    inline fun <reified COMPONENT: Target.Component> componentSet(): ComponentSet<COMPONENT> {
+        @Suppress("UNCHECKED_CAST")
+        return componentsByType[COMPONENT::class] as ComponentSet<COMPONENT>
+    }
+
+//     val isRoot: Boolean by lazy {
+//         components.all { it is ComponentSet.Common }
+//     }
+
+    val isIntermediate: Boolean by lazy {
+        !isTarget && !isRoot
+    }
+
+    val isTarget: Boolean by lazy {
+        components.all { it is ComponentSet.Specific }
+    }
+
+    fun shouldDependOn(other: SourceSet): Boolean {
+        if (this == other) {
+            return false
+        }
+        if (other.isRoot) {
+            return true
+        }
+        return components.zip(other.components) { thisComponent, otherComponent ->
+            thisComponent.shouldDependOn(otherComponent)
+        }.all { it }
     }
 
     data class Directory(
         val name: String,
-        val components: Target.ComponentsInDimension<Target.Component>,
+        val components: ComponentSet<out Target.Component>,
         val children: List<Directory>,
     )
+
+    sealed interface ComponentSet<COMPONENT: Target.Component> {
+        val name: String
+        val dimension: Target.Dimension<COMPONENT>
+        val componentType: KClass<out COMPONENT>
+        val components: Set<COMPONENT>
+
+        fun isEmpty(): Boolean = components.isEmpty()
+
+        fun shouldDependOn(other: ComponentSet<*>): Boolean
+
+        fun withErasedIdentity(): ComponentSet<COMPONENT> = Enumerated(
+            name = components.joinToString(",") { it.value },
+            dimension = dimension,
+            components = components,
+        )
+
+        data class Common<COMPONENT: Target.Component>(
+            override val name: String,
+            override val dimension: Target.Dimension<COMPONENT>,
+            override val components: Set<COMPONENT>,
+        ): ComponentSet<COMPONENT> {
+            constructor(name: String, dimension: Target.Dimension<COMPONENT>): this(name, dimension, dimension.components)
+
+            override val componentType: KClass<out COMPONENT> = components.first()::class
+
+            override fun shouldDependOn(other: ComponentSet<*>): Boolean = false
+        }
+
+        data class Enumerated<COMPONENT: Target.Component>(
+            override val name: String,
+            override val dimension: Target.Dimension<COMPONENT>,
+            override val components: Set<COMPONENT>,
+        ): ComponentSet<COMPONENT> {
+            override val componentType: KClass<out COMPONENT> = components.first()::class
+
+            override fun shouldDependOn(other: ComponentSet<*>): Boolean = componentType == other.componentType && when (other) {
+                is Common -> true
+                is Enumerated -> components != other.components && components.containsAll(other.components)
+                is Specific -> false
+            }
+        }
+
+        data class Specific<COMPONENT: Target.Component>(
+            override val name: String,
+            override val dimension: Target.Dimension<COMPONENT>,
+            val component: COMPONENT,
+        ): ComponentSet<COMPONENT> {
+            override val componentType: KClass<out COMPONENT> = component::class
+
+            override val components: Set<COMPONENT> = setOf(component)
+
+            override fun shouldDependOn(other: ComponentSet<*>): Boolean = componentType == other.componentType && when (other) {
+                is Common -> true
+                is Enumerated -> other.components.contains(component)
+                is Specific -> false
+            }
+
+            companion object {
+                fun <COMPONENT: Target.Component> unsafe(name: String, dimension: Target.Dimension<COMPONENT>, component: Target.Component): Specific<COMPONENT> {
+                    return Specific(name, dimension, component as COMPONENT)
+                }
+            }
+        }
+    }
 }

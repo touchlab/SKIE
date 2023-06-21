@@ -18,16 +18,11 @@ import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverGradleSubplugi
 
 class SkieGradle: Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
+        apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()
         apply<SamWithReceiverGradleSubplugin>()
         apply<SKIEGradlePluginPlugin>()
         apply<MultiDimensionTargetPlugin>()
-
-        group = "co.touchlab.skie"
-
-        extensions.configure<KotlinMultiplatformExtension> {
-            jvmToolchain(libs.versions.java)
-        }
 
         extensions.configure<MultiDimensionTargetExtension> {
             dimensions.add(gradleApiVersionDimension())

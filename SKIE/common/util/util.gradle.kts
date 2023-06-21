@@ -7,6 +7,9 @@ plugins {
 }
 
 buildConfig {
+    useKotlinOutput {
+        internalVisibility = false
+    }
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 }
 

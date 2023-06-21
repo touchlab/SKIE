@@ -17,12 +17,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 class SkieCompiler: Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
+        apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()
         apply<MultiDimensionTargetPlugin>()
-
-        group = "co.touchlab.skie"
-
-        KotlinCompilerVersion.registerIn(project.dependencies)
 
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)

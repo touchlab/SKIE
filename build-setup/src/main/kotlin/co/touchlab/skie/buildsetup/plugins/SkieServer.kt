@@ -14,16 +14,11 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 class SkieServer: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
+        apply<SkieBase>()
         apply<KotlinPluginWrapper>()
-
-        group = "co.touchlab.skie.server"
 
         extensions.configure<KotlinJvmProjectExtension> {
             jvmToolchain(libs.versions.java)
-        }
-
-        tasks.withType<Test>().configureEach {
-            useJUnitPlatform()
         }
 
         dependencies {

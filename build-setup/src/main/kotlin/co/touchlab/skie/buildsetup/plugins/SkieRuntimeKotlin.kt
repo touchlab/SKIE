@@ -21,61 +21,12 @@ import kotlin.io.path.name
 
 class SkieRuntimeKotlin: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
+        apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()
         apply<MultiDimensionTargetPlugin>()
 
-        group = "co.touchlab.skie"
-
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)
-
-//             val kotlinVersions = kotlinToolingVersions()
-//             with(kotlinVersions) {
-//                 val sourceDir = project.file("src").toPath()
-//                 val testsDir = project.file("tests").toPath()
-//
-//                 val versionRanges = sourceSetRangesIn(sourceDir, testsDir)
-//                 val rootTarget = SourceSetScope.Target.Root(oldest)
-//                 val commonTargets = commonTargets()
-//                 val leafTargets = cells.map {
-//                     SourceSetScope.Target.Leaf(it)
-//                 }
-//                 val rangeTargets = versionRanges.map {
-//                     SourceSetScope.Target.Range(it)
-//                 }
-//
-//                 val targetsByKotlinVersion = cells.associateWith { version ->
-//                     apple(version)
-//                 }
-//
-//                 SourceSetScope.Compilation.values().flatMap { compilation ->
-//                     val root = prepare(rootTarget, compilation, this)
-//                     val common = commonTargets.map { prepare(it, compilation, this) }
-//                     val ranges = rangeTargets.map { prepare(it, compilation, this) }
-//                     val leaves = leafTargets.map { prepare(it, compilation, this) }
-//
-//                     val all = listOf(listOf(root), common, ranges, leaves).flatten()
-//                     all.forEach { sourceSet ->
-//                         sourceSet.apply {
-//                             val root = when (compilation) {
-//                                 SourceSetScope.Compilation.Main -> sourceDir.name
-//                                 SourceSetScope.Compilation.Test -> testsDir.name
-//                             }
-//                             val path = sourceSet.target.pathComponents().joinToString("/")
-//                             kotlinSourceSet.kotlin.setSrcDirs(
-//                                 listOf("$root/$path/kotlin")
-//                             )
-//                             kotlinSourceSet.resources.setSrcDirs(
-//                                 listOf("$root/$path/resources")
-//                             )
-//                         }
-//                     }
-//
-//                     matrix.configureSourceSetHierarchy(root, common, ranges, leaves)
-//
-//                     all
-//                 }
-//             }
         }
 
         extensions.configure<MultiDimensionTargetExtension> {

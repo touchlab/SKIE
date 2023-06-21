@@ -14,9 +14,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 class SkieCommon: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
+        apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()
-
-        group = "co.touchlab.skie"
 
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)
@@ -26,20 +25,17 @@ class SkieCommon: Plugin<Project> {
             sourceSets {
                 val commonMain by getting {
                     dependencies {
-                        implementation(kotlin("stdlib"))
+                        compileOnly(kotlin("stdlib"))
                     }
                 }
 
                 val commonTest by getting {
                     dependencies {
+                        implementation(kotlin("stdlib"))
                         implementation(libs.bundles.testing.jvm)
                     }
                 }
             }
-        }
-
-        tasks.withType<Test>().configureEach {
-            useJUnitPlatform()
         }
     }
 }

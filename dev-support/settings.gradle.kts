@@ -13,18 +13,18 @@ plugins {
 }
 
 include(
-//    ":analytics",
-//    ":ir-inspector",
+    ":analytics",
+    ":ir-inspector",
     ":skie:mac",
     ":skie:mac:framework",
     ":skie:mac:dependency",
     ":skie:mac:swift",
-//    ":skie:ios",
-//    ":skie:ios:framework",
-//    ":skie:ios:dependency",
-//    ":skie:ios:swift",
-//    ":pure-compiler",
-//    ":pure-compiler:dependency",
-//    ":pure-compiler:framework",
-//    ":pure-compiler:swift",
+    ":skie:ios",
+    ":skie:ios:framework",
+    ":skie:ios:dependency",
+    ":skie:ios:swift",
+    ":pure-compiler",
+    ":pure-compiler:dependency",
+    ":pure-compiler:framework",
+    ":pure-compiler:swift",
 )

@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 plugins {
-    id("skie-multiplatform")
+    id("dev.multiplatform")
 
     id("co.touchlab.skie")
 }

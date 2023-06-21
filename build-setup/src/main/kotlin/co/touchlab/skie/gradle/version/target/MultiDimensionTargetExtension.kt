@@ -3,12 +3,13 @@ package co.touchlab.skie.gradle.version.target
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import javax.inject.Inject
 
 abstract class MultiDimensionTargetExtension @Inject constructor(private val onConfigurationComplete: () -> Unit) {
     abstract val dimensions: ListProperty<Target.Dimension<*>>
 
-    abstract val createTarget: Property<KotlinMultiplatformExtension.(Target) -> Unit>
+    abstract val createTarget: Property<KotlinMultiplatformExtension.(Target) -> KotlinTarget>
 
     abstract val configureSourceSet: Property<ConfigureSourceSetScope.(SourceSet) -> Unit>
 
@@ -17,7 +18,7 @@ abstract class MultiDimensionTargetExtension @Inject constructor(private val onC
         notifyConfigurationCompleted()
     }
 
-    fun createTarget(block: KotlinMultiplatformExtension.(Target) -> Unit) {
+    fun createTarget(block: KotlinMultiplatformExtension.(Target) -> KotlinTarget) {
         createTarget.set(block)
         notifyConfigurationCompleted()
     }

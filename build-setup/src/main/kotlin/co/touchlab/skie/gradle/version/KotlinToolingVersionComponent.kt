@@ -13,5 +13,10 @@ data class KotlinToolingVersionComponent(
 
 val Target.kotlinToolingVersion: KotlinToolingVersionComponent
     get() = component<KotlinToolingVersionComponent>()
+
 val SourceSet.kotlinToolingVersion: KotlinToolingVersionComponent
-    get() = components<KotlinToolingVersionComponent>().min()
+    get() = when (val componentSet = componentSet<KotlinToolingVersionComponent>()) {
+        is SourceSet.ComponentSet.Common -> componentSet.components.min()
+        is SourceSet.ComponentSet.Enumerated -> componentSet.components.min()
+        is SourceSet.ComponentSet.Specific -> componentSet.component
+    }

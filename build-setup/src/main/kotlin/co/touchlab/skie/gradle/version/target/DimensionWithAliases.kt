@@ -10,32 +10,36 @@ open class DimensionWithAliases<COMPONENT: Target.Component>(
         Target.ComponentInDimension(this, it)
     }.toSet()
 
-    private val aliasesAndSpecificComponents = aliases +
-        components.associate { it.value to setOf(it) } +
-        mapOf(commonName to components)
-
-
     override val prefix: String = name?.let { "${it}_" } ?: ""
+
+    private val aliasesAndSpecificComponents = aliases.mapValues { (name, components) ->
+            SourceSet.ComponentSet.Enumerated(prefix + name, this, components)
+        } +
+        components.associate { it.value to SourceSet.ComponentSet.Specific(it.value, this, it) } +
+        mapOf(commonName to SourceSet.ComponentSet.Common(prefix + commonName, this, components))
+
+
     protected val regexes = Regexes()
 
-    override fun parse(string: String): Set<COMPONENT> {
+    override fun parse(string: String): SourceSet.ComponentSet<COMPONENT>? {
         return tryParseEnumeratedComponents(string) ?:
-            tryParseAny(string) ?:
-            emptySet()
+            tryParseAny(string)
     }
 
-    private fun tryParseEnumeratedComponents(string: String): Set<COMPONENT>? {
+    private fun tryParseEnumeratedComponents(string: String): SourceSet.ComponentSet<COMPONENT>? {
         return regexes.enumeration.matchEntire(string)?.let { match ->
             val rawValues = match.groupValues[1]
-            rawValues.split(",").flatMap { rawValue ->
+            val value = rawValues.split(",").flatMap { rawValue ->
                 checkNotNull(aliasesAndSpecificComponents[rawValue]) {
                     "Could not find component with value $rawValue when parsing $string!"
-                }
+                }.components
             }.toSet()
+
+            SourceSet.ComponentSet.Enumerated(string, this, value)
         }
     }
 
-    private fun tryParseAny(string: String): Set<COMPONENT>? {
+    private fun tryParseAny(string: String): SourceSet.ComponentSet<COMPONENT>? {
         return regexes.any.matchEntire(string)?.let { match ->
             val possibleComponentNameOrAlias = match.groupValues[1]
             aliasesAndSpecificComponents[possibleComponentNameOrAlias]
