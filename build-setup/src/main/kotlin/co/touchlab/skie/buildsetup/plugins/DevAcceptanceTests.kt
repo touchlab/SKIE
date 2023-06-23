@@ -2,6 +2,7 @@ package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
+import co.touchlab.skie.gradle.util.String.enquoted
 import co.touchlab.skie.gradle.version.acceptanceTest
 import co.touchlab.skie.gradle.version.acceptanceTestsDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
@@ -62,10 +63,11 @@ abstract class DevAcceptanceTests: Plugin<Project> {
             dimensions(acceptanceTestsDimension(), kotlinToolingVersionDimension())
 
             createTarget { target ->
+                val acceptanceTestType = target.acceptanceTest
                 val kotlinTarget = jvm(target.name) {
                     attributes {
                         attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
-                        attribute(Attribute.of("co.touchlab.skie.dev.acceptance-test", String::class.java), target.acceptanceTest.value)
+                        attribute(Attribute.of("co.touchlab.skie.dev.acceptance-test", String::class.java), acceptanceTestType.value)
                     }
                 }
 
@@ -106,7 +108,7 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                         className.set("TestBuildConfig")
 
                         fun Collection<File>.toListString(): String =
-                            this.joinToString(", ") { "\"${it.absolutePath}\"" }
+                            this.joinToString(", ") { it.absolutePath.enquoted() }
 
                         val resolvedDependencies = provider { acceptanceTestDependencies.resolve() }
                         val exportedDependencies = provider { acceptanceTestDependencies.filter { it.path.contains("SKIE/runtime/kotlin") }.toList() }
@@ -117,13 +119,13 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                             value = kotlinTarget.compilations.named("test").flatMap {
                                 tasks.named<ProcessResources>(it.processResourcesTaskName)
                             }.map {
-                                "\"${it.destinationDir.absolutePath}\""
+                                it.destinationDir.absolutePath.enquoted()
                             },
                         )
                         buildConfigField(
                             type = "String",
                             name = "BUILD",
-                            value = layout.buildDirectory.map { "\"${it.asFile.absolutePath}\"" },
+                            value = layout.buildDirectory.map { it.dir(acceptanceTestType.value).asFile.absolutePath.enquoted() },
                         )
                         buildConfigField(
                             type = "co.touchlab.skie.acceptancetests.util.StringArray",

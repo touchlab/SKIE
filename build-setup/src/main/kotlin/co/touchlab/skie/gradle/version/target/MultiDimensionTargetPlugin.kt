@@ -71,9 +71,7 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
                         }
                     }
 
-                allSourceSets.forEach { (sourceSet, kotlinSourceSet) ->
-                    if (sourceSet.isRoot) { return@forEach }
-
+                allSourceSets.filterKeys { !it.isRoot }.forEach { (sourceSet, kotlinSourceSet) ->
                     val dependencies = allSourceSets.filter { (otherSourceSet, _) ->
                         sourceSet.shouldDependOn(otherSourceSet)
                     }
@@ -128,12 +126,6 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
         dimensions: List<Target.Dimension<*>>,
         targets: List<Target>,
     ): Set<SourceSet> {
-        fun sourceSetName(components: List<SourceSet.ComponentSet<out Target.Component>>): String {
-            return components.map { component ->
-                component.dimension.prefix + component.name
-            }.joinToString("__")
-        }
-
         fun List<SourceSet.Directory>.sourceSets(dimensions: List<Target.Dimension<*>>): Set<SourceSet> {
             return flatMap { directory ->
                 if (directory.children.isEmpty()) {
