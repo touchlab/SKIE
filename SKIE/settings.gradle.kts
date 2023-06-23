@@ -86,4 +86,7 @@ buildSetup {
         val `plugin-loader` by module
     }
 
+    val `acceptance-tests` by group {
+        val framework by module
+    }
 }

@@ -2,10 +2,12 @@ package co.touchlab.skie.gradle.version.target
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinVariant
 import java.io.File
@@ -17,6 +19,8 @@ import kotlin.io.path.notExists
 abstract class MultiDimensionTargetPlugin: Plugin<Project> {
 
     override fun apply(project: Project) {
+        project.apply<KotlinMultiplatformPluginWrapper>()
+
         val extension = project.extensions.create<MultiDimensionTargetExtension>("multiDimensionTarget", {
             doWork(project, project.extensions.getByType())
         })
@@ -61,7 +65,7 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
                 val allSourceSets = resolveSourceSets(compilation.directory, dimensions, allTargets)
                     .associateWith { sourceSet ->
                         if (sourceSet.isIntermediate) {
-                            sourceSets.maybeCreate(sourceSet.name + compilation.sourceSetNameSuffix)
+                            sourceSets.maybeCreate(sourceSet.name + "__" + compilation.sourceSetNameSuffix)
                         } else {
                             sourceSets.getByName(sourceSet.name + compilation.sourceSetNameSuffix)
                         }
@@ -83,11 +87,13 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
                 allSourceSets.forEach { (sourceSet, kotlinSourceSet) ->
                     kotlinSourceSet.apply {
                         println("Configuring source set ${kotlinSourceSet.name} - \n${compilation.kotlinSourcePaths(sourceSet).joinToString("\n") { "\t- $it" }}")
-                        kotlin.setSrcDirs(
+                        kotlin.srcDirs.remove(project.projectDir.resolve("src/${sourceSet.name}/kotlin"))
+                        kotlin.srcDirs(
                             compilation.kotlinSourcePaths(sourceSet),
                         )
 
-                        resources.setSrcDirs(
+                        resources.srcDirs.remove(project.projectDir.resolve("src/${sourceSet.name}/resources"))
+                        resources.srcDirs(
                             compilation.resourcePaths(sourceSet),
                         )
                     }
@@ -100,6 +106,19 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
 
                     extension.configureSourceSet.get().invoke(configureScope, sourceSet)
                 }
+
+                println("\n\nAll source sets for compilation ${compilation.sourceSetNameSuffix}:")
+                allSourceSets.forEach { (sourceSet, kotlinSourceSet) ->
+                    println("\tSS: ${sourceSet.name}, KSS: ${kotlinSourceSet.name}")
+                    println(sourceSet.components.joinToString(prefix = "\t\t[", postfix = "]") {
+                        it.components.joinToString(prefix = "{", postfix = "}") { it.value }
+                    })
+                    println(sourceSet.sourceDirs.joinToString("\n") {
+                        "\t\t- " + it.components.joinToString("/")
+                    })
+                    println(kotlinSourceSet.dependsOn.joinToString(prefix = "\t\tDepends on = [", postfix = "]") { it.name })
+                }
+                println("\n\n")
             }
         }
     }
@@ -115,18 +134,22 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
             }.joinToString("__")
         }
 
-        fun List<SourceSet.Directory>.sourceSets(): Set<SourceSet> {
+        fun List<SourceSet.Directory>.sourceSets(dimensions: List<Target.Dimension<*>>): Set<SourceSet> {
             return flatMap { directory ->
                 if (directory.children.isEmpty()) {
-                    setOf(
-                        SourceSet(
-                            name = directory.name,
-                            components = listOf(directory.components),
-                            sourceDirs = listOf(RelativePath(listOf(directory.name))),
+                    if (dimensions.size == 1) {
+                        setOf(
+                            SourceSet(
+                                name = directory.name,
+                                components = listOf(directory.components),
+                                sourceDirs = listOf(RelativePath(listOf(directory.name))),
+                            )
                         )
-                    )
+                    } else {
+                        emptySet()
+                    }
                 } else {
-                    directory.children.sourceSets().map { childSourceSet ->
+                    directory.children.sourceSets(dimensions.drop(1)).map { childSourceSet ->
                         SourceSet(
                             name = directory.name + "__" + childSourceSet.name,
                             components = listOf(directory.components) + childSourceSet.components,
@@ -159,25 +182,25 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
             )
         }
 
-        val sourceSetsFromDirectories = sourceSetDirectories.sourceSets()
+        val sourceSetsFromDirectories = sourceSetDirectories.sourceSets(dimensions)
         val intermediateSourceSets = sourceSetsFromDirectories.filter { it.isIntermediate }
 
-        val flattenedIntermediateSourceSets = intermediateSourceSets
-            .groupBy { sourceSet ->
-                sourceSet.components.map { it.withErasedIdentity() }
-            }
-            .map { (components, sourceSets) ->
-                if (sourceSets.size == 1) {
-                    sourceSets.single()
-                } else {
-                    SourceSet(
-                        name = sourceSetName(components),
-                        components = components,
-                        sourceDirs = sourceSets.flatMap { it.sourceDirs },
-                    )
-                }
-            }
-            .toSet()
+//         val flattenedIntermediateSourceSets = intermediateSourceSets
+//             .groupBy { sourceSet ->
+//                 sourceSet.components.map { it.withErasedIdentity() }
+//             }
+//             .map { (components, sourceSets) ->
+//                 if (sourceSets.size == 1) {
+//                     sourceSets.single()
+//                 } else {
+//                     SourceSet(
+//                         name = sourceSetName(components),
+//                         components = components,
+//                         sourceDirs = sourceSets.flatMap { it.sourceDirs },
+//                     )
+//                 }
+//             }
+//             .toSet()
 
         val rootSourceSet = SourceSet(
             name = "common",
@@ -195,7 +218,7 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
             isRoot = true,
         )
 
-        return setOf(rootSourceSet) + flattenedIntermediateSourceSets + targetSourceSets
+        return setOf(rootSourceSet) + intermediateSourceSets + targetSourceSets
     }
 
     private fun resolveSourceSetDirectories(

@@ -1,6 +1,5 @@
 package co.touchlab.skie.gradle.version
 
-import co.touchlab.skie.gradle.version.target.SourceSet
 import co.touchlab.skie.gradle.version.target.Target
 
 enum class DarwinPlatformComponent: Target.Component {

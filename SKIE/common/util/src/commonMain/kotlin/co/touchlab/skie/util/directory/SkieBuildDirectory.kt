@@ -73,6 +73,10 @@ class SkieBuildDirectory(
         val custom: Custom = Custom(this)
 
         class Generated(parent: Directory) : PermanentDirectory(parent, "generated") {
+            init {
+                // TODO: Added to make tests working. This should probably be created and reset in tests directly.
+                directory.mkdirs()
+            }
 
             fun swiftFile(baseName: String): File = directory.resolve("$baseName.swift")
         }
@@ -87,6 +91,10 @@ class SkieBuildDirectory(
         fun moduleHeader(moduleName: String): ModuleHeader = ModuleHeader(this, moduleName)
 
         class ObjectFiles(parent: Directory) : PermanentDirectory(parent, "object-files") {
+            init {
+                // TODO: Added to make tests working. This should probably be created and reset in tests directly.
+                directory.mkdirs()
+            }
 
             val all: List<File>
                 get() = directory.walkTopDown()
@@ -128,4 +136,3 @@ class SkieBuildDirectory(
         }
     }
 }
-

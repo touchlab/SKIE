@@ -1,6 +1,7 @@
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
+    id("com.osacky.doctor") version "0.8.1"
 }
 
 repositories {
@@ -21,6 +22,7 @@ dependencies {
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
     implementation(libs.ktor.client.java)
+    implementation(libs.kotlinPoet)
 }
 
 gradlePlugin {
@@ -53,6 +55,15 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.gradle.publish.SkiePublishGradlePlugin"
     }
 
+    plugins.register("dev.acceptance-tests") {
+        id = "dev.acceptance-tests"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevAcceptanceTests"
+    }
+
+    plugins.register("dev.acceptance-tests-framework") {
+        id = "dev.acceptance-tests-framework"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevAcceptanceTestsFramework"
+    }
 
     plugins.register("dev.buildconfig") {
         id = "dev.buildconfig"
@@ -77,6 +88,11 @@ gradlePlugin {
     plugins.register("experimental.context-receivers") {
         id = "experimental.context-receivers"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.ExperimentalContextReceivers"
+    }
+
+    plugins.register("opt-in.experimental-compiler-api") {
+        id = "opt-in.experimental-compiler-api"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.OptInExperimentalCompilerApi"
     }
 
     plugins.register("skie.common") {

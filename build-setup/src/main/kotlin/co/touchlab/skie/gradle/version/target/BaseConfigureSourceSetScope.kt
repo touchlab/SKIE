@@ -8,7 +8,7 @@ abstract class BaseConfigureSourceSetScope(
 
 ): ConfigureSourceSetScope {
     protected abstract val project: Project
-    protected abstract val kotlinSourceSet: KotlinSourceSet
+    abstract override val kotlinSourceSet: KotlinSourceSet
 
     override fun configureRelatedConfigurations(block: Configuration.() -> Unit) {
         kotlinSourceSet.relatedConfigurationNames.forEach {

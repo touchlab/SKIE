@@ -46,3 +46,12 @@ fun Project.darwinPlatformDimension(): Target.Dimension<DarwinPlatformComponent>
         ),
     )
 }
+
+fun Project.acceptanceTestsDimension(): Target.Dimension<AcceptanceTestsComponent> {
+    return DimensionWithAliases(
+        name = null,
+        commonName = "all-tests",
+        components = AcceptanceTestsComponent.values().toSet(),
+        aliases = emptyMap(),
+    )
+}

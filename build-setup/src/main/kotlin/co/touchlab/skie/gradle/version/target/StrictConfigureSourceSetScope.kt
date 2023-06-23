@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 class StrictConfigureSourceSetScope(
     override val project: Project,
     override val kotlinSourceSet: KotlinSourceSet,
-    private val compilation: MultiDimensionTargetPlugin.Compilation,
+    override val compilation: MultiDimensionTargetPlugin.Compilation,
 ): BaseConfigureSourceSetScope() {
     override fun addPlatform(notation: Any) {
         kotlinSourceSet.dependencies {

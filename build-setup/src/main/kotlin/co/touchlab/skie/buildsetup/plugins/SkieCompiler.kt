@@ -15,18 +15,14 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-class SkieCompiler: Plugin<Project> {
+abstract class SkieCompiler: Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         apply<SkieBase>()
-        apply<KotlinMultiplatformPluginWrapper>()
         apply<MultiDimensionTargetPlugin>()
-
-        extensions.configure<KotlinMultiplatformExtension> {
-            jvmToolchain(libs.versions.java)
-        }
+        apply<OptInExperimentalCompilerApi>()
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions.add(kotlinToolingVersionDimension())
+            dimensions(kotlinToolingVersionDimension())
 
             createTarget { target ->
                 jvm(target.name) {
@@ -43,10 +39,6 @@ class SkieCompiler: Plugin<Project> {
                 addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
                 addWeakDependency("org.jetbrains.kotlin:kotlin-native-compiler-embeddable", configureVersion(kotlinVersion))
             }
-        }
-
-        tasks.withType<KotlinCompilationTask<*>>().configureEach {
-            compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
         }
     }
 }

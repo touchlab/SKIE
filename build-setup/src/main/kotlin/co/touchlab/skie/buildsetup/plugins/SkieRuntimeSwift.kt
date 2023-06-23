@@ -10,13 +10,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-class SkieRuntimeSwift: Plugin<Project> {
+abstract class SkieRuntimeSwift: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<KotlinPluginWrapper>()
-
-        extensions.configure<KotlinJvmProjectExtension> {
-            jvmToolchain(libs.versions.java)
-        }
     }
 }

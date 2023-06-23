@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
-class ExperimentalContextReceivers: Plugin<Project> {
+abstract class ExperimentalContextReceivers: Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         tasks.withType<KotlinCompile<*>>().configureEach {

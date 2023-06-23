@@ -15,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:test" />
+          <option value=":acceptance-tests:functional__kgp_1.8.0Test" />
         </list>
       </option>
       <option name="vmOptions" />
@@ -23,6 +23,7 @@
     <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
+    <ForceTestExec>false</ForceTestExec>
     <method v="2" />
   </configuration>
 </component>

@@ -12,7 +12,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.maven
 
-class SkiePublishable: Plugin<Project> {
+abstract class SkiePublishable: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<MavenPublishPlugin>()

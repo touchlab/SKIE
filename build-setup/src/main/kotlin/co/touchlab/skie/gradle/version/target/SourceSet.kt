@@ -30,15 +30,14 @@ data class SourceSet(
     }
 
     fun shouldDependOn(other: SourceSet): Boolean {
-        if (this == other) {
-            return false
+        return when {
+            this == other -> false
+            other.isRoot -> true
+            other.isIntermediate -> components.zip(other.components) { thisComponent, otherComponent ->
+                thisComponent.shouldDependOn(otherComponent)
+            }.all { it }
+            else -> false
         }
-        if (other.isRoot) {
-            return true
-        }
-        return components.zip(other.components) { thisComponent, otherComponent ->
-            thisComponent.shouldDependOn(otherComponent)
-        }.all { it }
     }
 
     data class Directory(
@@ -72,7 +71,11 @@ data class SourceSet(
 
             override val componentType: KClass<out COMPONENT> = components.first()::class
 
-            override fun shouldDependOn(other: ComponentSet<*>): Boolean = false
+            override fun shouldDependOn(other: ComponentSet<*>): Boolean = componentType == other.componentType && when (other) {
+                is Common -> true
+                is Enumerated -> false
+                is Specific -> false
+            }
         }
 
         data class Enumerated<COMPONENT: Target.Component>(
@@ -101,7 +104,7 @@ data class SourceSet(
             override fun shouldDependOn(other: ComponentSet<*>): Boolean = componentType == other.componentType && when (other) {
                 is Common -> true
                 is Enumerated -> other.components.contains(component)
-                is Specific -> false
+                is Specific -> other.component == component
             }
 
             companion object {

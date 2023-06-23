@@ -3,7 +3,7 @@ java = "11"
 kotlin = "1.8.21"
 pluginPublish = "1.0.0"
 kotest = "5.4.0"
-buildconfig = "4.0.4"
+buildconfig = "4.1.1"
 ktor = "2.2.3"
 
 [plugins]
@@ -33,14 +33,20 @@ bugsnag = { module = "com.bugsnag:bugsnag", version = "3.6.4" }
 logback = { module = "ch.qos.logback:logback-classic", version = "1.4.6" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.5.0.202303070854-r" }
 java-jwt = { module = "com.auth0:java-jwt", version = "4.4.0" }
+apache-commons-lang = { module = "org.apache.commons:commons-lang3", version = "3.12.0" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
+kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest-jvm", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version = "1.12.5" }
 
 [bundles]
+kotest = [
+    "kotest-runner-junit5",
+    "kotest-assertions-core",
+    "kotest-framework-datatest",
+]
 testing-jvm = [
     "kotlin-test",
     "kotest-runner-junit5",

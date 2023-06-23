@@ -10,7 +10,7 @@ import org.gradle.kotlin.dsl.getValue
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
-class SkieRuntime: Plugin<Project> {
+abstract class SkieRuntime: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()

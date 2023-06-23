@@ -3,7 +3,8 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="acceptanceTest" value="sealed" />
+          <entry key="DEVELOPER_DIR" value="/Applications/Xcode-14.2.0.app/Contents/Developer" />
+          <entry key="acceptanceTest" value="tests/bugs/class_name_collision_with_builtins/compiles" />
         </map>
       </option>
       <option name="executionName" />
@@ -15,7 +16,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:test" />
+          <option value=":acceptance-tests:functional__kgp_1.8.0Test" />
         </list>
       </option>
       <option name="vmOptions" />
@@ -23,6 +24,7 @@
     <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
+    <ForceTestExec>false</ForceTestExec>
     <method v="2" />
   </configuration>
 </component>

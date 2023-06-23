@@ -7,7 +7,7 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
-class DevRoot: Plugin<Project> {
+abstract class DevRoot: Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         tasks.named<Wrapper>("wrapper") {

@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
+// TODO: Rename to DevBase?
 abstract class SkieBase: Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         group = "co.touchlab.skie"

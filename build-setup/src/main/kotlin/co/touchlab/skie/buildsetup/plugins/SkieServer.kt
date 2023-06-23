@@ -12,14 +12,10 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-class SkieServer: Plugin<Project> {
+abstract class SkieServer: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<KotlinPluginWrapper>()
-
-        extensions.configure<KotlinJvmProjectExtension> {
-            jvmToolchain(libs.versions.java)
-        }
 
         dependencies {
             testImplementation(libs.bundles.testing.jvm)

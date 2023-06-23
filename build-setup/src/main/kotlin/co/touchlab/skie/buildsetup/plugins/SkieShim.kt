@@ -16,16 +16,11 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverGradleSubplugin
 
-class SkieShim: Plugin<Project> {
+abstract class SkieShim: Plugin<Project> {
     override fun apply(project: Project) = with(project) {
         apply<SkieBase>()
-        apply<KotlinMultiplatformPluginWrapper>()
-        apply<SamWithReceiverGradleSubplugin>()
         apply<MultiDimensionTargetPlugin>()
-
-        extensions.configure<KotlinMultiplatformExtension> {
-            jvmToolchain(libs.versions.java)
-        }
+        apply<DevGradleImplicitReceiver>()
 
         extensions.configure<MultiDimensionTargetExtension> {
             dimensions(kotlinToolingVersionDimension(), gradleApiVersionDimension())
@@ -60,10 +55,6 @@ class SkieShim: Plugin<Project> {
                     }
                 }
             }
-        }
-
-        extensions.configure<SamWithReceiverExtension> {
-            annotation("org.gradle.api.HasImplicitReceiver")
         }
     }
 }
