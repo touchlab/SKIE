@@ -2,43 +2,67 @@ package co.touchlab.skie.gradle.version.target
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinVariant
 import java.io.File
 import java.nio.file.Path
+import javax.inject.Inject
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.notExists
+
+abstract class MultiDimensionTargetKotlinTargetExtension @Inject constructor(
+    val target: Target,
+)
+
+private fun KotlinTarget.attach(target: Target) {
+    (this as ExtensionAware).extensions.create<MultiDimensionTargetKotlinTargetExtension>("multiDimensionTarget", target)
+}
+
+val KotlinTarget.attachedTarget: Target
+    get() = (this as ExtensionAware).extensions.getByType<MultiDimensionTargetKotlinTargetExtension>().target
+
+abstract class MultiDimensionTargetKotlinSourceSetExtension @Inject constructor(
+    val sourceSet: SourceSet,
+)
+
+private fun KotlinSourceSet.attach(sourceSet: SourceSet) {
+    (this as ExtensionAware).extensions.create<MultiDimensionTargetKotlinSourceSetExtension>("multiDimensionTarget", sourceSet)
+}
+
+val KotlinSourceSet.attachedSourceSet: SourceSet
+    get() = (this as ExtensionAware).extensions.getByType<MultiDimensionTargetKotlinSourceSetExtension>().sourceSet
 
 abstract class MultiDimensionTargetPlugin: Plugin<Project> {
 
     override fun apply(project: Project) {
         project.apply<KotlinMultiplatformPluginWrapper>()
 
-        val extension = project.extensions.create<MultiDimensionTargetExtension>("multiDimensionTarget", {
-            doWork(project, project.extensions.getByType())
-        })
+        val extension = project.extensions.create<MultiDimensionTargetExtension>("multiDimensionTarget")
 
         project.afterEvaluate {
-            check(extension.dimensions.isPresent)
-            check(extension.createTarget.isPresent)
-            check(extension.configureSourceSet.isPresent)
+            check(extension.configuration.isPresent)
+            extension.configuration.disallowChanges()
+            extension.sourceSetConfigureActions.disallowChanges()
 
             /** TODO: We want to run in afterEvaluate instead of using the hack with `onConfigurationComplete`
              *      but we can't because targets created in `afterEvaluate` don't respect our custom attributes.
              */
-//             doWork(project, project.extensions.getByType())
+            doWork(project, project.extensions.getByType())
         }
     }
 
     private fun doWork(project: Project, extension: MultiDimensionTargetExtension) {
-        val dimensions = extension.dimensions.get()
+        val (dimensions, createTarget) = extension.configuration.get()
         val allTargets = dimensions
             .fold(tupleSpaceOf<Target.ComponentInDimension<*>>(tupleOf())) { acc, dimension ->
                 acc * dimension.componentsWithDimension
@@ -57,8 +81,9 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
 
         project.extensions.configure<KotlinMultiplatformExtension> {
             allTargets.forEach { target ->
-                val kotlinTarget = extension.createTarget.get().invoke(this, target)
-                // applyUserDefinedAttributes(kotlinTarget)
+                val kotlinTarget = createTarget(this, target)
+                kotlinTarget.attach(target)
+                kotlinTarget.applyUserDefinedAttributes()
             }
 
             compilations.forEach { compilation ->
@@ -68,6 +93,8 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
                             sourceSets.maybeCreate(sourceSet.name + "__" + compilation.sourceSetNameSuffix)
                         } else {
                             sourceSets.getByName(sourceSet.name + compilation.sourceSetNameSuffix)
+                        }.also {
+                            it.attach(sourceSet)
                         }
                     }
 
@@ -96,13 +123,8 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
                         )
                     }
 
-                    val configureScope = if (sourceSet.isTarget) {
-                        StrictConfigureSourceSetScope(project, kotlinSourceSet, compilation)
-                    } else {
-                        FloorRequirementConfigureSourceSetScope(project, kotlinSourceSet, compilation)
-                    }
-
-                    extension.configureSourceSet.get().invoke(configureScope, sourceSet)
+                    val configureScope = DefaultConfigureSourceSetScope(project, kotlinSourceSet, compilation)
+                    extension.sourceSetConfigureActions.get().forEach { it(configureScope, sourceSet) }
                 }
 
                 println("\n\nAll source sets for compilation ${compilation.sourceSetNameSuffix}:")

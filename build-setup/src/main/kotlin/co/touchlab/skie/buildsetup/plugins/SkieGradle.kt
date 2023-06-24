@@ -24,9 +24,7 @@ abstract class SkieGradle: Plugin<Project> {
         apply<SKIEGradlePluginPlugin>()
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions.add(gradleApiVersionDimension())
-
-            createTarget { target ->
+            dimensions(gradleApiVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
                         attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(target.gradleApiVersion.value))
@@ -40,14 +38,9 @@ abstract class SkieGradle: Plugin<Project> {
                 val gradleVersion = gradleApiVersion.value
                 val kotlinVersion = gradleApiVersion.version.kotlinVersion.toString()
 
-                addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
-                addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
-                addWeakDependency("dev.gradleplugins:gradle-api", configureVersion(gradleVersion))
-
-                configureRelatedConfigurations {
-                    attributes {
-                        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersion.value))
-                    }
+                dependencies {
+                    weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+                    weak("dev.gradleplugins:gradle-api:$gradleVersion")
                 }
             }
         }

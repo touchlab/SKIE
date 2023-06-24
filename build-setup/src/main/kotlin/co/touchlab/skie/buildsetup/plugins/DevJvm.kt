@@ -20,9 +20,7 @@ abstract class DevJvm: Plugin<Project> {
         apply<MultiDimensionTargetPlugin>()
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(kotlinToolingVersionDimension())
-
-            createTarget { target ->
+            dimensions(kotlinToolingVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
                         attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
@@ -33,15 +31,11 @@ abstract class DevJvm: Plugin<Project> {
             configureSourceSet { sourceSet ->
                 val kotlinVersion = sourceSet.kotlinToolingVersion.value
 
-                addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
-                addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
-                addWeakDependency("org.jetbrains.kotlin:kotlin-native-compiler-embeddable", configureVersion(kotlinVersion))
+                dependencies {
+                    weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+                    weak("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
 
-                when (compilation) {
-                    is MultiDimensionTargetPlugin.Compilation.Main -> {}
-                    is MultiDimensionTargetPlugin.Compilation.Test -> {
-//                         addImplementationDependency(libs.bundles.testing.jvm)
-                    }
+                    testOnly(libs.bundles.testing.jvm)
                 }
             }
         }

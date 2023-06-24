@@ -22,9 +22,7 @@ abstract class SkieCompiler: Plugin<Project> {
         apply<OptInExperimentalCompilerApi>()
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(kotlinToolingVersionDimension())
-
-            createTarget { target ->
+            dimensions(kotlinToolingVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
                         attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
@@ -35,9 +33,10 @@ abstract class SkieCompiler: Plugin<Project> {
             configureSourceSet { sourceSet ->
                 val kotlinVersion = sourceSet.kotlinToolingVersion.value
 
-                addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
-                addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
-                addWeakDependency("org.jetbrains.kotlin:kotlin-native-compiler-embeddable", configureVersion(kotlinVersion))
+                dependencies {
+                    weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+                    weak("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
+                }
             }
         }
     }

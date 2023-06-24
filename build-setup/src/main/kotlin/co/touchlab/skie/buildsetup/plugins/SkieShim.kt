@@ -23,9 +23,7 @@ abstract class SkieShim: Plugin<Project> {
         apply<DevGradleImplicitReceiver>()
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(kotlinToolingVersionDimension(), gradleApiVersionDimension())
-
-            createTarget { target ->
+            dimensions(kotlinToolingVersionDimension(), gradleApiVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
                         attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
@@ -39,20 +37,11 @@ abstract class SkieShim: Plugin<Project> {
                 val gradleApiVersion = sourceSet.gradleApiVersion.value
                 val kotlinVersion = sourceSet.gradleApiVersion.version.kotlinVersion.toString()
 
-                addPlatform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion")
-                addWeakDependency("org.jetbrains.kotlin:kotlin-stdlib", configureVersion(kotlinVersion))
-
-                println("Adding gradleApiVersion: $gradleApiVersion to ${sourceSet.name}")
-                addWeakDependency("dev.gradleplugins:gradle-api", configureVersion(gradleApiVersion))
-
-                addWeakDependency("org.jetbrains.kotlin:kotlin-gradle-plugin-api", configureVersion(kotlinToolingVersion))
-                addWeakDependency("org.jetbrains.kotlin:kotlin-gradle-plugin", configureVersion(kotlinToolingVersion))
-
-                configureRelatedConfigurations {
-                    attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion))
-                        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersion))
-                    }
+                dependencies {
+                    weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+                    weak("dev.gradleplugins:gradle-api:$gradleApiVersion")
+                    weak("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlinToolingVersion")
+                    weak("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinToolingVersion")
                 }
             }
         }

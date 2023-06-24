@@ -29,6 +29,16 @@ data class SourceSet(
         components.all { it is ComponentSet.Specific }
     }
 
+    fun isCommonFor(component: Target.Component): Boolean {
+        return components.all {
+            if (it.componentType == component::class) {
+                it is ComponentSet.Specific
+            } else {
+                it is ComponentSet.Common
+            }
+        }
+    }
+
     fun shouldDependOn(other: SourceSet): Boolean {
         return when {
             this == other -> false

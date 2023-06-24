@@ -19,9 +19,7 @@ abstract class SkieRuntimeKotlin: Plugin<Project> {
         apply<MultiDimensionTargetPlugin>()
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(darwinPlatformDimension(), kotlinToolingVersionDimension())
-
-            createTarget { target ->
+            dimensions(darwinPlatformDimension(), kotlinToolingVersionDimension()) { target ->
                 val preset = presets.getByName(target.darwinPlatform.name)
                 targetFromPreset(preset, target.name) {
                     this.attributes {
