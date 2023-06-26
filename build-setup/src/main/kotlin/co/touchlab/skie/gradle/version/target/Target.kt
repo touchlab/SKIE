@@ -1,11 +1,15 @@
 package co.touchlab.skie.gradle.version.target
 
+import org.gradle.api.Named
 import kotlin.reflect.KClass
 
 class Target(
+    @get:JvmName("name")
     val name: String,
     val components: Tuple<Component>,
-) {
+): Named {
+    override fun getName(): String = name
+
     @PublishedApi
     internal val componentsByType: Map<KClass<out Component>, Component> = components.associateBy { it::class }
         .also { check(it.size == components.size) { "Duplicate component types in $components!" } }

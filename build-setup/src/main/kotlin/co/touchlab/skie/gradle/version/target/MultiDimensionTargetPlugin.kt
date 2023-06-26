@@ -2,144 +2,105 @@ package co.touchlab.skie.gradle.version.target
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinVariant
 import java.io.File
 import java.nio.file.Path
-import javax.inject.Inject
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.notExists
 
-abstract class MultiDimensionTargetKotlinTargetExtension @Inject constructor(
-    val target: Target,
-)
+class MultiDimensionTargetConfigurer(
+    private val project: Project,
+) {
+    val allTargets = project.objects.namedDomainObjectList(Target::class)
 
-private fun KotlinTarget.attach(target: Target) {
-    (this as ExtensionAware).extensions.create<MultiDimensionTargetKotlinTargetExtension>("multiDimensionTarget", target)
-}
-
-val KotlinTarget.attachedTarget: Target
-    get() = (this as ExtensionAware).extensions.getByType<MultiDimensionTargetKotlinTargetExtension>().target
-
-abstract class MultiDimensionTargetKotlinSourceSetExtension @Inject constructor(
-    val sourceSet: SourceSet,
-)
-
-private fun KotlinSourceSet.attach(sourceSet: SourceSet) {
-    (this as ExtensionAware).extensions.create<MultiDimensionTargetKotlinSourceSetExtension>("multiDimensionTarget", sourceSet)
-}
-
-val KotlinSourceSet.attachedSourceSet: SourceSet
-    get() = (this as ExtensionAware).extensions.getByType<MultiDimensionTargetKotlinSourceSetExtension>().sourceSet
-
-abstract class MultiDimensionTargetPlugin: Plugin<Project> {
-
-    override fun apply(project: Project) {
-        project.apply<KotlinMultiplatformPluginWrapper>()
-
-        val extension = project.extensions.create<MultiDimensionTargetExtension>("multiDimensionTarget")
-
-        project.afterEvaluate {
-            check(extension.configuration.isPresent)
-            extension.configuration.disallowChanges()
-            extension.sourceSetConfigureActions.disallowChanges()
-
-            /** TODO: We want to run in afterEvaluate instead of using the hack with `onConfigurationComplete`
-             *      but we can't because targets created in `afterEvaluate` don't respect our custom attributes.
-             */
-            doWork(project, project.extensions.getByType())
-        }
-    }
-
-    private fun doWork(project: Project, extension: MultiDimensionTargetExtension) {
-        val (dimensions, createTarget) = extension.configuration.get()
-        val allTargets = dimensions
+    fun configure(
+        dimensions: List<Target.Dimension<*>>,
+        createTarget: KotlinMultiplatformExtension.(Target) -> KotlinTarget,
+    ) {
+        dimensions
             .fold(tupleSpaceOf<Target.ComponentInDimension<*>>(tupleOf())) { acc, dimension ->
                 acc * dimension.componentsWithDimension
             }
-            .map { tuple ->
-                Target(
-                    name = tuple.joinToString("__") { it.componentName },
-                    components = tuple.map { it.component }
+            .forEach { tuple ->
+                allTargets.add(
+                    Target(
+                        tuple.joinToString("__") { it.componentName },
+                        tuple.map { it.component },
+                    ),
                 )
             }
 
+        val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
+        allTargets.forEach { target ->
+            val kotlinTarget = kotlin.createTarget(target)
+//             kotlinTarget.applyUserDefinedAttributes()
+        }
+    }
+}
+
+class MultiDimensionSourceSetConfigurer(
+    private val project: Project,
+    private val dimensions: List<Target.Dimension<*>>,
+    private val targetConfigurer: MultiDimensionTargetConfigurer,
+    private val sourceSetConfigureActions: List<ConfigureSourceSetScope.(SourceSet) -> Unit>,
+) {
+    private val dependencyConfigurer = MultiDimensionSourceSetDependencyConfigurer()
+
+    fun configure() {
         val compilations = listOf(
-            Compilation.Main(project.file("src").toPath()),
-            Compilation.Test(project.file("tests").toPath()),
+            MultiDimensionTargetPlugin.Compilation.Main(project.file("src").toPath()),
+            MultiDimensionTargetPlugin.Compilation.Test(project.file("tests").toPath()),
         )
+        val allTargets = targetConfigurer.allTargets.toList()
 
-        project.extensions.configure<KotlinMultiplatformExtension> {
-            allTargets.forEach { target ->
-                val kotlinTarget = createTarget(this, target)
-                kotlinTarget.attach(target)
-                kotlinTarget.applyUserDefinedAttributes()
+        val kotlinExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
+        compilations.forEach { compilation ->
+            val allSourceSets = resolveSourceSets(compilation.directory, dimensions, allTargets)
+                .associateWith { sourceSet ->
+                    if (sourceSet.isIntermediate) {
+                        kotlinExtension.sourceSets.maybeCreate(sourceSet.name + "__" + compilation.sourceSetNameSuffix)
+                    } else {
+                        kotlinExtension.sourceSets.getByName(sourceSet.name + compilation.sourceSetNameSuffix)
+                    }
+                }
+
+            dependencyConfigurer.configure(allSourceSets)
+
+            allSourceSets.forEach { (sourceSet, kotlinSourceSet) ->
+                kotlinSourceSet.apply {
+                    println("Configuring source set ${kotlinSourceSet.name} - \n${compilation.kotlinSourcePaths(sourceSet).joinToString("\n") { "\t- $it" }}")
+                    kotlin.srcDirs.remove(project.projectDir.resolve("src/${sourceSet.name}/kotlin"))
+                    kotlin.srcDirs(
+                        compilation.kotlinSourcePaths(sourceSet),
+                    )
+
+                    resources.srcDirs.remove(project.projectDir.resolve("src/${sourceSet.name}/resources"))
+                    resources.srcDirs(
+                        compilation.resourcePaths(sourceSet),
+                    )
+                }
+
+                val configureScope = DefaultConfigureSourceSetScope(project, kotlinSourceSet, compilation)
+                sourceSetConfigureActions.forEach { it(configureScope, sourceSet) }
             }
 
-            compilations.forEach { compilation ->
-                val allSourceSets = resolveSourceSets(compilation.directory, dimensions, allTargets)
-                    .associateWith { sourceSet ->
-                        if (sourceSet.isIntermediate) {
-                            sourceSets.maybeCreate(sourceSet.name + "__" + compilation.sourceSetNameSuffix)
-                        } else {
-                            sourceSets.getByName(sourceSet.name + compilation.sourceSetNameSuffix)
-                        }.also {
-                            it.attach(sourceSet)
-                        }
-                    }
-
-                allSourceSets.filterKeys { !it.isRoot }.forEach { (sourceSet, kotlinSourceSet) ->
-                    val dependencies = allSourceSets.filter { (otherSourceSet, _) ->
-                        sourceSet.shouldDependOn(otherSourceSet)
-                    }
-
-                    dependencies.forEach { (_, otherKotlinSourceSet) ->
-                        println("Adding dependency from ${kotlinSourceSet.name} to ${otherKotlinSourceSet.name}")
-                        kotlinSourceSet.dependsOn(otherKotlinSourceSet)
-                    }
-                }
-
-                allSourceSets.forEach { (sourceSet, kotlinSourceSet) ->
-                    kotlinSourceSet.apply {
-                        println("Configuring source set ${kotlinSourceSet.name} - \n${compilation.kotlinSourcePaths(sourceSet).joinToString("\n") { "\t- $it" }}")
-                        kotlin.srcDirs.remove(project.projectDir.resolve("src/${sourceSet.name}/kotlin"))
-                        kotlin.srcDirs(
-                            compilation.kotlinSourcePaths(sourceSet),
-                        )
-
-                        resources.srcDirs.remove(project.projectDir.resolve("src/${sourceSet.name}/resources"))
-                        resources.srcDirs(
-                            compilation.resourcePaths(sourceSet),
-                        )
-                    }
-
-                    val configureScope = DefaultConfigureSourceSetScope(project, kotlinSourceSet, compilation)
-                    extension.sourceSetConfigureActions.get().forEach { it(configureScope, sourceSet) }
-                }
-
-                println("\n\nAll source sets for compilation ${compilation.sourceSetNameSuffix}:")
-                allSourceSets.forEach { (sourceSet, kotlinSourceSet) ->
-                    println("\tSS: ${sourceSet.name}, KSS: ${kotlinSourceSet.name}")
-                    println(sourceSet.components.joinToString(prefix = "\t\t[", postfix = "]") {
-                        it.components.joinToString(prefix = "{", postfix = "}") { it.value }
-                    })
-                    println(sourceSet.sourceDirs.joinToString("\n") {
-                        "\t\t- " + it.components.joinToString("/")
-                    })
-                    println(kotlinSourceSet.dependsOn.joinToString(prefix = "\t\tDepends on = [", postfix = "]") { it.name })
-                }
-                println("\n\n")
+            println("\n\nAll source sets for compilation ${compilation.sourceSetNameSuffix}:")
+            allSourceSets.forEach { (sourceSet, kotlinSourceSet) ->
+                println("\tSS: ${sourceSet.name}, KSS: ${kotlinSourceSet.name}")
+                println(sourceSet.components.joinToString(prefix = "\t\t[", postfix = "]") {
+                    it.components.joinToString(prefix = "{", postfix = "}") { it.value }
+                })
+                println(sourceSet.sourceDirs.joinToString("\n") {
+                    "\t\t- " + it.components.joinToString("/")
+                })
+                println(kotlinSourceSet.dependsOn.joinToString(prefix = "\t\tDepends on = [", postfix = "]") { it.name })
             }
+            println("\n\n")
         }
     }
 
@@ -199,23 +160,6 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
         val sourceSetsFromDirectories = sourceSetDirectories.sourceSets(dimensions)
         val intermediateSourceSets = sourceSetsFromDirectories.filter { it.isIntermediate }
 
-//         val flattenedIntermediateSourceSets = intermediateSourceSets
-//             .groupBy { sourceSet ->
-//                 sourceSet.components.map { it.withErasedIdentity() }
-//             }
-//             .map { (components, sourceSets) ->
-//                 if (sourceSets.size == 1) {
-//                     sourceSets.single()
-//                 } else {
-//                     SourceSet(
-//                         name = sourceSetName(components),
-//                         components = components,
-//                         sourceDirs = sourceSets.flatMap { it.sourceDirs },
-//                     )
-//                 }
-//             }
-//             .toSet()
-
         val rootSourceSet = SourceSet(
             name = "common",
             components = dimensions.map { dimension ->
@@ -232,7 +176,27 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
             isRoot = true,
         )
 
-        return setOf(rootSourceSet) + intermediateSourceSets + targetSourceSets
+        val allCommonSourceSets = setOf(rootSourceSet) + intermediateSourceSets
+
+        val flattenedCommonSourceSets = allCommonSourceSets
+            .groupBy { sourceSet ->
+                sourceSet.components.map { it.withErasedIdentity() }
+            }
+            .map { (components, sourceSets) ->
+                if (sourceSets.size == 1) {
+                    sourceSets.single()
+                } else {
+                    SourceSet(
+                        name = sourceSets.firstOrNull { it.isRoot }?.name ?: components.joinToString("__") { it.name },
+                        components = components,
+                        sourceDirs = sourceSets.flatMap { it.sourceDirs },
+                        isRoot = sourceSets.any { it.isRoot },
+                    )
+                }
+            }
+            .toSet()
+
+        return flattenedCommonSourceSets + targetSourceSets
     }
 
     private fun resolveSourceSetDirectories(
@@ -253,6 +217,34 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
                     resolveSourceSetDirectories(sourceSetDir, nextDimension, nextDimensions.drop(1))
                 } ?: emptyList(),
             )
+        }
+    }
+}
+
+abstract class MultiDimensionTargetPlugin(): Plugin<Project> {
+
+
+    override fun apply(project: Project) {
+        project.apply<KotlinMultiplatformPluginWrapper>()
+
+        val targetConfigurer = MultiDimensionTargetConfigurer(project)
+        val extension = project.extensions.create<MultiDimensionTargetExtension>(
+            "multiDimensionTarget",
+            targetConfigurer,
+        )
+
+        project.afterEvaluate {
+            check(extension.dimensions.isPresent)
+            extension.sourceSetConfigureActions.disallowChanges()
+
+            val sourceSetConfigurer = MultiDimensionSourceSetConfigurer(
+                project = project,
+                dimensions = extension.dimensions.get(),
+                targetConfigurer = targetConfigurer,
+                sourceSetConfigureActions = extension.sourceSetConfigureActions.get(),
+            )
+
+            sourceSetConfigurer.configure()
         }
     }
 
@@ -283,4 +275,72 @@ abstract class MultiDimensionTargetPlugin: Plugin<Project> {
             }
         }
     }
+}
+
+class MultiDimensionSourceSetDependencyConfigurer {
+    fun configure(sourceSets: Map<SourceSet, KotlinSourceSet>) {
+        val sourceSetPairs = sourceSets.map { (sourceSet, kotlinSourceSet) ->
+            SourceSetPair(
+                sourceSet = sourceSet,
+                kotlinSourceSet = kotlinSourceSet,
+            )
+        }
+
+        val allDependencies = sourceSetPairs.associateWith { (sourceSet, _) ->
+            if (!sourceSet.isRoot) {
+                sourceSetPairs.filter { (otherSourceSet, _) ->
+                    sourceSet.shouldDependOn(otherSourceSet)
+                }.toSet()
+            } else {
+                emptySet()
+            }
+        }
+
+        val directDependencies = allDependencies.mapValues { it.value.toMutableSet() }
+        fun allDependencies(sourceSet: SourceSetPair): Set<SourceSetPair> {
+            return directDependencies.getOrDefault(sourceSet, emptySet()).flatMap { dependency ->
+                setOf(dependency) + allDependencies(dependency)
+            }.toSet()
+        }
+
+        do {
+            var hasDoneWork = false
+
+            directDependencies.forEach { (sourceSetPair, dependencies) ->
+                val transitiveDependencies = dependencies.flatMap { allDependencies(it) }.toSet()
+                val dependenciesToRemove = dependencies intersect transitiveDependencies
+                if (dependenciesToRemove.isNotEmpty()) {
+                    println("Removed dependencies from ${sourceSetPair.sourceSet.name}: $dependenciesToRemove")
+                    dependencies.removeAll(dependenciesToRemove)
+                    hasDoneWork = true
+                }
+            }
+        } while (hasDoneWork)
+
+        println("All dependencies:")
+        println(
+            allDependencies.toList().joinToString("\n") { (pair, dependencies) ->
+                pair.sourceSet.name + dependencies.joinToString(prefix = "=> [", postfix = "]") { it.sourceSet.name }
+            }
+        )
+
+        println("Direct dependencies:")
+        println(
+            directDependencies.toList().joinToString("\n") { (pair, dependencies) ->
+                pair.sourceSet.name + dependencies.joinToString(prefix = "=> [", postfix = "]") { it.sourceSet.name }
+            }
+        )
+
+        directDependencies.forEach { (sourceSetPair, dependencies) ->
+            val kotlinSourceSet = sourceSetPair.kotlinSourceSet
+            dependencies.forEach { dependency ->
+                kotlinSourceSet.dependsOn(dependency.kotlinSourceSet)
+            }
+        }
+    }
+
+    private data class SourceSetPair(
+        val sourceSet: SourceSet,
+        val kotlinSourceSet: KotlinSourceSet,
+    )
 }

@@ -14,8 +14,11 @@ data class MultiDimensionTargetConfiguration(
     val createTarget: KotlinMultiplatformExtension.(Target) -> KotlinTarget,
 )
 
-abstract class MultiDimensionTargetExtension @Inject constructor(objects: ObjectFactory) {
-    internal val configuration: Property<MultiDimensionTargetConfiguration> = objects.property()
+abstract class MultiDimensionTargetExtension @Inject constructor(
+    objects: ObjectFactory,
+    private val targetConfigurer: MultiDimensionTargetConfigurer,
+) {
+    internal val dimensions: ListProperty<Target.Dimension<*>> = objects.listProperty()
 
     val sourceSetConfigureActions: ListProperty<ConfigureSourceSetScope.(SourceSet) -> Unit> = objects.listProperty()
 
@@ -24,16 +27,13 @@ abstract class MultiDimensionTargetExtension @Inject constructor(objects: Object
     }
 
     fun dimensions(vararg dimensions: Target.Dimension<*>, createTarget: KotlinMultiplatformExtension.(Target) -> KotlinTarget) {
-        configuration.set(
-            MultiDimensionTargetConfiguration(
-                dimensions.toList(),
-                createTarget
-            )
-        )
+        val dimensionList = dimensions.toList()
+        this.dimensions.set(dimensionList)
+        this.dimensions.disallowChanges()
+        targetConfigurer.configure(dimensionList, createTarget)
     }
 
     fun configureSourceSet(block: ConfigureSourceSetScope.(SourceSet) -> Unit) {
         sourceSetConfigureActions.add(block)
     }
-
 }
