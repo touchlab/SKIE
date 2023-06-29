@@ -4,10 +4,7 @@ import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import co.touchlab.skie.gradle.util.String.enquoted
 import co.touchlab.skie.gradle.version.*
-import co.touchlab.skie.gradle.version.AcceptanceTestsComponent.*
-import co.touchlab.skie.gradle.version.target.ExpectActualBuildConfigGenerator
-import co.touchlab.skie.gradle.version.target.MultiDimensionTargetExtension
-import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
+import co.touchlab.skie.gradle.version.target.*
 import co.touchlab.skie.gradle.version.target.Target
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 import org.gradle.api.Plugin
@@ -16,9 +13,9 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.kotlin.dsl.*
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -32,6 +29,14 @@ abstract class DevAcceptanceTests: Plugin<Project> {
         apply<DevBuildconfig>()
 
         configureExpectedBuildConfig()
+
+        val latestKotlin  = kotlinToolingVersionDimension().latest
+        acceptanceTestsDimension().components.forEach { testType ->
+            tasks.register("${testType.value}__kgp_latestTest") {
+                group = LifecycleBasePlugin.VERIFICATION_GROUP
+                dependsOn(tasks.named("${testType.value}__kgp_${latestKotlin.value}Test"))
+            }
+        }
 
         extensions.configure<MultiDimensionTargetExtension> {
             dimensions(acceptanceTestsDimension(), kotlinToolingVersionDimension()) { target ->

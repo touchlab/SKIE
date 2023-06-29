@@ -59,7 +59,7 @@ jobs:
       - name: Run Acceptance Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ':acceptance-tests:test'
+          arguments: ':acceptance-tests:functional__kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -68,8 +68,8 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: ${{ failure() || success() }}
         with:
-          check_name: "Smoke Test Reports - Acceptance Tests"
-          report_paths: 'SKIE/acceptance-tests/build/test-results/test/TEST-*.xml'
+          check_name: "Smoke Test Reports - Functional Tests"
+          report_paths: 'SKIE/acceptance-tests/build/test-results/functional__*/TEST-*.xml'
           require_tests: true
 
   type-mapping-tests:
@@ -86,7 +86,7 @@ jobs:
         id: run-tests
         if: ${{ inputs.configuration != 'debug' }}
         with:
-          arguments: ':acceptance-tests:type-mapping:test'
+          arguments: ':acceptance-tests:type-mapping__kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -97,7 +97,7 @@ jobs:
         if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
         with:
           check_name: "Smoke Test Reports - Type Mapping Tests"
-          report_paths: 'SKIE/acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
           require_tests: true
 
   external-libraries-tests:
@@ -112,7 +112,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ':acceptance-tests:external-libraries:test'
+          arguments: ':acceptance-tests:libraries__kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -122,5 +122,5 @@ jobs:
         if: ${{ failure() || success() }}
         with:
           check_name: "Smoke Test Reports - External Libraries Tests"
-          report_paths: 'SKIE/acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
           require_tests: true

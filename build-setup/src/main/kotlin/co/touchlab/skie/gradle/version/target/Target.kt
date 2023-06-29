@@ -45,3 +45,6 @@ class Target(
             get() = dimension.prefix + component.value
     }
 }
+
+val <COMPARABLE_COMPONENT> Target.Dimension<COMPARABLE_COMPONENT>.latest: COMPARABLE_COMPONENT where COMPARABLE_COMPONENT: Target.Component, COMPARABLE_COMPONENT: Comparable<COMPARABLE_COMPONENT>
+    get() = components.maxOrNull() ?: error("No components in $this!")
