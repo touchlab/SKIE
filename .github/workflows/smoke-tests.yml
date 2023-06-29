@@ -60,6 +60,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:test'
+          build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
@@ -68,7 +69,7 @@ jobs:
         if: ${{ failure() || success() }}
         with:
           check_name: "Smoke Test Reports - Acceptance Tests"
-          report_paths: 'acceptance-tests/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/build/test-results/test/TEST-*.xml'
           require_tests: true
 
   type-mapping-tests:
@@ -86,6 +87,7 @@ jobs:
         if: ${{ inputs.configuration != 'debug' }}
         with:
           arguments: ':acceptance-tests:type-mapping:test'
+          build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_TARGET: ${{ inputs.target }}
@@ -95,7 +97,7 @@ jobs:
         if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
         with:
           check_name: "Smoke Test Reports - Type Mapping Tests"
-          report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
           require_tests: true
 
   external-libraries-tests:
@@ -111,6 +113,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:external-libraries:test'
+          build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
@@ -119,5 +122,5 @@ jobs:
         if: ${{ failure() || success() }}
         with:
           check_name: "Smoke Test Reports - External Libraries Tests"
-          report_paths: 'acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
           require_tests: true
