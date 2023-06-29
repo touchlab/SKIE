@@ -4,19 +4,12 @@ package co.touchlab.skie.osversion
 
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.api.skieContext
-import co.touchlab.skie.plugin.intercept.PhaseListener
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
-import org.jetbrains.kotlin.backend.common.phaser.PhaserState
-import org.jetbrains.kotlin.backend.konan.Context
+import org.jetbrains.kotlin.backend.konan.KonanConfig
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.konan.properties.KonanPropertiesLoader
 
 // TODO Should be SKIE phase
-class MinOSVersionConfigurator : PhaseListener {
-
-    // Originally OBJC_EXPORT, moved to PSI_TO_IR to ensure statistics are collected first
-    override val phase: PhaseListener.Phase = PhaseListener.Phase.PSI_TO_IR
-
+object MinOSVersionConfigurator {
     private val coroutinesMinOsVersionMap = mutableMapOf(
         "osVersionMin.ios_arm32" to "13.0",
         "osVersionMin.ios_arm64" to "13.0",
@@ -35,10 +28,9 @@ class MinOSVersionConfigurator : PhaseListener {
         "osVersionMin.watchos_x86" to "6.0",
     )
 
-    override fun beforePhase(phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) {
-        if (context !is Context) return
-        if (SkieFeature.CoroutinesInterop !in context.skieContext.configuration.enabledFeatures) return
-        val properties = (context.config.platform.configurables as? KonanPropertiesLoader)?.properties ?: return
+    fun configure(configuration: CompilerConfiguration, konanConfig: KonanConfig) {
+        if (SkieFeature.CoroutinesInterop !in configuration.skieContext.configuration.enabledFeatures) return
+        val properties = (konanConfig.platform.configurables as? KonanPropertiesLoader)?.properties ?: return
 
         coroutinesMinOsVersionMap.forEach { (key, requiredMinVersion) ->
             val currentMinVersion = properties.getProperty(key)

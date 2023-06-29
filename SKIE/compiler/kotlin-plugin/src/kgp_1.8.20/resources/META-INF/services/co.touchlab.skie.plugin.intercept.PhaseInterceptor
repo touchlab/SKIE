@@ -1,0 +1,4 @@
+co.touchlab.skie.plugin.interceptors.ObjectFilesPhaseInterceptor
+co.touchlab.skie.plugin.interceptors.PsiToIrPhaseInterceptor
+co.touchlab.skie.plugin.interceptors.ProduceObjCExportInterfacePhaseInterceptor
+co.touchlab.skie.plugin.interceptors.CreateObjCExportCodeSpecPhaseInterceptor

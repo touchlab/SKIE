@@ -3,8 +3,10 @@
 package co.touchlab.skie.plugin.generator.internal.util
 
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportReflector
+import co.touchlab.skie.plugin.reflection.reflectors.ObjcExportedInterfaceReflector
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
+import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.getExportedDependencies
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
@@ -25,12 +27,18 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
-internal class NativeDescriptorProvider(private val context: CommonBackendContext) : InternalDescriptorProvider {
+internal fun interface ExposedModulesProvider {
+    fun exposedModules(): Set<ModuleDescriptor>
+}
+
+internal class NativeDescriptorProvider(
+    private val exposedModulesProvider: ExposedModulesProvider,
+    private val config: KonanConfig,
+    private val exportedInterface: ObjcExportedInterfaceReflector,
+) : InternalDescriptorProvider {
 
     override val exposedModules: Set<ModuleDescriptor> by lazy {
-        check(context is KonanContext) { "Context is not KonanContext. Was: ${context.javaClass.canonicalName}"}
-
-        setOf(context.moduleDescriptor) + context.getExportedDependencies()
+        exposedModulesProvider.exposedModules()
     }
 
     private val mutableExposedClasses by lazy {
@@ -71,12 +79,6 @@ internal class NativeDescriptorProvider(private val context: CommonBackendContex
 
     override fun isExposable(classDescriptor: ClassDescriptor): Boolean =
         classDescriptor.isExposable
-
-    private val exportedInterface by lazy {
-        val objCExport = ObjCExportReflector.new(context)
-
-        objCExport.reflectedExportedInterface
-    }
 
     private val CallableMemberDescriptor.isExposable: Boolean
         get() = mapper.shouldBeExposed(this)

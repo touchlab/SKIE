@@ -20,12 +20,16 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor>() : Namespace<D
     private val templates = mutableListOf<DeclarationTemplate<*>>()
 
     context(DescriptorRegistrationScope)
-    override fun addTemplate(declarationTemplate: DeclarationTemplate<*>, symbolTable: SymbolTable) {
+    override fun addTemplate(declarationTemplate: DeclarationTemplate<*>) {
         templates.add(declarationTemplate)
 
-        declarationTemplate.declareSymbol(symbolTable)
-
         registerDescriptorProvider(declarationTemplate.descriptor)
+    }
+
+    override fun registerSymbols(symbolTable: SymbolTable) {
+        templates.forEach {
+            it.declareSymbol(symbolTable)
+        }
     }
 
     context(DescriptorRegistrationScope)
@@ -42,7 +46,7 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor>() : Namespace<D
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable) {
         val generatorContext = GeneratorContext(
-            Psi2IrConfiguration(ignoreErrors = false, allowUnboundSymbols = false),
+            Psi2IrConfiguration(),
             descriptor.module,
             pluginContext.bindingContext,
             pluginContext.languageVersionSettings,

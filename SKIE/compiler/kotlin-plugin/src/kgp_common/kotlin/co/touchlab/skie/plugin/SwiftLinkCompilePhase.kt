@@ -29,12 +29,11 @@ class SwiftLinkCompilePhase(
 ) {
 
     // TODO Refactor to phases
-    fun process(): List<ObjectFile> {
+    fun process(configurables: AppleConfigurables, outputFile: String): List<ObjectFile> {
         if (config.configuration.get(KonanConfigKeys.PRODUCE) != CompilerOutputKind.FRAMEWORK) {
             return emptyList()
         }
-        val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
-        val framework = FrameworkLayout(config.outputFile).also { it.cleanSkie() }
+        val framework = FrameworkLayout(outputFile).also { it.cleanSkie() }
         val bridgeProvider = DescriptorBridgeProvider(namer)
         val swiftIrDeclarationRegistry = SwiftIrDeclarationRegistry(
             namer = namer,
@@ -44,8 +43,6 @@ class SwiftLinkCompilePhase(
             declarationRegistry = swiftIrDeclarationRegistry,
         )
         val builtinKotlinDeclarations = BuiltinDeclarations.Kotlin(namer)
-
-        finalizeDescriptorProvider()
 
         val translator = SwiftTypeTranslator(
             descriptorProvider = context.descriptorProvider,
@@ -76,11 +73,5 @@ class SwiftLinkCompilePhase(
         ).runLinkingPhases()
 
         return context.skieContext.skieBuildDirectory.swiftCompiler.objectFiles.all.map { it.absolutePath }
-    }
-
-    private fun finalizeDescriptorProvider() {
-        val finalizedDescriptorProvider = context.mutableDescriptorProvider.preventFurtherMutations()
-
-        context.configuration.put(DescriptorProviderKey, finalizedDescriptorProvider)
     }
 }

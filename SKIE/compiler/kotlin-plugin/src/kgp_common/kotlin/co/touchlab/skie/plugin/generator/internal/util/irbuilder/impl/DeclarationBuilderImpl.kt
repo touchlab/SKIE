@@ -20,14 +20,7 @@ import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -41,15 +34,13 @@ import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFra
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 internal class DeclarationBuilderImpl(
-    context: CommonBackendContext,
+    moduleDescriptor: ModuleDescriptor,
     private val mutableDescriptorProvider: MutableDescriptorProvider,
 ) : DeclarationBuilder {
 
-    private val symbolTable = context.reflectedBy<ContextReflector>().symbolTable
-
     private lateinit var mainIrModuleFragment: IrModuleFragment
 
-    private val newFileNamespaceFactory = NewFileNamespace.Factory(context, lazy { mainIrModuleFragment })
+    private val newFileNamespaceFactory = NewFileNamespace.Factory(moduleDescriptor, lazy { mainIrModuleFragment })
 
     private val newFileNamespacesByName = mutableMapOf<String, NewFileNamespace>()
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
@@ -128,16 +119,22 @@ internal class DeclarationBuilderImpl(
         val declarationTemplate = templateBuilder()
 
         mutableDescriptorProvider.mutate {
-            namespace.addTemplate(declarationTemplate, symbolTable)
+            namespace.addTemplate(declarationTemplate)
         }
 
         return declarationTemplate.descriptor
     }
 
-    fun generateIr(mairIrModuleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+    fun declareSymbols(symbolTable: SymbolTable) {
+        allNamespaces.forEach {
+            it.registerSymbols(symbolTable)
+        }
+    }
+
+    fun generateIr(mairIrModuleFragment: IrModuleFragment, pluginContext: IrPluginContext, symbolTable: SymbolTable) {
         this.mainIrModuleFragment = mairIrModuleFragment
 
-        fixPrivateTypeParametersSymbolsFromOldKLibs()
+        fixPrivateTypeParametersSymbolsFromOldKLibs(symbolTable)
 
         allNamespaces.forEach {
             it.generateIrDeclarations(pluginContext, symbolTable)
@@ -154,7 +151,7 @@ internal class DeclarationBuilderImpl(
      * The affected klibs behave differently during IR deserialization - exposed type parameters are deserialized without public symbols.
      * This fix registers these missing symbols manually.
      */
-    private fun fixPrivateTypeParametersSymbolsFromOldKLibs() {
+    private fun fixPrivateTypeParametersSymbolsFromOldKLibs(symbolTable: SymbolTable) {
         symbolTable.allExposedTypeParameters(mutableDescriptorProvider)
             .filter { it.symbol !is IrTypeParameterPublicSymbolImpl }
             .forEach {

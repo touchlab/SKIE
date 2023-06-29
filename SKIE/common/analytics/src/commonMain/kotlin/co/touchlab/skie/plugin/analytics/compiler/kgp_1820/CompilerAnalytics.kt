@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.analytics.compiler
+package co.touchlab.skie.plugin.analytics.compiler.kgp_1820
 
 import kotlinx.serialization.Serializable
 
@@ -24,6 +24,7 @@ data class CompilerAnalytics(
         val reportOutputFiles: Boolean?,
         val metadataVersion: String?,
         val useFir: Boolean?,
+        val useLightTree: Boolean?,
         val expectActualLinker: Boolean?,
         val useFirExtendedCheckers: Boolean?,
         val parallelBackendThreads: Int?,
@@ -39,10 +40,8 @@ data class CompilerAnalytics(
         val checkDependencies: Boolean?,
         val debug: Boolean?,
         val fakeOverrideValidator: Boolean?,
-        val disabledPhases: List<String>?,
         val bitcodeEmbeddingMode: String?,
         val enableAssertions: Boolean?,
-        val enabledPhases: List<String>?,
         val entry: String?,
         val makePerFileCache: Boolean?,
         val frameworkImportHeaders: List<String>?,
@@ -50,7 +49,6 @@ data class CompilerAnalytics(
         val lightDebug: Boolean?,
         val generateDebugTrampoline: Boolean?,
         val linkerArgs: List<String>?,
-        val listPhases: Boolean?,
         val listTargets: Boolean?,
         val metadataKlib: Boolean?,
         val moduleName: String?,
@@ -65,10 +63,7 @@ data class CompilerAnalytics(
         val exportKdoc: Boolean?,
         val printBitcode: Boolean?,
         val checkExternalCalls: Boolean?,
-        val printDescriptors: Boolean?,
         val printIr: Boolean?,
-        val printIrWithDescriptors: Boolean?,
-        val printLocations: Boolean?,
         val printFiles: Boolean?,
         val purgeUserLibs: Boolean?,
         val shortModuleName: String?,
@@ -84,7 +79,6 @@ data class CompilerAnalytics(
         val overrideKonanProperties: Map<String, String>?,
         val destroyRuntimeMode: String?,
         val garbageCollector: String?,
-        val checkLldCompatibility: Boolean?,
         val propertyLazyInitialization: Boolean?,
         val workerExceptionHandling: String?,
         val lazyIrForCaches: Boolean?,
@@ -102,6 +96,7 @@ data class CompilerAnalytics(
         val androidProgramType: String?,
         val unitSuspendFunctionObjCExport: String?,
         val objcExportSuspendFunctionLaunchThreadRestriction: String?,
+        val objcExportDisableSwiftMemberNameMangling: Boolean?,
         val gcSchedulerType: String?,
         val gcMarkSingleThreaded: Boolean?,
         val linkRuntime: String?,
@@ -111,6 +106,8 @@ data class CompilerAnalytics(
         val appStateTracking: String?,
         val sanitizer: String?,
         val mimallocUseDefaultOptions: Boolean?,
+        val mimallocUseCompaction: Boolean?,
+        val preview19LLVMPipeline: Boolean?,
     )
 
     @Serializable

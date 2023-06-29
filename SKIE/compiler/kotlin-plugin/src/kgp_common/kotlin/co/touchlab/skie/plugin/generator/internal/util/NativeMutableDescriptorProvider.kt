@@ -5,7 +5,9 @@ package co.touchlab.skie.plugin.generator.internal.util
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
 import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
+import co.touchlab.skie.plugin.reflection.reflectedBy
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -14,9 +16,12 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import java.util.concurrent.atomic.AtomicReference
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 
 internal class NativeMutableDescriptorProvider(
-    private val context: CommonBackendContext,
+    private val exposedModulesProvider: ExposedModulesProvider,
+    private val config: KonanConfig,
+    initialExportedInterface: ObjCExportedInterface,
 ): MutableDescriptorProvider, InternalDescriptorProvider {
     enum class State {
         MUTABLE,
@@ -33,11 +38,11 @@ internal class NativeMutableDescriptorProvider(
     private val state = AtomicReference(State.MUTABLE)
 
     init {
-        reload()
+        reload(initialExportedInterface)
     }
 
-    fun reload() {
-        realProvider = NativeDescriptorProvider(context)
+    fun reload(newExportedInterface: ObjCExportedInterface) {
+        realProvider = NativeDescriptorProvider(exposedModulesProvider, config, newExportedInterface.reflectedBy())
 
         mutationScope = object: DescriptorRegistrationScope, DescriptorProvider by realProvider {
             override fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
@@ -66,11 +71,11 @@ internal class NativeMutableDescriptorProvider(
         mutationListeners.forEach { it() }
     }
 
-    override fun preventFurtherMutations(): InternalDescriptorProvider {
+    fun preventFurtherMutations(newExportedInterface: ObjCExportedInterface): InternalDescriptorProvider {
         when (val witnessState = state.compareAndExchange(State.MUTABLE, State.IMMUTABLE)) {
             State.MUTABLE -> {
                 // Create a fresh provider with all the descriptors we've seen so far.
-                reload()
+                reload(newExportedInterface)
             }
             // We were already mutable, nothing to do.
             State.IMMUTABLE -> {}

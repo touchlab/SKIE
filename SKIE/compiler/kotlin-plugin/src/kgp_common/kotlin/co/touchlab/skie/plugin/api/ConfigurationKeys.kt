@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.api
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 // TODO Merge with SkieCompilerConfigurationKey
@@ -14,7 +15,10 @@ object MutableDescriptorProviderKey : CompilerConfigurationKey<MutableDescriptor
 object DescriptorProviderKey : CompilerConfigurationKey<DescriptorProvider>("DescriptorProvider")
 
 val CommonBackendContext.skieContext: SkieContext
-    get() = configuration.getNotNull(SkieContextKey)
+    get() = configuration.skieContext
+
+val CompilerConfiguration.skieContext: SkieContext
+    get() = getNotNull(SkieContextKey)
 
 val CommonBackendContext.descriptorProvider: DescriptorProvider
     get() = configuration.getNotNull(DescriptorProviderKey)

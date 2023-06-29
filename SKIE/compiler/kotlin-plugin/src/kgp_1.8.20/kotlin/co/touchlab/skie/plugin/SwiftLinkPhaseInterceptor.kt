@@ -1,0 +1,35 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
+package co.touchlab.skie.plugin
+
+import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.skieContext
+import co.touchlab.skie.plugin.intercept.PhaseInterceptor
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
+
+// internal class SwiftLinkPhaseInterceptor: PhaseInterceptor<KonanContext, Unit, Unit> {
+//     override val phase = PhaseInterceptor.Phase.ObjectFiles
+//
+//     override fun intercept(context: KonanContext, input: Unit, next: (KonanContext, Unit) -> Unit) {
+//         next(context, input)
+//
+//         val config = context.config
+//
+//         val generationState = context.generationState
+//         val namer = generationState.objCExport.namer
+//
+//         val swiftObjectFiles = SwiftLinkCompilePhase(
+//             config,
+//             context,
+//             namer,
+//         ).process()
+//
+//         generationState.compilerOutput += swiftObjectFiles
+//
+//         logSkiePerformance(context.skieContext)
+//     }
+//
+//     private fun logSkiePerformance(context: SkieContext) {
+//         context.analyticsCollector.collect(context.skiePerformanceAnalyticsProducer)
+//     }
+// }

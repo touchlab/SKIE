@@ -11,7 +11,7 @@ import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.configuration.SkieConfigurationProvider
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
-import co.touchlab.skie.plugin.intercept.PhaseInterceptor
+import co.touchlab.skie.plugin.intercept.PhaseInterceptorRegistrar
 import co.touchlab.skie.plugin.license.SkieLicense
 import co.touchlab.skie.plugin.license.SkieLicenseError
 import co.touchlab.skie.plugin.license.SkieLicenseProvider
@@ -73,7 +73,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
         IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
 
-        PhaseInterceptor.setupPhaseListeners(configuration)
+        PhaseInterceptorRegistrar.setupPhaseInterceptors(configuration)
     }
 
     private fun registerErrorAnalytics(
