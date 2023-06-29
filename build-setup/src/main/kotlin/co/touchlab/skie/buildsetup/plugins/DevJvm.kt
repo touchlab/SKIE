@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.util.implementation
 import co.touchlab.skie.gradle.util.libs
 import co.touchlab.skie.gradle.util.testImplementation
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
@@ -13,31 +14,28 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 abstract class DevJvm: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
-        apply<MultiDimensionTargetPlugin>()
+        apply<KotlinPluginWrapper>()
 
-        extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(kotlinToolingVersionDimension()) { target ->
-                jvm(target.name) {
-                    attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
-                    }
+        val kotlinVersion = project.getKotlinPluginVersion()
+
+        configurations.configureEach {
+            if (isCanBeResolved) {
+                attributes {
+                    attribute(KotlinCompilerVersion.attribute, objects.named(kotlinVersion))
                 }
             }
+        }
 
-            configureSourceSet { sourceSet ->
-                val kotlinVersion = sourceSet.kotlinToolingVersion.value
+        dependencies {
+            implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+            implementation("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
 
-                dependencies {
-                    weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-                    weak("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
-
-                    testOnly(libs.bundles.testing.jvm)
-                }
-            }
+            testImplementation(libs.bundles.testing.jvm)
         }
     }
 }
