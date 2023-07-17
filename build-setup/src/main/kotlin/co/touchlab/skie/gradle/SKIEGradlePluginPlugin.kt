@@ -416,7 +416,7 @@ abstract class SKIEGradlePluginDevelopmentExtension(
      * @since 7.6
      */
     @get:Incubating
-    val website: Property<String>
+    val website: Property<String> = project.objects.property(String::class.java)
 
     /**
      * Returns the property holding the URL for the plugin's VCS repository.
@@ -424,18 +424,12 @@ abstract class SKIEGradlePluginDevelopmentExtension(
      * @since 7.6
      */
     @get:Incubating
-    val vcsUrl: Property<String>
+    val vcsUrl: Property<String> = project.objects.property(String::class.java)
 
     /**
      * Returns the declared plugins.
      *
      * @return the declared plugins, never null
      */
-    val plugins: NamedDomainObjectContainer<PluginDeclaration>
-
-    init {
-        plugins = project.container(PluginDeclaration::class.java)
-        website = project.objects.property(String::class.java)
-        vcsUrl = project.objects.property(String::class.java)
-    }
+    val plugins: NamedDomainObjectContainer<PluginDeclaration> = project.container(PluginDeclaration::class.java)
 }

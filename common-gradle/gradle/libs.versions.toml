@@ -17,6 +17,7 @@ buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig
 plugin-kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-kotlin-gradle-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 plugin-kotlin-samWithReceiver = { module = "org.jetbrains.kotlin:kotlin-sam-with-receiver", version.ref = "kotlin" }
+plugin-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 plugin-buildconfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
 

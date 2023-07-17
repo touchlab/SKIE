@@ -4,7 +4,7 @@ plugins {
     id("dev.buildconfig")
     id("experimental.context-receivers")
 
-    alias(libs.plugins.kotlin.plugin.serialization)
+    kotlin("plugin.serialization")
 }
 
 buildConfig {

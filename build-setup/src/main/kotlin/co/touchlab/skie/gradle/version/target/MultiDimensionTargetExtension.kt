@@ -9,11 +9,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import javax.inject.Inject
 
-data class MultiDimensionTargetConfiguration(
-    val dimensions: List<Target.Dimension<*>>,
-    val createTarget: KotlinMultiplatformExtension.(Target) -> KotlinTarget,
-)
-
 abstract class MultiDimensionTargetExtension @Inject constructor(
     objects: ObjectFactory,
     private val targetConfigurer: MultiDimensionTargetConfigurer,

@@ -30,6 +30,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:test'
+          build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ matrix.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
@@ -38,7 +39,7 @@ jobs:
         if: always()
         with:
           check_name: "Test Reports - Acceptance Tests (${{ matrix.linkage }}, ${{ matrix.configuration }})"
-          report_paths: 'acceptance-tests/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/build/test-results/test/TEST-*.xml'
           require_tests: true
 
   type-mapping-tests:
@@ -60,6 +61,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:type-mapping:test'
+          build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ matrix.linkage }}
           KOTLIN_TARGET: ${{ matrix.target }}
@@ -69,7 +71,7 @@ jobs:
         if: always()
         with:
           check_name: "Test Reports - Type Mapping Tests (${{ matrix.target }}, ${{ matrix.linkage }}, ${{ matrix.configuration }})"
-          report_paths: 'acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
           require_tests: true
 
   external-libraries-tests:
@@ -90,6 +92,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ':acceptance-tests:external-libraries:test'
+          build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ matrix.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ matrix.configuration }}
@@ -98,5 +101,5 @@ jobs:
         if: always()
         with:
           check_name: "Test Reports - External Libraries Tests (${{ matrix.linkage }}, ${{ matrix.configuration }})"
-          report_paths: 'acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
           require_tests: true

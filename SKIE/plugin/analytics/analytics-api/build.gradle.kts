@@ -1,7 +1,8 @@
 plugins {
     id("skie-jvm")
     id("skie-publish-jvm")
-    alias(libs.plugins.kotlin.plugin.serialization)
+
+    kotlin("plugin.serialization")
 }
 
 dependencies {

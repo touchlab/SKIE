@@ -7,6 +7,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.utils.`is`
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.listDirectoryEntries
@@ -59,6 +61,7 @@ class MultiDimensionSourceSetConfigurer(
         val allTargets = targetConfigurer.allTargets.toList()
 
         val kotlinExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
+        kotlinExtension.targets.forEach { it.compilations.getByName("main").implementationConfigurationName }
         compilations.forEach { compilation ->
             val allSourceSets = resolveSourceSets(compilation.directory, dimensions, allTargets)
                 .associateWith { sourceSet ->
@@ -251,6 +254,10 @@ abstract class MultiDimensionTargetPlugin(): Plugin<Project> {
     sealed interface Compilation {
         val sourceSetNameSuffix: String
         val directory: Path
+        val isMain: Boolean
+            get() = this is Main
+        val isTest: Boolean
+            get() = this is Test
 
         data class Main(override val directory: Path): Compilation {
             override val sourceSetNameSuffix: String = "Main"

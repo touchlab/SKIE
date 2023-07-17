@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
+import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
 import java.io.File
 
 abstract class DevAcceptanceTests: Plugin<Project> {
@@ -27,6 +28,7 @@ abstract class DevAcceptanceTests: Plugin<Project> {
         apply<MultiDimensionTargetPlugin>()
         apply<OptInExperimentalCompilerApi>()
         apply<DevBuildconfig>()
+        apply<SerializationGradleSubplugin>()
 
         configureExpectedBuildConfig()
 
@@ -82,6 +84,7 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                     acceptanceTestType = acceptanceTestType,
                     testDependencies = testDependencies,
                     exportedTestDependencies = exportedTestDependencies,
+                    kotlinToolingVersion = target.kotlinToolingVersion,
                     kotlinTarget = kotlinTarget,
                 )
 
@@ -135,6 +138,7 @@ abstract class DevAcceptanceTests: Plugin<Project> {
         testDependencies: Configuration,
         exportedTestDependencies: Configuration,
         acceptanceTestType: AcceptanceTestsComponent,
+        kotlinToolingVersion: KotlinToolingVersionComponent,
         kotlinTarget: KotlinJvmTarget,
     ) {
         extensions.configure<BuildConfigExtension> {
@@ -160,7 +164,9 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                 buildConfigField(
                     type = "String",
                     name = "BUILD",
-                    value = layout.buildDirectory.map { it.dir(acceptanceTestType.value).asFile.absolutePath.enquoted() },
+                    value = layout.buildDirectory.map {
+                        it.dir(acceptanceTestType.value).dir(kotlinToolingVersion.value).asFile.absolutePath.enquoted()
+                    },
                 )
                 buildConfigField(
                     type = "co.touchlab.skie.acceptancetests.util.StringArray",

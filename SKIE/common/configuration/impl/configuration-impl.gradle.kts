@@ -3,7 +3,7 @@ plugins {
     id("skie.publishable")
     id("dev.buildconfig")
 
-    alias(libs.plugins.kotlin.plugin.serialization)
+    kotlin("plugin.serialization")
 }
 
 kotlin {

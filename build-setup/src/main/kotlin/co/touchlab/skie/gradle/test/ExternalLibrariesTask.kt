@@ -10,24 +10,35 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedConfiguration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmEnvironment
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.exclude
+import org.gradle.kotlin.dsl.*
+import org.gradle.tooling.BuildException
+import org.gradle.tooling.GradleConnector
+import org.gradle.tooling.ProgressListener
+import org.gradle.tooling.model.build.BuildEnvironment
+import org.gradle.util.internal.VersionNumber
+import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.konan.target.KonanTarget
+import org.jetbrains.kotlin.konan.target.presetName
+import java.io.File
+
 
 data class VersionedLibrary(
     val library: Library,
@@ -53,6 +64,9 @@ data class Library(val group: String, val name: String) {
 
 abstract class ExternalLibrariesTask: DefaultTask() {
 
+    @get:OutputDirectory
+    abstract val resolutionTempDir: DirectoryProperty
+
     @get:OutputFile
     abstract val mavenSearchCache: RegularFileProperty
 
@@ -63,69 +77,226 @@ abstract class ExternalLibrariesTask: DefaultTask() {
     abstract val acceptableKotlinPrefixes: SetProperty<String>
 
     @get:Input
-    abstract val platformSuffix: Property<String>
+    abstract val kotlinVersion: Property<String>
+
+    @get:Input
+    abstract val target: Property<KonanTarget>
 
     @TaskAction
     fun downloadAndStoreLibraries() {
         val libraries = loadOrPopulateMavenCache()
+
         val librariesToTest = getAllLibrariesToTest(libraries)
 
         val versionedLibrariesToTest = getVersionedLibrariesToTest(librariesToTest)
 
         librariesToTestFile.get().asFile.writeText(
-            versionedLibrariesToTest.map { it.dependencyString }.sorted().joinToString("\n")
+            versionedLibrariesToTest.sorted().joinToString("\n"),
         )
     }
 
-    private fun getAllLibrariesToTest(libraries: List<Library>): Set<Library> {
-        val platformSuffix = platformSuffix.get()
-        val allResolvedDependencies = libraries.flatMapIndexed { index, library ->
-            logger.info("Resolving {}", library.moduleName)
-            val configuration = createNativeConfiguration("library-test-configuration-$index")
+    private fun getAllLibrariesToTest(libraries: List<Library>): Set<String> {
+        val resolutionProjectDir = resolutionTempDir.dir("resolve-all-libraries").get().asFile.also { it.mkdirs() }
+        resolutionProjectDir.resolve("input").writeText(
+            libraries.joinToString("\n") { "${it.moduleName}:+" }
+        )
 
-            project.dependencies {
-                configuration(
-                    group = library.group,
-                    name = library.name,
-                    version = "+",
+        runSubGradle(
+            projectDir = resolutionProjectDir,
+            imports = listOf(
+                "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataTarget",
+            ),
+            tasks = listOf("findTestableLibraries"),
+            code = """
+            val libraries = project.file("input").readLines()
+            kotlin {
+                libraries.withIndex().forEach { (index, library) ->
+                    ${target.get().presetName}("library_${'$'}index") {
+                        attributes {
+                            attribute(Attribute.of("co.touchlab.skie.test.library", String::class.java), "library_${'$'}index")
+                        }
+                        // This configuration is created by Kotlin, but doesn't copy our attributes, so we need to do it manually
+                        project.configurations.named(this.name + "CInteropApiElements").configure {
+                            attributes {
+                                attribute(Attribute.of("co.touchlab.skie.test.library", String::class.java), "library_${'$'}index")
+                            }
+                        }
+                    }
+                    sourceSets["library_${'$'}{index}Main"].dependencies {
+                        implementation(library)
+                    }
+                }
+            }
+            tasks.register("findTestableLibraries") {
+                doLast {
+                    val allModules = kotlin.targets
+                        .filter { it !is KotlinMetadataTarget }
+                        .flatMap { target ->
+                            val resolvedConfiguration = configurations.getByName(target.name + "CompileKlibraries").resolvedConfiguration
+                            resolvedConfiguration.lenientConfiguration.allModuleDependencies
+                        }
+                        .map { it.module.id.module.toString().lowercase() }
+                        .filterNot { it.startsWith("org.jetbrains.kotlin:kotlin-stdlib", ignoreCase = true) }
+                        .filter { it.endsWith("-${target.get().presetName}", ignoreCase = true) }
+                        .toSet()
+                        .sorted()
+                    project.file("output").writeText(allModules.joinToString("\n"))
+                }
+            }
+            """.trimIndent()
+        )
+
+        return resolutionProjectDir.resolve("output").readLines().toSet()
+    }
+
+    private fun getVersionedLibrariesToTest(librariesToTest: Collection<String>): Set<String> {
+        val resolutionProjectDir = resolutionTempDir.dir("resolve-latest-versions").get().asFile.also { it.mkdirs() }
+        resolutionProjectDir.resolve("input").writeText(
+            librariesToTest.joinToString("\n") { "$it:+" }
+        )
+
+        runSubGradle(
+            projectDir = resolutionProjectDir,
+            imports = listOf(
+                "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget",
+                "org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask",
+            ),
+            tasks = listOf(
+                "compileAllNativeTargets",
+                "resolveLatestVersions",
+            ),
+            code = """
+            val libraries = project.file("input").readLines()
+            kotlin {
+                libraries.withIndex().forEach { (index, library) ->
+                    ${target.get().presetName}("library_${'$'}index") {
+                        attributes {
+                            attribute(Attribute.of("co.touchlab.skie.test.library", String::class.java), "library_${'$'}index")
+                        }
+                        binaries {
+                            framework(namePrefix = "library_${'$'}index", buildTypes = listOf(DEBUG)) {
+                                isStatic = true
+                            }
+                        }
+                        // This configuration is created by Kotlin, but doesn't copy our attributes, so we need to do it manually
+                        project.configurations.named(this.name + "CInteropApiElements").configure {
+                            attributes {
+                                attribute(Attribute.of("co.touchlab.skie.test.library", String::class.java), "library_${'$'}index")
+                            }
+                        }
+                        project.configurations.named(this.name + "DebugFrameworkIosFat").configure {
+                            attributes {
+                                attribute(Attribute.of("co.touchlab.skie.test.library", String::class.java), "library_${'$'}index")
+                                attribute(Attribute.of("co.touchlab.skie.test.disambiguate", String::class.java), "fat framework")
+                            }
+                        }
+                    }
+                    sourceSets["library_${'$'}{index}Main"].dependencies {
+                        implementation(library)
+                    }
+                }
+            }
+            val nativeTargets = kotlin.targets.filterIsInstance<KotlinNativeTarget>()
+            val compileAllNativeTargets by tasks.registering {
+                dependsOn(
+                    nativeTargets.map {
+                        it.compilations.getByName("main").compileTaskProvider
+                    }
                 )
             }
+            val resolveLatestVersions by tasks.registering {
+                mustRunAfter(compileAllNativeTargets)
+                doLast {
+                    val unresolvedLibraries = mutableListOf<String>()
+                    val allModules = nativeTargets.flatMap { target ->
+                            try {
+                                val taskState = target.compilations.getByName("main").compileTaskProvider.get().state
+                                val resolvedConfiguration = configurations.getByName(target.name + "CompileKlibraries").resolvedConfiguration
+                                taskState.rethrowFailure()
+                                resolvedConfiguration.firstLevelModuleDependencies
+                            } catch (e: Throwable) {
+                                logger.warn("Error resolving dependencies for ${'$'}{target.name}", e)
+                                unresolvedLibraries.add(libraries[target.name.split("_")[1].toInt()])
+                                emptyList()
+                            }
+                        }
+                        .map { it.module.id.toString() }
+                        .filterNot { it.startsWith("org.jetbrains.kotlin:kotlin-stdlib", ignoreCase = true) }
+                        .toSet()
+                        .sorted()
+                    project.file("output").writeText(allModules.joinToString("\n"))
+                    project.file("unresolved").writeText(unresolvedLibraries.joinToString("\n"))
+                }
+            }
+            """.trimIndent(),
+        )
 
-            configuration.resolvedConfiguration.lenientConfiguration.allModuleDependencies
-        }.associateBy { it.module.id.module.toString().toLowerCase() }
+        return resolutionProjectDir.resolve("output").readLines().toSet()
+    }
 
-        return allResolvedDependencies
-            .filterKeys {
-                it != "org.jetbrains.kotlin:kotlin-stdlib-common"
+    private fun runSubGradle(
+        projectDir: File,
+        imports: List<String> = emptyList(),
+        tasks: List<String> = emptyList(),
+        @Language("kotlin") code: String,
+    ) {
+        projectDir.resolve("build.gradle.kts").writeText(imports.joinToString("\n") { "import $it" } + """
+            |
+            |plugins {
+            |    kotlin("multiplatform") version "${kotlinVersion.get()}"
+            |}
+            |
+            |repositories {
+            |    mavenCentral()
+            |    google()
+            |    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
+            |    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev/")
+            |}
+        """.trimMargin() + "\n\n" + code)
+        projectDir.resolve("settings.gradle.kts").writeText("")
+        projectDir.resolve("gradle.properties").writeText("""
+            org.gradle.jvmargs=-Xmx8g -XX:+UseParallelGC
+            org.gradle.parallel=true
+            kotlin.native.cacheKind=none
+        """.trimIndent())
+        projectDir.resolve("src/commonMain/kotlin/Empty.kt").apply {
+            parentFile.mkdirs()
+            writeText("""
+                package co.touchlab.skie.test
+            """.trimIndent())
+        }
+
+        GradleConnector.newConnector()
+            .forProjectDirectory(projectDir)
+            .connect().use { connection ->
+                //obtain some information from the build
+                val environment = connection.model(BuildEnvironment::class.java).get()
+
+                try {
+                    //run some tasks
+                    val logFile = projectDir.resolve("run.log").outputStream()
+                    connection.newBuild()
+                        .forTasks(*tasks.toTypedArray())
+                        .withArguments("--continue")
+                        .setStandardOutput(logFile)
+                        .setStandardError(logFile)
+                        .run()
+                } catch (e: BuildException) {
+                    // We're ignoring the build error, as we expect some tasks to fail and that's okay.
+                }
             }
-            .filterKeys { key ->
-                key.endsWith(platformSuffix) || !allResolvedDependencies.containsKey(key + platformSuffix)
-            }
-            .values
-            .map {
-                Library(
-                    group = it.moduleGroup,
-                    name = it.moduleName,
-                )
-            }
-            .toSet()
     }
 
     private fun getVersionedLibrariesToTest(librariesToTest: Set<Library>) =
         librariesToTest.mapIndexedNotNull { index, library ->
-            val configurationWithKotlin = createNativeConfiguration("library-test-configuration-single-$index-kotlin")
-            val configuration = createNativeConfiguration("library-test-configuration-single-$index") {
+            val dependency = project.dependencies.create(
+                group = library.group,
+                name = library.name,
+                version = "+",
+            )
+            val configurationWithKotlin = createNativeConfiguration(dependency)
+            val configuration = createNativeConfiguration(dependency) {
                 exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
-            }
-
-            project.dependencies {
-                listOf(configurationWithKotlin, configuration).forEach {
-                    it(
-                        group = library.group,
-                        name = library.name,
-                        version = "+",
-                    )
-                }
             }
 
             val resolvedConfiguration = configuration.resolvedConfiguration
@@ -162,7 +333,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                 )
             }
         } else {
-            val downloadedLibraries = loadAll("*${platformSuffix.get()}").map {
+            val downloadedLibraries = loadAll("*-${target.get().presetName}").map {
                 it.copy(name = it.name)
             }
 
@@ -172,7 +343,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                         "group" to it.group,
                         "name" to it.name,
                     )
-                }
+                },
             )
 
             mavenSearchCacheFile.parentFile.mkdirs()
@@ -187,12 +358,14 @@ abstract class ExternalLibrariesTask: DefaultTask() {
         val client = HttpClient(Java)
         val result = runBlocking {
             // TODO: Print errors if they happen
-            client.post("https://central.sonatype.com/v1/browse") {
+            client.post("https://central.sonatype.com/api/internal/browse/components") {
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
-                setBody("""
+                setBody(
+                    """
                     {"size": 100, "page": $fromPage, "searchTerm": "$query", "filter": []}
-                """.trimIndent())
+                """.trimIndent(),
+                )
             }.bodyAsText()
         }
 
@@ -214,8 +387,8 @@ abstract class ExternalLibrariesTask: DefaultTask() {
         }
     }
 
-    private fun createNativeConfiguration(name: String, configure: Configuration.() -> Unit = { }): Configuration {
-        return project.configurations.create(name) {
+    private fun createNativeConfiguration(vararg dependencies: Dependency, configure: Configuration.() -> Unit = { }): Configuration {
+        return project.configurations.detachedConfiguration(*dependencies).apply {
             isCanBeConsumed = false
             isCanBeResolved = true
 
@@ -266,4 +439,12 @@ abstract class ExternalLibrariesTask: DefaultTask() {
         } catch (e: Throwable) {
             e
         }
+
+    private fun String.removeSuffixIgnoringCase(suffix: String): String {
+        return if (endsWith(suffix, ignoreCase = true)) {
+            dropLast(suffix.length)
+        } else {
+            this
+        }
+    }
 }

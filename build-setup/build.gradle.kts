@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.plugin.kotlin.gradle)
     implementation(libs.plugin.kotlin.gradle.api)
     implementation(libs.plugin.kotlin.samWithReceiver)
+    implementation(libs.plugin.kotlin.serialization)
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
     implementation(libs.ktor.client.java)
