@@ -19,7 +19,6 @@ kotlin {
             dependencies {
                 implementation(projects.common.analytics)
                 implementation(projects.common.configuration)
-                implementation(projects.common.license)
                 implementation(projects.common.util)
 
                 implementation(projects.runtime.runtimeSwift)

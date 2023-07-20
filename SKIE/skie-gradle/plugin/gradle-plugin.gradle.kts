@@ -18,7 +18,6 @@ kotlin {
                 compileOnly(projects.common.configuration)
 
                 implementation(projects.common.analytics)
-                implementation(projects.common.license)
                 implementation(projects.common.util)
 
                 implementation(libs.kotlinx.serialization.json)

@@ -4,7 +4,6 @@ import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.analytics.gradle.GradleAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
-import co.touchlab.skie.plugin.license.SkieLicense
 import co.touchlab.skie.util.hashed
 import co.touchlab.skie.util.redacted
 import kotlinx.serialization.encodeToString
@@ -16,7 +15,6 @@ import kotlin.reflect.KClass
 
 internal class GradleAnalyticsProducer(
     private val project: Project,
-    private val license: SkieLicense,
 ) : AnalyticsProducer<AnalyticsFeature.Gradle> {
 
     override val featureType: KClass<AnalyticsFeature.Gradle> = AnalyticsFeature.Gradle::class
@@ -40,8 +38,8 @@ internal class GradleAnalyticsProducer(
         projectFullName = "${project.rootProject.name}${project.path}",
         projectFullNameHash = "${project.rootProject.name}${project.path}".hashed(),
         rootProjectDiskLocationHash = rootProjectDiskLocationHash(project),
-        organizationKey = license.organizationId,
-        licenseKey = license.licenseKey.value,
+        organizationKey = "None",
+        licenseKey = "None",
         skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
         gradleVersion = project.gradle.gradleVersion,
         kotlinVersion = project.getKotlinPluginVersion(),

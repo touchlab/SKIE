@@ -5,14 +5,14 @@ import co.touchlab.skie.plugin.configuration.CreateSkieConfigurationTask
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.dependencies.addDependencyOnSkieRuntime
+import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
+import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
-import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.util.appleTargets
 import co.touchlab.skie.plugin.util.frameworks
-import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.util.subpluginOption
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,10 +26,10 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val licenseManager = GradleSkieLicenseManager(project)
-        val analyticsManager = GradleAnalyticsManager(project, licenseManager)
+        val analyticsManager = GradleAnalyticsManager(project)
 
         analyticsManager.withErrorLogging {
-            project.configureSkieGradlePlugin(licenseManager, analyticsManager)
+            project.configureSkieGradlePlugin(licenseManager)
         }
 
         project.afterEvaluate {
@@ -41,9 +41,8 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
     private fun Project.configureSkieGradlePlugin(
         licenseManager: GradleSkieLicenseManager,
-        analyticsManager: GradleAnalyticsManager,
     ) {
-        licenseManager.initializeLicensing(analyticsManager)
+        licenseManager.initializeLicensing()
 
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
     }
@@ -69,7 +68,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
     ) {
         SkieDirectoriesManager.configureCreateSkieBuildDirectoryTask(this, analyticsManager)
 
-        licenseManager.configureLicensing(this, analyticsManager)
         analyticsManager.configureAnalytics(this)
 
         binary.target.disableCaching()

@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.license.util
+package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.util.Command
 import co.touchlab.skie.util.hashed

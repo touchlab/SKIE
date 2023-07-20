@@ -1,30 +1,25 @@
 package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
+import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
-import co.touchlab.skie.plugin.configuration.SkieConfigurationProvider
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
-import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
+import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.util.doFirstOptimized
 import co.touchlab.skie.plugin.util.doLastOptimized
 import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
-import co.touchlab.skie.plugin.directory.skieBuildDirectory
-import co.touchlab.skie.plugin.directory.skieDirectories
-import co.touchlab.skie.plugin.license.license
 import co.touchlab.skie.util.Environment
 import co.touchlab.skie.util.directory.SkieAnalyticsDirectories
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
-// import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import java.time.Duration
 import java.util.UUID
 
 internal class GradleAnalyticsManager(
     private val project: Project,
-    private val licenseManager: GradleSkieLicenseManager,
 ) {
 
     val buildId: String = UUID.randomUUID().toString()
@@ -36,7 +31,7 @@ internal class GradleAnalyticsManager(
             BugsnagFactory.create(
                 skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
                 type = BugsnagFactory.Type.Gradle,
-                environment = licenseManager.licenseOrNull?.environment ?: Environment.Unknown,
+                environment = Environment.current,
             )
 
             throw e
@@ -44,27 +39,29 @@ internal class GradleAnalyticsManager(
     }
 
     fun configureAnalytics(linkTask: KotlinNativeLink) {
-        val analyticsCollectorProvider = linkTask.license.map { license ->
-            AnalyticsCollector(
-                analyticsDirectories = linkTask.skieDirectories.analyticsDirectories,
-                buildId = buildId,
-                skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
-                type = BugsnagFactory.Type.Gradle,
-                environment = license.environment,
-                configuration = SkieConfigurationProvider.getConfiguration(linkTask.skieBuildDirectory).analyticsConfiguration,
-            )
-        }
+        val analyticsCollector = AnalyticsCollector(
+            analyticsDirectories = linkTask.skieDirectories.analyticsDirectories,
+            buildId = buildId,
+            skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
+            type = BugsnagFactory.Type.Gradle,
+            configuration = AnalyticsConfiguration(
+                AnalyticsFeature.GradlePerformance(true),
+                AnalyticsFeature.CrashReporting(true),
+                AnalyticsFeature.OpenSource(true),
+                AnalyticsFeature.Gradle(true, true),
+            ),
+        )
 
-        configureAnalyticsTask(linkTask, analyticsCollectorProvider)
-        configureAnalyticsSecondaryUpload(linkTask, analyticsCollectorProvider)
+        configureAnalyticsTask(linkTask, analyticsCollector)
+        configureAnalyticsSecondaryUpload(linkTask, analyticsCollector)
 
-        configurePerformanceAnalytics(linkTask, analyticsCollectorProvider)
-        collectGradleAnalytics(linkTask, analyticsCollectorProvider)
+        configurePerformanceAnalytics(linkTask, analyticsCollector)
+        collectGradleAnalytics(linkTask, analyticsCollector)
     }
 
     private fun configurePerformanceAnalytics(
         linkTask: KotlinNativeLink,
-        analyticsCollectorProvider: Provider<AnalyticsCollector>,
+        analyticsCollector: AnalyticsCollector,
     ) {
         var start: Long = 0
 
@@ -75,16 +72,14 @@ internal class GradleAnalyticsManager(
         linkTask.doLastOptimized {
             val linkTaskDuration = Duration.ofMillis(System.currentTimeMillis() - start)
 
-            analyticsCollectorProvider.get().collect(
-                GradlePerformanceAnalyticsProducer(linkTaskDuration),
-            )
+            analyticsCollector.collect(GradlePerformanceAnalyticsProducer(linkTaskDuration))
         }
     }
 
-    private fun configureAnalyticsTask(linkTask: KotlinNativeLink, analyticsCollectorProvider: Provider<AnalyticsCollector>) {
+    private fun configureAnalyticsTask(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
         val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieFinalizeTask>("finalize", this) {
             this.linkTask.set(linkTask)
-            analyticsCollector.set(analyticsCollectorProvider)
+            this.analyticsCollector.set(analyticsCollector)
 
             dependsOn(linkTask.createSkieBuildDirectoryTask)
         }
@@ -92,19 +87,19 @@ internal class GradleAnalyticsManager(
         linkTask.finalizedBy(finalizeTask)
     }
 
-    private fun configureAnalyticsSecondaryUpload(linkTask: KotlinNativeLink, analyticsCollectorProvider: Provider<AnalyticsCollector>) {
+    private fun configureAnalyticsSecondaryUpload(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
         linkTask.doFirstOptimized {
-            uploadAnalytics(analyticsCollectorProvider.get(), linkTask.skieDirectories.analyticsDirectories)
+            uploadAnalytics(analyticsCollector, linkTask.skieDirectories.analyticsDirectories)
         }
     }
 
     private fun collectGradleAnalytics(
         linkTask: KotlinNativeLink,
-        analyticsCollectorProvider: Provider<AnalyticsCollector>,
+        analyticsCollector: AnalyticsCollector,
     ) {
         linkTask.doFirstOptimized {
-            analyticsCollectorProvider.get().collect(
-                GradleAnalyticsProducer(project, linkTask.license.get()),
+            analyticsCollector.collect(
+                GradleAnalyticsProducer(project),
                 OpenSourceAnalyticsProducer(project),
             )
         }

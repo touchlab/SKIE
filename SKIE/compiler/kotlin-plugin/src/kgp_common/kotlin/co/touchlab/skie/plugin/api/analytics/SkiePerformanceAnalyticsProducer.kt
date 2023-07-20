@@ -12,9 +12,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-class SkiePerformanceAnalyticsProducer(
-    private val environment: Environment,
-) : AnalyticsProducer<AnalyticsFeature.SkiePerformance> {
+class SkiePerformanceAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.SkiePerformance> {
 
     override val featureType: KClass<AnalyticsFeature.SkiePerformance> = AnalyticsFeature.SkiePerformance::class
 
@@ -41,7 +39,7 @@ class SkiePerformanceAnalyticsProducer(
     }
 
     private fun printLogInDevEnvironment(name: String, duration: Duration) {
-        if (environment == Environment.Dev) {
+        if (Environment.current == Environment.Dev) {
             println("$name: ${duration.toDouble(DurationUnit.SECONDS)}s")
         }
     }

@@ -18,16 +18,15 @@ class AnalyticsCollector(
     private val buildId: String,
     private val skieVersion: String,
     type: BugsnagFactory.Type,
-    private val environment: Environment,
     private val configuration: AnalyticsConfiguration,
 ) : AnalyticsConfigurationTarget<AnalyticsFeature.CrashReporting> {
 
     override val featureType: KClass<AnalyticsFeature.CrashReporting> = AnalyticsFeature.CrashReporting::class
 
     private val bugsnag: Bugsnag =
-        BugsnagFactory.create(skieVersion, type, environment)
+        BugsnagFactory.create(skieVersion, type, Environment.current)
 
-    private val analyticsDirectories = analyticsDirectories.forEnvironment(environment).map { it.toPath() }
+    private val analyticsDirectories = analyticsDirectories.forEnvironment(Environment.current).map { it.toPath() }
 
     @Synchronized
     fun collect(producers: List<AnalyticsProducer<*>>) {
@@ -90,7 +89,7 @@ class AnalyticsCollector(
             buildId = buildId,
             type = analyticsType,
             skieVersion = skieVersion,
-            environment = environment,
+            environment = Environment.current,
             compressionMethod = compressor.method,
         )
 
@@ -164,7 +163,7 @@ class AnalyticsCollector(
     }
 
     private fun rethrowIfNotProduction(exception: Throwable) {
-        if (!environment.canBeProduction()) {
+        if (!Environment.current.canBeProduction()) {
             throw exception
         }
     }

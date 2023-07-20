@@ -9,4 +9,10 @@ enum class Environment {
 
     fun canBeProduction(): Boolean =
         this == Production || this == Unknown
+
+    companion object {
+
+        val current: Environment =
+            if (BuildConfig.SKIE_VERSION.contains("SNAPSHOT")) Dev else Production
+    }
 }

@@ -27,23 +27,6 @@ dependencyResolutionManagement {
     }
 }
 
-
-
-// includeBuild("plugin")
-
-// includeBuild("common")
-// includeBuild("skie-gradle")
-// includeBuild("website")
-
-// include(
-//     ":acceptance-tests:framework",
-//     ":acceptance-tests:external-libraries",
-//     ":acceptance-tests:type-mapping",
-//     ":acceptance-tests:type-mapping:exported-dependency",
-//     ":acceptance-tests:type-mapping:nonexported-dependency",
-//     ":acceptance-tests",
-// )
-//
 @Suppress("UNUSED_VARIABLE", "LocalVariableName")
 buildSetup {
     val common by module {
@@ -53,22 +36,7 @@ buildSetup {
             val gradle by module
             val impl by module
         }
-        val license by module
         val util by module
-    }
-
-    val server by module {
-        val shared by group {
-            val api by module
-        }
-        val license by group {
-            val api by module
-            val ui by module
-            val impl by module
-        }
-        val analytics by group {
-            val ui by module
-        }
     }
 
     val runtime by group {

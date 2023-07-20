@@ -2,7 +2,7 @@ plugins {
     id("dev.jvm")
     id("dev.buildconfig")
     id("experimental.context-receivers")
-    alias(libs.plugins.kotlin.plugin.serialization)
+    kotlin("plugin.serialization")
 }
 
 val analyticsDir = layout.buildDirectory.dir("analytics")

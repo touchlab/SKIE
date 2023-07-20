@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
+import co.touchlab.skie.configuration.Configuration
 import co.touchlab.skie.kotlin_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
@@ -9,12 +10,8 @@ import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import co.touchlab.skie.plugin.configuration.SkieConfigurationProvider
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptorRegistrar
-import co.touchlab.skie.plugin.license.SkieLicense
-import co.touchlab.skie.plugin.license.SkieLicenseError
-import co.touchlab.skie.plugin.license.SkieLicenseProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.GroupingMessageCollectorReflector
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -26,6 +23,7 @@ import org.jetbrains.kotlin.cli.common.messages.GroupingMessageCollector
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import co.touchlab.skie.util.Environment
 
 class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
@@ -37,11 +35,8 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         }
         val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY) ?: MessageCollector.NONE
 
-        val license = SkieLicenseProvider.loadLicense(skieDirectories.buildDirectory)
-        license.printCompilerMessages(messageCollector)
-        license.validateWithoutFullContext()
-
-        val skieConfiguration = SkieConfigurationProvider.getConfiguration(skieDirectories.buildDirectory)
+        val serializedUserConfiguration = skieDirectories.buildDirectory.skieConfiguration.readText()
+        val skieConfiguration = Configuration.deserialize(serializedUserConfiguration)
 
         val swiftCompilerConfiguration = SwiftCompilerConfiguration(
             sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
@@ -51,7 +46,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
         val skieContext = DefaultSkieContext(
             module = DefaultSkieModule(),
-            license = license,
             configuration = skieConfiguration,
             swiftCompilerConfiguration = swiftCompilerConfiguration,
             skieDirectories = skieDirectories,
@@ -61,10 +55,9 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 buildId = configuration.getNotNull(ConfigurationKeys.buildId),
                 skieVersion = BuildConfig.SKIE_VERSION,
                 type = BugsnagFactory.Type.Compiler,
-                environment = license.environment,
                 configuration = skieConfiguration.analyticsConfiguration,
             ),
-            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(license.environment),
+            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
         )
 
         configuration.put(SkieContextKey, skieContext)
@@ -112,22 +105,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             }
 
             delegate.report(severity, message, location)
-        }
-    }
-
-    private fun SkieLicense.printCompilerMessages(messageCollector: MessageCollector) {
-        serverMessagesForCompiler.errors.forEach {
-            messageCollector.report(CompilerMessageSeverity.ERROR, it)
-        }
-        serverMessagesForCompiler.errors.forEach {
-            throw SkieLicenseError(it)
-        }
-
-        serverMessagesForCompiler.warnings.forEach {
-            messageCollector.report(CompilerMessageSeverity.WARNING, it)
-        }
-        serverMessagesForCompiler.info.forEach {
-            messageCollector.report(CompilerMessageSeverity.INFO, it)
         }
     }
 }
