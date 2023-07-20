@@ -12,6 +12,7 @@ import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
 import co.touchlab.skie.plugin.util.appleTargets
+import co.touchlab.skie.plugin.util.doFirstOptimized
 import co.touchlab.skie.plugin.util.frameworks
 import co.touchlab.skie.plugin.util.subpluginOption
 import org.gradle.api.Plugin
@@ -58,19 +59,18 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
         configureEachKotlinFrameworkLinkTask(analyticsManager) {
-            configureSkieForLinkTask(licenseManager, analyticsManager)
+            configureSkieForLinkTask(analyticsManager)
         }
     }
 
     private fun KotlinNativeLink.configureSkieForLinkTask(
-        licenseManager: GradleSkieLicenseManager,
         analyticsManager: GradleAnalyticsManager,
     ) {
         SkieDirectoriesManager.configureCreateSkieBuildDirectoryTask(this, analyticsManager)
 
         analyticsManager.configureAnalytics(this)
 
-        binary.target.disableCaching()
+        disableCaching()
         binary.target.addDependencyOnSkieRuntime()
 
         CreateSkieConfigurationTask.registerTask(this, analyticsManager)
@@ -126,8 +126,14 @@ internal fun Project.configureEachKotlinAppleTarget(
     }
 }
 
-private fun KotlinNativeTarget.disableCaching() {
-    project.extensions.extraProperties.set("kotlin.native.cacheKind.${konanTarget.presetName}", "none")
+private fun KotlinNativeLink.disableCaching() {
+    doFirstOptimized {
+        project.logger.warn(
+            "w: SKIE does not support Kotlin Native caching yet. Compilation time in debug mode might be increased as a result."
+        )
+    }
+
+    project.extensions.extraProperties.set("kotlin.native.cacheKind.${binary.target.konanTarget.presetName}", "none")
 }
 
 private val Project.isSkieEnabled: Boolean
