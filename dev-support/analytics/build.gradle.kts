@@ -2,7 +2,6 @@ plugins {
     id("dev.jvm")
     id("dev.buildconfig")
     id("experimental.context-receivers")
-    kotlin("plugin.serialization")
 }
 
 val analyticsDir = layout.buildDirectory.dir("analytics")
@@ -49,9 +48,8 @@ buildConfig {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
-    implementation("co.touchlab.skie:analytics-api")
-    implementation("co.touchlab.skie:producer")
-    implementation("co.touchlab.skie:configuration-api")
+    implementation("co.touchlab.skie:analytics")
+    implementation("co.touchlab.skie:configuration")
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.java)
