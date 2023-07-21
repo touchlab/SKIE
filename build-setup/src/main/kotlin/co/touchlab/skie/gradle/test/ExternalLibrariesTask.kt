@@ -160,6 +160,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
             imports = listOf(
                 "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget",
                 "org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask",
+                "org.jetbrains.kotlin.gradle.plugin.mpp.Framework",
             ),
             tasks = listOf(
                 "compileAllNativeTargets",
@@ -176,6 +177,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                         binaries {
                             framework(namePrefix = "library_${'$'}index", buildTypes = listOf(DEBUG)) {
                                 isStatic = true
+                                export(library)
                             }
                         }
                         // This configuration is created by Kotlin, but doesn't copy our attributes, so we need to do it manually
@@ -192,15 +194,15 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                         }
                     }
                     sourceSets["library_${'$'}{index}Main"].dependencies {
-                        implementation(library)
+                        api(library)
                     }
                 }
             }
             val nativeTargets = kotlin.targets.filterIsInstance<KotlinNativeTarget>()
             val compileAllNativeTargets by tasks.registering {
                 dependsOn(
-                    nativeTargets.map {
-                        it.compilations.getByName("main").compileTaskProvider
+                    nativeTargets.flatMap {
+                        it.binaries.withType<Framework>().map { it.linkTaskProvider }
                     }
                 )
             }
@@ -210,9 +212,11 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                     val unresolvedLibraries = mutableListOf<String>()
                     val allModules = nativeTargets.flatMap { target ->
                             try {
-                                val taskState = target.compilations.getByName("main").compileTaskProvider.get().state
+                                val compileTaskState = target.compilations.getByName("main").compileTaskProvider.get().state
+                                val linkTaskState = target.binaries.withType<Framework>().single().linkTask.state
                                 val resolvedConfiguration = configurations.getByName(target.name + "CompileKlibraries").resolvedConfiguration
-                                taskState.rethrowFailure()
+                                compileTaskState.rethrowFailure()
+                                linkTaskState.rethrowFailure()
                                 resolvedConfiguration.firstLevelModuleDependencies
                             } catch (e: Throwable) {
                                 logger.warn("Error resolving dependencies for ${'$'}{target.name}", e)

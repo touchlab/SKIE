@@ -113,7 +113,7 @@ abstract class PrepareTestClasspathsTask @Inject constructor(objects: ObjectFact
                         api(library)
                         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                             version {
-                                strictly("1.6.4")
+                                strictly("[1.6.4,)")
                             }
                         }
                     }
@@ -143,7 +143,6 @@ abstract class PrepareTestClasspathsTask @Inject constructor(objects: ObjectFact
 
         val runtimeKotlinKlib = runtimeKotlinCompileTask().get().outputFile.get().absolutePath
         val configurationAnnotationsKlib = configurationAnnotationsCompileTask().get().outputFile.get().absolutePath
-
 
         val updatedJson = json.mapValues { (library, artifacts) ->
             val cacheDirectory = libraryCacheDirectory.dir(library.replace(":", "/")).get().asFile
