@@ -195,6 +195,11 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                     }
                     sourceSets["library_${'$'}{index}Main"].dependencies {
                         api(library)
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+                            version {
+                                strictly("[1.6.4,)")
+                            }
+                        }
                     }
                 }
             }
