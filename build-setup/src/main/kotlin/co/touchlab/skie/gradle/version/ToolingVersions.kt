@@ -29,14 +29,14 @@ object ToolingVersions {
     }
 
     object Gradle: VersionContainer<GradleApiVersion>(identifier = { it.gradleVersion.version }) {
-        val `7․3` by version(Kotlin.`1․8․0`)
-        val `7․5` by version(Kotlin.`1․6․21`)
-        val `7․6` by version(Kotlin.`1․7․10`)
-        val `8․0` by version(Kotlin.`1․8․10`)
-        val `8․1` by version(Kotlin.`1․8․10`)
+        val `7․3` by version(Kotlin.`1․8․0`, "3.0.9")
+        val `7․5` by version(Kotlin.`1․6․21`, "3.0.10")
+        val `7․6` by version(Kotlin.`1․7․10`, "3.0.13")
+        val `8․0` by version(Kotlin.`1․8․10`, "3.0.13")
+        val `8․1` by version(Kotlin.`1․8․10`, "3.0.15")
 
-        fun version(kotlin: KotlinToolingVersion) = VersionProvider { gradle ->
-            GradleApiVersion(GradleVersion.version(gradle), kotlin)
+        fun version(kotlin: KotlinToolingVersion, groovy: String) = VersionProvider { gradle ->
+            GradleApiVersion(GradleVersion.version(gradle), kotlin, groovy)
         }
 
         fun dimensionFrom(requestedIdentifiers: List<String>): Target.Dimension<GradleApiVersionComponent> {
