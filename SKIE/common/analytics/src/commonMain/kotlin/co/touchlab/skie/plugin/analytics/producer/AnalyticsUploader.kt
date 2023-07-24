@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.analytics.producer
 
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.UnknownHostException
 import java.nio.file.Path
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -16,33 +15,21 @@ class AnalyticsUploader(
     private val analyticsCollector: AnalyticsCollector,
 ) {
 
-    fun sendAllIfPossible(directory: Path) {
-        try {
-            sendAll(directory)
+    fun sendAll(directory: Path) {
+        upload(directory)
 
-            deleteOldFiles(directory)
-        } catch (e: Throwable) {
-            handleUploadError(e)
-        }
+        deleteOldFiles(directory)
     }
 
-    private fun sendAll(analyticsDirectory: Path) {
+    private fun upload(analyticsDirectory: Path) {
         analyticsDirectory.listDirectoryEntries()
             .let { AnalyticsArtifact.fromFilesDeduplicated(it) }
             .parallelStream()
-            .forEach {
-                uploadAndDeleteSafely(it, analyticsDirectory)
+            .forEach { analyticsArtifact ->
+                upload(analyticsArtifact, analyticsDirectory)
+
+                analyticsArtifact.deleteFrom(analyticsDirectory)
             }
-    }
-
-    private fun uploadAndDeleteSafely(analyticsArtifact: AnalyticsArtifact, analyticsDirectory: Path) {
-        try {
-            upload(analyticsArtifact, analyticsDirectory)
-
-            analyticsArtifact.deleteFrom(analyticsDirectory)
-        } catch (e: Throwable) {
-            handleUploadError(e)
-        }
     }
 
     private fun upload(analyticsArtifact: AnalyticsArtifact, analyticsDirectory: Path) {
@@ -103,23 +90,6 @@ class AnalyticsUploader(
             .filter { it.getLastModifiedTime().toInstant().isBefore(yesterday) }
             .forEach { it.deleteIfExists() }
     }
-
-    private fun handleUploadError(e: Throwable) {
-        if (e is UnknownHostException && !isInternetAvailable()) {
-            return
-        }
-
-        analyticsCollector.logExceptionAndRethrowIfNotProduction(e)
-    }
-
-    private fun isInternetAvailable(): Boolean =
-        try {
-            URL("https://www.google.com").openConnection().connect()
-
-            true
-        } catch (e: Throwable) {
-            false
-        }
 
     class UploadException(override val message: String) : RuntimeException()
 }

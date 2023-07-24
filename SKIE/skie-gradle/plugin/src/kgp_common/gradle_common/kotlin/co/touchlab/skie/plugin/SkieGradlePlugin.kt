@@ -29,14 +29,10 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         val licenseManager = GradleSkieLicenseManager(project)
         val analyticsManager = GradleAnalyticsManager(project)
 
-        analyticsManager.withErrorLogging {
-            project.configureSkieGradlePlugin(licenseManager)
-        }
+        project.configureSkieGradlePlugin(licenseManager)
 
         project.afterEvaluate {
-            analyticsManager.withErrorLogging {
-                project.configureSkieCompilerPlugin(licenseManager, analyticsManager)
-            }
+            project.configureSkieCompilerPlugin(analyticsManager)
         }
     }
 
@@ -49,7 +45,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
     }
 
     private fun Project.configureSkieCompilerPlugin(
-        licenseManager: GradleSkieLicenseManager,
         analyticsManager: GradleAnalyticsManager,
     ) {
         if (!isSkieEnabled) {
@@ -58,7 +53,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
-        configureEachKotlinFrameworkLinkTask(analyticsManager) {
+        configureEachKotlinFrameworkLinkTask {
             configureSkieForLinkTask(analyticsManager)
         }
     }
@@ -103,15 +98,12 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 }
 
 internal fun Project.configureEachKotlinFrameworkLinkTask(
-    analyticsManager: GradleAnalyticsManager,
     configure: KotlinNativeLink.() -> Unit,
 ) {
     configureEachKotlinAppleTarget {
         frameworks.forEach { framework ->
-            analyticsManager.withErrorLogging {
-                // Cannot use configure on linkTaskProvider because it's not possible to register new tasks in configure block of another task
-                configure(framework.linkTask)
-            }
+            // Cannot use configure on linkTaskProvider because it's not possible to register new tasks in configure block of another task
+            configure(framework.linkTask)
         }
     }
 }

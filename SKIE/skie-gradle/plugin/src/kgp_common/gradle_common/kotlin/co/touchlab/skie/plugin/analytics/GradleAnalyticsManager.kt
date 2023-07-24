@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.analytics
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
 import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
-import co.touchlab.skie.plugin.analytics.crash.BugsnagFactory
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsUploader
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
@@ -24,26 +23,11 @@ internal class GradleAnalyticsManager(
 
     val buildId: String = UUID.randomUUID().toString()
 
-    fun <T> withErrorLogging(action: () -> T): T {
-        try {
-            return action()
-        } catch (e: Throwable) {
-            BugsnagFactory.create(
-                skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
-                type = BugsnagFactory.Type.Gradle,
-                environment = Environment.current,
-            )
-
-            throw e
-        }
-    }
-
     fun configureAnalytics(linkTask: KotlinNativeLink) {
         val analyticsCollector = AnalyticsCollector(
             analyticsDirectories = linkTask.skieDirectories.analyticsDirectories,
             buildId = buildId,
             skieVersion = BuildConfig.KOTLIN_PLUGIN_VERSION,
-            type = BugsnagFactory.Type.Gradle,
             configuration = AnalyticsConfiguration(
                 AnalyticsFeature.GradlePerformance(true),
                 AnalyticsFeature.CrashReporting(true),
@@ -53,7 +37,6 @@ internal class GradleAnalyticsManager(
         )
 
         configureAnalyticsTask(linkTask, analyticsCollector)
-        configureAnalyticsSecondaryUpload(linkTask, analyticsCollector)
 
         configurePerformanceAnalytics(linkTask, analyticsCollector)
         collectGradleAnalytics(linkTask, analyticsCollector)
@@ -77,7 +60,7 @@ internal class GradleAnalyticsManager(
     }
 
     private fun configureAnalyticsTask(linkTask: KotlinNativeLink, analyticsCollector: AnalyticsCollector) {
-        val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieFinalizeTask>("finalize", this) {
+        val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieAnalyticsTask>("finalize", this) {
             this.linkTask.set(linkTask)
             this.analyticsCollector.set(analyticsCollector)
 
@@ -110,7 +93,7 @@ internal class GradleAnalyticsManager(
         fun uploadAnalytics(analyticsCollector: AnalyticsCollector, analyticsDirectories: SkieAnalyticsDirectories) {
             val directoryWithFilesToUpload = analyticsDirectories.directoryWithFilesToUpload.toPath()
 
-            AnalyticsUploader(analyticsCollector).sendAllIfPossible(directoryWithFilesToUpload)
+            AnalyticsUploader(analyticsCollector).sendAll(directoryWithFilesToUpload)
         }
     }
 }

@@ -33,7 +33,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         val skieDirectories = configuration.getNotNull(ConfigurationKeys.skieDirectories).also {
             it.resetTemporaryDirectories()
         }
-        val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY) ?: MessageCollector.NONE
 
         val serializedUserConfiguration = skieDirectories.buildDirectory.skieConfiguration.readText()
         val skieConfiguration = Configuration.deserialize(serializedUserConfiguration)
@@ -54,7 +53,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 analyticsDirectories = skieDirectories.analyticsDirectories,
                 buildId = configuration.getNotNull(ConfigurationKeys.buildId),
                 skieVersion = BuildConfig.SKIE_VERSION,
-                type = BugsnagFactory.Type.Compiler,
                 configuration = skieConfiguration.analyticsConfiguration,
             ),
             skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
@@ -62,49 +60,8 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
         configuration.put(SkieContextKey, skieContext)
 
-        registerErrorAnalytics(messageCollector, configuration, skieContext.analyticsCollector)
-
         IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
 
         PhaseInterceptorRegistrar.setupPhaseInterceptors(configuration)
-    }
-
-    private fun registerErrorAnalytics(
-        messageCollector: MessageCollector,
-        configuration: CompilerConfiguration,
-        analyticsCollector: AnalyticsCollector,
-    ) {
-        if (messageCollector is GroupingMessageCollector) {
-            val reflector = messageCollector.reflectedBy<GroupingMessageCollectorReflector>()
-
-            val delegate = reflector.delegate
-
-            reflector.delegate = MessageCollectorWithSkieAnalytics(analyticsCollector, delegate)
-        } else {
-            val messageCollectorWithSkieAnalytics = MessageCollectorWithSkieAnalytics(analyticsCollector, messageCollector)
-
-            configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollectorWithSkieAnalytics)
-        }
-    }
-
-    private class MessageCollectorWithSkieAnalytics(
-        private val analyticsCollector: AnalyticsCollector,
-        private val delegate: MessageCollector,
-    ) : MessageCollector {
-
-        override fun clear() {
-            delegate.clear()
-        }
-
-        override fun hasErrors(): Boolean =
-            delegate.hasErrors()
-
-        override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
-            if (severity.isError) {
-                analyticsCollector.logException(message)
-            }
-
-            delegate.report(severity, message, location)
-        }
     }
 }

@@ -14,7 +14,6 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
 
                 implementation(libs.apache.compress)
-                api(libs.bugsnag)
             }
         }
     }

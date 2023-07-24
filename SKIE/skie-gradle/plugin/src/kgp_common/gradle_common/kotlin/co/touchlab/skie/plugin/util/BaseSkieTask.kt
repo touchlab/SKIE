@@ -16,12 +16,6 @@ internal interface SkieTask : Task {
     val analyticsManager: Property<GradleAnalyticsManager>
 
     @TaskAction
-    fun runTaskWithErrorHandling() {
-        analyticsManager.get().withErrorLogging {
-            runTask()
-        }
-    }
-
     fun runTask()
 }
 
