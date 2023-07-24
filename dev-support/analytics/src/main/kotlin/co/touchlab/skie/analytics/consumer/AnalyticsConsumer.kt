@@ -1,8 +1,8 @@
 package co.touchlab.skie.analytics.consumer
 
-import co.touchlab.skie.dev_support.analytics.BuildConfig
+import co.touchlab.skie.dev.analytics.BuildConfig
 import co.touchlab.skie.plugin.analytics.air.element.AirProject
-import co.touchlab.skie.plugin.analytics.compiler.CompilerAnalytics
+import co.touchlab.skie.plugin.analytics.compiler.kgp_1820.CompilerAnalytics
 import co.touchlab.skie.plugin.analytics.gradle.GradleAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsArtifact
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsEncryptor

@@ -21,6 +21,8 @@ abstract class DevJvm: Plugin<Project> {
         apply<SkieBase>()
         apply<KotlinPluginWrapper>()
 
+        project.group = "co.touchlab.skie.dev"
+
         val kotlinVersion = project.getKotlinPluginVersion()
 
         configurations.configureEach {
