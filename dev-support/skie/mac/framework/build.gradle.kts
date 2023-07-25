@@ -20,6 +20,7 @@ skie {
     debug {
         dumpSwiftApiBeforeApiNotes.set(true)
         dumpSwiftApiAfterApiNotes.set(true)
+        printSkiePerformanceLogs.set(true)
     }
 }
 

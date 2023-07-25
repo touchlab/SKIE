@@ -1,9 +1,9 @@
 package co.touchlab.skie.plugin.api.analytics
 
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
-import co.touchlab.skie.util.Environment
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration
@@ -11,7 +11,9 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-class SkiePerformanceAnalyticsProducer : AnalyticsProducer {
+class SkiePerformanceAnalyticsProducer(
+    private val skieConfiguration: SkieConfiguration,
+) : AnalyticsProducer {
 
     override val name: String = "skie-performance"
 
@@ -35,13 +37,13 @@ class SkiePerformanceAnalyticsProducer : AnalyticsProducer {
             ),
         )
 
-        printLogInDevEnvironment(name, timedValue.duration)
+        printLogIfEnabled(name, timedValue.duration)
 
         return timedValue.value
     }
 
-    private fun printLogInDevEnvironment(name: String, duration: Duration) {
-        if (Environment.current == Environment.Dev) {
+    private fun printLogIfEnabled(name: String, duration: Duration) {
+        if (SkieFeature.Debug_PrintSkiePerformanceLogs in skieConfiguration.enabledFeatures) {
             println("$name: ${duration.toDouble(DurationUnit.SECONDS)}s")
         }
     }

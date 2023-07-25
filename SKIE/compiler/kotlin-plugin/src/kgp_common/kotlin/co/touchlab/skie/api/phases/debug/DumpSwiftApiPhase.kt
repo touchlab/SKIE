@@ -20,7 +20,7 @@ sealed class DumpSwiftApiPhase(
         framework: FrameworkLayout,
     ) : DumpSwiftApiPhase(context, framework) {
 
-        override val isActive: Boolean = SkieFeature.DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledFeatures
+        override val isActive: Boolean = SkieFeature.Debug_DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledFeatures
     }
 
     class AfterApiNotes(
@@ -29,7 +29,7 @@ sealed class DumpSwiftApiPhase(
         framework: FrameworkLayout,
     ) : DumpSwiftApiPhase(context, framework) {
 
-        override val isActive: Boolean = SkieFeature.DumpSwiftApiAfterApiNotes in skieConfiguration.enabledFeatures
+        override val isActive: Boolean = SkieFeature.Debug_DumpSwiftApiAfterApiNotes in skieConfiguration.enabledFeatures
     }
 
     override fun execute() {

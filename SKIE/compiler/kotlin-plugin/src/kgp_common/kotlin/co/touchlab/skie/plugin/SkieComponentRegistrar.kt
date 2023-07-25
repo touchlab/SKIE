@@ -41,7 +41,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 skieBuildDirectory = skieDirectories.buildDirectory,
                 skieConfiguration = skieConfiguration,
             ),
-            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
+            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(skieConfiguration),
         )
 
         configuration.put(SkieContextKey, skieContext)

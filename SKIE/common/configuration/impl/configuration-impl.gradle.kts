@@ -11,7 +11,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
-                // api(projects.analytics.analyticsConfiguration)
                 implementation(projects.common.util)
             }
         }

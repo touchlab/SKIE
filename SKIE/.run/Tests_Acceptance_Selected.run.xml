@@ -3,7 +3,6 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="DEVELOPER_DIR" value="/Applications/Xcode-14.2.0.app/Contents/Developer" />
           <entry key="acceptanceTest" value="tests/bugs/class_name_collision_with_builtins/compiles" />
         </map>
       </option>

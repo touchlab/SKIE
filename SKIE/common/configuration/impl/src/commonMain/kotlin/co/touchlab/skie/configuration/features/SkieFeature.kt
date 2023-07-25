@@ -8,9 +8,10 @@ enum class SkieFeature {
     FqNames,
     ParallelSwiftCompilation,
     WildcardExport,
-    DumpSwiftApiBeforeApiNotes,
-    DumpSwiftApiAfterApiNotes,
 
+    Debug_DumpSwiftApiBeforeApiNotes,
+    Debug_DumpSwiftApiAfterApiNotes,
+    Debug_PrintSkiePerformanceLogs,
 
     Analytics_Compiler,
     Analytics_Gradle,
