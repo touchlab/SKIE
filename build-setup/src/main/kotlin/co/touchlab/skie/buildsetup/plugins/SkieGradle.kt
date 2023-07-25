@@ -1,12 +1,11 @@
 package co.touchlab.skie.buildsetup.plugins
 
-import co.touchlab.skie.gradle.SKIEGradlePluginPlugin
-import co.touchlab.skie.gradle.util.libs
 import co.touchlab.skie.gradle.version.*
 import co.touchlab.skie.gradle.version.target.MultiDimensionTargetExtension
 import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.plugin.GradlePluginApiVersion
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
@@ -17,13 +16,13 @@ abstract class SkieGradle: Plugin<Project> {
         apply<SkieBase>()
         apply<MultiDimensionTargetPlugin>()
         apply<DevGradleImplicitReceiver>()
-        apply<SKIEGradlePluginPlugin>()
 
         extensions.configure<MultiDimensionTargetExtension> {
             dimensions(gradleApiVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
                         attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(target.gradleApiVersion.value))
+                        attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
                     }
                 }
             }

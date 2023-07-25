@@ -1,12 +1,15 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.SKIEGradlePluginDevelopmentExtension
 import co.touchlab.skie.gradle.util.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -24,11 +27,18 @@ abstract class SkieBase: Plugin<Project> {
         plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
             extensions.configure<KotlinMultiplatformExtension> {
                 jvmToolchain(libs.versions.java)
+
+                targets.all {
+                    mavenPublication {
+                        attributes {
+                            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, libs.versions.java)
+                        }
+                    }
+                }
             }
         }
 
         plugins.withType<KotlinPluginWrapper>().configureEach {
-            println("Configuring KotlinPluginWrapper")
             extensions.configure<KotlinJvmProjectExtension> {
                 jvmToolchain(libs.versions.java)
             }
@@ -37,5 +47,6 @@ abstract class SkieBase: Plugin<Project> {
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
         }
+
     }
 }

@@ -1,16 +1,17 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.gradle.publish.mavenArtifactId
 import co.touchlab.skie.gradle.util.EnvironmentVariableProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.credentials.AwsCredentials
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.credentials
-import org.gradle.kotlin.dsl.maven
+import org.gradle.kotlin.dsl.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 abstract class SkiePublishable: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
@@ -31,6 +32,18 @@ abstract class SkiePublishable: Plugin<Project> {
                     credentials(AwsCredentials::class) {
                         accessKey = accessKeyProvider.valueOrEmpty
                         secretKey = secretKeyProvider.valueOrEmpty
+                    }
+                }
+            }
+        }
+
+        plugins.withType<KotlinPluginWrapper>().configureEach {
+            extensions.configure<PublishingExtension> {
+                publications {
+                    create("maven", MavenPublication::class.java) {
+                        artifactId = target.mavenArtifactId
+
+                        from(target.components.getAt("java"))
                     }
                 }
             }

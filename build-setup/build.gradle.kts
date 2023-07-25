@@ -111,6 +111,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieGradle"
     }
 
+    plugins.register("skie.gradle.plugin") {
+        id = "skie.gradle.plugin"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieGradlePlugin"
+    }
+
     plugins.register("skie.publishable") {
         id = "skie.publishable"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkiePublishable"

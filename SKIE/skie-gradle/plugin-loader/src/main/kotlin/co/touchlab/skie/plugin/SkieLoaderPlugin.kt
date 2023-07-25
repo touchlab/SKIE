@@ -13,11 +13,9 @@ import org.gradle.api.attributes.plugin.GradlePluginApiVersion
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.configurationcache.extensions.serviceOf
-import org.gradle.internal.classloader.ClassLoaderFactory
 import org.gradle.internal.classloader.HashingClassLoaderFactory
 import org.gradle.internal.classpath.DefaultClassPath
 import org.gradle.util.GradleVersion
-import java.net.URLClassLoader
 
 @Suppress("unused")
 abstract class SkieLoaderPlugin: Plugin<Project> {
@@ -41,11 +39,18 @@ abstract class SkieLoaderPlugin: Plugin<Project> {
         log.info("Resolving SKIE gradle plugin for Kotlin plugin version $kotlinVersion and Gradle version $gradleVersion")
 
         KotlinCompilerVersion.registerIn(project.dependencies)
-        val skieGradleConfiguration = project.configurations.detachedConfiguration(
-            project.dependencies.module(BuildConfig.SKIE_GRADLE_PLUGIN_DEPENDENCY)
+        KotlinCompilerVersion.registerIn(rootProject.buildscript.dependencies)
+        val skieGradleConfiguration = rootProject.buildscript.configurations.detachedConfiguration(
+            project.dependencies.create(BuildConfig.SKIE_GRADLE_PLUGIN_DEPENDENCY)
         ).apply {
             this.isCanBeConsumed = false
             this.isCanBeResolved = true
+
+            exclude(
+                mapOf(
+                    "group" to "org.jetbrains.kotlin"
+                )
+            )
 
             attributes {
                 attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
@@ -71,11 +76,6 @@ abstract class SkieLoaderPlugin: Plugin<Project> {
             DefaultClassPath.of(skieGradleConfiguration.resolve()),
             null,
         )
-//         URLClassLoader(
-//             "skieGradleClassLoader",
-//             .map { it.toURI().toURL() }.toTypedArray(),
-//             buildscript.classLoader,
-//         )
 
         val probablySkiePluginClass = skieGradleClassLoader.loadClass("co.touchlab.skie.plugin.SkieGradlePlugin")
         if (!Plugin::class.java.isAssignableFrom(probablySkiePluginClass)) {
