@@ -1,7 +1,6 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.SKIEGradlePluginDevelopmentExtension
 import co.touchlab.skie.gradle.util.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
