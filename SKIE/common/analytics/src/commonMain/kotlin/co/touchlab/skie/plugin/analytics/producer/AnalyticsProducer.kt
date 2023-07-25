@@ -1,11 +1,12 @@
 package co.touchlab.skie.plugin.analytics.producer
 
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfigurationTarget
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
+import co.touchlab.skie.configuration.features.SkieFeature
 
-interface AnalyticsProducer<T : AnalyticsFeature> : AnalyticsConfigurationTarget<T> {
+interface AnalyticsProducer {
 
     val name: String
 
-    fun produce(configuration: T): ByteArray
+    val feature: SkieFeature
+
+    fun produce(): String
 }

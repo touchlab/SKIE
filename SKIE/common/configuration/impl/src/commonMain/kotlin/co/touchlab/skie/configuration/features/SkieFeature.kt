@@ -1,3 +1,5 @@
+@file:Suppress("EnumEntryName")
+
 package co.touchlab.skie.configuration.features
 
 enum class SkieFeature {
@@ -7,5 +9,15 @@ enum class SkieFeature {
     ParallelSwiftCompilation,
     WildcardExport,
     DumpSwiftApiBeforeApiNotes,
-    DumpSwiftApiAfterApiNotes;
+    DumpSwiftApiAfterApiNotes,
+
+
+    Analytics_Compiler,
+    Analytics_Gradle,
+    Analytics_Hardware,
+    Analytics_GradlePerformance,
+    Analytics_SkiePerformance,
+    Analytics_SkieConfiguration,
+    Analytics_Sysctl,
+    Analytics_OpenSource;
 }

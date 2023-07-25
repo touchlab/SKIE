@@ -1,47 +1,27 @@
 package co.touchlab.skie.plugin.util
 
-import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
-internal interface SkieTask : Task {
-
-    @get:Internal
-    val analyticsManager: Property<GradleAnalyticsManager>
-
-    @TaskAction
-    fun runTask()
-}
-
-internal abstract class BaseSkieTask : DefaultTask(), SkieTask
-
-internal inline fun <reified T : SkieTask> KotlinNativeLink.registerSkieLinkBasedTask(
+internal inline fun <reified T : Task> KotlinNativeLink.registerSkieLinkBasedTask(
     baseName: String,
-    analyticsManager: GradleAnalyticsManager,
     crossinline configurationAction: T.() -> Unit,
 ): TaskProvider<T> {
     val taskNameWithoutPrefix = skieLinkTaskName(baseName).removePrefix("skie")
 
-    return project.registerSkieTask(taskNameWithoutPrefix, analyticsManager, configurationAction)
+    return project.registerSkieTask(taskNameWithoutPrefix, configurationAction)
 }
 
-internal inline fun <reified T : SkieTask> Project.registerSkieTask(
+internal inline fun <reified T : Task> Project.registerSkieTask(
     baseName: String,
-    analyticsManager: GradleAnalyticsManager,
     crossinline configurationAction: T.() -> Unit,
 ): TaskProvider<T> {
     val taskName = "skie${baseName.replaceFirstChar { it.uppercase() }}"
 
     return tasks.register(taskName, T::class.java) {
         this.group = "skie"
-
-        this.analyticsManager.set(analyticsManager)
 
         this.configurationAction()
     }

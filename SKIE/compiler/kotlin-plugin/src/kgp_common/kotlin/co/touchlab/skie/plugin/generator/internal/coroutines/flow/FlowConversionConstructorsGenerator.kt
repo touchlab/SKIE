@@ -20,7 +20,7 @@ internal class FlowConversionConstructorsGenerator(
     private val skieContext: SkieContext,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieContext.configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieContext.skieConfiguration.enabledFeatures
 
     override fun runObjcPhase() {
         skieContext.module.file("SkieFlowConversions") {

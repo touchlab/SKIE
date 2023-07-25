@@ -40,7 +40,7 @@ class SkieLinkingPhaseScheduler(
     private val objCTypeRenderer = ObjCTypeRenderer()
 
     private val linkingPhases = listOf(
-        DumpSwiftApiPhase.BeforeApiNotes(skieContext.configuration, context, framework),
+        DumpSwiftApiPhase.BeforeApiNotes(skieContext.skieConfiguration, context, framework),
         RemoveKonanManglingPhase(skieModule, context.descriptorProvider),
         RenameEnumRawValuePhase(skieModule, context.descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, context.descriptorProvider),
@@ -52,7 +52,7 @@ class SkieLinkingPhaseScheduler(
         AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
         AddTypeDefPhase(framework.kotlinHeader, objCTypeRenderer),
         DisableWildcardExportPhase(skieContext, framework),
-        DumpSwiftApiPhase.AfterApiNotes(skieContext.configuration, context, framework),
+        DumpSwiftApiPhase.AfterApiNotes(skieContext.skieConfiguration, context, framework),
         GenerateSwiftCodePhase(skieContext, skieModule, swiftModelScope, framework),
         SwiftCacheSetupPhase(skieContext, framework),
         CompileSwiftPhase(skieContext, framework, configurables, config),

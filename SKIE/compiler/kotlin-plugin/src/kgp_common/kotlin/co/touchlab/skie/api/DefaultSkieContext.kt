@@ -1,6 +1,6 @@
 package co.touchlab.skie.api
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
@@ -11,7 +11,7 @@ import co.touchlab.skie.util.directory.SkieDirectories
 
 class DefaultSkieContext(
     override val module: SkieModule,
-    override val configuration: Configuration,
+    override val skieConfiguration: SkieConfiguration,
     override val swiftCompilerConfiguration: SwiftCompilerConfiguration,
     override val skieDirectories: SkieDirectories,
     override val frameworkLayout: FrameworkLayout,

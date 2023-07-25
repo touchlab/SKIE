@@ -1,26 +1,25 @@
 package co.touchlab.skie.plugin.analytics
 
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.analytics.performance.GradlePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.Duration
-import kotlin.reflect.KClass
 
 internal class GradlePerformanceAnalyticsProducer(
     private val linkTaskDuration: Duration,
-) : AnalyticsProducer<AnalyticsFeature.GradlePerformance> {
-
-    override val featureType: KClass<AnalyticsFeature.GradlePerformance> = AnalyticsFeature.GradlePerformance::class
+) : AnalyticsProducer {
 
     override val name: String = "gradle-performance"
 
-    override fun produce(configuration: AnalyticsFeature.GradlePerformance): ByteArray =
+    override val feature: SkieFeature = SkieFeature.Analytics_GradlePerformance
+
+    override fun produce(): String =
         GradlePerformanceAnalytics(
             linkTaskDurationInSeconds = linkTaskDuration.toMillis().toDouble() / 1000.0,
-        ).encode()
+        ).serialize()
 }
 
-private fun GradlePerformanceAnalytics.encode(): ByteArray =
-    Json.encodeToString(this).toByteArray()
+private fun GradlePerformanceAnalytics.serialize(): String =
+    Json.encodeToString(this)

@@ -1,11 +1,10 @@
 package co.touchlab.skie.plugin.switflink
 
-import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
-import co.touchlab.skie.plugin.util.BaseSkieTask
-import co.touchlab.skie.plugin.util.SkieTask
-import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
-import co.touchlab.skie.plugin.directory.skieBuildDirectory
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
+import co.touchlab.skie.plugin.directory.skieBuildDirectory
+import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
+import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.SourceDirectorySet
@@ -13,20 +12,20 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
-import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
 import java.io.File
 
 internal object SwiftLinkingConfigurator {
 
-    fun configureCustomSwiftLinking(linkTask: KotlinNativeLink, analyticsManager: GradleAnalyticsManager) {
+    fun configureCustomSwiftLinking(linkTask: KotlinNativeLink) {
         with(linkTask.project) {
             val swiftSourceSets = linkTask.binary.compilation.allKotlinSourceSets.map { createSwiftSourceSet(it) }
 
             val swiftSources = objects.fileCollection().from(swiftSourceSets)
 
-            registerCustomSwiftTasks(linkTask, analyticsManager, swiftSources)
+            registerCustomSwiftTasks(linkTask, swiftSources)
         }
     }
 
@@ -44,10 +43,9 @@ internal object SwiftLinkingConfigurator {
 
     private fun registerCustomSwiftTasks(
         linkTask: KotlinNativeLink,
-        analyticsManager: GradleAnalyticsManager,
         swiftSources: ConfigurableFileCollection?,
     ) {
-        val mergeTask = linkTask.registerSkieLinkBasedTask<SkieMergeCustomSwiftTask>("mergeCustomSwift", analyticsManager) {
+        val mergeTask = linkTask.registerSkieLinkBasedTask<SkieMergeCustomSwiftTask>("mergeCustomSwift") {
             from(swiftSources)
 
             into(linkTask.skieBuildDirectory.temp.gradle.mergedCustomSwift.directory)
@@ -55,7 +53,7 @@ internal object SwiftLinkingConfigurator {
             dependsOn(linkTask.createSkieBuildDirectoryTask)
         }
 
-        val syncTask = linkTask.registerSkieLinkBasedTask<SkiePackageCustomSwiftTask>("packageCustomSwift", analyticsManager) {
+        val syncTask = linkTask.registerSkieLinkBasedTask<SkiePackageCustomSwiftTask>("packageCustomSwift") {
             inputDirectory.set(mergeTask.map { it.outputs.files.singleFile })
 
             outputDirectory.set(linkTask.skieBuildDirectory.swift.custom.directory)
@@ -66,14 +64,15 @@ internal object SwiftLinkingConfigurator {
         linkTask.inputs.files(syncTask.map { it.outputs.files })
     }
 
-    abstract class SkieMergeCustomSwiftTask : Sync(), SkieTask {
+    abstract class SkieMergeCustomSwiftTask : Sync() {
 
-        override fun runTask() {
-            // destinationDir.mkdirs()
+        @TaskAction
+        fun runTask() {
+            destinationDir.mkdirs()
         }
     }
 
-    abstract class SkiePackageCustomSwiftTask : BaseSkieTask() {
+    abstract class SkiePackageCustomSwiftTask : DefaultTask() {
 
         @get:InputDirectory
         abstract val inputDirectory: Property<File>
@@ -81,7 +80,8 @@ internal object SwiftLinkingConfigurator {
         @get:OutputDirectory
         abstract val outputDirectory: Property<File>
 
-        override fun runTask() {
+        @TaskAction
+        fun runTask() {
             inputDirectory.get().syncDirectoryContentIfDifferent(outputDirectory.get())
         }
     }

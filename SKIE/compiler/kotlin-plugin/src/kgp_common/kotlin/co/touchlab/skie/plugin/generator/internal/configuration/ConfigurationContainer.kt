@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.configuration
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.ConfigurationKey
 import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
 import co.touchlab.skie.plugin.api.SkieContext
@@ -12,11 +12,11 @@ interface ConfigurationContainer {
 
     val skieContext: SkieContext
 
-    val configuration: Configuration
-        get() = skieContext.configuration
+    val skieConfiguration: SkieConfiguration
+        get() = skieContext.skieConfiguration
 
     fun <T> DeclarationDescriptor.getConfiguration(key: ConfigurationKey<T>): T =
-        with(configuration) { this@getConfiguration.getConfigurationWithConfiguration(key) }
+        with(skieConfiguration) { this@getConfiguration.getConfigurationWithConfiguration(key) }
 
     val DeclarationDescriptor.canBeUsedWithExperimentalFeatures: Boolean
         get() = this.getConfiguration(ExperimentalFeatures.Enabled)

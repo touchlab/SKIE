@@ -12,7 +12,6 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
     override val pluginId: String = SkiePlugin.id
 
     private val options = listOf(
-        Options.buildId,
         Options.skieDirectories,
     )
 
@@ -24,9 +23,6 @@ class SwiftLinkCommandLineProcessor : CommandLineProcessor {
         super.processOption(option, value, configuration)
 
         when (optionsMap[option.optionName]) {
-            Options.buildId -> {
-                configuration.put(ConfigurationKeys.buildId, Options.buildId.deserialize(value))
-            }
             Options.skieDirectories -> {
                 configuration.put(ConfigurationKeys.skieDirectories, Options.skieDirectories.deserialize(value))
             }

@@ -8,7 +8,6 @@ import co.touchlab.skie.plugin.generator.internal.analytics.configuration.SkieCo
 import co.touchlab.skie.plugin.generator.internal.analytics.hw.HardwareAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.system.SysctlAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -24,7 +23,7 @@ internal class AnalyticsPhase(
     override fun runObjcPhase() {
         val producers = listOf(
             CompilerAnalyticsProducer(config),
-            SkieConfigurationAnalyticsProducer(skieContext.configuration),
+            SkieConfigurationAnalyticsProducer(skieContext.skieConfiguration),
             SysctlAnalyticsProducer,
             HardwareAnalyticsProducer,
         )
@@ -37,6 +36,7 @@ internal class AnalyticsPhase(
             AirAnalyticsProducer(descriptorProvider, allModules.values.toList()),
         )
 
-        skieContext.analyticsCollector.collect(producers)
+        // WIP
+//         skieContext.analyticsCollector.collect(producers)
     }
 }

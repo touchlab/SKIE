@@ -62,7 +62,7 @@ internal class ExtraClassExportPhase(
     }
 
     private fun MutableSet<ClassDescriptor>.addClassesForExportFromFlowArguments() {
-        if (SkieFeature.CoroutinesInterop !in skieContext.configuration.enabledFeatures) {
+        if (SkieFeature.CoroutinesInterop !in skieContext.skieConfiguration.enabledFeatures) {
             return
         }
 

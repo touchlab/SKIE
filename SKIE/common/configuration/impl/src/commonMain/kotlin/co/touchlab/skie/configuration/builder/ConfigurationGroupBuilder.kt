@@ -1,6 +1,6 @@
 package co.touchlab.skie.configuration.builder
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.ConfigurationKey
 
 class ConfigurationGroupBuilder(
@@ -14,7 +14,7 @@ class ConfigurationGroupBuilder(
         items[this.name] = this.serialize(value)
     }
 
-    internal fun build(): Configuration.Group = Configuration.Group(
+    internal fun build(): SkieConfiguration.Group = SkieConfiguration.Group(
         targetFqNamePrefix = targetFqNamePrefix,
         overridesAnnotations = overridesAnnotations,
         items = items.toMap(),

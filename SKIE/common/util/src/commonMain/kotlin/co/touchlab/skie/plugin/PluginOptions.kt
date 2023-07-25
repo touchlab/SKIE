@@ -9,15 +9,6 @@ object SkiePlugin {
 
     object Options {
 
-        val buildId = PluginOption(
-            optionName = "buildId",
-            valueDescription = "string",
-            description = "SKIE build ID",
-            isRequired = true,
-            serialize = { it },
-            deserialize = { it },
-        )
-
         val skieDirectories = PluginOption(
             optionName = "skieBuildDirectory",
             valueDescription = "<absolute path>",

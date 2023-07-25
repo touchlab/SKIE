@@ -19,3 +19,4 @@ data class GradleAnalytics(
     val timestampInMs: Long,
     val isCI: Boolean,
 )
+// WIP add build id to analytics

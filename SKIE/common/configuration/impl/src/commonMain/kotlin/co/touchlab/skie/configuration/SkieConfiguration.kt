@@ -2,7 +2,6 @@ package co.touchlab.skie.configuration
 
 import co.touchlab.skie.configuration.builder.ConfigurationBuilder
 import co.touchlab.skie.configuration.features.SkieFeatureSet
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -10,11 +9,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class Configuration(
+data class SkieConfiguration(
     val enabledFeatures: SkieFeatureSet = SkieFeatureSet(),
     val disabledFeatures: SkieFeatureSet = SkieFeatureSet(),
     val groups: List<Group> = emptyList(),
-    val analyticsConfiguration: AnalyticsConfiguration = AnalyticsConfiguration(),
 ) {
 
     init {
@@ -51,12 +49,11 @@ data class Configuration(
         return json.encodeToString(this)
     }
 
-    operator fun plus(other: Configuration): Configuration =
-        Configuration(
+    operator fun plus(other: SkieConfiguration): SkieConfiguration =
+        SkieConfiguration(
             (enabledFeatures - other.disabledFeatures) + other.enabledFeatures,
             other.disabledFeatures,
             groups + other.groups,
-            analyticsConfiguration + other.analyticsConfiguration,
         )
 
     @Serializable
@@ -69,13 +66,13 @@ data class Configuration(
 
     companion object {
 
-        operator fun invoke(builder: ConfigurationBuilder.() -> Unit): Configuration =
+        operator fun invoke(builder: ConfigurationBuilder.() -> Unit): SkieConfiguration =
             ConfigurationBuilder().also(builder).build()
 
-        operator fun invoke(builder: ConfigurationBuilder): Configuration =
+        operator fun invoke(builder: ConfigurationBuilder): SkieConfiguration =
             builder.build()
 
-        fun deserialize(string: String): Configuration =
+        fun deserialize(string: String): SkieConfiguration =
             Json.decodeFromString(string)
     }
 }

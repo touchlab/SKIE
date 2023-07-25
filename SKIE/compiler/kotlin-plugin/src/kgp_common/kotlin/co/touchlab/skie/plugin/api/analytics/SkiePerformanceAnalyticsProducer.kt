@@ -1,24 +1,26 @@
 package co.touchlab.skie.plugin.api.analytics
 
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.util.Environment
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-class SkiePerformanceAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.SkiePerformance> {
-
-    override val featureType: KClass<AnalyticsFeature.SkiePerformance> = AnalyticsFeature.SkiePerformance::class
+class SkiePerformanceAnalyticsProducer : AnalyticsProducer {
 
     override val name: String = "skie-performance"
 
     private val entries = mutableListOf<SkiePerformanceAnalytics.Entry>()
+
+    override val feature: SkieFeature = SkieFeature.Analytics_SkiePerformance
+
+    override fun produce(): String =
+        SkiePerformanceAnalytics(entries).serialize()
 
     @OptIn(ExperimentalTime::class)
     fun <T> log(name: String, block: () -> T): T {
@@ -43,10 +45,8 @@ class SkiePerformanceAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.Skie
             println("$name: ${duration.toDouble(DurationUnit.SECONDS)}s")
         }
     }
-
-    override fun produce(configuration: AnalyticsFeature.SkiePerformance): ByteArray =
-        SkiePerformanceAnalytics(entries).encode()
 }
 
-private fun SkiePerformanceAnalytics.encode(): ByteArray =
-    Json.encodeToString(this).toByteArray()
+// WIP one function for all analytics
+private fun SkiePerformanceAnalytics.serialize(): String =
+    Json.encodeToString(this)

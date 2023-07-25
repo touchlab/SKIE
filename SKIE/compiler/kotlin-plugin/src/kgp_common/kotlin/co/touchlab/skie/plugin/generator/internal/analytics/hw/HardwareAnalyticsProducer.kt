@@ -1,18 +1,17 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.hw
 
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.util.Command
-import kotlin.reflect.KClass
 
-object HardwareAnalyticsProducer : AnalyticsProducer<AnalyticsFeature.Hardware> {
-
-    override val featureType: KClass<AnalyticsFeature.Hardware> = AnalyticsFeature.Hardware::class
+object HardwareAnalyticsProducer : AnalyticsProducer {
 
     override val name: String = "hw"
 
-    override fun produce(configuration: AnalyticsFeature.Hardware): ByteArray =
-        queryHwData().toByteArray()
+    override val feature: SkieFeature = SkieFeature.Analytics_Hardware
+
+    override fun produce(): String =
+        queryHwData()
 
     private fun queryHwData(): String =
         Command("system_profiler", "SPHardwareDataType", "-json")

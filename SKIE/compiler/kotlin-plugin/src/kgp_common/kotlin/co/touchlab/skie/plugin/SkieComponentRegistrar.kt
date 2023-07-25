@@ -2,8 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
-import co.touchlab.skie.configuration.Configuration
-import co.touchlab.skie.kotlin_plugin.BuildConfig
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
@@ -21,12 +20,10 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = false
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
-        val skieDirectories = configuration.getNotNull(ConfigurationKeys.skieDirectories).also {
-            it.resetTemporaryDirectories()
-        }
+        val skieDirectories = configuration.getNotNull(ConfigurationKeys.skieDirectories)
 
         val serializedUserConfiguration = skieDirectories.buildDirectory.skieConfiguration.readText()
-        val skieConfiguration = Configuration.deserialize(serializedUserConfiguration)
+        val skieConfiguration = SkieConfiguration.deserialize(serializedUserConfiguration)
 
         val swiftCompilerConfiguration = SwiftCompilerConfiguration(
             sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
@@ -36,15 +33,13 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
         val skieContext = DefaultSkieContext(
             module = DefaultSkieModule(),
-            configuration = skieConfiguration,
+            skieConfiguration = skieConfiguration,
             swiftCompilerConfiguration = swiftCompilerConfiguration,
             skieDirectories = skieDirectories,
             frameworkLayout = FrameworkLayout(configuration.getNotNull(KonanConfigKeys.OUTPUT)),
             analyticsCollector = AnalyticsCollector(
-                analyticsDirectories = skieDirectories.analyticsDirectories,
-                buildId = configuration.getNotNull(ConfigurationKeys.buildId),
-                skieVersion = BuildConfig.SKIE_VERSION,
-                configuration = skieConfiguration.analyticsConfiguration,
+                skieBuildDirectory = skieDirectories.buildDirectory,
+                skieConfiguration = skieConfiguration,
             ),
             skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(),
         )

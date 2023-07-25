@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 object ConfigurationKeys {
 
-    val buildId = CompilerConfigurationKey<String>("SKIE build ID")
     val skieDirectories = CompilerConfigurationKey<SkieDirectories>("SKIE directories")
 
     object SwiftCompiler {

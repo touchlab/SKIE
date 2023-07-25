@@ -1,8 +1,6 @@
 package co.touchlab.skie.configuration.builder
 
-import co.touchlab.skie.configuration.Configuration
-import co.touchlab.skie.configuration.features.SkieFeatureSet
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsConfiguration
+import co.touchlab.skie.configuration.SkieConfiguration
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -38,22 +36,22 @@ class ConfigurationBuilder {
         from(files.map { it.toPath() })
     }
 
-    internal fun build(): Configuration =
-        builders.map { it.build() }.fold(Configuration(), Configuration::plus)
+    internal fun build(): SkieConfiguration =
+        builders.map { it.build() }.fold(SkieConfiguration(), SkieConfiguration::plus)
 
     private sealed interface Builder {
 
-        fun build(): Configuration
+        fun build(): SkieConfiguration
 
         class Group(val groupBuilder: ConfigurationGroupBuilder) : Builder {
 
-            override fun build(): Configuration = Configuration(groups = listOf(groupBuilder.build()))
+            override fun build(): SkieConfiguration = SkieConfiguration(groups = listOf(groupBuilder.build()))
         }
 
         class File(val path: Path) : Builder {
 
-            override fun build(): Configuration =
-                Configuration.deserialize(path.readText())
+            override fun build(): SkieConfiguration =
+                SkieConfiguration.deserialize(path.readText())
         }
     }
 }

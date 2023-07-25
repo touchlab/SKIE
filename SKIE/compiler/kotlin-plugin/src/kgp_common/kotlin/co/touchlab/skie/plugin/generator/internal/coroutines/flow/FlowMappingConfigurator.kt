@@ -15,7 +15,7 @@ internal class FlowMappingConfigurator(
     override val skieContext: SkieContext,
 ) : SkieCompilationPhase, ConfigurationContainer {
 
-    override val isActive: Boolean = SkieFeature.CoroutinesInterop in configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieConfiguration.enabledFeatures
 
     private val callableMemberConfigurator = CallableMemberConfigurator()
 

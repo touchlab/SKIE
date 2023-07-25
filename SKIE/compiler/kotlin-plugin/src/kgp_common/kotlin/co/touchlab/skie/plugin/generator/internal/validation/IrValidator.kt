@@ -22,7 +22,7 @@ internal class IrValidator(
 
     override fun runObjcPhase() {
         with(reporter) {
-            with(skieContext.configuration) {
+            with(skieContext.skieConfiguration) {
                 descriptorProvider.exposedClasses.forEach {
                     classRules.validate(it)
                 }

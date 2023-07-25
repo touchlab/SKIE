@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.configuration
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.builder.ConfigurationBuilder
 import co.touchlab.skie.configuration.gradle.AnalyticsTier
 import org.gradle.api.Action
@@ -28,7 +28,7 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         action.execute(features)
     }
 
-    val analytics: Property<AnalyticsTier> = objects.property(AnalyticsTier::class.java).convention(AnalyticsTier.Full)
+    val analytics: Property<AnalyticsTier> = objects.property(AnalyticsTier::class.java).convention(AnalyticsTier.All)
 
     val debug: SkieDebugConfiguration = objects.newInstance(SkieDebugConfiguration::class.java)
 
@@ -41,11 +41,10 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         fun Project.createExtension(): SkieExtension =
             project.extensions.create("skie", SkieExtension::class.java)
 
-        fun SkieExtension.buildConfiguration(): Configuration =
-            Configuration(configurationBuilder) +
-                Configuration(
-                    enabledFeatures = features.buildFeatureSet() + debug.buildFeatureSet(),
-                    analyticsConfiguration = analytics.get().buildAnalyticsConfiguration(),
+        fun SkieExtension.buildConfiguration(): SkieConfiguration =
+            SkieConfiguration(configurationBuilder) +
+                SkieConfiguration(
+                    enabledFeatures = features.buildFeatureSet() + debug.buildFeatureSet() + analytics.get().buildFeatureSet(),
                 )
     }
 }

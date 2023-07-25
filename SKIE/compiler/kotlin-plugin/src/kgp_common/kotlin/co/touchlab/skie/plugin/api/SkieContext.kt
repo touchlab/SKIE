@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.api
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.module.SkieModule
@@ -12,7 +12,7 @@ interface SkieContext {
 
     val module: SkieModule
 
-    val configuration: Configuration
+    val skieConfiguration: SkieConfiguration
 
     val swiftCompilerConfiguration: SwiftCompilerConfiguration
 

@@ -23,7 +23,7 @@ internal class SuspendGenerator(
     private val declarationBuilder: DeclarationBuilder,
 ) : BaseGenerator(skieContext, namespaceProvider) {
 
-    override val isActive: Boolean = SkieFeature.CoroutinesInterop in configuration.enabledFeatures
+    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieConfiguration.enabledFeatures
 
     override fun runObjcPhase() {
         val kotlinDelegate = KotlinSuspendGeneratorDelegate(module, declarationBuilder, descriptorProvider)

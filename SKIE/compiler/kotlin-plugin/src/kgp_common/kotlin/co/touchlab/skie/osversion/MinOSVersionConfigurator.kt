@@ -29,7 +29,7 @@ object MinOSVersionConfigurator {
     )
 
     fun configure(configuration: CompilerConfiguration, konanConfig: KonanConfig) {
-        if (SkieFeature.CoroutinesInterop !in configuration.skieContext.configuration.enabledFeatures) return
+        if (SkieFeature.CoroutinesInterop !in configuration.skieContext.skieConfiguration.enabledFeatures) return
         val properties = (konanConfig.platform.configurables as? KonanPropertiesLoader)?.properties ?: return
 
         coroutinesMinOsVersionMap.forEach { (key, requiredMinVersion) ->

@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.validation.rules
 
-import co.touchlab.skie.configuration.Configuration
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.values.ValidationSeverity
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -9,7 +9,7 @@ internal interface BaseValidationRule<D : DeclarationDescriptor> : ValidationRul
 
     val message: String
 
-    context(Reporter, Configuration) override fun validate(descriptor: D) {
+    context(Reporter, SkieConfiguration) override fun validate(descriptor: D) {
         if (isSatisfied(descriptor)) {
             return
         }
@@ -21,7 +21,7 @@ internal interface BaseValidationRule<D : DeclarationDescriptor> : ValidationRul
 
     fun isSatisfied(descriptor: D): Boolean
 
-    context(Configuration)
+    context(SkieConfiguration)
     fun severity(descriptor: D): Reporter.Severity
 }
 

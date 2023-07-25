@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.analytics
 
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.analytics.opensource.OpenSourceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import kotlinx.serialization.encodeToString
@@ -8,26 +8,25 @@ import kotlinx.serialization.json.Json
 import org.eclipse.jgit.api.Git
 import org.gradle.api.Project
 import java.io.File
-import kotlin.reflect.KClass
 
 internal class OpenSourceAnalyticsProducer(
     private val project: Project,
-) : AnalyticsProducer<AnalyticsFeature.OpenSource> {
+) : AnalyticsProducer {
 
-    override val featureType: KClass<AnalyticsFeature.OpenSource> = AnalyticsFeature.OpenSource::class
+    override val feature: SkieFeature = SkieFeature.Analytics_OpenSource
 
     override val name: String = "openSource"
 
-    override fun produce(configuration: AnalyticsFeature.OpenSource): ByteArray =
+    override fun produce(): String =
         OpenSourceAnalytics(
             rootProjectName = project.rootProject.name,
             projectFullName = "${project.rootProject.name}${project.path}",
             gitRemotes = project.getGitRemotes(),
-        ).encode()
+        ).serialize()
 }
 
-private fun OpenSourceAnalytics.encode(): ByteArray =
-    Json.encodeToString(this).toByteArray()
+private fun OpenSourceAnalytics.serialize(): String =
+    Json.encodeToString(this)
 
 internal fun Project.getGitRemotes(): List<String> {
     val directoryWithGit = project.projectDir.findGitRoot() ?: return emptyList()

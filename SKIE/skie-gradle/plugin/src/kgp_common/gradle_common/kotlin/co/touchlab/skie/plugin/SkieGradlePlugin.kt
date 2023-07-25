@@ -26,27 +26,20 @@ import org.jetbrains.kotlin.konan.target.presetName
 abstract class SkieGradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        val licenseManager = GradleSkieLicenseManager(project)
-        val analyticsManager = GradleAnalyticsManager(project)
-
-        project.configureSkieGradlePlugin(licenseManager)
+        project.configureSkieGradlePlugin()
 
         project.afterEvaluate {
-            project.configureSkieCompilerPlugin(analyticsManager)
+            project.configureSkieCompilerPlugin()
         }
     }
 
-    private fun Project.configureSkieGradlePlugin(
-        licenseManager: GradleSkieLicenseManager,
-    ) {
-        licenseManager.initializeLicensing()
+    private fun Project.configureSkieGradlePlugin() {
+        GradleSkieLicenseManager(project).initializeLicensing()
 
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
     }
 
-    private fun Project.configureSkieCompilerPlugin(
-        analyticsManager: GradleAnalyticsManager,
-    ) {
+    private fun Project.configureSkieCompilerPlugin() {
         if (!isSkieEnabled) {
             return
         }
@@ -54,41 +47,32 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
         configureEachKotlinFrameworkLinkTask {
-            configureSkieForLinkTask(analyticsManager)
+            configureSkieForLinkTask()
         }
     }
 
-    private fun KotlinNativeLink.configureSkieForLinkTask(
-        analyticsManager: GradleAnalyticsManager,
-    ) {
-        SkieDirectoriesManager.configureCreateSkieBuildDirectoryTask(this, analyticsManager)
+    private fun KotlinNativeLink.configureSkieForLinkTask() {
+        SkieDirectoriesManager.configureCreateSkieBuildDirectoryTask(this)
 
-        analyticsManager.configureAnalytics(this)
+        GradleAnalyticsManager(project).configureAnalytics(this)
 
         disableCaching()
         binary.target.addDependencyOnSkieRuntime()
 
-        CreateSkieConfigurationTask.registerTask(this, analyticsManager)
+        CreateSkieConfigurationTask.registerTask(this)
 
-        SwiftLinkingConfigurator.configureCustomSwiftLinking(this, analyticsManager)
+        SwiftLinkingConfigurator.configureCustomSwiftLinking(this)
 
         SkieSubPluginManager.registerSubPlugins(this)
 
-        configureKotlinCompiler(analyticsManager)
+        configureKotlinCompiler()
     }
 
-    private fun KotlinNativeLink.configureKotlinCompiler(
-        analyticsManager: GradleAnalyticsManager,
-    ) {
+    private fun KotlinNativeLink.configureKotlinCompiler() {
         compilerPluginClasspath = listOfNotNull(
             compilerPluginClasspath,
             SkieCompilerPluginDependencyProvider.getOrCreateDependencyConfiguration(project),
         ).reduce(FileCollection::plus)
-
-        compilerPluginOptions.addPluginArgument(
-            SkiePlugin.id,
-            SkiePlugin.Options.buildId.subpluginOption(analyticsManager.buildId),
-        )
 
         compilerPluginOptions.addPluginArgument(
             SkiePlugin.id,

@@ -10,6 +10,8 @@ class SkieBuildDirectory(
     rootDirectory: File,
 ) : RootDirectory(rootDirectory) {
 
+    val analytics: Analytics = Analytics(this)
+
     val cache: Cache = Cache(this)
 
     val debug: Debug = Debug(this)
@@ -23,6 +25,11 @@ class SkieBuildDirectory(
     val skieConfiguration: File = directory.resolve("configuration.json")
 
     val license: File = directory.resolve("license.json")
+
+    class Analytics(parent: Directory) : TemporaryDirectory(parent, "analytics") {
+
+        fun file(name: String): File = directory.resolve("$name.json")
+    }
 
     class Cache(parent: Directory) : PermanentDirectory(parent, "cache") {
 

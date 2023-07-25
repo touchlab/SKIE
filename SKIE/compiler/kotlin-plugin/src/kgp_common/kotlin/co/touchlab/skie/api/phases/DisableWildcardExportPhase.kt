@@ -10,7 +10,7 @@ class DisableWildcardExportPhase(
 ) : SkieLinkingPhase {
 
     override val isActive: Boolean
-        get() = SkieFeature.WildcardExport !in skieContext.configuration.enabledFeatures
+        get() = SkieFeature.WildcardExport !in skieContext.skieConfiguration.enabledFeatures
 
     override fun execute() {
         framework.modulemapFile.writeText(

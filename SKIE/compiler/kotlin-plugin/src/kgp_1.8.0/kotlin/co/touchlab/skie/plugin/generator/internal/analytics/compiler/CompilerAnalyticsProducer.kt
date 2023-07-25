@@ -2,40 +2,30 @@
 
 package co.touchlab.skie.plugin.generator.internal.analytics.compiler
 
+import co.touchlab.skie.configuration.features.SkieFeature
 import co.touchlab.skie.plugin.analytics.compiler.kgp_180.CompilerAnalytics
-import co.touchlab.skie.plugin.analytics.configuration.AnalyticsFeature
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.UserVisibleIrModulesSupportReflector
-import co.touchlab.skie.util.redacted
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.*
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.konan.target.Xcode
 import org.jetbrains.kotlin.utils.ResolvedDependency
-import kotlin.reflect.KClass
 
 actual class CompilerAnalyticsProducer actual constructor(
     private val config: KonanConfig,
-) : AnalyticsProducer<AnalyticsFeature.Compiler> {
-
-    override val featureType: KClass<AnalyticsFeature.Compiler> = AnalyticsFeature.Compiler::class
+) : AnalyticsProducer {
 
     override val name: String = "compiler"
 
-    override fun produce(configuration: AnalyticsFeature.Compiler): ByteArray =
-        Json.encodeToString(getCompilerAnalytics(configuration)).toByteArray()
+    override val feature: SkieFeature = SkieFeature.Analytics_Compiler
 
-    private fun getCompilerAnalytics(configuration: AnalyticsFeature.Compiler): CompilerAnalytics =
-        if (configuration.stripIdentifiers) {
-            getFullCompilerAnalytics().redacted()
-        } else {
-            getFullCompilerAnalytics()
-        }
+    override fun produce(): String =
+        Json.encodeToString(getFullCompilerAnalytics())
 
     private fun getFullCompilerAnalytics(): CompilerAnalytics = CompilerAnalytics(
         compilerVersion = config.distribution.compilerVersion,
@@ -168,42 +158,4 @@ private fun ResolvedDependency.toLibrary(exportedArtifactsPaths: Set<String>): C
         uniqueNames = id.uniqueNames.toList(),
         version = selectedVersion.version,
         isExported = artifactPaths.any { it.path in exportedArtifactsPaths },
-    )
-
-private fun CompilerAnalytics.redacted(): CompilerAnalytics =
-    copy(
-        commonConfig = commonConfig.redacted(),
-        konanConfig = konanConfig.redacted(),
-        binaryConfig = binaryConfig.redacted(),
-        mavenLibraries = mavenLibraries?.map { it.redacted() },
-    )
-
-private fun CompilerAnalytics.CommonConfig.redacted(): CompilerAnalytics.CommonConfig =
-    copy(
-        moduleName = moduleName?.redacted(),
-    )
-
-private fun CompilerAnalytics.KonanConfig.redacted(): CompilerAnalytics.KonanConfig =
-    copy(
-        bundleId = bundleId?.redacted(),
-        frameworkImportHeaders = frameworkImportHeaders?.redacted(),
-        linkerArgs = linkerArgs?.redacted(),
-        moduleName = moduleName?.redacted(),
-        shortModuleName = shortModuleName?.redacted(),
-        overrideKonanProperties = overrideKonanProperties?.redacted(),
-    )
-
-private fun CompilerAnalytics.BinaryConfig.redacted(): CompilerAnalytics.BinaryConfig =
-    copy(
-        bundleId = bundleId?.redacted(),
-        bundleShortVersionString = bundleShortVersionString?.redacted(),
-        bundleVersion = bundleVersion?.redacted(),
-        appStateTracking = appStateTracking?.redacted(),
-        sanitizer = sanitizer?.redacted(),
-    )
-
-private fun CompilerAnalytics.Library.redacted(): CompilerAnalytics.Library =
-    copy(
-        uniqueNames = uniqueNames.redacted(),
-        version = version.redacted(),
     )
