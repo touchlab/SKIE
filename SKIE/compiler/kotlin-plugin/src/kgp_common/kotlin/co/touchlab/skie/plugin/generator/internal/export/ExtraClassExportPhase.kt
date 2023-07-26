@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.export
 
-import co.touchlab.skie.configuration.features.SkieFeature
-import co.touchlab.skie.configuration.gradle.SealedInterop
+import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers

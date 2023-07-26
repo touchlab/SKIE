@@ -34,7 +34,7 @@ configurations.configureEach {
 
 dependencies {
     implementation(projects.gradle.gradlePluginApi)
-    api(projects.common.configuration.configurationGradle)
+    api(projects.common.configuration.configurationDeclaration)
     compileOnly("dev.gradleplugins:gradle-api:7.3")
 
     testImplementation(kotlin("test"))

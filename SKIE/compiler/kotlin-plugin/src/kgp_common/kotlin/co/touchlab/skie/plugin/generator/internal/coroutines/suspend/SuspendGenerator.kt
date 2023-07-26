@@ -2,8 +2,8 @@
 
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
-import co.touchlab.skie.configuration.features.SkieFeature
-import co.touchlab.skie.configuration.gradle.SuspendInterop
+import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility

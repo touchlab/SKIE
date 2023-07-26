@@ -1,11 +1,12 @@
 package co.touchlab.skie.plugin.analytics.producer
 
-import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.TypedSkieConfiguration
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 
 class AnalyticsCollector(
     private val skieBuildDirectory: SkieBuildDirectory,
-    private val skieConfiguration: SkieConfiguration,
+    private val skieConfiguration: TypedSkieConfiguration<SkieFeature>,
 ) {
 
     @Synchronized

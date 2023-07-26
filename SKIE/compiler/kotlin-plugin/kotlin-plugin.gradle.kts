@@ -1,16 +1,9 @@
 plugins {
     id("skie.compiler")
     id("skie.publishable")
-    id("dev.buildconfig")
     id("experimental.context-receivers")
 
     kotlin("plugin.serialization")
-}
-
-buildConfig {
-    val kotlinPlugin = projects.compiler.kotlinPlugin.dependencyProject
-
-    buildConfigField("String", "SKIE_VERSION", "\"${kotlinPlugin.version}\"")
 }
 
 kotlin {
@@ -18,7 +11,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.common.analytics)
-                implementation(projects.common.configuration)
+                api(projects.common.configuration.configurationApi)
+                implementation(projects.common.configuration.configurationAnnotations)
+                implementation(projects.common.configuration.configurationDeclaration)
                 implementation(projects.common.util)
 
                 implementation(projects.runtime.runtimeSwift)

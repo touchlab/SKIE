@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.validation.rules
 
-import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.configuration.values.ValidationSeverity
+import co.touchlab.skie.configuration.Validation
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 
@@ -25,9 +25,9 @@ internal interface BaseValidationRule<D : DeclarationDescriptor> : ValidationRul
     fun severity(descriptor: D): Reporter.Severity
 }
 
-internal val ValidationSeverity.asReporterSeverity: Reporter.Severity
+internal val Validation.Severity.Level.asReporterSeverity: Reporter.Severity
     get() = when (this) {
-        ValidationSeverity.Error -> Reporter.Severity.Error
-        ValidationSeverity.Warning -> Reporter.Severity.Warning
-        ValidationSeverity.None -> Reporter.Severity.None
+        Validation.Severity.Level.Error -> Reporter.Severity.Error
+        Validation.Severity.Level.Warning -> Reporter.Severity.Warning
+        Validation.Severity.Level.None -> Reporter.Severity.None
     }

@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.sealed
 
-import co.touchlab.skie.configuration.gradle.SealedInterop
+import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel

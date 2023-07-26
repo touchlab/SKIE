@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.validation.rules
 
-import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.configuration.gradle.Validation
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.Validation
 import co.touchlab.skie.plugin.generator.internal.configuration.getConfiguration
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

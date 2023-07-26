@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.configuration
 
-import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.ConfigurationKey
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 

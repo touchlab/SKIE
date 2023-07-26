@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.configuration
 
-import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 
 class SkieConfigurationAnalyticsProducer(

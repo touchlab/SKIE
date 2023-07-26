@@ -18,5 +18,6 @@ internal abstract class SkieAnalyticsUploadTask : DefaultTask() {
     @TaskAction
     fun runTask() {
         // WIP
+        // + disable based on extension
     }
 }

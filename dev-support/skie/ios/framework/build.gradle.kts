@@ -1,5 +1,5 @@
 
-import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
+import co.touchlab.skie.configuration.ExperimentalFeatures
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {

@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 
-import co.touchlab.skie.configuration.features.SkieFeature
-import co.touchlab.skie.configuration.gradle.FlowInterop
+import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor

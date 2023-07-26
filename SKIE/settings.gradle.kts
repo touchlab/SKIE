@@ -32,9 +32,9 @@ buildSetup {
     val common by module {
         val analytics by module
         val configuration by group {
+            val api by module
             val annotations by module
-            val gradle by module
-            val impl by module
+            val declaration by module
         }
         val util by module
     }

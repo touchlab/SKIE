@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
-import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration

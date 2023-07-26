@@ -18,5 +18,4 @@ buildConfig {
 dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation("co.touchlab.skie:analytics")
-    implementation("co.touchlab.skie:configuration")
 }

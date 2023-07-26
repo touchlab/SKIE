@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.`typealias`
 
-import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope

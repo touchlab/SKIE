@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
-import co.touchlab.skie.configuration.gradle.DefaultArgumentInterop
+import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder

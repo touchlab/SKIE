@@ -1,9 +1,9 @@
 package co.touchlab.skie.plugin.api.analytics
 
-import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.plugin.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration

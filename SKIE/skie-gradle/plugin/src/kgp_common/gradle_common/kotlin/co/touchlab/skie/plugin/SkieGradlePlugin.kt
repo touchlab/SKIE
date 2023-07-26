@@ -15,6 +15,7 @@ import co.touchlab.skie.plugin.util.appleTargets
 import co.touchlab.skie.plugin.util.doFirstOptimized
 import co.touchlab.skie.plugin.util.frameworks
 import co.touchlab.skie.plugin.util.subpluginOption
+import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection

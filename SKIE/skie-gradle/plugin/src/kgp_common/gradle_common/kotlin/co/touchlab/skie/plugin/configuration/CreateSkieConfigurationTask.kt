@@ -1,8 +1,10 @@
 package co.touchlab.skie.plugin.configuration
 
+import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.directory.skieBuildDirectory
 import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
+import groovy.json.JsonOutput
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.OutputFile
@@ -25,8 +27,8 @@ internal abstract class CreateSkieConfigurationTask : DefaultTask() {
 
         configurationFile.parentFile.mkdirs()
 
-        val configuration = with(SkieExtension) { project.skieExtension.buildConfiguration() }
-        val serializedConfiguration = configuration.serialize()
+        val configuration = project.skieExtension.buildConfiguration()
+        val serializedConfiguration = JsonOutput.toJson(configuration)
 
         configurationFile.writeText(serializedConfiguration)
     }

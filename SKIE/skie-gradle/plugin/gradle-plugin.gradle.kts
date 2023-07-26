@@ -1,5 +1,4 @@
 import co.touchlab.skie.gradle.publish.dependencyName
-import co.touchlab.skie.gradle.publish.mavenArtifactId
 
 plugins {
     id("skie.shim")
@@ -15,11 +14,12 @@ kotlin {
                 // TODO: It might be worthwhile to make this compile-time safe, so we don't have to manually check. Or at least a test?
                 // Whichever dependency is brought in by `gradle-plugin-loader` has to be `compileOnly` as we don't want duplicate classes.
                 compileOnly(projects.gradle.gradlePluginApi)
-                compileOnly(projects.common.configuration)
+                compileOnly(projects.common.configuration.configurationDeclaration)
 
                 implementation(projects.common.analytics)
                 implementation(projects.common.util)
 
+                // WIP Remove
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.jgit)
             }

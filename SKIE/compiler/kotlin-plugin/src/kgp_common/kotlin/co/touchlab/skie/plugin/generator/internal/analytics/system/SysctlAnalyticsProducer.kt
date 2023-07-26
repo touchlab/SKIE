@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.system
 
-import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.util.Command
 

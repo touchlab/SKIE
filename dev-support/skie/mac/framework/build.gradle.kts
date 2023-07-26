@@ -1,4 +1,4 @@
-import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
+import co.touchlab.skie.configuration.ExperimentalFeatures
 // import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink

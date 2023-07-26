@@ -1,8 +1,8 @@
 package co.touchlab.skie.api.phases.debug
 
 import co.touchlab.skie.api.phases.SkieLinkingPhase
-import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout

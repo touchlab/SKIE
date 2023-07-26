@@ -10,9 +10,11 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.common.util)
-                implementation(projects.common.configuration.configurationImpl)
-                implementation(libs.kotlinx.serialization.json)
+                api(projects.common.configuration.configurationApi)
+                api(projects.common.configuration.configurationDeclaration)
 
+                // WIP Remove
+                implementation(libs.kotlinx.serialization.json)
                 implementation(libs.apache.compress)
             }
         }

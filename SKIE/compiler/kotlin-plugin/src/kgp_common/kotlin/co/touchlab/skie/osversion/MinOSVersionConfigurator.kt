@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.osversion
 
-import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.plugin.api.skieContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.config.CompilerConfiguration

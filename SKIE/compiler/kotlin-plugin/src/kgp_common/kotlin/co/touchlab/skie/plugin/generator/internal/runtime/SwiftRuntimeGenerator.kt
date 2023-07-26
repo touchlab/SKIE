@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.runtime
 
-import co.touchlab.skie.configuration.features.SkieFeature
+import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 

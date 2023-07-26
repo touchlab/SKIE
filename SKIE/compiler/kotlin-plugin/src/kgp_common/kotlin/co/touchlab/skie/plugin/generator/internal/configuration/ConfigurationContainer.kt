@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.generator.internal.configuration
 
-import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.ConfigurationKey
-import co.touchlab.skie.configuration.gradle.ExperimentalFeatures
+import co.touchlab.skie.configuration.ExperimentalFeatures
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
