@@ -11,6 +11,7 @@ enum class AnalyticsTier(val features: Set<SkieFeature>) {
         SkieFeature.Analytics_SkieConfiguration,
         SkieFeature.Analytics_Sysctl,
         SkieFeature.Analytics_OpenSource,
+        SkieFeature.Analytics_GitRemotes,
     ),
 
     NoTracking(

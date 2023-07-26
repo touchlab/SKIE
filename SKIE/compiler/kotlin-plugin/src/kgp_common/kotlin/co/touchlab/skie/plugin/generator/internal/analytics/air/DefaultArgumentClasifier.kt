@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.air
 
-import co.touchlab.skie.plugin.analytics.air.element.AirValueParameter
+import co.touchlab.skie.analytics.air.element.AirValueParameter
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrConst

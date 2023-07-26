@@ -3,7 +3,7 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.compiler
 
 import co.touchlab.skie.configuration.SkieFeature
-import co.touchlab.skie.plugin.analytics.compiler.kgp_1820.CompilerAnalytics
+import co.touchlab.skie.plugin.generator.internal.analytics.compiler.kgp_1820.CompilerAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.UserVisibleIrModulesSupportReflector

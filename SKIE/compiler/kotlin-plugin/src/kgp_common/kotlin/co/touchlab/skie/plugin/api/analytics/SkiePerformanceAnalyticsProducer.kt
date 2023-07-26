@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.api.analytics
 
 import co.touchlab.skie.configuration.SkieFeature
-import co.touchlab.skie.plugin.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import kotlinx.serialization.encodeToString

@@ -18,10 +18,6 @@ kotlin {
 
                 implementation(projects.common.analytics)
                 implementation(projects.common.util)
-
-                // WIP Remove
-                implementation(libs.kotlinx.serialization.json)
-                implementation(libs.jgit)
             }
         }
     }

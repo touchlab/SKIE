@@ -2,11 +2,9 @@ package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.gradle_plugin.BuildConfig
-import co.touchlab.skie.plugin.analytics.gradle.GradleAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
 import co.touchlab.skie.util.hashed
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import groovy.json.JsonOutput
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
@@ -50,4 +48,4 @@ internal class GradleAnalyticsProducer(
 }
 
 private fun GradleAnalytics.serialize(): String =
-    Json.encodeToString(this)
+    JsonOutput.toJson(this)

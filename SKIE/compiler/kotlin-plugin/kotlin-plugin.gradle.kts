@@ -22,10 +22,11 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.serialization.yaml)
 
-                implementation(libs.java.jwt)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.jackson.databind)
                 implementation(libs.ktor.client.java)
+                implementation(libs.apache.compress)
+                implementation(libs.jgit)
             }
         }
     }

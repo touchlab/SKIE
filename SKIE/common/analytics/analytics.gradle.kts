@@ -12,10 +12,6 @@ kotlin {
                 implementation(projects.common.util)
                 api(projects.common.configuration.configurationApi)
                 api(projects.common.configuration.configurationDeclaration)
-
-                // WIP Remove
-                implementation(libs.kotlinx.serialization.json)
-                implementation(libs.apache.compress)
             }
         }
     }

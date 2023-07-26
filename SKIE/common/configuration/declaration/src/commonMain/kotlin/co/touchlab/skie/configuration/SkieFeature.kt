@@ -20,5 +20,6 @@ enum class SkieFeature {
     Analytics_SkiePerformance,
     Analytics_SkieConfiguration,
     Analytics_Sysctl,
-    Analytics_OpenSource;
+    Analytics_OpenSource,
+    Analytics_GitRemotes,
 }

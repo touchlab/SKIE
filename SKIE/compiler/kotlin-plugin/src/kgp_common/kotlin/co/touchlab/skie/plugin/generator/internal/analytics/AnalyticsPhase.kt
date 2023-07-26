@@ -2,9 +2,11 @@ package co.touchlab.skie.plugin.generator.internal.analytics
 
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.generator.internal.analytics.air.AirAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.compiler.CompilerAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.configuration.SkieConfigurationAnalyticsProducer
+import co.touchlab.skie.plugin.generator.internal.analytics.git.GitRemotesAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.hw.HardwareAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.analytics.system.SysctlAnalyticsProducer
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
@@ -26,6 +28,7 @@ internal class AnalyticsPhase(
             SkieConfigurationAnalyticsProducer(skieContext.skieConfiguration),
             SysctlAnalyticsProducer,
             HardwareAnalyticsProducer,
+            GitRemotesAnalyticsProducer(skieContext.skieBuildDirectory),
         )
 
         skieContext.analyticsCollector.collect(producers)

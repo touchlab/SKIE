@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.analytics.air
 
-import co.touchlab.skie.plugin.analytics.air.element.AirProject
+import co.touchlab.skie.analytics.air.element.AirProject
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

@@ -1,10 +1,8 @@
 package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.configuration.SkieFeature
-import co.touchlab.skie.plugin.analytics.performance.GradlePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.producer.AnalyticsProducer
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import groovy.json.JsonOutput
 import java.time.Duration
 
 internal class GradlePerformanceAnalyticsProducer(
@@ -22,4 +20,4 @@ internal class GradlePerformanceAnalyticsProducer(
 }
 
 private fun GradlePerformanceAnalytics.serialize(): String =
-    Json.encodeToString(this)
+    JsonOutput.toJson(this)
