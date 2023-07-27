@@ -6,6 +6,11 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+skiePublishing {
+    name = "SKIE Kotlin compiler plugin"
+    description = "Kotlin compiler plugin that improves Swift interface of a Kotlin Multiplatform framework."
+}
+
 kotlin {
     sourceSets {
         val commonMain by getting {

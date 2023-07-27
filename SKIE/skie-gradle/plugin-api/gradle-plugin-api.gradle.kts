@@ -3,6 +3,11 @@ plugins {
     id("skie.publishable")
 }
 
+skiePublishing {
+    name = "SKIE Gradle Plugin API"
+    description = "API that's implemented by the SKIE Gradle Plugin, used by the loader module."
+}
+
 kotlin {
     sourceSets {
         val commonMain by getting {

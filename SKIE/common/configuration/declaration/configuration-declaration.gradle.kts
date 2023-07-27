@@ -3,6 +3,11 @@ plugins {
     id("skie.publishable")
 }
 
+skiePublishing {
+    name = "SKIE Configuration Declaration"
+    description = "Configuration declarations for SKIE, used in Gradle plugin."
+}
+
 kotlin {
     sourceSets {
         val commonMain by getting {

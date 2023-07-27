@@ -1,5 +1,6 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import com.gradle.publish.PublishPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -11,6 +12,6 @@ abstract class SkieGradlePlugin: Plugin<Project> {
         apply<SkieBase>()
         apply<KotlinPluginWrapper>()
         apply<DevGradleImplicitReceiver>()
-        apply<JavaGradlePluginPlugin>()
+        apply<PublishPlugin>()
     }
 }

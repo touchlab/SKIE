@@ -2,7 +2,7 @@ package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
-import co.touchlab.skie.gradle.util.String.enquoted
+import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.version.*
 import co.touchlab.skie.gradle.version.target.*
 import co.touchlab.skie.gradle.version.target.Target

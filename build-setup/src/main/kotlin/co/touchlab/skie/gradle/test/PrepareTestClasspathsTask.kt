@@ -43,7 +43,7 @@ import org.jetbrains.kotlin.konan.target.presetName
 import java.io.File
 import javax.inject.Inject
 
-abstract class PrepareTestClasspathsTask @Inject constructor(objects: ObjectFactory): DefaultTask() {
+abstract class PrepareTestClasspathsTask: DefaultTask() {
 
     @get:Input
     abstract val target: Property<KonanTarget>

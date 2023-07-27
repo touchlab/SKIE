@@ -5,6 +5,11 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+skiePublishing {
+    name = "SKIE Analytics"
+    description = "Module providing basic analytics functionality for SKIE."
+}
+
 kotlin {
     sourceSets {
         val commonMain by getting {

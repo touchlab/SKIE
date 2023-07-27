@@ -1,69 +1,131 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.plugins.extensions.HasMavenPublishPlugin
+import co.touchlab.skie.buildsetup.plugins.extensions.HasSigningPlugin
 import co.touchlab.skie.gradle.publish.mavenArtifactId
-import co.touchlab.skie.gradle.util.EnvironmentVariableProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.credentials.AwsCredentials
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.*
+import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
+import org.gradle.plugins.signing.SigningPlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-abstract class SkiePublishable: Plugin<Project> {
+@Suppress("UnstableApiUsage")
+abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigningPlugin {
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<MavenPublishPlugin>()
+        apply<SigningPlugin>()
 
-        // Configure publishing to AWS S3
-        val accessKeyProvider = EnvironmentVariableProvider("AWS_TOUCHLAB_DEPLOY_ACCESS")
-        val secretKeyProvider = EnvironmentVariableProvider("AWS_TOUCHLAB_DEPLOY_SECRET")
+        val extension = extensions.create<SkiePublishingExtension>("skiePublishing")
 
-        extensions.configure<PublishingExtension> {
-            repositories {
-                val isReleaseBuild = !version.toString().contains("-SNAPSHOT")
-                val awsUrl = if (isReleaseBuild) "s3://touchlab-repo/release" else "s3://touchlab-repo/snapshot"
-                maven(awsUrl) {
-                    name = "aws"
+        configureMetadata(extension)
+        configureSigning()
+        configureKotlinJvmPublicationIfNeeded()
+        configureSourcesJar(extension)
+        configureJavadocJar()
+    }
 
-                    credentials(AwsCredentials::class) {
-                        accessKey = accessKeyProvider.valueOrEmpty
-                        secretKey = secretKeyProvider.valueOrEmpty
-                    }
-                }
-            }
+    private fun Project.configureSigning() {
+        publishing.publications.withType<MavenPublication>().configureEach {
+            signing.sign(this)
         }
+    }
 
-        plugins.withType<KotlinPluginWrapper>().configureEach {
-            extensions.configure<PublishingExtension> {
-                publications {
-                    create("maven", MavenPublication::class.java) {
-                        artifactId = target.mavenArtifactId
-
-                        from(target.components.getAt("java"))
-                    }
-                }
-            }
-        }
-
-        // Verify keys are present when publishing
+    private fun Project.configureMetadata(extension: SkiePublishingExtension) {
         gradle.taskGraph.whenReady {
-            val willPublish = allTasks.any { it is PublishToMavenRepository }
-
-            if (willPublish) {
-                accessKeyProvider.verifyWasSet()
-                secretKeyProvider.verifyWasSet()
-            }
+            requireNotNull(extension.name.orNull) { "Module name not set for project ${name}!" }
+            requireNotNull(extension.description.orNull) { "Module description not set for project ${name}!" }
         }
 
+        publishing {
+            publications.withType<MavenPublication>().configureEach {
+                pom {
+                    name = extension.name
+                    description = extension.description
+                    url = "https://skie.touchlab.co"
+
+                    licenses {
+                        license {
+                            name = "Touchlab SKIE License"
+                            url = "https://skie.touchlab.co/LICENSE"
+                        }
+                    }
+
+                    developers {
+                        listOf(
+                            "Kevin Galligan" to "kevin@touchlab.co",
+                            "Filip Dolnik" to "filip@touchlab.co",
+                            "Tadeas Kriz" to "tadeas@touchlab.co",
+                        ).forEach { (name, email) ->
+                            developer {
+                                this.name = name
+                                this.email = email
+                                organization = "Touchlab"
+                                organizationUrl = "https://touchlab.co"
+                            }
+                        }
+                    }
+
+                    scm {
+                        connection = "scm:git:git://github.com/touchlab/SKIE.git"
+                        developerConnection = "scm:git:ssh://github.com:touchlab/SKIE.git"
+                        url = "https://github.com/touchlab/SKIE"
+                    }
+                }
+            }
+        }
+    }
+
+    private fun Project.configureKotlinJvmPublicationIfNeeded() = afterEvaluate {
+        if (plugins.hasPlugin(KotlinPluginWrapper::class.java) && !plugins.hasPlugin(JavaGradlePluginPlugin::class.java)) {
+            publishing.publications.create<MavenPublication>("maven") {
+                artifactId = mavenArtifactId
+
+                from(components.getAt("java"))
+            }
+        }
+    }
+
+    private fun Project.configureSourcesJar(extension: SkiePublishingExtension): Unit = afterEvaluate {
         // Disable sources publishing for Kotlin Multiplatform modules
-        tasks.matching {
-            it.name.endsWith("sourcesJar", ignoreCase = true)
-        }.all {
-            enabled = false
+        if (!extension.publishSources.get()) {
+            if (plugins.hasPlugin(KotlinMultiplatformPluginWrapper::class.java)) {
+                tasks.matching {
+                    it.name.endsWith("sourcesJar", ignoreCase = true)
+                }.all {
+                    if (this is Jar) {
+                        exclude { true }
+                    }
+                }
+            }
+            if (plugins.hasPlugin(KotlinPluginWrapper::class.java)) {
+                publishing.publications.withType<MavenPublication> {
+                    val publication = this
+                    val sourcesJar = tasks.register("${publication.name}SourcesJar", Jar::class) {
+                        archiveClassifier.set("sources")
+                        // Each archive name should be distinct.
+                        archiveBaseName.set("${archiveBaseName.get()}-${publication.name}")
+                    }
+                    artifact(sourcesJar)
+                }
+            }
+        }
+    }
+
+    private fun Project.configureJavadocJar() = afterEvaluate {
+        publishing.publications.withType<MavenPublication> {
+            val publication = this
+            val javadocJar = tasks.register("${publication.name}JavadocJar", Jar::class) {
+                archiveClassifier.set("javadoc")
+                // Each archive name should be distinct. Mirror the format for the sources Jar tasks.
+                archiveBaseName.set("${archiveBaseName.get()}-${publication.name}")
+            }
+            artifact(javadocJar)
         }
     }
 }

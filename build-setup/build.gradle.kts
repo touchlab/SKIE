@@ -1,7 +1,6 @@
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
-    id("com.osacky.doctor") version "0.8.1"
 }
 
 repositories {
@@ -27,35 +26,6 @@ dependencies {
 }
 
 gradlePlugin {
-    plugins.register("buildconfig") {
-        id = "skie-buildconfig"
-        implementationClass = "co.touchlab.skie.gradle.buildconfig.SkieBuildConfigPlugin"
-    }
-    plugins.register("debug") {
-        id = "skie-debug"
-        implementationClass = "co.touchlab.skie.gradle.debug.GradleScriptDebugPlugin"
-    }
-    plugins.register("jvm") {
-        id = "skie-jvm"
-        implementationClass = "co.touchlab.skie.gradle.kotlin.SkieKotlinJvmPlugin"
-    }
-    plugins.register("multiplatform") {
-        id = "skie-multiplatform"
-        implementationClass = "co.touchlab.skie.gradle.kotlin.SkieKotlinMultiplatformPlugin"
-    }
-    plugins.register("publish-jvm") {
-        id = "skie-publish-jvm"
-        implementationClass = "co.touchlab.skie.gradle.publish.SkiePublishJvmPlugin"
-    }
-    plugins.register("publish-multiplatform") {
-        id = "skie-publish-multiplatform"
-        implementationClass = "co.touchlab.skie.gradle.publish.SkiePublishMultiplatformPlugin"
-    }
-    plugins.register("publish-gradle") {
-        id = "skie-publish-gradle"
-        implementationClass = "co.touchlab.skie.gradle.publish.SkiePublishGradlePlugin"
-    }
-
     plugins.register("dev.acceptance-tests") {
         id = "dev.acceptance-tests"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.DevAcceptanceTests"
@@ -119,6 +89,11 @@ gradlePlugin {
     plugins.register("skie.publishable") {
         id = "skie.publishable"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkiePublishable"
+    }
+
+    plugins.register("skie.root") {
+        id = "skie.root"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRoot"
     }
 
     plugins.register("skie.runtime") {

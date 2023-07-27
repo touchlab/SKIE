@@ -9,6 +9,11 @@ plugins {
     id("dev.buildconfig")
 }
 
+skiePublishing {
+    name = "SKIE Gradle Plugin Loader"
+    description = "Gradle plugin that loads the correct SKIE version based on Kotlin and Gradle versions."
+}
+
 buildConfig {
     val gradlePlugin = projects.gradle.gradlePlugin.dependencyProject
     // TODO Rename to SKIE_GRADLE_PLUGIN
@@ -78,11 +83,10 @@ gradlePlugin {
 
             description = "A Gradle plugin to add Swift into Kotlin/Native framework."
             tags = listOf(
-                "plugin",
-                "gradle",
                 "swift",
                 "kotlin",
                 "native",
+                "compiler",
             )
         }
     }

@@ -5,7 +5,11 @@ plugins {
     id("skie.publishable")
 }
 
-publishCode()
+skiePublishing {
+    name = "SKIE Configuration Annotations"
+    description = "Annotations to configure SKIE behavior."
+    publishSources = true
+}
 
 kotlin {
     jvm()

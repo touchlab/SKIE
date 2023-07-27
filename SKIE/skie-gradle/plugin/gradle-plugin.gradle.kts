@@ -7,6 +7,11 @@ plugins {
     id("dev.buildconfig")
 }
 
+skiePublishing {
+    name = "SKIE Gradle Plugin"
+    description = "Gradle plugin for configuring SKIE compiler plugin.."
+}
+
 kotlin {
     sourceSets {
         val commonMain by getting {
