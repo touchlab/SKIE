@@ -19,20 +19,28 @@ abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigni
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<MavenPublishPlugin>()
-        apply<SigningPlugin>()
+        configureSigningIfNeeded()
 
         val extension = extensions.create<SkiePublishingExtension>("skiePublishing")
 
         configureMetadata(extension)
-        configureSigning()
         configureKotlinJvmPublicationIfNeeded()
         configureSourcesJar(extension)
         configureJavadocJar()
     }
 
-    private fun Project.configureSigning() {
-        publishing.publications.withType<MavenPublication>().configureEach {
-            signing.sign(this)
+    private fun Project.configureSigningIfNeeded() {
+        val shouldSign = !version.toString().endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publishToSonatype")
+        if (shouldSign) {
+            apply<SigningPlugin>()
+            val signingKey: String? by project
+            val signingPassword: String? by project
+            if (!signingKey.isNullOrBlank()) {
+                signing.useInMemoryPgpKeys(signingKey, signingPassword)
+            }
+            publishing.publications.withType<MavenPublication>().configureEach {
+                signing.sign(this)
+            }
         }
     }
 

@@ -22,8 +22,10 @@ jobs:
           distribution: adopt
           java-version: 11
       # TODO Ensure all tests pass
-      - name: Publish on AWS
-        run: ./gradlew --project-dir plugin publishAllPublicationsToAwsRepository
+      - name: Publish to Maven Central
+        run: ./gradlew --project-dir SKIE publishToSonatype closeSonatypeStagingRepository
         env:
-          AWS_TOUCHLAB_DEPLOY_ACCESS: ${{ secrets.AWS_TOUCHLAB_DEPLOY_ACCESS }}
-          AWS_TOUCHLAB_DEPLOY_SECRET: ${{ secrets.AWS_TOUCHLAB_DEPLOY_PRIVATE }}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ""
