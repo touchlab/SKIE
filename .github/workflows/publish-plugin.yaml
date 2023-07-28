@@ -23,7 +23,10 @@ jobs:
           java-version: 11
       # TODO Ensure all tests pass
       - name: Publish to Maven Central
-        run: ./gradlew --project-dir SKIE publishToSonatype closeSonatypeStagingRepository
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: 'publishToSonatype closeSonatypeStagingRepository'
+          build-root-directory: SKIE
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
