@@ -30,7 +30,10 @@ abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigni
     }
 
     private fun Project.configureSigningIfNeeded() {
-        val shouldSign = !version.toString().endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publishToSonatype")
+        val isRelease = !version.toString().endsWith("SNAPSHOT")
+        val isPublishing = gradle.startParameter.taskNames.contains("publishToSonatype")
+        println("Configuring signing for project ${name} (isRelease: $isRelease, isPublishing: $isPublishing)")
+        val shouldSign = isRelease && isPublishing
         if (shouldSign) {
             apply<SigningPlugin>()
             val signingKey: String? by project
