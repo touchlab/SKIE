@@ -92,6 +92,11 @@ abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigni
     }
 
     private fun Project.configureSourcesJar(extension: SkiePublishingExtension): Unit = afterEvaluate {
+        // Gradle plugin already sets up Sources publishing
+        if (plugins.hasPlugin(JavaGradlePluginPlugin::class.java)) {
+            return@afterEvaluate
+        }
+
         // Disable sources publishing for Kotlin Multiplatform modules
         if (!extension.publishSources.get()) {
             if (plugins.hasPlugin(KotlinMultiplatformPluginWrapper::class.java)) {
@@ -118,6 +123,11 @@ abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigni
     }
 
     private fun Project.configureJavadocJar() = afterEvaluate {
+        // Gradle plugin already sets up Javadoc publishing
+        if (plugins.hasPlugin(JavaGradlePluginPlugin::class.java)) {
+            return@afterEvaluate
+        }
+
         publishing.publications.withType<MavenPublication> {
             val publication = this
             val javadocJar = tasks.register("${publication.name}JavadocJar", Jar::class) {
@@ -127,5 +137,6 @@ abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigni
             }
             artifact(javadocJar)
         }
+
     }
 }
