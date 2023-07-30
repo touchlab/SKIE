@@ -33,14 +33,14 @@ kotlin {
 configurations.configureEach {
     attributes {
         @Suppress("UnstableApiUsage")
-        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("7.3"))
+        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersionDimension().components.min().value))
     }
 }
 
 dependencies {
     implementation(projects.gradle.gradlePluginApi)
     api(projects.common.configuration.configurationDeclaration)
-    compileOnly("dev.gradleplugins:gradle-api:7.3")
+    compileOnly("dev.gradleplugins:gradle-api:${gradleApiVersionDimension().components.min().value}")
 
     testImplementation(kotlin("test"))
 }

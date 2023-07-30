@@ -1,6 +1,8 @@
 package co.touchlab.skie.plugin.dependencies
 
+import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.util.named
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 
@@ -16,6 +18,10 @@ internal object SkieCompilerPluginDependencyProvider {
         val skieCompilerPluginConfiguration = project.configurations.create(configurationName) {
             isCanBeConsumed = false
             isCanBeResolved = true
+
+            attributes {
+                attribute(KotlinCompilerVersion.attribute, project.objects.named(BuildConfig.KOTLIN_TOOLING_VERSION))
+            }
 
             exclude(
                 mapOf(

@@ -9,7 +9,7 @@ plugins {
 }
 
 nexusPublishing {
-    repositories {
+    this.repositories {
         sonatype()
     }
 }

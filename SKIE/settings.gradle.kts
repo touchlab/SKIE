@@ -1,3 +1,5 @@
+import java.util.Properties
+
 rootProject.name = "SKIE"
 
 pluginManagement {
@@ -24,6 +26,17 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         google()
+    }
+}
+
+val skieProperties = Properties()
+file("skie.gradle.properties").inputStream().use {
+    skieProperties.load(it)
+}
+skieProperties.stringPropertyNames().forEach { propertyName ->
+    val propertyValue = skieProperties.getProperty(propertyName)
+    if (propertyValue != null) {
+        extra[propertyName] = propertyValue
     }
 }
 
