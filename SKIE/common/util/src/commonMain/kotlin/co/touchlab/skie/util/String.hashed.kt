@@ -8,6 +8,5 @@ fun String.hashed(): String {
 
     val hash = digest.digest(toByteArray())
 
-    return Base64.getEncoder().encodeToString(hash)
+    return hash.joinToString("") { "%02x".format(it) }
 }
-

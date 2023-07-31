@@ -1,6 +1,13 @@
 package co.touchlab.skie.plugin.analytics
 
-import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
+import co.touchlab.skie.plugin.analytics.environment.AnonymousGradleEnvironmentAnalytics
+import co.touchlab.skie.plugin.analytics.git.AnonymousGitAnalytics
+import co.touchlab.skie.plugin.analytics.git.IdentifyingGitAnalytics
+import co.touchlab.skie.plugin.analytics.hardware.AnonymousHardwareAnalytics
+import co.touchlab.skie.plugin.analytics.hardware.TrackingHardwareAnalytics
+import co.touchlab.skie.plugin.analytics.performance.AnonymousGradlePerformanceAnalytics
+import co.touchlab.skie.plugin.analytics.project.IdentifyingProjectAnalytics
+import co.touchlab.skie.plugin.analytics.project.TrackingProjectAnalytics
 import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
@@ -25,13 +32,44 @@ internal class GradleAnalyticsManager(
             )
         }
 
-        configureAnalyticsTask(linkTask)
+        configureUploadAnalyticsTask(linkTask)
 
-        configurePerformanceAnalytics(linkTask, analyticsCollectorProvider)
-        collectGradleAnalytics(linkTask, analyticsCollectorProvider)
+        registerAnalyticsProducers(linkTask, analyticsCollectorProvider)
     }
 
-    private fun configurePerformanceAnalytics(
+    private fun configureUploadAnalyticsTask(linkTask: KotlinNativeLink) {
+        val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieUploadAnalyticsTask>("uploadAnalytics") {
+            this.analyticsDirectory.set(linkTask.skieDirectories.buildDirectory.analytics.directory)
+
+            dependsOn(linkTask.createSkieBuildDirectoryTask)
+        }
+
+        linkTask.finalizedBy(finalizeTask)
+    }
+
+    private fun registerAnalyticsProducers(
+        linkTask: KotlinNativeLink,
+        analyticsCollectorProvider: Provider<AnalyticsCollector>,
+    ) {
+        linkTask.doFirstOptimized {
+            analyticsCollectorProvider.get().collect(
+                AnonymousGradleEnvironmentAnalytics.Producer(project),
+
+                AnonymousGitAnalytics.Producer(project),
+                IdentifyingGitAnalytics.Producer(project),
+
+                TrackingHardwareAnalytics.Producer,
+                AnonymousHardwareAnalytics.Producer,
+
+                IdentifyingProjectAnalytics.Producer(project),
+                TrackingProjectAnalytics.Producer(project),
+            )
+        }
+
+        registerPerformanceAnalyticsProducer(linkTask, analyticsCollectorProvider)
+    }
+
+    private fun registerPerformanceAnalyticsProducer(
         linkTask: KotlinNativeLink,
         analyticsCollectorProvider: Provider<AnalyticsCollector>,
     ) {
@@ -44,28 +82,8 @@ internal class GradleAnalyticsManager(
         linkTask.doLastOptimized {
             val linkTaskDuration = Duration.ofMillis(System.currentTimeMillis() - start)
 
-            analyticsCollectorProvider.get().collect(GradlePerformanceAnalyticsProducer(linkTaskDuration))
-        }
-    }
-
-    private fun configureAnalyticsTask(linkTask: KotlinNativeLink) {
-        val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieAnalyticsUploadTask>("analyticsUpload") {
-            this.analyticsDirectory.set(linkTask.skieDirectories.buildDirectory.analytics.directory)
-
-            dependsOn(linkTask.createSkieBuildDirectoryTask)
-        }
-
-        linkTask.finalizedBy(finalizeTask)
-    }
-
-    private fun collectGradleAnalytics(
-        linkTask: KotlinNativeLink,
-        analyticsCollectorProvider: Provider<AnalyticsCollector>,
-    ) {
-        linkTask.doFirstOptimized {
-            analyticsCollectorProvider.get().collect(
-                GradleAnalyticsProducer(project),
-                OpenSourceAnalyticsProducer(project),
+            analyticsCollectorProvider.get().collectSynchronously(
+                AnonymousGradlePerformanceAnalytics.Producer(linkTaskDuration)
             )
         }
     }

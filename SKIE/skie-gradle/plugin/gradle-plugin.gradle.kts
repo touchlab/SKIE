@@ -25,6 +25,9 @@ kotlin {
                 compileOnly(projects.gradle.gradlePluginApi)
                 compileOnly(projects.common.configuration.configurationDeclaration)
 
+                implementation(libs.ci.info)
+                implementation(libs.jgit)
+
                 implementation(projects.common.analytics)
                 implementation(projects.common.util)
             }

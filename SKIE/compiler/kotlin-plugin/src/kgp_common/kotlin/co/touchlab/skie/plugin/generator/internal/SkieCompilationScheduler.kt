@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.generator.internal
 
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.generator.internal.analytics.AnalyticsPhase
+import co.touchlab.skie.analytics.AnalyticsPhase
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowConversionConstructorsGenerator

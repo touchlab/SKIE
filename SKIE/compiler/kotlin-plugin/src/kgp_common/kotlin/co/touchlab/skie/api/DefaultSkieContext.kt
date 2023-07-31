@@ -1,9 +1,9 @@
 package co.touchlab.skie.api
 
-import co.touchlab.skie.plugin.analytics.producer.AnalyticsCollector
+import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
-import co.touchlab.skie.plugin.api.analytics.SkiePerformanceAnalyticsProducer
+import co.touchlab.skie.analytics.performance.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.util.FrameworkLayout

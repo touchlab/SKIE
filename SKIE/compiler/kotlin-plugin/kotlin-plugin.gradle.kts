@@ -31,7 +31,6 @@ kotlin {
                 implementation(libs.jackson.databind)
                 implementation(libs.ktor.client.java)
                 implementation(libs.apache.compress)
-                implementation(libs.jgit)
             }
         }
     }
