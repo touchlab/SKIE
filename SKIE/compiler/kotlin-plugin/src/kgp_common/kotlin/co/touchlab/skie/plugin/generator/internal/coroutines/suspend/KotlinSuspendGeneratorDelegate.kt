@@ -15,11 +15,18 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.util.createValu
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeProjectionImpl
+import org.jetbrains.kotlin.types.TypeUtils
+import org.jetbrains.kotlin.types.typeUtil.extractTypeParametersFromUpperBounds
+import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsByParametersWith
+import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 
 internal class KotlinSuspendGeneratorDelegate(
     private val module: SkieModule,
@@ -57,8 +64,10 @@ internal class KotlinSuspendGeneratorDelegate(
             namespace = declarationBuilder.getPackageNamespace(functionDescriptor),
             annotations = Annotations.EMPTY,
         ) {
-            valueParameters = functionDescriptor.createValueParametersForBridgingFunction(descriptor)
-            typeParameters = functionDescriptor.typeParameters.copy(descriptor)
+            val capturedTypeParameters = functionDescriptor.typeParameters.copy(descriptor).toMutableList()
+
+            valueParameters = functionDescriptor.createValueParametersForBridgingFunction(descriptor, capturedTypeParameters)
+            typeParameters = capturedTypeParameters
             returnType = functionDescriptor.builtIns.unitType
             isSuspend = false
             modality = Modality.FINAL
@@ -70,12 +79,13 @@ internal class KotlinSuspendGeneratorDelegate(
 
     private fun FunctionDescriptor.createValueParametersForBridgingFunction(
         bridgingFunctionDescriptor: FunctionDescriptor,
+        typeParameters: MutableList<TypeParameterDescriptor>,
     ): List<ValueParameterDescriptor> {
         val parameters = mutableListOf<ValueParameterDescriptor>()
 
-        parameters.addDispatchReceiver(this, bridgingFunctionDescriptor)
-        parameters.addExtensionReceiver(this, bridgingFunctionDescriptor)
-        parameters.addCopiedValueParameters(this, bridgingFunctionDescriptor)
+        parameters.addDispatchReceiver(this, bridgingFunctionDescriptor, typeParameters)
+        parameters.addExtensionReceiver(this, bridgingFunctionDescriptor, typeParameters)
+        parameters.addCopiedValueParameters(this, bridgingFunctionDescriptor, typeParameters)
         parameters.addSuspendHandler(this, bridgingFunctionDescriptor)
 
         return parameters
@@ -84,13 +94,14 @@ internal class KotlinSuspendGeneratorDelegate(
     private fun MutableList<ValueParameterDescriptor>.addDispatchReceiver(
         originalFunctionDescriptor: FunctionDescriptor,
         bridgingFunctionDescriptor: FunctionDescriptor,
+        typeParameters: MutableList<TypeParameterDescriptor>,
     ) {
         originalFunctionDescriptor.dispatchReceiverParameter?.let { dispatchReceiver ->
             val dispatchReceiverParameter = createValueParameter(
                 owner = bridgingFunctionDescriptor,
                 name = "dispatchReceiver".collisionFreeIdentifier(originalFunctionDescriptor.valueParameters),
                 index = this.size,
-                type = dispatchReceiver.type
+                type = dispatchReceiver.type.withTypeParametersReplaced(bridgingFunctionDescriptor, typeParameters),
             )
 
             module.configure {
@@ -104,13 +115,14 @@ internal class KotlinSuspendGeneratorDelegate(
     private fun MutableList<ValueParameterDescriptor>.addExtensionReceiver(
         originalFunctionDescriptor: FunctionDescriptor,
         bridgingFunctionDescriptor: FunctionDescriptor,
+        typeParameters: MutableList<TypeParameterDescriptor>,
     ) {
         originalFunctionDescriptor.extensionReceiverParameter?.let { extensionReceiver ->
             val extensionReceiverParameter = createValueParameter(
                 owner = bridgingFunctionDescriptor,
                 name = "extensionReceiver".collisionFreeIdentifier(originalFunctionDescriptor.valueParameters),
                 index = this.size,
-                type = extensionReceiver.type
+                type = extensionReceiver.type.withTypeParametersReplaced(bridgingFunctionDescriptor, typeParameters),
             )
 
             extensionReceiverParameter.configureExtensionReceiverFlowMapping(originalFunctionDescriptor)
@@ -133,9 +145,14 @@ internal class KotlinSuspendGeneratorDelegate(
     private fun MutableList<ValueParameterDescriptor>.addCopiedValueParameters(
         originalFunctionDescriptor: FunctionDescriptor,
         bridgingFunctionDescriptor: FunctionDescriptor,
+        typeParameters: MutableList<TypeParameterDescriptor>,
     ) {
         originalFunctionDescriptor.valueParameters.forEach {
-            val copy = it.copyWithoutDefaultValue(bridgingFunctionDescriptor, this.size)
+            val copy = it.copyWithoutDefaultValue(
+                bridgingFunctionDescriptor,
+                this.size,
+                newType = it.type.withTypeParametersReplaced(bridgingFunctionDescriptor, typeParameters),
+            )
 
             this.add(copy)
         }
@@ -160,5 +177,24 @@ internal class KotlinSuspendGeneratorDelegate(
             index = index,
             type = suspendHandlerDescriptor.defaultType,
         )
-}
 
+    private fun KotlinType.withTypeParametersReplaced(
+        bridgingFunctionDescriptor: FunctionDescriptor,
+        typeParameters: MutableList<TypeParameterDescriptor>,
+    ): KotlinType {
+        return TypeUtils.getTypeParameterDescriptorOrNull(this)?.let {
+            it.copy(
+                newOwner = bridgingFunctionDescriptor,
+                index = typeParameters.size,
+            ).also { typeParameters.add(it) }.defaultType
+        } ?: replaceArgumentsByParametersWith { originalTypeParameter ->
+            originalTypeParameter.copy(
+                newOwner = bridgingFunctionDescriptor,
+                index = typeParameters.size,
+            )
+            .also { typeParameters.add(it) }
+            .let { TypeProjectionImpl(it.defaultType) }
+
+        }
+    }
+}

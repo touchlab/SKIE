@@ -57,7 +57,10 @@ class SkieBuildDirectory(
 
         class Logs(parent: Directory) : TemporaryDirectory(parent, "logs") {
 
-            val swiftc: File = directory.resolve("swiftc.log")
+            val swiftc: File by lazy {
+                directory.mkdirs()
+                directory.resolve("swiftc.log")
+            }
 
             fun apiFile(baseName: String): File = directory.resolve("$baseName.log")
         }

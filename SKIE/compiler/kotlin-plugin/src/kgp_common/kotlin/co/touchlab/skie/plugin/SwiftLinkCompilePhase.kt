@@ -7,14 +7,11 @@ import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvide
 import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
-import co.touchlab.skie.plugin.api.DescriptorProviderKey
-import co.touchlab.skie.plugin.api.descriptorProvider
-import co.touchlab.skie.plugin.api.mutableDescriptorProvider
+import co.touchlab.skie.api.model.type.translation.impl.CommonBackendContextSwiftTranslationProblemCollector
+import co.touchlab.skie.plugin.api.*
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.skieBuildDirectory
-import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.ObjectFile
@@ -24,8 +21,10 @@ import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 
 class SwiftLinkCompilePhase(
     private val config: KonanConfig,
-    private val context: CommonBackendContext,
+    private val skieContext: SkieContext,
+    private val descriptorProvider: DescriptorProvider,
     private val namer: ObjCExportNamer,
+    private val problemCollector: SwiftTranslationProblemCollector,
 ) {
 
     // TODO Refactor to phases
@@ -45,9 +44,9 @@ class SwiftLinkCompilePhase(
         val builtinKotlinDeclarations = BuiltinDeclarations.Kotlin(namer)
 
         val translator = SwiftTypeTranslator(
-            descriptorProvider = context.descriptorProvider,
+            descriptorProvider = descriptorProvider,
             namer = namer,
-            problemCollector = SwiftTranslationProblemCollector.Default(context),
+            problemCollector = problemCollector,
             builtinSwiftBridgeableProvider = builtinSwiftBridgeableProvider,
             builtinKotlinDeclarations = builtinKotlinDeclarations,
             swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
@@ -55,16 +54,16 @@ class SwiftLinkCompilePhase(
 
         val swiftModelScope = DefaultSwiftModelScope(
             namer = namer,
-            descriptorProvider = context.descriptorProvider,
+            descriptorProvider = descriptorProvider,
             bridgeProvider = bridgeProvider,
             translator = translator,
             declarationRegistry = swiftIrDeclarationRegistry,
         )
 
         SkieLinkingPhaseScheduler(
-            skieContext = context.skieContext,
-            skieModule = context.skieContext.module as DefaultSkieModule,
-            context = context,
+            skieContext = skieContext,
+            skieModule = skieContext.module as DefaultSkieModule,
+            descriptorProvider = descriptorProvider,
             framework = framework,
             swiftModelScope = swiftModelScope,
             builtinKotlinDeclarations = builtinKotlinDeclarations,
@@ -72,6 +71,6 @@ class SwiftLinkCompilePhase(
             config = config,
         ).runLinkingPhases()
 
-        return context.skieContext.skieBuildDirectory.swiftCompiler.objectFiles.all.map { it.absolutePath }
+        return skieContext.skieBuildDirectory.swiftCompiler.objectFiles.all.map { it.absolutePath }
     }
 }

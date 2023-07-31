@@ -3,7 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="acceptanceTest" value="tests/bugs/class_name_collision_with_builtins/compiles" />
+          <entry key="acceptanceTest" value="enums/basic/single_case" />
         </map>
       </option>
       <option name="executionName" />
@@ -15,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:functional__kgp_1.8.0Test" />
+          <option value=":acceptance-tests:functional__kgp_1.9.0Test" />
         </list>
       </option>
       <option name="vmOptions" />
@@ -23,7 +23,7 @@
     <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
-    <ForceTestExec>false</ForceTestExec>
+    <RunAsTest>false</RunAsTest>
     <method v="2" />
   </configuration>
 </component>

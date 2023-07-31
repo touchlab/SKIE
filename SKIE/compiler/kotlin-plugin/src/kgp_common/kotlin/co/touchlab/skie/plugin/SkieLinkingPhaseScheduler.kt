@@ -20,6 +20,7 @@ import co.touchlab.skie.api.phases.typeconflicts.AddTypeDefPhase
 import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.descriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -29,8 +30,8 @@ import org.jetbrains.kotlin.konan.target.AppleConfigurables
 class SkieLinkingPhaseScheduler(
     private val skieContext: SkieContext,
     skieModule: DefaultSkieModule,
-    context: CommonBackendContext,
     framework: FrameworkLayout,
+    descriptorProvider: DescriptorProvider,
     swiftModelScope: DefaultSwiftModelScope,
     builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
     configurables: AppleConfigurables,
@@ -40,19 +41,19 @@ class SkieLinkingPhaseScheduler(
     private val objCTypeRenderer = ObjCTypeRenderer()
 
     private val linkingPhases = listOf(
-        DumpSwiftApiPhase.BeforeApiNotes(skieContext.skieConfiguration, context, framework),
-        RemoveKonanManglingPhase(skieModule, context.descriptorProvider),
-        RenameEnumRawValuePhase(skieModule, context.descriptorProvider),
-        FixCallableMembersConflictsPhase(skieModule, context.descriptorProvider),
-        FixClassesConflictsPhase(skieModule, context.descriptorProvider, builtinKotlinDeclarations, framework),
-        FixNestedBridgedTypesPhase(skieModule, context.descriptorProvider),
+        DumpSwiftApiPhase.BeforeApiNotes(skieContext.skieConfiguration, skieContext, framework),
+        RemoveKonanManglingPhase(skieModule, descriptorProvider),
+        RenameEnumRawValuePhase(skieModule, descriptorProvider),
+        FixCallableMembersConflictsPhase(skieModule, descriptorProvider),
+        FixClassesConflictsPhase(skieModule, descriptorProvider, builtinKotlinDeclarations, framework),
+        FixNestedBridgedTypesPhase(skieModule, descriptorProvider),
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
         SkieModuleConfigurationPhase(skieModule, swiftModelScope),
-        ApiNotesGenerationPhase(swiftModelScope, objCTypeRenderer, context, framework),
+        ApiNotesGenerationPhase(swiftModelScope, objCTypeRenderer, descriptorProvider, framework),
         AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
         AddTypeDefPhase(framework.kotlinHeader, objCTypeRenderer),
         DisableWildcardExportPhase(skieContext, framework),
-        DumpSwiftApiPhase.AfterApiNotes(skieContext.skieConfiguration, context, framework),
+        DumpSwiftApiPhase.AfterApiNotes(skieContext.skieConfiguration, skieContext, framework),
         GenerateSwiftCodePhase(skieContext, skieModule, swiftModelScope, framework),
         SwiftCacheSetupPhase(skieContext, framework),
         CompileSwiftPhase(skieContext, framework, configurables, config),

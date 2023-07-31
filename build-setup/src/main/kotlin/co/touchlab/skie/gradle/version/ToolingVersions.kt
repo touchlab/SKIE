@@ -15,6 +15,7 @@ object ToolingVersions {
         val `1․8․0` by version()
         val `1․8․10` by version()
         val `1․8․20` by version()
+        val `1․9․0` by version()
 
         fun version() = VersionProvider(::KotlinToolingVersion)
 

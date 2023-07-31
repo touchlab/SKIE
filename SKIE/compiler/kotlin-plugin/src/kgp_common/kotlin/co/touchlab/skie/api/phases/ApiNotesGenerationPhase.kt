@@ -4,6 +4,7 @@ import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
 import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.descriptorProvider
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -11,11 +12,11 @@ import org.jetbrains.kotlin.backend.common.CommonBackendContext
 class ApiNotesGenerationPhase(
     swiftModelScope: MutableSwiftModelScope,
     objCTypeRenderer: ObjCTypeRenderer,
-    context: CommonBackendContext,
+    descriptorProvider: DescriptorProvider,
     private val framework: FrameworkLayout,
 ) : SkieLinkingPhase {
 
-    private val apiNotesFactory = ApiNotesFactory(framework.moduleName, context.descriptorProvider, swiftModelScope, objCTypeRenderer)
+    private val apiNotesFactory = ApiNotesFactory(framework.moduleName, descriptorProvider, swiftModelScope, objCTypeRenderer)
 
     override fun execute() {
         val apiNotes = apiNotesFactory.create()

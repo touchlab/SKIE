@@ -57,5 +57,4 @@ class ExpectActualBuildConfigGenerator(
             if (internalVisibility) KModifier.INTERNAL else KModifier.PUBLIC,
             if (isActualImplementation) KModifier.ACTUAL else KModifier.EXPECT,
         )
-
 }

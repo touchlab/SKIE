@@ -7,14 +7,17 @@ import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 internal fun List<TypeParameterDescriptor>.copy(newOwner: CallableDescriptor): List<TypeParameterDescriptor> =
     this.map { it.copy(newOwner) }
 
-internal fun TypeParameterDescriptor.copy(newOwner: CallableDescriptor): TypeParameterDescriptor =
+internal fun TypeParameterDescriptor.copy(
+    newOwner: CallableDescriptor,
+    index: Int = this.index,
+): TypeParameterDescriptor =
     TypeParameterDescriptorImpl.createForFurtherModification(
         newOwner,
         this.annotations,
         this.isReified,
         this.variance,
         this.name,
-        this.index,
+        index,
         this.source,
         this.storageManager,
     ).also { copy ->

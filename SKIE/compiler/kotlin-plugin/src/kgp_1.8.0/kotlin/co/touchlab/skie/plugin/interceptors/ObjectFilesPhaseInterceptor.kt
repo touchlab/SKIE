@@ -1,8 +1,10 @@
 @file:Suppress("invisible_reference", "invisible_member")
 package co.touchlab.skie.plugin.interceptors
 
+import co.touchlab.skie.api.model.type.translation.impl.CommonBackendContextSwiftTranslationProblemCollector
 import co.touchlab.skie.plugin.SwiftLinkCompilePhase
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.intercept.SameTypePhaseInterceptor
 import org.jetbrains.kotlin.backend.konan.KonanConfig
@@ -36,9 +38,11 @@ internal class ObjectFilesPhaseInterceptor: SameTypePhaseInterceptor<KonanContex
         val configurables = config.platform.configurables as? AppleConfigurables ?: return emptyList()
 
         return SwiftLinkCompilePhase(
-            config,
-            context,
-            namer,
+            config = config,
+            skieContext = context.skieContext,
+            descriptorProvider = context.descriptorProvider,
+            namer = namer,
+            problemCollector = CommonBackendContextSwiftTranslationProblemCollector(context),
         ).process(
             configurables,
             config.outputFile,

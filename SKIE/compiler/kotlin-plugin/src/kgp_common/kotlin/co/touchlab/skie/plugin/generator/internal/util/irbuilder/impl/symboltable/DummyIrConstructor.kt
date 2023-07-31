@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 
 internal class DummyIrConstructor(override val symbol: IrConstructorSymbol) : IrConstructor() {
 
-    override val isPrimary: Boolean by unsupported()
+    override var isPrimary: Boolean by unsupported()
     override val startOffset: Int by unsupported()
     override val endOffset: Int by unsupported()
     override val factory: IrFactory by unsupported()
@@ -34,13 +34,13 @@ internal class DummyIrConstructor(override val symbol: IrConstructorSymbol) : Ir
     override val descriptor: ClassConstructorDescriptor by unsupported()
     override var dispatchReceiverParameter: IrValueParameter? by unsupported()
     override var extensionReceiverParameter: IrValueParameter? by unsupported()
-    override val isExpect: Boolean by unsupported()
-    override val isInline: Boolean by unsupported()
+    override var isExpect: Boolean by unsupported()
+    override var isInline: Boolean by unsupported()
     override var returnType: IrType by unsupported()
     override var valueParameters: List<IrValueParameter> by unsupported()
     override val containerSource: DeserializedContainerSource? by unsupported()
     override var metadata: MetadataSource? by unsupported()
     override var annotations: List<IrConstructorCall> by unsupported()
-    override val isExternal: Boolean by unsupported()
+    override var isExternal: Boolean by unsupported()
     override var typeParameters: List<IrTypeParameter> by unsupported()
 }

@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
+import org.jetbrains.kotlin.types.KotlinType
 
 internal fun List<ValueParameterDescriptor>.copyWithoutDefaultValue(newOwner: CallableDescriptor): List<ValueParameterDescriptor> =
     this.mapIndexed { index, valueParameter -> valueParameter.copyWithoutDefaultValue(newOwner, index) }
@@ -11,13 +12,14 @@ internal fun List<ValueParameterDescriptor>.copyWithoutDefaultValue(newOwner: Ca
 internal fun ValueParameterDescriptor.copyWithoutDefaultValue(
     newOwner: CallableDescriptor,
     newIndex: Int,
+    newType: KotlinType = this.type,
 ): ValueParameterDescriptor = ValueParameterDescriptorImpl(
     containingDeclaration = newOwner,
     original = null,
     index = newIndex,
     annotations = Annotations.EMPTY,
     name = this.name,
-    outType = this.type,
+    outType = newType,
     declaresDefaultValue = false,
     isCrossinline = this.isCrossinline,
     isNoinline = this.isNoinline,
