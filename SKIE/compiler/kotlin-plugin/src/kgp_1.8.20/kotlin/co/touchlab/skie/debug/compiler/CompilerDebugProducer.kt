@@ -2,13 +2,9 @@
 
 package co.touchlab.skie.debug.compiler
 
-import co.touchlab.skie.configuration.SkieFeature
 import co.touchlab.skie.debug.compiler.kgp_1820.CompilerConfigurationDump
-import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.UserVisibleIrModulesSupportReflector
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.backend.konan.BinaryOptions
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
@@ -20,14 +16,10 @@ import org.jetbrains.kotlin.utils.ResolvedDependency
 
 actual class CompilerDebugProducer actual constructor(
     private val config: KonanConfig,
-) : AnalyticsProducer {
+) {
 
-    override val name: String = "compiler"
-
-    override val feature: SkieFeature = SkieFeature.Analytics_Compiler
-
-    override fun produce(): String =
-        Json.encodeToString(getCompilerAnalytics())
+//    override fun produce(): String =
+//        Json.encodeToString(getCompilerAnalytics())
 
     private fun getCompilerAnalytics(): CompilerConfigurationDump =
         getFullCompilerAnalytics()

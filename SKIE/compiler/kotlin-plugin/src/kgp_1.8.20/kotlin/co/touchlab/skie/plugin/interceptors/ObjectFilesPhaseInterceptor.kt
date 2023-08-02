@@ -48,6 +48,6 @@ internal class ObjectFilesPhaseInterceptor: SameTypePhaseInterceptor<KonanContex
     }
 
     private fun logSkiePerformance(context: SkieContext) {
-        context.analyticsCollector.collect(context.skiePerformanceAnalyticsProducer)
+        context.analyticsCollector.collectAsync(context.skiePerformanceAnalyticsProducer)
     }
 }

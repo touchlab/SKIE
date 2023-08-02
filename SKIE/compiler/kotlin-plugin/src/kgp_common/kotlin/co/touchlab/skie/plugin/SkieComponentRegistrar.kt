@@ -1,12 +1,12 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.analytics.performance.AnonymousSkiePerformanceAnalytics
 import co.touchlab.skie.api.DefaultSkieContext
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContextKey
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
-import co.touchlab.skie.analytics.performance.SkiePerformanceAnalyticsProducer
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.SkieIrGenerationExtension
 import co.touchlab.skie.plugin.intercept.PhaseInterceptorRegistrar
@@ -41,7 +41,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
                 skieBuildDirectory = skieDirectories.buildDirectory,
                 skieConfiguration = skieConfiguration,
             ),
-            skiePerformanceAnalyticsProducer = SkiePerformanceAnalyticsProducer(skieConfiguration),
+            skiePerformanceAnalyticsProducer = AnonymousSkiePerformanceAnalytics.Producer(skieConfiguration),
         )
 
         configuration.put(SkieContextKey, skieContext)

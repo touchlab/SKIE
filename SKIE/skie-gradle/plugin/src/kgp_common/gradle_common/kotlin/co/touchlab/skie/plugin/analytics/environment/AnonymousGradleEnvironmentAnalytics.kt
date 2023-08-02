@@ -9,7 +9,7 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 internal data class AnonymousGradleEnvironmentAnalytics(
-    val jdkVersion: String,
+    val jvmVersion: String,
     val skieVersion: String,
     val gradleVersion: String,
     val kotlinVersion: String,
@@ -26,7 +26,7 @@ internal data class AnonymousGradleEnvironmentAnalytics(
 
         override fun produce(): String =
             AnonymousGradleEnvironmentAnalytics(
-                jdkVersion = Runtime.version().toString(),
+                jvmVersion = Runtime.version().toString(),
                 skieVersion = BuildConfig.SKIE_VERSION,
                 gradleVersion = project.gradle.gradleVersion,
                 kotlinVersion = project.getKotlinPluginVersion(),

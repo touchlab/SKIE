@@ -1,4 +1,4 @@
-package co.touchlab.skie.analytics
+package co.touchlab.skie.debug
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream

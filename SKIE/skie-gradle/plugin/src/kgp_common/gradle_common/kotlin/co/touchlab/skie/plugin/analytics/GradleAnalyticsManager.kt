@@ -52,7 +52,7 @@ internal class GradleAnalyticsManager(
         analyticsCollectorProvider: Provider<AnalyticsCollector>,
     ) {
         linkTask.doFirstOptimized {
-            analyticsCollectorProvider.get().collect(
+            analyticsCollectorProvider.get().collectAsync(
                 AnonymousGradleEnvironmentAnalytics.Producer(project),
 
                 AnonymousGitAnalytics.Producer(project),

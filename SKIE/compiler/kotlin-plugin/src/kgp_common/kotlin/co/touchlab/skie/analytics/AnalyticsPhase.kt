@@ -1,7 +1,11 @@
 package co.touchlab.skie.analytics
 
-import co.touchlab.skie.analytics.configuration.SkieConfigurationAnalyticsProducer
-import co.touchlab.skie.debug.compiler.CompilerDebugProducer
+import co.touchlab.skie.analytics.compiler.common.AnonymousCommonCompilerConfigurationAnalytics
+import co.touchlab.skie.analytics.compiler.common.IdentifyingCommonCompilerConfigurationAnalytics
+import co.touchlab.skie.analytics.compiler.specific.AnonymousSpecificCompilerConfigurationAnalytics
+import co.touchlab.skie.analytics.configuration.AnonymousSkieConfigurationAnalytics
+import co.touchlab.skie.analytics.configuration.IdentifyingSkieConfigurationAnalytics
+import co.touchlab.skie.analytics.environment.AnonymousCompilerEnvironmentAnalytics
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
@@ -16,9 +20,13 @@ internal class AnalyticsPhase(
     override val isActive: Boolean = true
 
     override fun runObjcPhase() {
-        skieContext.analyticsCollector.collect(
-            CompilerDebugProducer(config),
-            SkieConfigurationAnalyticsProducer(skieContext.skieConfiguration),
+        skieContext.analyticsCollector.collectAsync(
+            AnonymousCommonCompilerConfigurationAnalytics.Producer(config),
+            IdentifyingCommonCompilerConfigurationAnalytics.Producer(config),
+            AnonymousSpecificCompilerConfigurationAnalytics.Producer(config),
+            AnonymousSkieConfigurationAnalytics.Producer(skieContext.skieConfiguration),
+            IdentifyingSkieConfigurationAnalytics.Producer(skieContext.skieConfiguration),
+            AnonymousCompilerEnvironmentAnalytics.Producer(config),
         )
     }
 }

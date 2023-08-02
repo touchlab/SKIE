@@ -22,6 +22,7 @@ skie {
         dumpSwiftApiBeforeApiNotes.set(true)
         dumpSwiftApiAfterApiNotes.set(true)
         printSkiePerformanceLogs.set(true)
+        crashOnSoftErrors.set(true)
     }
 }
 

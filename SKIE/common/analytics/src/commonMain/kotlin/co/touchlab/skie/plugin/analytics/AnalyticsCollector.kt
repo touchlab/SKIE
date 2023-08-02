@@ -9,14 +9,14 @@ class AnalyticsCollector(
     private val skieConfiguration: TypedSkieConfiguration<SkieFeature>,
 ) {
 
-    fun collect(producers: List<AnalyticsProducer>) {
+    fun collectAsync(producers: List<AnalyticsProducer>) {
         Thread {
             collectSynchronously(producers)
         }.start()
     }
 
-    fun collect(vararg producers: AnalyticsProducer) {
-        collect(producers.toList())
+    fun collectAsync(vararg producers: AnalyticsProducer) {
+        collectAsync(producers.toList())
     }
 
     fun collectSynchronously(producers: List<AnalyticsProducer>) {
@@ -33,10 +33,26 @@ class AnalyticsCollector(
 
     private fun produceAndSave(producer: AnalyticsProducer) {
         if (producer.isEnabled) {
-            val analyticsResult = producer.produce()
+            val analyticsResult = try {
+                producer.produce()
+            } catch (e: Throwable) {
+                handleProducerError(e)
+            }
 
             skieBuildDirectory.analytics.file(producer.name).writeText(analyticsResult)
         }
+    }
+
+    private fun handleProducerError(e: Throwable): String {
+        if (SkieFeature.Debug_CrashOnSoftErrors in skieConfiguration.enabledFeatures) {
+            throw e
+        }
+
+        return """
+            {
+                "error": "${e.message}"
+            }
+            """.trimIndent()
     }
 
     private val AnalyticsProducer.isEnabled: Boolean

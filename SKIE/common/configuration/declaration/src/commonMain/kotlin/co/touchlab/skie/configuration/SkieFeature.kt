@@ -12,6 +12,7 @@ enum class SkieFeature {
     Debug_DumpSwiftApiBeforeApiNotes,
     Debug_DumpSwiftApiAfterApiNotes,
     Debug_PrintSkiePerformanceLogs,
+    Debug_CrashOnSoftErrors,
 
     Analytics_Identifying_Project,
     Analytics_Tracking_Project,
@@ -21,9 +22,10 @@ enum class SkieFeature {
     Analytics_Anonymous_Git,
     Analytics_Tracking_Hardware,
     Analytics_Anonymous_Hardware,
-
-    Analytics_CompilerEnvironment,
-    Analytics_SkiePerformance,
-    Analytics_SkieConfiguration,
-    Analytics_Compiler,
+    Analytics_Anonymous_CompilerEnvironment,
+    Analytics_Anonymous_SkiePerformance,
+    Analytics_Identifying_SkieConfiguration,
+    Analytics_Anonymous_SkieConfiguration,
+    Analytics_Anonymous_CompilerConfiguration,
+    Analytics_Identifying_CompilerConfiguration,
 }
