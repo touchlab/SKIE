@@ -6,7 +6,7 @@ import co.touchlab.skie.plugin.analytics.git.IdentifyingGitAnalytics
 import co.touchlab.skie.plugin.analytics.hardware.AnonymousHardwareAnalytics
 import co.touchlab.skie.plugin.analytics.performance.AnonymousGradlePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.project.IdentifyingProjectAnalytics
-import co.touchlab.skie.plugin.analytics.project.TrackingProjectAnalytics
+import co.touchlab.skie.plugin.analytics.project.AnonymousProjectAnalytics
 import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
@@ -67,7 +67,7 @@ internal class GradleAnalyticsManager(
                 AnonymousHardwareAnalytics.Producer,
 
                 IdentifyingProjectAnalytics.Producer(project),
-                TrackingProjectAnalytics.Producer(project),
+                AnonymousProjectAnalytics.Producer(project),
             )
         }
 

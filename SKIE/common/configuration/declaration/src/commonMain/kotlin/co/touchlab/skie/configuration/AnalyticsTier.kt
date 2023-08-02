@@ -13,15 +13,11 @@ enum class AnalyticsTier(val features: Set<SkieFeature>) {
         SkieFeature.Analytics_Anonymous_SkieConfiguration,
         SkieFeature.Analytics_Anonymous_CompilerConfiguration,
         SkieFeature.Analytics_Anonymous_Git,
-    ),
-
-    NoIdentifyingData(
-        Anonymous,
-        SkieFeature.Analytics_Tracking_Project,
+        SkieFeature.Analytics_Anonymous_Project,
     ),
 
     All(
-        NoIdentifyingData,
+        Anonymous,
         SkieFeature.Analytics_Identifying_SkieConfiguration,
         SkieFeature.Analytics_Identifying_CompilerConfiguration,
         SkieFeature.Analytics_Identifying_Git,

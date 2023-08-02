@@ -15,7 +15,7 @@ enum class SkieFeature {
     Debug_CrashOnSoftErrors,
 
     Analytics_Identifying_Project,
-    Analytics_Tracking_Project,
+    Analytics_Anonymous_Project,
     Analytics_Anonymous_GradlePerformance,
     Analytics_Anonymous_GradleEnvironment,
     Analytics_Identifying_Git,
