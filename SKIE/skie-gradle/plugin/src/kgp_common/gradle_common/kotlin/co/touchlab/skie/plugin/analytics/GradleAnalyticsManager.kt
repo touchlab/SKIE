@@ -4,7 +4,6 @@ import co.touchlab.skie.plugin.analytics.environment.AnonymousGradleEnvironmentA
 import co.touchlab.skie.plugin.analytics.git.AnonymousGitAnalytics
 import co.touchlab.skie.plugin.analytics.git.IdentifyingGitAnalytics
 import co.touchlab.skie.plugin.analytics.hardware.AnonymousHardwareAnalytics
-import co.touchlab.skie.plugin.analytics.hardware.TrackingHardwareAnalytics
 import co.touchlab.skie.plugin.analytics.performance.AnonymousGradlePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.project.IdentifyingProjectAnalytics
 import co.touchlab.skie.plugin.analytics.project.TrackingProjectAnalytics
@@ -38,13 +37,20 @@ internal class GradleAnalyticsManager(
     }
 
     private fun configureUploadAnalyticsTask(linkTask: KotlinNativeLink) {
-        val finalizeTask = linkTask.registerSkieLinkBasedTask<SkieUploadAnalyticsTask>("uploadAnalytics") {
+        val uploadTask = linkTask.registerSkieLinkBasedTask<SkieUploadAnalyticsTask>("uploadAnalytics") {
             this.analyticsDirectory.set(linkTask.skieDirectories.buildDirectory.analytics.directory)
+            this.applicationSupportDirectory.set(linkTask.skieDirectories.applicationSupport)
 
             dependsOn(linkTask.createSkieBuildDirectoryTask)
         }
 
-        linkTask.finalizedBy(finalizeTask)
+        linkTask.finalizedBy(uploadTask)
+
+        linkTask.project.afterEvaluate {
+            uploadTask.configure {
+                isEnabled = !project.skieExtension.analytics.disableUpload.get()
+            }
+        }
     }
 
     private fun registerAnalyticsProducers(
@@ -58,7 +64,6 @@ internal class GradleAnalyticsManager(
                 AnonymousGitAnalytics.Producer(project),
                 IdentifyingGitAnalytics.Producer(project),
 
-                TrackingHardwareAnalytics.Producer,
                 AnonymousHardwareAnalytics.Producer,
 
                 IdentifyingProjectAnalytics.Producer(project),

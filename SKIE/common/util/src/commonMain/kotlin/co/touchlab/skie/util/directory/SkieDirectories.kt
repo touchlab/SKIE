@@ -7,4 +7,9 @@ class SkieDirectories(
 ) {
 
     val buildDirectory: SkieBuildDirectory = SkieBuildDirectory(skieBuildRootDirectory)
+
+    val applicationSupport: SkieApplicationSupportDirectory =
+        File(System.getProperty("user.home"))
+            .resolve("Library/Application Support/SKIE")
+            .let { SkieApplicationSupportDirectory(it) }
 }

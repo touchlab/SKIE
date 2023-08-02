@@ -20,7 +20,6 @@ enum class SkieFeature {
     Analytics_Anonymous_GradleEnvironment,
     Analytics_Identifying_Git,
     Analytics_Anonymous_Git,
-    Analytics_Tracking_Hardware,
     Analytics_Anonymous_Hardware,
     Analytics_Anonymous_CompilerEnvironment,
     Analytics_Anonymous_SkiePerformance,

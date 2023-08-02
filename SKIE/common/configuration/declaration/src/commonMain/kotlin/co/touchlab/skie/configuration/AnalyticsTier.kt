@@ -18,7 +18,6 @@ enum class AnalyticsTier(val features: Set<SkieFeature>) {
     NoIdentifyingData(
         Anonymous,
         SkieFeature.Analytics_Tracking_Project,
-        SkieFeature.Analytics_Tracking_Hardware,
     ),
 
     All(
