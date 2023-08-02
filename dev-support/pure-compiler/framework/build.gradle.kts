@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 
 plugins {
-    id("skie-multiplatform")
+    id("dev.multiplatform")
 }
 
 kotlin {

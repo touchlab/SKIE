@@ -3,7 +3,7 @@ import co.touchlab.skie.configuration.ExperimentalFeatures
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
-    id("skie-multiplatform")
+    id("dev.multiplatform")
 
     id("co.touchlab.skie")
     // id("dev.co.touchlab.skie")
