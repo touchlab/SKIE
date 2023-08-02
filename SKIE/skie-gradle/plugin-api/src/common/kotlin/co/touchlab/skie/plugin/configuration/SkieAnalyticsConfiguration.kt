@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 abstract class SkieAnalyticsConfiguration @Inject constructor(objects: ObjectFactory) {
 
-    val tier: Property<AnalyticsTier> = objects.property(AnalyticsTier::class.java).convention(AnalyticsTier.None)
+    val tier: Property<AnalyticsTier> = objects.property(AnalyticsTier::class.java).convention(AnalyticsTier.All)
     val disableUpload: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     internal fun buildFeatureSet(): Set<SkieFeature> = tier.get().features
