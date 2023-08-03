@@ -2,6 +2,7 @@
 package co.touchlab.skie.plugin.interceptors
 
 import co.touchlab.skie.api.model.type.translation.impl.PhaseContextSwiftTranslationProblemCollector
+import co.touchlab.skie.osversion.MinOSVersionConfigurator
 import co.touchlab.skie.plugin.SwiftLinkCompilePhase
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.descriptorProvider
@@ -36,6 +37,8 @@ internal class CreateObjCExportCodeSpecPhaseInterceptor: PhaseInterceptor<PsiToI
         input: ObjCExportedInterface,
         next: (PsiToIrContext, ObjCExportedInterface) -> ObjCExportCodeSpec,
     ): ObjCExportCodeSpec {
+        MinOSVersionConfigurator.configure(context.config.configuration, context.config)
+
         context.config.skieDeclarationBuilder.declareSymbols(context.symbolTable!!)
 
         val codeSpec = next(context, input)

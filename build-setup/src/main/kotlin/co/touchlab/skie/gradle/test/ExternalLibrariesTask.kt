@@ -154,7 +154,6 @@ abstract class ExternalLibrariesTask: DefaultTask() {
         resolutionProjectDir.resolve("input").writeText(
             librariesToTest.joinToString("\n") { "$it:+" }
         )
-
         runSubGradle(
             projectDir = resolutionProjectDir,
             imports = listOf(
@@ -186,7 +185,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                                 attribute(Attribute.of("co.touchlab.skie.test.library", String::class.java), "library_${'$'}index")
                             }
                         }
-                        project.configurations.named(this.name + "DebugFrameworkIosFat").configure {
+                        project.configurations.matching { it.name == this.name + "DebugFrameworkIosFat" }.configureEach {
                             attributes {
                                 attribute(Attribute.of("co.touchlab.skie.test.library", String::class.java), "library_${'$'}index")
                                 attribute(Attribute.of("co.touchlab.skie.test.disambiguate", String::class.java), "fat framework")

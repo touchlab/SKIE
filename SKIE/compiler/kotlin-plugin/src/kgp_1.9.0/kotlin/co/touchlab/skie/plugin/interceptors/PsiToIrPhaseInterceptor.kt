@@ -12,8 +12,6 @@ internal class PsiToIrPhaseInterceptor: PhaseInterceptor<PsiToIrContext, PsiToIr
     override fun getInterceptedPhase(): Any = PsiToIrPhase
 
     override fun intercept(context: PsiToIrContext, input: PsiToIrInput, next: (PsiToIrContext, PsiToIrInput) -> PsiToIrOutput): PsiToIrOutput {
-        MinOSVersionConfigurator.configure(context.config.configuration, context.config)
-
         return next(context, input)
     }
 }

@@ -49,9 +49,5 @@ internal actual class DummyIrSimpleFunction actual constructor(
     override var isOperator: Boolean by unsupported()
     override var isSuspend: Boolean by unsupported()
     override var isTailrec: Boolean by unsupported()
-    override var typeParameters: List<IrTypeParameter> = emptyList()  //by unsupported()
-
-    init {
-        symbol.bind(this)
-    }
+    override var typeParameters: List<IrTypeParameter> by unsupported()
 }

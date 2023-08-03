@@ -59,8 +59,15 @@ internal class SecondaryConstructorTemplate(
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
         val symbolFactory = { IrRebindableConstructorPublicSymbol(signature, descriptor) }
+        val functionFactory = { symbol: IrConstructorSymbol ->
+            DummyIrConstructor(symbol).also {
+                // We need to bind to the symbol to overcome a check in the `declareSimpleFunction` method ...
+                symbol.bind(it)
+            }
+        }
 
-        symbolTable.declareConstructor(signature, symbolFactory, ::DummyIrConstructor)
+        val declaration = symbolTable.declareConstructor(signature, symbolFactory, functionFactory)
+        (declaration.symbol as IrRebindableConstructorPublicSymbol).unbind()
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)

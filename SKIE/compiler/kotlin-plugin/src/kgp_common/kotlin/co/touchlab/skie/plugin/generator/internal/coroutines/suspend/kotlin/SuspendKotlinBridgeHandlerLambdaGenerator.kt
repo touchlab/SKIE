@@ -124,7 +124,7 @@ internal class SuspendKotlinBridgeHandlerLambdaGenerator {
     }
 
     private fun IrCall.setTypeArgumentsForDelegatingCall(bridgeFunction: IrSimpleFunction) {
-        bridgeFunction.typeParameters.forEach {
+        bridgeFunction.typeParameters.take(this.symbol.owner.typeParameters.size).forEach {
             putTypeArgument(it.index, it.defaultType)
         }
     }

@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:type-mapping__kgp_1.8.0Test" />
+          <option value=":acceptance-tests:type-mapping__kgp_1.9.0Test" />
         </list>
       </option>
       <option name="vmOptions" />
@@ -18,7 +18,7 @@
     <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
-    <ForceTestExec>false</ForceTestExec>
+    <RunAsTest>false</RunAsTest>
     <method v="2" />
   </configuration>
 </component>

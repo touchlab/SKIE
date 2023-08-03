@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.irUnit
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 
 internal class ExtraClassExportPhase(
     override val skieContext: SkieContext,
@@ -104,7 +105,7 @@ internal class ExtraClassExportPhase(
                     owner = descriptor,
                     name = Name.identifier("p${index}"),
                     index = index,
-                    type = classDescriptor.defaultType,
+                    type = classDescriptor.defaultType.replaceArgumentsWithStarProjections(),
                 )
             }
 

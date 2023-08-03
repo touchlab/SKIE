@@ -10,6 +10,7 @@ import co.touchlab.skie.plugin.generator.internal.util.InternalDescriptorProvide
 import co.touchlab.skie.plugin.generator.internal.util.NativeDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.SharedCounter
 import co.touchlab.skie.plugin.generator.internal.util.ir.copy
+import co.touchlab.skie.plugin.generator.internal.util.ir.copyIndexing
 import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValue
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
@@ -17,9 +18,12 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.getNamespace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irBlockBody
@@ -29,6 +33,8 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.resolve.calls.inference.returnTypeOrNothing
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsByParametersWith
 
 internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
@@ -73,10 +79,27 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             namespace = declarationBuilder.getNamespace(function),
             annotations = function.annotations,
         ) {
+            val typeParameterMappingPairs = function.typeParameters.zip(function.typeParameters.copyIndexing(descriptor))
+            val typeParameterSubstitutor = TypeSubstitutor.create(
+                TypeConstructorSubstitution.createByParametersMap(
+                    typeParameterMappingPairs.associate { (from, into) ->
+                        from to TypeProjectionImpl(into.defaultType)
+                    }
+                )
+            )
+
             dispatchReceiverParameter = function.dispatchReceiverParameter
             extensionReceiverParameter = function.extensionReceiverParameter
-            valueParameters = parameters.copyWithoutDefaultValue(descriptor)
-            typeParameters = function.typeParameters.copy(descriptor)
+                ?.copy(descriptor)
+                ?.substitute(typeParameterSubstitutor)
+            typeParameters = typeParameterMappingPairs.map { it.second }
+            valueParameters = parameters.mapIndexed { index, parameter ->
+                parameter.copyWithoutDefaultValue(
+                    newOwner = descriptor,
+                    newIndex = index,
+                    newType = typeParameterSubstitutor.safeSubstitute(parameter.type, Variance.INVARIANT)
+                )
+            } // parameters.copyWithoutDefaultValue(descriptor, typeParameters)
             returnType = function.returnTypeOrNothing
             isInline = function.isInline
             isSuspend = function.isSuspend
@@ -113,4 +136,20 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             overloadDescriptor.swiftModel.collisionResolutionStrategy = CollisionResolutionStrategy.Remove(numberOfDefaultArguments)
         }
     }
+
+//    private fun ReceiverParameterDescriptor.copy(
+//        newOwner: DeclarationDescriptor = this.containingDeclaration,
+//        newType:
+//    ): ReceiverParameterDescriptor {
+//
+//    }
+
+//    private fun KotlinType.withTypeParametersReplaced(
+//        typeParameterMapping: Map<TypeParameterDescriptor, TypeParameterDescriptor>,
+//    ): KotlinType {
+//
+//        replaceArgumentsByParametersWith {
+//
+//        }
+//    }
 }

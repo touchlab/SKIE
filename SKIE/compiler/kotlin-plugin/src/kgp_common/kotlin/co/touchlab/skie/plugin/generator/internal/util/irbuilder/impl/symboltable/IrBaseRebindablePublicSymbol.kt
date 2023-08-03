@@ -11,14 +11,20 @@ internal abstract class IrBaseRebindablePublicSymbol<out D : DeclarationDescript
     descriptor: D,
 ) : IrBindableSymbol<D, B>, IrPublicSymbolBase<D>(signature, descriptor) {
 
-    override lateinit var owner: B
+    private var _owner: B? = null
+    override val owner: B
+        get() = _owner ?: throw IllegalStateException("Symbol is not bound")
 
     override fun bind(owner: B) {
-        this.owner = owner
+        this._owner = owner
+    }
+
+    fun unbind() {
+        this._owner = null
     }
 
     override val isBound: Boolean
-        get() = ::owner.isInitialized
+        get() = _owner != null
 
     override var privateSignature: IdSignature? = null
 }

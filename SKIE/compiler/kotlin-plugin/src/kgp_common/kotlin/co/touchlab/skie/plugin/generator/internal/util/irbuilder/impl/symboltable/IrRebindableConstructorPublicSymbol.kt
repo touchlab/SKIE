@@ -7,4 +7,4 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrBindablePublicSymbolBase
 import org.jetbrains.kotlin.ir.util.IdSignature
 
 internal class IrRebindableConstructorPublicSymbol(signature: IdSignature, descriptor: ClassConstructorDescriptor) :
-    IrBindablePublicSymbolBase<ClassConstructorDescriptor, IrConstructor>(signature, descriptor), IrConstructorSymbol
+    IrBaseRebindablePublicSymbol<ClassConstructorDescriptor, IrConstructor>(signature, descriptor), IrConstructorSymbol

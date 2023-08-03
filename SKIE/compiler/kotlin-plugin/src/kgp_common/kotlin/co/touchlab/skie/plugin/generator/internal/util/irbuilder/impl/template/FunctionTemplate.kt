@@ -63,8 +63,16 @@ internal class FunctionTemplate(
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
         val symbolFactory = { IrRebindableSimpleFunctionPublicSymbol(signature, descriptor) }
+        val functionFactory = { symbol: IrSimpleFunctionSymbol ->
+            DummyIrSimpleFunction(symbol).also {
+                // We need to bind to the symbol to overcome a check in the `declareSimpleFunction` method ...
+                symbol.bind(it)
+            }
+        }
 
-        symbolTable.declareSimpleFunction(signature, symbolFactory, ::DummyIrSimpleFunction)
+        val declaration = symbolTable.declareSimpleFunction(signature, symbolFactory, functionFactory)
+        // ... but the symbol should be unbound to allow binding it to the correct declaration later
+        (declaration.symbol as IrRebindableSimpleFunctionPublicSymbol).unbind()
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)

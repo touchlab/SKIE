@@ -12,10 +12,13 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.kotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -43,9 +46,10 @@ abstract class DevAcceptanceTests: Plugin<Project> {
         extensions.configure<MultiDimensionTargetExtension> {
             dimensions(acceptanceTestsDimension(), kotlinToolingVersionDimension()) { target ->
                 val acceptanceTestType = target.acceptanceTest
+                val kotlinToolingVersion = target.kotlinToolingVersion
                 val kotlinTarget = jvm(target.name) {
                     attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
+                        attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
                         attribute(Attribute.of("co.touchlab.skie.dev.acceptance-test", String::class.java), acceptanceTestType.value)
                     }
                 }
@@ -70,6 +74,15 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                             testDependencies.buildDependencies,
                             exportedTestDependencies.buildDependencies,
                         )
+                        inputs.property(
+                            "failedOnly", System.getenv("failedOnly")
+                        ).optional(true)
+                        inputs.property(
+                            "acceptanceTest", System.getenv("acceptanceTest")
+                        ).optional(true)
+                        outputs.dir(
+                            testDirectory(project, acceptanceTestType, kotlinToolingVersion)
+                        )
 
                         maxHeapSize = "12g"
 
@@ -84,7 +97,7 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                     acceptanceTestType = acceptanceTestType,
                     testDependencies = testDependencies,
                     exportedTestDependencies = exportedTestDependencies,
-                    kotlinToolingVersion = target.kotlinToolingVersion,
+                    kotlinToolingVersion = kotlinToolingVersion,
                     kotlinTarget = kotlinTarget,
                 )
 
@@ -164,9 +177,8 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                 buildConfigField(
                     type = "String",
                     name = "BUILD",
-                    value = layout.buildDirectory.map {
-                        it.dir(acceptanceTestType.value).dir(kotlinToolingVersion.value).asFile.absolutePath.enquoted()
-                    },
+                    value = testDirectory(project, acceptanceTestType, kotlinToolingVersion)
+                        .map { it.asFile.absolutePath.enquoted() },
                 )
                 buildConfigField(
                     type = "co.touchlab.skie.acceptancetests.util.StringArray",
@@ -195,6 +207,18 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                 attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
                 attribute(KotlinNativeTarget.konanTargetAttribute, MacOsCpuArchitecture.getCurrent().konanTarget)
                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+            }
+        }
+    }
+
+    companion object {
+        fun testDirectory(
+            project: Project,
+            testType: AcceptanceTestsComponent,
+            kotlinToolingVersion: KotlinToolingVersionComponent,
+        ): Provider<Directory> {
+            return project.layout.buildDirectory.map {
+                it.dir(testType.value).dir(kotlinToolingVersion.value)
             }
         }
     }

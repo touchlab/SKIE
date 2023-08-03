@@ -12,6 +12,7 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.DeserializedPackageNamespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.NewFileNamespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.nameOrError
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrConstructor
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.FunctionTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.SecondaryConstructorTemplate
 import co.touchlab.skie.plugin.reflection.reflectedBy
@@ -32,6 +33,7 @@ import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrSimpleFunction
 
 internal class DeclarationBuilderImpl(
     moduleDescriptor: ModuleDescriptor,
@@ -177,7 +179,9 @@ private fun SymbolTable.referenceBoundTypeParameterContainer(
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 private fun SymbolTable.referenceBoundTypeParameterContainer(functionDescriptor: FunctionDescriptor): List<IrTypeParametersContainer> =
     listOfNotNull(
-        referenceFunction(functionDescriptor).takeIf { it.isBound }?.owner
+        referenceFunction(functionDescriptor).takeIf {
+            it.isBound && it.owner !is DummyIrSimpleFunction && it.owner !is DummyIrConstructor
+        }?.owner
     )
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
@@ -195,6 +199,7 @@ private fun SymbolTable.referenceBoundTypeParameterContainer(classDescriptor: Cl
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 private fun SymbolTable.declarePrivateTypeParameterAsPublic(typeParameter: IrTypeParameter) {
+    return
     val signature = signaturer.composeSignature(typeParameter.descriptor) ?: error("Type parameter $typeParameter is not exposed.")
 
     val publicSymbol = IrTypeParameterPublicSymbolImpl(signature, typeParameter.descriptor)
