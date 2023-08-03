@@ -1,12 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tests/Libraries/Compare" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Tests/Libraries/Compare" type="GradleRunConfiguration" factoryName="Gradle" folderName="1.9.0">
     <ExternalSystemSettings>
-      <option name="env">
-        <map>
-        </map>
-      </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -14,9 +10,9 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:external-libraries:pureTest" />
-          <option value=":acceptance-tests:external-libraries:test" />
-          <option value=":acceptance-tests:external-libraries:comparePureAndSkie" />
+          <option value="pure__kgp_1.9.0Test" />
+          <option value="libraries__kgp_1.9.0Test" />
+          <option value="comparePureAndSkie__kgp_1.9.0" />
         </list>
       </option>
       <option name="vmOptions" />
@@ -24,6 +20,7 @@
     <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
+    <RunAsTest>false</RunAsTest>
     <method v="2" />
   </configuration>
 </component>
