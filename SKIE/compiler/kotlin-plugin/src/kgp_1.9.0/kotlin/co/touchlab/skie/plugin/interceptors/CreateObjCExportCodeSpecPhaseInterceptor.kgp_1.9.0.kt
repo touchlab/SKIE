@@ -72,6 +72,6 @@ internal class CreateObjCExportCodeSpecPhaseInterceptor: PhaseInterceptor<PsiToI
     }
 
     private fun logSkiePerformance(context: SkieContext) {
-        context.analyticsCollector.collect(context.skiePerformanceAnalyticsProducer)
+        context.analyticsCollector.collectAsync(context.skiePerformanceAnalyticsProducer)
     }
 }

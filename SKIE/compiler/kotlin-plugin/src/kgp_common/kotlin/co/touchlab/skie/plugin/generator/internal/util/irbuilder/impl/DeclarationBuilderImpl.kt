@@ -199,7 +199,11 @@ private fun SymbolTable.referenceBoundTypeParameterContainer(classDescriptor: Cl
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 private fun SymbolTable.declarePrivateTypeParameterAsPublic(typeParameter: IrTypeParameter) {
-    return
+    /** FIXME: In certain libraries, the call to composeSignature crashes in 1.9.0 because of type parameter container misalignment.
+     *      However, skipping this code altogether fails somewhere else because this workaround is still needed. During simple testing,
+     *      we found that wrapping this whole block in `try { } catch { }` and ignoring exceptions, "solved" both issues. That's not a viable
+     *      solution though, so we need to figure out what's the correct approach here.
+     */
     val signature = signaturer.composeSignature(typeParameter.descriptor) ?: error("Type parameter $typeParameter is not exposed.")
 
     val publicSymbol = IrTypeParameterPublicSymbolImpl(signature, typeParameter.descriptor)
