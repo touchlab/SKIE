@@ -29,7 +29,7 @@ jobs:
       - name: Run Acceptance Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ':acceptance-tests:test'
+          arguments: ':acceptance-tests:functional__kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ matrix.linkage }}
@@ -39,7 +39,7 @@ jobs:
         if: always()
         with:
           check_name: "Test Reports - Acceptance Tests (${{ matrix.linkage }}, ${{ matrix.configuration }})"
-          report_paths: 'SKIE/acceptance-tests/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/build/test-results/functional__*/TEST-*.xml'
           require_tests: true
 
   type-mapping-tests:
@@ -60,7 +60,7 @@ jobs:
       - name: Run Type Mapping Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ':acceptance-tests:type-mapping:test'
+          arguments: ':acceptance-tests:type-mapping__kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ matrix.linkage }}
@@ -71,7 +71,7 @@ jobs:
         if: always()
         with:
           check_name: "Test Reports - Type Mapping Tests (${{ matrix.target }}, ${{ matrix.linkage }}, ${{ matrix.configuration }})"
-          report_paths: 'SKIE/acceptance-tests/type-mapping/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
           require_tests: true
 
   external-libraries-tests:
@@ -91,7 +91,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ':acceptance-tests:external-libraries:test'
+          arguments: ':acceptance-tests:libraries__kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ matrix.linkage }}
@@ -101,5 +101,5 @@ jobs:
         if: always()
         with:
           check_name: "Test Reports - External Libraries Tests (${{ matrix.linkage }}, ${{ matrix.configuration }})"
-          report_paths: 'SKIE/acceptance-tests/external-libraries/build/test-results/test/TEST-*.xml'
+          report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
           require_tests: true

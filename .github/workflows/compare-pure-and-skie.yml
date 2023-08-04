@@ -1,4 +1,4 @@
-name: Compare Pure and SKIE
+name: "[Broken] Compare Pure and SKIE"
 
 on:
   workflow_dispatch:

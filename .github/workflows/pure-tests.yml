@@ -1,4 +1,4 @@
-name: Pure Tests
+name: "[Broken] Pure Tests"
 
 on:
   workflow_dispatch:
