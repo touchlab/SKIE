@@ -151,7 +151,7 @@ class CompileSwiftPhase(
     }
 
     private val parallelizationArgument: String
-        get() = if (SkieConfigurationFlag.ParallelSwiftCompilation in skieContext.skieConfiguration.enabledConfigurationFlags) {
+        get() = if (SkieConfigurationFlag.Build_ParallelSwiftCompilation in skieContext.skieConfiguration.enabledConfigurationFlags) {
             "-j${Runtime.getRuntime().availableProcessors()}"
         } else {
             "-j1"

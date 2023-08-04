@@ -20,7 +20,7 @@ internal class TypeAliasGenerator(
 
     override val isActive: Boolean = true
 
-    private val areTypeAliasesExported = SkieConfigurationFlag.FqNames in skieContext.skieConfiguration.enabledConfigurationFlags
+    private val areTypeAliasesExported = SkieConfigurationFlag.Feature_FqNames in skieContext.skieConfiguration.enabledConfigurationFlags
 
     private val baseTypeAliasContainerName = "Skie"
 
