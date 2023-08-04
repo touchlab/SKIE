@@ -1,6 +1,6 @@
 package co.touchlab.skie.api.phases
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
@@ -151,7 +151,7 @@ class CompileSwiftPhase(
     }
 
     private val parallelizationArgument: String
-        get() = if (SkieFeature.ParallelSwiftCompilation in skieContext.skieConfiguration.enabledFeatures) {
+        get() = if (SkieConfigurationFlag.ParallelSwiftCompilation in skieContext.skieConfiguration.enabledConfigurationFlags) {
             "-j${Runtime.getRuntime().availableProcessors()}"
         } else {
             "-j1"

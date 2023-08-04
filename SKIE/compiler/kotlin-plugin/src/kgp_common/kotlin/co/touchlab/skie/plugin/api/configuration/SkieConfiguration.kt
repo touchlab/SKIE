@@ -3,7 +3,7 @@ package co.touchlab.skie.plugin.api.configuration
 import co.touchlab.skie.configuration.ConfigurationKey
 import co.touchlab.skie.configuration.TypedSkieConfiguration
 import co.touchlab.skie.configuration.ConfigurationTarget
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -11,14 +11,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SkieConfiguration(
-    override val enabledFeatures: Set<SkieFeature> = emptySet(),
-    val disabledFeatures: Set<SkieFeature> = emptySet(),
+    override val enabledConfigurationFlags: Set<SkieConfigurationFlag> = emptySet(),
+    val disabledConfigurationFlags: Set<SkieConfigurationFlag> = emptySet(),
     override val groups: List<Group> = emptyList(),
-) : TypedSkieConfiguration<SkieFeature> {
+) : TypedSkieConfiguration<SkieConfigurationFlag> {
 
     init {
-        require(enabledFeatures.intersect(disabledFeatures).isEmpty()) {
-            "A feature cannot be both enabled and disabled. Problem with: ${enabledFeatures.intersect(disabledFeatures)}"
+        require(enabledConfigurationFlags.intersect(disabledConfigurationFlags).isEmpty()) {
+            "A configuration flag cannot be both enabled and disabled. Problem with: ${enabledConfigurationFlags.intersect(disabledConfigurationFlags)}"
         }
     }
 
@@ -52,8 +52,8 @@ data class SkieConfiguration(
 
     operator fun plus(other: SkieConfiguration): SkieConfiguration =
         SkieConfiguration(
-            (enabledFeatures - other.disabledFeatures) + other.enabledFeatures,
-            other.disabledFeatures,
+            (enabledConfigurationFlags - other.disabledConfigurationFlags) + other.enabledConfigurationFlags,
+            other.disabledConfigurationFlags,
             groups + other.groups,
         )
 

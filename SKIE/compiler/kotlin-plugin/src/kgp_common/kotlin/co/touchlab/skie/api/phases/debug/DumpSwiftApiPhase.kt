@@ -1,14 +1,12 @@
 package co.touchlab.skie.api.phases.debug
 
 import co.touchlab.skie.api.phases.SkieLinkingPhase
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.api.skieBuildDirectory
-import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.util.Command
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 
 sealed class DumpSwiftApiPhase(
     private val skieContext: SkieContext,
@@ -21,7 +19,7 @@ sealed class DumpSwiftApiPhase(
         framework: FrameworkLayout,
     ) : DumpSwiftApiPhase(skieContext, framework) {
 
-        override val isActive: Boolean = SkieFeature.Debug_DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledFeatures
+        override val isActive: Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledConfigurationFlags
     }
 
     class AfterApiNotes(
@@ -30,7 +28,7 @@ sealed class DumpSwiftApiPhase(
         framework: FrameworkLayout,
     ) : DumpSwiftApiPhase(skieContext, framework) {
 
-        override val isActive: Boolean = SkieFeature.Debug_DumpSwiftApiAfterApiNotes in skieConfiguration.enabledFeatures
+        override val isActive: Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes in skieConfiguration.enabledConfigurationFlags
     }
 
     override fun execute() {

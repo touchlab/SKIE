@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.configuration
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.configuration.util.takeIf
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -13,11 +13,11 @@ abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory
     val printSkiePerformanceLogs: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val crashOnSoftErrors: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
-    internal fun buildFeatureSet(): Set<SkieFeature> =
+    internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(
-            SkieFeature.Debug_DumpSwiftApiBeforeApiNotes takeIf dumpSwiftApiBeforeApiNotes,
-            SkieFeature.Debug_DumpSwiftApiAfterApiNotes takeIf dumpSwiftApiAfterApiNotes,
-            SkieFeature.Debug_PrintSkiePerformanceLogs takeIf printSkiePerformanceLogs,
-            SkieFeature.Debug_CrashOnSoftErrors takeIf crashOnSoftErrors,
+            SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes takeIf dumpSwiftApiBeforeApiNotes,
+            SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes takeIf dumpSwiftApiAfterApiNotes,
+            SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs takeIf printSkiePerformanceLogs,
+            SkieConfigurationFlag.Debug_CrashOnSoftErrors takeIf crashOnSoftErrors,
         )
 }

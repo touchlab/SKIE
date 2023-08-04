@@ -2,7 +2,7 @@ package co.touchlab.skie.configuration
 
 interface TypedSkieConfiguration<FLAGS> {
 
-    val enabledFeatures: Set<FLAGS>
+    val enabledConfigurationFlags: Set<FLAGS>
 
     val groups: List<Group>
 

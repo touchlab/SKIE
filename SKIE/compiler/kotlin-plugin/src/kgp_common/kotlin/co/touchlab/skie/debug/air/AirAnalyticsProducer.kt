@@ -6,7 +6,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
-// WIP
 class AirAnalyticsProducer(
     private val descriptorProvider: DescriptorProvider,
     private val modules: Collection<IrModuleFragment>,

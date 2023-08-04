@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.analytics.environment
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.BuildConfig
@@ -22,7 +22,7 @@ internal data class AnonymousGradleEnvironmentAnalytics(
 
         override val name: String = "anonymous-gradle-environment"
 
-        override val feature: SkieFeature = SkieFeature.Analytics_Anonymous_GradleEnvironment
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_GradleEnvironment
 
         override fun produce(): String =
             AnonymousGradleEnvironmentAnalytics(

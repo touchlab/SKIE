@@ -1,11 +1,10 @@
 package co.touchlab.skie.plugin.analytics.hardware
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.Command
 import groovy.json.JsonSlurper
-import org.apache.groovy.json.internal.JsonFastParser
 
 internal object AnonymousHardwareAnalytics {
 
@@ -13,7 +12,7 @@ internal object AnonymousHardwareAnalytics {
 
         override val name: String = "anonymous-hardware"
 
-        override val feature: SkieFeature = SkieFeature.Analytics_Anonymous_Hardware
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_Hardware
 
         override fun produce(): String =
             Command("system_profiler", "SPHardwareDataType", "-detailLevel", "mini", "-json")

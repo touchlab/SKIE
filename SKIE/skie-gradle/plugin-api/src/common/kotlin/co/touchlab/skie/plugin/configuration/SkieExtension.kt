@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.configuration
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.configuration.util.GradleSkieConfiguration
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -16,26 +16,22 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
      */
     val isEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
 
-    val additionalFeatureFlags: SetProperty<SkieFeature> = objects.setProperty(SkieFeature::class.java).convention(emptySet())
+    val additionalConfigurationFlags: SetProperty<SkieConfigurationFlag> =
+        objects.setProperty(SkieConfigurationFlag::class.java).convention(emptySet())
 
-    val suppressedFeatureFlags: SetProperty<SkieFeature> = objects.setProperty(SkieFeature::class.java).convention(emptySet())
-
-    private val declarationConfigurationBuilder = SkieDeclarationConfiguration()
-
-    @Deprecated("replace with declaration {}")
-    fun configuration(builder: SkieDeclarationConfiguration.() -> Unit) {
-        declarationConfigurationBuilder.apply(builder)
-    }
-
-    // WIP Consider different name
-    fun declaration(builder: SkieDeclarationConfiguration.() -> Unit) {
-        declarationConfigurationBuilder.apply(builder)
-    }
+    val suppressedConfigurationFlags: SetProperty<SkieConfigurationFlag> =
+        objects.setProperty(SkieConfigurationFlag::class.java).convention(emptySet())
 
     val analytics: SkieAnalyticsConfiguration = objects.newInstance(SkieAnalyticsConfiguration::class.java)
 
     fun analytics(action: Action<in SkieAnalyticsConfiguration>) {
         action.execute(analytics)
+    }
+
+    val build: SkieBuildConfiguration = objects.newInstance(SkieBuildConfiguration::class.java)
+
+    fun build(action: Action<in SkieBuildConfiguration>) {
+        action.execute(build)
     }
 
     val debug: SkieDebugConfiguration = objects.newInstance(SkieDebugConfiguration::class.java)
@@ -50,6 +46,12 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         action.execute(features)
     }
 
+    val migration: SkieMigrationConfiguration = objects.newInstance(SkieMigrationConfiguration::class.java)
+
+    fun migration(action: Action<in SkieMigrationConfiguration>) {
+        action.execute(migration)
+    }
+
     // Putting these extensions here so that they don't pollute the extension's namespace. They can be used by wrapping in `with(SkieExtension) { ... }`
     companion object {
 
@@ -58,11 +60,15 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
 
         fun SkieExtension.buildConfiguration(): GradleSkieConfiguration =
             GradleSkieConfiguration(
-                enabledFeatures = (mergeFeatureSetsFromConfigurations() + additionalFeatureFlags.get()) - suppressedFeatureFlags.get(),
-                groups = declarationConfigurationBuilder.buildGroups(),
+                enabledConfigurationFlags = (mergeConfigurationSetsFromConfigurations() + additionalConfigurationFlags.get()) - suppressedConfigurationFlags.get(),
+                groups = features.buildGroups(),
             )
 
-        private fun SkieExtension.mergeFeatureSetsFromConfigurations() =
-            analytics.buildFeatureSet() + debug.buildFeatureSet() + features.buildFeatureSet()
+        private fun SkieExtension.mergeConfigurationSetsFromConfigurations() =
+            analytics.buildConfigurationFlags() +
+                    build.buildConfigurationFlags() +
+                    debug.buildConfigurationFlags() +
+                    features.buildConfigurationFlags() +
+                    migration.buildConfigurationFlags()
     }
 }

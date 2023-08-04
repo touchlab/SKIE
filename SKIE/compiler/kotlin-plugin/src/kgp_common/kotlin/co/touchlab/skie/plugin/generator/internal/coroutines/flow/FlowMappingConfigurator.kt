@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.coroutines.flow
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.model.callable.KotlinCallableMemberSwiftModel
@@ -15,7 +15,7 @@ internal class FlowMappingConfigurator(
     override val skieContext: SkieContext,
 ) : SkieCompilationPhase, ConfigurationContainer {
 
-    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieConfiguration.enabledFeatures
+    override val isActive: Boolean = SkieConfigurationFlag.CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     private val callableMemberConfigurator = CallableMemberConfigurator()
 

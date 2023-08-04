@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.analytics.environment
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.util.toPrettyJson
 import kotlinx.serialization.Serializable
@@ -22,7 +22,7 @@ data class AnonymousCompilerEnvironmentAnalytics(
 
         override val name: String = "anonymous-compiler-environment"
 
-        override val feature: SkieFeature = SkieFeature.Analytics_Anonymous_CompilerEnvironment
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_CompilerEnvironment
 
         override fun produce(): String =
             AnonymousCompilerEnvironmentAnalytics(

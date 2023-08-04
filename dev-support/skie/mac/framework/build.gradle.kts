@@ -10,13 +10,20 @@ plugins {
 }
 
 skie {
-    features {
+    analytics {
+        disableUpload.set(true)
     }
-    configuration {
+
+    build {
+        enableParallelSwiftCompilation = true
+    }
+
+    features {
         group {
             ExperimentalFeatures.Enabled(true)
         }
     }
+
     debug {
         dumpSwiftApiBeforeApiNotes.set(true)
         dumpSwiftApiAfterApiNotes.set(true)

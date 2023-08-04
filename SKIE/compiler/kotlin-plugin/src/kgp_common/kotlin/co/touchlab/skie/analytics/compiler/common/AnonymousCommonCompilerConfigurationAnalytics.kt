@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.analytics.compiler.common
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.util.toPrettyJson
 import kotlinx.serialization.Serializable
@@ -35,7 +35,7 @@ data class AnonymousCommonCompilerConfigurationAnalytics(
 
         override val name: String = "anonymous-common-compiler-configuration"
 
-        override val feature: SkieFeature = SkieFeature.Analytics_Anonymous_CompilerConfiguration
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_CompilerConfiguration
 
         override fun produce(): String =
             AnonymousCommonCompilerConfigurationAnalytics(

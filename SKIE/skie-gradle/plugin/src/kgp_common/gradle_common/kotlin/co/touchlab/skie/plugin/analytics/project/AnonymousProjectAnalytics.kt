@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.analytics.project
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.hashed
@@ -14,7 +14,7 @@ internal data class AnonymousProjectAnalytics(
 
     class Producer(private val project: Project) : AnalyticsProducer {
 
-        override val feature: SkieFeature = SkieFeature.Analytics_Anonymous_Project
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_Project
 
         override val name: String = "anonymous-project"
 

@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.osversion
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.api.skieContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -29,7 +29,7 @@ object MinOSVersionConfigurator {
     )
 
     fun configure(configuration: CompilerConfiguration, konanConfig: KonanConfig) {
-        if (SkieFeature.CoroutinesInterop !in configuration.skieContext.skieConfiguration.enabledFeatures) return
+        if (SkieConfigurationFlag.CoroutinesInterop !in configuration.skieContext.skieConfiguration.enabledConfigurationFlags) return
         val properties = (konanConfig.platform.configurables as? KonanPropertiesLoader)?.properties ?: return
 
         coroutinesMinOsVersionMap.forEach { (key, requiredMinVersion) ->

@@ -1,30 +1,33 @@
 package co.touchlab.skie.configuration
 
-enum class AnalyticsTier(val features: Set<SkieFeature>) {
+enum class AnalyticsTier(val configurationFlags: Set<SkieConfigurationFlag>) {
 
     None,
 
     Anonymous(
-        SkieFeature.Analytics_Anonymous_GradlePerformance,
-        SkieFeature.Analytics_Anonymous_GradleEnvironment,
-        SkieFeature.Analytics_Anonymous_CompilerEnvironment,
-        SkieFeature.Analytics_Anonymous_Hardware,
-        SkieFeature.Analytics_Anonymous_SkiePerformance,
-        SkieFeature.Analytics_Anonymous_SkieConfiguration,
-        SkieFeature.Analytics_Anonymous_CompilerConfiguration,
-        SkieFeature.Analytics_Anonymous_Git,
-        SkieFeature.Analytics_Anonymous_Project,
+        SkieConfigurationFlag.Analytics_Anonymous_GradlePerformance,
+        SkieConfigurationFlag.Analytics_Anonymous_GradleEnvironment,
+        SkieConfigurationFlag.Analytics_Anonymous_CompilerEnvironment,
+        SkieConfigurationFlag.Analytics_Anonymous_Hardware,
+        SkieConfigurationFlag.Analytics_Anonymous_SkiePerformance,
+        SkieConfigurationFlag.Analytics_Anonymous_SkieConfiguration,
+        SkieConfigurationFlag.Analytics_Anonymous_CompilerConfiguration,
+        SkieConfigurationFlag.Analytics_Anonymous_Git,
+        SkieConfigurationFlag.Analytics_Anonymous_Project,
     ),
 
     All(
         Anonymous,
-        SkieFeature.Analytics_Identifying_SkieConfiguration,
-        SkieFeature.Analytics_Identifying_CompilerConfiguration,
-        SkieFeature.Analytics_Identifying_Git,
-        SkieFeature.Analytics_Identifying_Project,
+        SkieConfigurationFlag.Analytics_Identifying_SkieConfiguration,
+        SkieConfigurationFlag.Analytics_Identifying_CompilerConfiguration,
+        SkieConfigurationFlag.Analytics_Identifying_Git,
+        SkieConfigurationFlag.Analytics_Identifying_Project,
     );
 
-    constructor(vararg features: SkieFeature) : this(features.toSet())
+    constructor(vararg configurationFlags: SkieConfigurationFlag) : this(configurationFlags.toSet())
 
-    constructor(parent: AnalyticsTier, vararg features: SkieFeature) : this(parent.features + features.toSet())
+    constructor(
+        parent: AnalyticsTier,
+        vararg configurationFlags: SkieConfigurationFlag,
+    ) : this(parent.configurationFlags + configurationFlags.toSet())
 }

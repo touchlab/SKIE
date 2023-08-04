@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.analytics.git
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import org.eclipse.jgit.api.ListBranchCommand
@@ -17,7 +17,7 @@ internal data class AnonymousGitAnalytics(
 
     class Producer(private val project: Project) : AnalyticsProducer {
 
-        override val feature: SkieFeature = SkieFeature.Analytics_Anonymous_Git
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_Git
 
         override val name: String = "anonymous-git"
 

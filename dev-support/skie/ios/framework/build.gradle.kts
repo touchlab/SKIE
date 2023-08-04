@@ -11,8 +11,6 @@ plugins {
 
 skie {
     features {
-    }
-    configuration {
         group {
             ExperimentalFeatures.Enabled(true)
         }

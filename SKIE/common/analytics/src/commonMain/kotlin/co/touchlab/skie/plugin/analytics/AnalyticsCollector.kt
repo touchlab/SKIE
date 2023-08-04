@@ -1,12 +1,12 @@
 package co.touchlab.skie.plugin.analytics
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.TypedSkieConfiguration
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 
 class AnalyticsCollector(
     private val skieBuildDirectory: SkieBuildDirectory,
-    private val skieConfiguration: TypedSkieConfiguration<SkieFeature>,
+    private val skieConfiguration: TypedSkieConfiguration<SkieConfigurationFlag>,
 ) {
 
     fun collectAsync(producers: List<AnalyticsProducer>) {
@@ -44,7 +44,7 @@ class AnalyticsCollector(
     }
 
     private fun handleProducerError(e: Throwable): String {
-        if (SkieFeature.Debug_CrashOnSoftErrors in skieConfiguration.enabledFeatures) {
+        if (SkieConfigurationFlag.Debug_CrashOnSoftErrors in skieConfiguration.enabledConfigurationFlags) {
             throw e
         }
 
@@ -56,5 +56,5 @@ class AnalyticsCollector(
     }
 
     private val AnalyticsProducer.isEnabled: Boolean
-        get() = this.feature in skieConfiguration.enabledFeatures
+        get() = this.configurationFlag in skieConfiguration.enabledConfigurationFlags
 }

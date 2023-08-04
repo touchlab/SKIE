@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
@@ -23,7 +23,7 @@ internal class SuspendGenerator(
     private val declarationBuilder: DeclarationBuilder,
 ) : BaseGenerator(skieContext, namespaceProvider) {
 
-    override val isActive: Boolean = SkieFeature.CoroutinesInterop in skieConfiguration.enabledFeatures
+    override val isActive: Boolean = SkieConfigurationFlag.CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     override fun runObjcPhase() {
         val kotlinDelegate = KotlinSuspendGeneratorDelegate(module, declarationBuilder, descriptorProvider)

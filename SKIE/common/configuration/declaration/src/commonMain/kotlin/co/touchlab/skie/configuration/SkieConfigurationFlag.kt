@@ -2,12 +2,14 @@
 
 package co.touchlab.skie.configuration
 
-enum class SkieFeature {
+enum class SkieConfigurationFlag {
 
-    CoroutinesInterop,
-    FqNames,
-    ParallelSwiftCompilation,
-    WildcardExport,
+    Feature_CoroutinesInterop,
+    Feature_FqNames,
+
+    Build_ParallelSwiftCompilation,
+
+    Migration_WildcardExport,
 
     Debug_DumpSwiftApiBeforeApiNotes,
     Debug_DumpSwiftApiAfterApiNotes,

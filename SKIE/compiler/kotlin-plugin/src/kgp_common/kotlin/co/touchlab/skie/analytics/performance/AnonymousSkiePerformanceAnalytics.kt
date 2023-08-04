@@ -1,6 +1,6 @@
 package co.touchlab.skie.analytics.performance
 
-import co.touchlab.skie.configuration.SkieFeature
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.util.toPrettyJson
@@ -20,7 +20,7 @@ object AnonymousSkiePerformanceAnalytics {
         // Name : Time in seconds
         private val entries = mutableMapOf<String, Double>()
 
-        override val feature: SkieFeature = SkieFeature.Analytics_Anonymous_SkiePerformance
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_SkiePerformance
 
         override fun produce(): String =
             entries.toPrettyJson()
@@ -39,7 +39,7 @@ object AnonymousSkiePerformanceAnalytics {
         }
 
         private fun printLogIfEnabled(name: String, duration: Duration) {
-            if (SkieFeature.Debug_PrintSkiePerformanceLogs in skieConfiguration.enabledFeatures) {
+            if (SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs in skieConfiguration.enabledConfigurationFlags) {
                 println("$name: ${duration.toDouble(DurationUnit.SECONDS)}s")
             }
         }
