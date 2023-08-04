@@ -62,8 +62,8 @@ abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigni
 
                     licenses {
                         license {
-                            name = "Touchlab SKIE License"
-                            url = "https://skie.touchlab.co/LICENSE"
+                            name = "The Apache License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                         }
                     }
 
