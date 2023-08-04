@@ -115,10 +115,4 @@ abstract class DevAcceptanceTestsFramework: Plugin<Project> {
             }
         }
     }
-
-    private fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersionComponent): File {
-        return NativeCompilerDownloader(project, CompilerVersion.fromString(kotlinVersion.value))
-            .also { it.downloadIfNeeded() }
-            .compilerDirectory
-    }
 }
