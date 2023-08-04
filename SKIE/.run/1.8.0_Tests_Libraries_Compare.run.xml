@@ -1,13 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tests/Acceptance/Failed" type="GradleRunConfiguration" factoryName="Gradle" folderName="1.9.0">
+  <configuration default="false" name="1.8.0/Tests/Libraries/Compare" type="GradleRunConfiguration" factoryName="Gradle" folderName="1.8.0">
     <ExternalSystemSettings>
-      <option name="env">
-        <map>
-          <entry key="failedOnly" value="" />
-        </map>
-      </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -15,7 +10,9 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:functional__kgp_1.9.0Test" />
+          <option value="pure__kgp_1.8.0Test" />
+          <option value="libraries__kgp_1.8.0Test" />
+          <option value="comparePureAndSkie__kgp_1.8.0" />
         </list>
       </option>
       <option name="vmOptions" />
