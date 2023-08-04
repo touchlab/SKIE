@@ -51,7 +51,7 @@ buildConfig {
     buildConfigField("String", "GRADLE_API_VERSION", "")
     buildConfigField("String", "RUNTIME_DEPENDENCY", "")
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "")
-    buildConfigField("String?", "MIXPANEL_PROJECT_TOKEN", "")
+    buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "")
 }
 
 multiDimensionTarget.configureSourceSet { sourceSet ->
@@ -84,8 +84,7 @@ multiDimensionTarget.configureSourceSet { sourceSet ->
             val pluginId: String by properties
             buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
 
-            // WIP?
-            buildConfigField("String?", "MIXPANEL_PROJECT_TOKEN", "null")
+            buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
         }
     }
 }

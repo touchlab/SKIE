@@ -24,14 +24,12 @@ internal abstract class SkieUploadAnalyticsTask : DefaultTask() {
 
     @TaskAction
     fun runTask() {
-        val projectToken = BuildConfig.MIXPANEL_PROJECT_TOKEN ?: return
-
         val analyticsId = getAnalyticsId()
         val eventData = getEventData()
 
         val json = JSONObject(eventData)
 
-        val event = MessageBuilder(projectToken).event(analyticsId, "compile", json)
+        val event = MessageBuilder(BuildConfig.MIXPANEL_PROJECT_TOKEN).event(analyticsId, "compile", json)
 
         MixpanelAPI().sendMessage(event)
     }
