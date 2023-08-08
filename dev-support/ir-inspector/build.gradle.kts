@@ -1,4 +1,6 @@
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
+import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
+import java.io.File
+import org.gradle.api.Project
 
 plugins {
     application
@@ -31,3 +33,8 @@ application {
 dependencies {
     implementation(libs.kotlin.native.compiler.embeddable)
 }
+
+val Project.kotlinNativeCompilerHome: File
+    get() = NativeCompilerDownloader(project)
+        .also { it.downloadIfNeeded() }
+        .compilerDirectory
