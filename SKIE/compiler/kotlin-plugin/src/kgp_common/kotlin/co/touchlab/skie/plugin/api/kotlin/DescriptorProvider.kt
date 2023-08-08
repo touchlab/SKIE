@@ -20,6 +20,8 @@ interface DescriptorProvider {
 
     fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean
 
+    fun isExposable(callableMemberDescriptor: CallableMemberDescriptor): Boolean
+
     fun isExposable(classDescriptor: ClassDescriptor): Boolean
 
     fun getFileModule(file: SourceFile): ModuleDescriptor

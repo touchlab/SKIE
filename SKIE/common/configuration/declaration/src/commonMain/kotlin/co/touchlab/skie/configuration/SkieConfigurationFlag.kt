@@ -29,4 +29,7 @@ enum class SkieConfigurationFlag {
     Analytics_Anonymous_SkieConfiguration,
     Analytics_Anonymous_CompilerConfiguration,
     Analytics_Identifying_CompilerConfiguration,
+    Analytics_Anonymous_Declarations,
+    Analytics_Anonymous_Libraries,
+    Analytics_Identifying_LocalModules,
 }

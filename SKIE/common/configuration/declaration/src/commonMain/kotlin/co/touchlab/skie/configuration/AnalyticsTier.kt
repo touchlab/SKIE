@@ -14,6 +14,8 @@ enum class AnalyticsTier(val configurationFlags: Set<SkieConfigurationFlag>) {
         SkieConfigurationFlag.Analytics_Anonymous_CompilerConfiguration,
         SkieConfigurationFlag.Analytics_Anonymous_Git,
         SkieConfigurationFlag.Analytics_Anonymous_Project,
+        SkieConfigurationFlag.Analytics_Anonymous_Declarations,
+        SkieConfigurationFlag.Analytics_Anonymous_Libraries,
     ),
 
     All(
@@ -22,6 +24,7 @@ enum class AnalyticsTier(val configurationFlags: Set<SkieConfigurationFlag>) {
         SkieConfigurationFlag.Analytics_Identifying_CompilerConfiguration,
         SkieConfigurationFlag.Analytics_Identifying_Git,
         SkieConfigurationFlag.Analytics_Identifying_Project,
+        SkieConfigurationFlag.Analytics_Identifying_LocalModules,
     );
 
     constructor(vararg configurationFlags: SkieConfigurationFlag) : this(configurationFlags.toSet())

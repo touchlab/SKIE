@@ -100,6 +100,9 @@ internal class NativeMutableDescriptorProvider(
     override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
         realProvider.isExposed(callableMemberDescriptor)
 
+    override fun isExposable(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
+        realProvider.isExposable(callableMemberDescriptor)
+
     override fun isExposable(classDescriptor: ClassDescriptor): Boolean =
         realProvider.isExposable(classDescriptor)
 

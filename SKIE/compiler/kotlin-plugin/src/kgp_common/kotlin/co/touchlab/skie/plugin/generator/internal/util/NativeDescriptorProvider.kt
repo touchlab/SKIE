@@ -2,12 +2,9 @@
 
 package co.touchlab.skie.plugin.generator.internal.util
 
-import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportReflector
 import co.touchlab.skie.plugin.reflection.reflectors.ObjcExportedInterfaceReflector
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.backend.konan.getExportedDependencies
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
@@ -25,7 +22,6 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
-import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
 internal fun interface ExposedModulesProvider {
     fun exposedModules(): Set<ModuleDescriptor>
@@ -77,9 +73,13 @@ internal class NativeDescriptorProvider(
     override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
         callableMemberDescriptor.isExposed
 
+    override fun isExposable(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
+        callableMemberDescriptor.isExposable
+
     override fun isExposable(classDescriptor: ClassDescriptor): Boolean =
         classDescriptor.isExposable
 
+    @get:JvmName("isExposableExtension")
     private val CallableMemberDescriptor.isExposable: Boolean
         get() = mapper.shouldBeExposed(this)
 
