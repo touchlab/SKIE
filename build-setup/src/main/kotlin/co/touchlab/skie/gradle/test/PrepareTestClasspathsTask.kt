@@ -110,7 +110,11 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
                         }
                     }
                     sourceSets["library_${'$'}{index}Main"].dependencies {
-                        api(library)
+                        api(library) {
+                            version {
+                                strictly(library.substringAfterLast(":"))
+                            }
+                        }
                         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                             version {
                                 strictly("[1.6.4,)")
