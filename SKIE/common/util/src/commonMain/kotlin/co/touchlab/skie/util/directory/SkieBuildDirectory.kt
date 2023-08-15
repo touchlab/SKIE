@@ -16,6 +16,8 @@ class SkieBuildDirectory(
 
     val debug: Debug = Debug(this)
 
+    val fakeObjCFrameworks: FakeObjCFrameworks = FakeObjCFrameworks(this)
+
     val swift: Swift = Swift(this)
 
     val temp: Temp = Temp(this)
@@ -69,6 +71,19 @@ class SkieBuildDirectory(
 
             fun apiFile(baseName: String): File = directory.resolve("$baseName.swift")
         }
+    }
+
+    class FakeObjCFrameworks(parent: Directory) : PermanentDirectory(parent, "fake-objc-frameworks") {
+
+        private fun framework(moduleName: String): File = directory.resolve("$moduleName.framework").also { it.mkdirs() }
+
+        private fun headers(moduleName: String): File = framework(moduleName).resolve("Headers").also { it.mkdirs() }
+
+        fun header(moduleName: String): File = headers(moduleName).resolve("$moduleName.h")
+
+        private fun modules(moduleName: String): File = framework(moduleName).resolve("Modules").also { it.mkdirs() }
+
+        fun moduleMap(moduleName: String): File = modules(moduleName).resolve("module.modulemap")
     }
 
     class Swift(parent: Directory) : PermanentDirectory(parent, "swift") {

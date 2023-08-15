@@ -8,6 +8,7 @@ import co.touchlab.skie.api.phases.DisableWildcardExportPhase
 import co.touchlab.skie.api.phases.FixClassesConflictsPhase
 import co.touchlab.skie.api.phases.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.api.phases.FixNestedBridgedTypesPhase
+import co.touchlab.skie.api.phases.GenerateFakeObjCDependenciesPhase
 import co.touchlab.skie.api.phases.GenerateSwiftCodePhase
 import co.touchlab.skie.api.phases.SkieModuleConfigurationPhase
 import co.touchlab.skie.api.phases.SwiftCacheSetupPhase
@@ -55,6 +56,7 @@ class SkieLinkingPhaseScheduler(
         DisableWildcardExportPhase(skieContext, framework),
         DumpSwiftApiPhase.AfterApiNotes(skieContext.skieConfiguration, skieContext, framework),
         GenerateSwiftCodePhase(skieContext, skieModule, swiftModelScope, framework),
+        GenerateFakeObjCDependenciesPhase(swiftModelScope, skieContext.skieDirectories.buildDirectory),
         SwiftCacheSetupPhase(skieContext, framework),
         CompileSwiftPhase(skieContext, framework, configurables, config),
     )

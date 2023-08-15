@@ -49,6 +49,8 @@ class CompileSwiftPhase(
             +"-import-underlying-module"
             +"-F"
             +skieContext.cacheableKotlinFramework.parentDir.absolutePath
+            +"-F"
+            +skieBuildDirectory.fakeObjCFrameworks.directory.absolutePath
             +"-emit-module"
             +"-emit-module-path"
             +swiftFrameworkHeader.swiftModule
