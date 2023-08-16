@@ -62,17 +62,21 @@ internal class FunctionTemplate(
         val signature = symbolTable.signaturer.composeSignature(descriptor)
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
+        // IrRebindableSimpleFunctionPublicSymbol is used so that we can later bind it to the correct declaration which cannot be created before the symbol table is validated to not contain any unbound symbols.
         val symbolFactory = { IrRebindableSimpleFunctionPublicSymbol(signature, descriptor) }
         val functionFactory = { symbol: IrSimpleFunctionSymbol ->
             DummyIrSimpleFunction(symbol).also {
-                // We need to bind to the symbol to overcome a check in the `declareSimpleFunction` method ...
-                symbol.bind(it)
+                // In 1.8.0 the symbol is already present before calling declareSimpleFunction and therefore is not IrRebindableSimpleFunctionPublicSymbol
+                // Starting from 1.9.0 the SymbolTable has additional check that requires that the symbol of created function is bounded in the factory.
+                if (symbol is IrRebindableSimpleFunctionPublicSymbol) {
+                    symbol.bind(it)
+                }
             }
         }
 
         val declaration = symbolTable.declareSimpleFunction(signature, symbolFactory, functionFactory)
-        // ... but the symbol should be unbound to allow binding it to the correct declaration later
-        (declaration.symbol as IrRebindableSimpleFunctionPublicSymbol).unbind()
+        // But the symbol cannot be bounded otherwise DeclarationBuilder will not to generate the declaration (because it thinks it already exists).
+        (declaration.symbol as? IrRebindableSimpleFunctionPublicSymbol)?.unbind()
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
