@@ -1,6 +1,7 @@
 package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
@@ -17,12 +18,15 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class SwiftIrDeclarationRegistry(
     private val namer: ObjCExportNamer,
 ) {
-    private val declarations = mutableSetOf<SwiftIrDeclaration>()
+
     private val declarationsByDescriptor = mutableMapOf<ClassDescriptor, SwiftIrDeclaration>()
 
     private val modules = mutableMapOf<String, SwiftIrModule>()
@@ -46,7 +50,10 @@ class SwiftIrDeclarationRegistry(
         }
     }
 
-    fun referenceExternalTypeDeclaration(fqName: SwiftFqName.External, defaultSupertypes: List<SwiftIrTypeDeclaration> = emptyList()): SwiftIrTypeDeclaration.External {
+    fun referenceExternalTypeDeclaration(
+        fqName: SwiftFqName.External,
+        defaultSupertypes: List<SwiftIrTypeDeclaration> = emptyList(),
+    ): SwiftIrTypeDeclaration.External {
         // TODO: Check if `defaultSupertypes` equal to the existing declaration's supertypes.
         return externalTypeDeclarations.getOrPut(fqName) {
             when (fqName) {
@@ -81,9 +88,21 @@ class SwiftIrDeclarationRegistry(
     } as SwiftIrProtocolDeclaration
 
     context(SwiftModelScope)
+    fun declarationForSwiftModel(swiftModel: KotlinClassSwiftModel): SwiftIrExtensibleDeclaration.Local =
+        declarationsByDescriptor.getOrPut(swiftModel.classDescriptor) {
+            val superTypesDeclarations = (swiftModel.classDescriptor.getSuperInterfaces() + swiftModel.classDescriptor.getSuperClassOrAny())
+                .map { resolveDeclaration(it) as SwiftIrExtensibleDeclaration }
+
+            if (swiftModel.kind.isInterface) {
+                SwiftIrProtocolDeclaration.Local.KotlinInterface.Modeled(swiftModel, superTypesDeclarations)
+            } else {
+                SwiftIrTypeDeclaration.Local.KotlinClass.Modeled(swiftModel, superTypesDeclarations)
+            }
+        } as SwiftIrExtensibleDeclaration.Local
+
+    context(SwiftModelScope)
     private fun resolveDeclaration(descriptor: ClassDescriptor): SwiftIrDeclaration = when {
-        // TODO: Remove these special cases, handle just the default one.
-        descriptor.hasSwiftModel -> descriptor.swiftModel.swiftIrDeclaration
+        descriptor.hasSwiftModel -> declarationForSwiftModel(descriptor.swiftModel)
         descriptor.isObjCMetaClass() -> BuiltinDeclarations.AnyClass
         descriptor.isObjCProtocolClass() -> BuiltinDeclarations.Protocol
         descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration() -> {

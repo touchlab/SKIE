@@ -1,6 +1,7 @@
 package co.touchlab.skie.api.model.type
 
 import co.touchlab.skie.api.model.callable.function.FakeObjcConstructorKotlinFunctionSwiftModel
+import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.getAllExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
@@ -32,6 +33,7 @@ class ActualKotlinClassSwiftModel(
     private val namer: ObjCExportNamer,
     private val swiftModelScope: MutableSwiftModelScope,
     private val descriptorProvider: DescriptorProvider,
+    private val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
 ) : MutableKotlinClassSwiftModel {
 
     override val descriptorHolder: ClassOrFileDescriptorHolder.Class = ClassOrFileDescriptorHolder.Class(classDescriptor)
@@ -126,10 +128,8 @@ class ActualKotlinClassSwiftModel(
     }
 
     override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration.Local by lazy {
-        if (kind.isInterface) {
-            SwiftIrProtocolDeclaration.Local.KotlinInterface.Modeled(this)
-        } else {
-            SwiftIrTypeDeclaration.Local.KotlinClass.Modeled(this)
+        with(swiftModelScope) {
+            swiftIrDeclarationRegistry.declarationForSwiftModel(this@ActualKotlinClassSwiftModel)
         }
     }
 

@@ -35,6 +35,7 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
 
             class Modeled(
                 private val model: KotlinClassSwiftModel,
+                override val superTypes: List<SwiftIrExtensibleDeclaration>,
             ): KotlinInterface() {
                 override val kotlinModule: String
                     get() = model.classDescriptor.module.swiftIdentifier
@@ -43,9 +44,6 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
 
                 override val publicName: SwiftFqName.Local.TopLevel
                     get() = SwiftFqName.Local.TopLevel(model.identifier.applyVisibility(model.visibility))
-
-                override val superTypes: List<SwiftIrExtensibleDeclaration>
-                    get() = TODO()
             }
 
             class Immutable(

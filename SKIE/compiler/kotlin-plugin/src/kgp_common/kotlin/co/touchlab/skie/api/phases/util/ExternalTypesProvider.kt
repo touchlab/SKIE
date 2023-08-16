@@ -68,13 +68,12 @@ private object ReferencedTypesVisitor : KotlinDirectlyCallableMemberSwiftModelVi
 private fun SwiftIrDeclaration.getAllReferencedExternalTypes(): List<ExternalType> =
     when (this) {
         is SwiftIrTypeDeclaration.External -> {
-            typeParameters.flatMap { it.getAllReferencedExternalTypes() } + ExternalType.Class(module.name, name, typeParameters.size)
+            (typeParameters + superTypes).flatMap { it.getAllReferencedExternalTypes() } +
+                    ExternalType.Class(module.name, name, typeParameters.size)
         }
-        // WIP SuperTypes
-        is SwiftIrTypeDeclaration.Local -> typeParameters.flatMap { it.getAllReferencedExternalTypes() }
-        is SwiftIrProtocolDeclaration.External -> listOf(ExternalType.Protocol(module.name, name))
-        // WIP SuperTypes
-        is SwiftIrProtocolDeclaration.Local -> emptyList()
+        is SwiftIrTypeDeclaration.Local -> (typeParameters + superTypes).flatMap { it.getAllReferencedExternalTypes() }
+        is SwiftIrProtocolDeclaration.External -> listOf(ExternalType.Protocol(module.name, name)) + superTypes.flatMap { it.getAllReferencedExternalTypes() }
+        is SwiftIrProtocolDeclaration.Local -> superTypes.flatMap { it.getAllReferencedExternalTypes() }
         is SwiftIrTypeParameterDeclaration -> bounds.flatMap { it.getAllReferencedExternalTypes() }
         is SwiftIrModule -> emptyList()
         BuiltinDeclarations.Any -> emptyList()

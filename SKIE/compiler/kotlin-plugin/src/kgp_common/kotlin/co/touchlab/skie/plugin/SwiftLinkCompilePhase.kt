@@ -58,6 +58,7 @@ class SwiftLinkCompilePhase(
             bridgeProvider = bridgeProvider,
             translator = translator,
             declarationRegistry = swiftIrDeclarationRegistry,
+            swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
         )
 
         SkieLinkingPhaseScheduler(

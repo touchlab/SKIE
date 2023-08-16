@@ -8,6 +8,7 @@ import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelWith
 import co.touchlab.skie.api.model.type.ActualKotlinClassSwiftModel
 import co.touchlab.skie.api.model.type.ActualKotlinEnumEntrySwiftModel
 import co.touchlab.skie.api.model.type.ActualKotlinFileSwiftModel
+import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
@@ -28,6 +29,7 @@ class SwiftModelFactory(
     private val descriptorProvider: DescriptorProvider,
     private val namer: ObjCExportNamer,
     bridgeProvider: DescriptorBridgeProvider,
+    private val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
 ) {
 
     private val membersDelegate = SwiftModelFactoryMembersDelegate(swiftModelScope, descriptorProvider, namer, bridgeProvider)
@@ -44,6 +46,7 @@ class SwiftModelFactory(
                     namer = namer,
                     swiftModelScope = swiftModelScope,
                     descriptorProvider = descriptorProvider,
+                    swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
                 )
             }
 

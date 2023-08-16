@@ -38,6 +38,7 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
 
             class Modeled(
                 private val model: KotlinClassSwiftModel,
+                override val superTypes: List<SwiftIrExtensibleDeclaration>,
             ): KotlinClass() {
                 override val kotlinModule: String
                     get() = model.classDescriptor.module.swiftIdentifier
@@ -60,9 +61,6 @@ sealed interface SwiftIrTypeDeclaration: SwiftIrExtensibleDeclaration {
                 override val containingDeclaration: SwiftIrTypeDeclaration.Local?
                     // TODO: Instead of runtime crash, it'd be nice if the compiler could catch this.
                     get() = model.containingType?.nonBridgedDeclaration?.let { it as SwiftIrTypeDeclaration.Local }
-
-                override val superTypes: List<SwiftIrExtensibleDeclaration>
-                    get() = TODO("Not yet implemented")
 
                 fun toImmutable(): Immutable {
                     return Immutable(

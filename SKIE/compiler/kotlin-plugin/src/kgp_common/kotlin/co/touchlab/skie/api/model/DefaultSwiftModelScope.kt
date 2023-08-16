@@ -51,9 +51,10 @@ class DefaultSwiftModelScope(
     private val bridgeProvider: DescriptorBridgeProvider,
     private val declarationRegistry: SwiftIrDeclarationRegistry,
     private val translator: SwiftTypeTranslator,
+    swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
 ) : MutableSwiftModelScope {
 
-    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider)
+    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider, swiftIrDeclarationRegistry)
 
     private val members = swiftModelFactory.createMembers(descriptorProvider.allExposedMembers)
 
