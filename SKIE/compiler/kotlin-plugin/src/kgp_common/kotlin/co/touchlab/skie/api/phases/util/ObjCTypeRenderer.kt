@@ -1,4 +1,4 @@
-package co.touchlab.skie.api.phases.typeconflicts
+package co.touchlab.skie.api.phases.util
 
 import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCBlockPointerType

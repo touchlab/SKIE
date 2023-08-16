@@ -1,6 +1,7 @@
 package co.touchlab.skie.api.phases.typeconflicts
 
 import co.touchlab.skie.api.phases.header.BaseHeaderInsertionPhase
+import co.touchlab.skie.api.phases.util.ObjCTypeRenderer
 import java.io.File
 
 class AddTypeDefPhase(

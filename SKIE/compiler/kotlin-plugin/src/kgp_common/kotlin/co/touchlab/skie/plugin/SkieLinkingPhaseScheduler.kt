@@ -18,13 +18,13 @@ import co.touchlab.skie.api.phases.memberconflicts.RemoveKonanManglingPhase
 import co.touchlab.skie.api.phases.memberconflicts.RenameEnumRawValuePhase
 import co.touchlab.skie.api.phases.typeconflicts.AddForwardDeclarationsPhase
 import co.touchlab.skie.api.phases.typeconflicts.AddTypeDefPhase
-import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
+import co.touchlab.skie.api.phases.typeconflicts.RenameInaccessibleNestedDeclarationsPhase
+import co.touchlab.skie.api.phases.util.ExternalTypesProvider
+import co.touchlab.skie.api.phases.util.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 
@@ -39,6 +39,7 @@ class SkieLinkingPhaseScheduler(
     config: KonanConfig,
 ) {
 
+    private val externalTypesProvider = ExternalTypesProvider(swiftModelScope)
     private val objCTypeRenderer = ObjCTypeRenderer()
 
     private val linkingPhases = listOf(
@@ -49,6 +50,7 @@ class SkieLinkingPhaseScheduler(
         FixClassesConflictsPhase(skieModule, descriptorProvider, builtinKotlinDeclarations, framework),
         FixNestedBridgedTypesPhase(skieModule, descriptorProvider),
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
+        RenameInaccessibleNestedDeclarationsPhase(skieModule, externalTypesProvider),
         SkieModuleConfigurationPhase(skieModule, swiftModelScope),
         ApiNotesGenerationPhase(swiftModelScope, objCTypeRenderer, descriptorProvider, framework),
         AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
@@ -56,7 +58,7 @@ class SkieLinkingPhaseScheduler(
         DisableWildcardExportPhase(skieContext, framework),
         DumpSwiftApiPhase.AfterApiNotes(skieContext.skieConfiguration, skieContext, framework),
         GenerateSwiftCodePhase(skieContext, skieModule, swiftModelScope, framework),
-        GenerateFakeObjCDependenciesPhase(swiftModelScope, skieContext.skieDirectories.buildDirectory),
+        GenerateFakeObjCDependenciesPhase(externalTypesProvider, skieContext.skieDirectories.buildDirectory),
         SwiftCacheSetupPhase(skieContext, framework),
         CompileSwiftPhase(skieContext, framework, configurables, config),
     )

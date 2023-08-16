@@ -5,6 +5,7 @@ import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.fqIdentifier
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.module.SkieModule
 import io.outfoxx.swiftpoet.FileSpec
@@ -51,13 +52,6 @@ class FixNestedBridgedTypesPhase(
         this.identifier = this.fqIdentifier.replace(".", "___")
         this.containingType = null
     }
-
-    private val KotlinTypeSwiftModel.fqIdentifier: String
-        get() {
-            val parentIdentifier = containingType?.fqIdentifier
-
-            return if (parentIdentifier != null) "$parentIdentifier.$identifier" else identifier
-        }
 
     context(FileSpec.Builder)
     private fun KotlinTypeSwiftModel.appendTypeAliasForBridging() {

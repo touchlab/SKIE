@@ -1,7 +1,7 @@
 package co.touchlab.skie.api.apinotes.builder
 
 import co.touchlab.skie.api.phases.safeForBridging
-import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
+import co.touchlab.skie.api.phases.util.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility

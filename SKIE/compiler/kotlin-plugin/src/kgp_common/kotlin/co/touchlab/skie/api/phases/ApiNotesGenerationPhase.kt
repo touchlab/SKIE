@@ -2,7 +2,7 @@ package co.touchlab.skie.api.phases
 
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
-import co.touchlab.skie.api.phases.typeconflicts.ObjCTypeRenderer
+import co.touchlab.skie.api.phases.util.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope

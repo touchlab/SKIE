@@ -63,3 +63,17 @@ interface KotlinTypeSwiftModel {
         val StableFqNameNamespace = SwiftFqName.Local.TopLevel("__Skie")
     }
 }
+
+/**
+ * Swift type identifier that includes the containing type.
+ * Examples:
+ * A
+ * A (visibility == Replaced)
+ * A.B (B.identifier == B)
+ */
+val KotlinTypeSwiftModel.fqIdentifier: String
+    get() {
+        val parentIdentifier = containingType?.fqIdentifier
+
+        return if (parentIdentifier != null) "$parentIdentifier.$identifier" else identifier
+    }
