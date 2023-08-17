@@ -3,7 +3,9 @@ package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.Namespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.SecondaryConstructorBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrConstructor
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrSimpleFunction
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.IrRebindableConstructorPublicSymbol
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.IrRebindableSimpleFunctionPublicSymbol
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.DeclarationDescriptorImplReflector
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -16,6 +18,7 @@ import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name
@@ -58,16 +61,21 @@ internal class SecondaryConstructorTemplate(
         val signature = symbolTable.signaturer.composeSignature(descriptor)
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
+        // IrRebindableConstructorPublicSymbol is used so that we can later bind it to the correct declaration which cannot be created before the symbol table is validated to not contain any unbound symbols.
         val symbolFactory = { IrRebindableConstructorPublicSymbol(signature, descriptor) }
         val functionFactory = { symbol: IrConstructorSymbol ->
             DummyIrConstructor(symbol).also {
-                // We need to bind to the symbol to overcome a check in the `declareSimpleFunction` method ...
-                symbol.bind(it)
+                // In 1.8.0 the symbol is already present before calling declareConstructor and therefore is not IrRebindableConstructorPublicSymbol
+                // Starting from 1.9.0 the SymbolTable has additional check that requires that the symbol of created function is bounded in the factory.
+                if (symbol is IrRebindableConstructorPublicSymbol) {
+                    symbol.bind(it)
+                }
             }
         }
 
         val declaration = symbolTable.declareConstructor(signature, symbolFactory, functionFactory)
-        (declaration.symbol as IrRebindableConstructorPublicSymbol).unbind()
+        // But the symbol cannot be bounded otherwise DeclarationBuilder will not to generate the declaration (because it thinks it already exists).
+        (declaration.symbol as? IrRebindableConstructorPublicSymbol)?.unbind()
     }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
