@@ -88,9 +88,9 @@ object SealedInterop {
      */
     object ElseName : ConfigurationKey.String {
 
-        override val defaultValue: String = "Else"
+        override val defaultValue: String = "else"
 
-        override val skieRuntimeValue: String = "Else"
+        override val skieRuntimeValue: String = "else"
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
             configurationTarget.findAnnotation<SealedInterop.ElseName>()?.elseName

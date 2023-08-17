@@ -30,7 +30,7 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
         get() {
             val configuredName = this.getConfiguration(SealedInterop.Case.Name)
 
-            return configuredName ?: this.classDescriptor.name.identifier
+            return configuredName ?: this.classDescriptor.name.identifier.replaceFirstChar { it.lowercase() }
         }
 
     val KotlinClassSwiftModel.enumCaseNameBasedOnSwiftIdentifier: String
