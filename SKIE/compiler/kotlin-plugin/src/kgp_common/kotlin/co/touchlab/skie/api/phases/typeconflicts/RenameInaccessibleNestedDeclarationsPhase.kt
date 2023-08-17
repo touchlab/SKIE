@@ -10,8 +10,15 @@ class RenameInaccessibleNestedDeclarationsPhase(
     private val externalTypesProvider: ExternalTypesProvider,
 ) : SkieLinkingPhase {
 
+    private val builtInConflictingNames =
+        listOf(
+            "Protocol",
+        )
+
     override fun execute() {
-        val conflictingNames = externalTypesProvider.allReferencedExternalTypesWithoutBuiltInModules.map { it.name }.toSet()
+        val conflictingNames = externalTypesProvider.allReferencedExternalTypesWithoutBuiltInModules
+            .map { it.name }
+            .toSet() + builtInConflictingNames
 
         skieModule.configure {
             exposedClasses
