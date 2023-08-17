@@ -122,6 +122,6 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     private fun CodeBlock.Builder.addReturnElse(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
-        add("return %N.%N$\n", enumType.canonicalName, swiftModel.elseCaseName)
+        add("return %N.%N\n", enumType.canonicalName, swiftModel.elseCaseName)
     }
 }
