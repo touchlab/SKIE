@@ -73,15 +73,15 @@ internal class SealedFunctionGeneratorDelegate(
                 val parameterName = swiftModel.enumConstructorParameterName
                 val subclassName = with(subclassSymbol) { swiftNameWithTypeParametersForSealedCase(swiftModel).canonicalName }
 
-                val condition = "let $parameterName = $parameterName as? $subclassName"
+                val condition = "let %N = %N as? %N"
 
                 if (index == 0) {
-                    beginControlFlow("if", condition)
+                    beginControlFlow("if", condition, parameterName, parameterName, subclassName)
                 } else {
-                    nextControlFlow("else if", condition)
+                    nextControlFlow("else if", condition, parameterName, parameterName, subclassName)
                 }
 
-                add("return ${enumType.canonicalName}.${subclassSymbol.enumCaseName(preferredNamesCollide)}($parameterName)\n")
+                add("return %N.%N(%N)\n", enumType.canonicalName, subclassSymbol.enumCaseName(preferredNamesCollide), parameterName)
             }
 
         return this
@@ -122,6 +122,6 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     private fun CodeBlock.Builder.addReturnElse(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
-        add("return ${enumType.canonicalName}.${swiftModel.elseCaseName}\n")
+        add("return %N.%N$\n", enumType.canonicalName, swiftModel.elseCaseName)
     }
 }
