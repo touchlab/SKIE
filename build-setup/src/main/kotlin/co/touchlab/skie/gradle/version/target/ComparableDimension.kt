@@ -16,11 +16,21 @@ class ComparableDimension<COMPONENT>(
     private fun tryParseRange(string: String): SourceSet.ComponentSet<COMPONENT>? {
         return regexes.range.matchEntire(string)?.let { match ->
             val (startValue, endValue) = match.destructured
-            val startComponentIndex = checkNotNull(sortedComponents.indexOfFirst { it.value == startValue }.takeIf { it >= 0 }) {
-                "Could not find start component with value $startValue when parsing $string!"
+            val startComponentIndexIfExists = sortedComponents.indexOfFirst { it.value == startValue }.takeIf { it >= 0 }
+            val endLabelIfExists = sortedComponents.indexOfLast { it.value == endValue }.takeIf { it >= 0 }
+
+            if (startComponentIndexIfExists == null) {
+                println("Warning: Could not find start component with value $startValue when parsing $string!")
             }
-            val endLabel = checkNotNull(sortedComponents.indexOfLast { it.value == endValue }.takeIf { it >= 0 }) {
-                "Could not find end component with value $endValue when parsing $string!"
+            if (endLabelIfExists == null) {
+                println("Warning: Could not find end component with value $endValue when parsing $string!")
+            }
+
+            val (startComponentIndex, endLabel) = when {
+                startComponentIndexIfExists != null && endLabelIfExists != null -> startComponentIndexIfExists to endLabelIfExists
+                startComponentIndexIfExists != null -> startComponentIndexIfExists to startComponentIndexIfExists
+                endLabelIfExists != null -> endLabelIfExists to endLabelIfExists
+                else -> return null
             }
 
             SourceSet.ComponentSet.Enumerated(
