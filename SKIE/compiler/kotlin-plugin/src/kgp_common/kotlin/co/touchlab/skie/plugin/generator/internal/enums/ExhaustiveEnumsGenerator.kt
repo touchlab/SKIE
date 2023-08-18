@@ -118,6 +118,7 @@ internal class ExhaustiveEnumsGenerator(
         bridge.nestedTypealiasName?.let { nestedTypealiasName ->
             addExtension(
                 ExtensionSpec.builder(nestedTypealiasName.parent.toSwiftPoetName())
+                    .addModifiers(Modifier.PUBLIC)
                     .addType(
                         TypeAliasSpec.builder(nestedTypealiasName.name, bridge.declaration.publicName.toSwiftPoetName()).build()
                     )
