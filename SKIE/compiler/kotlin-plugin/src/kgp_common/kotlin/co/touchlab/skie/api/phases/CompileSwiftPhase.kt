@@ -85,13 +85,21 @@ class CompileSwiftPhase(
     }
 
     private fun deleteOldObjectFiles(sourceFiles: List<File>) {
-        val sourceFilesNames = sourceFiles.map { it.nameWithoutExtension }.toSet()
+        if (config.debug) {
+            val sourceFilesNames = sourceFiles.map { it.nameWithoutExtension }.toSet()
 
-        skieBuildDirectory.swiftCompiler.objectFiles.all
-            .filterNot { it.nameWithoutExtension in sourceFilesNames }
-            .forEach { objectFile ->
-                objectFile.delete()
-            }
+            skieBuildDirectory.swiftCompiler.objectFiles.all
+                .filterNot { it.nameWithoutExtension in sourceFilesNames }
+                .forEach { objectFile ->
+                    objectFile.delete()
+                }
+        } else {
+            skieBuildDirectory.swiftCompiler.objectFiles.all
+                .filter { it.nameWithoutExtension != framework.moduleName }
+                .forEach { objectFile ->
+                    objectFile.delete()
+                }
+        }
     }
 
     private fun getSwiftcBitcodeArg() = when (config.configuration.get(KonanConfigKeys.BITCODE_EMBEDDING_MODE)) {

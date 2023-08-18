@@ -80,6 +80,12 @@ abstract class DevAcceptanceTests: Plugin<Project> {
                         inputs.property(
                             "acceptanceTest", System.getenv("acceptanceTest")
                         ).optional(true)
+                        inputs.property(
+                            "kotlinLinkMode", System.getenv("KOTLIN_LINK_MODE")
+                        ).optional(true)
+                        inputs.property(
+                            "kotlinBuildConfiguration", System.getenv("KOTLIN_BUILD_CONFIGURATION")
+                        ).optional(true)
                         outputs.dir(
                             testDirectory(project, acceptanceTestType, kotlinToolingVersion)
                         )
