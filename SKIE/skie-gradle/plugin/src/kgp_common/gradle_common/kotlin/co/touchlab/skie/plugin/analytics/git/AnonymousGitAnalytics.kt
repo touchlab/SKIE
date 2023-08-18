@@ -22,7 +22,7 @@ internal data class AnonymousGitAnalytics(
         override val name: String = "anonymous-git"
 
         override fun produce(): String {
-            val git = project.getGit() ?: return "git not found"
+            val git = project.getGit() ?: return """{ "error": "git not found" }"""
 
             return AnonymousGitAnalytics(
                 numberOfContributors = git.log().all().call().map { it.authorIdent.normalizedName }.distinct().size,

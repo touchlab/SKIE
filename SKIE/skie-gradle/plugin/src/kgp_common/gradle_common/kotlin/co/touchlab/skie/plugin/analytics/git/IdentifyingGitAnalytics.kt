@@ -17,19 +17,20 @@ internal data class IdentifyingGitAnalytics(
 
         override val name: String = "identifying-git"
 
-        override fun produce(): String =
-            IdentifyingGitAnalytics(
-                gitRemotes = getGitRemotes(),
-            ).toPrettyJson()
+        override fun produce(): String {
+            val git = project.getGit() ?: return """{ "error": "git not found" }"""
 
-        private fun getGitRemotes(): List<String> =
-            project.getGit()
-                ?.remoteList()
-                ?.call()
-                ?.flatMap { it.urIs }
-                ?.filter { it.isRemote }
-                ?.map { it.host + "/" + it.path }
-                ?: emptyList()
+            return IdentifyingGitAnalytics(
+                gitRemotes = git.getGitRemotes(),
+            ).toPrettyJson()
+        }
+
+        private fun Git.getGitRemotes(): List<String> =
+            remoteList()
+                .call()
+                .flatMap { it.urIs }
+                .filter { it.isRemote }
+                .map { it.host + "/" + it.path }
     }
 }
 

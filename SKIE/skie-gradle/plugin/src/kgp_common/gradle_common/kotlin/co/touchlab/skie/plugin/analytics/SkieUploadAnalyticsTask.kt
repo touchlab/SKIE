@@ -24,14 +24,18 @@ internal abstract class SkieUploadAnalyticsTask : DefaultTask() {
 
     @TaskAction
     fun runTask() {
-        val analyticsId = getAnalyticsId()
-        val eventData = getEventData()
+        try {
+            val analyticsId = getAnalyticsId()
+            val eventData = getEventData()
 
-        val json = JSONObject(eventData)
+            val json = JSONObject(eventData)
 
-        val event = MessageBuilder(BuildConfig.MIXPANEL_PROJECT_TOKEN).event(analyticsId, "compile", json)
+            val event = MessageBuilder(BuildConfig.MIXPANEL_PROJECT_TOKEN).event(analyticsId, "compile", json)
 
-        MixpanelAPI().sendMessage(event)
+            MixpanelAPI().sendMessage(event)
+        } catch (e: Throwable) {
+            logger.warn("SKIE analytics upload failed: $e")
+        }
     }
 
     private fun getAnalyticsId(): String {
@@ -66,11 +70,18 @@ internal abstract class SkieUploadAnalyticsTask : DefaultTask() {
         return directory.walkTopDown()
             .filter { it.extension == "json" }
             .fold(emptyMap()) { acc, file ->
-                val fileContent = file.readText()
-
-                val parsedJson = JsonSlurper().parseText(fileContent)
+                val parsedJson = file.parseJsonSafe()
 
                 acc + mapOf(file.nameWithoutExtension to parsedJson)
             }
     }
+
+    private fun File.parseJsonSafe(): Any =
+        try {
+            val fileContent = this.readText()
+
+            JsonSlurper().parseText(fileContent)
+        } catch (e: Throwable) {
+            mapOf("error" to e.toString())
+        }
 }
