@@ -31,7 +31,7 @@ class GenerateFakeObjCDependenciesPhase(
             }
         """.trimIndent()
 
-        skieBuildDirectory.fakeObjCFrameworks.moduleMap(module).writeTextIfDifferent(modulemapContent)
+        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module).writeTextIfDifferent(modulemapContent)
     }
 
     private fun generateHeader(module: String, types: List<ExternalType>) {
@@ -40,7 +40,7 @@ class GenerateFakeObjCDependenciesPhase(
 
         val headerContent = "$foundationImport\n\n$typeDeclarations"
 
-        skieBuildDirectory.fakeObjCFrameworks.header(module).writeTextIfDifferent(headerContent)
+        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(module).writeTextIfDifferent(headerContent)
     }
 }
 

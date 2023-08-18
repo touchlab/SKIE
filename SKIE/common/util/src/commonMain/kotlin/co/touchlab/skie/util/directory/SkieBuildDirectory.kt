@@ -16,8 +16,6 @@ class SkieBuildDirectory(
 
     val debug: Debug = Debug(this)
 
-    val fakeObjCFrameworks: FakeObjCFrameworks = FakeObjCFrameworks(this)
-
     val swift: Swift = Swift(this)
 
     val temp: Temp = Temp(this)
@@ -59,10 +57,7 @@ class SkieBuildDirectory(
 
         class Logs(parent: Directory) : TemporaryDirectory(parent, "logs") {
 
-            val swiftc: File by lazy {
-                directory.mkdirs()
-                directory.resolve("swiftc.log")
-            }
+            val swiftc: File = directory.resolve("swiftc.log")
 
             fun apiFile(baseName: String): File = directory.resolve("$baseName.log")
         }
@@ -71,19 +66,6 @@ class SkieBuildDirectory(
 
             fun apiFile(baseName: String): File = directory.resolve("$baseName.swift")
         }
-    }
-
-    class FakeObjCFrameworks(parent: Directory) : PermanentDirectory(parent, "fake-objc-frameworks") {
-
-        private fun framework(moduleName: String): File = directory.resolve("$moduleName.framework").also { it.mkdirs() }
-
-        private fun headers(moduleName: String): File = framework(moduleName).resolve("Headers").also { it.mkdirs() }
-
-        fun header(moduleName: String): File = headers(moduleName).resolve("$moduleName.h")
-
-        private fun modules(moduleName: String): File = framework(moduleName).resolve("Modules").also { it.mkdirs() }
-
-        fun moduleMap(moduleName: String): File = modules(moduleName).resolve("module.modulemap")
     }
 
     class Swift(parent: Directory) : PermanentDirectory(parent, "swift") {
@@ -98,10 +80,6 @@ class SkieBuildDirectory(
         val custom: Custom = Custom(this)
 
         class Generated(parent: Directory) : PermanentDirectory(parent, "generated") {
-            init {
-                // TODO: Added to make tests working. This should probably be created and reset in tests directly.
-                directory.mkdirs()
-            }
 
             fun swiftFile(baseName: String): File = directory.resolve("$baseName.swift")
         }
@@ -115,11 +93,11 @@ class SkieBuildDirectory(
 
         fun moduleHeader(moduleName: String): ModuleHeader = ModuleHeader(this, moduleName)
 
+        val fakeObjCFrameworks: FakeObjCFrameworks = FakeObjCFrameworks(this)
+
+        val apiNotes: ApiNotes = ApiNotes(this)
+
         class ObjectFiles(parent: Directory) : PermanentDirectory(parent, "object-files") {
-            init {
-                // TODO: Added to make tests working. This should probably be created and reset in tests directly.
-                directory.mkdirs()
-            }
 
             val all: List<File>
                 get() = directory.walkTopDown()
@@ -130,6 +108,7 @@ class SkieBuildDirectory(
         class ModuleHeader(parent: Directory, moduleName: String) : PermanentDirectory(parent, "headers") {
 
             init {
+                // Has to be called manually because the instances are created dynamically
                 directory.mkdirs()
             }
 
@@ -146,6 +125,24 @@ class SkieBuildDirectory(
             val swiftSourceInfo: File = directory.resolve("${moduleName}.swiftsourceinfo")
 
             val swiftHeader: File = directory.resolve("${moduleName}-Swift.h")
+        }
+
+        class FakeObjCFrameworks(parent: Directory) : PermanentDirectory(parent, "fake-objc-frameworks") {
+
+            private fun framework(moduleName: String): File = directory.resolve("$moduleName.framework").also { it.mkdirs() }
+
+            private fun headers(moduleName: String): File = framework(moduleName).resolve("Headers").also { it.mkdirs() }
+
+            fun header(moduleName: String): File = headers(moduleName).resolve("$moduleName.h")
+
+            private fun modules(moduleName: String): File = framework(moduleName).resolve("Modules").also { it.mkdirs() }
+
+            fun moduleMap(moduleName: String): File = modules(moduleName).resolve("module.modulemap")
+        }
+
+        class ApiNotes(parent: Directory) : PermanentDirectory(parent, "apinotes") {
+
+            fun apiNotes(moduleName: String): File = directory.resolve("$moduleName.apinotes")
         }
     }
 

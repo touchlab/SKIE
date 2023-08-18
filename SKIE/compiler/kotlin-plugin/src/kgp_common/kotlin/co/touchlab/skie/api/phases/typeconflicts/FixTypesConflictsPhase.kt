@@ -1,5 +1,6 @@
-package co.touchlab.skie.api.phases
+package co.touchlab.skie.api.phases.typeconflicts
 
+import co.touchlab.skie.api.phases.SkieLinkingPhase
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
@@ -15,7 +16,7 @@ import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 // TODO Currently does not take into account bridging and generated Swift code in general
-class FixClassesConflictsPhase(
+class FixTypesConflictsPhase(
     private val skieModule: SkieModule,
     private val descriptorProvider: DescriptorProvider,
     private val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,

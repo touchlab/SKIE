@@ -50,7 +50,7 @@ class CompileSwiftPhase(
             +"-F"
             +skieContext.cacheableKotlinFramework.parentDir.absolutePath
             +"-F"
-            +skieBuildDirectory.fakeObjCFrameworks.directory.absolutePath
+            +skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.directory.absolutePath
             +"-emit-module"
             +"-emit-module-path"
             +swiftFrameworkHeader.swiftModule

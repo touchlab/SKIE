@@ -37,10 +37,12 @@ sealed class DumpSwiftApiPhase(
         val apiFile = skieContext.skieBuildDirectory.debug.dumps.apiFile(apiFileBaseName)
         val logFile = skieContext.skieBuildDirectory.debug.logs.apiFile(apiFileBaseName)
 
-        Command(
+        val command = Command(
             "zsh",
             "-c",
             """echo "import Kotlin\n:type lookup $moduleName" | swift repl -F "${framework.framework.parentFile.absolutePath}" > "${apiFile.absolutePath}"""",
-        ).execute(handleError = false, logFile = logFile)
+        )
+
+        command.execute(handleError = false, logFile = logFile)
     }
 }

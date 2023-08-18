@@ -1,19 +1,21 @@
-package co.touchlab.skie.api.phases
+package co.touchlab.skie.api.phases.apinotes
 
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.api.apinotes.builder.ApiNotesFactory
+import co.touchlab.skie.api.phases.SkieLinkingPhase
 import co.touchlab.skie.api.phases.util.ObjCTypeRenderer
-import co.touchlab.skie.plugin.api.descriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
+import co.touchlab.skie.util.cache.writeTextIfDifferent
+import java.io.File
 
-class ApiNotesGenerationPhase(
+abstract class BaseApiNotesGenerationPhase(
     swiftModelScope: MutableSwiftModelScope,
     objCTypeRenderer: ObjCTypeRenderer,
     descriptorProvider: DescriptorProvider,
-    private val framework: FrameworkLayout,
+    framework: FrameworkLayout,
+    private val apiNotesFile: File,
 ) : SkieLinkingPhase {
 
     private val apiNotesFactory = ApiNotesFactory(framework.moduleName, descriptorProvider, swiftModelScope, objCTypeRenderer)
@@ -27,6 +29,6 @@ class ApiNotesGenerationPhase(
     private fun ApiNotes.createApiNotesFile() {
         val content = this.createApiNotesFileContent()
 
-        framework.apiNotes.writeText(content)
+        apiNotesFile.writeTextIfDifferent(content)
     }
 }

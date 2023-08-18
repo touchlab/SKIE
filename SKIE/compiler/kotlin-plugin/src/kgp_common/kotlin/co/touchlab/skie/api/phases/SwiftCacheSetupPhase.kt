@@ -31,7 +31,7 @@ class SwiftCacheSetupPhase(
         // Must use `or` to prevent short circuit optimization.
         return framework.kotlinHeader.copyFileToIfDifferent(dummyFramework.kotlinHeader) or
             framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
-            framework.apiNotes.copyFileToIfDifferent(dummyFramework.apiNotes)
+            skieContext.skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName).copyFileToIfDifferent(dummyFramework.apiNotes)
     }
 
     // Solves a bug in Swift compiler.

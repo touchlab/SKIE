@@ -10,10 +10,8 @@ class DefaultSkieModule : SkieModule {
     private val configureBlocks = OrderedList<context(MutableSwiftModelScope) () -> Unit>()
     private val swiftPoetFileBlocks = mutableMapOf<String, OrderedList<context(SwiftModelScope) FileSpec.Builder.() -> Unit>>()
     private val textFileBlocks = mutableMapOf<String, MutableList<String>>()
-    private var configureBlocksConsumed = false
 
     override fun configure(ordering: SkieModule.Ordering, configure: context(MutableSwiftModelScope) () -> Unit) {
-        require(!configureBlocksConsumed) { "configure() must not be called again after consumed" }
         configureBlocks.add(configure, ordering)
     }
 
@@ -26,12 +24,11 @@ class DefaultSkieModule : SkieModule {
     }
 
     fun consumeConfigureBlocks(scope: MutableSwiftModelScope) {
-        require(!configureBlocksConsumed) { "Configuration already consumed." }
-        configureBlocksConsumed = true
-
         configureBlocks.forEach {
             it(scope)
         }
+
+        configureBlocks.clear()
     }
 
     fun produceSwiftPoetFiles(context: SwiftModelScope, moduleName: String): List<FileSpec> {
@@ -82,6 +79,12 @@ class DefaultSkieModule : SkieModule {
             first.forEach(action)
             inOrder.forEach(action)
             last.forEach(action)
+        }
+
+        fun clear() {
+            first.clear()
+            inOrder.clear()
+            last.clear()
         }
     }
 }

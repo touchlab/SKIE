@@ -27,6 +27,9 @@ interface SwiftModelScope {
 
     val exposedFiles: List<KotlinTypeSwiftModel>
 
+    val exposedTypes: List<KotlinTypeSwiftModel>
+        get() = exposedClasses + exposedFiles
+
     val allExposedMembers: List<KotlinCallableMemberSwiftModel>
 
     fun referenceClass(classFqName: String): KotlinClassSwiftModel

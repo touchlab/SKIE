@@ -32,6 +32,8 @@ class ExternalTypesProvider(
     private val swiftModelScope: SwiftModelScope,
 ) {
 
+    val builtInModules = listOf("Swift", "Foundation")
+
     val allReferencedExternalTypes: List<ExternalType> = run {
         val externalTypesFromCallableMembers = swiftModelScope.allExposedMembers
             .flatMap { it.directlyCallableMembers }
@@ -49,8 +51,6 @@ class ExternalTypesProvider(
 
         (externalTypesFromCallableMembers + externalTypesFromClasses).distinct()
     }
-
-    private val builtInModules = listOf("Swift", "Foundation")
 
     val allReferencedExternalTypesWithoutBuiltInModules: List<ExternalType> =
         allReferencedExternalTypes.filter { it.module !in builtInModules }
