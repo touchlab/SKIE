@@ -31,6 +31,7 @@ class SwiftIrDeclarationRegistry(
 
     private val modules = mutableMapOf<String, SwiftIrModule>()
     private val externalTypeDeclarations = mutableMapOf<SwiftFqName.External, SwiftIrTypeDeclaration.External>()
+    private val externalProtocolDeclarations = mutableMapOf<SwiftFqName.External, SwiftIrProtocolDeclaration.External>()
 
     init {
         val knownExternalDeclarations = listOf(
@@ -77,15 +78,24 @@ class SwiftIrDeclarationRegistry(
         }
     }
 
-    context(SwiftModelScope)
-    fun declarationForClass(descriptor: ClassDescriptor): SwiftIrExtensibleDeclaration = declarationsByDescriptor.getOrPut(descriptor) {
-        resolveDeclaration(descriptor)
-    } as SwiftIrExtensibleDeclaration
+    fun referenceExternalProtocolDeclaration(
+        fqName: SwiftFqName.External.TopLevel,
+        defaultSupertypes: List<SwiftIrExtensibleDeclaration> = emptyList(),
+    ): SwiftIrProtocolDeclaration {
+        return externalProtocolDeclarations.getOrPut(fqName) {
+            SwiftIrProtocolDeclaration.External(
+                module = referenceModule(fqName.module),
+                name = fqName.name,
+                superTypes = defaultSupertypes,
+            )
+        }
+    }
 
     context(SwiftModelScope)
-    fun declarationForInterface(descriptor: ClassDescriptor): SwiftIrProtocolDeclaration = declarationsByDescriptor.getOrPut(descriptor) {
-        resolveDeclaration(descriptor)
-    } as SwiftIrProtocolDeclaration
+    fun declarationForClass(descriptor: ClassDescriptor): SwiftIrExtensibleDeclaration = resolveDeclaration(descriptor) as SwiftIrExtensibleDeclaration
+
+    context(SwiftModelScope)
+    fun declarationForInterface(descriptor: ClassDescriptor): SwiftIrProtocolDeclaration = resolveDeclaration(descriptor) as SwiftIrProtocolDeclaration
 
     context(SwiftModelScope)
     fun declarationForSwiftModel(swiftModel: KotlinClassSwiftModel): SwiftIrExtensibleDeclaration.Local =
@@ -102,23 +112,17 @@ class SwiftIrDeclarationRegistry(
 
     context(SwiftModelScope)
     private fun resolveDeclaration(descriptor: ClassDescriptor): SwiftIrDeclaration = when {
-        descriptor.hasSwiftModel -> declarationForSwiftModel(descriptor.swiftModel)
+        descriptor.hasSwiftModel -> descriptor.swiftModel.bridge?.declaration ?: declarationForSwiftModel(descriptor.swiftModel)
         descriptor.isObjCMetaClass() -> BuiltinDeclarations.AnyClass
         descriptor.isObjCProtocolClass() -> BuiltinDeclarations.Protocol
         descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration() -> {
-            val module = referenceModule(descriptor.fqNameSafe.pathSegments()[1].asString())
+            val moduleName = descriptor.fqNameSafe.pathSegments()[1].asString()
             if (descriptor.kind.isInterface) {
-                SwiftIrProtocolDeclaration.External(
-                    module = module,
-                    name = descriptor.name.asString().removeSuffix("Protocol"),
-                    superTypes = listOf(BuiltinDeclarations.Foundation.NSObject),
-                )
+                val fqName = SwiftFqName.External.TopLevel(moduleName, descriptor.name.asString().removeSuffix("Protocol"))
+                referenceExternalProtocolDeclaration(fqName, listOf(BuiltinDeclarations.Foundation.NSObject))
             } else {
-                SwiftIrTypeDeclaration.External(
-                    module = module,
-                    name = descriptor.name.asString(),
-                    superTypes = listOf(BuiltinDeclarations.Foundation.NSObject),
-                )
+                val fqName = SwiftFqName.External.TopLevel(moduleName, descriptor.name.asString())
+                referenceExternalTypeDeclaration(fqName, listOf(BuiltinDeclarations.Foundation.NSObject))
             }
         }
 
