@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
+import co.touchlab.skie.api.phases.AddDummySwiftHeaderImportPhase
 import co.touchlab.skie.api.phases.CompileSwiftPhase
 import co.touchlab.skie.api.phases.DisableWildcardExportPhase
 import co.touchlab.skie.api.phases.FixHeaderFilePropertyOrderingPhase
@@ -55,6 +56,7 @@ class SkieLinkingPhaseScheduler(
         FixTypesConflictsPhase(skieModule, descriptorProvider, builtinKotlinDeclarations, framework),
         FixNestedBridgedTypesPhase(skieModule, descriptorProvider),
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
+        AddDummySwiftHeaderImportPhase(framework.kotlinHeader, framework),
         RenameInaccessibleNestedDeclarationsPhase(skieModule, externalTypesProvider),
         MangleTypesConflictingWithModulesPhase(skieModule, externalTypesProvider, conflictingClassManglingContext),
         SkieModuleConfigurationPhase(skieModule, swiftModelScope),
