@@ -122,6 +122,7 @@ class CompileSwiftPhase(
             swiftFrameworkHeader.swiftDoc to framework.swiftDoc(targetTriple),
             swiftFrameworkHeader.abiJson to framework.abiJson(targetTriple),
             swiftFrameworkHeader.swiftSourceInfo to framework.swiftSourceInfo(targetTriple),
+            swiftFrameworkHeader.swiftHeader to framework.swiftHeader,
         )
 
         copyFiles.forEach { (source, target) ->
@@ -130,10 +131,6 @@ class CompileSwiftPhase(
     }
 
     private fun addSwiftSubmoduleToModuleMap() {
-        if (!framework.swiftHeader.exists()) {
-            framework.swiftHeader.writeText("")
-        }
-
         framework.modulemapFile.appendText(
             """
 
@@ -143,10 +140,6 @@ class CompileSwiftPhase(
                 requires objc
             }
             """.trimIndent(),
-        )
-
-        framework.kotlinHeader.appendText(
-            "\n#import \"${framework.swiftHeader.name}\"\n"
         )
     }
 

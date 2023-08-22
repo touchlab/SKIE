@@ -24,10 +24,6 @@ class SwiftCacheSetupPhase(
         dummyFramework.headersDir.mkdirs()
         dummyFramework.modulesDir.mkdirs()
 
-        if (!dummyFramework.swiftHeader.exists()) {
-            dummyFramework.swiftHeader.writeText("")
-        }
-
         // Must use `or` to prevent short circuit optimization.
         return framework.kotlinHeader.copyFileToIfDifferent(dummyFramework.kotlinHeader) or
             framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
