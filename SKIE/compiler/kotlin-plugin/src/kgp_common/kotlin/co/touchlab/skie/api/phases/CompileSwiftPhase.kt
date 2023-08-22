@@ -144,6 +144,10 @@ class CompileSwiftPhase(
             }
             """.trimIndent(),
         )
+
+        framework.kotlinHeader.appendText(
+            "\n#import \"${framework.swiftHeader.name}\"\n"
+        )
     }
 
     private fun addSwiftSpecificLinkerArgs() {
