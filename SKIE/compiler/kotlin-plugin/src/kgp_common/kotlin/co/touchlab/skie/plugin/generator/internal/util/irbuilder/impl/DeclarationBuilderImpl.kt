@@ -13,15 +13,23 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.NewFileNamespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace.nameOrError
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrConstructor
+import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrSimpleFunction
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.FunctionTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template.SecondaryConstructorTemplate
-import co.touchlab.skie.plugin.reflection.reflectedBy
-import co.touchlab.skie.plugin.reflection.reflectors.ContextReflector
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
+import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerIr
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -33,7 +41,6 @@ import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
-import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrSimpleFunction
 
 internal class DeclarationBuilderImpl(
     moduleDescriptor: ModuleDescriptor,
@@ -149,8 +156,10 @@ internal class DeclarationBuilderImpl(
 
     /**
      * This fixes a bug in klibs produced by Konan <= 1.5.
-     * (We don't know for sure because we don't know what is different about the klib, but we don't have a different type of reproducer.)
-     * The affected klibs behave differently during IR deserialization - exposed type parameters are deserialized without public symbols.
+     * The affected klibs behave differently during IR deserialization - some exposed type parameters are deserialized without public symbols.
+     * We do not fully understand the reason behind that but our guess is that older versions of the compiler did not correctly linked TypeParameter declarations with their usage.
+     * It looks like that for some TypeParameters the compiler created new instances instead of using the one available in the declaration scope.
+     * This then probably confuses the deserializer which in return declares the TypeParameters with non-public symbol (because it does not see that symbol as being declared in public declaration).
      * This fix registers these missing symbols manually.
      */
     private fun fixPrivateTypeParametersSymbolsFromOldKLibs(symbolTable: SymbolTable) {
@@ -181,7 +190,7 @@ private fun SymbolTable.referenceBoundTypeParameterContainer(functionDescriptor:
     listOfNotNull(
         referenceFunction(functionDescriptor).takeIf {
             it.isBound && it.owner !is DummyIrSimpleFunction && it.owner !is DummyIrConstructor
-        }?.owner
+        }?.owner,
     )
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
@@ -194,17 +203,12 @@ private fun SymbolTable.referenceBoundTypeParameterContainer(propertyDescriptor:
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 private fun SymbolTable.referenceBoundTypeParameterContainer(classDescriptor: ClassDescriptor): List<IrTypeParametersContainer> =
     listOfNotNull(
-        referenceClass(classDescriptor).takeIf { it.isBound }?.owner
+        referenceClass(classDescriptor).takeIf { it.isBound }?.owner,
     )
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 private fun SymbolTable.declarePrivateTypeParameterAsPublic(typeParameter: IrTypeParameter) {
-    /** FIXME: In certain libraries, the call to composeSignature crashes in 1.9.0 because of type parameter container misalignment.
-     *      However, skipping this code altogether fails somewhere else because this workaround is still needed. During simple testing,
-     *      we found that wrapping this whole block in `try { } catch { }` and ignoring exceptions, "solved" both issues. That's not a viable
-     *      solution though, so we need to figure out what's the correct approach here.
-     */
-    val signature = signaturer.composeSignature(typeParameter.descriptor) ?: error("Type parameter $typeParameter is not exposed.")
+    val signature = PublicIdSignatureComputer(KonanManglerIr).computeSignature(typeParameter)
 
     val publicSymbol = IrTypeParameterPublicSymbolImpl(signature, typeParameter.descriptor)
     publicSymbol.bind(typeParameter)

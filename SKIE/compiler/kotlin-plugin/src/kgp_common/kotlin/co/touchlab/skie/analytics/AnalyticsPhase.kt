@@ -32,15 +32,12 @@ internal class AnalyticsPhase(
             AnonymousSkieConfigurationAnalytics.Producer(skieContext.skieConfiguration),
             IdentifyingSkieConfigurationAnalytics.Producer(skieContext.skieConfiguration),
             AnonymousCompilerEnvironmentAnalytics.Producer(config),
+            IdentifyingLocalModulesAnalytics.Producer(config),
+            AnonymousLibrariesAnalytics.Producer(config),
         )
     }
 
     override fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
-        skieContext.analyticsCollector.collectAsync(
-            IdentifyingLocalModulesAnalytics.Producer(config),
-            AnonymousLibrariesAnalytics.Producer(config),
-        )
-
         skieContext.analyticsCollector.collectSynchronously(
             AnonymousDeclarationsAnalytics.Producer(config, allModules, descriptorProvider),
         )
