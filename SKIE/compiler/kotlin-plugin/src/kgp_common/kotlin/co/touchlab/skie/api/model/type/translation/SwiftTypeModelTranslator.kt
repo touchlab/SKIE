@@ -214,6 +214,13 @@ class SwiftTypeTranslator(
                                 swiftExportScope,
                                 flowMappingStrategy.forTypeArgumentsOf(kotlinType),
                             )
+                        } else if (kotlinType.immediateSupertypes().singleOrNull()?.isTypeParameter() == true) {
+                            val referencedType = kotlinType.immediateSupertypes().single()
+                            return mapReferenceTypeIgnoringNullability(
+                                referencedType,
+                                swiftExportScope,
+                                flowMappingStrategy.forTypeArgumentsOf(referencedType),
+                            )
                         }
                     }
                 }
