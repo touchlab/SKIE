@@ -19,23 +19,20 @@ import org.gradle.util.GradleVersion
 
 @Suppress("unused")
 abstract class SkieLoaderPlugin: Plugin<Project> {
+
     override fun apply(project: Project): Unit = with(project) {
         // We need to register the extension here, so that Gradle knows the type of it in the build script.
         with(SkieExtension) {
             createExtension()
         }
 
-        val rootClasspathConfiguration = rootProject.buildscript.configurations.getByName("classpath")
-        val kotlinDependency = rootClasspathConfiguration.resolvedConfiguration.resolvedArtifacts.singleOrNull { artifact ->
-            artifact.moduleVersion.id.let { it.group == "org.jetbrains.kotlin" && it.name == "kotlin-gradle-plugin" }
-        }
+        val kotlinVersion = project.kotlinGradlePluginVersionOverride ?: project.kotlinGradlePluginVersion ?: rootProject.kotlinGradlePluginVersion
 
-        if (kotlinDependency == null) {
-            log.error("Couldn't find Kotlin plugin version. Make sure you have Kotlin plugin applied.")
+        if (kotlinVersion == null) {
+            log.error("Couldn't find Kotlin plugin version. Make sure you have Kotlin plugin applied or set property 'skie.kgpVersion' in your gradle.properties.")
             return
         }
         val gradleVersion = GradleVersion.current().version
-        val kotlinVersion = kotlinDependency.moduleVersion.id.version
         log.info("Resolving SKIE gradle plugin for Kotlin plugin version $kotlinVersion and Gradle version $gradleVersion")
 
         KotlinCompilerVersion.registerIn(project.dependencies)
@@ -87,6 +84,18 @@ abstract class SkieLoaderPlugin: Plugin<Project> {
         val shimPlugin: Class<Plugin<Project>> = probablySkiePluginClass as Class<Plugin<Project>>
         plugins.apply(shimPlugin)
     }
+
+    private val Project.kotlinGradlePluginVersion: String?
+        get() {
+            val classpathConfiguration = buildscript.configurations.getByName("classpath")
+            val artifact = classpathConfiguration.resolvedConfiguration.resolvedArtifacts.singleOrNull { artifact ->
+                artifact.moduleVersion.id.let { it.group == "org.jetbrains.kotlin" && it.name == "kotlin-gradle-plugin" }
+            }
+            return artifact?.moduleVersion?.id?.version
+        }
+
+    private val Project.kotlinGradlePluginVersionOverride: String?
+        get() = findProperty("skie.kgpVersion") as? String
 
     private inline fun <reified T : Named> ObjectFactory.named(name: String): T =
         named(T::class.java, name)
