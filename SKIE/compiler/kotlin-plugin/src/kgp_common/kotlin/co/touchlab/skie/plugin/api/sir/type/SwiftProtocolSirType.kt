@@ -6,6 +6,9 @@ import io.outfoxx.swiftpoet.DeclaredTypeName
 data class SwiftProtocolSirType(
     override val declaration: SwiftIrProtocolDeclaration,
 ) : SwiftNonNullReferenceSirType {
+
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): DeclaredTypeName = declaration.internalName.toSwiftPoetName()
 
     override fun toString(): String = asString()

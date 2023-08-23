@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.KotlinValueParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
@@ -16,6 +17,7 @@ import co.touchlab.skie.plugin.generator.internal.enums.ObjCBridgeable.addObjcBr
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
+import co.touchlab.skie.plugin.generator.internal.util.swift.addFunctionBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -86,8 +88,8 @@ internal class ExhaustiveEnumsGenerator(
                 swiftName = name,
                 superTypes = listOf(
                     BuiltinDeclarations.Swift.Hashable,
-                )
-            )
+                ),
+            ),
         )
 
         this.visibility = SwiftModelVisibility.Replaced
@@ -120,9 +122,9 @@ internal class ExhaustiveEnumsGenerator(
                 ExtensionSpec.builder(nestedTypealiasName.parent.toSwiftPoetName())
                     .addModifiers(Modifier.PUBLIC)
                     .addType(
-                        TypeAliasSpec.builder(nestedTypealiasName.name, bridge.declaration.publicName.toSwiftPoetName()).build()
+                        TypeAliasSpec.builder(nestedTypealiasName.name, bridge.declaration.publicName.toSwiftPoetName()).build(),
                     )
-                    .build()
+                    .build(),
             )
         }
     }
@@ -163,7 +165,7 @@ internal class ExhaustiveEnumsGenerator(
                     // TODO: Should this be originalDeclaration or swiftIrDeclaration?
                     TypeAliasSpec.builder(it.identifier, it.nonBridgedDeclaration.internalName.toSwiftPoetName())
                         .addModifiers(Modifier.PUBLIC)
-                        .build()
+                        .build(),
                 )
             }
         }
@@ -182,7 +184,7 @@ internal class ExhaustiveEnumsGenerator(
                     .throws(function.isThrowing)
                     .returns(function.returnType.toSwiftPoetUsage())
                     .addFunctionBody(function)
-                    .build()
+                    .build(),
             )
         }
 
@@ -205,16 +207,18 @@ internal class ExhaustiveEnumsGenerator(
                     valueParameter.argumentLabel,
                     valueParameter.parameterName,
                     valueParameter.type.toSwiftPoetUsage(),
-                ).build()
+                ).build(),
             )
 
         private fun FunctionSpec.Builder.addFunctionBody(function: KotlinFunctionSwiftModel): FunctionSpec.Builder =
-            this.addStatement(
-                "return %L(self as _ObjectiveCType).%N(%L)",
-                if (function.isThrowing) "try " else "",
-                function.reference,
-                function.valueParameters.map { CodeBlock.of("%N", it.parameterName) }.joinToCode(", "),
-            )
+            this.addFunctionBodyWithErrorTypeHandling(function) {
+                addStatement(
+                    "return %L(self as _ObjectiveCType).%N(%L)",
+                    if (function.isThrowing) "try " else "",
+                    function.reference,
+                    function.valueParameters.map { CodeBlock.of("%N", it.parameterName) }.joinToCode(", "),
+                )
+            }
 
         override fun visit(regularProperty: KotlinRegularPropertySwiftModel) {
             builder.addProperty(
@@ -222,20 +226,25 @@ internal class ExhaustiveEnumsGenerator(
                     .addModifiers(Modifier.PUBLIC)
                     .addGetter(regularProperty)
                     .addSetterIfPresent(regularProperty)
-                    .build()
+                    .build(),
             )
         }
 
         private fun PropertySpec.Builder.addGetter(regularProperty: KotlinRegularPropertySwiftModel): PropertySpec.Builder =
             this.getter(
                 FunctionSpec.getterBuilder()
-                    .addStatement(
-                        "return %L(self as _ObjectiveCType).%N",
-                        if (regularProperty.getter.isThrowing) "try " else "",
-                        regularProperty.reference,
-                    )
-                    .build()
+                    .addGetterBody(regularProperty)
+                    .build(),
             )
+
+        private fun FunctionSpec.Builder.addGetterBody(regularProperty: KotlinRegularPropertySwiftModel): FunctionSpec.Builder =
+            this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
+                addStatement(
+                    "return %L(self as _ObjectiveCType).%N",
+                    if (regularProperty.getter.isThrowing) "try " else "",
+                    regularProperty.reference,
+                )
+            }
 
         private fun PropertySpec.Builder.addSetterIfPresent(regularProperty: KotlinRegularPropertySwiftModel): PropertySpec.Builder =
             this.apply {
@@ -245,12 +254,20 @@ internal class ExhaustiveEnumsGenerator(
                     FunctionSpec.setterBuilder()
                         .addModifiers(Modifier.NONMUTATING)
                         .addParameter("value", regularProperty.type.toSwiftPoetUsage())
-                        .addStatement(
-                            "%L(self as _ObjectiveCType).%N = value",
-                            if (setter.isThrowing) "try " else "",
-                            regularProperty.reference,
-                        )
-                        .build()
+                        .addSetterBody(regularProperty, setter)
+                        .build(),
+                )
+            }
+
+        private fun FunctionSpec.Builder.addSetterBody(
+            regularProperty: KotlinRegularPropertySwiftModel,
+            setter: KotlinRegularPropertySetterSwiftModel,
+        ): FunctionSpec.Builder =
+            this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
+                addStatement(
+                    "%L(self as _ObjectiveCType).%N = value",
+                    if (setter.isThrowing) "try " else "",
+                    regularProperty.reference,
                 )
             }
     }
@@ -265,9 +282,9 @@ internal class ExhaustiveEnumsGenerator(
                     .getter(
                         FunctionSpec.getterBuilder()
                             .addStatement("return _ObjectiveCType.companion")
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
             )
         }
 
@@ -281,7 +298,7 @@ internal class ExhaustiveEnumsGenerator(
             ExtensionSpec.builder(bridge.declaration.publicName.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .addToKotlinConversionMethod(classSwiftModel)
-                .build()
+                .build(),
         )
     }
 
@@ -292,16 +309,16 @@ internal class ExhaustiveEnumsGenerator(
                 FunctionSpec.builder("toKotlinEnum")
                     .returns(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                     .addStatement("return _bridgeToObjectiveC()")
-                    .build()
+                    .build(),
             )
-    }
+        }
 
     private fun FileSpec.Builder.addToSwiftConversionExtension(classSwiftModel: KotlinClassSwiftModel, bridge: ObjcSwiftBridge.FromSKIE) {
         addExtension(
             ExtensionSpec.builder(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
                 .addModifiers(Modifier.PUBLIC)
                 .addToSwiftConversionMethod(bridge)
-                .build()
+                .build(),
         )
     }
 
@@ -312,7 +329,7 @@ internal class ExhaustiveEnumsGenerator(
                 FunctionSpec.builder("toSwiftEnum")
                     .returns(bridge.declaration.publicName.toSwiftPoetName())
                     .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", bridge.declaration.publicName.toSwiftPoetName())
-                    .build()
+                    .build(),
             )
-    }
+        }
 }

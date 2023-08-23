@@ -8,6 +8,8 @@ data class SwiftGenericTypeUsageSirType(
     override val declaration: SwiftIrTypeParameterDeclaration,
 ) : SwiftNonNullReferenceSirType {
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName = TypeVariableName(declaration.name)
 
     override fun toString(): String = asString()

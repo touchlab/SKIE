@@ -8,6 +8,8 @@ object SwiftMetaClassSirType: SwiftNonNullReferenceSirType {
 
     override val declaration = BuiltinDeclarations.AnyClass
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName = DeclaredTypeName.qualifiedTypeName("Swift.AnyClass")
 
     override fun toString(): String = asString()

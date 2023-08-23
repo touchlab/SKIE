@@ -11,6 +11,7 @@ import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
 import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
+import co.touchlab.skie.plugin.generator.internal.util.swift.addFunctionBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -46,7 +47,7 @@ internal class SwiftSuspendGeneratorDelegate(
                 ExtensionSpec.builder(bridgeModel.extensionScopeForBridgingFunction.internalName.toSwiftPoetName())
                     .addModifiers(Modifier.PUBLIC)
                     .addSwiftBridgingFunction(bridgeModel)
-                    .build()
+                    .build(),
             )
         }
     }
@@ -83,7 +84,7 @@ internal class SwiftSuspendGeneratorDelegate(
                     .addValueParameters(bridgeModel)
                     .addReturnType(bridgeModel)
                     .addFunctionBody(bridgeModel)
-                    .build()
+                    .build(),
             )
         }
 
@@ -118,7 +119,7 @@ internal class SwiftSuspendGeneratorDelegate(
 
         addParameter(
             ParameterSpec.builder("_", bridgeModel.genericClassDispatchReceiverParameterName, receiver.toSwiftPoetUsage())
-                .build()
+                .build(),
         )
     }
 
@@ -128,7 +129,7 @@ internal class SwiftSuspendGeneratorDelegate(
     private fun FunctionSpec.Builder.addValueParameter(parameter: KotlinValueParameterSwiftModel) {
         addParameter(
             ParameterSpec.builder(parameter.argumentLabel, parameter.parameterName, parameter.type.toSwiftPoetUsage())
-                .build()
+                .build(),
         )
     }
 
@@ -138,7 +139,7 @@ internal class SwiftSuspendGeneratorDelegate(
         }
 
     private fun FunctionSpec.Builder.addFunctionBody(bridgeModel: BridgeModel): FunctionSpec.Builder =
-        this.apply {
+        this.addFunctionBodyWithErrorTypeHandling(bridgeModel.kotlinBridgingFunction) {
             addCode(
                 CodeBlock.builder()
                     .addStatement("return try await SwiftCoroutineDispatcher.dispatch {")
@@ -153,7 +154,7 @@ internal class SwiftSuspendGeneratorDelegate(
                     }
                     .unindent()
                     .addStatement("}")
-                    .build()
+                    .build(),
             )
         }
 

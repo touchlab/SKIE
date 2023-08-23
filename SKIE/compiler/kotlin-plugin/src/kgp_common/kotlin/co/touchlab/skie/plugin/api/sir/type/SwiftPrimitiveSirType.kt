@@ -24,6 +24,8 @@ sealed class SwiftPrimitiveSirType(
     object Float : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Float)
     object Double : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Double)
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName = declaration.internalName.toSwiftPoetName()
 
     override fun toString(): String = asString()

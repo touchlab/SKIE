@@ -7,6 +7,8 @@ import io.outfoxx.swiftpoet.TypeName
 object SwiftAnySirType: SwiftNonNullReferenceSirType {
     override val declaration = BuiltinDeclarations.Any
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName = AnyTypeName.INSTANCE
 
     override fun toString(): String = asString()

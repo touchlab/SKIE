@@ -2,8 +2,9 @@ package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 
-object SwiftAnyObjectSirType: SwiftNonNullReferenceSirType {
-    override val declaration = BuiltinDeclarations.Swift.AnyObject
+object SkieLambdaErrorSirType: SwiftNonNullReferenceSirType, SkieErrorSirType {
+
+    override val declaration = BuiltinDeclarations.SKIE.SkieLambdaErrorType
 
     override val directChildren: List<SirType> = emptyList()
 

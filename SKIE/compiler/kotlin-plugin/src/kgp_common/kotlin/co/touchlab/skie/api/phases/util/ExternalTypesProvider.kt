@@ -6,13 +6,13 @@ import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftMo
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrModule
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
 import co.touchlab.skie.plugin.api.sir.type.ObjcProtocolSirType
 import co.touchlab.skie.plugin.api.sir.type.SirType
+import co.touchlab.skie.plugin.api.sir.type.SkieLambdaErrorSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyObjectSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnySirType
@@ -99,5 +99,6 @@ private fun SirType.getAllReferencedExternalTypes(): List<ExternalType> =
         SwiftInstanceSirType -> emptyList()
         SwiftMetaClassSirType -> emptyList()
         SwiftVoidSirType -> emptyList()
+        SkieLambdaErrorSirType -> emptyList()
     }
 

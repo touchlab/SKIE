@@ -15,6 +15,7 @@ import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.isHashable
 import co.touchlab.skie.plugin.api.sir.type.ObjcProtocolSirType
 import co.touchlab.skie.plugin.api.sir.type.SirType
+import co.touchlab.skie.plugin.api.sir.type.SkieLambdaErrorSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyObjectSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnySirType
@@ -348,7 +349,11 @@ class SwiftTypeTranslator(
         swiftExportScope: SwiftExportScope,
         returnsVoid: Boolean,
         flowMappingStrategy: FlowMappingStrategy,
-    ): SwiftLambdaSirType {
+    ): SwiftNonNullReferenceSirType {
+        if (swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType)) {
+            return SkieLambdaErrorSirType
+        }
+
         val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
             functionType.getValueParameterTypesFromFunctionType().map { it.type }
 

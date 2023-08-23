@@ -10,6 +10,8 @@ data class SwiftPointerSirType(
 
     override val declaration = BuiltinDeclarations.Swift.UnsafeMutableRawPointer
 
+    override val directChildren: List<SirType> = listOf(pointee)
+
     override fun toSwiftPoetUsage(): TypeName = if (nullable) {
         declaration.internalName.toSwiftPoetName().makeOptional()
     } else {

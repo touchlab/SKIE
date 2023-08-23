@@ -10,6 +10,8 @@ data class SwiftClassSirType(
     val typeArguments: List<SwiftNonNullReferenceSirType> = emptyList(),
 ) : SwiftNonNullReferenceSirType {
 
+    override val directChildren: List<SirType> = typeArguments
+
     override fun toSwiftPoetUsage(): TypeName {
         return if (typeArguments.isEmpty()) {
             declaration.internalName.toSwiftPoetName()

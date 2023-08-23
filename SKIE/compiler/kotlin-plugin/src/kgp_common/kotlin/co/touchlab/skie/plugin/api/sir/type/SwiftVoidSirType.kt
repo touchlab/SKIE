@@ -8,6 +8,8 @@ import io.outfoxx.swiftpoet.TypeName
 object SwiftVoidSirType: SirType {
     override val declaration: SwiftIrDeclaration = BuiltinDeclarations.Void
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName = DeclaredTypeName.qualifiedTypeName("Swift.Void")
 
     override fun toString(): String = asString()

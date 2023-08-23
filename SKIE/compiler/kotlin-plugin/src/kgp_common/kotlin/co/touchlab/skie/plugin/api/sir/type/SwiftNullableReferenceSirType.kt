@@ -10,6 +10,7 @@ data class SwiftNullableReferenceSirType(
     override val declaration: SwiftIrDeclaration
         get() = nonNullType.declaration
 
+    override val directChildren: List<SirType> = listOf(nonNullType)
 
     override fun toSwiftPoetUsage(): TypeName = nonNullType.toSwiftPoetUsage().makeOptional()
 

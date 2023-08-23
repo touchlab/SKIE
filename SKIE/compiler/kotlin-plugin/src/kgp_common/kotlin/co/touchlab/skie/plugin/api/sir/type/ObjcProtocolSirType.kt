@@ -9,6 +9,8 @@ import io.outfoxx.swiftpoet.TypeName
 object ObjcProtocolSirType: SwiftNonNullReferenceSirType {
     override val declaration: SwiftIrDeclaration = BuiltinDeclarations.Protocol
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName = DeclaredTypeName.qualifiedLocalTypeName("Protocol")
 
     override fun toString(): String = asString()

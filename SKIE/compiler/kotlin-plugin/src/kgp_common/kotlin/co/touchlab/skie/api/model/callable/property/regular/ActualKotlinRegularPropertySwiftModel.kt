@@ -18,6 +18,8 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlin
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.type.SkieErrorSirType
+import co.touchlab.skie.plugin.api.sir.type.allChildrenRecursivelyAndThis
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
@@ -73,6 +75,10 @@ class ActualKotlinRegularPropertySwiftModel(
 
     override val objCType: ObjCType
         get() = core.getObjCType(descriptor, flowMappingStrategy)
+
+    override val hasValidSignatureInSwift: Boolean
+        get() = listOf(type, receiver).flatMap { it.allChildrenRecursivelyAndThis() }
+            .none { it is SkieErrorSirType }
 
     override val getter: KotlinRegularPropertyGetterSwiftModel by core::getter
 

@@ -13,19 +13,32 @@ import co.touchlab.skie.plugin.generator.internal.util.ir.copyWithoutDefaultValu
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.createFunction
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.util.createValueParameter
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassifierDescriptorWithTypeParameters
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.descriptorUtil.parents
-import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.extractTypeParameters
-import org.jetbrains.kotlin.types.typeUtil.extractTypeParametersFromUpperBounds
+import org.jetbrains.kotlin.types.FlexibleType
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.KotlinTypeFactory
+import org.jetbrains.kotlin.types.SimpleType
+import org.jetbrains.kotlin.types.TypeConstructorSubstitution
+import org.jetbrains.kotlin.types.TypeProjection
+import org.jetbrains.kotlin.types.TypeProjectionImpl
+import org.jetbrains.kotlin.types.TypeSubstitution
+import org.jetbrains.kotlin.types.TypeSubstitutor
+import org.jetbrains.kotlin.types.TypeUtils
+import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.types.inheritEnhancement
+import org.jetbrains.kotlin.types.replace
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
-import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsByParametersWith
-import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
-import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 
 internal class KotlinSuspendGeneratorDelegate(
     private val module: SkieModule,
@@ -154,7 +167,7 @@ internal class KotlinSuspendGeneratorDelegate(
     private fun ValueParameterDescriptor.configureExtensionReceiverFlowMapping(originalFunctionDescriptor: FunctionDescriptor) {
         module.configure {
             val isExtensionReceiverUsedAsSwiftReceiver = originalFunctionDescriptor.swiftModel.scope.isMember &&
-                originalFunctionDescriptor.dispatchReceiverParameter == null
+                    originalFunctionDescriptor.dispatchReceiverParameter == null
 
             if (isExtensionReceiverUsedAsSwiftReceiver) {
                 this.swiftModel.flowMappingStrategy = FlowMappingStrategy.TypeArgumentsOnly
@@ -248,9 +261,9 @@ internal class KotlinSuspendGeneratorDelegate(
     }
 }
 
-class T: TypeSubstitution() {
+class T : TypeSubstitution() {
+
     override fun get(key: KotlinType): TypeProjection? {
         TODO("Not yet implemented")
     }
-
 }

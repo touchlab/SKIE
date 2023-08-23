@@ -9,6 +9,8 @@ object SwiftInstanceSirType: SwiftNonNullReferenceSirType {
     override val declaration: SwiftIrDeclaration
         get() = TODO()
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName = SelfTypeName.INSTANCE
 
     override fun toString(): String = asString()

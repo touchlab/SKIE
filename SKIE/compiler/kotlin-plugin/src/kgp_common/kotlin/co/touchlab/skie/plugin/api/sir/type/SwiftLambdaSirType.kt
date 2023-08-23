@@ -15,6 +15,8 @@ data class SwiftLambdaSirType(
     override val declaration: SwiftIrDeclaration
         get() = TODO("Not yet implemented")
 
+    override val directChildren: List<SirType> = listOf(returnType) + parameterTypes
+
     override fun toSwiftPoetUsage(): TypeName = FunctionTypeName.get(
         parameters = parameterTypes.map { ParameterSpec.unnamed(it.toSwiftPoetUsage()) },
         returnType = returnType.toSwiftPoetUsage(),

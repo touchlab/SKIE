@@ -16,6 +16,8 @@ import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValuePa
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.type.SkieErrorSirType
+import co.touchlab.skie.plugin.api.sir.type.allChildrenRecursivelyAndThis
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -109,6 +111,10 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override val objCReturnType: ObjCType?
         get() = core.getObjCReturnType(descriptor, returnTypeFlowMappingStrategy)
+
+    override val hasValidSignatureInSwift: Boolean
+        get() = (listOf(returnType, receiver) + valueParameters.map { it.type }).flatMap { it.allChildrenRecursivelyAndThis() }
+            .none { it is SkieErrorSirType }
 
     override fun toString(): String = descriptor.toString()
 

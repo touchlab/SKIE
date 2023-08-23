@@ -220,4 +220,12 @@ object BuiltinDeclarations {
         //     }
         // }
     }
+
+    object SKIE {
+
+        val SkieLambdaErrorType = SwiftIrTypeDeclaration.Local.ObjcType(
+            swiftName = "__SkieLambdaErrorType",
+            superTypes = listOf(Foundation.NSObject),
+        )
+    }
 }

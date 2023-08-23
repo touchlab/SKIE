@@ -7,6 +7,8 @@ object SwiftErrorSirType: SwiftNonNullReferenceSirType {
     override val declaration: SwiftIrDeclaration
         get() = TODO("Not yet implemented")
 
+    override val directChildren: List<SirType> = emptyList()
+
     override fun toSwiftPoetUsage(): TypeName {
         TODO("Not yet implemented")
     }
