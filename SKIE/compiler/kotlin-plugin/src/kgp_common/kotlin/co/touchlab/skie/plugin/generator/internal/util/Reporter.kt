@@ -8,9 +8,9 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 
-internal class Reporter(private val compilerConfiguration: CompilerConfiguration) {
+class Reporter(private val compilerConfiguration: CompilerConfiguration) {
 
-    fun report(severity: Severity, message: String, declaration: DeclarationDescriptor?) {
+    fun report(severity: Severity, message: String, declaration: DeclarationDescriptor? = null) {
         val location = MessageUtil.psiElementToMessageLocation(declaration?.findPsi())?.let {
             CompilerMessageLocation.create(it.path, it.line, it.column, it.lineContent)
         }

@@ -56,7 +56,6 @@ internal class CreateSymbolTablePhaseInterceptor: SameTypePhaseInterceptor<Konan
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
             namespaceProvider = NamespaceProvider(context.skieContext.module),
-            reporter = Reporter(context.configuration),
         )
 
         skieScheduler.runClassExportingPhases()

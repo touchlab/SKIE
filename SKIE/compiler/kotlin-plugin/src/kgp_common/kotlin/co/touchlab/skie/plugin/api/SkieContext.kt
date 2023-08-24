@@ -5,6 +5,7 @@ import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
+import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 
@@ -23,6 +24,8 @@ interface SkieContext {
     val analyticsCollector: AnalyticsCollector
 
     val skiePerformanceAnalyticsProducer: AnonymousSkiePerformanceAnalytics.Producer
+
+    val reporter: Reporter
 }
 
 val SkieContext.skieBuildDirectory: SkieBuildDirectory

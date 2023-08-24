@@ -57,7 +57,6 @@ internal class ProduceObjCExportInterfacePhaseInterceptor: PhaseInterceptor<Phas
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
             namespaceProvider = NamespaceProvider(context.config.configuration.skieContext.module),
-            reporter = Reporter(context.config.configuration),
         )
 
         skieScheduler.runClassExportingPhases()

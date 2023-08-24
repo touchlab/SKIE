@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
-    private val reporter: Reporter,
 ) : BaseGenerator(skieContext, namespaceProvider) {
 
     override val isActive: Boolean = true
@@ -61,7 +60,7 @@ internal class ExhaustiveEnumsGenerator(
 
     private fun generate(classSwiftModel: MutableKotlinClassSwiftModel) {
         if (classSwiftModel.enumEntries.isEmpty()) {
-            reporter.report(
+            skieContext.reporter.report(
                 Reporter.Severity.Warning,
                 "Enum ${classSwiftModel.identifier} has no entries, no Swift enum will be generated. " +
                     "To silence this warning, add @EnumInterop.Disabled above the enum declaration.",

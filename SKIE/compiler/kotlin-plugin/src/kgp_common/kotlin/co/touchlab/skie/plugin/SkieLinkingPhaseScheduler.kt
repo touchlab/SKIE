@@ -19,6 +19,7 @@ import co.touchlab.skie.api.phases.memberconflicts.RemoveKonanManglingPhase
 import co.touchlab.skie.api.phases.memberconflicts.RenameEnumRawValuePhase
 import co.touchlab.skie.api.phases.typeconflicts.AddForwardDeclarationsPhase
 import co.touchlab.skie.api.phases.typeconflicts.AddTypeDefPhase
+import co.touchlab.skie.api.phases.typeconflicts.FixTypeConflictWithFrameworkNamePhase
 import co.touchlab.skie.api.phases.typeconflicts.FixTypesConflictsPhase
 import co.touchlab.skie.api.phases.typeconflicts.MangleTypesConflictingWithModulesPhase
 import co.touchlab.skie.api.phases.typeconflicts.RenameInaccessibleNestedDeclarationsPhase
@@ -53,7 +54,8 @@ class SkieLinkingPhaseScheduler(
         RemoveKonanManglingPhase(skieModule, descriptorProvider),
         RenameEnumRawValuePhase(skieModule, descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, descriptorProvider),
-        FixTypesConflictsPhase(skieModule, descriptorProvider, builtinKotlinDeclarations, framework),
+        FixTypeConflictWithFrameworkNamePhase(skieModule, framework, skieContext.reporter),
+        FixTypesConflictsPhase(skieModule, builtinKotlinDeclarations),
         FixNestedBridgedTypesPhase(skieModule, descriptorProvider),
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
         AddLambdaTypeArgumentErrorTypePhase(framework.kotlinHeader),

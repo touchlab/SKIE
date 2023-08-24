@@ -18,24 +18,18 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 // TODO Currently does not take into account bridging and generated Swift code in general
 class FixTypesConflictsPhase(
     private val skieModule: SkieModule,
-    private val descriptorProvider: DescriptorProvider,
     private val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
-    framework: FrameworkLayout,
 ) : SkieLinkingPhase {
 
     private val reservedNames by lazy {
         builtinKotlinDeclarations.allDeclarations.map { it.publicName } +
             // TODO: Unfortunate hack to avoid name collision with Swift's Any keyword
-            SwiftFqName.Local.TopLevel("Any") +
-            SwiftFqName.Local.TopLevel(framework.moduleName)
+            SwiftFqName.Local.TopLevel("Any")
     }
 
     override fun execute() {
         skieModule.configure(SkieModule.Ordering.Last) {
-            val allModels = descriptorProvider.exposedClasses.map { it.swiftModel } +
-                descriptorProvider.exposedFiles.map { it.swiftModel }
-
-            val sortedModels = allModels.sortedByCollisionResolutionPriority()
+            val sortedModels = exposedTypes.sortedByCollisionResolutionPriority()
 
             buildUniqueSignatureSet(sortedModels)
         }

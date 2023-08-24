@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 internal class IrValidator(
     private val skieContext: SkieContext,
     private val descriptorProvider: DescriptorProvider,
-    private val reporter: Reporter,
 ) : SkieCompilationPhase {
 
     override val isActive: Boolean = true
@@ -21,7 +20,7 @@ internal class IrValidator(
         SealedInteropRules.all
 
     override fun runObjcPhase() {
-        with(reporter) {
+        with(skieContext.reporter) {
             with(skieContext.skieConfiguration) {
                 descriptorProvider.exposedClasses.forEach {
                     classRules.validate(it)

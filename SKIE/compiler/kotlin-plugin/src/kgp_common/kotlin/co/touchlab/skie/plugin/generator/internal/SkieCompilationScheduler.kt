@@ -16,7 +16,6 @@ import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
 import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
@@ -30,7 +29,6 @@ internal class SkieCompilationScheduler(
     descriptorProvider: NativeMutableDescriptorProvider,
     declarationBuilder: DeclarationBuilderImpl,
     namespaceProvider: NamespaceProvider,
-    reporter: Reporter,
 ) {
 
     private val compilationPhases = listOf(
@@ -53,7 +51,6 @@ internal class SkieCompilationScheduler(
         ),
         IrValidator(
             skieContext = skieContext,
-            reporter = reporter,
             descriptorProvider = descriptorProvider,
         ),
         KotlinRuntimeHidingPhase(
@@ -84,7 +81,6 @@ internal class SkieCompilationScheduler(
         ExhaustiveEnumsGenerator(
             skieContext = skieContext,
             namespaceProvider = namespaceProvider,
-            reporter = reporter,
         ),
         SuspendGenerator(
             skieContext = skieContext,
