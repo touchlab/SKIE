@@ -8,7 +8,7 @@ import io.cloudflight.ci.info.CI
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
-internal data class AnonymousGradleEnvironmentAnalytics(
+internal data class GradleEnvironmentAnalytics(
     val jvmVersion: String,
     val skieVersion: String,
     val gradleVersion: String,
@@ -20,12 +20,12 @@ internal data class AnonymousGradleEnvironmentAnalytics(
 
     class Producer(private val project: Project) : AnalyticsProducer {
 
-        override val name: String = "anonymous-gradle-environment"
+        override val name: String = "gradle-environment"
 
-        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_GradleEnvironment
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_GradleEnvironment
 
         override fun produce(): String =
-            AnonymousGradleEnvironmentAnalytics(
+            GradleEnvironmentAnalytics(
                 jvmVersion = Runtime.version().toString(),
                 skieVersion = BuildConfig.SKIE_VERSION,
                 gradleVersion = project.gradle.gradleVersion,

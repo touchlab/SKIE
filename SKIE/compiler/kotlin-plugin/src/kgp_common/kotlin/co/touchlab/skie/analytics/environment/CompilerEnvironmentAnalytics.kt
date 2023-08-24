@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.konan.target.Xcode
 
 @Serializable
-data class AnonymousCompilerEnvironmentAnalytics(
+data class CompilerEnvironmentAnalytics(
     val jvmVersion: String,
     val compilerVersion: String?,
     val xcodeVersion: String,
@@ -20,12 +20,12 @@ data class AnonymousCompilerEnvironmentAnalytics(
 
     class Producer(private val konanConfig: KonanConfig) : AnalyticsProducer {
 
-        override val name: String = "anonymous-compiler-environment"
+        override val name: String = "compiler-environment"
 
-        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_CompilerEnvironment
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_CompilerEnvironment
 
         override fun produce(): String =
-            AnonymousCompilerEnvironmentAnalytics(
+            CompilerEnvironmentAnalytics(
                 jvmVersion = Runtime.version().toString(),
                 compilerVersion = konanConfig.distribution.compilerVersion,
                 xcodeVersion = Xcode.findCurrent().version,

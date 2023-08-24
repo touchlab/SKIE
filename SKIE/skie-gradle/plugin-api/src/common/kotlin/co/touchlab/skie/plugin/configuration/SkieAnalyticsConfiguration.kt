@@ -8,8 +8,9 @@ import javax.inject.Inject
 
 abstract class SkieAnalyticsConfiguration @Inject constructor(objects: ObjectFactory) {
 
-    val tier: Property<AnalyticsTier> = objects.property(AnalyticsTier::class.java).convention(AnalyticsTier.All)
+    val enabled: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
     val disableUpload: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
-    internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> = tier.get().configurationFlags
+    internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
+        (if (enabled.get()) AnalyticsTier.Anonymous else AnalyticsTier.None).configurationFlags
 }

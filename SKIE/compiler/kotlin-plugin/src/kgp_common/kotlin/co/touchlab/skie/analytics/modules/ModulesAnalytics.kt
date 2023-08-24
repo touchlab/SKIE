@@ -1,13 +1,19 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.analytics.modules
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.reflection.reflectedBy
+import co.touchlab.skie.plugin.reflection.reflectors.UserVisibleIrModulesSupportReflector
+import co.touchlab.skie.util.hash.hashed
 import co.touchlab.skie.util.toPrettyJson
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.ir.backend.js.moduleName
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -16,15 +22,18 @@ import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
+import org.jetbrains.kotlin.library.KotlinLibrary
+import org.jetbrains.kotlin.utils.ResolvedDependency
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
-object AnonymousDeclarationsAnalytics {
+object ModulesAnalytics {
 
     @Serializable
     data class Module(
         val id: String,
-        val isExported: Boolean,
+        val version: String?,
         val type: Type,
+        val isExported: Boolean,
         val statistics: Statistics?,
     ) {
 
@@ -53,6 +62,8 @@ object AnonymousDeclarationsAnalytics {
 
         val id: String
 
+        val version: String?
+
         val type: Module.Type
 
         val irModuleFragments: List<IrModuleFragment?>
@@ -66,17 +77,18 @@ object AnonymousDeclarationsAnalytics {
             override val irModuleFragments: List<IrModuleFragment?>,
         ) : TypedModule {
 
-            override val id: String = "stdlib"
+            override val id: String = "stdlib".hashed()
+
+            override val version: String? = null
 
             override val type: Module.Type = Module.Type.BuiltIn
         }
 
         data class Library(
-            val name: String,
+            override val id: String,
+            override val version: String,
             override val irModuleFragments: List<IrModuleFragment?>,
         ) : TypedModule {
-
-            override val id: String = name
 
             override val type: Module.Type = Module.Type.Library
         }
@@ -88,6 +100,8 @@ object AnonymousDeclarationsAnalytics {
 
             override val irModuleFragments: List<IrModuleFragment?> = listOf(irModuleFragment)
 
+            override val version: String? = null
+
             override val type: Module.Type = Module.Type.Local
         }
     }
@@ -98,9 +112,9 @@ object AnonymousDeclarationsAnalytics {
         private val descriptorProvider: DescriptorProvider,
     ) : AnalyticsProducer {
 
-        override val name: String = "anonymous-declarations"
+        override val name: String = "modules"
 
-        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_Declarations
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Modules
 
         override fun produce(): String {
             val allModules = getBuiltInModules() + getExternalLibraries() + getLocalModules()
@@ -120,12 +134,21 @@ object AnonymousDeclarationsAnalytics {
         private fun getExternalLibraries(): List<TypedModule> =
             config.externalLibraries
                 .map {
-                    TypedModule.Library(it.canonicalName, it.artifactPaths.map { artifactPath -> findModuleForKlib(artifactPath.path) })
+                    TypedModule.Library(
+                        id = it.canonicalName.hashed(),
+                        version = it.selectedVersion.version,
+                        irModuleFragments = it.artifactPaths.map { artifactPath -> findModuleForKlib(artifactPath.path) },
+                    )
                 }
 
         private fun getLocalModules(): List<TypedModule> =
             config.localModules
-                .map { TypedModule.Local(it.localModuleId, findModuleForKlib(it.libraryFile.absolutePath)) }
+                .map {
+                    TypedModule.Local(
+                        id = it.moduleName.hashed(),
+                        irModuleFragment = findModuleForKlib(it.libraryFile.absolutePath),
+                    )
+                }
 
         private fun findModuleForKlib(klib: String): IrModuleFragment? =
             modules[klib.removeSuffix(".klib")]
@@ -147,6 +170,7 @@ object AnonymousDeclarationsAnalytics {
 
             return Module(
                 id = this.id,
+                version = this.version,
                 isExported = this.isExported(descriptorProvider),
                 type = this.type,
                 statistics = statistics,
@@ -176,15 +200,15 @@ object AnonymousDeclarationsAnalytics {
             Module.Statistics(
                 exportedDeclarations = Module.Statistics.Declarations(
                     classes = exportedClasses,
-                    callableMembers = exportedCallableMembers
+                    callableMembers = exportedCallableMembers,
                 ),
                 exportableNonExportedDeclarations = Module.Statistics.Declarations(
                     classes = exportableNonExportedClasses,
-                    callableMembers = exportableNonExportedCallableMembers
+                    callableMembers = exportableNonExportedCallableMembers,
                 ),
                 nonExportableDeclarations = Module.Statistics.Declarations(
                     classes = nonExportableClasses,
-                    callableMembers = nonExportableCallableMembers
+                    callableMembers = nonExportableCallableMembers,
                 ),
                 overriddenCallableMembers = overriddenCallableMembers,
                 numberOfIrElements = numberOfIrElements,
@@ -268,3 +292,20 @@ object AnonymousDeclarationsAnalytics {
         }
     }
 }
+
+private val KonanConfig.localModules: Collection<KotlinLibrary>
+    get() {
+        val modulesWithoutBuiltIns = resolvedLibraries.getFullList().filter { !it.isDefault }
+
+        val externalLibrariesArtifacts = externalLibraries.flatMap { it.artifactPaths }.map { it.path }.toSet()
+
+        return modulesWithoutBuiltIns.filter { it.libraryFile.absolutePath !in externalLibrariesArtifacts }
+    }
+
+private val KonanConfig.externalLibraries: Collection<ResolvedDependency>
+    get() = userVisibleIrModulesSupport
+        .reflectedBy<UserVisibleIrModulesSupportReflector>()
+        .externalDependencyModules
+
+private val ResolvedDependency.canonicalName: String
+    get() = id.uniqueNames.minBy { it.length }

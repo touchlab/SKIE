@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.api
 
-import co.touchlab.skie.analytics.performance.AnonymousSkiePerformanceAnalytics
+import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
 import co.touchlab.skie.plugin.api.module.SkieModule
@@ -23,7 +23,7 @@ interface SkieContext {
 
     val analyticsCollector: AnalyticsCollector
 
-    val skiePerformanceAnalyticsProducer: AnonymousSkiePerformanceAnalytics.Producer
+    val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer
 
     val reporter: Reporter
 }

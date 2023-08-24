@@ -1,16 +1,13 @@
 package co.touchlab.skie.analytics
 
-import co.touchlab.skie.analytics.compiler.common.AnonymousCommonCompilerConfigurationAnalytics
-import co.touchlab.skie.analytics.compiler.common.IdentifyingCommonCompilerConfigurationAnalytics
-import co.touchlab.skie.analytics.compiler.specific.AnonymousSpecificCompilerConfigurationAnalytics
-import co.touchlab.skie.analytics.configuration.AnonymousSkieConfigurationAnalytics
-import co.touchlab.skie.analytics.configuration.IdentifyingSkieConfigurationAnalytics
-import co.touchlab.skie.analytics.environment.AnonymousCompilerEnvironmentAnalytics
-import co.touchlab.skie.analytics.modules.AnonymousDeclarationsAnalytics
-import co.touchlab.skie.analytics.modules.AnonymousLibrariesAnalytics
-import co.touchlab.skie.analytics.modules.IdentifyingLocalModulesAnalytics
+import co.touchlab.skie.analytics.compiler.common.CommonCompilerConfigurationAnalytics
+import co.touchlab.skie.analytics.compiler.specific.SpecificCompilerConfigurationAnalytics
+import co.touchlab.skie.analytics.configuration.SkieConfigurationAnalytics
+import co.touchlab.skie.analytics.environment.CompilerEnvironmentAnalytics
+import co.touchlab.skie.analytics.modules.ModulesAnalytics
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
@@ -26,20 +23,16 @@ internal class AnalyticsPhase(
 
     override fun runObjcPhase() {
         skieContext.analyticsCollector.collectAsync(
-            AnonymousCommonCompilerConfigurationAnalytics.Producer(config),
-            IdentifyingCommonCompilerConfigurationAnalytics.Producer(config),
-            AnonymousSpecificCompilerConfigurationAnalytics.Producer(config),
-            AnonymousSkieConfigurationAnalytics.Producer(skieContext.skieConfiguration),
-            IdentifyingSkieConfigurationAnalytics.Producer(skieContext.skieConfiguration),
-            AnonymousCompilerEnvironmentAnalytics.Producer(config),
-            IdentifyingLocalModulesAnalytics.Producer(config),
-            AnonymousLibrariesAnalytics.Producer(config),
+            CommonCompilerConfigurationAnalytics.Producer(config),
+            SpecificCompilerConfigurationAnalytics.Producer(config),
+            SkieConfigurationAnalytics.Producer(skieContext.skieConfiguration),
+            CompilerEnvironmentAnalytics.Producer(config),
         )
     }
 
     override fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
         skieContext.analyticsCollector.collectSynchronously(
-            AnonymousDeclarationsAnalytics.Producer(config, allModules, descriptorProvider),
+            ModulesAnalytics.Producer(config, allModules, descriptorProvider),
         )
     }
 }

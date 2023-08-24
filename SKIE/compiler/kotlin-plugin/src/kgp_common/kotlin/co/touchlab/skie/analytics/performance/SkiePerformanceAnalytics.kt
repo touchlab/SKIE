@@ -9,18 +9,18 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-object AnonymousSkiePerformanceAnalytics {
+object SkiePerformanceAnalytics {
 
     class Producer(
         private val skieConfiguration: SkieConfiguration,
     ) : AnalyticsProducer {
 
-        override val name: String = "anonymous-skie-performance"
+        override val name: String = "skie-performance"
 
         // Name : Time in seconds
         private val entries = mutableMapOf<String, Double>()
 
-        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_SkiePerformance
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_SkiePerformance
 
         override fun produce(): String =
             entries.toPrettyJson()

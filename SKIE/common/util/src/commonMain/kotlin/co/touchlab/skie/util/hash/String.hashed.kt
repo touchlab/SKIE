@@ -1,7 +1,6 @@
-package co.touchlab.skie.util
+package co.touchlab.skie.util.hash
 
 import java.security.MessageDigest
-import java.util.Base64
 
 fun String.hashed(): String {
     val digest = MessageDigest.getInstance("SHA-256")

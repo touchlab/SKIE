@@ -11,7 +11,8 @@ plugins {
 
 skie {
     analytics {
-        disableUpload.set(true)
+        enabled = false
+        disableUpload = true
     }
 
     build {

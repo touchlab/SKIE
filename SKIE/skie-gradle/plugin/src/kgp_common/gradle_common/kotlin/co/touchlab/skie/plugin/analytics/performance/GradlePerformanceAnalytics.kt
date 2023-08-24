@@ -5,7 +5,7 @@ import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import java.time.Duration
 
-internal data class AnonymousGradlePerformanceAnalytics(
+internal data class GradlePerformanceAnalytics(
     val linkTaskDurationInSeconds: Double,
 ) {
 
@@ -13,12 +13,12 @@ internal data class AnonymousGradlePerformanceAnalytics(
         private val linkTaskDuration: Duration,
     ) : AnalyticsProducer {
 
-        override val name: String = "anonymous-gradle-performance"
+        override val name: String = "gradle-performance"
 
-        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_GradlePerformance
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_GradlePerformance
 
         override fun produce(): String =
-            AnonymousGradlePerformanceAnalytics(
+            GradlePerformanceAnalytics(
                 linkTaskDurationInSeconds = linkTaskDuration.toMillis().toDouble() / 1000.0,
             ).toPrettyJson()
     }

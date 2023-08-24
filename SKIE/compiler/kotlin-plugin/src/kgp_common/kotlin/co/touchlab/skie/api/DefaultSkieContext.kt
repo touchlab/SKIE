@@ -1,6 +1,6 @@
 package co.touchlab.skie.api
 
-import co.touchlab.skie.analytics.performance.AnonymousSkiePerformanceAnalytics
+import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.SwiftCompilerConfiguration
@@ -17,6 +17,6 @@ class DefaultSkieContext(
     override val skieDirectories: SkieDirectories,
     override val frameworkLayout: FrameworkLayout,
     override val analyticsCollector: AnalyticsCollector,
-    override val skiePerformanceAnalyticsProducer: AnonymousSkiePerformanceAnalytics.Producer,
+    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer,
     override val reporter: Reporter,
 ) : SkieContext

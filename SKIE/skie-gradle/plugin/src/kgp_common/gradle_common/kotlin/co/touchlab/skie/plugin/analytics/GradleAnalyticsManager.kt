@@ -1,12 +1,10 @@
 package co.touchlab.skie.plugin.analytics
 
-import co.touchlab.skie.plugin.analytics.environment.AnonymousGradleEnvironmentAnalytics
-import co.touchlab.skie.plugin.analytics.git.AnonymousGitAnalytics
-import co.touchlab.skie.plugin.analytics.git.IdentifyingGitAnalytics
-import co.touchlab.skie.plugin.analytics.hardware.AnonymousHardwareAnalytics
-import co.touchlab.skie.plugin.analytics.performance.AnonymousGradlePerformanceAnalytics
-import co.touchlab.skie.plugin.analytics.project.IdentifyingProjectAnalytics
-import co.touchlab.skie.plugin.analytics.project.AnonymousProjectAnalytics
+import co.touchlab.skie.plugin.analytics.environment.GradleEnvironmentAnalytics
+import co.touchlab.skie.plugin.analytics.git.GitAnalytics
+import co.touchlab.skie.plugin.analytics.hardware.HardwareAnalytics
+import co.touchlab.skie.plugin.analytics.performance.GradlePerformanceAnalytics
+import co.touchlab.skie.plugin.analytics.project.ProjectAnalytics
 import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
@@ -59,15 +57,13 @@ internal class GradleAnalyticsManager(
     ) {
         linkTask.doFirstOptimized {
             analyticsCollectorProvider.get().collectAsync(
-                AnonymousGradleEnvironmentAnalytics.Producer(project),
+                GradleEnvironmentAnalytics.Producer(project),
 
-                AnonymousGitAnalytics.Producer(project),
-                IdentifyingGitAnalytics.Producer(project),
+                GitAnalytics.Producer(project),
 
-                AnonymousHardwareAnalytics.Producer,
+                HardwareAnalytics.Producer,
 
-                IdentifyingProjectAnalytics.Producer(project),
-                AnonymousProjectAnalytics.Producer(project),
+                ProjectAnalytics.Producer(project),
             )
         }
 
@@ -88,7 +84,7 @@ internal class GradleAnalyticsManager(
             val linkTaskDuration = Duration.ofMillis(System.currentTimeMillis() - start)
 
             analyticsCollectorProvider.get().collectSynchronously(
-                AnonymousGradlePerformanceAnalytics.Producer(linkTaskDuration)
+                GradlePerformanceAnalytics.Producer(linkTaskDuration),
             )
         }
     }

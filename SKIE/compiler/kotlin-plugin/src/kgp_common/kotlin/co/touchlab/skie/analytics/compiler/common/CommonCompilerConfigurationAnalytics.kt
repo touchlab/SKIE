@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.konan.target.HostManager
 
 @Serializable
-data class AnonymousCommonCompilerConfigurationAnalytics(
+data class CommonCompilerConfigurationAnalytics(
     val kotlinLanguageVersion: String,
     val kotlinApiVersion: String,
     val languageVersionString: String,
@@ -33,12 +33,12 @@ data class AnonymousCommonCompilerConfigurationAnalytics(
 
     class Producer(private val config: KonanConfig) : AnalyticsProducer {
 
-        override val name: String = "anonymous-common-compiler-configuration"
+        override val name: String = "common-compiler-configuration"
 
-        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Anonymous_CompilerConfiguration
+        override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_CompilerConfiguration
 
         override fun produce(): String =
-            AnonymousCommonCompilerConfigurationAnalytics(
+            CommonCompilerConfigurationAnalytics(
                 kotlinLanguageVersion = config.languageVersionSettings.languageVersion.toString(),
                 kotlinApiVersion = config.languageVersionSettings.apiVersion.toString(),
                 languageVersionString = config.languageVersionSettings.toString(),
