@@ -21,13 +21,13 @@ kotlin {
                 implementation(projects.common.configuration.configurationDeclaration)
                 implementation(projects.common.util)
 
+                implementation(libs.kotlinx.coroutines.jvm)
                 implementation(projects.runtime.runtimeSwift)
 
                 implementation(libs.logback)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.serialization.yaml)
 
-                implementation(libs.kotlinx.serialization.json)
                 implementation(libs.jackson.databind)
                 implementation(libs.ktor.client.java)
                 implementation(libs.apache.compress)

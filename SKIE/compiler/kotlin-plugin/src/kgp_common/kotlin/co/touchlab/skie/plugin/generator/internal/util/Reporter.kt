@@ -22,6 +22,14 @@ class Reporter(private val compilerConfiguration: CompilerConfiguration) {
         }
     }
 
+    fun error(message: String, declaration: DeclarationDescriptor? = null) {
+        report(Severity.Error, message, declaration)
+    }
+
+    fun warning(message: String, declaration: DeclarationDescriptor? = null) {
+        report(Severity.Warning, message, declaration)
+    }
+
     enum class Severity {
         Error, Warning, None
     }

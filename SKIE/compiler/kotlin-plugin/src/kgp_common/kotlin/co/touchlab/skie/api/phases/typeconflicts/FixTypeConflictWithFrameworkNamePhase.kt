@@ -29,8 +29,7 @@ class FixTypeConflictWithFrameworkNamePhase(
             .forEach {
                 it.identifier += "_"
 
-                reporter.report(
-                    Reporter.Severity.Warning,
+                reporter.warning(
                     "Declaration '${it.classDescriptor.name.asString()}' was renamed to '${it.identifier}' " +
                         "because it has the same name as the produced framework which is forbidden.",
                     it.classDescriptor,
@@ -42,8 +41,7 @@ class FixTypeConflictWithFrameworkNamePhase(
         exposedFiles
             .filter { it.swiftIrDeclaration.publicName == frameworkName }
             .forEach {
-                reporter.report(
-                    Reporter.Severity.Warning,
+                reporter.warning(
                     "File class '${it.identifier}' was renamed to '${it.identifier}_' " +
                         "because it has the same name as the produced framework which is forbidden.",
                 )

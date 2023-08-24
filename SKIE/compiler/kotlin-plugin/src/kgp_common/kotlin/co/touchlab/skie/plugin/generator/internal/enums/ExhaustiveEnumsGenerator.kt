@@ -60,8 +60,7 @@ internal class ExhaustiveEnumsGenerator(
 
     private fun generate(classSwiftModel: MutableKotlinClassSwiftModel) {
         if (classSwiftModel.enumEntries.isEmpty()) {
-            skieContext.reporter.report(
-                Reporter.Severity.Warning,
+            skieContext.reporter.warning(
                 "Enum ${classSwiftModel.identifier} has no entries, no Swift enum will be generated. " +
                     "To silence this warning, add @EnumInterop.Disabled above the enum declaration.",
                 classSwiftModel.classDescriptor,

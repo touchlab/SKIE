@@ -7,6 +7,7 @@ buildconfig = "4.1.1"
 ktor = "2.2.3"
 nexusPublish = "2.0.0-rc-1"
 gradleDoctor = "0.8.1"
+coroutines = "1.6.4"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -29,7 +30,8 @@ plugin-nexusPublish = { module = "io.github.gradle-nexus:publish-plugin", versio
 kotlin-native-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-native-compiler-embeddable", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version = "0.51.0" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
 jackson-databind = { module = " com.fasterxml.jackson.core:jackson-databind", version = "2.14.2" }
 kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.12.0" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
