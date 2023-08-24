@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.generator.internal
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.analytics.AnalyticsPhase
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
+import co.touchlab.skie.plugin.generator.internal.coroutines.IncreaseMinOSVersionPhase
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowConversionConstructorsGenerator
 import co.touchlab.skie.plugin.generator.internal.export.ExtraClassExportPhase
@@ -16,11 +17,9 @@ import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
-import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -39,6 +38,10 @@ internal class SkieCompilationScheduler(
             config = config,
             skieContext = skieContext,
             descriptorProvider = descriptorProvider,
+        ),
+        IncreaseMinOSVersionPhase(
+            configuration = skieContext.skieConfiguration,
+            konanConfig = config,
         ),
         ExtraClassExportPhase(
             skieContext = skieContext,

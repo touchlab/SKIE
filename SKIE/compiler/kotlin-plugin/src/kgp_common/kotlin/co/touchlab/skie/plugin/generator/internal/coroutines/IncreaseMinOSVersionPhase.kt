@@ -1,15 +1,19 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
-package co.touchlab.skie.osversion
+package co.touchlab.skie.plugin.generator.internal.coroutines
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.api.skieContext
+import co.touchlab.skie.plugin.api.configuration.SkieConfiguration
+import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.konan.properties.KonanPropertiesLoader
 
-// TODO Should be SKIE phase
-object MinOSVersionConfigurator {
+class IncreaseMinOSVersionPhase(
+    private val configuration: SkieConfiguration,
+    private val konanConfig: KonanConfig,
+) : SkieCompilationPhase {
+
+    override val isActive: Boolean
+        get() = SkieConfigurationFlag.Feature_CoroutinesInterop in configuration.enabledConfigurationFlags
+
     private val coroutinesMinOsVersionMap = mutableMapOf(
         "osVersionMin.ios_arm32" to "13.0",
         "osVersionMin.ios_arm64" to "13.0",
@@ -28,8 +32,7 @@ object MinOSVersionConfigurator {
         "osVersionMin.watchos_x86" to "6.0",
     )
 
-    fun configure(configuration: CompilerConfiguration, konanConfig: KonanConfig) {
-        if (SkieConfigurationFlag.Feature_CoroutinesInterop !in configuration.skieContext.skieConfiguration.enabledConfigurationFlags) return
+    override fun runObjcPhase() {
         val properties = (konanConfig.platform.configurables as? KonanPropertiesLoader)?.properties ?: return
 
         coroutinesMinOsVersionMap.forEach { (key, requiredMinVersion) ->

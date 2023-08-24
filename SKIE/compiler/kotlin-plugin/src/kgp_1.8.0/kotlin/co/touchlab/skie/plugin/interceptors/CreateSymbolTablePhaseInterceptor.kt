@@ -1,7 +1,6 @@
 @file:Suppress("invisible_reference", "invisible_member")
 package co.touchlab.skie.plugin.interceptors
 
-import co.touchlab.skie.osversion.MinOSVersionConfigurator
 import co.touchlab.skie.plugin.api.MutableDescriptorProviderKey
 import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.internal.SkieCompilationScheduler
@@ -14,7 +13,6 @@ import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.Declaratio
 import co.touchlab.skie.plugin.intercept.SameTypePhaseInterceptor
 import co.touchlab.skie.plugin.reflection.reflectors.ContextReflector
 import co.touchlab.skie.plugin.reflection.reflectors.ObjCExportReflector
-import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 import org.jetbrains.kotlin.backend.konan.createSymbolTablePhase
 import org.jetbrains.kotlin.library.KLIB_PROPERTY_SHORT_NAME
