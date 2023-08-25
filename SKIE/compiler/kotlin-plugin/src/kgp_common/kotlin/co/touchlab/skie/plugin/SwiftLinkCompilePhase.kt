@@ -7,10 +7,8 @@ import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvide
 import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
-import co.touchlab.skie.api.model.type.translation.impl.CommonBackendContextSwiftTranslationProblemCollector
 import co.touchlab.skie.plugin.api.*
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
@@ -41,14 +39,12 @@ class SwiftLinkCompilePhase(
             sdkPath = configurables.absoluteTargetSysRoot,
             declarationRegistry = swiftIrDeclarationRegistry,
         )
-        val builtinKotlinDeclarations = BuiltinDeclarations.Kotlin(namer)
 
         val translator = SwiftTypeTranslator(
             descriptorProvider = descriptorProvider,
             namer = namer,
             problemCollector = problemCollector,
             builtinSwiftBridgeableProvider = builtinSwiftBridgeableProvider,
-            builtinKotlinDeclarations = builtinKotlinDeclarations,
             swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
         )
 
@@ -57,7 +53,6 @@ class SwiftLinkCompilePhase(
             descriptorProvider = descriptorProvider,
             bridgeProvider = bridgeProvider,
             translator = translator,
-            declarationRegistry = swiftIrDeclarationRegistry,
             swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
         )
 
@@ -67,7 +62,7 @@ class SwiftLinkCompilePhase(
             descriptorProvider = descriptorProvider,
             framework = framework,
             swiftModelScope = swiftModelScope,
-            builtinKotlinDeclarations = builtinKotlinDeclarations,
+            swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
             configurables = configurables,
             config = config,
         ).runLinkingPhases()

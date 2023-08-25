@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
+import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.phases.AddLambdaTypeArgumentErrorTypePhase
 import co.touchlab.skie.api.phases.CompileSwiftPhase
 import co.touchlab.skie.api.phases.DisableWildcardExportPhase
@@ -39,8 +40,8 @@ class SkieLinkingPhaseScheduler(
     skieModule: DefaultSkieModule,
     framework: FrameworkLayout,
     descriptorProvider: DescriptorProvider,
+    swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
     swiftModelScope: DefaultSwiftModelScope,
-    builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
     configurables: AppleConfigurables,
     config: KonanConfig,
 ) {
@@ -55,7 +56,7 @@ class SkieLinkingPhaseScheduler(
         RenameEnumRawValuePhase(skieModule, descriptorProvider),
         FixCallableMembersConflictsPhase(skieModule, descriptorProvider),
         FixTypeConflictWithFrameworkNamePhase(skieModule, framework, skieContext.reporter),
-        FixTypesConflictsPhase(skieModule, builtinKotlinDeclarations),
+        FixTypesConflictsPhase(skieModule, swiftIrDeclarationRegistry),
         FixNestedBridgedTypesPhase(skieModule, descriptorProvider),
         FixHeaderFilePropertyOrderingPhase(framework.kotlinHeader),
         AddLambdaTypeArgumentErrorTypePhase(framework.kotlinHeader),

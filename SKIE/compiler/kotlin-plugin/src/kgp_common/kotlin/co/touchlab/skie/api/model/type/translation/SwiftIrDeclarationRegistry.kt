@@ -9,7 +9,6 @@ import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrModule
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
 import org.jetbrains.kotlin.backend.konan.isObjCForwardDeclaration
 import org.jetbrains.kotlin.backend.konan.isObjCMetaClass
@@ -17,15 +16,16 @@ import org.jetbrains.kotlin.backend.konan.isObjCProtocolClass
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
+import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class SwiftIrDeclarationRegistry(
     private val namer: ObjCExportNamer,
 ) {
+
+    val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin = BuiltinDeclarations.Kotlin(namer)
 
     private val declarationsByDescriptor = mutableMapOf<ClassDescriptor, SwiftIrDeclaration>()
 
@@ -92,16 +92,18 @@ class SwiftIrDeclarationRegistry(
     }
 
     context(SwiftModelScope)
-    fun declarationForClass(descriptor: ClassDescriptor): SwiftIrExtensibleDeclaration = resolveDeclaration(descriptor) as SwiftIrExtensibleDeclaration
+    fun declarationForClass(descriptor: ClassDescriptor): SwiftIrExtensibleDeclaration =
+        resolveDeclaration(descriptor) as SwiftIrExtensibleDeclaration? ?: error("No declaration for $descriptor")
 
     context(SwiftModelScope)
-    fun declarationForInterface(descriptor: ClassDescriptor): SwiftIrProtocolDeclaration = resolveDeclaration(descriptor) as SwiftIrProtocolDeclaration
+    fun declarationForInterface(descriptor: ClassDescriptor): SwiftIrProtocolDeclaration =
+        resolveDeclaration(descriptor) as SwiftIrProtocolDeclaration? ?: error("No declaration for $descriptor")
 
     context(SwiftModelScope)
     fun declarationForSwiftModel(swiftModel: KotlinClassSwiftModel): SwiftIrExtensibleDeclaration.Local =
         declarationsByDescriptor.getOrPut(swiftModel.classDescriptor) {
             val superTypesDeclarations = (swiftModel.classDescriptor.getSuperInterfaces() + swiftModel.classDescriptor.getSuperClassOrAny())
-                .map { resolveDeclaration(it) as SwiftIrExtensibleDeclaration }
+                .mapNotNull { resolveDeclaration(it) as SwiftIrExtensibleDeclaration? }
 
             if (swiftModel.kind.isInterface) {
                 SwiftIrProtocolDeclaration.Local.KotlinInterface.Modeled(swiftModel, superTypesDeclarations)
@@ -111,7 +113,7 @@ class SwiftIrDeclarationRegistry(
         } as SwiftIrExtensibleDeclaration.Local
 
     context(SwiftModelScope)
-    private fun resolveDeclaration(descriptor: ClassDescriptor): SwiftIrDeclaration = when {
+    private fun resolveDeclaration(descriptor: ClassDescriptor): SwiftIrDeclaration? = when {
         descriptor.hasSwiftModel -> descriptor.swiftModel.bridge?.declaration ?: declarationForSwiftModel(descriptor.swiftModel)
         descriptor.isObjCMetaClass() -> BuiltinDeclarations.AnyClass
         descriptor.isObjCProtocolClass() -> BuiltinDeclarations.Protocol
@@ -125,24 +127,7 @@ class SwiftIrDeclarationRegistry(
                 referenceExternalTypeDeclaration(fqName, listOf(BuiltinDeclarations.Foundation.NSObject))
             }
         }
-
-        else -> declarationsByDescriptor.getOrPut(descriptor) {
-            SwiftIrTypeDeclaration.Local.KotlinClass.Immutable(
-                kotlinModule = descriptor.module.name.asString(),
-                kotlinFqName = descriptor.fqNameSafe,
-                swiftName = namer.getClassOrProtocolName(descriptor).swiftName,
-                typeParameters = descriptor.declaredTypeParameters.map {
-                    SwiftIrTypeParameterDeclaration.KotlinTypeParameter(
-                        descriptor = it,
-                        name = namer.getTypeParameterName(it),
-                        bounds = it.upperBounds.map { bound ->
-                            bound.constructor.declarationDescriptor?.let {
-                                declarationForClass(it as ClassDescriptor)
-                            } ?: TODO()
-                        }
-                    )
-                },
-            )
-        }
+        descriptor == descriptor.builtIns.any -> builtinKotlinDeclarations.Base
+        else -> null
     }
 }

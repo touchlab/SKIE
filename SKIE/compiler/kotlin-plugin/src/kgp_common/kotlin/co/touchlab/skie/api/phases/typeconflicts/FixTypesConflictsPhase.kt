@@ -1,7 +1,7 @@
 package co.touchlab.skie.api.phases.typeconflicts
 
+import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.phases.SkieLinkingPhase
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
@@ -10,19 +10,17 @@ import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
-import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 // TODO Currently does not take into account bridging and generated Swift code in general
 class FixTypesConflictsPhase(
     private val skieModule: SkieModule,
-    private val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
+    private val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
 ) : SkieLinkingPhase {
 
     private val reservedNames by lazy {
-        builtinKotlinDeclarations.allDeclarations.map { it.publicName } +
+        swiftIrDeclarationRegistry.builtinKotlinDeclarations.allDeclarations.map { it.publicName } +
             // TODO: Unfortunate hack to avoid name collision with Swift's Any keyword
             SwiftFqName.Local.TopLevel("Any")
     }

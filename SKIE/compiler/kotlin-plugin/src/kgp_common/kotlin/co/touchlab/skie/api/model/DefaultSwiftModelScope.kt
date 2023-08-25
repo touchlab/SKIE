@@ -49,9 +49,8 @@ class DefaultSwiftModelScope(
     private val namer: ObjCExportNamer,
     private val descriptorProvider: DescriptorProvider,
     private val bridgeProvider: DescriptorBridgeProvider,
-    private val declarationRegistry: SwiftIrDeclarationRegistry,
+    private val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
     private val translator: SwiftTypeTranslator,
-    swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
 ) : MutableSwiftModelScope {
 
     private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider, swiftIrDeclarationRegistry)
@@ -135,7 +134,7 @@ class DefaultSwiftModelScope(
         val containingDeclaration = containingDeclaration
 
         return when {
-            receiverClassDescriptor != null -> declarationRegistry.declarationForClass(receiverClassDescriptor) // receiverClassDescriptor.swiftModel.swiftIrDeclaration
+            receiverClassDescriptor != null -> swiftIrDeclarationRegistry.declarationForClass(receiverClassDescriptor)
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.owner
             containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel.swiftIrDeclaration
             else -> error("Unsupported containing declaration for $this")
@@ -144,7 +143,6 @@ class DefaultSwiftModelScope(
 
     override fun CallableMemberDescriptor.receiverType(): SirType {
         val receiverClassDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(this)
-        val receiverClassModel = receiverClassDescriptor
         val containingDeclaration = containingDeclaration
 
         return when {

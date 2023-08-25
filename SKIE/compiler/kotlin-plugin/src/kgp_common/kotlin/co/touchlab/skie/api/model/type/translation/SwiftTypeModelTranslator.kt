@@ -77,9 +77,11 @@ class SwiftTypeTranslator(
     val namer: ObjCExportNamer,
     val problemCollector: SwiftTranslationProblemCollector,
     val builtinSwiftBridgeableProvider: BuiltinSwiftBridgeableProvider,
-    val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin,
     val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
 ) {
+
+    val builtinKotlinDeclarations: BuiltinDeclarations.Kotlin
+        get() = swiftIrDeclarationRegistry.builtinKotlinDeclarations
 
     context(SwiftModelScope)
     internal fun mapFileType(sourceFile: SourceFile): SirType {
@@ -112,7 +114,7 @@ class SwiftTypeTranslator(
                 if (!returnBridge.successMayBeZero) {
                     check(
                         successReturnType is SwiftNonNullReferenceSirType
-                            || (successReturnType is SwiftPointerSirType && !successReturnType.nullable),
+                                || (successReturnType is SwiftPointerSirType && !successReturnType.nullable),
                     ) {
                         "Unexpected return type: $successReturnType in $method"
                     }
@@ -170,7 +172,7 @@ class SwiftTypeTranslator(
 
             problemCollector.reportWarning(
                 "Exposed type '$kotlinType' is '$firstType' and '$secondType' at the same time. " +
-                    "This most likely wouldn't work as expected.",
+                        "This most likely wouldn't work as expected.",
             )
         }
 
@@ -309,11 +311,11 @@ class SwiftTypeTranslator(
                     // )
 
                     SwiftProtocolSirType(
-                        swiftIrDeclarationRegistry.declarationForInterface(descriptor),
+                        swiftIrDeclarationRegistry.declarationForInterface(descriptor)
                     )
                 } else {
                     SwiftClassSirType(
-                        swiftIrDeclarationRegistry.declarationForClass(descriptor),
+                        swiftIrDeclarationRegistry.declarationForClass(descriptor)
                     )
 
                     // TODO("Get from registry")
@@ -355,7 +357,7 @@ class SwiftTypeTranslator(
         }
 
         val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
-            functionType.getValueParameterTypesFromFunctionType().map { it.type }
+                functionType.getValueParameterTypesFromFunctionType().map { it.type }
 
         return SwiftLambdaSirType(
             if (returnsVoid) {
@@ -438,7 +440,8 @@ class SwiftTypeTranslator(
         }
 
         fun swiftTypeArgs(): List<SwiftNonNullReferenceSirType> = typeArgs(exportScope)
-        fun referenceTypeArgs(): List<SwiftNonNullReferenceSirType> = typeArgs(exportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType))
+        fun referenceTypeArgs(): List<SwiftNonNullReferenceSirType> =
+            typeArgs(exportScope.replacingFlags(SwiftExportScope.Flags.ReferenceType))
 
         return if (descriptor.hasSwiftModel) {
             val swiftModel = descriptor.swiftModel
