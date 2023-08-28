@@ -17,8 +17,8 @@ class AddLambdaTypeArgumentErrorTypePhase(
                 "// Generated declarations that reference __SkieLambdaErrorType cannot be called in any way and the __SkieLambdaErrorType class cannot be used.",
                 "// The original declarations can still be used in the same way as other declarations hidden by SKIE (and with the same limitations as without SKIE).",
                 "@interface __SkieLambdaErrorType : NSObject",
-                "- (instancetype)init __attribute__((unavailable));",
-                "+ (instancetype)new __attribute__((unavailable));",
+                "- (instancetype _Nonnull)init __attribute__((unavailable));",
+                "+ (instancetype _Nonnull)new __attribute__((unavailable));",
                 "@end",
             )
 
