@@ -3,8 +3,9 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
 import co.touchlab.skie.plugin.configuration.CreateSkieConfigurationTask
 import co.touchlab.skie.plugin.configuration.skieExtension
+import co.touchlab.skie.plugin.coroutines.addDependencyOnSkieRuntime
+import co.touchlab.skie.plugin.coroutines.registerConfigureMinOsVersionTaskIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
-import co.touchlab.skie.plugin.dependencies.addDependencyOnSkieRuntime
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
@@ -59,6 +60,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         disableCaching()
         binary.target.addDependencyOnSkieRuntime()
+        binary.registerConfigureMinOsVersionTaskIfNeeded()
 
         CreateSkieConfigurationTask.registerTask(this)
 
@@ -106,7 +108,7 @@ internal fun Project.configureEachKotlinAppleTarget(
 private fun KotlinNativeLink.disableCaching() {
     doFirstOptimized {
         project.logger.warn(
-            "w: SKIE does not support Kotlin Native caching yet. Compilation time in debug mode might be increased as a result."
+            "w: SKIE does not support Kotlin Native caching yet. Compilation time in debug mode might be increased as a result.",
         )
     }
 
