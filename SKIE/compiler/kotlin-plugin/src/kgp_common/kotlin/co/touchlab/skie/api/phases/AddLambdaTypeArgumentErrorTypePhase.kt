@@ -23,5 +23,5 @@ class AddLambdaTypeArgumentErrorTypePhase(
             )
 
     override fun insertImmediatelyBefore(line: String): Boolean =
-        line.startsWith("@interface KotlinBase : NSObject")
+        line.startsWith("NS_ASSUME_NONNULL_BEGIN")
 }
