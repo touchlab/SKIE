@@ -1,15 +1,15 @@
 package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
-import co.touchlab.skie.util.Command
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.isHashable
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftAnySirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
-import co.touchlab.skie.plugin.api.sir.declaration.isHashable
+import co.touchlab.skie.util.Command
 import org.jetbrains.kotlin.name.FqName
 import java.io.File
 
@@ -17,6 +17,7 @@ class BuiltinSwiftBridgeableProvider(
     private val sdkPath: String,
     private val declarationRegistry: SwiftIrDeclarationRegistry,
 ) {
+
     val builtinBridges: Map<FqName, SwiftClassSirType> by lazy {
         getAllBuiltinBridges()
     }
@@ -42,7 +43,12 @@ class BuiltinSwiftBridgeableProvider(
                 allTypes
                     .mapNotNull { apiNotesType ->
                         apiNotesType.bridgeFqName?.let { bridgeFqName ->
-                            getKotlinFqName(moduleName, apiNotesType.objCFqName) to getSwiftModelFor(getSwiftFqName(moduleName, bridgeFqName))
+                            getKotlinFqName(moduleName, apiNotesType.objCFqName) to getSwiftModelFor(
+                                getSwiftFqName(
+                                    moduleName,
+                                    bridgeFqName
+                                )
+                            )
                         }
                     }
             }
@@ -70,7 +76,10 @@ class BuiltinSwiftBridgeableProvider(
 
     private fun getSwiftModelFor(swiftFqName: SwiftFqName.External): SwiftClassSirType {
         return SwiftClassSirType(
-            declaration = declarationRegistry.referenceExternalTypeDeclaration(swiftFqName, defaultSupertypes = listOf(BuiltinDeclarations.Foundation.NSObject)),
+            declaration = declarationRegistry.referenceExternalTypeDeclaration(
+                swiftFqName,
+                defaultSupertypes = listOf(BuiltinDeclarations.Foundation.NSObject)
+            ),
             typeArguments = when (swiftFqName) {
                 BuiltinDeclarations.Swift.Array.publicName -> listOf(SwiftAnySirType)
                 BuiltinDeclarations.Swift.Dictionary.publicName -> listOf(SwiftAnyHashableSirType, SwiftAnySirType)
@@ -94,6 +103,7 @@ class BuiltinSwiftBridgeableProvider(
     private fun getKotlinFqName(module: String, type: String): FqName = FqName("platform.${module}.${type}")
 
     companion object {
+
         private val swiftArray = "Swift.Array"
         private val swiftDictionary = "Swift.Dictionary"
         private val swiftSet = "Swift.Set"

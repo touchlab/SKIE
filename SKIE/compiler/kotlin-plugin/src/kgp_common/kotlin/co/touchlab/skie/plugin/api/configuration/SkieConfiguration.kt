@@ -1,13 +1,13 @@
 package co.touchlab.skie.plugin.api.configuration
 
 import co.touchlab.skie.configuration.ConfigurationKey
-import co.touchlab.skie.configuration.TypedSkieConfiguration
 import co.touchlab.skie.configuration.ConfigurationTarget
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.configuration.TypedSkieConfiguration
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.Serializable
 
 @Serializable
 data class SkieConfiguration(
@@ -18,7 +18,11 @@ data class SkieConfiguration(
 
     init {
         require(enabledConfigurationFlags.intersect(disabledConfigurationFlags).isEmpty()) {
-            "A configuration flag cannot be both enabled and disabled. Problem with: ${enabledConfigurationFlags.intersect(disabledConfigurationFlags)}"
+            "A configuration flag cannot be both enabled and disabled. Problem with: ${
+                enabledConfigurationFlags.intersect(
+                    disabledConfigurationFlags
+                )
+            }"
         }
     }
 

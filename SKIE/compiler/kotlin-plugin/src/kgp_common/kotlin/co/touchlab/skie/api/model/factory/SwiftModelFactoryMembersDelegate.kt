@@ -24,13 +24,13 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
+import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
-import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 
 class SwiftModelFactoryMembersDelegate(
     private val swiftModelScope: MutableSwiftModelScope,
@@ -52,7 +52,8 @@ class SwiftModelFactoryMembersDelegate(
     }
 
     private fun getDirectParents(descriptor: CallableMemberDescriptor): List<CallableMemberDescriptor> =
-        if (descriptor is ConstructorDescriptor) getDirectParents(descriptor) else descriptor.overriddenDescriptors.map { it.original }.filter { namer.mapper.shouldBeExposed(it) }
+        if (descriptor is ConstructorDescriptor) getDirectParents(descriptor) else descriptor.overriddenDescriptors.map { it.original }
+            .filter { namer.mapper.shouldBeExposed(it) }
 
     private fun getDirectParents(descriptor: ConstructorDescriptor): List<CallableMemberDescriptor> =
         descriptor.constructedClass
@@ -155,7 +156,7 @@ class SwiftModelFactoryMembersDelegate(
         group: List<PropertyDescriptor>,
     ): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
         createBoundedConvertedPropertiesEnclosingModels(group) +
-            createBoundedConvertedPropertiesFunctions(group)
+                createBoundedConvertedPropertiesFunctions(group)
 
     private fun createBoundedConvertedPropertiesEnclosingModels(
         group: List<PropertyDescriptor>,

@@ -14,11 +14,13 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 val ModuleDescriptor.swiftIdentifier: String
     get() = (this.stableName ?: this.name).asStringStripSpecialMarkers().toValidSwiftIdentifier()
 
-sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
+sealed interface SwiftIrProtocolDeclaration : SwiftIrExtensibleDeclaration {
+
     override val swiftGenericExportScope: SwiftGenericExportScope
         get() = SwiftGenericExportScope.None
 
-    sealed class Local: SwiftIrProtocolDeclaration, SwiftIrExtensibleDeclaration.Local {
+    sealed class Local : SwiftIrProtocolDeclaration, SwiftIrExtensibleDeclaration.Local {
+
         abstract override val publicName: SwiftFqName.Local.TopLevel
 
         override val internalName: SwiftFqName.Local.Nested
@@ -26,7 +28,8 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
 
         override fun toString(): String = "local protocol: $publicName"
 
-        sealed class KotlinInterface: Local() {
+        sealed class KotlinInterface : Local() {
+
             protected abstract val kotlinModule: String
             protected abstract val kotlinFqName: FqName
 
@@ -36,7 +39,8 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
             class Modeled(
                 private val model: KotlinClassSwiftModel,
                 override val superTypes: List<SwiftIrExtensibleDeclaration>,
-            ): KotlinInterface() {
+            ) : KotlinInterface() {
+
                 override val kotlinModule: String
                     get() = model.classDescriptor.module.swiftIdentifier
                 override val kotlinFqName: FqName
@@ -51,7 +55,8 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
                 override val kotlinFqName: FqName,
                 swiftName: String,
                 override val superTypes: List<SwiftIrExtensibleDeclaration>,
-            ): KotlinInterface() {
+            ) : KotlinInterface() {
+
                 override val publicName: SwiftFqName.Local.TopLevel = SwiftFqName.Local.TopLevel(swiftName)
             }
         }
@@ -59,7 +64,8 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
         class SwiftProtocol(
             override val publicName: SwiftFqName.Local.TopLevel,
             override val superTypes: List<SwiftIrExtensibleDeclaration>,
-        ): Local() {
+        ) : Local() {
+
             override val typealiasName: String = "swift__${publicName.asString("_")}"
         }
     }
@@ -68,7 +74,7 @@ sealed interface SwiftIrProtocolDeclaration: SwiftIrExtensibleDeclaration {
         val module: SwiftIrModule,
         val name: String,
         override val superTypes: List<SwiftIrExtensibleDeclaration> = emptyList(),
-    ): SwiftIrProtocolDeclaration {
+    ) : SwiftIrProtocolDeclaration {
 
         override val publicName: SwiftFqName.External.TopLevel = SwiftFqName.External.TopLevel(module.name, name)
 

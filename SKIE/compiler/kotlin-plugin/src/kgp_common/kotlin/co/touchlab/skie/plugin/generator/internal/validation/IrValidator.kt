@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.generator.internal.validation
 
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import co.touchlab.skie.plugin.generator.internal.validation.rules.ValidationRule
 import co.touchlab.skie.plugin.generator.internal.validation.rules.sealed.SealedInteropRules

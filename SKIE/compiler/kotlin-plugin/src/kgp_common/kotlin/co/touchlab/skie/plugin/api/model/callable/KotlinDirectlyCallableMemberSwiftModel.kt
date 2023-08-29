@@ -48,7 +48,7 @@ interface KotlinDirectlyCallableMemberSwiftModel : KotlinCallableMemberSwiftMode
      * Only valid signatures can be used in generated Swift code.
      * Invalid signatures can be used only for generating placeholder declaration that cannot be called.
      * Example of such situation is if the signature contains a lambda type argument, such as A<() -> Unit>.
-      */
+     */
     val hasValidSignatureInSwift: Boolean
 
     fun <OUT> accept(visitor: KotlinDirectlyCallableMemberSwiftModelVisitor<OUT>): OUT

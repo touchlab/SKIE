@@ -4,7 +4,8 @@ import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import io.outfoxx.swiftpoet.AnyTypeName
 import io.outfoxx.swiftpoet.TypeName
 
-object SwiftAnySirType: SwiftNonNullReferenceSirType {
+object SwiftAnySirType : SwiftNonNullReferenceSirType {
+
     override val declaration = BuiltinDeclarations.Any
 
     override val directChildren: List<SirType> = emptyList()

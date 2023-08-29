@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 
-object SkieLambdaErrorSirType: SwiftNonNullReferenceSirType, SkieErrorSirType {
+object SkieLambdaErrorSirType : SwiftNonNullReferenceSirType, SkieErrorSirType {
 
     override val declaration = BuiltinDeclarations.SKIE.SkieLambdaErrorType
 

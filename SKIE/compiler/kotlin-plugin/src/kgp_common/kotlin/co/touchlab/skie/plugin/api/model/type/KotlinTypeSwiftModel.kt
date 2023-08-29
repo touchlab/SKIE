@@ -60,6 +60,7 @@ interface KotlinTypeSwiftModel {
     }
 
     companion object {
+
         val StableFqNameNamespace = SwiftFqName.Local.TopLevel("__Skie")
     }
 }

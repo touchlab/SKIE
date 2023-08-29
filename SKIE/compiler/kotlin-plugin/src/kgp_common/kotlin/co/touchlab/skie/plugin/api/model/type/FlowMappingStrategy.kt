@@ -33,5 +33,4 @@ enum class FlowMappingStrategy {
             Full, TypeArgumentsOnly -> Full
             None -> None
         }
-
 }

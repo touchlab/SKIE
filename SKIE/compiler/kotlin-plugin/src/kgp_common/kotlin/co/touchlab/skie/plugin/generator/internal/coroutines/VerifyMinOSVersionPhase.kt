@@ -25,8 +25,8 @@ class VerifyMinOSVersionPhase(
         if (currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
             error(
                 "Minimum OS version for ${configurables.target.name} must be at least $minRequiredVersion to support Swift Async. " +
-                    "However, the configured minimum OS version is only $currentMinVersion. " +
-                    "This is most likely a bug in SKIE Gradle plugin which should have set the minimum required version automatically.",
+                        "However, the configured minimum OS version is only $currentMinVersion. " +
+                        "This is most likely a bug in SKIE Gradle plugin which should have set the minimum required version automatically.",
             )
         }
     }

@@ -72,7 +72,12 @@ private fun SwiftIrDeclaration.getAllReferencedExternalTypes(): List<ExternalTyp
                     ExternalType.Class(module.name, name, typeParameters.size)
         }
         is SwiftIrTypeDeclaration.Local -> (typeParameters + superTypes).flatMap { it.getAllReferencedExternalTypes() }
-        is SwiftIrProtocolDeclaration.External -> listOf(ExternalType.Protocol(module.name, name)) + superTypes.flatMap { it.getAllReferencedExternalTypes() }
+        is SwiftIrProtocolDeclaration.External -> listOf(
+            ExternalType.Protocol(
+                module.name,
+                name
+            )
+        ) + superTypes.flatMap { it.getAllReferencedExternalTypes() }
         is SwiftIrProtocolDeclaration.Local -> superTypes.flatMap { it.getAllReferencedExternalTypes() }
         is SwiftIrTypeParameterDeclaration -> bounds.flatMap { it.getAllReferencedExternalTypes() }
         is SwiftIrModule -> emptyList()

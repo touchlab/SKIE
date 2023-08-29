@@ -16,8 +16,8 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegular
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.type.SkieErrorSirType
 import co.touchlab.skie.plugin.api.sir.type.allChildrenRecursivelyAndThis
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType

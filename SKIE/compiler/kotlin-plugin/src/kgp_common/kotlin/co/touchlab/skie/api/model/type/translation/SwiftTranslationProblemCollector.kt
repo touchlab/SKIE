@@ -16,5 +16,4 @@ interface SwiftTranslationProblemCollector {
         override fun reportWarning(method: FunctionDescriptor, text: String) {}
         override fun reportException(throwable: Throwable) {}
     }
-
 }

@@ -111,10 +111,10 @@ internal class SealedFunctionGeneratorDelegate(
         } else {
             add(
                 "fatalError(" +
-                    "\"Unknown subtype. " +
-                    "This error should not happen under normal circumstances " +
-                    "since ${swiftModel.swiftIrDeclaration} is sealed." +
-                    "\")\n"
+                        "\"Unknown subtype. " +
+                        "This error should not happen under normal circumstances " +
+                        "since ${swiftModel.swiftIrDeclaration} is sealed." +
+                        "\")\n"
             )
         }
 

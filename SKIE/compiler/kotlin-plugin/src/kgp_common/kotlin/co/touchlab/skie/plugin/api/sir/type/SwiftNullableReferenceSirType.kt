@@ -7,6 +7,7 @@ data class SwiftNullableReferenceSirType(
     val nonNullType: SwiftNonNullReferenceSirType,
     val isNullableResult: Boolean = false,
 ) : SwiftReferenceSirType {
+
     override val declaration: SwiftIrDeclaration
         get() = nonNullType.declaration
 

@@ -19,8 +19,6 @@ import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrProtocolDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.util.mutableLazy
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -101,9 +99,8 @@ class ActualKotlinClassSwiftModel(
 
     override var identifier: String = swiftName.name
     override val originalIdentifier: String
-        // Needs to be recalculated because the `identifier` is changed if the class is nested inside a non-exported class.
-        = namer.getClassOrProtocolName(classDescriptor.original).swiftName.substringAfter(".")
-
+    // Needs to be recalculated because the `identifier` is changed if the class is nested inside a non-exported class.
+            = namer.getClassOrProtocolName(classDescriptor.original).swiftName.substringAfter(".")
 
     override var bridge: ObjcSwiftBridge? = null
 

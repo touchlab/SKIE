@@ -2,7 +2,6 @@
 
 package co.touchlab.skie.api.model.factory
 
-import co.touchlab.skie.api.model.callable.function.FakeObjcConstructorKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
@@ -137,7 +136,7 @@ class ObjCTypeProvider(
             if (!returnBridge.successMayBeZero) {
                 check(
                     successReturnType is ObjCNonNullReferenceType
-                        || (successReturnType is ObjCPointerType && !successReturnType.nullable),
+                            || (successReturnType is ObjCPointerType && !successReturnType.nullable),
                 ) {
                     "Unexpected return type: $successReturnType in $method"
                 }

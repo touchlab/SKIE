@@ -42,8 +42,8 @@ internal interface SealedGeneratorExtensionContainer : ConfigurationContainer, S
 
     val KotlinClassSwiftModel.hasElseCase: Boolean
         get() = this.hasUnexposedSealedSubclasses ||
-            this.exposedSealedSubclasses.size != this.visibleSealedSubclasses.size ||
-            this.visibleSealedSubclasses.isEmpty()
+                this.exposedSealedSubclasses.size != this.visibleSealedSubclasses.size ||
+                this.visibleSealedSubclasses.isEmpty()
 
     val KotlinClassSwiftModel.visibleSealedSubclasses: List<KotlinClassSwiftModel>
         get() = this.exposedSealedSubclasses.filter { it.getConfiguration(SealedInterop.Case.Visible) }

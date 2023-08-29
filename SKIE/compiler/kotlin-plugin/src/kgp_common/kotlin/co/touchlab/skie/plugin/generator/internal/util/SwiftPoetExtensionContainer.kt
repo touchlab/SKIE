@@ -46,7 +46,7 @@ internal interface SwiftPoetExtensionContainer {
             is DeclaredTypeName -> this.canonicalName
             is ParameterizedTypeName -> {
                 this.rawType.canonicalName +
-                    this.typeArguments.joinToString(", ", prefix = "<", postfix = ">") { it.name }
+                        this.typeArguments.joinToString(", ", prefix = "<", postfix = ">") { it.name }
             }
 
             else -> error("TypeName $this is not supported.")

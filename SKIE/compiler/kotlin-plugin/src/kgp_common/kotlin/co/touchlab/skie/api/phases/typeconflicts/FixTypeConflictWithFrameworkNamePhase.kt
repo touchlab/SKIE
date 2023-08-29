@@ -31,7 +31,7 @@ class FixTypeConflictWithFrameworkNamePhase(
 
                 reporter.warning(
                     "Declaration '${it.classDescriptor.name.asString()}' was renamed to '${it.identifier}' " +
-                        "because it has the same name as the produced framework which is forbidden.",
+                            "because it has the same name as the produced framework which is forbidden.",
                     it.classDescriptor,
                 )
             }
@@ -43,7 +43,7 @@ class FixTypeConflictWithFrameworkNamePhase(
             .forEach {
                 reporter.warning(
                     "File class '${it.identifier}' was renamed to '${it.identifier}_' " +
-                        "because it has the same name as the produced framework which is forbidden.",
+                            "because it has the same name as the produced framework which is forbidden.",
                 )
 
                 it.identifier += "_"

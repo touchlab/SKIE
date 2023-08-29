@@ -4,6 +4,7 @@ import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 
 sealed interface SwiftFqName {
+
     val root: SwiftFqName
     val name: String
     val components: List<SwiftFqName>
@@ -16,7 +17,8 @@ sealed interface SwiftFqName {
 
     fun toSwiftPoetName(): DeclaredTypeName
 
-    sealed interface Local: SwiftFqName {
+    sealed interface Local : SwiftFqName {
+
         override val root: TopLevel
         override val components: List<Local>
 
@@ -31,7 +33,8 @@ sealed interface SwiftFqName {
 
         data class TopLevel(
             override val name: String,
-        ): Local {
+        ) : Local {
+
             override val root: TopLevel = this
             override val components: List<TopLevel> = listOf(this)
 
@@ -43,7 +46,8 @@ sealed interface SwiftFqName {
         data class Nested(
             val parent: Local,
             override val name: String,
-        ): Local {
+        ) : Local {
+
             override val root: TopLevel = parent.root
             override val components: List<Local> = parent.components + this
 
@@ -53,7 +57,8 @@ sealed interface SwiftFqName {
         }
     }
 
-    sealed interface External: SwiftFqName {
+    sealed interface External : SwiftFqName {
+
         override val root: TopLevel
         override val components: List<External>
 
@@ -68,7 +73,8 @@ sealed interface SwiftFqName {
         data class TopLevel(
             val module: String,
             override val name: String,
-        ): External {
+        ) : External {
+
             override val root: TopLevel = this
             override val components: List<TopLevel> = listOf(this)
 
@@ -80,7 +86,8 @@ sealed interface SwiftFqName {
         data class Nested(
             val parent: External,
             override val name: String,
-        ): External {
+        ) : External {
+
             override val root: TopLevel = parent.root
             override val components: List<External> = parent.components + this
 

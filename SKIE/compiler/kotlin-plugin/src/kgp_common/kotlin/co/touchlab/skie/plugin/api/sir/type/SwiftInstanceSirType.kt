@@ -4,7 +4,7 @@ import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
 import io.outfoxx.swiftpoet.SelfTypeName
 import io.outfoxx.swiftpoet.TypeName
 
-object SwiftInstanceSirType: SwiftNonNullReferenceSirType {
+object SwiftInstanceSirType : SwiftNonNullReferenceSirType {
 
     override val declaration: SwiftIrDeclaration
         get() = TODO()

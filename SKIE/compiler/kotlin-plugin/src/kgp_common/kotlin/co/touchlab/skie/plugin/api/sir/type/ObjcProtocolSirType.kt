@@ -6,7 +6,8 @@ import co.touchlab.skie.plugin.api.util.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.TypeName
 
-object ObjcProtocolSirType: SwiftNonNullReferenceSirType {
+object ObjcProtocolSirType : SwiftNonNullReferenceSirType {
+
     override val declaration: SwiftIrDeclaration = BuiltinDeclarations.Protocol
 
     override val directChildren: List<SirType> = emptyList()

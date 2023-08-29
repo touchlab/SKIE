@@ -9,6 +9,6 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 
 typealias InterceptedPhase<CONTEXT> = CompilerPhase<CONTEXT, Unit, Unit>
 typealias ErasedListener = Pair<
-        (phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) -> Unit,
-        (phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) -> Unit
-    >
+            (phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) -> Unit,
+            (phaseConfig: PhaseConfig, phaserState: PhaserState<Unit>, context: CommonBackendContext) -> Unit
+        >

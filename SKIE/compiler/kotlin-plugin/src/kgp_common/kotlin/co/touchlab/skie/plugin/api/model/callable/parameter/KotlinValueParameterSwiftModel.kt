@@ -2,10 +2,10 @@ package co.touchlab.skie.plugin.api.model.callable.parameter
 
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
 import co.touchlab.skie.plugin.api.sir.type.SirType
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 
 interface KotlinValueParameterSwiftModel {
 

@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.api.kotlin
 
-interface MutableDescriptorProvider: DescriptorProvider {
+interface MutableDescriptorProvider : DescriptorProvider {
+
     fun mutate(block: DescriptorRegistrationScope.() -> Unit)
 
     /**

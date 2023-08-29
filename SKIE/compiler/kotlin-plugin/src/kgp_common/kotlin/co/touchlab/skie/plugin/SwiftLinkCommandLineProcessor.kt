@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.util.plugin.SkiePlugin.Options
 import co.touchlab.skie.plugin.util.toCliOption
 import co.touchlab.skie.util.plugin.SkiePlugin
+import co.touchlab.skie.util.plugin.SkiePlugin.Options
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration

@@ -31,7 +31,11 @@ object FlowTypeMappers {
             return when {
                 swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> {
                     val typeArguments = type.arguments.map {
-                        translator.mapReferenceTypeIgnoringNullability(it.type, swiftExportScope, flowMappingStrategy.forTypeArgumentsOf(type))
+                        translator.mapReferenceTypeIgnoringNullability(
+                            it.type,
+                            swiftExportScope,
+                            flowMappingStrategy.forTypeArgumentsOf(type)
+                        )
                     }
                     val hasNullableTypeArgument = type.arguments.any { it.type.isNullable() }
                     val flowVariant = if (hasNullableTypeArgument) supportedFlow.optionalVariant else supportedFlow.requiredVariant

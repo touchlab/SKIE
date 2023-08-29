@@ -8,7 +8,8 @@ internal class SwiftRuntimeGenerator(
     private val skieContext: SkieContext,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieContext.skieConfiguration.enabledConfigurationFlags
+    override val isActive: Boolean =
+        SkieConfigurationFlag.Feature_CoroutinesInterop in skieContext.skieConfiguration.enabledConfigurationFlags
 
     override fun runObjcPhase() {
         getSwiftRuntimeFiles().forEach {

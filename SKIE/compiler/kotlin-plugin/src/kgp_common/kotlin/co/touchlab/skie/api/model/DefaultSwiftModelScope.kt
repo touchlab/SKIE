@@ -23,9 +23,9 @@ import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
 import co.touchlab.skie.plugin.api.sir.type.SwiftLambdaSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
 import co.touchlab.skie.plugin.api.sir.type.SwiftNullableReferenceSirType
@@ -179,7 +179,7 @@ class DefaultSwiftModelScope(
     override fun FunctionDescriptor.asyncReturnType(
         genericExportScope: SwiftGenericExportScope,
         bridge: MethodBridgeParameter.ValueParameter.SuspendCompletion,
-        flowMappingStrategy: FlowMappingStrategy
+        flowMappingStrategy: FlowMappingStrategy,
     ): SirType {
         val exportScope = SwiftExportScope(genericExportScope)
         return if (bridge.useUnitCompletion) {
@@ -193,11 +193,16 @@ class DefaultSwiftModelScope(
         descriptor: ParameterDescriptor?,
         bridge: MethodBridgeParameter.ValueParameter,
         genericExportScope: SwiftGenericExportScope,
-        flowMappingStrategy: FlowMappingStrategy
+        flowMappingStrategy: FlowMappingStrategy,
     ): SirType {
         val exportScope = SwiftExportScope(genericExportScope, SwiftExportScope.Flags.Escaping)
         return when (bridge) {
-            is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(descriptor!!.type, exportScope, bridge.bridge, flowMappingStrategy)
+            is MethodBridgeParameter.ValueParameter.Mapped -> translator.mapType(
+                descriptor!!.type,
+                exportScope,
+                bridge.bridge,
+                flowMappingStrategy
+            )
             MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
                 SwiftPointerSirType(SwiftNullableReferenceSirType(SwiftClassSirType(BuiltinDeclarations.Swift.Error)), nullable = true)
             is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
@@ -228,8 +233,8 @@ class DefaultSwiftModelScope(
     private fun DeclarationDescriptor.throwUnknownDescriptor(): Nothing {
         throw IllegalArgumentException(
             "Cannot find SwiftModel for descriptor: $this. Possible reasons: " +
-                "Descriptor is not exposed and therefore does not have a SwiftModel. " +
-                "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty)."
+                    "Descriptor is not exposed and therefore does not have a SwiftModel. " +
+                    "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty)."
         )
     }
 

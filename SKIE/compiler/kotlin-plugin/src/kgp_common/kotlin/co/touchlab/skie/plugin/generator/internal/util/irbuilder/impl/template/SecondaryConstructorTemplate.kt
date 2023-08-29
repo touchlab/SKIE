@@ -3,9 +3,7 @@ package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.template
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.Namespace
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.SecondaryConstructorBuilder
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrConstructor
-import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.DummyIrSimpleFunction
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.IrRebindableConstructorPublicSymbol
-import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.symboltable.IrRebindableSimpleFunctionPublicSymbol
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.DeclarationDescriptorImplReflector
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -18,7 +16,6 @@ import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
-import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name

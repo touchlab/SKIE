@@ -1,9 +1,9 @@
 package co.touchlab.skie.plugin.api.model
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
+import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -16,7 +16,8 @@ interface SwiftGenericExportScope {
 
     class FromTypeDeclaration(
         val declaration: SwiftIrTypeDeclaration,
-    ): SwiftGenericExportScope {
+    ) : SwiftGenericExportScope {
+
         override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType? {
             val localTypeParam = declaration.typeParameters.firstOrNull {
                 // TODO: We don't really want to cast, but here we're only resolving Kotlin type params anyway

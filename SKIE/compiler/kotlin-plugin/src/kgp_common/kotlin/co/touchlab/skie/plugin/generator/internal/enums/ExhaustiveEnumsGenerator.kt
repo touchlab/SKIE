@@ -16,7 +16,6 @@ import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.generator.internal.enums.ObjCBridgeable.addObjcBridgeableImplementation
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.swift.addFunctionBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -53,7 +52,7 @@ internal class ExhaustiveEnumsGenerator(
 
     private val KotlinClassSwiftModel.isSupported: Boolean
         get() = this.classDescriptor.kind.isEnumClass &&
-            this.classDescriptor.isEnumInteropEnabled
+                this.classDescriptor.isEnumInteropEnabled
 
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
         get() = getConfiguration(EnumInterop.Enabled)
@@ -62,7 +61,7 @@ internal class ExhaustiveEnumsGenerator(
         if (classSwiftModel.enumEntries.isEmpty()) {
             skieContext.reporter.warning(
                 "Enum ${classSwiftModel.identifier} has no entries, no Swift enum will be generated. " +
-                    "To silence this warning, add @EnumInterop.Disabled above the enum declaration.",
+                        "To silence this warning, add @EnumInterop.Disabled above the enum declaration.",
                 classSwiftModel.classDescriptor,
             )
             return

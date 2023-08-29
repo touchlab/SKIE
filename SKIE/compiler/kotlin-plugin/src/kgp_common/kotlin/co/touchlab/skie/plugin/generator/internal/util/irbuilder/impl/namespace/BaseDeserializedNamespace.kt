@@ -1,13 +1,12 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.DeserializedMemberScopeReflector
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 
-internal abstract class BaseDeserializedNamespace<D : DeclarationDescriptor>: BaseNamespace<D>() {
+internal abstract class BaseDeserializedNamespace<D : DeclarationDescriptor> : BaseNamespace<D>() {
 
     protected fun MemberScope.addFunctionDescriptorToImpl(functionDescriptor: SimpleFunctionDescriptor) {
         val reflectedMemberScope = this.reflectedBy<DeserializedMemberScopeReflector>()

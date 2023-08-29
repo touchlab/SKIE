@@ -1,10 +1,10 @@
 package co.touchlab.skie.plugin.reflection.reflectors
 
 import co.touchlab.skie.plugin.reflection.Reflector
+import co.touchlab.skie.plugin.reflection.reflectedBy
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.storage.MemoizedFunctionToNotNull
-import co.touchlab.skie.plugin.reflection.reflectedBy
 
 class DeserializedMemberScopeOptimizedImplementationReflector(
     override val instance: Any,

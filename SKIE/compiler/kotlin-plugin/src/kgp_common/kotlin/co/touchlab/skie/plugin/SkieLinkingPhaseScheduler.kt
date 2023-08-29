@@ -29,7 +29,6 @@ import co.touchlab.skie.api.phases.util.ExternalTypesProvider
 import co.touchlab.skie.api.phases.util.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.konan.KonanConfig
@@ -63,7 +62,13 @@ class SkieLinkingPhaseScheduler(
         RenameInaccessibleNestedDeclarationsPhase(skieModule, externalTypesProvider),
         MangleTypesConflictingWithModulesPhase(skieModule, externalTypesProvider, conflictingClassManglingContext),
         SkieModuleConfigurationPhase(skieModule, swiftModelScope),
-        SwiftCompilationApiNotesGenerationPhase(swiftModelScope, objCTypeRenderer, descriptorProvider, framework, skieContext.skieBuildDirectory),
+        SwiftCompilationApiNotesGenerationPhase(
+            swiftModelScope,
+            objCTypeRenderer,
+            descriptorProvider,
+            framework,
+            skieContext.skieBuildDirectory
+        ),
         AddForwardDeclarationsPhase(framework.kotlinHeader, objCTypeRenderer),
         AddTypeDefPhase(framework.kotlinHeader, objCTypeRenderer),
         DisableWildcardExportPhase(skieContext, framework),

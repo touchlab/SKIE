@@ -7,7 +7,6 @@ import co.touchlab.skie.analytics.environment.CompilerEnvironmentAnalytics
 import co.touchlab.skie.analytics.modules.ModulesAnalytics
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.generator.internal.util.SkieCompilationPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig

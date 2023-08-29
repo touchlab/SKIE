@@ -3,7 +3,8 @@ package co.touchlab.skie.plugin.api.sir.declaration
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
 
-sealed interface SwiftIrExtensibleDeclaration: SwiftIrDeclaration {
+sealed interface SwiftIrExtensibleDeclaration : SwiftIrDeclaration {
+
     val superTypes: List<SwiftIrExtensibleDeclaration>
 
     val swiftGenericExportScope: SwiftGenericExportScope
@@ -22,7 +23,8 @@ sealed interface SwiftIrExtensibleDeclaration: SwiftIrDeclaration {
     //
     // fun toPublicSwiftPoetName(): DeclaredTypeName
 
-    sealed interface Local: SwiftIrExtensibleDeclaration {
+    sealed interface Local : SwiftIrExtensibleDeclaration {
+
         val typealiasName: String
 
         override val publicName: SwiftFqName.Local

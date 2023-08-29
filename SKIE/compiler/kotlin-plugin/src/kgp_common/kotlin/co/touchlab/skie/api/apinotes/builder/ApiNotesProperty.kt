@@ -18,5 +18,5 @@ data class ApiNotesProperty(
     @SerialName("AvailabilityMsg")
     val availabilityMessage: String = "",
     @SerialName("Type")
-    val type: String = ""
+    val type: String = "",
 )

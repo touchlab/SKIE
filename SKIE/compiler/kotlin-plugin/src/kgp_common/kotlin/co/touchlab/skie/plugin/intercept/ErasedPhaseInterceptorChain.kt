@@ -5,7 +5,8 @@ typealias ErasedPhaseInterceptor<Context, Input, Output> = (Context, Input, Orig
 
 internal class ErasedPhaseInterceptorChain<Context, Input, Output>(
     interceptors: List<PhaseInterceptor<Context, Input, Output>>,
-): ErasedPhaseInterceptor<Context, Input, Output> {
+) : ErasedPhaseInterceptor<Context, Input, Output> {
+
     // We need to get rid of the `PhaseInterceptor` type as it's not available between different class loaders
     private val chainedInterceptors: ErasedPhaseInterceptor<Context, Input, Output> by lazy {
         val erasedInterceptors: Sequence<ErasedPhaseInterceptor<Context, Input, Output>> = interceptors.asSequence().map { it::intercept }

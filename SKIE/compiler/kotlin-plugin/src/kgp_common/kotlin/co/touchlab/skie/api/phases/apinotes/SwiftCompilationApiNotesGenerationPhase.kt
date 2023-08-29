@@ -5,7 +5,6 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.util.directory.SkieBuildDirectory
-import java.io.File
 
 class SwiftCompilationApiNotesGenerationPhase(
     swiftModelScope: MutableSwiftModelScope,

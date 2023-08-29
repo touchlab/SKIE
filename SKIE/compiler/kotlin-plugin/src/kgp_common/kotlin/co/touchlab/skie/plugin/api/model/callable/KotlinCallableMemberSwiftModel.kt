@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.api.model.callable
 
-import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 
 interface KotlinCallableMemberSwiftModel {

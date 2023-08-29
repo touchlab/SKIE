@@ -1,8 +1,6 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
-import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationTemplate
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.Namespace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -15,7 +13,7 @@ import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-internal abstract class BaseNamespace<D : DeclarationDescriptor>() : Namespace<D> {
+internal abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
 
     private val templates = mutableListOf<DeclarationTemplate<*>>()
 

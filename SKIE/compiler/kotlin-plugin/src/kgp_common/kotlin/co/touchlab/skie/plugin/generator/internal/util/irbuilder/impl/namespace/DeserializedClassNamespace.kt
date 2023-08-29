@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.findSourceFile
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.UnsupportedDeclarationDescriptorException
 import co.touchlab.skie.plugin.reflection.reflectedBy

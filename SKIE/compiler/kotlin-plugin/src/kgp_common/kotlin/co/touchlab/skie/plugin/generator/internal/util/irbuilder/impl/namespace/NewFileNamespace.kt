@@ -2,12 +2,10 @@
 
 package co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.namespace
 
-import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.util.toValidSwiftIdentifier
 import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.plugin.reflection.reflectors.ModuleDescriptorImplReflector
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -28,7 +26,6 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.source.PsiSourceFile
-import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
 internal class NewFileNamespace private constructor(
     private val sourceFile: SourceFile,
@@ -85,6 +82,7 @@ internal class NewFileNamespace private constructor(
         private val moduleDescriptor: ModuleDescriptor,
         mainIrModuleFragment: Lazy<IrModuleFragment>,
     ) {
+
         private val namespaceContext = Context(moduleDescriptor, mainIrModuleFragment)
 
         private val packagesByName = mutableMapOf<FqName, PackageFragmentDescriptor>()

@@ -11,7 +11,8 @@ internal class FlowBridgingConfigurator(
     private val skieContext: SkieContext,
 ) : SkieCompilationPhase {
 
-    override val isActive: Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieContext.skieConfiguration.enabledConfigurationFlags
+    override val isActive: Boolean =
+        SkieConfigurationFlag.Feature_CoroutinesInterop in skieContext.skieConfiguration.enabledConfigurationFlags
 
     override fun runObjcPhase() {
         skieContext.module.configure {

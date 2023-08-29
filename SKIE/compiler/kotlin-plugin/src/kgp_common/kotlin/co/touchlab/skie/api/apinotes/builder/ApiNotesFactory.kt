@@ -32,7 +32,7 @@ internal class ApiNotesFactory(
     context(SwiftModelScope)
     private val DescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
         get() = this.exposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
-            this.exposedFiles.map { it.swiftModel }
+                this.exposedFiles.map { it.swiftModel }
 
     context(SwiftModelScope)
     private val DescriptorProvider.swiftModelsForInterfaces: List<KotlinTypeSwiftModel>

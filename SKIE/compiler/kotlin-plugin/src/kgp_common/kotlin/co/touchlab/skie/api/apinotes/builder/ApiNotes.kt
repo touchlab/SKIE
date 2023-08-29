@@ -20,6 +20,7 @@ data class ApiNotes(
     fun createApiNotesFileContent(): String = coder.encodeToString(serializer(), this)
 
     companion object {
+
         private val coder = Yaml(
             configuration = YamlConfiguration(
                 encodeDefaults = false,

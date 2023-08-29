@@ -21,8 +21,8 @@ class FixTypesConflictsPhase(
 
     private val reservedNames by lazy {
         swiftIrDeclarationRegistry.builtinKotlinDeclarations.allDeclarations.map { it.publicName } +
-            // TODO: Unfortunate hack to avoid name collision with Swift's Any keyword
-            SwiftFqName.Local.TopLevel("Any")
+                // TODO: Unfortunate hack to avoid name collision with Swift's Any keyword
+                SwiftFqName.Local.TopLevel("Any")
     }
 
     override fun execute() {
@@ -89,7 +89,8 @@ class FixTypesConflictsPhase(
             existingFqNames.add(model.nonBridgedDeclaration.publicName)
 
             val existingBridge = model.bridge as? ObjcSwiftBridge.FromSKIE ?: return@forEach
-            val localBridgeDeclaration = existingBridge.declaration as? SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType ?: return@forEach
+            val localBridgeDeclaration =
+                existingBridge.declaration as? SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType ?: return@forEach
             while (localBridgeDeclaration.publicName in existingFqNames) {
                 localBridgeDeclaration.swiftName += "_"
             }

@@ -11,6 +11,7 @@ sealed class SwiftPrimitiveSirType(
 
     object NSUInteger : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.UInt)
     object Bool : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Bool)
+
     @Suppress("ClassName")
     object unichar : SwiftPrimitiveSirType(BuiltinDeclarations.Foundation.unichar)
     object Int8 : SwiftPrimitiveSirType(BuiltinDeclarations.Swift.Int8)

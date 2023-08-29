@@ -24,7 +24,8 @@ sealed class DumpSwiftApiPhase(
         framework: FrameworkLayout,
     ) : DumpSwiftApiPhase(skieContext, framework) {
 
-        override val isActive: Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledConfigurationFlags
+        override val isActive: Boolean =
+            SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledConfigurationFlags
     }
 
     class AfterApiNotes(
@@ -33,7 +34,8 @@ sealed class DumpSwiftApiPhase(
         framework: FrameworkLayout,
     ) : DumpSwiftApiPhase(skieContext, framework) {
 
-        override val isActive: Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes in skieConfiguration.enabledConfigurationFlags
+        override val isActive: Boolean =
+            SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes in skieConfiguration.enabledConfigurationFlags
     }
 
     override fun execute() {
@@ -50,7 +52,8 @@ sealed class DumpSwiftApiPhase(
 
         withBlockingTimeoutOrNull(15.seconds) {
             command.execute(handleError = false, logFile = logFile)
-        } ?: error("${this::class.qualifiedName} timed out. This is likely due to exporting a type with the same name as the produced framework.")
+        }
+            ?: error("${this::class.qualifiedName} timed out. This is likely due to exporting a type with the same name as the produced framework.")
     }
 
     private fun <T : Any> withBlockingTimeoutOrNull(timeout: Duration, block: () -> T): T? {

@@ -2,29 +2,33 @@ package co.touchlab.skie.plugin.api.sir.declaration
 
 import co.touchlab.skie.plugin.api.util.nsNumberKindClassIds
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.name.FqName
 
 object BuiltinDeclarations {
 
-    object Any: SwiftIrDeclaration {
+    object Any : SwiftIrDeclaration {
+
         override fun toString(): String = "Any"
     }
 
     // TODO: This should be a typealias declaration to ()
-    object Void: SwiftIrDeclaration {
+    object Void : SwiftIrDeclaration {
+
         override fun toString(): String = "Swift.Void"
     }
 
     // TODO: This should be a typealias declaration to AnyObject.Type
-    object AnyClass: SwiftIrDeclaration {
+    object AnyClass : SwiftIrDeclaration {
+
         override fun toString(): String = "Swift.AnyClass"
     }
 
-    object Protocol: SwiftIrDeclaration {
+    object Protocol : SwiftIrDeclaration {
+
         override fun toString(): String = "Protocol"
     }
 
     object Swift {
+
         val module = SwiftIrModule("Swift")
 
         val Hashable = "Hashable"()
@@ -123,6 +127,7 @@ object BuiltinDeclarations {
     class Kotlin(
         val namer: ObjCExportNamer,
     ) {
+
         val allDeclarations: List<SwiftIrTypeDeclaration.Local.ObjcType> by lazy {
             listOf(
                 Base,

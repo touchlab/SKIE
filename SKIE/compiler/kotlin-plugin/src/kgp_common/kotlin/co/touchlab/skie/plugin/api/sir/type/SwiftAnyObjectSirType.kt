@@ -2,7 +2,8 @@ package co.touchlab.skie.plugin.api.sir.type
 
 import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
 
-object SwiftAnyObjectSirType: SwiftNonNullReferenceSirType {
+object SwiftAnyObjectSirType : SwiftNonNullReferenceSirType {
+
     override val declaration = BuiltinDeclarations.Swift.AnyObject
 
     override val directChildren: List<SirType> = emptyList()
