@@ -15,7 +15,7 @@ public class SkieSwiftFlowIterator<T>: _Concurrency.AsyncIteratorProtocol {
     }
 
     public func next() async -> Element? {
-        let hasNext = try? await SkieColdFlowIteratorKt.hasNext(iterator)
+        let hasNext = try? await __SkieSuspendWrappersKt.hasNext(iterator)
 
         if (hasNext?.boolValue ?? false) {
             return .some(iterator.next() as! Element)
