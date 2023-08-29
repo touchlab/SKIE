@@ -31,10 +31,10 @@ import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 
 internal class ConstructorsDefaultArgumentGeneratorDelegate(
     skieContext: SkieContext,
-    private val descriptorProvider: DescriptorProvider,
+    descriptorProvider: DescriptorProvider,
     declarationBuilder: DeclarationBuilder,
     private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(skieContext, declarationBuilder) {
+) : BaseDefaultArgumentGeneratorDelegate(skieContext, descriptorProvider, declarationBuilder) {
 
     override fun generate() {
         descriptorProvider.allSupportedClasses.forEach { classDescriptor ->

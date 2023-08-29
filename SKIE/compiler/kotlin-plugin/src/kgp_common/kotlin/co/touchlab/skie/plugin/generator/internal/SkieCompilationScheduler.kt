@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal
 
 import co.touchlab.skie.analytics.AnalyticsPhase
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.arguments.DefaultArgumentGenerator
 import co.touchlab.skie.plugin.generator.internal.coroutines.VerifyMinOSVersionPhase
 import co.touchlab.skie.plugin.generator.internal.coroutines.flow.FlowBridgingConfigurator
@@ -15,7 +16,6 @@ import co.touchlab.skie.plugin.generator.internal.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
 import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 internal class SkieCompilationScheduler(
     config: KonanConfig,
     private val skieContext: SkieContext,
-    descriptorProvider: NativeMutableDescriptorProvider,
+    descriptorProvider: MutableDescriptorProvider,
     declarationBuilder: DeclarationBuilderImpl,
     namespaceProvider: NamespaceProvider,
 ) {

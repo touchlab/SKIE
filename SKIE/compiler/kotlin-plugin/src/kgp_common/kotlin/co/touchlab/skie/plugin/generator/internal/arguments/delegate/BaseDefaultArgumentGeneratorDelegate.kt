@@ -1,7 +1,9 @@
 package co.touchlab.skie.plugin.generator.internal.arguments.delegate
 
 import co.touchlab.skie.configuration.DefaultArgumentInterop
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.configuration.ConfigurationContainer
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -16,7 +18,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.declaresOrInheritsDefaultValue
 
 internal abstract class BaseDefaultArgumentGeneratorDelegate(
-    override val skieContext: SkieContext,
+    final override val skieContext: SkieContext,
+    protected val descriptorProvider: DescriptorProvider,
     protected val declarationBuilder: DeclarationBuilder,
 ) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
 
@@ -25,8 +28,13 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
     protected val FunctionDescriptor.hasDefaultArguments: Boolean
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
 
+    private val isInteropEnabledForExternalModules: Boolean =
+        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in skieContext.skieConfiguration.enabledConfigurationFlags
+
     protected val FunctionDescriptor.isInteropEnabled: Boolean
-        get() = this.getConfiguration(DefaultArgumentInterop.Enabled) && this.satisfiesMaximumDefaultArgumentCount
+        get() = this.getConfiguration(DefaultArgumentInterop.Enabled) &&
+                this.satisfiesMaximumDefaultArgumentCount &&
+                (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
 
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean
         get() = this.defaultArgumentCount <= this.getConfiguration(DefaultArgumentInterop.MaximumDefaultArgumentCount)

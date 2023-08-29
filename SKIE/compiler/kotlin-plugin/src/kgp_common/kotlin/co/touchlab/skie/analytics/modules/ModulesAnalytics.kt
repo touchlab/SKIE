@@ -5,8 +5,6 @@ package co.touchlab.skie.analytics.modules
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
-import co.touchlab.skie.plugin.reflection.reflectedBy
-import co.touchlab.skie.plugin.reflection.reflectors.UserVisibleIrModulesSupportReflector
 import co.touchlab.skie.util.hash.hashed
 import co.touchlab.skie.util.toPrettyJson
 import kotlinx.serialization.Serializable
@@ -22,7 +20,6 @@ import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
-import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
@@ -125,14 +122,14 @@ object ModulesAnalytics {
         }
 
         private fun getBuiltInModules(): List<TypedModule> =
-            config.resolvedLibraries.getFullList().filter { it.isDefault }
+            descriptorProvider.buildInLibraries
                 .let { builtInLibraries ->
                     TypedModule.BuiltIn(builtInLibraries.map { findModuleForKlib(it.libraryFile.absolutePath) })
                 }
                 .let { listOf(it) }
 
         private fun getExternalLibraries(): List<TypedModule> =
-            config.externalLibraries
+            descriptorProvider.externalDependencies
                 .map {
                     TypedModule.Library(
                         id = it.canonicalName.hashed(),
@@ -142,7 +139,7 @@ object ModulesAnalytics {
                 }
 
         private fun getLocalModules(): List<TypedModule> =
-            config.localModules
+            descriptorProvider.localLibraries
                 .map {
                     TypedModule.Local(
                         id = it.moduleName.hashed(),
@@ -292,20 +289,6 @@ object ModulesAnalytics {
         }
     }
 }
-
-private val KonanConfig.localModules: Collection<KotlinLibrary>
-    get() {
-        val modulesWithoutBuiltIns = resolvedLibraries.getFullList().filter { !it.isDefault }
-
-        val externalLibrariesArtifacts = externalLibraries.flatMap { it.artifactPaths }.map { it.path }.toSet()
-
-        return modulesWithoutBuiltIns.filter { it.libraryFile.absolutePath !in externalLibrariesArtifacts }
-    }
-
-private val KonanConfig.externalLibraries: Collection<ResolvedDependency>
-    get() = userVisibleIrModulesSupport
-        .reflectedBy<UserVisibleIrModulesSupportReflector>()
-        .externalDependencyModules
 
 private val ResolvedDependency.canonicalName: String
     get() = id.uniqueNames.minBy { it.length }

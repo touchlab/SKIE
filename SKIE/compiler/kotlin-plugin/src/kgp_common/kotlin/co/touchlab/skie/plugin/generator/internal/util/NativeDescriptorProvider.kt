@@ -2,11 +2,16 @@
 
 package co.touchlab.skie.plugin.generator.internal.util
 
+import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.reflection.reflectedBy
 import co.touchlab.skie.plugin.reflection.reflectors.ObjcExportedInterfaceReflector
+import co.touchlab.skie.plugin.reflection.reflectors.UserVisibleIrModulesSupportReflector
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.KonanConfig
+import org.jetbrains.kotlin.backend.konan.ir.konanLibrary
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
+import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
@@ -15,23 +20,28 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
+import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
+import org.jetbrains.kotlin.utils.ResolvedDependency
 
 internal fun interface ExposedModulesProvider {
+
     fun exposedModules(): Set<ModuleDescriptor>
 }
 
 internal class NativeDescriptorProvider(
     private val exposedModulesProvider: ExposedModulesProvider,
-    private val config: KonanConfig,
+    private val konanConfig: KonanConfig,
     private val exportedInterface: ObjcExportedInterfaceReflector,
-) : InternalDescriptorProvider {
+) : DescriptorProvider {
 
     override val exposedModules: Set<ModuleDescriptor> by lazy {
         exposedModulesProvider.exposedModules()
@@ -66,9 +76,35 @@ internal class NativeDescriptorProvider(
     override val exposedTopLevelMembers: Set<CallableMemberDescriptor>
         get() = mutableTopLevel.values.flatten().toSet()
 
-    override val mapper: ObjCExportMapper by lazy {
+    private val mapper: ObjCExportMapper by lazy {
         exportedInterface.mapper
     }
+
+    override val externalDependencies: Set<ResolvedDependency> by lazy {
+        konanConfig.userVisibleIrModulesSupport
+            .reflectedBy<UserVisibleIrModulesSupportReflector>()
+            .externalDependencyModules
+            .toSet()
+    }
+
+    override val buildInLibraries: Set<KotlinLibrary> by lazy {
+        konanConfig.resolvedLibraries.getFullList().filter { it.isDefault }.toSet()
+    }
+
+    override val externalLibraries: Set<KotlinLibrary> by lazy {
+        val externalLibrariesArtifacts = externalDependencies.flatMap { it.artifactPaths }.map { it.path }.toSet()
+
+        konanConfig.resolvedLibraries.getFullList()
+            .filter { it.libraryFile.absolutePath in externalLibrariesArtifacts }
+            .toSet() - buildInLibraries
+    }
+
+    override val localLibraries: Set<KotlinLibrary> by lazy {
+        konanConfig.resolvedLibraries.getFullList().toSet() - buildInLibraries - externalLibraries
+    }
+
+    override fun isFromLocalModule(declarationDescriptor: DeclarationDescriptor): Boolean =
+        declarationDescriptor.module.konanLibrary in localLibraries
 
     override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
         callableMemberDescriptor.isExposed
@@ -78,6 +114,9 @@ internal class NativeDescriptorProvider(
 
     override fun isExposable(classDescriptor: ClassDescriptor): Boolean =
         classDescriptor.isExposable
+
+    override fun isBaseMethod(functionDescriptor: FunctionDescriptor): Boolean =
+        mapper.isBaseMethod(functionDescriptor)
 
     @get:JvmName("isExposableExtension")
     private val CallableMemberDescriptor.isExposable: Boolean
@@ -90,8 +129,8 @@ internal class NativeDescriptorProvider(
     @get:JvmName("isExposedExtension")
     private val CallableMemberDescriptor.isExposed: Boolean
         get() = this in exposedTopLevelMembers ||
-            this in exposedCategoryMembers ||
-            (this.containingDeclaration in exposedClasses && this.isExposable)
+                this in exposedCategoryMembers ||
+                (this.containingDeclaration in exposedClasses && this.isExposable)
 
     internal fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
         when (descriptor) {

@@ -5,21 +5,19 @@ package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.SuspendInterop
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
-import co.touchlab.skie.plugin.generator.internal.util.InternalDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
-import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 internal class SuspendGenerator(
     skieContext: SkieContext,
     namespaceProvider: NamespaceProvider,
-    private val descriptorProvider: NativeMutableDescriptorProvider,
+    private val descriptorProvider: MutableDescriptorProvider,
     private val declarationBuilder: DeclarationBuilder,
 ) : BaseGenerator(skieContext, namespaceProvider) {
 
@@ -38,9 +36,9 @@ internal class SuspendGenerator(
         }
     }
 
-    private val InternalDescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
+    private val MutableDescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
         get() = this.allExposedMembers.filterIsInstance<SimpleFunctionDescriptor>()
-            .filter { this.mapper.isBaseMethod(it) }
+            .filter { this.isBaseMethod(it) }
             .filter { it.isSupported }
             .filter { it.isInteropEnabled }
 

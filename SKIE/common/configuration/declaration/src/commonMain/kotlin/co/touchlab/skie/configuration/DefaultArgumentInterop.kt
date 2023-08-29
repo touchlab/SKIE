@@ -6,9 +6,9 @@ object DefaultArgumentInterop {
 
     object Enabled : ConfigurationKey.Boolean {
 
-        override val defaultValue: Boolean = true
+        override val defaultValue: Boolean = false
 
-        override val skieRuntimeValue: Boolean = true
+        override val skieRuntimeValue: Boolean = false
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {

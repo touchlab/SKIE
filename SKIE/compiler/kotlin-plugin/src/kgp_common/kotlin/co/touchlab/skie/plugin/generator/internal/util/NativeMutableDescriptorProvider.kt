@@ -6,23 +6,25 @@ import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.DescriptorRegistrationScope
 import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.reflection.reflectedBy
-import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.library.KotlinLibrary
+import org.jetbrains.kotlin.utils.ResolvedDependency
 import java.util.concurrent.atomic.AtomicReference
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 
 internal class NativeMutableDescriptorProvider(
     private val exposedModulesProvider: ExposedModulesProvider,
     private val config: KonanConfig,
     initialExportedInterface: ObjCExportedInterface,
-): MutableDescriptorProvider, InternalDescriptorProvider {
+) : MutableDescriptorProvider {
+
     enum class State {
         MUTABLE,
         MUTATING,
@@ -44,7 +46,7 @@ internal class NativeMutableDescriptorProvider(
     fun reload(newExportedInterface: ObjCExportedInterface) {
         realProvider = NativeDescriptorProvider(exposedModulesProvider, config, newExportedInterface.reflectedBy())
 
-        mutationScope = object: DescriptorRegistrationScope, DescriptorProvider by realProvider {
+        mutationScope = object : DescriptorRegistrationScope, DescriptorProvider by realProvider {
             override fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
                 realProvider.registerExposedDescriptor(descriptor)
             }
@@ -71,7 +73,7 @@ internal class NativeMutableDescriptorProvider(
         mutationListeners.forEach { it() }
     }
 
-    fun preventFurtherMutations(newExportedInterface: ObjCExportedInterface): InternalDescriptorProvider {
+    fun preventFurtherMutations(newExportedInterface: ObjCExportedInterface): DescriptorProvider {
         when (val witnessState = state.compareAndExchange(State.MUTABLE, State.IMMUTABLE)) {
             State.MUTABLE -> {
                 // Create a fresh provider with all the descriptors we've seen so far.
@@ -80,7 +82,7 @@ internal class NativeMutableDescriptorProvider(
             // We were already mutable, nothing to do.
             State.IMMUTABLE -> {}
             State.MUTATING -> error("Cannot prevent further mutations while mutating.")
-            null -> error("Unexpected state: $witnessState")
+            else -> error("Unexpected state: $witnessState")
         }
         return realProvider
     }
@@ -90,12 +92,29 @@ internal class NativeMutableDescriptorProvider(
     }
 
     // MARK:- DescriptorProvider delegation
-    override val mapper: ObjCExportMapper get() = realProvider.mapper
     override val exposedModules: Set<ModuleDescriptor> get() = realProvider.exposedModules
     override val exposedClasses: Set<ClassDescriptor> get() = realProvider.exposedClasses
     override val exposedFiles: Set<SourceFile> get() = realProvider.exposedFiles
     override val exposedCategoryMembers: Set<CallableMemberDescriptor> get() = realProvider.exposedCategoryMembers
     override val exposedTopLevelMembers: Set<CallableMemberDescriptor> get() = realProvider.exposedTopLevelMembers
+
+    override val externalDependencies: Set<ResolvedDependency>
+        get() = realProvider.externalDependencies
+
+    override val buildInLibraries: Set<KotlinLibrary>
+        get() = realProvider.buildInLibraries
+
+    override val externalLibraries: Set<KotlinLibrary>
+        get() = realProvider.externalLibraries
+
+    override val localLibraries: Set<KotlinLibrary>
+        get() = realProvider.localLibraries
+
+    override fun isFromLocalModule(declarationDescriptor: DeclarationDescriptor): Boolean =
+        realProvider.isFromLocalModule(declarationDescriptor)
+
+    override fun isBaseMethod(functionDescriptor: FunctionDescriptor): Boolean =
+        realProvider.isBaseMethod(functionDescriptor)
 
     override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
         realProvider.isExposed(callableMemberDescriptor)

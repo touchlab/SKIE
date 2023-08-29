@@ -3,8 +3,12 @@ package co.touchlab.skie.plugin.api.kotlin
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.library.KotlinLibrary
+import org.jetbrains.kotlin.utils.ResolvedDependency
 
 interface DescriptorProvider {
 
@@ -18,11 +22,23 @@ interface DescriptorProvider {
 
     val exposedTopLevelMembers: Set<CallableMemberDescriptor>
 
+    val externalDependencies: Set<ResolvedDependency>
+
+    val buildInLibraries: Set<KotlinLibrary>
+
+    val externalLibraries: Set<KotlinLibrary>
+
+    val localLibraries: Set<KotlinLibrary>
+
+    fun isFromLocalModule(declarationDescriptor: DeclarationDescriptor): Boolean
+
     fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean
 
     fun isExposable(callableMemberDescriptor: CallableMemberDescriptor): Boolean
 
     fun isExposable(classDescriptor: ClassDescriptor): Boolean
+
+    fun isBaseMethod(functionDescriptor: FunctionDescriptor): Boolean
 
     fun getFileModule(file: SourceFile): ModuleDescriptor
 
@@ -51,10 +67,10 @@ interface DescriptorProvider {
 
 fun DescriptorProvider.getAllExposedMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
     this.getExposedClassMembers(classDescriptor) +
-        this.getExposedCategoryMembers(classDescriptor) +
-        this.getExposedConstructors(classDescriptor)
+            this.getExposedCategoryMembers(classDescriptor) +
+            this.getExposedConstructors(classDescriptor)
 
 val DescriptorProvider.allExposedMembers: List<CallableMemberDescriptor>
     get() = (this.exposedFiles.flatMap { this.getExposedStaticMembers(it) } +
-        this.exposedClasses.flatMap { this.getExposedClassMembers(it) + this.getExposedConstructors(it) }) +
-        this.exposedCategoryMembers
+            this.exposedClasses.flatMap { this.getExposedClassMembers(it) + this.getExposedConstructors(it) }) +
+            this.exposedCategoryMembers
