@@ -2,8 +2,11 @@ package co.touchlab.skie.api.phases.typeconflicts
 
 import co.touchlab.skie.api.phases.SkieLinkingPhase
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
+import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
 import co.touchlab.skie.plugin.api.module.SkieModule
 import co.touchlab.skie.plugin.api.sir.SwiftFqName
+import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import co.touchlab.skie.plugin.generator.internal.util.Reporter
 
@@ -13,40 +16,42 @@ class FixTypeConflictWithFrameworkNamePhase(
     private val reporter: Reporter,
 ) : SkieLinkingPhase {
 
+    private val frameworkName = SwiftFqName.Local.TopLevel(framework.moduleName)
+
     override fun execute() {
         skieModule.configure(SkieModule.Ordering.Last) {
-            val frameworkName = SwiftFqName.Local.TopLevel(framework.moduleName)
-
-            renameClasses(frameworkName)
-
-            renameFiles(frameworkName)
+            fixTypeNameCollisions()
         }
     }
 
-    private fun MutableSwiftModelScope.renameClasses(frameworkName: SwiftFqName.Local.TopLevel) {
-        exposedClasses
-            .filter { it.swiftIrDeclaration.publicName == frameworkName }
-            .forEach {
-                it.identifier += "_"
+    private fun MutableSwiftModelScope.fixTypeNameCollisions() {
+        var collisionExists = false
 
-                reporter.warning(
-                    "Declaration '${it.classDescriptor.name.asString()}' was renamed to '${it.identifier}' " +
-                            "because it has the same name as the produced framework which is forbidden.",
-                    it.classDescriptor,
-                )
+        exposedTypes.forEach { type ->
+            if (type.nonBridgedDeclaration.publicName == frameworkName) {
+                type.identifier += "_"
+                collisionExists = true
             }
+
+            val localBridgeDeclaration = type.asSkieGeneratedSwiftType()
+            if (localBridgeDeclaration?.publicName == frameworkName) {
+                localBridgeDeclaration.swiftName += "_"
+                collisionExists = true
+            }
+        }
+
+        if (collisionExists) {
+            logModuleNameCollisionWarning()
+        }
     }
 
-    private fun MutableSwiftModelScope.renameFiles(frameworkName: SwiftFqName.Local.TopLevel) {
-        exposedFiles
-            .filter { it.swiftIrDeclaration.publicName == frameworkName }
-            .forEach {
-                reporter.warning(
-                    "File class '${it.identifier}' was renamed to '${it.identifier}_' " +
-                            "because it has the same name as the produced framework which is forbidden.",
-                )
+    private fun MutableKotlinTypeSwiftModel.asSkieGeneratedSwiftType(): SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType? =
+        (this.bridge as? ObjcSwiftBridge.FromSKIE)?.declaration as? SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType
 
-                it.identifier += "_"
-            }
+    private fun logModuleNameCollisionWarning() {
+        reporter.warning(
+            "Type '${framework.moduleName}' was renamed to '${framework.moduleName}_' " +
+                    "because it has the same name as the produced framework which is forbidden.",
+        )
     }
 }
