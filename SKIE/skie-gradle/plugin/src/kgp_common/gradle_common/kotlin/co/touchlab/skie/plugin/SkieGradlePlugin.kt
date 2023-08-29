@@ -5,6 +5,7 @@ import co.touchlab.skie.plugin.configuration.CreateSkieConfigurationTask
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.coroutines.addDependencyOnSkieRuntime
 import co.touchlab.skie.plugin.coroutines.registerConfigureMinOsVersionTaskIfNeeded
+import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.directory.skieDirectories
@@ -13,7 +14,6 @@ import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
 import co.touchlab.skie.plugin.util.appleTargets
-import co.touchlab.skie.plugin.util.doFirstOptimized
 import co.touchlab.skie.plugin.util.frameworks
 import co.touchlab.skie.plugin.util.subpluginOption
 import co.touchlab.skie.util.plugin.SkiePlugin
@@ -23,7 +23,6 @@ import org.gradle.api.file.FileCollection
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
-import org.jetbrains.kotlin.konan.target.presetName
 
 abstract class SkieGradlePlugin : Plugin<Project> {
 
@@ -58,7 +57,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         GradleAnalyticsManager(project).configureAnalytics(this)
 
-        disableCaching()
+        disableCachingIfNeeded()
         binary.target.addDependencyOnSkieRuntime()
         binary.registerConfigureMinOsVersionTaskIfNeeded()
 
@@ -103,16 +102,6 @@ internal fun Project.configureEachKotlinAppleTarget(
     kotlinExtension.appleTargets.forEach {
         configure(it)
     }
-}
-
-private fun KotlinNativeLink.disableCaching() {
-    doFirstOptimized {
-        project.logger.warn(
-            "w: SKIE does not support Kotlin Native caching yet. Compilation time in debug mode might be increased as a result.",
-        )
-    }
-
-    project.extensions.extraProperties.set("kotlin.native.cacheKind.${binary.target.konanTarget.presetName}", "none")
 }
 
 private val Project.isSkieEnabled: Boolean
