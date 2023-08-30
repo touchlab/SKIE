@@ -16,6 +16,7 @@ import org.gradle.configurationcache.extensions.serviceOf
 import org.gradle.internal.classloader.HashingClassLoaderFactory
 import org.gradle.internal.classpath.DefaultClassPath
 import org.gradle.util.GradleVersion
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
 @Suppress("unused")
 abstract class SkieLoaderPlugin: Plugin<Project> {
@@ -86,16 +87,30 @@ abstract class SkieLoaderPlugin: Plugin<Project> {
     }
 
     private val Project.kotlinGradlePluginVersion: String?
-        get() {
-            val classpathConfiguration = buildscript.configurations.getByName("classpath")
-            val artifact = classpathConfiguration.resolvedConfiguration.resolvedArtifacts.singleOrNull { artifact ->
-                artifact.moduleVersion.id.let { it.group == "org.jetbrains.kotlin" && it.name == "kotlin-gradle-plugin" }
-            }
-            return artifact?.moduleVersion?.id?.version
-        }
+        get() = kotlinGradlePluginVersionFromPlugin() ?: kotlinGradlePluginVersionFromClasspathConfiguration()
 
     private val Project.kotlinGradlePluginVersionOverride: String?
         get() = findProperty("skie.kgpVersion") as? String
+
+    private fun Project.kotlinGradlePluginVersionFromPlugin(): String? {
+        return try {
+            plugins.filterIsInstance<KotlinBasePlugin>().firstOrNull()?.pluginVersion
+        } catch (e: NoClassDefFoundError) {
+            // This happens when kotlin-gradle-plugin-api is not on classpath. SKIE loader doesn't add it to make sure we don't lock it to a specific version.
+            null
+        } catch (e: ClassNotFoundException) {
+            // We'll probably never get here, but we want to be sure not to crash when we can't find the KotlinBasePlugin class.
+            null
+        }
+    }
+
+    private fun Project.kotlinGradlePluginVersionFromClasspathConfiguration(): String? {
+        val classpathConfiguration = buildscript.configurations.getByName("classpath")
+        val artifact = classpathConfiguration.resolvedConfiguration.resolvedArtifacts.singleOrNull { artifact ->
+            artifact.moduleVersion.id.let { it.group == "org.jetbrains.kotlin" && it.name == "kotlin-gradle-plugin" }
+        }
+        return artifact?.moduleVersion?.id?.version
+    }
 
     private inline fun <reified T : Named> ObjectFactory.named(name: String): T =
         named(T::class.java, name)

@@ -41,6 +41,7 @@ dependencies {
     implementation(projects.gradle.gradlePluginApi)
     api(projects.common.configuration.configurationDeclaration)
     compileOnly("dev.gradleplugins:gradle-api:${gradleApiVersionDimension().components.min().value}")
+    compileOnly(libs.plugin.kotlin.gradle.api)
 
     testImplementation(kotlin("test"))
 }
