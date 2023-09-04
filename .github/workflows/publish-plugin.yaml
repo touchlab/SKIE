@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
       - uses: actions/setup-java@v2
         with:
           distribution: adopt
