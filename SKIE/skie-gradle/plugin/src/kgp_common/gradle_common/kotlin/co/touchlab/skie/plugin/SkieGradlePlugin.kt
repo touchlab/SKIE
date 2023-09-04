@@ -10,7 +10,6 @@ import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
-import co.touchlab.skie.plugin.license.GradleSkieLicenseManager
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
 import co.touchlab.skie.plugin.util.appleTargets
@@ -35,8 +34,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
     }
 
     private fun Project.configureSkieGradlePlugin() {
-        GradleSkieLicenseManager(project).initializeLicensing()
-
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
     }
 
