@@ -42,6 +42,8 @@ abstract class SkieGradlePlugin : Plugin<Project> {
             return
         }
 
+        warnOnEmptyFrameworks()
+
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
         configureEachKotlinFrameworkLinkTask {
@@ -77,6 +79,13 @@ abstract class SkieGradlePlugin : Plugin<Project> {
             SkiePlugin.id,
             SkiePlugin.Options.skieDirectories.subpluginOption(skieDirectories),
         )
+    }
+}
+
+internal fun Project.warnOnEmptyFrameworks() {
+    val hasFrameworks = extensions.findByType(KotlinMultiplatformExtension::class.java)?.appleTargets?.any { it.frameworks.isNotEmpty() } ?: false
+    if (!hasFrameworks) {
+        logger.warn("w: No Apple frameworks configured. Make sure you applied SKIE plugin in the correct module.")
     }
 }
 
