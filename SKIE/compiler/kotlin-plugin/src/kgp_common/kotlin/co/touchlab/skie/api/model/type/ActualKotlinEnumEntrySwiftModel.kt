@@ -12,7 +12,7 @@ class ActualKotlinEnumEntrySwiftModel(
     private val swiftModelScope: MutableSwiftModelScope,
 ) : KotlinEnumEntrySwiftModel {
 
-    override val identifier: String = namer.getEnumEntrySelector(descriptor.original)
+    override val identifier: String = namer.getEnumEntrySwiftName(descriptor.original)
 
     override val enum: KotlinClassSwiftModel
         get() = with(swiftModelScope) {
