@@ -37,9 +37,9 @@ abstract class SkieLoaderPlugin: Plugin<Project> {
         log.info("Resolving SKIE gradle plugin for Kotlin plugin version $kotlinVersion and Gradle version $gradleVersion")
 
         KotlinCompilerVersion.registerIn(project.dependencies)
-        KotlinCompilerVersion.registerIn(rootProject.buildscript.dependencies)
-        val skieGradleConfiguration = rootProject.buildscript.configurations.detachedConfiguration(
-            project.dependencies.create(BuildConfig.SKIE_GRADLE_PLUGIN_DEPENDENCY)
+        KotlinCompilerVersion.registerIn(buildscript.dependencies)
+        val skieGradleConfiguration = buildscript.configurations.detachedConfiguration(
+            buildscript.dependencies.create(BuildConfig.SKIE_GRADLE_PLUGIN_DEPENDENCY)
         ).apply {
             this.isCanBeConsumed = false
             this.isCanBeResolved = true
@@ -51,9 +51,9 @@ abstract class SkieLoaderPlugin: Plugin<Project> {
             )
 
             attributes {
-                attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
-                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
-                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
+                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
                 attribute(KotlinCompilerVersion.attribute, objects.named(kotlinVersion))
                 if (GradleVersion.current() >= GradleVersion.version("7.0")) {
