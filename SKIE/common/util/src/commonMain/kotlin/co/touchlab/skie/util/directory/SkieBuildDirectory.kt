@@ -80,8 +80,6 @@ class SkieBuildDirectory(
         val custom: Custom = Custom(this)
 
         class Generated(parent: Directory) : PermanentDirectory(parent, "generated") {
-
-            fun swiftFile(baseName: String): File = directory.resolve("$baseName.swift")
         }
 
         class Custom(parent: Directory) : PermanentDirectory(parent, "custom")

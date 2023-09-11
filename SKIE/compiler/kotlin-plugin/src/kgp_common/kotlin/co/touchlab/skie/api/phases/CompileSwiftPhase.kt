@@ -64,7 +64,6 @@ class CompileSwiftPhase(
             getSwiftcBitcodeArg()?.let { +it }
             +getSwiftcBuildTypeArgs()
             +"-emit-object"
-            +"-enable-library-evolution"
             +"-parse-as-library"
             +"-g"
             +"-module-cache-path"

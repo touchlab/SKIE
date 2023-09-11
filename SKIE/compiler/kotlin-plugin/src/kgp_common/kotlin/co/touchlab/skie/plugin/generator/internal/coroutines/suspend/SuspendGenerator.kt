@@ -1,4 +1,5 @@
-@file:Suppress("invisible_reference", "invisible_member")
+// WIP 3 Try to remove all unnecessary
+// @file:Suppress("invisible_reference", "invisible_member")
 
 package co.touchlab.skie.plugin.generator.internal.coroutines.suspend
 
@@ -9,17 +10,15 @@ import co.touchlab.skie.plugin.api.kotlin.MutableDescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
-import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.DeclarationBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 internal class SuspendGenerator(
     skieContext: SkieContext,
-    namespaceProvider: NamespaceProvider,
     private val descriptorProvider: MutableDescriptorProvider,
     private val declarationBuilder: DeclarationBuilder,
-) : BaseGenerator(skieContext, namespaceProvider) {
+) : BaseGenerator(skieContext) {
 
     override val isActive: Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 

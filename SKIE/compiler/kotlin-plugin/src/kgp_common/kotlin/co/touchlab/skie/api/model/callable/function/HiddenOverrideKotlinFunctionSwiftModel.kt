@@ -6,22 +6,27 @@ import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSw
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.sir.type.SirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class HiddenOverrideKotlinFunctionSwiftModel(
     private val baseModel: KotlinFunctionSwiftModelWithCore,
-    receiverDescriptor: ClassDescriptor,
+    ownerDescriptor: ClassDescriptor,
     private val swiftModelScope: MutableSwiftModelScope,
 ) : KotlinFunctionSwiftModelWithCore by baseModel {
 
     override val directlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel> = listOf(this)
 
+    override val owner: KotlinTypeSwiftModel by lazy {
+        with(swiftModelScope) {
+            ownerDescriptor.swiftModel
+        }
+    }
+
     override val receiver: SirType by lazy {
         with(swiftModelScope) {
-            // TODO: This is wrong, we shouldn't create a SirType here!
-            SwiftClassSirType(receiverDescriptor.swiftModel.swiftIrDeclaration)
+            ownerDescriptor.receiverType()
         }
     }
 

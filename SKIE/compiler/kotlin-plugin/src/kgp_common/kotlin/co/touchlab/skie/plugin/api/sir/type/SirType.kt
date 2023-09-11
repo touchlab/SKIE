@@ -1,20 +1,22 @@
 package co.touchlab.skie.plugin.api.sir.type
 
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrDeclaration
 import io.outfoxx.swiftpoet.TypeName
 
-sealed interface SirType {
+sealed class SirType {
 
-    val declaration: SwiftIrDeclaration
+    abstract val isHashable: Boolean
 
-    val directChildren: List<SirType>
+    abstract val isPrimitive: Boolean
 
-    fun toSwiftPoetUsage(): TypeName
+    open val directlyReferencedTypes: List<SirType> = emptyList()
 
-    fun asString(): String {
-        return toSwiftPoetUsage().toString()
-    }
+    fun allReferencedTypes(): List<SirType> =
+        listOf(this) + directlyReferencedTypes.flatMap { it.allReferencedTypes() }
+
+    override fun toString(): String =
+        toSwiftPoetUsage().toString()
+
+    abstract fun toSwiftPoetUsage(): TypeName
+
+    abstract fun toNonNull(): NonNullSirType
 }
-
-fun SirType.allChildrenRecursivelyAndThis(): List<SirType> =
-    listOf(this) + directChildren.flatMap { it.allChildrenRecursivelyAndThis() }

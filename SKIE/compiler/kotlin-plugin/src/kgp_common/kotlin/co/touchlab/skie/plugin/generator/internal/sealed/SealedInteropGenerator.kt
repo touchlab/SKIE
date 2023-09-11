@@ -2,14 +2,13 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
-import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 
 internal class SealedInteropGenerator(
     skieContext: SkieContext,
-    namespaceProvider: NamespaceProvider,
-) : BaseGenerator(skieContext, namespaceProvider), SealedGeneratorExtensionContainer {
+) : BaseGenerator(skieContext), SealedGeneratorExtensionContainer {
 
     override val isActive: Boolean = true
 
@@ -32,13 +31,10 @@ internal class SealedInteropGenerator(
     private val KotlinClassSwiftModel.isSealedInteropEnabled: Boolean
         get() = this.getConfiguration(SealedInterop.Enabled)
 
+    context(MutableSwiftModelScope)
     private fun generate(swiftModel: KotlinClassSwiftModel) {
-        module.generateCode(swiftModel) {
-            val classNamespace = addNamespaceFor(swiftModel.nonBridgedDeclaration.publicName)
+        val enum = sealedEnumGeneratorDelegate.generate(swiftModel)
 
-            val enumType = sealedEnumGeneratorDelegate.generate(swiftModel, classNamespace, this)
-
-            sealedFunctionGeneratorDelegate.generate(swiftModel, enumType, this)
-        }
+        sealedFunctionGeneratorDelegate.generate(swiftModel, enum)
     }
 }

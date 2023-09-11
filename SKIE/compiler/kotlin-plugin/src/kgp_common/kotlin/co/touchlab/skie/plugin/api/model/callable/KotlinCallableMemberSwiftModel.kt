@@ -1,6 +1,10 @@
 package co.touchlab.skie.plugin.api.model.callable
 
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import co.touchlab.skie.plugin.api.sir.element.resolveAsDirectClassSirType
+import co.touchlab.skie.plugin.api.sir.type.DeclaredSirType
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 
@@ -8,8 +12,8 @@ interface KotlinCallableMemberSwiftModel {
 
     val descriptor: CallableMemberDescriptor
 
-    // TODO: Probably needs a different interface than ExtensibleDeclaration
-    val owner: SwiftIrExtensibleDeclaration
+    // TODO hack to avoid problems with some special Kotlin classes not having a SwiftModel yet, safe to use with !! for suspend functions
+    val owner: KotlinTypeSwiftModel?
 
     val receiver: SirType
 
@@ -59,3 +63,6 @@ val KotlinCallableMemberSwiftModel.Scope.isStatic: Boolean
 
 val KotlinCallableMemberSwiftModel.Scope.isMember: Boolean
     get() = this == KotlinCallableMemberSwiftModel.Scope.Member
+
+val KotlinCallableMemberSwiftModel.swiftGenericExportScope: SwiftGenericExportScope
+    get() = owner?.swiftGenericExportScope ?: SwiftGenericExportScope.None

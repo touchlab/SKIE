@@ -4,11 +4,11 @@ import co.touchlab.skie.api.DefaultSkieModule
 import co.touchlab.skie.api.model.DefaultSwiftModelScope
 import co.touchlab.skie.api.model.DescriptorBridgeProvider
 import co.touchlab.skie.api.model.type.translation.BuiltinSwiftBridgeableProvider
-import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.api.model.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.SkieContext
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
+import co.touchlab.skie.plugin.api.sir.SirProvider
 import co.touchlab.skie.plugin.api.skieBuildDirectory
 import co.touchlab.skie.plugin.api.util.FrameworkLayout
 import org.jetbrains.kotlin.backend.konan.KonanConfig
@@ -33,28 +33,18 @@ class SwiftLinkCompilePhase(
         }
         val framework = FrameworkLayout(outputFile).also { it.cleanSkie() }
         val bridgeProvider = DescriptorBridgeProvider(namer)
-        val swiftIrDeclarationRegistry = SwiftIrDeclarationRegistry(
+        val sirProvider = SirProvider(
             namer = namer,
-        )
-        val builtinSwiftBridgeableProvider = BuiltinSwiftBridgeableProvider(
-            sdkPath = configurables.absoluteTargetSysRoot,
-            declarationRegistry = swiftIrDeclarationRegistry,
-        )
-
-        val translator = SwiftTypeTranslator(
+            framework = framework,
             descriptorProvider = descriptorProvider,
-            namer = namer,
+            sdkPath = configurables.absoluteTargetSysRoot,
             problemCollector = problemCollector,
-            builtinSwiftBridgeableProvider = builtinSwiftBridgeableProvider,
-            swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
         )
-
         val swiftModelScope = DefaultSwiftModelScope(
             namer = namer,
             descriptorProvider = descriptorProvider,
             bridgeProvider = bridgeProvider,
-            translator = translator,
-            swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
+            sirProvider = sirProvider,
         )
 
         SkieLinkingPhaseScheduler(
@@ -63,7 +53,7 @@ class SwiftLinkCompilePhase(
             descriptorProvider = descriptorProvider,
             framework = framework,
             swiftModelScope = swiftModelScope,
-            swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
+            sirProvider = sirProvider,
             configurables = configurables,
             config = config,
         ).runLinkingPhases()

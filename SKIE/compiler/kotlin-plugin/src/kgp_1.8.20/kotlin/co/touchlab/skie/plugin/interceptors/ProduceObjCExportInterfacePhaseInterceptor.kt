@@ -7,9 +7,7 @@ import co.touchlab.skie.plugin.api.skieContext
 import co.touchlab.skie.plugin.generator.internal.SkieCompilationScheduler
 import co.touchlab.skie.plugin.generator.internal.SkieCompilerConfigurationKey
 import co.touchlab.skie.plugin.generator.internal.util.ExposedModulesProvider
-import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.NativeMutableDescriptorProvider
-import co.touchlab.skie.plugin.generator.internal.util.Reporter
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.phases.FrontendPhaseOutput
@@ -56,7 +54,6 @@ internal class ProduceObjCExportInterfacePhaseInterceptor: PhaseInterceptor<Phas
             skieContext = context.config.configuration.skieContext,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-            namespaceProvider = NamespaceProvider(context.config.configuration.skieContext.module),
         )
 
         skieScheduler.runClassExportingPhases()

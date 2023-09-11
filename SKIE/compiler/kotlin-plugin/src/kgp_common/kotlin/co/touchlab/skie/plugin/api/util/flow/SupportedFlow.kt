@@ -4,9 +4,7 @@ import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
+import co.touchlab.skie.plugin.api.sir.element.SirClass
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
@@ -29,7 +27,8 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         val owner: SupportedFlow
 
-        val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType
+        context(SwiftModelScope)
+        fun swiftFlowClass(): SirClass
 
         val kotlinFlowFqName: String
 
@@ -47,19 +46,15 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
             override val kotlinFlowFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlin${owner.name}"
 
-            override val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType = SwiftIrTypeDeclaration.Local.SwiftType(
-                swiftName = "SkieSwift${owner.name}",
-                typeParameters = listOf(
-                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = emptyList()),
-                ),
-                superTypes = listOf(
-                    // TODO: Verify if this is enough, or we should have a separate `SwiftIrReferenceDeclaration` for classes
-                    // This is how we tell when it's a class, or a reference protocol
-                    BuiltinDeclarations.Swift.AnyObject,
-                    // TODO: We don't use these supertypes yet, will we need them?
-                    // "_Concurrency.AsyncSequence", "Swift._ObjectiveCBridgeable"
-                ),
-            )
+            context(SwiftModelScope)
+            override fun swiftFlowClass(): SirClass =
+                when (owner) {
+                    Flow -> sirBuiltins.Skie.SkieSwiftFlow
+                    SharedFlow -> sirBuiltins.Skie.SkieSwiftSharedFlow
+                    MutableSharedFlow -> sirBuiltins.Skie.SkieSwiftMutableSharedFlow
+                    StateFlow -> sirBuiltins.Skie.SkieSwiftStateFlow
+                    MutableStateFlow -> sirBuiltins.Skie.SkieSwiftMutableStateFlow
+                }
 
             override fun isCastableTo(variant: Variant): Boolean {
                 return owner.isSelfOrChildOf(variant.owner)
@@ -70,19 +65,15 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
             override val kotlinFlowFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlinOptional${owner.name}"
 
-            override val swiftFlowDeclaration: SwiftIrTypeDeclaration.Local.SwiftType = SwiftIrTypeDeclaration.Local.SwiftType(
-                swiftName = "SkieSwiftOptional${owner.name}",
-                typeParameters = listOf(
-                    SwiftIrTypeParameterDeclaration.SwiftTypeParameter(name = "T", bounds = emptyList()),
-                ),
-                superTypes = listOf(
-                    // TODO: Verify if this is enough, or we should have a separate `SwiftIrReferenceDeclaration` for classes
-                    // This is how we tell when it's a class, or a reference protocol
-                    BuiltinDeclarations.Swift.AnyObject,
-                    // TODO: We don't use these supertypes yet, will we need them?
-                    // "_Concurrency.AsyncSequence", "Swift._ObjectiveCBridgeable"
-                ),
-            )
+            context(SwiftModelScope)
+            override fun swiftFlowClass(): SirClass =
+                when (owner) {
+                    Flow -> sirBuiltins.Skie.SkieSwiftOptionalFlow
+                    SharedFlow -> sirBuiltins.Skie.SkieSwiftOptionalSharedFlow
+                    MutableSharedFlow -> sirBuiltins.Skie.SkieSwiftOptionalMutableSharedFlow
+                    StateFlow -> sirBuiltins.Skie.SkieSwiftOptionalStateFlow
+                    MutableStateFlow -> sirBuiltins.Skie.SkieSwiftOptionalMutableStateFlow
+                }
 
             override fun isCastableTo(variant: Variant): Boolean {
                 if (variant is Required) return false

@@ -7,7 +7,6 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.sir.type.SirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 class HiddenOverrideKotlinRegularPropertySwiftModel(
@@ -20,8 +19,7 @@ class HiddenOverrideKotlinRegularPropertySwiftModel(
 
     override val receiver: SirType by lazy {
         with(swiftModelScope) {
-            // TODO: This is wrong, we shouldn't create a SirType here!
-            SwiftClassSirType(receiverDescriptor.swiftModel.swiftIrDeclaration)
+            receiverDescriptor.receiverType()
         }
     }
 

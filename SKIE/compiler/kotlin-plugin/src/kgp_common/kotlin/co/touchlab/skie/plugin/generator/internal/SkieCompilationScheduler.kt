@@ -14,8 +14,6 @@ import co.touchlab.skie.plugin.generator.internal.export.ExtraClassExportPhase
 import co.touchlab.skie.plugin.generator.internal.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.plugin.generator.internal.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.plugin.generator.internal.sealed.SealedInteropGenerator
-import co.touchlab.skie.plugin.generator.internal.`typealias`.TypeAliasGenerator
-import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.plugin.generator.internal.util.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.plugin.generator.internal.validation.IrValidator
@@ -28,7 +26,6 @@ internal class SkieCompilationScheduler(
     private val skieContext: SkieContext,
     descriptorProvider: MutableDescriptorProvider,
     declarationBuilder: DeclarationBuilderImpl,
-    namespaceProvider: NamespaceProvider,
 ) {
 
     private val compilationPhases = listOf(
@@ -71,7 +68,6 @@ internal class SkieCompilationScheduler(
         ),
         SealedInteropGenerator(
             skieContext = skieContext,
-            namespaceProvider = namespaceProvider,
         ),
         DefaultArgumentGenerator(
             skieContext = skieContext,
@@ -80,17 +76,11 @@ internal class SkieCompilationScheduler(
         ),
         ExhaustiveEnumsGenerator(
             skieContext = skieContext,
-            namespaceProvider = namespaceProvider,
         ),
         SuspendGenerator(
             skieContext = skieContext,
-            namespaceProvider = namespaceProvider,
             descriptorProvider = descriptorProvider,
             declarationBuilder = declarationBuilder,
-        ),
-        TypeAliasGenerator(
-            skieContext = skieContext,
-            descriptorProvider = descriptorProvider,
         ),
     )
 

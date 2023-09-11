@@ -19,6 +19,8 @@ package io.outfoxx.swiftpoet
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
 import io.outfoxx.swiftpoet.Modifier.PRIVATE
 import io.outfoxx.swiftpoet.Modifier.PUBLIC
+import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
+import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
 
 /** A generated typealias declaration */
 class TypeAliasSpec private constructor(
@@ -62,7 +64,7 @@ class TypeAliasSpec private constructor(
   class Builder internal constructor(
     internal val name: String,
     internal val type: TypeName
-  ) : AttributedSpec.Builder<Builder>() {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters {
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableSetOf<Modifier>()
     internal val typeVariables = mutableSetOf<TypeVariableName>()
@@ -79,7 +81,7 @@ class TypeAliasSpec private constructor(
       doc.add(block)
     }
 
-    fun addModifiers(vararg modifiers: Modifier) = apply {
+    override fun addModifiers(vararg modifiers: Modifier) = apply {
       modifiers.forEach(this::addModifier)
     }
 
@@ -94,7 +96,7 @@ class TypeAliasSpec private constructor(
       this.typeVariables += typeVariables
     }
 
-    fun addTypeVariable(typeVariable: TypeVariableName) = apply {
+    override fun addTypeVariable(typeVariable: TypeVariableName) = apply {
       typeVariables += typeVariable
     }
 

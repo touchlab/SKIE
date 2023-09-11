@@ -1,6 +1,5 @@
 package co.touchlab.skie.api.apinotes.builder
 
-import co.touchlab.skie.api.phases.safeForBridging
 import co.touchlab.skie.api.phases.util.ObjCTypeRenderer
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.SwiftModelScope
@@ -42,8 +41,8 @@ internal class ApiNotesFactory(
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
         ApiNotesType(
             objCFqName = this.objCFqName.asString(),
-            bridgeFqName = this.bridge?.declaration?.publicName?.safeForBridging,
-            swiftFqName = this.nonBridgedDeclaration.publicName.asString(),
+            bridgeFqName = this.bridgedSirClass?.bridgingName?.toLocalUnescapedNameString(),
+            swiftFqName = this.kotlinSirClass.fqName.toLocalUnescapedNameString(),
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
             methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote(this) },

@@ -13,16 +13,17 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.swiftGenericExportScope
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.bridge.valueParametersAssociated
 import co.touchlab.skie.plugin.api.sir.type.SirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNoneExportScope
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 internal class FakeObjcConstructorKotlinFunctionSwiftModel(
     private val baseModel: KotlinFunctionSwiftModelWithCore,
-    val receiverDescriptor: ClassDescriptor,
+    ownerDescriptor: ClassDescriptor,
     private val swiftModelScope: MutableSwiftModelScope,
     objCTypeProvider: ObjCTypeProvider,
 ) : KotlinFunctionSwiftModelWithCore by baseModel {
@@ -48,7 +49,7 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
                             flowMappingStrategy = flowMappingStrategy,
                             genericExportScope = ObjCNoneExportScope,
                         )
-                    }
+                    },
                 ) to parameterBridgeWithDescriptor.second
             }
             .mapIndexed { index, (core, parameterDescriptor) ->
@@ -62,7 +63,7 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
                         descriptor.getParameterType(
                             parameterDescriptor,
                             core.parameterBridge,
-                            owner.swiftGenericExportScope,
+                            swiftGenericExportScope,
                             flowMappingStrategy,
                         )
                     }
@@ -70,10 +71,15 @@ internal class FakeObjcConstructorKotlinFunctionSwiftModel(
             }
     }
 
+    override val owner: KotlinTypeSwiftModel by lazy {
+        with(swiftModelScope) {
+            ownerDescriptor.swiftModel
+        }
+    }
+
     override val receiver: SirType by lazy {
         with(swiftModelScope) {
-            // TODO: This is wrong, we shouldn't create a SirType here!
-            SwiftClassSirType(receiverDescriptor.swiftModel.swiftIrDeclaration)
+            ownerDescriptor.receiverType()
         }
     }
 

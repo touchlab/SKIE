@@ -1,64 +1,75 @@
 package co.touchlab.skie.api.phases
 
-import co.touchlab.skie.api.phases.util.ExternalType
-import co.touchlab.skie.api.phases.util.ExternalTypesProvider
+import co.touchlab.skie.plugin.api.sir.SirProvider
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import co.touchlab.skie.plugin.api.sir.element.SirModule
+import co.touchlab.skie.plugin.api.sir.element.SirTypeAlias
+import co.touchlab.skie.plugin.api.sir.element.SirTypeDeclaration
+import co.touchlab.skie.plugin.api.sir.element.module
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 
 class GenerateFakeObjCDependenciesPhase(
-    private val externalTypesProvider: ExternalTypesProvider,
+    private val sirProvider: SirProvider,
     private val skieBuildDirectory: SkieBuildDirectory,
 ) : SkieLinkingPhase {
 
     override fun execute() {
-        externalTypesProvider.allReferencedExternalTypesWithoutBuiltInModules
+        sirProvider.allExternalTypesFromNonBuiltinModules
             .groupBy { it.module }
             .forEach { (module, types) ->
                 generateFakeFramework(module, types)
             }
     }
 
-    private fun generateFakeFramework(module: String, types: List<ExternalType>) {
+    private fun generateFakeFramework(module: SirModule, types: List<SirTypeDeclaration>) {
         generateModuleMap(module)
         generateHeader(module, types)
     }
 
-    private fun generateModuleMap(module: String) {
+    private fun generateModuleMap(module: SirModule) {
         val modulemapContent =
             """
-            framework module $module {
-                umbrella header "$module.h"
+            framework module ${module.name} {
+                umbrella header "${module.name}.h"
             }
         """.trimIndent()
 
-        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module).writeTextIfDifferent(modulemapContent)
+        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module.name).writeTextIfDifferent(modulemapContent)
     }
 
-    private fun generateHeader(module: String, types: List<ExternalType>) {
+    private fun generateHeader(module: SirModule, types: List<SirTypeDeclaration>) {
         val foundationImport = "#import <Foundation/NSObject.h>"
-        val typeDeclarations = types.sortedBy { it.name }.joinToString("\n") { it.getHeaderEntry() }
+        val typeDeclarations = types
+            .sortedBy { it.fqName.toLocalUnescapedNameString() }
+            .joinToString("\n") { it.getHeaderEntry() }
 
         val headerContent = "$foundationImport\n\n$typeDeclarations"
 
-        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(module).writeTextIfDifferent(headerContent)
+        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(module.name).writeTextIfDifferent(headerContent)
     }
 }
 
-private fun ExternalType.getHeaderEntry(): String =
+private fun SirTypeDeclaration.getHeaderEntry(): String =
     when (this) {
-        is ExternalType.Class -> getHeaderEntry()
-        is ExternalType.Protocol -> getHeaderEntry()
+        is SirClass -> when (kind) {
+            SirClass.Kind.Class -> getClassHeaderEntry()
+            SirClass.Kind.Enum -> getClassHeaderEntry()
+            SirClass.Kind.Struct -> getClassHeaderEntry()
+            SirClass.Kind.Protocol -> getProtocolHeaderEntry()
+        }
+        is SirTypeAlias -> getClassHeaderEntry()
     }
 
-private fun ExternalType.Class.getHeaderEntry(): String =
-    "@interface $name${getTypeParametersDeclaration()} : NSObject @end"
+private fun SirTypeDeclaration.getClassHeaderEntry(): String =
+    "@interface ${fqName.toLocalUnescapedNameString()}${getTypeParametersDeclaration()} : NSObject @end"
 
-private fun ExternalType.Class.getTypeParametersDeclaration(): String =
-    if (typeParameterCount == 0) {
+private fun SirTypeDeclaration.getTypeParametersDeclaration(): String =
+    if (typeParameters.isEmpty()) {
         ""
     } else {
-        "<${(0 until typeParameterCount).joinToString { "T$it" }}>"
+        typeParameters.joinToString(prefix = "<", postfix = ">") { it.name }
     }
 
-private fun ExternalType.Protocol.getHeaderEntry(): String =
-    "@protocol $name @end"
+private fun SirClass.getProtocolHeaderEntry(): String =
+    "@protocol ${fqName.toLocalUnescapedNameString()} @end"

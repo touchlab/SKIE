@@ -2,11 +2,12 @@ package co.touchlab.skie.plugin.generator.internal.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.plugin.api.SkieContext
-import co.touchlab.skie.plugin.api.kotlin.collisionFreeIdentifier
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
-import co.touchlab.skie.plugin.generator.internal.util.SwiftPoetExtensionContainer
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import co.touchlab.skie.plugin.api.sir.element.toSwiftPoetVariables
+import co.touchlab.skie.plugin.api.sir.element.toTypeFromEnclosingTypeParameters
 import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeName
@@ -14,24 +15,31 @@ import io.outfoxx.swiftpoet.TypeVariableName
 
 internal class SealedFunctionGeneratorDelegate(
     override val skieContext: SkieContext,
-) : SealedGeneratorExtensionContainer, SwiftPoetExtensionContainer {
+) : SealedGeneratorExtensionContainer {
 
-    fun generate(swiftModel: KotlinClassSwiftModel, enumType: TypeName, fileBuilder: FileSpec.Builder) {
-        val enumGenericTypeParameter = swiftModel.enumGenericTypeParameter
+    context(SwiftModelScope)
+    fun generate(swiftModel: KotlinClassSwiftModel, enum: SirClass) {
+        val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
 
-        fileBuilder.addFunction(
-            FunctionSpec.builder(swiftModel.enumConstructorFunctionName)
-                .addModifiers(Modifier.PUBLIC)
-                .addTypeVariables(swiftModel.swiftTypeVariablesNames + enumGenericTypeParameter)
-                .addParameter(
-                    label = swiftModel.enumConstructorArgumentLabel,
-                    name = swiftModel.enumConstructorParameterName,
-                    type = enumGenericTypeParameter,
-                )
-                .returns(enumType)
-                .addExhaustivelyFunctionBody(swiftModel, enumType)
-                .build()
-        )
+        val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
+
+        val enumSelfTypeParameter = TypeVariableName.typeVariable("__Sealed").withBounds(TypeVariableName.bound(kotlinType))
+
+        sirProvider.getFile(swiftModel).swiftPoetBuilderModifications.add {
+            addFunction(
+                FunctionSpec.builder(swiftModel.enumConstructorFunctionName)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addTypeVariables(enum.typeParameters.toSwiftPoetVariables() + enumSelfTypeParameter)
+                    .addParameter(
+                        label = swiftModel.enumConstructorArgumentLabel,
+                        name = swiftModel.enumConstructorParameterName,
+                        type = enumSelfTypeParameter,
+                    )
+                    .returns(enumType)
+                    .addExhaustivelyFunctionBody(swiftModel, enum, enumType)
+                    .build(),
+            )
+        }
     }
 
     private val KotlinClassSwiftModel.enumConstructorFunctionName: String
@@ -43,27 +51,22 @@ internal class SealedFunctionGeneratorDelegate(
     private val KotlinClassSwiftModel.enumConstructorParameterName: String
         get() = this.getConfiguration(SealedInterop.Function.ParameterName)
 
-    private val KotlinClassSwiftModel.enumGenericTypeParameter: TypeVariableName
-        get() {
-            val otherTypeNames = this.swiftTypeVariablesNames.map { it.name }
-
-            val typeName = "SEALED".collisionFreeIdentifier(otherTypeNames)
-
-            return TypeVariableName.typeVariable(typeName).withBounds(TypeVariableName.bound(this.swiftNameWithTypeParameters))
-        }
-
+    context(SwiftModelScope)
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
         swiftModel: KotlinClassSwiftModel,
+        enum: SirClass,
         enumType: TypeName,
     ): FunctionSpec.Builder = addCode(
         CodeBlock.builder()
-            .addExhaustivelyCaseBranches(swiftModel, enumType)
+            .addExhaustivelyCaseBranches(swiftModel, enum, enumType)
             .addExhaustivelyFunctionEnd(swiftModel, enumType)
-            .build()
+            .build(),
     )
 
+    context(SwiftModelScope)
     private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
         swiftModel: KotlinClassSwiftModel,
+        enum: SirClass,
         enumType: TypeName,
     ): CodeBlock.Builder {
         val preferredNamesCollide = swiftModel.enumCaseNamesBasedOnKotlinIdentifiersCollide
@@ -71,9 +74,9 @@ internal class SealedFunctionGeneratorDelegate(
         swiftModel.visibleSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
                 val parameterName = swiftModel.enumConstructorParameterName
-                val subclassName = with(subclassSymbol) { swiftNameWithTypeParametersForSealedCase(swiftModel).canonicalName }
+                val subclassName = subclassSymbol.primarySirClass.getSealedSubclassType(enum, this@SwiftModelScope).toSwiftPoetUsage()
 
-                val condition = "let %N = %N as? %N"
+                val condition = "let %N = %N as? %T"
 
                 if (index == 0) {
                     beginControlFlow("if", condition, parameterName, parameterName, subclassName)
@@ -81,7 +84,7 @@ internal class SealedFunctionGeneratorDelegate(
                     nextControlFlow("else if", condition, parameterName, parameterName, subclassName)
                 }
 
-                add("return %N.%N(%N)\n", enumType.canonicalName, subclassSymbol.enumCaseName(preferredNamesCollide), parameterName)
+                add("return %T.%N(%N)\n", enumType, subclassSymbol.enumCaseName(preferredNamesCollide), parameterName)
             }
 
         return this
@@ -111,10 +114,10 @@ internal class SealedFunctionGeneratorDelegate(
         } else {
             add(
                 "fatalError(" +
-                        "\"Unknown subtype. " +
-                        "This error should not happen under normal circumstances " +
-                        "since ${swiftModel.swiftIrDeclaration} is sealed." +
-                        "\")\n"
+                    "\"Unknown subtype. " +
+                    "This error should not happen under normal circumstances " +
+                    "since ${swiftModel.primarySirClass} is sealed." +
+                    "\")\n",
             )
         }
 
@@ -122,6 +125,6 @@ internal class SealedFunctionGeneratorDelegate(
     }
 
     private fun CodeBlock.Builder.addReturnElse(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
-        add("return %N.%N\n", enumType.canonicalName, swiftModel.elseCaseName)
+        add("return %T.%N\n", enumType, swiftModel.elseCaseName)
     }
 }

@@ -2,8 +2,6 @@ package co.touchlab.skie.api.model
 
 import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelWithCore
 import co.touchlab.skie.api.model.factory.SwiftModelFactory
-import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
-import co.touchlab.skie.api.model.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.kotlin.allExposedMembers
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
@@ -17,20 +15,18 @@ import co.touchlab.skie.plugin.api.model.callable.property.MutableKotlinProperty
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.SirProvider
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import co.touchlab.skie.plugin.api.sir.element.SirTypeDeclaration
+import co.touchlab.skie.plugin.api.sir.type.LambdaSirType
+import co.touchlab.skie.plugin.api.sir.type.NullableSirType
 import co.touchlab.skie.plugin.api.sir.type.SirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftLambdaSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftNullableReferenceSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftPointerSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftVoidSirType
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -44,16 +40,18 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.utils.getOrPutNullable
 
 class DefaultSwiftModelScope(
-    private val namer: ObjCExportNamer,
+    override val sirProvider: SirProvider,
+    namer: ObjCExportNamer,
     private val descriptorProvider: DescriptorProvider,
     private val bridgeProvider: DescriptorBridgeProvider,
-    private val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
-    private val translator: SwiftTypeTranslator,
 ) : MutableSwiftModelScope {
 
-    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider, swiftIrDeclarationRegistry)
+    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider, sirProvider)
+
+    private val translator = sirProvider.translator
 
     private val members = swiftModelFactory.createMembers(descriptorProvider.allExposedMembers)
 
@@ -72,6 +70,13 @@ class DefaultSwiftModelScope(
     private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
 
     private val classByFqNameCache = mutableMapOf<String, MutableKotlinClassSwiftModel>()
+
+    private val sirTypeDeclarationsToSwiftModelCache =
+        (classSwiftModels + fileSwiftModels).values.associateBy { it.kotlinSirClass }.toMutableMap()
+
+    init {
+        sirProvider.finishInitialization()
+    }
 
     override fun referenceClass(classFqName: String): MutableKotlinClassSwiftModel =
         classByFqNameCache.getOrPut(classFqName) {
@@ -122,6 +127,9 @@ class DefaultSwiftModelScope(
     override val ClassDescriptor.swiftModelOrNull: MutableKotlinClassSwiftModel?
         get() = classSwiftModels[this.original]
 
+    override val SirClass.swiftModelOrNull: KotlinTypeSwiftModel?
+        get() = sirTypeDeclarationsToSwiftModelCache[this]
+
     override val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
         get() = enumEntrySwiftModels[this.original] ?: throwUnknownDescriptor()
 
@@ -129,14 +137,14 @@ class DefaultSwiftModelScope(
         get() = fileSwiftModels[this]
             ?: throw IllegalArgumentException("File $this is not exposed and therefore does not have a SwiftModel.")
 
-    override fun CallableMemberDescriptor.owner(): SwiftIrExtensibleDeclaration {
+    override fun CallableMemberDescriptor.owner(): KotlinTypeSwiftModel? {
         val receiverClassDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(this)
         val containingDeclaration = containingDeclaration
 
         return when {
-            receiverClassDescriptor != null -> swiftIrDeclarationRegistry.declarationForClass(receiverClassDescriptor)
+            receiverClassDescriptor != null -> receiverClassDescriptor.swiftModelOrNull
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.owner
-            containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel.swiftIrDeclaration
+            containingDeclaration is PackageFragmentDescriptor -> this.findSourceFile().swiftModel
             else -> error("Unsupported containing declaration for $this")
         }
     }
@@ -146,16 +154,20 @@ class DefaultSwiftModelScope(
         val containingDeclaration = containingDeclaration
 
         return when {
-            receiverClassDescriptor != null -> translator.mapReferenceType(
-                receiverClassDescriptor.defaultType,
-                SwiftExportScope(SwiftGenericExportScope.Class(receiverClassDescriptor, namer), SwiftExportScope.Flags.ReferenceType),
-                FlowMappingStrategy.TypeArgumentsOnly,
-            )
+            receiverClassDescriptor != null -> receiverClassDescriptor.receiverType()
             this is PropertyAccessorDescriptor -> correspondingProperty.swiftModel.receiver
             containingDeclaration is PackageFragmentDescriptor -> translator.mapFileType(this.findSourceFile())
             else -> error("Unsupported containing declaration for $this")
         }
     }
+
+    override fun ClassDescriptor.receiverType(): SirType =
+        translator.mapReferenceType(
+            this.defaultType,
+            // TODO ?: SwiftGenericExportScope.None is a hack that relies on the fact that none of the types with SwiftModel can inherit from a special type that is generic
+            SwiftExportScope(this.swiftModelOrNull?.swiftGenericExportScope ?: SwiftGenericExportScope.None, SwiftExportScope.Flags.ReferenceType),
+            FlowMappingStrategy.TypeArgumentsOnly,
+        )
 
     override fun PropertyDescriptor.propertyType(
         baseDescriptor: PropertyDescriptor,
@@ -183,7 +195,7 @@ class DefaultSwiftModelScope(
     ): SirType {
         val exportScope = SwiftExportScope(genericExportScope)
         return if (bridge.useUnitCompletion) {
-            SwiftVoidSirType
+            sirBuiltins.Swift.Void.defaultType
         } else {
             translator.mapReferenceType(returnType!!, exportScope, flowMappingStrategy)
         }
@@ -201,30 +213,28 @@ class DefaultSwiftModelScope(
                 descriptor!!.type,
                 exportScope,
                 bridge.bridge,
-                flowMappingStrategy
+                flowMappingStrategy,
             )
-            MethodBridgeParameter.ValueParameter.ErrorOutParameter ->
-                SwiftPointerSirType(SwiftNullableReferenceSirType(SwiftClassSirType(BuiltinDeclarations.Swift.Error)), nullable = true)
+            MethodBridgeParameter.ValueParameter.ErrorOutParameter -> NullableSirType(sirBuiltins.Swift.UnsafeMutableRawPointer.defaultType)
             is MethodBridgeParameter.ValueParameter.SuspendCompletion -> {
                 val resultType = if (bridge.useUnitCompletion) {
                     null
                 } else {
-                    when (val it = translator.mapReferenceType(
+                    translator.mapReferenceType(
                         returnType!!,
                         exportScope.removingFlags(SwiftExportScope.Flags.Escaping),
                         flowMappingStrategy,
-                    )) {
-                        is SwiftNonNullReferenceSirType -> SwiftNullableReferenceSirType(it, isNullableResult = false)
-                        is SwiftNullableReferenceSirType -> SwiftNullableReferenceSirType(it.nonNullType, isNullableResult = true)
-                    }
+                    )
+                        .toNonNull()
+                        .let { NullableSirType(it) }
                 }
-                SwiftLambdaSirType(
-                    returnType = SwiftVoidSirType,
-                    parameterTypes = listOfNotNull(
+                LambdaSirType(
+                    returnType = sirBuiltins.Swift.Void.defaultType,
+                    valueParameterTypes = listOfNotNull(
                         resultType,
-                        SwiftNullableReferenceSirType(SwiftClassSirType(BuiltinDeclarations.Swift.Error))
+                        NullableSirType(sirBuiltins.Swift.Error.defaultType),
                     ),
-                    isEscaping = true
+                    isEscaping = true,
                 )
             }
         }
@@ -233,8 +243,8 @@ class DefaultSwiftModelScope(
     private fun DeclarationDescriptor.throwUnknownDescriptor(): Nothing {
         throw IllegalArgumentException(
             "Cannot find SwiftModel for descriptor: $this. Possible reasons: " +
-                    "Descriptor is not exposed and therefore does not have a SwiftModel. " +
-                    "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty)."
+                "Descriptor is not exposed and therefore does not have a SwiftModel. " +
+                "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty).",
         )
     }
 

@@ -8,9 +8,6 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
-//internal fun List<TypeParameterDescriptor>.copy(newOwner: CallableDescriptor): List<TypeParameterDescriptor> =
-//    this.map { it.copy(newOwner) }
-
 internal fun TypeParameterDescriptor.copy(
     newOwner: CallableDescriptor,
     index: Int = this.index,

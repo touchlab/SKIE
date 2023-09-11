@@ -17,6 +17,9 @@
 package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
+import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
+import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
+import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
 /** A generated class, struct, enum or protocol declaration. */
 class TypeSpec private constructor(
@@ -243,7 +246,7 @@ class TypeSpec private constructor(
   class Builder internal constructor(
     internal var kind: Kind,
     internal val name: String
-  ) : AttributedSpec.Builder<Builder>() {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters, BuilderWithTypeSpecs {
     internal val doc = CodeBlock.builder()
     internal val typeVariables = mutableListOf<TypeVariableName>()
     internal val superTypes = mutableSetOf<TypeName>()
@@ -265,7 +268,7 @@ class TypeSpec private constructor(
       doc.add(block)
     }
 
-    fun addModifiers(vararg modifiers: Modifier) = apply {
+    override fun addModifiers(vararg modifiers: Modifier) = apply {
       kind = kind.plusModifiers(*modifiers)
     }
 
@@ -273,7 +276,7 @@ class TypeSpec private constructor(
       this.typeVariables += typeVariables
     }
 
-    fun addTypeVariable(typeVariable: TypeVariableName) = apply {
+    override fun addTypeVariable(typeVariable: TypeVariableName) = apply {
       typeVariables += typeVariable
     }
 
@@ -348,7 +351,7 @@ class TypeSpec private constructor(
       typeSpecs.forEach(::addType)
     }
 
-    fun addType(typeSpec: AnyTypeSpec) = apply {
+    override fun addType(typeSpec: AnyTypeSpec) = apply {
       check(!isProtocol || typeSpec is TypeAliasSpec) {
         "${this.name} is a protocol, it can only contain type aliases as nested types"
       }

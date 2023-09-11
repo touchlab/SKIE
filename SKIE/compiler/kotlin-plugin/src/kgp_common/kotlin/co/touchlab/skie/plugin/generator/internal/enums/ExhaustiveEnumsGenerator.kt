@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.generator.internal.enums
 
 import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.plugin.api.SkieContext
+import co.touchlab.skie.plugin.api.model.SwiftModelScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
@@ -10,33 +11,28 @@ import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegular
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
-import co.touchlab.skie.plugin.generator.internal.enums.ObjCBridgeable.addObjcBridgeableImplementation
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import co.touchlab.skie.plugin.api.sir.element.SirEnumCase
+import co.touchlab.skie.plugin.api.sir.element.SirExtension
+import co.touchlab.skie.plugin.api.sir.element.SirTypeAlias
+import co.touchlab.skie.plugin.api.sir.type.DeclaredSirType
 import co.touchlab.skie.plugin.generator.internal.util.BaseGenerator
-import co.touchlab.skie.plugin.generator.internal.util.NamespaceProvider
 import co.touchlab.skie.plugin.generator.internal.util.swift.addFunctionBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.PropertySpec
-import io.outfoxx.swiftpoet.STRING
-import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isEnumClass
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 internal class ExhaustiveEnumsGenerator(
     skieContext: SkieContext,
-    namespaceProvider: NamespaceProvider,
-) : BaseGenerator(skieContext, namespaceProvider) {
+) : BaseGenerator(skieContext) {
 
     override val isActive: Boolean = true
 
@@ -52,281 +48,265 @@ internal class ExhaustiveEnumsGenerator(
 
     private val KotlinClassSwiftModel.isSupported: Boolean
         get() = this.classDescriptor.kind.isEnumClass &&
-                this.classDescriptor.isEnumInteropEnabled
+            this.classDescriptor.isEnumInteropEnabled
 
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
         get() = getConfiguration(EnumInterop.Enabled)
 
+    context(SwiftModelScope)
     private fun generate(classSwiftModel: MutableKotlinClassSwiftModel) {
-        if (classSwiftModel.enumEntries.isEmpty()) {
-            skieContext.reporter.warning(
-                "Enum ${classSwiftModel.identifier} has no entries, no Swift enum will be generated. " +
-                        "To silence this warning, add @EnumInterop.Disabled above the enum declaration.",
-                classSwiftModel.classDescriptor,
+        val skieClass = classSwiftModel.generateBridge()
+
+        classSwiftModel.configureBridging(skieClass)
+    }
+}
+
+private fun MutableKotlinClassSwiftModel.configureBridging(skieClass: SirClass) {
+    bridgedSirClass = skieClass
+
+    visibility = SwiftModelVisibility.Replaced
+}
+
+context(SwiftModelScope)
+private fun KotlinClassSwiftModel.generateBridge(): SirClass {
+    val skieClass = createBridgingEnum()
+
+    addConversionExtensions(skieClass)
+
+    return skieClass
+}
+
+context(SwiftModelScope)
+private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass {
+    val enum = SirClass(
+        simpleName = "__Enum",
+        parent = sirProvider.getNamespace(this),
+        kind = SirClass.Kind.Enum,
+    )
+
+    SirTypeAlias(
+        simpleName = kotlinSirClass.simpleName,
+        parent = kotlinSirClass.namespace?.let { namespace ->
+            SirExtension(
+                typeDeclaration = when (namespace) {
+                    is SirClass -> namespace
+                    is SirExtension -> namespace.typeDeclaration
+                },
+                parent = sirProvider.getFile(this),
             )
-            return
-        }
-
-        val bridge = classSwiftModel.configureBridging()
-        classSwiftModel.generateBridge(bridge)
-    }
-
-    private fun MutableKotlinClassSwiftModel.configureBridging(): ObjcSwiftBridge.FromSKIE {
-        val localContainingDeclaration = this.containingType?.swiftIrDeclaration as? SwiftIrTypeDeclaration.Local
-        val name = if (localContainingDeclaration != null) {
-            "__" + localContainingDeclaration.publicName.nested(this.identifier).asString("__")
-        } else {
-            this.identifier
-        }
-
-        val bridge = ObjcSwiftBridge.FromSKIE(
-            nestedTypealiasName = localContainingDeclaration?.internalName?.nested(this.identifier),
-            declaration = SwiftIrTypeDeclaration.Local.SKIEGeneratedSwiftType(
-                swiftName = name,
-                superTypes = listOf(
-                    BuiltinDeclarations.Swift.Hashable,
-                ),
-            ),
-        )
-
-        this.visibility = SwiftModelVisibility.Replaced
-        this.bridge = bridge
-        return bridge
-    }
-
-    private fun KotlinClassSwiftModel.generateBridge(bridge: ObjcSwiftBridge.FromSKIE) {
-        val classSwiftModel = this
-
-        module.generateCode(this) {
-            addImport("Foundation")
-
-            addBridgingEnum(classSwiftModel, bridge)
-        }
-
-        module.file(this.classDescriptor.fqNameSafe.asString() + "_conversions") {
-            addConversionExtensions(classSwiftModel, bridge)
-        }
-    }
-
-    private fun FileSpec.Builder.addBridgingEnum(
-        classSwiftModel: KotlinClassSwiftModel,
-        bridge: ObjcSwiftBridge.FromSKIE,
+        } ?: sirProvider.getFile(this),
     ) {
-        addType(classSwiftModel.generateBridgingEnum(bridge))
-
-        bridge.nestedTypealiasName?.let { nestedTypealiasName ->
-            addExtension(
-                ExtensionSpec.builder(nestedTypealiasName.parent.toSwiftPoetName())
-                    .addModifiers(Modifier.PUBLIC)
-                    .addType(
-                        TypeAliasSpec.builder(nestedTypealiasName.name, bridge.declaration.publicName.toSwiftPoetName()).build(),
-                    )
-                    .build(),
-            )
-        }
+        enum.defaultType
     }
 
-    private fun KotlinClassSwiftModel.generateBridgingEnum(bridge: ObjcSwiftBridge.FromSKIE): TypeSpec =
-        TypeSpec.enumBuilder(bridge.declaration.publicName.toSwiftPoetName())
-            .addAttribute("frozen")
-            .addModifiers(Modifier.PUBLIC)
-            .addSuperType(STRING)
-            .addSuperType(DeclaredTypeName.typeName("Swift.Hashable"))
-            .addSuperType(DeclaredTypeName.typeName("Swift.CaseIterable"))
-            .addEnumCases(this)
-            .addPassthroughForMembers(this)
-            .addNestedClassTypeAliases(this)
-            .addCompanionObjectPropertyIfNeeded(this)
-            .addObjcBridgeableImplementation(this)
-            .build()
+    addEnumCases(enum)
+    addNestedClassTypeAliases(enum)
 
-    private fun TypeSpec.Builder.addEnumCases(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
-        this.apply {
-            classSwiftModel.enumEntries.forEach {
-                addEnumCase(it.identifier)
-            }
+    enum.superTypes += listOf(
+        sirBuiltins.Swift.Hashable.defaultType,
+        sirBuiltins.Swift.CaseIterable.defaultType,
+        sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
+    )
+
+    enum.swiftPoetBuilderModifications.add {
+        addAttribute("frozen")
+        addPassthroughForMembers()
+        addCompanionObjectPropertyIfNeeded()
+        addObjcBridgeableImplementation()
+    }
+
+    return enum
+}
+
+private fun KotlinClassSwiftModel.addEnumCases(skieClass: SirClass) {
+    enumEntries.forEach {
+        SirEnumCase(
+            simpleName = it.identifier,
+            parent = skieClass,
+        )
+    }
+}
+
+context(KotlinClassSwiftModel)
+private fun TypeSpec.Builder.addPassthroughForMembers() {
+    allAccessibleDirectlyCallableMembers
+        .forEach {
+            it.accept(MemberPassthroughGeneratorVisitor(this))
         }
+}
 
-    private fun TypeSpec.Builder.addPassthroughForMembers(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
-        this.apply {
-            classSwiftModel.allAccessibleDirectlyCallableMembers
-                .forEach {
-                    it.accept(MemberPassthroughGeneratorVisitor(this))
-                }
+private fun KotlinClassSwiftModel.addNestedClassTypeAliases(skieClass: SirClass) {
+    nestedClasses.forEach { nestedClass ->
+        SirTypeAlias(
+            simpleName = nestedClass.primarySirClass.fqName.simpleName,
+            parent = skieClass,
+        ) {
+            DeclaredSirType(nestedClass.primarySirClass)
         }
+    }
+}
 
-    private fun TypeSpec.Builder.addNestedClassTypeAliases(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
-        this.apply {
-            classSwiftModel.nestedClasses.forEach {
-                addType(
-                    // TODO: Should this be originalDeclaration or swiftIrDeclaration?
-                    TypeAliasSpec.builder(it.identifier, it.nonBridgedDeclaration.internalName.toSwiftPoetName())
-                        .addModifiers(Modifier.PUBLIC)
-                        .build(),
-                )
-            }
-        }
+context(KotlinClassSwiftModel)
+private fun TypeSpec.Builder.addCompanionObjectPropertyIfNeeded() {
+    val companion = companionObject ?: return
 
-    private class MemberPassthroughGeneratorVisitor(
-        private val builder: TypeSpec.Builder,
-    ) : KotlinDirectlyCallableMemberSwiftModelVisitor.Unit {
-
-        override fun visit(function: KotlinFunctionSwiftModel) {
-            if (!function.isSupported) return
-
-            builder.addFunction(
-                FunctionSpec.builder(function.identifier)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addFunctionValueParameters(function)
-                    .throws(function.isThrowing)
-                    .returns(function.returnType.toSwiftPoetUsage())
-                    .addFunctionBody(function)
-                    .build(),
-            )
-        }
-
-        // TODO When implementing interfaces: Implement remaining methods if needed (at least compareTo(other:) and toString/description should be supportable)
-        private val unsupportedFunctionNames = listOf("compareTo(other:)", "hash()", "description()", "isEqual(_:)")
-
-        private val KotlinFunctionSwiftModel.isSupported: Boolean
-            get() = !this.isSuspend && this.name !in unsupportedFunctionNames
-
-        private fun FunctionSpec.Builder.addFunctionValueParameters(function: KotlinFunctionSwiftModel): FunctionSpec.Builder =
-            this.apply {
-                function.valueParameters.forEach {
-                    this.addFunctionValueParameter(it)
-                }
-            }
-
-        private fun FunctionSpec.Builder.addFunctionValueParameter(valueParameter: KotlinValueParameterSwiftModel): FunctionSpec.Builder =
-            this.addParameter(
-                ParameterSpec.builder(
-                    valueParameter.argumentLabel,
-                    valueParameter.parameterName,
-                    valueParameter.type.toSwiftPoetUsage(),
-                ).build(),
-            )
-
-        private fun FunctionSpec.Builder.addFunctionBody(function: KotlinFunctionSwiftModel): FunctionSpec.Builder =
-            this.addFunctionBodyWithErrorTypeHandling(function) {
-                addStatement(
-                    "return %L(self as _ObjectiveCType).%N(%L)",
-                    if (function.isThrowing) "try " else "",
-                    function.reference,
-                    function.valueParameters.map { CodeBlock.of("%N", it.parameterName) }.joinToCode(", "),
-                )
-            }
-
-        override fun visit(regularProperty: KotlinRegularPropertySwiftModel) {
-            builder.addProperty(
-                PropertySpec.builder(regularProperty.identifier, regularProperty.type.toSwiftPoetUsage())
-                    .addModifiers(Modifier.PUBLIC)
-                    .addGetter(regularProperty)
-                    .addSetterIfPresent(regularProperty)
-                    .build(),
-            )
-        }
-
-        private fun PropertySpec.Builder.addGetter(regularProperty: KotlinRegularPropertySwiftModel): PropertySpec.Builder =
-            this.getter(
+    addProperty(
+        PropertySpec.builder("companion", companion.primarySirClass.internalName.toSwiftPoetName())
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .getter(
                 FunctionSpec.getterBuilder()
-                    .addGetterBody(regularProperty)
+                    .addStatement("return _ObjectiveCType.companion")
                     .build(),
             )
+            .build(),
+    )
+}
 
-        private fun FunctionSpec.Builder.addGetterBody(regularProperty: KotlinRegularPropertySwiftModel): FunctionSpec.Builder =
-            this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
-                addStatement(
-                    "return %L(self as _ObjectiveCType).%N",
-                    if (regularProperty.getter.isThrowing) "try " else "",
-                    regularProperty.reference,
-                )
-            }
-
-        private fun PropertySpec.Builder.addSetterIfPresent(regularProperty: KotlinRegularPropertySwiftModel): PropertySpec.Builder =
-            this.apply {
-                val setter = regularProperty.setter ?: return@apply
-
-                setter(
-                    FunctionSpec.setterBuilder()
-                        .addModifiers(Modifier.NONMUTATING)
-                        .addParameter("value", regularProperty.type.toSwiftPoetUsage())
-                        .addSetterBody(regularProperty, setter)
-                        .build(),
-                )
-            }
-
-        private fun FunctionSpec.Builder.addSetterBody(
-            regularProperty: KotlinRegularPropertySwiftModel,
-            setter: KotlinRegularPropertySetterSwiftModel,
-        ): FunctionSpec.Builder =
-            this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
-                addStatement(
-                    "%L(self as _ObjectiveCType).%N = value",
-                    if (setter.isThrowing) "try " else "",
-                    regularProperty.reference,
-                )
-            }
+context(SwiftModelScope)
+private fun KotlinClassSwiftModel.addConversionExtensions(skieClass: SirClass) {
+    sirProvider.getFile(this).swiftPoetBuilderModifications.add {
+        addToKotlinConversionExtension(skieClass)
+        addToSwiftConversionExtension(skieClass)
     }
+}
 
-    private fun TypeSpec.Builder.addCompanionObjectPropertyIfNeeded(classSwiftModel: KotlinClassSwiftModel): TypeSpec.Builder =
-        this.apply {
-            val companion = classSwiftModel.companionObject ?: return@apply
+context(KotlinClassSwiftModel)
+private fun FileSpec.Builder.addToKotlinConversionExtension(skieClass: SirClass) {
+    addExtension(
+        ExtensionSpec.builder(skieClass.fqName.toSwiftPoetName())
+            .addModifiers(Modifier.PUBLIC)
+            .addToKotlinConversionMethod()
+            .build(),
+    )
+}
 
-            addProperty(
-                PropertySpec.builder("companion", companion.swiftIrDeclaration.internalName.toSwiftPoetName())
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .getter(
-                        FunctionSpec.getterBuilder()
-                            .addStatement("return _ObjectiveCType.companion")
-                            .build(),
-                    )
-                    .build(),
-            )
-        }
+context(KotlinClassSwiftModel)
+private fun ExtensionSpec.Builder.addToKotlinConversionMethod(): ExtensionSpec.Builder =
+    addFunction(
+        // TODO After Sir: solve name collision
+        FunctionSpec.builder("toKotlinEnum")
+            .returns(kotlinSirClass.internalName.toSwiftPoetName())
+            .addStatement("return _bridgeToObjectiveC()")
+            .build(),
+    )
 
-    private fun FileSpec.Builder.addConversionExtensions(classSwiftModel: KotlinClassSwiftModel, bridge: ObjcSwiftBridge.FromSKIE) {
-        addToKotlinConversionExtension(classSwiftModel, bridge)
-        addToSwiftConversionExtension(classSwiftModel, bridge)
-    }
+context(KotlinClassSwiftModel)
+private fun FileSpec.Builder.addToSwiftConversionExtension(skieClass: SirClass) {
+    addExtension(
+        ExtensionSpec.builder(kotlinSirClass.internalName.toSwiftPoetName())
+            .addModifiers(Modifier.PUBLIC)
+            .addToSwiftConversionMethod(skieClass)
+            .build(),
+    )
+}
 
-    private fun FileSpec.Builder.addToKotlinConversionExtension(classSwiftModel: KotlinClassSwiftModel, bridge: ObjcSwiftBridge.FromSKIE) {
-        addExtension(
-            ExtensionSpec.builder(bridge.declaration.publicName.toSwiftPoetName())
+context(KotlinClassSwiftModel)
+private fun ExtensionSpec.Builder.addToSwiftConversionMethod(skieClass: SirClass): ExtensionSpec.Builder =
+    addFunction(
+        // TODO After Sir: solve name collision
+        FunctionSpec.builder("toSwiftEnum")
+            .returns(skieClass.fqName.toSwiftPoetName())
+            .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", skieClass.fqName.toSwiftPoetName())
+            .build(),
+    )
+
+private class MemberPassthroughGeneratorVisitor(
+    private val builder: TypeSpec.Builder,
+) : KotlinDirectlyCallableMemberSwiftModelVisitor.Unit {
+
+    override fun visit(function: KotlinFunctionSwiftModel) {
+        if (!function.isSupported) return
+
+        builder.addFunction(
+            FunctionSpec.builder(function.identifier)
                 .addModifiers(Modifier.PUBLIC)
-                .addToKotlinConversionMethod(classSwiftModel)
+                .addFunctionValueParameters(function)
+                .throws(function.isThrowing)
+                .returns(function.returnType.toSwiftPoetUsage())
+                .addFunctionBody(function)
                 .build(),
         )
     }
 
-    private fun ExtensionSpec.Builder.addToKotlinConversionMethod(classSwiftModel: KotlinClassSwiftModel): ExtensionSpec.Builder =
+    private val unsupportedFunctionNames = listOf("compareTo(other:)", "hash()", "description()", "isEqual(_:)")
+
+    private val KotlinFunctionSwiftModel.isSupported: Boolean
+        get() = !this.isSuspend && this.name !in unsupportedFunctionNames
+
+    private fun FunctionSpec.Builder.addFunctionValueParameters(function: KotlinFunctionSwiftModel): FunctionSpec.Builder =
         this.apply {
-            addFunction(
-                // TODO After Sir: solve name collision
-                FunctionSpec.builder("toKotlinEnum")
-                    .returns(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
-                    .addStatement("return _bridgeToObjectiveC()")
-                    .build(),
+            function.valueParameters.forEach {
+                this.addFunctionValueParameter(it)
+            }
+        }
+
+    private fun FunctionSpec.Builder.addFunctionValueParameter(valueParameter: KotlinValueParameterSwiftModel): FunctionSpec.Builder =
+        this.addParameter(
+            ParameterSpec.builder(
+                valueParameter.argumentLabel,
+                valueParameter.parameterName,
+                valueParameter.type.toSwiftPoetUsage(),
+            ).build(),
+        )
+
+    private fun FunctionSpec.Builder.addFunctionBody(function: KotlinFunctionSwiftModel): FunctionSpec.Builder =
+        this.addFunctionBodyWithErrorTypeHandling(function) {
+            addStatement(
+                "return %L(self as _ObjectiveCType).%N(%L)",
+                if (function.isThrowing) "try " else "",
+                function.reference,
+                function.valueParameters.map { CodeBlock.of("%N", it.parameterName) }.joinToCode(", "),
             )
         }
 
-    private fun FileSpec.Builder.addToSwiftConversionExtension(classSwiftModel: KotlinClassSwiftModel, bridge: ObjcSwiftBridge.FromSKIE) {
-        addExtension(
-            ExtensionSpec.builder(classSwiftModel.nonBridgedDeclaration.internalName.toSwiftPoetName())
+    override fun visit(regularProperty: KotlinRegularPropertySwiftModel) {
+        builder.addProperty(
+            PropertySpec.builder(regularProperty.identifier, regularProperty.type.toSwiftPoetUsage())
                 .addModifiers(Modifier.PUBLIC)
-                .addToSwiftConversionMethod(bridge)
+                .addGetter(regularProperty)
+                .addSetterIfPresent(regularProperty)
                 .build(),
         )
     }
 
-    private fun ExtensionSpec.Builder.addToSwiftConversionMethod(bridge: ObjcSwiftBridge.FromSKIE): ExtensionSpec.Builder =
+    private fun PropertySpec.Builder.addGetter(regularProperty: KotlinRegularPropertySwiftModel): PropertySpec.Builder =
+        this.getter(
+            FunctionSpec.getterBuilder()
+                .addGetterBody(regularProperty)
+                .build(),
+        )
+
+    private fun FunctionSpec.Builder.addGetterBody(regularProperty: KotlinRegularPropertySwiftModel): FunctionSpec.Builder =
+        this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
+            addStatement(
+                "return %L(self as _ObjectiveCType).%N",
+                if (regularProperty.getter.isThrowing) "try " else "",
+                regularProperty.reference,
+            )
+        }
+
+    private fun PropertySpec.Builder.addSetterIfPresent(regularProperty: KotlinRegularPropertySwiftModel): PropertySpec.Builder =
         this.apply {
-            addFunction(
-                // TODO After Sir: solve name collision
-                FunctionSpec.builder("toSwiftEnum")
-                    .returns(bridge.declaration.publicName.toSwiftPoetName())
-                    .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", bridge.declaration.publicName.toSwiftPoetName())
+            val setter = regularProperty.setter ?: return@apply
+
+            setter(
+                FunctionSpec.setterBuilder()
+                    .addModifiers(Modifier.NONMUTATING)
+                    .addParameter("value", regularProperty.type.toSwiftPoetUsage())
+                    .addSetterBody(regularProperty, setter)
                     .build(),
+            )
+        }
+
+    private fun FunctionSpec.Builder.addSetterBody(
+        regularProperty: KotlinRegularPropertySwiftModel,
+        setter: KotlinRegularPropertySetterSwiftModel,
+    ): FunctionSpec.Builder =
+        this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
+            addStatement(
+                "%L(self as _ObjectiveCType).%N = value",
+                if (setter.isThrowing) "try " else "",
+                regularProperty.reference,
             )
         }
 }

@@ -12,7 +12,6 @@ import javax.inject.Inject
 abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFactory) {
 
     val coroutinesInterop: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
-    val fqNames: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     /**
      * For performance reasons SKIE does not generate default arguments for functions in external libraries even if enabled via the group configuration.
@@ -61,7 +60,6 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(
             SkieConfigurationFlag.Feature_CoroutinesInterop takeIf coroutinesInterop,
-            SkieConfigurationFlag.Feature_FqNames takeIf fqNames,
             SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries takeIf defaultArgumentsInExternalLibraries,
         )
 }

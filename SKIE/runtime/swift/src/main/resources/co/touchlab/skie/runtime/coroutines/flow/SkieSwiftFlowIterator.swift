@@ -6,7 +6,7 @@ public class SkieSwiftFlowIterator<T>: _Concurrency.AsyncIteratorProtocol {
 
     private let iterator: SkieColdFlowIterator<AnyObject>
 
-    init(flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_Flow) {
+    init(flow: Skie.KotlinxCoroutinesCore.Flow.__Kotlin) {
         iterator = SkieColdFlowIterator(flow: flow)
     }
 
@@ -15,7 +15,7 @@ public class SkieSwiftFlowIterator<T>: _Concurrency.AsyncIteratorProtocol {
     }
 
     public func next() async -> Element? {
-        let hasNext = try? await __SkieSuspendWrappersKt.hasNext(iterator)
+        let hasNext = try? await skie(iterator).hasNext()
 
         if (hasNext?.boolValue ?? false) {
             return .some(iterator.next() as! Element)

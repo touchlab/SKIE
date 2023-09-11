@@ -13,11 +13,11 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.parameter.MutableKotlinValueParameterSwiftModel
+import co.touchlab.skie.plugin.api.model.callable.swiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.type.SkieErrorSirType
-import co.touchlab.skie.plugin.api.sir.type.allChildrenRecursivelyAndThis
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -46,7 +46,7 @@ internal class ActualKotlinFunctionSwiftModel(
                     descriptor.getParameterType(
                         parameterDescriptor,
                         core.parameterBridge,
-                        owner.swiftGenericExportScope,
+                        swiftGenericExportScope,
                         isFlowMappingEnabled,
                     )
                 }
@@ -56,7 +56,7 @@ internal class ActualKotlinFunctionSwiftModel(
 
     override var visibility: SwiftModelVisibility by core::visibility
 
-    override val owner: SwiftIrExtensibleDeclaration
+    override val owner: KotlinTypeSwiftModel?
         get() = with(swiftModelScope) {
             descriptor.owner()
         }
@@ -101,7 +101,7 @@ internal class ActualKotlinFunctionSwiftModel(
     override val returnType: SirType
         get() = with(swiftModelScope) {
             descriptor.returnType(
-                owner.swiftGenericExportScope,
+                swiftGenericExportScope,
                 core.getMethodBridge(core.descriptor).returnBridge,
                 returnTypeFlowMappingStrategy,
             )
@@ -113,7 +113,7 @@ internal class ActualKotlinFunctionSwiftModel(
         get() = core.getObjCReturnType(descriptor, returnTypeFlowMappingStrategy)
 
     override val hasValidSignatureInSwift: Boolean
-        get() = (listOf(returnType, receiver) + valueParameters.map { it.type }).flatMap { it.allChildrenRecursivelyAndThis() }
+        get() = (listOf(returnType, receiver) + valueParameters.map { it.type }).flatMap { it.allReferencedTypes() }
             .none { it is SkieErrorSirType }
 
     override fun toString(): String = descriptor.toString()

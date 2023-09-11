@@ -16,6 +16,7 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 import java.io.File
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -132,7 +133,7 @@ class FileSpec private constructor(
   class Builder internal constructor(
     val moduleName: String,
     val name: String
-  ) : Taggable.Builder<Builder>() {
+  ) : Taggable.Builder<Builder>(), BuilderWithTypeSpecs {
     internal val comment = CodeBlock.builder()
     internal val moduleImports = sortedSetOf<ImportSpec>()
     internal var indent = DEFAULT_INDENT
@@ -146,7 +147,7 @@ class FileSpec private constructor(
       members += memberSpec
     }
 
-    fun addType(typeSpec: AnyTypeSpec) = apply {
+    override fun addType(typeSpec: AnyTypeSpec) = apply {
       addMember(FileMemberSpec.builder(typeSpec).build())
     }
 

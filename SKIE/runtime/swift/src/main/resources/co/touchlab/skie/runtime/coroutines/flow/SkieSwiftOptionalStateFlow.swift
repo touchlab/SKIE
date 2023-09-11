@@ -8,9 +8,9 @@ public final class SkieSwiftOptionalStateFlow<T>: _Concurrency.AsyncSequence, Sw
 
     public typealias _ObjectiveCType = SkieKotlinOptionalStateFlow<Swift.AnyObject>
 
-    internal let delegate: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_StateFlow
+    internal let delegate: Skie.KotlinxCoroutinesCore.StateFlow.__Kotlin
 
-    internal init(internal flow: Skie.class__org_jetbrains_kotlinx_kotlinx_coroutines_core__kotlinx_coroutines_flow_StateFlow) {
+    internal init(internal flow: Skie.KotlinxCoroutinesCore.StateFlow.__Kotlin) {
         delegate = flow
     }
 

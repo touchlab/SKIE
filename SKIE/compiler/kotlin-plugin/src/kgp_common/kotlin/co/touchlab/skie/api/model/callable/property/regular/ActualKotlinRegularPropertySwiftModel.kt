@@ -15,11 +15,11 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableM
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertyGetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.plugin.api.model.callable.swiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.type.FlowMappingStrategy
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import co.touchlab.skie.plugin.api.sir.type.SkieErrorSirType
-import co.touchlab.skie.plugin.api.sir.type.allChildrenRecursivelyAndThis
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
@@ -31,7 +31,7 @@ class ActualKotlinRegularPropertySwiftModel(
     descriptorProvider: DescriptorProvider,
 ) : MutableKotlinRegularPropertySwiftModel {
 
-    override val owner: SwiftIrExtensibleDeclaration by lazy {
+    override val owner: KotlinTypeSwiftModel? by lazy {
         with(swiftModelScope) {
             descriptor.owner()
         }
@@ -68,7 +68,7 @@ class ActualKotlinRegularPropertySwiftModel(
 
     override val type: SirType
         get() = with(swiftModelScope) {
-            descriptor.propertyType(core.descriptor, owner.swiftGenericExportScope, flowMappingStrategy)
+            descriptor.propertyType(core.descriptor, swiftGenericExportScope, flowMappingStrategy)
         }
 
     override var flowMappingStrategy: FlowMappingStrategy = FlowMappingStrategy.None
@@ -77,7 +77,7 @@ class ActualKotlinRegularPropertySwiftModel(
         get() = core.getObjCType(descriptor, flowMappingStrategy)
 
     override val hasValidSignatureInSwift: Boolean
-        get() = listOf(type, receiver).flatMap { it.allChildrenRecursivelyAndThis() }
+        get() = listOf(type, receiver).flatMap { it.allReferencedTypes() }
             .none { it is SkieErrorSirType }
 
     override val getter: KotlinRegularPropertyGetterSwiftModel by core::getter

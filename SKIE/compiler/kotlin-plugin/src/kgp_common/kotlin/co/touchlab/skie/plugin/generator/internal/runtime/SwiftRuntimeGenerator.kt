@@ -13,7 +13,9 @@ internal class SwiftRuntimeGenerator(
 
     override fun runObjcPhase() {
         getSwiftRuntimeFiles().forEach {
-            skieContext.module.file(it.swiftFileName, it.readText())
+            skieContext.module.staticFile(it.swiftFileName) {
+                it.readText()
+            }
         }
     }
 
@@ -25,7 +27,7 @@ internal class SwiftRuntimeGenerator(
             .map { Resource(it) }
 
     private val Resource.swiftFileName: String
-        get() = this.name.replace("/", "_").removeSuffix(".swift")
+        get() = this.name.substringAfterLast("/").removeSuffix(".swift")
 
     private class Resource(val name: String) {
 

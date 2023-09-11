@@ -97,7 +97,7 @@ internal class ExtraClassExportPhase(
     private fun generateStubFunction(exportedClasses: Collection<ClassDescriptor>): FunctionDescriptor =
         declarationBuilder.createFunction(
             name = "skieTypeExports",
-            namespace = declarationBuilder.getCustomNamespace("SkieTypeExports"),
+            namespace = declarationBuilder.getCustomNamespace("__SkieTypeExports"),
             annotations = Annotations.EMPTY,
         ) {
             valueParameters = exportedClasses.mapIndexed { index: Int, classDescriptor: ClassDescriptor ->

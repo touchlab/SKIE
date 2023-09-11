@@ -8,7 +8,6 @@ import co.touchlab.skie.api.model.callable.function.KotlinFunctionSwiftModelWith
 import co.touchlab.skie.api.model.type.ActualKotlinClassSwiftModel
 import co.touchlab.skie.api.model.type.ActualKotlinEnumEntrySwiftModel
 import co.touchlab.skie.api.model.type.ActualKotlinFileSwiftModel
-import co.touchlab.skie.api.model.type.translation.SwiftIrDeclarationRegistry
 import co.touchlab.skie.plugin.api.kotlin.DescriptorProvider
 import co.touchlab.skie.plugin.api.model.MutableSwiftModelScope
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModel
@@ -16,6 +15,7 @@ import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunction
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
+import co.touchlab.skie.plugin.api.sir.SirProvider
 import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -29,7 +29,7 @@ class SwiftModelFactory(
     private val descriptorProvider: DescriptorProvider,
     private val namer: ObjCExportNamer,
     bridgeProvider: DescriptorBridgeProvider,
-    private val swiftIrDeclarationRegistry: SwiftIrDeclarationRegistry,
+    private val sirProvider: SirProvider,
 ) {
 
     private val membersDelegate = SwiftModelFactoryMembersDelegate(swiftModelScope, descriptorProvider, namer, bridgeProvider)
@@ -43,10 +43,10 @@ class SwiftModelFactory(
             .associateWith { classDescriptor ->
                 ActualKotlinClassSwiftModel(
                     classDescriptor = classDescriptor,
+                    kotlinSirClass = sirProvider.getKotlinSirClass(classDescriptor),
                     namer = namer,
                     swiftModelScope = swiftModelScope,
                     descriptorProvider = descriptorProvider,
-                    swiftIrDeclarationRegistry = swiftIrDeclarationRegistry,
                 )
             }
 
@@ -61,7 +61,7 @@ class SwiftModelFactory(
         files.associateWith { file ->
             ActualKotlinFileSwiftModel(
                 file = file,
-                module = descriptorProvider.getFileModule(file),
+                kotlinSirClass = sirProvider.createKotlinSirClass(file),
                 namer = namer,
                 swiftModelScope = swiftModelScope,
                 descriptorProvider = descriptorProvider,

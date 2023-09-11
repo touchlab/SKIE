@@ -8,7 +8,7 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwi
 import co.touchlab.skie.plugin.api.model.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.plugin.api.model.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.plugin.api.model.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
@@ -18,7 +18,7 @@ class ActualKotlinConvertedPropertySwiftModel(
     swiftModelScope: MutableSwiftModelScope,
 ) : MutableKotlinConvertedPropertySwiftModel {
 
-    override val owner: SwiftIrExtensibleDeclaration by lazy {
+    override val owner: KotlinTypeSwiftModel? by lazy {
         with(swiftModelScope) {
             descriptor.owner()
         }

@@ -3,12 +3,10 @@ package co.touchlab.skie.plugin.api.model.type
 import co.touchlab.skie.plugin.api.model.SwiftGenericExportScope
 import co.touchlab.skie.plugin.api.model.SwiftModelVisibility
 import co.touchlab.skie.plugin.api.model.callable.KotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.plugin.api.sir.SwiftFqName
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 interface KotlinTypeSwiftModel {
-
-    val containingType: KotlinTypeSwiftModel?
 
     val descriptorHolder: ClassOrFileDescriptorHolder
 
@@ -21,60 +19,26 @@ interface KotlinTypeSwiftModel {
 
     val allDirectlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
 
-    /**
-     * Examples:
-     * Foo
-     * Foo (visibility == Replaced)
-     */
-    val identifier: String
+    val primarySirClass: SirClass
+        get() = bridgedSirClass ?: kotlinSirClass
 
-    val originalIdentifier: String
+    val kotlinSirClass: SirClass
 
-    val swiftIrDeclaration: SwiftIrExtensibleDeclaration
-        get() = bridge?.declaration ?: nonBridgedDeclaration
-
-    val bridge: ObjcSwiftBridge?
-
-    val nonBridgedDeclaration: SwiftIrExtensibleDeclaration.Local
-
-    val kind: Kind
+    // WIP 2 check Has to be from local module
+    val bridgedSirClass: SirClass?
 
     val objCFqName: ObjcFqName
 
-    val isSwiftSymbol: Boolean
-        get() = bridge != null
-
     val swiftGenericExportScope: SwiftGenericExportScope
+
+    val kind: Kind
 
     enum class Kind {
         Class, Interface, File;
-
-        val isClass: Boolean
-            get() = this == Class
-
-        val isInterface: Boolean
-            get() = this == Interface
-
-        val isFile: Boolean
-            get() = this == File
-    }
-
-    companion object {
-
-        val StableFqNameNamespace = SwiftFqName.Local.TopLevel("__Skie")
     }
 }
 
-/**
- * Swift type identifier that includes the containing type.
- * Examples:
- * A
- * A (visibility == Replaced)
- * A.B (B.identifier == B)
- */
-val KotlinTypeSwiftModel.fqIdentifier: String
-    get() {
-        val parentIdentifier = containingType?.fqIdentifier
-
-        return if (parentIdentifier != null) "$parentIdentifier.$identifier" else identifier
-    }
+// WIP
+fun SirClass.swiftGenericExportScope(classDescriptor: ClassDescriptor): SwiftGenericExportScope {
+    return SwiftGenericExportScope.Class(classDescriptor, typeParameters)
+}

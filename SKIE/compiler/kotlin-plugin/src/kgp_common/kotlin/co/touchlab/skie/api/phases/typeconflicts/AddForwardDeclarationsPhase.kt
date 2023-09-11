@@ -9,8 +9,8 @@ class AddForwardDeclarationsPhase(
     private val objCTypeRenderer: ObjCTypeRenderer,
 ) : BaseHeaderInsertionPhase(headerFile) {
 
-    private val classRegex = "^@interface ([^ <,]+(<[^>]*>)?).*".toRegex()
-    private val protocolRegex = "^@protocol ([^ ,]+).*".toRegex()
+    private val classRegex = "^@interface ([^ <,;]+(<[^>]*>)?).*".toRegex()
+    private val protocolRegex = "^@protocol ([^ ,;]+).*".toRegex()
 
     private lateinit var classes: Set<String>
     private lateinit var protocols: Set<String>

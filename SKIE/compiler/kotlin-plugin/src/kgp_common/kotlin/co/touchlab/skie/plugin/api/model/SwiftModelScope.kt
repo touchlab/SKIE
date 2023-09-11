@@ -12,7 +12,10 @@ import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridge
 import co.touchlab.skie.plugin.api.model.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.plugin.api.model.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
+import co.touchlab.skie.plugin.api.sir.SirProvider
+import co.touchlab.skie.plugin.api.sir.builtin.SirBuiltins
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import co.touchlab.skie.plugin.api.sir.element.SirTypeDeclaration
 import co.touchlab.skie.plugin.api.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -22,6 +25,11 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 interface SwiftModelScope {
+
+    val sirProvider: SirProvider
+
+    val sirBuiltins: SirBuiltins
+        get() = sirProvider.sirBuiltins
 
     val exposedClasses: List<KotlinClassSwiftModel>
 
@@ -56,11 +64,15 @@ interface SwiftModelScope {
 
     val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
 
+    val SirClass.swiftModelOrNull: KotlinTypeSwiftModel?
+
     val SourceFile.swiftModel: KotlinTypeSwiftModel
 
-    fun CallableMemberDescriptor.owner(): SwiftIrExtensibleDeclaration
+    fun CallableMemberDescriptor.owner(): KotlinTypeSwiftModel?
 
     fun CallableMemberDescriptor.receiverType(): SirType
+
+    fun ClassDescriptor.receiverType(): SirType
 
     fun PropertyDescriptor.propertyType(
         baseDescriptor: PropertyDescriptor,

@@ -8,28 +8,21 @@ import co.touchlab.skie.plugin.api.model.callable.MutableKotlinDirectlyCallableM
 import co.touchlab.skie.plugin.api.model.isRemoved
 import co.touchlab.skie.plugin.api.model.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.plugin.api.model.type.KotlinTypeSwiftModel
-import co.touchlab.skie.plugin.api.model.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.plugin.api.model.type.MutableKotlinFileSwiftModel
 import co.touchlab.skie.plugin.api.model.type.ObjcFqName
-import co.touchlab.skie.plugin.api.model.type.ObjcSwiftBridge
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrExtensibleDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
-import co.touchlab.skie.util.swiftIdentifier
+import co.touchlab.skie.plugin.api.sir.element.SirClass
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 class ActualKotlinFileSwiftModel(
     private val file: SourceFile,
-    module: ModuleDescriptor,
+    override val kotlinSirClass: SirClass,
     namer: ObjCExportNamer,
     private val swiftModelScope: MutableSwiftModelScope,
     private val descriptorProvider: DescriptorProvider,
 ) : MutableKotlinFileSwiftModel {
 
     override val descriptorHolder: ClassOrFileDescriptorHolder.File = ClassOrFileDescriptorHolder.File(file)
-
-    override var containingType: MutableKotlinClassSwiftModel? = null
 
     override var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
 
@@ -46,36 +39,11 @@ class ActualKotlinFileSwiftModel(
 
     private val fileClassName = namer.getFileClassName(file)
 
-    override var identifier: String = fileClassName.swiftName
-    override val originalIdentifier: String = identifier
-
-    override var bridge: ObjcSwiftBridge? = null
+    override var bridgedSirClass: SirClass? = null
 
     override val kind: KotlinTypeSwiftModel.Kind = KotlinTypeSwiftModel.Kind.File
 
     override val objCFqName: ObjcFqName = ObjcFqName(fileClassName.objCName)
 
     override val swiftGenericExportScope: SwiftGenericExportScope = SwiftGenericExportScope.None
-
-    // val stableFqName: String = run {
-    //     val moduleFragment = module.swiftIdentifier
-    //
-    //     val fileNameFragment =
-    //         file.name?.removeSuffix(".kt")?.let { it + "Kt" }?.toValidSwiftIdentifier() ?: error("File does not have a name.")
-    //
-    //     TypeSwiftModel.StableFqNameNamespace + "file__" + moduleFragment + "__" + fileNameFragment
-    // }
-
-    // override val original: KotlinTypeSwiftModel = OriginalKotlinFileSwiftModel(this)
-
-    override val nonBridgedDeclaration: SwiftIrExtensibleDeclaration.Local by lazy {
-        SwiftIrTypeDeclaration.Local.KotlinFile.Modeled(this, module.swiftIdentifier, fileClassName.swiftName)
-    }
-
-    // override val isChanged: Boolean
-    //     get() = identifier != original.identifier ||
-    //         containingType?.isChanged == true ||
-    //         containingType != original.containingType ||
-    //         visibility != original.visibility ||
-    //         bridge != original.bridge
 }

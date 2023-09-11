@@ -1,65 +1,46 @@
 package co.touchlab.skie.plugin.api.model
 
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeDeclaration
-import co.touchlab.skie.plugin.api.sir.declaration.SwiftIrTypeParameterDeclaration
-import co.touchlab.skie.plugin.api.sir.type.SwiftGenericTypeUsageSirType
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import co.touchlab.skie.plugin.api.model.type.KotlinClassSwiftModel
+import co.touchlab.skie.plugin.api.sir.element.SirTypeParameter
+import co.touchlab.skie.plugin.api.sir.type.TypeParameterUsageSirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
 
 interface SwiftGenericExportScope {
 
-    fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType?
+    fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): TypeParameterUsageSirType?
 
-    class FromTypeDeclaration(
-        val declaration: SwiftIrTypeDeclaration,
+    class Class(
+        classDescriptor: ClassDescriptor,
+        sirTypeParameters: List<SirTypeParameter>,
     ) : SwiftGenericExportScope {
 
-        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType? {
-            val localTypeParam = declaration.typeParameters.firstOrNull {
-                // TODO: We don't really want to cast, but here we're only resolving Kotlin type params anyway
-                (it as? SwiftIrTypeParameterDeclaration.KotlinTypeParameter)?.descriptor == typeParameterDescriptor /* || (it.isCapturedFromOuterDeclaration && it.original == typeParameterDescriptor) */
-            }
+        constructor(
+            kotlinClassSwiftModel: KotlinClassSwiftModel,
+        ) : this(kotlinClassSwiftModel.classDescriptor, kotlinClassSwiftModel.kotlinSirClass.typeParameters)
 
-            return localTypeParam?.let {
-                SwiftGenericTypeUsageSirType(localTypeParam)
-            }
-        }
-    }
+        private val descriptorsWithTypeParameters = if (!classDescriptor.kind.isInterface) {
+            val descriptors = classDescriptor.typeConstructor.parameters
 
-    class Class(container: DeclarationDescriptor, val namer: ObjCExportNamer) : SwiftGenericExportScope {
+            assert(descriptors.size == sirTypeParameters.size)
 
-        private val typeNames = if (container is ClassDescriptor && !container.kind.isInterface) {
-            container.typeConstructor.parameters
+            descriptors.zip(sirTypeParameters)
         } else {
-            emptyList<TypeParameterDescriptor>()
+            emptyList()
         }
 
-        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType? {
-            val localTypeParam = typeNames.firstOrNull {
-                it == typeParameterDescriptor || (it.isCapturedFromOuterDeclaration && it.original == typeParameterDescriptor)
-            }
+        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): TypeParameterUsageSirType? {
+            val typeParameter = descriptorsWithTypeParameters.firstOrNull { (descriptor, _) ->
+                descriptor == typeParameterDescriptor || (descriptor.isCapturedFromOuterDeclaration && descriptor.original == typeParameterDescriptor)
+            }?.second
 
-            return if (localTypeParam == null) {
-                null
-            } else {
-                // TODO: The TypeParameterDeclaration should be a singleton, but it isn't here. This whole implementation should go away.
-                SwiftGenericTypeUsageSirType(
-                    SwiftIrTypeParameterDeclaration.KotlinTypeParameter(
-                        name = namer.getTypeParameterName(localTypeParam),
-                        bounds = listOf(BuiltinDeclarations.Swift.AnyObject),
-                        descriptor = localTypeParam,
-                    )
-                )
-            }
+            return typeParameter?.let { TypeParameterUsageSirType(it) }
         }
     }
 
     object None : SwiftGenericExportScope {
 
-        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): SwiftGenericTypeUsageSirType? = null
+        override fun getGenericTypeUsage(typeParameterDescriptor: TypeParameterDescriptor): TypeParameterUsageSirType? = null
     }
 }

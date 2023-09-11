@@ -2,36 +2,37 @@ package co.touchlab.skie.api.model.type.translation
 
 import co.touchlab.skie.api.apinotes.builder.ApiNotes
 import co.touchlab.skie.plugin.api.model.SwiftExportScope
-import co.touchlab.skie.plugin.api.sir.SwiftFqName
-import co.touchlab.skie.plugin.api.sir.declaration.BuiltinDeclarations
-import co.touchlab.skie.plugin.api.sir.declaration.isHashable
-import co.touchlab.skie.plugin.api.sir.type.SwiftAnyHashableSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftAnySirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftClassSirType
-import co.touchlab.skie.plugin.api.sir.type.SwiftNonNullReferenceSirType
+import co.touchlab.skie.plugin.api.sir.SirFqName
+import co.touchlab.skie.plugin.api.sir.SirProvider
+import co.touchlab.skie.plugin.api.sir.element.SirClass
+import co.touchlab.skie.plugin.api.sir.type.DeclaredSirType
+import co.touchlab.skie.plugin.api.sir.type.NonNullSirType
+import co.touchlab.skie.plugin.api.sir.type.SpecialSirType
 import co.touchlab.skie.util.Command
 import org.jetbrains.kotlin.name.FqName
 import java.io.File
 
 class BuiltinSwiftBridgeableProvider(
     private val sdkPath: String,
-    private val declarationRegistry: SwiftIrDeclarationRegistry,
+    private val sirProvider: SirProvider,
 ) {
 
-    val builtinBridges: Map<FqName, SwiftClassSirType> by lazy {
+    private val sirBuiltins = sirProvider.sirBuiltins
+
+    private val builtinBridges: Map<FqName, DeclaredSirType> by lazy {
         getAllBuiltinBridges()
     }
 
-    fun bridgeFor(fqName: FqName, swiftExportScope: SwiftExportScope): SwiftNonNullReferenceSirType? {
+    fun bridgeFor(fqName: FqName, swiftExportScope: SwiftExportScope): NonNullSirType? {
         val bridge = builtinBridges[fqName] ?: return null
         return when {
             swiftExportScope.hasFlag(SwiftExportScope.Flags.ReferenceType) -> null
-            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) && !bridge.declaration.isHashable() -> SwiftAnyHashableSirType
+            swiftExportScope.hasFlag(SwiftExportScope.Flags.Hashable) && !bridge.isHashable -> sirBuiltins.Swift.AnyHashable.defaultType
             else -> bridge
         }
     }
 
-    private fun getAllBuiltinBridges(): Map<FqName, SwiftClassSirType> {
+    private fun getAllBuiltinBridges(): Map<FqName, DeclaredSirType> {
         val apiNotesFiles = getAllApiNotesFiles()
         return apiNotesFiles
             .map { file ->
@@ -46,8 +47,8 @@ class BuiltinSwiftBridgeableProvider(
                             getKotlinFqName(moduleName, apiNotesType.objCFqName) to getSwiftModelFor(
                                 getSwiftFqName(
                                     moduleName,
-                                    bridgeFqName
-                                )
+                                    bridgeFqName,
+                                ),
                             )
                         }
                     }
@@ -74,42 +75,31 @@ class BuiltinSwiftBridgeableProvider(
             }
     }
 
-    private fun getSwiftModelFor(swiftFqName: SwiftFqName.External): SwiftClassSirType {
-        return SwiftClassSirType(
-            declaration = declarationRegistry.referenceExternalTypeDeclaration(
-                swiftFqName,
-                defaultSupertypes = listOf(BuiltinDeclarations.Foundation.NSObject)
-            ),
-            typeArguments = when (swiftFqName) {
-                BuiltinDeclarations.Swift.Array.publicName -> listOf(SwiftAnySirType)
-                BuiltinDeclarations.Swift.Dictionary.publicName -> listOf(SwiftAnyHashableSirType, SwiftAnySirType)
-                BuiltinDeclarations.Swift.Set.publicName -> listOf(SwiftAnyHashableSirType)
+    private fun getSwiftModelFor(sirFqName: SirFqName): DeclaredSirType {
+        return DeclaredSirType(
+            // Protocols cannot have bridge
+            declaration = sirProvider.getExternalTypeDeclaration(sirFqName, SirClass.Kind.Class),
+            typeArguments = when (sirFqName) {
+                sirBuiltins.Swift.Array.fqName -> listOf(SpecialSirType.Any)
+                sirBuiltins.Swift.Dictionary.fqName -> listOf(sirBuiltins.Swift.AnyHashable.defaultType, SpecialSirType.Any)
+                sirBuiltins.Swift.Set.fqName -> listOf(sirBuiltins.Swift.AnyHashable.defaultType)
                 else -> emptyList()
-            }
+            },
         )
     }
 
-    private fun getSwiftFqName(module: String, bridgeFqName: String): SwiftFqName.External.TopLevel {
-        val bridgeModule = bridgeFqName.substringBefore(".", missingDelimiterValue = "").ifBlank { module }
+    private fun getSwiftFqName(module: String, bridgeFqName: String): SirFqName {
+        val bridgeModuleName = bridgeFqName.substringBefore(".", missingDelimiterValue = "").ifBlank { module }
         val bridgeName = bridgeFqName.substringAfter(".")
 
+        val bridgeModule = sirProvider.getExternalModule(bridgeModuleName)
+
         // APINotes bridging doesn't support nested types, so we don't need to either.
-        return SwiftFqName.External.TopLevel(
+        return SirFqName(
             module = bridgeModule,
-            name = bridgeName,
+            simpleName = bridgeName,
         )
     }
 
     private fun getKotlinFqName(module: String, type: String): FqName = FqName("platform.${module}.${type}")
-
-    companion object {
-
-        private val swiftArray = "Swift.Array"
-        private val swiftDictionary = "Swift.Dictionary"
-        private val swiftSet = "Swift.Set"
-
-        private val nonHashableTypes = setOf(
-            swiftArray, swiftDictionary
-        )
-    }
 }
