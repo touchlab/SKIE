@@ -1,4 +1,0 @@
-co.touchlab.skie.plugin.interceptors.PsiToIrPhaseInterceptor
-co.touchlab.skie.plugin.interceptors.ObjectFilesPhaseInterceptor
-co.touchlab.skie.plugin.interceptors.CreateSymbolTablePhaseInterceptor
-co.touchlab.skie.plugin.interceptors.ObjCExportPhaseInterceptor
