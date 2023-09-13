@@ -1,11 +1,8 @@
 package co.touchlab.skie.phases.header
 
 import co.touchlab.skie.phases.util.header.BaseHeaderInsertionPhase
-import java.io.File
 
-class AddLambdaTypeArgumentErrorTypePhase(
-    headerFile: File,
-) : BaseHeaderInsertionPhase(headerFile) {
+object AddLambdaTypeArgumentErrorTypePhase : BaseHeaderInsertionPhase() {
 
     override val insertedContent: List<String>
         get() =

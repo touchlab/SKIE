@@ -3,7 +3,7 @@ package co.touchlab.skie.compilerinject.interceptor
 typealias OriginalPhaseBody<Context, Input, Output> = (Context, Input) -> Output
 typealias ErasedPhaseInterceptor<Context, Input, Output> = (Context, Input, OriginalPhaseBody<Context, Input, Output>) -> Output
 
-internal class ErasedPhaseInterceptorChain<Context, Input, Output>(
+class ErasedPhaseInterceptorChain<Context, Input, Output>(
     interceptors: List<PhaseInterceptor<Context, Input, Output>>,
 ) : ErasedPhaseInterceptor<Context, Input, Output> {
 
@@ -20,7 +20,7 @@ internal class ErasedPhaseInterceptorChain<Context, Input, Output>(
     }
 }
 
-internal infix fun <Context, Input, Output> ErasedPhaseInterceptor<Context, Input, Output>.then(
+infix fun <Context, Input, Output> ErasedPhaseInterceptor<Context, Input, Output>.then(
     next: ErasedPhaseInterceptor<Context, Input, Output>,
 ): ErasedPhaseInterceptor<Context, Input, Output> {
     return { outerContext, outerInput, original ->

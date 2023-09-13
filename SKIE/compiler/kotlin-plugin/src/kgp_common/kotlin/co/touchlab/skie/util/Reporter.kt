@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 
 // WIP 3 remove unused code and reformat
-
 class Reporter(private val compilerConfiguration: CompilerConfiguration) {
 
     fun report(severity: Severity, message: String, declaration: DeclarationDescriptor? = null) {

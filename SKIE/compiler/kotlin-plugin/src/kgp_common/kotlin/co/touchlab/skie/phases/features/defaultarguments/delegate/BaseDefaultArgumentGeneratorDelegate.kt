@@ -1,11 +1,11 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
+import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.SkieContext
 import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
+import co.touchlab.skie.phases.DescriptorModificationPhase
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
@@ -17,11 +17,13 @@ import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.declaresOrInheritsDefaultValue
 
-internal abstract class BaseDefaultArgumentGeneratorDelegate(
-    final override val skieContext: SkieContext,
-    protected val descriptorProvider: DescriptorProvider,
-    protected val declarationBuilder: DeclarationBuilder,
+abstract class BaseDefaultArgumentGeneratorDelegate(
+    final override val context: DescriptorModificationPhase.Context,
 ) : DefaultArgumentGeneratorDelegate, ConfigurationContainer {
+
+    protected val descriptorProvider: DescriptorProvider = context.descriptorProvider
+
+    protected val declarationBuilder: DeclarationBuilder = context.declarationBuilder
 
     protected val uniqueNameSubstring = "__Skie_DefaultArguments__"
 
@@ -29,12 +31,12 @@ internal abstract class BaseDefaultArgumentGeneratorDelegate(
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
 
     private val isInteropEnabledForExternalModules: Boolean =
-        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in skieContext.skieConfiguration.enabledConfigurationFlags
+        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in context.skieConfiguration.enabledConfigurationFlags
 
     protected val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.getConfiguration(DefaultArgumentInterop.Enabled) &&
-                this.satisfiesMaximumDefaultArgumentCount &&
-                (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
+            this.satisfiesMaximumDefaultArgumentCount &&
+            (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
 
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean
         get() = this.defaultArgumentCount <= this.getConfiguration(DefaultArgumentInterop.MaximumDefaultArgumentCount)

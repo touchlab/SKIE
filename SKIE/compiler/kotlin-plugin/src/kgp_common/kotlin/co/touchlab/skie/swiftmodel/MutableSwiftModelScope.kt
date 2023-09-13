@@ -28,6 +28,27 @@ interface MutableSwiftModelScope : SwiftModelScope {
 
     override fun referenceClass(classFqName: String): MutableKotlinClassSwiftModel
 
+    override fun getSwiftModel(callableMemberDescriptor: CallableMemberDescriptor): MutableKotlinCallableMemberSwiftModel =
+        callableMemberDescriptor.swiftModel
+
+    override fun getSwiftModel(functionDescriptor: FunctionDescriptor): MutableKotlinFunctionSwiftModel =
+        functionDescriptor.swiftModel
+
+    override fun getSwiftModel(parameterDescriptor: ParameterDescriptor): MutableKotlinValueParameterSwiftModel =
+        parameterDescriptor.swiftModel
+
+    override fun getSwiftModel(propertyDescriptor: PropertyDescriptor): MutableKotlinPropertySwiftModel =
+        propertyDescriptor.swiftModel
+
+    override fun getSwiftModel(classDescriptor: ClassDescriptor): MutableKotlinClassSwiftModel =
+        classDescriptor.swiftModel
+
+    override fun getSwiftModel(sourceFile: SourceFile): MutableKotlinTypeSwiftModel =
+        sourceFile.swiftModel
+
+    override fun getSwiftModelOrNull(classDescriptor: ClassDescriptor): MutableKotlinClassSwiftModel? =
+        classDescriptor.swiftModelOrNull
+
     override val CallableMemberDescriptor.swiftModel: MutableKotlinCallableMemberSwiftModel
 
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel

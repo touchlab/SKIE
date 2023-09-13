@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
 
-internal class SecondaryConstructorBuilder(val descriptor: ClassConstructorDescriptor) {
+class SecondaryConstructorBuilder(val descriptor: ClassConstructorDescriptor) {
 
     var valueParameters: List<ValueParameterDescriptor> = emptyList()
 

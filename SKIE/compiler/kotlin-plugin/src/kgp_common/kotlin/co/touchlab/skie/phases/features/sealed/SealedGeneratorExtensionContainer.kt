@@ -12,7 +12,7 @@ import co.touchlab.skie.sir.type.TypeParameterUsageSirType
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import co.touchlab.skie.configuration.ConfigurationContainer
 
-internal interface SealedGeneratorExtensionContainer : ConfigurationContainer {
+interface SealedGeneratorExtensionContainer : ConfigurationContainer {
 
     val KotlinClassSwiftModel.elseCaseName: String
         get() = this.getConfiguration(SealedInterop.ElseName)

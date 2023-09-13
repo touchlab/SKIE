@@ -1,7 +1,7 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
-import co.touchlab.skie.phases.SkieContext
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.sir.element.SirClass
@@ -13,8 +13,8 @@ import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
 
-internal class SealedFunctionGeneratorDelegate(
-    override val skieContext: SkieContext,
+class SealedFunctionGeneratorDelegate(
+    override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {
 
     context(SwiftModelScope)

@@ -4,7 +4,7 @@ import co.touchlab.skie.compilerinject.interceptor.ErasedPhaseInterceptorConfigu
 import co.touchlab.skie.compilerinject.interceptor.NamedPhaseInterceptorConfigurer
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-internal actual fun phaseInterceptorConfigurers(configuration: CompilerConfiguration): List<ErasedPhaseInterceptorConfigurer> {
+actual fun phaseInterceptorConfigurers(configuration: CompilerConfiguration): List<ErasedPhaseInterceptorConfigurer> {
     return listOf(
         NamedPhaseInterceptorConfigurer(),
     )

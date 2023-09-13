@@ -1,20 +1,21 @@
 @file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.interceptor.SameTypePhaseInterceptor
-import co.touchlab.skie.swiftmodel.type.translation.impl.CommonBackendContextSwiftTranslationProblemCollector
-import co.touchlab.skie.phases.SwiftLinkCompilePhase
-import co.touchlab.skie.phases.SkieContext
-import co.touchlab.skie.compilerinject.reflection.skieContext
 import co.touchlab.skie.compilerinject.reflection.descriptorProvider
+import co.touchlab.skie.compilerinject.reflection.skieContext
+import co.touchlab.skie.phases.SwiftLinkCompilePhase
+import co.touchlab.skie.swiftmodel.type.translation.impl.CommonBackendContextSwiftTranslationProblemCollector
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.ObjectFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 import org.jetbrains.kotlin.backend.konan.objectFilesPhase
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
-internal class ObjectFilesPhaseInterceptor: SameTypePhaseInterceptor<KonanContext, Unit> {
+internal class ObjectFilesPhaseInterceptor : SameTypePhaseInterceptor<KonanContext, Unit> {
+
     override fun getInterceptedPhase(): Any = objectFilesPhase
 
     override fun intercept(context: KonanContext, input: Unit, next: (KonanContext, Unit) -> Unit) {
@@ -28,8 +29,6 @@ internal class ObjectFilesPhaseInterceptor: SameTypePhaseInterceptor<KonanContex
         val swiftObjectFiles = runSwiftLinkCompilePhase(config, context, namer)
 
         generationState.compilerOutput += swiftObjectFiles
-
-        logSkiePerformance(context.skieContext)
     }
 
     private fun runSwiftLinkCompilePhase(
@@ -49,9 +48,7 @@ internal class ObjectFilesPhaseInterceptor: SameTypePhaseInterceptor<KonanContex
             configurables,
             context.generationState.outputFile,
         )
-    }
 
-    private fun logSkiePerformance(context: SkieContext) {
-        context.analyticsCollector.collectAsync(context.skiePerformanceAnalyticsProducer)
+        return skieContext.skieBuildDirectory.swiftCompiler.objectFiles.all.map { it.absolutePath }
     }
 }

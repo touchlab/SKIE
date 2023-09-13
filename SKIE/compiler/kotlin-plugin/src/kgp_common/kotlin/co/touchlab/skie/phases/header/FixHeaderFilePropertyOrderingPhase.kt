@@ -1,9 +1,8 @@
 package co.touchlab.skie.phases.header
 
 import co.touchlab.skie.phases.util.header.BaseHeaderModificationPhase
-import java.io.File
 
-class FixHeaderFilePropertyOrderingPhase(headerFile: File) : BaseHeaderModificationPhase(headerFile) {
+object FixHeaderFilePropertyOrderingPhase : BaseHeaderModificationPhase() {
 
     override fun modifyHeaderContent(content: List<String>): List<String> {
         val reorderedContent = mutableListOf<String>()

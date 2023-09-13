@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.ir.symbols.IrBindableSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrPublicSymbolBase
 import org.jetbrains.kotlin.ir.util.IdSignature
 
-internal abstract class IrBaseRebindablePublicSymbol<out D : DeclarationDescriptor, B : IrSymbolOwner>(
+abstract class IrBaseRebindablePublicSymbol<out D : DeclarationDescriptor, B : IrSymbolOwner>(
     signature: IdSignature,
     descriptor: D,
 ) : IrBindableSymbol<D, B>, IrPublicSymbolBase<D>(signature, descriptor) {

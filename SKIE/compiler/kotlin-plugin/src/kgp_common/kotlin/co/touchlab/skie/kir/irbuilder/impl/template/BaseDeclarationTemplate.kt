@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.SyntheticDeclarationsGenerator
 
-internal abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : IrDeclaration, S : IrBindableSymbol<D, IR>> :
+abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : IrDeclaration, S : IrBindableSymbol<D, IR>> :
     DeclarationTemplate<D> {
 
     override fun generateIrDeclaration(parent: IrDeclarationContainer, generatorContext: GeneratorContext) {

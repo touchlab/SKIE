@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.backend.common.phaser.SameTypeCompilerPhase
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
-internal class InterceptedSameTypeCompilerPhase<Context: CommonBackendContext, Data>(
+class InterceptedSameTypeCompilerPhase<Context: CommonBackendContext, Data>(
     val originalPhase: SameTypeCompilerPhase<Context, Data>,
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Data, Data>>,
 ): SameTypeCompilerPhase<Context, Data> {

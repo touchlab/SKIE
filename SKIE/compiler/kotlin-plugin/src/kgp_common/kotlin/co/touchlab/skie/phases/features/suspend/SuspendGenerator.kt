@@ -3,28 +3,30 @@
 
 package co.touchlab.skie.phases.features.suspend
 
+import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.SuspendInterop
-import co.touchlab.skie.phases.SkieContext
 import co.touchlab.skie.kir.MutableDescriptorProvider
 import co.touchlab.skie.kir.allExposedMembers
-import co.touchlab.skie.phases.BaseGenerator
-import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
+import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.util.StatefulSirPhase
+import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
-internal class SuspendGenerator(
-    skieContext: SkieContext,
-    private val descriptorProvider: MutableDescriptorProvider,
-    private val declarationBuilder: DeclarationBuilder,
-) : BaseGenerator(skieContext) {
+class SuspendGenerator(
+    override val context: DescriptorModificationPhase.Context,
+) : DescriptorModificationPhase, ConfigurationContainer {
 
-    override val isActive: Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
+    context(DescriptorModificationPhase.Context)
+    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
-    override fun runObjcPhase() {
-        val kotlinDelegate = KotlinSuspendGeneratorDelegate(module, declarationBuilder, descriptorProvider)
-        val swiftDelegate = SwiftSuspendGeneratorDelegate(module)
+    private val kotlinDelegate = KotlinSuspendGeneratorDelegate(context)
+    private val swiftDelegate = SwiftSuspendGeneratorDelegate(context)
 
+    context(DescriptorModificationPhase.Context)
+    override fun execute() {
         descriptorProvider.allSupportedFunctions.forEach { function ->
             val kotlinBridgingFunction = kotlinDelegate.generateKotlinBridgingFunction(function)
 
@@ -47,8 +49,12 @@ internal class SuspendGenerator(
         get() = this.getConfiguration(SuspendInterop.Enabled)
 
     private fun markOriginalFunctionAsReplaced(originalFunctionDescriptor: SimpleFunctionDescriptor) {
-        module.configure {
-            originalFunctionDescriptor.swiftModel.visibility = co.touchlab.skie.swiftmodel.SwiftModelVisibility.Replaced
+        context.doInPhase(KotlinBridgeConfigurationPhase) {
+            originalFunctionDescriptor.swiftModel.visibility = SwiftModelVisibility.Replaced
         }
     }
+
+    object KotlinBridgeConfigurationPhase : StatefulSirPhase()
+
+    object SwiftBridgeGeneratorPhase : StatefulSirPhase()
 }

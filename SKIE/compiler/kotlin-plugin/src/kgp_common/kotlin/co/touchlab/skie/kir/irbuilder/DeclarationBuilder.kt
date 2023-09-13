@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 
-internal interface DeclarationBuilder {
+interface DeclarationBuilder {
 
     fun getCustomNamespace(name: String): Namespace<PackageFragmentDescriptor>
 
@@ -31,24 +31,24 @@ internal interface DeclarationBuilder {
     ): ClassConstructorDescriptor
 }
 
-internal fun DeclarationBuilder.getNamespace(function: FunctionDescriptor): Namespace<*> =
+fun DeclarationBuilder.getNamespace(function: FunctionDescriptor): Namespace<*> =
     when (val containingDeclaration = function.containingDeclaration) {
         is ClassDescriptor -> getClassNamespace(containingDeclaration)
         is PackageFragmentDescriptor -> getPackageNamespace(function)
         else -> throw UnsupportedDeclarationDescriptorException(containingDeclaration)
     }
 
-internal fun DeclarationBuilder.getNamespace(constructor: ClassConstructorDescriptor): Namespace<ClassDescriptor> =
+fun DeclarationBuilder.getNamespace(constructor: ClassConstructorDescriptor): Namespace<ClassDescriptor> =
     getClassNamespace(constructor.containingDeclaration)
 
-internal fun DeclarationBuilder.createFunction(
+fun DeclarationBuilder.createFunction(
     name: String,
     namespace: Namespace<*>,
     annotations: Annotations,
     builder: FunctionBuilder.() -> Unit,
 ): FunctionDescriptor = createFunction(Name.identifier(name), namespace, annotations, builder)
 
-internal fun DeclarationBuilder.createSecondaryConstructor(
+fun DeclarationBuilder.createSecondaryConstructor(
     name: String = SpecialNames.INIT.asString(),
     namespace: Namespace<ClassDescriptor>,
     annotations: Annotations,

@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.reflect.jvm.jvmName
 
-internal class NamedPhaseInterceptorConfigurer<Context: CommonBackendContext, Data>:
+class NamedPhaseInterceptorConfigurer<Context: CommonBackendContext, Data>:
     PhaseInterceptorConfigurer<NamedCompilerPhase<Context, Data>, Context, Data, Data> {
     override fun canConfigurePhase(phase: Any): Boolean = phase is NamedCompilerPhase<*, *>
 

@@ -1,8 +1,7 @@
 package co.touchlab.skie.phases.apinotes.builder
 
-import co.touchlab.skie.swiftmodel.ObjCTypeRenderer
 import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
@@ -13,31 +12,26 @@ import co.touchlab.skie.swiftmodel.isReplaced
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.isInterface
 
-internal class ApiNotesFactory(
-    private val moduleName: String,
-    private val descriptorProvider: DescriptorProvider,
-    private val swiftModelScope: SwiftModelScope,
-    private val objCTypeRenderer: ObjCTypeRenderer,
-) {
+object ApiNotesFactory {
 
-    fun create(): ApiNotes = with(swiftModelScope) {
+    context(SirPhase.Context)
+    fun create(): ApiNotes =
         ApiNotes(
-            moduleName = moduleName,
+            moduleName = framework.moduleName,
             classes = descriptorProvider.swiftModelsForClassesAndFiles.map { it.toApiNote() },
             protocols = descriptorProvider.swiftModelsForInterfaces.map { it.toApiNote() },
         )
-    }
 
-    context(SwiftModelScope)
+    context(SirPhase.Context)
     private val DescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
         get() = this.exposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
-                this.exposedFiles.map { it.swiftModel }
+            this.exposedFiles.map { it.swiftModel }
 
-    context(SwiftModelScope)
+    context(SirPhase.Context)
     private val DescriptorProvider.swiftModelsForInterfaces: List<KotlinTypeSwiftModel>
         get() = this.exposedClasses.filter { it.kind.isInterface }.map { it.swiftModel }
 
-    context(SwiftModelScope)
+    context(SirPhase.Context)
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
         ApiNotesType(
             objCFqName = this.objCFqName.asString(),
@@ -49,6 +43,7 @@ internal class ApiNotesFactory(
             properties = this.allDirectlyCallableMembers.filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote(this) },
         )
 
+    context(SirPhase.Context)
     private fun KotlinFunctionSwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesMethod =
         ApiNotesMethod(
             objCSelector = this.objCSelector,
@@ -60,12 +55,14 @@ internal class ApiNotesFactory(
             parameters = this.valueParameters.map { it.toApiNote(this) },
         )
 
+    context(SirPhase.Context)
     private fun KotlinValueParameterSwiftModel.toApiNote(owner: KotlinFunctionSwiftModel): ApiNotesParameter =
         ApiNotesParameter(
             position = this.position,
             type = objCTypeRenderer.render(this.objCType, owner.reservedIdentifierInApiNotes),
         )
 
+    context(SirPhase.Context)
     private fun KotlinRegularPropertySwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesProperty =
         ApiNotesProperty(
             objCName = this.objCName,

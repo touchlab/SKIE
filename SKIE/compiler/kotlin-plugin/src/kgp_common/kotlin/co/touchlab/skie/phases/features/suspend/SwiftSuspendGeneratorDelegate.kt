@@ -1,11 +1,12 @@
 package co.touchlab.skie.phases.features.suspend
 
+import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.isRemoved
-import co.touchlab.skie.phases.SkieModule
+import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.util.swift.addFunctionBodyWithErrorTypeHandling
@@ -20,8 +21,8 @@ import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 // WIP Test suspend in enum
-internal class SwiftSuspendGeneratorDelegate(
-    private val module: SkieModule,
+class SwiftSuspendGeneratorDelegate(
+    private val context: DescriptorModificationPhase.Context,
 ) {
 
     private val skieClassSuspendGenerator = SkieClassSuspendGenerator()
@@ -30,9 +31,9 @@ internal class SwiftSuspendGeneratorDelegate(
         originalFunctionDescriptor: FunctionDescriptor,
         kotlinBridgingFunctionDescriptor: FunctionDescriptor,
     ) {
-        module.configure(SkieModule.Ordering.Last) {
+        context.doInPhase(SuspendGenerator.SwiftBridgeGeneratorPhase) {
             if (originalFunctionDescriptor.swiftModel.visibility.isRemoved || kotlinBridgingFunctionDescriptor.swiftModel.visibility.isRemoved) {
-                return@configure
+                return@doInPhase
             }
 
             val bridgeModel = BridgeModel(
@@ -138,7 +139,6 @@ internal class SwiftSuspendGeneratorDelegate(
 
             this.bridgedParameters.forEachIndexed { index, parameter ->
                 if (isFromGenericClass) {
-                    // WIP
                     val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.toSwiftPoetUsage()
                         // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
                         .removingEscapingAttribute()
@@ -180,7 +180,6 @@ internal class SwiftSuspendGeneratorDelegate(
         val kotlinBridgingFunction: KotlinFunctionSwiftModel,
     )
 
-    // WIP
     private fun TypeName.removingEscapingAttribute(): TypeName {
         return when (this) {
             is FunctionTypeName -> this.copy(attributes = this.attributes - AttributeSpec.ESCAPING)

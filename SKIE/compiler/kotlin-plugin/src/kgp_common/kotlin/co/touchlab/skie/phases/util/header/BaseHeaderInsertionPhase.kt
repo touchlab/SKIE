@@ -1,8 +1,6 @@
 package co.touchlab.skie.phases.util.header
 
-import java.io.File
-
-abstract class BaseHeaderInsertionPhase(headerFile: File) : BaseHeaderModificationPhase(headerFile) {
+abstract class BaseHeaderInsertionPhase : BaseHeaderModificationPhase() {
 
     override fun modifyHeaderContent(content: List<String>): List<String> {
         val insertIndex = content.indexOfFirst { insertImmediatelyBefore(it) }

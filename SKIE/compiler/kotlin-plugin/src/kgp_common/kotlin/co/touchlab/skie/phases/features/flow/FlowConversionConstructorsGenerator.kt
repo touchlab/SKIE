@@ -1,10 +1,10 @@
 package co.touchlab.skie.phases.features.flow
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.SkieContext
-import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.features.enums.ObjCBridgeable
-import co.touchlab.skie.phases.SkieCompilationPhase
+import co.touchlab.skie.sir.element.SirFile
+import co.touchlab.skie.swiftmodel.SwiftModelScope
 import io.outfoxx.swiftpoet.ANY_OBJECT
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
@@ -15,15 +15,15 @@ import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
 import io.outfoxx.swiftpoet.parameterizedBy
 
-internal class FlowConversionConstructorsGenerator(
-    private val skieContext: SkieContext,
-) : SkieCompilationPhase {
+object FlowConversionConstructorsGenerator : SirPhase {
 
-    override val isActive: Boolean =
-        SkieConfigurationFlag.Feature_CoroutinesInterop in skieContext.skieConfiguration.enabledConfigurationFlags
+    context(SirPhase.Context)
+    override fun isActive(): Boolean =
+        SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
-    override fun runObjcPhase() {
-        skieContext.module.file("FlowConversions") {
+    context(SirPhase.Context)
+    override fun execute() {
+        sirProvider.getFile(SirFile.skieNamespace, "FlowConversions").swiftPoetBuilderModifications.add {
             SupportedFlow.values().forEach {
                 it.generateAllConversions()
             }
@@ -100,7 +100,7 @@ private fun FileSpec.Builder.generateSwiftClassConversions(
             .addModifiers(Modifier.PUBLIC)
             .addConversions(variant) { from -> addKotlinToSwiftConversion(from, flowTypeParameter) }
             .addConversions(variant) { from -> addSwiftToSwiftConversion(from, flowTypeParameter) }
-            .build()
+            .build(),
     )
 }
 
@@ -136,11 +136,11 @@ private fun FileSpec.Builder.addSwiftToKotlinConversion(
             .addParameter(
                 "_",
                 "flow",
-                from.swiftFlowClass().internalName.toSwiftPoetName().parameterizedBy(TypeVariableName.typeVariable("T"))
+                from.swiftFlowClass().internalName.toSwiftPoetName().parameterizedBy(TypeVariableName.typeVariable("T")),
             )
             .returns(to.kotlinFlowModel.kotlinSirClass.fqName.toSwiftPoetName().parameterizedBy(flowTypeParameter))
             .addStatement("return %T(%L)", to.kotlinFlowModel.kotlinSirClass.fqName.toSwiftPoetName(), "flow.delegate")
-            .build()
+            .build(),
     )
 }
 
@@ -151,7 +151,7 @@ private fun ExtensionSpec.Builder.addSwiftToSwiftConversion(from: SupportedFlow.
             .addModifiers(Modifier.CONVENIENCE)
             .addParameter("_", "flow", from.swiftFlowClass().internalName.toSwiftPoetName().parameterizedBy(typeParameter))
             .addStatement("self.init(internal: %L)", "flow.delegate")
-            .build()
+            .build(),
     )
 }
 
@@ -163,9 +163,9 @@ private fun ExtensionSpec.Builder.addKotlinToSwiftConversion(from: SupportedFlow
             .addParameter(
                 "_",
                 "flow",
-                from.kotlinFlowModel.kotlinSirClass.internalName.toSwiftPoetName().parameterizedBy(flowTypeParameter)
+                from.kotlinFlowModel.kotlinSirClass.internalName.toSwiftPoetName().parameterizedBy(flowTypeParameter),
             )
             .addStatement("self.init(internal: %L)", "flow")
-            .build()
+            .build(),
     )
 }

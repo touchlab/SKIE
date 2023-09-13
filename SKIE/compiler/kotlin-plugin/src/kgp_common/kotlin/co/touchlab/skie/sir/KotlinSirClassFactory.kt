@@ -37,7 +37,7 @@ class KotlinSirClassFactory(
         get() = sirProvider.sirBuiltins
 
     context(SwiftModelScope)
-    internal fun finishInitialization() {
+    fun finishInitialization() {
         superTypesInitializationBlocks.forEach { it(this@SwiftModelScope) }
     }
 

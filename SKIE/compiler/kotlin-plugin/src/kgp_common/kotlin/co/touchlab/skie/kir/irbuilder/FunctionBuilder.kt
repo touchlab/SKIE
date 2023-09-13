@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.KotlinType
 
-internal class FunctionBuilder(val descriptor: SimpleFunctionDescriptor) {
+class FunctionBuilder(val descriptor: SimpleFunctionDescriptor) {
 
     var extensionReceiverParameter: ReceiverParameterDescriptor? = null
 

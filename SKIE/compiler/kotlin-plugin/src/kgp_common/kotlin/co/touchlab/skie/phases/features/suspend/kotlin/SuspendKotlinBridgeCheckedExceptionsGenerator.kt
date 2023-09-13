@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.resolve.constants.KClassValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.KotlinType
 
-internal class SuspendKotlinBridgeCheckedExceptionsGenerator {
+class SuspendKotlinBridgeCheckedExceptionsGenerator {
 
     context(IrPluginContext, DeclarationIrBuilder)
     fun createGetCheckedExceptions(

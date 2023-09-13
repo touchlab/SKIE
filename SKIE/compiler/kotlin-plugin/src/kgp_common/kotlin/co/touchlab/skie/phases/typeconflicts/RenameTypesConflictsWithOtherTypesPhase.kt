@@ -1,26 +1,22 @@
 package co.touchlab.skie.phases.typeconflicts
 
-import co.touchlab.skie.phases.SkieLinkingPhase
+import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirTypeDeclaration
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
-import co.touchlab.skie.phases.SkieModule
-import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirTypeDeclaration
-import co.touchlab.skie.sir.element.SirVisibility
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
-class RenameTypesConflictsWithOtherTypesPhase(
-    private val skieModule: SkieModule,
-) : SkieLinkingPhase {
+object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 
+    context(SirPhase.Context)
     override fun execute() {
-        skieModule.configure(SkieModule.Ordering.First) {
-            val sortedTypeDeclarations = sirProvider.allLocalTypes.sortedByCollisionResolutionPriority()
+        val sortedTypeDeclarations = sirProvider.allLocalTypes.sortedByCollisionResolutionPriority()
 
-            buildUniqueSignatureSet(sortedTypeDeclarations)
-        }
+        buildUniqueSignatureSet(sortedTypeDeclarations)
     }
 
     context(SwiftModelScope)

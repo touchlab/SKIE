@@ -5,10 +5,10 @@ package co.touchlab.skie.phases.analytics.modules
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.util.hash.hashed
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
 import kotlinx.serialization.Serializable
-import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.backend.js.moduleName
@@ -104,10 +104,10 @@ object ModulesAnalytics {
     }
 
     class Producer(
-        private val config: KonanConfig,
-        private val modules: Map<String, IrModuleFragment>,
-        private val descriptorProvider: DescriptorProvider,
+        private val context: KotlinIrPhase.Context,
     ) : AnalyticsProducer {
+
+        private val descriptorProvider = context.descriptorProvider
 
         override val name: String = "modules"
 
@@ -148,7 +148,7 @@ object ModulesAnalytics {
                 }
 
         private fun findModuleForKlib(klib: String): IrModuleFragment? =
-            modules[klib.removeSuffix(".klib")]
+            context.allModules[klib.removeSuffix(".klib")]
 
         private fun TypedModule.toModuleWithStatistics(): Module {
             val hasUnknownModule = this.irModuleFragments.any { it == null }

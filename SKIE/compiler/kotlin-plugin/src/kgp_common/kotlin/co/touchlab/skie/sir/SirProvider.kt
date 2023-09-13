@@ -95,7 +95,7 @@ class SirProvider(
             .getChildDeclarationsRecursively().filterIsInstance<SirTypeDeclaration>()
 
     context(SwiftModelScope)
-    internal fun finishInitialization() {
+    fun finishInitialization() {
         kotlinSirClassFactory.finishInitialization()
     }
 

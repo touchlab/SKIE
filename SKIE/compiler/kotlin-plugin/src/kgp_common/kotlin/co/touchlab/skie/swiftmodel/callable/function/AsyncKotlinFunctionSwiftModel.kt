@@ -12,7 +12,7 @@ import co.touchlab.skie.swiftmodel.callable.swiftGenericExportScope
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.sir.type.SirType
 
-internal class AsyncKotlinFunctionSwiftModel(
+class AsyncKotlinFunctionSwiftModel(
     private val delegate: KotlinFunctionSwiftModelWithCore,
     override val allBoundedSwiftModels: List<MutableKotlinFunctionSwiftModel>,
     private val swiftModelScope: MutableSwiftModelScope,

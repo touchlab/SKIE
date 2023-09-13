@@ -1,7 +1,13 @@
 package co.touchlab.skie.phases.features.enums
 
+import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.EnumInterop
-import co.touchlab.skie.phases.SkieContext
+import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirEnumCase
+import co.touchlab.skie.sir.element.SirExtension
+import co.touchlab.skie.sir.element.SirTypeAlias
+import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
@@ -11,12 +17,6 @@ import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularProper
 import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirEnumCase
-import co.touchlab.skie.sir.element.SirExtension
-import co.touchlab.skie.sir.element.SirTypeAlias
-import co.touchlab.skie.sir.type.DeclaredSirType
-import co.touchlab.skie.phases.BaseGenerator
 import co.touchlab.skie.util.swift.addFunctionBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -30,20 +30,17 @@ import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isEnumClass
 
-internal class ExhaustiveEnumsGenerator(
-    skieContext: SkieContext,
-) : BaseGenerator(skieContext) {
+class ExhaustiveEnumsGenerator(
+    override val context: SirPhase.Context,
+) : SirPhase, ConfigurationContainer {
 
-    override val isActive: Boolean = true
-
-    override fun runObjcPhase() {
-        module.configure {
-            exposedClasses
-                .filter { it.isSupported }
-                .forEach {
-                    generate(it)
-                }
-        }
+    context(SirPhase.Context)
+    override fun execute() {
+        exposedClasses
+            .filter { it.isSupported }
+            .forEach {
+                generate(it)
+            }
     }
 
     private val KotlinClassSwiftModel.isSupported: Boolean

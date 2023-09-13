@@ -1,11 +1,7 @@
 package co.touchlab.skie.phases.debug
 
-import co.touchlab.skie.phases.SkieLinkingPhase
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.SkieContext
-import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.phases.skieBuildDirectory
-import co.touchlab.skie.util.FrameworkLayout
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.util.Command
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
@@ -13,36 +9,28 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-sealed class DumpSwiftApiPhase(
-    private val skieContext: SkieContext,
-    private val framework: FrameworkLayout,
-) : SkieLinkingPhase {
+sealed class DumpSwiftApiPhase : SirPhase {
 
-    class BeforeApiNotes(
-        skieConfiguration: SkieConfiguration,
-        skieContext: SkieContext,
-        framework: FrameworkLayout,
-    ) : DumpSwiftApiPhase(skieContext, framework) {
+    object BeforeApiNotes: DumpSwiftApiPhase() {
 
-        override val isActive: Boolean =
+        context(SirPhase.Context)
+        override fun isActive(): Boolean =
             SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledConfigurationFlags
     }
 
-    class AfterApiNotes(
-        skieConfiguration: SkieConfiguration,
-        skieContext: SkieContext,
-        framework: FrameworkLayout,
-    ) : DumpSwiftApiPhase(skieContext, framework) {
+    object AfterApiNotes : DumpSwiftApiPhase() {
 
-        override val isActive: Boolean =
+        context(SirPhase.Context)
+        override fun isActive(): Boolean =
             SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes in skieConfiguration.enabledConfigurationFlags
     }
 
+    context(SirPhase.Context)
     override fun execute() {
         val moduleName = framework.moduleName
         val apiFileBaseName = "${moduleName}_${this::class.simpleName}"
-        val apiFile = skieContext.skieBuildDirectory.debug.dumps.apiFile(apiFileBaseName)
-        val logFile = skieContext.skieBuildDirectory.debug.logs.apiFile(apiFileBaseName)
+        val apiFile = skieBuildDirectory.debug.dumps.apiFile(apiFileBaseName)
+        val logFile = skieBuildDirectory.debug.logs.apiFile(apiFileBaseName)
 
         val command = Command(
             "zsh",

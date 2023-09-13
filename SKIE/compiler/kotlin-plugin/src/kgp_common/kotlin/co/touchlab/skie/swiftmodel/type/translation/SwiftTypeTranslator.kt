@@ -63,14 +63,14 @@ class SwiftTypeTranslator(
     private val customTypeMappers = CustomTypeMappers(sirBuiltins)
 
     context(SwiftModelScope)
-    internal fun mapFileType(sourceFile: SourceFile): SirType {
+    fun mapFileType(sourceFile: SourceFile): SirType {
         val fileModel = sourceFile.swiftModel
 
         return DeclaredSirType(fileModel.primarySirClass)
     }
 
     context(SwiftModelScope)
-    internal fun mapReturnType(
+    fun mapReturnType(
         returnBridge: MethodBridge.ReturnValue,
         method: FunctionDescriptor,
         swiftExportScope: SwiftExportScope,
@@ -108,7 +108,7 @@ class SwiftTypeTranslator(
     }
 
     context(SwiftModelScope)
-    internal fun mapReferenceType(
+    fun mapReferenceType(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         flowMappingStrategy: FlowMappingStrategy,
@@ -116,7 +116,7 @@ class SwiftTypeTranslator(
         mapReferenceTypeIgnoringNullability(kotlinType, swiftExportScope, flowMappingStrategy).withNullabilityOf(kotlinType)
 
     context(SwiftModelScope)
-    internal fun mapReferenceTypeIgnoringNullability(
+    fun mapReferenceTypeIgnoringNullability(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         flowMappingStrategy: FlowMappingStrategy,
@@ -163,7 +163,7 @@ class SwiftTypeTranslator(
     }
 
     context(SwiftModelScope)
-    internal fun mapReferenceTypeIgnoringNullabilitySkippingPredefined(
+    fun mapReferenceTypeIgnoringNullabilitySkippingPredefined(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         flowMappingStrategy: FlowMappingStrategy,
@@ -345,7 +345,7 @@ class SwiftTypeTranslator(
     }
 
     context(SwiftModelScope)
-    internal fun mapType(
+    fun mapType(
         kotlinType: KotlinType,
         swiftExportScope: SwiftExportScope,
         typeBridge: NativeTypeBridge,
@@ -415,5 +415,5 @@ fun SirType.makeNullableIfNotPrimitive(): SirType =
 fun NonNullSirType.withNullabilityOf(kotlinType: KotlinType): SirType =
     if (kotlinType.binaryRepresentationIsNullable()) NullableSirType(this) else this
 
-internal tailrec fun KotlinType.getErasedTypeClass(): Pair<KotlinType, ClassDescriptor> =
+private tailrec fun KotlinType.getErasedTypeClass(): Pair<KotlinType, ClassDescriptor> =
     TypeUtils.getClassDescriptor(this)?.let { this to it } ?: this.constructor.supertypes.first().getErasedTypeClass()

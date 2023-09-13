@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 
-internal class ActualKotlinFunctionSwiftModel(
+class ActualKotlinFunctionSwiftModel(
     override val descriptor: FunctionDescriptor,
     override val allBoundedSwiftModels: List<KotlinFunctionSwiftModelWithCore>,
     override val core: KotlinFunctionSwiftModelCore,

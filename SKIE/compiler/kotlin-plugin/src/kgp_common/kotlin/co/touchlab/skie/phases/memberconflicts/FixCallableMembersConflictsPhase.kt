@@ -1,13 +1,10 @@
 package co.touchlab.skie.phases.memberconflicts
 
-import co.touchlab.skie.phases.SkieLinkingPhase
-import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.kir.allExposedMembers
-import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.KotlinPropertySwiftModel
-import co.touchlab.skie.phases.SkieModule
 import org.jetbrains.kotlin.backend.common.descriptors.allParameters
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -16,22 +13,18 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.overriddenTreeAsSequence
 import org.jetbrains.kotlin.resolve.substitutedUnderlyingTypes
 
-class FixCallableMembersConflictsPhase(
-    private val skieModule: SkieModule,
-    private val descriptorProvider: DescriptorProvider,
-) : SkieLinkingPhase {
+object FixCallableMembersConflictsPhase : SirPhase {
 
+    context(SirPhase.Context)
     override fun execute() {
-        skieModule.configure(SkieModule.Ordering.Last) {
-            val allMembers = descriptorProvider.allExposedMembers.map { it.swiftModel }
+        val allMembers = descriptorProvider.allExposedMembers.map { it.swiftModel }
 
-            val sortedMembers = allMembers.sortedByCollisionResolutionPriority()
+        val sortedMembers = allMembers.sortedByCollisionResolutionPriority()
 
-            buildUniqueSignatureSet(sortedMembers)
-        }
+        buildUniqueSignatureSet(sortedMembers)
     }
 
-    context(SwiftModelScope)
+    context(SirPhase.Context)
     private fun List<MutableKotlinCallableMemberSwiftModel>.sortedByCollisionResolutionPriority(): List<MutableKotlinCallableMemberSwiftModel> =
         this.sortedByDescending { it.collisionResolutionPriority }
 
@@ -48,6 +41,7 @@ class FixCallableMembersConflictsPhase(
      * length of fqname (lower is better)
      * hash of toString
      */
+    context(SirPhase.Context)
     private val KotlinCallableMemberSwiftModel.collisionResolutionPriority: Long
         get() {
             var priority = 0L

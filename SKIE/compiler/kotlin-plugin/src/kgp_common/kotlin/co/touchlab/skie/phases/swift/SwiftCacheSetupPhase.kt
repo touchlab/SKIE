@@ -1,16 +1,12 @@
 package co.touchlab.skie.phases.swift
 
-import co.touchlab.skie.phases.SkieContext
-import co.touchlab.skie.phases.SkieLinkingPhase
-import co.touchlab.skie.phases.skieBuildDirectory
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.cache.copyFileToIfDifferent
 
-class SwiftCacheSetupPhase(
-    private val skieContext: SkieContext,
-    private val framework: FrameworkLayout,
-) : SkieLinkingPhase {
+object SwiftCacheSetupPhase: SirPhase {
 
+    context(SirPhase.Context)
     override fun execute() {
         val wasChanged = synchronizeDummyKotlinFramework()
 
@@ -19,8 +15,9 @@ class SwiftCacheSetupPhase(
         }
     }
 
+    context(SirPhase.Context)
     private fun synchronizeDummyKotlinFramework(): Boolean {
-        val dummyFramework = skieContext.cacheableKotlinFramework
+        val dummyFramework = cacheableKotlinFramework
 
         dummyFramework.headersDir.mkdirs()
         dummyFramework.modulesDir.mkdirs()
@@ -28,15 +25,16 @@ class SwiftCacheSetupPhase(
         // Must use `or` to prevent short circuit optimization.
         return framework.kotlinHeader.copyFileToIfDifferent(dummyFramework.kotlinHeader) or
                 framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
-                skieContext.skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName)
+                skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName)
                     .copyFileToIfDifferent(dummyFramework.apiNotes)
     }
 
     // Solves a bug in Swift compiler.
     // If the module cache is not deleted then all threads rebuild the same cache in series (the caching is done in a synchronized block).
     // This could lead to significant performance degradation if the Obj-C takes a long time to load.
+    context(SirPhase.Context)
     private fun deleteKotlinFrameworkCache() {
-        skieContext.skieBuildDirectory.cache.swiftModules.directory.walkTopDown()
+        skieBuildDirectory.cache.swiftModules.directory.walkTopDown()
             .filter { it.isFile && it.extension == "pcm" && it.name.startsWith(framework.moduleName + "-") }
             .forEach {
                 it.delete()
@@ -44,5 +42,5 @@ class SwiftCacheSetupPhase(
     }
 }
 
-val SkieContext.cacheableKotlinFramework: FrameworkLayout
+val SirPhase.Context.cacheableKotlinFramework: FrameworkLayout
     get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(frameworkLayout.moduleName))

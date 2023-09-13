@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 
-internal fun IrBuilderWithScope.irSimpleFunction(
+fun IrBuilderWithScope.irSimpleFunction(
     name: Name,
     visibility: DescriptorVisibility,
     returnType: IrType,

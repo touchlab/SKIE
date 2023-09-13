@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 
-internal class KotlinParameterSwiftModelCore(
+class KotlinParameterSwiftModelCore(
     var argumentLabel: String,
     val parameterBridge: MethodBridgeParameter.ValueParameter,
     baseParameterDescriptor: ParameterDescriptor?,

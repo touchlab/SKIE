@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name
 
-internal class SecondaryConstructorTemplate(
+class SecondaryConstructorTemplate(
     name: Name,
     namespace: Namespace<ClassDescriptor>,
     annotations: Annotations,

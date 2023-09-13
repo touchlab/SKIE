@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.reflect.jvm.jvmName
 
-internal class SimpleNamedPhaseInterceptorConfigurer<Context, Input, Output>:
+class SimpleNamedPhaseInterceptorConfigurer<Context, Input, Output>:
     PhaseInterceptorConfigurer<SimpleNamedCompilerPhase<Context, Input, Output>, Context, Input, Output>
     where Context: LoggingContext, Context: ConfigChecks
 {

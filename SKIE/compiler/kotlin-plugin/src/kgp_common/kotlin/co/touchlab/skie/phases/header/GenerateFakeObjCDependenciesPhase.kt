@@ -1,20 +1,16 @@
 package co.touchlab.skie.phases.header
 
-import co.touchlab.skie.phases.SkieLinkingPhase
-import co.touchlab.skie.sir.SirProvider
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.util.cache.writeTextIfDifferent
-import co.touchlab.skie.util.directory.SkieBuildDirectory
 
-class GenerateFakeObjCDependenciesPhase(
-    private val sirProvider: SirProvider,
-    private val skieBuildDirectory: SkieBuildDirectory,
-) : SkieLinkingPhase {
+object GenerateFakeObjCDependenciesPhase : SirPhase {
 
+    context(SirPhase.Context)
     override fun execute() {
         sirProvider.allExternalTypesFromNonBuiltinModules
             .groupBy { it.module }
@@ -23,11 +19,13 @@ class GenerateFakeObjCDependenciesPhase(
             }
     }
 
+    context(SirPhase.Context)
     private fun generateFakeFramework(module: SirModule, types: List<SirTypeDeclaration>) {
         generateModuleMap(module)
         generateHeader(module, types)
     }
 
+    context(SirPhase.Context)
     private fun generateModuleMap(module: SirModule) {
         val modulemapContent =
             """
@@ -39,6 +37,7 @@ class GenerateFakeObjCDependenciesPhase(
         skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module.name).writeTextIfDifferent(modulemapContent)
     }
 
+    context(SirPhase.Context)
     private fun generateHeader(module: SirModule, types: List<SirTypeDeclaration>) {
         val foundationImport = "#import <Foundation/NSObject.h>"
         val typeDeclarations = types

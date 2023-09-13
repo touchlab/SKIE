@@ -1,17 +1,12 @@
 package co.touchlab.skie.kir.irbuilder.impl
 
-import co.touchlab.skie.phases.SkieCompilationPhase
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
-internal class GenerateIrPhase(
-    private val declarationBuilder: DeclarationBuilderImpl,
-) : SkieCompilationPhase {
+object GenerateIrPhase : KotlinIrPhase {
 
-    override val isActive: Boolean = true
-
-    override fun runIrPhase(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, allModules: Map<String, IrModuleFragment>) {
+    context(KotlinIrPhase.Context)
+    override fun execute() {
         declarationBuilder.generateIr(moduleFragment, pluginContext, pluginContext.symbolTable as SymbolTable)
     }
 }

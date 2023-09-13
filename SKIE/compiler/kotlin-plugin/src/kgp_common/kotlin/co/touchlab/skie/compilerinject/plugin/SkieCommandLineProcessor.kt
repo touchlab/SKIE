@@ -1,6 +1,5 @@
 package co.touchlab.skie.compilerinject.plugin
 
-import co.touchlab.skie.compilerinject.reflection.ConfigurationKeys
 import co.touchlab.skie.util.plugin.SkiePlugin
 import co.touchlab.skie.util.plugin.SkiePlugin.Options
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
@@ -25,7 +24,7 @@ class SkieCommandLineProcessor : CommandLineProcessor {
 
         when (optionsMap[option.optionName]) {
             Options.skieDirectories -> {
-                configuration.put(ConfigurationKeys.skieDirectories, Options.skieDirectories.deserialize(value))
+                configuration.put(SkieConfigurationKeys.SkieDirectories, Options.skieDirectories.deserialize(value))
             }
         }
     }

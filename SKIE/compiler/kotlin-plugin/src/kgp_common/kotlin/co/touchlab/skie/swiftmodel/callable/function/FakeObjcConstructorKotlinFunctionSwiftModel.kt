@@ -21,7 +21,7 @@ import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNoneExportScope
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
-internal class FakeObjcConstructorKotlinFunctionSwiftModel(
+class FakeObjcConstructorKotlinFunctionSwiftModel(
     private val baseModel: KotlinFunctionSwiftModelWithCore,
     ownerDescriptor: ClassDescriptor,
     private val swiftModelScope: MutableSwiftModelScope,

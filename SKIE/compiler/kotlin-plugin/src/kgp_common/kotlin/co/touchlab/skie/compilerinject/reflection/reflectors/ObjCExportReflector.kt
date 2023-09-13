@@ -15,7 +15,7 @@ class ObjCExportReflector(
     override val instance: Any,
 ) : Reflector(fqName) {
 
-    val exportedInterface by declaredField<Any>()
+    var exportedInterface by declaredField<Any>()
 
     val reflectedExportedInterface: ObjcExportedInterfaceReflector
         get() = exportedInterface.reflectedBy()
@@ -35,7 +35,7 @@ class ObjCExportReflector(
         private fun createSymbolTable(): SymbolTable =
             SymbolTable(DummySignaturer(), IrFactoryImpl)
 
-        internal class DummySignaturer : IdSignatureComposer {
+        class DummySignaturer : IdSignatureComposer {
 
             override fun composeAnonInitSignature(descriptor: ClassDescriptor): IdSignature? = null
 

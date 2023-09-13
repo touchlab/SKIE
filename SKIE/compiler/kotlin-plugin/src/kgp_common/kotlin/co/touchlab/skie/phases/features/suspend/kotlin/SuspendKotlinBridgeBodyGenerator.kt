@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 
-internal class SuspendKotlinBridgeBodyGenerator(
+class SuspendKotlinBridgeBodyGenerator(
     private val suspendHandlerDescriptor: ClassDescriptor,
 ) {
 

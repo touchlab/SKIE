@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.name.SpecialNames
 
-internal class SuspendKotlinBridgeHandlerLambdaGenerator {
+class SuspendKotlinBridgeHandlerLambdaGenerator {
 
     context(IrPluginContext, IrBlockBodyBuilder)
     fun createOriginalFunctionCallLambda(

@@ -16,4 +16,4 @@ object SpecificCompilerConfigurationAnalytics {
     }
 }
 
-internal expect fun KonanConfig.getSpecificCompilerConfigurationAnalytics(): String
+expect fun KonanConfig.getSpecificCompilerConfigurationAnalytics(): String

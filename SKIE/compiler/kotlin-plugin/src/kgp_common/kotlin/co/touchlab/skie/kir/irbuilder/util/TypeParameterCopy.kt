@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
-internal fun TypeParameterDescriptor.copy(
+fun TypeParameterDescriptor.copy(
     newOwner: CallableDescriptor,
     index: Int = this.index,
 ): TypeParameterDescriptor =
@@ -30,7 +30,7 @@ internal fun TypeParameterDescriptor.copy(
         copy.setInitialized()
     }
 
-internal fun List<TypeParameterDescriptor>.copyIndexing(newOwner: CallableDescriptor): List<TypeParameterDescriptor> {
+fun List<TypeParameterDescriptor>.copyIndexing(newOwner: CallableDescriptor): List<TypeParameterDescriptor> {
     val newDescriptors = mapIndexed { index, oldDescriptor ->
         TypeParameterDescriptorImpl.createForFurtherModification(
             newOwner,

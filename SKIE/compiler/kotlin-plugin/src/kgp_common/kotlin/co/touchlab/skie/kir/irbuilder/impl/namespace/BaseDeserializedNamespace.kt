@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 
-internal abstract class BaseDeserializedNamespace<D : DeclarationDescriptor> : BaseNamespace<D>() {
+abstract class BaseDeserializedNamespace<D : DeclarationDescriptor> : BaseNamespace<D>() {
 
     protected fun MemberScope.addFunctionDescriptorToImpl(functionDescriptor: SimpleFunctionDescriptor) {
         val reflectedMemberScope = this.reflectedBy<DeserializedMemberScopeReflector>()

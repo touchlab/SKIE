@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 
-internal class DummyIrConstructor(override val symbol: IrConstructorSymbol) : IrConstructor() {
+class DummyIrConstructor(override val symbol: IrConstructorSymbol) : IrConstructor() {
 
     override var isPrimary: Boolean by unsupported()
     override val startOffset: Int by unsupported()

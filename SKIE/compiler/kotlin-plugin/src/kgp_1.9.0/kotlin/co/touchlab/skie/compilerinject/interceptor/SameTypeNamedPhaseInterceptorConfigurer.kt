@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.reflect.jvm.jvmName
 
-internal class SameTypeNamedPhaseInterceptorConfigurer<Context, Data>:
+class SameTypeNamedPhaseInterceptorConfigurer<Context, Data>:
     SameTypePhaseInterceptorConfigurer<SameTypeNamedCompilerPhase<Context, Data>, Context, Data> where Context: LoggingContext, Context: ConfigChecks {
     override fun canConfigurePhase(phase: Any): Boolean = phase is SameTypeNamedCompilerPhase<*, *>
 

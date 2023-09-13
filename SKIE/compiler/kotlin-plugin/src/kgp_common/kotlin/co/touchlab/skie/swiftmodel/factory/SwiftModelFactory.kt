@@ -68,7 +68,7 @@ class SwiftModelFactory(
             )
         }
 
-    internal fun createAsyncFunctions(
+    fun createAsyncFunctions(
         models: Collection<KotlinFunctionSwiftModelWithCore>,
     ): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> =
         models.filter { it.descriptor.isSuspend }

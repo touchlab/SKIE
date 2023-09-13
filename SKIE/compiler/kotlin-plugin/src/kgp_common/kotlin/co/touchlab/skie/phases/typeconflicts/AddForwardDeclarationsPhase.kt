@@ -1,13 +1,11 @@
 package co.touchlab.skie.phases.typeconflicts
 
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.util.header.BaseHeaderInsertionPhase
-import co.touchlab.skie.swiftmodel.ObjCTypeRenderer
-import java.io.File
 
 class AddForwardDeclarationsPhase(
-    headerFile: File,
-    private val objCTypeRenderer: ObjCTypeRenderer,
-) : BaseHeaderInsertionPhase(headerFile) {
+    private val context: SirPhase.Context,
+) : BaseHeaderInsertionPhase() {
 
     private val classRegex = "^@interface ([^ <,;]+(<[^>]*>)?).*".toRegex()
     private val protocolRegex = "^@protocol ([^ ,;]+).*".toRegex()
@@ -28,8 +26,8 @@ class AddForwardDeclarationsPhase(
         val classesFromHeader = classRegex.parseDeclarations(content)
         val protocolsFromHeader = protocolRegex.parseDeclarations(content)
 
-        classes = (classesFromHeader + objCTypeRenderer.mappedClasses.filterExistingClasses(classesFromHeader)).toSet()
-        protocols = (protocolsFromHeader + objCTypeRenderer.mappedProtocols).toSet()
+        classes = (classesFromHeader + context.objCTypeRenderer.mappedClasses.filterExistingClasses(classesFromHeader)).toSet()
+        protocols = (protocolsFromHeader + context.objCTypeRenderer.mappedProtocols).toSet()
 
         return super.modifyHeaderContent(content)
     }

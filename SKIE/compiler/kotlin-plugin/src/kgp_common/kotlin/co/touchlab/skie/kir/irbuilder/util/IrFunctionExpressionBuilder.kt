@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.types.IrType
 
-internal fun IrBuilderWithScope.irFunctionExpression(
+fun IrBuilderWithScope.irFunctionExpression(
     type: IrType,
     origin: IrStatementOrigin,
     function: IrSimpleFunction,

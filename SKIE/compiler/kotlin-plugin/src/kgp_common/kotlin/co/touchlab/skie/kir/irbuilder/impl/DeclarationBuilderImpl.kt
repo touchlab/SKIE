@@ -42,7 +42,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
-internal class DeclarationBuilderImpl(
+class DeclarationBuilderImpl(
     moduleDescriptor: ModuleDescriptor,
     private val mutableDescriptorProvider: MutableDescriptorProvider,
 ) : DeclarationBuilder {

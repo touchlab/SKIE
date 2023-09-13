@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 
-internal class DeserializedPackageNamespace(
+class DeserializedPackageNamespace(
     private val existingMember: FunctionDescriptor,
 ) : BaseDeserializedNamespace<PackageFragmentDescriptor>() {
 

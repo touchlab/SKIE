@@ -1,21 +1,19 @@
 package co.touchlab.skie.phases.runtime
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.SkieContext
-import co.touchlab.skie.phases.SkieCompilationPhase
+import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirFile
 
-internal class SwiftRuntimeGenerator(
-    private val skieContext: SkieContext,
-) : SkieCompilationPhase {
+object SwiftRuntimeGenerator : SirPhase {
 
-    override val isActive: Boolean =
-        SkieConfigurationFlag.Feature_CoroutinesInterop in skieContext.skieConfiguration.enabledConfigurationFlags
+    context(SirPhase.Context)
+    override fun isActive(): Boolean =
+        SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
-    override fun runObjcPhase() {
+    context(SirPhase.Context)
+    override fun execute() {
         getSwiftRuntimeFiles().forEach {
-            skieContext.module.staticFile(it.swiftFileName) {
-                it.readText()
-            }
+            sirProvider.getFile(SirFile.skieNamespace, it.swiftFileName).content = it.readText()
         }
     }
 

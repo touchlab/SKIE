@@ -10,7 +10,7 @@ import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
-internal class HiddenOverrideKotlinFunctionSwiftModel(
+class HiddenOverrideKotlinFunctionSwiftModel(
     private val baseModel: KotlinFunctionSwiftModelWithCore,
     ownerDescriptor: ClassDescriptor,
     private val swiftModelScope: MutableSwiftModelScope,

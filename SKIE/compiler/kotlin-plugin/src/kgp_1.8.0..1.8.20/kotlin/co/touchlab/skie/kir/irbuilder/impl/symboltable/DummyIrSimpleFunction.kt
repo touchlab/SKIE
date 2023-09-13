@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 
-internal actual class DummyIrSimpleFunction actual constructor(
+actual class DummyIrSimpleFunction actual constructor(
     override val symbol: IrSimpleFunctionSymbol,
 ) : IrSimpleFunction() {
 

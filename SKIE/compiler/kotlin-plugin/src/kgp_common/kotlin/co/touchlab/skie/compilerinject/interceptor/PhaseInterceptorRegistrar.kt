@@ -16,7 +16,7 @@ interface PhaseInterceptorConfigurer<Phase, Context, Input, Output> {
 
 interface SameTypePhaseInterceptorConfigurer<Phase, Context, Data> : PhaseInterceptorConfigurer<Phase, Context, Data, Data>
 
-internal expect fun phaseInterceptorConfigurers(configuration: CompilerConfiguration): List<ErasedPhaseInterceptorConfigurer>
+expect fun phaseInterceptorConfigurers(configuration: CompilerConfiguration): List<ErasedPhaseInterceptorConfigurer>
 
 interface PhaseInterceptor<Context, Input, Output> {
 

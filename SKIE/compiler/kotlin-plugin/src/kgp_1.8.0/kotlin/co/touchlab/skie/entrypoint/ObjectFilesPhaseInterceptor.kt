@@ -26,8 +26,6 @@ internal class ObjectFilesPhaseInterceptor: SameTypePhaseInterceptor<KonanContex
         val swiftObjectFiles = runSwiftLinkCompilePhase(config, context, namer)
 
         context.compilerOutput += swiftObjectFiles
-
-        logSkiePerformance(context.skieContext)
     }
 
     private fun runSwiftLinkCompilePhase(
@@ -47,9 +45,7 @@ internal class ObjectFilesPhaseInterceptor: SameTypePhaseInterceptor<KonanContex
             configurables,
             config.outputFile,
         )
-    }
 
-    private fun logSkiePerformance(context: SkieContext) {
-        context.analyticsCollector.collectAsync(context.skiePerformanceAnalyticsProducer)
+        return skieContext.skieBuildDirectory.swiftCompiler.objectFiles.all.map { it.absolutePath }
     }
 }

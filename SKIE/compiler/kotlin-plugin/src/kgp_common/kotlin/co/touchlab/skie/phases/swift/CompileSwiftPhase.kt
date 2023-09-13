@@ -1,32 +1,29 @@
 package co.touchlab.skie.phases.swift
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.SkieContext
-import co.touchlab.skie.phases.SkieLinkingPhase
-import co.touchlab.skie.phases.skieBuildDirectory
-import co.touchlab.skie.util.FrameworkLayout
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.util.Command
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
-import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
-import org.jetbrains.kotlin.konan.target.AppleConfigurables
 import org.jetbrains.kotlin.konan.target.platformName
 import org.jetbrains.kotlin.konan.target.withOSVersion
 import java.io.File
 
 class CompileSwiftPhase(
-    private val skieContext: SkieContext,
-    private val framework: FrameworkLayout,
-    private val configurables: AppleConfigurables,
-    private val config: KonanConfig,
-) : SkieLinkingPhase {
+    context: SirPhase.Context,
+) : SirPhase {
 
-    private val compilerConfiguration = skieContext.swiftCompilerConfiguration
-    private val skieBuildDirectory = skieContext.skieBuildDirectory
-    private val swiftFrameworkHeader = skieBuildDirectory.swiftCompiler.moduleHeader(framework.moduleName)
+    private val framework = context.framework
+    private val cacheableKotlinFramework = context.cacheableKotlinFramework
+    private val konanConfig = context.konanConfig
+    private val swiftCompilerConfiguration = context.swiftCompilerConfiguration
+    private val skieConfiguration = context.skieConfiguration
+    private val configurables = context.configurables
+    private val skieBuildDirectory = context.skieBuildDirectory
+    private val targetTriple = context.configurables.targetTriple
+    private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.moduleName)
 
-    private val targetTriple = configurables.targetTriple
-
+    context(SirPhase.Context)
     override fun execute() {
         val sourceFiles = skieBuildDirectory.swift.allSwiftFiles
         if (sourceFiles.isEmpty()) {
@@ -49,7 +46,7 @@ class CompileSwiftPhase(
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
             +"-F"
-            +skieContext.cacheableKotlinFramework.parentDir.absolutePath
+            +cacheableKotlinFramework.parentDir.absolutePath
             +"-F"
             +skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.directory.absolutePath
             +"-emit-module"
@@ -70,12 +67,12 @@ class CompileSwiftPhase(
             +"-module-cache-path"
             +skieBuildDirectory.cache.swiftModules.directory.absolutePath
             +"-swift-version"
-            +compilerConfiguration.swiftVersion
+            +swiftCompilerConfiguration.swiftVersion
             +parallelizationArgument
             +"-sdk"
             +configurables.absoluteTargetSysRoot
             +"-target"
-            +targetTriple.withOSVersion(configurables.osVersionMin).toString()
+            +configurables.targetTriple.withOSVersion(configurables.osVersionMin).toString()
             +sourceFiles.map { it.absolutePath }
 
             workingDirectory = skieBuildDirectory.swiftCompiler.objectFiles.directory
@@ -85,7 +82,7 @@ class CompileSwiftPhase(
     }
 
     private fun deleteOldObjectFiles(sourceFiles: List<File>) {
-        if (config.debug) {
+        if (konanConfig.debug) {
             val sourceFilesNames = sourceFiles.map { it.nameWithoutExtension }.toSet()
 
             skieBuildDirectory.swiftCompiler.objectFiles.all
@@ -102,17 +99,19 @@ class CompileSwiftPhase(
         }
     }
 
-    private fun getSwiftcBitcodeArg() = when (config.configuration.get(KonanConfigKeys.BITCODE_EMBEDDING_MODE)) {
-        BitcodeEmbedding.Mode.NONE, null -> null
-        BitcodeEmbedding.Mode.FULL -> "-embed-bitcode"
-        BitcodeEmbedding.Mode.MARKER -> "-embed-bitcode-marker"
-    }
+    private fun getSwiftcBitcodeArg() =
+        when (konanConfig.configuration.get(KonanConfigKeys.BITCODE_EMBEDDING_MODE)) {
+            BitcodeEmbedding.Mode.NONE, null -> null
+            BitcodeEmbedding.Mode.FULL -> "-embed-bitcode"
+            BitcodeEmbedding.Mode.MARKER -> "-embed-bitcode-marker"
+        }
 
-    private fun getSwiftcBuildTypeArgs() = if (config.debug) {
-        emptyList()
-    } else {
-        listOf("-O", "-whole-module-optimization")
-    }
+    private fun getSwiftcBuildTypeArgs() =
+        if (konanConfig.debug) {
+            emptyList()
+        } else {
+            listOf("-O", "-whole-module-optimization")
+        }
 
     private fun copySwiftModuleFiles() {
         val copyFiles = mapOf(
@@ -153,12 +152,12 @@ class CompileSwiftPhase(
             "-rpath", "/usr/lib/swift", "-dead_strip",
         )
 
-        config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
-        config.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
+        konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
+        konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
     }
 
     private val parallelizationArgument: String
-        get() = if (SkieConfigurationFlag.Build_ParallelSwiftCompilation in skieContext.skieConfiguration.enabledConfigurationFlags) {
+        get() = if (SkieConfigurationFlag.Build_ParallelSwiftCompilation in skieConfiguration.enabledConfigurationFlags) {
             "-j${Runtime.getRuntime().availableProcessors()}"
         } else {
             "-j1"

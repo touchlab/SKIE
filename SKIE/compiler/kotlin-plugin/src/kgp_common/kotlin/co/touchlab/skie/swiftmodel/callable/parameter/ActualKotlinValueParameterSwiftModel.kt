@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 
-internal class ActualKotlinValueParameterSwiftModel(
+class ActualKotlinValueParameterSwiftModel(
     private val core: KotlinParameterSwiftModelCore,
     private val functionDescriptor: FunctionDescriptor,
     private val parameterDescriptor: ParameterDescriptor?,

@@ -2,14 +2,15 @@
 
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
-import co.touchlab.skie.phases.SkieContext
 import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
-import co.touchlab.skie.util.SharedCounter
-import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
-import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 import co.touchlab.skie.kir.irbuilder.createSecondaryConstructor
 import co.touchlab.skie.kir.irbuilder.getNamespace
+import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
+import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
+import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
+import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -29,12 +30,10 @@ import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 
-internal class ConstructorsDefaultArgumentGeneratorDelegate(
-    skieContext: SkieContext,
-    descriptorProvider: DescriptorProvider,
-    declarationBuilder: DeclarationBuilder,
+class ConstructorsDefaultArgumentGeneratorDelegate(
+    context: DescriptorModificationPhase.Context,
     private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(skieContext, descriptorProvider, declarationBuilder) {
+) : BaseDefaultArgumentGeneratorDelegate(context) {
 
     override fun generate() {
         descriptorProvider.allSupportedClasses.forEach { classDescriptor ->
@@ -139,15 +138,15 @@ internal class ConstructorsDefaultArgumentGeneratorDelegate(
     }
 
     private fun fixOverloadLastParameterName(overloadDescriptor: FunctionDescriptor) {
-        skieContext.module.configure {
-            val lastParameter = overloadDescriptor.swiftModel.valueParameters.lastOrNull() ?: return@configure
+        context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
+            val lastParameter = overloadDescriptor.swiftModel.valueParameters.lastOrNull() ?: return@doInPhase
 
             lastParameter.argumentLabel = lastParameter.argumentLabel.dropUniqueParameterMangling()
         }
     }
 
     private fun removeConflictingOverloads(overloadDescriptor: FunctionDescriptor, constructor: ClassConstructorDescriptor) {
-        skieContext.module.configure {
+        context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
             val numberOfDefaultArguments = constructor.valueParameters.size - overloadDescriptor.valueParameters.size
 
             overloadDescriptor.swiftModel.collisionResolutionStrategy = CollisionResolutionStrategy.Remove(numberOfDefaultArguments)

@@ -14,7 +14,7 @@ class SirFile(
     val relativePath: Path
         get() = relativePath(namespace, name)
 
-    var sourceCode: String = ""
+    var content: String = ""
 
     override val parent: SirModule
         get() = module

@@ -1,22 +1,11 @@
 package co.touchlab.skie.phases.typeconflicts
 
-import co.touchlab.skie.phases.SkieLinkingPhase
-import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
-import co.touchlab.skie.phases.SkieModule
-import co.touchlab.skie.util.Reporter
+import co.touchlab.skie.phases.SirPhase
 
-class RenameTypesConflictingWithKotlinModulePhase(
-    private val skieModule: SkieModule,
-    private val reporter: Reporter,
-) : SkieLinkingPhase {
+object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
 
+    context(SirPhase.Context)
     override fun execute() {
-        skieModule.configure(SkieModule.Ordering.First) {
-            fixTypeNameCollisions()
-        }
-    }
-
-    private fun MutableSwiftModelScope.fixTypeNameCollisions() {
         val moduleName = sirBuiltins.Kotlin.module.name
 
         var collisionExists = false
@@ -33,6 +22,7 @@ class RenameTypesConflictingWithKotlinModulePhase(
         }
     }
 
+    context(SirPhase.Context)
     private fun logModuleNameCollisionWarning(moduleName: String) {
         reporter.warning(
             "Type '$moduleName' was renamed to '${moduleName}_' " +

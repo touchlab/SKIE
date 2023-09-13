@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 
-internal class KotlinFunctionSwiftModelCore(
+class KotlinFunctionSwiftModelCore(
     val descriptor: FunctionDescriptor,
     private val namer: ObjCExportNamer,
     private val bridgeProvider: DescriptorBridgeProvider,

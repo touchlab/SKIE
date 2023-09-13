@@ -5,7 +5,6 @@ import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
 import co.touchlab.skie.kir.irbuilder.Namespace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
@@ -13,7 +12,7 @@ import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-internal abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
+abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
 
     private val templates = mutableListOf<DeclarationTemplate<*>>()
 
@@ -41,7 +40,6 @@ internal abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> 
         registerExposedDescriptor(declarationDescriptor)
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable) {
         val generatorContext = GeneratorContext(
             Psi2IrConfiguration(),

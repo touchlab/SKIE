@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name
 
-internal class FunctionTemplate(
+class FunctionTemplate(
     name: Name,
     namespace: Namespace<*>,
     annotations: Annotations,

@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
-internal class DeserializedClassNamespace(
+class DeserializedClassNamespace(
     override val descriptor: DeserializedClassDescriptor,
 ) : BaseDeserializedNamespace<ClassDescriptor>() {
 

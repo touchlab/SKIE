@@ -14,8 +14,7 @@ data class SirFqName(
     fun nested(name: String): SirFqName =
         SirFqName(module, name, this)
 
-    // WIP Should be used only from DeclaredSirType
-    // WIP Then remove DeclaredSirType.toInternalSwiftPoetName
+    // WIP Should be used only from DeclaredSirType and current usages should use .defaultType to get the needed DeclaredSirType
     fun toSwiftPoetName(): DeclaredTypeName =
         parent?.toSwiftPoetName()?.nestedType(simpleName)
             ?: if (module is SirModule.External) {

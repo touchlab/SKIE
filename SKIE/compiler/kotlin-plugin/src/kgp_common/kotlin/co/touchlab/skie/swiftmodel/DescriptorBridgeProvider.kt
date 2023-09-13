@@ -25,7 +25,7 @@ class DescriptorBridgeProvider internal constructor(
 
     constructor(namer: ObjCExportNamer) : this(namer.mapper)
 
-    internal fun bridgeMethod(descriptor: FunctionDescriptor): MethodBridge {
+    fun bridgeMethod(descriptor: FunctionDescriptor): MethodBridge {
         return mapper.bridgeMethod(descriptor).toMethodBridge()
     }
 

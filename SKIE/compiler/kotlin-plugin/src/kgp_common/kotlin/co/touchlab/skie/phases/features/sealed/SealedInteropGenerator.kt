@@ -1,28 +1,24 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
-import co.touchlab.skie.phases.SkieContext
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
-import co.touchlab.skie.phases.BaseGenerator
 
-internal class SealedInteropGenerator(
-    skieContext: SkieContext,
-) : BaseGenerator(skieContext), SealedGeneratorExtensionContainer {
+class SealedInteropGenerator(
+    override val context: SirPhase.Context,
+) : SirPhase, SealedGeneratorExtensionContainer {
 
-    override val isActive: Boolean = true
+    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(context)
+    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(context)
 
-    private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(skieContext)
-    private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(skieContext)
-
-    override fun runObjcPhase() {
-        module.configure {
-            exposedClasses
-                .filter { it.isSupported }
-                .forEach {
-                    generate(it)
-                }
-        }
+    context(SirPhase.Context)
+    override fun execute() {
+        exposedClasses
+            .filter { it.isSupported }
+            .forEach {
+                generate(it)
+            }
     }
 
     private val KotlinClassSwiftModel.isSupported: Boolean

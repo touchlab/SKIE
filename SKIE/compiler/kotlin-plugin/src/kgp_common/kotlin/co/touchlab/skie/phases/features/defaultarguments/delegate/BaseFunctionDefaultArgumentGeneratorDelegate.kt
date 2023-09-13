@@ -1,16 +1,15 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
-import co.touchlab.skie.phases.SkieContext
 import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
-import co.touchlab.skie.util.SharedCounter
-import co.touchlab.skie.kir.irbuilder.util.copyIndexing
-import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
-import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.getNamespace
+import co.touchlab.skie.kir.irbuilder.util.copyIndexing
+import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
+import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
+import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
+import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -30,12 +29,10 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
-internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
-    skieContext: SkieContext,
-    descriptorProvider: DescriptorProvider,
-    declarationBuilder: DeclarationBuilder,
+abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
+    context: DescriptorModificationPhase.Context,
     private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(skieContext, descriptorProvider, declarationBuilder) {
+) : BaseDefaultArgumentGeneratorDelegate(context) {
 
     override fun generate() {
         descriptorProvider.allSupportedFunctions()
@@ -78,8 +75,8 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
                 TypeConstructorSubstitution.createByParametersMap(
                     typeParameterMappingPairs.associate { (from, into) ->
                         from to TypeProjectionImpl(into.defaultType)
-                    }
-                )
+                    },
+                ),
             )
 
             dispatchReceiverParameter = function.dispatchReceiverParameter
@@ -91,7 +88,7 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
                 parameter.copyWithoutDefaultValue(
                     newOwner = descriptor,
                     newIndex = index,
-                    newType = typeParameterSubstitutor.safeSubstitute(parameter.type, Variance.INVARIANT)
+                    newType = typeParameterSubstitutor.safeSubstitute(parameter.type, Variance.INVARIANT),
                 )
             }
             returnType = function.returnTypeOrNothing
@@ -116,13 +113,13 @@ internal abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
                     dispatchReceiver = overloadIr.dispatchReceiverParameter?.let { irGet(it) }
                     extensionReceiver = overloadIr.extensionReceiverParameter?.let { irGet(it) }
                     passArgumentsWithMatchingNames(overloadIr)
-                }
+                },
             )
         }
     }
 
     private fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
-        skieContext.module.configure {
+        context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
             overloadDescriptor.swiftModel.identifier = function.swiftModel.identifier
 
             val numberOfDefaultArguments = function.valueParameters.size - overloadDescriptor.valueParameters.size

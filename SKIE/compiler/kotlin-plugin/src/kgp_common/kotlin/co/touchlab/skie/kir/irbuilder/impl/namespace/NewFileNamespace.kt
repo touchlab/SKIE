@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.source.PsiSourceFile
 
-internal class NewFileNamespace private constructor(
+class NewFileNamespace private constructor(
     private val sourceFile: SourceFile,
     private val context: Context,
 ) : BaseNamespace<PackageFragmentDescriptor>() {

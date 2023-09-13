@@ -30,12 +30,12 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
-internal fun interface ExposedModulesProvider {
+fun interface ExposedModulesProvider {
 
     fun exposedModules(): Set<ModuleDescriptor>
 }
 
-internal class NativeDescriptorProvider(
+class NativeDescriptorProvider(
     private val exposedModulesProvider: ExposedModulesProvider,
     private val konanConfig: KonanConfig,
     private val exportedInterface: ObjcExportedInterfaceReflector,
@@ -130,7 +130,7 @@ internal class NativeDescriptorProvider(
                 this in exposedCategoryMembers ||
                 (this.containingDeclaration in exposedClasses && this.isExposable)
 
-    internal fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
+    fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
         when (descriptor) {
             is ClassDescriptor -> registerDescriptor(descriptor)
             is CallableMemberDescriptor -> registerDescriptor(descriptor)

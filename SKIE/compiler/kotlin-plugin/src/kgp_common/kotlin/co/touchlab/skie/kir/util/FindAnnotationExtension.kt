@@ -12,19 +12,19 @@ import org.jetbrains.kotlin.resolve.constants.KClassValue
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 
-internal inline fun <reified T : Annotation> Annotated.hasAnnotation(): Boolean =
+inline fun <reified T : Annotation> Annotated.hasAnnotation(): Boolean =
     hasAnnotation(T::class)
 
-internal fun <T : Annotation> Annotated.hasAnnotation(annotation: KClass<T>): Boolean {
+fun <T : Annotation> Annotated.hasAnnotation(annotation: KClass<T>): Boolean {
     val annotationName = FqName(annotation.qualifiedName!!)
 
     return this.annotations.hasAnnotation(annotationName)
 }
 
-internal inline fun <reified T : Annotation> Annotated.findAnnotation(): T? =
+inline fun <reified T : Annotation> Annotated.findAnnotation(): T? =
     findAnnotation(T::class)
 
-internal fun <T : Annotation> Annotated.findAnnotation(annotationClass: KClass<T>): T? {
+fun <T : Annotation> Annotated.findAnnotation(annotationClass: KClass<T>): T? {
     val annotationName = FqName(annotationClass.qualifiedName!!)
     val annotation = this.annotations.findAnnotation(annotationName) ?: return null
 
