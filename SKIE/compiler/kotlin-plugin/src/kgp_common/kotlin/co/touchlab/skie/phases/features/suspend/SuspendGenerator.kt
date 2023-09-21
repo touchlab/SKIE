@@ -22,11 +22,11 @@ class SuspendGenerator(
     context(DescriptorModificationPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
-    private val kotlinDelegate = KotlinSuspendGeneratorDelegate(context)
-    private val swiftDelegate = SwiftSuspendGeneratorDelegate(context)
-
     context(DescriptorModificationPhase.Context)
     override fun execute() {
+        val kotlinDelegate = KotlinSuspendGeneratorDelegate(context)
+        val swiftDelegate = SwiftSuspendGeneratorDelegate(context)
+
         descriptorProvider.allSupportedFunctions.forEach { function ->
             val kotlinBridgingFunction = kotlinDelegate.generateKotlinBridgingFunction(function)
 
