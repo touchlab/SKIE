@@ -8,9 +8,9 @@ public final class SkieSwiftOptionalMutableSharedFlow<T>: _Concurrency.AsyncSequ
 
     public typealias _ObjectiveCType = SkieKotlinOptionalMutableSharedFlow<Swift.AnyObject>
 
-    internal let delegate: Skie.KotlinxCoroutinesCore.MutableSharedFlow.__Kotlin
+    internal let delegate: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.MutableSharedFlow.__Kotlin
 
-    internal init(internal flow: Skie.KotlinxCoroutinesCore.MutableSharedFlow.__Kotlin) {
+    internal init(internal flow: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.MutableSharedFlow.__Kotlin) {
         delegate = flow
     }
 

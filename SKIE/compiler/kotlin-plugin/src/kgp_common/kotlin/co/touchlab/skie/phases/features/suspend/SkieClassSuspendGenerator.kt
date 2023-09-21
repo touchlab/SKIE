@@ -31,7 +31,7 @@ class SkieClassSuspendGenerator {
     private fun createSkieClass(swiftModel: KotlinTypeSwiftModel): SirClass {
         val skieClass = SirClass(
             simpleName = "__Suspend",
-            parent = sirProvider.getNamespace(swiftModel),
+            parent = sirProvider.getSkieNamespace(swiftModel),
         )
 
         skieClass.copyTypeParametersFrom(swiftModel.kotlinSirClass)

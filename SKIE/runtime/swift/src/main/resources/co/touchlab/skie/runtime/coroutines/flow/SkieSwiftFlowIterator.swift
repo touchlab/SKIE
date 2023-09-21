@@ -6,7 +6,7 @@ public class SkieSwiftFlowIterator<T>: _Concurrency.AsyncIteratorProtocol {
 
     private let iterator: SkieColdFlowIterator<AnyObject>
 
-    init(flow: Skie.KotlinxCoroutinesCore.Flow.__Kotlin) {
+    init(flow: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.Flow.__Kotlin) {
         iterator = SkieColdFlowIterator(flow: flow)
     }
 

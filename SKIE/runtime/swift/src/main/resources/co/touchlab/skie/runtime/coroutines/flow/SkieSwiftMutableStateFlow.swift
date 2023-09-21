@@ -8,9 +8,9 @@ public final class SkieSwiftMutableStateFlow<T>: _Concurrency.AsyncSequence, Swi
 
     public typealias _ObjectiveCType = SkieKotlinMutableStateFlow<Swift.AnyObject>
 
-    internal let delegate: Skie.KotlinxCoroutinesCore.MutableStateFlow.__Kotlin
+    internal let delegate: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.MutableStateFlow.__Kotlin
 
-    internal init(internal flow: Skie.KotlinxCoroutinesCore.MutableStateFlow.__Kotlin) {
+    internal init(internal flow: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.MutableStateFlow.__Kotlin) {
         delegate = flow
     }
 

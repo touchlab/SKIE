@@ -8,9 +8,9 @@ public final class SkieSwiftSharedFlow<T>: _Concurrency.AsyncSequence, Swift._Ob
 
     public typealias _ObjectiveCType = SkieKotlinSharedFlow<Swift.AnyObject>
 
-    internal let delegate: Skie.KotlinxCoroutinesCore.SharedFlow.__Kotlin
+    internal let delegate: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.SharedFlow.__Kotlin
 
-    internal init(internal flow: Skie.KotlinxCoroutinesCore.SharedFlow.__Kotlin) {
+    internal init(internal flow: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.SharedFlow.__Kotlin) {
         delegate = flow
     }
 

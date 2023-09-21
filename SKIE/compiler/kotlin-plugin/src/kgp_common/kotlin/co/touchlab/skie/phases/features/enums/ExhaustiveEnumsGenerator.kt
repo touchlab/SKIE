@@ -91,7 +91,7 @@ private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass {
 
     enum.internalTypeAlias = SirTypeAlias(
         simpleName = "__Enum",
-        parent = sirProvider.getNamespace(this),
+        parent = sirProvider.getSkieNamespace(this),
     ) {
         enum.defaultType.also { it.useInternalName = false }
     }

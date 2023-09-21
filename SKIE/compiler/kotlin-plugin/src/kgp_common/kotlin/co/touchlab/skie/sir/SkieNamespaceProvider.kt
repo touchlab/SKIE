@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir
 
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.kir.modulesWithExposedDeclarations
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
@@ -14,7 +15,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-class SirNamespaceProvider(
+class SkieNamespaceProvider(
     private val descriptorProvider: DescriptorProvider,
     private val namer: ObjCExportNamer,
     private val sirProvider: SirProvider,
@@ -42,7 +43,7 @@ class SirNamespaceProvider(
     }
 
     private val modulesWithShortNameCollision =
-        descriptorProvider.exposedModules
+        descriptorProvider.modulesWithExposedDeclarations
             .groupBy { it.shortSkieModuleName }
             .filter { it.value.size > 1 }
             .values

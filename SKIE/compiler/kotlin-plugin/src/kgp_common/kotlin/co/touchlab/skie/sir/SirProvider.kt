@@ -55,15 +55,15 @@ class SirProvider(
         SirBuiltins(kotlinBuiltinsModule, kotlinModule, skieModule, this, namer)
     }
 
-    private val namespaceProvider by lazy {
-        SirNamespaceProvider(descriptorProvider, namer, this)
+    private val skieNamespaceProvider by lazy {
+        SkieNamespaceProvider(descriptorProvider, namer, this)
     }
 
     private val kotlinSirClassFactory by lazy {
         KotlinSirClassFactory(
             sirProvider = this,
             translator = translator,
-            namespaceProvider = namespaceProvider,
+            namespaceProvider = skieNamespaceProvider,
             namer = namer,
             descriptorProvider = descriptorProvider,
         )
@@ -107,12 +107,12 @@ class SirProvider(
         }
 
     fun getFile(swiftModel: KotlinTypeSwiftModel): SirFile =
-        namespaceProvider.getFile(swiftModel)
+        skieNamespaceProvider.getFile(swiftModel)
 
-    fun getNamespace(swiftModel: KotlinTypeSwiftModel): SirClass =
+    fun getSkieNamespace(swiftModel: KotlinTypeSwiftModel): SirClass =
         when (val descriptorHolder = swiftModel.descriptorHolder) {
-            is ClassOrFileDescriptorHolder.Class -> namespaceProvider.getOrCreateNamespace(descriptorHolder.value)
-            is ClassOrFileDescriptorHolder.File -> namespaceProvider.getOrCreateNamespace(descriptorHolder.value)
+            is ClassOrFileDescriptorHolder.Class -> skieNamespaceProvider.getOrCreateNamespace(descriptorHolder.value)
+            is ClassOrFileDescriptorHolder.File -> skieNamespaceProvider.getOrCreateNamespace(descriptorHolder.value)
         }
 
     fun getExternalModule(moduleName: String): SirModule.External =

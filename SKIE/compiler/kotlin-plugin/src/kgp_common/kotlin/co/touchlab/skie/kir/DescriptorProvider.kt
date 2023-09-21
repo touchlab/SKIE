@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.library.KotlinLibrary
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
 interface DescriptorProvider {
@@ -76,3 +77,6 @@ val DescriptorProvider.allExposedMembers: List<CallableMemberDescriptor>
     get() = (this.exposedFiles.flatMap { this.getExposedStaticMembers(it) } +
             this.exposedClasses.flatMap { this.getExposedClassMembers(it) + this.getExposedConstructors(it) }) +
             this.exposedCategoryMembers
+
+val DescriptorProvider.modulesWithExposedDeclarations: Set<ModuleDescriptor>
+    get() = (exposedClasses.map { it.module } + exposedFiles.map { getFileModule(it) }).toSet()

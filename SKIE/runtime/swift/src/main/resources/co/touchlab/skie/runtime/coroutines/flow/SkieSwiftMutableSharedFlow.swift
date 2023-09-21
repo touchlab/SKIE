@@ -8,9 +8,9 @@ public final class SkieSwiftMutableSharedFlow<T>: _Concurrency.AsyncSequence, Sw
 
     public typealias _ObjectiveCType = SkieKotlinMutableSharedFlow<Swift.AnyObject>
 
-    internal let delegate: Skie.KotlinxCoroutinesCore.MutableSharedFlow.__Kotlin
+    internal let delegate: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.MutableSharedFlow.__Kotlin
 
-    internal init(internal flow: Skie.KotlinxCoroutinesCore.MutableSharedFlow.__Kotlin) {
+    internal init(internal flow: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.MutableSharedFlow.__Kotlin) {
         delegate = flow
     }
 
@@ -64,6 +64,6 @@ internal func bridgeSubscriptionCount(_ subscriptionCount: SkieSwiftStateFlow<Ko
     return subscriptionCount
 }
 
-internal func bridgeSubscriptionCount(_ subscriptionCount: any Skie.KotlinxCoroutinesCore.StateFlow.__Kotlin) -> SkieSwiftStateFlow<KotlinInt> {
+internal func bridgeSubscriptionCount(_ subscriptionCount: any Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.StateFlow.__Kotlin) -> SkieSwiftStateFlow<KotlinInt> {
     return SkieSwiftStateFlow(internal: subscriptionCount)
 }

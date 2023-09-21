@@ -17,7 +17,7 @@ class SealedEnumGeneratorDelegate(
         val enum = SirClass(
             simpleName = "__Sealed",
             kind = SirClass.Kind.Enum,
-            parent = sirProvider.getNamespace(swiftModel),
+            parent = sirProvider.getSkieNamespace(swiftModel),
         )
 
         enum.copyTypeParametersFrom(swiftModel.primarySirClass)

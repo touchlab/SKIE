@@ -1,14 +1,14 @@
 import Foundation
 
-class AsyncStreamDispatcherDelegate: Skie.RuntimeKotlin.Skie_DispatcherDelegate.__Kotlin {
+class AsyncStreamDispatcherDelegate: Skie.co_touchlab_skie__runtime_kotlin.Skie_DispatcherDelegate.__Kotlin {
 
-    private let continuation: _Concurrency.AsyncStream<Skie.KotlinxCoroutinesCore.Runnable.__Kotlin>.Continuation
+    private let continuation: _Concurrency.AsyncStream<Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.Runnable.__Kotlin>.Continuation
 
-    init(continuation: _Concurrency.AsyncStream<Skie.KotlinxCoroutinesCore.Runnable.__Kotlin>.Continuation) {
+    init(continuation: _Concurrency.AsyncStream<Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.Runnable.__Kotlin>.Continuation) {
         self.continuation = continuation
     }
 
-    func dispatch(block: Skie.KotlinxCoroutinesCore.Runnable.__Kotlin) {
+    func dispatch(block: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.Runnable.__Kotlin) {
         let result = continuation.yield(block)
 
         if case .terminated = result {

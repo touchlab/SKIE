@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.descriptors.isInterface
 class KotlinSirClassFactory(
     private val sirProvider: SirProvider,
     private val translator: SwiftTypeTranslator,
-    private val namespaceProvider: SirNamespaceProvider,
+    private val namespaceProvider: SkieNamespaceProvider,
     private val namer: ObjCExportNamer,
     private val descriptorProvider: DescriptorProvider,
 ) {
