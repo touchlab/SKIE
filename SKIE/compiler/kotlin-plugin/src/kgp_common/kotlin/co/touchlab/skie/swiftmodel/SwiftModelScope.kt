@@ -1,5 +1,9 @@
 package co.touchlab.skie.swiftmodel
 
+import co.touchlab.skie.sir.SirProvider
+import co.touchlab.skie.sir.builtin.SirBuiltins
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
@@ -12,16 +16,6 @@ import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridge
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.swiftmodel.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.sir.SirProvider
-import co.touchlab.skie.sir.builtin.SirBuiltins
-import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.type.SirType
-import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
-import co.touchlab.skie.swiftmodel.callable.property.MutableKotlinPropertySwiftModel
-import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.swiftmodel.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -46,27 +40,6 @@ interface SwiftModelScope {
     val allExposedMembers: List<KotlinCallableMemberSwiftModel>
 
     fun referenceClass(classFqName: String): KotlinClassSwiftModel
-
-    fun getSwiftModel(callableMemberDescriptor: CallableMemberDescriptor): KotlinCallableMemberSwiftModel =
-        callableMemberDescriptor.swiftModel
-
-    fun getSwiftModel(functionDescriptor: FunctionDescriptor): KotlinFunctionSwiftModel =
-        functionDescriptor.swiftModel
-
-    fun getSwiftModel(parameterDescriptor: ParameterDescriptor): KotlinValueParameterSwiftModel =
-        parameterDescriptor.swiftModel
-
-    fun getSwiftModel(propertyDescriptor: PropertyDescriptor): KotlinPropertySwiftModel =
-        propertyDescriptor.swiftModel
-
-    fun getSwiftModel(classDescriptor: ClassDescriptor): KotlinClassSwiftModel =
-        classDescriptor.swiftModel
-
-    fun getSwiftModel(sourceFile: SourceFile): KotlinTypeSwiftModel =
-        sourceFile.swiftModel
-
-    fun getSwiftModelOrNull(classDescriptor: ClassDescriptor): KotlinClassSwiftModel? =
-        classDescriptor.swiftModelOrNull
 
     val CallableMemberDescriptor.swiftModel: KotlinCallableMemberSwiftModel
 
@@ -125,3 +98,24 @@ interface SwiftModelScope {
         flowMappingStrategy: FlowMappingStrategy,
     ): SirType
 }
+
+fun SwiftModelScope.getSwiftModel(callableMemberDescriptor: CallableMemberDescriptor): KotlinCallableMemberSwiftModel =
+    callableMemberDescriptor.swiftModel
+
+fun SwiftModelScope.getSwiftModel(functionDescriptor: FunctionDescriptor): KotlinFunctionSwiftModel =
+    functionDescriptor.swiftModel
+
+fun SwiftModelScope.getSwiftModel(parameterDescriptor: ParameterDescriptor): KotlinValueParameterSwiftModel =
+    parameterDescriptor.swiftModel
+
+fun SwiftModelScope.getSwiftModel(propertyDescriptor: PropertyDescriptor): KotlinPropertySwiftModel =
+    propertyDescriptor.swiftModel
+
+fun SwiftModelScope.getSwiftModel(classDescriptor: ClassDescriptor): KotlinClassSwiftModel =
+    classDescriptor.swiftModel
+
+fun SwiftModelScope.getSwiftModel(sourceFile: SourceFile): KotlinTypeSwiftModel =
+    sourceFile.swiftModel
+
+fun SwiftModelScope.getSwiftModelOrNull(classDescriptor: ClassDescriptor): KotlinClassSwiftModel? =
+    classDescriptor.swiftModelOrNull

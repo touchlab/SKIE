@@ -70,7 +70,7 @@ internal class NativeMutableDescriptorProvider(
         mutationListeners.forEach { it() }
     }
 
-    fun preventFurtherMutations(newExportedInterface: ObjCExportedInterface): DescriptorProvider {
+    fun preventFurtherMutations(newExportedInterface: ObjCExportedInterface) {
         when (val witnessState = state.compareAndExchange(State.MUTABLE, State.IMMUTABLE)) {
             State.MUTABLE -> {
                 // Create a fresh provider with all the descriptors we've seen so far.
@@ -81,7 +81,6 @@ internal class NativeMutableDescriptorProvider(
             State.MUTATING -> error("Cannot prevent further mutations while mutating.")
             else -> error("Unexpected state: $witnessState")
         }
-        return realProvider
     }
 
     override fun onMutated(listener: () -> Unit) {
@@ -100,6 +99,9 @@ internal class NativeMutableDescriptorProvider(
 
     override val buildInLibraries: Set<KotlinLibrary>
         get() = realProvider.buildInLibraries
+
+    override val resolvedLibraries: List<KotlinLibrary>
+        get() = realProvider.resolvedLibraries
 
     override val externalLibraries: Set<KotlinLibrary>
         get() = realProvider.externalLibraries

@@ -2,7 +2,7 @@ package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.plugin.mainSkieContext
 import co.touchlab.skie.phases.SkiePhaseScheduler
-import co.touchlab.skie.phases.context.KotlinIrPhaseContext
+import co.touchlab.skie.context.KotlinIrPhaseContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.config.CompilerConfiguration

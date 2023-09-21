@@ -1,12 +1,12 @@
 package co.touchlab.skie.sir
 
 import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
-import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirTypeAlias
+import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
+import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -26,12 +26,19 @@ class SirNamespaceProvider(
 
     private val moduleNamespaceCache = mutableMapOf<ModuleDescriptor, SirClass>()
 
-    private val skieNamespaceBaseClass: SirClass by lazy {
-        SirClass(
-            simpleName = "Skie",
-            parent = sirProvider.getFile(SirFile.skieNamespace, "Skie"),
-            kind = SirClass.Kind.Enum,
-        )
+    private val skieNamespaceFile = sirProvider.getFile(SirFile.skieNamespace, "Skie")
+
+    private val skieNamespaceBaseClass: SirClass = SirClass(
+        simpleName = "Skie",
+        parent = skieNamespaceFile,
+        kind = SirClass.Kind.Enum,
+    )
+
+    init {
+        // Ensures at least one file imports Foundation
+        skieNamespaceFile.swiftPoetBuilderModifications.add {
+            addImport("Foundation")
+        }
     }
 
     private val modulesWithShortNameCollision =

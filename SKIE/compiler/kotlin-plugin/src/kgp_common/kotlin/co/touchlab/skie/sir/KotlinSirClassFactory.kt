@@ -25,13 +25,13 @@ class KotlinSirClassFactory(
     private val descriptorProvider: DescriptorProvider,
 ) {
 
-    private val kotlinSirClassCache = mutableMapOf<ClassDescriptor, SirClass>()
-
     private val classDescriptorToFqNameMap = mutableMapOf<ClassDescriptor, SirFqName>()
 
     private val fqNameToClassDescriptorMap = mutableMapOf<SirFqName, ClassDescriptor>()
 
     private val superTypesInitializationBlocks = mutableListOf<SwiftModelScope.() -> Unit>()
+
+    private val kotlinSirClassCache = mutableMapOf<ClassDescriptor, SirClass>()
 
     val sirBuiltins: SirBuiltins
         get() = sirProvider.sirBuiltins
@@ -90,7 +90,7 @@ class KotlinSirClassFactory(
             .any { KotlinBuiltIns.isAnyOrNullableAny(it) }
 
         if (directlyInheritsAny) {
-            superTypes.add(sirBuiltins.Kotlin.Base.defaultType)
+            superTypes.add(sirBuiltins.Stdlib.Base.defaultType)
         }
 
         val superTypesWithoutAny = classDescriptor.defaultType
@@ -110,7 +110,7 @@ class KotlinSirClassFactory(
             simpleName = namer.getFileClassName(sourceFile).swiftName,
             parent = sirBuiltins.Kotlin.module,
             kind = SirClass.Kind.Class,
-            superTypes = listOf(sirBuiltins.Kotlin.Base.defaultType),
+            superTypes = listOf(sirBuiltins.Stdlib.Base.defaultType),
         )
 
         val namespace = namespaceProvider.getOrCreateNamespace(sourceFile)

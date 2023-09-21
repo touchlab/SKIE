@@ -44,8 +44,6 @@ object GenerateSirFileCodePhase : SirPhase {
 
     private fun SirFile.generateCodeUsing(fileBuilder: FileSpec.Builder) {
         fileBuilder.apply {
-            addImport("Foundation")
-
             generateDeclarations()
 
             applyFileBuilderModifications()

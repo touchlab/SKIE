@@ -1,6 +1,5 @@
 package co.touchlab.skie.phases.memberconflicts
 
-import co.touchlab.skie.kir.allExposedMembers
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
@@ -17,9 +16,7 @@ object FixCallableMembersConflictsPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        val allMembers = descriptorProvider.allExposedMembers.map { it.swiftModel }
-
-        val sortedMembers = allMembers.sortedByCollisionResolutionPriority()
+        val sortedMembers = allExposedMembers.sortedByCollisionResolutionPriority()
 
         buildUniqueSignatureSet(sortedMembers)
     }

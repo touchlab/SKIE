@@ -17,6 +17,7 @@ import kotlin.reflect.KProperty
 
 @Suppress("PropertyName", "FunctionName")
 class SirBuiltins(
+    kotlinBuiltinsModule: SirModule.KotlinBuiltins,
     kotlinModule: SirModule.Kotlin,
     skieModule: SirModule.Skie,
     sirProvider: SirProvider,
@@ -27,7 +28,9 @@ class SirBuiltins(
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
-    val Kotlin = Modules.Kotlin(kotlinModule, Swift, Foundation, namer)
+    val Stdlib = Modules.KotlinBuiltins(kotlinBuiltinsModule, Swift, Foundation, namer)
+
+    val Kotlin = Modules.Kotlin(kotlinModule)
 
     val Skie = Modules.Skie(skieModule)
 
@@ -37,7 +40,9 @@ class SirBuiltins(
 
             override val module = sirProvider.getExternalModule("Swift")
 
-            val Hashable by Protocol()
+            val Hashable by Protocol {
+                isInherentlyHashable = true
+            }
 
             val AnyHashable by Struct(superTypes = listOf(Hashable.defaultType))
 
@@ -132,7 +137,7 @@ class SirBuiltins(
                 )
 
                 superTypes.add(
-                    NSArray.toTypeFromEnclosingTypeParameters(typeParameters)
+                    NSArray.toTypeFromEnclosingTypeParameters(typeParameters),
                 )
             }
 
@@ -162,7 +167,7 @@ class SirBuiltins(
                 )
 
                 superTypes.add(
-                    NSDictionary.toTypeFromEnclosingTypeParameters(typeParameters)
+                    NSDictionary.toTypeFromEnclosingTypeParameters(typeParameters),
                 )
             }
 
@@ -182,13 +187,13 @@ class SirBuiltins(
                 )
 
                 superTypes.add(
-                    NSSet.toTypeFromEnclosingTypeParameters(typeParameters)
+                    NSSet.toTypeFromEnclosingTypeParameters(typeParameters),
                 )
             }
         }
 
-        class Kotlin(
-            override val module: SirModule.Kotlin,
+        class KotlinBuiltins(
+            override val module: SirModule.KotlinBuiltins,
             swift: Swift,
             foundation: Foundation,
             namer: ObjCExportNamer,
@@ -204,7 +209,7 @@ class SirBuiltins(
                 )
 
                 superTypes.add(
-                    foundation.NSMutableSet.toTypeFromEnclosingTypeParameters(typeParameters)
+                    foundation.NSMutableSet.toTypeFromEnclosingTypeParameters(typeParameters),
                 )
             }
 
@@ -221,13 +226,13 @@ class SirBuiltins(
                 )
 
                 superTypes.add(
-                    foundation.NSMutableDictionary.toTypeFromEnclosingTypeParameters(typeParameters)
+                    foundation.NSMutableDictionary.toTypeFromEnclosingTypeParameters(typeParameters),
                 )
             }
 
             val Number by Class(nameOverride = namer.kotlinNumberName.swiftName, superTypes = listOf(foundation.NSNumber.defaultType))
 
-            val nsNumberDeclarations by lazy {
+            val nsNumberDeclarations =
                 nsNumberKindClassIds().associateWith {
                     namer.kotlinNumberName
                     SirClass(
@@ -237,17 +242,11 @@ class SirBuiltins(
                         superTypes = listOf(Number.defaultType),
                     )
                 }
-            }
-
-            val allDeclarations: List<SirClass> by lazy {
-                listOf(
-                    Base,
-                    MutableSet,
-                    MutableMap,
-                    Number,
-                ) + nsNumberDeclarations.values
-            }
         }
+
+        class Kotlin(
+            override val module: SirModule.Kotlin,
+        ) : ModuleBase()
 
         class Skie(
             override val module: SirModule.Skie,

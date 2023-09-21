@@ -27,8 +27,6 @@ interface SkiePhase<C : SkiePhase.Context> {
 
         val context: Context
 
-        val commonBackendContext: CommonBackendContext
-
         val skieConfiguration: SkieConfiguration
 
         val swiftCompilerConfiguration: SwiftCompilerConfiguration
@@ -60,6 +58,15 @@ interface SkiePhase<C : SkiePhase.Context> {
 
         fun <T : Any> getOrNull(key: CompilerConfigurationKey<T>): T? =
             konanConfig.configuration.get(key)
+
+        fun <T : Any> getOrCreate(key: CompilerConfigurationKey<T>, defaultValue: () -> T): T =
+            getOrNull(key) ?: run {
+                val value = defaultValue()
+
+                put(key, value)
+
+                value
+            }
 
         fun <T : Any> put(key: CompilerConfigurationKey<T>, value: T) {
             konanConfig.configuration.put(key, value)

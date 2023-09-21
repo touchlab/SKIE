@@ -42,14 +42,6 @@ class SirClass(
     override val internalName: SirFqName
         get() = internalTypeAlias?.fqName ?: fqName
 
-    var bridgingTypeAlias: SirTypeAlias? = null
-
-    /**
-     * Name used by SKIE in ApiNotes to configure bridging to avoid problem with ApiNotes not being able to reference nested classes.
-     */
-    val bridgingName: SirFqName
-        get() = bridgingTypeAlias?.fqName ?: fqName
-
     // TODO Replace SwiftPoet with Sir
     val swiftPoetBuilderModifications = mutableListOf<TypeSpec.Builder.() -> Unit>()
 

@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.util.header
+package co.touchlab.skie.phases.header.util
 
 abstract class BaseHeaderInsertionPhase : BaseHeaderModificationPhase() {
 

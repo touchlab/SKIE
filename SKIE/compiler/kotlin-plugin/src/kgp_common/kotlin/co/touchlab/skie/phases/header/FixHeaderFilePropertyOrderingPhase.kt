@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases.header
 
-import co.touchlab.skie.phases.util.header.BaseHeaderModificationPhase
+import co.touchlab.skie.phases.header.util.BaseHeaderModificationPhase
 
 object FixHeaderFilePropertyOrderingPhase : BaseHeaderModificationPhase() {
 

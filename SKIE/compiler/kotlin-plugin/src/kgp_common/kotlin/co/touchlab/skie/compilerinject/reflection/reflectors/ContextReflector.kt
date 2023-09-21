@@ -9,6 +9,4 @@ class ContextReflector(
 ) : Reflector("org.jetbrains.kotlin.backend.konan.Context") {
 
     val symbolTable by extensionProperty<SymbolTable>("org.jetbrains.kotlin.backend.konan.ToplevelPhasesKt")
-
-    val librariesWithDependencies by declaredProperty<List<KonanLibrary>>()
 }

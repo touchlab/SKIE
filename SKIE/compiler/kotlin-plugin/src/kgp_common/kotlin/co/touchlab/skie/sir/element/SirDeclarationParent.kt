@@ -11,5 +11,5 @@ sealed interface SirDeclarationParent {
 }
 
 @Suppress("RecursivePropertyAccessor")
-val SirDeclarationParent.rootParent: SirDeclarationParent
-    get() = parent?.rootParent ?: this
+val SirDeclarationParent.namespaceParent: SirDeclarationParent
+    get() = if (this is SirDeclarationNamespace) (parent as? SirDeclarationNamespace)?.namespaceParent ?: parent ?: this else this

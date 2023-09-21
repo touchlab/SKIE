@@ -5,7 +5,7 @@ import co.touchlab.skie.phases.analytics.ClassExportAnalyticsPhase
 import co.touchlab.skie.phases.analytics.KotlinIrAnalyticsPhase
 import co.touchlab.skie.phases.analytics.performance.LogSkiePerformanceAnalyticsPhase
 import co.touchlab.skie.phases.apinotes.ApiNotesGenerationPhase
-import co.touchlab.skie.phases.apinotes.GenerateBridgingTypeAliasesPhase
+import co.touchlab.skie.phases.apinotes.MoveBridgesToTopLevelPhase
 import co.touchlab.skie.phases.debug.DumpSwiftApiPhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.features.enums.ExhaustiveEnumsGenerator
@@ -20,6 +20,7 @@ import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
 import co.touchlab.skie.phases.memberconflicts.FixCallableMembersConflictsPhase
 import co.touchlab.skie.phases.memberconflicts.RemoveKonanManglingPhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
+import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.DisableWildcardExportPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
@@ -30,9 +31,10 @@ import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.GenerateSirFileCodePhase
 import co.touchlab.skie.phases.swift.SwiftCacheSetupPhase
 import co.touchlab.skie.phases.swift.WriteSirFileContentToDiskPhase
-import co.touchlab.skie.phases.typeconflicts.AddForwardDeclarationsPhase
-import co.touchlab.skie.phases.typeconflicts.AddTypeDefPhase
+import co.touchlab.skie.phases.header.AddForwardDeclarationsPhase
+import co.touchlab.skie.phases.header.AddTypeDefPhase
 import co.touchlab.skie.phases.typeconflicts.RenameNestedTypesConflictingWithExternalTypesPhase
+import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKeywordsPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKotlinModulePhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictsWithOtherTypesPhase
 import co.touchlab.skie.phases.typeconflicts.TemporarilyRenameTypesConflictingWithExternalModulesPhase
@@ -74,6 +76,7 @@ object SkiePhaseScheduler {
             DumpSwiftApiPhase.BeforeApiNotes,
 
             RemoveKonanManglingPhase,
+            RenameTypesConflictingWithKeywordsPhase,
             RenameNestedTypesConflictingWithExternalTypesPhase,
             RenameTypesConflictingWithKotlinModulePhase,
             KotlinRuntimeHidingPhase,
@@ -81,19 +84,21 @@ object SkiePhaseScheduler {
             SwiftRuntimeGenerator,
             ExtraClassExportPhase.FinalizePhase,
             DefaultArgumentGenerator.FinalizePhase,
-            SuspendGenerator.KotlinBridgeConfigurationPhase,
             FlowBridgingConfigurator,
             FlowConversionConstructorsGenerator,
             FlowMappingConfigurator(context),
-            SealedInteropGenerator(context),
+            SuspendGenerator.KotlinBridgeConfigurationPhase,
             ExhaustiveEnumsGenerator(context),
+            SealedInteropGenerator(context),
+
+            MoveBridgesToTopLevelPhase,
+            RenameTypesConflictsWithOtherTypesPhase,
+            FixCallableMembersConflictsPhase,
             SuspendGenerator.SwiftBridgeGeneratorPhase,
 
-            GenerateBridgingTypeAliasesPhase,
-            FixCallableMembersConflictsPhase,
-            RenameTypesConflictsWithOtherTypesPhase,
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,
 
+            DeleteSkieFrameworkContentPhase,
             FixHeaderFilePropertyOrderingPhase,
             AddLambdaTypeArgumentErrorTypePhase,
             ApiNotesGenerationPhase.ForSwiftCompilation,

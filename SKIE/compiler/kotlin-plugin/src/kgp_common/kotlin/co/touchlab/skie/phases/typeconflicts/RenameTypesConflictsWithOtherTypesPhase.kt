@@ -4,6 +4,7 @@ import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
@@ -38,7 +39,9 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 }
 
 /**
+ * immutable modules are prioritized because their declarations cannot be renamed
  * nested classes are renamed first so that their fqName is not changed before their renaming is resolved
+ * classes are prioritized over type aliases
  * was original identifier changed (unchanged is prioritized)
  * Kotlin SirClasses are prioritized
  * Kotlin SirClasses with shorter Obj-C names are prioritized
@@ -46,13 +49,22 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
  * visibility (Visible/public, Hidden, Replaced, Removed/non-public)
  * hash of Kotlin fqName if available
  */
-// WIP typealiases are deprioritized
 context(SwiftModelScope)
 private fun SirTypeDeclaration.getCollisionResolutionPriority(): Long {
     val swiftModel = (this as? SirClass)?.swiftModelOrNull
 
     var priority = 0L
+    if (!module.isMutable) {
+        priority += 1
+    }
+
+    priority = priority shl 1
     if (namespace != null) {
+        priority += 1
+    }
+
+    priority = priority shl 1
+    if (this is SirClass) {
         priority += 1
     }
 

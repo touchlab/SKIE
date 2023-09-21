@@ -1,7 +1,6 @@
 package co.touchlab.skie.sir
 
 import co.touchlab.skie.swiftmodel.type.translation.BuiltinSwiftBridgeableProvider
-import co.touchlab.skie.swiftmodel.type.translation.SwiftTranslationProblemCollector
 import co.touchlab.skie.swiftmodel.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.swiftmodel.SwiftModelScope
@@ -16,6 +15,7 @@ import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.util.FrameworkLayout
+import co.touchlab.skie.util.Reporter
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -29,14 +29,14 @@ class SirProvider(
     framework: FrameworkLayout,
     private val descriptorProvider: DescriptorProvider,
     sdkPath: String,
-    problemCollector: SwiftTranslationProblemCollector,
+    reporter: Reporter,
 ) {
 
     val translator: SwiftTypeTranslator by lazy {
         SwiftTypeTranslator(
             descriptorProvider = descriptorProvider,
             namer = namer,
-            problemCollector = problemCollector,
+            reporter = reporter,
             builtinSwiftBridgeableProvider = BuiltinSwiftBridgeableProvider(
                 sdkPath = sdkPath,
                 sirProvider = this,
@@ -45,12 +45,14 @@ class SirProvider(
         )
     }
 
-    private val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
+    private val kotlinBuiltinsModule: SirModule.KotlinBuiltins = SirModule.KotlinBuiltins("stdlib")
 
     private val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
 
+    private val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
+
     val sirBuiltins by lazy {
-        SirBuiltins(kotlinModule, skieModule, this, namer)
+        SirBuiltins(kotlinBuiltinsModule, kotlinModule, skieModule, this, namer)
     }
 
     private val namespaceProvider by lazy {
@@ -79,7 +81,7 @@ class SirProvider(
         get() = skieModule.files
 
     private val allLocalDeclarations: List<SirDeclaration>
-        get() = (skieModule.files + skieModule + kotlinModule).getChildDeclarationsRecursively()
+        get() = (skieModule.files + skieModule + kotlinModule + kotlinBuiltinsModule).getChildDeclarationsRecursively()
 
     val allLocalTypes: List<SirTypeDeclaration>
         get() = allLocalDeclarations.filterIsInstance<SirTypeDeclaration>()

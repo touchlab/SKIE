@@ -27,10 +27,4 @@ class FrameworkLayout(val framework: File) {
     fun abiJson(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.abi.json")
 
     fun swiftSourceInfo(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.swiftsourceinfo")
-
-    fun cleanSkie() {
-        swiftHeader.delete()
-        swiftModuleParent.deleteRecursively()
-        swiftModuleParent.mkdirs()
-    }
 }

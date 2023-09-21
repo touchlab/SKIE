@@ -43,4 +43,4 @@ object SwiftCacheSetupPhase: SirPhase {
 }
 
 val SirPhase.Context.cacheableKotlinFramework: FrameworkLayout
-    get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(frameworkLayout.moduleName))
+    get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(framework.moduleName))

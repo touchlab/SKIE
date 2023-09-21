@@ -26,6 +26,8 @@ interface DescriptorProvider {
 
     val buildInLibraries: Set<KotlinLibrary>
 
+    val resolvedLibraries: List<KotlinLibrary>
+
     val externalLibraries: Set<KotlinLibrary>
 
     val localLibraries: Set<KotlinLibrary>

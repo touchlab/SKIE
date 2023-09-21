@@ -1,7 +1,7 @@
-package co.touchlab.skie.phases.typeconflicts
+package co.touchlab.skie.phases.header
 
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.util.header.BaseHeaderInsertionPhase
+import co.touchlab.skie.phases.header.util.BaseHeaderInsertionPhase
 import co.touchlab.skie.swiftmodel.ObjCTypeRenderer
 
 class AddTypeDefPhase(

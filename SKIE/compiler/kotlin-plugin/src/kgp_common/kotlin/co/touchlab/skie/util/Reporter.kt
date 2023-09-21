@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.report
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
+import org.jetbrains.kotlin.renderer.DescriptorRenderer
 
 // WIP 3 remove unused code and reformat
 class Reporter(private val compilerConfiguration: CompilerConfiguration) {
@@ -14,6 +15,10 @@ class Reporter(private val compilerConfiguration: CompilerConfiguration) {
     fun report(severity: Severity, message: String, declaration: DeclarationDescriptor? = null) {
         val location = MessageUtil.psiElementToMessageLocation(declaration?.findPsi())?.let {
             CompilerMessageLocation.create(it.path, it.line, it.column, it.lineContent)
+        }
+
+        if (declaration != null && location == null) {
+            return report(severity, "$message\n    (at ${DescriptorRenderer.COMPACT_WITH_SHORT_TYPES.render(declaration)})", null)
         }
 
         when (severity) {

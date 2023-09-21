@@ -40,7 +40,11 @@ object SkiePerformanceAnalytics {
 
         private fun printLogIfEnabled(name: String, duration: Duration) {
             if (SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs in skieConfiguration.enabledConfigurationFlags) {
-                println("$name: ${duration.toDouble(DurationUnit.SECONDS)}s")
+                val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
+
+                val durationInSecondsAsString = String.format("%.6f", durationInSeconds)
+
+                println("$name: ${durationInSecondsAsString}s")
             }
         }
     }

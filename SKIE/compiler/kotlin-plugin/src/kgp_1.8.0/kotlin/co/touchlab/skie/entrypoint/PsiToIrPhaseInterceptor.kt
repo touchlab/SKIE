@@ -7,7 +7,7 @@ import co.touchlab.skie.compilerinject.plugin.mainSkieContext
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.ContextReflector
 import co.touchlab.skie.phases.SkiePhaseScheduler
-import co.touchlab.skie.phases.context.SymbolTablePhaseContext
+import co.touchlab.skie.context.SymbolTablePhaseContext
 import org.jetbrains.kotlin.backend.konan.Context
 import org.jetbrains.kotlin.backend.konan.psiToIrPhase
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
@@ -17,17 +17,11 @@ internal class PsiToIrPhaseInterceptor : SameTypePhaseInterceptor<KonanContext, 
     override fun getInterceptedPhase(): Any = psiToIrPhase
 
     override fun intercept(context: KonanContext, input: Unit, next: (KonanContext, Unit) -> Unit) {
-        runSymbolTablePhases(context)
-
-        next(context, input)
-    }
-
-    private fun runSymbolTablePhases(context: Context) {
-        val symbolTableContext = SymbolTablePhaseContext(
+        EntrypointUtils.runSymbolTablePhases(
             mainSkieContext = context.config.configuration.mainSkieContext,
             symbolTable = context.reflectedBy<ContextReflector>().symbolTable,
         )
 
-        SkiePhaseScheduler.runSymbolTablePhases(symbolTableContext)
+        next(context, input)
     }
 }

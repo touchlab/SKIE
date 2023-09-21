@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.context
+package co.touchlab.skie.context
 
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.SkiePhase

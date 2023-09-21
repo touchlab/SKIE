@@ -76,12 +76,6 @@ private fun KotlinClassSwiftModel.generateBridge(): SirClass {
 context(SwiftModelScope)
 private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass {
     val enum = SirClass(
-        simpleName = "__Enum",
-        parent = sirProvider.getNamespace(this),
-        kind = SirClass.Kind.Enum,
-    )
-
-    SirTypeAlias(
         simpleName = kotlinSirClass.simpleName,
         parent = kotlinSirClass.namespace?.let { namespace ->
             SirExtension(
@@ -92,8 +86,14 @@ private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass {
                 parent = sirProvider.getFile(this),
             )
         } ?: sirProvider.getFile(this),
+        kind = SirClass.Kind.Enum,
+    )
+
+    enum.internalTypeAlias = SirTypeAlias(
+        simpleName = "__Enum",
+        parent = sirProvider.getNamespace(this),
     ) {
-        enum.defaultType
+        enum.defaultType.also { it.useInternalName = false }
     }
 
     addEnumCases(enum)

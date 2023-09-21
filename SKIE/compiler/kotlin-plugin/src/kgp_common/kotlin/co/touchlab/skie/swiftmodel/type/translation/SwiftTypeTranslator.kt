@@ -18,6 +18,7 @@ import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.SkieErrorSirType
+import co.touchlab.skie.util.Reporter
 import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
 import org.jetbrains.kotlin.backend.konan.isInlined
@@ -53,7 +54,7 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 class SwiftTypeTranslator(
     private val descriptorProvider: DescriptorProvider,
     val namer: ObjCExportNamer,
-    val problemCollector: SwiftTranslationProblemCollector,
+    val reporter: Reporter,
     val builtinSwiftBridgeableProvider: BuiltinSwiftBridgeableProvider,
     val sirProvider: SirProvider,
 ) {
@@ -149,7 +150,7 @@ class SwiftTypeTranslator(
             val firstType = types[0]
             val secondType = types[1]
 
-            problemCollector.reportWarning(
+            reporter.warning(
                 "Exposed type '$kotlinType' is '$firstType' and '$secondType' at the same time. " +
                         "This most likely wouldn't work as expected.",
             )

@@ -1,7 +1,8 @@
-package co.touchlab.skie.phases.context
+package co.touchlab.skie.context
 
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.header.util.HeaderDeclarationsProvider
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
@@ -23,10 +24,12 @@ class SirPhaseContext private constructor(
                 framework = mainSkieContext.framework,
                 descriptorProvider = mainSkieContext.descriptorProvider,
                 sdkPath = mainSkieContext.configurables.absoluteTargetSysRoot,
-                problemCollector = mainSkieContext.problemCollector,
+                reporter = mainSkieContext.reporter,
             ),
         ),
     )
+
+    override val headerDeclarationsProvider: HeaderDeclarationsProvider = HeaderDeclarationsProvider(framework.kotlinHeader)
 
     override val context: SirPhase.Context = this
 }

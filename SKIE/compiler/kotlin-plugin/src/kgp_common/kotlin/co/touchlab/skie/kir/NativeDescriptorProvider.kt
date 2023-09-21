@@ -85,20 +85,24 @@ class NativeDescriptorProvider(
             .toSet()
     }
 
+    override val resolvedLibraries: List<KotlinLibrary> by lazy {
+        konanConfig.resolvedLibraries.getFullList()
+    }
+
     override val buildInLibraries: Set<KotlinLibrary> by lazy {
-        konanConfig.resolvedLibraries.getFullList().filter { it.isDefault }.toSet()
+        resolvedLibraries.filter { it.isDefault }.toSet()
     }
 
     override val externalLibraries: Set<KotlinLibrary> by lazy {
         val externalLibrariesArtifacts = externalDependencies.flatMap { it.artifactPaths }.map { it.path }.toSet()
 
-        konanConfig.resolvedLibraries.getFullList()
+        resolvedLibraries
             .filter { it.libraryFile.absolutePath in externalLibrariesArtifacts }
             .toSet() - buildInLibraries
     }
 
     override val localLibraries: Set<KotlinLibrary> by lazy {
-        konanConfig.resolvedLibraries.getFullList().toSet() - buildInLibraries - externalLibraries
+        resolvedLibraries.toSet() - buildInLibraries - externalLibraries
     }
 
     override fun isFromLocalModule(declarationDescriptor: DeclarationDescriptor): Boolean =

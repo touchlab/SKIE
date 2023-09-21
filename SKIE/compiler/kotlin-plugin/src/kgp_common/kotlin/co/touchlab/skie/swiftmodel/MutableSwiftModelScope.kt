@@ -1,11 +1,17 @@
 package co.touchlab.skie.swiftmodel
 
+import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
+import co.touchlab.skie.swiftmodel.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
+import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -28,27 +34,6 @@ interface MutableSwiftModelScope : SwiftModelScope {
 
     override fun referenceClass(classFqName: String): MutableKotlinClassSwiftModel
 
-    override fun getSwiftModel(callableMemberDescriptor: CallableMemberDescriptor): MutableKotlinCallableMemberSwiftModel =
-        callableMemberDescriptor.swiftModel
-
-    override fun getSwiftModel(functionDescriptor: FunctionDescriptor): MutableKotlinFunctionSwiftModel =
-        functionDescriptor.swiftModel
-
-    override fun getSwiftModel(parameterDescriptor: ParameterDescriptor): MutableKotlinValueParameterSwiftModel =
-        parameterDescriptor.swiftModel
-
-    override fun getSwiftModel(propertyDescriptor: PropertyDescriptor): MutableKotlinPropertySwiftModel =
-        propertyDescriptor.swiftModel
-
-    override fun getSwiftModel(classDescriptor: ClassDescriptor): MutableKotlinClassSwiftModel =
-        classDescriptor.swiftModel
-
-    override fun getSwiftModel(sourceFile: SourceFile): MutableKotlinTypeSwiftModel =
-        sourceFile.swiftModel
-
-    override fun getSwiftModelOrNull(classDescriptor: ClassDescriptor): MutableKotlinClassSwiftModel? =
-        classDescriptor.swiftModelOrNull
-
     override val CallableMemberDescriptor.swiftModel: MutableKotlinCallableMemberSwiftModel
 
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
@@ -67,3 +52,24 @@ interface MutableSwiftModelScope : SwiftModelScope {
 
     override val SourceFile.swiftModel: MutableKotlinTypeSwiftModel
 }
+
+fun MutableSwiftModelScope.getSwiftModel(callableMemberDescriptor: CallableMemberDescriptor): MutableKotlinCallableMemberSwiftModel =
+    callableMemberDescriptor.swiftModel
+
+fun MutableSwiftModelScope.getSwiftModel(functionDescriptor: FunctionDescriptor): MutableKotlinFunctionSwiftModel =
+    functionDescriptor.swiftModel
+
+fun MutableSwiftModelScope.getSwiftModel(parameterDescriptor: ParameterDescriptor): MutableKotlinValueParameterSwiftModel =
+    parameterDescriptor.swiftModel
+
+fun MutableSwiftModelScope.getSwiftModel(propertyDescriptor: PropertyDescriptor): MutableKotlinPropertySwiftModel =
+    propertyDescriptor.swiftModel
+
+fun MutableSwiftModelScope.getSwiftModel(classDescriptor: ClassDescriptor): MutableKotlinClassSwiftModel =
+    classDescriptor.swiftModel
+
+fun MutableSwiftModelScope.getSwiftModel(sourceFile: SourceFile): MutableKotlinTypeSwiftModel =
+    sourceFile.swiftModel
+
+fun MutableSwiftModelScope.getSwiftModelOrNull(classDescriptor: ClassDescriptor): MutableKotlinClassSwiftModel? =
+    classDescriptor.swiftModelOrNull

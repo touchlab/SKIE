@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases.header
 
-import co.touchlab.skie.phases.util.header.BaseHeaderInsertionPhase
+import co.touchlab.skie.phases.header.util.BaseHeaderInsertionPhase
 
 object AddLambdaTypeArgumentErrorTypePhase : BaseHeaderInsertionPhase() {
 

@@ -9,7 +9,6 @@ interface ClassExportPhase : SkiePhase<ClassExportPhase.Context> {
     interface Context : SkiePhase.Context {
 
         override val context: Context
-            get() = this
 
         override val descriptorProvider: MutableDescriptorProvider
 

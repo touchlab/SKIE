@@ -35,7 +35,7 @@ object ApiNotesFactory {
     private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
         ApiNotesType(
             objCFqName = this.objCFqName.asString(),
-            bridgeFqName = this.bridgedSirClass?.bridgingName?.toLocalUnescapedNameString(),
+            bridgeFqName = this.bridgedSirClass?.fqName?.toLocalUnescapedNameString(),
             swiftFqName = this.kotlinSirClass.fqName.toLocalUnescapedNameString(),
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,

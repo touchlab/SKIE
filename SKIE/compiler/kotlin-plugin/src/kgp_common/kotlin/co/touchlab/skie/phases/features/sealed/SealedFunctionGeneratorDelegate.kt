@@ -19,13 +19,13 @@ class SealedFunctionGeneratorDelegate(
 
     context(SwiftModelScope)
     fun generate(swiftModel: KotlinClassSwiftModel, enum: SirClass) {
-        val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
-
-        val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
-
-        val enumSelfTypeParameter = TypeVariableName.typeVariable("__Sealed").withBounds(TypeVariableName.bound(kotlinType))
-
         sirProvider.getFile(swiftModel).swiftPoetBuilderModifications.add {
+            val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
+
+            val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
+
+            val enumSelfTypeParameter = TypeVariableName.typeVariable("__Sealed").withBounds(TypeVariableName.bound(kotlinType))
+
             addFunction(
                 FunctionSpec.builder(swiftModel.enumConstructorFunctionName)
                     .addModifiers(Modifier.PUBLIC)

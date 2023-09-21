@@ -143,4 +143,4 @@ private fun FunctionSpec.Builder.addFromObjectiveCBody(): FunctionSpec.Builder =
     )
 
 private val KotlinClassSwiftModel.fatalErrorFromObjectiveC: CodeBlock
-    get() = CodeBlock.of("""fatalError("Couldn't map value of \(String(describing: source)) to ${kotlinSirClass.fqName}")""")
+    get() = CodeBlock.of("""fatalError("Couldn't map value of \(Swift.String(describing: source)) to ${kotlinSirClass.fqName}")""")
