@@ -7,7 +7,6 @@ import co.touchlab.skie.context.DescriptorModificationPhaseContext
 import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.context.SirPhaseContext
 import co.touchlab.skie.context.SymbolTablePhaseContext
-import co.touchlab.skie.phases.SkiePhaseScheduler
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
@@ -18,7 +17,7 @@ internal object EntrypointUtils {
         produceObjCExportInterface: () -> ObjCExportedInterface,
     ) {
         val classExportPhaseContext = ClassExportPhaseContext(mainSkieContext)
-        SkiePhaseScheduler.runClassExportPhases(classExportPhaseContext)
+        classExportPhaseContext.skiePhaseScheduler.runClassExportPhases(classExportPhaseContext)
 
         val updatedExportedInterface = produceObjCExportInterface()
         mainSkieContext.reloadDescriptorProvider(updatedExportedInterface)
@@ -29,7 +28,7 @@ internal object EntrypointUtils {
         produceObjCExportInterface: () -> ObjCExportedInterface,
     ): ObjCExportedInterface {
         val descriptorModificationPhaseContext = DescriptorModificationPhaseContext(mainSkieContext)
-        SkiePhaseScheduler.runDescriptorModificationPhases(descriptorModificationPhaseContext)
+        descriptorModificationPhaseContext.skiePhaseScheduler.runDescriptorModificationPhases(descriptorModificationPhaseContext)
 
         val finalExportedInterface = produceObjCExportInterface()
         mainSkieContext.finalizeDescriptorProvider(finalExportedInterface)
@@ -43,12 +42,12 @@ internal object EntrypointUtils {
             symbolTable = symbolTable,
         )
 
-        SkiePhaseScheduler.runSymbolTablePhases(symbolTableContext)
+        symbolTableContext.skiePhaseScheduler.runSymbolTablePhases(symbolTableContext)
     }
 
     fun runSirPhases(mainSkieContext: MainSkieContext) {
         val sirPhaseContext = SirPhaseContext(mainSkieContext)
 
-        SkiePhaseScheduler.runSirPhases(sirPhaseContext)
+        sirPhaseContext.skiePhaseScheduler.runSirPhases(sirPhaseContext)
     }
 }

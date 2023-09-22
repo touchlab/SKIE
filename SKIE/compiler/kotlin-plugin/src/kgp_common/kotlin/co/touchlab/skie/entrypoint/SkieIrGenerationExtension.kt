@@ -1,7 +1,6 @@
 package co.touchlab.skie.entrypoint
 
-import co.touchlab.skie.compilerinject.plugin.mainSkieContext
-import co.touchlab.skie.phases.SkiePhaseScheduler
+import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.context.KotlinIrPhaseContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -17,6 +16,6 @@ class SkieIrGenerationExtension(private val configuration: CompilerConfiguration
             pluginContext = pluginContext,
         )
 
-        SkiePhaseScheduler.runKotlinIrPhases(context)
+        context.skiePhaseScheduler.runKotlinIrPhases(context)
     }
 }

@@ -1,4 +1,4 @@
-package co.touchlab.skie.compilerinject.plugin
+package co.touchlab.skie.compilerinject.compilerplugin
 
 import co.touchlab.skie.context.MainSkieContext
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -7,7 +7,7 @@ import co.touchlab.skie.util.directory.SkieDirectories as SkieDirectoriesValue
 
 object SkieConfigurationKeys {
 
-    object SkiePhaseContext : CompilerConfigurationKey<MainSkieContext>("MainSkieContext")
+    object MainContext : CompilerConfigurationKey<MainSkieContext>("MainSkieContext")
 
     object SkieDirectories : CompilerConfigurationKey<SkieDirectoriesValue>("SKIE directories")
 
@@ -19,5 +19,5 @@ object SkieConfigurationKeys {
 }
 
 var CompilerConfiguration.mainSkieContext: MainSkieContext
-    get() = getNotNull(SkieConfigurationKeys.SkiePhaseContext)
-    set(value) = put(SkieConfigurationKeys.SkiePhaseContext, value)
+    get() = getNotNull(SkieConfigurationKeys.MainContext)
+    set(value) = put(SkieConfigurationKeys.MainContext, value)

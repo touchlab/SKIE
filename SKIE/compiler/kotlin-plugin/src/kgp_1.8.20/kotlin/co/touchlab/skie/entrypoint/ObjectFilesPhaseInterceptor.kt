@@ -3,7 +3,7 @@
 package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.interceptor.SameTypePhaseInterceptor
-import co.touchlab.skie.compilerinject.plugin.mainSkieContext
+import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.util.objectFilePaths
 import org.jetbrains.kotlin.backend.konan.objectFilesPhase
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext

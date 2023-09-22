@@ -2,13 +2,14 @@
 
 package co.touchlab.skie.context
 
-import co.touchlab.skie.compilerinject.plugin.SkieConfigurationKeys
+import co.touchlab.skie.compilerinject.compilerplugin.SkieConfigurationKeys
 import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.kir.ExposedModulesProvider
 import co.touchlab.skie.kir.MutableDescriptorProvider
 import co.touchlab.skie.kir.NativeMutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.phases.swift.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
@@ -24,11 +25,13 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 class MainSkieContext(
-    compilerConfiguration: CompilerConfiguration,
+    override val compilerConfiguration: CompilerConfiguration,
 ) : SkiePhase.Context {
 
     override val context: SkiePhase.Context
         get() = this
+
+    override val skiePhaseScheduler: SkiePhaseScheduler = SkiePhaseScheduler()
 
     override val skieDirectories: SkieDirectories = compilerConfiguration.getNotNull(SkieConfigurationKeys.SkieDirectories)
 

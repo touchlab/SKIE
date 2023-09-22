@@ -12,6 +12,7 @@ import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.konan.KonanConfig
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 
@@ -26,6 +27,10 @@ interface SkiePhase<C : SkiePhase.Context> {
     interface Context {
 
         val context: Context
+
+        val skiePhaseScheduler: SkiePhaseScheduler
+
+        val compilerConfiguration: CompilerConfiguration
 
         val skieConfiguration: SkieConfiguration
 

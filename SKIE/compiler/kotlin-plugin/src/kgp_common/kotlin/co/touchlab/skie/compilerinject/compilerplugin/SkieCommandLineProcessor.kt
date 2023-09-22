@@ -1,4 +1,4 @@
-package co.touchlab.skie.compilerinject.plugin
+package co.touchlab.skie.compilerinject.compilerplugin
 
 import co.touchlab.skie.util.plugin.SkiePlugin
 import co.touchlab.skie.util.plugin.SkiePlugin.Options
