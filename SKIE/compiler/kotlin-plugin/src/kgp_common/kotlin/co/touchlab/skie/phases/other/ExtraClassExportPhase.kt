@@ -14,6 +14,7 @@ import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.builders.irBlockBody
@@ -137,11 +138,15 @@ private fun ClassDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
 private fun CallableMemberDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
     typeParameters.flatMap { it.getAllFlowArgumentClasses() } +
         valueParameters.flatMap { it.type.getAllFlowArgumentClasses() } +
-        (returnType?.getAllFlowArgumentClasses() ?: emptyList())
+        (returnType?.getAllFlowArgumentClasses() ?: emptyList()) +
+        (contextReceiverParameters + listOfNotNull(dispatchReceiverParameter, extensionReceiverParameter)).flatMap { it.getAllFlowArgumentClasses() }
 
 // Sacrifices some completeness for simplicity - otherwise it would have to check all usages of the type parameter.
 private fun TypeParameterDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
     upperBounds.flatMap { it.getAllReferencedClasses() }
+
+private fun ReceiverParameterDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
+    type.getAllFlowArgumentClasses()
 
 private fun KotlinType.getAllFlowArgumentClasses(visitedTypes: Set<KotlinType> = emptySet()): List<ClassDescriptor> {
     if (this in visitedTypes) return emptyList()
