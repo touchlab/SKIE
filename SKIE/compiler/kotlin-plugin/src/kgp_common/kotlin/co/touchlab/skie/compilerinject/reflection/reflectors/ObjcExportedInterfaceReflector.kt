@@ -3,7 +3,6 @@
 package co.touchlab.skie.compilerinject.reflection.reflectors
 
 import co.touchlab.skie.compilerinject.reflection.Reflector
-import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -20,7 +19,4 @@ class ObjcExportedInterfaceReflector(
     val topLevel by declaredProperty<Map<SourceFile, List<CallableMemberDescriptor>>>()
 
     internal val mapper by declaredProperty<ObjCExportMapper>()
-
-    val reflectedMapper: ObjCExportMapperReflector
-        get() = mapper.reflectedBy()
 }

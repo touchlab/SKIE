@@ -17,9 +17,6 @@ class ObjCExportReflector(
 
     var exportedInterface by declaredField<Any>()
 
-    val reflectedExportedInterface: ObjcExportedInterfaceReflector
-        get() = exportedInterface.reflectedBy()
-
     companion object {
 
         const val fqName: String = "org.jetbrains.kotlin.backend.konan.objcexport.ObjCExport"
