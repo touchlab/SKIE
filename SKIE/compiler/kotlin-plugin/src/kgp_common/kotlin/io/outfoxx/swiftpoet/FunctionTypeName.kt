@@ -21,6 +21,7 @@ class FunctionTypeName internal constructor(
   val returnType: TypeName = VOID,
   attributes: List<AttributeSpec> = emptyList(),
 ) : TypeName() {
+
   val parameters = parameters.toImmutableList()
   val attributes = attributes.toImmutableList()
 
@@ -47,15 +48,18 @@ class FunctionTypeName internal constructor(
   }
 
   companion object {
+
     /** Returns a function type with `returnType` and parameters listed in `parameters`. */
-    @JvmStatic fun get(
+    @JvmStatic
+    fun get(
       parameters: List<ParameterSpec> = emptyList(),
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
     ) = FunctionTypeName(parameters, returnType, attributes)
 
     /** Returns a function type with `returnType` and parameters listed in `parameters`. */
-    @JvmStatic fun get(
+    @JvmStatic
+    fun get(
       vararg parameters: TypeName = emptyArray(),
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
@@ -68,7 +72,8 @@ class FunctionTypeName internal constructor(
     }
 
     /** Returns a function type with `returnType` and parameters listed in `parameters`. */
-    @JvmStatic fun get(
+    @JvmStatic
+    fun get(
       vararg parameters: ParameterSpec = emptyArray(),
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),

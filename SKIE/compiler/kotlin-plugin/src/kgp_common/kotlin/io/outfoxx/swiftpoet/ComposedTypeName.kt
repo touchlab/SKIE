@@ -17,7 +17,7 @@
 package io.outfoxx.swiftpoet
 
 class ComposedTypeName private constructor(
-  val types: List<DeclaredTypeName>
+  val types: List<DeclaredTypeName>,
 ) : TypeName() {
 
   override fun emit(out: CodeWriter): CodeWriter {

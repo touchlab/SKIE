@@ -8,11 +8,16 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.reflect.jvm.jvmName
 
-class NamedPhaseInterceptorConfigurer<Context: CommonBackendContext, Data>:
+class NamedPhaseInterceptorConfigurer<Context : CommonBackendContext, Data> :
     PhaseInterceptorConfigurer<NamedCompilerPhase<Context, Data>, Context, Data, Data> {
+
     override fun canConfigurePhase(phase: Any): Boolean = phase is NamedCompilerPhase<*, *>
 
-    override fun configure(configuration: CompilerConfiguration, phase: NamedCompilerPhase<Context, Data>, interceptors: List<PhaseInterceptor<Context, Data, Data>>) {
+    override fun configure(
+        configuration: CompilerConfiguration,
+        phase: NamedCompilerPhase<Context, Data>,
+        interceptors: List<PhaseInterceptor<Context, Data, Data>>,
+    ) {
         val namedPhase = phase.reflector
         val chain = ErasedPhaseInterceptorChain(interceptors)
 
@@ -32,24 +37,25 @@ class NamedPhaseInterceptorConfigurer<Context: CommonBackendContext, Data>:
         }
     }
 
-    private val <Context: CommonBackendContext, Data> NamedCompilerPhase<Context, Data>.reflector: NamedCompilerPhaseReflector<Context, Data>
+    private val <Context : CommonBackendContext, Data> NamedCompilerPhase<Context, Data>.reflector: NamedCompilerPhaseReflector<Context, Data>
         get() = NamedCompilerPhaseReflector(this)
-
 }
 
-private class NamedCompilerPhaseReflector<Context: CommonBackendContext, Data>(
+private class NamedCompilerPhaseReflector<Context : CommonBackendContext, Data>(
     override val instance: NamedCompilerPhase<Context, Data>,
-): Reflector(instance::class) {
+) : Reflector(instance::class) {
+
     var lower: SameTypeCompilerPhase<Context, Data> by declaredField()
 }
 
-private class InterceptedSameTypeCompilerPhaseReflector<Context: CommonBackendContext, Data>(
+private class InterceptedSameTypeCompilerPhaseReflector<Context : CommonBackendContext, Data>(
     override val instance: SameTypeCompilerPhase<Context, Data>,
-): Reflector(instance::class) {
+) : Reflector(instance::class) {
+
     val originalPhase: SameTypeCompilerPhase<Context, Data> by declaredField()
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Data, Data>> by declaredField()
 }
 
-private fun <Context: CommonBackendContext, Data> SameTypeCompilerPhase<Context, Data>.isIntercepted(): Boolean {
+private fun <Context : CommonBackendContext, Data> SameTypeCompilerPhase<Context, Data>.isIntercepted(): Boolean {
     return javaClass.name == InterceptedSameTypeCompilerPhase::class.jvmName
 }

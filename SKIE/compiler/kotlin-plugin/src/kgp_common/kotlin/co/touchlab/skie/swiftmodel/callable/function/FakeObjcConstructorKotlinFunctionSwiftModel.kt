@@ -2,9 +2,7 @@
 
 package co.touchlab.skie.swiftmodel.callable.function
 
-import co.touchlab.skie.swiftmodel.callable.parameter.ActualKotlinValueParameterSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.KotlinParameterSwiftModelCore
-import co.touchlab.skie.swiftmodel.factory.ObjCTypeProvider
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModelVisitor
@@ -12,12 +10,14 @@ import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftMod
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
+import co.touchlab.skie.swiftmodel.callable.parameter.ActualKotlinValueParameterSwiftModel
+import co.touchlab.skie.swiftmodel.callable.parameter.KotlinParameterSwiftModelCore
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.swiftGenericExportScope
+import co.touchlab.skie.swiftmodel.factory.ObjCTypeProvider
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.swiftmodel.type.bridge.valueParametersAssociated
-import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCNoneExportScope
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 

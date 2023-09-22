@@ -1,12 +1,12 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
+import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 
 class SealedEnumGeneratorDelegate(
     override val context: SirPhase.Context,

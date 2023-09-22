@@ -11,8 +11,9 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.reflect.jvm.jvmName
 
-class SameTypeNamedPhaseInterceptorConfigurer<Context, Data>:
-    SameTypePhaseInterceptorConfigurer<SameTypeNamedCompilerPhase<Context, Data>, Context, Data> where Context: LoggingContext, Context: ConfigChecks {
+class SameTypeNamedPhaseInterceptorConfigurer<Context, Data> :
+    SameTypePhaseInterceptorConfigurer<SameTypeNamedCompilerPhase<Context, Data>, Context, Data> where Context : LoggingContext, Context : ConfigChecks {
+
     override fun canConfigurePhase(phase: Any): Boolean = phase is SameTypeNamedCompilerPhase<*, *>
 
     override fun configure(
@@ -43,16 +44,17 @@ class SameTypeNamedPhaseInterceptorConfigurer<Context, Data>:
         get() = SameTypeNamedCompilerPhaseReflector(this)
 }
 
-
 private class SameTypeNamedCompilerPhaseReflector<Context, Data>(
     override val instance: SameTypeNamedCompilerPhase<Context, Data>,
-): Reflector(instance::class) where Context: LoggingContext {
+) : Reflector(instance::class) where Context : LoggingContext {
+
     var lower: SameTypeCompilerPhase<Context, Data> by declaredField()
 }
 
 private class InterceptedSameTypeCompilerPhaseReflector<Context, Data>(
     override val instance: SameTypeCompilerPhase<Context, Data>,
-): Reflector(instance::class) where Context: LoggingContext, Context: ConfigChecks {
+) : Reflector(instance::class) where Context : LoggingContext, Context : ConfigChecks {
+
     val originalPhase: SameTypeCompilerPhase<Context, Data> by declaredField()
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Data, Data>> by declaredField()
 }
@@ -60,7 +62,8 @@ private class InterceptedSameTypeCompilerPhaseReflector<Context, Data>(
 private class InterceptedSameTypeCompilerPhase<Context, Data>(
     val originalPhase: SameTypeCompilerPhase<Context, Data>,
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Data, Data>>,
-): SameTypeCompilerPhase<Context, Data> where Context: LoggingContext, Context: ConfigChecks {
+) : SameTypeCompilerPhase<Context, Data> where Context : LoggingContext, Context : ConfigChecks {
+
     override fun invoke(phaseConfig: PhaseConfigurationService, phaserState: PhaserState<Data>, context: Context, input: Data): Data {
         val interceptor = context.config.configuration.get(interceptorKey)
         return if (interceptor != null) {
@@ -73,6 +76,6 @@ private class InterceptedSameTypeCompilerPhase<Context, Data>(
     }
 }
 
-private fun <Context, Data> SameTypeCompilerPhase<Context, Data>.isIntercepted(): Boolean where Context: LoggingContext, Context: ConfigChecks {
+private fun <Context, Data> SameTypeCompilerPhase<Context, Data>.isIntercepted(): Boolean where Context : LoggingContext, Context : ConfigChecks {
     return javaClass.name == InterceptedSameTypeCompilerPhase::class.jvmName
 }

@@ -15,14 +15,15 @@ package io.outfoxx.swiftpoet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class AnyTypeName private constructor(): TypeName() {
+class AnyTypeName private constructor() : TypeName() {
+
   override fun emit(out: CodeWriter): CodeWriter {
     out.emit("Any")
     return out
   }
 
   companion object {
+
     val INSTANCE = AnyTypeName()
   }
-
 }

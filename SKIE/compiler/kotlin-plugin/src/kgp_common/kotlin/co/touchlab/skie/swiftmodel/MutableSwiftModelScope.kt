@@ -1,17 +1,11 @@
 package co.touchlab.skie.swiftmodel
 
-import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
-import co.touchlab.skie.swiftmodel.callable.property.KotlinPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
-import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor

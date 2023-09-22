@@ -17,7 +17,7 @@
 package io.outfoxx.swiftpoet
 
 class EnumerationCaseSpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
 
   val name = builder.name
@@ -46,7 +46,7 @@ class EnumerationCaseSpec private constructor(
 
   class Builder internal constructor(
     internal var name: String,
-    internal var typeOrConstant: Any?
+    internal var typeOrConstant: Any?,
   ) : AttributedSpec.Builder<Builder>() {
 
     internal val doc = CodeBlock.builder()
@@ -65,16 +65,23 @@ class EnumerationCaseSpec private constructor(
   }
 
   companion object {
-    @JvmStatic fun builder(name: String) = Builder(name, null)
 
-    @JvmStatic fun builder(name: String, type: TypeName) = Builder(name, TupleTypeName.of("" to type))
+    @JvmStatic
+    fun builder(name: String) = Builder(name, null)
 
-    @JvmStatic fun builder(name: String, type: TupleTypeName) = Builder(name, type)
+    @JvmStatic
+    fun builder(name: String, type: TypeName) = Builder(name, TupleTypeName.of("" to type))
 
-    @JvmStatic fun builder(name: String, constant: CodeBlock) = Builder(name, constant)
+    @JvmStatic
+    fun builder(name: String, type: TupleTypeName) = Builder(name, type)
 
-    @JvmStatic fun builder(name: String, constant: String) = Builder(name, CodeBlock.of("%S", constant))
+    @JvmStatic
+    fun builder(name: String, constant: CodeBlock) = Builder(name, constant)
 
-    @JvmStatic fun builder(name: String, constant: Int) = Builder(name, CodeBlock.of("%L", constant.toString()))
+    @JvmStatic
+    fun builder(name: String, constant: String) = Builder(name, CodeBlock.of("%S", constant))
+
+    @JvmStatic
+    fun builder(name: String, constant: Int) = Builder(name, CodeBlock.of("%L", constant.toString()))
   }
 }

@@ -20,7 +20,7 @@ import io.outfoxx.swiftpoet.CodeBlock.Companion.ABSTRACT
 
 /** A generated property declaration.  */
 class PropertySpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
 
   val mutable = builder.mutable
@@ -35,7 +35,7 @@ class PropertySpec private constructor(
   internal fun emit(
     codeWriter: CodeWriter,
     implicitModifiers: Set<Modifier>,
-    withInitializer: Boolean = true
+    withInitializer: Boolean = true,
   ) {
     codeWriter.emitDoc(doc)
     codeWriter.emitAttributes(attributes)
@@ -99,8 +99,9 @@ class PropertySpec private constructor(
 
   class Builder internal constructor(
     internal val name: String,
-    internal val type: TypeName
+    internal val type: TypeName,
   ) : AttributedSpec.Builder<Builder>() {
+
     internal var mutable = false
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableListOf<Modifier>()
@@ -156,18 +157,22 @@ class PropertySpec private constructor(
   }
 
   companion object {
-    @JvmStatic fun builder(name: String, type: TypeName, vararg modifiers: Modifier): Builder {
+
+    @JvmStatic
+    fun builder(name: String, type: TypeName, vararg modifiers: Modifier): Builder {
       return Builder(name, type)
         .addModifiers(*modifiers)
     }
 
-    @JvmStatic fun varBuilder(name: String, type: TypeName, vararg modifiers: Modifier): Builder {
+    @JvmStatic
+    fun varBuilder(name: String, type: TypeName, vararg modifiers: Modifier): Builder {
       return Builder(name, type)
         .mutable(true)
         .addModifiers(*modifiers)
     }
 
-    @JvmStatic fun abstractBuilder(name: String, type: TypeName, vararg modifiers: Modifier): Builder {
+    @JvmStatic
+    fun abstractBuilder(name: String, type: TypeName, vararg modifiers: Modifier): Builder {
       return Builder(name, type)
         .mutable(true)
         .addModifiers(*modifiers)

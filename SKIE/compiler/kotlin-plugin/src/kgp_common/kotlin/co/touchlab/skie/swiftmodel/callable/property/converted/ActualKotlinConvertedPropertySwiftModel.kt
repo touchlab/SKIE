@@ -1,14 +1,14 @@
 package co.touchlab.skie.swiftmodel.callable.property.converted
 
-import co.touchlab.skie.swiftmodel.callable.swiftModelOrigin
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.swiftmodel.callable.swiftModelOrigin
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
-import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class ActualKotlinConvertedPropertySwiftModel(

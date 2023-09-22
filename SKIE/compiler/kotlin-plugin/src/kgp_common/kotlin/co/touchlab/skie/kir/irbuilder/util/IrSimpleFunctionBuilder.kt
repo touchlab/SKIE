@@ -54,7 +54,7 @@ fun IrBuilderWithScope.irSimpleFunction(
     isExpect = isExpect,
     isFakeOverride = isFakeOverride,
     containerSource = containerSource,
-    factory = factory
+    factory = factory,
 ).apply {
     val irDeclarationBuilder = DeclarationIrBuilder(context, symbol, startOffset = startOffset, endOffset = endOffset)
 

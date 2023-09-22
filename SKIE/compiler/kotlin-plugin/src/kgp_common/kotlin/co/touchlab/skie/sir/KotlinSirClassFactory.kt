@@ -1,22 +1,21 @@
 package co.touchlab.skie.sir
 
-import co.touchlab.skie.swiftmodel.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.SwiftExportScope
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.swiftmodel.SwiftExportScope
+import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
+import co.touchlab.skie.swiftmodel.type.translation.SwiftTypeTranslator
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.isInterface
 
-// WIP Refactor
 class KotlinSirClassFactory(
     private val sirProvider: SirProvider,
     private val translator: SwiftTypeTranslator,

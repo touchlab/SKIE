@@ -1,5 +1,6 @@
 package co.touchlab.skie.swiftmodel.callable.function
 
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
@@ -7,7 +8,6 @@ import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftMode
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
-import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 class HiddenOverrideKotlinFunctionSwiftModel(

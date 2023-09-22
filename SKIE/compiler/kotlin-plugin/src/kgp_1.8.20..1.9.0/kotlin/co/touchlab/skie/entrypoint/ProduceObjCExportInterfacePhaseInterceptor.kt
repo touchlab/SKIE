@@ -2,8 +2,8 @@
 
 package co.touchlab.skie.entrypoint
 
-import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
+import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.phases.FrontendPhaseOutput
 import org.jetbrains.kotlin.backend.konan.driver.phases.ProduceObjCExportInterfacePhase

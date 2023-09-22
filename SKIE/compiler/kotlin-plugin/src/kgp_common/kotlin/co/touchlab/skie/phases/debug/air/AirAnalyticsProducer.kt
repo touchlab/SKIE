@@ -1,7 +1,7 @@
 package co.touchlab.skie.phases.debug.air
 
-import co.touchlab.skie.phases.debug.air.element.AirProject
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.debug.air.element.AirProject
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment

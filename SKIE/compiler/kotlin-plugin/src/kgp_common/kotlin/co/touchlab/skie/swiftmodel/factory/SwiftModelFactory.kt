@@ -1,21 +1,19 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.swiftmodel.factory
 
+import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
+import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
+import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.AsyncKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelWithCore
+import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.type.ActualKotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.ActualKotlinEnumEntrySwiftModel
 import co.touchlab.skie.swiftmodel.type.ActualKotlinFileSwiftModel
-import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
-import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.sir.SirProvider
 import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor

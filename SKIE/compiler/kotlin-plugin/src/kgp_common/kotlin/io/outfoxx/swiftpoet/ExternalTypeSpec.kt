@@ -20,6 +20,7 @@ package io.outfoxx.swiftpoet
  * Placeholder for an externally defined type that needs to be in the scope hierarchy.
  */
 class ExternalTypeSpec(name: String) : AnyTypeSpec(name, emptyList(), emptyMap()) {
+
   override fun emit(codeWriter: CodeWriter) {
   }
 }

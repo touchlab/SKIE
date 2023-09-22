@@ -1,6 +1,5 @@
 package co.touchlab.skie.swiftmodel.callable
 
-import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.types.typeUtil.isEnum
 import org.jetbrains.kotlin.types.typeUtil.isInterface

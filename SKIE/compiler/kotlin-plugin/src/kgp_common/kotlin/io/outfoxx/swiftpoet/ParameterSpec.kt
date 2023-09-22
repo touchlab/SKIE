@@ -18,7 +18,7 @@ package io.outfoxx.swiftpoet
 
 /** A generated parameter declaration.  */
 class ParameterSpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
 
   val argumentLabel = builder.argumentLabel
@@ -86,8 +86,9 @@ class ParameterSpec private constructor(
   class Builder internal constructor(
     internal val argumentLabel: String?,
     internal val parameterName: String,
-    internal val type: TypeName
+    internal val type: TypeName,
   ) : AttributedSpec.Builder<Builder>() {
+
     internal val modifiers = mutableListOf<Modifier>()
     internal var variadic = false
     internal var defaultValue: CodeBlock? = null
@@ -118,15 +119,18 @@ class ParameterSpec private constructor(
 
   companion object {
 
-    @JvmStatic fun builder(argumentLabel: String, parameterName: String, type: TypeName, vararg modifiers: Modifier): Builder {
+    @JvmStatic
+    fun builder(argumentLabel: String, parameterName: String, type: TypeName, vararg modifiers: Modifier): Builder {
       return Builder(argumentLabel, parameterName, type).addModifiers(*modifiers)
     }
 
-    @JvmStatic fun builder(parameterName: String, type: TypeName, vararg modifiers: Modifier): Builder {
+    @JvmStatic
+    fun builder(parameterName: String, type: TypeName, vararg modifiers: Modifier): Builder {
       return Builder(null, parameterName, type).addModifiers(*modifiers)
     }
 
-    @JvmStatic fun unnamed(typeName: TypeName): ParameterSpec {
+    @JvmStatic
+    fun unnamed(typeName: TypeName): ParameterSpec {
       return Builder("", "", typeName).build()
     }
   }
@@ -136,7 +140,7 @@ internal fun List<ParameterSpec>.emit(
   codeWriter: CodeWriter,
   forceNewLines: Boolean = false,
   includeNames: Boolean = true,
-  emitParameter: (ParameterSpec) -> Unit = { it.emit(codeWriter, includeNames = includeNames) }
+  emitParameter: (ParameterSpec) -> Unit = { it.emit(codeWriter, includeNames = includeNames) },
 ) = with(codeWriter) {
   val params = this@emit
   emit("(")

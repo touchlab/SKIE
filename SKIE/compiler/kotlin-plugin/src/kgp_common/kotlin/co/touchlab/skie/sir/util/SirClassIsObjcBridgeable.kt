@@ -1,9 +1,9 @@
 package co.touchlab.skie.sir.util
 
-import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.swiftmodel.SwiftModelScope
 
 context(SwiftModelScope)
 fun SirClass.isObjcBridgeable(): Boolean =

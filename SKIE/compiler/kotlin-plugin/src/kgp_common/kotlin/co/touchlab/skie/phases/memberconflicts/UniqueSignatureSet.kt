@@ -90,7 +90,7 @@ class UniqueSignatureSet {
                     listOfNotNull(
                         RemoveNew.takeIf { newModelStrategy.shouldBeRemovedBefore(existingModelStrategy) },
                         RemoveExisting(existingModel).takeIf { existingModelStrategy.shouldBeRemovedBefore(newModelStrategy) },
-                    )
+                    ),
                 )
             }
         }

@@ -20,7 +20,7 @@ import io.outfoxx.swiftpoet.TypeVariableName.Bound.Constraint.SAME_TYPE
 
 class TypeVariableName private constructor(
   override val name: String,
-  val bounds: List<Bound>
+  val bounds: List<Bound>,
 ) : TypeName() {
 
   class Bound internal constructor(val constraint: Constraint? = null, val type: TypeName) {
@@ -76,13 +76,15 @@ class TypeVariableName private constructor(
     }
 
     /** Returns type variable named `name` with `variance` and without bounds.  */
-    @JvmStatic @JvmName("get")
+    @JvmStatic
+    @JvmName("get")
     operator fun invoke(name: String) =
-      TypeVariableName.typeVariable(name, listOf())
+      typeVariable(name, listOf())
 
     /** Returns type variable named `name` with `variance` and `bounds`.  */
-    @JvmStatic @JvmName("get")
+    @JvmStatic
+    @JvmName("get")
     operator fun invoke(name: String, vararg bounds: Bound) =
-      TypeVariableName.typeVariable(name, bounds.toList())
+      typeVariable(name, bounds.toList())
   }
 }

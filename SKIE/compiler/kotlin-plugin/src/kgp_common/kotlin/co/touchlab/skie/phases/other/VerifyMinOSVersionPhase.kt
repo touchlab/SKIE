@@ -6,7 +6,7 @@ import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 
-object VerifyMinOSVersionPhase: ClassExportPhase {
+object VerifyMinOSVersionPhase : ClassExportPhase {
 
     context(ClassExportPhase.Context)
     override fun isActive(): Boolean =
@@ -22,8 +22,8 @@ object VerifyMinOSVersionPhase: ClassExportPhase {
         if (currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
             error(
                 "Minimum OS version for ${configurables.target.name} must be at least $minRequiredVersion to support Swift Async. " +
-                        "However, the configured minimum OS version is only $currentMinVersion. " +
-                        "This is most likely a bug in SKIE Gradle plugin which should have set the minimum required version automatically.",
+                    "However, the configured minimum OS version is only $currentMinVersion. " +
+                    "This is most likely a bug in SKIE Gradle plugin which should have set the minimum required version automatically.",
             )
         }
     }

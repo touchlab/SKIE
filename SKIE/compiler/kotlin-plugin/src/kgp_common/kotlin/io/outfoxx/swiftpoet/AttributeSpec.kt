@@ -17,7 +17,7 @@
 package io.outfoxx.swiftpoet
 
 class AttributeSpec internal constructor(
-  builder: Builder
+  builder: Builder,
 ) : Taggable(builder.tags.toImmutableMap()) {
 
   internal val identifier = builder.identifier
@@ -35,8 +35,9 @@ class AttributeSpec internal constructor(
   }
 
   class Builder internal constructor(
-    val identifier: CodeBlock
+    val identifier: CodeBlock,
   ) : Taggable.Builder<Builder>() {
+
     internal val arguments = mutableListOf<String>()
 
     fun addArgument(code: String): Builder = apply {
@@ -56,6 +57,7 @@ class AttributeSpec internal constructor(
   }
 
   companion object {
+
     fun builder(name: String): Builder {
       return Builder(CodeBlock.of("%L", name))
     }

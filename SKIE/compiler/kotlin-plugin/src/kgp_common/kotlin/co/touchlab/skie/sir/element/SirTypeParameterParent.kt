@@ -40,7 +40,7 @@ private fun SirType.substituteTypeParameters(
         is LambdaSirType -> LambdaSirType(
             returnType = returnType.substituteTypeParameters(substitutions),
             valueParameterTypes = valueParameterTypes.map { it.substituteTypeParameters(substitutions) },
-            isEscaping = isEscaping
+            isEscaping = isEscaping,
         )
         is NullableSirType -> NullableSirType(type.substituteTypeParameters(substitutions))
         is SkieErrorSirType,

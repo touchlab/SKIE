@@ -1,11 +1,11 @@
 package co.touchlab.skie.swiftmodel.callable.property.regular
 
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
-import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 class HiddenOverrideKotlinRegularPropertySwiftModel(

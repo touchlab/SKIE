@@ -30,7 +30,7 @@ class SuspendKotlinBridgeBodyGenerator(
             val originalFunctionCallLambda = lambdaGenerator.createOriginalFunctionCallLambda(
                 bridgingFunction = bridgingFunction,
                 originalFunctionDescriptor = originalFunctionDescriptor,
-                type = suspendHandlerLaunchMethod.valueParameters.last().type
+                type = suspendHandlerLaunchMethod.valueParameters.last().type,
             )
 
             +irReturn(
@@ -39,7 +39,7 @@ class SuspendKotlinBridgeBodyGenerator(
 
                     putValueArgument(0, checkedExceptions)
                     putValueArgument(1, originalFunctionCallLambda)
-                }
+                },
             )
         }
 

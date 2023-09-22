@@ -25,12 +25,13 @@ private val NO_MODULE = String()
  * Converts a [FileSpec] to a string suitable to both human- and swiftc-consumption. This honors
  * imports, indentation, and variable names.
  */
-internal class CodeWriter constructor(
+internal class CodeWriter(
   out: Appendable,
   private val indent: String = DEFAULT_INDENT,
   internal val importedTypes: Map<String, DeclaredTypeName> = emptyMap(),
-  private val importedModules: Set<String> = emptySet()
+  private val importedModules: Set<String> = emptySet(),
 ) {
+
   private val out = LineWrapper(out, indent, 100)
   private var indentLevel = 0
 
@@ -106,7 +107,7 @@ internal class CodeWriter constructor(
   fun emitAttributes(
     attributes: List<AttributeSpec>,
     separator: String = "\n",
-    suffix: String = "\n"
+    suffix: String = "\n",
   ) {
     if (attributes.isNotEmpty()) {
       var firstAttribute = true
@@ -125,7 +126,7 @@ internal class CodeWriter constructor(
    */
   fun emitModifiers(
     modifiers: Set<Modifier>,
-    implicitModifiers: Set<Modifier> = emptySet()
+    implicitModifiers: Set<Modifier> = emptySet(),
   ) {
     if (modifiers.isEmpty()) return
     for (modifier in modifiers.toEnumSet()) {
@@ -213,7 +214,7 @@ internal class CodeWriter constructor(
           emit(
             if (string != null)
               stringLiteralWithQuotes(string) else
-              "null"
+              "null",
           )
         }
 

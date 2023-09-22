@@ -1,5 +1,3 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
 import co.touchlab.skie.kir.DescriptorProvider

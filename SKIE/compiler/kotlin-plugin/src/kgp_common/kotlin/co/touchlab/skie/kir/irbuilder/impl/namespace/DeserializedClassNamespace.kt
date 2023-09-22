@@ -1,9 +1,9 @@
 package co.touchlab.skie.kir.irbuilder.impl.namespace
 
-import co.touchlab.skie.kir.irbuilder.util.findSourceFile
-import co.touchlab.skie.kir.irbuilder.UnsupportedDeclarationDescriptorException
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.DeserializedClassMemberScopeReflector
+import co.touchlab.skie.kir.irbuilder.UnsupportedDeclarationDescriptorException
+import co.touchlab.skie.kir.irbuilder.util.findSourceFile
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor

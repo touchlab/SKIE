@@ -1,7 +1,7 @@
 package co.touchlab.skie.swiftmodel.callable.property.regular
 
-import co.touchlab.skie.swiftmodel.factory.ObjCTypeProvider
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
+import co.touchlab.skie.swiftmodel.factory.ObjCTypeProvider
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType

@@ -1,5 +1,5 @@
 package co.touchlab.skie.phases.apinotes
-// WIP 2 Remove commented code
+
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationNamespace

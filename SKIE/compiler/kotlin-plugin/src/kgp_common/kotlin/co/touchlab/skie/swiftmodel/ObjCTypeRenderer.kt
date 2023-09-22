@@ -46,14 +46,17 @@ class ObjCTypeRenderer {
                 nonNullType.render(" $attribute".withAttrsAndName(attrsAndName), true, reservedIdentifiers)
             }
             is ObjCBlockPointerType ->
-                returnType.render(buildString {
-                    append("(^")
-                    append(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
-                    append(")(")
-                    if (parameterTypes.isEmpty()) append("void".asTypeDefIfNeeded(reservedIdentifiers))
-                    parameterTypes.joinTo(this) { it.render("", false, reservedIdentifiers) }
-                    append(')')
-                }, false, reservedIdentifiers)
+                returnType.render(
+                    buildString {
+                        append("(^")
+                        append(attrsAndName.withPrependedExplicitNullability(hasNullableAttribute))
+                        append(")(")
+                        if (parameterTypes.isEmpty()) append("void".asTypeDefIfNeeded(reservedIdentifiers))
+                        parameterTypes.joinTo(this) { it.render("", false, reservedIdentifiers) }
+                        append(')')
+                    },
+                    false, reservedIdentifiers,
+                )
             is ObjCProtocolType -> {
                 mutableMappedProtocols.add(protocolName)
 

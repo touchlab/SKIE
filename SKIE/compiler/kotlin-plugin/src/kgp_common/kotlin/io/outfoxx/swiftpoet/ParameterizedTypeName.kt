@@ -19,8 +19,9 @@ package io.outfoxx.swiftpoet
 class ParameterizedTypeName internal constructor(
   private val enclosingType: TypeName?,
   val rawType: DeclaredTypeName,
-  typeArguments: List<TypeName>
+  typeArguments: List<TypeName>,
 ) : TypeName() {
+
   val typeArguments = typeArguments.toImmutableList()
 
   init {

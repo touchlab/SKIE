@@ -1,6 +1,5 @@
 package co.touchlab.skie.kir.irbuilder.impl.symboltable
 
-import co.touchlab.skie.kir.irbuilder.impl.symboltable.IrBaseRebindablePublicSymbol
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol

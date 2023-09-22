@@ -10,7 +10,7 @@ import kotlin.reflect.jvm.jvmName
 
 class SimpleNamedPhaseInterceptorConfigurer<Context, Input, Output> :
     PhaseInterceptorConfigurer<SimpleNamedCompilerPhase<Context, Input, Output>, Context, Input, Output>
-        where Context : LoggingContext, Context : ConfigChecks {
+    where Context : LoggingContext, Context : ConfigChecks {
 
     override fun canConfigurePhase(phase: Any): Boolean = phase is SimpleNamedCompilerPhase<*, *, *>
 

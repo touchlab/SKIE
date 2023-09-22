@@ -48,8 +48,8 @@ fun List<TypeParameterDescriptor>.copyIndexing(newOwner: CallableDescriptor): Li
         TypeConstructorSubstitution.createByParametersMap(
             this.zip(newDescriptors).associate { (from, into) ->
                 from to TypeProjectionImpl(into.defaultType)
-            }
-        )
+            },
+        ),
     )
 
     forEachIndexed { index, oldDescriptor ->
@@ -62,7 +62,7 @@ fun List<TypeParameterDescriptor>.copyIndexing(newOwner: CallableDescriptor): Li
                 upperBound
             }
             newDescriptor.addUpperBound(
-                typeSubstitutor.safeSubstitute(upperBoundToAdd, Variance.INVARIANT)
+                typeSubstitutor.safeSubstitute(upperBoundToAdd, Variance.INVARIANT),
             )
         }
     }

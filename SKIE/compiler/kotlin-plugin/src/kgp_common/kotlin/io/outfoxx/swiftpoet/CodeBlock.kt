@@ -45,8 +45,9 @@ package io.outfoxx.swiftpoet
  */
 class CodeBlock private constructor(
   internal val formatParts: List<String>,
-  internal val args: List<Any?>
+  internal val args: List<Any?>,
 ) {
+
   /** A heterogeneous list containing string literals and value placeholders.  */
 
   fun isEmpty() = formatParts.isEmpty()
@@ -154,6 +155,7 @@ class CodeBlock private constructor(
   }
 
   class Builder {
+
     internal val formatParts = mutableListOf<String>()
     internal val args = mutableListOf<Any?>()
 
@@ -282,10 +284,12 @@ class CodeBlock private constructor(
         }
 
         require(index >= 0 && index < args.size) {
-          "index ${index + 1} for '${format.substring(
-            indexStart - 1,
-            indexEnd + 1
-          )}' not in range (received ${args.size} arguments)"
+          "index ${index + 1} for '${
+            format.substring(
+              indexStart - 1,
+              indexEnd + 1,
+            )
+          }' not in range (received ${args.size} arguments)"
         }
         require(!hasIndexed || !hasRelative) { "cannot mix indexed and positional parameters" }
 
@@ -318,7 +322,7 @@ class CodeBlock private constructor(
         'S' -> this.args += argToString(arg)
         'T' -> this.args += argToType(arg)
         else -> throw IllegalArgumentException(
-          String.format("invalid format string: '%s'", format)
+          String.format("invalid format string: '%s'", format),
         )
       }
     }
@@ -399,6 +403,7 @@ class CodeBlock private constructor(
   }
 
   companion object {
+
     private val NAMED_ARGUMENT = Regex("%([\\w_]+):([\\w]).*")
     private val LOWERCASE = Regex("[a-z]+[\\w_]*")
     private const val ARG_NAME = 1
@@ -406,8 +411,10 @@ class CodeBlock private constructor(
     private val NO_ARG_PLACEHOLDERS = setOf("%W", "%>", "%<", "%[", "%]")
     val ABSTRACT = CodeBlock(emptyList(), emptyList())
 
-    @JvmStatic fun of(format: String, vararg args: Any?) = Builder().add(format, *args).build()
-    @JvmStatic fun builder() = Builder()
+    @JvmStatic
+    fun of(format: String, vararg args: Any?) = Builder().add(format, *args).build()
+    @JvmStatic
+    fun builder() = Builder()
 
     internal fun isNoArgPlaceholder(c: Char) = c.isOneOf('%', '>', '<', '[', ']', 'W')
   }
@@ -417,7 +424,7 @@ class CodeBlock private constructor(
 fun Collection<CodeBlock>.joinToCode(
   separator: CharSequence = ", ",
   prefix: CharSequence = "",
-  suffix: CharSequence = ""
+  suffix: CharSequence = "",
 ): CodeBlock {
   val blocks = toTypedArray()
   val placeholders = Array(blocks.size, { "%L" })

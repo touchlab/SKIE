@@ -26,9 +26,7 @@ data class Signature(
 
                 other as Specific
 
-                if (name != other.name) return false
-
-                return true
+                return name == other.name
             }
 
             override fun hashCode(): Int = 0

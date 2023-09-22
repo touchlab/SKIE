@@ -17,7 +17,7 @@
 package io.outfoxx.swiftpoet
 
 class FileMemberSpec internal constructor(
-  builder: Builder
+  builder: Builder,
 ) : Taggable(builder.tags.toImmutableMap()) {
 
   val doc = builder.doc.build()
@@ -51,8 +51,9 @@ class FileMemberSpec internal constructor(
   }
 
   class Builder internal constructor(
-    internal val member: Any
+    internal val member: Any,
   ) : Taggable.Builder<Builder>() {
+
     internal val doc = CodeBlock.builder()
     internal val guardTest = CodeBlock.builder()
 
@@ -78,12 +79,17 @@ class FileMemberSpec internal constructor(
   }
 
   companion object {
-    @JvmStatic fun builder(member: AnyTypeSpec) = Builder(member)
 
-    @JvmStatic fun builder(member: FunctionSpec) = Builder(member)
+    @JvmStatic
+    fun builder(member: AnyTypeSpec) = Builder(member)
 
-    @JvmStatic fun builder(member: PropertySpec) = Builder(member)
+    @JvmStatic
+    fun builder(member: FunctionSpec) = Builder(member)
 
-    @JvmStatic fun builder(member: ExtensionSpec) = Builder(member)
+    @JvmStatic
+    fun builder(member: PropertySpec) = Builder(member)
+
+    @JvmStatic
+    fun builder(member: ExtensionSpec) = Builder(member)
   }
 }

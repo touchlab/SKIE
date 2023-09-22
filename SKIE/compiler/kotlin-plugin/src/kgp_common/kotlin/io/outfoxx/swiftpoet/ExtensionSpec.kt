@@ -22,7 +22,7 @@ import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
 /** A generated class, protocol, or enum declaration.  */
 class ExtensionSpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : Taggable(builder.tags.toImmutableMap()) {
 
   val doc = builder.doc.build()
@@ -130,8 +130,9 @@ class ExtensionSpec private constructor(
   override fun toString() = buildString { emit(CodeWriter(this)) }
 
   class Builder internal constructor(
-    internal val extendedTypeOrName: Any
+    internal val extendedTypeOrName: Any,
   ) : Taggable.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeSpecs {
+
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableSetOf<Modifier>()
     internal val superTypes = mutableListOf<TypeName>()
@@ -180,7 +181,7 @@ class ExtensionSpec private constructor(
     }
 
     fun addFunction(functionSpec: FunctionSpec) = apply {
-      requireNoneOrOneOf(functionSpec.modifiers, Modifier.OPEN, Modifier.INTERNAL, Modifier.PUBLIC, Modifier.PRIVATE)
+      requireNoneOrOneOf(functionSpec.modifiers, Modifier.OPEN, INTERNAL, Modifier.PUBLIC, Modifier.PRIVATE)
       functionSpecs += functionSpec
     }
 
@@ -198,7 +199,10 @@ class ExtensionSpec private constructor(
   }
 
   companion object {
-    @JvmStatic fun builder(extendedType: AnyTypeSpec) = Builder(extendedType)
-    @JvmStatic fun builder(extendedType: DeclaredTypeName) = Builder(extendedType)
+
+    @JvmStatic
+    fun builder(extendedType: AnyTypeSpec) = Builder(extendedType)
+    @JvmStatic
+    fun builder(extendedType: DeclaredTypeName) = Builder(extendedType)
   }
 }

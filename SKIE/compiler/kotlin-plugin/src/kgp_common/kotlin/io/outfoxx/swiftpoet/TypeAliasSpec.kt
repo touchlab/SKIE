@@ -24,7 +24,7 @@ import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
 
 /** A generated typealias declaration */
 class TypeAliasSpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : AnyTypeSpec(builder.name, builder.attributes, builder.tags) {
 
   val type = builder.type
@@ -63,8 +63,9 @@ class TypeAliasSpec private constructor(
 
   class Builder internal constructor(
     internal val name: String,
-    internal val type: TypeName
+    internal val type: TypeName,
   ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters {
+
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableSetOf<Modifier>()
     internal val typeVariables = mutableSetOf<TypeVariableName>()
@@ -104,6 +105,8 @@ class TypeAliasSpec private constructor(
   }
 
   companion object {
-    @JvmStatic fun builder(name: String, type: TypeName) = Builder(name, type)
+
+    @JvmStatic
+    fun builder(name: String, type: TypeName) = Builder(name, type)
   }
 }

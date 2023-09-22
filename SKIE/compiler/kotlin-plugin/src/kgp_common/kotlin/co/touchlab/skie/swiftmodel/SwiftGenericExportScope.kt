@@ -1,8 +1,8 @@
 package co.touchlab.skie.swiftmodel
 
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
+import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface

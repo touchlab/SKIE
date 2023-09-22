@@ -1,9 +1,9 @@
 package co.touchlab.skie.phases.analytics.performance
 
-import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
+import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime

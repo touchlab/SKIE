@@ -26,7 +26,7 @@ data class ApiNotes(
                 encodeDefaults = false,
                 strictMode = false,
                 breakScalarsAt = Int.MAX_VALUE,
-            )
+            ),
         )
 
         operator fun invoke(file: File): ApiNotes = coder.decodeFromStream(serializer(), file.inputStream())

@@ -24,6 +24,7 @@ class SelfTypeName private constructor() : TypeName() {
   }
 
   companion object {
+
     val INSTANCE = SelfTypeName()
   }
 }

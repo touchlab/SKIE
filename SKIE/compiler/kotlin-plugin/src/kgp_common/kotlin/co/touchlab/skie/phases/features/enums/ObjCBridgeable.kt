@@ -31,7 +31,7 @@ private fun TypeSpec.Builder.addObjectiveCTypeAlias(): TypeSpec.Builder =
     addType(
         TypeAliasSpec.builder(ObjCBridgeable.bridgedObjCTypeAlias, kotlinSirClass.internalName.toSwiftPoetName())
             .addModifiers(Modifier.PUBLIC)
-            .build()
+            .build(),
     )
 
 context(KotlinClassSwiftModel)
@@ -42,7 +42,7 @@ private fun TypeSpec.Builder.addForceBridgeFromObjectiveC(): TypeSpec.Builder =
             .addParameter("_", "source", kotlinSirClass.internalName.toSwiftPoetName())
             .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
             .addStatement("result = fromObjectiveC(source)")
-            .build()
+            .build(),
     )
 
 context(KotlinClassSwiftModel)
@@ -55,7 +55,7 @@ private fun TypeSpec.Builder.addConditionallyBridgeFromObjectiveC(): TypeSpec.Bu
             .addStatement("result = fromObjectiveC(source)")
             .addStatement("return true")
             .returns(BOOL)
-            .build()
+            .build(),
     )
 
 context(KotlinClassSwiftModel)
@@ -66,7 +66,7 @@ private fun TypeSpec.Builder.addUnconditionallyBridgeFromObjectiveC(): TypeSpec.
             .addParameter("_", "source", kotlinSirClass.internalName.toSwiftPoetName().makeOptional())
             .addStatement("return fromObjectiveC(source)")
             .returns(SelfTypeName.INSTANCE)
-            .build()
+            .build(),
     )
 
 context(KotlinClassSwiftModel)
@@ -76,7 +76,7 @@ private fun TypeSpec.Builder.addBridgeToObjectiveC(): TypeSpec.Builder =
             .addModifiers(Modifier.PUBLIC)
             .returns(kotlinSirClass.internalName.toSwiftPoetName())
             .addBridgeToObjectiveCBody()
-            .build()
+            .build(),
     )
 
 context(KotlinClassSwiftModel)
@@ -85,10 +85,10 @@ private fun FunctionSpec.Builder.addBridgeToObjectiveCBody(): FunctionSpec.Build
         CodeBlock.builder()
             .beginControlFlow("switch", "self")
             .add(
-                enumEntries.map { it.swiftBridgeCase }.joinToCode("\n", suffix = "\n")
+                enumEntries.map { it.swiftBridgeCase }.joinToCode("\n", suffix = "\n"),
             )
             .endControlFlow("switch")
-            .build()
+            .build(),
     )
 
 private val KotlinEnumEntrySwiftModel.swiftBridgeCase: CodeBlock
@@ -108,7 +108,7 @@ private fun TypeSpec.Builder.addFromObjectiveC(): TypeSpec.Builder =
             .addParameter("_", "source", kotlinSirClass.internalName.toSwiftPoetName().makeOptional())
             .returns(SelfTypeName.INSTANCE)
             .addFromObjectiveCBody()
-            .build()
+            .build(),
     )
 
 context(KotlinClassSwiftModel)
@@ -139,7 +139,7 @@ private fun FunctionSpec.Builder.addFromObjectiveCBody(): FunctionSpec.Builder =
                     addCode(fatalErrorFromObjectiveC)
                 }
             }
-            .build()
+            .build(),
     )
 
 private val KotlinClassSwiftModel.fatalErrorFromObjectiveC: CodeBlock

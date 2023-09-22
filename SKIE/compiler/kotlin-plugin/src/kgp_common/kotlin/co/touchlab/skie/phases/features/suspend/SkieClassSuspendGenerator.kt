@@ -1,12 +1,12 @@
 package co.touchlab.skie.phases.features.suspend
 
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toSwiftPoetVariables
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
+import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier

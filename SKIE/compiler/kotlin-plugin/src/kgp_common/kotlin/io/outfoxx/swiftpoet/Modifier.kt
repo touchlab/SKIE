@@ -18,7 +18,7 @@ package io.outfoxx.swiftpoet
 
 enum class Modifier(
   internal val keyword: String,
-  private vararg val targets: Target
+  private vararg val targets: Target,
 ) {
 
   OPEN("open", Target.CLASS, Target.FUNCTION, Target.PROPERTY),

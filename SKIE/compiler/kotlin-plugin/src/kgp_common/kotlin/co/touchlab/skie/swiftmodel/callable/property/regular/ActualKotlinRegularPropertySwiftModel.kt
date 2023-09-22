@@ -1,8 +1,8 @@
 package co.touchlab.skie.swiftmodel.callable.property.regular
 
-import co.touchlab.skie.swiftmodel.callable.identifierAfterVisibilityChanges
-import co.touchlab.skie.swiftmodel.callable.swiftModelOrigin
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.sir.type.SirType
+import co.touchlab.skie.sir.type.SkieErrorSirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
@@ -12,11 +12,11 @@ import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftMod
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
+import co.touchlab.skie.swiftmodel.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.swiftmodel.callable.swiftGenericExportScope
+import co.touchlab.skie.swiftmodel.callable.swiftModelOrigin
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
-import co.touchlab.skie.sir.type.SirType
-import co.touchlab.skie.sir.type.SkieErrorSirType
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 

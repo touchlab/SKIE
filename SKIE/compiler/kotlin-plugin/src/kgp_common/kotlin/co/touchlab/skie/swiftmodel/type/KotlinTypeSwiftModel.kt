@@ -1,10 +1,9 @@
 package co.touchlab.skie.swiftmodel.type
 
+import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.swiftmodel.SwiftGenericExportScope
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.sir.element.SirClass
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 interface KotlinTypeSwiftModel {
 
@@ -24,7 +23,6 @@ interface KotlinTypeSwiftModel {
 
     val kotlinSirClass: SirClass
 
-    // WIP 2 check Has to be from local module
     val bridgedSirClass: SirClass?
 
     val objCFqName: ObjcFqName
@@ -38,7 +36,3 @@ interface KotlinTypeSwiftModel {
     }
 }
 
-// WIP
-fun SirClass.swiftGenericExportScope(classDescriptor: ClassDescriptor): SwiftGenericExportScope {
-    return SwiftGenericExportScope.Class(classDescriptor, typeParameters)
-}

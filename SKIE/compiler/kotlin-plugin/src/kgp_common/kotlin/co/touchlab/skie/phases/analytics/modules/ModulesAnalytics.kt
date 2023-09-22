@@ -1,13 +1,11 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.phases.analytics.modules
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.phases.KotlinIrPhase
-import co.touchlab.skie.util.hash.hashed
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
+import co.touchlab.skie.plugin.analytics.AnalyticsProducer
+import co.touchlab.skie.util.hash.hashed
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI

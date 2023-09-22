@@ -2,16 +2,16 @@
 
 package co.touchlab.skie.swiftmodel.callable.function
 
+import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
+import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.swiftmodel.callable.parameter.KotlinParameterSwiftModelCore
 import co.touchlab.skie.swiftmodel.factory.ObjCTypeProvider
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridge
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.swiftmodel.type.bridge.valueParametersAssociated
-import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.backend.konan.objcexport.doesThrow
@@ -78,7 +78,7 @@ class KotlinFunctionSwiftModelCore(
                             bridge = parameterBridgeWithDescriptor.first,
                             flowMappingStrategy = flowMappingStrategy,
                         )
-                    }
+                    },
                 ) to parameterBridgeWithDescriptor.second
             }
 

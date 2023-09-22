@@ -70,13 +70,13 @@ interface DescriptorProvider {
 
 fun DescriptorProvider.getAllExposedMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
     this.getExposedClassMembers(classDescriptor) +
-            this.getExposedCategoryMembers(classDescriptor) +
-            this.getExposedConstructors(classDescriptor)
+        this.getExposedCategoryMembers(classDescriptor) +
+        this.getExposedConstructors(classDescriptor)
 
 val DescriptorProvider.allExposedMembers: List<CallableMemberDescriptor>
     get() = (this.exposedFiles.flatMap { this.getExposedStaticMembers(it) } +
-            this.exposedClasses.flatMap { this.getExposedClassMembers(it) + this.getExposedConstructors(it) }) +
-            this.exposedCategoryMembers
+        this.exposedClasses.flatMap { this.getExposedClassMembers(it) + this.getExposedConstructors(it) }) +
+        this.exposedCategoryMembers
 
 val DescriptorProvider.modulesWithExposedDeclarations: Set<ModuleDescriptor>
     get() = (exposedClasses.map { it.module } + exposedFiles.map { getFileModule(it) }).toSet()

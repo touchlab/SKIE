@@ -2,16 +2,16 @@
 
 package co.touchlab.skie.swiftmodel.factory
 
+import co.touchlab.skie.compilerinject.reflection.reflectedBy
+import co.touchlab.skie.compilerinject.reflection.reflectors.ObjCExportTranslatorImplReflector
+import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.features.flow.SupportedFlow
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.swiftmodel.type.bridge.NativeTypeBridge
 import co.touchlab.skie.swiftmodel.type.translation.ObjCValueType
-import co.touchlab.skie.phases.features.flow.SupportedFlow
-import co.touchlab.skie.compilerinject.reflection.reflectedBy
-import co.touchlab.skie.compilerinject.reflection.reflectors.ObjCExportTranslatorImplReflector
-import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.konan.objcexport.BlockPointerBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCBlockPointerType
@@ -136,7 +136,7 @@ class ObjCTypeProvider(
             if (!returnBridge.successMayBeZero) {
                 check(
                     successReturnType is ObjCNonNullReferenceType
-                            || (successReturnType is ObjCPointerType && !successReturnType.nullable),
+                        || (successReturnType is ObjCPointerType && !successReturnType.nullable),
                 ) {
                     "Unexpected return type: $successReturnType in $method"
                 }

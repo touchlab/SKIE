@@ -1,8 +1,8 @@
 package co.touchlab.skie.configuration
 
-import co.touchlab.skie.phases.runtime.belongsToSkieRuntime
 import co.touchlab.skie.kir.util.findAnnotation
 import co.touchlab.skie.kir.util.hasAnnotation
+import co.touchlab.skie.phases.runtime.belongsToSkieRuntime
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import kotlin.reflect.KClass

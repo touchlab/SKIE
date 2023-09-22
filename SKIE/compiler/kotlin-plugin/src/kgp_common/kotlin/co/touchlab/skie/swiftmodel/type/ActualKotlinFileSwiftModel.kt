@@ -1,12 +1,12 @@
 package co.touchlab.skie.swiftmodel.type
 
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftGenericExportScope
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.isRemoved
-import co.touchlab.skie.sir.element.SirClass
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.SourceFile
 

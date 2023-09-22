@@ -1,5 +1,6 @@
 package co.touchlab.skie.swiftmodel.callable.function
 
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
@@ -10,7 +11,6 @@ import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftM
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.swiftGenericExportScope
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
-import co.touchlab.skie.sir.type.SirType
 
 class AsyncKotlinFunctionSwiftModel(
     private val delegate: KotlinFunctionSwiftModelWithCore,

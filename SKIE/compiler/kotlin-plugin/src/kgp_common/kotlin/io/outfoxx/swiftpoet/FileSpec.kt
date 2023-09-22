@@ -36,7 +36,7 @@ import java.nio.file.Path
  * - Members
  */
 class FileSpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : Taggable(builder.tags.toImmutableMap()) {
 
   val comment = builder.comment.build()
@@ -132,8 +132,9 @@ class FileSpec private constructor(
 
   class Builder internal constructor(
     val moduleName: String,
-    val name: String
+    val name: String,
   ) : Taggable.Builder<Builder>(), BuilderWithTypeSpecs {
+
     internal val comment = CodeBlock.builder()
     internal val moduleImports = sortedSetOf<ImportSpec>()
     internal var indent = DEFAULT_INDENT
@@ -174,7 +175,7 @@ class FileSpec private constructor(
       addImport(
         ImportSpec.builder(moduleName)
           .apply { attributes.forEach { addAttribute(it) } }
-          .build()
+          .build(),
       )
     }
 
@@ -186,13 +187,17 @@ class FileSpec private constructor(
   }
 
   companion object {
-    @JvmStatic fun get(moduleName: String, typeSpec: AnyTypeSpec): FileSpec {
+
+    @JvmStatic
+    fun get(moduleName: String, typeSpec: AnyTypeSpec): FileSpec {
       return builder(moduleName, typeSpec.name).addType(typeSpec).build()
     }
 
-    @JvmStatic fun builder(moduleName: String, fileName: String) = Builder(moduleName, fileName)
+    @JvmStatic
+    fun builder(moduleName: String, fileName: String) = Builder(moduleName, fileName)
 
-    @JvmStatic fun builder(fileName: String) = Builder("", fileName)
+    @JvmStatic
+    fun builder(fileName: String) = Builder("", fileName)
   }
 }
 

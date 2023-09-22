@@ -22,7 +22,7 @@ import kotlin.reflect.KClass
 
 open class AttributedSpec(
   val attributes: List<AttributeSpec>,
-  tags: Map<KClass<*>, Any>
+  tags: Map<KClass<*>, Any>,
 ) : Taggable(tags.toImmutableMap()) {
 
   /** The builder analogue to [AttributedSpec] types. */

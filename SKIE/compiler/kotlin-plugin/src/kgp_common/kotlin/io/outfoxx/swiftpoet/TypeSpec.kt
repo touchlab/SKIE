@@ -23,7 +23,7 @@ import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
 /** A generated class, struct, enum or protocol declaration. */
 class TypeSpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : AnyTypeSpec(builder.name, builder.attributes, builder.tags) {
 
   internal val kind = builder.kind
@@ -176,7 +176,7 @@ class TypeSpec private constructor(
     internal val declarationKeyword: String,
     internal val defaultImplicitPropertyModifiers: Set<Modifier>,
     internal val defaultImplicitFunctionModifiers: Set<Modifier>,
-    internal val modifiers: Set<Modifier> = emptySet()
+    internal val modifiers: Set<Modifier> = emptySet(),
   ) {
 
     internal val implicitPropertyModifiers get() = defaultImplicitPropertyModifiers
@@ -191,7 +191,7 @@ class TypeSpec private constructor(
       "class",
       setOf(INTERNAL),
       setOf(INTERNAL),
-      modifiers.toSet()
+      modifiers.toSet(),
     ) {
 
       override fun plusModifiers(vararg modifiers: Modifier) =
@@ -202,7 +202,7 @@ class TypeSpec private constructor(
       "struct",
       setOf(INTERNAL),
       setOf(INTERNAL),
-      modifiers.toSet()
+      modifiers.toSet(),
     ) {
 
       override fun plusModifiers(vararg modifiers: Modifier) =
@@ -213,7 +213,7 @@ class TypeSpec private constructor(
       "protocol",
       setOf(INTERNAL),
       setOf(INTERNAL),
-      modifiers.toSet()
+      modifiers.toSet(),
     ) {
 
       override fun plusModifiers(vararg modifiers: Modifier) =
@@ -224,7 +224,7 @@ class TypeSpec private constructor(
       "enum",
       setOf(INTERNAL),
       setOf(INTERNAL),
-      modifiers.toSet()
+      modifiers.toSet(),
     ) {
 
       override fun plusModifiers(vararg modifiers: Modifier) =
@@ -235,7 +235,7 @@ class TypeSpec private constructor(
       "actor",
       setOf(INTERNAL),
       setOf(INTERNAL),
-      modifiers.toSet()
+      modifiers.toSet(),
     ) {
 
       override fun plusModifiers(vararg modifiers: Modifier) =
@@ -245,8 +245,9 @@ class TypeSpec private constructor(
 
   class Builder internal constructor(
     internal var kind: Kind,
-    internal val name: String
+    internal val name: String,
   ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters, BuilderWithTypeSpecs {
+
     internal val doc = CodeBlock.builder()
     internal val typeVariables = mutableListOf<TypeVariableName>()
     internal val superTypes = mutableSetOf<TypeName>()
@@ -343,7 +344,7 @@ class TypeSpec private constructor(
 
     fun addFunction(functionSpec: FunctionSpec) = apply {
       check(!isProtocol || functionSpec.body === CodeBlock.ABSTRACT) { "Protocols require abstract functions; see FunctionSpec.abstractBuilder(...)" }
-      requireNoneOrOneOf(functionSpec.modifiers, Modifier.OPEN, Modifier.INTERNAL, Modifier.PUBLIC, Modifier.PRIVATE)
+      requireNoneOrOneOf(functionSpec.modifiers, Modifier.OPEN, INTERNAL, Modifier.PUBLIC, Modifier.PRIVATE)
       functionSpecs += functionSpec
     }
 
@@ -372,29 +373,41 @@ class TypeSpec private constructor(
   }
 
   companion object {
-    @JvmStatic fun classBuilder(name: String) = Builder(Kind.Class(), name)
 
-    @JvmStatic fun classBuilder(className: DeclaredTypeName) = classBuilder(className.simpleName)
+    @JvmStatic
+    fun classBuilder(name: String) = Builder(Kind.Class(), name)
 
-    @JvmStatic fun structBuilder(name: String) = Builder(Kind.Struct(), name)
+    @JvmStatic
+    fun classBuilder(className: DeclaredTypeName) = classBuilder(className.simpleName)
 
-    @JvmStatic fun structBuilder(structName: DeclaredTypeName) = structBuilder(structName.simpleName)
+    @JvmStatic
+    fun structBuilder(name: String) = Builder(Kind.Struct(), name)
 
-    @JvmStatic fun protocolBuilder(name: String) = Builder(Kind.Protocol(), name)
+    @JvmStatic
+    fun structBuilder(structName: DeclaredTypeName) = structBuilder(structName.simpleName)
 
-    @JvmStatic fun protocolBuilder(protocolName: DeclaredTypeName) = protocolBuilder(protocolName.simpleName)
+    @JvmStatic
+    fun protocolBuilder(name: String) = Builder(Kind.Protocol(), name)
 
-    @JvmStatic fun enumBuilder(name: String) = Builder(Kind.Enum(), name)
+    @JvmStatic
+    fun protocolBuilder(protocolName: DeclaredTypeName) = protocolBuilder(protocolName.simpleName)
 
-    @JvmStatic fun enumBuilder(enumName: DeclaredTypeName) = enumBuilder(enumName.simpleName)
+    @JvmStatic
+    fun enumBuilder(name: String) = Builder(Kind.Enum(), name)
 
-    @JvmStatic fun actorBuilder(name: String) = Builder(Kind.Actor(), name)
+    @JvmStatic
+    fun enumBuilder(enumName: DeclaredTypeName) = enumBuilder(enumName.simpleName)
 
-    @JvmStatic fun actorBuilder(actorName: DeclaredTypeName) = actorBuilder(actorName.simpleName)
+    @JvmStatic
+    fun actorBuilder(name: String) = Builder(Kind.Actor(), name)
+
+    @JvmStatic
+    fun actorBuilder(actorName: DeclaredTypeName) = actorBuilder(actorName.simpleName)
   }
 }
 
 private object CLASS : TypeName() {
+
   override fun emit(out: CodeWriter): CodeWriter {
     return out.emit("class")
   }

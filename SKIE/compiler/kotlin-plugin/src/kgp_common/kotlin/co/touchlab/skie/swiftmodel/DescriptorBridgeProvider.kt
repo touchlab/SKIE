@@ -2,11 +2,11 @@
 
 package co.touchlab.skie.swiftmodel
 
+import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridge
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.swiftmodel.type.bridge.NativeTypeBridge
 import co.touchlab.skie.swiftmodel.type.translation.ObjCValueType
-import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

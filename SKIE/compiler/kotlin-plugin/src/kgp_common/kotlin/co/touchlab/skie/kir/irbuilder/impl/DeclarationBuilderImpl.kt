@@ -88,7 +88,7 @@ class DeclarationBuilderImpl(
         val sourceFile = existingMember.findSourceFileOrNull()
 
         val hasOriginalPackage = existingMember.findPackage() is DeserializedPackageFragment &&
-                sourceFile in originalExposedFiles
+            sourceFile in originalExposedFiles
 
         return when {
             sourceFile == null -> getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
@@ -173,7 +173,7 @@ class DeclarationBuilderImpl(
 
 private fun SymbolTable.allExposedTypeParameters(descriptorProvider: DescriptorProvider): List<IrTypeParameter> =
     (descriptorProvider.allExposedMembers.flatMap { referenceBoundTypeParameterContainer(it) } +
-            descriptorProvider.exposedClasses.flatMap { referenceBoundTypeParameterContainer(it) })
+        descriptorProvider.exposedClasses.flatMap { referenceBoundTypeParameterContainer(it) })
         .flatMap { it.typeParameters }
 
 private fun SymbolTable.referenceBoundTypeParameterContainer(

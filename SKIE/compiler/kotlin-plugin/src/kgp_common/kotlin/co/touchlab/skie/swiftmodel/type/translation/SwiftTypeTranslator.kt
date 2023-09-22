@@ -1,23 +1,21 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.swiftmodel.type.translation
 
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.sir.SirProvider
+import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.sir.type.KotlinErrorSirType
+import co.touchlab.skie.sir.type.LambdaSirType
+import co.touchlab.skie.sir.type.NonNullSirType
+import co.touchlab.skie.sir.type.NullableSirType
+import co.touchlab.skie.sir.type.SirType
+import co.touchlab.skie.sir.type.SkieErrorSirType
+import co.touchlab.skie.sir.type.SpecialSirType
 import co.touchlab.skie.swiftmodel.SwiftExportScope
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridge
 import co.touchlab.skie.swiftmodel.type.bridge.NativeTypeBridge
-import co.touchlab.skie.sir.SirProvider
-import co.touchlab.skie.sir.type.SpecialSirType
-import co.touchlab.skie.sir.type.KotlinErrorSirType
-import co.touchlab.skie.sir.type.LambdaSirType
-import co.touchlab.skie.sir.type.NonNullSirType
-import co.touchlab.skie.sir.type.NullableSirType
-import co.touchlab.skie.sir.type.SirType
-import co.touchlab.skie.sir.type.DeclaredSirType
-import co.touchlab.skie.sir.type.SkieErrorSirType
 import co.touchlab.skie.util.Reporter
 import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
@@ -152,7 +150,7 @@ class SwiftTypeTranslator(
 
             reporter.warning(
                 "Exposed type '$kotlinType' is '$firstType' and '$secondType' at the same time. " +
-                        "This most likely wouldn't work as expected.",
+                    "This most likely wouldn't work as expected.",
             )
         }
 
@@ -302,7 +300,7 @@ class SwiftTypeTranslator(
         }
 
         val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
-                functionType.getValueParameterTypesFromFunctionType().map { it.type }
+            functionType.getValueParameterTypesFromFunctionType().map { it.type }
 
         return LambdaSirType(
             if (returnsVoid) {
@@ -408,7 +406,6 @@ class SwiftTypeTranslator(
         }
     }
 }
-
 
 fun SirType.makeNullableIfNotPrimitive(): SirType =
     if (this is NonNullSirType && !isPrimitive) NullableSirType(this) else this

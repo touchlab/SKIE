@@ -2,24 +2,24 @@
 
 package co.touchlab.skie.swiftmodel.factory
 
+import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
+import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
+import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
+import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.ActualKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.FakeObjcConstructorKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.HiddenOverrideKotlinFunctionSwiftModel
+import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelCore
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelWithCore
+import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.converted.ActualKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.ActualKotlinRegularPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.HiddenOverrideKotlinRegularPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModelCore
-import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
-import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
@@ -156,7 +156,7 @@ class SwiftModelFactoryMembersDelegate(
         group: List<PropertyDescriptor>,
     ): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
         createBoundedConvertedPropertiesEnclosingModels(group) +
-                createBoundedConvertedPropertiesFunctions(group)
+            createBoundedConvertedPropertiesFunctions(group)
 
     private fun createBoundedConvertedPropertiesEnclosingModels(
         group: List<PropertyDescriptor>,

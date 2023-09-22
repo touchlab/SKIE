@@ -1,8 +1,8 @@
 package co.touchlab.skie.swiftmodel.type
 
+import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.sir.element.SirClass
 
 interface MutableKotlinTypeSwiftModel : KotlinTypeSwiftModel {
 

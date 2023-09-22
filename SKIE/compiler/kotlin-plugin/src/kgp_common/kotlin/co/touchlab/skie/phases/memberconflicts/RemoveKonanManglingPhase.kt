@@ -1,7 +1,7 @@
 package co.touchlab.skie.phases.memberconflicts
 
-import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.kir.allExposedMembers
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel

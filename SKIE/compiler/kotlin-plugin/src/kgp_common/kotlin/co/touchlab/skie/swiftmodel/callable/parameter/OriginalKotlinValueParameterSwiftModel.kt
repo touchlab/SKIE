@@ -1,6 +1,5 @@
 package co.touchlab.skie.swiftmodel.callable.parameter
 
-import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 
 class OriginalKotlinValueParameterSwiftModel(

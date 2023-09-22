@@ -17,7 +17,7 @@
 package io.outfoxx.swiftpoet
 
 class TupleTypeName internal constructor(
-  internal val types: List<Pair<String, TypeName>>
+  internal val types: List<Pair<String, TypeName>>,
 ) : TypeName() {
 
   override fun emit(out: CodeWriter): CodeWriter {
@@ -38,6 +38,7 @@ class TupleTypeName internal constructor(
   }
 
   companion object {
+
     fun of(vararg types: Pair<String, TypeName>): TupleTypeName {
       return TupleTypeName(listOf(*types))
     }

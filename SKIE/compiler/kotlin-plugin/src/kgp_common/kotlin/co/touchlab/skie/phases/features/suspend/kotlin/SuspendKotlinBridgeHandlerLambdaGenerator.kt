@@ -35,7 +35,7 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
         irFunctionExpression(
             type = type,
             origin = IrStatementOrigin.LAMBDA,
-            function = createOriginalFunctionCallLambdaFunction(bridgingFunction, originalFunctionDescriptor)
+            function = createOriginalFunctionCallLambdaFunction(bridgingFunction, originalFunctionDescriptor),
         )
 
     context(IrPluginContext, IrBlockBodyBuilder)
@@ -49,7 +49,7 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
             returnType = irBuiltIns.anyType.makeNullable(),
             origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
             isSuspend = true,
-            body = { createOriginalFunctionCallLambdaFunctionBody(bridgingFunction, originalFunctionDescriptor) }
+            body = { createOriginalFunctionCallLambdaFunctionBody(bridgingFunction, originalFunctionDescriptor) },
         )
 
     context(IrPluginContext, DeclarationIrBuilder)
@@ -61,12 +61,14 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
         irBlockBody {
             val originalFunctionSymbol = symbolTable.referenceSimpleFunction(originalFunctionDescriptor)
 
-            +irReturn(irCall(originalFunctionSymbol).apply {
-                setDispatchReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
-                setExtensionReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
-                setValueArgumentsForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
-                setTypeArgumentsForDelegatingCall(bridgingFunction)
-            })
+            +irReturn(
+                irCall(originalFunctionSymbol).apply {
+                    setDispatchReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
+                    setExtensionReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
+                    setValueArgumentsForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
+                    setTypeArgumentsForDelegatingCall(bridgingFunction)
+                },
+            )
         }
 
     context(DeclarationIrBuilder)

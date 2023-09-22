@@ -1,11 +1,11 @@
 package co.touchlab.skie.kir.irbuilder.impl.template
 
+import co.touchlab.skie.compilerinject.reflection.reflectedBy
+import co.touchlab.skie.compilerinject.reflection.reflectors.DeclarationDescriptorImplReflector
 import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.kir.irbuilder.SecondaryConstructorBuilder
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrConstructor
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.IrRebindableConstructorPublicSymbol
-import co.touchlab.skie.compilerinject.reflection.reflectedBy
-import co.touchlab.skie.compilerinject.reflection.reflectors.DeclarationDescriptorImplReflector
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor

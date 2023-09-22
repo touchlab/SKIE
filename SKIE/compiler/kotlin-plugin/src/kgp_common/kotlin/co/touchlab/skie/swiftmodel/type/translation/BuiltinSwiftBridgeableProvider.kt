@@ -1,13 +1,13 @@
 package co.touchlab.skie.swiftmodel.type.translation
 
 import co.touchlab.skie.phases.apinotes.builder.ApiNotes
-import co.touchlab.skie.swiftmodel.SwiftExportScope
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.NonNullSirType
 import co.touchlab.skie.sir.type.SpecialSirType
+import co.touchlab.skie.swiftmodel.SwiftExportScope
 import co.touchlab.skie.util.Command
 import org.jetbrains.kotlin.name.FqName
 import java.io.File

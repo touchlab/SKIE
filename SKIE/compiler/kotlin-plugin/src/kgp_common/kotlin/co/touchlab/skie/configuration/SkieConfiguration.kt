@@ -16,7 +16,7 @@ data class SkieConfiguration(
         require(enabledConfigurationFlags.intersect(disabledConfigurationFlags).isEmpty()) {
             "A configuration flag cannot be both enabled and disabled. Problem with: ${
                 enabledConfigurationFlags.intersect(
-                    disabledConfigurationFlags
+                    disabledConfigurationFlags,
                 )
             }"
         }

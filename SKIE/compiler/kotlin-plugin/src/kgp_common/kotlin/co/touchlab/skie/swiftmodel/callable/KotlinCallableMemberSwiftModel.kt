@@ -1,8 +1,8 @@
 package co.touchlab.skie.swiftmodel.callable
 
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.SwiftGenericExportScope
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
-import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 
 interface KotlinCallableMemberSwiftModel {

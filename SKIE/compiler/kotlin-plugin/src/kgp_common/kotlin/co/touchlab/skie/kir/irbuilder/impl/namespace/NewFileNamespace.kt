@@ -1,11 +1,9 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.kir.irbuilder.impl.namespace
 
-import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.compilerinject.reflection.reflectors.ModuleDescriptorImplReflector
+import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor

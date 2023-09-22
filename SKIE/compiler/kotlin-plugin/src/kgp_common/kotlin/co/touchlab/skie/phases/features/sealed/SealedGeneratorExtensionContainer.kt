@@ -1,16 +1,16 @@
 package co.touchlab.skie.phases.features.sealed
 
+import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.SealedInterop
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.superClassType
 import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
+import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
-import co.touchlab.skie.configuration.ConfigurationContainer
 
 interface SealedGeneratorExtensionContainer : ConfigurationContainer {
 

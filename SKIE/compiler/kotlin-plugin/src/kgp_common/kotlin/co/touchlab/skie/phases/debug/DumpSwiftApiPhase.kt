@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 
 sealed class DumpSwiftApiPhase : SirPhase {
 
-    object BeforeApiNotes: DumpSwiftApiPhase() {
+    object BeforeApiNotes : DumpSwiftApiPhase() {
 
         context(SirPhase.Context)
         override fun isActive(): Boolean =

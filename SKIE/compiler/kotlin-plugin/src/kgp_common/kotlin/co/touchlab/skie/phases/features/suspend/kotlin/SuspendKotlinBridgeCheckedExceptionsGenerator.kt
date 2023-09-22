@@ -89,7 +89,7 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
 
                     putTypeArgument(0, varargElementType)
                     putValueArgument(0, vararg)
-                }
+                },
             )
         }
 
@@ -107,7 +107,7 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
                     endOffset = 0,
                     type = irBuiltIns.kClassClass.typeWith(exceptionTypeSymbol.defaultType),
                     symbol = exceptionTypeSymbol,
-                    classType = exceptionTypeSymbol.defaultType
+                    classType = exceptionTypeSymbol.defaultType,
                 )
             }
 

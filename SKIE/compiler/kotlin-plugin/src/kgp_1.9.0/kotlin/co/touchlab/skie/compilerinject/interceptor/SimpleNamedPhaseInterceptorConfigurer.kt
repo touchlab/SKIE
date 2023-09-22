@@ -8,10 +8,10 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.reflect.jvm.jvmName
 
-class SimpleNamedPhaseInterceptorConfigurer<Context, Input, Output>:
+class SimpleNamedPhaseInterceptorConfigurer<Context, Input, Output> :
     PhaseInterceptorConfigurer<SimpleNamedCompilerPhase<Context, Input, Output>, Context, Input, Output>
-    where Context: LoggingContext, Context: ConfigChecks
-{
+    where Context : LoggingContext, Context : ConfigChecks {
+
     override fun canConfigurePhase(phase: Any): Boolean = phase is SimpleNamedCompilerPhase<*, *, *>
 
     override fun configure(
@@ -47,7 +47,8 @@ class SimpleNamedPhaseInterceptorConfigurer<Context, Input, Output>:
 private class InterceptedPhaseBody<Context, Input, Output>(
     val originalPhaseBody: OriginalPhaseBody<Context, Input, Output>,
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Input, Output>>,
-): (Context, Input) -> Output where Context: LoggingContext, Context: ConfigChecks {
+) : (Context, Input) -> Output where Context : LoggingContext, Context : ConfigChecks {
+
     override fun invoke(context: Context, input: Input): Output {
         val interceptor = context.config.configuration.get(interceptorKey)
         return if (interceptor != null) {
@@ -60,17 +61,19 @@ private class InterceptedPhaseBody<Context, Input, Output>(
 
 private class SimpleNamedCompilerPhaseReflector<Context, Input, Output>(
     override val instance: SimpleNamedCompilerPhase<Context, Input, Output>,
-): Reflector(instance::class) where Context: LoggingContext, Context: ConfigChecks {
+) : Reflector(instance::class) where Context : LoggingContext, Context : ConfigChecks {
+
     var op: (Context, Input) -> Output by declaredField("\$op")
 }
 
 private class InterceptedPhaseBodyReflector<Context, Input, Output>(
     override val instance: (Context, Input) -> Output,
-): Reflector(instance::class) where Context: LoggingContext, Context: ConfigChecks {
+) : Reflector(instance::class) where Context : LoggingContext, Context : ConfigChecks {
+
     val originalPhaseBody: (Context, Input) -> Output by declaredField()
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Input, Output>> by declaredField()
 }
 
-private fun <Context, Input, Output> ((Context, Input) -> Output).isIntercepted(): Boolean where Context: LoggingContext, Context: ConfigChecks {
+private fun <Context, Input, Output> ((Context, Input) -> Output).isIntercepted(): Boolean where Context : LoggingContext, Context : ConfigChecks {
     return javaClass.name == InterceptedPhaseBody::class.jvmName
 }

@@ -3,8 +3,8 @@
 package co.touchlab.skie.phases.analytics.environment
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
+import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.konan.target.Xcode

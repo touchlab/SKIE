@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.debug.air
 
+import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.phases.debug.air.element.AirAnonymousInitializer
 import co.touchlab.skie.phases.debug.air.element.AirClass
 import co.touchlab.skie.phases.debug.air.element.AirConstant
@@ -30,7 +31,6 @@ import co.touchlab.skie.phases.debug.air.type.AirType
 import co.touchlab.skie.phases.debug.air.type.AirTypeAbbreviation
 import co.touchlab.skie.phases.debug.air.type.AirTypeArgument
 import co.touchlab.skie.phases.debug.air.type.AirTypeVariance
-import co.touchlab.skie.kir.DescriptorProvider
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.descriptors.Modality

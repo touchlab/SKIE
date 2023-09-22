@@ -1,9 +1,9 @@
 package co.touchlab.skie.swiftmodel.callable.parameter
 
-import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel.Origin
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
+import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 
 class ObjCExportMapperReflector(override val instance: Any) : Reflector(
-    "org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper"
+    "org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper",
 ) {
 
     private val extensionClass = "org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapperKt"

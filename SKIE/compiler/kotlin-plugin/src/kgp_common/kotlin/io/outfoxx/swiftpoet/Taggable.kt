@@ -21,7 +21,7 @@ import kotlin.reflect.KClass
 /** A type that can be tagged with extra metadata of the user's choice. */
 abstract class Taggable(
   /** all tags. */
-  val tags: Map<KClass<*>, Any>
+  val tags: Map<KClass<*>, Any>,
 ) {
 
   /** Returns the tag attached with [type] as a key, or null if no tag is attached with that key. */

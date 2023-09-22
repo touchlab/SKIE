@@ -18,7 +18,7 @@ package io.outfoxx.swiftpoet
 
 /** A generated function declaration.  */
 class FunctionSpec private constructor(
-  builder: Builder
+  builder: Builder,
 ) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
 
   val name = builder.name
@@ -44,7 +44,7 @@ class FunctionSpec private constructor(
     codeWriter: CodeWriter,
     enclosingName: String?,
     implicitModifiers: Set<Modifier>,
-    conciseGetter: Boolean = false
+    conciseGetter: Boolean = false,
   ) {
     if (type == Type.Getter && conciseGetter && doc.isEmpty() && attributes.isEmpty() && modifiers.isEmpty()) {
       emitLocalTypes(codeWriter)
@@ -180,6 +180,7 @@ class FunctionSpec private constructor(
     internal val name: String,
     internal val type: Type = Type.Function,
   ) : AttributedSpec.Builder<Builder>() {
+
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableListOf<Modifier>()
     internal val typeVariables = mutableListOf<TypeVariableName>()
@@ -316,25 +317,33 @@ class FunctionSpec private constructor(
   }
 
   companion object {
+
     private const val GETTER = "get"
     private const val SETTER = "set"
     private const val CONSTRUCTOR = "init"
     private const val DEINITIALIZER = "deinit"
     private const val OPERATOR = "op:"
 
-    @JvmStatic fun builder(name: String) = Builder(name)
+    @JvmStatic
+    fun builder(name: String) = Builder(name)
 
-    @JvmStatic fun abstractBuilder(name: String) = Builder(name).abstract(true)
+    @JvmStatic
+    fun abstractBuilder(name: String) = Builder(name).abstract(true)
 
-    @JvmStatic fun constructorBuilder() = Builder(special(CONSTRUCTOR), Type.Initializer)
+    @JvmStatic
+    fun constructorBuilder() = Builder(special(CONSTRUCTOR), Type.Initializer)
 
-    @JvmStatic fun deinitializerBuilder() = Builder(special(DEINITIALIZER), Type.Deinitializer)
+    @JvmStatic
+    fun deinitializerBuilder() = Builder(special(DEINITIALIZER), Type.Deinitializer)
 
-    @JvmStatic fun getterBuilder() = Builder(special(GETTER), Type.Getter)
+    @JvmStatic
+    fun getterBuilder() = Builder(special(GETTER), Type.Getter)
 
-    @JvmStatic fun setterBuilder() = Builder(special(SETTER), Type.Setter)
+    @JvmStatic
+    fun setterBuilder() = Builder(special(SETTER), Type.Setter)
 
-    @JvmStatic fun operatorBuilder(name: String) = Builder(OPERATOR + name, Type.Operator)
+    @JvmStatic
+    fun operatorBuilder(name: String) = Builder(OPERATOR + name, Type.Operator)
 
     @JvmStatic
     private fun special(name: String) = "<$name>"

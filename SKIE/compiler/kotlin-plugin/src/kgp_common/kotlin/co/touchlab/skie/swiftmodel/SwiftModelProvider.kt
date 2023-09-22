@@ -1,16 +1,21 @@
 package co.touchlab.skie.swiftmodel
 
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelWithCore
-import co.touchlab.skie.swiftmodel.factory.SwiftModelFactory
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.kir.allExposedMembers
+import co.touchlab.skie.sir.SirProvider
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.type.LambdaSirType
+import co.touchlab.skie.sir.type.NullableSirType
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
+import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelWithCore
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.MutableKotlinPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.converted.MutableKotlinConvertedPropertySwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import co.touchlab.skie.swiftmodel.factory.SwiftModelFactory
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
@@ -18,11 +23,6 @@ import co.touchlab.skie.swiftmodel.type.MutableKotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridge
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.swiftmodel.type.enumentry.KotlinEnumEntrySwiftModel
-import co.touchlab.skie.sir.SirProvider
-import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.type.LambdaSirType
-import co.touchlab.skie.sir.type.NullableSirType
-import co.touchlab.skie.sir.type.SirType
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor

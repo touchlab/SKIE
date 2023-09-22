@@ -1,10 +1,10 @@
 package co.touchlab.skie.phases.analytics.configuration
 
-import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.util.hash.hashed
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
+import co.touchlab.skie.plugin.analytics.AnalyticsProducer
+import co.touchlab.skie.util.hash.hashed
 import kotlinx.serialization.Serializable
 
 @Serializable

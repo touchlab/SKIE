@@ -1,11 +1,6 @@
 package co.touchlab.skie.sir
 
-import co.touchlab.skie.swiftmodel.type.translation.BuiltinSwiftBridgeableProvider
-import co.touchlab.skie.swiftmodel.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
-import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclaration
@@ -14,6 +9,11 @@ import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
+import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
+import co.touchlab.skie.swiftmodel.type.translation.BuiltinSwiftBridgeableProvider
+import co.touchlab.skie.swiftmodel.type.translation.SwiftTypeTranslator
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.Reporter
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer

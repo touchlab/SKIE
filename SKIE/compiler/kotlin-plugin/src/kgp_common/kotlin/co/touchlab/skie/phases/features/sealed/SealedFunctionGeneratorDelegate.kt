@@ -2,11 +2,11 @@ package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.toSwiftPoetVariables
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
+import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier

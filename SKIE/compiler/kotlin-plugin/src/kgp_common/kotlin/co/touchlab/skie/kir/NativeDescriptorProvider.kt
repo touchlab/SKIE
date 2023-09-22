@@ -131,8 +131,8 @@ class NativeDescriptorProvider(
     @get:JvmName("isExposedExtension")
     private val CallableMemberDescriptor.isExposed: Boolean
         get() = this in exposedTopLevelMembers ||
-                this in exposedCategoryMembers ||
-                (this.containingDeclaration in exposedClasses && this.isExposable)
+            this in exposedCategoryMembers ||
+            (this.containingDeclaration in exposedClasses && this.isExposable)
 
     fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
         when (descriptor) {
