@@ -1,3 +1,5 @@
+@file:Suppress("invisible_reference", "invisible_member")
+
 package co.touchlab.skie.kir.irbuilder.impl.template
 
 import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
