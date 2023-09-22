@@ -16,7 +16,7 @@ sealed class SpecialSirType(
 
     override val directlyReferencedTypes: List<SirType> = emptyList()
 
-    override fun toSwiftPoetUsage(): TypeName =
+    override fun toSwiftPoetTypeName(): TypeName =
         typeName
 
     object Self : SpecialSirType(SelfTypeName.INSTANCE)

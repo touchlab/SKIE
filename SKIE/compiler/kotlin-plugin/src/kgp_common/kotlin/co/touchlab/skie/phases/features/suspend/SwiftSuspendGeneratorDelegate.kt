@@ -100,14 +100,14 @@ class SwiftSuspendGeneratorDelegate(
 
     private fun FunctionSpec.Builder.addValueParameter(parameter: KotlinValueParameterSwiftModel) {
         addParameter(
-            ParameterSpec.builder(parameter.argumentLabel, parameter.parameterName, parameter.type.toSwiftPoetUsage())
+            ParameterSpec.builder(parameter.argumentLabel, parameter.parameterName, parameter.type.toSwiftPoetTypeName())
                 .build(),
         )
     }
 
     private fun FunctionSpec.Builder.addReturnType(bridgeModel: BridgeModel): FunctionSpec.Builder =
         this.apply {
-            returns(bridgeModel.asyncOriginalFunction.returnType.toSwiftPoetUsage())
+            returns(bridgeModel.asyncOriginalFunction.returnType.toSwiftPoetTypeName())
         }
 
     private fun FunctionSpec.Builder.addFunctionBody(bridgeModel: BridgeModel): FunctionSpec.Builder =
@@ -119,7 +119,7 @@ class SwiftSuspendGeneratorDelegate(
                     .apply {
                         addStatement(
                             "%T.%N(%L)",
-                            bridgeModel.kotlinBridgingFunction.receiver.toSwiftPoetUsage(),
+                            bridgeModel.kotlinBridgingFunction.receiver.toSwiftPoetTypeName(),
                             bridgeModel.kotlinBridgingFunction.reference,
                             bridgeModel.argumentsForBridgingCall,
                         )
@@ -138,11 +138,11 @@ class SwiftSuspendGeneratorDelegate(
 
             this.bridgedParameters.forEachIndexed { index, parameter ->
                 if (isFromGenericClass) {
-                    val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.toSwiftPoetUsage()
+                    val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.toSwiftPoetTypeName()
                         // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
                         .removingEscapingAttribute()
 
-                    if (parameter.type.toSwiftPoetUsage() != erasedParameterType) {
+                    if (parameter.type.toSwiftPoetTypeName() != erasedParameterType) {
                         arguments.add(CodeBlock.of("%N as! %T", parameter.parameterName, erasedParameterType))
                     } else {
                         arguments.add(CodeBlock.of("%N", parameter.parameterName))
@@ -163,7 +163,7 @@ class SwiftSuspendGeneratorDelegate(
         }
 
         if (bridgeModel.isFromGenericClass) {
-            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.valueParameters.first().type.toSwiftPoetUsage()
+            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.valueParameters.first().type.toSwiftPoetTypeName()
 
             add(CodeBlock.of("%N as! %T", SkieClassSuspendGenerator.kotlinObjectVariableName, dispatchReceiverErasedType))
         } else {

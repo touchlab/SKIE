@@ -10,7 +10,7 @@ object KotlinErrorSirType : NonNullSirType() {
 
     override val directlyReferencedTypes: List<SirType> = emptyList()
 
-    override fun toSwiftPoetUsage(): TypeName {
+    override fun toSwiftPoetTypeName(): TypeName {
         throw UnsupportedOperationException("Error type cannot be used in SwiftPoet.")
     }
 

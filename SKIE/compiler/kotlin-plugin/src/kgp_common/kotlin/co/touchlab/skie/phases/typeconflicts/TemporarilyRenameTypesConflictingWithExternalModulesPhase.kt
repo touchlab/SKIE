@@ -25,11 +25,11 @@ object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
     private fun SirTypeDeclaration.renameConflictingType(conflictingNames: MutableSet<String>) {
         registerReverseOperation(this)
 
-        while (fqName.toLocalUnescapedNameString() in conflictingNames) {
+        while (fqName.toLocalString() in conflictingNames) {
             this.simpleName += "_"
         }
 
-        conflictingNames.add(this.fqName.toLocalUnescapedNameString())
+        conflictingNames.add(this.fqName.toLocalString())
     }
 
     context(SirPhase.Context)

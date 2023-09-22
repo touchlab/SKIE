@@ -17,6 +17,6 @@ data class TypeParameterUsageSirType(
     override val directlyReferencedTypes: List<SirType>
         get() = typeParameter.bounds
 
-    override fun toSwiftPoetUsage(): TypeName =
+    override fun toSwiftPoetTypeName(): TypeName =
         TypeVariableName(typeParameter.name)
 }

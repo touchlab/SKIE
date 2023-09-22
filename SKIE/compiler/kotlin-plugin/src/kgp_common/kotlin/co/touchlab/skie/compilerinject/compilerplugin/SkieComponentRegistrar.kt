@@ -3,7 +3,7 @@ package co.touchlab.skie.compilerinject.compilerplugin
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptorRegistrar
 import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.entrypoint.SkieIrGenerationExtension
-import co.touchlab.skie.plugin.SkiePluginLoader
+import co.touchlab.skie.spi.SkiePluginLoader
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration

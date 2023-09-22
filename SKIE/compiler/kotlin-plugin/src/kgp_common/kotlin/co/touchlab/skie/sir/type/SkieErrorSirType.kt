@@ -13,7 +13,7 @@ sealed class SkieErrorSirType(
 
     override val directlyReferencedTypes: List<SirType> = emptyList()
 
-    override fun toSwiftPoetUsage() =
+    override fun toSwiftPoetTypeName() =
         DeclaredTypeName.qualifiedLocalTypeName(name)
 
     object Lambda : SkieErrorSirType("__SkieLambdaErrorType")

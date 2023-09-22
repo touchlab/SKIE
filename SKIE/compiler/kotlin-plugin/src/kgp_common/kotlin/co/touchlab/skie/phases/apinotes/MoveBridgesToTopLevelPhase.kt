@@ -43,6 +43,6 @@ private fun SirClass.createReplacementTypeAlias(namespace: SirDeclarationNamespa
 }
 
 private fun SirClass.renameAndRemoveFromNamespace() {
-    simpleName = "__Skie__Bridge__${fqName.toLocalUnescapedNameString().replace(".", "_")}"
+    simpleName = "__Skie__Bridge__${fqName.toLocalString().replace(".", "_")}"
     this.namespace = null
 }

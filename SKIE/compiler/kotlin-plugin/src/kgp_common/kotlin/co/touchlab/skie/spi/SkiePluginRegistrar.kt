@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin
+package co.touchlab.skie.spi
 
 import co.touchlab.skie.context.MainSkieContext
 

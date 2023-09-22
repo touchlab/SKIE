@@ -413,6 +413,7 @@ class CodeBlock private constructor(
 
     @JvmStatic
     fun of(format: String, vararg args: Any?) = Builder().add(format, *args).build()
+
     @JvmStatic
     fun builder() = Builder()
 

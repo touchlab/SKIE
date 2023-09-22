@@ -1,7 +1,6 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.ConfigurationKey
-import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.configuration.util.GradleSkieConfiguration
 import co.touchlab.skie.plugin.configuration.util.takeIf

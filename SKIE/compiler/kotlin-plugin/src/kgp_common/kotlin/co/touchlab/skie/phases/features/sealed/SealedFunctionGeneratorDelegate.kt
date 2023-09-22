@@ -20,9 +20,9 @@ class SealedFunctionGeneratorDelegate(
     context(SwiftModelScope)
     fun generate(swiftModel: KotlinClassSwiftModel, enum: SirClass) {
         sirProvider.getFile(swiftModel).swiftPoetBuilderModifications.add {
-            val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
+            val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetTypeName()
 
-            val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetUsage()
+            val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetTypeName()
 
             val enumSelfTypeParameter = TypeVariableName.typeVariable("__Sealed").withBounds(TypeVariableName.bound(kotlinType))
 
@@ -74,7 +74,7 @@ class SealedFunctionGeneratorDelegate(
         swiftModel.visibleSealedSubclasses
             .forEachIndexed { index, subclassSymbol ->
                 val parameterName = swiftModel.enumConstructorParameterName
-                val subclassName = subclassSymbol.primarySirClass.getSealedSubclassType(enum, this@SwiftModelScope).toSwiftPoetUsage()
+                val subclassName = subclassSymbol.primarySirClass.getSealedSubclassType(enum, this@SwiftModelScope).toSwiftPoetTypeName()
 
                 val condition = "let %N = %N as? %T"
 

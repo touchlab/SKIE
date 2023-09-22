@@ -17,6 +17,6 @@ data class NullableSirType(
     override fun toNonNull(): NonNullSirType =
         type.toNonNull()
 
-    override fun toSwiftPoetUsage(): TypeName =
-        type.toSwiftPoetUsage().makeOptional()
+    override fun toSwiftPoetTypeName(): TypeName =
+        type.toSwiftPoetTypeName().makeOptional()
 }

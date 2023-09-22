@@ -38,7 +38,7 @@ interface SealedGeneratorExtensionContainer : ConfigurationContainer {
         get() {
             val configuredName = this.getConfiguration(SealedInterop.Case.Name)
 
-            return configuredName ?: this.kotlinSirClass.fqName.toLocalUnescapedNameString().toValidSwiftIdentifier()
+            return configuredName ?: this.kotlinSirClass.fqName.toLocalString().toValidSwiftIdentifier()
         }
 
     val KotlinClassSwiftModel.hasElseCase: Boolean

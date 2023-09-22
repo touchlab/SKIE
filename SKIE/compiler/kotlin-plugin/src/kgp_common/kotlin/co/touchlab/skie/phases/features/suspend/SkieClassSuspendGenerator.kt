@@ -45,14 +45,14 @@ class SkieClassSuspendGenerator {
     private fun FileSpec.Builder.generateNamespaceProvider(swiftModel: KotlinTypeSwiftModel, skieClass: SirClass) {
         val kotlinClass = swiftModel.kotlinSirClass
         val typeParameters = skieClass.typeParameters
-        val skieClassType = skieClass.toTypeFromEnclosingTypeParameters(typeParameters).toSwiftPoetUsage()
+        val skieClassType = skieClass.toTypeFromEnclosingTypeParameters(typeParameters).toSwiftPoetTypeName()
 
         addFunction(
             FunctionSpec.builder("skie")
                 .addModifiers(Modifier.PUBLIC)
                 .addTypeVariables(typeParameters.toSwiftPoetVariables())
-                .addParameter("_", "kotlinObject", kotlinClass.toTypeFromEnclosingTypeParameters(typeParameters).toSwiftPoetUsage())
-                .addCode("return %T(kotlinObject)", skieClass.internalName.toSwiftPoetName())
+                .addParameter("_", "kotlinObject", kotlinClass.toTypeFromEnclosingTypeParameters(typeParameters).toSwiftPoetTypeName())
+                .addCode("return %T(kotlinObject)", skieClass.defaultType.toSwiftPoetDeclaredTypeName())
                 .returns(skieClassType)
                 .build(),
         )
@@ -67,7 +67,7 @@ class SkieClassSuspendGenerator {
 private fun SirClass.addBody(
     swiftModel: KotlinTypeSwiftModel,
 ) {
-    val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters).toSwiftPoetUsage()
+    val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters).toSwiftPoetTypeName()
 
     swiftPoetBuilderModifications.add {
         addProperty(SkieClassSuspendGenerator.kotlinObjectVariableName, kotlinType, Modifier.PUBLIC)

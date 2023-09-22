@@ -17,7 +17,7 @@ class SirTypeParameter(
 
     fun toSwiftPoetVariable() = TypeVariableName.typeVariable(
         name,
-        bounds.map { TypeVariableName.Bound(it.toSwiftPoetUsage()) },
+        bounds.map { TypeVariableName.Bound(it.toSwiftPoetTypeName()) },
     )
 
     override fun toString(): String = "type parameter: $name : ${bounds.joinToString("&")}>"

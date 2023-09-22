@@ -104,44 +104,61 @@ class DeclaredTypeName internal constructor(
 
 @JvmField
 val OPTIONAL = DeclaredTypeName.typeName("Swift.Optional")
+
 @JvmField
 val IMPLICIT = DeclaredTypeName.typeName("Swift.ImplicitlyUnwrappedOptional")
+
 @JvmField
 val ANY = DeclaredTypeName.typeName("Swift.Any")
+
 @JvmField
 val ANY_OBJECT = DeclaredTypeName.typeName("Swift.AnyObject")
+
 @JvmField
 val ANY_CLASS = DeclaredTypeName.typeName("Swift.AnyClass")
+
 @JvmField
 val VOID = DeclaredTypeName.typeName("Swift.Void")
 
 @JvmField
 val INT = DeclaredTypeName.typeName("Swift.Int")
+
 @JvmField
 val FLOAT = DeclaredTypeName.typeName("Swift.Float")
+
 @JvmField
 val DOUBLE = DeclaredTypeName.typeName("Swift.Double")
 
 @JvmField
 val INT8 = DeclaredTypeName.typeName("Swift.Int8")
+
 @JvmField
 val UINT8 = DeclaredTypeName.typeName("Swift.UInt8")
+
 @JvmField
 val INT16 = DeclaredTypeName.typeName("Swift.Int16")
+
 @JvmField
 val UIN16 = DeclaredTypeName.typeName("Swift.UInt16")
+
 @JvmField
 val INT32 = DeclaredTypeName.typeName("Swift.Int32")
+
 @JvmField
 val UINT32 = DeclaredTypeName.typeName("Swift.UInt32")
+
 @JvmField
 val INT64 = DeclaredTypeName.typeName("Swift.Int64")
+
 @JvmField
 val UINT64 = DeclaredTypeName.typeName("Swift.UInt64")
+
 @JvmField
 val FLOAT32 = DeclaredTypeName.typeName("Swift.Float32")
+
 @JvmField
 val FLOAT64 = DeclaredTypeName.typeName("Swift.Float64")
+
 @JvmField
 val FLOAT80 = DeclaredTypeName.typeName("Swift.Float80")
 
@@ -153,8 +170,10 @@ val BOOL = DeclaredTypeName.typeName("Swift.Bool")
 
 @JvmField
 val ARRAY = DeclaredTypeName.typeName("Swift.Array")
+
 @JvmField
 val SET = DeclaredTypeName.typeName("Swift.Set")
+
 @JvmField
 val DICTIONARY = DeclaredTypeName.typeName("Swift.Dictionary")
 

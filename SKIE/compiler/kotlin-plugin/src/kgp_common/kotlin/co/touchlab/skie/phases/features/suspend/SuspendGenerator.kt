@@ -1,6 +1,3 @@
-// WIP 3 Try to remove all unnecessary
-// @file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.phases.features.suspend
 
 import co.touchlab.skie.configuration.ConfigurationContainer

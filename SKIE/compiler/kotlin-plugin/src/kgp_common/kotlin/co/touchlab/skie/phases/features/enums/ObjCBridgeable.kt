@@ -29,7 +29,7 @@ fun TypeSpec.Builder.addObjcBridgeableImplementation(): TypeSpec.Builder =
 context(KotlinClassSwiftModel)
 private fun TypeSpec.Builder.addObjectiveCTypeAlias(): TypeSpec.Builder =
     addType(
-        TypeAliasSpec.builder(ObjCBridgeable.bridgedObjCTypeAlias, kotlinSirClass.internalName.toSwiftPoetName())
+        TypeAliasSpec.builder(ObjCBridgeable.bridgedObjCTypeAlias, kotlinSirClass.defaultType.toSwiftPoetTypeName())
             .addModifiers(Modifier.PUBLIC)
             .build(),
     )
@@ -39,7 +39,7 @@ private fun TypeSpec.Builder.addForceBridgeFromObjectiveC(): TypeSpec.Builder =
     addFunction(
         FunctionSpec.builder("_forceBridgeFromObjectiveC")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addParameter("_", "source", kotlinSirClass.internalName.toSwiftPoetName())
+            .addParameter("_", "source", kotlinSirClass.defaultType.toSwiftPoetTypeName())
             .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
             .addStatement("result = fromObjectiveC(source)")
             .build(),
@@ -50,7 +50,7 @@ private fun TypeSpec.Builder.addConditionallyBridgeFromObjectiveC(): TypeSpec.Bu
     addFunction(
         FunctionSpec.builder("_conditionallyBridgeFromObjectiveC")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addParameter("_", "source", kotlinSirClass.internalName.toSwiftPoetName())
+            .addParameter("_", "source", kotlinSirClass.defaultType.toSwiftPoetTypeName())
             .addParameter("result", SelfTypeName.INSTANCE.makeOptional(), Modifier.INOUT)
             .addStatement("result = fromObjectiveC(source)")
             .addStatement("return true")
@@ -63,7 +63,7 @@ private fun TypeSpec.Builder.addUnconditionallyBridgeFromObjectiveC(): TypeSpec.
     addFunction(
         FunctionSpec.builder("_unconditionallyBridgeFromObjectiveC")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addParameter("_", "source", kotlinSirClass.internalName.toSwiftPoetName().makeOptional())
+            .addParameter("_", "source", kotlinSirClass.defaultType.toSwiftPoetTypeName().makeOptional())
             .addStatement("return fromObjectiveC(source)")
             .returns(SelfTypeName.INSTANCE)
             .build(),
@@ -74,7 +74,7 @@ private fun TypeSpec.Builder.addBridgeToObjectiveC(): TypeSpec.Builder =
     addFunction(
         FunctionSpec.builder("_bridgeToObjectiveC")
             .addModifiers(Modifier.PUBLIC)
-            .returns(kotlinSirClass.internalName.toSwiftPoetName())
+            .returns(kotlinSirClass.defaultType.toSwiftPoetTypeName())
             .addBridgeToObjectiveCBody()
             .build(),
     )
@@ -95,9 +95,9 @@ private val KotlinEnumEntrySwiftModel.swiftBridgeCase: CodeBlock
     get() = CodeBlock.of(
         "case .%N: return %T.%N as %T",
         identifier,
-        enum.kotlinSirClass.internalName.toSwiftPoetName(),
+        enum.kotlinSirClass.defaultType.toSwiftPoetTypeName(),
         identifier,
-        enum.kotlinSirClass.internalName.toSwiftPoetName(),
+        enum.kotlinSirClass.defaultType.toSwiftPoetTypeName(),
     )
 
 context(KotlinClassSwiftModel)
@@ -105,7 +105,7 @@ private fun TypeSpec.Builder.addFromObjectiveC(): TypeSpec.Builder =
     addFunction(
         FunctionSpec.builder("fromObjectiveC")
             .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-            .addParameter("_", "source", kotlinSirClass.internalName.toSwiftPoetName().makeOptional())
+            .addParameter("_", "source", kotlinSirClass.defaultType.toSwiftPoetTypeName().makeOptional())
             .returns(SelfTypeName.INSTANCE)
             .addFromObjectiveCBody()
             .build(),
@@ -121,9 +121,9 @@ private fun FunctionSpec.Builder.addFromObjectiveCBody(): FunctionSpec.Builder =
                     enumEntries.forEachIndexed { index, entry ->
                         val controlFlowCode = "source == %T.%N as %T"
                         val controlFlowArguments = arrayOf(
-                            entry.enum.kotlinSirClass.internalName.toSwiftPoetName(),
+                            entry.enum.kotlinSirClass.defaultType.toSwiftPoetTypeName(),
                             entry.identifier,
-                            entry.enum.kotlinSirClass.internalName.toSwiftPoetName(),
+                            entry.enum.kotlinSirClass.defaultType.toSwiftPoetTypeName(),
                         )
                         if (index == 0) {
                             beginControlFlow("if", controlFlowCode, *controlFlowArguments)

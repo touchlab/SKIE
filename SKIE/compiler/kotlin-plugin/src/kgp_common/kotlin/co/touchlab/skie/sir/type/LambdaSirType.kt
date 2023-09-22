@@ -17,9 +17,9 @@ data class LambdaSirType(
 
     override val directlyReferencedTypes: List<SirType> = listOf(returnType) + valueParameterTypes
 
-    override fun toSwiftPoetUsage(): TypeName = FunctionTypeName.get(
-        parameters = valueParameterTypes.map { ParameterSpec.unnamed(it.toSwiftPoetUsage()) },
-        returnType = returnType.toSwiftPoetUsage(),
+    override fun toSwiftPoetTypeName(): TypeName = FunctionTypeName.get(
+        parameters = valueParameterTypes.map { ParameterSpec.unnamed(it.toSwiftPoetTypeName()) },
+        returnType = returnType.toSwiftPoetTypeName(),
         attributes = if (isEscaping) {
             listOf(AttributeSpec.ESCAPING)
         } else {

@@ -202,6 +202,7 @@ class ExtensionSpec private constructor(
 
     @JvmStatic
     fun builder(extendedType: AnyTypeSpec) = Builder(extendedType)
+
     @JvmStatic
     fun builder(extendedType: DeclaredTypeName) = Builder(extendedType)
   }

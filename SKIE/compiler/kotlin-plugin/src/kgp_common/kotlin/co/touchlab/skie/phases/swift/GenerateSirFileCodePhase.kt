@@ -78,7 +78,7 @@ object GenerateSirFileCodePhase : SirPhase {
         addType(
             TypeAliasSpec.builder(
                 name = typeAlias.simpleName,
-                type = typeAlias.type.toSwiftPoetUsage(),
+                type = typeAlias.type.toSwiftPoetTypeName(),
             )
                 .addVisibility(typeAlias.visibility, typeAlias.defaultVisibility)
                 .addTypeParameters(typeAlias)
@@ -108,7 +108,7 @@ object GenerateSirFileCodePhase : SirPhase {
     }
 
     private fun BuilderWithTypeParameters.addTypeParameter(typeDeclaration: SirTypeParameter) {
-        val bounds = typeDeclaration.bounds.map { it.toSwiftPoetUsage() }.map { TypeVariableName.Bound(it) }
+        val bounds = typeDeclaration.bounds.map { it.toSwiftPoetTypeName() }.map { TypeVariableName.Bound(it) }
 
         addTypeVariable(
             TypeVariableName(typeDeclaration.name).withBounds(bounds),
@@ -117,7 +117,7 @@ object GenerateSirFileCodePhase : SirPhase {
 
     private fun FileSpec.Builder.generateExtension(extension: SirExtension) {
         addExtension(
-            ExtensionSpec.builder(extension.internalName.toSwiftPoetName())
+            ExtensionSpec.builder(extension.typeDeclaration.defaultType.toSwiftPoetDeclaredTypeName())
                 .addVisibility(extension.visibility, extension.defaultVisibility)
                 .addExtensionDeclarations(extension)
                 .applyExtensionBuilderModifications(extension)
@@ -153,7 +153,7 @@ object GenerateSirFileCodePhase : SirPhase {
         addType(
             TypeSpec.Builder(sirClass.swiftPoetKind, sirClass.simpleName)
                 .addVisibility(sirClass.visibility, sirClass.defaultVisibility)
-                .addSuperTypes(sirClass.superTypes.map { it.toSwiftPoetUsage() })
+                .addSuperTypes(sirClass.superTypes.map { it.toSwiftPoetTypeName() })
                 .addTypeParameters(sirClass)
                 .addClassDeclarations(sirClass)
                 .applyClassBuilderModifications(sirClass)
@@ -195,7 +195,7 @@ object GenerateSirFileCodePhase : SirPhase {
 
     private fun TypeSpec.Builder.generateEnumCase(enumCase: SirEnumCase) {
         val associatedValues = enumCase.associatedValues
-            .map { "" to it.type.toSwiftPoetUsage() }
+            .map { "" to it.type.toSwiftPoetTypeName() }
             .takeIf { it.isNotEmpty() }
             ?.let { TupleTypeName.of(it) }
 

@@ -148,7 +148,7 @@ private fun TypeSpec.Builder.addCompanionObjectPropertyIfNeeded() {
     val companion = companionObject ?: return
 
     addProperty(
-        PropertySpec.builder("companion", companion.primarySirClass.internalName.toSwiftPoetName())
+        PropertySpec.builder("companion", companion.primarySirClass.defaultType.toSwiftPoetTypeName())
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .getter(
                 FunctionSpec.getterBuilder()
@@ -170,7 +170,7 @@ private fun KotlinClassSwiftModel.addConversionExtensions(skieClass: SirClass) {
 context(KotlinClassSwiftModel)
 private fun FileSpec.Builder.addToKotlinConversionExtension(skieClass: SirClass) {
     addExtension(
-        ExtensionSpec.builder(skieClass.fqName.toSwiftPoetName())
+        ExtensionSpec.builder(skieClass.defaultType.toSwiftPoetDeclaredTypeName())
             .addModifiers(Modifier.PUBLIC)
             .addToKotlinConversionMethod()
             .build(),
@@ -182,7 +182,7 @@ private fun ExtensionSpec.Builder.addToKotlinConversionMethod(): ExtensionSpec.B
     addFunction(
         // TODO After Sir: solve name collision
         FunctionSpec.builder("toKotlinEnum")
-            .returns(kotlinSirClass.internalName.toSwiftPoetName())
+            .returns(kotlinSirClass.defaultType.toSwiftPoetTypeName())
             .addStatement("return _bridgeToObjectiveC()")
             .build(),
     )
@@ -190,7 +190,7 @@ private fun ExtensionSpec.Builder.addToKotlinConversionMethod(): ExtensionSpec.B
 context(KotlinClassSwiftModel)
 private fun FileSpec.Builder.addToSwiftConversionExtension(skieClass: SirClass) {
     addExtension(
-        ExtensionSpec.builder(kotlinSirClass.internalName.toSwiftPoetName())
+        ExtensionSpec.builder(kotlinSirClass.defaultType.toSwiftPoetDeclaredTypeName())
             .addModifiers(Modifier.PUBLIC)
             .addToSwiftConversionMethod(skieClass)
             .build(),
@@ -202,8 +202,8 @@ private fun ExtensionSpec.Builder.addToSwiftConversionMethod(skieClass: SirClass
     addFunction(
         // TODO After Sir: solve name collision
         FunctionSpec.builder("toSwiftEnum")
-            .returns(skieClass.internalName.toSwiftPoetName())
-            .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", skieClass.internalName.toSwiftPoetName())
+            .returns(skieClass.defaultType.toSwiftPoetTypeName())
+            .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", skieClass.defaultType.toSwiftPoetTypeName())
             .build(),
     )
 
@@ -219,7 +219,7 @@ private class MemberPassthroughGeneratorVisitor(
                 .addModifiers(Modifier.PUBLIC)
                 .addFunctionValueParameters(function)
                 .throws(function.isThrowing)
-                .returns(function.returnType.toSwiftPoetUsage())
+                .returns(function.returnType.toSwiftPoetTypeName())
                 .addFunctionBody(function)
                 .build(),
         )
@@ -242,7 +242,7 @@ private class MemberPassthroughGeneratorVisitor(
             ParameterSpec.builder(
                 valueParameter.argumentLabel,
                 valueParameter.parameterName,
-                valueParameter.type.toSwiftPoetUsage(),
+                valueParameter.type.toSwiftPoetTypeName(),
             ).build(),
         )
 
@@ -258,7 +258,7 @@ private class MemberPassthroughGeneratorVisitor(
 
     override fun visit(regularProperty: KotlinRegularPropertySwiftModel) {
         builder.addProperty(
-            PropertySpec.builder(regularProperty.identifier, regularProperty.type.toSwiftPoetUsage())
+            PropertySpec.builder(regularProperty.identifier, regularProperty.type.toSwiftPoetTypeName())
                 .addModifiers(Modifier.PUBLIC)
                 .addGetter(regularProperty)
                 .addSetterIfPresent(regularProperty)
@@ -289,7 +289,7 @@ private class MemberPassthroughGeneratorVisitor(
             setter(
                 FunctionSpec.setterBuilder()
                     .addModifiers(Modifier.NONMUTATING)
-                    .addParameter("value", regularProperty.type.toSwiftPoetUsage())
+                    .addParameter("value", regularProperty.type.toSwiftPoetTypeName())
                     .addSetterBody(regularProperty, setter)
                     .build(),
             )

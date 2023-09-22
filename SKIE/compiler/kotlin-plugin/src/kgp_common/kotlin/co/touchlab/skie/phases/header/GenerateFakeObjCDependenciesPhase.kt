@@ -41,7 +41,7 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
     private fun generateHeader(module: SirModule, types: List<SirTypeDeclaration>) {
         val foundationImport = "#import <Foundation/NSObject.h>"
         val typeDeclarations = types
-            .sortedBy { it.fqName.toLocalUnescapedNameString() }
+            .sortedBy { it.fqName.toLocalString() }
             .joinToString("\n") { it.getHeaderEntry() }
 
         val headerContent = "$foundationImport\n\n$typeDeclarations"
@@ -62,7 +62,7 @@ private fun SirTypeDeclaration.getHeaderEntry(): String =
     }
 
 private fun SirTypeDeclaration.getClassHeaderEntry(): String =
-    "@interface ${fqName.toLocalUnescapedNameString()}${getTypeParametersDeclaration()} : NSObject @end"
+    "@interface ${fqName.toLocalString()}${getTypeParametersDeclaration()} : NSObject @end"
 
 private fun SirTypeDeclaration.getTypeParametersDeclaration(): String =
     if (typeParameters.isEmpty()) {
@@ -72,4 +72,4 @@ private fun SirTypeDeclaration.getTypeParametersDeclaration(): String =
     }
 
 private fun SirClass.getProtocolHeaderEntry(): String =
-    "@protocol ${fqName.toLocalUnescapedNameString()} @end"
+    "@protocol ${fqName.toLocalString()} @end"

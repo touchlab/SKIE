@@ -14,9 +14,9 @@ sealed class SirType {
         listOf(this) + directlyReferencedTypes.flatMap { it.allReferencedTypes() }
 
     override fun toString(): String =
-        toSwiftPoetUsage().toString()
+        toSwiftPoetTypeName().toString()
 
-    abstract fun toSwiftPoetUsage(): TypeName
+    abstract fun toSwiftPoetTypeName(): TypeName
 
     abstract fun toNonNull(): NonNullSirType
 }
