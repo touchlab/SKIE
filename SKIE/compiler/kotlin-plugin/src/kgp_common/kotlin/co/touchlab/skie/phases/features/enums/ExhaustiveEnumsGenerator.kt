@@ -202,8 +202,8 @@ private fun ExtensionSpec.Builder.addToSwiftConversionMethod(skieClass: SirClass
     addFunction(
         // TODO After Sir: solve name collision
         FunctionSpec.builder("toSwiftEnum")
-            .returns(skieClass.fqName.toSwiftPoetName())
-            .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", skieClass.fqName.toSwiftPoetName())
+            .returns(skieClass.internalName.toSwiftPoetName())
+            .addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", skieClass.internalName.toSwiftPoetName())
             .build(),
     )
 

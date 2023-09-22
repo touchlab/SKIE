@@ -17,6 +17,9 @@ abstract class SkieRoot : Plugin<Project> {
     private fun Project.registerReplaceDataTask() {
         tasks.register("replaceData") {
             doLast {
+                /**
+                 * Format: OLD1|||NEW1&&&OLD2|||NEW2
+                 */
                 val replacementString = System.getenv()["SKIE_REPLACEMENT_STRING"] ?: return@doLast
 
                 replaceData(replacementString)
