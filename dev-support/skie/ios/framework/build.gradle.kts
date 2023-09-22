@@ -1,4 +1,4 @@
-
+import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.ExperimentalFeatures
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
@@ -6,19 +6,29 @@ plugins {
     id("dev.multiplatform")
 
     id("co.touchlab.skie")
-    // id("dev.co.touchlab.skie")
 }
 
 skie {
+//     isEnabled = false
+    analytics {
+//        enabled = false
+        disableUpload = true
+    }
+
+    build {
+        enableParallelSwiftCompilation = true
+    }
+
     features {
+       defaultArgumentsInExternalLibraries = true
+//         coroutinesInterop.set(false)
         group {
             ExperimentalFeatures.Enabled(true)
+            DefaultArgumentInterop.Enabled(true)
         }
     }
 
     debug {
-        dumpSwiftApiBeforeApiNotes.set(true)
-        dumpSwiftApiAfterApiNotes.set(true)
         printSkiePerformanceLogs.set(true)
         crashOnSoftErrors.set(true)
     }
@@ -52,7 +62,6 @@ kotlin {
         dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation("co.touchlab.skie:configuration-annotations")
-            implementation("co.touchlab.skie:runtime-kotlin")
 
             api(projects.devSupport.skie.ios.dependency)
 
@@ -72,11 +81,4 @@ kotlin {
         dependsOn(iosTest)
     }
 
-}
-
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("co.touchlab.skie:skie-kotlin-plugin")).using(module("co.touchlab.skie:kotlin-plugin:${version}"))
-        substitute(module("co.touchlab.skie:skie-runtime-kotlin")).using(module("co.touchlab.skie:kotlin:${version}"))
-    }
 }

@@ -1,7 +1,7 @@
+import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.ExperimentalFeatures
-// import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
+import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 plugins {
     id("dev.multiplatform")
@@ -10,8 +10,9 @@ plugins {
 }
 
 skie {
+//     isEnabled = false
     analytics {
-        enabled = false
+//        enabled = false
         disableUpload = true
     }
 
@@ -20,14 +21,17 @@ skie {
     }
 
     features {
+//        defaultArgumentsInExternalLibraries = true
+//         coroutinesInterop.set(false)
         group {
             ExperimentalFeatures.Enabled(true)
+            DefaultArgumentInterop.Enabled(false)
         }
     }
 
     debug {
-        dumpSwiftApiBeforeApiNotes.set(true)
-        dumpSwiftApiAfterApiNotes.set(true)
+//        dumpSwiftApiBeforeApiNotes.set(true)
+//        dumpSwiftApiAfterApiNotes.set(true)
         printSkiePerformanceLogs.set(true)
         crashOnSoftErrors.set(true)
     }
@@ -48,7 +52,7 @@ kotlin {
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 
-                export(projects.skie.mac.dependency)
+//                 export(projects.skie.mac.dependency)
 
                 exportedLibraries.forEach {
                     export(it)
@@ -60,8 +64,7 @@ kotlin {
     val commonMain by sourceSets.getting {
         dependencies {
             implementation(libs.kotlinx.coroutines.core)
-//             implementation("co.touchlab.skie:configuration-annotations")
-//             implementation("co.touchlab.skie:kotlin")
+            implementation("co.touchlab.skie:configuration-annotations")
 
             api(projects.skie.mac.dependency)
 
@@ -84,37 +87,15 @@ kotlin {
     }
 }
 
-// configurations.all {
-//     resolutionStrategy.dependencySubstitution {
-//         substitute(module("co.touchlab.skie:skie-kotlin-plugin")).using(module("co.touchlab.skie:kotlin-plugin:${version}"))
-//         substitute(module("co.touchlab.skie:skie-runtime-kotlin")).using(module("co.touchlab.skie:kotlin:${version}"))
-//     }
-// }
-
-tasks.withType<KotlinNativeLink>().configureEach {
+tasks.register("dependenciesForExport") {
     doLast {
-        val frameworkDirectory = outputs.files.toList().first()
-        val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
+        val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent().kotlinGradleName + "Api")
 
-        exec {
-            commandLine(
-                "zsh",
-                "-c",
-                "echo \"import Kotlin\\n:type lookup Kotlin\" | swift repl -F \"${frameworkDirectory.absolutePath}\" > \"${apiFile.absolutePath}\"",
-            )
+        val dependencies = configuration.incoming.resolutionResult.allComponents.map { it.toString() }
+        val externalDependencies = dependencies.filterNot { it.startsWith("project :") }
+
+        externalDependencies.forEach {
+            println("export(\"$it\")")
         }
     }
 }
-
-// tasks.register("dependenciesForExport") {
-//     doLast {
-//         val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent().kotlinGradleName + "Api")
-//
-//         val dependencies = configuration.incoming.resolutionResult.allComponents.map { it.toString() }
-//         val externalDependencies = dependencies.filterNot { it.startsWith("project :") }
-//
-//         externalDependencies.forEach {
-//             println("export(\"$it\")")
-//         }
-//     }
-// }

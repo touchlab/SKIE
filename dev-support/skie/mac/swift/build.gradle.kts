@@ -41,6 +41,8 @@ fun Exec.configureBuild(mode: String) {
 
     val linkTask = tasks.getByPath(":skie:mac:framework:link${mode.capitalized()}Framework${architecture.kotlinGradleName.capitalized()}")
 
+//     linkTask.enabled = false
+
     inputs.files(linkTask.outputs)
     inputs.files(createSwiftMain.map { it.outputs })
 
