@@ -35,8 +35,9 @@ import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.GenerateSirFileCodePhase
 import co.touchlab.skie.phases.swift.SwiftCacheSetupPhase
 import co.touchlab.skie.phases.swift.WriteSirFileContentToDiskPhase
-import co.touchlab.skie.phases.typeconflicts.RenameNestedTypesConflictingWithExternalTypesPhase
 import co.touchlab.skie.phases.typeconflicts.RenameNestedKotlinTypesConflictingWithKeywordsPhase
+import co.touchlab.skie.phases.typeconflicts.RenameNestedTypesConflictingWithExternalTypesPhase
+import co.touchlab.skie.phases.typeconflicts.RenameSkieNamespacesConflictingWithKeywordsPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKotlinModulePhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictsWithOtherTypesPhase
 import co.touchlab.skie.phases.typeconflicts.TemporarilyRenameTypesConflictingWithExternalModulesPhase
@@ -81,6 +82,7 @@ class SkiePhaseScheduler {
             RemoveKonanManglingPhase,
             RenameNestedTypesConflictingWithExternalTypesPhase,
             RenameNestedKotlinTypesConflictingWithKeywordsPhase,
+            RenameSkieNamespacesConflictingWithKeywordsPhase,
             RenameTypesConflictingWithKotlinModulePhase,
             KotlinRuntimeHidingPhase,
 
