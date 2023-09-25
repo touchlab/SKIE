@@ -18,6 +18,7 @@ class SealedEnumGeneratorDelegate(
             simpleName = "__Sealed",
             kind = SirClass.Kind.Enum,
             parent = sirProvider.getSkieNamespace(swiftModel),
+            superTypes = listOf(sirBuiltins.Swift.Hashable.defaultType),
         )
 
         enum.copyTypeParametersFrom(swiftModel.primarySirClass)
