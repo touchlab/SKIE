@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases
 
+import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
@@ -23,15 +24,15 @@ interface SkiePhase<C : SkiePhase.Context> {
     context(C)
     fun execute()
 
-    interface Context {
+    interface Context : ConfigurationContainer {
 
-        val context: Context
+        override val context: Context
 
         val skiePhaseScheduler: SkiePhaseScheduler
 
         val compilerConfiguration: CompilerConfiguration
 
-        val skieConfiguration: SkieConfiguration
+        override val skieConfiguration: SkieConfiguration
 
         val swiftCompilerConfiguration: SwiftCompilerConfiguration
 

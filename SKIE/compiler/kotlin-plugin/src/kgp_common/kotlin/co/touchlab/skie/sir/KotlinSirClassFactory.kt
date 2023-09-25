@@ -5,8 +5,10 @@ import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.superClass
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.swiftmodel.SwiftExportScope
+import co.touchlab.skie.swiftmodel.SwiftGenericExportScope
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.translation.SwiftTypeTranslator
@@ -50,7 +52,7 @@ class KotlinSirClassFactory(
                 kind = if (classDescriptor.kind.isInterface) SirClass.Kind.Protocol else SirClass.Kind.Class,
             )
 
-            if (sirClass.kind != SirClass.Kind.Protocol) {
+            if (sirClass.kind == SirClass.Kind.Class) {
                 classDescriptor.typeConstructor.parameters.forEach { typeParameter ->
                     SirTypeParameter(
                         name = typeParameter.name.asString(),
@@ -81,16 +83,7 @@ class KotlinSirClassFactory(
 
     context(SwiftModelScope)
     private fun SirClass.initializeSuperTypes(classDescriptor: ClassDescriptor) {
-        val genericExportScope = co.touchlab.skie.swiftmodel.SwiftGenericExportScope.Class(classDescriptor, typeParameters)
-
-        val directlyInheritsAny = classDescriptor.defaultType
-            .constructor
-            .supertypes
-            .any { KotlinBuiltIns.isAnyOrNullableAny(it) }
-
-        if (directlyInheritsAny) {
-            superTypes.add(sirBuiltins.Stdlib.Base.defaultType)
-        }
+        val genericExportScope = SwiftGenericExportScope.Class(classDescriptor, typeParameters)
 
         val superTypesWithoutAny = classDescriptor.defaultType
             .constructor
@@ -100,6 +93,10 @@ class KotlinSirClassFactory(
                 translator.mapReferenceType(it, SwiftExportScope(genericExportScope), FlowMappingStrategy.TypeArgumentsOnly)
             }
             .filterIsInstance<DeclaredSirType>()
+
+        if (this.kind == SirClass.Kind.Class && this.superClass == null) {
+            superTypes.add(sirBuiltins.Stdlib.Base.defaultType)
+        }
 
         superTypes.addAll(superTypesWithoutAny)
     }

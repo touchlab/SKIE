@@ -12,14 +12,15 @@ class SealedEnumGeneratorDelegate(
     override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {
 
-    context(SwiftModelScope)
+    context(SirPhase.Context)
     fun generate(swiftModel: KotlinClassSwiftModel): SirClass {
         val enum = SirClass(
             simpleName = "__Sealed",
             kind = SirClass.Kind.Enum,
             parent = sirProvider.getSkieNamespace(swiftModel),
-            superTypes = listOf(sirBuiltins.Swift.Hashable.defaultType),
         )
+
+        enum.addConformanceToHashableIfPossible(swiftModel)
 
         enum.copyTypeParametersFrom(swiftModel.primarySirClass)
 
@@ -30,6 +31,13 @@ class SealedEnumGeneratorDelegate(
         }
 
         return enum
+    }
+
+    context(SirPhase.Context)
+    private fun SirClass.addConformanceToHashableIfPossible(swiftModel: KotlinClassSwiftModel) {
+        if (swiftModel.areAllExposedChildrenHashable) {
+            this.superTypes.add(sirBuiltins.Swift.Hashable.defaultType)
+        }
     }
 
     context(SwiftModelScope)
@@ -67,3 +75,6 @@ class SealedEnumGeneratorDelegate(
         )
     }
 }
+
+private val KotlinClassSwiftModel.areAllExposedChildrenHashable: Boolean
+    get() = exposedSealedSubclasses.all { it.primarySirClass.isHashable }

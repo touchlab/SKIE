@@ -27,7 +27,7 @@ class SealedInteropGenerator(
     private val KotlinClassSwiftModel.isSealedInteropEnabled: Boolean
         get() = this.getConfiguration(SealedInterop.Enabled)
 
-    context(MutableSwiftModelScope)
+    context(SirPhase.Context)
     private fun generate(swiftModel: KotlinClassSwiftModel) {
         val enum = sealedEnumGeneratorDelegate.generate(swiftModel)
 

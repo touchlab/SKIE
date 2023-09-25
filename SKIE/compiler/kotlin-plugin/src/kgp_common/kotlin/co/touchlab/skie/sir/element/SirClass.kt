@@ -60,6 +60,9 @@ val SirClass.superClassType: DeclaredSirType?
     get() = superTypes.map { it.resolveAsDirectClassSirType() }
         .firstOrNull { (it?.declaration as? SirClass)?.kind == SirClass.Kind.Class }
 
+val SirClass.superClass: SirClass?
+    get() = superClassType?.declaration as? SirClass
+
 fun DeclaredSirType.resolveAsDirectClassSirType(): DeclaredSirType? =
     when (declaration) {
         is SirClass -> this
