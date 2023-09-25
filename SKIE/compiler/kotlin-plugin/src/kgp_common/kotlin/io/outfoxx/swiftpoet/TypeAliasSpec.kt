@@ -36,7 +36,7 @@ class TypeAliasSpec private constructor(
     codeWriter.emitDoc(doc)
     codeWriter.emitAttributes(attributes)
     codeWriter.emitModifiers(modifiers)
-    codeWriter.emitCode("typealias %L", name)
+    codeWriter.emitCode("typealias %L", escapeIfNecessary(name))
     codeWriter.emitTypeVariables(typeVariables)
     codeWriter.emitCode(" = %T", type)
     codeWriter.emit("\n")
@@ -69,10 +69,6 @@ class TypeAliasSpec private constructor(
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableSetOf<Modifier>()
     internal val typeVariables = mutableSetOf<TypeVariableName>()
-
-    init {
-      require(name.isName) { "not a valid name: $name" }
-    }
 
     fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
