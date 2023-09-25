@@ -156,7 +156,7 @@ private val IDENTIFIER_REGEX =
     .toRegex()
 
 // https://github.com/JetBrains/kotlin/blob/master/core/descriptors/src/org/jetbrains/kotlin/renderer/KeywordStringsGenerated.java
-private val KEYWORDS = setOf(
+val KEYWORDS = setOf(
   "associatedtype",
   "class",
   "deinit",
