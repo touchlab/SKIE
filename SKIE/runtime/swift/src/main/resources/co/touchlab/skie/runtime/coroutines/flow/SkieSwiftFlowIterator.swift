@@ -15,12 +15,26 @@ public class SkieSwiftFlowIterator<T>: _Concurrency.AsyncIteratorProtocol {
     }
 
     public func next() async -> Element? {
-        let hasNext = try? await skie(iterator).hasNext()
+        do {
+            let hasNext = try await skie(iterator).hasNext()
 
-        if (hasNext?.boolValue ?? false) {
-            return .some(iterator.next() as! Element)
-        } else {
+            if (hasNext.boolValue) {
+                return .some(iterator.next() as! Element)
+            } else {
+                return nil
+            }
+        } catch is _Concurrency.CancellationError {
+            await cancelTask()
+
             return nil
+        } catch {
+            Swift.fatalError("Unexpected error: \(error)")
+        }
+    }
+
+    private func cancelTask() async {
+        _Concurrency.withUnsafeCurrentTask { task in
+            task?.cancel()
         }
     }
 }
