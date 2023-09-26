@@ -22,6 +22,7 @@ import org.gradle.api.file.FileCollection
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
+import org.jetbrains.kotlin.konan.target.HostManager
 
 abstract class SkieGradlePlugin : Plugin<Project> {
 
@@ -111,4 +112,4 @@ internal fun Project.configureEachKotlinAppleTarget(
 }
 
 private val Project.isSkieEnabled: Boolean
-    get() = project.skieExtension.isEnabled.get()
+    get() = project.skieExtension.isEnabled.get() && HostManager.hostIsMac
