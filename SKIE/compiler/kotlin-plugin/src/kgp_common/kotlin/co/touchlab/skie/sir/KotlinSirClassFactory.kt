@@ -83,22 +83,22 @@ class KotlinSirClassFactory(
 
     context(SwiftModelScope)
     private fun SirClass.initializeSuperTypes(classDescriptor: ClassDescriptor) {
-        val genericExportScope = SwiftGenericExportScope.Class(classDescriptor, typeParameters)
+        val swiftExportScope = SwiftExportScope(SwiftGenericExportScope.Class(classDescriptor, typeParameters))
 
         val superTypesWithoutAny = classDescriptor.defaultType
             .constructor
             .supertypes
             .filter { !KotlinBuiltIns.isAnyOrNullableAny(it) }
             .mapNotNull {
-                translator.mapReferenceType(it, SwiftExportScope(genericExportScope), FlowMappingStrategy.TypeArgumentsOnly)
+                translator.mapReferenceType(it, swiftExportScope, FlowMappingStrategy.TypeArgumentsOnly)
             }
             .filterIsInstance<DeclaredSirType>()
+
+        superTypes.addAll(superTypesWithoutAny)
 
         if (this.kind == SirClass.Kind.Class && this.superClass == null) {
             superTypes.add(sirBuiltins.Stdlib.Base.defaultType)
         }
-
-        superTypes.addAll(superTypesWithoutAny)
     }
 
     fun createKotlinSirClass(sourceFile: SourceFile): SirClass {
