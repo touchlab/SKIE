@@ -58,7 +58,7 @@ class SkiePhaseScheduler {
     val descriptorModificationPhases = SkiePhaseGroup<DescriptorModificationPhase, DescriptorModificationPhase.Context> { context ->
         addAll(
             DefaultArgumentGenerator(context),
-            SuspendGenerator(context),
+            SuspendGenerator,
         )
     }
 
@@ -93,7 +93,7 @@ class SkiePhaseScheduler {
             FlowConversionConstructorsGenerator,
             FlowMappingConfigurator(context),
             SuspendGenerator.KotlinBridgeConfigurationPhase,
-            ExhaustiveEnumsGenerator(context),
+            ExhaustiveEnumsGenerator,
             SealedInteropGenerator(context),
 
             MoveBridgesToTopLevelPhase,

@@ -89,6 +89,8 @@ class KotlinSuspendGeneratorDelegate(
                 ),
             )
 
+            context.configurationProvider.inheritConfiguration(functionDescriptor, descriptor)
+
             valueParameters = functionDescriptor.createValueParametersForBridgingFunction(descriptor, typeSubstitutor)
             typeParameters = typeParameterMappingPairs.map { it.second }
             returnType = functionDescriptor.builtIns.unitType

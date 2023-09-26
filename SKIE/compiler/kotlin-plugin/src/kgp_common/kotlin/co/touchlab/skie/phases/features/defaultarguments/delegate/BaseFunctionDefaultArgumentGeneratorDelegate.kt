@@ -6,6 +6,7 @@ import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
@@ -34,6 +35,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
+    context(SkiePhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
@@ -78,6 +80,8 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
                     },
                 ),
             )
+
+            context.configurationProvider.inheritConfiguration(function, descriptor)
 
             dispatchReceiverParameter = function.dispatchReceiverParameter
             extensionReceiverParameter = function.extensionReceiverParameter

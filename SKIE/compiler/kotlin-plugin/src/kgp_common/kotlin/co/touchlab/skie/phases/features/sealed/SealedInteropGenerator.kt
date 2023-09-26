@@ -1,8 +1,8 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 
 class SealedInteropGenerator(
@@ -25,7 +25,7 @@ class SealedInteropGenerator(
         get() = this.isSealed && this.isSealedInteropEnabled
 
     private val KotlinClassSwiftModel.isSealedInteropEnabled: Boolean
-        get() = this.getConfiguration(SealedInterop.Enabled)
+        get() = configurationProvider.getConfiguration(this, SealedInterop.Enabled)
 
     context(SirPhase.Context)
     private fun generate(swiftModel: KotlinClassSwiftModel) {

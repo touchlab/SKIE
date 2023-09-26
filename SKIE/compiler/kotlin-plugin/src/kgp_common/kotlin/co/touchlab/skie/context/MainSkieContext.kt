@@ -3,6 +3,7 @@
 package co.touchlab.skie.context
 
 import co.touchlab.skie.compilerinject.compilerplugin.SkieConfigurationKeys
+import co.touchlab.skie.configuration.ConfigurationProvider
 import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.kir.ExposedModulesProvider
 import co.touchlab.skie.kir.MutableDescriptorProvider
@@ -40,6 +41,8 @@ class MainSkieContext(
 
         SkieConfiguration.deserialize(serializedUserConfiguration)
     }
+
+    override val configurationProvider: ConfigurationProvider = ConfigurationProvider(this)
 
     override val swiftCompilerConfiguration: SwiftCompilerConfiguration = SwiftCompilerConfiguration(
         sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,

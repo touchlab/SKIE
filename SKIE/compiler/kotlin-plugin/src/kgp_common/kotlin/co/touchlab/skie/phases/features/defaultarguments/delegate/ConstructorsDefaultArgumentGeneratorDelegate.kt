@@ -5,6 +5,7 @@ import co.touchlab.skie.kir.irbuilder.createSecondaryConstructor
 import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
@@ -33,6 +34,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
+    context(SkiePhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedClasses.forEach { classDescriptor ->
             classDescriptor.allSupportedConstructors.forEach {
@@ -47,6 +49,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassDescriptor.isSupported: Boolean
         get() = this.kind == ClassKind.CLASS
 
+    context(SkiePhase.Context)
     private val ClassDescriptor.allSupportedConstructors: List<ClassConstructorDescriptor>
         get() = descriptorProvider.getExposedConstructors(this)
             .filter { it.isInteropEnabled }
@@ -85,6 +88,8 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
             namespace = declarationBuilder.getNamespace(constructor),
             annotations = constructor.annotations,
         ) {
+            context.configurationProvider.inheritConfiguration(constructor, descriptor)
+
             valueParameters = parameters.copyWithoutDefaultValue(descriptor).withUniqueLastParameter(overloadId)
             body = { overloadIr ->
                 getOverloadBody(constructor, overloadIr)

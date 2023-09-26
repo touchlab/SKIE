@@ -1,8 +1,9 @@
 package co.touchlab.skie.phases.features.enums
 
-import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.EnumInterop
+import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
@@ -30,9 +31,7 @@ import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isEnumClass
 
-class ExhaustiveEnumsGenerator(
-    override val context: SirPhase.Context,
-) : SirPhase, ConfigurationContainer {
+object ExhaustiveEnumsGenerator : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
@@ -43,12 +42,14 @@ class ExhaustiveEnumsGenerator(
             }
     }
 
+    context(SkiePhase.Context)
     private val KotlinClassSwiftModel.isSupported: Boolean
         get() = this.classDescriptor.kind.isEnumClass &&
             this.classDescriptor.isEnumInteropEnabled
 
+    context(SkiePhase.Context)
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
-        get() = getConfiguration(EnumInterop.Enabled)
+        get() = this.getConfiguration(EnumInterop.Enabled)
 
     context(SwiftModelScope)
     private fun generate(classSwiftModel: MutableKotlinClassSwiftModel) {

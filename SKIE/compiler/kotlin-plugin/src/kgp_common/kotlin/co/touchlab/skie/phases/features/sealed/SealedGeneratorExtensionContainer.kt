@@ -1,7 +1,9 @@
 package co.touchlab.skie.phases.features.sealed
 
-import co.touchlab.skie.configuration.ConfigurationContainer
+import co.touchlab.skie.configuration.ConfigurationProvider
 import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.getConfiguration
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.superClassType
 import co.touchlab.skie.sir.element.toTypeParameterUsage
@@ -12,10 +14,15 @@ import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
-interface SealedGeneratorExtensionContainer : ConfigurationContainer {
+interface SealedGeneratorExtensionContainer {
+
+    val context: SirPhase.Context
+
+    val configurationProvider: ConfigurationProvider
+        get() = context.configurationProvider
 
     val KotlinClassSwiftModel.elseCaseName: String
-        get() = this.getConfiguration(SealedInterop.ElseName)
+        get() = configurationProvider.getConfiguration(this, SealedInterop.ElseName)
 
     fun KotlinClassSwiftModel.enumCaseName(preferredNamesCollide: Boolean): String =
         if (preferredNamesCollide) this.enumCaseNameBasedOnSwiftIdentifier else this.enumCaseNameBasedOnKotlinIdentifier
@@ -29,14 +36,14 @@ interface SealedGeneratorExtensionContainer : ConfigurationContainer {
 
     val KotlinClassSwiftModel.enumCaseNameBasedOnKotlinIdentifier: String
         get() {
-            val configuredName = this.getConfiguration(SealedInterop.Case.Name)
+            val configuredName = configurationProvider.getConfiguration(this, SealedInterop.Case.Name)
 
             return configuredName ?: this.classDescriptor.name.identifier.replaceFirstChar { it.lowercase() }.toValidSwiftIdentifier()
         }
 
     val KotlinClassSwiftModel.enumCaseNameBasedOnSwiftIdentifier: String
         get() {
-            val configuredName = this.getConfiguration(SealedInterop.Case.Name)
+            val configuredName = configurationProvider.getConfiguration(this, SealedInterop.Case.Name)
 
             return configuredName ?: this.kotlinSirClass.fqName.toLocalString().toValidSwiftIdentifier()
         }
@@ -47,7 +54,7 @@ interface SealedGeneratorExtensionContainer : ConfigurationContainer {
             this.visibleSealedSubclasses.isEmpty()
 
     val KotlinClassSwiftModel.visibleSealedSubclasses: List<KotlinClassSwiftModel>
-        get() = this.exposedSealedSubclasses.filter { it.getConfiguration(SealedInterop.Case.Visible) }
+        get() = this.exposedSealedSubclasses.filter { configurationProvider.getConfiguration(it, SealedInterop.Case.Visible) }
 
     fun SirClass.getSealedSubclassType(
         enum: SirClass,

@@ -1,8 +1,9 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
-import co.touchlab.skie.configuration.ConfigurationContainer
+import co.touchlab.skie.phases.SkiePhase
 
-interface DefaultArgumentGeneratorDelegate : ConfigurationContainer {
+interface DefaultArgumentGeneratorDelegate {
 
+    context(SkiePhase.Context)
     fun generate()
 }

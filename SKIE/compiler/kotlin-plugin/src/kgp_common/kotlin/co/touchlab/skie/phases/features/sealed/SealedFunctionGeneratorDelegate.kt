@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.toSwiftPoetVariables
@@ -43,13 +44,13 @@ class SealedFunctionGeneratorDelegate(
     }
 
     private val KotlinClassSwiftModel.enumConstructorFunctionName: String
-        get() = this.getConfiguration(SealedInterop.Function.Name)
+        get() = configurationProvider.getConfiguration(this, SealedInterop.Function.Name)
 
     private val KotlinClassSwiftModel.enumConstructorArgumentLabel: String
-        get() = this.getConfiguration(SealedInterop.Function.ArgumentLabel)
+        get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ArgumentLabel)
 
     private val KotlinClassSwiftModel.enumConstructorParameterName: String
-        get() = this.getConfiguration(SealedInterop.Function.ParameterName)
+        get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ParameterName)
 
     context(SwiftModelScope)
     private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(

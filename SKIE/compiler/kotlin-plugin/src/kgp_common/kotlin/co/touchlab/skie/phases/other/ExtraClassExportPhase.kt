@@ -1,6 +1,5 @@
 package co.touchlab.skie.phases.other
 
-import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.MutableDescriptorProvider
@@ -25,8 +24,8 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 
 class ExtraClassExportPhase(
-    override val context: ClassExportPhase.Context,
-) : ClassExportPhase, ConfigurationContainer {
+    private val context: ClassExportPhase.Context,
+) : ClassExportPhase {
 
     private val descriptorProvider = context.descriptorProvider
 
@@ -62,7 +61,7 @@ class ExtraClassExportPhase(
     }
 
     private fun MutableSet<ClassDescriptor>.addClassesForExportFromFlowArguments() {
-        if (SkieConfigurationFlag.Feature_CoroutinesInterop !in skieConfiguration.enabledConfigurationFlags) {
+        if (SkieConfigurationFlag.Feature_CoroutinesInterop !in context.skieConfiguration.enabledConfigurationFlags) {
             return
         }
 
@@ -81,7 +80,7 @@ class ExtraClassExportPhase(
     }
 
     private fun ClassDescriptor.getAllExportedSealedChildren(): List<ClassDescriptor> {
-        if (!this.getConfiguration(SealedInterop.ExportEntireHierarchy)) {
+        if (!context.configurationProvider.getConfiguration(this, SealedInterop.ExportEntireHierarchy)) {
             return emptyList()
         }
 

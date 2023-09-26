@@ -1,6 +1,5 @@
 package co.touchlab.skie.phases.features.flow
 
-import co.touchlab.skie.configuration.ConfigurationContainer
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
@@ -11,8 +10,8 @@ import co.touchlab.skie.swiftmodel.callable.property.regular.MutableKotlinRegula
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 
 class FlowMappingConfigurator(
-    override val context: SirPhase.Context,
-) : SirPhase, ConfigurationContainer {
+    private val context: SirPhase.Context,
+) : SirPhase {
 
     context(SirPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
@@ -44,6 +43,6 @@ class FlowMappingConfigurator(
             if (this.isInteropEnabled) FlowMappingStrategy.Full else FlowMappingStrategy.None
 
         private val KotlinCallableMemberSwiftModel.isInteropEnabled: Boolean
-            get() = this.descriptor.getConfiguration(FlowInterop.Enabled)
+            get() = context.configurationProvider.getConfiguration(this.descriptor, FlowInterop.Enabled)
     }
 }
