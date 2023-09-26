@@ -77,9 +77,14 @@ class ActualKotlinRegularPropertySwiftModel(
         get() = listOf(type, receiver).flatMap { it.allReferencedTypes() }
             .none { it is SkieErrorSirType }
 
-    override val getter: KotlinRegularPropertyGetterSwiftModel by core::getter
+    override val getter: KotlinRegularPropertyGetterSwiftModel = DefaultKotlinRegularPropertyGetterSwiftModel(
+        descriptor.getter ?: error("$descriptor does not have a getter."),
+        core.namer,
+    )
 
-    override val setter: KotlinRegularPropertySetterSwiftModel? by core::setter
+    override val setter: KotlinRegularPropertySetterSwiftModel? = descriptor.setter?.let {
+        DefaultKotlinRegularPropertySetterSwiftModel(it, core.namer)
+    }
 
     override fun toString(): String = descriptor.toString()
 

@@ -9,20 +9,13 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class KotlinRegularPropertySwiftModelCore(
     val descriptor: PropertyDescriptor,
-    namer: ObjCExportNamer,
+    val namer: ObjCExportNamer,
     private val objCTypeProvider: ObjCTypeProvider,
 ) {
 
     var identifier: String = namer.getPropertyName(descriptor.original).swiftName
 
     var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
-
-    val getter: KotlinRegularPropertyGetterSwiftModel = DefaultKotlinRegularPropertyGetterSwiftModel(
-        descriptor.getter ?: error("$descriptor does not have a getter."),
-        namer,
-    )
-
-    val setter: KotlinRegularPropertySetterSwiftModel? = descriptor.setter?.let { DefaultKotlinRegularPropertySetterSwiftModel(it, namer) }
 
     val objCName: String = namer.getPropertyName(descriptor.original).objCName
 
