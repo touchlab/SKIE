@@ -55,6 +55,11 @@ class ActualKotlinFunctionSwiftModel(
 
     override var visibility: SwiftModelVisibility by core::visibility
 
+    override val asyncSwiftModelOrNull: KotlinFunctionSwiftModel?
+        get() = with(swiftModelScope) {
+            descriptor.asyncSwiftModelOrNull
+        }
+
     override val owner: KotlinTypeSwiftModel?
         get() = with(swiftModelScope) {
             descriptor.owner()
@@ -68,7 +73,7 @@ class ActualKotlinFunctionSwiftModel(
 
     override val objCSelector: String by core::objCSelector
 
-    override val isSuspend: Boolean = descriptor.isSuspend
+    override val isSuspend: Boolean = false
 
     override val isThrowing: Boolean by core::isThrowing
 

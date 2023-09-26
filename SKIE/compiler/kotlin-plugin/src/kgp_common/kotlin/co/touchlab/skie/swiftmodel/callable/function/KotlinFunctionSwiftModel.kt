@@ -23,6 +23,8 @@ interface KotlinFunctionSwiftModel : KotlinDirectlyCallableMemberSwiftModel {
 
     val valueParameters: List<KotlinValueParameterSwiftModel>
 
+    val asyncSwiftModelOrNull: KotlinFunctionSwiftModel?
+
     val objCSelector: String
 
     val isSuspend: Boolean

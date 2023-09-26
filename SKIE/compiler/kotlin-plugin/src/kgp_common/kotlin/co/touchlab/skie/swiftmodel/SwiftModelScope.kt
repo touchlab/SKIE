@@ -47,6 +47,8 @@ interface SwiftModelScope {
 
     val FunctionDescriptor.asyncSwiftModel: KotlinFunctionSwiftModel
 
+    val FunctionDescriptor.asyncSwiftModelOrNull: KotlinFunctionSwiftModel?
+
     val ParameterDescriptor.swiftModel: KotlinValueParameterSwiftModel
 
     val PropertyDescriptor.swiftModel: KotlinPropertySwiftModel

@@ -97,7 +97,10 @@ class SwiftModelProvider(
         get() = functionSwiftModels[this.original] ?: throwUnknownDescriptor()
 
     override val FunctionDescriptor.asyncSwiftModel: KotlinFunctionSwiftModel
-        get() = asyncFunctionSwiftModels[this.original] ?: throwUnknownDescriptor()
+        get() = this.asyncSwiftModelOrNull ?: throwUnknownDescriptor()
+
+    override val FunctionDescriptor.asyncSwiftModelOrNull: KotlinFunctionSwiftModel?
+        get() = asyncFunctionSwiftModels[this.original]
 
     override val ParameterDescriptor.swiftModel: MutableKotlinValueParameterSwiftModel
         get() = parameterSwiftModels[this] ?: throwUnknownDescriptor()

@@ -58,19 +58,22 @@ class SwiftSuspendGeneratorDelegate(
             return if (this.isFromGenericClass) {
                 skieClassSuspendGenerator.getOrCreateSkieClass(owner)
             } else {
-                owner.primarySirClass
+                owner.kotlinSirClass
             }
         }
 
     private val BridgeModel.isFromGenericClass: Boolean
-        get() = this.originalFunction.owner?.primarySirClass?.typeParameters?.isEmpty()?.not() ?: false
+        get() = this.originalFunction.owner?.kotlinSirClass?.typeParameters?.isEmpty()?.not() ?: false
+
+    private val BridgeModel.isFromBridgedClass: Boolean
+        get() = this.originalFunction.owner?.bridgedSirClass != null
 
     private fun SirExtension.addSwiftBridgingFunction(bridgeModel: BridgeModel) {
         this.swiftPoetBuilderModifications.add {
             addFunction(
                 FunctionSpec.builder(bridgeModel.originalFunction.identifier)
                     .setScope(bridgeModel)
-                    .addAttribute(AttributeSpec.available("iOS" to "13", "macOS" to "10.15", "watchOS" to "6", "tvOS" to "13", "*" to ""))
+                    .addAvailabilityForAsync()
                     .async(true)
                     .throws(true)
                     .addValueParameters(bridgeModel)
@@ -162,10 +165,14 @@ class SwiftSuspendGeneratorDelegate(
             return
         }
 
-        if (bridgeModel.isFromGenericClass) {
-            val dispatchReceiverErasedType = bridgeModel.kotlinBridgingFunction.valueParameters.first().type.toSwiftPoetTypeName()
+        val dispatchReceiverErasedType by lazy {
+            bridgeModel.kotlinBridgingFunction.valueParameters.first().type.toSwiftPoetTypeName()
+        }
 
+        if (bridgeModel.isFromGenericClass) {
             add(CodeBlock.of("%N as! %T", SkieClassSuspendGenerator.kotlinObjectVariableName, dispatchReceiverErasedType))
+        } else if (bridgeModel.isFromBridgedClass) {
+            add(CodeBlock.of("self as %T", dispatchReceiverErasedType))
         } else {
             add(CodeBlock.of("self"))
         }
@@ -186,3 +193,6 @@ class SwiftSuspendGeneratorDelegate(
         }
     }
 }
+
+fun FunctionSpec.Builder.addAvailabilityForAsync(): FunctionSpec.Builder =
+    addAttribute(AttributeSpec.available("iOS" to "13", "macOS" to "10.15", "watchOS" to "6", "tvOS" to "13", "*" to ""))

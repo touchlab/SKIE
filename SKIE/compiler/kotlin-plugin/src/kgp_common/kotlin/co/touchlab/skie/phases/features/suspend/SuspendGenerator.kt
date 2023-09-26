@@ -10,13 +10,16 @@ import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
+import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 object SuspendGenerator : DescriptorModificationPhase {
 
     context(DescriptorModificationPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
+    override fun isActive(): Boolean = isEnabled()
+
+    private fun SkiePhase.Context.isEnabled(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(DescriptorModificationPhase.Context)
     override fun execute() {
@@ -38,6 +41,10 @@ object SuspendGenerator : DescriptorModificationPhase {
             .filter { this.isBaseMethod(it) }
             .filter { it.isSupported }
             .filter { it.isInteropEnabled }
+
+    context(SkiePhase.Context)
+    fun hasSuspendWrapper(swiftModel: KotlinFunctionSwiftModel): Boolean =
+        isEnabled() && swiftModel.descriptor.isSupported && swiftModel.descriptor.isInteropEnabled
 
     private val FunctionDescriptor.isSupported: Boolean
         get() = this.isSuspend

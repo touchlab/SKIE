@@ -4,6 +4,8 @@ import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.features.suspend.SuspendGenerator
+import co.touchlab.skie.phases.features.suspend.addAvailabilityForAsync
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
@@ -51,7 +53,7 @@ object ExhaustiveEnumsGenerator : SirPhase {
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
         get() = this.getConfiguration(EnumInterop.Enabled)
 
-    context(SwiftModelScope)
+    context(SirPhase.Context)
     private fun generate(classSwiftModel: MutableKotlinClassSwiftModel) {
         val skieClass = classSwiftModel.generateBridge()
 
@@ -65,7 +67,7 @@ private fun MutableKotlinClassSwiftModel.configureBridging(skieClass: SirClass) 
     visibility = SwiftModelVisibility.Replaced
 }
 
-context(SwiftModelScope)
+context(SirPhase.Context)
 private fun KotlinClassSwiftModel.generateBridge(): SirClass {
     val skieClass = createBridgingEnum()
 
@@ -74,7 +76,7 @@ private fun KotlinClassSwiftModel.generateBridge(): SirClass {
     return skieClass
 }
 
-context(SwiftModelScope)
+context(SirPhase.Context)
 private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass {
     val enum = SirClass(
         simpleName = kotlinSirClass.simpleName,
@@ -125,7 +127,7 @@ private fun KotlinClassSwiftModel.addEnumCases(skieClass: SirClass) {
     }
 }
 
-context(KotlinClassSwiftModel)
+context(KotlinClassSwiftModel, SirPhase.Context)
 private fun TypeSpec.Builder.addPassthroughForMembers() {
     allAccessibleDirectlyCallableMembers
         .forEach {
@@ -208,6 +210,7 @@ private fun ExtensionSpec.Builder.addToSwiftConversionMethod(skieClass: SirClass
             .build(),
     )
 
+context(SirPhase.Context)
 private class MemberPassthroughGeneratorVisitor(
     private val builder: TypeSpec.Builder,
 ) : KotlinDirectlyCallableMemberSwiftModelVisitor.Unit {
@@ -215,21 +218,37 @@ private class MemberPassthroughGeneratorVisitor(
     override fun visit(function: KotlinFunctionSwiftModel) {
         if (!function.isSupported) return
 
-        builder.addFunction(
-            FunctionSpec.builder(function.identifier)
-                .addModifiers(Modifier.PUBLIC)
-                .addFunctionValueParameters(function)
-                .throws(function.isThrowing)
-                .returns(function.returnType.toSwiftPoetTypeName())
-                .addFunctionBody(function)
-                .build(),
-        )
+        if (SuspendGenerator.hasSuspendWrapper(function)) {
+            val asyncFunction = function.asyncSwiftModelOrNull ?: error("Suspend function must have an async swift model: $function")
+
+            builder.addFunction(asyncFunction)
+        }
+
+        builder.addFunction(function)
     }
 
     private val unsupportedFunctionNames = listOf("compareTo(other:)", "hash()", "description()", "isEqual(_:)")
 
     private val KotlinFunctionSwiftModel.isSupported: Boolean
-        get() = !this.isSuspend && this.name !in unsupportedFunctionNames
+        get() = this.name !in unsupportedFunctionNames
+
+    private fun TypeSpec.Builder.addFunction(function: KotlinFunctionSwiftModel) {
+        addFunction(
+            FunctionSpec.builder(function.identifier)
+                .addModifiers(Modifier.PUBLIC)
+                .addFunctionValueParameters(function)
+                .throws(function.isThrowing)
+                .async(function.isSuspend)
+                .apply {
+                    if (function.isSuspend) {
+                        addAvailabilityForAsync()
+                    }
+                }
+                .returns(function.returnType.toSwiftPoetTypeName())
+                .addFunctionBody(function)
+                .build(),
+        )
+    }
 
     private fun FunctionSpec.Builder.addFunctionValueParameters(function: KotlinFunctionSwiftModel): FunctionSpec.Builder =
         this.apply {
@@ -250,8 +269,9 @@ private class MemberPassthroughGeneratorVisitor(
     private fun FunctionSpec.Builder.addFunctionBody(function: KotlinFunctionSwiftModel): FunctionSpec.Builder =
         this.addFunctionBodyWithErrorTypeHandling(function) {
             addStatement(
-                "return %L(self as _ObjectiveCType).%N(%L)",
+                "return %L%L(self as _ObjectiveCType).%N(%L)",
                 if (function.isThrowing) "try " else "",
+                if (function.isSuspend) "await " else "",
                 function.reference,
                 function.valueParameters.map { CodeBlock.of("%N", it.parameterName) }.joinToCode(", "),
             )

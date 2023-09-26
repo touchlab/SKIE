@@ -24,6 +24,17 @@ class AsyncKotlinFunctionSwiftModel(
     override val valueParameters: List<MutableKotlinValueParameterSwiftModel>
         get() = delegate.valueParameters.filter { it.origin != KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
 
+    // TODO: This is a hack for calling async function wrappers needed until Sir supports functions.
+    override val reference: String
+        get() = delegate.core.replacedReference(this)
+
+    override val name: String
+        get() = delegate.core.name(this)
+
+    override val isSuspend: Boolean = true
+
+    override val isThrowing: Boolean = true
+
     override val returnType: SirType
         get() = with(swiftModelScope) {
             descriptor.asyncReturnType(
