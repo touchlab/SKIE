@@ -45,7 +45,8 @@ class AddForwardDeclarationsPhase(
         val knownDeclarations = forwardDeclarations + definedDeclarations
 
         val missingExternalReferencedDeclarations = referencedDeclarations.filterNotIn(knownDeclarations)
-        val definedDeclarationsWithoutForwardDeclaration = definedDeclarations.filter { it.name !in forwardDeclarationsNames }.map { it.toString() }
+        val definedDeclarationsWithoutForwardDeclaration =
+            definedDeclarations.filter { it.name !in forwardDeclarationsNames }.map { it.toString() }
 
         return missingExternalReferencedDeclarations + definedDeclarationsWithoutForwardDeclaration
     }

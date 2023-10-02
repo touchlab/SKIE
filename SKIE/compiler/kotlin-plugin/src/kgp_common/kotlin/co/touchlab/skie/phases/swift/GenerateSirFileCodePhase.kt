@@ -374,7 +374,6 @@ private val SirDeclaration.defaultVisibility: SirVisibility
 private val SirOverridableDeclaration<*>.needsOverride: Boolean
     get() = overriddenDeclarations.any { it.memberOwner?.kind == SirClass.Kind.Class }
 
-
 private fun <T> T.applyIf(condition: Boolean, action: T.() -> Unit): T =
     this.apply {
         if (condition) {

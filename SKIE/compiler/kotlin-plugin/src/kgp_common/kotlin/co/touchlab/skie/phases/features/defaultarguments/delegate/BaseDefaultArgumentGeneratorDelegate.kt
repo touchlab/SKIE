@@ -37,8 +37,8 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
     context(SkiePhase.Context)
     protected val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.getConfiguration(DefaultArgumentInterop.Enabled) &&
-            this.satisfiesMaximumDefaultArgumentCount &&
-            (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
+                this.satisfiesMaximumDefaultArgumentCount &&
+                (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
 
     context(SkiePhase.Context)
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean

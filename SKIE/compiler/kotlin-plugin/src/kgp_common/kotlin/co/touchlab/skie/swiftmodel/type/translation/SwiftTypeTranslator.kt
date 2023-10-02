@@ -150,7 +150,7 @@ class SwiftTypeTranslator(
 
             reporter.warning(
                 "Exposed type '$kotlinType' is '$firstType' and '$secondType' at the same time. " +
-                    "This most likely wouldn't work as expected.",
+                        "This most likely wouldn't work as expected.",
             )
         }
 
@@ -300,7 +300,7 @@ class SwiftTypeTranslator(
         }
 
         val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
-            functionType.getValueParameterTypesFromFunctionType().map { it.type }
+                functionType.getValueParameterTypesFromFunctionType().map { it.type }
 
         return LambdaSirType(
             if (returnsVoid) {

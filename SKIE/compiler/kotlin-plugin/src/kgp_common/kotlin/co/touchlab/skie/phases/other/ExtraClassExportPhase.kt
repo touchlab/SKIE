@@ -66,7 +66,7 @@ class ExtraClassExportPhase(
         }
 
         val allFlowArguments = descriptorProvider.allExposedMembers.flatMap { it.getAllFlowArgumentClasses() } +
-            descriptorProvider.exposedClasses.flatMap { it.getAllFlowArgumentClasses() }
+                descriptorProvider.exposedClasses.flatMap { it.getAllFlowArgumentClasses() }
 
         val allExposableFlowArguments = allFlowArguments.filter { descriptorProvider.isExposable(it) }
 
@@ -136,9 +136,12 @@ private fun ClassDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
 
 private fun CallableMemberDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
     typeParameters.flatMap { it.getAllFlowArgumentClasses() } +
-        valueParameters.flatMap { it.type.getAllFlowArgumentClasses() } +
-        (returnType?.getAllFlowArgumentClasses() ?: emptyList()) +
-        (contextReceiverParameters + listOfNotNull(dispatchReceiverParameter, extensionReceiverParameter)).flatMap { it.getAllFlowArgumentClasses() }
+            valueParameters.flatMap { it.type.getAllFlowArgumentClasses() } +
+            (returnType?.getAllFlowArgumentClasses() ?: emptyList()) +
+            (contextReceiverParameters + listOfNotNull(
+                dispatchReceiverParameter,
+                extensionReceiverParameter
+            )).flatMap { it.getAllFlowArgumentClasses() }
 
 // Sacrifices some completeness for simplicity - otherwise it would have to check all usages of the type parameter.
 private fun TypeParameterDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =

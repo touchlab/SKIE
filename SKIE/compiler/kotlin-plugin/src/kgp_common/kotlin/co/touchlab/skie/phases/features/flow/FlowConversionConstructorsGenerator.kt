@@ -13,7 +13,6 @@ import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
 import co.touchlab.skie.swiftmodel.SwiftModelScope
-import io.outfoxx.swiftpoet.Modifier
 
 object FlowConversionConstructorsGenerator : SirPhase {
 

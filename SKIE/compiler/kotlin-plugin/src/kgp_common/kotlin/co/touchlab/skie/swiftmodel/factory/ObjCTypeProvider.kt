@@ -136,7 +136,7 @@ class ObjCTypeProvider(
             if (!returnBridge.successMayBeZero) {
                 check(
                     successReturnType is ObjCNonNullReferenceType
-                        || (successReturnType is ObjCPointerType && !successReturnType.nullable),
+                            || (successReturnType is ObjCPointerType && !successReturnType.nullable),
                 ) {
                     "Unexpected return type: $successReturnType in $method"
                 }

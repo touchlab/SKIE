@@ -155,7 +155,7 @@ class KotlinSuspendGeneratorDelegate(
     private fun ValueParameterDescriptor.configureExtensionReceiverFlowMapping(originalFunctionDescriptor: FunctionDescriptor) {
         context.doInPhase(SuspendGenerator.KotlinBridgeConfigurationPhase) {
             val isExtensionReceiverUsedAsSwiftReceiver = originalFunctionDescriptor.swiftModel.scope.isMember &&
-                originalFunctionDescriptor.dispatchReceiverParameter == null
+                    originalFunctionDescriptor.dispatchReceiverParameter == null
 
             if (isExtensionReceiverUsedAsSwiftReceiver) {
                 this@configureExtensionReceiverFlowMapping.swiftModel.flowMappingStrategy = FlowMappingStrategy.TypeArgumentsOnly

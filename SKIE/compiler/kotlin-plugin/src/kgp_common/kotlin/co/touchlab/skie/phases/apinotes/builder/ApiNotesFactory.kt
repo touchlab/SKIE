@@ -25,7 +25,7 @@ object ApiNotesFactory {
     context(SirPhase.Context)
     private val DescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
         get() = this.exposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
-            this.exposedFiles.map { it.swiftModel }
+                this.exposedFiles.map { it.swiftModel }
 
     context(SirPhase.Context)
     private val DescriptorProvider.swiftModelsForInterfaces: List<KotlinTypeSwiftModel>

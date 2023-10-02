@@ -26,7 +26,7 @@ object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
     private fun logModuleNameCollisionWarning(moduleName: String) {
         reporter.warning(
             "Type '$moduleName' was renamed to '${moduleName}_' " +
-                "because it has the same name as the produced framework which is forbidden.",
+                    "because it has the same name as the produced framework which is forbidden.",
         )
     }
 }

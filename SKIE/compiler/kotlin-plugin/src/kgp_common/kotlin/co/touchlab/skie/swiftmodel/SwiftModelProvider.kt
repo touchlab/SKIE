@@ -163,7 +163,10 @@ class SwiftModelProvider(
         translator.mapReferenceType(
             this.defaultType,
             // TODO ?: SwiftGenericExportScope.None is a hack that relies on the fact that none of the types with SwiftModel can inherit from a special type that is generic
-            SwiftExportScope(this.swiftModelOrNull?.swiftGenericExportScope ?: SwiftGenericExportScope.None, SwiftExportScope.Flags.ReferenceType),
+            SwiftExportScope(
+                this.swiftModelOrNull?.swiftGenericExportScope ?: SwiftGenericExportScope.None,
+                SwiftExportScope.Flags.ReferenceType
+            ),
             FlowMappingStrategy.TypeArgumentsOnly,
         )
 
@@ -241,8 +244,8 @@ class SwiftModelProvider(
     private fun DeclarationDescriptor.throwUnknownDescriptor(): Nothing {
         throw IllegalArgumentException(
             "Cannot find SwiftModel for descriptor: $this. Possible reasons: " +
-                "Descriptor is not exposed and therefore does not have a SwiftModel. " +
-                "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty).",
+                    "Descriptor is not exposed and therefore does not have a SwiftModel. " +
+                    "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty).",
         )
     }
 

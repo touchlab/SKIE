@@ -122,10 +122,10 @@ class SealedFunctionGeneratorDelegate(
         } else {
             add(
                 "fatalError(" +
-                    "\"Unknown subtype. " +
-                    "This error should not happen under normal circumstances " +
-                    "since ${swiftModel.primarySirClass} is sealed." +
-                    "\")\n",
+                        "\"Unknown subtype. " +
+                        "This error should not happen under normal circumstances " +
+                        "since ${swiftModel.primarySirClass} is sealed." +
+                        "\")\n",
             )
         }
 

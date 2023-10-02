@@ -156,7 +156,7 @@ class SwiftModelFactoryMembersDelegate(
         group: List<PropertyDescriptor>,
     ): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
         createBoundedConvertedPropertiesEnclosingModels(group) +
-            createBoundedConvertedPropertiesFunctions(group)
+                createBoundedConvertedPropertiesFunctions(group)
 
     private fun createBoundedConvertedPropertiesEnclosingModels(
         group: List<PropertyDescriptor>,

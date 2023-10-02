@@ -50,7 +50,7 @@ object ExhaustiveEnumsGenerator : SirPhase {
     context(SkiePhase.Context)
     private val KotlinClassSwiftModel.isSupported: Boolean
         get() = this.classDescriptor.kind.isEnumClass &&
-            this.classDescriptor.isEnumInteropEnabled
+                this.classDescriptor.isEnumInteropEnabled
 
     context(SkiePhase.Context)
     private val ClassDescriptor.isEnumInteropEnabled: Boolean

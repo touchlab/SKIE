@@ -19,7 +19,8 @@ object SuspendGenerator : DescriptorModificationPhase {
     context(DescriptorModificationPhase.Context)
     override fun isActive(): Boolean = isEnabled()
 
-    private fun SkiePhase.Context.isEnabled(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
+    private fun SkiePhase.Context.isEnabled(): Boolean =
+        SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(DescriptorModificationPhase.Context)
     override fun execute() {
