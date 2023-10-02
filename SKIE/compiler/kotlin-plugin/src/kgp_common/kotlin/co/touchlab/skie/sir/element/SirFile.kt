@@ -1,6 +1,5 @@
 package co.touchlab.skie.sir.element
 
-import io.outfoxx.swiftpoet.FileSpec
 import java.nio.file.Path
 
 // File can only be created from SirProvider
@@ -9,6 +8,8 @@ class SirFile(
     val name: String,
     override val module: SirModule.Skie,
 ) : SirElement, SirTopLevelDeclarationParent {
+
+    val imports: MutableList<String> = mutableListOf()
 
     // Relative to generated swift directory
     val relativePath: Path
@@ -24,9 +25,6 @@ class SirFile(
     }
 
     override val declarations: MutableList<SirDeclaration> = mutableListOf()
-
-    // TODO Replace SwiftPoet with Sir
-    val swiftPoetBuilderModifications = mutableListOf<FileSpec.Builder.() -> Unit>()
 
     override fun toString(): String = "${this::class.simpleName}: $name"
 

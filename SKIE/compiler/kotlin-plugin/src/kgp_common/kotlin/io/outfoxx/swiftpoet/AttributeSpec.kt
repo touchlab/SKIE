@@ -70,6 +70,10 @@ class AttributeSpec internal constructor(
       return builder("available").addArguments(platforms.map { "${it.first} ${it.second}" }).build()
     }
 
+    fun rawBuilder(name: String): Builder {
+      return Builder(CodeBlock.of(name))
+    }
+
     val DISCARDABLE_RESULT = builder("discardableResult").build()
     val ESCAPING = builder("escaping").build()
     val CONVENTION_BLOCK = builder("convention").addArgument("block").build()

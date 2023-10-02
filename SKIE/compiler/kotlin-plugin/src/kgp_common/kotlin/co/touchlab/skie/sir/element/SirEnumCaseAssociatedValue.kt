@@ -12,4 +12,16 @@ class SirEnumCaseAssociatedValue(
 
     override fun toString(): String =
         "${this::class.simpleName} of $parent: $type"
+
+    companion object {
+
+        context(SirEnumCase)
+        operator fun invoke(
+            type: SirType,
+        ): SirEnumCaseAssociatedValue =
+            SirEnumCaseAssociatedValue(
+                type = type,
+                parent = this@SirEnumCase,
+            )
+    }
 }

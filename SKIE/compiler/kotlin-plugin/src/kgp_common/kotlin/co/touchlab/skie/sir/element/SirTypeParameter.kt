@@ -3,7 +3,6 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.sir.element.util.sirTypeParameterParent
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
-import io.outfoxx.swiftpoet.TypeVariableName
 
 class SirTypeParameter(
     val name: String,
@@ -15,16 +14,32 @@ class SirTypeParameter(
 
     var parent: SirTypeParameterParent by sirTypeParameterParent(parent)
 
-    fun toSwiftPoetVariable() = TypeVariableName.typeVariable(
-        name,
-        bounds.map { TypeVariableName.Bound(it.toSwiftPoetTypeName()) },
-    )
-
     override fun toString(): String = "type parameter: $name : ${bounds.joinToString("&")}>"
+
+    companion object {
+
+        context(SirTypeParameterParent)
+        operator fun invoke(
+            name: String,
+            bounds: List<SirType> = emptyList(),
+        ): SirTypeParameter =
+            SirTypeParameter(
+                name = name,
+                parent = this@SirTypeParameterParent,
+                bounds = bounds,
+            )
+
+        context(SirTypeParameterParent)
+        operator fun invoke(
+            name: String,
+            vararg bounds: SirType,
+        ): SirTypeParameter =
+            SirTypeParameter(
+                name = name,
+                bounds = bounds.toList(),
+            )
+    }
 }
 
 fun SirTypeParameter.toTypeParameterUsage(): TypeParameterUsageSirType =
     TypeParameterUsageSirType(this)
-
-fun List<SirTypeParameter>.toSwiftPoetVariables(): List<TypeVariableName> =
-    map { it.toSwiftPoetVariable() }

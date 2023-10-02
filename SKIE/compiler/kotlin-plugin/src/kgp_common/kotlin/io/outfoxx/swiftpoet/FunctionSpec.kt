@@ -16,6 +16,9 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
+import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
+
 /** A generated function declaration.  */
 class FunctionSpec private constructor(
   builder: Builder,
@@ -179,7 +182,7 @@ class FunctionSpec private constructor(
   class Builder internal constructor(
     internal val name: String,
     internal val type: Type = Type.Function,
-  ) : AttributedSpec.Builder<Builder>() {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters {
 
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableListOf<Modifier>()
@@ -201,7 +204,7 @@ class FunctionSpec private constructor(
       doc.add(block)
     }
 
-    fun addModifiers(vararg modifiers: Modifier) = apply {
+    override fun addModifiers(vararg modifiers: Modifier) = apply {
       this.modifiers += modifiers
     }
 
@@ -214,7 +217,7 @@ class FunctionSpec private constructor(
       this.typeVariables += typeVariables
     }
 
-    fun addTypeVariable(typeVariable: TypeVariableName) = apply {
+    override fun addTypeVariable(typeVariable: TypeVariableName) = apply {
       check(!type.isAccessor) { "$name cannot have type variables" }
       typeVariables += typeVariable
     }

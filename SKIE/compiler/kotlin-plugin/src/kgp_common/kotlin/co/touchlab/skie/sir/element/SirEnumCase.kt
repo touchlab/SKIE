@@ -13,4 +13,16 @@ class SirEnumCase(
 
     override fun toString(): String =
         "${this::class.simpleName}: $simpleName"
+
+    companion object {
+
+        context(SirDeclarationParent)
+        operator fun invoke(
+            simpleName: String,
+        ): SirEnumCase =
+            SirEnumCase(
+                simpleName = simpleName,
+                parent = this@SirDeclarationParent,
+            )
+    }
 }

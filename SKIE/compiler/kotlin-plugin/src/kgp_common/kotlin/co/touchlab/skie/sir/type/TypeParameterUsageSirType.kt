@@ -6,6 +6,7 @@ import io.outfoxx.swiftpoet.TypeVariableName
 
 data class TypeParameterUsageSirType(
     val typeParameter: SirTypeParameter,
+    val parentScope: TypeParameterUsageSirType? = null,
 ) : NonNullSirType() {
 
     override val isHashable: Boolean
@@ -17,6 +18,10 @@ data class TypeParameterUsageSirType(
     override val directlyReferencedTypes: List<SirType>
         get() = typeParameter.bounds
 
+    fun typeParameter(typeParameter: SirTypeParameter): TypeParameterUsageSirType =
+        TypeParameterUsageSirType(typeParameter, this)
+
     override fun toSwiftPoetTypeName(): TypeName =
-        TypeVariableName(typeParameter.name)
+        parentScope?.let { TypeVariableName(it.toSwiftPoetTypeName().name + "." + typeParameter.name) }
+            ?: TypeVariableName(typeParameter.name)
 }

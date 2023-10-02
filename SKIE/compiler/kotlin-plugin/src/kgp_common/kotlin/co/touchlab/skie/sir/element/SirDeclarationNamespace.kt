@@ -6,3 +6,4 @@ sealed interface SirDeclarationNamespace : SirDeclarationParent {
 
     val fqName: SirFqName
 }
+

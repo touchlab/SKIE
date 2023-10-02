@@ -90,7 +90,6 @@ class SkiePhaseScheduler {
             ExtraClassExportPhase.FinalizePhase,
             DefaultArgumentGenerator.FinalizePhase,
             FlowBridgingConfigurator,
-            FlowConversionConstructorsGenerator,
             FlowMappingConfigurator(context),
             SuspendGenerator.KotlinBridgeConfigurationPhase,
             ExhaustiveEnumsGenerator,
@@ -99,6 +98,9 @@ class SkiePhaseScheduler {
             MoveBridgesToTopLevelPhase,
             RenameTypesConflictsWithOtherTypesPhase,
             FixCallableMembersConflictsPhase,
+
+            FlowConversionConstructorsGenerator,
+            ExhaustiveEnumsGenerator.FunctionGeneratorPhase,
             SuspendGenerator.SwiftBridgeGeneratorPhase,
 
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,

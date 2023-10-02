@@ -1,28 +1,34 @@
 package co.touchlab.skie.util.swift
 
+import co.touchlab.skie.sir.element.SirElementWithAttributes
+import co.touchlab.skie.sir.element.SirElementWithSwiftPoetBuilderModifications
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
-import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 
-fun FunctionSpec.Builder.addFunctionBodyWithErrorTypeHandling(
+fun <T> T.addFunctionBodyWithErrorTypeHandling(
     swiftModel: KotlinDirectlyCallableMemberSwiftModel,
     realFunctionBuilder: FunctionSpec.Builder.() -> Unit,
-): FunctionSpec.Builder =
-    this.apply {
-        if (swiftModel.hasValidSignatureInSwift) {
+) where T : SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder>, T : SirElementWithAttributes {
+    if (swiftModel.hasValidSignatureInSwift) {
+        swiftPoetBuilderModifications.add {
             realFunctionBuilder()
-        } else {
-            addSkieLambdaErrorFunctionBody()
         }
+    } else {
+        addSkieLambdaErrorFunctionBody()
     }
+}
 
 private const val errorMessage =
     "Due to an Obj-C/Swift interop limitation, SKIE cannot generate Swift types with a lambda type argument. " +
-        "Example of such type is: A<() -> Unit> where A<T> is a generic class. " +
-        "The original declarations can still be used in the same way as other declarations hidden by SKIE (and with the same limitations as without SKIE)."
+            "Example of such type is: A<() -> Unit> where A<T> is a generic class. " +
+            "The original declarations can still be used in the same way as other declarations hidden by SKIE (and with the same limitations as without SKIE)."
 
-private fun FunctionSpec.Builder.addSkieLambdaErrorFunctionBody() {
-    addAttribute(AttributeSpec.available("*," to """unavailable, message: "$errorMessage""""))
-    addStatement("""fatalError("$errorMessage")""")
+private fun <T> T.addSkieLambdaErrorFunctionBody()
+        where T : SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder>, T : SirElementWithAttributes {
+    attributes.add("available(*, unavailable, message: \"$errorMessage\")")
+
+    swiftPoetBuilderModifications.add {
+        addStatement("""fatalError("$errorMessage")""")
+    }
 }
 

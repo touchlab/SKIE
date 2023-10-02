@@ -13,25 +13,20 @@ class SealedEnumGeneratorDelegate(
 ) : SealedGeneratorExtensionContainer {
 
     context(SirPhase.Context)
-    fun generate(swiftModel: KotlinClassSwiftModel): SirClass {
-        val enum = SirClass(
+    fun generate(swiftModel: KotlinClassSwiftModel): SirClass =
+        SirClass(
             simpleName = "__Sealed",
             kind = SirClass.Kind.Enum,
             parent = sirProvider.getSkieNamespace(swiftModel),
-        )
+        ).apply {
+            addConformanceToHashableIfPossible(swiftModel)
 
-        enum.addConformanceToHashableIfPossible(swiftModel)
+            copyTypeParametersFrom(swiftModel.primarySirClass)
 
-        enum.copyTypeParametersFrom(swiftModel.primarySirClass)
+            addSealedEnumCases(swiftModel)
 
-        enum.addSealedEnumCases(swiftModel)
-
-        enum.swiftPoetBuilderModifications.add {
-            addAttribute("frozen")
+            attributes.add("frozen")
         }
-
-        return enum
-    }
 
     context(SirPhase.Context)
     private fun SirClass.addConformanceToHashableIfPossible(swiftModel: KotlinClassSwiftModel) {
@@ -52,7 +47,6 @@ class SealedEnumGeneratorDelegate(
         if (swiftModel.hasElseCase) {
             SirEnumCase(
                 simpleName = swiftModel.elseCaseName,
-                parent = this,
             )
         }
     }
@@ -64,15 +58,13 @@ class SealedEnumGeneratorDelegate(
     ) {
         val enum = this
 
-        val enumCase = SirEnumCase(
+        SirEnumCase(
             simpleName = sealedSubclass.enumCaseName(preferredNamesCollide),
-            parent = this,
-        )
-
-        SirEnumCaseAssociatedValue(
-            type = sealedSubclass.primarySirClass.getSealedSubclassType(enum, this@SwiftModelScope),
-            parent = enumCase,
-        )
+        ).apply {
+            SirEnumCaseAssociatedValue(
+                type = sealedSubclass.primarySirClass.getSealedSubclassType(enum, this@SwiftModelScope),
+            )
+        }
     }
 }
 

@@ -20,3 +20,6 @@ sealed class SirType {
 
     abstract fun toNonNull(): NonNullSirType
 }
+
+fun SirType.optional(): NullableSirType =
+    NullableSirType(this)

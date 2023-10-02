@@ -32,7 +32,7 @@ class SirBuiltins(
 
     val Kotlin = Modules.Kotlin(kotlinModule)
 
-    val Skie = Modules.Skie(skieModule)
+    val Skie = Modules.Skie(skieModule, Foundation)
 
     object Modules {
 
@@ -46,7 +46,9 @@ class SirBuiltins(
 
             val AnyHashable by Struct(superTypes = listOf(Hashable.defaultType))
 
-            val _ObjectiveCBridgeable by Protocol()
+            val _ObjectiveCBridgeable by Protocol {
+                SirTypeParameter("_ObjectiveCType")
+            }
 
             val CaseIterable by Protocol()
 
@@ -57,30 +59,16 @@ class SirBuiltins(
             val Error by Protocol()
 
             val Array by Struct {
-                SirTypeParameter(
-                    name = "Element",
-                    parent = this,
-                )
+                SirTypeParameter("Element")
             }
 
             val Dictionary by Struct {
-                SirTypeParameter(
-                    name = "Key",
-                    parent = this,
-                    bounds = listOf(Hashable.defaultType),
-                )
-                SirTypeParameter(
-                    name = "Value",
-                    parent = this,
-                )
+                SirTypeParameter("Key", Hashable.defaultType)
+                SirTypeParameter("Value")
             }
 
             val Set by Struct(superTypes = listOf(Hashable.defaultType)) {
-                SirTypeParameter(
-                    name = "Element",
-                    parent = this,
-                    bounds = listOf(Hashable.defaultType),
-                )
+                SirTypeParameter("Element", Hashable.defaultType)
             }
 
             val Void by Struct(isPrimitive = true)
@@ -122,19 +110,11 @@ class SirBuiltins(
             val NSNumber by Class(superTypes = listOf(NSValue.defaultType))
 
             val NSArray by Class(superTypes = listOf(NSObject.defaultType)) {
-                SirTypeParameter(
-                    name = "E",
-                    parent = this,
-                    bounds = listOf(swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("E", swift.AnyObject.defaultType)
             }
 
             val NSMutableArray by Class {
-                SirTypeParameter(
-                    name = "E",
-                    parent = this,
-                    bounds = listOf(swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("E", swift.AnyObject.defaultType)
 
                 superTypes.add(
                     NSArray.toTypeFromEnclosingTypeParameters(typeParameters),
@@ -142,29 +122,13 @@ class SirBuiltins(
             }
 
             val NSDictionary by Class(superTypes = listOf(NSObject.defaultType)) {
-                SirTypeParameter(
-                    name = "K",
-                    parent = this,
-                    bounds = listOf(swift.Hashable.defaultType, swift.AnyObject.defaultType),
-                )
-                SirTypeParameter(
-                    name = "V",
-                    parent = this,
-                    bounds = listOf(swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("K", swift.Hashable.defaultType, swift.AnyObject.defaultType)
+                SirTypeParameter("V", swift.AnyObject.defaultType)
             }
 
             val NSMutableDictionary by Class {
-                SirTypeParameter(
-                    name = "K",
-                    parent = this,
-                    bounds = listOf(swift.Hashable.defaultType, swift.AnyObject.defaultType),
-                )
-                SirTypeParameter(
-                    name = "V",
-                    parent = this,
-                    bounds = listOf(swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("K", swift.Hashable.defaultType, swift.AnyObject.defaultType)
+                SirTypeParameter("V", swift.AnyObject.defaultType)
 
                 superTypes.add(
                     NSDictionary.toTypeFromEnclosingTypeParameters(typeParameters),
@@ -172,19 +136,11 @@ class SirBuiltins(
             }
 
             val NSSet by Class(superTypes = listOf(NSObject.defaultType)) {
-                SirTypeParameter(
-                    name = "E",
-                    parent = this,
-                    bounds = listOf(swift.Hashable.defaultType, swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("E", swift.Hashable.defaultType, swift.AnyObject.defaultType)
             }
 
             val NSMutableSet by Class {
-                SirTypeParameter(
-                    name = "E",
-                    parent = this,
-                    bounds = listOf(swift.Hashable.defaultType, swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("E", swift.Hashable.defaultType, swift.AnyObject.defaultType)
 
                 superTypes.add(
                     NSSet.toTypeFromEnclosingTypeParameters(typeParameters),
@@ -202,11 +158,7 @@ class SirBuiltins(
             val Base by Class(nameOverride = namer.kotlinAnyName.swiftName, superTypes = listOf(foundation.NSObject.defaultType))
 
             val MutableSet by Class(nameOverride = namer.mutableSetName.swiftName) {
-                SirTypeParameter(
-                    name = "E",
-                    parent = this,
-                    bounds = listOf(swift.Hashable.defaultType, swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("E", swift.Hashable.defaultType, swift.AnyObject.defaultType)
 
                 superTypes.add(
                     foundation.NSMutableSet.toTypeFromEnclosingTypeParameters(typeParameters),
@@ -214,16 +166,8 @@ class SirBuiltins(
             }
 
             val MutableMap by Class(nameOverride = namer.mutableMapName.swiftName) {
-                SirTypeParameter(
-                    name = "K",
-                    parent = this,
-                    bounds = listOf(swift.Hashable.defaultType, swift.AnyObject.defaultType),
-                )
-                SirTypeParameter(
-                    name = "V",
-                    parent = this,
-                    bounds = listOf(swift.AnyObject.defaultType),
-                )
+                SirTypeParameter("K", swift.Hashable.defaultType, swift.AnyObject.defaultType)
+                SirTypeParameter("V", swift.AnyObject.defaultType)
 
                 superTypes.add(
                     foundation.NSMutableDictionary.toTypeFromEnclosingTypeParameters(typeParameters),
@@ -250,29 +194,50 @@ class SirBuiltins(
 
         class Skie(
             override val module: SirModule.Skie,
+            foundation: Foundation,
         ) : ModuleBase() {
 
-            // The SkieSwiftFlow classes are only stubs (correct super types, type parameters and content are currently not needed)
+            // The SkieSwiftFlow classes are only stubs (correct super types, and content are currently not needed)
 
-            val SkieSwiftFlow by Class()
+            val SkieSwiftFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftSharedFlow by Class()
+            val SkieSwiftSharedFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftMutableSharedFlow by Class()
+            val SkieSwiftMutableSharedFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftStateFlow by Class()
+            val SkieSwiftStateFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftMutableStateFlow by Class()
+            val SkieSwiftMutableStateFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftOptionalFlow by Class()
+            val SkieSwiftOptionalFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftOptionalSharedFlow by Class()
+            val SkieSwiftOptionalSharedFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftOptionalMutableSharedFlow by Class()
+            val SkieSwiftOptionalMutableSharedFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftOptionalStateFlow by Class()
+            val SkieSwiftOptionalStateFlow by Class {
+                SirTypeParameter("T")
+            }
 
-            val SkieSwiftOptionalMutableStateFlow by Class()
+            val SkieSwiftOptionalMutableStateFlow by Class {
+                SirTypeParameter("T")
+            }
         }
 
         abstract class ModuleBase {

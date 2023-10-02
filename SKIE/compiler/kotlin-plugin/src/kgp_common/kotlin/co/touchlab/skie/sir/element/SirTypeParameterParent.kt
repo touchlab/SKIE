@@ -16,7 +16,7 @@ sealed interface SirTypeParameterParent {
 
 fun SirTypeParameterParent.copyTypeParametersFrom(other: SirClass) {
     val copiesWithOriginal = other.typeParameters.map {
-        it to SirTypeParameter(it.name, this)
+        it to SirTypeParameter(it.name)
     }
 
     val substitutions = copiesWithOriginal.toMap()
@@ -28,6 +28,7 @@ fun SirTypeParameterParent.copyTypeParametersFrom(other: SirClass) {
     }
 }
 
+// WIP To SirType
 private fun SirType.substituteTypeParameters(
     substitutions: Map<SirTypeParameter, SirTypeParameter>,
 ): SirType =

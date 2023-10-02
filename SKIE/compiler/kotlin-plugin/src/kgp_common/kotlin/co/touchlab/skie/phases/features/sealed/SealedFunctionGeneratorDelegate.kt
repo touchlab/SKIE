@@ -4,15 +4,16 @@ import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.toSwiftPoetVariables
+import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
+import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.FunctionSpec
-import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeName
-import io.outfoxx.swiftpoet.TypeVariableName
 
 class SealedFunctionGeneratorDelegate(
     override val context: SirPhase.Context,
@@ -20,26 +21,27 @@ class SealedFunctionGeneratorDelegate(
 
     context(SwiftModelScope)
     fun generate(swiftModel: KotlinClassSwiftModel, enum: SirClass) {
-        sirProvider.getFile(swiftModel).swiftPoetBuilderModifications.add {
-            val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetTypeName()
+        SirFunction(
+            identifier = swiftModel.enumConstructorFunctionName,
+            parent = sirProvider.getFile(swiftModel),
+            returnType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters),
+        ).apply {
+            copyTypeParametersFrom(enum)
 
-            val kotlinType = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetTypeName()
-
-            val enumSelfTypeParameter = TypeVariableName.typeVariable("__Sealed").withBounds(TypeVariableName.bound(kotlinType))
-
-            addFunction(
-                FunctionSpec.builder(swiftModel.enumConstructorFunctionName)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addTypeVariables(enum.typeParameters.toSwiftPoetVariables() + enumSelfTypeParameter)
-                    .addParameter(
-                        label = swiftModel.enumConstructorArgumentLabel,
-                        name = swiftModel.enumConstructorParameterName,
-                        type = enumSelfTypeParameter,
-                    )
-                    .returns(enumType)
-                    .addExhaustivelyFunctionBody(swiftModel, enum, enumType)
-                    .build(),
+            val sealedTypeParameter = SirTypeParameter(
+                name = "__Sealed",
+                bounds = listOf(
+                    swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
+                ),
             )
+
+            SirValueParameter(
+                label = swiftModel.enumConstructorArgumentLabel,
+                name = swiftModel.enumConstructorParameterName,
+                type = sealedTypeParameter.toTypeParameterUsage(),
+            )
+
+            addFunctionBody(swiftModel, enum)
         }
     }
 
@@ -53,19 +55,24 @@ class SealedFunctionGeneratorDelegate(
         get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ParameterName)
 
     context(SwiftModelScope)
-    private fun FunctionSpec.Builder.addExhaustivelyFunctionBody(
+    private fun SirFunction.addFunctionBody(
         swiftModel: KotlinClassSwiftModel,
         enum: SirClass,
-        enumType: TypeName,
-    ): FunctionSpec.Builder = addCode(
-        CodeBlock.builder()
-            .addExhaustivelyCaseBranches(swiftModel, enum, enumType)
-            .addExhaustivelyFunctionEnd(swiftModel, enumType)
-            .build(),
-    )
+    ) {
+        swiftPoetBuilderModifications.add {
+            val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetTypeName()
+
+            addCode(
+                CodeBlock.builder()
+                    .addCaseBranches(swiftModel, enum, enumType)
+                    .addFunctionEnd(swiftModel, enumType)
+                    .build(),
+            )
+        }
+    }
 
     context(SwiftModelScope)
-    private fun CodeBlock.Builder.addExhaustivelyCaseBranches(
+    private fun CodeBlock.Builder.addCaseBranches(
         swiftModel: KotlinClassSwiftModel,
         enum: SirClass,
         enumType: TypeName,
@@ -91,12 +98,12 @@ class SealedFunctionGeneratorDelegate(
         return this
     }
 
-    private fun CodeBlock.Builder.addExhaustivelyFunctionEnd(
+    private fun CodeBlock.Builder.addFunctionEnd(
         swiftModel: KotlinClassSwiftModel,
         enumType: TypeName,
     ): CodeBlock.Builder {
         if (swiftModel.hasAnyVisibleSealedSubclasses) {
-            addExhaustivelyElseBranch(swiftModel, enumType)
+            addElseBranch(swiftModel, enumType)
         } else {
             addReturnElse(swiftModel, enumType)
         }
@@ -107,7 +114,7 @@ class SealedFunctionGeneratorDelegate(
     private val KotlinClassSwiftModel.hasAnyVisibleSealedSubclasses: Boolean
         get() = this.visibleSealedSubclasses.isNotEmpty()
 
-    private fun CodeBlock.Builder.addExhaustivelyElseBranch(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
+    private fun CodeBlock.Builder.addElseBranch(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
         nextControlFlow("else")
 
         if (swiftModel.hasElseCase) {

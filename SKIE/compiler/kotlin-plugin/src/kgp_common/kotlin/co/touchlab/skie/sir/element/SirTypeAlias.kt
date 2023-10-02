@@ -38,4 +38,20 @@ class SirTypeAlias(
 
     override fun toString(): String =
         "${this::class.simpleName}: $fqName"
+
+    companion object {
+
+        context(SirDeclarationParent)
+        operator fun invoke(
+            simpleName: String,
+            visibility: SirVisibility = SirVisibility.Public,
+            typeFactory: ((SirTypeAlias) -> SirType),
+        ): SirTypeAlias =
+            SirTypeAlias(
+                simpleName = simpleName,
+                parent = this@SirDeclarationParent,
+                visibility = visibility,
+                typeFactory = typeFactory,
+            )
+    }
 }

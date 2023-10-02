@@ -1,87 +1,112 @@
 package co.touchlab.skie.sir.element.util
 
+import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
+import co.touchlab.skie.sir.element.SirExtension
+import co.touchlab.skie.sir.element.SirGetter
+import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirPropertyAccessor
+import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirTypeParameterParent
+import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirValueParameterParent
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 fun <T : SirDeclarationParent> sirDeclarationParent(
     initialValue: T,
-): PropertyDelegateProvider<SirDeclaration, ReadWriteProperty<SirDeclaration, T>> =
-    PropertyDelegateProvider<SirDeclaration, ReadWriteProperty<SirDeclaration, T>> { thisRef, _ ->
-        object : ReadWriteProperty<SirDeclaration, T> {
+) = parent<SirDeclaration, T>(
+    initialValue = initialValue,
+    onChange = { oldValue, newValue, thisRef ->
+        oldValue?.declarations?.remove(thisRef)
 
-            private var value = initialValue
-
-            init {
-                value.declarations.add(thisRef)
-            }
-
-            override fun getValue(thisRef: SirDeclaration, property: KProperty<*>): T =
-                value
-
-            override fun setValue(thisRef: SirDeclaration, property: KProperty<*>, value: T) {
-                this.value.declarations.remove(thisRef)
-
-                this.value = value
-
-                value.declarations.add(thisRef)
-            }
-        }
-    }
+        newValue.declarations.add(thisRef)
+    },
+)
 
 fun sirEnumCaseParent(
     initialValue: SirEnumCase,
-): PropertyDelegateProvider<SirEnumCaseAssociatedValue, ReadWriteProperty<SirEnumCaseAssociatedValue, SirEnumCase>> =
-    PropertyDelegateProvider<SirEnumCaseAssociatedValue, ReadWriteProperty<SirEnumCaseAssociatedValue, SirEnumCase>> { thisRef, _ ->
-        object : ReadWriteProperty<SirEnumCaseAssociatedValue, SirEnumCase> {
+) = parent<SirEnumCaseAssociatedValue, SirEnumCase>(
+    initialValue = initialValue,
+    onChange = { oldValue, newValue, thisRef ->
+        oldValue?.associatedValues?.remove(thisRef)
 
-            private var value = initialValue
-
-            init {
-                value.associatedValues.add(thisRef)
-            }
-
-            override fun getValue(thisRef: SirEnumCaseAssociatedValue, property: KProperty<*>): SirEnumCase =
-                value
-
-            override fun setValue(thisRef: SirEnumCaseAssociatedValue, property: KProperty<*>, value: SirEnumCase) {
-                this.value.associatedValues.remove(thisRef)
-
-                this.value = value
-
-                value.associatedValues.add(thisRef)
-            }
-        }
-    }
+        newValue.associatedValues.add(thisRef)
+    },
+)
 
 fun sirTypeParameterParent(
     initialValue: SirTypeParameterParent,
-): PropertyDelegateProvider<SirTypeParameter, ReadWriteProperty<SirTypeParameter, SirTypeParameterParent>> =
-    PropertyDelegateProvider<SirTypeParameter, ReadWriteProperty<SirTypeParameter, SirTypeParameterParent>> { thisRef, _ ->
-        object : ReadWriteProperty<SirTypeParameter, SirTypeParameterParent> {
+) = parent<SirTypeParameter, SirTypeParameterParent>(
+    initialValue = initialValue,
+    onChange = { oldValue, newValue, thisRef ->
+        oldValue?.typeParameters?.remove(thisRef)
+
+        newValue.typeParameters.add(thisRef)
+    },
+)
+
+fun sirValueParameterParent(
+    initialValue: SirValueParameterParent,
+) = parent<SirValueParameter, SirValueParameterParent>(
+    initialValue = initialValue,
+    onChange = { oldValue, newValue, thisRef ->
+        oldValue?.valueParameters?.remove(thisRef)
+
+        newValue.valueParameters.add(thisRef)
+    },
+)
+
+fun <T : SirPropertyAccessor> sirPropertyAccessorParent(
+    initialValue: SirProperty,
+) = parent<T, SirProperty>(
+    initialValue = initialValue,
+    onChange = { _, newValue, thisRef ->
+        when (thisRef) {
+            is SirGetter -> newValue.setGetterInternal(thisRef)
+            is SirSetter -> newValue.setSetterInternal(thisRef)
+        }
+    },
+)
+
+fun sirConditionalConstraintParent(
+    initialValue: SirExtension,
+) = parent<SirConditionalConstraint, SirExtension>(
+    initialValue = initialValue,
+    onChange = { oldValue, newValue, thisRef ->
+        oldValue?.conditionalConstraints?.remove(thisRef)
+
+        newValue.conditionalConstraints.add(thisRef)
+    },
+)
+
+private fun <CHILD : Any, PARENT : Any> parent(
+    initialValue: PARENT,
+    onChange: (oldValue: PARENT?, newValue: PARENT, thisRef: CHILD) -> Unit,
+): PropertyDelegateProvider<CHILD, ReadWriteProperty<CHILD, PARENT>> =
+    PropertyDelegateProvider<CHILD, ReadWriteProperty<CHILD, PARENT>> { thisRef, _ ->
+        object : ReadWriteProperty<CHILD, PARENT> {
 
             private var value = initialValue
 
             init {
-                value.typeParameters.add(thisRef)
+                onChange(null, value, thisRef)
             }
 
-            override fun getValue(thisRef: SirTypeParameter, property: KProperty<*>): SirTypeParameterParent =
+            override fun getValue(thisRef: CHILD, property: KProperty<*>): PARENT =
                 value
 
-            override fun setValue(thisRef: SirTypeParameter, property: KProperty<*>, value: SirTypeParameterParent) {
-                this.value.typeParameters.remove(thisRef)
+            override fun setValue(thisRef: CHILD, property: KProperty<*>, value: PARENT) {
+                val oldValue = this.value
 
                 this.value = value
 
-                value.typeParameters.add(thisRef)
+                onChange(oldValue, value, thisRef)
             }
         }
     }
-

@@ -46,30 +46,27 @@ class KotlinSirClassFactory(
         kotlinSirClassCache.getOrPut(classDescriptor) {
             val fqName = classDescriptor.sirFqName
 
-            val sirClass = SirClass(
+            SirClass(
                 simpleName = fqName.simpleName,
                 parent = fqName.parent?.let { getKotlinSirClass(it.classDescriptor) } ?: sirBuiltins.Kotlin.module,
                 kind = if (classDescriptor.kind.isInterface) SirClass.Kind.Protocol else SirClass.Kind.Class,
-            )
-
-            if (sirClass.kind == SirClass.Kind.Class) {
-                classDescriptor.typeConstructor.parameters.forEach { typeParameter ->
-                    SirTypeParameter(
-                        name = typeParameter.name.asString(),
-                        parent = sirClass,
-                        bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType),
-                    )
+            ).apply {
+                if (kind == SirClass.Kind.Class) {
+                    classDescriptor.typeConstructor.parameters.forEach { typeParameter ->
+                        SirTypeParameter(
+                            name = typeParameter.name.asString(),
+                            bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType),
+                        )
+                    }
                 }
+
+                superTypesInitializationBlocks.add {
+                    initializeSuperTypes(classDescriptor)
+                }
+
+                val namespace = namespaceProvider.getOrCreateNamespace(classDescriptor)
+                createKotlinTypeAlias(this, namespace)
             }
-
-            superTypesInitializationBlocks.add {
-                sirClass.initializeSuperTypes(classDescriptor)
-            }
-
-            val namespace = namespaceProvider.getOrCreateNamespace(classDescriptor)
-            createKotlinTypeAlias(sirClass, namespace)
-
-            sirClass
         }
 
     private fun createKotlinTypeAlias(sirClass: SirClass, namespace: SirClass) {

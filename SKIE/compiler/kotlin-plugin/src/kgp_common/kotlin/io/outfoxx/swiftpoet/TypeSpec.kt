@@ -17,6 +17,7 @@
 package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
+import io.outfoxx.swiftpoet.builder.BuilderWithMembers
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
@@ -246,7 +247,7 @@ class TypeSpec private constructor(
   class Builder internal constructor(
     internal var kind: Kind,
     internal val name: String,
-  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters, BuilderWithTypeSpecs {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters, BuilderWithTypeSpecs, BuilderWithMembers {
 
     internal val doc = CodeBlock.builder()
     internal val typeVariables = mutableListOf<TypeVariableName>()
@@ -328,7 +329,7 @@ class TypeSpec private constructor(
       propertySpecs.map(this::addProperty)
     }
 
-    fun addProperty(propertySpec: PropertySpec) = apply {
+    override fun addProperty(propertySpec: PropertySpec) = apply {
       propertySpecs += propertySpec
     }
 
@@ -342,7 +343,7 @@ class TypeSpec private constructor(
       functionSpecs.forEach { addFunction(it) }
     }
 
-    fun addFunction(functionSpec: FunctionSpec) = apply {
+    override fun addFunction(functionSpec: FunctionSpec) = apply {
       check(!isProtocol || functionSpec.body === CodeBlock.ABSTRACT) { "Protocols require abstract functions; see FunctionSpec.abstractBuilder(...)" }
       requireNoneOrOneOf(functionSpec.modifiers, Modifier.OPEN, INTERNAL, Modifier.PUBLIC, Modifier.PRIVATE)
       functionSpecs += functionSpec

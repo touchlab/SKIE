@@ -16,7 +16,9 @@
 
 package io.outfoxx.swiftpoet
 
+import co.touchlab.skie.sir.element.SirElementWithAttributes
 import io.outfoxx.swiftpoet.CodeBlock.Companion.ABSTRACT
+import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
 
 /** A generated property declaration.  */
 class PropertySpec private constructor(
@@ -100,7 +102,7 @@ class PropertySpec private constructor(
   class Builder internal constructor(
     internal val name: String,
     internal val type: TypeName,
-  ) : AttributedSpec.Builder<Builder>() {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers {
 
     internal var mutable = false
     internal val doc = CodeBlock.builder()
@@ -121,7 +123,7 @@ class PropertySpec private constructor(
       doc.add(block)
     }
 
-    fun addModifiers(vararg modifiers: Modifier) = apply {
+    override fun addModifiers(vararg modifiers: Modifier) = apply {
       modifiers.forEach { it.checkTarget(Modifier.Target.PROPERTY) }
       this.modifiers += modifiers
     }

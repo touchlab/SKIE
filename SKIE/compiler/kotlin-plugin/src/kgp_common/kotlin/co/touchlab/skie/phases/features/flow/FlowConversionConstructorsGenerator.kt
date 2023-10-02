@@ -2,18 +2,18 @@ package co.touchlab.skie.phases.features.flow
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.features.enums.ObjCBridgeable
+import co.touchlab.skie.sir.element.SirConditionalConstraint
+import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
+import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.toTypeParameterUsage
+import co.touchlab.skie.sir.type.SirType
+import co.touchlab.skie.sir.type.TypeParameterUsageSirType
 import co.touchlab.skie.swiftmodel.SwiftModelScope
-import io.outfoxx.swiftpoet.ANY_OBJECT
-import io.outfoxx.swiftpoet.ExtensionSpec
-import io.outfoxx.swiftpoet.FileSpec
-import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
-import io.outfoxx.swiftpoet.Taggable
-import io.outfoxx.swiftpoet.TypeName
-import io.outfoxx.swiftpoet.TypeVariableName
-import io.outfoxx.swiftpoet.parameterizedBy
 
 object FlowConversionConstructorsGenerator : SirPhase {
 
@@ -23,89 +23,105 @@ object FlowConversionConstructorsGenerator : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        sirProvider.getFile(SirFile.skieNamespace, "FlowConversions").swiftPoetBuilderModifications.add {
-            SupportedFlow.values().forEach {
-                it.generateAllConversions()
-            }
+        val file = sirProvider.getFile(SirFile.skieNamespace, "FlowConversions")
+
+        SupportedFlow.values().forEach {
+            it.generateAllConversions(file)
         }
     }
 }
 
-context (FileSpec.Builder, SwiftModelScope)
-private fun SupportedFlow.generateAllConversions() {
-    requiredVariant.generateAllConversions()
-    optionalVariant.generateAllConversions()
-}
-
-context (FileSpec.Builder, SwiftModelScope)
-private fun SupportedFlow.Variant.generateAllConversions() {
-    generateAllKotlinClassConversions(this)
-    generateAllSwiftClassConversions(this)
+context (SwiftModelScope)
+private fun SupportedFlow.generateAllConversions(file: SirFile) {
+    requiredVariant.generateAllConversions(file)
+    optionalVariant.generateAllConversions(file)
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.generateAllKotlinClassConversions(variant: SupportedFlow.Variant) {
-    generateKotlinClassWithAnyObjectConversions(variant)
-    generateKotlinClassWithBridgeableConversions(variant)
+private fun SupportedFlow.Variant.generateAllConversions(file: SirFile) {
+    generateAllKotlinClassConversions(this, file)
+    generateAllSwiftClassConversions(this, file)
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.generateAllSwiftClassConversions(variant: SupportedFlow.Variant) {
-    generateSwiftClassWithAnyObjectConversions(variant)
-    generateSwiftClassWithBridgeableConversions(variant)
+private fun generateAllKotlinClassConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    generateKotlinClassWithAnyObjectConversions(variant, file)
+    generateKotlinClassWithBridgeableConversions(variant, file)
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.generateKotlinClassWithAnyObjectConversions(variant: SupportedFlow.Variant) {
-    addConversions(variant) { from ->
-        addSwiftToKotlinConversion(from, variant, ANY_OBJECT, TypeVariableName("T"))
-    }
+private fun generateAllSwiftClassConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    generateSwiftClassWithAnyObjectConversions(variant, file)
+    generateSwiftClassWithBridgeableConversions(variant, file)
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.generateKotlinClassWithBridgeableConversions(variant: SupportedFlow.Variant) {
-    addConversions(variant) { from ->
+private fun generateKotlinClassWithAnyObjectConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    file.addConversions(variant) { from ->
         addSwiftToKotlinConversion(
             from,
             variant,
-            sirBuiltins.Swift._ObjectiveCBridgeable.defaultType.toSwiftPoetTypeName(),
-            TypeVariableName("T.${ObjCBridgeable.bridgedObjCTypeAlias}"),
-        )
+            sirBuiltins.Swift.AnyObject.defaultType,
+        ) { it }
     }
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.generateSwiftClassWithAnyObjectConversions(variant: SupportedFlow.Variant) {
-    generateSwiftClassConversions(variant, ANY_OBJECT, TypeVariableName("T"))
+private fun generateKotlinClassWithBridgeableConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    file.addConversions(variant) { from ->
+        addSwiftToKotlinConversion(
+            from,
+            variant,
+            sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
+        ) { it.typeParameter(sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first()) }
+    }
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.generateSwiftClassWithBridgeableConversions(variant: SupportedFlow.Variant) {
+private fun generateSwiftClassWithAnyObjectConversions(variant: SupportedFlow.Variant, file: SirFile) {
     generateSwiftClassConversions(
         variant,
-        sirBuiltins.Swift._ObjectiveCBridgeable.defaultType.toSwiftPoetTypeName(),
-        TypeVariableName("T.${ObjCBridgeable.bridgedObjCTypeAlias}"),
-    )
+        file,
+        sirBuiltins.Swift.AnyObject.defaultType,
+    ) { it }
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.generateSwiftClassConversions(
+private fun generateSwiftClassWithBridgeableConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    generateSwiftClassConversions(
+        variant,
+        file,
+        sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
+    ) { it.typeParameter(sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first()) }
+}
+
+context (SwiftModelScope)
+private fun generateSwiftClassConversions(
     variant: SupportedFlow.Variant,
-    typeBound: TypeName,
-    flowTypeParameter: TypeName,
+    file: SirFile,
+    typeBound: SirType,
+    flowTypeArgumentFactory: (TypeParameterUsageSirType) -> SirType,
 ) {
-    addExtension(
-        ExtensionSpec.builder(variant.swiftFlowClass().defaultType.toSwiftPoetDeclaredTypeName())
-            .addConditionalConstraint(TypeVariableName.typeVariable("T", TypeVariableName.bound(typeBound)))
-            .addModifiers(Modifier.PUBLIC)
-            .addConversions(variant) { from -> addKotlinToSwiftConversion(from, flowTypeParameter) }
-            .addConversions(variant) { from -> addSwiftToSwiftConversion(from, flowTypeParameter) }
-            .build(),
-    )
+    SirExtension(
+        classDeclaration = variant.swiftFlowClass(),
+        parent = file,
+    ).apply {
+        val typeParameter = classDeclaration.typeParameters.first()
+
+        SirConditionalConstraint(
+            typeParameter = typeParameter,
+            bounds = listOf(typeBound),
+        )
+
+        val flowTypeArgument = flowTypeArgumentFactory(typeParameter.toTypeParameterUsage())
+
+        addConversions(variant) { from -> addKotlinToSwiftConversion(from, flowTypeArgument) }
+        addConversions(variant) { from -> addSwiftToSwiftConversion(from, flowTypeArgument) }
+    }
 }
 
 context (SwiftModelScope)
-private fun <T : Taggable.Builder<T>> T.addConversions(
+private fun <T> T.addConversions(
     variant: SupportedFlow.Variant,
     conversionBuilder: context (SwiftModelScope) T.(from: SupportedFlow.Variant) -> Unit,
 ): T =
@@ -123,49 +139,66 @@ private inline fun SupportedFlow.Variant.forEachChildVariant(action: (SupportedF
 }
 
 context (SwiftModelScope)
-private fun FileSpec.Builder.addSwiftToKotlinConversion(
+private fun SirFile.addSwiftToKotlinConversion(
     from: SupportedFlow.Variant,
     to: SupportedFlow.Variant,
-    typeBound: TypeName,
-    flowTypeParameter: TypeName,
+    typeBound: SirType,
+    flowTypeArgumentFactory: (TypeParameterUsageSirType) -> SirType,
 ) {
-    addFunction(
-        FunctionSpec.builder(to.kotlinFlowModel.kotlinSirClass.simpleName)
-            .addModifiers(Modifier.PUBLIC)
-            .addTypeVariable(TypeVariableName.typeVariable("T", TypeVariableName.Bound(typeBound)))
-            .addParameter(
-                "_",
-                "flow",
-                from.swiftFlowClass().defaultType.toSwiftPoetDeclaredTypeName().parameterizedBy(TypeVariableName.typeVariable("T")),
-            )
-            .returns(to.kotlinFlowModel.kotlinSirClass.defaultType.toSwiftPoetDeclaredTypeName().parameterizedBy(flowTypeParameter))
-            .addStatement("return %T(%L)", to.kotlinFlowModel.kotlinSirClass.defaultType.toSwiftPoetDeclaredTypeName(), "flow.delegate")
-            .build(),
-    )
+    SirFunction(
+        identifier = to.kotlinFlowModel.kotlinSirClass.simpleName,
+        returnType = sirBuiltins.Swift.Void.defaultType,
+    ).apply {
+        val typeParameter = SirTypeParameter(
+            name = "T",
+            bounds = listOf(typeBound),
+        )
+
+        val flowTypeArgument = flowTypeArgumentFactory(typeParameter.toTypeParameterUsage())
+        returnType = to.kotlinFlowModel.kotlinSirClass.toType(flowTypeArgument)
+
+        SirValueParameter(
+            label = "_",
+            name = "flow",
+            type = from.swiftFlowClass().toType(typeParameter.toTypeParameterUsage()),
+        )
+
+        swiftPoetBuilderModifications.add {
+            addStatement("return %T(%L)", to.kotlinFlowModel.kotlinSirClass.defaultType.toSwiftPoetDeclaredTypeName(), "flow.delegate")
+        }
+    }
 }
 
 context (SwiftModelScope)
-private fun ExtensionSpec.Builder.addSwiftToSwiftConversion(from: SupportedFlow.Variant, typeParameter: TypeName) {
-    addFunction(
-        FunctionSpec.constructorBuilder()
-            .addModifiers(Modifier.CONVENIENCE)
-            .addParameter("_", "flow", from.swiftFlowClass().defaultType.toSwiftPoetDeclaredTypeName().parameterizedBy(typeParameter))
-            .addStatement("self.init(internal: %L)", "flow.delegate")
-            .build(),
-    )
+private fun SirExtension.addKotlinToSwiftConversion(from: SupportedFlow.Variant, flowTypeArgument: SirType) {
+    SirConstructor(
+        isConvenience = true,
+    ).apply {
+        SirValueParameter(
+            label = "_",
+            name = "flow",
+            type = from.kotlinFlowModel.kotlinSirClass.toType(flowTypeArgument),
+        )
+
+        swiftPoetBuilderModifications.add {
+            addStatement("self.init(internal: %L)", "flow")
+        }
+    }
 }
 
 context (SwiftModelScope)
-private fun ExtensionSpec.Builder.addKotlinToSwiftConversion(from: SupportedFlow.Variant, flowTypeParameter: TypeName) {
-    addFunction(
-        FunctionSpec.constructorBuilder()
-            .addModifiers(Modifier.CONVENIENCE)
-            .addParameter(
-                "_",
-                "flow",
-                from.kotlinFlowModel.kotlinSirClass.defaultType.toSwiftPoetDeclaredTypeName().parameterizedBy(flowTypeParameter),
-            )
-            .addStatement("self.init(internal: %L)", "flow")
-            .build(),
-    )
+private fun SirExtension.addSwiftToSwiftConversion(from: SupportedFlow.Variant, flowTypeArgument: SirType) {
+    SirConstructor(
+        isConvenience = true,
+    ).apply {
+        SirValueParameter(
+            label = "_",
+            name = "flow",
+            type = from.swiftFlowClass().toType(flowTypeArgument),
+        )
+
+        swiftPoetBuilderModifications.add {
+            addStatement("self.init(internal: %L)", "flow.delegate")
+        }
+    }
 }

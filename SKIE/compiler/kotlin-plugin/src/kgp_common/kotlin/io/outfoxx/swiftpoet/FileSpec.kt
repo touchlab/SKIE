@@ -16,6 +16,7 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.builder.BuilderWithMembers
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 import java.io.File
 import java.io.IOException
@@ -133,7 +134,7 @@ class FileSpec private constructor(
   class Builder internal constructor(
     val moduleName: String,
     val name: String,
-  ) : Taggable.Builder<Builder>(), BuilderWithTypeSpecs {
+  ) : Taggable.Builder<Builder>(), BuilderWithTypeSpecs, BuilderWithMembers {
 
     internal val comment = CodeBlock.builder()
     internal val moduleImports = sortedSetOf<ImportSpec>()
@@ -152,14 +153,14 @@ class FileSpec private constructor(
       addMember(FileMemberSpec.builder(typeSpec).build())
     }
 
-    fun addFunction(functionSpec: FunctionSpec) = apply {
+    override fun addFunction(functionSpec: FunctionSpec) = apply {
       require(!functionSpec.isConstructor && !functionSpec.type.isAccessor) {
         "cannot add ${functionSpec.name} to file $name"
       }
       addMember(FileMemberSpec.builder(functionSpec).build())
     }
 
-    fun addProperty(propertySpec: PropertySpec) = apply {
+    override fun addProperty(propertySpec: PropertySpec) = apply {
       addMember(FileMemberSpec.builder(propertySpec).build())
     }
 

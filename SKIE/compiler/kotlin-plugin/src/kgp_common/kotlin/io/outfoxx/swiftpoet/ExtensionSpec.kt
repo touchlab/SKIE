@@ -17,6 +17,7 @@
 package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
+import io.outfoxx.swiftpoet.builder.BuilderWithMembers
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
@@ -131,7 +132,7 @@ class ExtensionSpec private constructor(
 
   class Builder internal constructor(
     internal val extendedTypeOrName: Any,
-  ) : Taggable.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeSpecs {
+  ) : Taggable.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeSpecs, BuilderWithMembers {
 
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableSetOf<Modifier>()
@@ -169,7 +170,7 @@ class ExtensionSpec private constructor(
       propertySpecs.map(this::addProperty)
     }
 
-    fun addProperty(propertySpec: PropertySpec) = apply {
+    override fun addProperty(propertySpec: PropertySpec) = apply {
       propertySpecs += propertySpec
     }
 
@@ -180,7 +181,7 @@ class ExtensionSpec private constructor(
       functionSpecs.forEach { addFunction(it) }
     }
 
-    fun addFunction(functionSpec: FunctionSpec) = apply {
+    override fun addFunction(functionSpec: FunctionSpec) = apply {
       requireNoneOrOneOf(functionSpec.modifiers, Modifier.OPEN, INTERNAL, Modifier.PUBLIC, Modifier.PRIVATE)
       functionSpecs += functionSpec
     }

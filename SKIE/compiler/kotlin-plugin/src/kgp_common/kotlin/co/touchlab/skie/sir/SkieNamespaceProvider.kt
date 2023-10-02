@@ -37,9 +37,7 @@ class SkieNamespaceProvider(
 
     init {
         // Ensures at least one file imports Foundation
-        skieNamespaceFile.swiftPoetBuilderModifications.add {
-            addImport("Foundation")
-        }
+        skieNamespaceFile.imports.add("Foundation")
     }
 
     private val modulesWithShortNameCollision =
@@ -60,7 +58,7 @@ class SkieNamespaceProvider(
         classNamespaceCache.getOrPut(classDescriptor) {
             val parent = if (classDescriptor in descriptorProvider.exposedClasses) {
                 SirExtension(
-                    typeDeclaration = getNamespaceParent(classDescriptor),
+                    classDeclaration = getNamespaceParent(classDescriptor),
                     parent = getFile(classDescriptor),
                 )
             } else {
@@ -146,7 +144,8 @@ class SkieNamespaceProvider(
 
     @Suppress("RecursivePropertyAccessor")
     private val ClassDescriptor.skieFileName: String
-        get() = ((this.containingDeclaration as? ClassDescriptor)?.skieFileName?.let { "$it." } ?: "") + this.name.identifier.toValidSwiftIdentifier()
+        get() = ((this.containingDeclaration as? ClassDescriptor)?.skieFileName?.let { "$it." }
+            ?: "") + this.name.identifier.toValidSwiftIdentifier()
 
     private val ModuleDescriptor.shortSkieModuleName: String
         get() = (this.stableName ?: this.name).asStringStripSpecialMarkers().substringAfter(":")
