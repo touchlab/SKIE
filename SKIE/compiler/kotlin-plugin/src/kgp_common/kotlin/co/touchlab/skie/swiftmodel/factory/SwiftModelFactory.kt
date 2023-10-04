@@ -1,6 +1,7 @@
 package co.touchlab.skie.swiftmodel.factory
 
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
@@ -28,9 +29,10 @@ class SwiftModelFactory(
     private val namer: ObjCExportNamer,
     bridgeProvider: DescriptorBridgeProvider,
     private val sirProvider: SirProvider,
+    skieContext: SkiePhase.Context,
 ) {
 
-    private val membersDelegate = SwiftModelFactoryMembersDelegate(swiftModelScope, descriptorProvider, namer, bridgeProvider)
+    private val membersDelegate = SwiftModelFactoryMembersDelegate(swiftModelScope, descriptorProvider, namer, bridgeProvider, sirProvider, skieContext)
 
     fun createMembers(descriptors: List<CallableMemberDescriptor>): Map<CallableMemberDescriptor, MutableKotlinCallableMemberSwiftModel> =
         membersDelegate.createMembers(descriptors)
@@ -59,7 +61,7 @@ class SwiftModelFactory(
         files.associateWith { file ->
             ActualKotlinFileSwiftModel(
                 file = file,
-                kotlinSirClass = sirProvider.createKotlinSirClass(file),
+                kotlinSirClass = sirProvider.getKotlinSirClass(file),
                 namer = namer,
                 swiftModelScope = swiftModelScope,
                 descriptorProvider = descriptorProvider,
@@ -76,7 +78,14 @@ class SwiftModelFactory(
                 val allBoundedSwiftModels = mutableListOf<MutableKotlinFunctionSwiftModel>()
 
                 group
-                    .map { AsyncKotlinFunctionSwiftModel(it, allBoundedSwiftModels, swiftModelScope) }
+                    .map {
+                        AsyncKotlinFunctionSwiftModel(
+                            delegate = it,
+                            kotlinSirCallableDeclarationFactory = { sirProvider.getKotlinSirAsyncFunction(it.descriptor) },
+                            allBoundedSwiftModels = allBoundedSwiftModels,
+                            swiftModelScope = swiftModelScope
+                        )
+                    }
                     .also { allBoundedSwiftModels.addAll(it) }
                     .map { it.descriptor to it }
             }

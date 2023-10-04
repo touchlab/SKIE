@@ -6,7 +6,7 @@ import co.touchlab.skie.sir.element.util.sirDeclarationParent
 class SirExtension(
     var classDeclaration: SirClass,
     parent: SirTopLevelDeclarationParent,
-    var visibility: SirVisibility = SirVisibility.Public,
+    override var visibility: SirVisibility = SirVisibility.Public,
 ) : SirDeclaration, SirDeclarationNamespace {
 
     override var parent: SirTopLevelDeclarationParent by sirDeclarationParent(parent)

@@ -3,7 +3,8 @@ package co.touchlab.skie.phases.memberconflicts
 import co.touchlab.skie.phases.memberconflicts.UniqueSignatureSet.Collision.Group
 import co.touchlab.skie.phases.memberconflicts.UniqueSignatureSet.Collision.RemoveExisting
 import co.touchlab.skie.phases.memberconflicts.UniqueSignatureSet.Collision.RemoveNew
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
+import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy.Remove
@@ -14,7 +15,6 @@ import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberS
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.MutableKotlinRegularPropertySwiftModel
-import co.touchlab.skie.swiftmodel.isRemoved
 
 class UniqueSignatureSet {
 
@@ -97,7 +97,7 @@ class UniqueSignatureSet {
     }
 
     private val KotlinDirectlyCallableMemberSwiftModel.isNotRemoved: Boolean
-        get() = !this.visibility.isRemoved
+        get() = this.kotlinSirCallableDeclaration.visibility != SirVisibility.Removed
 
     private fun getNonRemovedModelForSignatureOrNull(signature: Signature): MutableKotlinDirectlyCallableMemberSwiftModel? =
         signatureMap[signature]?.takeIf { it.isNotRemoved }
@@ -122,7 +122,7 @@ class UniqueSignatureSet {
             .map { DirectlyCallableSwiftModelWithSignature(it, it.signature) }
 
     private fun MutableKotlinDirectlyCallableMemberSwiftModel.remove() {
-        this.visibility = SwiftModelVisibility.Removed
+        this.kotlinSirCallableDeclaration.visibility = SirVisibility.Removed
 
         this.addToRemovedSignaturesMap()
     }
@@ -164,17 +164,21 @@ class UniqueSignatureSet {
                 override fun visit(function: MutableKotlinFunctionSwiftModel) {
                     when (function.role) {
                         KotlinFunctionSwiftModel.Role.Constructor -> {
-                            val lastParameter = function.valueParameters.lastOrNull()
+                            val lastParameter = function.kotlinSirConstructor.valueParameters.lastOrNull()
                                 ?: error("Class ${function.receiver} has multiple constructors without parameters.")
 
-                            lastParameter.argumentLabel += "_"
+                            lastParameter.label = lastParameter.labelOrName + "_"
                         }
-                        else -> function.identifier += "_"
+                        else -> function.kotlinSirFunction.applyToEntireOverrideHierarchy {
+                            identifier += "_"
+                        }
                     }
                 }
 
                 override fun visit(regularProperty: MutableKotlinRegularPropertySwiftModel) {
-                    regularProperty.identifier += "_"
+                    regularProperty.kotlinSirProperty.applyToEntireOverrideHierarchy {
+                        identifier += "_"
+                    }
                 }
             }
         }

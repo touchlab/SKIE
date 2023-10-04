@@ -7,6 +7,8 @@ import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.features.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
 import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.isMember
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
@@ -49,8 +51,11 @@ class KotlinSuspendGeneratorDelegate(
     }
 
     private fun FunctionDescriptor.hide() {
-        context.doInPhase(SuspendGenerator.KotlinBridgeConfigurationPhase) {
-            this@hide.swiftModel.visibility = SwiftModelVisibility.Hidden
+        // WIP Needs to be done in an earlier phase but after functions can be generated
+        context.doInPhase(SuspendGenerator.SwiftBridgeGeneratorPhase) {
+            this@hide.swiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
+                visibility = SirVisibility.PublicButHidden
+            }
         }
     }
 

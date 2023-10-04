@@ -2,13 +2,10 @@ package co.touchlab.skie.phases.apinotes.builder
 
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
-import co.touchlab.skie.swiftmodel.isHidden
-import co.touchlab.skie.swiftmodel.isRemoved
-import co.touchlab.skie.swiftmodel.isReplaced
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.descriptors.isInterface
 
@@ -25,7 +22,7 @@ object ApiNotesFactory {
     context(SirPhase.Context)
     private val DescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
         get() = this.exposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
-                this.exposedFiles.map { it.swiftModel }
+            this.exposedFiles.map { it.swiftModel }
 
     context(SirPhase.Context)
     private val DescriptorProvider.swiftModelsForInterfaces: List<KotlinTypeSwiftModel>
@@ -37,8 +34,8 @@ object ApiNotesFactory {
             objCFqName = this.objCFqName.asString(),
             bridgeFqName = this.bridgedSirClass?.fqName?.toLocalString(),
             swiftFqName = this.kotlinSirClass.publicName.toLocalString(),
-            isHidden = this.visibility.isHiddenOrReplaced,
-            availability = this.visibility.availability,
+            isHidden = this.kotlinSirClass.visibility.isHiddenInApiNotes,
+            availability = this.kotlinSirClass.visibility.availability,
             methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote(this) },
             properties = this.allDirectlyCallableMembers.filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote(this) },
         )
@@ -48,9 +45,9 @@ object ApiNotesFactory {
         ApiNotesMethod(
             objCSelector = this.objCSelector,
             kind = owner.kind.toMemberKind(),
-            swiftName = this.name,
-            isHidden = this.visibility.isHiddenOrReplaced,
-            availability = this.visibility.availability,
+            swiftName = this.kotlinSirCallableDeclaration.name,
+            isHidden = this.kotlinSirCallableDeclaration.visibility.isHiddenInApiNotes,
+            availability = this.kotlinSirCallableDeclaration.visibility.availability,
             resultType = this.objCReturnType?.let { objCTypeRenderer.render(it, this.reservedIdentifierInApiNotes) } ?: "",
             parameters = this.valueParameters.map { it.toApiNote(this) },
         )
@@ -67,17 +64,21 @@ object ApiNotesFactory {
         ApiNotesProperty(
             objCName = this.objCName,
             kind = owner.kind.toMemberKind(),
-            swiftName = this.name,
-            isHidden = this.visibility.isHiddenOrReplaced,
-            availability = this.visibility.availability,
+            swiftName = this.kotlinSirProperty.name,
+            isHidden = this.kotlinSirProperty.visibility.isHiddenInApiNotes,
+            availability = this.kotlinSirProperty.visibility.availability,
             type = objCTypeRenderer.render(this.objCType, emptyList()),
         )
 
-    private val SwiftModelVisibility.isHiddenOrReplaced: Boolean
-        get() = this.isHidden || this.isReplaced
+    private val SirVisibility.isHiddenInApiNotes: Boolean
+        get() = when (this) {
+            SirVisibility.PublicButHidden -> true
+            SirVisibility.PublicButReplaced -> true
+            else -> false
+        }
 
-    private val SwiftModelVisibility.availability: ApiNotesAvailabilityMode
-        get() = if (this.isRemoved) ApiNotesAvailabilityMode.NonSwift else ApiNotesAvailabilityMode.Available
+    private val SirVisibility.availability: ApiNotesAvailabilityMode
+        get() = if (this == SirVisibility.Removed) ApiNotesAvailabilityMode.NonSwift else ApiNotesAvailabilityMode.Available
 
     private fun KotlinTypeSwiftModel.Kind.toMemberKind(): ApiNotesTypeMemberKind =
         when (this) {
@@ -87,4 +88,4 @@ object ApiNotesFactory {
 }
 
 private val KotlinFunctionSwiftModel.reservedIdentifierInApiNotes: List<String>
-    get() = valueParameters.map { it.parameterName }
+    get() = kotlinSirValueParameters.map { it.name }

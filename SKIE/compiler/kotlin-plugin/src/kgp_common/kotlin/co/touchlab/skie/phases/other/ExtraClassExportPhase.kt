@@ -9,6 +9,7 @@ import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -116,7 +117,7 @@ class ExtraClassExportPhase(
 
     private fun FunctionDescriptor.removeFromSwift() {
         context.doInPhase(FinalizePhase) {
-            this@removeFromSwift.swiftModel.visibility = SwiftModelVisibility.Removed
+            this@removeFromSwift.swiftModel.kotlinSirFunction.visibility = SirVisibility.Removed
         }
     }
 

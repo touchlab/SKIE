@@ -9,8 +9,6 @@ interface KotlinTypeSwiftModel {
 
     val descriptorHolder: ClassOrFileDescriptorHolder
 
-    val visibility: SwiftModelVisibility
-
     /**
      * All non-removed directly callable members of this type.
      */

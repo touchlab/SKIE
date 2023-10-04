@@ -1,28 +1,27 @@
 package co.touchlab.skie.sir.element
 
-import co.touchlab.skie.sir.element.util.sirDeclarationParent
+import co.touchlab.skie.sir.element.util.sirEnumCaseParent
 
 class SirEnumCase(
     var simpleName: String,
-    parent: SirDeclarationParent,
-) : SirDeclaration {
+    parent: SirClass,
+) : SirElement {
 
-    override var parent: SirDeclarationParent by sirDeclarationParent(parent)
+    var parent: SirClass by sirEnumCaseParent(parent)
 
     val associatedValues: MutableList<SirEnumCaseAssociatedValue> = mutableListOf()
 
-    override fun toString(): String =
-        "${this::class.simpleName}: $simpleName"
+    override fun toString(): String = "${this::class.simpleName}: $simpleName"
 
     companion object {
 
-        context(SirDeclarationParent)
+        context(SirClass)
         operator fun invoke(
             simpleName: String,
         ): SirEnumCase =
             SirEnumCase(
                 simpleName = simpleName,
-                parent = this@SirDeclarationParent,
+                parent = this@SirClass,
             )
     }
 }

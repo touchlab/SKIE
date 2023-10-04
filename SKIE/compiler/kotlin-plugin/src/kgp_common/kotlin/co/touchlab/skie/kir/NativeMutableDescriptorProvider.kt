@@ -5,6 +5,7 @@ package co.touchlab.skie.kir
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -27,6 +28,9 @@ internal class NativeMutableDescriptorProvider(
         MUTATING,
         IMMUTABLE,
     }
+
+    override val builtIns: KotlinBuiltIns
+        get() = realProvider.builtIns
 
     private lateinit var realProvider: NativeDescriptorProvider
 

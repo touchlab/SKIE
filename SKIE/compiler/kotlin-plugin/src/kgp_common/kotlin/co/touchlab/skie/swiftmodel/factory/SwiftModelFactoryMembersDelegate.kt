@@ -4,6 +4,8 @@ package co.touchlab.skie.swiftmodel.factory
 
 import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
@@ -37,6 +39,8 @@ class SwiftModelFactoryMembersDelegate(
     private val descriptorProvider: DescriptorProvider,
     private val namer: ObjCExportNamer,
     private val bridgeProvider: DescriptorBridgeProvider,
+    private val sirProvider: SirProvider,
+    private val skieContext: SkiePhase.Context,
 ) {
 
     private val exposedClassChildrenCache = ExposedClassChildrenCache(descriptorProvider)
@@ -77,7 +81,17 @@ class SwiftModelFactoryMembersDelegate(
         val core = KotlinFunctionSwiftModelCore(group.representative, namer, bridgeProvider, objCTypeProvider)
 
         return group
-            .associateWith { ActualKotlinFunctionSwiftModel(it, allBoundedSwiftModels, core, swiftModelScope, descriptorProvider) }
+            .associateWith {
+                ActualKotlinFunctionSwiftModel(
+                    descriptor = it,
+                    kotlinSirCallableDeclarationFactory = { sirProvider.getKotlinSirFunctionOrConstructor(it) },
+                    allBoundedSwiftModels = allBoundedSwiftModels,
+                    core = core,
+                    swiftModelScope = swiftModelScope,
+                    descriptorProvider = descriptorProvider,
+                    skieContext = skieContext,
+                )
+            }
             .also { allBoundedSwiftModels.addAll(it.values) }
             .also { allBoundedSwiftModels.addFakeObjcConstructors(group, it.values.first()) }
             .also { allBoundedSwiftModels.addHiddenOverrides(group, it.values.first()) }
@@ -92,7 +106,14 @@ class SwiftModelFactoryMembersDelegate(
         }
 
         val hiddenOverrides = group.getMissingChildClasses()
-            .map { FakeObjcConstructorKotlinFunctionSwiftModel(representativeModel, it, swiftModelScope, objCTypeProvider) }
+            .map { FakeObjcConstructorKotlinFunctionSwiftModel(
+                baseModel = representativeModel,
+                ownerDescriptor = it,
+                swiftModelScope = swiftModelScope,
+                objCTypeProvider = objCTypeProvider,
+                skieContext = skieContext,
+                kotlinSirConstructorFactory = { sirProvider.createKotlinSirFakeObjCConstructor(it, representativeModel) },
+            ) }
 
         this.addAll(hiddenOverrides)
     }
@@ -126,7 +147,17 @@ class SwiftModelFactoryMembersDelegate(
         val core = KotlinRegularPropertySwiftModelCore(group.representative, namer, objCTypeProvider)
 
         return group
-            .associateWith { ActualKotlinRegularPropertySwiftModel(it, allBoundedSwiftModels, core, swiftModelScope, descriptorProvider) }
+            .associateWith {
+                ActualKotlinRegularPropertySwiftModel(
+                    descriptor = it,
+                    kotlinSirPropertyFactory = { sirProvider.getKotlinSirProperty(it) },
+                    allBoundedSwiftModels = allBoundedSwiftModels,
+                    core = core,
+                    swiftModelScope = swiftModelScope,
+                    descriptorProvider = descriptorProvider,
+                    skieContext = skieContext,
+                )
+            }
             .also { allBoundedSwiftModels.addAll(it.values) }
             .also { allBoundedSwiftModels.addHiddenOverrides(group, it.values.first()) }
             .mapKeys {

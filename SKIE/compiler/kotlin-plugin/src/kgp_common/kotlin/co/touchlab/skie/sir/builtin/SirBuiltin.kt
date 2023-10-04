@@ -11,6 +11,9 @@ import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.util.nsNumberKindClassIds
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.name.FqName
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -22,13 +25,14 @@ class SirBuiltins(
     skieModule: SirModule.Skie,
     sirProvider: SirProvider,
     namer: ObjCExportNamer,
+    kotlinBuiltIns: KotlinBuiltIns,
 ) {
 
     val Swift = Modules.Swift(sirProvider)
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
-    val Stdlib = Modules.KotlinBuiltins(kotlinBuiltinsModule, Swift, Foundation, namer)
+    val Stdlib = Modules.KotlinBuiltins(kotlinBuiltinsModule, Swift, Foundation, namer, kotlinBuiltIns)
 
     val Kotlin = Modules.Kotlin(kotlinModule)
 
@@ -148,12 +152,25 @@ class SirBuiltins(
             }
         }
 
+        // WIP 2 Merge with Kotlin
         class KotlinBuiltins(
             override val module: SirModule.KotlinBuiltins,
             swift: Swift,
             foundation: Foundation,
             namer: ObjCExportNamer,
+            kotlinBuiltIns: KotlinBuiltIns,
         ) : ModuleBase() {
+
+            val allBuiltInsWithDescriptors: Map<SirClass, ClassDescriptor> by lazy {
+                mapOf(
+                    Base to kotlinBuiltIns.any,
+                    MutableSet to kotlinBuiltIns.mutableSet,
+                    MutableMap to kotlinBuiltIns.mutableMap,
+                    Number to kotlinBuiltIns.number,
+                ) + nsNumberDeclarations.map {
+                    it.value to kotlinBuiltIns.getBuiltInClassByFqName(FqName(it.key.asFqNameString()))
+                }
+            }
 
             val Base by Class(nameOverride = namer.kotlinAnyName.swiftName, superTypes = listOf(foundation.NSObject.defaultType))
 
@@ -180,7 +197,7 @@ class SirBuiltins(
                 nsNumberKindClassIds().associateWith {
                     namer.kotlinNumberName
                     SirClass(
-                        simpleName = namer.numberBoxName(it).swiftName,
+                        baseName = namer.numberBoxName(it).swiftName,
                         kind = SirClass.Kind.Class,
                         parent = module,
                         superTypes = listOf(Number.defaultType),
@@ -321,7 +338,7 @@ class SirBuiltins(
             ) : ReadOnlyProperty<Any?, SirClass> {
 
                 private val value = SirClass(
-                    simpleName = name,
+                    baseName = name,
                     kind = kind,
                     isPrimitive = isPrimitive,
                     parent = parent,
@@ -356,7 +373,7 @@ class SirBuiltins(
             ) : ReadOnlyProperty<Any?, SirTypeAlias> {
 
                 private val value = SirTypeAlias(
-                    simpleName = name,
+                    baseName = name,
                     parent = parent,
                     typeFactory = typeFactory,
                 ).apply(apply)

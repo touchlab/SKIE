@@ -5,9 +5,9 @@ import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
-import co.touchlab.skie.phases.features.suspend.addAvailabilityForAsync
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.sir.addAvailabilityForAsync
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
@@ -19,13 +19,11 @@ import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirValueParameter
-import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
+import co.touchlab.skie.swiftmodel.callable.function.ActualKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
-import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySetterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
@@ -50,7 +48,7 @@ object ExhaustiveEnumsGenerator : SirPhase {
     context(SkiePhase.Context)
     private val KotlinClassSwiftModel.isSupported: Boolean
         get() = this.classDescriptor.kind.isEnumClass &&
-                this.classDescriptor.isEnumInteropEnabled
+            this.classDescriptor.isEnumInteropEnabled
 
     context(SkiePhase.Context)
     private val ClassDescriptor.isEnumInteropEnabled: Boolean
@@ -63,13 +61,13 @@ object ExhaustiveEnumsGenerator : SirPhase {
         classSwiftModel.configureBridging(skieClass)
     }
 
-    object MembersGeneratorPhase : StatefulSirPhase()
+    object EnumBodyGeneratorPhase : StatefulSirPhase()
 }
 
 private fun MutableKotlinClassSwiftModel.configureBridging(skieClass: SirClass) {
     bridgedSirClass = skieClass
 
-    visibility = SwiftModelVisibility.Replaced
+    kotlinSirClass.visibility = SirVisibility.PublicButReplaced
 }
 
 context(SirPhase.Context)
@@ -84,7 +82,7 @@ private fun KotlinClassSwiftModel.generateBridge(): SirClass {
 context(SirPhase.Context)
 private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass =
     SirClass(
-        simpleName = kotlinSirClass.simpleName,
+        baseName = kotlinSirClass.baseName,
         parent = kotlinSirClass.namespace?.let { namespace ->
             SirExtension(
                 classDeclaration = when (namespace) {
@@ -97,10 +95,11 @@ private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass =
         kind = SirClass.Kind.Enum,
     ).apply {
         internalTypeAlias = SirTypeAlias(
-            simpleName = "__Enum",
+            baseName = "Enum",
             parent = sirProvider.getSkieNamespace(this@createBridgingEnum),
+            visibility = SirVisibility.PublicButReplaced,
         ) {
-            defaultType.also { it.useInternalName = false }
+            defaultType.withFqName()
         }
 
         addEnumCases()
@@ -113,7 +112,7 @@ private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass =
 
         attributes.add("frozen")
 
-        doInPhase(ExhaustiveEnumsGenerator.MembersGeneratorPhase) {
+        doInPhase(ExhaustiveEnumsGenerator.EnumBodyGeneratorPhase) {
             addPassthroughForMembers()
             addNestedClassTypeAliases()
             addCompanionObjectPropertyIfNeeded()
@@ -149,7 +148,7 @@ private fun SirClass.addNestedClassTypeAliases() {
 context(KotlinClassSwiftModel)
 private fun SirClass.addNestedClassTypeAlias(sirClass: SirClass) {
     SirTypeAlias(
-        simpleName = sirClass.publicName.simpleName,
+        baseName = sirClass.publicName.simpleName,
         visibility = sirClass.visibility,
     ) {
         sirClass.defaultType
@@ -228,7 +227,7 @@ private class MemberPassthroughGeneratorVisitor(
 ) : KotlinDirectlyCallableMemberSwiftModelVisitor.Unit {
 
     override fun visit(function: KotlinFunctionSwiftModel) {
-        if (!function.isSupported) return
+        if (function !is ActualKotlinFunctionSwiftModel || !function.primarySirFunction.isSupported) return
 
         if (SuspendGenerator.hasSuspendWrapper(function)) {
             val asyncFunction = function.asyncSwiftModelOrNull ?: error("Suspend function must have an async swift model: $function")
@@ -241,21 +240,21 @@ private class MemberPassthroughGeneratorVisitor(
 
     private val unsupportedFunctionNames = listOf("compareTo(other:)", "hash()", "description()", "isEqual(_:)")
 
-    private val KotlinFunctionSwiftModel.isSupported: Boolean
+    private val SirFunction.isSupported: Boolean
         get() = this.name !in unsupportedFunctionNames
 
     private fun addFunction(function: KotlinFunctionSwiftModel) {
         SirFunction(
-            identifier = function.identifier,
+            identifier = function.primarySirFunction.identifier,
             parent = enum,
-            returnType = function.returnType,
+            returnType = function.primarySirFunction.returnType,
         ).apply {
-            addFunctionValueParameters(function)
+            addFunctionValueParameters(function.primarySirFunction)
 
-            throws = function.isThrowing
+            throws = function.primarySirFunction.throws
 
-            isAsync = function.isSuspend
-            if (function.isSuspend) {
+            isAsync = function.primarySirFunction.isAsync
+            if (function.primarySirFunction.isAsync) {
                 addAvailabilityForAsync()
             }
 
@@ -263,16 +262,16 @@ private class MemberPassthroughGeneratorVisitor(
         }
     }
 
-    private fun SirFunction.addFunctionValueParameters(function: KotlinFunctionSwiftModel) {
+    private fun SirFunction.addFunctionValueParameters(function: SirFunction) {
         function.valueParameters.forEach {
             this.addFunctionValueParameter(it)
         }
     }
 
-    private fun SirFunction.addFunctionValueParameter(valueParameter: KotlinValueParameterSwiftModel) {
+    private fun SirFunction.addFunctionValueParameter(valueParameter: SirValueParameter) {
         SirValueParameter(
-            label = valueParameter.argumentLabel,
-            name = valueParameter.parameterName,
+            label = valueParameter.label,
+            name = valueParameter.name,
             type = valueParameter.type,
         )
     }
@@ -281,19 +280,19 @@ private class MemberPassthroughGeneratorVisitor(
         this.addFunctionBodyWithErrorTypeHandling(function) {
             addStatement(
                 "return %L%L(self as _ObjectiveCType).%N(%L)",
-                if (function.isThrowing) "try " else "",
-                if (function.isSuspend) "await " else "",
-                function.reference,
-                function.valueParameters.map { CodeBlock.of("%N", it.parameterName) }.joinToCode(", "),
+                if (function.primarySirFunction.throws) "try " else "",
+                if (function.primarySirFunction.isAsync) "await " else "",
+                function.primarySirFunction.reference,
+                function.primarySirFunction.valueParameters.map { CodeBlock.of("%N", it.name) }.joinToCode(", "),
             )
         }
     }
 
     override fun visit(regularProperty: KotlinRegularPropertySwiftModel) {
         SirProperty(
-            name = regularProperty.identifier,
+            identifier = regularProperty.primarySirProperty.identifier,
             parent = enum,
-            type = regularProperty.type,
+            type = regularProperty.primarySirProperty.type,
         ).apply {
             addGetter(regularProperty)
             addSetterIfPresent(regularProperty)
@@ -301,36 +300,39 @@ private class MemberPassthroughGeneratorVisitor(
     }
 
     private fun SirProperty.addGetter(regularProperty: KotlinRegularPropertySwiftModel) {
-        SirGetter().addGetterBody(regularProperty)
+        SirGetter(
+            throws = regularProperty.primarySirProperty.getter!!.throws,
+        ).addGetterBody(regularProperty)
     }
 
     private fun SirGetter.addGetterBody(regularProperty: KotlinRegularPropertySwiftModel) {
         this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
             addStatement(
                 "return %L(self as _ObjectiveCType).%N",
-                if (regularProperty.getter.isThrowing) "try " else "",
-                regularProperty.reference,
+                if (regularProperty.primarySirProperty.getter!!.throws) "try " else "",
+                regularProperty.primarySirProperty.reference,
             )
         }
     }
 
     private fun SirProperty.addSetterIfPresent(regularProperty: KotlinRegularPropertySwiftModel) {
-        val setter = regularProperty.setter ?: return
+        val setter = regularProperty.primarySirProperty.setter ?: return
 
         SirSetter(
+            throws = setter.throws,
             modifiers = listOf(Modifier.NONMUTATING),
         ).addSetterBody(regularProperty, setter)
     }
 
     private fun SirSetter.addSetterBody(
         regularProperty: KotlinRegularPropertySwiftModel,
-        setter: KotlinRegularPropertySetterSwiftModel,
+        setter: SirSetter,
     ) {
         this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
             addStatement(
                 "%L(self as _ObjectiveCType).%N = value",
-                if (setter.isThrowing) "try " else "",
-                regularProperty.reference,
+                if (setter.throws) "try " else "",
+                regularProperty.primarySirProperty.reference,
             )
         }
     }

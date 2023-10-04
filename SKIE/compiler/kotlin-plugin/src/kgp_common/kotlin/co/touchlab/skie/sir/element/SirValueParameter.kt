@@ -4,16 +4,33 @@ import co.touchlab.skie.sir.element.util.sirValueParameterParent
 import co.touchlab.skie.sir.type.SirType
 
 class SirValueParameter(
-    var name: String,
+    name: String,
     var type: SirType,
     parent: SirValueParameterParent,
-    var label: String? = null,
+    label: String? = null,
     var inout: Boolean = false,
 ) : SirElement {
 
     var parent: SirValueParameterParent by sirValueParameterParent(parent)
 
-    // WIP Add missing toStrings
+    var name: String = name
+        set(value) {
+            field = value
+
+            label = label
+        }
+
+    var label: String? = if (label != name) label else null
+        set(value) {
+            field = if (value != name) value else null
+        }
+
+    val labelOrName: String
+        get() = label ?: name
+
+    // WIP 2 Add missing toStrings
+
+    override fun toString(): String = "${this::class.simpleName}: $label $name: $type"
 
     companion object {
 

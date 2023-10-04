@@ -26,7 +26,7 @@ object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
         registerReverseOperation(this)
 
         while (fqName.toLocalString() in conflictingNames) {
-            this.simpleName += "_"
+            this.baseName += "_"
         }
 
         conflictingNames.add(this.fqName.toLocalString())
@@ -34,10 +34,10 @@ object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
 
     context(SirPhase.Context)
     private fun registerReverseOperation(sirTypeDeclaration: SirTypeDeclaration) {
-        val originalSimpleName = sirTypeDeclaration.simpleName
+        val originalBaseName = sirTypeDeclaration.baseName
 
         doInPhase(RevertPhase) {
-            sirTypeDeclaration.simpleName = originalSimpleName
+            sirTypeDeclaration.baseName = originalBaseName
         }
     }
 

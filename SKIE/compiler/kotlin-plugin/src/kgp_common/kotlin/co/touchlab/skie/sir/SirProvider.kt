@@ -1,15 +1,22 @@
 package co.touchlab.skie.sir
 
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.sir.builtin.SirBuiltins
+import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirFile
+import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirModule
+import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
 import co.touchlab.skie.swiftmodel.SwiftModelScope
+import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelWithCore
 import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.translation.BuiltinSwiftBridgeableProvider
@@ -19,18 +26,27 @@ import co.touchlab.skie.util.Reporter
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import java.nio.file.Path
 
+// WIP 2 Refactor this + factories
+// WIP 2 Refactor DI
 class SirProvider(
     private val namer: ObjCExportNamer,
     framework: FrameworkLayout,
     private val descriptorProvider: DescriptorProvider,
     sdkPath: String,
     reporter: Reporter,
+    bridgeProvider: DescriptorBridgeProvider,
+    private val skieContext: SkiePhase.Context,
 ) {
+
+    // Temporary hack to get around circular dependency between SwiftModelScope and KotlinSirCallableDeclarationsFactory
+    private lateinit var swiftModelScope: SwiftModelScope
 
     val translator: SwiftTypeTranslator by lazy {
         SwiftTypeTranslator(
@@ -52,7 +68,7 @@ class SirProvider(
     private val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
 
     val sirBuiltins by lazy {
-        SirBuiltins(kotlinBuiltinsModule, kotlinModule, skieModule, this, namer)
+        SirBuiltins(kotlinBuiltinsModule, kotlinModule, skieModule, this, namer, descriptorProvider.builtIns)
     }
 
     private val skieNamespaceProvider by lazy {
@@ -66,6 +82,19 @@ class SirProvider(
             namespaceProvider = skieNamespaceProvider,
             namer = namer,
             descriptorProvider = descriptorProvider,
+        )
+    }
+
+    private val kotlinSirCallableDeclarationsFactory by lazy {
+        KotlinSirCallableDeclarationsFactory(
+            sirProvider = this,
+            translator = translator,
+            namer = namer,
+            descriptorProvider = descriptorProvider,
+            swiftModelScope = swiftModelScope,
+            bridgeProvider = bridgeProvider,
+            kotlinSirClassFactory = kotlinSirClassFactory,
+            skieContext = skieContext,
         )
     }
 
@@ -97,8 +126,10 @@ class SirProvider(
             .getChildDeclarationsRecursively().filterIsInstance<SirTypeDeclaration>()
 
     context(SwiftModelScope)
-    fun finishInitialization() {
+    fun finishClassInitialization(swiftModelScope: SwiftModelScope) {
         kotlinSirClassFactory.finishInitialization()
+
+        this.swiftModelScope = swiftModelScope
     }
 
     fun getFile(namespace: String, name: String): SirFile =
@@ -149,7 +180,7 @@ class SirProvider(
             }
 
             return@getOrPut SirClass(
-                simpleName = fqName.simpleName,
+                baseName = fqName.simpleName,
                 parent = parent,
                 kind = kind,
                 superTypes = if (kind == SirClass.Kind.Class) listOf(sirBuiltins.Foundation.NSObject.defaultType) else emptyList(),
@@ -159,8 +190,26 @@ class SirProvider(
     fun getKotlinSirClass(classDescriptor: ClassDescriptor): SirClass =
         kotlinSirClassFactory.getKotlinSirClass(classDescriptor)
 
-    fun createKotlinSirClass(sourceFile: SourceFile): SirClass =
-        kotlinSirClassFactory.createKotlinSirClass(sourceFile)
+    fun getKotlinSirClass(sourceFile: SourceFile): SirClass =
+        kotlinSirClassFactory.getKotlinSirClass(sourceFile)
+
+    fun getKotlinSirFunctionOrConstructor(functionDescriptor: FunctionDescriptor): SirCallableDeclaration =
+        kotlinSirCallableDeclarationsFactory.getKotlinSirFunctionOrConstructor(functionDescriptor)
+
+    fun getKotlinSirConstructor(constructorDescriptor: FunctionDescriptor): SirConstructor =
+        kotlinSirCallableDeclarationsFactory.getKotlinSirConstructor(constructorDescriptor)
+
+    fun getKotlinSirFunction(functionDescriptor: FunctionDescriptor): SirFunction =
+        kotlinSirCallableDeclarationsFactory.getKotlinSirFunction(functionDescriptor)
+
+    fun getKotlinSirAsyncFunction(functionDescriptor: FunctionDescriptor): SirFunction =
+        kotlinSirCallableDeclarationsFactory.getKotlinSirAsyncFunction(functionDescriptor)
+
+    fun getKotlinSirProperty(propertyDescriptor: PropertyDescriptor): SirProperty =
+        kotlinSirCallableDeclarationsFactory.getKotlinSirProperty(propertyDescriptor)
+
+    fun createKotlinSirFakeObjCConstructor(classDescriptor: ClassDescriptor, representativeModel: KotlinFunctionSwiftModelWithCore): SirConstructor =
+        kotlinSirCallableDeclarationsFactory.createKotlinSirFakeObjCConstructor(classDescriptor, representativeModel)
 }
 
 private fun SirDeclarationParent.getChildDeclarationsRecursively(): List<SirDeclaration> =

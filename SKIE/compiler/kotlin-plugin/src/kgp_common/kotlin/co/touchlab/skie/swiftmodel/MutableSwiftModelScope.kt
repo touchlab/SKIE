@@ -1,6 +1,7 @@
 package co.touchlab.skie.swiftmodel
 
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
+import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.MutableKotlinPropertySwiftModel
@@ -31,6 +32,10 @@ interface MutableSwiftModelScope : SwiftModelScope {
     override val CallableMemberDescriptor.swiftModel: MutableKotlinCallableMemberSwiftModel
 
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
+
+    override val FunctionDescriptor.asyncSwiftModel: MutableKotlinFunctionSwiftModel
+
+    override val FunctionDescriptor.asyncSwiftModelOrNull: MutableKotlinFunctionSwiftModel?
 
     override val ParameterDescriptor.swiftModel: MutableKotlinValueParameterSwiftModel
 

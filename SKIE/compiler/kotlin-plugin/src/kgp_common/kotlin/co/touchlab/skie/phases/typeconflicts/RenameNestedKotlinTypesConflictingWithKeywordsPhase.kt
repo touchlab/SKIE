@@ -12,7 +12,7 @@ object RenameNestedKotlinTypesConflictingWithKeywordsPhase : SirPhase {
             .map { it.kotlinSirClass }
             .filter { it.namespace?.fqName?.simpleName in KEYWORDS }
             .forEach {
-                it.simpleName = it.fqName.toString().replace(".", "")
+                it.baseName = it.fqName.toString().replace(".", "")
                 it.namespace = null
             }
     }

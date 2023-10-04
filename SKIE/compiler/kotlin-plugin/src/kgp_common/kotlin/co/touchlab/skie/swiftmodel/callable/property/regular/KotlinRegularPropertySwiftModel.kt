@@ -1,5 +1,6 @@
 package co.touchlab.skie.swiftmodel.callable.property.regular
 
+import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.KotlinPropertySwiftModel
@@ -12,9 +13,12 @@ interface KotlinRegularPropertySwiftModel : KotlinPropertySwiftModel, KotlinDire
 
     val setter: KotlinRegularPropertySetterSwiftModel?
 
-    val type: SirType
+    val primarySirProperty: SirProperty
+        get() = bridgedSirProperty ?: kotlinSirProperty
 
-    val flowMappingStrategy: FlowMappingStrategy
+    val kotlinSirProperty: SirProperty
+
+    val bridgedSirProperty: SirProperty?
 
     val objCType: ObjCType
 

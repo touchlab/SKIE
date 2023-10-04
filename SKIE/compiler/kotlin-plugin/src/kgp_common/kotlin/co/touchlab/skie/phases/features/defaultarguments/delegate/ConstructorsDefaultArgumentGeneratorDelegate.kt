@@ -140,9 +140,9 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
 
     private fun fixOverloadLastParameterName(overloadDescriptor: FunctionDescriptor) {
         context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
-            val lastParameter = overloadDescriptor.swiftModel.valueParameters.lastOrNull() ?: return@doInPhase
+            val lastParameter = overloadDescriptor.swiftModel.primarySirConstructor.valueParameters.lastOrNull() ?: return@doInPhase
 
-            lastParameter.argumentLabel = lastParameter.argumentLabel.dropUniqueParameterMangling()
+            lastParameter.label = lastParameter.labelOrName.dropUniqueParameterMangling()
         }
     }
 

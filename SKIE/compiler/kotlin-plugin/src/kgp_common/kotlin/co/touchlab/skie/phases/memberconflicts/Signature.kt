@@ -1,9 +1,9 @@
 package co.touchlab.skie.phases.memberconflicts
 
+import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
 
 data class Signature(
@@ -54,22 +54,25 @@ data class Signature(
 
         override fun visit(function: KotlinFunctionSwiftModel): Signature =
             Signature(
-                receiver = function.receiver.toSwiftPoetTypeName().toString(), //.stableFqName,
-                identifier = function.identifier,
-                parameters = function.valueParameters.map { it.toSignatureParameter() },
-                returnType = ReturnType.Specific(function.returnType.toSwiftPoetTypeName().toString() /*.stableFqName*/),
+                receiver = function.receiver.toSwiftPoetTypeName().toString(),
+                identifier = function.kotlinSirCallableDeclaration.identifier,
+                parameters = function.kotlinSirValueParameters.map { it.toSignatureParameter() },
+                returnType = when (function.role) {
+                    KotlinFunctionSwiftModel.Role.Constructor -> ReturnType.Specific(function.receiver.toSwiftPoetTypeName().toString())
+                    else -> ReturnType.Specific(function.kotlinSirFunction.returnType.toSwiftPoetTypeName().toString())
+                },
             )
 
-        private fun KotlinValueParameterSwiftModel.toSignatureParameter(): Parameter =
+        private fun SirValueParameter.toSignatureParameter(): Parameter =
             Parameter(
-                argumentLabel = this.argumentLabel,
-                type = this.type.toSwiftPoetTypeName().toString(), //stableFqName,
+                argumentLabel = this.labelOrName,
+                type = this.type.toSwiftPoetTypeName().toString(),
             )
 
         override fun visit(regularProperty: KotlinRegularPropertySwiftModel): Signature =
             Signature(
-                receiver = regularProperty.receiver.toSwiftPoetTypeName().toString(), //.stableFqName,
-                identifier = regularProperty.identifier,
+                receiver = regularProperty.receiver.toSwiftPoetTypeName().toString(),
+                identifier = regularProperty.kotlinSirProperty.identifier,
                 parameters = emptyList(),
                 returnType = ReturnType.Any,
             )

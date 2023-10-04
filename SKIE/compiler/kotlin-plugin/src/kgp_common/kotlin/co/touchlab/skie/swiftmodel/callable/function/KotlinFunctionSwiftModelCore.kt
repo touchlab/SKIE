@@ -5,8 +5,6 @@ package co.touchlab.skie.swiftmodel.callable.function
 import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.identifierAfterVisibilityChanges
 import co.touchlab.skie.swiftmodel.callable.parameter.KotlinParameterSwiftModelCore
 import co.touchlab.skie.swiftmodel.factory.ObjCTypeProvider
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
@@ -48,29 +46,6 @@ class KotlinFunctionSwiftModelCore(
     var identifier: String = swiftFunctionName.identifier
 
     var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
-
-    fun reference(swiftModel: KotlinFunctionSwiftModel): String =
-        if (swiftModel.valueParameters.isEmpty()) {
-            swiftModel.identifierAfterVisibilityChanges
-        } else {
-            "${swiftModel.identifierAfterVisibilityChanges}(${swiftModel.valueParameters.joinToString("") { "${it.argumentLabel}:" }})"
-        }
-
-    fun replacedReference(swiftModel: KotlinFunctionSwiftModel): String =
-        if (swiftModel.valueParameters.isEmpty()) {
-            swiftModel.identifierAfterVisibilityChangesWithoutReplaced
-        } else {
-            "${swiftModel.identifierAfterVisibilityChangesWithoutReplaced}(${swiftModel.valueParameters.joinToString("") { "${it.argumentLabel}:" }})"
-        }
-
-    private val KotlinDirectlyCallableMemberSwiftModel.identifierAfterVisibilityChangesWithoutReplaced: String
-        get() = when (visibility) {
-            SwiftModelVisibility.Replaced -> identifier
-            else -> identifierAfterVisibilityChanges
-        }
-
-    fun name(swiftModel: KotlinFunctionSwiftModel): String =
-        if (swiftModel.valueParameters.isEmpty()) "${swiftModel.identifierAfterVisibilityChanges}()" else reference(swiftModel)
 
     fun getParameterCoresWithDescriptors(
         functionDescriptor: FunctionDescriptor,

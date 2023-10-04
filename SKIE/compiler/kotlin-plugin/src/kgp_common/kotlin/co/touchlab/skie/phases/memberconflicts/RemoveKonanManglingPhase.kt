@@ -2,10 +2,16 @@ package co.touchlab.skie.phases.memberconflicts
 
 import co.touchlab.skie.kir.allExposedMembers
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModelVisitor
+import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.MutableKotlinRegularPropertySwiftModel
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 object RemoveKonanManglingPhase : SirPhase {
 
@@ -19,19 +25,43 @@ object RemoveKonanManglingPhase : SirPhase {
     private object ResetNameVisitor : MutableKotlinCallableMemberSwiftModelVisitor.Unit {
 
         override fun visit(function: MutableKotlinFunctionSwiftModel) {
-            function.identifier = function.identifier.stripMangling(function.descriptor.name.asString())
+            when (function.role) {
+                KotlinFunctionSwiftModel.Role.Constructor -> {
+                    function.kotlinSirConstructor.resetName()
+                    function.bridgedSirConstructor?.resetName()
+                }
+                else -> {
+                    function.kotlinSirFunction.resetName(function.descriptor)
+                    function.bridgedSirFunction?.resetName(function.descriptor)
+                }
+            }
+        }
 
-            function.valueParameters.forEach {
+        private fun SirFunction.resetName(functionDescriptor: FunctionDescriptor) {
+            this.identifier = this.identifier.stripMangling(functionDescriptor.name.asString())
+
+            valueParameters.forEach {
                 it.resetName()
             }
         }
 
-        private fun MutableKotlinValueParameterSwiftModel.resetName() {
-            this.argumentLabel = this.argumentLabel.stripMangling(this.parameterName)
+        private fun SirConstructor.resetName() {
+            valueParameters.forEach {
+                it.resetName()
+            }
+        }
+
+        private fun SirValueParameter.resetName() {
+            this.label = this.labelOrName.stripMangling(this.name)
         }
 
         override fun visit(regularProperty: MutableKotlinRegularPropertySwiftModel) {
-            regularProperty.identifier = regularProperty.identifier.stripMangling(regularProperty.descriptor.name.asString())
+            regularProperty.kotlinSirProperty.resetName(regularProperty.descriptor)
+            regularProperty.bridgedSirProperty?.resetName(regularProperty.descriptor)
+        }
+
+        private fun SirProperty.resetName(propertyDescriptor: PropertyDescriptor) {
+            this.identifier = identifier.stripMangling(propertyDescriptor.name.asString())
         }
 
         private fun String.stripMangling(kotlinName: String): String {

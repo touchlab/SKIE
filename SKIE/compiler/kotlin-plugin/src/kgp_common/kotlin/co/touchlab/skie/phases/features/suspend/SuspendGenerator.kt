@@ -9,6 +9,8 @@ import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -31,8 +33,6 @@ object SuspendGenerator : DescriptorModificationPhase {
             val kotlinBridgingFunction = kotlinDelegate.generateKotlinBridgingFunction(function)
 
             swiftDelegate.generateSwiftBridgingFunction(function, kotlinBridgingFunction)
-
-            markOriginalFunctionAsReplaced(function)
         }
     }
 
@@ -53,13 +53,6 @@ object SuspendGenerator : DescriptorModificationPhase {
     context(SkiePhase.Context)
     private val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.getConfiguration(SuspendInterop.Enabled)
-
-    context(SkiePhase.Context)
-    private fun markOriginalFunctionAsReplaced(originalFunctionDescriptor: SimpleFunctionDescriptor) {
-        context.doInPhase(KotlinBridgeConfigurationPhase) {
-            originalFunctionDescriptor.swiftModel.visibility = SwiftModelVisibility.Replaced
-        }
-    }
 
     object KotlinBridgeConfigurationPhase : StatefulSirPhase()
 

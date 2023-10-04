@@ -4,6 +4,7 @@ import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
@@ -15,9 +16,10 @@ class SealedEnumGeneratorDelegate(
     context(SirPhase.Context)
     fun generate(swiftModel: KotlinClassSwiftModel): SirClass =
         SirClass(
-            simpleName = "__Sealed",
+            baseName = "Sealed",
             kind = SirClass.Kind.Enum,
             parent = sirProvider.getSkieNamespace(swiftModel),
+            visibility = SirVisibility.PublicButReplaced,
         ).apply {
             addConformanceToHashableIfPossible(swiftModel)
 

@@ -5,6 +5,7 @@ import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 import co.touchlab.skie.swiftmodel.SwiftModelScope
@@ -27,8 +28,9 @@ class SkieClassSuspendGenerator {
     context(SwiftModelScope)
     private fun createSkieClass(swiftModel: KotlinTypeSwiftModel): SirClass =
         SirClass(
-            simpleName = "__Suspend",
+            baseName = "Suspend",
             parent = sirProvider.getSkieNamespace(swiftModel),
+            visibility = SirVisibility.PublicButReplaced,
         ).apply {
             copyTypeParametersFrom(swiftModel.kotlinSirClass)
 

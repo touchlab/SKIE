@@ -11,6 +11,7 @@ import io.outfoxx.swiftpoet.parameterizedBy
 data class DeclaredSirType(
     val declaration: SirTypeDeclaration,
     val typeArguments: List<SirType> = emptyList(),
+    val pointsToInternalName: Boolean = true
 ) : NonNullSirType() {
 
     override val isHashable: Boolean
@@ -19,12 +20,13 @@ data class DeclaredSirType(
     override val isPrimitive: Boolean
         get() = declaration.isPrimitive
 
-    var useInternalName: Boolean = true
+    fun withFqName(): DeclaredSirType =
+        copy(pointsToInternalName = false)
 
     override val directlyReferencedTypes: List<SirType> = typeArguments
 
     fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName =
-        if (useInternalName) declaration.internalName.toSwiftPoetName() else declaration.fqName.toExternalSwiftPoetName()
+        if (pointsToInternalName) declaration.internalName.toSwiftPoetName() else declaration.fqName.toExternalSwiftPoetName()
 
     override fun toSwiftPoetTypeName(): TypeName {
         val baseName = toSwiftPoetDeclaredTypeName()

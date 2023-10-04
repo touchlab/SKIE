@@ -11,7 +11,7 @@ object RenameNestedTypesConflictingWithExternalTypesPhase : SirPhase {
         sirProvider.allLocalTypes
             .filter { it.namespace?.fqName?.toString() in conflictingNames }
             .forEach {
-                it.simpleName = it.fqName.toString().replace(".", "")
+                it.baseName = it.fqName.toString().replace(".", "")
                 it.namespace = null
             }
     }

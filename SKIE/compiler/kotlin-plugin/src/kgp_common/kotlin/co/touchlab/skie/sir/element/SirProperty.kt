@@ -2,20 +2,27 @@ package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
+import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.PropertySpec
 
 class SirProperty(
-    var name: String,
+    override var identifier: String,
     parent: SirDeclarationParent,
     var type: SirType,
-    var visibility: SirVisibility = SirVisibility.Public,
+    override var visibility: SirVisibility = SirVisibility.Public,
     override var scope: SirScope = SirScope.Member,
-    overriddenDeclarations: List<SirProperty> = emptyList(),
     attributes: List<String> = emptyList(),
-) : SirDeclaration, SirDeclarationWithScope, SirOverridableDeclaration<SirProperty>,
+    modifiers: List<Modifier> = emptyList(),
+) : SirCallableDeclaration, SirOverridableDeclaration<SirProperty>,
     SirElementWithSwiftPoetBuilderModifications<PropertySpec.Builder> {
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
+
+    override val reference: String
+        get() = identifierAfterVisibilityChanges
+
+    override val name: String
+        get() = reference
 
     var getter: SirGetter? = null
         private set
@@ -23,18 +30,35 @@ class SirProperty(
     var setter: SirSetter? = null
         private set
 
-    override val memberOwner: SirClass?
-        get() = when (val parent = parent) {
-            is SirClass -> parent
-            is SirExtension -> parent.classDeclaration
-            else -> null
-        }
+    override val attributes: MutableList<String> = attributes.toMutableList()
 
-    override val overriddenDeclarations: MutableList<SirProperty> = overriddenDeclarations.toMutableList()
-
-    val attributes: MutableList<String> = attributes.toMutableList()
+    override val modifiers: MutableList<Modifier> = modifiers.toMutableList()
 
     override val swiftPoetBuilderModifications = mutableListOf<PropertySpec.Builder.() -> Unit>()
+
+    private val overridableDeclarationDelegate = SirOverridableDeclarationDelegate(this)
+
+    override val memberOwner: SirClass? by overridableDeclarationDelegate::memberOwner
+
+    override val overriddenDeclarations: List<SirProperty> by overridableDeclarationDelegate::overriddenDeclarations
+
+    override val overriddenBy: List<SirProperty> by overridableDeclarationDelegate::overriddenBy
+
+    override fun addOverride(declaration: SirProperty) {
+        overridableDeclarationDelegate.addOverride(declaration)
+    }
+
+    override fun removeOverride(declaration: SirProperty) {
+        overridableDeclarationDelegate.removeOverride(declaration)
+    }
+
+    override fun addOverriddenBy(declaration: SirProperty) {
+        overridableDeclarationDelegate.addOverriddenBy(declaration)
+    }
+
+    override fun removeOverriddenBy(declaration: SirProperty) {
+        overridableDeclarationDelegate.removeOverriddenBy(declaration)
+    }
 
     fun setGetterInternal(getter: SirGetter) {
         this.getter = getter
@@ -44,6 +68,8 @@ class SirProperty(
         this.setter = setter
     }
 
+    override fun toString(): String = "${this::class.simpleName}: $name"
+
     companion object {
 
         context(SirDeclarationParent)
@@ -52,17 +78,17 @@ class SirProperty(
             type: SirType,
             visibility: SirVisibility = SirVisibility.Public,
             scope: SirScope = SirScope.Member,
-            overriddenDeclarations: List<SirProperty> = emptyList(),
             attributes: List<String> = emptyList(),
+            modifiers: List<Modifier> = emptyList(),
         ): SirProperty =
             SirProperty(
-                name = name,
+                identifier = name,
                 parent = this@SirDeclarationParent,
                 type = type,
                 visibility = visibility,
                 scope = scope,
-                overriddenDeclarations = overriddenDeclarations,
                 attributes = attributes,
+                modifiers = modifiers,
             )
     }
 }

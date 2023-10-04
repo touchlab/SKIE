@@ -13,7 +13,6 @@ import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerato
 import co.touchlab.skie.phases.features.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.phases.features.flow.FlowBridgingConfigurator
 import co.touchlab.skie.phases.features.flow.FlowConversionConstructorsGenerator
-import co.touchlab.skie.phases.features.flow.FlowMappingConfigurator
 import co.touchlab.skie.phases.features.sealed.SealedInteropGenerator
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
 import co.touchlab.skie.phases.header.AddForwardDeclarationsPhase
@@ -79,7 +78,6 @@ class SkiePhaseScheduler {
         addAll(
             DumpSwiftApiPhase.BeforeApiNotes,
 
-            RemoveKonanManglingPhase,
             RenameNestedTypesConflictingWithExternalTypesPhase,
             RenameNestedKotlinTypesConflictingWithKeywordsPhase,
             RenameSkieNamespacesConflictingWithKeywordsPhase,
@@ -90,17 +88,18 @@ class SkiePhaseScheduler {
             ExtraClassExportPhase.FinalizePhase,
             DefaultArgumentGenerator.FinalizePhase,
             FlowBridgingConfigurator,
-            FlowMappingConfigurator(context),
             SuspendGenerator.KotlinBridgeConfigurationPhase,
             ExhaustiveEnumsGenerator,
             SealedInteropGenerator(context),
 
             MoveBridgesToTopLevelPhase,
             RenameTypesConflictsWithOtherTypesPhase,
+
+            RemoveKonanManglingPhase,
             FixCallableMembersConflictsPhase,
 
             FlowConversionConstructorsGenerator,
-            ExhaustiveEnumsGenerator.MembersGeneratorPhase,
+            ExhaustiveEnumsGenerator.EnumBodyGeneratorPhase,
             SuspendGenerator.SwiftBridgeGeneratorPhase,
 
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,

@@ -6,7 +6,6 @@ import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -30,7 +29,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 
         typeDeclarations.forEach { typeDeclaration ->
             while (typeDeclaration.fqName.toString() in existingFqNames) {
-                typeDeclaration.simpleName += "_"
+                typeDeclaration.baseName += "_"
             }
 
             existingFqNames.add(typeDeclaration.fqName.toString())
@@ -49,6 +48,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
  * visibility (Visible/public, Hidden, Replaced, Removed/non-public)
  * hash of Kotlin fqName if available
  */
+// WIP 2 Logic needs to be updated
 context(SwiftModelScope)
 private fun SirTypeDeclaration.getCollisionResolutionPriority(): Long {
     val swiftModel = (this as? SirClass)?.swiftModelOrNull
@@ -89,11 +89,11 @@ private fun SirTypeDeclaration.getCollisionResolutionPriority(): Long {
     }
 
     priority = priority shl 2
-    priority += when (swiftModel?.visibility) {
-        SwiftModelVisibility.Visible -> 3
-        SwiftModelVisibility.Hidden -> 2
-        SwiftModelVisibility.Replaced -> 1
-        SwiftModelVisibility.Removed, null -> 0
+    priority += when (visibility) {
+        SirVisibility.Public -> 3
+        SirVisibility.PublicButHidden -> 2
+        SirVisibility.PublicButReplaced -> 1
+        else -> 0
     }
     if (swiftModel == null && this.visibility == SirVisibility.Public) {
         priority += 3

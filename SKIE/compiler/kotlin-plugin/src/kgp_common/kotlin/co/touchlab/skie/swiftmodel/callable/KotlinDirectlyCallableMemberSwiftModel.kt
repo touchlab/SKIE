@@ -1,45 +1,20 @@
 package co.touchlab.skie.swiftmodel.callable
 
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
+import co.touchlab.skie.sir.element.SirCallableDeclaration
 
 interface KotlinDirectlyCallableMemberSwiftModel : KotlinCallableMemberSwiftModel {
+
+    val primarySirCallableDeclaration: SirCallableDeclaration
+        get() = bridgedSirCallableDeclaration ?: kotlinSirCallableDeclaration
+
+    val kotlinSirCallableDeclaration: SirCallableDeclaration
+
+    val bridgedSirCallableDeclaration: SirCallableDeclaration?
 
     override val allBoundedSwiftModels: List<KotlinDirectlyCallableMemberSwiftModel>
 
     override val directlyCallableMembers: List<KotlinDirectlyCallableMemberSwiftModel>
         get() = listOf(this)
-
-    val visibility: SwiftModelVisibility
-
-    /**
-     * Examples:
-     * foo
-     * foo (visibility == Replaced)
-     */
-    val identifier: String
-
-    /**
-     * Examples:
-     * foo (for functions and properties)
-     * foo(param1:)
-     * __foo(param1:) (visibility == Replaced)
-     * __Skie_Removed__foo(param1:) (visibility == Removed)
-     *
-     * Use `reference` to call this function from generated Swift code.
-     */
-    val reference: String
-
-    /**
-     * Examples
-     * foo  (for properties)
-     * foo() (for functions)
-     * foo(param1:)
-     * __foo(param1:) (visibility == Replaced)
-     * __Skie_Removed__foo(param1:) (visibility == Removed)
-     *
-     * Use `name` for Api notes and documentation.
-     */
-    val name: String
 
     val collisionResolutionStrategy: CollisionResolutionStrategy
 

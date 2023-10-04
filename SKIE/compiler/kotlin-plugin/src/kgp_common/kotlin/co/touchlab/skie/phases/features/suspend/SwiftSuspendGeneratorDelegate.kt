@@ -1,17 +1,20 @@
 package co.touchlab.skie.phases.features.suspend
 
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.sir.addAvailabilityForAsync
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
-import co.touchlab.skie.swiftmodel.isRemoved
+import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.util.swift.addFunctionBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
@@ -31,7 +34,9 @@ class SwiftSuspendGeneratorDelegate(
         kotlinBridgingFunctionDescriptor: FunctionDescriptor,
     ) {
         context.doInPhase(SuspendGenerator.SwiftBridgeGeneratorPhase) {
-            if (originalFunctionDescriptor.swiftModel.visibility.isRemoved || kotlinBridgingFunctionDescriptor.swiftModel.visibility.isRemoved) {
+            if (originalFunctionDescriptor.swiftModel.primarySirFunction.visibility == SirVisibility.Removed ||
+                kotlinBridgingFunctionDescriptor.swiftModel.primarySirFunction.visibility == SirVisibility.Removed
+            ) {
                 return@doInPhase
             }
 
@@ -41,13 +46,33 @@ class SwiftSuspendGeneratorDelegate(
                 kotlinBridgingFunction = kotlinBridgingFunctionDescriptor.swiftModel,
             )
 
-            SirExtension(
+            val extension = SirExtension(
                 classDeclaration = bridgeModel.extensionTypeDeclarationForBridgingFunction,
                 parent = sirProvider.getFile(bridgeModel.originalFunction.owner!!),
-            ).apply {
-                addSwiftBridgingFunction(bridgeModel)
-            }
+            )
+
+            val bridgingFunction = extension.addSwiftBridgingFunction(bridgeModel)
+
+            markOriginalFunctionAsReplaced(bridgeModel.originalFunction, bridgeModel.asyncOriginalFunction, bridgingFunction)
         }
+    }
+    // WIP 2 Verify that we generate overload for all function in hierarchy
+
+    context(SirPhase.Context)
+    private fun markOriginalFunctionAsReplaced(
+        originalFunctionSwiftModel: MutableKotlinFunctionSwiftModel,
+        originalFunctionAsyncSwiftModel: MutableKotlinFunctionSwiftModel,
+        sirFunction: SirFunction,
+    ) {
+        originalFunctionSwiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
+            visibility = SirVisibility.PublicButReplaced
+        }
+        originalFunctionAsyncSwiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
+            visibility = SirVisibility.PublicButReplaced
+        }
+
+        // WIP 2 Should be mapped to entire hierarchy
+        originalFunctionAsyncSwiftModel.bridgedSirFunction = sirFunction
     }
 
     context(SwiftModelScope)
@@ -63,21 +88,17 @@ class SwiftSuspendGeneratorDelegate(
         }
 }
 
-fun SirFunction.addAvailabilityForAsync() {
-    attributes.add("available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)")
-}
-
-private fun SirExtension.addSwiftBridgingFunction(bridgeModel: BridgeModel) {
+private fun SirExtension.addSwiftBridgingFunction(bridgeModel: BridgeModel): SirFunction =
     SirFunction(
-        identifier = bridgeModel.originalFunction.identifier,
-        returnType = bridgeModel.asyncOriginalFunction.returnType,
+        identifier = bridgeModel.originalFunction.primarySirFunction.identifier,
+        returnType = bridgeModel.asyncOriginalFunction.primarySirFunction.returnType,
         scope = if (bridgeModel.originalFunction.scope == KotlinCallableMemberSwiftModel.Scope.Static) SirScope.Static else SirScope.Member,
     ).apply {
-        // WIP Replace with copyValueParametersFrom once Functions have Sir
+        // WIP 2 Replace with copyValueParametersFrom once Functions have Sir
         bridgeModel.bridgedParameters.forEach {
             SirValueParameter(
-                label = it.argumentLabel,
-                name = it.parameterName,
+                label = it.label,
+                name = it.name,
                 type = it.type,
             )
         }
@@ -88,7 +109,6 @@ private fun SirExtension.addSwiftBridgingFunction(bridgeModel: BridgeModel) {
 
         addSwiftBridgingFunctionBody(bridgeModel)
     }
-}
 
 private fun SirFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeModel) {
     addFunctionBodyWithErrorTypeHandling(bridgeModel.kotlinBridgingFunction) {
@@ -100,7 +120,7 @@ private fun SirFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeModel) {
                     addStatement(
                         "%T.%N(%L)",
                         bridgeModel.kotlinBridgingFunction.receiver.toSwiftPoetTypeName(),
-                        bridgeModel.kotlinBridgingFunction.reference,
+                        bridgeModel.kotlinBridgingFunction.primarySirFunction.reference,
                         bridgeModel.argumentsForBridgingCall,
                     )
                 }
@@ -119,17 +139,17 @@ private val BridgeModel.argumentsForBridgingCall: CodeBlock
 
         this.bridgedParameters.forEachIndexed { index, parameter ->
             if (isFromGenericClass) {
-                val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.toSwiftPoetTypeName()
+                val erasedParameterType = kotlinBridgingFunction.kotlinSirFunction.valueParameters[index + 1].type.toSwiftPoetTypeName()
                     // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
                     .removingEscapingAttribute()
 
                 if (parameter.type.toSwiftPoetTypeName() != erasedParameterType) {
-                    arguments.add(CodeBlock.of("%N as! %T", parameter.parameterName, erasedParameterType))
+                    arguments.add(CodeBlock.of("%N as! %T", parameter.name, erasedParameterType))
                 } else {
-                    arguments.add(CodeBlock.of("%N", parameter.parameterName))
+                    arguments.add(CodeBlock.of("%N", parameter.name))
                 }
             } else {
-                arguments.add(CodeBlock.of("%N", parameter.parameterName))
+                arguments.add(CodeBlock.of("%N", parameter.name))
             }
         }
 
@@ -144,7 +164,7 @@ private fun MutableList<CodeBlock>.addDispatchReceiver(bridgeModel: BridgeModel)
     }
 
     val dispatchReceiverErasedType by lazy {
-        bridgeModel.kotlinBridgingFunction.valueParameters.first().type.toSwiftPoetTypeName()
+        bridgeModel.kotlinBridgingFunction.kotlinSirFunction.valueParameters.first().type.toSwiftPoetTypeName()
     }
 
     if (bridgeModel.isFromGenericClass) {
@@ -166,13 +186,13 @@ private fun TypeName.removingEscapingAttribute(): TypeName {
 }
 
 private data class BridgeModel(
-    val originalFunction: KotlinFunctionSwiftModel,
-    val asyncOriginalFunction: KotlinFunctionSwiftModel,
+    val originalFunction: MutableKotlinFunctionSwiftModel,
+    val asyncOriginalFunction: MutableKotlinFunctionSwiftModel,
     val kotlinBridgingFunction: KotlinFunctionSwiftModel,
 )
 
-private val BridgeModel.bridgedParameters: List<KotlinValueParameterSwiftModel>
-    get() = this.originalFunction.valueParameters.filter { it.origin != KotlinValueParameterSwiftModel.Origin.SuspendCompletion }
+private val BridgeModel.bridgedParameters: List<SirValueParameter>
+    get() = this.asyncOriginalFunction.kotlinSirFunction.valueParameters
 
 private val BridgeModel.isFromGenericClass: Boolean
     get() = this.originalFunction.owner?.kotlinSirClass?.typeParameters?.isEmpty()?.not() ?: false

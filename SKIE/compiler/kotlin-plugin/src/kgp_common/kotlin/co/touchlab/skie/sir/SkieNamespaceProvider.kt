@@ -32,7 +32,7 @@ class SkieNamespaceProvider(
     private val skieNamespaceFile = sirProvider.getFile(SirFile.skieNamespace, "Skie")
 
     private val skieNamespaceBaseClass: SirClass = SirClass(
-        simpleName = "Skie",
+        baseName = "Skie",
         parent = skieNamespaceFile,
         kind = SirClass.Kind.Enum,
     )
@@ -68,7 +68,7 @@ class SkieNamespaceProvider(
             }
 
             SirClass(
-                simpleName = classDescriptor.name.identifier.toValidNamespaceIdentifier(),
+                baseName = classDescriptor.name.identifier.toValidNamespaceIdentifier(),
                 parent = parent,
                 kind = SirClass.Kind.Enum,
             )
@@ -95,14 +95,14 @@ class SkieNamespaceProvider(
     private fun getModuleNamespace(moduleDescriptor: ModuleDescriptor): SirClass =
         moduleNamespaceCache.getOrPut(moduleDescriptor) {
             val sirClass = SirClass(
-                simpleName = moduleDescriptor.skieModuleName,
+                baseName = moduleDescriptor.skieModuleName,
                 parent = skieNamespaceBaseClass,
                 kind = SirClass.Kind.Enum,
             )
 
             if (!moduleDescriptor.shortNameCollides) {
                 SirTypeAlias(
-                    simpleName = moduleDescriptor.fullSkieModuleName,
+                    baseName = moduleDescriptor.fullSkieModuleName,
                     parent = skieNamespaceBaseClass,
                 ) {
                     sirClass.defaultType
@@ -117,7 +117,7 @@ class SkieNamespaceProvider(
             val module = descriptorProvider.getFileModule(sourceFile)
 
             SirClass(
-                simpleName = namer.getFileClassName(sourceFile).swiftName.toValidNamespaceIdentifier(),
+                baseName = namer.getFileClassName(sourceFile).swiftName.toValidNamespaceIdentifier(),
                 parent = getModuleNamespace(module),
                 kind = SirClass.Kind.Enum,
             )

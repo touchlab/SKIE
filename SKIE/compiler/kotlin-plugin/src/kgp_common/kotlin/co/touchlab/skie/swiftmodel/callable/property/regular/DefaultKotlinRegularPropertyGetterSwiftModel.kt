@@ -11,6 +11,4 @@ class DefaultKotlinRegularPropertyGetterSwiftModel(
     descriptor: PropertyGetterDescriptor,
     namer: ObjCExportNamer,
 ) : KotlinRegularPropertyGetterSwiftModel {
-
-    override val isThrowing: Boolean = namer.mapper.doesThrow(descriptor)
 }

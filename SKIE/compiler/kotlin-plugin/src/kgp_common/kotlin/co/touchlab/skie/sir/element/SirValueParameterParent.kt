@@ -1,10 +1,11 @@
 package co.touchlab.skie.sir.element
 
-sealed interface SirValueParameterParent {
+sealed interface SirValueParameterParent : SirDeclaration {
 
     val valueParameters: MutableList<SirValueParameter>
 }
 
+// WIP 2 Use
 fun SirValueParameterParent.copyValueParametersFrom(other: SirValueParameterParent) {
     val copies = other.valueParameters.map {
         SirValueParameter(
@@ -13,5 +14,5 @@ fun SirValueParameterParent.copyValueParametersFrom(other: SirValueParameterPare
             type = it.type,
         )
     }
-//     WIP("Solve type substitutions")
+// WIP 2    WIP("Solve type substitutions")
 }

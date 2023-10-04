@@ -11,7 +11,7 @@ object RenameSkieNamespacesConflictingWithKeywordsPhase : SirPhase {
             .map { sirProvider.getSkieNamespace(it) }
             .filter { it.simpleName in KEYWORDS }
             .forEach {
-                it.simpleName += "_"
+                it.baseName += "_"
             }
     }
 }

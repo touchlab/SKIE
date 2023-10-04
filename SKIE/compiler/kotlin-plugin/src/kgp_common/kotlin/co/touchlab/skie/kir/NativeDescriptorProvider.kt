@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -40,6 +41,10 @@ class NativeDescriptorProvider(
     private val konanConfig: KonanConfig,
     private val exportedInterface: ObjcExportedInterfaceReflector,
 ) : DescriptorProvider {
+
+    override val builtIns: KotlinBuiltIns by lazy {
+        exposedModules.first().builtIns
+    }
 
     override val exposedModules: Set<ModuleDescriptor> by lazy {
         exposedModulesProvider.exposedModules()

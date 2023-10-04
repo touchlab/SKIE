@@ -4,6 +4,7 @@ import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationNamespace
 import co.touchlab.skie.sir.element.SirTypeAlias
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 
@@ -29,10 +30,10 @@ private fun SirClass.moveToTopLevel() {
 
 private fun SirClass.createReplacementTypeAlias(namespace: SirDeclarationNamespace) {
     val typeAlias = SirTypeAlias(
-        simpleName = simpleName,
+        baseName = baseName,
         parent = namespace,
         typeFactory = { typeAlias ->
-            this.toTypeFromEnclosingTypeParameters(typeAlias.typeParameters).also { it.useInternalName = false }
+            this.toTypeFromEnclosingTypeParameters(typeAlias.typeParameters).withFqName()
         },
     )
 
@@ -46,6 +47,7 @@ private fun SirClass.createReplacementTypeAlias(namespace: SirDeclarationNamespa
 }
 
 private fun SirClass.renameAndRemoveFromNamespace() {
-    simpleName = "__Skie__Bridge__${fqName.toLocalString().replace(".", "_")}"
+    baseName = "Bridge__${fqName.toLocalString().replace(".", "_")}"
+    visibility = SirVisibility.PublicButReplaced
     this.namespace = null
 }

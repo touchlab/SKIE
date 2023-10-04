@@ -1,6 +1,10 @@
 package co.touchlab.skie.swiftmodel.callable.property.regular
 
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.sir.element.SirCallableDeclaration
+import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.flowMappingStrategy
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.SkieErrorSirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
@@ -12,21 +16,24 @@ import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftMod
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModelVisitor
-import co.touchlab.skie.swiftmodel.callable.identifierAfterVisibilityChanges
-import co.touchlab.skie.swiftmodel.callable.swiftGenericExportScope
 import co.touchlab.skie.swiftmodel.callable.swiftModelOrigin
-import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class ActualKotlinRegularPropertySwiftModel(
     override val descriptor: PropertyDescriptor,
+    kotlinSirPropertyFactory: () -> SirProperty,
     override val allBoundedSwiftModels: List<MutableKotlinDirectlyCallableMemberSwiftModel>,
     private val core: KotlinRegularPropertySwiftModelCore,
     private val swiftModelScope: MutableSwiftModelScope,
     descriptorProvider: DescriptorProvider,
+    private val skieContext: SkiePhase.Context,
 ) : MutableKotlinRegularPropertySwiftModel {
+
+    override val kotlinSirProperty: SirProperty by lazy {
+        kotlinSirPropertyFactory()
+    }
 
     override val owner: KotlinTypeSwiftModel? by lazy {
         with(swiftModelScope) {
@@ -40,17 +47,13 @@ class ActualKotlinRegularPropertySwiftModel(
         }
     }
 
-    override var identifier: String by core::identifier
+    override val kotlinSirCallableDeclaration: SirCallableDeclaration by ::kotlinSirProperty
 
-    override var visibility: SwiftModelVisibility by core::visibility
+    override var bridgedSirProperty: SirProperty? = null
+
+    override val bridgedSirCallableDeclaration: SirCallableDeclaration? by ::bridgedSirProperty
 
     override val objCName: String by core::objCName
-
-    override val reference: String
-        get() = identifierAfterVisibilityChanges
-
-    override val name: String
-        get() = reference
 
     override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
 
@@ -63,18 +66,13 @@ class ActualKotlinRegularPropertySwiftModel(
             KotlinCallableMemberSwiftModel.Scope.Member
         }
 
-    override val type: SirType
-        get() = with(swiftModelScope) {
-            descriptor.propertyType(core.descriptor, swiftGenericExportScope, flowMappingStrategy)
+    override val objCType: ObjCType
+        get() = with(skieContext) {
+            core.getObjCType(descriptor, descriptor.flowMappingStrategy)
         }
 
-    override var flowMappingStrategy: FlowMappingStrategy = FlowMappingStrategy.None
-
-    override val objCType: ObjCType
-        get() = core.getObjCType(descriptor, flowMappingStrategy)
-
     override val hasValidSignatureInSwift: Boolean
-        get() = listOf(type, receiver).flatMap { it.allReferencedTypes() }
+        get() = listOf(kotlinSirProperty.type, receiver).flatMap { it.allReferencedTypes() }
             .none { it is SkieErrorSirType }
 
     override val getter: KotlinRegularPropertyGetterSwiftModel = DefaultKotlinRegularPropertyGetterSwiftModel(

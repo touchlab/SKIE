@@ -10,6 +10,7 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
+import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
@@ -122,7 +123,9 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     private fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
         context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
-            overloadDescriptor.swiftModel.identifier = function.swiftModel.identifier
+            overloadDescriptor.swiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
+                identifier = function.swiftModel.kotlinSirFunction.identifier
+            }
 
             val numberOfDefaultArguments = function.valueParameters.size - overloadDescriptor.valueParameters.size
 

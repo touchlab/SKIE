@@ -1,5 +1,6 @@
 package co.touchlab.skie.kir
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -12,6 +13,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
 interface DescriptorProvider {
+
+    val builtIns: KotlinBuiltIns
 
     val exposedModules: Set<ModuleDescriptor>
 

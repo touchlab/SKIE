@@ -7,11 +7,20 @@ import co.touchlab.skie.sir.type.SirType
 sealed interface SirTypeDeclaration : SirDeclaration {
 
     /**
-     * Last component of fqName.
+     * Used to derive other names.
      */
-    var simpleName: String
+    var baseName: String
 
-    var visibility: SirVisibility
+    /**
+     * Use `simpleName` in generated Swift code.
+     */
+    val simpleName: String
+        get() = when (visibility) {
+            SirVisibility.PublicButReplaced -> "__$baseName"
+            // WIP Will not be needed once the type is removed from header
+            SirVisibility.Removed -> "__Skie__Removed__$baseName"
+            else -> baseName
+        }
 
     override var parent: SirDeclarationParent
 

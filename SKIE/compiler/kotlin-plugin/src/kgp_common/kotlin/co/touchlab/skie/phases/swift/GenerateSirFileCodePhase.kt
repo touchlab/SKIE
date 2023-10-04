@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.swift
 
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirConstructor
@@ -83,15 +84,17 @@ object GenerateSirFileCodePhase : SirPhase {
     }
 
     private fun FileSpec.Builder.generateDeclaration(declaration: SirDeclaration) {
+        if (declaration.visibility == SirVisibility.Removed) {
+            return
+        }
+
         when (declaration) {
             is SirTypeAlias -> generateTypeAlias(declaration)
             is SirExtension -> generateExtension(declaration)
             is SirClass -> generateClass(declaration)
             is SirFunction -> generateFunction(declaration)
             is SirProperty -> generateProperty(declaration)
-            is SirConstructor,
-            is SirEnumCase,
-            -> error("Declaration $declaration cannot be directly inside a file ${declaration.parent}.")
+            is SirConstructor -> error("Declaration $declaration cannot be directly inside a file ${declaration.parent}.")
         }
     }
 
@@ -114,9 +117,13 @@ object GenerateSirFileCodePhase : SirPhase {
             }
 
             val modifier = when (visibility) {
-                SirVisibility.Public -> Modifier.PUBLIC
+                SirVisibility.Public,
+                SirVisibility.PublicButHidden,
+                SirVisibility.PublicButReplaced,
+                -> Modifier.PUBLIC
                 SirVisibility.Internal -> Modifier.INTERNAL
                 SirVisibility.Private -> Modifier.PRIVATE
+                SirVisibility.Removed -> error("Removed declarations should not be generated.")
             }
 
             addModifiers(modifier)
@@ -169,15 +176,17 @@ object GenerateSirFileCodePhase : SirPhase {
         }
 
     private fun ExtensionSpec.Builder.addExtensionDeclaration(declaration: SirDeclaration) {
+        if (declaration.visibility == SirVisibility.Removed) {
+            return
+        }
+
         when (declaration) {
             is SirTypeAlias -> generateTypeAlias(declaration)
             is SirClass -> generateClass(declaration)
             is SirFunction -> generateFunction(declaration)
             is SirProperty -> generateProperty(declaration)
             is SirConstructor -> generateConstructor(declaration)
-            is SirExtension,
-            is SirEnumCase,
-            -> error("Declaration $declaration cannot be directly inside an extension ${declaration.parent}.")
+            is SirExtension -> error("Declaration $declaration cannot be directly inside an extension ${declaration.parent}.")
         }
     }
 
@@ -189,6 +198,7 @@ object GenerateSirFileCodePhase : SirPhase {
                 .addAttributes(sirClass)
                 .addTypeParameters(sirClass)
                 .addClassDeclarations(sirClass)
+                .addEnumCases(sirClass)
                 .build(),
         )
     }
@@ -208,16 +218,21 @@ object GenerateSirFileCodePhase : SirPhase {
             }
         }
 
+    private fun TypeSpec.Builder.addEnumCases(sirClass: SirClass): TypeSpec.Builder =
+        apply {
+            sirClass.enumCases.forEach {
+                generateEnumCase(it)
+            }
+        }
+
     private fun TypeSpec.Builder.addClassDeclaration(declaration: SirDeclaration) {
         when (declaration) {
             is SirTypeAlias -> generateTypeAlias(declaration)
             is SirClass -> generateClass(declaration)
-            is SirEnumCase -> generateEnumCase(declaration)
             is SirFunction -> generateFunction(declaration)
             is SirProperty -> generateProperty(declaration)
             is SirConstructor -> generateConstructor(declaration)
-            is SirExtension,
-            -> error("Declaration $declaration cannot be directly inside an extension ${declaration.parent}.")
+            is SirExtension -> error("Declaration $declaration cannot be directly inside an extension ${declaration.parent}.")
         }
     }
 
@@ -237,8 +252,7 @@ object GenerateSirFileCodePhase : SirPhase {
     private fun <T : BuilderWithMembers> T.generateFunction(function: SirFunction) {
         addFunction(
             FunctionSpec.builder(function.identifier)
-                .addVisibility(function.visibility, function.defaultVisibility)
-                .addAttributes(function)
+                .addCallableDeclarationProperties(function)
                 .addOverrideIfNeeded(function)
                 .addScope(function)
                 .addTypeParameters(function)
@@ -253,8 +267,8 @@ object GenerateSirFileCodePhase : SirPhase {
 
     private fun <T : BuilderWithMembers> T.generateProperty(property: SirProperty) {
         addProperty(
-            PropertySpec.builder(property.name, property.type.toSwiftPoetTypeName())
-                .addVisibility(property.visibility, property.defaultVisibility)
+            PropertySpec.builder(property.identifier, property.type.toSwiftPoetTypeName())
+                .addCallableDeclarationProperties(property)
                 .addOverrideIfNeeded(property)
                 .addScope(property)
                 .addGetter(property)
@@ -270,6 +284,7 @@ object GenerateSirFileCodePhase : SirPhase {
 
             getter(
                 FunctionSpec.getterBuilder()
+                    .throws(getter.throws)
                     .addAttributes(getter)
                     .applyBuilderModifications(getter)
                     .build(),
@@ -283,6 +298,7 @@ object GenerateSirFileCodePhase : SirPhase {
             setter(
                 FunctionSpec.setterBuilder()
                     .addParameter(setter.parameterName, property.type.toSwiftPoetTypeName())
+                    .throws(setter.throws)
                     .addAttributes(setter)
                     .addModifiers(setter)
                     .applyBuilderModifications(setter)
@@ -293,14 +309,21 @@ object GenerateSirFileCodePhase : SirPhase {
     private fun <T : BuilderWithMembers> T.generateConstructor(constructor: SirConstructor) {
         addFunction(
             FunctionSpec.constructorBuilder()
-                .addVisibility(constructor.visibility, constructor.defaultVisibility)
-                .addModifiers(constructor)
+                .addCallableDeclarationProperties(constructor)
                 .applyIf(constructor.isConvenience) { addModifiers(Modifier.CONVENIENCE) }
                 .addValueParameters(constructor)
                 .applyBuilderModifications(constructor)
                 .build(),
         )
     }
+
+    private fun <T> T.addCallableDeclarationProperties(callableDeclaration: SirCallableDeclaration): T
+        where T : BuilderWithModifiers, T : AttributedSpec.Builder<*> =
+        this.apply {
+            addVisibility(callableDeclaration.visibility, callableDeclaration.defaultVisibility)
+            addAttributes(callableDeclaration)
+            addModifiers(callableDeclaration)
+        }
 
     private fun <BUILDER> BUILDER.applyBuilderModifications(
         elementWithSwiftPoetBuilderModifications: SirElementWithSwiftPoetBuilderModifications<BUILDER>,
@@ -339,11 +362,7 @@ object GenerateSirFileCodePhase : SirPhase {
     private fun FunctionSpec.Builder.addValueParameter(valueParameter: SirValueParameter) {
         val label = valueParameter.label
 
-        val builder = if (label != null) {
-            ParameterSpec.builder(label, valueParameter.name, valueParameter.type.toSwiftPoetTypeName())
-        } else {
-            ParameterSpec.builder(valueParameter.name, valueParameter.type.toSwiftPoetTypeName())
-        }
+        val builder = ParameterSpec.builder(label, valueParameter.name, valueParameter.type.toSwiftPoetTypeName())
 
         if (valueParameter.inout) {
             builder.addModifiers(Modifier.INOUT)

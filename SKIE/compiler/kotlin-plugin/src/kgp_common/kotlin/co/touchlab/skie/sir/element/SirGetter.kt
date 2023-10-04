@@ -5,6 +5,7 @@ import io.outfoxx.swiftpoet.FunctionSpec
 
 class SirGetter(
     property: SirProperty,
+    var throws: Boolean = false,
     attributes: List<String> = emptyList(),
 ) : SirElement, SirPropertyAccessor, SirElementWithAttributes, SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder> {
 
@@ -14,14 +15,18 @@ class SirGetter(
 
     override val swiftPoetBuilderModifications = mutableListOf<FunctionSpec.Builder.() -> Unit>()
 
+    override fun toString(): String = "${this::class.simpleName}: ($property)"
+
     companion object {
 
         context(SirProperty)
         operator fun invoke(
+            throws: Boolean = false,
             attributes: List<String> = emptyList(),
         ): SirGetter =
             SirGetter(
                 property = this@SirProperty,
+                throws = throws,
                 attributes = attributes,
             )
     }

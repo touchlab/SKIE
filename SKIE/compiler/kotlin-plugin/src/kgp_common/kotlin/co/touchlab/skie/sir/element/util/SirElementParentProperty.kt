@@ -1,5 +1,6 @@
 package co.touchlab.skie.sir.element.util
 
+import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationParent
@@ -30,6 +31,17 @@ fun <T : SirDeclarationParent> sirDeclarationParent(
 )
 
 fun sirEnumCaseParent(
+    initialValue: SirClass,
+) = parent<SirEnumCase, SirClass>(
+    initialValue = initialValue,
+    onChange = { oldValue, newValue, thisRef ->
+        oldValue?.enumCases?.remove(thisRef)
+
+        newValue.enumCases.add(thisRef)
+    },
+)
+
+fun sirEnumCaseAssociatedValueParent(
     initialValue: SirEnumCase,
 ) = parent<SirEnumCaseAssociatedValue, SirEnumCase>(
     initialValue = initialValue,

@@ -145,7 +145,7 @@ private fun SirFile.addSwiftToKotlinConversion(
     flowTypeArgumentFactory: (TypeParameterUsageSirType) -> SirType,
 ) {
     SirFunction(
-        identifier = to.kotlinFlowModel.kotlinSirClass.simpleName,
+        identifier = to.kotlinFlowModel.kotlinSirClass.baseName,
         returnType = sirBuiltins.Swift.Void.defaultType,
     ).apply {
         val typeParameter = SirTypeParameter(

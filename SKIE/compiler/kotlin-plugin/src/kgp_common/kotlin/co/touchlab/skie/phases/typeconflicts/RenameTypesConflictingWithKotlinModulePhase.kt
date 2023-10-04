@@ -12,7 +12,7 @@ object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
 
         sirProvider.allLocalPublicTypes.forEach { type ->
             if (type.fqName.toString() == moduleName) {
-                type.simpleName += "_"
+                type.baseName += "_"
                 collisionExists = true
             }
         }

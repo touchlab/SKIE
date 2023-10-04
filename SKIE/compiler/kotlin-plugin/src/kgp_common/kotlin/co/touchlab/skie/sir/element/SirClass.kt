@@ -5,7 +5,7 @@ import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.DeclaredSirType
 
 class SirClass(
-    override var simpleName: String,
+    override var baseName: String,
     parent: SirDeclarationParent,
     var kind: Kind = Kind.Class,
     override var visibility: SirVisibility = SirVisibility.Public,
@@ -33,6 +33,8 @@ class SirClass(
     override val typeParameters: MutableList<SirTypeParameter> = mutableListOf()
 
     override val declarations: MutableList<SirDeclaration> = mutableListOf()
+
+    val enumCases: MutableList<SirEnumCase> = mutableListOf()
 
     /**
      * Name used to generate SKIE code.
@@ -67,7 +69,7 @@ class SirClass(
 
         context(SirDeclarationParent)
         operator fun invoke(
-            simpleName: String,
+            baseName: String,
             kind: Kind = Kind.Class,
             visibility: SirVisibility = SirVisibility.Public,
             superTypes: List<DeclaredSirType> = emptyList(),
@@ -77,7 +79,7 @@ class SirClass(
             isPrimitive: Boolean = false,
         ): SirClass =
             SirClass(
-                simpleName = simpleName,
+                baseName = baseName,
                 parent = this@SirDeclarationParent,
                 kind = kind,
                 visibility = visibility,

@@ -6,6 +6,7 @@ import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.type.SpecialSirType
 import co.touchlab.skie.sir.type.optional
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
@@ -26,7 +27,7 @@ fun SirClass.addObjcBridgeableImplementation(swiftModel: KotlinClassSwiftModel) 
 context(SirPhase.Context)
 private fun SirClass.addObjectiveCTypeAlias(swiftModel: KotlinClassSwiftModel) {
     SirTypeAlias(
-        simpleName = sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first().name,
+        baseName = sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first().name,
     ) {
         swiftModel.kotlinSirClass.defaultType
     }
@@ -138,6 +139,7 @@ private fun SirClass.addFromObjectiveC(swiftModel: KotlinClassSwiftModel) {
         identifier = "fromObjectiveC",
         returnType = SpecialSirType.Self,
         scope = SirScope.Static,
+        visibility = SirVisibility.Private,
     ).apply {
         SirValueParameter(
             label = "_",

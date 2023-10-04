@@ -6,7 +6,7 @@ import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 
 class SirTypeAlias(
-    override var simpleName: String,
+    override var baseName: String,
     parent: SirDeclarationParent,
     override var visibility: SirVisibility = SirVisibility.Public,
     typeFactory: ((SirTypeAlias) -> SirType),
@@ -39,19 +39,18 @@ class SirTypeAlias(
     override val internalName: SirFqName
         get() = fqName
 
-    override fun toString(): String =
-        "${this::class.simpleName}: $fqName"
+    override fun toString(): String = "${this::class.simpleName}: $fqName"
 
     companion object {
 
         context(SirDeclarationParent)
         operator fun invoke(
-            simpleName: String,
+            baseName: String,
             visibility: SirVisibility = SirVisibility.Public,
             typeFactory: ((SirTypeAlias) -> SirType),
         ): SirTypeAlias =
             SirTypeAlias(
-                simpleName = simpleName,
+                baseName = baseName,
                 parent = this@SirDeclarationParent,
                 visibility = visibility,
                 typeFactory = typeFactory,

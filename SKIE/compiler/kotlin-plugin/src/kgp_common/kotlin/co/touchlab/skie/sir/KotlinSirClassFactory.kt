@@ -5,6 +5,7 @@ import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.superClass
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.swiftmodel.SwiftExportScope
@@ -34,8 +35,21 @@ class KotlinSirClassFactory(
 
     private val kotlinSirClassCache = mutableMapOf<ClassDescriptor, SirClass>()
 
+    private val kotlinSirFileClassCache = mutableMapOf<SourceFile, SirClass>()
+
+    private val kotlinSirToClassDescriptorClass = mutableMapOf<SirClass, ClassDescriptor>()
+
     val sirBuiltins: SirBuiltins
         get() = sirProvider.sirBuiltins
+
+    init {
+        sirBuiltins.Stdlib.allBuiltInsWithDescriptors.forEach { (sirClass, classDescriptor) ->
+            classDescriptorToFqNameMap[classDescriptor] = sirClass.fqName
+            fqNameToClassDescriptorMap[sirClass.fqName] = classDescriptor
+            kotlinSirClassCache[classDescriptor] = sirClass
+            kotlinSirToClassDescriptorClass[sirClass] = classDescriptor
+        }
+    }
 
     context(SwiftModelScope)
     fun finishInitialization() {
@@ -47,7 +61,7 @@ class KotlinSirClassFactory(
             val fqName = classDescriptor.sirFqName
 
             SirClass(
-                simpleName = fqName.simpleName,
+                baseName = fqName.simpleName,
                 parent = fqName.parent?.let { getKotlinSirClass(it.classDescriptor) } ?: sirBuiltins.Kotlin.module,
                 kind = if (classDescriptor.kind.isInterface) SirClass.Kind.Protocol else SirClass.Kind.Class,
             ).apply {
@@ -66,15 +80,21 @@ class KotlinSirClassFactory(
 
                 val namespace = namespaceProvider.getOrCreateNamespace(classDescriptor)
                 createKotlinTypeAlias(this, namespace)
+
+                kotlinSirToClassDescriptorClass[this] = classDescriptor
             }
         }
 
+    fun getClassDescriptorForKotlinSirClass(sirClass: SirClass): ClassDescriptor? =
+        kotlinSirToClassDescriptorClass[sirClass]
+
     private fun createKotlinTypeAlias(sirClass: SirClass, namespace: SirClass) {
         sirClass.internalTypeAlias = SirTypeAlias(
-            simpleName = "__Kotlin",
+            baseName = "Kotlin",
             parent = namespace,
+            visibility = SirVisibility.PublicButReplaced,
         ) {
-            sirClass.defaultType.also { it.useInternalName = false }
+            sirClass.defaultType.withFqName()
         }
     }
 
@@ -98,19 +118,20 @@ class KotlinSirClassFactory(
         }
     }
 
-    fun createKotlinSirClass(sourceFile: SourceFile): SirClass {
-        val sirClass = SirClass(
-            simpleName = namer.getFileClassName(sourceFile).swiftName,
-            parent = sirBuiltins.Kotlin.module,
-            kind = SirClass.Kind.Class,
-            superTypes = listOf(sirBuiltins.Stdlib.Base.defaultType),
-        )
+    fun getKotlinSirClass(sourceFile: SourceFile): SirClass =
+        kotlinSirFileClassCache.getOrPut(sourceFile) {
+            val sirClass = SirClass(
+                baseName = namer.getFileClassName(sourceFile).swiftName,
+                parent = sirBuiltins.Kotlin.module,
+                kind = SirClass.Kind.Class,
+                superTypes = listOf(sirBuiltins.Stdlib.Base.defaultType),
+            )
 
-        val namespace = namespaceProvider.getOrCreateNamespace(sourceFile)
-        createKotlinTypeAlias(sirClass, namespace)
+            val namespace = namespaceProvider.getOrCreateNamespace(sourceFile)
+            createKotlinTypeAlias(sirClass, namespace)
 
-        return sirClass
-    }
+            sirClass
+        }
 
     private val ClassDescriptor.sirFqName: SirFqName
         get() = classDescriptorToFqNameMap.getOrPut(this) {

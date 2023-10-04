@@ -6,4 +6,6 @@ object SirNoParent : SirTopLevelDeclarationParent {
 
     override val declarations: MutableList<SirDeclaration>
         get() = mutableListOf()
+
+    override fun toString(): String = "${this::class.simpleName}"
 }

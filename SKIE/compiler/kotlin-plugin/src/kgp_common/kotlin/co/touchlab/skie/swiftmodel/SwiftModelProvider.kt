@@ -2,6 +2,7 @@ package co.touchlab.skie.swiftmodel
 
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.kir.allExposedMembers
+import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.type.LambdaSirType
@@ -42,11 +43,25 @@ class SwiftModelProvider(
     namer: ObjCExportNamer,
     private val descriptorProvider: DescriptorProvider,
     private val bridgeProvider: DescriptorBridgeProvider,
+    skieContext: SkiePhase.Context,
 ) : MutableSwiftModelScope {
 
-    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider, sirProvider)
+    private val swiftModelFactory = SwiftModelFactory(this, descriptorProvider, namer, bridgeProvider, sirProvider, skieContext)
 
     private val translator = sirProvider.translator
+
+    private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.exposedClasses)
+    private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.exposedClasses)
+    private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
+
+    private val classByFqNameCache = mutableMapOf<String, MutableKotlinClassSwiftModel>()
+
+    private val sirTypeDeclarationsToSwiftModelCache =
+        (classSwiftModels + fileSwiftModels).values.associateBy { it.kotlinSirClass }.toMutableMap()
+
+    init {
+        sirProvider.finishClassInitialization(this)
+    }
 
     private val members = swiftModelFactory.createMembers(descriptorProvider.allExposedMembers)
 
@@ -59,19 +74,6 @@ class SwiftModelProvider(
         .flatMap { it.valueParameters }
         .mapNotNull { swiftModel -> swiftModel.descriptor?.let { it to swiftModel } }
         .toMap()
-
-    private val classSwiftModels = swiftModelFactory.createClasses(descriptorProvider.exposedClasses)
-    private val enumEntrySwiftModels = swiftModelFactory.createEnumEntries(descriptorProvider.exposedClasses)
-    private val fileSwiftModels = swiftModelFactory.createFiles(descriptorProvider.exposedFiles)
-
-    private val classByFqNameCache = mutableMapOf<String, MutableKotlinClassSwiftModel>()
-
-    private val sirTypeDeclarationsToSwiftModelCache =
-        (classSwiftModels + fileSwiftModels).values.associateBy { it.kotlinSirClass }.toMutableMap()
-
-    init {
-        sirProvider.finishInitialization()
-    }
 
     override fun referenceClass(classFqName: String): MutableKotlinClassSwiftModel =
         classByFqNameCache.getOrPut(classFqName) {
@@ -96,10 +98,10 @@ class SwiftModelProvider(
     override val FunctionDescriptor.swiftModel: MutableKotlinFunctionSwiftModel
         get() = functionSwiftModels[this.original] ?: throwUnknownDescriptor()
 
-    override val FunctionDescriptor.asyncSwiftModel: KotlinFunctionSwiftModel
+    override val FunctionDescriptor.asyncSwiftModel: MutableKotlinFunctionSwiftModel
         get() = this.asyncSwiftModelOrNull ?: throwUnknownDescriptor()
 
-    override val FunctionDescriptor.asyncSwiftModelOrNull: KotlinFunctionSwiftModel?
+    override val FunctionDescriptor.asyncSwiftModelOrNull: MutableKotlinFunctionSwiftModel?
         get() = asyncFunctionSwiftModels[this.original]
 
     override val ParameterDescriptor.swiftModel: MutableKotlinValueParameterSwiftModel

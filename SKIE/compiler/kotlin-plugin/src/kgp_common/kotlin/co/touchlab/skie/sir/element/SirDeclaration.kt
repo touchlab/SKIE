@@ -3,6 +3,8 @@ package co.touchlab.skie.sir.element
 sealed interface SirDeclaration : SirElement {
 
     val parent: SirDeclarationParent
+
+    var visibility: SirVisibility
 }
 
 val SirDeclaration.module: SirModule

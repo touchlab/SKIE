@@ -1,10 +1,14 @@
 package co.touchlab.skie.swiftmodel.callable.function
 
 import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.sir.element.SirCallableDeclaration
+import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.flowMappingStrategy
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.SkieErrorSirType
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModelVisitor
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
@@ -15,7 +19,6 @@ import co.touchlab.skie.swiftmodel.callable.parameter.ActualKotlinValueParameter
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
 import co.touchlab.skie.swiftmodel.callable.swiftGenericExportScope
 import co.touchlab.skie.swiftmodel.callable.swiftModelOrigin
-import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCType
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
@@ -25,13 +28,17 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 
 class ActualKotlinFunctionSwiftModel(
     override val descriptor: FunctionDescriptor,
+    kotlinSirCallableDeclarationFactory: () -> SirCallableDeclaration,
     override val allBoundedSwiftModels: List<KotlinFunctionSwiftModelWithCore>,
     override val core: KotlinFunctionSwiftModelCore,
     private val swiftModelScope: MutableSwiftModelScope,
     descriptorProvider: DescriptorProvider,
+    private val skieContext: SkiePhase.Context,
 ) : KotlinFunctionSwiftModelWithCore {
 
-    override var identifier: String by core::identifier
+    override val kotlinSirCallableDeclaration: SirCallableDeclaration by lazy {
+        kotlinSirCallableDeclarationFactory()
+    }
 
     override val valueParameters: List<MutableKotlinValueParameterSwiftModel> by lazy {
         core.getParameterCoresWithDescriptors(descriptor).mapIndexed { index, (core, parameterDescriptor) ->
@@ -40,6 +47,7 @@ class ActualKotlinFunctionSwiftModel(
                 descriptor,
                 parameterDescriptor,
                 index,
+                skieContext,
             ) { isFlowMappingEnabled ->
                 with(swiftModelScope) {
                     descriptor.getParameterType(
@@ -53,9 +61,43 @@ class ActualKotlinFunctionSwiftModel(
         }
     }
 
-    override var visibility: SwiftModelVisibility by core::visibility
+    override val kotlinSirFunction: SirFunction
+        get() = kotlinSirCallableDeclaration as? SirFunction ?: error("Constructor $kotlinSirCallableDeclaration does not have a SirFunction.")
 
-    override val asyncSwiftModelOrNull: KotlinFunctionSwiftModel?
+    override val kotlinSirConstructor: SirConstructor
+        get() = kotlinSirCallableDeclaration as? SirConstructor ?: error("Function $kotlinSirCallableDeclaration does not have a SirConstructor.")
+
+    override var bridgedSirCallableDeclaration: SirCallableDeclaration? = null
+
+    override var bridgedSirConstructor: SirConstructor?
+        get() {
+            // Check this is constructor
+            kotlinSirConstructor
+
+            return bridgedSirCallableDeclaration as? SirConstructor
+        }
+        set(value) {
+            // Check this is constructor
+            kotlinSirConstructor
+
+            bridgedSirCallableDeclaration = value
+        }
+
+    override var bridgedSirFunction: SirFunction?
+        get() {
+            // Check this is function
+            kotlinSirFunction
+
+            return bridgedSirCallableDeclaration as? SirFunction
+        }
+        set(value) {
+            // Check this is function
+            kotlinSirFunction
+
+            bridgedSirCallableDeclaration = value
+        }
+
+    override val asyncSwiftModelOrNull: MutableKotlinFunctionSwiftModel?
         get() = with(swiftModelScope) {
             descriptor.asyncSwiftModelOrNull
         }
@@ -72,16 +114,6 @@ class ActualKotlinFunctionSwiftModel(
     }
 
     override val objCSelector: String by core::objCSelector
-
-    override val isSuspend: Boolean = false
-
-    override val isThrowing: Boolean by core::isThrowing
-
-    override val reference: String
-        get() = core.reference(this)
-
-    override val name: String
-        get() = core.name(this)
 
     override val role: KotlinFunctionSwiftModel.Role
         get() = when (descriptor) {
@@ -102,23 +134,22 @@ class ActualKotlinFunctionSwiftModel(
 
     override var collisionResolutionStrategy: CollisionResolutionStrategy = CollisionResolutionStrategy.Rename
 
-    override val returnType: SirType
-        get() = with(swiftModelScope) {
-            descriptor.returnType(
-                swiftGenericExportScope,
-                core.getMethodBridge(core.descriptor).returnBridge,
-                returnTypeFlowMappingStrategy,
-            )
+    override val objCReturnType: ObjCType?
+        get() = with(skieContext) {
+            core.getObjCReturnType(descriptor, descriptor.flowMappingStrategy)
         }
 
-    override var returnTypeFlowMappingStrategy: FlowMappingStrategy = FlowMappingStrategy.None
-
-    override val objCReturnType: ObjCType?
-        get() = core.getObjCReturnType(descriptor, returnTypeFlowMappingStrategy)
-
     override val hasValidSignatureInSwift: Boolean
-        get() = (listOf(returnType, receiver) + valueParameters.map { it.type }).flatMap { it.allReferencedTypes() }
-            .none { it is SkieErrorSirType }
+        get() = when (role) {
+            KotlinFunctionSwiftModel.Role.Constructor -> {
+                kotlinSirValueParameters.map { it.type }.flatMap { it.allReferencedTypes() }
+                    .none { it is SkieErrorSirType }
+            }
+            else -> {
+                (listOf(kotlinSirFunction.returnType, receiver) + kotlinSirValueParameters.map { it.type }).flatMap { it.allReferencedTypes() }
+                    .none { it is SkieErrorSirType }
+            }
+        }
 
     override fun toString(): String = descriptor.toString()
 

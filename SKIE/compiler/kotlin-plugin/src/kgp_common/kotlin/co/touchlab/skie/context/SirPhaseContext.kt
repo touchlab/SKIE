@@ -19,12 +19,16 @@ class SirPhaseContext private constructor(
             namer = mainSkieContext.namer,
             descriptorProvider = mainSkieContext.descriptorProvider,
             bridgeProvider = DescriptorBridgeProvider(mainSkieContext.namer),
+            skieContext = mainSkieContext,
             sirProvider = SirProvider(
                 namer = mainSkieContext.namer,
                 framework = mainSkieContext.framework,
                 descriptorProvider = mainSkieContext.descriptorProvider,
                 sdkPath = mainSkieContext.configurables.absoluteTargetSysRoot,
                 reporter = mainSkieContext.reporter,
+                // WIP 2 Refactor so that it is not duplicated
+                bridgeProvider = DescriptorBridgeProvider(mainSkieContext.namer),
+                skieContext = mainSkieContext,
             ),
         ),
     )

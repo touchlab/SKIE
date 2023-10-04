@@ -2,11 +2,10 @@ package co.touchlab.skie.swiftmodel.type
 
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftGenericExportScope
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.isRemoved
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.SourceFile
 
@@ -20,11 +19,9 @@ class ActualKotlinFileSwiftModel(
 
     override val descriptorHolder: ClassOrFileDescriptorHolder.File = ClassOrFileDescriptorHolder.File(file)
 
-    override var visibility: SwiftModelVisibility = SwiftModelVisibility.Visible
-
     override val allAccessibleDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
         get() = allDirectlyCallableMembers
-            .filterNot { it.visibility.isRemoved }
+            .filter { it.primarySirCallableDeclaration.visibility.isAccessibleFromOtherModules }
 
     override val allDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
         get() = with(swiftModelScope) {

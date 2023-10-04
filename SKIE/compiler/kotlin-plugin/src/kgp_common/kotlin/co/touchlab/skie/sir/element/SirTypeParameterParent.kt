@@ -28,7 +28,7 @@ fun SirTypeParameterParent.copyTypeParametersFrom(other: SirClass) {
     }
 }
 
-// WIP To SirType
+// WIP 2 To SirType
 private fun SirType.substituteTypeParameters(
     substitutions: Map<SirTypeParameter, SirTypeParameter>,
 ): SirType =

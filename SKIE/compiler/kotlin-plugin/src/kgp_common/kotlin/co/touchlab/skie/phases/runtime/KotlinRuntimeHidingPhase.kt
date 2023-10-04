@@ -1,15 +1,17 @@
 package co.touchlab.skie.phases.runtime
 
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirVisibility
 
 object KotlinRuntimeHidingPhase : SirPhase {
 
+    // WIP 2 Should the whole runtime be hidden?
     context(SirPhase.Context)
     override fun execute() {
         descriptorProvider.exposedClasses
             .filter { it.belongsToSkieRuntime }
             .forEach {
-                it.swiftModel.visibility = co.touchlab.skie.swiftmodel.SwiftModelVisibility.Hidden
+                it.swiftModel.kotlinSirClass.visibility = SirVisibility.PublicButHidden
             }
     }
 }
