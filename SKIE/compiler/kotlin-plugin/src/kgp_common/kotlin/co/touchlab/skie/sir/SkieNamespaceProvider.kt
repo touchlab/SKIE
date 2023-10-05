@@ -51,10 +51,10 @@ class SkieNamespaceProvider(
             .toSet()
 
     fun getFile(swiftModel: KotlinTypeSwiftModel): SirFile =
-        sirProvider.getFile(swiftModel.skieNamespaceName, swiftModel.skieFileName)
+        sirProvider.getFile(swiftModel.skieFileNamespaceName, swiftModel.skieFileName)
 
     private fun getNamespaceFile(classDescriptor: ClassDescriptor): SirFile =
-        sirProvider.getFile(classDescriptor.skieNamespaceName, "Skie")
+        sirProvider.getFile(classDescriptor.skieFileNamespaceName, "Skie")
 
     fun getOrCreateNamespace(classDescriptor: ClassDescriptor): SirClass =
         classNamespaceCache.getOrPut(classDescriptor) {
@@ -116,26 +116,39 @@ class SkieNamespaceProvider(
         fileNamespaceCache.getOrPut(sourceFile) {
             val module = descriptorProvider.getFileModule(sourceFile)
 
-            SirClass(
-                baseName = namer.getFileClassName(sourceFile).swiftName.toValidNamespaceIdentifier(),
-                parent = getModuleNamespace(module),
-                kind = SirClass.Kind.Enum,
-            )
+            SirExtension(
+                classDeclaration = getModuleNamespace(module),
+                parent = getFile(sourceFile),
+            ).run {
+                SirClass(
+                    baseName = sourceFile.skieNamespaceName,
+                    kind = SirClass.Kind.Enum,
+                )
+            }
         }
+
+    private fun getFile(sourceFile: SourceFile): SirFile =
+        sirProvider.getFile(sourceFile.skieFileNamespaceName, sourceFile.skieNamespaceName)
+
+    private val SourceFile.skieNamespaceName: String
+        get() = namer.getFileClassName(this).swiftName.toValidNamespaceIdentifier()
 
     private val ModuleDescriptor.skieModuleName: String
         get() {
             return if (this.shortNameCollides) this.fullSkieModuleName else this.shortSkieModuleName
         }
 
-    private val KotlinTypeSwiftModel.skieNamespaceName: String
+    private val KotlinTypeSwiftModel.skieFileNamespaceName: String
         get() = when (val descriptorHolder = descriptorHolder) {
-            is ClassOrFileDescriptorHolder.Class -> descriptorHolder.value.skieNamespaceName
-            is ClassOrFileDescriptorHolder.File -> descriptorProvider.getFileModule(descriptorHolder.value).skieModuleName
+            is ClassOrFileDescriptorHolder.Class -> descriptorHolder.value.skieFileNamespaceName
+            is ClassOrFileDescriptorHolder.File -> descriptorHolder.value.skieFileNamespaceName
         }
 
-    private val ClassDescriptor.skieNamespaceName: String
+    private val ClassDescriptor.skieFileNamespaceName: String
         get() = module.skieModuleName
+
+    private val SourceFile.skieFileNamespaceName: String
+        get() = descriptorProvider.getFileModule(this).skieModuleName
 
     private val ModuleDescriptor.shortNameCollides: Boolean
         get() = this in modulesWithShortNameCollision
