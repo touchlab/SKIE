@@ -294,7 +294,7 @@ object FileScopeConversionPhase : SirPhase {
                 ).let(::listOfNotNull)
                 is SpecialSirType.Any -> createNonOptionalExtension(
                     file = file,
-                    sirClass = sirProvider.sirBuiltins.Swift.AnyObject,
+                    sirClass = sirProvider.sirBuiltins.Foundation.NSObject,
                 ).let(::listOfNotNull)
                 is NullableSirType -> listOfNotNull(
                     createOptionalExtension(file, parentType),
@@ -305,8 +305,8 @@ object FileScopeConversionPhase : SirPhase {
         }
 
         private fun createNonOptionalExtension(file: SirFile, sirClass: SirClass): SirExtension? =
-            if (sirClass.kind == SirClass.Kind.Class) {
-                // WIP Classes are not supported yet
+            if (sirClass.kind != SirClass.Kind.Protocol) {
+                // WIP Non protocol types are not supported yet
                 null
             } else {
                 SirExtension(
@@ -318,7 +318,7 @@ object FileScopeConversionPhase : SirPhase {
         private fun createOptionalExtension(file: SirFile, nullableSirType: NullableSirType): SirExtension? {
             val constraintType = when (val type = nullableSirType.type) {
                 is DeclaredSirType -> type.resolveAsDirectClassSirType() ?: return null
-                SpecialSirType.Any -> sirProvider.sirBuiltins.Swift.AnyObject.defaultType
+                SpecialSirType.Any -> sirProvider.sirBuiltins.Foundation.NSObject.defaultType
                 else -> return null
             }
 
