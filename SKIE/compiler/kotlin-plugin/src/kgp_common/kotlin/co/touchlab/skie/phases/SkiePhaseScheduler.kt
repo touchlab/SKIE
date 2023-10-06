@@ -13,6 +13,7 @@ import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerato
 import co.touchlab.skie.phases.features.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.phases.features.flow.FlowBridgingConfigurator
 import co.touchlab.skie.phases.features.flow.FlowConversionConstructorsGenerator
+import co.touchlab.skie.phases.features.functions.FileScopeConversionPhase
 import co.touchlab.skie.phases.features.sealed.SealedInteropGenerator
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
 import co.touchlab.skie.phases.header.AddForwardDeclarationsPhase
@@ -20,8 +21,10 @@ import co.touchlab.skie.phases.header.AddLambdaTypeArgumentErrorTypePhase
 import co.touchlab.skie.phases.header.AddTypeDefPhase
 import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
-import co.touchlab.skie.phases.memberconflicts.FixCallableMembersConflictsPhase
+import co.touchlab.skie.phases.memberconflicts.FixCallableDeclarationsConflictsPhase
+import co.touchlab.skie.phases.memberconflicts.RemoveConflictingDefaultArgumentsPhase
 import co.touchlab.skie.phases.memberconflicts.RemoveKonanManglingPhase
+import co.touchlab.skie.phases.memberconflicts.RenameParametersNamedSelfPhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.DisableWildcardExportPhase
@@ -85,8 +88,6 @@ class SkiePhaseScheduler {
             KotlinRuntimeHidingPhase,
 
             SwiftRuntimeGenerator,
-            ExtraClassExportPhase.FinalizePhase,
-            DefaultArgumentGenerator.FinalizePhase,
             FlowBridgingConfigurator,
             SuspendGenerator.KotlinBridgeConfigurationPhase,
             ExhaustiveEnumsGenerator,
@@ -95,12 +96,18 @@ class SkiePhaseScheduler {
             MoveBridgesToTopLevelPhase,
             RenameTypesConflictsWithOtherTypesPhase,
 
+            ExtraClassExportPhase.FinalizePhase,
+            DefaultArgumentGenerator.FinalizePhase,
             RemoveKonanManglingPhase,
-            FixCallableMembersConflictsPhase,
 
             FlowConversionConstructorsGenerator,
+            RemoveConflictingDefaultArgumentsPhase,
             ExhaustiveEnumsGenerator.EnumBodyGeneratorPhase,
             SuspendGenerator.SwiftBridgeGeneratorPhase,
+            FileScopeConversionPhase,
+            RenameParametersNamedSelfPhase,
+
+            FixCallableDeclarationsConflictsPhase(context),
 
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,
 

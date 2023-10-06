@@ -15,6 +15,9 @@ data class LambdaSirType(
 
     override val isPrimitive: Boolean = false
 
+    override val canonicalName: String =
+        "((${valueParameterTypes.joinToString { it.canonicalName }}) -> ${returnType.canonicalName})"
+
     override val directlyReferencedTypes: List<SirType> = listOf(returnType) + valueParameterTypes
 
     override fun toSwiftPoetTypeName(): TypeName = FunctionTypeName.get(

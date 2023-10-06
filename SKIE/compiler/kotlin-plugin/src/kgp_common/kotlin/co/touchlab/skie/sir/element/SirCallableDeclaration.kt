@@ -1,5 +1,7 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.sir.type.SirType
+
 // WIP 2 Verify that all wrappers for SirCallableDeclaration copy correctly all properties
 
 sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {

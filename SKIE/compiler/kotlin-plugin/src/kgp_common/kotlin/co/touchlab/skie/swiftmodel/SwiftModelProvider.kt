@@ -9,7 +9,6 @@ import co.touchlab.skie.sir.type.LambdaSirType
 import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelWithCore
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.parameter.MutableKotlinValueParameterSwiftModel
@@ -20,7 +19,7 @@ import co.touchlab.skie.swiftmodel.factory.SwiftModelFactory
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.swiftmodel.type.MutableKotlinTypeSwiftModel
+import co.touchlab.skie.swiftmodel.type.MutableKotlinFileSwiftModel
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridge
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
 import co.touchlab.skie.swiftmodel.type.enumentry.KotlinEnumEntrySwiftModel
@@ -83,7 +82,7 @@ class SwiftModelProvider(
     override val exposedClasses: List<MutableKotlinClassSwiftModel> =
         descriptorProvider.exposedClasses.map { it.swiftModel }
 
-    override val exposedFiles: List<MutableKotlinTypeSwiftModel> =
+    override val exposedFiles: List<MutableKotlinFileSwiftModel> =
         descriptorProvider.exposedFiles.map { it.swiftModel }
 
     override val allExposedMembers: List<MutableKotlinCallableMemberSwiftModel> =
@@ -133,7 +132,7 @@ class SwiftModelProvider(
     override val ClassDescriptor.enumEntrySwiftModel: KotlinEnumEntrySwiftModel
         get() = enumEntrySwiftModels[this.original] ?: throwUnknownDescriptor()
 
-    override val SourceFile.swiftModel: MutableKotlinTypeSwiftModel
+    override val SourceFile.swiftModel: MutableKotlinFileSwiftModel
         get() = fileSwiftModels[this]
             ?: throw IllegalArgumentException("File $this is not exposed and therefore does not have a SwiftModel.")
 
@@ -167,7 +166,7 @@ class SwiftModelProvider(
             // TODO ?: SwiftGenericExportScope.None is a hack that relies on the fact that none of the types with SwiftModel can inherit from a special type that is generic
             SwiftExportScope(
                 this.swiftModelOrNull?.swiftGenericExportScope ?: SwiftGenericExportScope.None,
-                SwiftExportScope.Flags.ReferenceType
+                SwiftExportScope.Flags.ReferenceType,
             ),
             FlowMappingStrategy.TypeArgumentsOnly,
         )
@@ -246,8 +245,8 @@ class SwiftModelProvider(
     private fun DeclarationDescriptor.throwUnknownDescriptor(): Nothing {
         throw IllegalArgumentException(
             "Cannot find SwiftModel for descriptor: $this. Possible reasons: " +
-                    "Descriptor is not exposed and therefore does not have a SwiftModel. " +
-                    "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty).",
+                "Descriptor is not exposed and therefore does not have a SwiftModel. " +
+                "Or it is exposed but as another type (for example as ConvertedProperty instead of a RegularProperty).",
         )
     }
 

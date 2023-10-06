@@ -112,21 +112,25 @@ object GenerateSirFileCodePhase : SirPhase {
 
     private fun <T : BuilderWithModifiers> T.addVisibility(visibility: SirVisibility, defaultVisibility: SirVisibility): T =
         apply {
-            if (defaultVisibility == visibility) {
+            val visibilityModifier = visibility.toSwiftPoetVisibility()
+            val defaultVisibilityModifier = defaultVisibility.toSwiftPoetVisibility()
+
+            if (visibilityModifier == defaultVisibilityModifier) {
                 return@apply
             }
 
-            val modifier = when (visibility) {
-                SirVisibility.Public,
-                SirVisibility.PublicButHidden,
-                SirVisibility.PublicButReplaced,
-                -> Modifier.PUBLIC
-                SirVisibility.Internal -> Modifier.INTERNAL
-                SirVisibility.Private -> Modifier.PRIVATE
-                SirVisibility.Removed -> error("Removed declarations should not be generated.")
-            }
+            addModifiers(visibilityModifier)
+        }
 
-            addModifiers(modifier)
+    private fun SirVisibility.toSwiftPoetVisibility(): Modifier =
+        when (this) {
+            SirVisibility.Public,
+            SirVisibility.PublicButHidden,
+            SirVisibility.PublicButReplaced,
+            -> Modifier.PUBLIC
+            SirVisibility.Internal -> Modifier.INTERNAL
+            SirVisibility.Private -> Modifier.PRIVATE
+            SirVisibility.Removed -> error("Removed declarations should not be generated.")
         }
 
     private fun <T : BuilderWithTypeParameters> T.addTypeParameters(parent: SirTypeParameterParent) = apply {
@@ -273,7 +277,6 @@ object GenerateSirFileCodePhase : SirPhase {
                 .addScope(property)
                 .addGetter(property)
                 .addSetter(property)
-                .applyBuilderModifications(property)
                 .build(),
         )
     }
@@ -318,7 +321,7 @@ object GenerateSirFileCodePhase : SirPhase {
     }
 
     private fun <T> T.addCallableDeclarationProperties(callableDeclaration: SirCallableDeclaration): T
-        where T : BuilderWithModifiers, T : AttributedSpec.Builder<*> =
+            where T : BuilderWithModifiers, T : AttributedSpec.Builder<*> =
         this.apply {
             addVisibility(callableDeclaration.visibility, callableDeclaration.defaultVisibility)
             addAttributes(callableDeclaration)
@@ -360,9 +363,7 @@ object GenerateSirFileCodePhase : SirPhase {
         }
 
     private fun FunctionSpec.Builder.addValueParameter(valueParameter: SirValueParameter) {
-        val label = valueParameter.label
-
-        val builder = ParameterSpec.builder(label, valueParameter.name, valueParameter.type.toSwiftPoetTypeName())
+        val builder = ParameterSpec.builder(valueParameter.label, valueParameter.name, valueParameter.type.toSwiftPoetTypeName())
 
         if (valueParameter.inout) {
             builder.addModifiers(Modifier.INOUT)

@@ -7,13 +7,13 @@ import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirDeclaration
-import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
 import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModelWithCore
@@ -61,14 +61,12 @@ class SirProvider(
         )
     }
 
-    private val kotlinBuiltinsModule: SirModule.KotlinBuiltins = SirModule.KotlinBuiltins("stdlib")
+    val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
 
-    private val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
-
-    private val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
+    val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
 
     val sirBuiltins by lazy {
-        SirBuiltins(kotlinBuiltinsModule, kotlinModule, skieModule, this, namer, descriptorProvider.builtIns)
+        SirBuiltins(kotlinModule, skieModule, this, namer, descriptorProvider.builtIns)
     }
 
     private val skieNamespaceProvider by lazy {
@@ -109,8 +107,8 @@ class SirProvider(
     val files: Collection<SirFile>
         get() = skieModule.files
 
-    private val allLocalDeclarations: List<SirDeclaration>
-        get() = (skieModule.files + skieModule + kotlinModule + kotlinBuiltinsModule).getChildDeclarationsRecursively()
+    val allLocalDeclarations: List<SirDeclaration>
+        get() = listOf(skieModule, kotlinModule).flatMap { it.getAllDeclarationsRecursively() }
 
     val allLocalTypes: List<SirTypeDeclaration>
         get() = allLocalDeclarations.filterIsInstance<SirTypeDeclaration>()
@@ -119,11 +117,14 @@ class SirProvider(
         get() = allLocalTypes.filter { it.visibility == SirVisibility.Public }
 
     val allExternalTypes: List<SirTypeDeclaration>
-        get() = externalModuleCache.values.getChildDeclarationsRecursively().filterIsInstance<SirTypeDeclaration>()
+        get() = externalModuleCache.values
+            .flatMap { it.getAllDeclarationsRecursively() }
+            .filterIsInstance<SirTypeDeclaration>()
 
     val allExternalTypesFromNonBuiltinModules: List<SirTypeDeclaration>
         get() = (externalModuleCache.values - sirBuiltins.Foundation.module - sirBuiltins.Swift.module)
-            .getChildDeclarationsRecursively().filterIsInstance<SirTypeDeclaration>()
+            .flatMap { it.getAllDeclarationsRecursively() }
+            .filterIsInstance<SirTypeDeclaration>()
 
     context(SwiftModelScope)
     fun finishClassInitialization(swiftModelScope: SwiftModelScope) {
@@ -211,12 +212,3 @@ class SirProvider(
     fun createKotlinSirFakeObjCConstructor(classDescriptor: ClassDescriptor, representativeModel: KotlinFunctionSwiftModelWithCore): SirConstructor =
         kotlinSirCallableDeclarationsFactory.createKotlinSirFakeObjCConstructor(classDescriptor, representativeModel)
 }
-
-private fun SirDeclarationParent.getChildDeclarationsRecursively(): List<SirDeclaration> =
-    declarations.flatMap { it.getAllDeclarationsRecursively() }
-
-private fun SirDeclaration.getAllDeclarationsRecursively(): List<SirDeclaration> =
-    listOf(this) + if (this is SirDeclarationParent) getChildDeclarationsRecursively() else emptyList()
-
-private fun Collection<SirDeclarationParent>.getChildDeclarationsRecursively(): List<SirDeclaration> =
-    flatMap { it.getChildDeclarationsRecursively() }

@@ -20,7 +20,6 @@ import kotlin.reflect.KProperty
 
 @Suppress("PropertyName", "FunctionName")
 class SirBuiltins(
-    kotlinBuiltinsModule: SirModule.KotlinBuiltins,
     kotlinModule: SirModule.Kotlin,
     skieModule: SirModule.Skie,
     sirProvider: SirProvider,
@@ -32,11 +31,9 @@ class SirBuiltins(
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
-    val Stdlib = Modules.KotlinBuiltins(kotlinBuiltinsModule, Swift, Foundation, namer, kotlinBuiltIns)
+    val Kotlin = Modules.Kotlin(kotlinModule, Swift, Foundation, namer, kotlinBuiltIns)
 
-    val Kotlin = Modules.Kotlin(kotlinModule)
-
-    val Skie = Modules.Skie(skieModule, Foundation)
+    val Skie = Modules.Skie(skieModule)
 
     object Modules {
 
@@ -57,6 +54,10 @@ class SirBuiltins(
             val CaseIterable by Protocol()
 
             val AnyObject by Protocol()
+
+            val Optional by Protocol {
+                SirTypeParameter("Wrapped")
+            }
 
             val AnyClass by Protocol(superTypes = listOf(AnyObject.defaultType))
 
@@ -152,15 +153,15 @@ class SirBuiltins(
             }
         }
 
-        // WIP 2 Merge with Kotlin
-        class KotlinBuiltins(
-            override val module: SirModule.KotlinBuiltins,
+        class Kotlin(
+            override val module: SirModule.Kotlin,
             swift: Swift,
             foundation: Foundation,
             namer: ObjCExportNamer,
             kotlinBuiltIns: KotlinBuiltIns,
         ) : ModuleBase() {
 
+            // WIP 2 Replace with origin
             val allBuiltInsWithDescriptors: Map<SirClass, ClassDescriptor> by lazy {
                 mapOf(
                     Base to kotlinBuiltIns.any,
@@ -205,13 +206,8 @@ class SirBuiltins(
                 }
         }
 
-        class Kotlin(
-            override val module: SirModule.Kotlin,
-        ) : ModuleBase()
-
         class Skie(
             override val module: SirModule.Skie,
-            foundation: Foundation,
         ) : ModuleBase() {
 
             // The SkieSwiftFlow classes are only stubs (correct super types, and content are currently not needed)

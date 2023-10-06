@@ -112,3 +112,7 @@ fun DeclaredSirType.resolveAsDirectClassSirType(): DeclaredSirType? =
 
 fun DeclaredSirType.resolveAsDirectSirClass(): SirClass? =
     resolveAsDirectClassSirType()?.declaration as? SirClass
+
+fun SirClass.inheritsFrom(other: SirClass): Boolean =
+    superTypes.mapNotNull { it.resolveAsDirectSirClass() }
+        .any { it == other || it.inheritsFrom(other) }

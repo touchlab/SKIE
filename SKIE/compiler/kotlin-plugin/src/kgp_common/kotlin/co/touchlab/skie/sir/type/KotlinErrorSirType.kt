@@ -8,6 +8,8 @@ object KotlinErrorSirType : NonNullSirType() {
 
     override val isPrimitive: Boolean = false
 
+    override val canonicalName: String = "KOTLIN_ERROR"
+
     override val directlyReferencedTypes: List<SirType> = emptyList()
 
     override fun toSwiftPoetTypeName(): TypeName {

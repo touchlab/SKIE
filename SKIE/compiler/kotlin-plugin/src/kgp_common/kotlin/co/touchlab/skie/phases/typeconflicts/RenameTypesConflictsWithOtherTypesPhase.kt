@@ -38,7 +38,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 }
 
 /**
- * immutable modules are prioritized because their declarations cannot be renamed
+ * built-ins are prioritized because their declarations cannot be renamed
  * nested classes are renamed first so that their fqName is not changed before their renaming is resolved
  * classes are prioritized over type aliases
  * was original identifier changed (unchanged is prioritized)
@@ -54,7 +54,7 @@ private fun SirTypeDeclaration.getCollisionResolutionPriority(): Long {
     val swiftModel = (this as? SirClass)?.swiftModelOrNull
 
     var priority = 0L
-    if (!module.isMutable) {
+    if (this in sirBuiltins.Kotlin.allBuiltInsWithDescriptors) {
         priority += 1
     }
 

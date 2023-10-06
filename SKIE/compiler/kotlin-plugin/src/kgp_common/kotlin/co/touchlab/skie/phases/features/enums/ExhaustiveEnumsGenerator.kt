@@ -27,7 +27,7 @@ import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.util.swift.addFunctionBodyWithErrorTypeHandling
+import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.joinToCode
@@ -160,7 +160,7 @@ private fun SirClass.addCompanionObjectPropertyIfNeeded() {
     val companion = companionObject ?: return
 
     SirProperty(
-        name = "companion",
+        identifier = "companion",
         type = companion.primarySirClass.defaultType,
         scope = SirScope.Static,
     ).apply {
@@ -277,7 +277,7 @@ private class MemberPassthroughGeneratorVisitor(
     }
 
     private fun SirFunction.addFunctionBody(function: KotlinFunctionSwiftModel) {
-        this.addFunctionBodyWithErrorTypeHandling(function) {
+        this.addFunctionDeclarationBodyWithErrorTypeHandling(function) {
             addStatement(
                 "return %L%L(self as _ObjectiveCType).%N(%L)",
                 if (function.primarySirFunction.throws) "try " else "",
@@ -306,7 +306,7 @@ private class MemberPassthroughGeneratorVisitor(
     }
 
     private fun SirGetter.addGetterBody(regularProperty: KotlinRegularPropertySwiftModel) {
-        this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
+        this.addFunctionDeclarationBodyWithErrorTypeHandling(regularProperty) {
             addStatement(
                 "return %L(self as _ObjectiveCType).%N",
                 if (regularProperty.primarySirProperty.getter!!.throws) "try " else "",
@@ -328,7 +328,7 @@ private class MemberPassthroughGeneratorVisitor(
         regularProperty: KotlinRegularPropertySwiftModel,
         setter: SirSetter,
     ) {
-        this.addFunctionBodyWithErrorTypeHandling(regularProperty) {
+        this.addFunctionDeclarationBodyWithErrorTypeHandling(regularProperty) {
             addStatement(
                 "%L(self as _ObjectiveCType).%N = value",
                 if (setter.throws) "try " else "",

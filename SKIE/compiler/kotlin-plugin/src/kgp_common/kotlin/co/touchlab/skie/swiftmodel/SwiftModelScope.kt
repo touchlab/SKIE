@@ -12,6 +12,7 @@ import co.touchlab.skie.swiftmodel.callable.property.converted.KotlinConvertedPr
 import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
+import co.touchlab.skie.swiftmodel.type.KotlinFileSwiftModel
 import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridge
 import co.touchlab.skie.swiftmodel.type.bridge.MethodBridgeParameter
@@ -32,7 +33,7 @@ interface SwiftModelScope {
 
     val exposedClasses: List<KotlinClassSwiftModel>
 
-    val exposedFiles: List<KotlinTypeSwiftModel>
+    val exposedFiles: List<KotlinFileSwiftModel>
 
     val exposedTypes: List<KotlinTypeSwiftModel>
         get() = exposedClasses + exposedFiles

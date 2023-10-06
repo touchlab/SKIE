@@ -14,6 +14,8 @@ sealed class SpecialSirType(
 
     override val isPrimitive: Boolean = false
 
+    override val canonicalName: String = typeName.name
+
     override val directlyReferencedTypes: List<SirType> = emptyList()
 
     override fun toSwiftPoetTypeName(): TypeName =

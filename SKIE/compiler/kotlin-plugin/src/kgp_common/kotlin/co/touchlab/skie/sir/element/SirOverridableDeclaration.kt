@@ -2,7 +2,7 @@ package co.touchlab.skie.sir.element
 
 import org.jetbrains.kotlin.backend.common.pop
 
-sealed interface SirOverridableDeclaration<T : SirOverridableDeclaration<T>> : SirDeclaration {
+sealed interface SirOverridableDeclaration<T : SirOverridableDeclaration<T>> : SirCallableDeclaration {
 
     val memberOwner: SirClass?
 
@@ -63,8 +63,14 @@ class SirOverridableDeclarationDelegate<T : SirOverridableDeclaration<T>>(
     }
 }
 
-fun <T : SirOverridableDeclaration<T>> T.getEntireOverrideHierarchy(): List<T> {
-    val visited = mutableSetOf<T>()
+@Suppress("UNCHECKED_CAST")
+fun <T : SirOverridableDeclaration<T>> T.getEntireOverrideHierarchy(): List<T> =
+    (this as SirCallableDeclaration).getEntireOverrideHierarchy() as List<T>
+
+fun SirCallableDeclaration.getEntireOverrideHierarchy(): List<SirCallableDeclaration> {
+    if (this !is SirOverridableDeclaration<*>) return listOf(this)
+
+    val visited = mutableSetOf<SirOverridableDeclaration<*>>()
 
     val open = mutableListOf(this)
 

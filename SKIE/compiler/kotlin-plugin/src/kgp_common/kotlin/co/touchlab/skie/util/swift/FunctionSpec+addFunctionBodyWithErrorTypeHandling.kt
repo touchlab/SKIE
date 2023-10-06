@@ -5,7 +5,7 @@ import co.touchlab.skie.sir.element.SirElementWithSwiftPoetBuilderModifications
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
 import io.outfoxx.swiftpoet.FunctionSpec
 
-fun <T> T.addFunctionBodyWithErrorTypeHandling(
+fun <T> T.addFunctionDeclarationBodyWithErrorTypeHandling(
     swiftModel: KotlinDirectlyCallableMemberSwiftModel,
     realFunctionBuilder: FunctionSpec.Builder.() -> Unit,
 ) where T : SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder>, T : SirElementWithAttributes {

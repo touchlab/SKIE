@@ -1,5 +1,8 @@
 package co.touchlab.skie.phases.features.suspend
 
+import co.touchlab.skie.configuration.FlowInterop
+import co.touchlab.skie.configuration.belongsToSkieRuntime
+import co.touchlab.skie.configuration.configuration
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
@@ -9,7 +12,6 @@ import co.touchlab.skie.phases.features.suspend.kotlin.SuspendKotlinBridgeBodyGe
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import co.touchlab.skie.swiftmodel.callable.isMember
 import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.util.collisionFreeIdentifier
@@ -42,12 +44,21 @@ class KotlinSuspendGeneratorDelegate(
 
     private val bodyGenerator = SuspendKotlinBridgeBodyGenerator(suspendHandlerDescriptor)
 
+    context(DescriptorModificationPhase.Context)
     fun generateKotlinBridgingFunction(functionDescriptor: FunctionDescriptor): FunctionDescriptor {
         val bridgingFunctionDescriptor = createBridgingFunction(functionDescriptor)
 
         bridgingFunctionDescriptor.hide()
+        bridgingFunctionDescriptor.changeSkieConfiguration(functionDescriptor)
 
         return bridgingFunctionDescriptor
+    }
+
+    context(DescriptorModificationPhase.Context)
+    private fun FunctionDescriptor.changeSkieConfiguration(originalFunctionDescriptor: FunctionDescriptor) {
+        this.belongsToSkieRuntime = true
+
+        this.configuration[FlowInterop.Enabled] = originalFunctionDescriptor.configuration[FlowInterop.Enabled]
     }
 
     private fun FunctionDescriptor.hide() {
@@ -93,8 +104,6 @@ class KotlinSuspendGeneratorDelegate(
                     },
                 ),
             )
-
-            context.configurationProvider.inheritConfiguration(functionDescriptor, descriptor)
 
             valueParameters = functionDescriptor.createValueParametersForBridgingFunction(descriptor, typeSubstitutor)
             typeParameters = typeParameterMappingPairs.map { it.second }
@@ -160,7 +169,7 @@ class KotlinSuspendGeneratorDelegate(
     private fun ValueParameterDescriptor.configureExtensionReceiverFlowMapping(originalFunctionDescriptor: FunctionDescriptor) {
         context.doInPhase(SuspendGenerator.KotlinBridgeConfigurationPhase) {
             val isExtensionReceiverUsedAsSwiftReceiver = originalFunctionDescriptor.swiftModel.scope.isMember &&
-                    originalFunctionDescriptor.dispatchReceiverParameter == null
+                originalFunctionDescriptor.dispatchReceiverParameter == null
 
             if (isExtensionReceiverUsedAsSwiftReceiver) {
                 this@configureExtensionReceiverFlowMapping.swiftModel.flowMappingStrategy = FlowMappingStrategy.TypeArgumentsOnly

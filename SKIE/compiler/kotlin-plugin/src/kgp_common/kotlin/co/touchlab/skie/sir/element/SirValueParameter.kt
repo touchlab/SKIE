@@ -22,7 +22,7 @@ class SirValueParameter(
 
     var label: String? = if (label != name) label else null
         set(value) {
-            field = if (value != name) value else null
+            field = if (value != name && value?.isNotBlank() == true) value else null
         }
 
     val labelOrName: String

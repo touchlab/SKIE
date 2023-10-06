@@ -4,9 +4,6 @@ sealed class SirModule(
     val name: String,
 ) : SirElement, SirTopLevelDeclarationParent {
 
-    val isMutable: Boolean
-        get() = this is Kotlin || this is Skie
-
     override val module: SirModule
         get() = this
 
@@ -15,10 +12,6 @@ sealed class SirModule(
     override var declarations: MutableList<SirDeclaration> = mutableListOf()
 
     class Kotlin(
-        name: String,
-    ) : SirModule(name)
-
-    class KotlinBuiltins(
         name: String,
     ) : SirModule(name)
 

@@ -2,6 +2,7 @@ package co.touchlab.skie.swiftmodel.factory
 
 import co.touchlab.skie.kir.DescriptorProvider
 import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.features.suspend.isSuspendInteropEnabled
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.swiftmodel.DescriptorBridgeProvider
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
@@ -13,7 +14,7 @@ import co.touchlab.skie.swiftmodel.type.ActualKotlinClassSwiftModel
 import co.touchlab.skie.swiftmodel.type.ActualKotlinEnumEntrySwiftModel
 import co.touchlab.skie.swiftmodel.type.ActualKotlinFileSwiftModel
 import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.swiftmodel.type.MutableKotlinTypeSwiftModel
+import co.touchlab.skie.swiftmodel.type.MutableKotlinFileSwiftModel
 import co.touchlab.skie.swiftmodel.type.enumentry.KotlinEnumEntrySwiftModel
 import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -29,7 +30,7 @@ class SwiftModelFactory(
     private val namer: ObjCExportNamer,
     bridgeProvider: DescriptorBridgeProvider,
     private val sirProvider: SirProvider,
-    skieContext: SkiePhase.Context,
+    private val skieContext: SkiePhase.Context,
 ) {
 
     private val membersDelegate = SwiftModelFactoryMembersDelegate(swiftModelScope, descriptorProvider, namer, bridgeProvider, sirProvider, skieContext)
@@ -57,7 +58,7 @@ class SwiftModelFactory(
             .flatMap { it.enumEntries }
             .associateWith { ActualKotlinEnumEntrySwiftModel(it, namer, swiftModelScope) }
 
-    fun createFiles(files: Set<SourceFile>): Map<SourceFile, MutableKotlinTypeSwiftModel> =
+    fun createFiles(files: Set<SourceFile>): Map<SourceFile, MutableKotlinFileSwiftModel> =
         files.associateWith { file ->
             ActualKotlinFileSwiftModel(
                 file = file,
@@ -71,9 +72,17 @@ class SwiftModelFactory(
     fun createAsyncFunctions(
         models: Collection<KotlinFunctionSwiftModelWithCore>,
     ): Map<FunctionDescriptor, MutableKotlinFunctionSwiftModel> =
-        models.filter { it.descriptor.isSuspend }
+        models
+            .asSequence()
+            .filter { it.descriptor.isSuspend }
             .map { it.allBoundedSwiftModels.toSet() }
             .distinct()
+            .map { group ->
+                with(skieContext) {
+                    group.filter { it.descriptor.isSuspendInteropEnabled }
+                }
+            }
+            .filter { it.isNotEmpty() }.toList()
             .flatMap { group ->
                 val allBoundedSwiftModels = mutableListOf<MutableKotlinFunctionSwiftModel>()
 
@@ -83,7 +92,7 @@ class SwiftModelFactory(
                             delegate = it,
                             kotlinSirCallableDeclarationFactory = { sirProvider.getKotlinSirAsyncFunction(it.descriptor) },
                             allBoundedSwiftModels = allBoundedSwiftModels,
-                            swiftModelScope = swiftModelScope
+                            swiftModelScope = swiftModelScope,
                         )
                     }
                     .also { allBoundedSwiftModels.addAll(it) }

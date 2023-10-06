@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.overriddenTreeAsSequence
 import org.jetbrains.kotlin.resolve.substitutedUnderlyingTypes
 
-object FixCallableMembersConflictsPhase : SirPhase {
+object RemoveConflictingDefaultArgumentsPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
@@ -96,7 +96,7 @@ object FixCallableMembersConflictsPhase : SirPhase {
         }
 
     private fun buildUniqueSignatureSet(members: List<MutableKotlinCallableMemberSwiftModel>) {
-        val signatureSet = UniqueSignatureSet()
+        val signatureSet = OldUniqueSignatureSet()
 
         members.forEach { member ->
             signatureSet.addGroup(member)

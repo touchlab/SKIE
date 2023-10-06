@@ -18,6 +18,8 @@ data class TypeParameterUsageSirType(
     override val directlyReferencedTypes: List<SirType>
         get() = typeParameter.bounds
 
+    override val canonicalName: String = "[${typeParameter.name}: ${typeParameter.bounds.joinToString { it.canonicalName }}]"
+
     fun typeParameter(typeParameter: SirTypeParameter): TypeParameterUsageSirType =
         TypeParameterUsageSirType(typeParameter, this)
 

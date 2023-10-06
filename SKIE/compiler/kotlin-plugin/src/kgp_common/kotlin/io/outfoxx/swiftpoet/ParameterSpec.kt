@@ -121,11 +121,7 @@ class ParameterSpec private constructor(
 
     @JvmStatic
     fun builder(argumentLabel: String?, parameterName: String, type: TypeName, vararg modifiers: Modifier): Builder {
-      return if (argumentLabel == null) {
-        Builder(parameterName, parameterName, type).addModifiers(*modifiers)
-      } else {
-        Builder(argumentLabel, parameterName, type).addModifiers(*modifiers)
-      }
+      return Builder(argumentLabel, parameterName, type).addModifiers(*modifiers)
     }
 
     @JvmStatic

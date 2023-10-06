@@ -13,6 +13,9 @@ val SirDeclaration.module: SirModule
 val SirDeclaration.firstParentThatIsNotNamespace: SirDeclarationParent
     get() = if (parent is SirDeclarationNamespace) parent.firstParentThatIsNotNamespace else parent
 
+val SirDeclaration.topLevelParent: SirTopLevelDeclarationParent
+    get() = (parent as? SirTopLevelDeclarationParent) ?: parent.topLevelParent
+
 @Suppress("RecursivePropertyAccessor")
 val SirDeclaration.file: SirFile?
     get() = parent as? SirFile ?: (parent as? SirDeclaration)?.file

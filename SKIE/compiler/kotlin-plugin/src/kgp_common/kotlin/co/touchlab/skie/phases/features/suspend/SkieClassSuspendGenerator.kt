@@ -76,7 +76,7 @@ private fun SirClass.addSkieClassMembers(
 
 private fun SirClass.addSkieClassKotlinObjectHolder(swiftModel: KotlinTypeSwiftModel) {
     SirProperty(
-        name = SkieClassSuspendGenerator.kotlinObjectVariableName,
+        identifier = SkieClassSuspendGenerator.kotlinObjectVariableName,
         type = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
     )
 }

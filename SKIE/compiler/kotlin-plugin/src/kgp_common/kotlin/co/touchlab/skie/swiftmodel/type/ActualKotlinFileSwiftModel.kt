@@ -5,6 +5,7 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
 import co.touchlab.skie.swiftmodel.SwiftGenericExportScope
+import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.MutableKotlinDirectlyCallableMemberSwiftModel
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.SourceFile
@@ -24,10 +25,13 @@ class ActualKotlinFileSwiftModel(
             .filter { it.primarySirCallableDeclaration.visibility.isAccessibleFromOtherModules }
 
     override val allDirectlyCallableMembers: List<MutableKotlinDirectlyCallableMemberSwiftModel>
+        get() = allCallableMembers
+            .flatMap { it.directlyCallableMembers }
+
+    override val allCallableMembers: List<MutableKotlinCallableMemberSwiftModel>
         get() = with(swiftModelScope) {
             descriptorProvider.getExposedStaticMembers(file)
                 .map { it.swiftModel }
-                .flatMap { it.directlyCallableMembers }
         }
 
     private val fileClassName = namer.getFileClassName(file)

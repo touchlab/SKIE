@@ -12,6 +12,9 @@ data class NullableSirType(
     override val isPrimitive: Boolean
         get() = false
 
+    override val canonicalName: String
+        get() = type.canonicalName + "?"
+
     override val directlyReferencedTypes: List<SirType> = listOf(type)
 
     override fun toNonNull(): NonNullSirType =

@@ -2,6 +2,7 @@ package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.configuration.belongsToSkieRuntime
 import co.touchlab.skie.kir.MutableDescriptorProvider
 import co.touchlab.skie.kir.allExposedMembers
 import co.touchlab.skie.kir.irbuilder.createFunction
@@ -10,7 +11,6 @@ import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
-import co.touchlab.skie.swiftmodel.SwiftModelVisibility
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -37,6 +37,8 @@ class ExtraClassExportPhase(
         val stubFunction = generateStubFunction(additionallyExportedClasses)
 
         stubFunction.removeFromSwift()
+
+        stubFunction.belongsToSkieRuntime = true
     }
 
     private fun getAllAdditionallyExportedClasses(): Set<ClassDescriptor> {

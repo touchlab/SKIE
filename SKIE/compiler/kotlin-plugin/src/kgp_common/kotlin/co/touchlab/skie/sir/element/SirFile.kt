@@ -26,7 +26,7 @@ class SirFile(
 
     override val declarations: MutableList<SirDeclaration> = mutableListOf()
 
-    override fun toString(): String = "${this::class.simpleName}: $name"
+    override fun toString(): String = "${this::class.simpleName}: $namespace.$name.swift"
 
     companion object {
 

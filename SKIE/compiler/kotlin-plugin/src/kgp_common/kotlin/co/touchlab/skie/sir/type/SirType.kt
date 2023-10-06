@@ -8,6 +8,8 @@ sealed class SirType {
 
     abstract val isPrimitive: Boolean
 
+    abstract val canonicalName: String
+
     open val directlyReferencedTypes: List<SirType> = emptyList()
 
     fun allReferencedTypes(): List<SirType> =

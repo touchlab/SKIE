@@ -3,7 +3,6 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.Modifier
-import io.outfoxx.swiftpoet.PropertySpec
 
 class SirProperty(
     override var identifier: String,
@@ -13,8 +12,7 @@ class SirProperty(
     override var scope: SirScope = SirScope.Member,
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
-) : SirCallableDeclaration, SirOverridableDeclaration<SirProperty>,
-    SirElementWithSwiftPoetBuilderModifications<PropertySpec.Builder> {
+) : SirCallableDeclaration, SirOverridableDeclaration<SirProperty> {
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
 
@@ -33,8 +31,6 @@ class SirProperty(
     override val attributes: MutableList<String> = attributes.toMutableList()
 
     override val modifiers: MutableList<Modifier> = modifiers.toMutableList()
-
-    override val swiftPoetBuilderModifications = mutableListOf<PropertySpec.Builder.() -> Unit>()
 
     private val overridableDeclarationDelegate = SirOverridableDeclarationDelegate(this)
 
@@ -74,7 +70,7 @@ class SirProperty(
 
         context(SirDeclarationParent)
         operator fun invoke(
-            name: String,
+            identifier: String,
             type: SirType,
             visibility: SirVisibility = SirVisibility.Public,
             scope: SirScope = SirScope.Member,
@@ -82,7 +78,7 @@ class SirProperty(
             modifiers: List<Modifier> = emptyList(),
         ): SirProperty =
             SirProperty(
-                identifier = name,
+                identifier = identifier,
                 parent = this@SirDeclarationParent,
                 type = type,
                 visibility = visibility,

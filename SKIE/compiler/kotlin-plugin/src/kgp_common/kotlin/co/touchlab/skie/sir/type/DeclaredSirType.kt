@@ -1,7 +1,9 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.SirFqName
+import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirModule
+import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.util.swift.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -19,6 +21,16 @@ data class DeclaredSirType(
 
     override val isPrimitive: Boolean
         get() = declaration.isPrimitive
+
+    override val canonicalName: String
+        get() = when (declaration) {
+            is SirClass -> declaration.fqName.toString() + canonicalNameTypeArguments
+            // WIP 2 This should be done with substitution
+            is SirTypeAlias -> declaration.type.canonicalName + canonicalNameTypeArguments
+        }
+
+    private val canonicalNameTypeArguments: String
+        get() = if (typeArguments.isEmpty()) "" else "<${typeArguments.joinToString { it.canonicalName }}>"
 
     fun withFqName(): DeclaredSirType =
         copy(pointsToInternalName = false)

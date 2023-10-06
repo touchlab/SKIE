@@ -43,7 +43,7 @@ class KotlinSirClassFactory(
         get() = sirProvider.sirBuiltins
 
     init {
-        sirBuiltins.Stdlib.allBuiltInsWithDescriptors.forEach { (sirClass, classDescriptor) ->
+        sirBuiltins.Kotlin.allBuiltInsWithDescriptors.forEach { (sirClass, classDescriptor) ->
             classDescriptorToFqNameMap[classDescriptor] = sirClass.fqName
             fqNameToClassDescriptorMap[sirClass.fqName] = classDescriptor
             kotlinSirClassCache[classDescriptor] = sirClass
@@ -114,7 +114,7 @@ class KotlinSirClassFactory(
         superTypes.addAll(superTypesWithoutAny)
 
         if (this.kind == SirClass.Kind.Class && this.superClass == null) {
-            superTypes.add(sirBuiltins.Stdlib.Base.defaultType)
+            superTypes.add(sirBuiltins.Kotlin.Base.defaultType)
         }
     }
 
@@ -124,7 +124,7 @@ class KotlinSirClassFactory(
                 baseName = namer.getFileClassName(sourceFile).swiftName,
                 parent = sirBuiltins.Kotlin.module,
                 kind = SirClass.Kind.Class,
-                superTypes = listOf(sirBuiltins.Stdlib.Base.defaultType),
+                superTypes = listOf(sirBuiltins.Kotlin.Base.defaultType),
             )
 
             val namespace = namespaceProvider.getOrCreateNamespace(sourceFile)

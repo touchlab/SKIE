@@ -22,11 +22,11 @@ class SirFunction(
         get() = if (valueParameters.isEmpty()) {
             identifierAfterVisibilityChanges
         } else {
-            "${identifierAfterVisibilityChanges}(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
+            "$identifierAfterVisibilityChanges(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
         }
 
     override val name: String
-        get() = if (valueParameters.isEmpty()) "${identifierAfterVisibilityChanges}()" else reference
+        get() = if (valueParameters.isEmpty()) "$identifierAfterVisibilityChanges()" else reference
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 

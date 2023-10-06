@@ -1,3 +1,8 @@
 package co.touchlab.skie.swiftmodel.type
 
-interface MutableKotlinFileSwiftModel : KotlinFileSwiftModel, MutableKotlinTypeSwiftModel
+import co.touchlab.skie.swiftmodel.callable.MutableKotlinCallableMemberSwiftModel
+
+interface MutableKotlinFileSwiftModel : KotlinFileSwiftModel, MutableKotlinTypeSwiftModel {
+
+    override val allCallableMembers: List<MutableKotlinCallableMemberSwiftModel>
+}

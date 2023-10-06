@@ -33,15 +33,15 @@ class CustomTypeMappers(
         result += ListMapper
         result += Simple(ClassId.topLevel(mutableList)) { sirBuiltins.Foundation.NSMutableArray.defaultType }
         result += SetMapper
-        result += Collection(mutableSet) { sirBuiltins.Stdlib.MutableSet.toType(it) }
+        result += Collection(mutableSet) { sirBuiltins.Kotlin.MutableSet.toType(it) }
         result += MapMapper
-        result += Collection(mutableMap) { sirBuiltins.Stdlib.MutableMap.toType(it) }
+        result += Collection(mutableMap) { sirBuiltins.Kotlin.MutableMap.toType(it) }
 
         NSNumberKind.values().forEach {
             // TODO: NSNumber seem to have different equality semantics.
             val classId = it.mappedKotlinClassId
             if (classId != null) {
-                result += Simple(classId) { sirBuiltins.Stdlib.nsNumberDeclarations.getValue(classId).defaultType }
+                result += Simple(classId) { sirBuiltins.Kotlin.nsNumberDeclarations.getValue(classId).defaultType }
             }
         }
 

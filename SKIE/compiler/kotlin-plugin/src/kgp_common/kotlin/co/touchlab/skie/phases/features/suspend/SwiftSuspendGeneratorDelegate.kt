@@ -15,7 +15,7 @@ import co.touchlab.skie.swiftmodel.SwiftModelScope
 import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
 import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
-import co.touchlab.skie.util.swift.addFunctionBodyWithErrorTypeHandling
+import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionTypeName
@@ -111,7 +111,7 @@ private fun SirExtension.addSwiftBridgingFunction(bridgeModel: BridgeModel): Sir
     }
 
 private fun SirFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeModel) {
-    addFunctionBodyWithErrorTypeHandling(bridgeModel.kotlinBridgingFunction) {
+    addFunctionDeclarationBodyWithErrorTypeHandling(bridgeModel.kotlinBridgingFunction) {
         addCode(
             CodeBlock.builder()
                 .addStatement("return try await SwiftCoroutineDispatcher.dispatch {")

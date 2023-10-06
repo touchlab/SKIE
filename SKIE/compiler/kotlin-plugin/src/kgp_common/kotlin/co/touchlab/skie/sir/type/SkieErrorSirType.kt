@@ -4,7 +4,7 @@ import co.touchlab.skie.util.swift.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 
 sealed class SkieErrorSirType(
-    private val name: String,
+    override val canonicalName: String,
 ) : NonNullSirType() {
 
     override val isHashable: Boolean = true
@@ -14,7 +14,7 @@ sealed class SkieErrorSirType(
     override val directlyReferencedTypes: List<SirType> = emptyList()
 
     override fun toSwiftPoetTypeName() =
-        DeclaredTypeName.qualifiedLocalTypeName(name)
+        DeclaredTypeName.qualifiedLocalTypeName(canonicalName)
 
     object Lambda : SkieErrorSirType("__SkieLambdaErrorType")
 }
