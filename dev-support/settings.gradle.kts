@@ -14,7 +14,6 @@ plugins {
 
 include(
     ":analytics",
-    ":ir-inspector",
     ":skie:mac",
     ":skie:mac:framework",
     ":skie:mac:dependency",
