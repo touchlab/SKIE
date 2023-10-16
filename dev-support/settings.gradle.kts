@@ -13,7 +13,6 @@ plugins {
 }
 
 include(
-    ":analytics",
     ":skie:mac",
     ":skie:mac:framework",
     ":skie:mac:dependency",
