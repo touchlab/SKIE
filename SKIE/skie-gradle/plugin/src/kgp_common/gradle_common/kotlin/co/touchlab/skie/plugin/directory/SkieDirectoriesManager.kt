@@ -16,29 +16,29 @@ import javax.inject.Inject
 
 internal object SkieDirectoriesManager {
 
-    const val baseTaskName = "createBuildDirectory"
+    const val baseTaskName: String = "createSkieDirectories"
 
     fun configureCreateSkieBuildDirectoryTask(linkTask: KotlinNativeLink) {
-        linkTask.registerSkieLinkBasedTask<SkieCreateBuildDirectoryTask>(baseTaskName) {
-            directory.set(linkTask.skieBuildDirectory)
+        linkTask.registerSkieLinkBasedTask<SkieCreateSkieDirectoriesTask>(baseTaskName) {
+            skieDirectories.set(linkTask.skieDirectories)
         }
     }
 
-    abstract class SkieCreateBuildDirectoryTask @Inject constructor(objects: ObjectFactory) : DefaultTask() {
+    abstract class SkieCreateSkieDirectoriesTask @Inject constructor(objects: ObjectFactory) : DefaultTask() {
 
         @get:Internal
-        val directory: Property<SkieBuildDirectory> = objects.property(SkieBuildDirectory::class.java)
+        val skieDirectories: Property<SkieDirectories> = objects.property(SkieDirectories::class.java)
 
         init {
-            outputs.dir(directory.map { it.directory })
+            outputs.dirs(skieDirectories.map { it.directories })
         }
 
         @TaskAction
         fun runTask() {
-            val directory = directory.get()
-
-            directory.createDirectories()
-            directory.resetTemporaryDirectories()
+            skieDirectories.get().run {
+                createDirectories()
+                resetTemporaryDirectories()
+            }
         }
     }
 }

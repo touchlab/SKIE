@@ -1,15 +1,39 @@
 package co.touchlab.skie.util.directory
 
+import co.touchlab.skie.util.directory.structure.RootDirectory
 import java.io.File
 
 class SkieDirectories(
     skieBuildRootDirectory: File,
 ) {
 
-    val buildDirectory: SkieBuildDirectory = SkieBuildDirectory(skieBuildRootDirectory)
+    private val rootDirectories = mutableListOf<RootDirectory>()
 
-    val applicationSupport: SkieApplicationSupportDirectory =
+    val buildDirectory: SkieBuildDirectory = rootDirectory {
+        SkieBuildDirectory(skieBuildRootDirectory)
+    }
+
+    val applicationSupport: SkieApplicationSupportDirectory = rootDirectory {
         File(System.getProperty("user.home"))
             .resolve("Library/Application Support/SKIE")
             .let { SkieApplicationSupportDirectory(it) }
+    }
+
+    val directories: List<File>
+        get() = rootDirectories.map { it.directory }
+
+    private fun <T : RootDirectory> rootDirectory(action: () -> T): T =
+        action().also { rootDirectories.add(it) }
+
+    fun createDirectories() {
+        rootDirectories.forEach {
+            it.createDirectories()
+        }
+    }
+
+    fun resetTemporaryDirectories() {
+        rootDirectories.forEach {
+            it.resetTemporaryDirectories()
+        }
+    }
 }

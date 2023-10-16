@@ -46,7 +46,7 @@ internal class GradleAnalyticsManager(
 
         linkTask.project.afterEvaluate {
             uploadTask.configure {
-                isEnabled = !project.skieExtension.analytics.disableUpload.get()
+                isEnabled = !project.skieExtension.analytics.disableUpload.get() && project.skieExtension.analytics.enabled.get()
             }
         }
     }

@@ -34,7 +34,7 @@ internal abstract class SkieUploadAnalyticsTask : DefaultTask() {
 
             MixpanelAPI().sendMessage(event)
         } catch (e: Throwable) {
-            logger.warn("SKIE analytics upload failed: $e")
+            logger.warn("W: SKIE analytics upload failed: $e")
         }
     }
 
