@@ -18,9 +18,6 @@ class SirExtension(
     override val fqName: SirFqName
         get() = classDeclaration.fqName
 
-    val internalName: SirFqName
-        get() = classDeclaration.internalName
-
     override fun toString(): String =
         "${this::class.simpleName}: $fqName"
 

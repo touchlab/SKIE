@@ -33,6 +33,9 @@ class SirTypeAlias(
 
     override val originalFqName: SirFqName = fqName
 
+    override val publicName: SirFqName
+        get() = fqName
+
     override val internalName: SirFqName
         get() = fqName
 

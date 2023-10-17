@@ -45,7 +45,7 @@ interface SealedGeneratorExtensionContainer {
         get() {
             val configuredName = configurationProvider.getConfiguration(this, SealedInterop.Case.Name)
 
-            return configuredName ?: this.kotlinSirClass.fqName.toLocalString().toValidSwiftIdentifier()
+            return configuredName ?: this.kotlinSirClass.publicName.toLocalString().toValidSwiftIdentifier()
         }
 
     val KotlinClassSwiftModel.hasElseCase: Boolean

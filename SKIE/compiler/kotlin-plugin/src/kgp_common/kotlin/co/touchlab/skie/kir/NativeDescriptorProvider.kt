@@ -218,7 +218,7 @@ class NativeDescriptorProvider(
         classDescriptor.unsubstitutedInnerClassesScope
             .getDescriptorsFiltered(DescriptorKindFilter.CLASSIFIERS)
             .filterIsInstance<ClassDescriptor>()
-            .filter { it.kind == ClassKind.CLASS || it.kind == ClassKind.OBJECT }
+            .filter { it.kind == ClassKind.CLASS || it.kind == ClassKind.OBJECT || it.kind == ClassKind.ENUM_CLASS }
             .filter { it.isExposable }
 
     override fun getExposedEnumEntries(classDescriptor: ClassDescriptor): List<ClassDescriptor> =

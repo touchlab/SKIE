@@ -200,4 +200,4 @@ private fun CodeBlock.Builder.addFromObjectiveCBodyCase(
 }
 
 private val KotlinClassSwiftModel.fatalErrorFromObjectiveC: CodeBlock
-    get() = CodeBlock.of("""fatalError("Couldn't map value of \(Swift.String(describing: source)) to ${kotlinSirClass.fqName}")""")
+    get() = CodeBlock.of("""fatalError("Couldn't map value of \(Swift.String(describing: source)) to ${kotlinSirClass.publicName}")""")

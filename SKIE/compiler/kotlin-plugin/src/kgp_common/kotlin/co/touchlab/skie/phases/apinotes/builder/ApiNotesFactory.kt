@@ -36,7 +36,7 @@ object ApiNotesFactory {
         ApiNotesType(
             objCFqName = this.objCFqName.asString(),
             bridgeFqName = this.bridgedSirClass?.fqName?.toLocalString(),
-            swiftFqName = this.kotlinSirClass.fqName.toLocalString(),
+            swiftFqName = this.kotlinSirClass.publicName.toLocalString(),
             isHidden = this.visibility.isHiddenOrReplaced,
             availability = this.visibility.availability,
             methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote(this) },

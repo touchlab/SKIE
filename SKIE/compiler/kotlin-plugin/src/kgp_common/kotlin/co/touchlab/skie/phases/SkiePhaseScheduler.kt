@@ -100,7 +100,7 @@ class SkiePhaseScheduler {
             FixCallableMembersConflictsPhase,
 
             FlowConversionConstructorsGenerator,
-            ExhaustiveEnumsGenerator.FunctionGeneratorPhase,
+            ExhaustiveEnumsGenerator.MembersGeneratorPhase,
             SuspendGenerator.SwiftBridgeGeneratorPhase,
 
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,

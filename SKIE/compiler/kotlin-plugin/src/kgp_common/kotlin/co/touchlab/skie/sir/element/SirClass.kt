@@ -11,6 +11,7 @@ class SirClass(
     override var visibility: SirVisibility = SirVisibility.Public,
     superTypes: List<DeclaredSirType> = emptyList(),
     attributes: List<String> = emptyList(),
+    var publicTypeAlias: SirTypeAlias? = null,
     var internalTypeAlias: SirTypeAlias? = null,
     var isInherentlyHashable: Boolean = false,
     override var isPrimitive: Boolean = false,
@@ -33,18 +34,27 @@ class SirClass(
 
     override val declarations: MutableList<SirDeclaration> = mutableListOf()
 
+    /**
+     * Name used to generate SKIE code.
+     */
     override val fqName: SirFqName
         get() = super.fqName
 
     override val originalFqName: SirFqName = fqName
 
     /**
+     * Name that is expected to be used by external Swift code.
+     */
+    override val publicName: SirFqName
+        get() = publicTypeAlias?.publicName ?: fqName
+
+    /**
      * Name used by SKIE generated code to avoid many problems with ambiguous identifiers and bugs in Swift compiler.
      */
     override val internalName: SirFqName
-        get() = internalTypeAlias?.fqName ?: fqName
+        get() = internalTypeAlias?.internalName ?: publicName
 
-    override fun toString(): String = "${this::class.simpleName}: $fqName"
+    override fun toString(): String = "${this::class.simpleName}: $fqName${if (fqName != publicName) "($publicName)" else ""}"
 
     enum class Kind {
         Class,

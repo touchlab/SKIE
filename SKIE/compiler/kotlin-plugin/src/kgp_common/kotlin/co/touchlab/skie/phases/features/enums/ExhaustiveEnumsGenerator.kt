@@ -63,7 +63,7 @@ object ExhaustiveEnumsGenerator : SirPhase {
         classSwiftModel.configureBridging(skieClass)
     }
 
-    object FunctionGeneratorPhase : StatefulSirPhase()
+    object MembersGeneratorPhase : StatefulSirPhase()
 }
 
 private fun MutableKotlinClassSwiftModel.configureBridging(skieClass: SirClass) {
@@ -104,7 +104,6 @@ private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass =
         }
 
         addEnumCases()
-        addNestedClassTypeAliases()
 
         superTypes += listOf(
             sirBuiltins.Swift.Hashable.defaultType,
@@ -114,11 +113,11 @@ private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass =
 
         attributes.add("frozen")
 
-        addCompanionObjectPropertyIfNeeded()
-        addObjcBridgeableImplementation(this@createBridgingEnum)
-
-        doInPhase(ExhaustiveEnumsGenerator.FunctionGeneratorPhase) {
+        doInPhase(ExhaustiveEnumsGenerator.MembersGeneratorPhase) {
             addPassthroughForMembers()
+            addNestedClassTypeAliases()
+            addCompanionObjectPropertyIfNeeded()
+            addObjcBridgeableImplementation(this@createBridgingEnum)
         }
     }
 
@@ -131,23 +130,30 @@ private fun SirClass.addEnumCases() {
     }
 }
 
-context(KotlinClassSwiftModel)
-private fun SirClass.addNestedClassTypeAliases() {
-    nestedClasses.forEach { nestedClass ->
-        SirTypeAlias(
-            simpleName = nestedClass.primarySirClass.fqName.simpleName,
-        ) {
-            DeclaredSirType(nestedClass.primarySirClass)
-        }
-    }
-}
-
 context(SirPhase.Context, KotlinClassSwiftModel)
 private fun SirClass.addPassthroughForMembers() {
     allAccessibleDirectlyCallableMembers
         .forEach {
             it.accept(MemberPassthroughGeneratorVisitor(this))
         }
+}
+
+context(KotlinClassSwiftModel)
+private fun SirClass.addNestedClassTypeAliases() {
+    nestedClasses.forEach { nestedClass ->
+        addNestedClassTypeAlias(nestedClass.kotlinSirClass)
+        nestedClass.bridgedSirClass?.let { addNestedClassTypeAlias(it) }
+    }
+}
+
+context(KotlinClassSwiftModel)
+private fun SirClass.addNestedClassTypeAlias(sirClass: SirClass) {
+    SirTypeAlias(
+        simpleName = sirClass.publicName.simpleName,
+        visibility = sirClass.visibility,
+    ) {
+        sirClass.defaultType
+    }
 }
 
 context(KotlinClassSwiftModel)

@@ -37,6 +37,9 @@ private fun SirClass.createReplacementTypeAlias(namespace: SirDeclarationNamespa
     )
 
     typeAlias.copyTypeParametersFrom(this)
+    if (publicTypeAlias == null) {
+        publicTypeAlias = typeAlias
+    }
     if (internalTypeAlias == null) {
         internalTypeAlias = typeAlias
     }
