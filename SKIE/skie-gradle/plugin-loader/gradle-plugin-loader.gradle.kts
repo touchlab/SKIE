@@ -1,5 +1,7 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyName
+import co.touchlab.skie.gradle.util.enquoted
+import co.touchlab.skie.gradle.util.stringListProperty
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
@@ -18,6 +20,13 @@ buildConfig {
     val gradlePlugin = projects.gradle.gradlePlugin.dependencyProject
     // TODO Rename to SKIE_GRADLE_PLUGIN
     buildConfigField("String", "SKIE_GRADLE_PLUGIN_DEPENDENCY", "\"${gradlePlugin.dependencyName}\"")
+
+    // Workaround for problems with BuildConfig - it incorrectly wraps long strings, and it cannot easily generate a List
+    val supportedKotlinVersions = project.stringListProperty("versionSupport.supportedKotlinVersions")
+        .joinToString(", ") { it.enquoted() }
+    buildConfigField("kotlin.Any", "SUPPORTED_KOTLIN_VERSIONS", "listOf<String>($supportedKotlinVersions)")
+
+    buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 }
 
 kotlin {
@@ -53,7 +62,7 @@ tasks.named("compileKotlin").configure {
     gradleApiVersions.components.forEach { gradleApiVersion ->
         kotlinToolingVersions.components.forEach { kotlinToolingVersion ->
             val shimConfiguration = configurations.detachedConfiguration(
-                projects.gradle.gradlePlugin
+                projects.gradle.gradlePlugin,
             ).apply {
                 attributes {
                     attribute(

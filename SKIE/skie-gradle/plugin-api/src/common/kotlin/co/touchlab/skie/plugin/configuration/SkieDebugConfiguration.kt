@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory) {
 
+    val skipSupportedVersionsCheck: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val dumpSwiftApiBeforeApiNotes: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val dumpSwiftApiAfterApiNotes: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val printSkiePerformanceLogs: Property<Boolean> = objects.property(Boolean::class.java).convention(false)

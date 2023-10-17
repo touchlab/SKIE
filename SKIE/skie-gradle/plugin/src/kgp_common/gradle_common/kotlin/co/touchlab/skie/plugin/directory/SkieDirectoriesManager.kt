@@ -43,8 +43,6 @@ internal object SkieDirectoriesManager {
     }
 }
 
-// TODO Decide if this should be public or internal
-
 val KotlinNativeLink.skieDirectories: SkieDirectories
     get() = SkieDirectories(
         project.layout.buildDirectory.dir("skie/${binary.name}/${binary.target.targetName}").get().asFile,
