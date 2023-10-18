@@ -48,14 +48,15 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
         }
 
         val error = when {
-            kotlinVersion == null ->
+            kotlinVersion == null -> {
                 """
                     SKIE could not infer Kotlin plugin version.
                     Make sure you have Kotlin Multiplatform plugin applied in the same module as SKIE and that the plugin works - for example by calling the link task that produces the Obj-C framework.
                     If that is the case, then this problem is likely caused by a bug in SKIE - please report it to the SKIE developers.
                     You can try to workaround this issue by providing the Kotlin version manually via 'skie.kgpVersion' property in your gradle.properties.
                 """.trimIndent()
-            !kotlinVersion.isSupported && !skipSupportedVersionsCheck ->
+            }
+            !kotlinVersion.isSupported && !skipSupportedVersionsCheck -> {
                 """
                     SKIE ${BuildConfig.SKIE_VERSION} does not support Kotlin $kotlinVersion.
                     Supported versions are ${BuildConfig.SUPPORTED_KOTLIN_VERSIONS}.
@@ -63,22 +64,19 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
                     New Kotlin versions are usually supported within a few days after they are released.
                     Note that there are no plans for supporting early access versions like Beta, RC, etc.
                 """.trimIndent()
-            else -> null
+            }
+            else -> return kotlinVersion
         }
 
-        if (error != null) {
-            reportSkieLoaderError(error)
+        reportSkieLoaderError(error)
 
-            return null
-        }
-
-        return kotlinVersion
+        return null
     }
 
     private fun Project.reportSkieLoaderError(error: String) {
         logger.error("Error:\n$error\nSKIE cannot not be used until this error is resolved.\n")
 
-        project.gradle.taskGraph.whenReady {
+        gradle.taskGraph.whenReady {
             val hasLinkTask = allTasks.any { it.name.startsWith("link") && it.project == project }
             val isSkieEnabled = extensions.findByType(SkieExtension::class.java)?.isEnabled?.get() == true
 
@@ -183,7 +181,7 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
     private value class KotlinVersion(val value: String) {
 
         val isSupported: Boolean
-            get() = (BuildConfig.SUPPORTED_KOTLIN_VERSIONS as List<*>).contains(value)
+            get() = BuildConfig.SUPPORTED_KOTLIN_VERSIONS.contains(value)
 
         override fun toString(): String = value
     }

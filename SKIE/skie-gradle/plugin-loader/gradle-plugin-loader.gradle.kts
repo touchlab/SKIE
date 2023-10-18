@@ -24,7 +24,7 @@ buildConfig {
     // Workaround for problems with BuildConfig - it incorrectly wraps long strings, and it cannot easily generate a List
     val supportedKotlinVersions = project.stringListProperty("versionSupport.supportedKotlinVersions")
         .joinToString(", ") { it.enquoted() }
-    buildConfigField("kotlin.Any", "SUPPORTED_KOTLIN_VERSIONS", "listOf<String>($supportedKotlinVersions)")
+    buildConfigField("co.touchlab.skie.plugin.util.StringList", "SUPPORTED_KOTLIN_VERSIONS", "listOf($supportedKotlinVersions)")
 
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 }
