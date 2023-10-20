@@ -1,10 +1,9 @@
 package co.touchlab.skie.phases.features.suspend.kotlin
 
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irGet
@@ -19,7 +18,7 @@ class SuspendKotlinBridgeBodyGenerator(
     private val exceptionFieldGenerator = SuspendKotlinBridgeCheckedExceptionsGenerator()
     private val lambdaGenerator = SuspendKotlinBridgeHandlerLambdaGenerator()
 
-    context(IrPluginContext, DeclarationIrBuilder)
+    context(KotlinIrPhase.Context, DeclarationIrBuilder)
     fun createBody(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
@@ -43,10 +42,10 @@ class SuspendKotlinBridgeBodyGenerator(
             )
         }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    private val IrPluginContext.suspendHandlerLaunchMethod: IrSimpleFunction
+    context(KotlinIrPhase.Context)
+    private val suspendHandlerLaunchMethod: IrSimpleFunction
         get() {
-            val suspendHandlerClass = symbolTable.referenceClass(suspendHandlerDescriptor).owner
+            val suspendHandlerClass = skieSymbolTable.descriptorExtension.referenceClass(suspendHandlerDescriptor).owner
 
             return suspendHandlerClass.declarations
                 .filterIsInstance<IrSimpleFunction>()

@@ -1,18 +1,21 @@
 package co.touchlab.skie.kir.irbuilder
 
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
-import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 
 interface DeclarationTemplate<D : DeclarationDescriptor> {
 
     val descriptor: D
 
-    fun declareSymbol(symbolTable: SymbolTable)
+    context(SymbolTablePhase.Context)
+    fun declareSymbol()
 
+    context(KotlinIrPhase.Context)
     fun generateIrDeclaration(parent: IrDeclarationContainer, generatorContext: GeneratorContext)
 
-    fun generateIrBody(irPluginContext: IrPluginContext)
+    context(KotlinIrPhase.Context)
+    fun generateIrBody()
 }

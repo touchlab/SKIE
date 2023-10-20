@@ -6,18 +6,17 @@ import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.util.SharedCounter
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irGet
@@ -104,12 +103,11 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             }
         }
 
-    context(IrPluginContext, DeclarationIrBuilder)
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    context(KotlinIrPhase.Context, DeclarationIrBuilder)
     private fun getOverloadBody(
         originalFunction: FunctionDescriptor, overloadIr: IrFunction,
     ): IrBody {
-        val originalFunctionSymbol = symbolTable.referenceSimpleFunction(originalFunction)
+        val originalFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunction)
 
         return irBlockBody {
             +irReturn(

@@ -6,6 +6,6 @@ object DeclareMissingSymbolsPhase : SymbolTablePhase {
 
     context(SymbolTablePhase.Context)
     override fun execute() {
-        declarationBuilder.declareSymbols(symbolTable)
+        declarationBuilder.declareSymbols()
     }
 }

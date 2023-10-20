@@ -26,7 +26,6 @@ data class CommonCompilerConfigurationAnalytics(
     val objcGenerics: Boolean?,
     val memoryModel: String?,
     val allocationMode: String?,
-    val garbageCollector: String?,
     val unitSuspendFunctionObjCExport: String?,
     val objcExportSuspendFunctionLaunchThreadRestriction: String?,
 ) {
@@ -52,7 +51,6 @@ data class CommonCompilerConfigurationAnalytics(
                 objcGenerics = config.configuration.get(KonanConfigKeys.OBJC_GENERICS),
                 memoryModel = config.configuration.get(BinaryOptions.memoryModel)?.toString(),
                 allocationMode = config.configuration.get(KonanConfigKeys.ALLOCATION_MODE)?.toString(),
-                garbageCollector = config.configuration.get(KonanConfigKeys.GARBAGE_COLLECTOR)?.toString(),
                 unitSuspendFunctionObjCExport = config.configuration.get(BinaryOptions.unitSuspendFunctionObjCExport)?.toString(),
                 objcExportSuspendFunctionLaunchThreadRestriction = config.configuration.get(BinaryOptions.objcExportSuspendFunctionLaunchThreadRestriction)
                     ?.toString(),

@@ -5,19 +5,18 @@ import co.touchlab.skie.kir.irbuilder.createSecondaryConstructor
 import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.util.SharedCounter
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irDelegatingConstructorCall
@@ -118,12 +117,11 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private fun String.dropUniqueParameterMangling(): String =
         this.split(uniqueNameSubstring).first()
 
-    context(IrPluginContext, DeclarationIrBuilder)
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    context(KotlinIrPhase.Context, DeclarationIrBuilder)
     private fun getOverloadBody(
         originalConstructor: ClassConstructorDescriptor, overloadIr: IrConstructor,
     ): IrBody {
-        val originalConstructorSymbol = symbolTable.referenceConstructor(originalConstructor)
+        val originalConstructorSymbol = skieSymbolTable.descriptorExtension.referenceConstructor(originalConstructor)
 
         return irBlockBody {
             +irDelegatingConstructorCall(originalConstructorSymbol.owner).apply {

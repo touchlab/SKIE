@@ -4,14 +4,13 @@ import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.DeserializedClassMemberScopeReflector
 import co.touchlab.skie.kir.irbuilder.UnsupportedDeclarationDescriptorException
 import co.touchlab.skie.kir.irbuilder.util.findSourceFile
+import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
-import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 class DeserializedClassNamespace(
@@ -48,7 +47,7 @@ class DeserializedClassNamespace(
         (descriptor.constructors as MutableCollection).add(constructorDescriptor)
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    override fun generateNamespaceIr(generatorContext: GeneratorContext): IrDeclarationContainer =
-        generatorContext.symbolTable.referenceClass(descriptor).owner
+    context(KotlinIrPhase.Context)
+    override fun generateNamespaceIr(): IrDeclarationContainer =
+        skieSymbolTable.descriptorExtension.referenceClass(descriptor).owner
 }

@@ -3,10 +3,10 @@ package co.touchlab.skie.kir.irbuilder.impl.namespace
 import co.touchlab.skie.kir.DescriptorRegistrationScope
 import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
 import co.touchlab.skie.kir.irbuilder.Namespace
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
-import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
@@ -23,9 +23,10 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
         registerDescriptorProvider(declarationTemplate.descriptor)
     }
 
-    override fun registerSymbols(symbolTable: SymbolTable) {
+    context(SymbolTablePhase.Context)
+    override fun registerSymbols() {
         templates.forEach {
-            it.declareSymbol(symbolTable)
+            it.declareSymbol()
         }
     }
 
@@ -40,33 +41,36 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
         registerExposedDescriptor(declarationDescriptor)
     }
 
-    override fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable) {
+    context(KotlinIrPhase.Context)
+    override fun generateIrDeclarations() {
         val generatorContext = GeneratorContext(
             Psi2IrConfiguration(),
             descriptor.module,
             pluginContext.bindingContext,
             pluginContext.languageVersionSettings,
-            symbolTable,
+            skieSymbolTable.kotlinSymbolTable,
             GeneratorExtensions(),
             pluginContext.typeTranslator,
             pluginContext.irBuiltIns,
             null,
         )
 
-        val namespaceIr = generateNamespaceIr(generatorContext)
+        val namespaceIr = generateNamespaceIr()
 
         templates.forEach {
             it.generateIrDeclaration(namespaceIr, generatorContext)
         }
     }
 
-    override fun generateIrBodies(pluginContext: IrPluginContext) {
+    context(KotlinIrPhase.Context)
+    override fun generateIrBodies() {
         templates.forEach {
-            it.generateIrBody(pluginContext)
+            it.generateIrBody()
         }
     }
 
     protected abstract fun addDescriptorIntoDescriptorHierarchy(declarationDescriptor: DeclarationDescriptor)
 
-    protected abstract fun generateNamespaceIr(generatorContext: GeneratorContext): IrDeclarationContainer
+    context(KotlinIrPhase.Context)
+    protected abstract fun generateNamespaceIr(): IrDeclarationContainer
 }

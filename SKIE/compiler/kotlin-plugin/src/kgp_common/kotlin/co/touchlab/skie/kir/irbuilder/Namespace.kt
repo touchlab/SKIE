@@ -1,10 +1,12 @@
 package co.touchlab.skie.kir.irbuilder
 
 import co.touchlab.skie.kir.DescriptorRegistrationScope
+import co.touchlab.skie.kir.util.SkieSymbolTable
+import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.ir.util.SymbolTable
 
 interface Namespace<D : DeclarationDescriptor> {
 
@@ -15,9 +17,12 @@ interface Namespace<D : DeclarationDescriptor> {
     context(DescriptorRegistrationScope)
     fun addTemplate(declarationTemplate: DeclarationTemplate<*>)
 
-    fun registerSymbols(symbolTable: SymbolTable)
+    context(SymbolTablePhase.Context)
+    fun registerSymbols()
 
-    fun generateIrDeclarations(pluginContext: IrPluginContext, symbolTable: SymbolTable)
+    context(KotlinIrPhase.Context)
+    fun generateIrDeclarations()
 
-    fun generateIrBodies(pluginContext: IrPluginContext)
+    context(KotlinIrPhase.Context)
+    fun generateIrBodies()
 }

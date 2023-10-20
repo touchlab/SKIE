@@ -16,10 +16,14 @@ import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrConstructor
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrSimpleFunction
 import co.touchlab.skie.kir.irbuilder.impl.template.FunctionTemplate
 import co.touchlab.skie.kir.irbuilder.impl.template.SecondaryConstructorTemplate
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.kir.util.SkieSymbolTable
+import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
+import org.jetbrains.kotlin.backend.konan.serialization.KonanIdSignaturer
+import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerIr
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -36,8 +40,6 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
@@ -88,7 +90,7 @@ class DeclarationBuilderImpl(
         val sourceFile = existingMember.findSourceFileOrNull()
 
         val hasOriginalPackage = existingMember.findPackage() is DeserializedPackageFragment &&
-                sourceFile in originalExposedFiles
+            sourceFile in originalExposedFiles
 
         return when {
             sourceFile == null -> getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
@@ -134,23 +136,25 @@ class DeclarationBuilderImpl(
         return declarationTemplate.descriptor
     }
 
-    fun declareSymbols(symbolTable: SymbolTable) {
+    context(SymbolTablePhase.Context)
+    fun declareSymbols() {
         allNamespaces.forEach {
-            it.registerSymbols(symbolTable)
+            it.registerSymbols()
         }
     }
 
-    fun generateIr(mairIrModuleFragment: IrModuleFragment, pluginContext: IrPluginContext, symbolTable: SymbolTable) {
-        this.mainIrModuleFragment = mairIrModuleFragment
+    context(KotlinIrPhase.Context)
+    fun generateIr() {
+        this.mainIrModuleFragment = moduleFragment
 
-        fixPrivateTypeParametersSymbolsFromOldKLibs(symbolTable)
+        fixPrivateTypeParametersSymbolsFromOldKLibs(skieSymbolTable)
 
         allNamespaces.forEach {
-            it.generateIrDeclarations(pluginContext, symbolTable)
+            it.generateIrDeclarations()
         }
 
         allNamespaces.forEach {
-            it.generateIrBodies(pluginContext)
+            it.generateIrBodies()
         }
     }
 
@@ -162,21 +166,21 @@ class DeclarationBuilderImpl(
      * This then probably confuses the deserializer which in return declares the TypeParameters with non-public symbol (because it does not see that symbol as being declared in public declaration).
      * This fix registers these missing symbols manually.
      */
-    private fun fixPrivateTypeParametersSymbolsFromOldKLibs(symbolTable: SymbolTable) {
-        symbolTable.allExposedTypeParameters(mutableDescriptorProvider)
+    private fun fixPrivateTypeParametersSymbolsFromOldKLibs(skieSymbolTable: SkieSymbolTable) {
+        skieSymbolTable.allExposedTypeParameters(mutableDescriptorProvider)
             .filter { it.symbol !is IrTypeParameterPublicSymbolImpl }
             .forEach {
-                symbolTable.declarePrivateTypeParameterAsPublic(it)
+                skieSymbolTable.declarePrivateTypeParameterAsPublic(it)
             }
     }
 }
 
-private fun SymbolTable.allExposedTypeParameters(descriptorProvider: DescriptorProvider): List<IrTypeParameter> =
+private fun SkieSymbolTable.allExposedTypeParameters(descriptorProvider: DescriptorProvider): List<IrTypeParameter> =
     (descriptorProvider.allExposedMembers.flatMap { referenceBoundTypeParameterContainer(it) } +
-            descriptorProvider.exposedClasses.flatMap { referenceBoundTypeParameterContainer(it) })
+        descriptorProvider.exposedClasses.flatMap { referenceBoundTypeParameterContainer(it) })
         .flatMap { it.typeParameters }
 
-private fun SymbolTable.referenceBoundTypeParameterContainer(
+private fun SkieSymbolTable.referenceBoundTypeParameterContainer(
     callableMemberDescriptor: CallableMemberDescriptor,
 ): List<IrTypeParametersContainer> =
     when (callableMemberDescriptor) {
@@ -185,33 +189,30 @@ private fun SymbolTable.referenceBoundTypeParameterContainer(
         else -> error("Unsupported type $callableMemberDescriptor.")
     }
 
-@OptIn(ObsoleteDescriptorBasedAPI::class)
-private fun SymbolTable.referenceBoundTypeParameterContainer(functionDescriptor: FunctionDescriptor): List<IrTypeParametersContainer> =
+private fun SkieSymbolTable.referenceBoundTypeParameterContainer(functionDescriptor: FunctionDescriptor): List<IrTypeParametersContainer> =
     listOfNotNull(
-        referenceFunction(functionDescriptor).takeIf {
+        descriptorExtension.referenceFunction(functionDescriptor).takeIf {
             it.isBound && it.owner !is DummyIrSimpleFunction && it.owner !is DummyIrConstructor
         }?.owner,
     )
 
-@OptIn(ObsoleteDescriptorBasedAPI::class)
-private fun SymbolTable.referenceBoundTypeParameterContainer(propertyDescriptor: PropertyDescriptor): List<IrTypeParametersContainer> {
-    val property = referenceProperty(propertyDescriptor).takeIf { it.isBound }?.owner
+private fun SkieSymbolTable.referenceBoundTypeParameterContainer(propertyDescriptor: PropertyDescriptor): List<IrTypeParametersContainer> {
+    val property = descriptorExtension.referenceProperty(propertyDescriptor).takeIf { it.isBound }?.owner
 
     return listOfNotNull(property?.getter, property?.setter)
 }
 
-@OptIn(ObsoleteDescriptorBasedAPI::class)
-private fun SymbolTable.referenceBoundTypeParameterContainer(classDescriptor: ClassDescriptor): List<IrTypeParametersContainer> =
+private fun SkieSymbolTable.referenceBoundTypeParameterContainer(classDescriptor: ClassDescriptor): List<IrTypeParametersContainer> =
     listOfNotNull(
-        referenceClass(classDescriptor).takeIf { it.isBound }?.owner,
+        descriptorExtension.referenceClass(classDescriptor).takeIf { it.isBound }?.owner,
     )
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
-private fun SymbolTable.declarePrivateTypeParameterAsPublic(typeParameter: IrTypeParameter) {
+private fun SkieSymbolTable.declarePrivateTypeParameterAsPublic(typeParameter: IrTypeParameter) {
     val signature = PublicIdSignatureComputer(KonanManglerIr).computeSignature(typeParameter)
 
     val publicSymbol = IrTypeParameterPublicSymbolImpl(signature, typeParameter.descriptor)
     publicSymbol.bind(typeParameter)
 
-    declareGlobalTypeParameter(signature, { publicSymbol }, { typeParameter })
+    kotlinSymbolTable.declareGlobalTypeParameter(signature, { publicSymbol }, { typeParameter })
 }

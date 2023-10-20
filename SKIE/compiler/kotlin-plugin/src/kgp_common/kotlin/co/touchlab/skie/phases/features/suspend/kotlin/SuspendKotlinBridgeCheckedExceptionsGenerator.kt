@@ -2,12 +2,11 @@ package co.touchlab.skie.phases.features.suspend.kotlin
 
 import co.touchlab.skie.kir.irbuilder.util.SUSPEND_WRAPPER_CHECKED_EXCEPTIONS
 import co.touchlab.skie.kir.irbuilder.util.addChild
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
-import org.jetbrains.kotlin.ir.backend.jvm.serialization.JvmIrMangler.fqnString
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irExprBody
 import org.jetbrains.kotlin.ir.builders.irGetField
@@ -33,7 +32,7 @@ import org.jetbrains.kotlin.types.KotlinType
 
 class SuspendKotlinBridgeCheckedExceptionsGenerator {
 
-    context(IrPluginContext, DeclarationIrBuilder)
+    context(KotlinIrPhase.Context, DeclarationIrBuilder)
     fun createGetCheckedExceptions(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
@@ -43,7 +42,8 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
         return irGetField(null, field)
     }
 
-    private fun IrPluginContext.createCheckedExceptionsField(
+    context(KotlinIrPhase.Context)
+    private fun createCheckedExceptionsField(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrFieldImpl {
@@ -69,17 +69,19 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
         return field
     }
 
+    @Suppress("RecursivePropertyAccessor")
     private val IrDeclaration.parentPackageFragment: IrPackageFragment
         get() = parent as? IrPackageFragment ?: (parent as IrDeclaration).parentPackageFragment
 
     private val IrSimpleFunction.nameForCheckedExceptionsField: String
-        get() = this.fqnString(false) + "_checkedExceptions"
+        get() = this.name.identifier + "__checkedExceptions"
 
-    private fun IrPluginContext.createCheckExceptionsFieldInitializer(
+    context(KotlinIrPhase.Context)
+    private fun createCheckExceptionsFieldInitializer(
         fieldSymbol: IrFieldSymbolImpl,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrExpressionBody =
-        DeclarationIrBuilder(this, fieldSymbol, 0, 0).run {
+        DeclarationIrBuilder(pluginContext, fieldSymbol, 0, 0).run {
             irExprBody(
                 irCall(irBuiltIns.arrayOf).apply {
                     val checkedExceptionClassReferences = createCheckedExceptionClassReferences(originalFunctionDescriptor)
@@ -93,14 +95,14 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
             )
         }
 
-    context(IrPluginContext)
+    context(KotlinIrPhase.Context)
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun createCheckedExceptionClassReferences(
         originalFunctionDescriptor: FunctionDescriptor,
     ): List<IrClassReference> =
         originalFunctionDescriptor.declaredThrownExceptions
             .map { exceptionType ->
-                val exceptionTypeSymbol = symbolTable.referenceClassifier(exceptionType.constructor.declarationDescriptor!!)
+                val exceptionTypeSymbol = skieSymbolTable.kotlinSymbolTable.referenceClassifier(exceptionType.constructor.declarationDescriptor!!)
 
                 IrClassReferenceImpl(
                     startOffset = 0,

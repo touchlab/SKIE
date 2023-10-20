@@ -3,12 +3,9 @@ package co.touchlab.skie.compilerinject.reflection.reflectors
 import co.touchlab.skie.compilerinject.reflection.Reflector
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.backend.konan.serialization.KonanIdSignaturer
+import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
-import org.jetbrains.kotlin.ir.util.IdSignature
-import org.jetbrains.kotlin.ir.util.IdSignatureComposer
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
 class ObjCExportReflector(
@@ -30,21 +27,6 @@ class ObjCExportReflector(
         }
 
         private fun createSymbolTable(): SymbolTable =
-            SymbolTable(DummySignaturer(), IrFactoryImpl)
-
-        class DummySignaturer : IdSignatureComposer {
-
-            override fun composeAnonInitSignature(descriptor: ClassDescriptor): IdSignature? = null
-
-            override fun composeEnumEntrySignature(descriptor: ClassDescriptor): IdSignature? = null
-
-            override fun composeFieldSignature(descriptor: PropertyDescriptor): IdSignature? = null
-
-            override fun composeSignature(descriptor: DeclarationDescriptor): IdSignature? = null
-
-            override fun withFileSignature(fileSignature: IdSignature.FileSignature, body: () -> Unit) {
-                body()
-            }
-        }
+            SymbolTable(KonanIdSignaturer(KonanManglerDesc), IrFactoryImpl)
     }
 }

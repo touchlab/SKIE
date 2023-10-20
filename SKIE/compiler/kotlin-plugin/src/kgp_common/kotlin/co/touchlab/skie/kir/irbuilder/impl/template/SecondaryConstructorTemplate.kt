@@ -6,18 +6,16 @@ import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.kir.irbuilder.SecondaryConstructorBuilder
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrConstructor
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.IrRebindableConstructorPublicSymbol
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
-import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
-import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name
 
 class SecondaryConstructorTemplate(
@@ -36,8 +34,8 @@ class SecondaryConstructorTemplate(
 
     private val constructorBuilder = SecondaryConstructorBuilder(descriptor)
 
-    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
-    private val irBodyBuilder: context(IrPluginContext) DeclarationIrBuilder.(IrConstructor) -> IrBody
+    // TODO Change to context(KotlinIrPhase.Context, DeclarationIrBuilder) once are context implemented properly
+    private val irBodyBuilder: context(KotlinIrPhase.Context) DeclarationIrBuilder.(IrConstructor) -> IrBody
 
     init {
         descriptor.reflectedBy<DeclarationDescriptorImplReflector>().name = name
@@ -54,8 +52,9 @@ class SecondaryConstructorTemplate(
         descriptor.returnType = namespace.descriptor.defaultType
     }
 
-    override fun declareSymbol(symbolTable: SymbolTable) {
-        val signature = symbolTable.signaturer.composeSignature(descriptor)
+    context(SymbolTablePhase.Context)
+    override fun declareSymbol() {
+        val signature = skieSymbolTable.kotlinSymbolTable.signaturer.composeSignature(descriptor)
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
         // IrRebindableConstructorPublicSymbol is used so that we can later bind it to the correct declaration which cannot be created before the symbol table is validated to not contain any unbound symbols.
@@ -70,20 +69,17 @@ class SecondaryConstructorTemplate(
             }
         }
 
-        val declaration = symbolTable.declareConstructor(signature, symbolFactory, functionFactory)
+        val declaration = skieSymbolTable.kotlinSymbolTable.declareConstructor(signature, symbolFactory, functionFactory)
         // But the symbol cannot be bounded otherwise DeclarationBuilder will not to generate the declaration (because it thinks it already exists).
         (declaration.symbol as? IrRebindableConstructorPublicSymbol)?.unbind()
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    override fun getSymbol(symbolTable: ReferenceSymbolTable): IrConstructorSymbol =
-        symbolTable.referenceConstructor(descriptor)
+    context(KotlinIrPhase.Context)
+    override fun getSymbol(): IrConstructorSymbol =
+        skieSymbolTable.descriptorExtension.referenceConstructor(descriptor)
 
-    override fun initializeBody(
-        declaration: IrConstructor,
-        irPluginContext: IrPluginContext,
-        declarationIrBuilder: DeclarationIrBuilder,
-    ) {
-        declaration.body = irBodyBuilder(irPluginContext, declarationIrBuilder, declaration)
+    context(KotlinIrPhase.Context)
+    override fun initializeBody(declaration: IrConstructor, declarationIrBuilder: DeclarationIrBuilder) {
+        declaration.body = irBodyBuilder(this@Context, declarationIrBuilder, declaration)
     }
 }

@@ -1,5 +1,6 @@
 package co.touchlab.skie.kir.irbuilder
 
+import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -15,6 +16,6 @@ class SecondaryConstructorBuilder(val descriptor: ClassConstructorDescriptor) {
 
     var visibility: DescriptorVisibility = DescriptorVisibilities.PUBLIC
 
-    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
-    var body: (context(IrPluginContext) DeclarationIrBuilder.(IrConstructor) -> IrBody)? = null
+    // TODO Change to context(KotlinIrPhase.Context, DeclarationIrBuilder) once are context implemented properly
+    var body: (context(KotlinIrPhase.Context) DeclarationIrBuilder.(IrConstructor) -> IrBody)? = null
 }

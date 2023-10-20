@@ -2,11 +2,10 @@ package co.touchlab.skie.phases.features.suspend.kotlin
 
 import co.touchlab.skie.kir.irbuilder.util.irFunctionExpression
 import co.touchlab.skie.kir.irbuilder.util.irSimpleFunction
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
@@ -26,7 +25,7 @@ import org.jetbrains.kotlin.name.SpecialNames
 
 class SuspendKotlinBridgeHandlerLambdaGenerator {
 
-    context(IrPluginContext, IrBlockBodyBuilder)
+    context(KotlinIrPhase.Context, IrBlockBodyBuilder)
     fun createOriginalFunctionCallLambda(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
@@ -38,7 +37,7 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
             function = createOriginalFunctionCallLambdaFunction(bridgingFunction, originalFunctionDescriptor),
         )
 
-    context(IrPluginContext, IrBlockBodyBuilder)
+    context(KotlinIrPhase.Context, IrBlockBodyBuilder)
     private fun createOriginalFunctionCallLambdaFunction(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
@@ -52,14 +51,13 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
             body = { createOriginalFunctionCallLambdaFunctionBody(bridgingFunction, originalFunctionDescriptor) },
         )
 
-    context(IrPluginContext, DeclarationIrBuilder)
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    context(KotlinIrPhase.Context, DeclarationIrBuilder)
     private fun createOriginalFunctionCallLambdaFunctionBody(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrBlockBody =
         irBlockBody {
-            val originalFunctionSymbol = symbolTable.referenceSimpleFunction(originalFunctionDescriptor)
+            val originalFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunctionDescriptor)
 
             +irReturn(
                 irCall(originalFunctionSymbol).apply {

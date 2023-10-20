@@ -3,6 +3,7 @@ package co.touchlab.skie.kir.irbuilder.impl.namespace
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.compilerinject.reflection.reflectors.ModuleDescriptorImplReflector
+import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -21,7 +22,6 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.source.PsiSourceFile
 
@@ -53,7 +53,8 @@ class NewFileNamespace private constructor(
         packageContent.add(declarationDescriptor)
     }
 
-    override fun generateNamespaceIr(generatorContext: GeneratorContext): IrDeclarationContainer {
+    context(KotlinIrPhase.Context)
+    override fun generateNamespaceIr(): IrDeclarationContainer {
         val fileEntry = DummyIrFileEntry(sourceFile.nameOrError)
 
         val file = IrFileImpl(fileEntry, descriptor, context.mainIrModuleFragment)

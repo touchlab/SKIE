@@ -24,11 +24,13 @@ data class CompilerEnvironmentAnalytics(
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_CompilerEnvironment
 
+        // Xcode.findCurrent().version.toString() is not redundant because from 1.9.20 the version is not a String
+        @Suppress("RemoveRedundantCallsOfConversionMethods")
         override fun produce(): String =
             CompilerEnvironmentAnalytics(
                 jvmVersion = Runtime.version().toString(),
                 compilerVersion = konanConfig.distribution.compilerVersion,
-                xcodeVersion = Xcode.findCurrent().version,
+                xcodeVersion = Xcode.findCurrent().version.toString(),
                 availableProcessors = Runtime.getRuntime().availableProcessors(),
                 maxJvmMemory = Runtime.getRuntime().maxMemory(),
             ).toPrettyJson()

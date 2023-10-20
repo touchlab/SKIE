@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.coroutines
 
+import co.touchlab.skie.plugin.util.getKonanHome
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
 import org.gradle.api.DefaultTask
@@ -10,7 +11,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
-import org.jetbrains.kotlin.konan.util.DependencyDirectories
 import java.util.Properties
 
 internal abstract class ConfigureMinOsVersionTask : DefaultTask() {
@@ -47,7 +47,7 @@ private val NativeBinary.distribution: Distribution
     get() {
         val overrideKonanProperties = parseOverrideKonanProperties(freeCompilerArgs)
 
-        return Distribution(konanHome = DependencyDirectories.localKonanDir.absolutePath, propertyOverrides = overrideKonanProperties)
+        return Distribution(konanHome = project.getKonanHome().absolutePath, propertyOverrides = overrideKonanProperties)
     }
 
 private fun parseOverrideKonanProperties(

@@ -1,5 +1,6 @@
 package co.touchlab.skie.kir.irbuilder
 
+import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -36,6 +37,6 @@ class FunctionBuilder(val descriptor: SimpleFunctionDescriptor) {
 
     var isSuspend: Boolean = false
 
-    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
-    var body: (context(IrPluginContext) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody)? = null
+    // TODO Change to context(KotlinIrPhase.Context, DeclarationIrBuilder) once are context implemented properly
+    var body: (context(KotlinIrPhase.Context) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody)? = null
 }

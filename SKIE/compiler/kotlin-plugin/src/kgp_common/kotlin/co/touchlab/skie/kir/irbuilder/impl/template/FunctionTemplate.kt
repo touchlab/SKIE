@@ -4,18 +4,16 @@ import co.touchlab.skie.kir.irbuilder.FunctionBuilder
 import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrSimpleFunction
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.IrRebindableSimpleFunctionPublicSymbol
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
-import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
-import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.Name
 
 class FunctionTemplate(
@@ -35,8 +33,8 @@ class FunctionTemplate(
 
     private val functionBuilder = FunctionBuilder(descriptor)
 
-    // TODO Change to context(IrPluginContext, DeclarationIrBuilder) once are context implemented properly
-    private val irBodyBuilder: context(IrPluginContext) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody
+    // TODO Change to context(KotlinIrPhase.Context, DeclarationIrBuilder) once are context implemented properly
+    private val irBodyBuilder: context(KotlinIrPhase.Context) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody
 
     init {
         functionBuilder.config()
@@ -58,8 +56,9 @@ class FunctionTemplate(
         descriptor.isSuspend = functionBuilder.isSuspend
     }
 
-    override fun declareSymbol(symbolTable: SymbolTable) {
-        val signature = symbolTable.signaturer.composeSignature(descriptor)
+    context(SymbolTablePhase.Context)
+    override fun declareSymbol() {
+        val signature = skieSymbolTable.kotlinSymbolTable.signaturer.composeSignature(descriptor)
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
         // IrRebindableSimpleFunctionPublicSymbol is used so that we can later bind it to the correct declaration which cannot be created before the symbol table is validated to not contain any unbound symbols.
@@ -74,20 +73,17 @@ class FunctionTemplate(
             }
         }
 
-        val declaration = symbolTable.declareSimpleFunction(signature, symbolFactory, functionFactory)
+        val declaration = skieSymbolTable.kotlinSymbolTable.declareSimpleFunction(signature, symbolFactory, functionFactory)
         // But the symbol cannot be bounded otherwise DeclarationBuilder will not to generate the declaration (because it thinks it already exists).
         (declaration.symbol as? IrRebindableSimpleFunctionPublicSymbol)?.unbind()
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    override fun getSymbol(symbolTable: ReferenceSymbolTable): IrSimpleFunctionSymbol =
-        symbolTable.referenceSimpleFunction(descriptor)
+    context(KotlinIrPhase.Context)
+    override fun getSymbol(): IrSimpleFunctionSymbol =
+        skieSymbolTable.descriptorExtension.referenceSimpleFunction(descriptor)
 
-    override fun initializeBody(
-        declaration: IrSimpleFunction,
-        irPluginContext: IrPluginContext,
-        declarationIrBuilder: DeclarationIrBuilder,
-    ) {
-        declaration.body = irBodyBuilder(irPluginContext, declarationIrBuilder, declaration)
+    context(KotlinIrPhase.Context)
+    override fun initializeBody(declaration: IrSimpleFunction, declarationIrBuilder: DeclarationIrBuilder) {
+        declaration.body = irBodyBuilder(this@Context, declarationIrBuilder, declaration)
     }
 }
