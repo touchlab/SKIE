@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.plugins.signing.SigningExtension
 
 interface HasSigningPlugin {
+
     val Project.signing: SigningExtension
         get() = extensions.getByType()
 

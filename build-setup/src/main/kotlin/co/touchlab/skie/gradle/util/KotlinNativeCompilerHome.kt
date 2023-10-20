@@ -1,7 +1,6 @@
 package co.touchlab.skie.gradle.util
 
 import co.touchlab.skie.gradle.KotlinToolingVersion
-import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.extra
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
@@ -10,10 +9,11 @@ import java.io.File
 
 private data class BackupProperty<T>(
     val name: String,
-    val value: T
+    val value: T,
 )
 
 private object KotlinNativeVersionPropertyName {
+
     const val main = "kotlin.native.version"
     const val deprecated = "org.jetbrains.kotlin.native.version"
 }

@@ -2,7 +2,7 @@ package co.touchlab.skie.gradle.version
 
 import co.touchlab.skie.gradle.version.target.Target
 
-enum class DarwinPlatformComponent: Target.Component {
+enum class DarwinPlatformComponent : Target.Component {
     iosArm32,
     iosArm64,
     iosX64,

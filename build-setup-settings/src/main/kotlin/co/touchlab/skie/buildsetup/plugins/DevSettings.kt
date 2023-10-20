@@ -4,7 +4,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.maven
 
-class DevSettings: Plugin<Settings> {
+class DevSettings : Plugin<Settings> {
+
     override fun apply(target: Settings) = with(target) {
         dependencyResolutionManagement {
             repositories {

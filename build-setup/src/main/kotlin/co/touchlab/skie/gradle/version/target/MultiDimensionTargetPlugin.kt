@@ -9,7 +9,8 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.name
 
-abstract class MultiDimensionTargetPlugin(): Plugin<Project> {
+abstract class MultiDimensionTargetPlugin() : Plugin<Project> {
+
     override fun apply(project: Project) {
         project.apply<KotlinMultiplatformPluginWrapper>()
 
@@ -35,6 +36,7 @@ abstract class MultiDimensionTargetPlugin(): Plugin<Project> {
     }
 
     sealed interface Compilation {
+
         val sourceSetNameSuffix: String
         val directory: Path
         val isMain: Boolean
@@ -42,11 +44,13 @@ abstract class MultiDimensionTargetPlugin(): Plugin<Project> {
         val isTest: Boolean
             get() = this is Test
 
-        data class Main(override val directory: Path): Compilation {
+        data class Main(override val directory: Path) : Compilation {
+
             override val sourceSetNameSuffix: String = "Main"
         }
 
-        data class Test(override val directory: Path): Compilation {
+        data class Test(override val directory: Path) : Compilation {
+
             override val sourceSetNameSuffix: String = "Test"
         }
 
@@ -59,7 +63,7 @@ abstract class MultiDimensionTargetPlugin(): Plugin<Project> {
                 val allPathComponents = listOf(
                     directory.name,
                 ) + path.components + listOf(
-                    sourceName
+                    sourceName,
                 )
                 allPathComponents.joinToString(File.separator)
             }

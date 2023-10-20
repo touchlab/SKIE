@@ -8,14 +8,20 @@ import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 @Suppress("UnstableApiUsage")
-abstract class SkiePublishable: Plugin<Project>, HasMavenPublishPlugin, HasSigningPlugin {
+abstract class SkiePublishable : Plugin<Project>, HasMavenPublishPlugin, HasSigningPlugin {
+
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<MavenPublishPlugin>()

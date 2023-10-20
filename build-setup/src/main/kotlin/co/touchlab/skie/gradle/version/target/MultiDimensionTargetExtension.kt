@@ -2,9 +2,7 @@ package co.touchlab.skie.gradle.version.target
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.listProperty
-import org.gradle.kotlin.dsl.property
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import javax.inject.Inject
@@ -13,6 +11,7 @@ abstract class MultiDimensionTargetExtension @Inject constructor(
     objects: ObjectFactory,
     private val targetConfigurer: MultiDimensionTargetConfigurer,
 ) {
+
     internal val dimensions: ListProperty<Target.Dimension<*>> = objects.listProperty()
 
     val sourceSetConfigureActions: ListProperty<ConfigureSourceSetScope.(SourceSet) -> Unit> = objects.listProperty()

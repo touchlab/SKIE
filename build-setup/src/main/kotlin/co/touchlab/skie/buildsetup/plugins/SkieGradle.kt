@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
-import co.touchlab.skie.gradle.version.*
+import co.touchlab.skie.gradle.version.gradleApiVersion
+import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.target.MultiDimensionTargetExtension
 import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import org.gradle.api.Plugin
@@ -11,7 +12,8 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
 
-abstract class SkieGradle: Plugin<Project> {
+abstract class SkieGradle : Plugin<Project> {
+
     override fun apply(project: Project): Unit = with(project) {
         apply<SkieBase>()
         apply<MultiDimensionTargetPlugin>()

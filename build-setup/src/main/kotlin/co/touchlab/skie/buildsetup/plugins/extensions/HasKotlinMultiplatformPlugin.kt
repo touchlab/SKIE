@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 interface HasKotlinMultiplatformPlugin {
+
     val Project.kotlin: KotlinMultiplatformExtension
         get() = extensions.getByType()
 

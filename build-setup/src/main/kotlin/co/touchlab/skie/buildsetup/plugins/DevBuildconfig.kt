@@ -7,7 +7,8 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-abstract class DevBuildconfig: Plugin<Project> {
+abstract class DevBuildconfig : Plugin<Project> {
+
     override fun apply(target: Project): Unit = with(target) {
         apply<BuildConfigPlugin>()
 

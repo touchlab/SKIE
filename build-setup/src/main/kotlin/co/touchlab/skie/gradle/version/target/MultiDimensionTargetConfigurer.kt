@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 class MultiDimensionTargetConfigurer(
     private val project: Project,
 ) {
+
     val allTargets = project.objects.namedDomainObjectList(Target::class)
 
     fun configure(

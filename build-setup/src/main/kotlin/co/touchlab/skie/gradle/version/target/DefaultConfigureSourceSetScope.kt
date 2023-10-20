@@ -11,7 +11,8 @@ class DefaultConfigureSourceSetScope(
     private val project: Project,
     override val kotlinSourceSet: KotlinSourceSet,
     override val compilation: MultiDimensionTargetPlugin.Compilation,
-): ConfigureSourceSetScope {
+) : ConfigureSourceSetScope {
+
     override fun dependencies(block: MultiDimensionTargetDependencyHandler.() -> Unit) {
         kotlinSourceSet.dependencies {
             with(DependencyHandler(this)) {
@@ -28,7 +29,8 @@ class DefaultConfigureSourceSetScope(
 
     private inner class DependencyHandler(
         kotlinDependencyHandler: KotlinDependencyHandler,
-    ): MultiDimensionTargetDependencyHandler, KotlinDependencyHandler by kotlinDependencyHandler {
+    ) : MultiDimensionTargetDependencyHandler, KotlinDependencyHandler by kotlinDependencyHandler {
+
         override fun weak(dependencyNotation: Any): Dependency? = compilation(
             main = { compileOnly(dependencyNotation) },
             test = { implementation(dependencyNotation) },

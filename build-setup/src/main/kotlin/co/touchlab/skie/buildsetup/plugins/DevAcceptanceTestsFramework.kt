@@ -12,10 +12,13 @@ import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.named
 import org.gradle.language.jvm.tasks.ProcessResources
 
-abstract class DevAcceptanceTestsFramework: Plugin<Project> {
+abstract class DevAcceptanceTestsFramework : Plugin<Project> {
+
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<MultiDimensionTargetPlugin>()
@@ -28,7 +31,7 @@ abstract class DevAcceptanceTestsFramework: Plugin<Project> {
                 ExpectActualBuildConfigGenerator(
                     isActualImplementation = false,
                     internalVisibility = false,
-                )
+                ),
             )
 
             buildConfigField(

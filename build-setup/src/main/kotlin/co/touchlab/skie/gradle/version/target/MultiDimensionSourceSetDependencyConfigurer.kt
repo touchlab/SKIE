@@ -3,6 +3,7 @@ package co.touchlab.skie.gradle.version.target
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 class MultiDimensionSourceSetDependencyConfigurer {
+
     fun configure(sourceSets: Map<SourceSet, KotlinSourceSet>) {
         val sourceSetPairs = sourceSets.map { (sourceSet, kotlinSourceSet) ->
             SourceSetPair(

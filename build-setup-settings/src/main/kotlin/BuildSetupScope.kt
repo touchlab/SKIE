@@ -11,6 +11,7 @@ class BuildSetupScope(
     private val path: List<String>,
     private val prefix: String?,
 ) {
+
     val module: ModuleDelegateProvider
         get() = ModuleDelegateProvider(isGroup = false, directoryNameOverride = null) { }
 
@@ -37,7 +38,8 @@ class BuildSetupScope(
         }
     }
 
-    class ValueProperty<T>(private val value: T): ReadOnlyProperty<Nothing?, T> {
+    class ValueProperty<T>(private val value: T) : ReadOnlyProperty<Nothing?, T> {
+
         override fun getValue(thisRef: Nothing?, property: KProperty<*>): T = value
     }
 
@@ -45,7 +47,8 @@ class BuildSetupScope(
         internal val isGroup: Boolean,
         internal val directoryNameOverride: String?,
         internal val configure: BuildSetupScope.() -> Unit,
-    ): PropertyDelegateProvider<Nothing?, ValueProperty<ProjectDescriptor>> {
+    ) : PropertyDelegateProvider<Nothing?, ValueProperty<ProjectDescriptor>> {
+
         override fun provideDelegate(thisRef: Nothing?, property: KProperty<*>): ValueProperty<ProjectDescriptor> {
             return ValueProperty(module(property.name, this))
         }

@@ -5,7 +5,7 @@ class ComparableDimension<COMPONENT>(
     commonName: String,
     components: Set<COMPONENT>,
     aliases: Map<String, Set<COMPONENT>>,
-): DimensionWithAliases<COMPONENT>(name, commonName, components, aliases) where COMPONENT: Comparable<COMPONENT>, COMPONENT: Target.Component {
+) : DimensionWithAliases<COMPONENT>(name, commonName, components, aliases) where COMPONENT : Comparable<COMPONENT>, COMPONENT : Target.Component {
 
     private val sortedComponents = components.sorted()
 

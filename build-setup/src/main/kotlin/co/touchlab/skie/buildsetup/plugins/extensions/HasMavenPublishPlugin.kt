@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 
 interface HasMavenPublishPlugin {
+
     val Project.publishing: PublishingExtension
         get() = extensions.getByType()
 

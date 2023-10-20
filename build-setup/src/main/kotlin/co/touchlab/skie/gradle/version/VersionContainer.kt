@@ -4,9 +4,10 @@ import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-abstract class VersionContainer<VERSION: Comparable<VERSION>>(
+abstract class VersionContainer<VERSION : Comparable<VERSION>>(
     private val identifier: (VERSION) -> String,
 ) {
+
     private val mutableVersions = mutableListOf<VERSION>()
     val allVersions: List<VERSION> = mutableVersions
 
@@ -23,18 +24,21 @@ abstract class VersionContainer<VERSION: Comparable<VERSION>>(
         mutableVersions.add(version)
     }
 
-    inner class VersionProvider(private val factory: (String) -> VERSION):
+    inner class VersionProvider(private val factory: (String) -> VERSION) :
         PropertyDelegateProvider<Any?, ValueProperty<VERSION>> {
+
         override fun provideDelegate(thisRef: Any?, property: KProperty<*>): ValueProperty<VERSION> = ValueProperty(
-            factory(property.name.replace(fakePeriodCharacter, realPeriodCharacter)).also(::addVersion)
+            factory(property.name.replace(fakePeriodCharacter, realPeriodCharacter)).also(::addVersion),
         )
     }
 
-    class ValueProperty<VALUE>(private val value: VALUE): ReadOnlyProperty<Any?, VALUE> {
+    class ValueProperty<VALUE>(private val value: VALUE) : ReadOnlyProperty<Any?, VALUE> {
+
         override fun getValue(thisRef: Any?, property: KProperty<*>): VALUE = value
     }
 
     companion object {
+
         const val fakePeriodCharacter = '․'
         const val realPeriodCharacter = '.'
     }

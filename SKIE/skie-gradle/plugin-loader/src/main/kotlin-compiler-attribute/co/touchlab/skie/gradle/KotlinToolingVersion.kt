@@ -8,7 +8,7 @@
 package co.touchlab.skie.gradle
 
 import java.io.Serializable
-import java.util.*
+import java.util.Locale
 
 fun KotlinToolingVersion(kotlinVersionString: String): KotlinToolingVersion {
     val baseVersion = kotlinVersionString.split("-", limit = 2)[0]
@@ -27,7 +27,7 @@ fun KotlinToolingVersion(kotlinVersionString: String): KotlinToolingVersion {
         major = majorVersion,
         minor = minorVersion,
         patch = baseVersionSplit.getOrNull(2)?.toIntOrNull() ?: 0,
-        classifier = classifier
+        classifier = classifier,
     )
 }
 
@@ -39,7 +39,7 @@ class KotlinToolingVersion(
     val major: Int,
     val minor: Int,
     val patch: Int,
-    val classifier: String?
+    val classifier: String?,
 ) : Comparable<KotlinToolingVersion>, Serializable {
 
     enum class Maturity {
@@ -203,7 +203,6 @@ val KotlinToolingVersion.classifierNumber: Int?
         if (buildNumberOnlyClassifierRegex.matches(classifier)) {
             return null
         }
-
 
         val classifierRegex = Regex("""(.+?)(\d*)?(-release)?-?(\d*)?""")
         val classifierMatch = classifierRegex.matchEntire(classifier) ?: return null

@@ -8,11 +8,12 @@ data class SourceSet(
     val sourceDirs: List<RelativePath>,
     val isRoot: Boolean = false,
 ) {
+
     @PublishedApi
     internal val componentsByType: Map<KClass<out Target.Component>, ComponentSet<*>> = components.associateBy { it.componentType }
         .also { check(it.size == components.size) { "Duplicate component types in $components!" } }
 
-    inline fun <reified COMPONENT: Target.Component> componentSet(): ComponentSet<COMPONENT> {
+    inline fun <reified COMPONENT : Target.Component> componentSet(): ComponentSet<COMPONENT> {
         @Suppress("UNCHECKED_CAST")
         return componentsByType[COMPONENT::class] as ComponentSet<COMPONENT>
     }
@@ -56,7 +57,8 @@ data class SourceSet(
         val children: List<Directory>,
     )
 
-    sealed interface ComponentSet<COMPONENT: Target.Component> {
+    sealed interface ComponentSet<COMPONENT : Target.Component> {
+
         val name: String
         val dimension: Target.Dimension<COMPONENT>
         val componentType: KClass<out COMPONENT>
@@ -72,12 +74,13 @@ data class SourceSet(
             components = components,
         )
 
-        data class Common<COMPONENT: Target.Component>(
+        data class Common<COMPONENT : Target.Component>(
             override val name: String,
             override val dimension: Target.Dimension<COMPONENT>,
             override val components: Set<COMPONENT>,
-        ): ComponentSet<COMPONENT> {
-            constructor(name: String, dimension: Target.Dimension<COMPONENT>): this(name, dimension, dimension.components)
+        ) : ComponentSet<COMPONENT> {
+
+            constructor(name: String, dimension: Target.Dimension<COMPONENT>) : this(name, dimension, dimension.components)
 
             override val componentType: KClass<out COMPONENT> = components.first()::class
 
@@ -88,11 +91,12 @@ data class SourceSet(
             }
         }
 
-        data class Enumerated<COMPONENT: Target.Component>(
+        data class Enumerated<COMPONENT : Target.Component>(
             override val name: String,
             override val dimension: Target.Dimension<COMPONENT>,
             override val components: Set<COMPONENT>,
-        ): ComponentSet<COMPONENT> {
+        ) : ComponentSet<COMPONENT> {
+
             override val componentType: KClass<out COMPONENT> = components.first()::class
 
             override fun shouldDependOn(other: ComponentSet<*>): Boolean = componentType == other.componentType && when (other) {
@@ -102,11 +106,12 @@ data class SourceSet(
             }
         }
 
-        data class Specific<COMPONENT: Target.Component>(
+        data class Specific<COMPONENT : Target.Component>(
             override val name: String,
             override val dimension: Target.Dimension<COMPONENT>,
             val component: COMPONENT,
-        ): ComponentSet<COMPONENT> {
+        ) : ComponentSet<COMPONENT> {
+
             override val componentType: KClass<out COMPONENT> = component::class
 
             override val components: Set<COMPONENT> = setOf(component)
@@ -118,7 +123,12 @@ data class SourceSet(
             }
 
             companion object {
-                fun <COMPONENT: Target.Component> unsafe(name: String, dimension: Target.Dimension<COMPONENT>, component: Target.Component): Specific<COMPONENT> {
+
+                fun <COMPONENT : Target.Component> unsafe(
+                    name: String,
+                    dimension: Target.Dimension<COMPONENT>,
+                    component: Target.Component,
+                ): Specific<COMPONENT> {
                     return Specific(name, dimension, component as COMPONENT)
                 }
             }

@@ -2,11 +2,14 @@ package co.touchlab.skie.gradle.test
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import io.ktor.client.*
-import io.ktor.client.engine.java.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.java.Java
+import io.ktor.client.request.accept
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
@@ -25,12 +28,11 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.exclude
 import org.gradle.tooling.BuildException
 import org.gradle.tooling.GradleConnector
-import org.gradle.tooling.ProgressListener
 import org.gradle.tooling.model.build.BuildEnvironment
-import org.gradle.util.internal.VersionNumber
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -39,16 +41,16 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.target.presetName
 import java.io.File
 
-
 data class VersionedLibrary(
     val library: Library,
     val version: String,
 ) {
+
     constructor(
         group: String,
         name: String,
         version: String,
-    ): this(
+    ) : this(
         library = Library(group, name),
         version = version,
     )
@@ -58,11 +60,12 @@ data class VersionedLibrary(
 }
 
 data class Library(val group: String, val name: String) {
+
     val moduleName: String
         get() = "$group:$name"
 }
 
-abstract class ExternalLibrariesTask: DefaultTask() {
+abstract class ExternalLibrariesTask : DefaultTask() {
 
     @get:OutputDirectory
     abstract val resolutionTempDir: DirectoryProperty
@@ -98,7 +101,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
     private fun getAllLibrariesToTest(libraries: List<Library>): Set<String> {
         val resolutionProjectDir = resolutionTempDir.dir("resolve-all-libraries").get().asFile.also { it.mkdirs() }
         resolutionProjectDir.resolve("input").writeText(
-            libraries.joinToString("\n") { "${it.moduleName}:+" }
+            libraries.joinToString("\n") { "${it.moduleName}:+" },
         )
 
         runSubGradle(
@@ -143,7 +146,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                     project.file("output").writeText(allModules.joinToString("\n"))
                 }
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         return resolutionProjectDir.resolve("output").readLines().toSet()
@@ -152,7 +155,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
     private fun getVersionedLibrariesToTest(librariesToTest: Collection<String>): Set<String> {
         val resolutionProjectDir = resolutionTempDir.dir("resolve-latest-versions").get().asFile.also { it.mkdirs() }
         resolutionProjectDir.resolve("input").writeText(
-            librariesToTest.joinToString("\n") { "$it:+" }
+            librariesToTest.joinToString("\n") { "$it:+" },
         )
         runSubGradle(
             projectDir = resolutionProjectDir,
@@ -248,7 +251,8 @@ abstract class ExternalLibrariesTask: DefaultTask() {
         tasks: List<String> = emptyList(),
         @Language("kotlin") code: String,
     ) {
-        projectDir.resolve("build.gradle.kts").writeText(imports.joinToString("\n") { "import $it" } + """
+        projectDir.resolve("build.gradle.kts").writeText(
+            imports.joinToString("\n") { "import $it" } + """
             |
             |plugins {
             |    kotlin("multiplatform") version "${kotlinVersion.get()}"
@@ -260,18 +264,23 @@ abstract class ExternalLibrariesTask: DefaultTask() {
             |    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
             |    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev/")
             |}
-        """.trimMargin() + "\n\n" + code)
+        """.trimMargin() + "\n\n" + code,
+        )
         projectDir.resolve("settings.gradle.kts").writeText("")
-        projectDir.resolve("gradle.properties").writeText("""
+        projectDir.resolve("gradle.properties").writeText(
+            """
             org.gradle.jvmargs=-Xmx8g -XX:+UseParallelGC
             org.gradle.parallel=true
             kotlin.native.cacheKind=none
-        """.trimIndent())
+        """.trimIndent(),
+        )
         projectDir.resolve("src/commonMain/kotlin/Empty.kt").apply {
             parentFile.mkdirs()
-            writeText("""
+            writeText(
+                """
                 package co.touchlab.skie.test
-            """.trimIndent())
+            """.trimIndent(),
+            )
         }
 
         GradleConnector.newConnector()

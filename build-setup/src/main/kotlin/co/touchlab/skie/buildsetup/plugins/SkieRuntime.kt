@@ -2,11 +2,17 @@ package co.touchlab.skie.buildsetup.plugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
-abstract class SkieRuntime: Plugin<Project> {
+abstract class SkieRuntime : Plugin<Project> {
+
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()

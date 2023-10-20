@@ -1,7 +1,6 @@
 package co.touchlab.skie.gradle.version.target
 
 import org.gradle.api.Project
-import org.gradle.api.logging.Logger
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.nio.file.Path
@@ -15,6 +14,7 @@ class MultiDimensionSourceSetConfigurer(
     private val targetConfigurer: MultiDimensionTargetConfigurer,
     private val sourceSetConfigureActions: List<ConfigureSourceSetScope.(SourceSet) -> Unit>,
 ) {
+
     private val dependencyConfigurer = MultiDimensionSourceSetDependencyConfigurer()
 
     fun configure() {
@@ -71,7 +71,7 @@ class MultiDimensionSourceSetConfigurer(
                                 name = directory.name,
                                 components = listOf(directory.components),
                                 sourceDirs = listOf(RelativePath(listOf(directory.name))),
-                            )
+                            ),
                         )
                     } else {
                         emptySet()
@@ -83,7 +83,7 @@ class MultiDimensionSourceSetConfigurer(
                             components = listOf(directory.components) + childSourceSet.components,
                             sourceDirs = childSourceSet.sourceDirs.map {
                                 it.copy(components = listOf(directory.name) + it.components)
-                            }
+                            },
                         )
                     }
                 }
@@ -105,8 +105,8 @@ class MultiDimensionSourceSetConfigurer(
                 name = target.name,
                 components = components,
                 sourceDirs = listOf(
-                    RelativePath(components.map { it.name })
-                )
+                    RelativePath(components.map { it.name }),
+                ),
             )
         }
 
@@ -123,7 +123,7 @@ class MultiDimensionSourceSetConfigurer(
             },
             sourceDirs = listOf(
                 RelativePath(
-                    listOf("common")
+                    listOf("common"),
                 ),
             ),
             isRoot = true,
@@ -157,11 +157,15 @@ class MultiDimensionSourceSetConfigurer(
         dimension: Target.Dimension<*>,
         nextDimensions: List<Target.Dimension<*>>,
     ): List<SourceSet.Directory> {
-        if (parentDirectory.notExists()) { return emptyList() }
+        if (parentDirectory.notExists()) {
+            return emptyList()
+        }
 
         return parentDirectory.listDirectoryEntries().mapNotNull { sourceSetDir ->
             val components = dimension.parse(sourceSetDir.name)
-            if (components == null || components.isEmpty()) { return@mapNotNull null }
+            if (components == null || components.isEmpty()) {
+                return@mapNotNull null
+            }
 
             SourceSet.Directory(
                 name = sourceSetDir.name,

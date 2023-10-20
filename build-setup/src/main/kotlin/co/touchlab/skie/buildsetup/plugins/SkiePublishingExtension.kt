@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
 abstract class SkiePublishingExtension @Inject constructor(objects: ObjectFactory) {
+
     val publishSources: Property<Boolean> = objects.property<Boolean>().convention(true)
 
     val name: Property<String> = objects.property()

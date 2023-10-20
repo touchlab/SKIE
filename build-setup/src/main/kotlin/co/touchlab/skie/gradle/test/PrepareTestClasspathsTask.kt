@@ -2,48 +2,29 @@ package co.touchlab.skie.gradle.test
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import io.ktor.client.*
-import io.ktor.client.engine.java.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ResolvedConfiguration
-import org.gradle.api.artifacts.ResolvedDependency
-import org.gradle.api.artifacts.type.ArtifactTypeDefinition
-import org.gradle.api.attributes.Category
-import org.gradle.api.attributes.Usage
-import org.gradle.api.attributes.java.TargetJvmEnvironment
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.named
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.model.build.BuildEnvironment
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.target.presetName
 import java.io.File
-import javax.inject.Inject
 
-abstract class PrepareTestClasspathsTask: DefaultTask() {
+abstract class PrepareTestClasspathsTask : DefaultTask() {
 
     @get:Input
     abstract val target: Property<KonanTarget>
@@ -69,7 +50,6 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
             configurationAnnotationsCompileTask(),
         )
     }
-
 
     @TaskAction
     fun downloadAndStoreLibraries() {
@@ -169,7 +149,7 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
 
             mapOf(
                 "files" to filePathMap.values.map { it.absolutePath }.sorted() + configurationAnnotationsKlib + runtimeKotlinKlib,
-                "exported-files" to exportedFiles.map { filePathMap.getValue(it).absolutePath } +  runtimeKotlinKlib,
+                "exported-files" to exportedFiles.map { filePathMap.getValue(it).absolutePath } + runtimeKotlinKlib,
             )
         }
 
@@ -182,7 +162,8 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
         tasks: List<String> = emptyList(),
         @Language("kotlin") code: String,
     ) {
-        projectDir.resolve("build.gradle.kts").writeText(imports.joinToString("\n") { "import $it" } + """
+        projectDir.resolve("build.gradle.kts").writeText(
+            imports.joinToString("\n") { "import $it" } + """
             |
             |plugins {
             |    kotlin("multiplatform") version "${kotlinVersion.get()}"
@@ -194,18 +175,23 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
             |    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
             |    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev/")
             |}
-        """.trimMargin() + "\n\n" + code)
+        """.trimMargin() + "\n\n" + code,
+        )
         projectDir.resolve("settings.gradle.kts").writeText("")
-        projectDir.resolve("gradle.properties").writeText("""
+        projectDir.resolve("gradle.properties").writeText(
+            """
             org.gradle.jvmargs=-Xmx8g -XX:+UseParallelGC
             org.gradle.parallel=true
             kotlin.native.cacheKind=none
-        """.trimIndent())
+        """.trimIndent(),
+        )
         projectDir.resolve("src/commonMain/kotlin/Empty.kt").apply {
             parentFile.mkdirs()
-            writeText("""
+            writeText(
+                """
                 package co.touchlab.skie.test
-            """.trimIndent())
+            """.trimIndent(),
+            )
         }
 
         GradleConnector.newConnector()
