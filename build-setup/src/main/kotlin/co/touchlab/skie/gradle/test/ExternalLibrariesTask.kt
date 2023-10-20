@@ -341,7 +341,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                 )
             }
         } else {
-            val downloadedLibraries = loadAll("*-${target.get().presetName}").map {
+            val downloadedLibraries = loadAll("-${target.get().presetName}").map {
                 it.copy(name = it.name)
             }
 
@@ -371,7 +371,7 @@ abstract class ExternalLibrariesTask: DefaultTask() {
                 contentType(ContentType.Application.Json)
                 setBody(
                     """
-                    {"size": 100, "page": $fromPage, "searchTerm": "$query", "filter": []}
+                    {"size": 20, "page": $fromPage, "searchTerm": "$query", "filter": []}
                 """.trimIndent(),
                 )
             }.bodyAsText()
