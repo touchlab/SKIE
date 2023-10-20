@@ -97,7 +97,7 @@ data class SourceSet(
 
             override fun shouldDependOn(other: ComponentSet<*>): Boolean = componentType == other.componentType && when (other) {
                 is Common -> true
-                is Enumerated -> components != other.components && components.containsAll(other.components)
+                is Enumerated -> components != other.components && other.components.containsAll(components)
                 is Specific -> false
             }
         }
