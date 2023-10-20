@@ -21,7 +21,7 @@ sealed interface SirTypeDeclaration : SirDeclaration {
     var namespace: SirDeclarationNamespace?
         get() = parent as? SirDeclarationNamespace
         set(value) {
-            parent = value ?: namespaceParent
+            parent = value ?: firstParentThatIsNotNamespace
         }
 
     /**

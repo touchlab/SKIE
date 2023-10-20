@@ -8,8 +8,9 @@ sealed interface SirDeclaration : SirElement {
 val SirDeclaration.module: SirModule
     get() = parent.module
 
-val SirDeclaration.namespaceParent: SirDeclarationParent
-    get() = if (parent is SirDeclarationNamespace) parent.namespaceParent else parent
+val SirDeclaration.firstParentThatIsNotNamespace: SirDeclarationParent
+    get() = if (parent is SirDeclarationNamespace) parent.firstParentThatIsNotNamespace else parent
 
+@Suppress("RecursivePropertyAccessor")
 val SirDeclaration.file: SirFile?
     get() = parent as? SirFile ?: (parent as? SirDeclaration)?.file
