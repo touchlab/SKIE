@@ -75,7 +75,11 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 }
                 dependencies {
                     testDependencies(project(":common:configuration:configuration-annotations"))
-                    exportedTestDependencies(project(":runtime:runtime-kotlin"))
+                    exportedTestDependencies(project(":runtime:runtime-kotlin")) {
+                        attributes {
+                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+                        }
+                    }
 
                     testDependencies(project(":acceptance-tests:test-dependencies:regular-dependency"))
                     exportedTestDependencies(project(":acceptance-tests:test-dependencies:exported-dependency"))
