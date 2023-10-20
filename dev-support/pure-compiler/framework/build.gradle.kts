@@ -36,7 +36,6 @@ kotlin {
         dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation("co.touchlab.skie:configuration-annotations")
-            implementation("co.touchlab.skie:runtime-kotlin")
 
             api(projects.devSupport.pureCompiler.dependency)
 
