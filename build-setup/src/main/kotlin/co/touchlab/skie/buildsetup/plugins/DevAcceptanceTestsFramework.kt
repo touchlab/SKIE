@@ -1,11 +1,8 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import co.touchlab.skie.gradle.util.libs
-import co.touchlab.skie.gradle.util.testImplementation
-import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import co.touchlab.skie.gradle.version.ToolingVersions
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -15,14 +12,8 @@ import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
-import org.jetbrains.kotlin.konan.CompilerVersion
-import java.io.File
 
 abstract class DevAcceptanceTestsFramework: Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
@@ -73,7 +64,7 @@ abstract class DevAcceptanceTestsFramework: Plugin<Project> {
                         buildConfigField(
                             type = "String",
                             name = "KONAN_HOME",
-                            value = "\"${project.kotlinNativeCompilerHome(target.kotlinToolingVersion).path}\"",
+                            value = "\"${project.kotlinNativeCompilerHome(target.kotlinToolingVersion.primaryVersion).path}\"",
                         )
 
                         buildConfigField(
@@ -98,16 +89,16 @@ abstract class DevAcceptanceTestsFramework: Plugin<Project> {
             }
 
             configureSourceSet { sourceSet ->
-                val kotlinVersion = sourceSet.kotlinToolingVersion
+                val kotlinVersion = sourceSet.kotlinToolingVersion.primaryVersion
 
                 dependencies {
-                    weak("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion.value}")
-                    weak("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:${kotlinVersion.value}")
+                    weak("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
+                    weak("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:${kotlinVersion}")
 
                     testOnly(libs.bundles.testing.jvm)
                 }
 
-                if (kotlinVersion.version >= ToolingVersions.Kotlin.`1․8․20`) {
+                if (kotlinVersion >= ToolingVersions.Kotlin.`1․8․20`) {
                     dependencies {
                         implementation(files(project.kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/trove4j.jar")))
                     }

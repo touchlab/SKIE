@@ -2,6 +2,7 @@ import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyName
 import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.util.stringListProperty
+import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
@@ -18,13 +19,19 @@ skiePublishing {
 
 buildConfig {
     val gradlePlugin = projects.gradle.gradlePlugin.dependencyProject
-    // TODO Rename to SKIE_GRADLE_PLUGIN
-    buildConfigField("String", "SKIE_GRADLE_PLUGIN_DEPENDENCY", "\"${gradlePlugin.dependencyName}\"")
+    buildConfigField("String", "SKIE_GRADLE_PLUGIN", "\"${gradlePlugin.dependencyName}\"")
 
-    // Workaround for problems with BuildConfig - it incorrectly wraps long strings, and it cannot easily generate a List
-    val supportedKotlinVersions = project.stringListProperty("versionSupport.supportedKotlinVersions")
-        .joinToString(", ") { it.enquoted() }
-    buildConfigField("co.touchlab.skie.plugin.util.StringList", "SUPPORTED_KOTLIN_VERSIONS", "listOf($supportedKotlinVersions)")
+    val kotlinToSkieKgpVersion = project.kotlinToolingVersionDimension().components
+        .flatMap { versionComponent ->
+            versionComponent.supportedVersions.map { version ->
+                version to versionComponent.name
+            }
+        }
+        .joinToString { (version, name) ->
+            "${version.toString().enquoted()} to ${name.toString().enquoted()}"
+        }
+
+    buildConfigField("co.touchlab.skie.plugin.util.StringMap", "KOTLIN_TO_SKIE_KGP_VERSION", "mapOf($kotlinToSkieKgpVersion)")
 
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 }

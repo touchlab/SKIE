@@ -51,6 +51,9 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
     @get:Input
     abstract val kotlinVersion: Property<String>
 
+    @get:Input
+    abstract val skieRuntimeVersion: Property<String>
+
     @get:InputFile
     abstract val libraryLockFile: RegularFileProperty
 
@@ -143,6 +146,7 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
             """.trimIndent(),
         )
 
+        @Suppress("UNCHECKED_CAST")
         val json = JsonSlurper().parse(resolutionProjectDir.resolve("output")) as Map<String, Map<String, List<String>>>
 
         val runtimeKotlinKlib = runtimeKotlinCompileTask().get().outputFile.get().absolutePath
@@ -221,7 +225,7 @@ abstract class PrepareTestClasspathsTask: DefaultTask() {
 
     private fun runtimeKotlinCompileTask(): Provider<KotlinNativeCompile> = kotlinCompileTask(
         projectName = ":runtime:runtime-kotlin",
-        targetName = "${target.get().presetName}__kgp_${kotlinVersion.get()}",
+        targetName = "${target.get().presetName}__kgp_${skieRuntimeVersion.get()}",
     )
 
     private fun configurationAnnotationsCompileTask(): Provider<KotlinNativeCompile> = kotlinCompileTask(

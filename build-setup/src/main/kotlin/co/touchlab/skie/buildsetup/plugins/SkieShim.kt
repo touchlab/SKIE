@@ -1,8 +1,10 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.util.libs
-import co.touchlab.skie.gradle.version.*
+import co.touchlab.skie.gradle.version.gradleApiVersion
+import co.touchlab.skie.gradle.version.gradleApiVersionDimension
+import co.touchlab.skie.gradle.version.kotlinToolingVersion
+import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import co.touchlab.skie.gradle.version.target.MultiDimensionTargetExtension
 import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import org.gradle.api.Plugin
@@ -11,12 +13,9 @@ import org.gradle.api.attributes.plugin.GradlePluginApiVersion
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
-import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverGradleSubplugin
 
-abstract class SkieShim: Plugin<Project> {
+abstract class SkieShim : Plugin<Project> {
+
     override fun apply(project: Project) = with(project) {
         apply<SkieBase>()
         apply<MultiDimensionTargetPlugin>()
@@ -33,7 +32,7 @@ abstract class SkieShim: Plugin<Project> {
             }
 
             configureSourceSet { sourceSet ->
-                val kotlinToolingVersion = sourceSet.kotlinToolingVersion.value
+                val kotlinToolingVersion = sourceSet.kotlinToolingVersion.primaryVersion
                 val gradleApiVersion = sourceSet.gradleApiVersion.value
                 val kotlinVersion = sourceSet.gradleApiVersion.version.kotlinVersion.toString()
                 val groovyVersion = sourceSet.gradleApiVersion.version.groovyVersion

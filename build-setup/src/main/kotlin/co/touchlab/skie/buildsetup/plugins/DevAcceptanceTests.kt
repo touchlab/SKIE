@@ -18,7 +18,6 @@ import org.gradle.kotlin.dsl.*
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.kotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -111,7 +110,7 @@ abstract class DevAcceptanceTests: Plugin<Project> {
             }
 
             configureSourceSet { sourceSet ->
-                val kotlinVersion = sourceSet.kotlinToolingVersion.value
+                val kotlinVersion = sourceSet.kotlinToolingVersion.primaryVersion
 
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")

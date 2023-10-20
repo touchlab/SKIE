@@ -1,5 +1,6 @@
 package co.touchlab.skie.gradle.util
 
+import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.extra
@@ -17,11 +18,11 @@ private object KotlinNativeVersionPropertyName {
     const val deprecated = "org.jetbrains.kotlin.native.version"
 }
 
-fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersionComponent): File {
-    return NativeCompilerDownloader(project, CompilerVersion.fromString(kotlinVersion.value))
+fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File {
+    return NativeCompilerDownloader(project, CompilerVersion.fromString(kotlinVersion.toString()))
         .also { downloader ->
             val backupProperty = backupProperty<String?>(KotlinNativeVersionPropertyName.main) ?: backupProperty(KotlinNativeVersionPropertyName.deprecated)
-            extra.set(KotlinNativeVersionPropertyName.main, kotlinVersion.value)
+            extra.set(KotlinNativeVersionPropertyName.main, kotlinVersion.toString())
             downloader.downloadIfNeeded()
             extra.set(KotlinNativeVersionPropertyName.main, null)
             backupProperty?.let { restoreProperty(it) }

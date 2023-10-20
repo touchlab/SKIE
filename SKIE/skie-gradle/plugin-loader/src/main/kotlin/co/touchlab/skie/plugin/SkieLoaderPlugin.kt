@@ -22,27 +22,25 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         // We need to register the extension here, so that Gradle knows the type of it in the build script.
-        val skieExtension = with(SkieExtension) {
+        with(SkieExtension) {
             project.createExtension()
         }
 
-        project.afterEvaluate {
-            val kotlinVersion = getValidKotlinVersion(skieExtension) ?: return@afterEvaluate
+        val kotlinVersion = project.getValidKotlinVersion() ?: return
 
-            loadSkieGradlePlugin(kotlinVersion)
-        }
+        project.loadSkieGradlePlugin(kotlinVersion)
     }
 
-    private fun Project.getValidKotlinVersion(skieExtension: SkieExtension): KotlinVersion? {
-        val kotlinVersion = getKotlinVersionString()?.let(::KotlinVersion)
+    private fun Project.getValidKotlinVersion(): String? {
+        val kotlinVersion = getKotlinVersionString()
+        val kgpVersion = kotlinVersion?.let { BuildConfig.KOTLIN_TO_SKIE_KGP_VERSION[it] }
 
-        val skipSupportedVersionsCheck = skieExtension.debug.skipSupportedVersionsCheck.get()
-        if (skipSupportedVersionsCheck) {
+        if (kotlinGradlePluginVersionOverride != null) {
             logger.error(
                 """
                     Warning:
-                    SKIE skips Kotlin compiler version compatibility check because 'skie.debug.skipSupportedVersionsCheck' is set to true.
-                    Usage of this flag in production is highly discouraged as it may lead to non-obvious compiler errors caused by SKIE incompatibility with the given Kotlin compiler version.
+                    skie.kgpVersion is used to override automatic Kotlin version resolution for SKIE plugin.
+                    Usage of this property in production is highly discouraged as it may lead to non-obvious compiler errors caused by SKIE incompatibility with the used Kotlin compiler version.
                 """.trimIndent(),
             )
         }
@@ -56,16 +54,18 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
                     You can try to workaround this issue by providing the Kotlin version manually via 'skie.kgpVersion' property in your gradle.properties.
                 """.trimIndent()
             }
-            !kotlinVersion.isSupported && !skipSupportedVersionsCheck -> {
+            kgpVersion == null -> {
+                val supportedKotlinVersions = BuildConfig.KOTLIN_TO_SKIE_KGP_VERSION.keys.sorted()
+
                 """
                     SKIE ${BuildConfig.SKIE_VERSION} does not support Kotlin $kotlinVersion.
-                    Supported versions are ${BuildConfig.SUPPORTED_KOTLIN_VERSIONS}.
+                    Supported versions are: ${supportedKotlinVersions}.
                     Check if you have the most recent version of SKIE and if so, please wait for the SKIE developers to add support for this Kotlin version.
                     New Kotlin versions are usually supported within a few days after they are released.
                     Note that there are no plans for supporting early access versions like Beta, RC, etc.
                 """.trimIndent()
             }
-            else -> return kotlinVersion
+            else -> return kgpVersion
         }
 
         reportSkieLoaderError(error)
@@ -89,14 +89,12 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
     private fun Project.getKotlinVersionString(): String? =
         (project.kotlinGradlePluginVersionOverride ?: project.kotlinGradlePluginVersion ?: project.rootProject.kotlinGradlePluginVersion)
 
-    private fun Project.loadSkieGradlePlugin(kotlinVersion: KotlinVersion) {
+    private fun Project.loadSkieGradlePlugin(kotlinVersion: String) {
         val gradleVersion = GradleVersion.current().version
         logger.info("Resolving SKIE gradle plugin for Kotlin plugin version $kotlinVersion and Gradle version $gradleVersion")
 
-        KotlinCompilerVersion.registerIn(project.dependencies)
-        KotlinCompilerVersion.registerIn(buildscript.dependencies)
         val skieGradleConfiguration = buildscript.configurations.detachedConfiguration(
-            buildscript.dependencies.create(BuildConfig.SKIE_GRADLE_PLUGIN_DEPENDENCY),
+            buildscript.dependencies.create(BuildConfig.SKIE_GRADLE_PLUGIN),
         ).apply {
             this.isCanBeConsumed = false
             this.isCanBeResolved = true
@@ -112,7 +110,7 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
                 attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-                attribute(KotlinCompilerVersion.attribute, objects.named(kotlinVersion.value))
+                attribute(KotlinCompilerVersion.attribute, objects.named(kotlinVersion))
                 if (GradleVersion.current() >= GradleVersion.version("7.0")) {
                     attribute(
                         GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
@@ -176,13 +174,4 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
 
     private inline fun <reified T : Named> ObjectFactory.named(name: String): T =
         named(T::class.java, name)
-
-    @JvmInline
-    private value class KotlinVersion(val value: String) {
-
-        val isSupported: Boolean
-            get() = BuildConfig.SUPPORTED_KOTLIN_VERSIONS.contains(value)
-
-        override fun toString(): String = value
-    }
 }
