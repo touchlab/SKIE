@@ -41,11 +41,6 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.DevBuildconfig"
     }
 
-    plugins.register("dev.jvm") {
-        id = "dev.jvm"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevJvm"
-    }
-
     plugins.register("dev.multiplatform") {
         id = "dev.multiplatform"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.DevMultiplatform"
