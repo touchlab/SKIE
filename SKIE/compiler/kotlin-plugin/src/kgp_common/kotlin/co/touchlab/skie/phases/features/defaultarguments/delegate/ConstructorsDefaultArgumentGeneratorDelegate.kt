@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
-import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.createSecondaryConstructor
 import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
@@ -9,13 +9,11 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.irBlockBody
@@ -72,17 +70,16 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private fun generateOverload(constructor: ClassConstructorDescriptor, parameters: List<ValueParameterDescriptor>) {
         val overload = generateOverloadWithUniqueName(constructor, parameters)
 
-        fixOverloadLastParameterName(overload)
-        removeConflictingOverloads(overload, constructor)
+        registerOverload(overload, constructor)
     }
 
     private fun generateOverloadWithUniqueName(
         constructor: ClassConstructorDescriptor,
         parameters: List<ValueParameterDescriptor>,
-    ): FunctionDescriptor {
+    ): ClassConstructorDescriptor {
         val overloadId = sharedCounter.next()
 
-        return declarationBuilder.createSecondaryConstructor(
+        val overload = declarationBuilder.createSecondaryConstructor(
             name = "<init$uniqueNameSubstring$overloadId>",
             namespace = declarationBuilder.getNamespace(constructor),
             annotations = constructor.annotations,
@@ -94,6 +91,12 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
                 getOverloadBody(constructor, overloadIr)
             }
         }
+
+        if (parameters.isNotEmpty()) {
+            removeManglingOfOverload(overload, constructor, overload.valueParameters.last(), parameters.last())
+        }
+
+        return overload
     }
 
     private fun List<ValueParameterDescriptor>.withUniqueLastParameter(id: Int): List<ValueParameterDescriptor> {
@@ -138,19 +141,35 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
         this.dispatchReceiver = irGet(dispatchReceiverParameter)
     }
 
-    private fun fixOverloadLastParameterName(overloadDescriptor: FunctionDescriptor) {
-        context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
-            val lastParameter = overloadDescriptor.swiftModel.primarySirConstructor.valueParameters.lastOrNull() ?: return@doInPhase
+    private fun registerOverload(overloadDescriptor: ClassConstructorDescriptor, constructor: ClassConstructorDescriptor) {
+        context.doInPhase(DefaultArgumentGenerator.RegisterOverloadsPhase) {
+            val overloadKirConstructor = kirProvider.getConstructor(overloadDescriptor)
 
-            lastParameter.label = lastParameter.labelOrName.dropUniqueParameterMangling()
+            kirProvider.getConstructor(constructor).defaultArgumentsOverloads.add(overloadKirConstructor)
         }
     }
 
-    private fun removeConflictingOverloads(overloadDescriptor: FunctionDescriptor, constructor: ClassConstructorDescriptor) {
-        context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
-            val numberOfDefaultArguments = constructor.valueParameters.size - overloadDescriptor.valueParameters.size
+    private fun removeManglingOfOverload(
+        overloadDescriptor: ClassConstructorDescriptor,
+        constructor: ClassConstructorDescriptor,
+        mangledValueParameterDescriptorFromOverload: ValueParameterDescriptor,
+        mangledValueParameterDescriptorFromConstructor: ValueParameterDescriptor,
+    ) {
+        context.doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsPhase) {
+            val overloadKirConstructor = kirProvider.getConstructor(overloadDescriptor)
+            val baseKirConstructor = kirProvider.getConstructor(constructor)
 
-            overloadDescriptor.swiftModel.collisionResolutionStrategy = CollisionResolutionStrategy.Remove(numberOfDefaultArguments)
+            val mangledValueParameterFromOverload = overloadKirConstructor.valueParameters
+                .single { it.kind.descriptorOrNull == mangledValueParameterDescriptorFromOverload }
+                .oirValueParameter
+                .originalSirValueParameter
+
+            val mangledValueParameterFromConstructor = baseKirConstructor.valueParameters
+                .single { it.kind.descriptorOrNull == mangledValueParameterDescriptorFromConstructor }
+                .oirValueParameter
+                .originalSirValueParameter
+
+            mangledValueParameterFromOverload?.label = mangledValueParameterFromConstructor?.labelOrName
         }
     }
 }

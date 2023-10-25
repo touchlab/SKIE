@@ -1,7 +1,6 @@
 package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
-import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 
@@ -11,7 +10,8 @@ class SirConstructor(
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
     var isConvenience: Boolean = false,
-) : SirCallableDeclaration, SirValueParameterParent, SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder> {
+    override var throws: Boolean = false,
+) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()) {
 
     override val identifier = "init"
 
@@ -25,17 +25,11 @@ class SirConstructor(
     override val name: String
         get() = if (valueParameters.isEmpty()) "${identifier}()" else reference
 
-    override val scope: SirScope = SirScope.Static
+    override val scope: SirScope = SirScope.Global
 
     override var parent: SirDeclarationNamespace by sirDeclarationParent(parent)
 
     override val valueParameters: MutableList<SirValueParameter> = mutableListOf()
-
-    override val attributes: MutableList<String> = attributes.toMutableList()
-
-    override val modifiers: MutableList<Modifier> = modifiers.toMutableList()
-
-    override val swiftPoetBuilderModifications = mutableListOf<FunctionSpec.Builder.() -> Unit>()
 
     override fun toString(): String = "${this::class.simpleName}: $name"
 
@@ -47,6 +41,7 @@ class SirConstructor(
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
             isConvenience: Boolean = false,
+            throws: Boolean = false,
         ): SirConstructor =
             SirConstructor(
                 parent = this@SirDeclarationNamespace,
@@ -54,6 +49,24 @@ class SirConstructor(
                 attributes = attributes,
                 modifiers = modifiers,
                 isConvenience = isConvenience,
+                throws = throws,
             )
     }
 }
+
+fun SirConstructor.shallowCopy(
+    parent: SirDeclarationNamespace = this.parent,
+    visibility: SirVisibility = this.visibility,
+    attributes: List<String> = this.attributes,
+    modifiers: List<Modifier> = this.modifiers,
+    isConvenience: Boolean = this.isConvenience,
+    throws: Boolean = this.throws,
+): SirConstructor =
+    SirConstructor(
+        parent = parent,
+        visibility = visibility,
+        attributes = attributes,
+        modifiers = modifiers,
+        isConvenience = isConvenience,
+        throws = throws,
+    )

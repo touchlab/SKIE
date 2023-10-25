@@ -3,13 +3,14 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 
+// Can be instantiated via SirProvider to improve performance.
 class SirExtension(
-    var classDeclaration: SirClass,
+    override val classDeclaration: SirClass,
     parent: SirTopLevelDeclarationParent,
     override var visibility: SirVisibility = SirVisibility.Public,
 ) : SirDeclaration, SirDeclarationNamespace {
 
-    override var parent: SirTopLevelDeclarationParent by sirDeclarationParent(parent)
+    override val parent: SirTopLevelDeclarationParent by sirDeclarationParent(parent)
 
     override val declarations: MutableList<SirDeclaration> = mutableListOf()
 
@@ -20,18 +21,4 @@ class SirExtension(
 
     override fun toString(): String =
         "${this::class.simpleName}: $fqName"
-
-    companion object {
-
-        context(SirTopLevelDeclarationParent)
-        operator fun invoke(
-            classDeclaration: SirClass,
-            visibility: SirVisibility = SirVisibility.Public,
-        ): SirExtension =
-            SirExtension(
-                classDeclaration = classDeclaration,
-                parent = this@SirTopLevelDeclarationParent,
-                visibility = visibility,
-            )
-    }
 }

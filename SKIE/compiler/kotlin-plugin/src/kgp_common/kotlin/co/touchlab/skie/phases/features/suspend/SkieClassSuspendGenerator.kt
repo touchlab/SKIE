@@ -1,47 +1,48 @@
 package co.touchlab.skie.phases.features.suspend
 
+import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConstructor
-import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 
 class SkieClassSuspendGenerator {
 
-    private val skieClassCache = mutableMapOf<KotlinTypeSwiftModel, SirClass>()
+    private val skieClassCache = mutableMapOf<KirClass, SirClass>()
 
-    context(SwiftModelScope)
-    fun getOrCreateSkieClass(swiftModel: KotlinTypeSwiftModel): SirClass =
-        skieClassCache.getOrPut(swiftModel) {
-            val skieClass = createSkieClass(swiftModel)
+    context(SirPhase.Context)
+    fun getOrCreateSuspendClass(suspendFunctionOwner: KirClass): SirClass =
+        skieClassCache.getOrPut(suspendFunctionOwner) {
+            val skieClass = createSkieClass(suspendFunctionOwner)
 
-            generateNamespaceProvider(swiftModel, skieClass)
+            generateNamespaceProvider(suspendFunctionOwner, skieClass)
 
             skieClass
         }
 
-    context(SwiftModelScope)
-    private fun createSkieClass(swiftModel: KotlinTypeSwiftModel): SirClass =
+    context(SirPhase.Context)
+    private fun createSkieClass(suspendFunctionOwner: KirClass): SirClass =
         SirClass(
             baseName = "Suspend",
-            parent = sirProvider.getSkieNamespace(swiftModel),
+            parent = skieNamespaceProvider.getNamespace(suspendFunctionOwner),
             visibility = SirVisibility.PublicButReplaced,
+            kind = SirClass.Kind.Struct,
         ).apply {
-            copyTypeParametersFrom(swiftModel.kotlinSirClass)
+            copyTypeParametersFrom(suspendFunctionOwner.originalSirClass)
 
-            addSkieClassMembers(swiftModel)
+            addSkieClassMembers(suspendFunctionOwner)
         }
 
-    context(SwiftModelScope)
-    private fun generateNamespaceProvider(swiftModel: KotlinTypeSwiftModel, skieClass: SirClass) {
-        SirFunction(
+    context(SirPhase.Context)
+    private fun generateNamespaceProvider(suspendFunctionOwner: KirClass, skieClass: SirClass) {
+        SirSimpleFunction(
             identifier = "skie",
-            parent = sirProvider.getFile(swiftModel),
+            parent = skieNamespaceProvider.getNamespaceFile(suspendFunctionOwner),
             returnType = sirBuiltins.Swift.Void.defaultType,
         ).apply {
             copyTypeParametersFrom(skieClass)
@@ -49,7 +50,7 @@ class SkieClassSuspendGenerator {
             SirValueParameter(
                 label = "_",
                 name = "kotlinObject",
-                type = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
+                type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
             )
 
             returnType = skieClass.toTypeFromEnclosingTypeParameters(typeParameters)
@@ -67,26 +68,26 @@ class SkieClassSuspendGenerator {
 }
 
 private fun SirClass.addSkieClassMembers(
-    swiftModel: KotlinTypeSwiftModel,
+    suspendFunctionOwner: KirClass,
 ) {
-    addSkieClassKotlinObjectHolder(swiftModel)
+    addSkieClassKotlinObjectHolder(suspendFunctionOwner)
 
-    addSkieClassConstructor(swiftModel)
+    addSkieClassConstructor(suspendFunctionOwner)
 }
 
-private fun SirClass.addSkieClassKotlinObjectHolder(swiftModel: KotlinTypeSwiftModel) {
+private fun SirClass.addSkieClassKotlinObjectHolder(suspendFunctionOwner: KirClass) {
     SirProperty(
         identifier = SkieClassSuspendGenerator.kotlinObjectVariableName,
-        type = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
+        type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
     )
 }
 
-private fun SirClass.addSkieClassConstructor(swiftModel: KotlinTypeSwiftModel) {
+private fun SirClass.addSkieClassConstructor(suspendFunctionOwner: KirClass) {
     SirConstructor().apply {
         SirValueParameter(
             label = "_",
             name = SkieClassSuspendGenerator.kotlinObjectVariableName,
-            type = swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
+            type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
         )
 
         swiftPoetBuilderModifications.add {

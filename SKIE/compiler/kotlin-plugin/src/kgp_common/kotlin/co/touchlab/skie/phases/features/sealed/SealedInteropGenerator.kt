@@ -2,9 +2,12 @@ package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.getConfiguration
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
+import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
+import co.touchlab.skie.sir.element.isExported
 
+@MustBeExecutedAfterBridgingConfiguration
 class SealedInteropGenerator(
     override val context: SirPhase.Context,
 ) : SirPhase, SealedGeneratorExtensionContainer {
@@ -14,23 +17,25 @@ class SealedInteropGenerator(
 
     context(SirPhase.Context)
     override fun execute() {
-        exposedClasses
+        kirProvider.allClasses
             .filter { it.isSupported }
             .forEach {
                 generate(it)
             }
     }
 
-    private val KotlinClassSwiftModel.isSupported: Boolean
-        get() = this.isSealed && this.isSealedInteropEnabled
+    private val KirClass.isSupported: Boolean
+        get() = this.originalSirClass.isExported &&
+            this.isSealed &&
+            this.isSealedInteropEnabled
 
-    private val KotlinClassSwiftModel.isSealedInteropEnabled: Boolean
+    private val KirClass.isSealedInteropEnabled: Boolean
         get() = configurationProvider.getConfiguration(this, SealedInterop.Enabled)
 
     context(SirPhase.Context)
-    private fun generate(swiftModel: KotlinClassSwiftModel) {
-        val enum = sealedEnumGeneratorDelegate.generate(swiftModel)
+    private fun generate(kirClass: KirClass) {
+        val enum = sealedEnumGeneratorDelegate.generate(kirClass)
 
-        sealedFunctionGeneratorDelegate.generate(swiftModel, enum)
+        sealedFunctionGeneratorDelegate.generate(kirClass, enum)
     }
 }

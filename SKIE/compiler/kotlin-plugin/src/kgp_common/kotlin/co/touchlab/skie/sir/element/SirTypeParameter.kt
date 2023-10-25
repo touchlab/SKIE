@@ -14,7 +14,7 @@ class SirTypeParameter(
 
     var parent: SirTypeParameterParent by sirTypeParameterParent(parent)
 
-    override fun toString(): String = "type parameter: $name : ${bounds.joinToString("&")}>"
+    override fun toString(): String = "${this::class.simpleName}: $name : ${bounds.joinToString("&")}>"
 
     companion object {
 

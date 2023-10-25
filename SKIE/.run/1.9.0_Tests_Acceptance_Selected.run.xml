@@ -3,7 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="acceptanceTest" value="tests/coroutines/suspend/type_params_copied" />
+          <entry key="acceptanceTest" value="enums/interactions/suspend" />
         </map>
       </option>
       <option name="executionName" />

@@ -13,7 +13,6 @@ kotlin {
     macosArm64()
 
     val exportedLibraries = listOf<String>(
-
     )
 
     targets.withType<KotlinNativeTarget> {

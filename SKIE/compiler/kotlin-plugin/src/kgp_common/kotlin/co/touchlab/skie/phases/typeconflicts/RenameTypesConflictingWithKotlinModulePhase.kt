@@ -6,11 +6,11 @@ object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        val moduleName = sirBuiltins.Kotlin.module.name
+        val moduleName = sirProvider.kotlinModule.name
 
         var collisionExists = false
 
-        sirProvider.allLocalPublicTypes.forEach { type ->
+        sirProvider.allLocalPublicTypeDeclarations.forEach { type ->
             if (type.fqName.toString() == moduleName) {
                 type.baseName += "_"
                 collisionExists = true

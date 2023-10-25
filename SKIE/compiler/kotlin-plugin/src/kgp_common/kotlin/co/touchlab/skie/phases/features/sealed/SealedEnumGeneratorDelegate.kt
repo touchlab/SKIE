@@ -1,61 +1,58 @@
 package co.touchlab.skie.phases.features.sealed
 
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 
 class SealedEnumGeneratorDelegate(
     override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {
 
     context(SirPhase.Context)
-    fun generate(swiftModel: KotlinClassSwiftModel): SirClass =
+    fun generate(kirClass: KirClass): SirClass =
         SirClass(
             baseName = "Sealed",
             kind = SirClass.Kind.Enum,
-            parent = sirProvider.getSkieNamespace(swiftModel),
+            parent = skieNamespaceProvider.getNamespace(kirClass),
             visibility = SirVisibility.PublicButReplaced,
         ).apply {
-            addConformanceToHashableIfPossible(swiftModel)
+            addConformanceToHashableIfPossible(kirClass)
 
-            copyTypeParametersFrom(swiftModel.primarySirClass)
+            copyTypeParametersFrom(kirClass.originalSirClass)
 
-            addSealedEnumCases(swiftModel)
+            addSealedEnumCases(kirClass)
 
             attributes.add("frozen")
         }
 
     context(SirPhase.Context)
-    private fun SirClass.addConformanceToHashableIfPossible(swiftModel: KotlinClassSwiftModel) {
-        if (swiftModel.areAllExposedChildrenHashable) {
+    private fun SirClass.addConformanceToHashableIfPossible(kirClass: KirClass) {
+        if (kirClass.areAllExposedChildrenHashable) {
             this.superTypes.add(sirBuiltins.Swift.Hashable.defaultType)
         }
     }
 
-    context(SwiftModelScope)
-    private fun SirClass.addSealedEnumCases(swiftModel: KotlinClassSwiftModel) {
-        val preferredNamesCollide = swiftModel.enumCaseNamesBasedOnKotlinIdentifiersCollide
+    private fun SirClass.addSealedEnumCases(kirClass: KirClass) {
+        val preferredNamesCollide = kirClass.enumCaseNamesBasedOnKotlinIdentifiersCollide
 
-        swiftModel.visibleSealedSubclasses
+        kirClass.visibleSealedSubclasses
             .forEach { sealedSubclass ->
                 addSealedEnumCase(sealedSubclass, preferredNamesCollide)
             }
 
-        if (swiftModel.hasElseCase) {
+        if (kirClass.hasElseCase) {
             SirEnumCase(
-                simpleName = swiftModel.elseCaseName,
+                simpleName = kirClass.elseCaseName,
             )
         }
     }
 
-    context(SwiftModelScope)
     private fun SirClass.addSealedEnumCase(
-        sealedSubclass: KotlinClassSwiftModel,
+        sealedSubclass: KirClass,
         preferredNamesCollide: Boolean,
     ) {
         val enum = this
@@ -64,11 +61,11 @@ class SealedEnumGeneratorDelegate(
             simpleName = sealedSubclass.enumCaseName(preferredNamesCollide),
         ).apply {
             SirEnumCaseAssociatedValue(
-                type = sealedSubclass.primarySirClass.getSealedSubclassType(enum, this@SwiftModelScope),
+                type = sealedSubclass.primarySirClass.getSealedSubclassType(enum),
             )
         }
     }
 }
 
-private val KotlinClassSwiftModel.areAllExposedChildrenHashable: Boolean
-    get() = exposedSealedSubclasses.all { it.primarySirClass.isHashable }
+private val KirClass.areAllExposedChildrenHashable: Boolean
+    get() = sealedSubclasses.all { it.primarySirClass.isHashable }

@@ -8,8 +8,7 @@ object RenameNestedKotlinTypesConflictingWithKeywordsPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        swiftModelProvider.exposedClasses
-            .map { it.kotlinSirClass }
+        sirProvider.allLocalTypeDeclarations
             .filter { it.namespace?.fqName?.simpleName in KEYWORDS }
             .forEach {
                 it.baseName = it.fqName.toString().replace(".", "")

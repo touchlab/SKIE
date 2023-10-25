@@ -39,7 +39,7 @@ kotlin {
     iosSimulatorArm64()
 
     val exportedLibraries = listOf<String>(
-
+//         "com.soywiz.korge:korge-core:5.0.6"
     )
 
     targets.withType<KotlinNativeTarget> {

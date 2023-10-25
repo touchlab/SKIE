@@ -1,8 +1,8 @@
 package co.touchlab.skie.kir.irbuilder.impl
 
-import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.kir.MutableDescriptorProvider
-import co.touchlab.skie.kir.allExposedMembers
+import co.touchlab.skie.kir.descriptor.DescriptorProvider
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
+import co.touchlab.skie.kir.descriptor.allExposedMembers
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
 import co.touchlab.skie.kir.irbuilder.FunctionBuilder
@@ -22,8 +22,6 @@ import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
-import org.jetbrains.kotlin.backend.konan.serialization.KonanIdSignaturer
-import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerIr
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor

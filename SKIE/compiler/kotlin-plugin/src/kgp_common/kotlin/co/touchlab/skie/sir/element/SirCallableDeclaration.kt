@@ -1,9 +1,6 @@
 package co.touchlab.skie.sir.element
 
-import co.touchlab.skie.sir.type.SirType
-
-// WIP 2 Verify that all wrappers for SirCallableDeclaration copy correctly all properties
-
+// WIP Check that visibility is correctly filtered in all refactored project
 sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {
 
     /**
@@ -36,12 +33,25 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      * __foo(param1:) (visibility == PublicButReplaced)
      */
     val name: String
+
+    /**
+     * Signature is not valid if and only if it references a SkieErrorType.
+     * Only valid signatures can be used in generated Swift code.
+     * Invalid signatures can be used only for generating placeholder declaration that cannot be called.
+     * Example of such situation is if the signature contains a lambda type argument, such as A<() -> Unit>.
+     */
+    val hasValidSignature: Boolean
 }
+
+val SirCallableDeclaration.receiverDeclaration: SirClass?
+    get() = when (val parent = parent) {
+        is SirClass -> parent
+        is SirExtension -> parent.classDeclaration
+        else -> null
+    }
 
 val SirCallableDeclaration.identifierAfterVisibilityChanges: String
     get() = when (visibility) {
         SirVisibility.PublicButReplaced -> "__$identifier"
-        // WIP Will not be needed once the type is removed from header
-        SirVisibility.Removed -> "__Skie__Removed__$identifier"
         else -> identifier
     }

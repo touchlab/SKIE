@@ -12,10 +12,10 @@ object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        val conflictingModules = sirProvider.allExternalTypes.map { it.module.name }
+        val conflictingModules = sirProvider.allExternalTypeDeclarations.map { it.module.name }
         val conflictingNames = conflictingModules.toMutableSet()
 
-        sirProvider.allLocalTypes
+        sirProvider.allLocalTypeDeclarations
             .forEach {
                 it.renameConflictingType(conflictingNames)
             }

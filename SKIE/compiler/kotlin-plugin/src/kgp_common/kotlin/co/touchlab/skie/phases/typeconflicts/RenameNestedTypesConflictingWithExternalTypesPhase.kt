@@ -6,9 +6,9 @@ object RenameNestedTypesConflictingWithExternalTypesPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        val conflictingNames = headerDeclarationsProvider.externalTypes.map { it.name }.toSet()
+        val conflictingNames = sirProvider.allExternalTypeDeclarations.map { it.simpleName }
 
-        sirProvider.allLocalTypes
+        sirProvider.allLocalTypeDeclarations
             .filter { it.namespace?.fqName?.toString() in conflictingNames }
             .forEach {
                 it.baseName = it.fqName.toString().replace(".", "")

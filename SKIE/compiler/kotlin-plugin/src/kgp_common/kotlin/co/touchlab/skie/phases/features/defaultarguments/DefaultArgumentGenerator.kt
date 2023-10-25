@@ -28,5 +28,7 @@ class DefaultArgumentGenerator(
         }
     }
 
-    object FinalizePhase : StatefulSirPhase()
+    object RegisterOverloadsPhase : StatefulSirPhase()
+
+    object RemoveManglingOfOverloadsPhase : StatefulSirPhase()
 }

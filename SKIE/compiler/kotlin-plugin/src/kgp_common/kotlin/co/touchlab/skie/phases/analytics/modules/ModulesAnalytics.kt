@@ -1,7 +1,7 @@
 package co.touchlab.skie.phases.analytics.modules
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer

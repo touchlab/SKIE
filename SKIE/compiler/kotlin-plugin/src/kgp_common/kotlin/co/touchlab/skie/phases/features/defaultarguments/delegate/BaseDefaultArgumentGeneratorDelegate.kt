@@ -3,7 +3,7 @@ package co.touchlab.skie.phases.features.defaultarguments.delegate
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.getConfiguration
-import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.SkiePhase
@@ -37,8 +37,8 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
     context(SkiePhase.Context)
     protected val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.getConfiguration(DefaultArgumentInterop.Enabled) &&
-                this.satisfiesMaximumDefaultArgumentCount &&
-                (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
+            this.satisfiesMaximumDefaultArgumentCount &&
+            (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
 
     context(SkiePhase.Context)
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean

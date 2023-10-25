@@ -9,10 +9,10 @@ class SirProperty(
     parent: SirDeclarationParent,
     var type: SirType,
     override var visibility: SirVisibility = SirVisibility.Public,
-    override var scope: SirScope = SirScope.Member,
+    override var scope: SirScope = parent.coerceScope(SirScope.Member),
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
-) : SirCallableDeclaration, SirOverridableDeclaration<SirProperty> {
+) : SirOverridableDeclaration<SirProperty>, SirCallableDeclaration {
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
 
@@ -31,6 +31,9 @@ class SirProperty(
     override val attributes: MutableList<String> = attributes.toMutableList()
 
     override val modifiers: MutableList<Modifier> = modifiers.toMutableList()
+
+    override val hasValidSignature: Boolean
+        get() = type.evaluate().isValid
 
     private val overridableDeclarationDelegate = SirOverridableDeclarationDelegate(this)
 
@@ -73,7 +76,7 @@ class SirProperty(
             identifier: String,
             type: SirType,
             visibility: SirVisibility = SirVisibility.Public,
-            scope: SirScope = SirScope.Member,
+            scope: SirScope = coerceScope(SirScope.Member),
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
         ): SirProperty =
@@ -88,3 +91,22 @@ class SirProperty(
             )
     }
 }
+
+fun SirProperty.shallowCopy(
+    identifier: String = this.identifier,
+    parent: SirDeclarationParent = this.parent,
+    type: SirType = this.type,
+    visibility: SirVisibility = this.visibility,
+    scope: SirScope = parent.coerceScope(this.scope),
+    attributes: List<String> = this.attributes,
+    modifiers: List<Modifier> = this.modifiers,
+): SirProperty =
+    SirProperty(
+        identifier = identifier,
+        parent = parent,
+        type = type,
+        visibility = visibility,
+        scope = scope,
+        attributes = attributes,
+        modifiers = modifiers,
+    )

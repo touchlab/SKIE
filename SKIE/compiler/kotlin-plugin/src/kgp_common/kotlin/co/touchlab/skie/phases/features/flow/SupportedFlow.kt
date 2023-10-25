@@ -1,10 +1,11 @@
 package co.touchlab.skie.phases.features.flow
 
+import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.SirFqName
+import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.swiftmodel.MutableSwiftModelScope
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
-import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
@@ -27,34 +28,25 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         val owner: SupportedFlow
 
-        context(SwiftModelScope)
-        fun swiftFlowClass(): SirClass
+        fun getKotlinKirClass(kirProvider: KirProvider): KirClass
 
-        val kotlinFlowFqName: String
+        fun getSwiftClass(sirProvider: SirProvider): SirClass
 
-        context (SwiftModelScope)
-        val kotlinFlowModel: KotlinClassSwiftModel
-            get() = referenceClass(kotlinFlowFqName)
+        context(SirPhase.Context)
+        fun getKotlinKirClass(): KirClass = getKotlinKirClass(kirProvider)
 
-        context (MutableSwiftModelScope)
-        val kotlinFlowModel: MutableKotlinClassSwiftModel
-            get() = referenceClass(kotlinFlowFqName)
+        context(SirPhase.Context)
+        fun getSwiftClass(): SirClass = getSwiftClass(sirProvider)
 
         fun isCastableTo(variant: Variant): Boolean
 
         class Required(override val owner: SupportedFlow) : Variant {
 
-            override val kotlinFlowFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlin${owner.name}"
+            override fun getKotlinKirClass(kirProvider: KirProvider): KirClass =
+                kirProvider.getClassByFqName("co.touchlab.skie.runtime.coroutines.flow.SkieKotlin${owner.name}")
 
-            context(SwiftModelScope)
-            override fun swiftFlowClass(): SirClass =
-                when (owner) {
-                    Flow -> sirBuiltins.Skie.SkieSwiftFlow
-                    SharedFlow -> sirBuiltins.Skie.SkieSwiftSharedFlow
-                    MutableSharedFlow -> sirBuiltins.Skie.SkieSwiftMutableSharedFlow
-                    StateFlow -> sirBuiltins.Skie.SkieSwiftStateFlow
-                    MutableStateFlow -> sirBuiltins.Skie.SkieSwiftMutableStateFlow
-                }
+            override fun getSwiftClass(sirProvider: SirProvider): SirClass =
+                sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwift${owner.name}"))
 
             override fun isCastableTo(variant: Variant): Boolean {
                 return owner.isSelfOrChildOf(variant.owner)
@@ -63,17 +55,11 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         class Optional(override val owner: SupportedFlow) : Variant {
 
-            override val kotlinFlowFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlinOptional${owner.name}"
+            override fun getKotlinKirClass(kirProvider: KirProvider): KirClass =
+                kirProvider.getClassByFqName("co.touchlab.skie.runtime.coroutines.flow.SkieKotlinOptional${owner.name}")
 
-            context(SwiftModelScope)
-            override fun swiftFlowClass(): SirClass =
-                when (owner) {
-                    Flow -> sirBuiltins.Skie.SkieSwiftOptionalFlow
-                    SharedFlow -> sirBuiltins.Skie.SkieSwiftOptionalSharedFlow
-                    MutableSharedFlow -> sirBuiltins.Skie.SkieSwiftOptionalMutableSharedFlow
-                    StateFlow -> sirBuiltins.Skie.SkieSwiftOptionalStateFlow
-                    MutableStateFlow -> sirBuiltins.Skie.SkieSwiftOptionalMutableStateFlow
-                }
+            override fun getSwiftClass(sirProvider: SirProvider): SirClass =
+                sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftOptional${owner.name}"))
 
             override fun isCastableTo(variant: Variant): Boolean {
                 if (variant is Required) return false
@@ -83,18 +69,18 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
         }
     }
 
-    fun isSelfOrChildOf(flow: SupportedFlow): Boolean =
+    private fun isSelfOrChildOf(flow: SupportedFlow): Boolean =
         this == flow || (directParent?.isSelfOrChildOf(flow) ?: false)
 
     companion object {
 
-        fun from(classDescriptor: ClassDescriptor): SupportedFlow? {
+        fun from(type: KotlinType): SupportedFlow? =
+            (type.constructor.declarationDescriptor as? ClassDescriptor)?.let { from(it) }
+
+        private fun from(classDescriptor: ClassDescriptor): SupportedFlow? {
             val classFqName = classDescriptor.fqNameSafe.asString()
 
             return values().firstOrNull { it.coroutinesFlowFqName == classFqName }
         }
-
-        fun from(type: KotlinType): SupportedFlow? =
-            (type.constructor.declarationDescriptor as? ClassDescriptor)?.let { from(it) }
     }
 }

@@ -13,7 +13,8 @@ object MoveBridgesToTopLevelPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        exposedTypes.mapNotNull { it.bridgedSirClass }
+        kirProvider.allClasses
+            .mapNotNull { it.bridgedSirClass }
             .forEach {
                 it.moveToTopLevel()
             }

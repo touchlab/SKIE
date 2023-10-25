@@ -2,7 +2,6 @@ package co.touchlab.skie.phases.runtime
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.SirFile
 
 object SwiftRuntimeGenerator : SirPhase {
 
@@ -13,7 +12,7 @@ object SwiftRuntimeGenerator : SirPhase {
     context(SirPhase.Context)
     override fun execute() {
         getSwiftRuntimeFiles().forEach {
-            sirProvider.getFile(SirFile.skieNamespace, it.swiftFileName).content = it.readText()
+            sirProvider.getSkieNamespaceFile(it.swiftFileName).content = it.readText()
         }
     }
 

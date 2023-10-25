@@ -6,12 +6,12 @@ import co.touchlab.skie.sir.type.SirType
 class SirValueParameter(
     name: String,
     var type: SirType,
-    parent: SirValueParameterParent,
+    parent: SirFunction,
     label: String? = null,
     var inout: Boolean = false,
 ) : SirElement {
 
-    var parent: SirValueParameterParent by sirValueParameterParent(parent)
+    var parent: SirFunction by sirValueParameterParent(parent)
 
     var name: String = name
         set(value) {
@@ -28,13 +28,11 @@ class SirValueParameter(
     val labelOrName: String
         get() = label ?: name
 
-    // WIP 2 Add missing toStrings
-
-    override fun toString(): String = "${this::class.simpleName}: $label $name: $type"
+    override fun toString(): String = "${this::class.simpleName}:${label?.let { " $it" } ?: ""} $name: $type"
 
     companion object {
 
-        context(SirValueParameterParent)
+        context(SirFunction)
         operator fun invoke(
             name: String,
             type: SirType,
@@ -44,7 +42,7 @@ class SirValueParameter(
             SirValueParameter(
                 name = name,
                 type = type,
-                parent = this@SirValueParameterParent,
+                parent = this@SirFunction,
                 label = label,
                 inout = inout,
             )

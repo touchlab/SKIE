@@ -1,7 +1,6 @@
 package co.touchlab.skie.kir.irbuilder
 
 import co.touchlab.skie.phases.KotlinIrPhase
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities

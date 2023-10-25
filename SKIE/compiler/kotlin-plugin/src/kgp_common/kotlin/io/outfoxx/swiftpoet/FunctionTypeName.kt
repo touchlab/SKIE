@@ -20,6 +20,7 @@ class FunctionTypeName internal constructor(
   parameters: List<ParameterSpec> = emptyList(),
   val returnType: TypeName = VOID,
   attributes: List<AttributeSpec> = emptyList(),
+  val throws: Boolean,
 ) : TypeName() {
 
   val parameters = parameters.toImmutableList()
@@ -36,12 +37,16 @@ class FunctionTypeName internal constructor(
     parameters: List<ParameterSpec> = this.parameters,
     returnType: TypeName = this.returnType,
     attributes: List<AttributeSpec> = this.attributes,
-  ) = FunctionTypeName(parameters, returnType, attributes)
+    throws: Boolean = this.throws,
+  ) = FunctionTypeName(parameters, returnType, attributes, throws)
 
   override fun emit(out: CodeWriter): CodeWriter {
 
     out.emitAttributes(attributes, separator = " ", suffix = " ")
     parameters.emit(out, includeNames = false)
+    if (throws) {
+      out.emitCode(" throws")
+    }
     out.emitCode(" -> %T", returnType)
 
     return out
@@ -55,7 +60,8 @@ class FunctionTypeName internal constructor(
       parameters: List<ParameterSpec> = emptyList(),
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
-    ) = FunctionTypeName(parameters, returnType, attributes)
+      throws: Boolean = false,
+    ) = FunctionTypeName(parameters, returnType, attributes, throws)
 
     /** Returns a function type with `returnType` and parameters listed in `parameters`. */
     @JvmStatic
@@ -63,11 +69,13 @@ class FunctionTypeName internal constructor(
       vararg parameters: TypeName = emptyArray(),
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
+      throws: Boolean = false,
     ): FunctionTypeName {
       return FunctionTypeName(
         parameters.toList().map { ParameterSpec.unnamed(it) },
         returnType,
         attributes,
+        throws,
       )
     }
 
@@ -77,6 +85,7 @@ class FunctionTypeName internal constructor(
       vararg parameters: ParameterSpec = emptyArray(),
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
-    ) = FunctionTypeName(parameters.toList(), returnType, attributes)
+      throws: Boolean = false,
+    ) = FunctionTypeName(parameters.toList(), returnType, attributes, throws)
   }
 }

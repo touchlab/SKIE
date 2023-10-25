@@ -3,17 +3,17 @@ package co.touchlab.skie.phases.features.suspend
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.belongsToSkieRuntime
 import co.touchlab.skie.configuration.configuration
+import co.touchlab.skie.kir.element.KirScope
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.features.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
-import co.touchlab.skie.swiftmodel.callable.isMember
-import co.touchlab.skie.swiftmodel.type.FlowMappingStrategy
 import co.touchlab.skie.util.collisionFreeIdentifier
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -62,10 +62,9 @@ class KotlinSuspendGeneratorDelegate(
     }
 
     private fun FunctionDescriptor.hide() {
-        // WIP Needs to be done in an earlier phase but after functions can be generated
-        context.doInPhase(SuspendGenerator.SwiftBridgeGeneratorPhase) {
-            this@hide.swiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
-                visibility = SirVisibility.PublicButHidden
+        context.doInPhase(SuspendGenerator.KotlinBridgingFunctionVisibilityConfigurationPhase) {
+            kirProvider.getFunction(this@hide).originalSirFunction.applyToEntireOverrideHierarchy {
+                visibility = SirVisibility.Internal
             }
         }
     }
@@ -139,12 +138,24 @@ class KotlinSuspendGeneratorDelegate(
                 type = typeSubstitutor.safeSubstitute(dispatchReceiver.type, Variance.INVARIANT),
             )
 
-            context.doInPhase(SuspendGenerator.KotlinBridgeConfigurationPhase) {
-                dispatchReceiverParameter.swiftModel.flowMappingStrategy = FlowMappingStrategy.TypeArgumentsOnly
+            context.doInPhase(SuspendGenerator.FlowMappingConfigurationPhase) {
+                configureFlowMappingForReceiver(bridgingFunctionDescriptor, dispatchReceiverParameter)
             }
 
             this.add(dispatchReceiverParameter)
         }
+    }
+
+    context(SirPhase.Context)
+    private fun configureFlowMappingForReceiver(
+        bridgingFunctionDescriptor: FunctionDescriptor,
+        dispatchReceiverParameter: ValueParameterDescriptor,
+    ) {
+        val configuration = kirProvider.getFunction(bridgingFunctionDescriptor).valueParameters
+            .single { it.descriptorOrNull == dispatchReceiverParameter }
+            .configuration
+
+        configuration.flowMappingStrategy = configuration.flowMappingStrategy.limitedToTypeArguments()
     }
 
     private fun MutableList<ValueParameterDescriptor>.addExtensionReceiver(
@@ -160,19 +171,25 @@ class KotlinSuspendGeneratorDelegate(
                 type = typeSubstitutor.safeSubstitute(extensionReceiver.type, Variance.INVARIANT),
             )
 
-            extensionReceiverParameter.configureExtensionReceiverFlowMapping(originalFunctionDescriptor)
+            configureFlowMappingForExtensionReceiver(originalFunctionDescriptor, bridgingFunctionDescriptor, extensionReceiverParameter)
 
             this.add(extensionReceiverParameter)
         }
     }
 
-    private fun ValueParameterDescriptor.configureExtensionReceiverFlowMapping(originalFunctionDescriptor: FunctionDescriptor) {
-        context.doInPhase(SuspendGenerator.KotlinBridgeConfigurationPhase) {
-            val isExtensionReceiverUsedAsSwiftReceiver = originalFunctionDescriptor.swiftModel.scope.isMember &&
+    private fun configureFlowMappingForExtensionReceiver(
+        originalFunctionDescriptor: FunctionDescriptor,
+        bridgingFunctionDescriptor: FunctionDescriptor,
+        extensionReceiverParameter: ValueParameterDescriptor,
+    ) {
+        context.doInPhase(SuspendGenerator.FlowMappingConfigurationPhase) {
+            val function = kirProvider.getFunction(originalFunctionDescriptor)
+
+            val isExtensionReceiverUsedAsSwiftReceiver = function.scope == KirScope.Member &&
                 originalFunctionDescriptor.dispatchReceiverParameter == null
 
             if (isExtensionReceiverUsedAsSwiftReceiver) {
-                this@configureExtensionReceiverFlowMapping.swiftModel.flowMappingStrategy = FlowMappingStrategy.TypeArgumentsOnly
+                configureFlowMappingForReceiver(bridgingFunctionDescriptor, extensionReceiverParameter)
             }
         }
     }

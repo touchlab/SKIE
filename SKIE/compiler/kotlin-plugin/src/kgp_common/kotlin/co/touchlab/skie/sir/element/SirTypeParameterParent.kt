@@ -1,17 +1,16 @@
 package co.touchlab.skie.sir.element
 
-import co.touchlab.skie.sir.type.DeclaredSirType
-import co.touchlab.skie.sir.type.KotlinErrorSirType
-import co.touchlab.skie.sir.type.LambdaSirType
-import co.touchlab.skie.sir.type.NullableSirType
-import co.touchlab.skie.sir.type.SirType
-import co.touchlab.skie.sir.type.SkieErrorSirType
-import co.touchlab.skie.sir.type.SpecialSirType
-import co.touchlab.skie.sir.type.TypeParameterUsageSirType
-
 sealed interface SirTypeParameterParent {
 
     val typeParameters: MutableList<SirTypeParameter>
+
+    object None : SirTypeParameterParent {
+
+        override val typeParameters: MutableList<SirTypeParameter>
+            get() = mutableListOf()
+
+        override fun toString(): String = "${SirTypeParameterParent::class.simpleName}.${this::class.simpleName}"
+    }
 }
 
 fun SirTypeParameterParent.copyTypeParametersFrom(other: SirClass) {
@@ -22,30 +21,9 @@ fun SirTypeParameterParent.copyTypeParametersFrom(other: SirClass) {
     val substitutions = copiesWithOriginal.toMap()
 
     copiesWithOriginal.forEach { (original, copy) ->
+        // TODO This is not entirely correct, because we don't substitute type parameters from parent scope as nested scopes are not implemented yet.
         val bounds = original.bounds.map { it.substituteTypeParameters(substitutions) }
 
         copy.bounds.addAll(bounds)
     }
 }
-
-// WIP 2 To SirType
-private fun SirType.substituteTypeParameters(
-    substitutions: Map<SirTypeParameter, SirTypeParameter>,
-): SirType =
-    when (this) {
-        is TypeParameterUsageSirType -> substitutions[typeParameter]?.toTypeParameterUsage() ?: this
-        is DeclaredSirType -> DeclaredSirType(
-            declaration = declaration,
-            typeArguments = typeArguments.map { it.substituteTypeParameters(substitutions) },
-        )
-        is LambdaSirType -> LambdaSirType(
-            returnType = returnType.substituteTypeParameters(substitutions),
-            valueParameterTypes = valueParameterTypes.map { it.substituteTypeParameters(substitutions) },
-            isEscaping = isEscaping,
-        )
-        is NullableSirType -> NullableSirType(type.substituteTypeParameters(substitutions))
-        is SkieErrorSirType,
-        is SpecialSirType,
-        KotlinErrorSirType,
-        -> this
-    }

@@ -1,6 +1,6 @@
 package co.touchlab.skie.sir.type
 
-import io.outfoxx.swiftpoet.TypeName
+import co.touchlab.skie.sir.element.SirTypeParameter
 
 data class NullableSirType(
     val type: SirType,
@@ -9,17 +9,28 @@ data class NullableSirType(
     override val isHashable: Boolean
         get() = type.isHashable
 
-    override val isPrimitive: Boolean
-        get() = false
+    override val isReference: Boolean = false
 
-    override val canonicalName: String
-        get() = type.canonicalName + "?"
+    override fun evaluate(): EvaluatedSirType<NullableSirType> {
+        val evaluatedType = type.evaluate()
 
-    override val directlyReferencedTypes: List<SirType> = listOf(type)
+        return EvaluatedSirType(
+            type = copy(type = evaluatedType.type),
+            isValid = evaluatedType.isValid,
+            canonicalName = evaluatedType.canonicalName + "?",
+            swiftPoetTypeName = evaluatedType.swiftPoetTypeName.makeOptional(),
+        )
+    }
 
-    override fun toNonNull(): NonNullSirType =
-        type.toNonNull()
+    override fun asHashableType(): SirType? =
+        type.asHashableType()?.let(::NullableSirType)
 
-    override fun toSwiftPoetTypeName(): TypeName =
-        type.toSwiftPoetTypeName().makeOptional()
+    override fun asReferenceType(): SirType? =
+        null
+
+    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): NullableSirType =
+        copy(type = type.substituteTypeParameters(substitutions))
+
+    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): NullableSirType =
+        copy(type = type.substituteTypeArguments(substitutions))
 }

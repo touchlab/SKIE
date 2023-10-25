@@ -7,6 +7,7 @@ import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
 import co.touchlab.skie.sir.element.SirExtension
+import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirGetter
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirPropertyAccessor
@@ -14,7 +15,6 @@ import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirTypeParameterParent
 import co.touchlab.skie.sir.element.SirValueParameter
-import co.touchlab.skie.sir.element.SirValueParameterParent
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -64,8 +64,8 @@ fun sirTypeParameterParent(
 )
 
 fun sirValueParameterParent(
-    initialValue: SirValueParameterParent,
-) = parent<SirValueParameter, SirValueParameterParent>(
+    initialValue: SirFunction,
+) = parent<SirValueParameter, SirFunction>(
     initialValue = initialValue,
     onChange = { oldValue, newValue, thisRef ->
         oldValue?.valueParameters?.remove(thisRef)

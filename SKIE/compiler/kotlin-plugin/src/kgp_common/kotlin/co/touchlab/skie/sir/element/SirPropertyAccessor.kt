@@ -1,6 +1,8 @@
 package co.touchlab.skie.sir.element
 
-sealed interface SirPropertyAccessor {
+import io.outfoxx.swiftpoet.FunctionSpec
+
+sealed interface SirPropertyAccessor : SirElementWithAttributes, SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder> {
 
     var property: SirProperty
 }

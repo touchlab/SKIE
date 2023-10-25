@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases
 
-import co.touchlab.skie.kir.MutableDescriptorProvider
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 
 interface DescriptorModificationPhase : SkiePhase<DescriptorModificationPhase.Context> {

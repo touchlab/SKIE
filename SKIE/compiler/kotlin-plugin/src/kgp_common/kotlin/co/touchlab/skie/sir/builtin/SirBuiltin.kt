@@ -6,34 +6,22 @@ import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeParameter
-import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
-import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
-import co.touchlab.skie.sir.util.nsNumberKindClassIds
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.name.FqName
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 @Suppress("PropertyName", "FunctionName")
 class SirBuiltins(
-    kotlinModule: SirModule.Kotlin,
-    skieModule: SirModule.Skie,
     sirProvider: SirProvider,
-    namer: ObjCExportNamer,
-    kotlinBuiltIns: KotlinBuiltIns,
 ) {
 
     val Swift = Modules.Swift(sirProvider)
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
-    val Kotlin = Modules.Kotlin(kotlinModule, Swift, Foundation, namer, kotlinBuiltIns)
-
-    val Skie = Modules.Skie(skieModule)
+    val Skie = Modules.Skie(sirProvider.skieModule)
 
     object Modules {
 
@@ -53,7 +41,9 @@ class SirBuiltins(
 
             val CaseIterable by Protocol()
 
-            val AnyObject by Protocol()
+            val AnyObject by Protocol {
+                isAlwaysAReference = true
+            }
 
             val Optional by Protocol {
                 SirTypeParameter("Wrapped")
@@ -76,28 +66,28 @@ class SirBuiltins(
                 SirTypeParameter("Element", Hashable.defaultType)
             }
 
-            val Void by Struct(isPrimitive = true)
+            val Void by Struct()
 
             val UnsafeMutableRawPointer by Struct(superTypes = listOf(Hashable.defaultType))
 
             val String by Struct(superTypes = listOf(Hashable.defaultType))
 
-            val Bool by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
+            val Bool by Struct(superTypes = listOf(Hashable.defaultType))
 
-            val Int by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val Int8 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val Int16 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val Int32 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val Int64 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
+            val Int by Struct(superTypes = listOf(Hashable.defaultType))
+            val Int8 by Struct(superTypes = listOf(Hashable.defaultType))
+            val Int16 by Struct(superTypes = listOf(Hashable.defaultType))
+            val Int32 by Struct(superTypes = listOf(Hashable.defaultType))
+            val Int64 by Struct(superTypes = listOf(Hashable.defaultType))
 
-            val UInt by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val UInt8 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val UInt16 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val UInt32 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val UInt64 by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
+            val UInt by Struct(superTypes = listOf(Hashable.defaultType))
+            val UInt8 by Struct(superTypes = listOf(Hashable.defaultType))
+            val UInt16 by Struct(superTypes = listOf(Hashable.defaultType))
+            val UInt32 by Struct(superTypes = listOf(Hashable.defaultType))
+            val UInt64 by Struct(superTypes = listOf(Hashable.defaultType))
 
-            val Float by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
-            val Double by Struct(superTypes = listOf(Hashable.defaultType), isPrimitive = true)
+            val Float by Struct(superTypes = listOf(Hashable.defaultType))
+            val Double by Struct(superTypes = listOf(Hashable.defaultType))
         }
 
         class Foundation(sirProvider: SirProvider, swift: Swift) : ModuleBase() {
@@ -105,105 +95,6 @@ class SirBuiltins(
             override val module = sirProvider.getExternalModule("Foundation")
 
             val unichar by TypeAlias { swift.UInt16.defaultType }
-
-            val NSObject by Class(superTypes = listOf(swift.Hashable.defaultType, swift.AnyObject.defaultType))
-
-            val NSString by Class(superTypes = listOf(NSObject.defaultType))
-
-            val NSValue by Class(superTypes = listOf(NSObject.defaultType))
-
-            val NSNumber by Class(superTypes = listOf(NSValue.defaultType))
-
-            val NSArray by Class(superTypes = listOf(NSObject.defaultType)) {
-                SirTypeParameter("E", swift.AnyObject.defaultType)
-            }
-
-            val NSMutableArray by Class {
-                SirTypeParameter("E", swift.AnyObject.defaultType)
-
-                superTypes.add(
-                    NSArray.toTypeFromEnclosingTypeParameters(typeParameters),
-                )
-            }
-
-            val NSDictionary by Class(superTypes = listOf(NSObject.defaultType)) {
-                SirTypeParameter("K", swift.Hashable.defaultType, swift.AnyObject.defaultType)
-                SirTypeParameter("V", swift.AnyObject.defaultType)
-            }
-
-            val NSMutableDictionary by Class {
-                SirTypeParameter("K", swift.Hashable.defaultType, swift.AnyObject.defaultType)
-                SirTypeParameter("V", swift.AnyObject.defaultType)
-
-                superTypes.add(
-                    NSDictionary.toTypeFromEnclosingTypeParameters(typeParameters),
-                )
-            }
-
-            val NSSet by Class(superTypes = listOf(NSObject.defaultType)) {
-                SirTypeParameter("E", swift.Hashable.defaultType, swift.AnyObject.defaultType)
-            }
-
-            val NSMutableSet by Class {
-                SirTypeParameter("E", swift.Hashable.defaultType, swift.AnyObject.defaultType)
-
-                superTypes.add(
-                    NSSet.toTypeFromEnclosingTypeParameters(typeParameters),
-                )
-            }
-        }
-
-        class Kotlin(
-            override val module: SirModule.Kotlin,
-            swift: Swift,
-            foundation: Foundation,
-            namer: ObjCExportNamer,
-            kotlinBuiltIns: KotlinBuiltIns,
-        ) : ModuleBase() {
-
-            // WIP 2 Replace with origin
-            val allBuiltInsWithDescriptors: Map<SirClass, ClassDescriptor> by lazy {
-                mapOf(
-                    Base to kotlinBuiltIns.any,
-                    MutableSet to kotlinBuiltIns.mutableSet,
-                    MutableMap to kotlinBuiltIns.mutableMap,
-                    Number to kotlinBuiltIns.number,
-                ) + nsNumberDeclarations.map {
-                    it.value to kotlinBuiltIns.getBuiltInClassByFqName(FqName(it.key.asFqNameString()))
-                }
-            }
-
-            val Base by Class(nameOverride = namer.kotlinAnyName.swiftName, superTypes = listOf(foundation.NSObject.defaultType))
-
-            val MutableSet by Class(nameOverride = namer.mutableSetName.swiftName) {
-                SirTypeParameter("E", swift.Hashable.defaultType, swift.AnyObject.defaultType)
-
-                superTypes.add(
-                    foundation.NSMutableSet.toTypeFromEnclosingTypeParameters(typeParameters),
-                )
-            }
-
-            val MutableMap by Class(nameOverride = namer.mutableMapName.swiftName) {
-                SirTypeParameter("K", swift.Hashable.defaultType, swift.AnyObject.defaultType)
-                SirTypeParameter("V", swift.AnyObject.defaultType)
-
-                superTypes.add(
-                    foundation.NSMutableDictionary.toTypeFromEnclosingTypeParameters(typeParameters),
-                )
-            }
-
-            val Number by Class(nameOverride = namer.kotlinNumberName.swiftName, superTypes = listOf(foundation.NSNumber.defaultType))
-
-            val nsNumberDeclarations =
-                nsNumberKindClassIds().associateWith {
-                    namer.kotlinNumberName
-                    SirClass(
-                        baseName = namer.numberBoxName(it).swiftName,
-                        kind = SirClass.Kind.Class,
-                        parent = module,
-                        superTypes = listOf(Number.defaultType),
-                    )
-                }
         }
 
         class Skie(
@@ -258,7 +149,7 @@ class SirBuiltins(
             abstract val module: SirDeclarationParent
 
             protected fun Class(
-                superTypes: List<DeclaredSirType> = emptyList(),
+                superTypes: List<SirDeclaredSirType> = emptyList(),
                 parent: SirDeclarationParent = module,
                 nameOverride: String? = null,
                 apply: (SirClass.() -> Unit) = { },
@@ -271,7 +162,7 @@ class SirBuiltins(
             )
 
             protected fun Protocol(
-                superTypes: List<DeclaredSirType> = emptyList(),
+                superTypes: List<SirDeclaredSirType> = emptyList(),
                 parent: SirDeclarationParent = module,
                 apply: (SirClass.() -> Unit) = { },
             ) = ClassDeclarationPropertyProvider(
@@ -282,14 +173,12 @@ class SirBuiltins(
             )
 
             protected fun Struct(
-                superTypes: List<DeclaredSirType> = emptyList(),
+                superTypes: List<SirDeclaredSirType> = emptyList(),
                 parent: SirDeclarationParent = module,
-                isPrimitive: Boolean = false,
                 apply: (SirClass.() -> Unit) = { },
             ) = ClassDeclarationPropertyProvider(
                 kind = SirClass.Kind.Struct,
                 parent = parent,
-                isPrimitive = isPrimitive,
                 superTypes = superTypes,
                 apply = apply,
             )
@@ -307,8 +196,7 @@ class SirBuiltins(
             inner class ClassDeclarationPropertyProvider(
                 private val kind: SirClass.Kind,
                 private val parent: SirDeclarationParent,
-                private val isPrimitive: Boolean = false,
-                private val superTypes: List<DeclaredSirType> = emptyList(),
+                private val superTypes: List<SirDeclaredSirType> = emptyList(),
                 private val apply: (SirClass.() -> Unit) = { },
                 private val nameOverride: String? = null,
             ) : PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SirClass>> {
@@ -317,7 +205,6 @@ class SirBuiltins(
                     ClassDeclarationProperty(
                         name = nameOverride ?: property.name,
                         kind = kind,
-                        isPrimitive = isPrimitive,
                         parent = parent,
                         superTypes = superTypes,
                         apply = apply,
@@ -327,16 +214,14 @@ class SirBuiltins(
             private inner class ClassDeclarationProperty(
                 name: String,
                 kind: SirClass.Kind,
-                isPrimitive: Boolean,
                 parent: SirDeclarationParent,
-                superTypes: List<DeclaredSirType>,
+                superTypes: List<SirDeclaredSirType>,
                 apply: (SirClass.() -> Unit) = { },
             ) : ReadOnlyProperty<Any?, SirClass> {
 
                 private val value = SirClass(
                     baseName = name,
                     kind = kind,
-                    isPrimitive = isPrimitive,
                     parent = parent,
                     superTypes = superTypes,
                 ).apply(apply)

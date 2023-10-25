@@ -1,20 +1,20 @@
 package co.touchlab.skie.phases.features.suspend
 
+import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.kir.element.KirSimpleFunction
+import co.touchlab.skie.kir.element.forEachAssociatedExportedSirDeclaration
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.util.doInPhase
-import co.touchlab.skie.sir.addAvailabilityForAsync
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
-import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirScope
-import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.callable.KotlinCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.MutableKotlinFunctionSwiftModel
+import co.touchlab.skie.sir.element.copyValueParametersFrom
+import co.touchlab.skie.sir.element.shallowCopy
+import co.touchlab.skie.sir.element.toSwiftVisibility
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
@@ -34,83 +34,57 @@ class SwiftSuspendGeneratorDelegate(
         kotlinBridgingFunctionDescriptor: FunctionDescriptor,
     ) {
         context.doInPhase(SuspendGenerator.SwiftBridgeGeneratorPhase) {
-            if (originalFunctionDescriptor.swiftModel.primarySirFunction.visibility == SirVisibility.Removed ||
-                kotlinBridgingFunctionDescriptor.swiftModel.primarySirFunction.visibility == SirVisibility.Removed
-            ) {
-                return@doInPhase
-            }
-
             val bridgeModel = BridgeModel(
-                originalFunction = originalFunctionDescriptor.swiftModel,
-                asyncOriginalFunction = originalFunctionDescriptor.asyncSwiftModel,
-                kotlinBridgingFunction = kotlinBridgingFunctionDescriptor.swiftModel,
+                suspendKirFunction = kirProvider.getFunction(originalFunctionDescriptor),
+                kotlinBridgingKirFunction = kirProvider.getFunction(kotlinBridgingFunctionDescriptor),
             )
 
-            val extension = SirExtension(
+            val extension = sirProvider.getExtension(
                 classDeclaration = bridgeModel.extensionTypeDeclarationForBridgingFunction,
-                parent = sirProvider.getFile(bridgeModel.originalFunction.owner!!),
+                parent = skieNamespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
             )
 
-            val bridgingFunction = extension.addSwiftBridgingFunction(bridgeModel)
+            markOriginalFunctionAsReplaced(bridgeModel.suspendKirFunction)
 
-            markOriginalFunctionAsReplaced(bridgeModel.originalFunction, bridgeModel.asyncOriginalFunction, bridgingFunction)
+            bridgeModel.suspendKirFunction.bridgedSirFunction = extension.createSwiftBridgingFunction(bridgeModel)
         }
     }
-    // WIP 2 Verify that we generate overload for all function in hierarchy
 
     context(SirPhase.Context)
     private fun markOriginalFunctionAsReplaced(
-        originalFunctionSwiftModel: MutableKotlinFunctionSwiftModel,
-        originalFunctionAsyncSwiftModel: MutableKotlinFunctionSwiftModel,
-        sirFunction: SirFunction,
+        suspendKirFunction: KirSimpleFunction,
     ) {
-        originalFunctionSwiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
-            visibility = SirVisibility.PublicButReplaced
+        suspendKirFunction.forEachAssociatedExportedSirDeclaration {
+            it.applyToEntireOverrideHierarchy {
+                visibility = SirVisibility.PublicButReplaced
+            }
         }
-        originalFunctionAsyncSwiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
-            visibility = SirVisibility.PublicButReplaced
-        }
-
-        // WIP 2 Should be mapped to entire hierarchy
-        originalFunctionAsyncSwiftModel.bridgedSirFunction = sirFunction
     }
 
-    context(SwiftModelScope)
+    context(SirPhase.Context)
     private val BridgeModel.extensionTypeDeclarationForBridgingFunction: SirClass
         get() {
-            val owner = this.originalFunction.owner ?: error("No owner for bridging function")
-
             return if (this.isFromGenericClass) {
-                skieClassSuspendGenerator.getOrCreateSkieClass(owner)
+                skieClassSuspendGenerator.getOrCreateSuspendClass(this.suspendFunctionOwner)
             } else {
-                owner.kotlinSirClass
+                this.suspendFunctionOwner.originalSirClass
             }
         }
 }
 
-private fun SirExtension.addSwiftBridgingFunction(bridgeModel: BridgeModel): SirFunction =
-    SirFunction(
-        identifier = bridgeModel.originalFunction.primarySirFunction.identifier,
-        returnType = bridgeModel.asyncOriginalFunction.primarySirFunction.returnType,
-        scope = if (bridgeModel.originalFunction.scope == KotlinCallableMemberSwiftModel.Scope.Static) SirScope.Static else SirScope.Member,
+private fun SirExtension.createSwiftBridgingFunction(bridgeModel: BridgeModel): SirSimpleFunction =
+    bridgeModel.originalFunction.shallowCopy(
+        parent = this,
+        isAsync = true,
+        throws = true,
+        visibility = bridgeModel.originalFunction.visibility.toSwiftVisibility(),
     ).apply {
-        // WIP 2 Replace with copyValueParametersFrom once Functions have Sir
-        bridgeModel.bridgedParameters.forEach {
-            SirValueParameter(
-                label = it.label,
-                name = it.name,
-                type = it.type,
-            )
-        }
-
-        addAvailabilityForAsync()
-        isAsync = true
-        throws = true
+        copyValueParametersFrom(bridgeModel.originalFunction)
 
         addSwiftBridgingFunctionBody(bridgeModel)
     }
 
-private fun SirFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeModel) {
+private fun SirSimpleFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeModel) {
     addFunctionDeclarationBodyWithErrorTypeHandling(bridgeModel.kotlinBridgingFunction) {
         addCode(
             CodeBlock.builder()
@@ -119,8 +93,8 @@ private fun SirFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeModel) {
                 .apply {
                     addStatement(
                         "%T.%N(%L)",
-                        bridgeModel.kotlinBridgingFunction.receiver.toSwiftPoetTypeName(),
-                        bridgeModel.kotlinBridgingFunction.primarySirFunction.reference,
+                        bridgeModel.kotlinBridgingFunctionOwner.defaultType.evaluate().swiftPoetTypeName,
+                        bridgeModel.kotlinBridgingFunction.reference,
                         bridgeModel.argumentsForBridgingCall,
                     )
                 }
@@ -137,13 +111,13 @@ private val BridgeModel.argumentsForBridgingCall: CodeBlock
 
         arguments.addDispatchReceiver(this)
 
-        this.bridgedParameters.forEachIndexed { index, parameter ->
+        this.originalFunction.valueParameters.forEachIndexed { index, parameter ->
             if (isFromGenericClass) {
-                val erasedParameterType = kotlinBridgingFunction.kotlinSirFunction.valueParameters[index + 1].type.toSwiftPoetTypeName()
+                val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.evaluate().swiftPoetTypeName
                     // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
                     .removingEscapingAttribute()
 
-                if (parameter.type.toSwiftPoetTypeName() != erasedParameterType) {
+                if (parameter.type.evaluate().swiftPoetTypeName != erasedParameterType) {
                     arguments.add(CodeBlock.of("%N as! %T", parameter.name, erasedParameterType))
                 } else {
                     arguments.add(CodeBlock.of("%N", parameter.name))
@@ -159,12 +133,12 @@ private val BridgeModel.argumentsForBridgingCall: CodeBlock
     }
 
 private fun MutableList<CodeBlock>.addDispatchReceiver(bridgeModel: BridgeModel) {
-    if (bridgeModel.originalFunction.scope != KotlinCallableMemberSwiftModel.Scope.Member) {
+    if (bridgeModel.originalFunction.scope != SirScope.Member) {
         return
     }
 
     val dispatchReceiverErasedType by lazy {
-        bridgeModel.kotlinBridgingFunction.kotlinSirFunction.valueParameters.first().type.toSwiftPoetTypeName()
+        bridgeModel.kotlinBridgingFunction.valueParameters.first().type.evaluate().swiftPoetTypeName
     }
 
     if (bridgeModel.isFromGenericClass) {
@@ -186,16 +160,22 @@ private fun TypeName.removingEscapingAttribute(): TypeName {
 }
 
 private data class BridgeModel(
-    val originalFunction: MutableKotlinFunctionSwiftModel,
-    val asyncOriginalFunction: MutableKotlinFunctionSwiftModel,
-    val kotlinBridgingFunction: KotlinFunctionSwiftModel,
-)
+    val suspendKirFunction: KirSimpleFunction,
+    val kotlinBridgingKirFunction: KirSimpleFunction,
+) {
 
-private val BridgeModel.bridgedParameters: List<SirValueParameter>
-    get() = this.asyncOriginalFunction.kotlinSirFunction.valueParameters
+    val originalFunction: SirSimpleFunction = suspendKirFunction.bridgedSirFunction ?: error("Suspend function $suspendKirFunction does not have an async bridge.")
 
-private val BridgeModel.isFromGenericClass: Boolean
-    get() = this.originalFunction.owner?.kotlinSirClass?.typeParameters?.isEmpty()?.not() ?: false
+    val kotlinBridgingFunction: SirSimpleFunction = kotlinBridgingKirFunction.originalSirFunction
 
-private val BridgeModel.isFromBridgedClass: Boolean
-    get() = this.originalFunction.owner?.bridgedSirClass != null
+    val kotlinBridgingFunctionOwner: SirClass = kotlinBridgingKirFunction.owner.originalSirClass
+
+    val suspendFunctionOwner: KirClass = suspendKirFunction.owner
+
+    val isFromGenericClass: Boolean = this.suspendKirFunction.owner.typeParameters.isEmpty().not()
+
+    // Can be called only during code generation
+    val isFromBridgedClass: Boolean
+        get() = suspendFunctionOwner.bridgedSirClass != null
+}
+

@@ -3,8 +3,8 @@ package co.touchlab.skie.phases.other
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.belongsToSkieRuntime
-import co.touchlab.skie.kir.MutableDescriptorProvider
-import co.touchlab.skie.kir.allExposedMembers
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
+import co.touchlab.skie.kir.descriptor.allExposedMembers
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.ClassExportPhase
@@ -119,7 +119,7 @@ class ExtraClassExportPhase(
 
     private fun FunctionDescriptor.removeFromSwift() {
         context.doInPhase(FinalizePhase) {
-            this@removeFromSwift.swiftModel.kotlinSirFunction.visibility = SirVisibility.Removed
+            kirProvider.getFunction(this@removeFromSwift).originalSirFunction.visibility = SirVisibility.Private
         }
     }
 

@@ -1,10 +1,8 @@
 package co.touchlab.skie.kir.irbuilder
 
-import co.touchlab.skie.kir.DescriptorRegistrationScope
-import co.touchlab.skie.kir.util.SkieSymbolTable
+import co.touchlab.skie.kir.descriptor.DescriptorRegistrationScope
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 

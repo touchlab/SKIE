@@ -1,18 +1,17 @@
 package co.touchlab.skie.phases.header
 
+import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.OirModule
+import co.touchlab.skie.oir.element.renderForwardDeclaration
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirModule
-import co.touchlab.skie.sir.element.SirTypeAlias
-import co.touchlab.skie.sir.element.SirTypeDeclaration
-import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 
 object GenerateFakeObjCDependenciesPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        sirProvider.allExternalTypesFromNonBuiltinModules
+        oirProvider.allExternalClassesAndProtocols
+            .filter { it.module.name != "Foundation" }
             .groupBy { it.module }
             .forEach { (module, types) ->
                 generateFakeFramework(module, types)
@@ -20,56 +19,45 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
     }
 
     context(SirPhase.Context)
-    private fun generateFakeFramework(module: SirModule, types: List<SirTypeDeclaration>) {
+    private fun generateFakeFramework(module: OirModule, classes: List<OirClass>) {
         generateModuleMap(module)
-        generateHeader(module, types)
+        generateHeader(module, classes)
     }
 
     context(SirPhase.Context)
-    private fun generateModuleMap(module: SirModule) {
-        val modulemapContent =
+    private fun generateModuleMap(module: OirModule) {
+        val moduleMapContent =
             """
             framework module ${module.name} {
                 umbrella header "${module.name}.h"
             }
         """.trimIndent()
 
-        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module.name).writeTextIfDifferent(modulemapContent)
+        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module.name).writeTextIfDifferent(moduleMapContent)
     }
 
     context(SirPhase.Context)
-    private fun generateHeader(module: SirModule, types: List<SirTypeDeclaration>) {
+    private fun generateHeader(module: OirModule, classes: List<OirClass>) {
         val foundationImport = "#import <Foundation/NSObject.h>"
-        val typeDeclarations = types
-            .sortedBy { it.fqName.toLocalString() }
+
+        val declarations = classes
+            .sortedBy { it.name }
             .joinToString("\n") { it.getHeaderEntry() }
 
-        val headerContent = "$foundationImport\n\n$typeDeclarations"
+        val headerContent = "$foundationImport\n\n$declarations"
 
         skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(module.name).writeTextIfDifferent(headerContent)
     }
 }
 
-private fun SirTypeDeclaration.getHeaderEntry(): String =
-    when (this) {
-        is SirClass -> when (kind) {
-            SirClass.Kind.Class -> getClassHeaderEntry()
-            SirClass.Kind.Enum -> getClassHeaderEntry()
-            SirClass.Kind.Struct -> getClassHeaderEntry()
-            SirClass.Kind.Protocol -> getProtocolHeaderEntry()
-        }
-        is SirTypeAlias -> getClassHeaderEntry()
+private fun OirClass.getHeaderEntry(): String =
+    when (kind) {
+        OirClass.Kind.Class -> getClassHeaderEntry()
+        OirClass.Kind.Protocol -> getProtocolHeaderEntry()
     }
 
-private fun SirTypeDeclaration.getClassHeaderEntry(): String =
-    "@interface ${fqName.toLocalString()}${getTypeParametersDeclaration()} : NSObject @end"
+private fun OirClass.getClassHeaderEntry(): String =
+    "@interface ${renderForwardDeclaration()} : NSObject @end"
 
-private fun SirTypeDeclaration.getTypeParametersDeclaration(): String =
-    if (typeParameters.isEmpty()) {
-        ""
-    } else {
-        typeParameters.joinToString(prefix = "<", postfix = ">") { it.name }
-    }
-
-private fun SirClass.getProtocolHeaderEntry(): String =
-    "@protocol ${fqName.toLocalString()} @end"
+private fun OirClass.getProtocolHeaderEntry(): String =
+    "@protocol ${renderForwardDeclaration()} @end"

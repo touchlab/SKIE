@@ -10,8 +10,7 @@ class SirSetter(
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
     var parameterName: String = "value",
-) : SirElement, SirPropertyAccessor, SirElementWithAttributes, SirElementWithModifiers,
-    SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder> {
+) : SirElement, SirPropertyAccessor, SirElementWithModifiers {
 
     override var property: SirProperty by sirPropertyAccessorParent(property)
 

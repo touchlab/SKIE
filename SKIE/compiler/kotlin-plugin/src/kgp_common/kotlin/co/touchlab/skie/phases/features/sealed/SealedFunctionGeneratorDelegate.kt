@@ -2,16 +2,15 @@ package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.getConfiguration
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 import co.touchlab.skie.sir.element.toTypeParameterUsage
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.TypeName
 
@@ -19,11 +18,11 @@ class SealedFunctionGeneratorDelegate(
     override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {
 
-    context(SwiftModelScope)
-    fun generate(swiftModel: KotlinClassSwiftModel, enum: SirClass) {
-        SirFunction(
-            identifier = swiftModel.enumConstructorFunctionName,
-            parent = sirProvider.getFile(swiftModel),
+    context(SirPhase.Context)
+    fun generate(kirClass: KirClass, enum: SirClass) {
+        SirSimpleFunction(
+            identifier = kirClass.enumConstructorFunctionName,
+            parent = skieNamespaceProvider.getNamespaceFile(kirClass),
             returnType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters),
         ).apply {
             copyTypeParametersFrom(enum)
@@ -31,58 +30,56 @@ class SealedFunctionGeneratorDelegate(
             val sealedTypeParameter = SirTypeParameter(
                 name = "__Sealed",
                 bounds = listOf(
-                    swiftModel.kotlinSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
+                    kirClass.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
                 ),
             )
 
             SirValueParameter(
-                label = swiftModel.enumConstructorArgumentLabel,
-                name = swiftModel.enumConstructorParameterName,
+                label = kirClass.enumConstructorArgumentLabel,
+                name = kirClass.enumConstructorParameterName,
                 type = sealedTypeParameter.toTypeParameterUsage(),
             )
 
-            addFunctionBody(swiftModel, enum)
+            addFunctionBody(kirClass, enum)
         }
     }
 
-    private val KotlinClassSwiftModel.enumConstructorFunctionName: String
+    private val KirClass.enumConstructorFunctionName: String
         get() = configurationProvider.getConfiguration(this, SealedInterop.Function.Name)
 
-    private val KotlinClassSwiftModel.enumConstructorArgumentLabel: String
+    private val KirClass.enumConstructorArgumentLabel: String
         get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ArgumentLabel)
 
-    private val KotlinClassSwiftModel.enumConstructorParameterName: String
+    private val KirClass.enumConstructorParameterName: String
         get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ParameterName)
 
-    context(SwiftModelScope)
-    private fun SirFunction.addFunctionBody(
-        swiftModel: KotlinClassSwiftModel,
+    private fun SirSimpleFunction.addFunctionBody(
+        kirClass: KirClass,
         enum: SirClass,
     ) {
         swiftPoetBuilderModifications.add {
-            val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).toSwiftPoetTypeName()
+            val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).evaluate().swiftPoetTypeName
 
             addCode(
                 CodeBlock.builder()
-                    .addCaseBranches(swiftModel, enum, enumType)
-                    .addFunctionEnd(swiftModel, enumType)
+                    .addCaseBranches(kirClass, enum, enumType)
+                    .addFunctionEnd(kirClass, enumType)
                     .build(),
             )
         }
     }
 
-    context(SwiftModelScope)
     private fun CodeBlock.Builder.addCaseBranches(
-        swiftModel: KotlinClassSwiftModel,
+        kirClass: KirClass,
         enum: SirClass,
         enumType: TypeName,
     ): CodeBlock.Builder {
-        val preferredNamesCollide = swiftModel.enumCaseNamesBasedOnKotlinIdentifiersCollide
+        val preferredNamesCollide = kirClass.enumCaseNamesBasedOnKotlinIdentifiersCollide
 
-        swiftModel.visibleSealedSubclasses
-            .forEachIndexed { index, subclassSymbol ->
-                val parameterName = swiftModel.enumConstructorParameterName
-                val subclassName = subclassSymbol.primarySirClass.getSealedSubclassType(enum, this@SwiftModelScope).toSwiftPoetTypeName()
+        kirClass.visibleSealedSubclasses
+            .forEachIndexed { index, subclass ->
+                val parameterName = kirClass.enumConstructorParameterName
+                val subclassName = subclass.primarySirClass.getSealedSubclassType(enum).evaluate().swiftPoetTypeName
 
                 val condition = "let %N = %N as? %T"
 
@@ -92,47 +89,47 @@ class SealedFunctionGeneratorDelegate(
                     nextControlFlow("else if", condition, parameterName, parameterName, subclassName)
                 }
 
-                add("return %T.%N(%N)\n", enumType, subclassSymbol.enumCaseName(preferredNamesCollide), parameterName)
+                add("return %T.%N(%N)\n", enumType, subclass.enumCaseName(preferredNamesCollide), parameterName)
             }
 
         return this
     }
 
     private fun CodeBlock.Builder.addFunctionEnd(
-        swiftModel: KotlinClassSwiftModel,
+        kirClass: KirClass,
         enumType: TypeName,
     ): CodeBlock.Builder {
-        if (swiftModel.hasAnyVisibleSealedSubclasses) {
-            addElseBranch(swiftModel, enumType)
+        if (kirClass.hasAnyVisibleSealedSubclasses) {
+            addElseBranch(kirClass, enumType)
         } else {
-            addReturnElse(swiftModel, enumType)
+            addReturnElse(kirClass, enumType)
         }
 
         return this
     }
 
-    private val KotlinClassSwiftModel.hasAnyVisibleSealedSubclasses: Boolean
+    private val KirClass.hasAnyVisibleSealedSubclasses: Boolean
         get() = this.visibleSealedSubclasses.isNotEmpty()
 
-    private fun CodeBlock.Builder.addElseBranch(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
+    private fun CodeBlock.Builder.addElseBranch(kirClass: KirClass, enumType: TypeName) {
         nextControlFlow("else")
 
-        if (swiftModel.hasElseCase) {
-            addReturnElse(swiftModel, enumType)
+        if (kirClass.hasElseCase) {
+            addReturnElse(kirClass, enumType)
         } else {
             add(
                 "fatalError(" +
-                        "\"Unknown subtype. " +
-                        "This error should not happen under normal circumstances " +
-                        "since ${swiftModel.primarySirClass} is sealed." +
-                        "\")\n",
+                    "\"Unknown subtype. " +
+                    "This error should not happen under normal circumstances " +
+                    "since ${kirClass.originalSirClass} is sealed." +
+                    "\")\n",
             )
         }
 
         endControlFlow("else")
     }
 
-    private fun CodeBlock.Builder.addReturnElse(swiftModel: KotlinClassSwiftModel, enumType: TypeName) {
-        add("return %T.%N\n", enumType, swiftModel.elseCaseName)
+    private fun CodeBlock.Builder.addReturnElse(kirClass: KirClass, enumType: TypeName) {
+        add("return %T.%N\n", enumType, kirClass.elseCaseName)
     }
 }

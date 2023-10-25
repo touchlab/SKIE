@@ -1,7 +1,9 @@
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.ExperimentalFeatures
+import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import java.util.Locale
 
 plugins {
     id("dev.multiplatform")
@@ -10,7 +12,7 @@ plugins {
 }
 
 skie {
-//     isEnabled = false
+//     isEnabled.set(false)
     analytics {
 //        enabled = false
         disableUpload = true
@@ -19,13 +21,12 @@ skie {
     build {
         enableParallelSwiftCompilation = true
     }
-
     features {
 //        defaultArgumentsInExternalLibraries = true
 //         coroutinesInterop.set(false)
         group {
             ExperimentalFeatures.Enabled(true)
-            DefaultArgumentInterop.Enabled(false)
+            DefaultArgumentInterop.Enabled(true)
         }
     }
 
@@ -52,7 +53,7 @@ kotlin {
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 
-//                 export(projects.skie.mac.dependency)
+                export(projects.skie.mac.dependency)
 
                 exportedLibraries.forEach {
                     export(it)

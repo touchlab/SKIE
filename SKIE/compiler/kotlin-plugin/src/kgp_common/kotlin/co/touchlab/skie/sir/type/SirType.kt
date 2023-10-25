@@ -1,27 +1,31 @@
 package co.touchlab.skie.sir.type
 
-import io.outfoxx.swiftpoet.TypeName
+import co.touchlab.skie.sir.element.SirTypeParameter
 
 sealed class SirType {
 
     abstract val isHashable: Boolean
 
-    abstract val isPrimitive: Boolean
+    abstract val isReference: Boolean
 
-    abstract val canonicalName: String
+    abstract fun evaluate(): EvaluatedSirType<SirType>
 
-    open val directlyReferencedTypes: List<SirType> = emptyList()
+    open fun asHashableType(): SirType? = null
 
-    fun allReferencedTypes(): List<SirType> =
-        listOf(this) + directlyReferencedTypes.flatMap { it.allReferencedTypes() }
+    open fun asReferenceType(): SirType? = null
+
+    abstract fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SirType
+
+    abstract fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SirType
 
     override fun toString(): String =
-        toSwiftPoetTypeName().toString()
-
-    abstract fun toSwiftPoetTypeName(): TypeName
-
-    abstract fun toNonNull(): NonNullSirType
+        evaluate().swiftPoetTypeName.toString()
 }
 
-fun SirType.optional(): NullableSirType =
-    NullableSirType(this)
+fun SirType.toNullable(condition: Boolean = true): SirType =
+    if (condition) {
+        NullableSirType(this)
+    } else {
+        this
+    }
+

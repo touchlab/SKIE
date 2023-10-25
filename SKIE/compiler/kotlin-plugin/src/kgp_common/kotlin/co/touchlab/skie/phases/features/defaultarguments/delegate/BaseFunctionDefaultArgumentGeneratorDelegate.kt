@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
-import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
@@ -10,8 +10,6 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
-import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel.CollisionResolutionStrategy
 import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -60,7 +58,9 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     ) {
         val newFunction = generateOverloadWithUniqueName(function, parameters)
 
-        renameOverloadedFunction(newFunction, function)
+        registerOverload(newFunction, function)
+
+        removeManglingOfOverload(newFunction, function)
     }
 
     private fun generateOverloadWithUniqueName(
@@ -121,15 +121,21 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         }
     }
 
-    private fun renameOverloadedFunction(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
-        context.doInPhase(DefaultArgumentGenerator.FinalizePhase) {
-            overloadDescriptor.swiftModel.kotlinSirFunction.applyToEntireOverrideHierarchy {
-                identifier = function.swiftModel.kotlinSirFunction.identifier
-            }
+    private fun registerOverload(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
+        context.doInPhase(DefaultArgumentGenerator.RegisterOverloadsPhase) {
+            val overloadKirFunction = kirProvider.getFunction(overloadDescriptor)
 
-            val numberOfDefaultArguments = function.valueParameters.size - overloadDescriptor.valueParameters.size
+            kirProvider.getFunction(function).defaultArgumentsOverloads.add(overloadKirFunction)
+        }
+    }
 
-            overloadDescriptor.swiftModel.collisionResolutionStrategy = CollisionResolutionStrategy.Remove(numberOfDefaultArguments)
+    private fun removeManglingOfOverload(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
+        context.doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsPhase) {
+            val overloadFunction = kirProvider.getFunction(overloadDescriptor)
+            val baseFunction = kirProvider.getFunction(function)
+
+            overloadFunction.originalSirFunction.identifier = baseFunction.originalSirFunction.identifier
+            overloadFunction.primarySirFunction.identifier = baseFunction.primarySirFunction.identifier
         }
     }
 }

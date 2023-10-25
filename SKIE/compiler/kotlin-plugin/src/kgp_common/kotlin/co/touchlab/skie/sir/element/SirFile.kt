@@ -2,7 +2,7 @@ package co.touchlab.skie.sir.element
 
 import java.nio.file.Path
 
-// File can only be created from SirProvider
+// Instantiate only in SirProvider
 class SirFile(
     val namespace: String,
     val name: String,
@@ -32,7 +32,5 @@ class SirFile(
 
         fun relativePath(namespace: String, name: String): Path =
             Path.of("$namespace/$namespace.$name.swift")
-
-        const val skieNamespace: String = "Skie"
     }
 }

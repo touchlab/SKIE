@@ -1,64 +1,10 @@
 package co.touchlab.skie.sir.type
 
-import co.touchlab.skie.sir.SirFqName
-import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirModule
-import co.touchlab.skie.sir.element.SirTypeAlias
-import co.touchlab.skie.sir.element.SirTypeDeclaration
-import co.touchlab.skie.util.swift.qualifiedLocalTypeName
-import io.outfoxx.swiftpoet.DeclaredTypeName
-import io.outfoxx.swiftpoet.TypeName
-import io.outfoxx.swiftpoet.parameterizedBy
+sealed class DeclaredSirType : NonNullSirType() {
 
-data class DeclaredSirType(
-    val declaration: SirTypeDeclaration,
-    val typeArguments: List<SirType> = emptyList(),
-    val pointsToInternalName: Boolean = true
-) : NonNullSirType() {
+    abstract val pointsToInternalName: Boolean
 
-    override val isHashable: Boolean
-        get() = declaration.isHashable
+    abstract fun withFqName(): DeclaredSirType
 
-    override val isPrimitive: Boolean
-        get() = declaration.isPrimitive
-
-    override val canonicalName: String
-        get() = when (declaration) {
-            is SirClass -> declaration.fqName.toString() + canonicalNameTypeArguments
-            // WIP 2 This should be done with substitution
-            is SirTypeAlias -> declaration.type.canonicalName + canonicalNameTypeArguments
-        }
-
-    private val canonicalNameTypeArguments: String
-        get() = if (typeArguments.isEmpty()) "" else "<${typeArguments.joinToString { it.canonicalName }}>"
-
-    fun withFqName(): DeclaredSirType =
-        copy(pointsToInternalName = false)
-
-    override val directlyReferencedTypes: List<SirType> = typeArguments
-
-    fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName =
-        if (pointsToInternalName) declaration.internalName.toSwiftPoetName() else declaration.fqName.toExternalSwiftPoetName()
-
-    override fun toSwiftPoetTypeName(): TypeName {
-        val baseName = toSwiftPoetDeclaredTypeName()
-
-        return if (typeArguments.isEmpty()) {
-            baseName
-        } else {
-            baseName.parameterizedBy(typeArguments.map { it.toSwiftPoetTypeName() })
-        }
-    }
+    abstract override fun evaluate(): EvaluatedSirType<SirDeclaredSirType>
 }
-
-private fun SirFqName.toSwiftPoetName(): DeclaredTypeName =
-    parent?.toSwiftPoetName()?.nestedType(simpleName)
-        ?: if (module is SirModule.External) {
-            DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)
-        } else {
-            DeclaredTypeName.qualifiedLocalTypeName(simpleName)
-        }
-
-private fun SirFqName.toExternalSwiftPoetName(): DeclaredTypeName =
-    parent?.toExternalSwiftPoetName()?.nestedType(simpleName)
-        ?: DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)

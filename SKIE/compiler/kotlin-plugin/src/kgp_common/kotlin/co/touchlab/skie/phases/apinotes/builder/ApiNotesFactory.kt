@@ -1,91 +1,90 @@
 package co.touchlab.skie.phases.apinotes.builder
 
-import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.OirFunction
+import co.touchlab.skie.oir.element.OirProperty
+import co.touchlab.skie.oir.element.OirScope
+import co.touchlab.skie.oir.element.OirValueParameter
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirVisibility
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.parameter.KotlinValueParameterSwiftModel
-import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
-import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
-import org.jetbrains.kotlin.descriptors.isInterface
+import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 
-object ApiNotesFactory {
+class ApiNotesFactory(
+    private val exposeInternalMembers: Boolean,
+) {
 
     context(SirPhase.Context)
     fun create(): ApiNotes =
         ApiNotes(
             moduleName = framework.moduleName,
-            classes = descriptorProvider.swiftModelsForClassesAndFiles.map { it.toApiNote() },
-            protocols = descriptorProvider.swiftModelsForInterfaces.map { it.toApiNote() },
+            classes = oirProvider.allKotlinClasses.map { it.toApiNote() },
+            protocols = oirProvider.allKotlinProtocols.map { it.toApiNote() },
         )
 
     context(SirPhase.Context)
-    private val DescriptorProvider.swiftModelsForClassesAndFiles: List<KotlinTypeSwiftModel>
-        get() = this.exposedClasses.filterNot { it.kind.isInterface }.map { it.swiftModel } +
-            this.exposedFiles.map { it.swiftModel }
-
-    context(SirPhase.Context)
-    private val DescriptorProvider.swiftModelsForInterfaces: List<KotlinTypeSwiftModel>
-        get() = this.exposedClasses.filter { it.kind.isInterface }.map { it.swiftModel }
-
-    context(SirPhase.Context)
-    private fun KotlinTypeSwiftModel.toApiNote(): ApiNotesType =
+    private fun OirClass.toApiNote(): ApiNotesType =
         ApiNotesType(
-            objCFqName = this.objCFqName.asString(),
+            objCFqName = this.name,
             bridgeFqName = this.bridgedSirClass?.fqName?.toLocalString(),
-            swiftFqName = this.kotlinSirClass.publicName.toLocalString(),
-            isHidden = this.kotlinSirClass.visibility.isHiddenInApiNotes,
-            availability = this.kotlinSirClass.visibility.availability,
-            methods = this.allDirectlyCallableMembers.filterIsInstance<KotlinFunctionSwiftModel>().map { it.toApiNote(this) },
-            properties = this.allDirectlyCallableMembers.filterIsInstance<KotlinRegularPropertySwiftModel>().map { it.toApiNote(this) },
+            swiftFqName = this.originalSirClass.publicName.toLocalString(),
+            isHidden = this.originalSirClass.visibility.isHiddenInApiNotes,
+            availability = this.originalSirClass.visibility.availability,
+            methods = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirFunction>().map { it.toApiNote() },
+            properties = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirProperty>().map { it.toApiNote() },
         )
 
     context(SirPhase.Context)
-    private fun KotlinFunctionSwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesMethod =
+    private fun OirFunction.toApiNote(): ApiNotesMethod =
         ApiNotesMethod(
-            objCSelector = this.objCSelector,
-            kind = owner.kind.toMemberKind(),
-            swiftName = this.kotlinSirCallableDeclaration.name,
-            isHidden = this.kotlinSirCallableDeclaration.visibility.isHiddenInApiNotes,
-            availability = this.kotlinSirCallableDeclaration.visibility.availability,
-            resultType = this.objCReturnType?.let { objCTypeRenderer.render(it, this.reservedIdentifierInApiNotes) } ?: "",
-            parameters = this.valueParameters.map { it.toApiNote(this) },
+            objCSelector = this.selector,
+            kind = this.scope.toMemberKind(),
+            swiftName = this.originalSirCallableDeclaration.name,
+            isHidden = this.originalSirCallableDeclaration.visibility.isHiddenInApiNotes,
+            availability = this.originalSirCallableDeclaration.visibility.availability,
+            resultType = this.returnType?.render() ?: "",
+            // ErrorOut parameters are required for the header, but not strictly required in api notes
+            // If put in ApiNotes with current implementation it results in an error: pointer to non-const type 'NSError * _Nullable' with no explicit ownership
+            // For yet unknown reason the same type compiles if put in the Kotlin header.
+            // This is possible to fix by explicitly stating the ownership, but it's not worth the effort right now.
+            parameters = this.valueParameters.filter { it.originalSirValueParameter != null }.map { it.toApiNote() },
         )
 
     context(SirPhase.Context)
-    private fun KotlinValueParameterSwiftModel.toApiNote(owner: KotlinFunctionSwiftModel): ApiNotesParameter =
+    private fun OirValueParameter.toApiNote(): ApiNotesParameter =
         ApiNotesParameter(
-            position = this.position,
-            type = objCTypeRenderer.render(this.objCType, owner.reservedIdentifierInApiNotes),
+            position = this.index,
+            type = this.type.render(),
         )
 
     context(SirPhase.Context)
-    private fun KotlinRegularPropertySwiftModel.toApiNote(owner: KotlinTypeSwiftModel): ApiNotesProperty =
+    private fun OirProperty.toApiNote(): ApiNotesProperty =
         ApiNotesProperty(
-            objCName = this.objCName,
-            kind = owner.kind.toMemberKind(),
-            swiftName = this.kotlinSirProperty.name,
-            isHidden = this.kotlinSirProperty.visibility.isHiddenInApiNotes,
-            availability = this.kotlinSirProperty.visibility.availability,
-            type = objCTypeRenderer.render(this.objCType, emptyList()),
+            objCName = this.name,
+            kind = this.scope.toMemberKind(),
+            swiftName = this.originalSirProperty.name,
+            isHidden = this.originalSirProperty.visibility.isHiddenInApiNotes,
+            availability = this.originalSirProperty.visibility.availability,
+            type = this.type.render(),
         )
 
     private val SirVisibility.isHiddenInApiNotes: Boolean
         get() = when (this) {
             SirVisibility.PublicButHidden -> true
             SirVisibility.PublicButReplaced -> true
+            SirVisibility.Internal -> exposeInternalMembers
             else -> false
         }
 
     private val SirVisibility.availability: ApiNotesAvailabilityMode
-        get() = if (this == SirVisibility.Removed) ApiNotesAvailabilityMode.NonSwift else ApiNotesAvailabilityMode.Available
+        get() = when {
+            this.isAccessibleFromOtherModules -> ApiNotesAvailabilityMode.Available
+            this == SirVisibility.Internal && exposeInternalMembers -> ApiNotesAvailabilityMode.Available
+            else -> ApiNotesAvailabilityMode.NonSwift
+        }
 
-    private fun KotlinTypeSwiftModel.Kind.toMemberKind(): ApiNotesTypeMemberKind =
+    private fun OirScope.toMemberKind(): ApiNotesTypeMemberKind =
         when (this) {
-            KotlinTypeSwiftModel.Kind.Class, KotlinTypeSwiftModel.Kind.Interface -> ApiNotesTypeMemberKind.Instance
-            KotlinTypeSwiftModel.Kind.File -> ApiNotesTypeMemberKind.Class
+            OirScope.Member -> ApiNotesTypeMemberKind.Instance
+            OirScope.Static -> ApiNotesTypeMemberKind.Class
         }
 }
-
-private val KotlinFunctionSwiftModel.reservedIdentifierInApiNotes: List<String>
-    get() = kotlinSirValueParameters.map { it.name }

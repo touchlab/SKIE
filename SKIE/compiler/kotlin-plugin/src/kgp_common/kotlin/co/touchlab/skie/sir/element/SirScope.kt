@@ -5,4 +5,5 @@ enum class SirScope {
     Member,
     Static,
     Class,
+    Global,
 }

@@ -3,6 +3,7 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.sir.type.OirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 
 class SirTypeAlias(
@@ -21,23 +22,34 @@ class SirTypeAlias(
     override val typeParameters: MutableList<SirTypeParameter> = mutableListOf()
 
     var type: SirType = typeFactory(this)
+        set(value) {
+            require(value !is OirDeclaredSirType) {
+                "Type alias for OirDeclaredSirType $type is not supported because " +
+                    "it creates problems with bridging translation - it's not clear which SirClass this type alias points to."
+            }
+
+            field = value
+        }
 
     override val isHashable: Boolean
         get() = type.isHashable
 
-    override val isPrimitive: Boolean
-        get() = type.isPrimitive
+    override val isReference: Boolean
+        get() = type.isReference
 
     val framework: SirModule
         get() = parent.module
-
-    override val originalFqName: SirFqName = fqName
 
     override val publicName: SirFqName
         get() = fqName
 
     override val internalName: SirFqName
         get() = fqName
+
+    init {
+        // Check invariant
+        type = type
+    }
 
     override fun toString(): String = "${this::class.simpleName}: $fqName"
 

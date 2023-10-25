@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.irbuilder.impl.namespace
 
-import co.touchlab.skie.kir.DescriptorRegistrationScope
+import co.touchlab.skie.kir.descriptor.DescriptorRegistrationScope
 import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
 import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.phases.KotlinIrPhase

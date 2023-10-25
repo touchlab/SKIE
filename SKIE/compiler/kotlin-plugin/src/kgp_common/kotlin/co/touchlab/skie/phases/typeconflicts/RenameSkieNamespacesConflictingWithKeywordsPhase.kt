@@ -7,8 +7,8 @@ object RenameSkieNamespacesConflictingWithKeywordsPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        swiftModelProvider.exposedTypes
-            .map { sirProvider.getSkieNamespace(it) }
+        kirProvider.allClasses
+            .map { skieNamespaceProvider.getNamespaceClass(it) }
             .filter { it.simpleName in KEYWORDS }
             .forEach {
                 it.baseName += "_"

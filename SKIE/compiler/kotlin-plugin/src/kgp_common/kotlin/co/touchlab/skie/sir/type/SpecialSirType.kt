@@ -1,29 +1,40 @@
 package co.touchlab.skie.sir.type
 
+import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.util.swift.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.AnyTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.SelfTypeName
 import io.outfoxx.swiftpoet.TypeName
 
-sealed class SpecialSirType(
+sealed class SpecialSirType<SELF : SirType>(
     private val typeName: TypeName,
 ) : NonNullSirType() {
 
     override val isHashable: Boolean = false
 
-    override val isPrimitive: Boolean = false
+    override val isReference: Boolean = false
 
-    override val canonicalName: String = typeName.name
+    @Suppress("UNCHECKED_CAST")
+    override fun evaluate(): EvaluatedSirType<SELF> =
+        EvaluatedSirType(
+            type = this,
+            isValid = true,
+            canonicalName = typeName.name,
+            swiftPoetTypeName = typeName,
+        ) as EvaluatedSirType<SELF>
 
-    override val directlyReferencedTypes: List<SirType> = emptyList()
+    @Suppress("UNCHECKED_CAST")
+    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SELF =
+        this as SELF
 
-    override fun toSwiftPoetTypeName(): TypeName =
-        typeName
+    @Suppress("UNCHECKED_CAST")
+    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SELF =
+        this as SELF
 
-    object Self : SpecialSirType(SelfTypeName.INSTANCE)
+    object Self : SpecialSirType<Self>(SelfTypeName.INSTANCE)
 
-    object Any : SpecialSirType(AnyTypeName.INSTANCE)
+    object Any : SpecialSirType<Any>(AnyTypeName.INSTANCE)
 
-    object Protocol : SpecialSirType(DeclaredTypeName.qualifiedLocalTypeName("Protocol"))
+    object Protocol : SpecialSirType<Protocol>(DeclaredTypeName.qualifiedLocalTypeName("Protocol"))
 }

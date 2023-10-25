@@ -5,16 +5,15 @@ package co.touchlab.skie.context
 import co.touchlab.skie.compilerinject.compilerplugin.SkieConfigurationKeys
 import co.touchlab.skie.configuration.ConfigurationProvider
 import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.kir.ExposedModulesProvider
-import co.touchlab.skie.kir.MutableDescriptorProvider
-import co.touchlab.skie.kir.NativeMutableDescriptorProvider
+import co.touchlab.skie.kir.descriptor.ExposedModulesProvider
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
+import co.touchlab.skie.kir.descriptor.NativeMutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.phases.swift.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
-import co.touchlab.skie.swiftmodel.ObjCTypeRenderer
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.Reporter
 import co.touchlab.skie.util.directory.SkieDirectories
@@ -59,8 +58,6 @@ class MainSkieContext(
 
     override val reporter: Reporter = Reporter(compilerConfiguration)
 
-    override val objCTypeRenderer: ObjCTypeRenderer = ObjCTypeRenderer()
-
     override val framework: FrameworkLayout = run {
         val frameworkPath = compilerConfiguration.getNotNull(KonanConfigKeys.OUTPUT)
 
@@ -73,6 +70,9 @@ class MainSkieContext(
     private lateinit var nativeMutableDescriptorProvider: NativeMutableDescriptorProvider
 
     override val descriptorProvider: MutableDescriptorProvider by ::nativeMutableDescriptorProvider
+
+    lateinit var mainModuleDescriptor: ModuleDescriptor
+        private set
 
     lateinit var declarationBuilder: DeclarationBuilderImpl
         private set
@@ -101,6 +101,8 @@ class MainSkieContext(
         )
 
         namer = objCExportedInterface.namer
+
+        this.mainModuleDescriptor = mainModuleDescriptor
 
         declarationBuilder = DeclarationBuilderImpl(mainModuleDescriptor, nativeMutableDescriptorProvider)
     }

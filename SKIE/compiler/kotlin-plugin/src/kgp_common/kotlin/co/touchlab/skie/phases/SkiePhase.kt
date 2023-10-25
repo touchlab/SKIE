@@ -2,16 +2,17 @@ package co.touchlab.skie.phases
 
 import co.touchlab.skie.configuration.ConfigurationProvider
 import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.kir.DescriptorProvider
+import co.touchlab.skie.kir.descriptor.DescriptorProvider
+import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.phases.swift.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
-import co.touchlab.skie.swiftmodel.ObjCTypeRenderer
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.Reporter
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.jetbrains.kotlin.backend.konan.KonanConfig
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
@@ -58,7 +59,11 @@ interface SkiePhase<C : SkiePhase.Context> {
 
         val descriptorProvider: DescriptorProvider
 
-        val objCTypeRenderer: ObjCTypeRenderer
+        val kotlinBuiltins: KotlinBuiltIns
+            get() = descriptorProvider.builtIns
+
+        val extraDescriptorBuiltins: ExtraDescriptorBuiltins
+            get() = descriptorProvider.extraDescriptorBuiltins
 
         fun <T : Any> get(key: CompilerConfigurationKey<T>): T =
             konanConfig.configuration.getNotNull(key)

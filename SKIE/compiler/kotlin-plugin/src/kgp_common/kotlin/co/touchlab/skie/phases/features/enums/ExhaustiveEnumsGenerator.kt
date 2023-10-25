@@ -2,43 +2,30 @@ package co.touchlab.skie.phases.features.enums
 
 import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.configuration.getConfiguration
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
-import co.touchlab.skie.phases.features.suspend.SuspendGenerator
+import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
-import co.touchlab.skie.sir.addAvailabilityForAsync
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
-import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirGetter
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
-import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirTypeAlias
-import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
-import co.touchlab.skie.swiftmodel.SwiftModelScope
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
-import co.touchlab.skie.swiftmodel.callable.function.ActualKotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
-import co.touchlab.skie.swiftmodel.type.MutableKotlinClassSwiftModel
-import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
-import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.Modifier
-import io.outfoxx.swiftpoet.joinToCode
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.isEnumClass
+import co.touchlab.skie.sir.element.isExported
+import co.touchlab.skie.sir.getExtension
 
 object ExhaustiveEnumsGenerator : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        exposedClasses
+        kirProvider.allClasses
             .filter { it.isSupported }
             .forEach {
                 generate(it)
@@ -46,63 +33,62 @@ object ExhaustiveEnumsGenerator : SirPhase {
     }
 
     context(SkiePhase.Context)
-    private val KotlinClassSwiftModel.isSupported: Boolean
-        get() = this.classDescriptor.kind.isEnumClass &&
-            this.classDescriptor.isEnumInteropEnabled
+    private val KirClass.isSupported: Boolean
+        get() = this.originalSirClass.isExported &&
+            this.kind == KirClass.Kind.Enum &&
+            this.isEnumInteropEnabled
 
     context(SkiePhase.Context)
-    private val ClassDescriptor.isEnumInteropEnabled: Boolean
+    private val KirClass.isEnumInteropEnabled: Boolean
         get() = this.getConfiguration(EnumInterop.Enabled)
 
     context(SirPhase.Context)
-    private fun generate(classSwiftModel: MutableKotlinClassSwiftModel) {
-        val skieClass = classSwiftModel.generateBridge()
+    private fun generate(kirClass: KirClass) {
+        val skieClass = kirClass.generateBridge()
 
-        classSwiftModel.configureBridging(skieClass)
+        kirClass.configureBridging(skieClass)
     }
 
-    object EnumBodyGeneratorPhase : StatefulSirPhase()
+    @MustBeExecutedAfterBridgingConfiguration
+    object NestedTypeDeclarationsPhase : StatefulSirPhase()
 }
 
-private fun MutableKotlinClassSwiftModel.configureBridging(skieClass: SirClass) {
+private fun KirClass.configureBridging(skieClass: SirClass) {
     bridgedSirClass = skieClass
 
-    kotlinSirClass.visibility = SirVisibility.PublicButReplaced
+    originalSirClass.visibility = SirVisibility.PublicButReplaced
 }
 
 context(SirPhase.Context)
-private fun KotlinClassSwiftModel.generateBridge(): SirClass {
-    val skieClass = createBridgingEnum()
+private fun KirClass.generateBridge(): SirClass {
+    val bridgedEnum = createBridgingEnum(this)
 
-    addConversionExtensions(skieClass)
+    addConversionExtensions(bridgedEnum)
 
-    return skieClass
+    return bridgedEnum
 }
 
 context(SirPhase.Context)
-private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass =
+private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
     SirClass(
-        baseName = kotlinSirClass.baseName,
-        parent = kotlinSirClass.namespace?.let { namespace ->
-            SirExtension(
-                classDeclaration = when (namespace) {
-                    is SirClass -> namespace
-                    is SirExtension -> namespace.classDeclaration
-                },
-                parent = sirProvider.getFile(this),
+        baseName = enumKirClass.originalSirClass.baseName,
+        parent = enumKirClass.originalSirClass.namespace?.let { namespace ->
+            sirProvider.getExtension(
+                classDeclaration = namespace.classDeclaration,
+                parent = skieNamespaceProvider.getNamespaceFile(enumKirClass),
             )
-        } ?: sirProvider.getFile(this),
+        } ?: skieNamespaceProvider.getNamespaceFile(enumKirClass),
         kind = SirClass.Kind.Enum,
     ).apply {
         internalTypeAlias = SirTypeAlias(
             baseName = "Enum",
-            parent = sirProvider.getSkieNamespace(this@createBridgingEnum),
+            parent = skieNamespaceProvider.getNamespace(enumKirClass),
             visibility = SirVisibility.PublicButReplaced,
         ) {
             defaultType.withFqName()
         }
 
-        addEnumCases()
+        addEnumCases(enumKirClass)
 
         superTypes += listOf(
             sirBuiltins.Swift.Hashable.defaultType,
@@ -112,52 +98,45 @@ private fun KotlinClassSwiftModel.createBridgingEnum(): SirClass =
 
         attributes.add("frozen")
 
-        doInPhase(ExhaustiveEnumsGenerator.EnumBodyGeneratorPhase) {
-            addPassthroughForMembers()
-            addNestedClassTypeAliases()
-            addCompanionObjectPropertyIfNeeded()
-            addObjcBridgeableImplementation(this@createBridgingEnum)
+        ExhaustiveEnumsMembersPassthroughGenerator.generatePassthroughForMembers(enumKirClass, this)
+        addObjcBridgeableImplementation(enumKirClass)
+
+        doInPhase(ExhaustiveEnumsGenerator.NestedTypeDeclarationsPhase) {
+            addNestedClassTypeAliases(enumKirClass)
+            addCompanionObjectPropertyIfNeeded(enumKirClass)
         }
     }
 
-context(KotlinClassSwiftModel)
-private fun SirClass.addEnumCases() {
-    enumEntries.forEach {
+private fun SirClass.addEnumCases(enum: KirClass) {
+    enum.enumEntries.forEach {
         SirEnumCase(
-            simpleName = it.identifier,
+            simpleName = it.swiftName,
         )
     }
 }
 
-context(SirPhase.Context, KotlinClassSwiftModel)
-private fun SirClass.addPassthroughForMembers() {
-    allAccessibleDirectlyCallableMembers
-        .forEach {
-            it.accept(MemberPassthroughGeneratorVisitor(this))
+context(SirPhase.Context)
+private fun SirClass.addNestedClassTypeAliases(enum: KirClass) {
+    enum.originalSirClass.declarations
+        .filterIsInstance<SirClass>()
+        .forEach { nestedClass ->
+            addNestedClassTypeAlias(nestedClass)
+
+            oirProvider.findClass(nestedClass)?.bridgedSirClass?.let { addNestedClassTypeAlias(it) }
         }
 }
 
-context(KotlinClassSwiftModel)
-private fun SirClass.addNestedClassTypeAliases() {
-    nestedClasses.forEach { nestedClass ->
-        addNestedClassTypeAlias(nestedClass.kotlinSirClass)
-        nestedClass.bridgedSirClass?.let { addNestedClassTypeAlias(it) }
-    }
-}
-
-context(KotlinClassSwiftModel)
-private fun SirClass.addNestedClassTypeAlias(sirClass: SirClass) {
+private fun SirClass.addNestedClassTypeAlias(nestedClass: SirClass) {
     SirTypeAlias(
-        baseName = sirClass.publicName.simpleName,
-        visibility = sirClass.visibility,
+        baseName = nestedClass.baseName,
+        visibility = nestedClass.visibility,
     ) {
-        sirClass.defaultType
+        nestedClass.defaultType
     }
 }
 
-context(KotlinClassSwiftModel)
-private fun SirClass.addCompanionObjectPropertyIfNeeded() {
-    val companion = companionObject ?: return
+private fun SirClass.addCompanionObjectPropertyIfNeeded(enum: KirClass) {
+    val companion = enum.companionObject ?: return
 
     SirProperty(
         identifier = "companion",
@@ -170,28 +149,27 @@ private fun SirClass.addCompanionObjectPropertyIfNeeded() {
     }
 }
 
-context(SwiftModelScope)
-private fun KotlinClassSwiftModel.addConversionExtensions(skieClass: SirClass) {
-    sirProvider.getFile(this).apply {
-        addToKotlinConversionExtension(skieClass)
-        addToSwiftConversionExtension(skieClass)
+context(SirPhase.Context)
+private fun KirClass.addConversionExtensions(bridgedEnum: SirClass) {
+    skieNamespaceProvider.getNamespaceFile(this).apply {
+        addToKotlinConversionExtension(originalSirClass, bridgedEnum)
+        addToSwiftConversionExtension(originalSirClass, bridgedEnum)
     }
 }
 
-context(KotlinClassSwiftModel)
-private fun SirFile.addToKotlinConversionExtension(skieClass: SirClass) {
-    SirExtension(
-        classDeclaration = skieClass,
+context(SirPhase.Context)
+private fun SirFile.addToKotlinConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
+    this.getExtension(
+        classDeclaration = bridgedEnum,
     ).apply {
-        addToKotlinConversionMethod()
+        addToKotlinConversionMethod(enum)
     }
 }
 
-context(KotlinClassSwiftModel)
-private fun SirExtension.addToKotlinConversionMethod() {
-    SirFunction(
+private fun SirExtension.addToKotlinConversionMethod(enum: SirClass) {
+    SirSimpleFunction(
         identifier = "toKotlinEnum",
-        returnType = kotlinSirClass.defaultType,
+        returnType = enum.defaultType,
     ).apply {
         swiftPoetBuilderModifications.add {
             addStatement("return _bridgeToObjectiveC()")
@@ -199,141 +177,22 @@ private fun SirExtension.addToKotlinConversionMethod() {
     }
 }
 
-context(KotlinClassSwiftModel)
-private fun SirFile.addToSwiftConversionExtension(skieClass: SirClass) {
-    SirExtension(
-        classDeclaration = kotlinSirClass,
+context(SirPhase.Context)
+private fun SirFile.addToSwiftConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
+    this.getExtension(
+        classDeclaration = enum,
     ).apply {
-        addToSwiftConversionMethod(skieClass)
+        addToSwiftConversionMethod(bridgedEnum)
     }
 }
 
-context(KotlinClassSwiftModel)
-private fun SirExtension.addToSwiftConversionMethod(skieClass: SirClass) {
-    // TODO After Sir: solve name collision
-    SirFunction(
+private fun SirExtension.addToSwiftConversionMethod(bridgedEnum: SirClass) {
+    SirSimpleFunction(
         identifier = "toSwiftEnum",
-        returnType = skieClass.defaultType,
+        returnType = bridgedEnum.defaultType,
     ).apply {
         swiftPoetBuilderModifications.add {
-            addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", skieClass.defaultType.toSwiftPoetTypeName())
-        }
-    }
-}
-
-context(SirPhase.Context)
-private class MemberPassthroughGeneratorVisitor(
-    private val enum: SirClass,
-) : KotlinDirectlyCallableMemberSwiftModelVisitor.Unit {
-
-    override fun visit(function: KotlinFunctionSwiftModel) {
-        if (function !is ActualKotlinFunctionSwiftModel || !function.primarySirFunction.isSupported) return
-
-        if (SuspendGenerator.hasSuspendWrapper(function)) {
-            val asyncFunction = function.asyncSwiftModelOrNull ?: error("Suspend function must have an async swift model: $function")
-
-            addFunction(asyncFunction)
-        }
-
-        addFunction(function)
-    }
-
-    private val unsupportedFunctionNames = listOf("compareTo(other:)", "hash()", "description()", "isEqual(_:)")
-
-    private val SirFunction.isSupported: Boolean
-        get() = this.name !in unsupportedFunctionNames
-
-    private fun addFunction(function: KotlinFunctionSwiftModel) {
-        SirFunction(
-            identifier = function.primarySirFunction.identifier,
-            parent = enum,
-            returnType = function.primarySirFunction.returnType,
-        ).apply {
-            addFunctionValueParameters(function.primarySirFunction)
-
-            throws = function.primarySirFunction.throws
-
-            isAsync = function.primarySirFunction.isAsync
-            if (function.primarySirFunction.isAsync) {
-                addAvailabilityForAsync()
-            }
-
-            addFunctionBody(function)
-        }
-    }
-
-    private fun SirFunction.addFunctionValueParameters(function: SirFunction) {
-        function.valueParameters.forEach {
-            this.addFunctionValueParameter(it)
-        }
-    }
-
-    private fun SirFunction.addFunctionValueParameter(valueParameter: SirValueParameter) {
-        SirValueParameter(
-            label = valueParameter.label,
-            name = valueParameter.name,
-            type = valueParameter.type,
-        )
-    }
-
-    private fun SirFunction.addFunctionBody(function: KotlinFunctionSwiftModel) {
-        this.addFunctionDeclarationBodyWithErrorTypeHandling(function) {
-            addStatement(
-                "return %L%L(self as _ObjectiveCType).%N(%L)",
-                if (function.primarySirFunction.throws) "try " else "",
-                if (function.primarySirFunction.isAsync) "await " else "",
-                function.primarySirFunction.reference,
-                function.primarySirFunction.valueParameters.map { CodeBlock.of("%N", it.name) }.joinToCode(", "),
-            )
-        }
-    }
-
-    override fun visit(regularProperty: KotlinRegularPropertySwiftModel) {
-        SirProperty(
-            identifier = regularProperty.primarySirProperty.identifier,
-            parent = enum,
-            type = regularProperty.primarySirProperty.type,
-        ).apply {
-            addGetter(regularProperty)
-            addSetterIfPresent(regularProperty)
-        }
-    }
-
-    private fun SirProperty.addGetter(regularProperty: KotlinRegularPropertySwiftModel) {
-        SirGetter(
-            throws = regularProperty.primarySirProperty.getter!!.throws,
-        ).addGetterBody(regularProperty)
-    }
-
-    private fun SirGetter.addGetterBody(regularProperty: KotlinRegularPropertySwiftModel) {
-        this.addFunctionDeclarationBodyWithErrorTypeHandling(regularProperty) {
-            addStatement(
-                "return %L(self as _ObjectiveCType).%N",
-                if (regularProperty.primarySirProperty.getter!!.throws) "try " else "",
-                regularProperty.primarySirProperty.reference,
-            )
-        }
-    }
-
-    private fun SirProperty.addSetterIfPresent(regularProperty: KotlinRegularPropertySwiftModel) {
-        val setter = regularProperty.primarySirProperty.setter ?: return
-
-        SirSetter(
-            throws = setter.throws,
-            modifiers = listOf(Modifier.NONMUTATING),
-        ).addSetterBody(regularProperty, setter)
-    }
-
-    private fun SirSetter.addSetterBody(
-        regularProperty: KotlinRegularPropertySwiftModel,
-        setter: SirSetter,
-    ) {
-        this.addFunctionDeclarationBodyWithErrorTypeHandling(regularProperty) {
-            addStatement(
-                "%L(self as _ObjectiveCType).%N = value",
-                if (setter.throws) "try " else "",
-                regularProperty.primarySirProperty.reference,
-            )
+            addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", bridgedEnum.defaultType.evaluate().swiftPoetTypeName)
         }
     }
 }

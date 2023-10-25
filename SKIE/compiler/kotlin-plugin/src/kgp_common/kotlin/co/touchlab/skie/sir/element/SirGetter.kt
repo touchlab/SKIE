@@ -7,7 +7,7 @@ class SirGetter(
     property: SirProperty,
     var throws: Boolean = false,
     attributes: List<String> = emptyList(),
-) : SirElement, SirPropertyAccessor, SirElementWithAttributes, SirElementWithSwiftPoetBuilderModifications<FunctionSpec.Builder> {
+) : SirElement, SirPropertyAccessor {
 
     override var property: SirProperty by sirPropertyAccessorParent(property)
 

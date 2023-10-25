@@ -2,6 +2,7 @@ package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 
 sealed interface SirTypeDeclaration : SirDeclaration {
@@ -17,8 +18,6 @@ sealed interface SirTypeDeclaration : SirDeclaration {
     val simpleName: String
         get() = when (visibility) {
             SirVisibility.PublicButReplaced -> "__$baseName"
-            // WIP Will not be needed once the type is removed from header
-            SirVisibility.Removed -> "__Skie__Removed__$baseName"
             else -> baseName
         }
 
@@ -39,8 +38,6 @@ sealed interface SirTypeDeclaration : SirDeclaration {
     val fqName: SirFqName
         get() = namespace?.fqName?.nested(simpleName) ?: SirFqName(module, simpleName)
 
-    val originalFqName: SirFqName
-
     /**
      * Name that is expected to be used by external Swift code.
      */
@@ -55,17 +52,27 @@ sealed interface SirTypeDeclaration : SirDeclaration {
 
     val isHashable: Boolean
 
-    val isPrimitive: Boolean
+    val isReference: Boolean
 
     val defaultType: DeclaredSirType
 
-    fun toType(typeArguments: List<SirType>): DeclaredSirType =
-        DeclaredSirType(this, typeArguments = typeArguments)
+    fun toType(typeArguments: List<SirType>): SirDeclaredSirType =
+        SirDeclaredSirType(this, typeArguments = typeArguments)
 
-    fun toType(vararg typeArguments: SirType): DeclaredSirType =
+    fun toType(vararg typeArguments: SirType): SirDeclaredSirType =
         toType(typeArguments.toList())
 }
 
 fun SirTypeDeclaration.toTypeFromEnclosingTypeParameters(typeParameters: List<SirTypeParameter>): DeclaredSirType =
     toType(typeParameters.map { it.toTypeParameterUsage() })
 
+fun SirTypeDeclaration.resolveAsSirClass(): SirClass? =
+    when (this) {
+        is SirClass -> this
+        is SirTypeAlias -> {
+            when (val type = type) {
+                is SirTypeDeclaration -> type.resolveAsSirClass()
+                else -> null
+            }
+        }
+    }

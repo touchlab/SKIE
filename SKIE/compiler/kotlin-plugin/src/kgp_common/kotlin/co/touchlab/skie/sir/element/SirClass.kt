@@ -1,34 +1,42 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
-import co.touchlab.skie.sir.type.DeclaredSirType
+import co.touchlab.skie.sir.type.SirDeclaredSirType
 
 class SirClass(
     override var baseName: String,
     parent: SirDeclarationParent,
-    var kind: Kind = Kind.Class,
+    // Class requires explicit declaration of inheritance from AnyObject
+    var kind: Kind,
     override var visibility: SirVisibility = SirVisibility.Public,
-    superTypes: List<DeclaredSirType> = emptyList(),
+    superTypes: List<SirDeclaredSirType> = emptyList(),
     attributes: List<String> = emptyList(),
     var publicTypeAlias: SirTypeAlias? = null,
     var internalTypeAlias: SirTypeAlias? = null,
     var isInherentlyHashable: Boolean = false,
-    override var isPrimitive: Boolean = false,
+    var isAlwaysAReference: Boolean = false,
 ) : SirTypeDeclaration, SirDeclarationNamespace, SirTypeParameterParent, SirElementWithAttributes {
+
+    override val classDeclaration: SirClass
+        get() = this
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 
-    val superTypes: MutableList<DeclaredSirType> = superTypes.toMutableList()
+    val superTypes: MutableList<SirDeclaredSirType> = superTypes.toMutableList()
 
     override val attributes: MutableList<String> = attributes.toMutableList()
 
-    override val defaultType: DeclaredSirType by lazy {
+    override val defaultType: SirDeclaredSirType by lazy {
         toType(emptyList())
     }
 
     override val isHashable: Boolean
         get() = isInherentlyHashable || superTypes.any { it.isHashable }
+
+    override val isReference: Boolean
+        get() = isAlwaysAReference || superTypes.any { it.isReference }
 
     override val typeParameters: MutableList<SirTypeParameter> = mutableListOf()
 
@@ -41,8 +49,6 @@ class SirClass(
      */
     override val fqName: SirFqName
         get() = super.fqName
-
-    override val originalFqName: SirFqName = fqName
 
     /**
      * Name that is expected to be used by external Swift code.
@@ -72,11 +78,11 @@ class SirClass(
             baseName: String,
             kind: Kind = Kind.Class,
             visibility: SirVisibility = SirVisibility.Public,
-            superTypes: List<DeclaredSirType> = emptyList(),
+            superTypes: List<SirDeclaredSirType> = emptyList(),
             attributes: List<String> = emptyList(),
+            publicTypeAlias: SirTypeAlias? = null,
             internalTypeAlias: SirTypeAlias? = null,
             isInherentlyHashable: Boolean = false,
-            isPrimitive: Boolean = false,
         ): SirClass =
             SirClass(
                 baseName = baseName,
@@ -85,34 +91,40 @@ class SirClass(
                 visibility = visibility,
                 superTypes = superTypes,
                 attributes = attributes,
+                publicTypeAlias = publicTypeAlias,
                 internalTypeAlias = internalTypeAlias,
                 isInherentlyHashable = isInherentlyHashable,
-                isPrimitive = isPrimitive,
             )
     }
 }
 
-val SirClass.superClassType: DeclaredSirType?
-    get() = superTypes.map { it.resolveAsDirectClassSirType() }
+fun OirClass.Kind.toSirKind(): SirClass.Kind =
+    when (this) {
+        OirClass.Kind.Class -> SirClass.Kind.Class
+        OirClass.Kind.Protocol -> SirClass.Kind.Protocol
+    }
+
+val SirClass.superClassType: SirDeclaredSirType?
+    get() = superTypes.map { it.resolveAsSirClassType() }
         .firstOrNull { (it?.declaration as? SirClass)?.kind == SirClass.Kind.Class }
 
 val SirClass.superClass: SirClass?
     get() = superClassType?.declaration as? SirClass
 
-fun DeclaredSirType.resolveAsDirectClassSirType(): DeclaredSirType? =
+fun SirDeclaredSirType.resolveAsSirClassType(): SirDeclaredSirType? =
     when (declaration) {
         is SirClass -> this
         is SirTypeAlias -> {
             when (val type = declaration.type) {
-                is DeclaredSirType -> type.resolveAsDirectClassSirType()
+                is SirDeclaredSirType -> type.resolveAsSirClassType()
                 else -> null
             }
         }
     }
 
-fun DeclaredSirType.resolveAsDirectSirClass(): SirClass? =
-    resolveAsDirectClassSirType()?.declaration as? SirClass
+fun SirDeclaredSirType.resolveAsSirClass(): SirClass? =
+    resolveAsSirClassType()?.declaration as? SirClass
 
 fun SirClass.inheritsFrom(other: SirClass): Boolean =
-    superTypes.mapNotNull { it.resolveAsDirectSirClass() }
+    superTypes.mapNotNull { it.resolveAsSirClass() }
         .any { it == other || it.inheritsFrom(other) }

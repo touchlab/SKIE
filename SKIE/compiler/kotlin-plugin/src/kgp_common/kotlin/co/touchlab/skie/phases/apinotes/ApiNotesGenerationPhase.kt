@@ -6,11 +6,13 @@ import co.touchlab.skie.phases.apinotes.builder.ApiNotesFactory
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 import java.io.File
 
-sealed class ApiNotesGenerationPhase : SirPhase {
+sealed class ApiNotesGenerationPhase(
+    private val exposeInternalMembers: Boolean,
+) : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        val apiNotes = ApiNotesFactory.create()
+        val apiNotes = ApiNotesFactory(exposeInternalMembers).create()
 
         apiNotes.createApiNotesFile()
     }
@@ -25,14 +27,14 @@ sealed class ApiNotesGenerationPhase : SirPhase {
     context(SirPhase.Context)
     protected abstract fun getApiNotesFile(): File
 
-    object ForSwiftCompilation : ApiNotesGenerationPhase() {
+    object ForSwiftCompilation : ApiNotesGenerationPhase(true) {
 
         context(SirPhase.Context)
         override fun getApiNotesFile(): File =
             skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName)
     }
 
-    object ForFramework : ApiNotesGenerationPhase() {
+    object ForFramework : ApiNotesGenerationPhase(false) {
 
         context(SirPhase.Context)
         override fun getApiNotesFile(): File =

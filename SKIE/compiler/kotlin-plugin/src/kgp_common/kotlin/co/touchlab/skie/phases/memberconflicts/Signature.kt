@@ -2,32 +2,31 @@ package co.touchlab.skie.phases.memberconflicts
 
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirScope
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
-import co.touchlab.skie.sir.element.SirValueParameterParent
 import co.touchlab.skie.sir.element.identifierAfterVisibilityChanges
 import co.touchlab.skie.sir.element.inheritsFrom
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModel
-import co.touchlab.skie.swiftmodel.callable.KotlinDirectlyCallableMemberSwiftModelVisitor
-import co.touchlab.skie.swiftmodel.callable.function.KotlinFunctionSwiftModel
-import co.touchlab.skie.swiftmodel.callable.property.regular.KotlinRegularPropertySwiftModel
 
 data class Signature(
     val receiver: Receiver?,
     val identifierAfterVisibilityChanges: String,
     val valueParameters: List<ValueParameter>,
     val returnType: ReturnType,
+    val scope: SirScope,
+    val conditionalConstraints: List<ConditionalConstraint>,
 ) {
 
-    // WIP 2 Needs to correctly account for type parameters
     class Receiver(
         private val declaration: SirClass,
     ) {
 
-        val canonicalName: String = declaration.defaultType.canonicalName
+        val canonicalName: String = declaration.defaultType.evaluate().canonicalName
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -77,24 +76,31 @@ data class Signature(
         }
     }
 
-    companion object {
+    data class ConditionalConstraint(val typeParameter: String, val bounds: Set<String>) {
 
-        operator fun invoke(directlyCallableMember: KotlinDirectlyCallableMemberSwiftModel): Signature =
-            directlyCallableMember.accept(SignatureConvertorVisitor)
+        constructor(conditionalConstraint: SirConditionalConstraint) : this(
+            typeParameter = conditionalConstraint.typeParameter.name,
+            bounds = conditionalConstraint.bounds.map { it.evaluate().canonicalName }.toSet(),
+        )
+    }
+
+    companion object {
 
         operator fun invoke(callableDeclaration: SirCallableDeclaration): Signature =
             when (callableDeclaration) {
-                is SirFunction -> Signature(callableDeclaration)
+                is SirSimpleFunction -> Signature(callableDeclaration)
                 is SirConstructor -> Signature(callableDeclaration)
                 is SirProperty -> Signature(callableDeclaration)
             }
 
-        operator fun invoke(function: SirFunction): Signature =
+        operator fun invoke(function: SirSimpleFunction): Signature =
             Signature(
                 receiver = function.receiver,
                 identifierAfterVisibilityChanges = function.identifierAfterVisibilityChanges,
                 valueParameters = function.signatureValueParameters,
-                returnType = ReturnType.Specific(function.returnType.canonicalName),
+                returnType = ReturnType.Specific(function.returnType.evaluate().canonicalName),
+                scope = function.scope,
+                conditionalConstraints = function.conditionalConstraints,
             )
 
         operator fun invoke(constructor: SirConstructor): Signature =
@@ -103,6 +109,8 @@ data class Signature(
                 identifierAfterVisibilityChanges = constructor.identifierAfterVisibilityChanges,
                 valueParameters = constructor.signatureValueParameters,
                 returnType = ReturnType.Specific(constructor.receiver!!.canonicalName),
+                scope = constructor.scope,
+                conditionalConstraints = constructor.conditionalConstraints,
             )
 
         operator fun invoke(property: SirProperty): Signature =
@@ -111,43 +119,33 @@ data class Signature(
                 identifierAfterVisibilityChanges = property.identifierAfterVisibilityChanges,
                 valueParameters = emptyList(),
                 returnType = ReturnType.Any,
+                scope = property.scope,
+                conditionalConstraints = property.conditionalConstraints,
             )
 
-        private val SirValueParameterParent.signatureValueParameters: List<ValueParameter>
+        private val SirFunction.signatureValueParameters: List<ValueParameter>
             get() = valueParameters.map { it.toSignatureParameter() }
 
         private fun SirValueParameter.toSignatureParameter(): ValueParameter =
             ValueParameter(
                 argumentLabel = this.labelOrName,
-                // WIP 2 canonicalName does not addresses type parameters
-                type = this.type.canonicalName,
+                type = this.type.evaluate().canonicalName,
             )
 
         private val SirCallableDeclaration.receiver: Receiver?
             get() = when (val parent = parent) {
                 is SirClass -> Receiver(parent)
-                is SirExtension -> if (parent.conditionalConstraints.isEmpty()) {
-                    Receiver(parent.classDeclaration)
-                } else {
-                    // WIP 2 Needs to correctly account for type parameters
-                    Receiver(parent.classDeclaration)
-                }
+                is SirExtension -> Receiver(parent.classDeclaration)
                 else -> null
             }
-    }
 
-    private object SignatureConvertorVisitor : KotlinDirectlyCallableMemberSwiftModelVisitor<Signature> {
-
-        override fun visit(function: KotlinFunctionSwiftModel): Signature =
-            invoke(function.kotlinSirCallableDeclaration)
-
-        override fun visit(regularProperty: KotlinRegularPropertySwiftModel): Signature =
-            invoke(regularProperty.kotlinSirCallableDeclaration)
+        private val SirCallableDeclaration.conditionalConstraints: List<ConditionalConstraint>
+            get() = when (val parent = parent) {
+                is SirExtension -> parent.conditionalConstraints.map { ConditionalConstraint(it) }
+                else -> emptyList()
+            }
     }
 }
-
-val KotlinDirectlyCallableMemberSwiftModel.signature: Signature
-    get() = Signature(this)
 
 val SirCallableDeclaration.signature: Signature
     get() = Signature(this)

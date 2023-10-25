@@ -1,8 +1,9 @@
 package co.touchlab.skie.configuration
 
+import co.touchlab.skie.kir.element.KirCallableDeclaration
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SkiePhase
-import co.touchlab.skie.phases.runtime.belongsToSkieRuntime
-import co.touchlab.skie.swiftmodel.type.KotlinClassSwiftModel
+import co.touchlab.skie.phases.runtime.belongsToSkieKotlinRuntime
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import kotlin.properties.Delegates
 
@@ -11,6 +12,9 @@ class ConfigurationProvider(
 ) {
 
     private val declarationConfigurationMap = mutableMapOf<DeclarationDescriptor, DeclarationConfiguration>()
+
+    fun <T> getDefaultConfiguration(key: ConfigurationKey<T>): T =
+        context.skieConfiguration[NoConfigurationTarget, key]
 
     fun <T> getConfiguration(descriptor: DeclarationDescriptor, key: ConfigurationKey<T>): T =
         getConfiguration(descriptor)[key]
@@ -28,11 +32,10 @@ class ConfigurationProvider(
             DeclarationConfiguration(
                 descriptor,
                 context.skieConfiguration,
-                this@ConfigurationProvider
+                this@ConfigurationProvider,
             )
         }
 
-    // WIP Move to Kir
     class DeclarationConfiguration(
         private val descriptor: DeclarationDescriptor,
         private val skieConfiguration: SkieConfiguration,
@@ -41,7 +44,7 @@ class ConfigurationProvider(
 
         private val cachedValues = mutableMapOf<ConfigurationKey<*>, Any?>()
 
-        var belongsToSkieRuntime: Boolean by Delegates.observable(descriptor.belongsToSkieRuntime) { _, _, _ ->
+        var belongsToSkieRuntime: Boolean by Delegates.observable(descriptor.belongsToSkieKotlinRuntime) { _, _, _ ->
             cachedValues.clear()
         }
 
@@ -95,9 +98,17 @@ val DeclarationDescriptor.canBeUsedWithExperimentalFeatures: Boolean
 fun ConfigurationProvider.canBeUsedWithExperimentalFeatures(descriptor: DeclarationDescriptor): Boolean =
     getConfiguration(descriptor, ExperimentalFeatures.Enabled)
 
-fun <T> ConfigurationProvider.getConfiguration(swiftModel: KotlinClassSwiftModel, key: ConfigurationKey<T>): T =
-    getConfiguration(swiftModel.classDescriptor, key)
+fun <T> ConfigurationProvider.getConfiguration(kirClass: KirClass, key: ConfigurationKey<T>): T =
+    when (kirClass.descriptor) {
+        is KirClass.Descriptor.Class -> getConfiguration(kirClass.descriptor.value, key)
+        is KirClass.Descriptor.File -> getDefaultConfiguration(key)
+    }
 
 context(SkiePhase.Context)
-fun <T> KotlinClassSwiftModel.getConfiguration(key: ConfigurationKey<T>): T =
-    this.classDescriptor.getConfiguration(key)
+fun <T> KirClass.getConfiguration(key: ConfigurationKey<T>): T =
+    configurationProvider.getConfiguration(this, key)
+
+context(SkiePhase.Context)
+fun <T> KirCallableDeclaration<*>.getConfiguration(key: ConfigurationKey<T>): T =
+    configurationProvider.getConfiguration(descriptor, key)
+

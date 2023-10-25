@@ -1,35 +1,28 @@
 package co.touchlab.skie.sir
 
-import co.touchlab.skie.kir.DescriptorProvider
-import co.touchlab.skie.kir.modulesWithExposedDeclarations
+import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.kir.element.KirClassParent
+import co.touchlab.skie.kir.element.KirModule
+import co.touchlab.skie.kir.element.classDescriptorOrNull
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirTypeAlias
-import co.touchlab.skie.swiftmodel.type.ClassOrFileDescriptorHolder
-import co.touchlab.skie.swiftmodel.type.KotlinTypeSwiftModel
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.SourceFile
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class SkieNamespaceProvider(
-    private val descriptorProvider: DescriptorProvider,
-    private val namer: ObjCExportNamer,
+    private val kirProvider: KirProvider,
     private val sirProvider: SirProvider,
+    private val mainModuleDescriptor: ModuleDescriptor,
 ) {
 
-    private val classNamespaceCache = mutableMapOf<ClassDescriptor, SirClass>()
+    private val namespaceClassCache = mutableMapOf<KirClass, SirClass>()
 
-    private val fileNamespaceCache = mutableMapOf<SourceFile, SirClass>()
+    private val moduleNamespaceCache = mutableMapOf<KirModule, SirClass>()
 
-    private val moduleNamespaceCache = mutableMapOf<ModuleDescriptor, SirClass>()
-
-    private val namespaceParentExtensionCache = mutableMapOf<Pair<SirClass, SirFile>, SirExtension>()
-
-    private val skieNamespaceFile = sirProvider.getFile(SirFile.skieNamespace, "Skie")
+    private val skieNamespaceFile = sirProvider.getFile(kirProvider.skieModule.name, "Namespace")
 
     private val skieNamespaceBaseClass: SirClass = SirClass(
         baseName = "Skie",
@@ -43,66 +36,48 @@ class SkieNamespaceProvider(
     }
 
     private val modulesWithShortNameCollision =
-        descriptorProvider.modulesWithExposedDeclarations
-            .groupBy { it.shortSkieModuleName }
+        kirProvider.allModules
+            .groupBy { it.shortNamespaceModuleName }
             .filter { it.value.size > 1 }
             .values
             .flatten()
             .toSet()
 
-    fun getFile(swiftModel: KotlinTypeSwiftModel): SirFile =
-        sirProvider.getFile(swiftModel.skieFileNamespaceName, swiftModel.skieFileName)
+    fun getNamespaceFile(kirClass: KirClass): SirFile =
+        sirProvider.getFile(kirClass.skieFileNamespaceName, kirClass.skieFileName)
 
-    private fun getNamespaceFile(classDescriptor: ClassDescriptor): SirFile =
-        sirProvider.getFile(classDescriptor.skieFileNamespaceName, "Skie")
+    fun getNamespace(kirClass: KirClass): SirExtension =
+        sirProvider.getExtension(
+            classDeclaration = getNamespaceClass(kirClass),
+            parent = getNamespaceFile(kirClass),
+        )
 
-    fun getOrCreateNamespace(classDescriptor: ClassDescriptor): SirClass =
-        classNamespaceCache.getOrPut(classDescriptor) {
-            val parent = if (classDescriptor in descriptorProvider.exposedClasses) {
-                getNamespaceParentExtension(
-                    classDeclaration = getNamespaceParent(classDescriptor),
-                    file = getNamespaceFile(classDescriptor),
-                )
-            } else {
-                getNamespaceParent(classDescriptor)
-            }
-
+    fun getNamespaceClass(kirClass: KirClass): SirClass =
+        namespaceClassCache.getOrPut(kirClass) {
             SirClass(
-                baseName = classDescriptor.name.identifier.toValidNamespaceIdentifier(),
-                parent = parent,
+                baseName = kirClass.skieNamespaceSimpleName,
+                parent = getNamespaceClass(kirClass.parent),
                 kind = SirClass.Kind.Enum,
             )
         }
 
-    private fun getNamespaceParentExtension(classDeclaration: SirClass, file: SirFile): SirExtension =
-        namespaceParentExtensionCache.getOrPut(classDeclaration to file) {
-            SirExtension(
-                classDeclaration = classDeclaration,
-                parent = file,
-            )
+    private fun getNamespaceClass(classParent: KirClassParent): SirClass =
+        when (classParent) {
+            is KirClass -> this.getNamespaceClass(classParent)
+            is KirModule -> getModuleNamespace(classParent)
         }
 
-    private fun getNamespaceParent(classDescriptor: ClassDescriptor): SirClass {
-        val containingClass = classDescriptor.containingDeclaration as? ClassDescriptor
-
-        return if (containingClass != null) {
-            getOrCreateNamespace(containingClass)
-        } else {
-            getModuleNamespace(classDescriptor.module)
-        }
-    }
-
-    private fun getModuleNamespace(moduleDescriptor: ModuleDescriptor): SirClass =
-        moduleNamespaceCache.getOrPut(moduleDescriptor) {
+    private fun getModuleNamespace(module: KirModule): SirClass =
+        moduleNamespaceCache.getOrPut(module) {
             val sirClass = SirClass(
-                baseName = moduleDescriptor.skieModuleName,
+                baseName = module.namespaceModuleName,
                 parent = skieNamespaceBaseClass,
                 kind = SirClass.Kind.Enum,
             )
 
-            if (!moduleDescriptor.shortNameCollides) {
+            if (!module.shortNameCollides) {
                 SirTypeAlias(
-                    baseName = moduleDescriptor.fullSkieModuleName,
+                    baseName = module.fullNamespaceModuleName,
                     parent = skieNamespaceBaseClass,
                 ) {
                     sirClass.defaultType
@@ -112,71 +87,45 @@ class SkieNamespaceProvider(
             sirClass
         }
 
-    fun getOrCreateNamespace(sourceFile: SourceFile): SirClass =
-        fileNamespaceCache.getOrPut(sourceFile) {
-            val module = descriptorProvider.getFileModule(sourceFile)
-
-            SirExtension(
-                classDeclaration = getModuleNamespace(module),
-                parent = getFile(sourceFile),
-            ).run {
-                SirClass(
-                    baseName = sourceFile.skieNamespaceName,
-                    kind = SirClass.Kind.Enum,
-                )
-            }
-        }
-
-    private fun getFile(sourceFile: SourceFile): SirFile =
-        sirProvider.getFile(sourceFile.skieFileNamespaceName, sourceFile.skieNamespaceName)
-
-    private val SourceFile.skieNamespaceName: String
-        get() = namer.getFileClassName(this).swiftName.toValidNamespaceIdentifier()
-
-    private val ModuleDescriptor.skieModuleName: String
+    private val KirModule.namespaceModuleName: String
         get() {
-            return if (this.shortNameCollides) this.fullSkieModuleName else this.shortSkieModuleName
+            val canUseShortName = !this.shortNameCollides && shortNamespaceModuleName != sirProvider.sirBuiltins.Skie.module.name.toValidNamespaceIdentifier()
+
+            return if (canUseShortName) this.shortNamespaceModuleName else this.fullNamespaceModuleName
         }
 
-    private val KotlinTypeSwiftModel.skieFileNamespaceName: String
-        get() = when (val descriptorHolder = descriptorHolder) {
-            is ClassOrFileDescriptorHolder.Class -> descriptorHolder.value.skieFileNamespaceName
-            is ClassOrFileDescriptorHolder.File -> descriptorHolder.value.skieFileNamespaceName
+    private val KirClass.skieFileNamespaceName: String
+        get() {
+            val isProducedBySkie = this.belongsToSkieKotlinRuntime || this.module.descriptor == mainModuleDescriptor
+
+            return if (isProducedBySkie) kirProvider.skieModule.name else module.namespaceModuleName
         }
 
-    private val ClassDescriptor.skieFileNamespaceName: String
-        get() = module.skieModuleName
-
-    private val SourceFile.skieFileNamespaceName: String
-        get() = descriptorProvider.getFileModule(this).skieModuleName
-
-    private val ModuleDescriptor.shortNameCollides: Boolean
+    private val KirModule.shortNameCollides: Boolean
         get() = this in modulesWithShortNameCollision
 
-    private val KotlinTypeSwiftModel.skieFileName: String
-        get() = when (val descriptorHolder = descriptorHolder) {
-            is ClassOrFileDescriptorHolder.Class -> descriptorHolder.value.skieFileName
-            is ClassOrFileDescriptorHolder.File -> namer.getFileClassName(descriptorHolder.value).swiftName
-        }
-
+    // WIP Remove after renaming all classes to avoid collision with ModuleName
     private fun String.toValidNamespaceIdentifier(): String {
         val defaultName = this.toValidSwiftIdentifier()
 
         return if (defaultName == sirProvider.sirBuiltins.Skie.module.name) defaultName + "_" else defaultName
     }
 
-    @Suppress("RecursivePropertyAccessor")
-    private val ClassDescriptor.skieFileName: String
-        get() = ((this.containingDeclaration as? ClassDescriptor)?.skieFileName?.let { "$it." }
-            ?: "") + this.name.identifier.toValidSwiftIdentifier()
+    private val KirClass.skieNamespaceSimpleName: String
+        get() = this.classDescriptorOrNull?.name?.identifier?.toValidNamespaceIdentifier() ?: this.name.swiftName
 
-    private val ModuleDescriptor.shortSkieModuleName: String
-        get() = (this.stableName ?: this.name).asStringStripSpecialMarkers().substringAfter(":")
+    @Suppress("RecursivePropertyAccessor")
+    private val KirClass.skieFileName: String
+        get() = ((this.parent as? KirClass)?.skieFileName?.let { "$it." } ?: "") + this.skieNamespaceSimpleName
+
+    private val KirModule.shortNamespaceModuleName: String
+        get() = this.name
+            .substringAfter(":")
             .changeNamingConventionToPascalCase()
             .toValidNamespaceIdentifier()
 
-    private val ModuleDescriptor.fullSkieModuleName: String
-        get() = (this.stableName ?: this.name).asStringStripSpecialMarkers()
+    private val KirModule.fullNamespaceModuleName: String
+        get() = this.name
             .replace(":", "__")
             .toValidNamespaceIdentifier()
 }

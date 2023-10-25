@@ -1,7 +1,11 @@
 package co.touchlab.skie.phases.runtime
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-val DeclarationDescriptor.belongsToSkieRuntime: Boolean
-    get() = this.fqNameSafe.asString().startsWith("co.touchlab.skie.runtime")
+val ModuleDescriptor.isSkieKotlinRuntime: Boolean
+    get() = (stableName ?: name).asString().lowercase().let { it.contains("co.touchlab.skie") && it.contains("runtime") }
+
+val DeclarationDescriptor.belongsToSkieKotlinRuntime: Boolean
+    get() = module.isSkieKotlinRuntime

@@ -8,6 +8,16 @@ sealed interface SirDeclarationParent {
     val parent: SirDeclarationParent?
 
     val declarations: MutableList<SirDeclaration>
+
+    object None : SirTopLevelDeclarationParent {
+
+        override val parent: SirDeclarationParent? = null
+
+        override val declarations: MutableList<SirDeclaration>
+            get() = mutableListOf()
+
+        override fun toString(): String = "${SirDeclarationParent::class.simpleName}.${this::class.simpleName}"
+    }
 }
 
 @Suppress("RecursivePropertyAccessor")
@@ -18,11 +28,11 @@ val SirDeclarationParent.firstParentThatIsNotNamespace: SirDeclarationParent
 val SirDeclarationParent.topLevelParent: SirTopLevelDeclarationParent
     get() = (parent as? SirTopLevelDeclarationParent) ?: parent?.topLevelParent ?: module
 
-fun SirDeclarationParent.getAllDeclarationsRecursively(): List<SirDeclaration> =
-    declarations + declarations.filterIsInstance<SirDeclarationParent>().flatMap { it.getAllDeclarationsRecursively() } +
-    if (this is SirModule.Skie) {
-        files.flatMap { it.getAllDeclarationsRecursively() }
-    } else {
-        emptyList()
-    }
+fun SirDeclarationParent.getAllDeclarationsRecursively(): List<SirDeclaration> {
+    val declarationParents = ((this as? SirModule)?.files ?: emptyList()) + declarations.filterIsInstance<SirDeclarationParent>()
 
+    return declarations + declarationParents.flatMap { it.getAllDeclarationsRecursively() }
+}
+
+fun SirDeclarationParent.coerceScope(scope: SirScope): SirScope =
+    if (this !is SirDeclarationNamespace) SirScope.Global else scope
