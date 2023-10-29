@@ -49,7 +49,9 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "")
     buildConfigField("String", "KOTLIN_TOOLING_VERSION", "")
     buildConfigField("String", "GRADLE_API_VERSION", "")
-    buildConfigField("String", "RUNTIME_DEPENDENCY", "")
+    buildConfigField("String", "RUNTIME_DEPENDENCY_GROUP", "")
+    buildConfigField("String", "RUNTIME_DEPENDENCY_NAME", "")
+    buildConfigField("String", "RUNTIME_DEPENDENCY_VERSION", "")
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "")
     buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "")
 }
@@ -78,8 +80,10 @@ multiDimensionTarget.configureSourceSet { sourceSet ->
             buildConfigField("String", "KOTLIN_TOOLING_VERSION", sourceSet.kotlinToolingVersion.value.enquoted())
             buildConfigField("String", "GRADLE_API_VERSION", sourceSet.gradleApiVersion.value.enquoted())
 
-            val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject.dependencyName }
-            buildConfigField("String", "RUNTIME_DEPENDENCY", runtime.map { it.enquoted() })
+            val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
+            buildConfigField("String", "RUNTIME_DEPENDENCY_GROUP", runtime.map { it.group.toString().enquoted() })
+            buildConfigField("String", "RUNTIME_DEPENDENCY_NAME", runtime.map { it.name.enquoted() })
+            buildConfigField("String", "RUNTIME_DEPENDENCY_VERSION", runtime.map { it.version.toString().enquoted() })
 
             val pluginId: String by properties
             buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")

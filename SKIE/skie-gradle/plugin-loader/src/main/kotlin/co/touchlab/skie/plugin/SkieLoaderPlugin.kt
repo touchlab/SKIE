@@ -93,6 +93,8 @@ abstract class SkieLoaderPlugin : Plugin<Project> {
         val gradleVersion = GradleVersion.current().version
         logger.info("Resolving SKIE gradle plugin for Kotlin plugin version $kotlinVersion and Gradle version $gradleVersion")
 
+        KotlinCompilerVersion.registerIn(project.dependencies, kotlinVersion)
+        KotlinCompilerVersion.registerIn(buildscript.dependencies, kotlinVersion)
         val skieGradleConfiguration = buildscript.configurations.detachedConfiguration(
             buildscript.dependencies.create(BuildConfig.SKIE_GRADLE_PLUGIN),
         ).apply {
