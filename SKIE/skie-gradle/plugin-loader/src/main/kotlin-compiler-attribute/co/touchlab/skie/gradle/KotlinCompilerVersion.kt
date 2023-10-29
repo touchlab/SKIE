@@ -6,6 +6,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.AttributeDisambiguationRule
 import org.gradle.api.attributes.MultipleCandidatesDetails
 import org.gradle.api.logging.Logging
+import javax.inject.Inject
 
 interface KotlinCompilerVersion : Named {
     companion object {
@@ -21,7 +22,7 @@ interface KotlinCompilerVersion : Named {
         }
     }
 
-    class DisambiguationRule(
+    class DisambiguationRule @Inject constructor(
         private val currentKotlinVersion: String,
     ): AttributeDisambiguationRule<KotlinCompilerVersion> {
         override fun execute(details: MultipleCandidatesDetails<KotlinCompilerVersion>) {
