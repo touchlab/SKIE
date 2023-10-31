@@ -4,8 +4,7 @@ import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import co.touchlab.skie.gradle.util.enquoted
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddableDependency
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
+import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.version.AcceptanceTestsComponent
 import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import co.touchlab.skie.gradle.version.acceptanceTest
@@ -132,7 +131,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
-                    weak(kotlinNativeCompilerEmbeddableDependency(kotlinVersion))
+                    withKotlinNativeCompilerEmbeddableDependency(kotlinVersion, isTarget = sourceSet.isTarget) {
+                        weak(it)
+                    }
 
                     testOnly("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
                 }

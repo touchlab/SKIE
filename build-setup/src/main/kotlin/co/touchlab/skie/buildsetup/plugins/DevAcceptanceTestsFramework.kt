@@ -1,9 +1,9 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import co.touchlab.skie.gradle.util.libs
+import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.version.ToolingVersions
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -97,7 +97,10 @@ abstract class DevAcceptanceTestsFramework : Plugin<Project> {
 
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
-                    weak(kotlinNativeCompilerEmbeddableDependency(kotlinVersion))
+
+                    withKotlinNativeCompilerEmbeddableDependency(kotlinVersion, isTarget = sourceSet.isTarget) {
+                        weak(it)
+                    }
 
                     testOnly(libs.bundles.testing.jvm)
                 }

@@ -54,4 +54,4 @@ private val KonanTarget.presetName: String
         KonanTarget.MINGW_X86, KonanTarget.WASM32, is KonanTarget.ZEPHYR -> error(
             "SKIE doesn't support these platforms, so it should never ask for the preset name of this target."
         )
-    }
+    }.lowercase()

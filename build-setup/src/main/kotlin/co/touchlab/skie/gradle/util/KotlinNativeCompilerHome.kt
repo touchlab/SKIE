@@ -32,17 +32,22 @@ fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File 
         .compilerDirectory
 }
 
-internal fun Project.kotlinNativeCompilerEmbeddableDependency(kotlinVersion: KotlinToolingVersion): Dependency {
+internal inline fun Project.withKotlinNativeCompilerEmbeddableDependency(kotlinVersion: KotlinToolingVersion, isTarget: Boolean, block: (Dependency) -> Unit) {
     val kotlinNativeCompilerEmbeddableFromHome: String? by project
-    return if (kotlinNativeCompilerEmbeddableFromHome.toBoolean()) {
-        project.dependencies.create(
-            files(
-                kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/kotlin-native-compiler-embeddable.jar")
+    val dependency = if (kotlinNativeCompilerEmbeddableFromHome.toBoolean()) {
+        if (isTarget) {
+            project.dependencies.create(
+                files(
+                    kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/kotlin-native.jar")
+                )
             )
-        )
+        } else {
+            return
+        }
     } else {
         project.dependencies.create("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
     }
+    block(dependency)
 }
 
 private fun <T> Project.backupProperty(name: String): BackupProperty<T>? {
