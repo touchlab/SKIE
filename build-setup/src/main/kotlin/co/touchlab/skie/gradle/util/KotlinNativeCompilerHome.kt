@@ -2,7 +2,9 @@ package co.touchlab.skie.gradle.util
 
 import co.touchlab.skie.gradle.KotlinToolingVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 import org.jetbrains.kotlin.konan.CompilerVersion
 import java.io.File
@@ -28,6 +30,19 @@ fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File 
             backupProperty?.let { restoreProperty(it) }
         }
         .compilerDirectory
+}
+
+internal fun Project.kotlinNativeCompilerEmbeddableDependency(kotlinVersion: KotlinToolingVersion): Dependency {
+    val kotlinNativeCompilerEmbeddableFromHome: String? by project
+    return if (kotlinNativeCompilerEmbeddableFromHome.toBoolean()) {
+        project.dependencies.create(
+            files(
+                kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/kotlin-native-compiler-embeddable.jar")
+            )
+        )
+    } else {
+        project.dependencies.create("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
+    }
 }
 
 private fun <T> Project.backupProperty(name: String): BackupProperty<T>? {

@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.util.kotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import co.touchlab.skie.gradle.version.target.MultiDimensionTargetExtension
@@ -32,7 +33,7 @@ abstract class SkieCompiler : Plugin<Project> {
 
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-                    weak("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
+                    weak(kotlinNativeCompilerEmbeddableDependency(kotlinVersion))
                 }
             }
         }
