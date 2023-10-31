@@ -49,6 +49,8 @@ class CompileSwiftPhase(
             +cacheableKotlinFramework.parentDir.absolutePath
             +"-F"
             +skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.directory.absolutePath
+            +"-enable-library-evolution"
+            +"-no-verify-emitted-module-interface"
             +"-emit-module"
             +"-emit-module-path"
             +swiftFrameworkHeader.swiftModule
