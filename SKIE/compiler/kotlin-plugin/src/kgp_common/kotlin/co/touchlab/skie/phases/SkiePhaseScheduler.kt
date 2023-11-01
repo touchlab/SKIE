@@ -114,8 +114,8 @@ class SkiePhaseScheduler {
             GenerateSirFileCodePhase,
             WriteSirFileContentToDiskPhase,
             GenerateFakeObjCDependenciesPhase,
-            SwiftCacheSetupPhase,
             DisableWildcardExportPhase,
+            SwiftCacheSetupPhase,
             CompileSwiftPhase(context),
 
             TemporarilyRenameTypesConflictingWithExternalModulesPhase.RevertPhase,

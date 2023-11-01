@@ -50,7 +50,7 @@ class CompileSwiftPhase(
             +"-F"
             +skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.directory.absolutePath
             +"-enable-library-evolution"
-            +"-no-verify-emitted-module-interface"
+            +"-verify-emitted-module-interface"
             +"-emit-module"
             +"-emit-module-path"
             +swiftFrameworkHeader.swiftModule
