@@ -27,6 +27,8 @@ class SkieNamespaceProvider(
 
     private val moduleNamespaceCache = mutableMapOf<ModuleDescriptor, SirClass>()
 
+    private val namespaceParentExtensionCache = mutableMapOf<Pair<SirClass, SirFile>, SirExtension>()
+
     private val skieNamespaceFile = sirProvider.getFile(SirFile.skieNamespace, "Skie")
 
     private val skieNamespaceBaseClass: SirClass = SirClass(
@@ -57,9 +59,9 @@ class SkieNamespaceProvider(
     fun getOrCreateNamespace(classDescriptor: ClassDescriptor): SirClass =
         classNamespaceCache.getOrPut(classDescriptor) {
             val parent = if (classDescriptor in descriptorProvider.exposedClasses) {
-                SirExtension(
+                getNamespaceParentExtension(
                     classDeclaration = getNamespaceParent(classDescriptor),
-                    parent = getNamespaceFile(classDescriptor),
+                    file = getNamespaceFile(classDescriptor),
                 )
             } else {
                 getNamespaceParent(classDescriptor)
@@ -69,6 +71,14 @@ class SkieNamespaceProvider(
                 simpleName = classDescriptor.name.identifier.toValidNamespaceIdentifier(),
                 parent = parent,
                 kind = SirClass.Kind.Enum,
+            )
+        }
+
+    private fun getNamespaceParentExtension(classDeclaration: SirClass, file: SirFile): SirExtension =
+        namespaceParentExtensionCache.getOrPut(classDeclaration to file) {
+            SirExtension(
+                classDeclaration = classDeclaration,
+                parent = file,
             )
         }
 
