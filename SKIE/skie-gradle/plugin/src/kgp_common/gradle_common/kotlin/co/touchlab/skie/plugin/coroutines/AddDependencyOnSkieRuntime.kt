@@ -34,10 +34,10 @@ private val BuildConfig.DEFAULT_RUNTIME_DEPENDENCY: String
     get() = "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME:$RUNTIME_DEPENDENCY_VERSION"
 
 private fun BuildConfig.SPECIFIC_RUNTIME_DEPENDENCY(konanTarget: KonanTarget, kotlinVersion: String): String {
-    return "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME-${konanTarget.presetName}__kgp_${kotlinVersion}:$RUNTIME_DEPENDENCY_VERSION"
+    return "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME-${konanTarget.dependencyPresetName}__kgp_${kotlinVersion}:$RUNTIME_DEPENDENCY_VERSION"
 }
 
-private val KonanTarget.presetName: String
+private val KonanTarget.dependencyPresetName: String
     get() = when (this) {
         KonanTarget.IOS_ARM32 -> "iosArm32"
         KonanTarget.IOS_ARM64 -> "iosArm64"
