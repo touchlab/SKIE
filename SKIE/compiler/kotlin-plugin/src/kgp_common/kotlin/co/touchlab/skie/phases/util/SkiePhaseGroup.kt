@@ -16,10 +16,13 @@ class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
     fun run(context: C) {
         with(context) {
             buildPhases(context)
-                .filter { it.isActive() }
                 .forEach {
-                    context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
-                        it.execute()
+                    if (it.isActive()) {
+                        context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
+                            it.execute()
+                        }
+                    } else {
+                        context.skiePerformanceAnalyticsProducer.logSkipped(it::class.nameForLogger)
                     }
                 }
         }

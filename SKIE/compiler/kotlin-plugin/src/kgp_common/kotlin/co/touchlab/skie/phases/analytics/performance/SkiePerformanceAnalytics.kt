@@ -25,6 +25,10 @@ object SkiePerformanceAnalytics {
         override fun produce(): String =
             entries.toPrettyJson()
 
+        fun logSkipped(name: String) {
+            printLogIfEnabled("$name: Skipped")
+        }
+
         @OptIn(ExperimentalTime::class)
         fun <T> log(name: String, block: () -> T): T {
             val timedValue = measureTimedValue {
@@ -33,18 +37,22 @@ object SkiePerformanceAnalytics {
 
             entries[name] = timedValue.duration.toDouble(DurationUnit.SECONDS)
 
-            printLogIfEnabled(name, timedValue.duration)
+            printFormattedLogIfEnabled(name, timedValue.duration)
 
             return timedValue.value
         }
 
-        private fun printLogIfEnabled(name: String, duration: Duration) {
+        private fun printFormattedLogIfEnabled(name: String, duration: Duration) {
+            val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
+
+            val durationInSecondsAsString = String.format("%.6f", durationInSeconds)
+
+            printLogIfEnabled("$name: ${durationInSecondsAsString}s")
+        }
+
+        private fun printLogIfEnabled(content: String) {
             if (SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs in skieConfiguration.enabledConfigurationFlags) {
-                val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
-
-                val durationInSecondsAsString = String.format("%.6f", durationInSeconds)
-
-                println("$name: ${durationInSecondsAsString}s")
+                println(content)
             }
         }
     }
