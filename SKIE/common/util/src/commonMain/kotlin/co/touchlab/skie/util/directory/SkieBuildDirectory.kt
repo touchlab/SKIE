@@ -89,18 +89,38 @@ class SkieBuildDirectory(
 
         val objectFiles: ObjectFiles = ObjectFiles(this)
 
+        val module: Module = Module(this)
+
         fun moduleHeader(moduleName: String): ModuleHeader = ModuleHeader(this, moduleName)
 
         val fakeObjCFrameworks: FakeObjCFrameworks = FakeObjCFrameworks(this)
 
         val apiNotes: ApiNotes = ApiNotes(this)
 
+        val config: Config = Config(this)
+
         class ObjectFiles(parent: Directory) : PermanentDirectory(parent, "object-files") {
 
-            val all: List<File>
-                get() = directory.walkTopDown()
-                    .filter { it.extension == "o" }
-                    .toList()
+            val allFiles: List<File>
+                get() = directory.walkTopDown().toList()
+
+            val allObjectFiles: List<File>
+                get() = allFiles.filter { it.extension == "o" }
+
+            fun objectFile(sourceFileName: String): File = directory.resolve("$sourceFileName.o")
+
+            fun swiftDependencies(sourceFileName: String): File = directory.resolve("$sourceFileName.swiftdeps")
+
+            fun dependencies(sourceFileName: String): File = directory.resolve("$sourceFileName.d")
+
+            fun partialSwiftModule(sourceFileName: String): File = directory.resolve("$sourceFileName~partial.swiftmodule")
+        }
+
+        class Module(parent: Directory) : PermanentDirectory(parent, "module") {
+
+            fun swiftDependencies(moduleName: String): File = directory.resolve("$moduleName.swiftdeps")
+
+            fun dependencies(moduleName: String): File = directory.resolve("$moduleName.d")
         }
 
         class ModuleHeader(parent: Directory, moduleName: String) : PermanentDirectory(parent, "headers") {
@@ -141,6 +161,13 @@ class SkieBuildDirectory(
         class ApiNotes(parent: Directory) : PermanentDirectory(parent, "apinotes") {
 
             fun apiNotes(moduleName: String): File = directory.resolve("$moduleName.apinotes")
+        }
+
+        class Config(parent: Directory) : PermanentDirectory(parent, "config") {
+
+            val outputFileMap: File = directory.resolve("OutputFileMap.json")
+
+            fun swiftFileList(moduleName: String): File = directory.resolve("$moduleName.SwiftFileList")
         }
     }
 

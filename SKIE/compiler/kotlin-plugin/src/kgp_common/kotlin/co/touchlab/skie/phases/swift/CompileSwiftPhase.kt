@@ -22,6 +22,12 @@ class CompileSwiftPhase(
     private val skieBuildDirectory = context.skieBuildDirectory
     private val targetTriple = context.configurables.targetTriple
     private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.moduleName)
+    private val swiftFileList = context.skieBuildDirectory.swiftCompiler.config.swiftFileList(framework.moduleName)
+    private val outputFileMap = context.skieBuildDirectory.swiftCompiler.config.outputFileMap
+    private val objectFiles = skieBuildDirectory.swiftCompiler.objectFiles
+    private val moduleDirectory = skieBuildDirectory.swiftCompiler.module
+
+    private val isDebug = konanConfig.debug
 
     context(SirPhase.Context)
     override fun execute() {
@@ -30,7 +36,11 @@ class CompileSwiftPhase(
             return
         }
 
-        callSwiftCompiler(sourceFiles)
+        createSwiftFileList(sourceFiles)
+
+        createOutputFileMap(sourceFiles)
+
+        callSwiftCompiler()
 
         deleteOldObjectFiles(sourceFiles)
 
@@ -41,7 +51,43 @@ class CompileSwiftPhase(
         addSwiftSpecificLinkerArgs()
     }
 
-    private fun callSwiftCompiler(sourceFiles: List<File>) {
+    private fun createSwiftFileList(sourceFiles: List<File>) {
+        val content = sourceFiles.joinToString("\n") { it.absolutePath }
+
+        swiftFileList.writeText(content)
+    }
+
+    private fun createOutputFileMap(sourceFiles: List<File>) {
+        if (!isDebug) {
+            return
+        }
+
+        val root = """
+              "": {
+                "emit-module-dependencies": "${moduleDirectory.dependencies(framework.moduleName).absolutePath}",
+                "swift-dependencies": "${moduleDirectory.swiftDependencies(framework.moduleName).absolutePath}"
+              },
+        """.trimIndent()
+
+        val body = sourceFiles.joinToString(",\n") { sourceFile ->
+            val sourceFileName = sourceFile.nameWithoutExtension
+
+            """
+                "${sourceFile.absolutePath}": {
+                    "object": "${objectFiles.objectFile(sourceFileName).absolutePath}",
+                    "dependencies": "${objectFiles.dependencies(sourceFileName).absolutePath}",
+                    "swift-dependencies": "${objectFiles.swiftDependencies(sourceFileName).absolutePath}",
+                    "swiftmodule": "${objectFiles.partialSwiftModule(sourceFileName).absolutePath}"
+                }
+            """.trimIndent()
+        }
+
+        val content = "{\n$root\n$body\n}"
+
+        outputFileMap.writeText(content)
+    }
+
+    private fun callSwiftCompiler() {
         Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
@@ -62,10 +108,18 @@ class CompileSwiftPhase(
             +"-emit-objc-header-path"
             +swiftFrameworkHeader.swiftHeader
             getSwiftcBitcodeArg()?.let { +it }
-            +getSwiftcBuildTypeArgs()
             +"-emit-object"
             +"-parse-as-library"
             +"-enable-batch-mode"
+            if (isDebug) {
+                +"-Onone"
+                +"-incremental"
+                +"-output-file-map"
+                +outputFileMap.absolutePath
+            } else {
+                +"-O"
+                +"-whole-module-optimization"
+            }
             +"-g"
             +"-module-cache-path"
             +skieBuildDirectory.cache.swiftModules.directory.absolutePath
@@ -76,28 +130,28 @@ class CompileSwiftPhase(
             +configurables.absoluteTargetSysRoot
             +"-target"
             +configurables.targetTriple.withOSVersion(configurables.osVersionMin).toString()
-            +sourceFiles.map { it.absolutePath }
+            +"@${swiftFileList.absolutePath}"
 
-            workingDirectory = skieBuildDirectory.swiftCompiler.objectFiles.directory
+            workingDirectory = objectFiles.directory
 
             execute(logFile = skieBuildDirectory.debug.logs.swiftc)
         }
     }
 
     private fun deleteOldObjectFiles(sourceFiles: List<File>) {
-        if (konanConfig.debug) {
+        if (isDebug) {
             val sourceFilesNames = sourceFiles.map { it.nameWithoutExtension }.toSet()
 
-            skieBuildDirectory.swiftCompiler.objectFiles.all
+            objectFiles.allFiles
                 .filterNot { it.nameWithoutExtension in sourceFilesNames }
-                .forEach { objectFile ->
-                    objectFile.delete()
+                .forEach {
+                    it.delete()
                 }
         } else {
-            skieBuildDirectory.swiftCompiler.objectFiles.all
+            objectFiles.allFiles
                 .filter { it.nameWithoutExtension != framework.moduleName }
-                .forEach { objectFile ->
-                    objectFile.delete()
+                .forEach {
+                    it.delete()
                 }
         }
     }
@@ -107,13 +161,6 @@ class CompileSwiftPhase(
             BitcodeEmbedding.Mode.NONE, null -> null
             BitcodeEmbedding.Mode.FULL -> "-embed-bitcode"
             BitcodeEmbedding.Mode.MARKER -> "-embed-bitcode-marker"
-        }
-
-    private fun getSwiftcBuildTypeArgs() =
-        if (konanConfig.debug) {
-            emptyList()
-        } else {
-            listOf("-O", "-whole-module-optimization")
         }
 
     private fun copySwiftModuleFiles() {
