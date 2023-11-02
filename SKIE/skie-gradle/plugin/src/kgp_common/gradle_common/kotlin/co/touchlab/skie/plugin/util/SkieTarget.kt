@@ -129,10 +129,11 @@ sealed interface SkieTarget {
 
         private companion object {
             fun linkTaskName(artifact: KotlinNativeArtifact, konanTarget: KonanTarget, buildType: NativeBuildType): String {
-                return "assemble" + when (artifact) {
+                return when (artifact) {
                     is KotlinNativeLibrary -> {
                         val kind = if (artifact.isStatic) NativeOutputKind.STATIC else NativeOutputKind.DYNAMIC
                         lowerCamelCaseName(
+                            "assemble",
                             artifact.artifactName,
                             buildType.visibleName,
                             kind.taskNameClassifier,
@@ -141,12 +142,14 @@ sealed interface SkieTarget {
                         )
                     }
                     is KotlinNativeFramework -> lowerCamelCaseName(
+                        "assemble",
                         artifact.artifactName,
                         buildType.visibleName,
                         NativeOutputKind.FRAMEWORK.taskNameClassifier,
                         konanTarget.presetName
                     )
                     is KotlinNativeFatFramework -> lowerCamelCaseName(
+                        "assemble",
                         artifact.artifactName,
                         buildType.visibleName,
                         NativeOutputKind.FRAMEWORK.taskNameClassifier,
@@ -154,6 +157,7 @@ sealed interface SkieTarget {
                         "ForFat",
                     )
                     is KotlinNativeXCFramework -> lowerCamelCaseName(
+                        "assemble",
                         artifact.artifactName,
                         buildType.visibleName,
                         NativeOutputKind.FRAMEWORK.taskNameClassifier,
