@@ -65,6 +65,7 @@ class CompileSwiftPhase(
             +getSwiftcBuildTypeArgs()
             +"-emit-object"
             +"-parse-as-library"
+            +"-enable-batch-mode"
             +"-g"
             +"-module-cache-path"
             +skieBuildDirectory.cache.swiftModules.directory.absolutePath
