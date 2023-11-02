@@ -51,15 +51,15 @@ class SkieNamespaceProvider(
     fun getFile(swiftModel: KotlinTypeSwiftModel): SirFile =
         sirProvider.getFile(swiftModel.skieNamespaceName, swiftModel.skieFileName)
 
-    private fun getFile(classDescriptor: ClassDescriptor): SirFile =
-        sirProvider.getFile(classDescriptor.skieNamespaceName, classDescriptor.skieFileName)
+    private fun getNamespaceFile(classDescriptor: ClassDescriptor): SirFile =
+        sirProvider.getFile(classDescriptor.skieNamespaceName, "Skie")
 
     fun getOrCreateNamespace(classDescriptor: ClassDescriptor): SirClass =
         classNamespaceCache.getOrPut(classDescriptor) {
             val parent = if (classDescriptor in descriptorProvider.exposedClasses) {
                 SirExtension(
                     classDeclaration = getNamespaceParent(classDescriptor),
-                    parent = getFile(classDescriptor),
+                    parent = getNamespaceFile(classDescriptor),
                 )
             } else {
                 getNamespaceParent(classDescriptor)
