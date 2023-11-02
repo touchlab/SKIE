@@ -1,15 +1,16 @@
 package co.touchlab.skie.plugin.configuration
 
+import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
-import co.touchlab.skie.plugin.directory.skieBuildDirectory
-import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
+import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
+import co.touchlab.skie.plugin.util.skieBuildDirectory
+import co.touchlab.skie.plugin.util.skieConfiguration
 import groovy.json.JsonOutput
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import java.io.File
 
 internal abstract class CreateSkieConfigurationTask : DefaultTask() {
@@ -35,14 +36,16 @@ internal abstract class CreateSkieConfigurationTask : DefaultTask() {
 
     companion object {
 
-        fun registerTask(linkTask: KotlinNativeLink) {
-            val createConfiguration = linkTask.registerSkieLinkBasedTask<CreateSkieConfigurationTask>("createConfiguration") {
-                configurationFile.set(linkTask.skieBuildDirectory.skieConfiguration)
+        fun registerTask(target: SkieTarget) {
+            val createConfiguration = target.registerSkieTargetBasedTask<CreateSkieConfigurationTask>("createConfiguration") {
+                configurationFile.set(target.skieBuildDirectory.skieConfiguration)
 
-                dependsOn(linkTask.createSkieBuildDirectoryTask)
+                dependsOn(target.createSkieBuildDirectoryTask)
             }
 
-            linkTask.inputs.files(createConfiguration.map { it.outputs })
+            target.task.configure {
+                inputs.files(createConfiguration.map { it.outputs })
+            }
         }
     }
 }

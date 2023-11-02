@@ -8,34 +8,42 @@ import co.touchlab.skie.plugin.coroutines.registerConfigureMinOsVersionTaskIfNee
 import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
-import co.touchlab.skie.plugin.directory.skieDirectories
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
-import co.touchlab.skie.plugin.util.appleTargets
-import co.touchlab.skie.plugin.util.frameworks
-import co.touchlab.skie.plugin.util.subpluginOption
+import co.touchlab.skie.plugin.util.*
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
+import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
 import org.jetbrains.kotlin.konan.target.HostManager
 
 abstract class SkieGradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
+        project.extensions.create("skieInternal", SkieInternalExtension::class.java)
+
         project.configureSkieGradlePlugin()
 
         project.afterEvaluate {
+            project.configureRuntimeVariantFallback()
             project.configureSkieCompilerPlugin()
         }
     }
 
     private fun Project.configureSkieGradlePlugin() {
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
+    }
+
+    private fun Project.configureRuntimeVariantFallback() {
+        if (!skieInternal.runtimeVariantFallback.isPresent) {
+            val extraPropertiesKey = "skieRuntimeVariantFallback"
+            skieInternal.runtimeVariantFallback.set(
+                project.properties[extraPropertiesKey]?.toString().toBoolean()
+            )
+        }
     }
 
     private fun Project.configureSkieCompilerPlugin() {
@@ -47,69 +55,74 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
-        configureEachKotlinFrameworkLinkTask {
-            configureSkieForLinkTask()
+        kotlinMultiplatformExtension?.appleTargets?.all {
+            val target = this
+            binaries.all {
+                val binary = this
+                skieInternal.targets.add(
+                    SkieTarget.TargetBinary(
+                        project = project,
+                        target = target,
+                        binary = binary,
+                    )
+                )
+            }
+        }
+
+        kotlinArtifactsExtension.artifacts.withType<KotlinNativeArtifact>().all {
+            skieInternal.targets.addAll(skieTargetsOf(this))
+        }
+
+        skieInternal.targets.all {
+            configureSkie()
         }
     }
 
-    private fun KotlinNativeLink.configureSkieForLinkTask() {
+    private fun SkieTarget.configureSkie() {
         SkieDirectoriesManager.configureCreateSkieBuildDirectoryTask(this)
 
         GradleAnalyticsManager(project).configureAnalytics(this)
 
-        disableCachingIfNeeded()
-        binary.target.addDependencyOnSkieRuntime()
-        binary.registerConfigureMinOsVersionTaskIfNeeded()
+        registerConfigureMinOsVersionTaskIfNeeded()
 
         CreateSkieConfigurationTask.registerTask(this)
 
         SwiftLinkingConfigurator.configureCustomSwiftLinking(this)
+
+        disableCachingIfNeeded()
+
+        addDependencyOnSkieRuntime()
 
         SkieSubPluginManager.registerSubPlugins(this)
 
         configureKotlinCompiler()
     }
 
-    private fun KotlinNativeLink.configureKotlinCompiler() {
-        compilerPluginClasspath = listOfNotNull(
-            compilerPluginClasspath,
-            SkieCompilerPluginDependencyProvider.getOrCreateDependencyConfiguration(project),
-        ).reduce(FileCollection::plus)
-
-        compilerPluginOptions.addPluginArgument(
+    private fun SkieTarget.configureKotlinCompiler() {
+        addPluginArgument(
             SkiePlugin.id,
-            SkiePlugin.Options.skieDirectories.subpluginOption(skieDirectories),
+            SkiePlugin.Options.skieDirectories.subpluginOption(skieDirectories.get()),
+        )
+
+        addToCompilerClasspath(
+            SkieCompilerPluginDependencyProvider.getOrCreateDependencyConfiguration(project)
         )
     }
 }
 
 internal fun Project.warnOnEmptyFrameworks() {
-    val hasFrameworks = extensions.findByType(KotlinMultiplatformExtension::class.java)?.appleTargets?.any { it.frameworks.isNotEmpty() } ?: false
-    if (!hasFrameworks) {
-        logger.warn("w: No Apple frameworks configured. Make sure you applied SKIE plugin in the correct module.")
-    }
-}
-
-internal fun Project.configureEachKotlinFrameworkLinkTask(
-    configure: KotlinNativeLink.() -> Unit,
-) {
-    configureEachKotlinAppleTarget {
-        frameworks.forEach { framework ->
-            // Cannot use configure on linkTaskProvider because it's not possible to register new tasks in configure block of another task
-            configure(framework.linkTask)
+    gradle.taskGraph.whenReady {
+        if (skieInternal.targets.isEmpty()) {
+            logger.warn("w: No Apple frameworks configured in module ${this@warnOnEmptyFrameworks.path}. Make sure you applied SKIE plugin in the correct module.")
         }
-    }
-}
-
-internal fun Project.configureEachKotlinAppleTarget(
-    configure: KotlinNativeTarget.() -> Unit,
-) {
-    val kotlinExtension = extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
-
-    kotlinExtension.appleTargets.forEach {
-        configure(it)
     }
 }
 
 private val Project.isSkieEnabled: Boolean
     get() = project.skieExtension.isEnabled.get() && HostManager.hostIsMac
+
+internal val Project.kotlinMultiplatformExtension: KotlinMultiplatformExtension?
+    get() = project.extensions.findByType(KotlinMultiplatformExtension::class.java)
+
+internal val Project.skieInternal: SkieInternalExtension
+    get() = project.extensions.getByType(SkieInternalExtension::class.java)

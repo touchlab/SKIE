@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.directory
 
-import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
-import co.touchlab.skie.plugin.util.skieLinkTaskName
-import co.touchlab.skie.util.directory.SkieBuildDirectory
+import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
+import co.touchlab.skie.plugin.util.skieTargetBasedTaskName
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
@@ -11,16 +11,15 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import javax.inject.Inject
 
 internal object SkieDirectoriesManager {
 
     const val baseTaskName: String = "createSkieDirectories"
 
-    fun configureCreateSkieBuildDirectoryTask(linkTask: KotlinNativeLink) {
-        linkTask.registerSkieLinkBasedTask<SkieCreateSkieDirectoriesTask>(baseTaskName) {
-            skieDirectories.set(linkTask.skieDirectories)
+    fun configureCreateSkieBuildDirectoryTask(target: SkieTarget) {
+        target.registerSkieTargetBasedTask<SkieCreateSkieDirectoriesTask>(baseTaskName) {
+            skieDirectories.set(target.skieDirectories)
         }
     }
 
@@ -43,13 +42,5 @@ internal object SkieDirectoriesManager {
     }
 }
 
-val KotlinNativeLink.skieDirectories: SkieDirectories
-    get() = SkieDirectories(
-        project.layout.buildDirectory.dir("skie/${binary.name}/${binary.target.targetName}").get().asFile,
-    )
-
-val KotlinNativeLink.skieBuildDirectory: SkieBuildDirectory
-    get() = skieDirectories.buildDirectory
-
-internal val KotlinNativeLink.createSkieBuildDirectoryTask: TaskProvider<Task>
-    get() = project.tasks.named(skieLinkTaskName(SkieDirectoriesManager.baseTaskName))
+internal val SkieTarget.createSkieBuildDirectoryTask: TaskProvider<Task>
+    get() = project.tasks.named(skieTargetBasedTaskName(SkieDirectoriesManager.baseTaskName))

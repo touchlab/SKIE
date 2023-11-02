@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.analytics
 
+import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.analytics.environment.GradleEnvironmentAnalytics
 import co.touchlab.skie.plugin.analytics.git.GitAnalytics
 import co.touchlab.skie.plugin.analytics.hardware.HardwareAnalytics
@@ -8,58 +9,53 @@ import co.touchlab.skie.plugin.analytics.project.ProjectAnalytics
 import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
-import co.touchlab.skie.plugin.directory.skieDirectories
-import co.touchlab.skie.plugin.util.doFirstOptimized
-import co.touchlab.skie.plugin.util.doLastOptimized
-import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
+import co.touchlab.skie.plugin.util.*
+import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import java.time.Duration
 
 internal class GradleAnalyticsManager(
     private val project: Project,
 ) {
 
-    fun configureAnalytics(linkTask: KotlinNativeLink) {
-        val analyticsCollectorProvider = project.provider {
+    fun configureAnalytics(target: SkieTarget) {
+        val analyticsCollectorProvider = target.skieDirectories.map { skieDirectories ->
             AnalyticsCollector(
-                skieBuildDirectory = linkTask.skieDirectories.buildDirectory,
+                skieBuildDirectory = skieDirectories.buildDirectory,
                 skieConfiguration = project.skieExtension.buildConfiguration(),
             )
         }
 
-        configureUploadAnalyticsTask(linkTask)
+        configureUploadAnalyticsTask(target)
 
-        registerAnalyticsProducers(linkTask, analyticsCollectorProvider)
+        registerAnalyticsProducers(target, analyticsCollectorProvider)
     }
 
-    private fun configureUploadAnalyticsTask(linkTask: KotlinNativeLink) {
-        val uploadTask = linkTask.registerSkieLinkBasedTask<SkieUploadAnalyticsTask>("uploadAnalytics") {
-            this.analyticsDirectory.set(linkTask.skieDirectories.buildDirectory.analytics.directory)
-            this.applicationSupportDirectory.set(linkTask.skieDirectories.applicationSupport)
+    private fun configureUploadAnalyticsTask(target: SkieTarget) {
+        val uploadTask = target.registerSkieTargetBasedTask<SkieUploadAnalyticsTask>("uploadAnalytics") {
+            this.analyticsDirectory.set(target.skieDirectories.map { it.buildDirectory.analytics.directory })
+            this.applicationSupportDirectory.set(target.skieDirectories.map { it.applicationSupport })
 
-            dependsOn(linkTask.createSkieBuildDirectoryTask)
+            dependsOn(target.createSkieBuildDirectoryTask)
+
+            onlyIf {
+                val analyticsConfiguration = project.skieExtension.analytics
+
+                analyticsConfiguration.enabled.get() && !analyticsConfiguration.disableUpload.get()
+            }
         }
 
-        linkTask.finalizedBy(uploadTask)
-
-        linkTask.project.afterEvaluate {
-            uploadTask.configure {
-                onlyIf {
-                    val analyticsConfiguration = project.skieExtension.analytics
-
-                    analyticsConfiguration.enabled.get() && !analyticsConfiguration.disableUpload.get()
-                }
-            }
+        target.task.configure {
+            finalizedBy(uploadTask)
         }
     }
 
     private fun registerAnalyticsProducers(
-        linkTask: KotlinNativeLink,
+        target: SkieTarget,
         analyticsCollectorProvider: Provider<AnalyticsCollector>,
     ) {
-        linkTask.doFirstOptimized {
+        target.task.configureDoFirstOptimized {
             analyticsCollectorProvider.get().collectAsync(
                 GradleEnvironmentAnalytics.Producer(project),
 
@@ -71,20 +67,20 @@ internal class GradleAnalyticsManager(
             )
         }
 
-        registerPerformanceAnalyticsProducer(linkTask, analyticsCollectorProvider)
+        registerPerformanceAnalyticsProducer(target, analyticsCollectorProvider)
     }
 
     private fun registerPerformanceAnalyticsProducer(
-        linkTask: KotlinNativeLink,
+        target: SkieTarget,
         analyticsCollectorProvider: Provider<AnalyticsCollector>,
     ) {
         var start: Long = 0
 
-        linkTask.doFirstOptimized {
+        target.task.configureDoFirstOptimized {
             start = System.currentTimeMillis()
         }
 
-        linkTask.doLastOptimized {
+        target.task.configureDoLastOptimized {
             val linkTaskDuration = Duration.ofMillis(System.currentTimeMillis() - start)
 
             analyticsCollectorProvider.get().collectSynchronously(

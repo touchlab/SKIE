@@ -1,30 +1,39 @@
 package co.touchlab.skie.plugin.coroutines
 
-import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
-import co.touchlab.skie.plugin.util.named
-import co.touchlab.skie.plugin.util.withType
+import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.skieInternal
+import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractNativeLibrary
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
+import org.jetbrains.kotlin.konan.target.presetName
 
-internal fun KotlinNativeTarget.addDependencyOnSkieRuntime() {
-    if (!project.isCoroutinesInteropEnabled) {
-        return
+internal fun SkieTarget.addDependencyOnSkieRuntime() {
+    val configurationNames = when (this) {
+        is SkieTarget.TargetBinary -> listOfNotNull(
+            binary.compilation.apiConfigurationName,
+            (binary as? AbstractNativeLibrary)?.exportConfigurationName,
+        )
+        is SkieTarget.Artifact -> listOf(
+            lowerCamelCaseName(konanTarget.presetName, artifact.artifactName, "linkLibrary"),
+            lowerCamelCaseName(konanTarget.presetName, artifact.artifactName, "linkExport"),
+        )
     }
 
-    compilations.named("main") {
-        defaultSourceSet.dependencies {
-            api(BuildConfig.RUNTIME_DEPENDENCY(konanTarget, BuildConfig.KOTLIN_TOOLING_VERSION))
-        }
+    val dependency = if (project.skieInternal.runtimeVariantFallback.get()) {
+        BuildConfig.DEFAULT_RUNTIME_DEPENDENCY
+    } else {
+        BuildConfig.SPECIFIC_RUNTIME_DEPENDENCY(konanTarget, BuildConfig.KOTLIN_TOOLING_VERSION)
     }
-
-    binaries.withType<AbstractNativeLibrary>().configureEach {
-        export(BuildConfig.RUNTIME_DEPENDENCY(konanTarget, BuildConfig.KOTLIN_TOOLING_VERSION))
+    configurationNames.forEach { configurationName ->
+        project.dependencies.add(configurationName, dependency)
     }
 }
 
-private fun BuildConfig.RUNTIME_DEPENDENCY(konanTarget: KonanTarget, kotlinVersion: String): String {
+private val BuildConfig.DEFAULT_RUNTIME_DEPENDENCY: String
+    get() = "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME:$RUNTIME_DEPENDENCY_VERSION"
+
+private fun BuildConfig.SPECIFIC_RUNTIME_DEPENDENCY(konanTarget: KonanTarget, kotlinVersion: String): String {
     return "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME-${konanTarget.presetName}__kgp_${kotlinVersion}:$RUNTIME_DEPENDENCY_VERSION"
 }
 

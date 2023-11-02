@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.subplugin
 
+import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.exclude
 import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.plugin.util.withType
@@ -8,9 +9,6 @@ import org.gradle.api.Project
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.FileCollection
-import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 internal object SkieSubPluginManager {
 
@@ -37,29 +35,24 @@ internal object SkieSubPluginManager {
         }
     }
 
-    fun registerSubPlugins(linkTask: KotlinNativeLink) {
-        val framework = linkTask.binary as? Framework ?: return
+    fun registerSubPlugins(target: SkieTarget) {
+        target.registerSubPluginsOptions()
 
-        linkTask.registerSubPluginsOptions(framework)
-
-        linkTask.registerSubPluginsToClasspath()
+        target.registerSubPluginsToClasspath()
     }
 
-    private fun KotlinNativeLink.registerSubPluginsOptions(framework: Framework) {
+    private fun SkieTarget.registerSubPluginsOptions() {
         project.skieSubPlugins.forEach { subPlugin ->
-            val options = subPlugin.getOptions(project, framework)
+            val options = subPlugin.getOptions(project, this)
 
             options.get().forEach {
-                compilerPluginOptions.addPluginArgument(subPlugin.compilerPluginId, it)
+                addPluginArgument(subPlugin.compilerPluginId, it)
             }
         }
     }
 
-    private fun KotlinNativeLink.registerSubPluginsToClasspath() {
-        compilerPluginClasspath = listOfNotNull(
-            compilerPluginClasspath,
-            project.configurations.getByName(subPluginConfigurationName),
-        ).reduce(FileCollection::plus)
+    private fun SkieTarget.registerSubPluginsToClasspath() {
+        addToCompilerClasspath(project.configurations.getByName(subPluginConfigurationName))
     }
 }
 

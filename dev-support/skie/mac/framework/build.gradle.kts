@@ -37,13 +37,13 @@ skie {
     }
 }
 
+val exportedLibraries = listOf<String>(
+
+)
+
 kotlin {
     macosX64()
     macosArm64()
-
-    val exportedLibraries = listOf<String>(
-
-    )
 
     targets.withType<KotlinNativeTarget> {
         binaries {
@@ -96,6 +96,20 @@ tasks.register("dependenciesForExport") {
 
         externalDependencies.forEach {
             println("export(\"$it\")")
+        }
+    }
+}
+
+kotlinArtifacts {
+    Native.Framework("Kotlin") {
+        target = macosArm64
+        isStatic = true
+        toolOptions {
+            freeCompilerArgs.add("-Xbinary=bundleId=Kotlin")
+        }
+
+        exportedLibraries.forEach {
+            addModule(it)
         }
     }
 }

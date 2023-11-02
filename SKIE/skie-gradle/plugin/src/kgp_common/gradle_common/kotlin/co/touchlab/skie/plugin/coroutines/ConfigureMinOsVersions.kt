@@ -1,16 +1,18 @@
 package co.touchlab.skie.plugin.coroutines
 
-import co.touchlab.skie.plugin.util.registerSkieLinkBasedTask
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
+import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 
-internal fun NativeBinary.registerConfigureMinOsVersionTaskIfNeeded() {
+internal fun SkieTarget.registerConfigureMinOsVersionTaskIfNeeded() {
     if (!project.isCoroutinesInteropEnabled) {
         return
     }
 
-    val task = linkTask.registerSkieLinkBasedTask<ConfigureMinOsVersionTask>("configureMinOsVersion") {
-        this.binary.set(this@registerConfigureMinOsVersionTaskIfNeeded)
+    val configureMinOsVersionTask = registerSkieTargetBasedTask<ConfigureMinOsVersionTask>("configureMinOsVersion") {
+        this.target.set(this@registerConfigureMinOsVersionTaskIfNeeded)
     }
 
-    linkTask.dependsOn(task)
+    task.configure {
+        dependsOn(configureMinOsVersionTask)
+    }
 }
