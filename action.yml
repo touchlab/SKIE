@@ -1,0 +1,36 @@
+name: Prepare Job Worker
+description: Prepares a job worker for running Gradle tasks on SKIE project
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+      with:
+      submodules: true
+      token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+    - uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      env:
+        GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: 'true'
+      with:
+        cache-disabled: true
+    - name: Run Acceptance Tests
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: ':acceptance-tests:functional__kgp_latestTest'
+        build-root-directory: SKIE
+      env:
+        KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+        KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+      - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v3
+      if: ${{ failure() || success() }}
+      with:
+        check_name: "Smoke Test Reports - Functional Tests"
+        report_paths: 'SKIE/acceptance-tests/build/test-results/functional__*/TEST-*.xml'
+        require_tests: true
