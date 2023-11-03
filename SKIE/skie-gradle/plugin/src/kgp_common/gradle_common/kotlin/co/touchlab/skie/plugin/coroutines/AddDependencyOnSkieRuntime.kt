@@ -4,6 +4,7 @@ import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.skieInternal
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeXCFramework
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractNativeLibrary
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.target.presetName
@@ -14,10 +15,14 @@ internal fun SkieTarget.addDependencyOnSkieRuntime() {
             binary.compilation.apiConfigurationName,
             (binary as? AbstractNativeLibrary)?.exportConfigurationName,
         )
-        is SkieTarget.Artifact -> listOf(
-            lowerCamelCaseName(konanTarget.presetName, artifact.artifactName, "linkLibrary"),
-            lowerCamelCaseName(konanTarget.presetName, artifact.artifactName, "linkExport"),
-        )
+
+        is SkieTarget.Artifact -> {
+            val nameSuffix = SkieTarget.Artifact.artifactNameSuffix(artifact)
+            listOf(
+                lowerCamelCaseName(konanTarget.presetName, artifact.artifactName + nameSuffix, "linkLibrary"),
+                lowerCamelCaseName(konanTarget.presetName, artifact.artifactName + nameSuffix, "linkExport"),
+            )
+        }
     }
 
     val dependency = if (project.skieInternal.runtimeVariantFallback.get()) {

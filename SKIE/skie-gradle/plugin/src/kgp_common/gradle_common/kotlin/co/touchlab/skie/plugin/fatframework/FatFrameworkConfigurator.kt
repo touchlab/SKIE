@@ -31,9 +31,16 @@ internal object FatFrameworkConfigurator {
     private fun Project.configureFatFrameworkPatching() {
         tasks.withType<FatFrameworkTask>().configureEach {
             doLastOptimized {
+                // There shouldn't be any real difference between the frameworks except for architecture, so we consider the first one "primary"
+                val primaryFramework = frameworks.first()
                 val target = FrameworkLayout(
                     rootDir = fatFramework,
-                    isMacosFramework = frameworks.first().target.family == Family.OSX,
+                    isMacosFramework = primaryFramework.files.isMacosFramework,
+                )
+
+                // FatFramewrokTask writes its own
+                target.moduleFile.writeText(
+                    primaryFramework.files.moduleFile.readText()
                 )
 
                 val frameworksByArchs = frameworks.associateBy { it.target.architecture }
@@ -56,10 +63,10 @@ internal object FatFrameworkConfigurator {
                         }
                         writer.appendLine(
                             """
-                                    #else
-                                    #error Unsupported platform
-                                    #endif
-                                    """.trimIndent(),
+                            #else
+                            #error Unsupported platform
+                            #endif
+                            """.trimIndent(),
                         )
                     }
                 }

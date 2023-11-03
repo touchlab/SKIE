@@ -114,7 +114,9 @@ sealed interface SkieTarget {
         override fun addToCompilerClasspath(fileCollection: FileCollection) {
             task.configure {
                 toolOptions.freeCompilerArgs.addAll(
-                    fileCollection.files.map { it.canonicalPath }.sorted().map { "-Xplugin=$it" }
+                    project.provider {
+                        fileCollection.files.map { it.canonicalPath }.sorted().map { "-Xplugin=$it" }
+                    }
                 )
             }
         }
@@ -127,7 +129,13 @@ sealed interface SkieTarget {
             }
         }
 
-        private companion object {
+        companion object {
+            fun artifactNameSuffix(artifact: KotlinNativeArtifact): String = when (artifact) {
+                is KotlinNativeFatFramework -> "ForFat"
+                is KotlinNativeXCFramework -> "ForXCF"
+                else -> ""
+            }
+
             fun linkTaskName(artifact: KotlinNativeArtifact, konanTarget: KonanTarget, buildType: NativeBuildType): String {
                 return when (artifact) {
                     is KotlinNativeLibrary -> {
@@ -141,28 +149,13 @@ sealed interface SkieTarget {
                             konanTarget.presetName,
                         )
                     }
-                    is KotlinNativeFramework -> lowerCamelCaseName(
-                        "assemble",
-                        artifact.artifactName,
-                        buildType.visibleName,
-                        NativeOutputKind.FRAMEWORK.taskNameClassifier,
-                        konanTarget.presetName
-                    )
-                    is KotlinNativeFatFramework -> lowerCamelCaseName(
+                    is KotlinNativeFramework, is KotlinNativeFatFramework, is KotlinNativeXCFramework -> lowerCamelCaseName(
                         "assemble",
                         artifact.artifactName,
                         buildType.visibleName,
                         NativeOutputKind.FRAMEWORK.taskNameClassifier,
                         konanTarget.presetName,
-                        "ForFat",
-                    )
-                    is KotlinNativeXCFramework -> lowerCamelCaseName(
-                        "assemble",
-                        artifact.artifactName,
-                        buildType.visibleName,
-                        NativeOutputKind.FRAMEWORK.taskNameClassifier,
-                        konanTarget.presetName,
-                        "ForXCF",
+                        artifactNameSuffix(artifact),
                     )
                     else -> error("Unknown KotlinNativeArtifact type: $this")
                 }
