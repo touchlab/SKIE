@@ -1,6 +1,12 @@
 name: Prepare Job Worker
 description: Prepares a job worker for running Gradle tasks on SKIE project
 
+inputs:
+  github-token:
+    description: 'GitHub token'
+    required: true
+
+
 runs:
   using: composite
   steps:
@@ -8,7 +14,7 @@ runs:
       uses: actions/checkout@v3
       with:
         submodules: true
-        token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+        token: ${{ inputs.github-token }}
     - uses: actions/setup-java@v3
       with:
         distribution: temurin
@@ -24,9 +30,6 @@ runs:
       with:
         arguments: ':acceptance-tests:functional__kgp_latestTest'
         build-root-directory: SKIE
-      env:
-        KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-        KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
       - name: Publish Test Report
       uses: mikepenz/action-junit-report@v3
       if: ${{ failure() || success() }}

@@ -15,4 +15,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: touchlab/SKIE@tk/smoke-tests
+        with:
+          github-token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
     
