@@ -17,6 +17,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
 import org.jetbrains.kotlin.konan.target.HostManager
 
@@ -57,7 +58,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         kotlinMultiplatformExtension?.appleTargets?.all {
             val target = this
-            binaries.all {
+            binaries.withType<Framework>().all {
                 val binary = this
                 skieInternal.targets.add(
                     SkieTarget.TargetBinary(
