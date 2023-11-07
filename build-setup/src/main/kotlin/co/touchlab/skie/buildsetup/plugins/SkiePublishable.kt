@@ -29,12 +29,26 @@ abstract class SkiePublishable : Plugin<Project>, HasMavenPublishPlugin, HasSign
 
         val extension = extensions.create<SkiePublishingExtension>("skiePublishing")
 
+        configureSmokeTestTmpRepository()
         configureMetadata(extension)
         configureKotlinJvmPublicationIfNeeded()
         configureSourcesJar(extension)
         configureJavadocJar()
     }
 
+    private fun Project.configureSmokeTestTmpRepository() {
+        val smokeTestTmpRepositoryPath: String? by this
+        smokeTestTmpRepositoryPath?.let {
+            publishing {
+                repositories {
+                    maven {
+                        url = uri(it)
+                        name = "smokeTestTmpRepository"
+                    }
+                }
+            }
+        }
+    }
     private fun Project.configureSigningIfNeeded() {
         val isRelease = !version.toString().endsWith("SNAPSHOT")
         val isPublishing = gradle.startParameter.taskNames.contains("publishToSonatype")
