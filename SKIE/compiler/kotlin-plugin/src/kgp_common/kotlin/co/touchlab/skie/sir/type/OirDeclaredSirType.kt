@@ -37,7 +37,7 @@ data class OirDeclaredSirType(
 
     private fun getType(selectedClass: SirClass): SirDeclaredSirType {
         val convertedTypeArguments = selectedClass.typeParameters
-            .mapIndexed { index, typeParameter -> typeParameter to (typeArguments.getOrNull(index) ?: SpecialReferenceOirType.Id)  }
+            .mapIndexed { index, typeParameter -> typeParameter to (typeArguments.getOrNull(index) ?: SpecialReferenceOirType.Id) }
             .map { (typeParameter, typeArgument) ->
                 mapTypeArgument(typeArgument, typeParameter)
             }

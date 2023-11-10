@@ -4,8 +4,8 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConstructor
-import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom

@@ -1,7 +1,6 @@
 package co.touchlab.skie.phases.sir.type
 
 import co.touchlab.skie.kir.element.KirClass
-import co.touchlab.skie.kir.element.classDescriptorOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirVisibility

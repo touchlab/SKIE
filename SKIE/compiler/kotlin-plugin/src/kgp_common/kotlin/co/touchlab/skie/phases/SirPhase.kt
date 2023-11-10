@@ -11,7 +11,6 @@ import co.touchlab.skie.sir.SkieNamespaceProvider
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.type.translation.SirTypeTranslator
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 
 interface SirPhase : SkiePhase<SirPhase.Context> {
 

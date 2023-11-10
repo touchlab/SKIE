@@ -2,10 +2,7 @@ package co.touchlab.skie.oir
 
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
-import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirModule
-import co.touchlab.skie.kir.element.classDescriptorOrNull
-import co.touchlab.skie.kir.element.sourceFileOrNull
 import co.touchlab.skie.oir.builtin.OirBuiltins
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.OirFile

@@ -10,8 +10,8 @@ import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.receiverDeclaration
-import co.touchlab.skie.sir.element.resolveAsSirClassType
 import co.touchlab.skie.sir.element.resolveAsSirClass
+import co.touchlab.skie.sir.element.resolveAsSirClassType
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.OirDeclaredSirType

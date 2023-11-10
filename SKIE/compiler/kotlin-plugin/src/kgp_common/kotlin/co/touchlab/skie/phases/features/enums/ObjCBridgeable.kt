@@ -4,8 +4,8 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirScope
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility

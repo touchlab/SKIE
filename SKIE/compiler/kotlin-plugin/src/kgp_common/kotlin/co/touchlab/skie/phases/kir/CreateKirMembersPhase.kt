@@ -7,9 +7,9 @@ import co.touchlab.skie.kir.element.KirCallableDeclaration.Origin
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
 import co.touchlab.skie.kir.element.KirFunction
-import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirProperty
 import co.touchlab.skie.kir.element.KirScope
+import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.oir.element.OirFunction

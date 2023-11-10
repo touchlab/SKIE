@@ -2,8 +2,8 @@ package co.touchlab.skie.phases.sir.member
 
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirConstructor
-import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirProperty
+import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.phases.SirPhase
 

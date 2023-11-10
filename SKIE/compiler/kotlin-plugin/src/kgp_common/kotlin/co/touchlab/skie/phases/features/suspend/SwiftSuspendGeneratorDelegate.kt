@@ -164,7 +164,8 @@ private data class BridgeModel(
     val kotlinBridgingKirFunction: KirSimpleFunction,
 ) {
 
-    val originalFunction: SirSimpleFunction = suspendKirFunction.bridgedSirFunction ?: error("Suspend function $suspendKirFunction does not have an async bridge.")
+    val originalFunction: SirSimpleFunction =
+        suspendKirFunction.bridgedSirFunction ?: error("Suspend function $suspendKirFunction does not have an async bridge.")
 
     val kotlinBridgingFunction: SirSimpleFunction = kotlinBridgingKirFunction.originalSirFunction
 

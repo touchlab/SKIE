@@ -14,5 +14,6 @@ class KirEnumEntry(
     init {
         parent.enumEntries.add(this)
     }
+
     override fun toString(): String = "${this::class.simpleName}: $descriptor"
 }

@@ -5,8 +5,8 @@ import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
-import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirProperty
+import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.phases.SirPhase
 
 class FileScopeConvertor(

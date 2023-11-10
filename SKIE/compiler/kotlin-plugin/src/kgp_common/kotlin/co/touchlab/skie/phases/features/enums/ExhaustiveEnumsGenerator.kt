@@ -12,10 +12,10 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
-import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirGetter
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isExported

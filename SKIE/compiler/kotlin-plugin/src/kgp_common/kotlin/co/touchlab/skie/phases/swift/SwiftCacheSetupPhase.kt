@@ -24,9 +24,9 @@ object SwiftCacheSetupPhase : SirPhase {
 
         // Must use `or` to prevent short circuit optimization.
         return framework.kotlinHeader.copyFileToIfDifferent(dummyFramework.kotlinHeader) or
-                framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
-                skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName)
-                    .copyFileToIfDifferent(dummyFramework.apiNotes)
+            framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
+            skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName)
+                .copyFileToIfDifferent(dummyFramework.apiNotes)
     }
 
     // Solves a bug in Swift compiler.

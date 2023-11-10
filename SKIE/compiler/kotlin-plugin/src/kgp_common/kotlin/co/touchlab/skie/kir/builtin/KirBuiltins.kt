@@ -59,7 +59,7 @@ class KirBuiltins(
 
         val kotlinSuperType = KotlinTypeFactory.simpleType(
             baseType = extraDescriptorBuiltins.NSMutableDictionary.defaultType,
-            arguments = listOf(keyArgument, valueArgument)
+            arguments = listOf(keyArgument, valueArgument),
         )
 
         superTypes.add(

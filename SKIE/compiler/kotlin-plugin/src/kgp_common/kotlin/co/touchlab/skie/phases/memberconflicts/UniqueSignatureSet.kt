@@ -2,8 +2,8 @@ package co.touchlab.skie.phases.memberconflicts
 
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirConstructor
-import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.getEntireOverrideHierarchy
 
 class UniqueSignatureSet {
@@ -52,8 +52,8 @@ class UniqueSignatureSet {
                     val lastValueParameter = this.valueParameters.lastOrNull()
                         ?: error(
                             "Cannot mangle $this because it does not have any value parameters. " +
-                                    "This should never happen because constructors without value parameters " +
-                                    "shouldn't create conflicts (as they are processed first)."
+                                "This should never happen because constructors without value parameters " +
+                                "shouldn't create conflicts (as they are processed first).",
                         )
 
                     lastValueParameter.label = lastValueParameter.labelOrName + "_"

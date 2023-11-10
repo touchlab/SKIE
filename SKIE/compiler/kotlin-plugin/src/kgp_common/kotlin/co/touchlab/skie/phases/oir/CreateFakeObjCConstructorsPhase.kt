@@ -7,7 +7,6 @@ import co.touchlab.skie.oir.element.constructors
 import co.touchlab.skie.oir.element.copyValueParametersFrom
 import co.touchlab.skie.oir.element.superClass
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.shallowCopy

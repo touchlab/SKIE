@@ -4,8 +4,8 @@ import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
 import co.touchlab.skie.kir.element.KirFunction
-import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirProperty
+import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.kir.element.classDescriptorOrError
 import co.touchlab.skie.kir.type.BlockPointerKirType

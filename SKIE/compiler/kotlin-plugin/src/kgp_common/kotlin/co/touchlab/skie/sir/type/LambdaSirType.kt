@@ -1,7 +1,6 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
-import co.touchlab.skie.sir.element.toTypeParameterUsage
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.ParameterSpec

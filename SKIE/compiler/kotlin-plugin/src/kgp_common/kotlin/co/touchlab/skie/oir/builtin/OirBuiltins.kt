@@ -5,7 +5,6 @@ import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.OirTypeParameter
 import co.touchlab.skie.oir.element.toTypeParameterUsage
-import co.touchlab.skie.oir.type.TypeParameterUsageOirType
 
 @Suppress("PropertyName")
 class OirBuiltins(

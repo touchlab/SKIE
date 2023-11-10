@@ -1,7 +1,6 @@
 package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
-import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 
 class SirConstructor(

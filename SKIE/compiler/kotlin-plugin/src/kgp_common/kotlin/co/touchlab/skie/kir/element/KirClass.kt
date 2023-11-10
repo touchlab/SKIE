@@ -1,7 +1,6 @@
 package co.touchlab.skie.kir.element
 
 import co.touchlab.skie.kir.configuration.KirConfiguration
-import co.touchlab.skie.kir.irbuilder.impl.namespace.nameOrError
 import co.touchlab.skie.kir.type.ReferenceKirType
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.sir.element.SirClass
@@ -91,7 +90,6 @@ val KirClass.classDescriptorOrNull: ClassDescriptor?
 
 val KirClass.classDescriptorOrError: ClassDescriptor
     get() = classDescriptorOrNull ?: error("Class descriptor is not available for file classes. Was: $this")
-
 
 val KirClass.sourceFileOrNull: SourceFile?
     get() = when (val descriptor = descriptor) {

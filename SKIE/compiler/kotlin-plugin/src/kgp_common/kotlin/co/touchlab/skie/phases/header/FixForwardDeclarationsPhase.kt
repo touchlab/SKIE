@@ -1,6 +1,5 @@
 package co.touchlab.skie.phases.header
 
-import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.renderForwardDeclaration
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.header.util.BaseHeaderModificationPhase
