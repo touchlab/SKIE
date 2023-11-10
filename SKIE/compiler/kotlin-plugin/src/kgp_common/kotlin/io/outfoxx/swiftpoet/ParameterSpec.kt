@@ -146,14 +146,12 @@ internal fun List<ParameterSpec>.emit(
   emit("(")
   when {
     size > 2 || forceNewLines -> {
-      emit("\n")
       indent(1)
       forEachIndexed { index, parameter ->
         if (index > 0) emit(",\n")
         emitParameter(parameter)
       }
       unindent(1)
-      emit("\n")
     }
     size == 0 -> emit("")
     size == 1 -> emitParameter(params[0])

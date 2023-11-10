@@ -85,11 +85,9 @@ class TypeSpec private constructor(
 
       codeWriter.pushType(this)
       codeWriter.indent()
-      var firstMember = true
 
       if (associatedTypes.isNotEmpty()) {
         codeWriter.emit("\n")
-        firstMember = false
         for (associatedType in associatedTypes) {
           codeWriter.emit("associatedtype ")
           associatedType.emit(codeWriter)
@@ -100,7 +98,6 @@ class TypeSpec private constructor(
 
       if (enumCases.isNotEmpty()) {
         codeWriter.emit("\n")
-        firstMember = false
         val i = enumCases.iterator()
         while (i.hasNext()) {
           i.next().emit(codeWriter)
@@ -115,13 +112,11 @@ class TypeSpec private constructor(
           propertySpec.emit(codeWriter, kind.implicitPropertyModifiers)
           codeWriter.emit("\n")
         }
-        firstMember = false
       }
 
       // Constructors.
       val constructors = funSpecs.filter { it.isConstructor }
       if (constructors.isNotEmpty()) {
-        firstMember = false
         constructors.forEachIndexed { index, funSpec ->
           codeWriter.emit("\n")
           funSpec.emit(codeWriter, name, kind.implicitFunctionModifiers)
@@ -132,7 +127,6 @@ class TypeSpec private constructor(
       // Functions.
       val functions = funSpecs.filterNot { it.isConstructor }
       if (functions.isNotEmpty()) {
-        firstMember = false
         functions.forEachIndexed { index, funSpec ->
           codeWriter.emit("\n")
           funSpec.emit(codeWriter, name, kind.implicitFunctionModifiers)
@@ -142,7 +136,6 @@ class TypeSpec private constructor(
 
       // Types.
       if (typeSpecs.isNotEmpty()) {
-        firstMember = false
         typeSpecs.forEach { typeSpec ->
           codeWriter.emit("\n")
           typeSpec.emit(codeWriter)
@@ -152,11 +145,7 @@ class TypeSpec private constructor(
       codeWriter.unindent()
       codeWriter.popType()
 
-      if (!firstMember) {
-        codeWriter.emit("\n")
-      }
-
-      codeWriter.emit("}\n")
+      codeWriter.emit("\n}\n")
     } finally {
       codeWriter.statementLine = previousStatementLine
     }

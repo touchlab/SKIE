@@ -49,13 +49,20 @@ internal class CodeWriter(
    */
   var statementLine = -1
 
-  fun indent(levels: Int = 1) = apply {
+  fun indent(levels: Int = 1): CodeWriter = apply {
     indentLevel += levels
+    if (!trailingNewline) {
+      emit("\n")
+    }
   }
 
-  fun unindent(levels: Int = 1) = apply {
+  fun unindent(levels: Int = 1): CodeWriter = apply {
     require(indentLevel - levels >= 0) { "cannot unindent $levels from $indentLevel" }
     indentLevel -= levels
+
+    if (!trailingNewline) {
+      emit("\n")
+    }
   }
 
   val currentModule: String get() = this.moduleStack.last()
@@ -242,7 +249,7 @@ internal class CodeWriter(
           statementLine = -1
         }
 
-        "%W" -> out.wrappingSpace(indentLevel + 2)
+        "%W" -> emitWrappingSpace()
 
         else -> emit(part)
       }
@@ -251,6 +258,7 @@ internal class CodeWriter(
 
   fun emitWrappingSpace() = apply {
     out.wrappingSpace(indentLevel + 2)
+    trailingNewline = false
   }
 
   private fun emitLiteral(o: Any?) {
@@ -370,7 +378,7 @@ internal class CodeWriter(
    * [CodeWriter.out] does it through here, since we emit indentation lazily in order to avoid
    * unnecessary trailing whitespace.
    */
-  fun emit(s: String) = apply {
+  fun emit(s: String): CodeWriter = apply {
     var first = true
     for (line in s.split('\n')) {
       // Emit a newline character. Make sure blank lines in doc & comments look good.
@@ -403,7 +411,7 @@ internal class CodeWriter(
       }
 
       out.append(line)
-      trailingNewline = false
+      trailingNewline = line.trimEnd { it.isWhitespace() && it != '\n' }.endsWith('\n')
     }
   }
 

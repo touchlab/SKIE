@@ -109,11 +109,7 @@ class ExtensionSpec private constructor(
       codeWriter.popType()
       codeWriter.popModule()
 
-      if (typeSpecs.isNotEmpty() || propertySpecs.isNotEmpty() || funSpecs.isNotEmpty()) {
-        codeWriter.emit("\n")
-      }
-
-      codeWriter.emit("}\n")
+      codeWriter.emit("\n}\n")
     } finally {
       codeWriter.statementLine = previousStatementLine
     }
