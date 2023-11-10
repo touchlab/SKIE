@@ -96,6 +96,12 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                             "acceptanceTest", System.getenv("acceptanceTest"),
                         ).optional(true)
                         inputs.property(
+                            "libraryTest", System.getenv("libraryTest"),
+                        ).optional(true)
+                        inputs.property(
+                            "onlyIndices", System.getenv("onlyIndices"),
+                        ).optional(true)
+                        inputs.property(
                             "kotlinLinkMode", System.getenv("KOTLIN_LINK_MODE"),
                         ).optional(true)
                         inputs.property(
