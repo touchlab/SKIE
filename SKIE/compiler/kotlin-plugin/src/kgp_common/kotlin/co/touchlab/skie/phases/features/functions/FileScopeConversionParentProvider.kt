@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.functions
 
 import co.touchlab.skie.kir.element.KirCallableDeclaration
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
@@ -95,15 +96,19 @@ class FileScopeConversionParentProvider(
         callableDeclaration: KirCallableDeclaration<*>,
         parentType: SirType,
     ): SirFile {
-        val extensionReceiverKirClass = when (parentType) {
-            is SirDeclaredSirType -> parentType.declaration.resolveAsSirClass()?.let { context.kirProvider.findClass(it) }
-            is OirDeclaredSirType -> context.kirProvider.findClass(parentType.declaration)
-            else -> null
-        }
+        val extensionReceiverKirClass = getExtensionReceiverKirClassIfExists(parentType)
 
         return extensionReceiverKirClass?.let { context.skieNamespaceProvider.getNamespaceFile(it) }
             ?: context.skieNamespaceProvider.getNamespaceFile(callableDeclaration.owner)
     }
+
+    private fun getExtensionReceiverKirClassIfExists(parentType: SirType): KirClass? =
+        when (parentType) {
+            is SirDeclaredSirType -> parentType.declaration.resolveAsSirClass()?.let { context.kirProvider.findClass(it) }
+            is OirDeclaredSirType -> context.kirProvider.findClass(parentType.declaration)
+            is NullableSirType -> getExtensionReceiverKirClassIfExists(parentType.type)
+            else -> null
+        }
 
     private fun createNonOptionalExtension(file: SirFile, sirClass: SirClass): SirExtension? =
         if (sirClass.typeParameters.isEmpty()) {
@@ -116,7 +121,6 @@ class FileScopeConversionParentProvider(
             null
         }
 
-    // WIP Test nullable class extensions
     private fun getOptionalExtensions(callableDeclaration: KirCallableDeclaration<*>, type: NullableSirType, namespace: SirFile): List<SirExtension> {
         val nonNullType = type.type
 

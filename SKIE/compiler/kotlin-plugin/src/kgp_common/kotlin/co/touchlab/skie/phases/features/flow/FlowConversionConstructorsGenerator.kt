@@ -80,7 +80,12 @@ class FlowConversionConstructorsGenerator(
             variant,
             file,
             sirBuiltins.Swift.AnyObject.defaultType,
-        ) { it }
+        ) { flowTypeParameter ->
+            val flowTypeArgument = flowTypeParameter.toTypeParameterUsage()
+
+            addConversions(variant) { from -> addKotlinToSwiftConversion(from, flowTypeArgument) }
+            addConversions(variant) { from -> addSwiftToSwiftConversion(from, flowTypeArgument) }
+        }
     }
 
     private fun generateSwiftClassWithBridgeableConversions(variant: SupportedFlow.Variant, file: SirFile) {
@@ -88,14 +93,23 @@ class FlowConversionConstructorsGenerator(
             variant,
             file,
             sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
-        ) { it.typeParameter(sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first()) }
+        ) { flowTypeParameter ->
+            val bridgeableTypeParameter = sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first()
+
+            val flowTypeArgument = flowTypeParameter.toTypeParameterUsage()
+            val bridgeableTypeArgument = flowTypeArgument.typeParameter(bridgeableTypeParameter)
+
+            addConversions(variant) { from -> addKotlinToSwiftConversion(from, bridgeableTypeArgument) }
+            addConversions(variant) { from -> addSwiftToSwiftConversion(from, bridgeableTypeArgument) }
+            addConversions(variant) { from -> addSwiftToSwiftConversion(from, flowTypeArgument) }
+        }
     }
 
     private fun generateSwiftClassConversions(
         variant: SupportedFlow.Variant,
         file: SirFile,
         typeBound: SirType,
-        flowTypeArgumentFactory: (TypeParameterUsageSirType) -> SirType,
+        bodyFactory: SirExtension.(SirTypeParameter) -> Unit,
     ) {
         SirExtension(
             classDeclaration = variant.swiftClass,
@@ -108,10 +122,7 @@ class FlowConversionConstructorsGenerator(
                 bounds = listOf(typeBound),
             )
 
-            val flowTypeArgument = flowTypeArgumentFactory(typeParameter.toTypeParameterUsage())
-
-            addConversions(variant) { from -> addKotlinToSwiftConversion(from, flowTypeArgument) }
-            addConversions(variant) { from -> addSwiftToSwiftConversion(from, flowTypeArgument) }
+            bodyFactory(typeParameter)
         }
     }
 

@@ -1,6 +1,5 @@
 package co.touchlab.skie.sir.element
 
-// WIP Check that visibility is correctly filtered in all refactored project
 sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {
 
     /**
