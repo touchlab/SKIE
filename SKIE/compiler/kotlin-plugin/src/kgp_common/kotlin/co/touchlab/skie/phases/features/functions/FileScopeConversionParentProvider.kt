@@ -122,25 +122,28 @@ class FileScopeConversionParentProvider(
         }
 
     private fun getOptionalExtensions(callableDeclaration: KirCallableDeclaration<*>, type: NullableSirType, namespace: SirFile): List<SirExtension> {
-        val nonNullType = type.type
+//         val nonNullType = type.type
+//
+//         val constraintType = when (nonNullType) {
+//             is DeclaredSirType -> nonNullType.evaluate().type.resolveAsSirClassType() ?: return emptyList()
+//             SpecialSirType.Any -> oirBuiltins.NSObject.originalSirClass.defaultType
+//             else -> return emptyList()
+//         }
+//
+//         return getExtensions(callableDeclaration, nonNullType) + createOptionalExtension(namespace, constraintType)
 
-        val constraintType = when (nonNullType) {
-            is DeclaredSirType -> nonNullType.evaluate().type.resolveAsSirClassType() ?: return emptyList()
-            SpecialSirType.Any -> oirBuiltins.NSObject.originalSirClass.defaultType
-            else -> return emptyList()
-        }
-
-        return getExtensions(callableDeclaration, nonNullType) + createOptionalExtension(namespace, constraintType)
+        // TODO Not supported properly yet (support is missing for structs, enums and unsupportable types)
+        return emptyList()
     }
 
-    private fun createOptionalExtension(parent: SirFile, constraintType: SirDeclaredSirType): SirExtension =
-        SirExtension(
-            classDeclaration = sirProvider.sirBuiltins.Swift.Optional,
-            parent = parent,
-        ).apply {
-            SirConditionalConstraint(
-                typeParameter = sirProvider.sirBuiltins.Swift.Optional.typeParameters.first(),
-                bounds = listOf(constraintType),
-            )
-        }
+//     private fun createOptionalExtension(parent: SirFile, constraintType: SirDeclaredSirType): SirExtension =
+//         SirExtension(
+//             classDeclaration = sirProvider.sirBuiltins.Swift.Optional,
+//             parent = parent,
+//         ).apply {
+//             SirConditionalConstraint(
+//                 typeParameter = sirProvider.sirBuiltins.Swift.Optional.typeParameters.first(),
+//                 bounds = listOf(constraintType),
+//             )
+//         }
 }
