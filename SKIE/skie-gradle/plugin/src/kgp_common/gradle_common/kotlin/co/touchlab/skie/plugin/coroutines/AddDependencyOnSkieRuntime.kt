@@ -10,6 +10,10 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.target.presetName
 
 internal fun SkieTarget.addDependencyOnSkieRuntime() {
+    if (!project.isCoroutinesInteropEnabled) {
+        return
+    }
+
     val configurationNames = when (this) {
         is SkieTarget.TargetBinary -> listOfNotNull(
             binary.compilation.apiConfigurationName,
