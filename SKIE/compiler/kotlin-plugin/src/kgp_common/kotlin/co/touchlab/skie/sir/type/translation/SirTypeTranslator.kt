@@ -116,7 +116,6 @@ class SirTypeTranslator(
             SpecialReferenceOirType.Class -> sirBuiltins.Swift.AnyClass.defaultType
             SpecialReferenceOirType.Id -> SpecialSirType.Any
             SpecialReferenceOirType.InstanceType -> SpecialSirType.Self
-            SpecialReferenceOirType.Protocol -> SpecialSirType.Protocol
         }
 
     private fun mapType(oirType: TypeParameterUsageOirType): SirType =

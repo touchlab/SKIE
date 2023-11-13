@@ -8,8 +8,6 @@ sealed class SpecialReferenceOirType(private val name: String) : NonNullReferenc
 
     object Class : SpecialReferenceOirType("Class")
 
-    object Protocol : SpecialReferenceOirType("Protocol")
-
     override fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String =
         name.withAttrsAndName(attrsAndName.plusNonnullAttributeIfNeeded(needsNonnullAttribute))
 }

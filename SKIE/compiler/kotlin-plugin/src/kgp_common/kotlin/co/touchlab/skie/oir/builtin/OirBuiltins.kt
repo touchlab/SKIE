@@ -15,6 +15,11 @@ class OirBuiltins(
 
     private val Foundation: OirModule.External = oirProvider.getExternalModule("Foundation")
 
+    val Protocol: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.Protocol, Foundation).apply {
+        name = "Protocol"
+        kind = OirClass.Kind.Class
+    }
+
     val NSObject: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSObject, Foundation)
 
     val NSError: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSError).apply {

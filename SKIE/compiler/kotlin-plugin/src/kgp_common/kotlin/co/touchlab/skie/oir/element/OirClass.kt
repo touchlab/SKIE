@@ -5,9 +5,9 @@ import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirClass
 
 class OirClass(
-    override val name: String,
+    override var name: String,
     override val parent: OirTopLevelDeclarationParent,
-    val kind: Kind,
+    var kind: Kind,
 ) : OirTypeDeclaration, OirCallableDeclarationParent {
 
     lateinit var originalSirClass: SirClass
