@@ -3,6 +3,7 @@ package co.touchlab.skie.oir.builtin
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.OirModule
 import co.touchlab.skie.oir.element.OirTypeParameter
 import co.touchlab.skie.oir.element.toTypeParameterUsage
 
@@ -12,7 +13,9 @@ class OirBuiltins(
     extraDescriptorBuiltins: ExtraDescriptorBuiltins,
 ) {
 
-    val NSObject: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSObject)
+    private val Foundation: OirModule.External = oirProvider.getExternalModule("Foundation")
+
+    val NSObject: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSObject, Foundation)
 
     val NSError: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSError).apply {
         superTypes.add(NSObject.defaultType)

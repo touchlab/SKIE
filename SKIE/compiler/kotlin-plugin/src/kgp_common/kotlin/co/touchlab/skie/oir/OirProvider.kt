@@ -86,10 +86,13 @@ class OirProvider(
             OirFile(name, oirModule)
         }
 
-    fun getExternalClass(descriptor: ClassDescriptor): OirClass =
+    fun getExternalClass(descriptor: ClassDescriptor, module: OirModule.External? = null): OirClass =
         externalClassesAndProtocolsCache.getOrPut(descriptor.original) {
-            val moduleName = descriptor.fqNameSafe.pathSegments()[1].asString()
-            val externalModule = getExternalModule(moduleName)
+            val externalModule = module ?: run {
+                val moduleName = descriptor.fqNameSafe.pathSegments()[1].asString()
+
+                getExternalModule(moduleName)
+            }
 
             val (name, kind) = if (descriptor.kind.isInterface) {
                 descriptor.name.asString().removeSuffix("Protocol") to OirClass.Kind.Protocol
@@ -101,7 +104,7 @@ class OirProvider(
 
             CreateOirTypesPhase.createTypeParameters(oirClass, descriptor.declaredTypeParameters, namer)
 
-            externalClassesAndProtocolsFqNameCache[moduleName to name] = oirClass
+            externalClassesAndProtocolsFqNameCache[externalModule.name to name] = oirClass
 
             oirClass
         }
