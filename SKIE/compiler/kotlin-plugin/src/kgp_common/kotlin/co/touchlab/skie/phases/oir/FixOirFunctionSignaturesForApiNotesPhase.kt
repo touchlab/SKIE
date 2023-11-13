@@ -99,11 +99,15 @@ class FixOirFunctionSignaturesForApiNotesPhase(
         }
 
     private fun OirType.collidesWith(reservedIdentifiers: Set<String>): Boolean {
-        if (this is DeclaredOirType && this.declaration is OirClass && this.declaration.kind == OirClass.Kind.Protocol) {
-            return "id" in reservedIdentifiers || this.declaration.name in reservedIdentifiers
+        return when {
+            this is DeclaredOirType && this.declaration is OirClass -> {
+                when (declaration.kind) {
+                    OirClass.Kind.Class -> this.declaration.name in reservedIdentifiers
+                    OirClass.Kind.Protocol -> "id" in reservedIdentifiers || this.declaration.name in reservedIdentifiers
+                }
+            }
+            else -> this.renderWithoutAttributes() in reservedIdentifiers
         }
-
-        return this.renderWithoutAttributes() in reservedIdentifiers
     }
 
     private fun OirType.renderWithoutAttributes(): String =
