@@ -80,13 +80,13 @@ class FixOirFunctionSignaturesForApiNotesPhase(
         }
 
     private fun OirType.substituteLeafType(reservedIdentifiers: Set<String>): OirType =
-        if (this.renderWithoutAttributes() in reservedIdentifiers) getOrCreateTypeDef(this).defaultType else this
+        if (this.collidesWith(reservedIdentifiers)) getOrCreateTypeDef(this).defaultType else this
 
     private fun NonNullReferenceOirType.substituteLeafType(reservedIdentifiers: Set<String>): NonNullReferenceOirType =
-        if (this.renderWithoutAttributes() in reservedIdentifiers) getOrCreateTypeDef(this).defaultType else this
+        if (this.collidesWith(reservedIdentifiers)) getOrCreateTypeDef(this).defaultType else this
 
     private fun DeclaredOirType.substituteLeafType(reservedIdentifiers: Set<String>): DeclaredOirType =
-        if (this.renderWithoutAttributes() in reservedIdentifiers) getOrCreateTypeDef(this).defaultType else this
+        if (this.collidesWith(reservedIdentifiers)) getOrCreateTypeDef(this).defaultType else this
 
     private fun getOrCreateTypeDef(type: OirType): OirTypeDef =
         typedefsMap.getOrPut(type) {
@@ -97,6 +97,14 @@ class FixOirFunctionSignaturesForApiNotesPhase(
                 visibility = OirVisibility.Private,
             )
         }
+
+    private fun OirType.collidesWith(reservedIdentifiers: Set<String>): Boolean {
+        if (this is DeclaredOirType && this.declaration is OirClass && this.declaration.kind == OirClass.Kind.Protocol) {
+            return "id" in reservedIdentifiers || this.declaration.name in reservedIdentifiers
+        }
+
+        return this.renderWithoutAttributes() in reservedIdentifiers
+    }
 
     private fun OirType.renderWithoutAttributes(): String =
         this.render("", false)
