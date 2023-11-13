@@ -6,9 +6,9 @@ import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirTypeDef
 import co.touchlab.skie.oir.element.OirVisibility
 import co.touchlab.skie.oir.element.allFunctions
-import co.touchlab.skie.oir.element.memberFunctions
 import co.touchlab.skie.oir.type.BlockPointerOirType
 import co.touchlab.skie.oir.type.DeclaredOirType
+import co.touchlab.skie.oir.type.NonNullReferenceOirType
 import co.touchlab.skie.oir.type.NullableReferenceOirType
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.oir.type.PointerOirType
@@ -73,7 +73,13 @@ class FixOirFunctionSignaturesForApiNotesPhase(
             }
             is TypeParameterUsageOirType -> this
             is SpecialReferenceOirType -> substituteLeafType(reservedIdentifiers)
-            is NullableReferenceOirType -> substituteLeafType(reservedIdentifiers)
+            is NullableReferenceOirType -> {
+                when (val innerType = nonNullType.substituteReservedIdentifiers(reservedIdentifiers)) {
+                    is NonNullReferenceOirType -> NullableReferenceOirType(innerType)
+                    is TypeDefOirType -> getOrCreateTypeDef(this).toType(innerType.typeArguments)
+                    else -> error("Unexpected inner type: $innerType")
+                }
+            }
             is PointerOirType -> copy(pointee = pointee.substituteReservedIdentifiers(reservedIdentifiers))
             is PrimitiveOirType, VoidOirType -> substituteLeafType(reservedIdentifiers)
             is TypeDefOirType -> {
