@@ -1,6 +1,7 @@
 package co.touchlab.skie.oir.element
 
 import co.touchlab.skie.oir.type.DeclaredOirType
+import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirClass
 
 class OirClass(
@@ -38,6 +39,12 @@ class OirClass(
         toType(emptyList())
     }
 
+    override fun toType(typeArguments: List<OirType>): DeclaredOirType =
+        DeclaredOirType(this, typeArguments = typeArguments)
+
+    override fun toType(vararg typeArguments: OirType): DeclaredOirType =
+        toType(typeArguments.toList())
+
     override fun toString(): String =
         "${this::class.simpleName}: $name"
 
@@ -48,22 +55,10 @@ class OirClass(
 }
 
 val OirClass.superClassType: DeclaredOirType?
-    get() = superTypes.map { it.resolveAsOirClassType() }
-        .firstOrNull { (it?.declaration as? OirClass)?.kind == OirClass.Kind.Class }
+    get() = superTypes.firstOrNull { it.declaration.kind == OirClass.Kind.Class }
 
 val OirClass.superClass: OirClass?
-    get() = superClassType?.declaration as? OirClass
-
-fun DeclaredOirType.resolveAsOirClassType(): DeclaredOirType? =
-    when (declaration) {
-        is OirClass -> this
-        is OirTypeDef -> {
-            when (val type = declaration.type) {
-                is DeclaredOirType -> type.resolveAsOirClassType()
-                else -> null
-            }
-        }
-    }
+    get() = superClassType?.declaration
 
 fun OirClass.renderForwardDeclaration(): String =
     if (typeParameters.isEmpty()) name else "$name<${typeParameters.joinToString(", ") { it.name }}>"

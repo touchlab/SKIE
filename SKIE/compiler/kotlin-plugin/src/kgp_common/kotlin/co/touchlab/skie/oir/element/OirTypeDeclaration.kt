@@ -1,17 +1,14 @@
 package co.touchlab.skie.oir.element
 
-import co.touchlab.skie.oir.type.DeclaredOirType
 import co.touchlab.skie.oir.type.OirType
 
 sealed interface OirTypeDeclaration : OirTopLevelDeclaration {
 
     val name: String
 
-    val defaultType: DeclaredOirType
+    val defaultType: OirType
 
-    fun toType(typeArguments: List<OirType>): DeclaredOirType =
-        DeclaredOirType(this, typeArguments = typeArguments)
+    fun toType(typeArguments: List<OirType>): OirType
 
-    fun toType(vararg typeArguments: OirType): DeclaredOirType =
-        toType(typeArguments.toList())
+    fun toType(vararg typeArguments: OirType): OirType
 }

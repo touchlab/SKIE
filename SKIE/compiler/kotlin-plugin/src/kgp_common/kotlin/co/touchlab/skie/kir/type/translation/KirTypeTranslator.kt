@@ -8,8 +8,6 @@ import co.touchlab.skie.kir.type.KirType
 import co.touchlab.skie.kir.type.OirBasedKirType
 import co.touchlab.skie.kir.type.ReferenceKirType
 import co.touchlab.skie.kir.type.SuspendCompletionKirType
-import co.touchlab.skie.oir.type.NonNullReferenceOirType
-import co.touchlab.skie.oir.type.NullableReferenceOirType
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.oir.type.PointerOirType
 import co.touchlab.skie.oir.type.PrimitiveOirType
@@ -118,15 +116,17 @@ class KirTypeTranslator {
     private fun KirType.makeNullableIfReferenceOrPointer(): KirType =
         when (this) {
             is BlockPointerKirType -> this.copy(kotlinType = kotlinType.makeNullable())
-            is OirBasedKirType -> when (this.oirType) {
-                is PointerOirType -> this.oirType.copy(nullable = true).toKirType()
-                is NonNullReferenceOirType -> NullableReferenceOirType(this.oirType).toKirType()
-                is PrimitiveOirType -> this
-                is NullableReferenceOirType -> this
-                VoidOirType -> this
-            }
+            is OirBasedKirType -> this.makeNullableIfReferenceOrPointer()
             is ReferenceKirType -> this.copy(kotlinType = kotlinType.makeNullable())
             is SuspendCompletionKirType -> this.copy(kotlinType = kotlinType.makeNullable())
             ErrorOutKirType -> this
+        }
+
+    private fun OirBasedKirType.makeNullableIfReferenceOrPointer(): KirType =
+        when (this.oirType) {
+            is PointerOirType -> this.oirType.copy(nullable = true).toKirType()
+            is PrimitiveOirType -> this
+            VoidOirType -> this
+            else -> error("Unsupported OirBasedKirType type: $this")
         }
 }

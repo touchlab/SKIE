@@ -1,8 +1,6 @@
 package co.touchlab.skie.sir.type.translation
 
-import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.OirFunction
-import co.touchlab.skie.oir.element.OirTypeDef
 import co.touchlab.skie.oir.type.BlockPointerOirType
 import co.touchlab.skie.oir.type.DeclaredOirType
 import co.touchlab.skie.oir.type.NullableReferenceOirType
@@ -10,6 +8,7 @@ import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.oir.type.PointerOirType
 import co.touchlab.skie.oir.type.PrimitiveOirType
 import co.touchlab.skie.oir.type.SpecialReferenceOirType
+import co.touchlab.skie.oir.type.TypeDefOirType
 import co.touchlab.skie.oir.type.TypeParameterUsageOirType
 import co.touchlab.skie.oir.type.VoidOirType
 import co.touchlab.skie.sir.builtin.SirBuiltins
@@ -33,7 +32,8 @@ class SirTypeTranslator(
             is PointerOirType -> mapType(oirType)
             is PrimitiveOirType -> mapType(oirType)
             is BlockPointerOirType -> mapType(oirType, isEscaping)
-            is DeclaredOirType -> mapType(oirType, isEscaping)
+            is DeclaredOirType -> mapType(oirType)
+            is TypeDefOirType -> mapType(oirType, isEscaping)
             is SpecialReferenceOirType -> mapType(oirType)
             is TypeParameterUsageOirType -> mapType(oirType)
             is NullableReferenceOirType -> mapType(oirType)
@@ -98,18 +98,18 @@ class SirTypeTranslator(
             isEscaping = isEscaping,
         )
 
+    private fun mapType(oirType: DeclaredOirType): SirType =
+        OirDeclaredSirType(
+            declaration = oirType.declaration,
+            typeArguments = oirType.typeArguments,
+            mapTypeArgument = ::mapTypeArgument,
+        )
+
     private fun mapType(
-        oirType: DeclaredOirType,
+        oirType: TypeDefOirType,
         isEscaping: Boolean,
     ): SirType =
-        when (oirType.declaration) {
-            is OirClass -> OirDeclaredSirType(
-                declaration = oirType.declaration,
-                typeArguments = oirType.typeArguments,
-                mapTypeArgument = ::mapTypeArgument,
-            )
-            is OirTypeDef -> mapType(oirType.declaration.type, isEscaping = isEscaping)
-        }
+        mapType(oirType.declaration.type, isEscaping = isEscaping)
 
     private fun mapType(oirType: SpecialReferenceOirType): SirType =
         when (oirType) {
