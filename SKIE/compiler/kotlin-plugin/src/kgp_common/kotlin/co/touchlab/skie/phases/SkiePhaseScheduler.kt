@@ -39,6 +39,7 @@ import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.DisableWildcardExportPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
+import co.touchlab.skie.phases.other.FixDuplicatedOverridenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
@@ -172,6 +173,7 @@ class SkiePhaseScheduler {
             AddAvailabilityToAsyncFunctionsPhase,
             RenameParametersNamedSelfPhase,
             FixCallableDeclarationsConflictsPhase,
+            FixDuplicatedOverridenFunctionsPhase,
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,
             FixOirFunctionSignaturesForApiNotesPhase(context),
             CreateFakeObjCConstructorsPhase,
