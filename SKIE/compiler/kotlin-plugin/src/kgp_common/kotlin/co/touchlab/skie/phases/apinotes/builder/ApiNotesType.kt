@@ -10,7 +10,7 @@ data class ApiNotesType(
     @SerialName("SwiftBridge")
     val bridgeFqName: String? = null,
     @SerialName("SwiftName")
-    val swiftFqName: String = "",
+    val swiftFqName: String? = null,
     @SerialName("SwiftPrivate")
     val isHidden: Boolean = false,
     @SerialName("Availability")

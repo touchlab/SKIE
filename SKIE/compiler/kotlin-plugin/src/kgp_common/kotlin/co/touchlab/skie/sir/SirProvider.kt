@@ -74,7 +74,7 @@ class SirProvider(
             SirModule.External(moduleName)
         }
 
-    fun getClassByFqName(fqName: SirFqName): SirClass {
+    fun findClassByFqName(fqName: SirFqName): SirClass? {
         val parent = fqName.parent?.let { getClassByFqName(it) }
 
         val possibleParentDeclarations = if (parent != null) {
@@ -91,8 +91,12 @@ class SirProvider(
             }
         }
 
-        error("SirClass with fqName $fqName not found.")
+        return null
     }
+
+    fun getClassByFqName(fqName: SirFqName): SirClass =
+        findClassByFqName(fqName)
+            ?: error("SirClass with fqName $fqName not found.")
 }
 
 context(SirProvider)

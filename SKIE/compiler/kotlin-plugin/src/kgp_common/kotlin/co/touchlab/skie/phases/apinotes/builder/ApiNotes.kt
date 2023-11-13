@@ -30,5 +30,7 @@ data class ApiNotes(
         )
 
         operator fun invoke(file: File): ApiNotes = coder.decodeFromStream(serializer(), file.inputStream())
+
+        fun fromString(string: String): ApiNotes = coder.decodeFromString(serializer(), string)
     }
 }

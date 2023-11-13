@@ -120,7 +120,7 @@ class OirProvider(
         sirClassCache = allClassesAndProtocols.associateBy { it.originalSirClass }
     }
 
-    fun findExistingExternalClass(moduleName: String, name: String): OirClass? =
+    fun findExistingExternalOirClass(moduleName: String, name: String): OirClass? =
         externalClassesAndProtocolsFqNameCache[moduleName to name]
 
     fun findClass(sirClass: SirClass): OirClass? =
