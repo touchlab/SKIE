@@ -2,7 +2,7 @@ package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.copyValueParametersFrom
-import co.touchlab.skie.oir.element.simpleFunctions
+import co.touchlab.skie.oir.element.memberSimpleFunctions
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyValueParametersFrom
@@ -16,7 +16,7 @@ object FixDuplicatedOverridenFunctionsPhase : SirPhase {
     context(SirPhase.Context)
     override fun execute() {
         oirProvider.allKotlinClassesAndProtocols
-            .flatMap { it.simpleFunctions }
+            .flatMap { it.memberSimpleFunctions }
             .forEach {
                 fixDuplicates(it)
             }

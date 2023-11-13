@@ -93,7 +93,7 @@ class CreateOirMembersPhase(
     }
 
     private fun getOirCallableDeclarationParent(kirCallableDeclaration: KirCallableDeclaration<*>): OirCallableDeclarationParent =
-        if (kirCallableDeclaration.origin == KirCallableDeclaration.Origin.Extension && kirCallableDeclaration.owner.kind != KirClass.Kind.Interface) {
+        if (kirCallableDeclaration.origin == KirCallableDeclaration.Origin.Extension && kirCallableDeclaration.owner.kind != KirClass.Kind.File) {
             getOrCreateExtension(kirCallableDeclaration.owner.oirClass)
         } else {
             kirCallableDeclaration.owner.oirClass

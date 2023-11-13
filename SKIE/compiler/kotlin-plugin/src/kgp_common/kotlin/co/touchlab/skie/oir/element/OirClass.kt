@@ -63,11 +63,17 @@ val OirClass.superClass: OirClass?
 fun OirClass.renderForwardDeclaration(): String =
     if (typeParameters.isEmpty()) name else "$name<${typeParameters.joinToString(", ") { it.name }}>"
 
-val OirClass.functions: List<OirFunction>
+val OirClass.memberFunctions: List<OirFunction>
     get() = callableDeclarations.filterIsInstance<OirFunction>()
 
 val OirClass.constructors: List<OirConstructor>
     get() = callableDeclarations.filterIsInstance<OirConstructor>()
 
-val OirClass.simpleFunctions: List<OirSimpleFunction>
+val OirClass.memberSimpleFunctions: List<OirSimpleFunction>
     get() = callableDeclarations.filterIsInstance<OirSimpleFunction>()
+
+val OirClass.allFunctions: List<OirFunction>
+    get() = callableDeclarationsIncludingExtensions.filterIsInstance<OirFunction>()
+
+val OirClass.allSimpleFunctions: List<OirSimpleFunction>
+    get() = callableDeclarationsIncludingExtensions.filterIsInstance<OirSimpleFunction>()

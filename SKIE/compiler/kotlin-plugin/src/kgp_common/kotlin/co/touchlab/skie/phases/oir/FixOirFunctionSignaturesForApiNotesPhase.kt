@@ -5,10 +5,10 @@ import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirTypeDef
 import co.touchlab.skie.oir.element.OirVisibility
-import co.touchlab.skie.oir.element.functions
+import co.touchlab.skie.oir.element.allFunctions
+import co.touchlab.skie.oir.element.memberFunctions
 import co.touchlab.skie.oir.type.BlockPointerOirType
 import co.touchlab.skie.oir.type.DeclaredOirType
-import co.touchlab.skie.oir.type.NonNullReferenceOirType
 import co.touchlab.skie.oir.type.NullableReferenceOirType
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.oir.type.PointerOirType
@@ -39,7 +39,7 @@ class FixOirFunctionSignaturesForApiNotesPhase(
     }
 
     private fun fixFunctionSignatures(oirClass: OirClass) {
-        oirClass.functions.forEach {
+        oirClass.allFunctions.forEach {
             fixFunctionSignature(it)
         }
     }
