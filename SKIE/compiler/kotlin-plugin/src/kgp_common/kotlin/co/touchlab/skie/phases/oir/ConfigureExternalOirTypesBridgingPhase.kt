@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.oir
 
+import co.touchlab.skie.oir.element.OirModule
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.apinotes.builder.ApiNotes
 import co.touchlab.skie.sir.SirFqName
@@ -11,37 +12,43 @@ class ConfigureExternalOirTypesBridgingPhase(
     val context: SirPhase.Context,
 ) : SirPhase {
 
+    private val oirProvider = context.oirProvider
+    private val sirProvider = context.sirProvider
+
+    private val sdkPath = context.configurables.absoluteTargetSysRoot.trimEnd('/') + '/'
+
     context(SirPhase.Context)
     override fun execute() {
-        val apiNotesEntries = getRelevantExternalApiNotesEntries(configurables.absoluteTargetSysRoot)
+        val apiNotesFilesByModuleName = getAllApiNotesFilesByModuleName()
 
-        apiNotesEntries.forEach {
-            configureBridging(it)
+        oirProvider.allExternalModules.forEach {
+            configureBridging(it, apiNotesFilesByModuleName)
         }
     }
 
-    private fun getRelevantExternalApiNotesEntries(sdkPath: String): List<ApiNotesEntry> {
-        val apiNotesFiles = getAllApiNotesFiles(sdkPath)
+    private fun configureBridging(module: OirModule, apiNotesFilesByModuleName: Map<String, List<File>>) {
+        val apiNotesEntries = getApiNotesEntries(module, apiNotesFilesByModuleName)
 
-        return apiNotesFiles
-            .flatMap { parseApiNotesFile(it) }
+        apiNotesEntries.forEach(::configureBridging)
     }
 
-    private fun getAllApiNotesFiles(sdkPath: String): List<File> {
-        val grepResult = Command(
-            "grep",
-            "--include=*.apinotes",
-            "--recursive",
-            "--files-with-matches",
-            "-E",
-            "SwiftBridge:|SwiftName:",
-            sdkPath.trimEnd('/') + '/',
-        ).execute()
+    private fun getApiNotesEntries(module: OirModule, apiNotesFilesByModuleName: Map<String, List<File>>): List<ApiNotesEntry> =
+        apiNotesFilesByModuleName[module.name]?.flatMap { parseApiNotesFile(it) } ?: emptyList()
 
-        return grepResult.outputLines
+    private fun getAllApiNotesFilesByModuleName(): Map<String, List<File>> =
+        Command(
+            "find",
+            sdkPath,
+            "-type",
+            "f",
+            "-name",
+            "*.apinotes",
+        )
+            .execute()
+            .outputLines
             .map { File(it) }
             .filter { it.exists() && it.isFile }
-    }
+            .groupBy { it.nameWithoutExtension }
 
     private fun parseApiNotesFile(file: File): List<ApiNotesEntry> =
         getApiNotesSegments(file).flatMap { getApiNotesEntries(it) }
@@ -99,7 +106,6 @@ class ConfigureExternalOirTypesBridgingPhase(
             }
             .filter { it.swiftName != null || it.bridgeSwiftName != null }
 
-    context(SirPhase.Context)
     private fun configureBridging(apiNotesEntry: ApiNotesEntry) {
         val oirClass = oirProvider.findExistingExternalOirClass(apiNotesEntry.moduleName, apiNotesEntry.objCName) ?: return
 
@@ -122,7 +128,6 @@ class ConfigureExternalOirTypesBridgingPhase(
         }
     }
 
-    context(SirPhase.Context)
     private fun getOrCreateSirClass(fqName: SirFqName): SirClass {
         sirProvider.findClassByFqName(fqName)?.let { return it }
 
