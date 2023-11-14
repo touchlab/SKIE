@@ -21,7 +21,7 @@ import kotlin.reflect.KProperty
 
 @Suppress("PropertyName", "FunctionName")
 class KirBuiltins(
-    private val stdlibModule: KirModule,
+    val stdlibModule: KirModule,
     private val kotlinBuiltIns: KotlinBuiltIns,
     private val extraDescriptorBuiltins: ExtraDescriptorBuiltins,
     private val namer: ObjCExportNamer,

@@ -43,6 +43,7 @@ object FixCallableDeclarationsConflictsPhase : SirPhase {
      * constructors without value parameters are processed first because they cannot be renamed
      * Non-removed declarations are prioritized
      * visibility (exported is prioritized)
+     * originating from Kotlin stdlib (is prioritized)
      * originating from Kotlin (is prioritized)
      * true member vs extension (member is prioritized)
      * receiverDeclaration is class vs. protocol (protocol is prioritized)
@@ -68,6 +69,7 @@ object FixCallableDeclarationsConflictsPhase : SirPhase {
                     SirVisibility.Removed -> 5
                 }
             }
+            .thenByDescending { it.getKirDeclarationOrNull()?.module == context.kirBuiltins.stdlibModule }
             .thenByDescending { it.isFromKotlin }
             .thenBy { it.parent is SirExtension }
             .thenByDescending { it.receiverDeclaration?.kind == SirClass.Kind.Protocol }
@@ -80,12 +82,12 @@ object FixCallableDeclarationsConflictsPhase : SirPhase {
                 }
             }
             .thenBy { declaration ->
-                (declaration.getKirClassOrNull() as? KirFunction<*>)?.valueParameters?.count { it.type.isInlinedType } ?: 0
+                (declaration.getKirDeclarationOrNull() as? KirFunction<*>)?.valueParameters?.count { it.type.isInlinedType } ?: 0
             }
             .thenBy { it.parent.containerFqName }
             .thenBy {
                 with(KonanManglerDesc) {
-                    it.getKirClassOrNull()?.descriptor?.signatureString(false)
+                    it.getKirDeclarationOrNull()?.descriptor?.signatureString(false)
                 } ?: ""
             }
 
@@ -102,7 +104,7 @@ object FixCallableDeclarationsConflictsPhase : SirPhase {
         }
 
     context(SirPhase.Context)
-    private fun SirCallableDeclaration.getKirClassOrNull(): KirCallableDeclaration<*>? =
+    private fun SirCallableDeclaration.getKirDeclarationOrNull(): KirCallableDeclaration<*>? =
         kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
 
     private val KirType.isInlinedType: Boolean

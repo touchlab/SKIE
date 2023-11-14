@@ -21,6 +21,9 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     val oirCallableDeclaration: OirCallableDeclaration
 
+    val module: KirModule
+        get() = owner.module
+
     enum class Origin {
 
         Member, Extension, Global
