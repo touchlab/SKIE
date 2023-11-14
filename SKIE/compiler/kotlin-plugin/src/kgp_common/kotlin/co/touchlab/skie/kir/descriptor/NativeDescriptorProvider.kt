@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -213,13 +212,7 @@ class NativeDescriptorProvider(
 
         return when {
             categoryClass != null -> categoryClass
-            descriptor is PropertyAccessorDescriptor -> {
-                if (mapper.isObjCProperty(descriptor.correspondingProperty)) {
-                    getReceiverClassDescriptorOrNull(descriptor.correspondingProperty)
-                } else {
-                    null
-                }
-            }
+            descriptor is PropertyAccessorDescriptor -> getReceiverClassDescriptorOrNull(descriptor.correspondingProperty)
             containingDeclaration is ClassDescriptor -> containingDeclaration
             else -> null
         }
