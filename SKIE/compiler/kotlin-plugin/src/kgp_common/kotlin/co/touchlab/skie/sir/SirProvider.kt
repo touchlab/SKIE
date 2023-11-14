@@ -56,6 +56,9 @@ class SirProvider(
     val allSkieGeneratedDeclarations: List<SirDeclaration>
         get() = skieModule.getAllDeclarationsRecursively()
 
+    val allSkieGeneratedTopLevelDeclarations: List<SirDeclaration>
+        get() = skieModule.declarations + files.flatMap { it.declarations }
+
     val allSkieGeneratedCallableDeclarations: List<SirCallableDeclaration>
         get() = allSkieGeneratedDeclarations.filterIsInstance<SirCallableDeclaration>()
 

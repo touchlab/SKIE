@@ -26,7 +26,8 @@ import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
 import co.touchlab.skie.phases.kir.CreateKirMembersPhase
 import co.touchlab.skie.phases.kir.CreateKirTypesPhase
-import co.touchlab.skie.phases.memberconflicts.FixCallableDeclarationsConflictsPhase
+import co.touchlab.skie.phases.memberconflicts.RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase
+import co.touchlab.skie.phases.memberconflicts.RenameConflictingCallableDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameParametersNamedSelfPhase
 import co.touchlab.skie.phases.oir.ConfigureExternalOirTypesBridgingPhase
 import co.touchlab.skie.phases.oir.ConfigureOirBuiltinsBridgingPhase
@@ -145,7 +146,7 @@ class SkiePhaseScheduler {
             KotlinRuntimeHidingPhase,
             SwiftRuntimeGenerator,
 
-            FixCallableDeclarationsConflictsPhase,
+            RenameConflictingCallableDeclarationsPhase,
 
             // Features
 
@@ -170,12 +171,13 @@ class SkiePhaseScheduler {
 
             // IR finalization
 
+            AddAvailabilityBasedDeprecationLevelPhase,
+            AddAvailabilityToAsyncFunctionsPhase,
             MoveBridgesToTopLevelPhase,
             RenameTypesConflictsWithOtherTypesPhase,
-            AddAvailabilityToAsyncFunctionsPhase,
-            AddAvailabilityBasedDeprecationLevelPhase,
+            RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase,
             RenameParametersNamedSelfPhase,
-            FixCallableDeclarationsConflictsPhase,
+            RenameConflictingCallableDeclarationsPhase,
             FixDuplicatedOverridenFunctionsPhase,
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,
             FixOirFunctionSignaturesForApiNotesPhase(context),

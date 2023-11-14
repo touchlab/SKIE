@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.resolve.isValueClass
 import org.jetbrains.kotlin.types.KotlinType
 
-object FixCallableDeclarationsConflictsPhase : SirPhase {
+object RenameConflictingCallableDeclarationsPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
