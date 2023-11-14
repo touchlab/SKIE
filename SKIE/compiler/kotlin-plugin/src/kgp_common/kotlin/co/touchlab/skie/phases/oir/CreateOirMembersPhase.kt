@@ -59,6 +59,7 @@ class CreateOirMembersPhase(
             selector = namer.getSelector(constructor.baseDescriptor),
             parent = constructor.owner.oirClass,
             errorHandlingStrategy = constructor.errorHandlingStrategy,
+            deprecationLevel = constructor.deprecationLevel,
         )
 
         createValueParameters(constructor, oirConstructor)
@@ -73,6 +74,7 @@ class CreateOirMembersPhase(
             scope = function.oirScope,
             returnType = oirTypeTranslator.mapType(function.returnType, function.owner.oirClass.genericsScope),
             errorHandlingStrategy = function.errorHandlingStrategy,
+            deprecationLevel = function.deprecationLevel,
         )
 
         createValueParameters(function, oirSimpleFunction)
@@ -87,6 +89,7 @@ class CreateOirMembersPhase(
             isVar = property.isVar,
             parent = getOirCallableDeclarationParent(property),
             scope = property.oirScope,
+            deprecationLevel = property.deprecationLevel,
         )
 
         property.oirProperty = oirProperty

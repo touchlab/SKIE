@@ -39,6 +39,7 @@ object CreateFakeObjCConstructorsPhase : SirPhase {
             selector = parentConstructor.selector,
             parent = this,
             errorHandlingStrategy = parentConstructor.errorHandlingStrategy,
+            deprecationLevel = parentConstructor.deprecationLevel,
         ).apply {
             copyValueParametersFrom(parentConstructor)
         }

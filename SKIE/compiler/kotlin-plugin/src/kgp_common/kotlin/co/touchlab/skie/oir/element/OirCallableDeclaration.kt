@@ -1,6 +1,7 @@
 package co.touchlab.skie.oir.element
 
 import co.touchlab.skie.sir.element.SirCallableDeclaration
+import co.touchlab.skie.kir.element.DeprecationLevel
 
 sealed interface OirCallableDeclaration : OirElement {
 
@@ -13,6 +14,8 @@ sealed interface OirCallableDeclaration : OirElement {
         }
 
     val scope: OirScope
+
+    val deprecationLevel: DeprecationLevel
 
     val visibility: OirVisibility
         get() = originalSirCallableDeclaration.visibility.toOirVisibility()

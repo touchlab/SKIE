@@ -18,7 +18,7 @@ class SirSetter(
 
     override val modifiers: MutableList<Modifier> = modifiers.toMutableList()
 
-    override val swiftPoetBuilderModifications = mutableListOf<FunctionSpec.Builder.() -> Unit>()
+    override val bodyBuilder = mutableListOf<FunctionSpec.Builder.() -> Unit>()
 
     override fun toString(): String = "${this::class.simpleName}: ($property)"
 

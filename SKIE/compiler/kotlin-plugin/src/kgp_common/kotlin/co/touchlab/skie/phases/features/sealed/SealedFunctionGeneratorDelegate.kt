@@ -57,7 +57,7 @@ class SealedFunctionGeneratorDelegate(
         kirClass: KirClass,
         enum: SirClass,
     ) {
-        swiftPoetBuilderModifications.add {
+        bodyBuilder.add {
             val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).evaluate().swiftPoetTypeName
 
             addCode(

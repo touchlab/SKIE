@@ -15,6 +15,7 @@ class KirProperty(
     override val scope: KirScope,
     var type: KirType,
     val isVar: Boolean,
+    override val deprecationLevel: DeprecationLevel,
 ) : KirOverridableDeclaration<KirProperty, SirProperty> {
 
     val name: String

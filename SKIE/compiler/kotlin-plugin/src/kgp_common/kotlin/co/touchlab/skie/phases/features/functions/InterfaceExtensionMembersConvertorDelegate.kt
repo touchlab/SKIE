@@ -75,6 +75,7 @@ class InterfaceExtensionMembersConvertorDelegate(
                 identifier = getter.identifier,
                 visibility = getter.visibility,
                 type = getter.returnType,
+                deprecationLevel = getter.deprecationLevel,
             ).apply {
                 addPropertyGetter(getter)
 

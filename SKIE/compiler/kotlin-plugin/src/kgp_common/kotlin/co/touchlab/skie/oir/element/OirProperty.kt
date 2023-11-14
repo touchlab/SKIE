@@ -2,6 +2,7 @@ package co.touchlab.skie.oir.element
 
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.kir.element.DeprecationLevel
 
 class OirProperty(
     val name: String,
@@ -9,6 +10,7 @@ class OirProperty(
     val isVar: Boolean,
     override val parent: OirCallableDeclarationParent,
     override val scope: OirScope,
+    override val deprecationLevel: DeprecationLevel,
 ) : OirCallableDeclaration, OirOverridableDeclaration<OirProperty> {
 
     lateinit var originalSirProperty: SirProperty

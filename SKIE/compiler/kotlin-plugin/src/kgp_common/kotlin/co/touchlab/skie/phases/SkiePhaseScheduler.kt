@@ -34,6 +34,7 @@ import co.touchlab.skie.phases.oir.CreateFakeObjCConstructorsPhase
 import co.touchlab.skie.phases.oir.CreateOirMembersPhase
 import co.touchlab.skie.phases.oir.CreateOirTypesPhase
 import co.touchlab.skie.phases.oir.FixOirFunctionSignaturesForApiNotesPhase
+import co.touchlab.skie.phases.other.AddAvailabilityBasedDeprecationLevelPhase
 import co.touchlab.skie.phases.other.AddAvailabilityToAsyncFunctionsPhase
 import co.touchlab.skie.phases.other.AddFoundationImportsPhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
@@ -172,6 +173,7 @@ class SkiePhaseScheduler {
             MoveBridgesToTopLevelPhase,
             RenameTypesConflictsWithOtherTypesPhase,
             AddAvailabilityToAsyncFunctionsPhase,
+            AddAvailabilityBasedDeprecationLevelPhase,
             RenameParametersNamedSelfPhase,
             FixCallableDeclarationsConflictsPhase,
             FixDuplicatedOverridenFunctionsPhase,

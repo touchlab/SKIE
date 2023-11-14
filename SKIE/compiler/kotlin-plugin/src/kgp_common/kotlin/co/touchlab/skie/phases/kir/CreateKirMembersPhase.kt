@@ -3,6 +3,7 @@
 package co.touchlab.skie.phases.kir
 
 import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
+import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.kir.element.KirCallableDeclaration.Origin
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
@@ -16,6 +17,7 @@ import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.phases.SirPhase
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
+import org.jetbrains.kotlin.backend.konan.objcexport.getDeprecation
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.valueParametersAssociated
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -28,6 +30,7 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
+import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
 
 class CreateKirMembersPhase(
     context: SirPhase.Context,
@@ -86,6 +89,7 @@ class CreateKirMembersPhase(
             descriptor = originalDescriptor,
             owner = kirClass,
             errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
+            deprecationLevel = descriptor.kirDeprecationLevel,
         )
 
         createValueParameters(constructor, originalDescriptor, methodBridge)
@@ -149,6 +153,7 @@ class CreateKirMembersPhase(
             },
             scope = kirClass.callableDeclarationScope,
             errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
+            deprecationLevel = descriptor.kirDeprecationLevel,
         )
 
         getDirectParents(descriptor)
@@ -196,6 +201,7 @@ class CreateKirMembersPhase(
             scope = kirClass.callableDeclarationScope,
             type = kirTypeTranslator.mapReturnType(originalDescriptor.getter!!, getterBridge.returnBridge),
             isVar = descriptor.isVar,
+            deprecationLevel = descriptor.kirDeprecationLevel,
         )
 
         getDirectParents(descriptor)
@@ -253,6 +259,18 @@ class CreateKirMembersPhase(
         get() = when (this.kind) {
             KirClass.Kind.File -> KirScope.Static
             else -> KirScope.Member
+        }
+
+    private val CallableMemberDescriptor.kirDeprecationLevel: DeprecationLevel
+        get() {
+            val deprecationInfo = mapper.getDeprecation(this)
+
+            return when (deprecationInfo?.deprecationLevel) {
+                DeprecationLevelValue.ERROR -> DeprecationLevel.Error(deprecationInfo.message)
+                DeprecationLevelValue.WARNING -> DeprecationLevel.Warning(deprecationInfo.message)
+                DeprecationLevelValue.HIDDEN -> error("Hidden Kir declarations should not be created: $deprecationInfo")
+                null -> DeprecationLevel.None
+            }
         }
 
     private val MethodBridge.ReturnValue.errorHandlingStrategy: OirFunction.ErrorHandlingStrategy

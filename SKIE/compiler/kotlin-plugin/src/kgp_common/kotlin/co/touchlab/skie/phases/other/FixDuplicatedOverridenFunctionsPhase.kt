@@ -43,6 +43,7 @@ object FixDuplicatedOverridenFunctionsPhase : SirPhase {
             scope = function.scope,
             returnType = function.returnType,
             errorHandlingStrategy = function.errorHandlingStrategy,
+            deprecationLevel = function.deprecationLevel,
         )
 
         override.copyValueParametersFrom(baseFunctionToOverride)

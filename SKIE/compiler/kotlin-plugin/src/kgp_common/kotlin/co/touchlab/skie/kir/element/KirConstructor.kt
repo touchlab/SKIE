@@ -10,6 +10,7 @@ class KirConstructor(
     override val descriptor: ConstructorDescriptor,
     override val owner: KirClass,
     override val errorHandlingStrategy: OirFunction.ErrorHandlingStrategy,
+    override val deprecationLevel: DeprecationLevel,
 ) : KirFunction<SirConstructor>() {
 
     override val baseDescriptor: ConstructorDescriptor

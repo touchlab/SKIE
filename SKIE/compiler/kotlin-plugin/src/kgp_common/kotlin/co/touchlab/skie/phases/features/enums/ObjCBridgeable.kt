@@ -55,7 +55,7 @@ private fun SirClass.addForceBridgeFromObjectiveC(enum: SirClass) {
             inout = true,
         )
 
-        swiftPoetBuilderModifications.add {
+        bodyBuilder.add {
             addStatement("result = fromObjectiveC(source)")
         }
     }
@@ -80,7 +80,7 @@ private fun SirClass.addConditionallyBridgeFromObjectiveC(enum: SirClass) {
             inout = true,
         )
 
-        swiftPoetBuilderModifications.add {
+        bodyBuilder.add {
             addStatement("result = fromObjectiveC(source)")
             addStatement("return true")
         }
@@ -99,7 +99,7 @@ private fun SirClass.addUnconditionallyBridgeFromObjectiveC(enum: SirClass) {
             type = enum.defaultType.toNullable(),
         )
 
-        swiftPoetBuilderModifications.add {
+        bodyBuilder.add {
             addStatement("return fromObjectiveC(source)")
         }
     }
@@ -115,7 +115,7 @@ private fun SirClass.addBridgeToObjectiveC(enumKirClass: KirClass) {
 }
 
 private fun SirSimpleFunction.addBridgeToObjectiveCBody(enumKirClass: KirClass) {
-    swiftPoetBuilderModifications.add {
+    bodyBuilder.add {
         addCode(
             CodeBlock.builder()
                 .beginControlFlow("switch", "self")
@@ -158,7 +158,7 @@ private fun SirClass.addFromObjectiveC(enumKirClass: KirClass) {
 }
 
 private fun SirSimpleFunction.addFromObjectiveCBody(enumKirClass: KirClass) {
-    swiftPoetBuilderModifications.add {
+    bodyBuilder.add {
         addCode(
             CodeBlock.builder()
                 .apply {

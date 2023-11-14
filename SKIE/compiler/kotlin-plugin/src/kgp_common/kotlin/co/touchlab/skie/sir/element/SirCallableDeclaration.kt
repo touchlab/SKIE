@@ -1,5 +1,7 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.kir.element.DeprecationLevel
+
 sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {
 
     /**
@@ -40,6 +42,8 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      * Example of such situation is if the signature contains a lambda type argument, such as A<() -> Unit>.
      */
     val hasValidSignature: Boolean
+
+    val deprecationLevel: DeprecationLevel
 }
 
 val SirCallableDeclaration.receiverDeclaration: SirClass?

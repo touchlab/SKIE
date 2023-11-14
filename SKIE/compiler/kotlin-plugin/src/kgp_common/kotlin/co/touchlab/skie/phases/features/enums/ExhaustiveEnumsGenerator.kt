@@ -143,7 +143,7 @@ private fun SirClass.addCompanionObjectPropertyIfNeeded(enum: KirClass) {
         type = companion.primarySirClass.defaultType,
         scope = SirScope.Static,
     ).apply {
-        SirGetter().swiftPoetBuilderModifications.add {
+        SirGetter().bodyBuilder.add {
             addStatement("return _ObjectiveCType.companion")
         }
     }
@@ -171,7 +171,7 @@ private fun SirExtension.addToKotlinConversionMethod(enum: SirClass) {
         identifier = "toKotlinEnum",
         returnType = enum.defaultType,
     ).apply {
-        swiftPoetBuilderModifications.add {
+        bodyBuilder.add {
             addStatement("return _bridgeToObjectiveC()")
         }
     }
@@ -191,7 +191,7 @@ private fun SirExtension.addToSwiftConversionMethod(bridgedEnum: SirClass) {
         identifier = "toSwiftEnum",
         returnType = bridgedEnum.defaultType,
     ).apply {
-        swiftPoetBuilderModifications.add {
+        bodyBuilder.add {
             addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", bridgedEnum.defaultType.evaluate().swiftPoetTypeName)
         }
     }

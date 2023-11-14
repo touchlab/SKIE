@@ -55,7 +55,7 @@ class SkieClassSuspendGenerator {
 
             returnType = skieClass.toTypeFromEnclosingTypeParameters(typeParameters)
 
-            swiftPoetBuilderModifications.add {
+            bodyBuilder.add {
                 addCode("return %T(kotlinObject)", skieClass.defaultType.toSwiftPoetDeclaredTypeName())
             }
         }
@@ -90,7 +90,7 @@ private fun SirClass.addSkieClassConstructor(suspendFunctionOwner: KirClass) {
             type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
         )
 
-        swiftPoetBuilderModifications.add {
+        bodyBuilder.add {
             addCode("self.${SkieClassSuspendGenerator.kotlinObjectVariableName} = ${SkieClassSuspendGenerator.kotlinObjectVariableName}")
         }
     }

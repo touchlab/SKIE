@@ -9,7 +9,7 @@ import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationWithScope
 import co.touchlab.skie.sir.element.SirElementWithAttributes
 import co.touchlab.skie.sir.element.SirElementWithModifiers
-import co.touchlab.skie.sir.element.SirElementWithSwiftPoetBuilderModifications
+import co.touchlab.skie.sir.element.SirElementWithFunctionBodyBuilder
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
@@ -350,11 +350,11 @@ object GenerateSirFileCodePhase : SirPhase {
             addModifiers(callableDeclaration)
         }
 
-    private fun <BUILDER> BUILDER.applyBuilderModifications(
-        elementWithSwiftPoetBuilderModifications: SirElementWithSwiftPoetBuilderModifications<BUILDER>,
-    ): BUILDER =
+    private fun FunctionSpec.Builder.applyBuilderModifications(
+        elementWithSwiftPoetBuilderModifications: SirElementWithFunctionBodyBuilder,
+    ): FunctionSpec.Builder =
         apply {
-            elementWithSwiftPoetBuilderModifications.swiftPoetBuilderModifications.forEach {
+            elementWithSwiftPoetBuilderModifications.bodyBuilder.forEach {
                 it(this)
             }
         }

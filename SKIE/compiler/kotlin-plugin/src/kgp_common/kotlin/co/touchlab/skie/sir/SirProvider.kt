@@ -3,11 +3,13 @@ package co.touchlab.skie.sir
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.builtin.SirBuiltins
+import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirModule
+import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTopLevelDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
@@ -50,6 +52,15 @@ class SirProvider(
         get() = externalModuleCache.values
             .flatMap { it.getAllDeclarationsRecursively() }
             .filterIsInstance<SirTypeDeclaration>()
+
+    val allSkieGeneratedDeclarations: List<SirDeclaration>
+        get() = skieModule.getAllDeclarationsRecursively()
+
+    val allSkieGeneratedCallableDeclarations: List<SirCallableDeclaration>
+        get() = allSkieGeneratedDeclarations.filterIsInstance<SirCallableDeclaration>()
+
+    val allSkieGeneratedSimpleFunctions: List<SirSimpleFunction>
+        get() = allSkieGeneratedCallableDeclarations.filterIsInstance<SirSimpleFunction>()
 
     fun getSkieNamespaceFile(name: String): SirFile =
         getFile(kirProvider.skieModule.name, name)

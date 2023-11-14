@@ -3,6 +3,7 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.Modifier
+import co.touchlab.skie.kir.element.DeprecationLevel
 
 class SirSimpleFunction(
     override var identifier: String,
@@ -14,6 +15,7 @@ class SirSimpleFunction(
     modifiers: List<Modifier> = emptyList(),
     var isAsync: Boolean = false,
     override var throws: Boolean = false,
+    override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
 ) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction> {
 
     override val reference: String
@@ -73,6 +75,7 @@ class SirSimpleFunction(
             modifiers: List<Modifier> = emptyList(),
             isAsync: Boolean = false,
             throws: Boolean = false,
+            deprecationLevel: DeprecationLevel = DeprecationLevel.None,
         ): SirSimpleFunction =
             SirSimpleFunction(
                 identifier = identifier,
@@ -84,6 +87,7 @@ class SirSimpleFunction(
                 modifiers = modifiers,
                 isAsync = isAsync,
                 throws = throws,
+                deprecationLevel = deprecationLevel,
             )
     }
 }
@@ -98,6 +102,7 @@ fun SirSimpleFunction.shallowCopy(
     modifiers: List<Modifier> = this.modifiers,
     isAsync: Boolean = this.isAsync,
     throws: Boolean = this.throws,
+    deprecationLevel: DeprecationLevel = this.deprecationLevel,
 ): SirSimpleFunction =
     SirSimpleFunction(
         identifier = identifier,
@@ -109,4 +114,5 @@ fun SirSimpleFunction.shallowCopy(
         modifiers = modifiers,
         isAsync = isAsync,
         throws = throws,
+        deprecationLevel = deprecationLevel,
     )

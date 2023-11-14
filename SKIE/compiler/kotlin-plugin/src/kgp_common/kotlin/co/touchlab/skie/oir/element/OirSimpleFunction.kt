@@ -2,6 +2,7 @@ package co.touchlab.skie.oir.element
 
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.kir.element.DeprecationLevel
 
 class OirSimpleFunction(
     override val selector: String,
@@ -9,6 +10,7 @@ class OirSimpleFunction(
     override val scope: OirScope,
     override var returnType: OirType,
     override val errorHandlingStrategy: ErrorHandlingStrategy,
+    override val deprecationLevel: DeprecationLevel,
 ) : OirFunction(parent), OirOverridableDeclaration<OirSimpleFunction> {
 
     lateinit var originalSirFunction: SirSimpleFunction

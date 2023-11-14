@@ -47,6 +47,7 @@ class CreateSirMembersPhase(
         val sirConstructor = SirConstructor(
             parent = constructor.getSirParent(),
             throws = constructor.errorHandlingStrategy.isThrowing,
+            deprecationLevel = constructor.deprecationLevel,
         ).apply {
             createValueParameters(constructor, constructor.swiftFunctionName)
         }
@@ -64,6 +65,7 @@ class CreateSirMembersPhase(
             returnType = sirTypeTranslator.mapReturnType(oirSimpleFunction.returnType, function.errorHandlingStrategy),
             scope = oirSimpleFunction.scope.sirScope,
             throws = function.errorHandlingStrategy.isThrowing,
+            deprecationLevel = function.deprecationLevel,
         ).apply {
             createValueParameters(function, swiftFunctionName)
         }
@@ -79,6 +81,7 @@ class CreateSirMembersPhase(
             parent = property.getSirParent(),
             type = sirTypeTranslator.mapType(oirProperty.type),
             scope = oirProperty.scope.sirScope,
+            deprecationLevel = property.deprecationLevel,
         ).apply {
             property.descriptor.getter?.let {
                 SirGetter(

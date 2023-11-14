@@ -2,6 +2,7 @@ package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import io.outfoxx.swiftpoet.Modifier
+import co.touchlab.skie.kir.element.DeprecationLevel
 
 class SirConstructor(
     parent: SirDeclarationNamespace,
@@ -10,6 +11,7 @@ class SirConstructor(
     modifiers: List<Modifier> = emptyList(),
     var isConvenience: Boolean = false,
     override var throws: Boolean = false,
+    override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
 ) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()) {
 
     override val identifier = "init"
@@ -41,6 +43,7 @@ class SirConstructor(
             modifiers: List<Modifier> = emptyList(),
             isConvenience: Boolean = false,
             throws: Boolean = false,
+            deprecationLevel: DeprecationLevel = DeprecationLevel.None,
         ): SirConstructor =
             SirConstructor(
                 parent = this@SirDeclarationNamespace,
@@ -49,6 +52,7 @@ class SirConstructor(
                 modifiers = modifiers,
                 isConvenience = isConvenience,
                 throws = throws,
+                deprecationLevel = deprecationLevel,
             )
     }
 }
@@ -60,6 +64,7 @@ fun SirConstructor.shallowCopy(
     modifiers: List<Modifier> = this.modifiers,
     isConvenience: Boolean = this.isConvenience,
     throws: Boolean = this.throws,
+    deprecationLevel: DeprecationLevel = this.deprecationLevel,
 ): SirConstructor =
     SirConstructor(
         parent = parent,
@@ -68,4 +73,5 @@ fun SirConstructor.shallowCopy(
         modifiers = modifiers,
         isConvenience = isConvenience,
         throws = throws,
+        deprecationLevel = deprecationLevel,
     )

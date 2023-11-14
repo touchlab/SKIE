@@ -167,7 +167,7 @@ class FlowConversionConstructorsGenerator(
                 type = from.swiftClass.toType(typeParameter.toTypeParameterUsage()),
             )
 
-            swiftPoetBuilderModifications.add {
+            bodyBuilder.add {
                 addStatement("return %T(%L)", to.kotlinClass.defaultType.toSwiftPoetDeclaredTypeName(), "flow.delegate")
             }
         }
@@ -183,7 +183,7 @@ class FlowConversionConstructorsGenerator(
                 type = from.kotlinClass.toType(flowTypeArgument),
             )
 
-            swiftPoetBuilderModifications.add {
+            bodyBuilder.add {
                 addStatement("self.init(internal: %L)", "flow")
             }
         }
@@ -199,7 +199,7 @@ class FlowConversionConstructorsGenerator(
                 type = from.swiftClass.toType(flowTypeArgument),
             )
 
-            swiftPoetBuilderModifications.add {
+            bodyBuilder.add {
                 addStatement("self.init(internal: %L)", "flow.delegate")
             }
         }

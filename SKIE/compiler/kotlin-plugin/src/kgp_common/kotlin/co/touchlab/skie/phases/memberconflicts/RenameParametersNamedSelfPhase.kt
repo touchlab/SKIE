@@ -2,15 +2,13 @@ package co.touchlab.skie.phases.memberconflicts
 
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirSimpleFunction
-import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
 import co.touchlab.skie.util.collisionFreeIdentifier
 
 object RenameParametersNamedSelfPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        sirProvider.skieModule.getAllDeclarationsRecursively()
-            .filterIsInstance<SirSimpleFunction>()
+        sirProvider.allSkieGeneratedSimpleFunctions
             .forEach {
                 renameParametersNamedSelf(it)
             }

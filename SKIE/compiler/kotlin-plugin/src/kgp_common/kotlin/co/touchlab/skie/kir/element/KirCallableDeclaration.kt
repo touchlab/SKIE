@@ -17,6 +17,8 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     val scope: KirScope
 
+    val deprecationLevel: DeprecationLevel
+
     val configuration: KirConfiguration
 
     val oirCallableDeclaration: OirCallableDeclaration
