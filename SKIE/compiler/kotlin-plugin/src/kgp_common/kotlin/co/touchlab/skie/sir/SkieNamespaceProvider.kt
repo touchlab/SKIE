@@ -30,11 +30,6 @@ class SkieNamespaceProvider(
         kind = SirClass.Kind.Enum,
     )
 
-    init {
-        // Ensures at least one file imports Foundation
-        skieNamespaceFile.imports.add("Foundation")
-    }
-
     private val modulesWithShortNameCollision =
         kirProvider.allModules
             .groupBy { it.shortNamespaceModuleName }
