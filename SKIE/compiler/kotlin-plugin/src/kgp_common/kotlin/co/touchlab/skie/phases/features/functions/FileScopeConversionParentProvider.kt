@@ -26,8 +26,13 @@ class FileScopeConversionParentProvider(
 
     private val sirProvider = context.sirProvider
     private val oirBuiltins = context.oirBuiltins
+    private val sirBuiltins = context.sirBuiltins
 
     private val cache: MutableMap<SirType, List<SirExtension>> = mutableMapOf()
+
+    private val unsupportedExtensionTypes = listOf(
+        sirBuiltins.Swift.AnyClass,
+    )
 
     fun <T : SirCallableDeclaration> forEachParent(
         callableDeclaration: KirCallableDeclaration<T>,
@@ -78,7 +83,7 @@ class FileScopeConversionParentProvider(
             is DeclaredSirType -> {
                 createNonOptionalExtension(
                     file = namespace,
-                    sirClass = parentType.evaluate().type.resolveAsSirClass() ?: return emptyList(),
+                    sirClass = parentType.evaluateAsExtensionClass() ?: return emptyList(),
                 ).let(::listOfNotNull)
             }
             is SpecialSirType.Any -> {
@@ -91,6 +96,9 @@ class FileScopeConversionParentProvider(
             else -> return emptyList()
         }
     }
+
+    private fun DeclaredSirType.evaluateAsExtensionClass(): SirClass? =
+        evaluate().type.resolveAsSirClass()?.takeIf { it !in unsupportedExtensionTypes }
 
     private fun getExtensionNamespace(
         callableDeclaration: KirCallableDeclaration<*>,
