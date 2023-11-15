@@ -415,6 +415,9 @@ class CodeBlock private constructor(
     fun of(format: String, vararg args: Any?) = Builder().add(format, *args).build()
 
     @JvmStatic
+    fun toString(format: String, vararg args: Any?): String = of(format, *args).toString()
+
+    @JvmStatic
     fun builder() = Builder()
 
     internal fun isNoArgPlaceholder(c: Char) = c.isOneOf('%', '>', '<', '[', ']', 'W')

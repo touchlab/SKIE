@@ -10,7 +10,6 @@ import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
-import co.touchlab.skie.sir.element.identifierAfterVisibilityChanges
 import co.touchlab.skie.sir.element.inheritsFrom
 
 data class Signature(

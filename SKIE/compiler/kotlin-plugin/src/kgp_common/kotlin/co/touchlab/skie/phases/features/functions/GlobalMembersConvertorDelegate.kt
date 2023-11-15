@@ -38,12 +38,11 @@ class GlobalMembersConvertorDelegate(
     private fun SirSimpleFunction.addFunctionBody(function: SirSimpleFunction) {
         addFunctionDeclarationBodyWithErrorTypeHandling(function) {
             addStatement(
-                "return %L%L%T.%N(%L)",
+                "return %L%L%T.%L",
                 if (function.throws) "try " else "",
                 if (function.isAsync) "await " else "",
                 function.kotlinStaticMemberOwnerTypeName,
-                function.reference,
-                valueParameters.map { CodeBlock.of("%N", it.name) }.joinToCode(", "),
+                function.call(valueParameters.map { CodeBlock.toString("%N", it.name) }),
             )
         }
     }

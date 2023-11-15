@@ -67,11 +67,10 @@ object ExhaustiveEnumsMembersPassthroughGenerator {
     private fun SirSimpleFunction.addFunctionBody(function: SirSimpleFunction) {
         this.addFunctionDeclarationBodyWithErrorTypeHandling(function) {
             addStatement(
-                "return %L%L(self as _ObjectiveCType).%N(%L)",
+                "return %L%L(self as _ObjectiveCType).%L",
                 if (function.throws) "try " else "",
                 if (function.isAsync) "await " else "",
-                function.reference,
-                function.valueParameters.map { CodeBlock.of("%N", it.name) }.joinToCode(", "),
+                function.call(function.valueParameters.map { CodeBlock.toString("%N", it.name) }),
             )
         }
     }

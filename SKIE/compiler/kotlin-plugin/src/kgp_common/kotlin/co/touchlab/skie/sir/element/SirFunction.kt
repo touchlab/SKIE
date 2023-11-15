@@ -1,5 +1,6 @@
 package co.touchlab.skie.sir.element
 
+import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 
@@ -16,6 +17,38 @@ sealed class SirFunction(
 
     override val hasValidSignature: Boolean
         get() = valueParameters.all { it.type.evaluate().isValid }
+
+    override val reference: String
+        get() = if (valueParameters.isEmpty()) {
+            identifierForReference
+        } else {
+            "$identifierForReference(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
+        }
+
+    override val name: String
+        get() = if (valueParameters.isEmpty()) {
+            "$identifierAfterVisibilityChanges()"
+        } else {
+            "$identifierAfterVisibilityChanges(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
+        }
+
+    /**
+     * Creates interpolated string for SwiftPoet that represents a function call to this function.
+     */
+    fun call(arguments: List<String>): String {
+        require(valueParameters.size == arguments.size) {
+            "Expected ${valueParameters.size} arguments, but got ${arguments.size} for $this"
+        }
+
+        val argumentsWithLabels = valueParameters.zip(arguments)
+            .joinToString(", ") { (parameter, argument) ->
+                if (parameter.label == "_") argument else CodeBlock.toString("%N: ", parameter.labelOrName) + argument
+            }
+
+        return "$identifierForReference($argumentsWithLabels)"
+    }
+
+    protected abstract val identifierForReference: String
 }
 
 fun SirFunction.copyValueParametersFrom(other: SirFunction) {

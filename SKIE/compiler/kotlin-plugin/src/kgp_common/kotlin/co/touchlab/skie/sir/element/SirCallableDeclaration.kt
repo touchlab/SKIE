@@ -9,18 +9,27 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      *
      * Examples:
      * foo
-     * foo (visibility == Replaced)
+     * foo (visibility == PublicButReplaced)
      */
     val identifier: String
 
     /**
-     * Use `reference` in generated Swift code.
+     * Used to derive other names.
+     *
+     * Examples:
+     * foo
+     * __foo (visibility == PublicButReplaced && !constructor)
+     */
+    val identifierAfterVisibilityChanges: String
+
+    /**
+     * Use to obtain declaration `reference` in generated Swift code.
      *
      * Examples:
      * foo  (for properties)
      * foo (for functions without parameters)
      * foo(param1:)
-     * __foo(param1:) (visibility == PublicButReplaced)
+     * __foo(param1:) (visibility == PublicButReplaced && !constructor)
      */
     val reference: String
 
@@ -51,10 +60,4 @@ val SirCallableDeclaration.receiverDeclaration: SirClass?
         is SirClass -> parent
         is SirExtension -> parent.classDeclaration
         else -> null
-    }
-
-val SirCallableDeclaration.identifierAfterVisibilityChanges: String
-    get() = when (visibility) {
-        SirVisibility.PublicButReplaced -> "__$identifier"
-        else -> identifier
     }

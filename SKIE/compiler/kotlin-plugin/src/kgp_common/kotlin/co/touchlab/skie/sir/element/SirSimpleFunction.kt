@@ -4,6 +4,7 @@ import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.Modifier
 import co.touchlab.skie.kir.element.DeprecationLevel
+import io.outfoxx.swiftpoet.CodeBlock
 
 class SirSimpleFunction(
     override var identifier: String,
@@ -18,15 +19,14 @@ class SirSimpleFunction(
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
 ) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction> {
 
-    override val reference: String
-        get() = if (valueParameters.isEmpty()) {
-            identifierAfterVisibilityChanges
-        } else {
-            "$identifierAfterVisibilityChanges(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
+    override val identifierAfterVisibilityChanges: String
+        get() = when (visibility) {
+            SirVisibility.PublicButReplaced -> "__$identifier"
+            else -> identifier
         }
 
-    override val name: String
-        get() = if (valueParameters.isEmpty()) "$identifierAfterVisibilityChanges()" else reference
+    override val identifierForReference: String
+        get() = CodeBlock.toString("%N", identifierAfterVisibilityChanges)
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 

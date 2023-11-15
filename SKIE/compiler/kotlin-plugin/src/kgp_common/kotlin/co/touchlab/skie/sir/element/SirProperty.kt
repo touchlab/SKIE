@@ -1,9 +1,10 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
+import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.Modifier
-import co.touchlab.skie.kir.element.DeprecationLevel
 
 class SirProperty(
     override var identifier: String,
@@ -18,11 +19,17 @@ class SirProperty(
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
 
+    override val identifierAfterVisibilityChanges: String
+        get() = when (visibility) {
+            SirVisibility.PublicButReplaced -> "__$identifier"
+            else -> identifier
+        }
+
     override val reference: String
-        get() = identifierAfterVisibilityChanges
+        get() = CodeBlock.toString("%N", identifierAfterVisibilityChanges)
 
     override val name: String
-        get() = reference
+        get() = identifierAfterVisibilityChanges
 
     var getter: SirGetter? = null
         private set

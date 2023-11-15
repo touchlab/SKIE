@@ -16,15 +16,11 @@ class SirConstructor(
 
     override val identifier = "init"
 
-    override val reference: String
-        get() = if (valueParameters.isEmpty()) {
-            identifier
-        } else {
-            "${identifier}(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
-        }
+    override val identifierAfterVisibilityChanges: String
+        get() = identifier
 
-    override val name: String
-        get() = if (valueParameters.isEmpty()) "${identifier}()" else reference
+    override val identifierForReference: String
+        get() = identifier
 
     override val scope: SirScope = SirScope.Global
 

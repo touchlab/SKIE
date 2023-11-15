@@ -92,10 +92,9 @@ private fun SirSimpleFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeMo
                 .indent()
                 .apply {
                     addStatement(
-                        "%T.%N(%L)",
+                        "%T.%L",
                         bridgeModel.kotlinBridgingFunctionOwner.defaultType.evaluate().swiftPoetTypeName,
-                        bridgeModel.kotlinBridgingFunction.reference,
-                        bridgeModel.argumentsForBridgingCall,
+                        bridgeModel.kotlinBridgingFunction.call(bridgeModel.argumentsForBridgingCall),
                     )
                 }
                 .unindent()
@@ -105,34 +104,20 @@ private fun SirSimpleFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeMo
     }
 }
 
-private val BridgeModel.argumentsForBridgingCall: CodeBlock
+private val BridgeModel.argumentsForBridgingCall: List<String>
     get() {
-        val arguments = mutableListOf<CodeBlock>()
+        val arguments = mutableListOf<String>()
 
         arguments.addDispatchReceiver(this)
 
-        this.originalFunction.valueParameters.forEachIndexed { index, parameter ->
-            if (isFromGenericClass) {
-                val erasedParameterType = kotlinBridgingFunction.valueParameters[index + 1].type.evaluate().swiftPoetTypeName
-                    // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
-                    .removingEscapingAttribute()
-
-                if (parameter.type.evaluate().swiftPoetTypeName != erasedParameterType) {
-                    arguments.add(CodeBlock.of("%N as! %T", parameter.name, erasedParameterType))
-                } else {
-                    arguments.add(CodeBlock.of("%N", parameter.name))
-                }
-            } else {
-                arguments.add(CodeBlock.of("%N", parameter.name))
-            }
-        }
+        arguments.addValueParameters(this)
 
         arguments.addSuspendHandlerParameter()
 
-        return arguments.joinToCode()
+        return arguments
     }
 
-private fun MutableList<CodeBlock>.addDispatchReceiver(bridgeModel: BridgeModel) {
+private fun MutableList<String>.addDispatchReceiver(bridgeModel: BridgeModel) {
     if (bridgeModel.originalFunction.scope != SirScope.Member) {
         return
     }
@@ -142,15 +127,35 @@ private fun MutableList<CodeBlock>.addDispatchReceiver(bridgeModel: BridgeModel)
     }
 
     if (bridgeModel.isFromGenericClass) {
-        add(CodeBlock.of("%N as! %T", SkieClassSuspendGenerator.kotlinObjectVariableName, dispatchReceiverErasedType))
+        add(CodeBlock.toString("%N as! %T", SkieClassSuspendGenerator.kotlinObjectVariableName, dispatchReceiverErasedType))
     } else if (bridgeModel.isFromBridgedClass) {
-        add(CodeBlock.of("self as %T", dispatchReceiverErasedType))
+        add(CodeBlock.toString("self as %T", dispatchReceiverErasedType))
     } else {
-        add(CodeBlock.of("self"))
+        add("self")
     }
 }
 
-private fun MutableList<CodeBlock>.addSuspendHandlerParameter() = add(CodeBlock.of("$0"))
+private fun MutableList<String>.addValueParameters(bridgeModel: BridgeModel) {
+    bridgeModel.originalFunction.valueParameters.forEachIndexed { index, parameter ->
+        if (bridgeModel.isFromGenericClass) {
+            val erasedParameterType = bridgeModel.kotlinBridgingFunction.valueParameters[index + 1].type.evaluate().swiftPoetTypeName
+                // Ideally we wouldn't need this, but in case the parameter is a lambda, it will have the escaping attribute which we can't use elsewhere.
+                .removingEscapingAttribute()
+
+            if (parameter.type.evaluate().swiftPoetTypeName != erasedParameterType) {
+                add(CodeBlock.toString("%N as! %T", parameter.name, erasedParameterType))
+            } else {
+                add(CodeBlock.toString("%N", parameter.name))
+            }
+        } else {
+            add(CodeBlock.toString("%N", parameter.name))
+        }
+    }
+}
+
+private fun MutableList<String>.addSuspendHandlerParameter() {
+    add("$0")
+}
 
 private fun TypeName.removingEscapingAttribute(): TypeName {
     return when (this) {
