@@ -12,6 +12,7 @@ abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory
     val dumpSwiftApiAfterApiNotes: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val printSkiePerformanceLogs: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val crashOnSoftErrors: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val loadAllPlatformApiNotes: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(
@@ -19,5 +20,6 @@ abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory
             SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes takeIf dumpSwiftApiAfterApiNotes,
             SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs takeIf printSkiePerformanceLogs,
             SkieConfigurationFlag.Debug_CrashOnSoftErrors takeIf crashOnSoftErrors,
+            SkieConfigurationFlag.Debug_LoadAllPlatformApiNotes takeIf loadAllPlatformApiNotes,
         )
 }

@@ -5,7 +5,6 @@ import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import java.io.File
 
 @Serializable
 data class ApiNotes(
@@ -28,9 +27,5 @@ data class ApiNotes(
                 breakScalarsAt = Int.MAX_VALUE,
             ),
         )
-
-        operator fun invoke(file: File): ApiNotes = coder.decodeFromStream(serializer(), file.inputStream())
-
-        fun fromString(string: String): ApiNotes = coder.decodeFromString(serializer(), string)
     }
 }
