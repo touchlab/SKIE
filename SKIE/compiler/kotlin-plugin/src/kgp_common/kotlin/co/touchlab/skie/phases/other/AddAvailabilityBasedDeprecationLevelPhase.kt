@@ -6,6 +6,7 @@ import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirElementWithFunctionBodyBuilder
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.util.swift.quoteAsSwiftLiteral
 
 object AddAvailabilityBasedDeprecationLevelPhase : SirPhase {
 
@@ -33,7 +34,7 @@ object AddAvailabilityBasedDeprecationLevelPhase : SirPhase {
 
         val fullMessage = if (message != null) "$messagePrefix: $message" else messagePrefix
 
-        this.attributes.add("available(*, $type, message: \"$fullMessage\")")
+        this.attributes.add("available(*, $type, message: ${fullMessage.quoteAsSwiftLiteral()})")
     }
 
     private fun SirCallableDeclaration.replaceBodyWithError() {
