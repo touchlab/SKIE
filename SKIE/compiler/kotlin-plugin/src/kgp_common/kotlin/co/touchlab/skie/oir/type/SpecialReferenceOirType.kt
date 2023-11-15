@@ -14,7 +14,7 @@ sealed class SpecialReferenceOirType(val name: String) : NonNullReferenceOirType
             buildString {
                 append(name)
                 append(" *")
-                appendAttrsAndName(attrsAndName)
+                appendAttrsAndName(attrsAndName.plusNonnullAttributeIfNeeded(needsNonnullAttribute))
             }
     }
 

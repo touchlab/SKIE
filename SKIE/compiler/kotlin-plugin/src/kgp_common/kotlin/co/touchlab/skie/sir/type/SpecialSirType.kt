@@ -38,5 +38,10 @@ sealed class SpecialSirType<SELF : SirType>(
 
     object Any : SpecialSirType<Any>(AnyTypeName.INSTANCE)
 
-    object Protocol : SpecialSirType<Protocol>(ProtocolTypeName.INSTANCE)
+    object Protocol : SpecialSirType<Protocol>(ProtocolTypeName.INSTANCE) {
+
+        override val isReference: Boolean = true
+
+        override fun asReferenceType(): Protocol = this
+    }
 }
