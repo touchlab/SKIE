@@ -26,7 +26,7 @@ data class Signature(
 
     sealed interface Receiver {
 
-        data class Simple(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver
+        data class Simple(val type: Type, val constraints: Set<Constraint>) : Receiver
 
         data class Constructor(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver
 
@@ -216,7 +216,7 @@ data class Signature(
 
         private val SirCallableDeclaration.receiver: Receiver
             get() {
-                 val (sirClass, constraints) = when (val parent = parent) {
+                val (sirClass, constraints) = when (val parent = parent) {
                     is SirClass -> parent.classDeclaration to emptySet()
                     is SirExtension -> parent.classDeclaration to parent.conditionalConstraints.map { Receiver.Constraint(it) }.toSet()
                     else -> return Receiver.None
@@ -224,7 +224,7 @@ data class Signature(
 
                 return when (this) {
                     is SirConstructor -> Receiver.Constructor(sirClass, constraints)
-                    is SirSimpleFunction, is SirProperty -> Receiver.Simple(sirClass, constraints)
+                    is SirSimpleFunction, is SirProperty -> Receiver.Simple(sirClass.defaultType.signatureType, constraints)
                 }
             }
 
