@@ -14,10 +14,6 @@ class ExtraDescriptorBuiltins(
 
     private val Darwin = getModule("<org.jetbrains.kotlin.native.platform.darwin>")
 
-    private val stdlib = getModule("<stdlib>")
-
-    val Protocol: ClassDescriptor = getClass("kotlinx.cinterop.ObjCProtocol", stdlib)
-
     val NSObject: ClassDescriptor = getClass("platform.darwin.NSObject", Darwin)
 
     val NSCopying: ClassDescriptor = getClass("platform.Foundation.NSCopyingProtocol", Foundation)

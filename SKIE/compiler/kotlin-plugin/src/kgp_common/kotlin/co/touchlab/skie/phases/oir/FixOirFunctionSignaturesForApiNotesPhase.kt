@@ -111,6 +111,7 @@ class FixOirFunctionSignaturesForApiNotesPhase(
             }
             is TypeDefOirType -> this.declaration.name in reservedIdentifiers
             is NullableReferenceOirType -> this.nonNullType.collidesWith(reservedIdentifiers)
+            is SpecialReferenceOirType -> this.name in reservedIdentifiers
             else -> this.renderWithoutAttributes() in reservedIdentifiers
         }
 

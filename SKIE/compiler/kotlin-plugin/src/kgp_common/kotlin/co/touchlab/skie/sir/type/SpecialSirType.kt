@@ -2,6 +2,7 @@ package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
 import io.outfoxx.swiftpoet.AnyTypeName
+import io.outfoxx.swiftpoet.ProtocolTypeName
 import io.outfoxx.swiftpoet.SelfTypeName
 import io.outfoxx.swiftpoet.TypeName
 
@@ -36,4 +37,6 @@ sealed class SpecialSirType<SELF : SirType>(
     object Self : SpecialSirType<Self>(SelfTypeName.INSTANCE)
 
     object Any : SpecialSirType<Any>(AnyTypeName.INSTANCE)
+
+    object Protocol : SpecialSirType<Protocol>(ProtocolTypeName.INSTANCE)
 }

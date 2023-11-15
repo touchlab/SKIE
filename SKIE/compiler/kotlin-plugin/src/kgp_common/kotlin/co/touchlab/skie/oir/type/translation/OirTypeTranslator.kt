@@ -150,7 +150,7 @@ class OirTypeTranslator(
         // TODO: more precise types can be used.
 
         if (descriptor.isObjCMetaClass()) return SpecialReferenceOirType.Class
-        if (descriptor.isObjCProtocolClass()) return oirBuiltins.Protocol.defaultType
+        if (descriptor.isObjCProtocolClass()) return SpecialReferenceOirType.Protocol
 
         if (descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration()) {
             return oirProvider.getExternalClass(descriptor).defaultType
