@@ -27,6 +27,9 @@ data class TypeParameterUsageSirType(
         )
     }
 
+    override fun inlineTypeAliases(): SirType =
+        this
+
     override fun asHashableType(): SirType? =
         if (typeParameter.bounds.any { it.asHashableType() != null }) {
             this

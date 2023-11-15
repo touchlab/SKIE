@@ -35,6 +35,9 @@ data class OirDeclaredSirType(
     override fun evaluate(): EvaluatedSirType<SirDeclaredSirType> =
         getType(declaration.primarySirClass).evaluate()
 
+    override fun inlineTypeAliases(): SirType =
+        this
+
     private fun getType(selectedClass: SirClass): SirDeclaredSirType {
         val convertedTypeArguments = selectedClass.typeParameters
             .mapIndexed { index, typeParameter -> typeParameter to (typeArguments.getOrNull(index) ?: SpecialReferenceOirType.Id) }

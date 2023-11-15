@@ -128,3 +128,6 @@ fun SirDeclaredSirType.resolveAsSirClass(): SirClass? =
 fun SirClass.inheritsFrom(other: SirClass): Boolean =
     superTypes.mapNotNull { it.resolveAsSirClass() }
         .any { it == other || it.inheritsFrom(other) }
+
+fun SirClass.sharesDirectInheritanceHierarchy(other: SirClass): Boolean =
+    this == other || this.inheritsFrom(other) || other.inheritsFrom(this)

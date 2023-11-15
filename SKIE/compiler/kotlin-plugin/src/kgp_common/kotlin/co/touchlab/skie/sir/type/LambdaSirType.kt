@@ -35,6 +35,12 @@ data class LambdaSirType(
         )
     }
 
+    override fun inlineTypeAliases(): SirType =
+        copy(
+            valueParameterTypes = valueParameterTypes.map { it.inlineTypeAliases() },
+            returnType = returnType.inlineTypeAliases(),
+        )
+
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): LambdaSirType =
         LambdaSirType(
             returnType = returnType.substituteTypeParameters(substitutions),

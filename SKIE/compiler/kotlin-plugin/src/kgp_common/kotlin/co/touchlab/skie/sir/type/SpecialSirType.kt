@@ -22,6 +22,9 @@ sealed class SpecialSirType<SELF : SirType>(
             swiftPoetTypeName = typeName,
         ) as EvaluatedSirType<SELF>
 
+    override fun inlineTypeAliases(): SirType =
+        this
+
     @Suppress("UNCHECKED_CAST")
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SELF =
         this as SELF

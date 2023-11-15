@@ -10,45 +10,42 @@ import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
-import co.touchlab.skie.sir.element.inheritsFrom
+import co.touchlab.skie.sir.element.sharesDirectInheritanceHierarchy
+import co.touchlab.skie.sir.type.NullableSirType
+import co.touchlab.skie.sir.type.OirDeclaredSirType
+import co.touchlab.skie.sir.type.SirDeclaredSirType
+import co.touchlab.skie.sir.type.SirType
 
 data class Signature(
-    val receiver: Receiver?,
+    val receiver: Receiver,
     val identifierAfterVisibilityChanges: String,
     val valueParameters: List<ValueParameter>,
     val returnType: ReturnType,
-    val scope: SirScope,
-    val conditionalConstraints: List<ConditionalConstraint>,
+    val scope: Scope,
 ) {
 
-    class Receiver(
-        private val declaration: SirClass,
-    ) {
+    sealed interface Receiver {
 
-        val canonicalName: String = declaration.defaultType.evaluate().canonicalName
+        data class Simple(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver
 
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+        data class Constructor(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver
 
-            other as Receiver
+        object None : Receiver
 
-            if (declaration == other.declaration) return true
+        data class Constraint(val typeParameterName: String, val bounds: Set<Type>) {
 
-            if (declaration.inheritsFrom(other.declaration)) return true
-            if (other.declaration.inheritsFrom(declaration)) return true
-
-            return false
+            constructor(conditionalConstraint: SirConditionalConstraint) : this(
+                typeParameterName = conditionalConstraint.typeParameter.name,
+                bounds = conditionalConstraint.bounds.map { it.signatureType }.toSet(),
+            )
         }
-
-        override fun hashCode(): Int = 0
     }
 
     data class ValueParameter(val argumentLabel: String, val type: String)
 
     sealed interface ReturnType {
 
-        class Specific(val name: String) : ReturnType {
+        class Specific(val type: Type) : ReturnType {
 
             override fun equals(other: kotlin.Any?): Boolean {
                 if (this === other) return true
@@ -57,7 +54,7 @@ data class Signature(
 
                 other as Specific
 
-                return name == other.name
+                return type == other.type
             }
 
             override fun hashCode(): Int = 0
@@ -75,12 +72,73 @@ data class Signature(
         }
     }
 
-    data class ConditionalConstraint(val typeParameter: String, val bounds: Set<String>) {
+    sealed interface Type {
 
-        constructor(conditionalConstraint: SirConditionalConstraint) : this(
-            typeParameter = conditionalConstraint.typeParameter.name,
-            bounds = conditionalConstraint.bounds.map { it.evaluate().canonicalName }.toSet(),
-        )
+        class Class(val sirClass: SirClass, val typeArguments: List<TypeArgument>) : Type {
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Class
+
+                if (typeArguments != other.typeArguments) return false
+
+                return sirClass.sharesDirectInheritanceHierarchy(other.sirClass)
+            }
+
+            override fun hashCode(): Int = 0
+        }
+
+        class Optional(val nested: Type) : Type {
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Optional
+
+                return nested == other.nested
+            }
+
+            override fun hashCode(): Int = 1
+        }
+
+        class Special(val name: String) : Type {
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Special
+
+                return name == other.name
+            }
+
+            override fun hashCode(): Int = name.hashCode()
+        }
+
+        class TypeArgument(val type: SirType) {
+
+            private val canonicalName: String = type.evaluate().canonicalName
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as TypeArgument
+
+                return canonicalName == other.canonicalName
+            }
+
+            override fun hashCode(): Int = canonicalName.hashCode()
+        }
+    }
+
+    enum class Scope {
+
+        Member,
+        Static,
     }
 
     companion object {
@@ -97,20 +155,25 @@ data class Signature(
                 receiver = function.receiver,
                 identifierAfterVisibilityChanges = function.identifierAfterVisibilityChanges,
                 valueParameters = function.signatureValueParameters,
-                returnType = ReturnType.Specific(function.returnType.evaluate().canonicalName),
-                scope = function.scope,
-                conditionalConstraints = function.conditionalConstraints,
+                returnType = ReturnType.Specific(function.returnType.signatureType),
+                scope = function.signatureScope,
             )
 
-        operator fun invoke(constructor: SirConstructor): Signature =
-            Signature(
-                receiver = constructor.receiver!!,
+        operator fun invoke(constructor: SirConstructor): Signature {
+            val receiver = constructor.receiver
+
+            check(receiver is Receiver.Constructor) {
+                "Constructors should always have a constructor receiver. Was: $receiver"
+            }
+
+            return Signature(
+                receiver = receiver,
                 identifierAfterVisibilityChanges = constructor.identifierAfterVisibilityChanges,
                 valueParameters = constructor.signatureValueParameters,
-                returnType = ReturnType.Specific(constructor.receiver!!.canonicalName),
-                scope = constructor.scope,
-                conditionalConstraints = constructor.conditionalConstraints,
+                returnType = ReturnType.Specific(receiver.sirClass.defaultType.signatureType),
+                scope = constructor.signatureScope,
             )
+        }
 
         operator fun invoke(property: SirProperty): Signature =
             Signature(
@@ -118,12 +181,32 @@ data class Signature(
                 identifierAfterVisibilityChanges = property.identifierAfterVisibilityChanges,
                 valueParameters = emptyList(),
                 returnType = ReturnType.Any,
-                scope = property.scope,
-                conditionalConstraints = property.conditionalConstraints,
+                scope = property.signatureScope,
             )
 
         private val SirFunction.signatureValueParameters: List<ValueParameter>
             get() = valueParameters.map { it.toSignatureParameter() }
+
+        private val SirType.signatureType: Type
+            get() {
+                val evaluatedType = this.evaluate()
+
+                return when (val typeWithoutTypeAliases = evaluatedType.type.inlineTypeAliases()) {
+                    is SirDeclaredSirType -> {
+                        check(typeWithoutTypeAliases.declaration is SirClass) {
+                            "TypeAliases should have been inlined in the above step. Was: $this"
+                        }
+
+                        Type.Class(
+                            sirClass = typeWithoutTypeAliases.declaration,
+                            typeArguments = typeWithoutTypeAliases.typeArguments.map { Type.TypeArgument(it) },
+                        )
+                    }
+                    is NullableSirType -> Type.Optional(typeWithoutTypeAliases.type.signatureType)
+                    is OirDeclaredSirType -> error("Oir types should have been converted to Sir types in the above step. Was: $this")
+                    else -> Type.Special(evaluatedType.canonicalName)
+                }
+            }
 
         private fun SirValueParameter.toSignatureParameter(): ValueParameter =
             ValueParameter(
@@ -131,17 +214,24 @@ data class Signature(
                 type = this.type.evaluate().canonicalName,
             )
 
-        private val SirCallableDeclaration.receiver: Receiver?
-            get() = when (val parent = parent) {
-                is SirClass -> Receiver(parent)
-                is SirExtension -> Receiver(parent.classDeclaration)
-                else -> null
+        private val SirCallableDeclaration.receiver: Receiver
+            get() {
+                 val (sirClass, constraints) = when (val parent = parent) {
+                    is SirClass -> parent.classDeclaration to emptySet()
+                    is SirExtension -> parent.classDeclaration to parent.conditionalConstraints.map { Receiver.Constraint(it) }.toSet()
+                    else -> return Receiver.None
+                }
+
+                return when (this) {
+                    is SirConstructor -> Receiver.Constructor(sirClass, constraints)
+                    is SirSimpleFunction, is SirProperty -> Receiver.Simple(sirClass, constraints)
+                }
             }
 
-        private val SirCallableDeclaration.conditionalConstraints: List<ConditionalConstraint>
-            get() = when (val parent = parent) {
-                is SirExtension -> parent.conditionalConstraints.map { ConditionalConstraint(it) }
-                else -> emptyList()
+        private val SirCallableDeclaration.signatureScope: Scope
+            get() = when (this.scope) {
+                SirScope.Member -> Scope.Member
+                SirScope.Global, SirScope.Class, SirScope.Static -> Scope.Static
             }
     }
 }

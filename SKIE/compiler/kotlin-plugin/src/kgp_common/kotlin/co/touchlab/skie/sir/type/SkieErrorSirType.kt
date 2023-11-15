@@ -20,6 +20,9 @@ sealed class SkieErrorSirType(
             swiftPoetTypeName = DeclaredTypeName.qualifiedLocalTypeName(canonicalName),
         )
 
+    override fun inlineTypeAliases(): SirType =
+        this
+
     // To ensure this type is never erased
     override fun asHashableType(): SirType? =
         this

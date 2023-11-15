@@ -8,7 +8,15 @@ sealed class SirType {
 
     abstract val isReference: Boolean
 
+    /**
+     * Replaces OirDeclaredSirType with their corresponding SirType.
+     */
     abstract fun evaluate(): EvaluatedSirType<SirType>
+
+    /**
+     * Replace all type aliases with their underlying types.
+     */
+    abstract fun inlineTypeAliases(): SirType
 
     open fun asHashableType(): SirType? = null
 

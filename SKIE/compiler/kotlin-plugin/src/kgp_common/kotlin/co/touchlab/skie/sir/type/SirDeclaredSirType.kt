@@ -40,6 +40,19 @@ data class SirDeclaredSirType(
         )
     }
 
+    override fun inlineTypeAliases(): SirType {
+        val inlinedTypeArguments = typeArguments.map { it.inlineTypeAliases() }
+
+        return when (declaration) {
+            is SirClass -> copy(typeArguments = inlinedTypeArguments)
+            is SirTypeAlias -> {
+                val substitutions = declaration.typeParameters.zip(inlinedTypeArguments).toMap()
+
+                declaration.type.substituteTypeArguments(substitutions).inlineTypeAliases()
+            }
+        }
+    }
+
     fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName =
         if (pointsToInternalName) declaration.internalName.toSwiftPoetName() else declaration.fqName.toExternalSwiftPoetName()
 

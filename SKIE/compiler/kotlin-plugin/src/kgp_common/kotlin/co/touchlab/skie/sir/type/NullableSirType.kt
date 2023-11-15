@@ -22,6 +22,9 @@ data class NullableSirType(
         )
     }
 
+    override fun inlineTypeAliases(): SirType =
+        copy(type = type.inlineTypeAliases())
+
     override fun asHashableType(): SirType? =
         type.asHashableType()?.let(::NullableSirType)
 
