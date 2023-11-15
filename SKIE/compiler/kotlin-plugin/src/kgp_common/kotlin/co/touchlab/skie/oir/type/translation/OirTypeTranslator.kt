@@ -105,7 +105,9 @@ class OirTypeTranslator(
         }
 
         mostSpecificMatches.firstOrNull()?.let {
-            return it.mapper.mapType(it.type, oirTypeParameterScope)
+            val derivedParameterScope = oirTypeParameterScope.deriveFor(it.type) ?: return SpecialReferenceOirType.Id
+
+            return it.mapper.mapType(it.type, derivedParameterScope)
         }
 
         if (kotlinType.isTypeParameter()) {
