@@ -4,11 +4,11 @@ import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirEnumEntry
+import co.touchlab.skie.kir.util.hasArgumentValue
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.sir.element.isExported
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
-import org.jetbrains.kotlin.resolve.annotations.argumentValue
 
 object EnumEntryRenamingPhase : SirPhase {
 
@@ -27,7 +27,9 @@ object EnumEntryRenamingPhase : SirPhase {
 
     context(SkiePhase.Context)
     private val KirEnumEntry.isSupported: Boolean
-        get() = this.descriptor.annotations.findAnnotation(KonanFqNames.objCName)?.argumentValue("swiftName") == null
+        get() = this.descriptor.annotations.findAnnotation(KonanFqNames.objCName)
+            ?.let { !it.hasArgumentValue("name") && !it.hasArgumentValue("swiftName") }
+            ?: true
 
     context(SirPhase.Context)
     private fun KirClass.renameEnumEntries() {

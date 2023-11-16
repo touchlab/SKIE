@@ -3,6 +3,7 @@ package co.touchlab.skie.kir.util
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.constants.AnnotationValue
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
@@ -55,3 +56,6 @@ private val ConstantValue<*>.runtimeValue: Any?
 
         else -> this.value
     }
+
+fun AnnotationDescriptor.hasArgumentValue(parameterName: String): Boolean =
+    Name.identifier(parameterName) in this.allValueArguments
