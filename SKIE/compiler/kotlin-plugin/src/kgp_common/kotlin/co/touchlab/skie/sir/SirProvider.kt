@@ -93,7 +93,7 @@ class SirProvider(
         }
 
     fun findClassByFqName(fqName: SirFqName): SirClass? {
-        val parent = fqName.parent?.let { getClassByFqName(it) }
+        val parent = fqName.parent?.let { findClassByFqName(it) ?: return null }
 
         val possibleParentDeclarations = if (parent != null) {
             listOf(parent)

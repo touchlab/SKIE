@@ -7,6 +7,7 @@ import co.touchlab.skie.phases.apinotes.builder.ApiNotes
 import co.touchlab.skie.phases.apinotes.parser.ExternalApiNotesParser
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirTypeParameterParent
 import co.touchlab.skie.util.Command
 import java.io.File
 
@@ -56,6 +57,7 @@ class ConfigureExternalOirTypesBridgingPhase(
                     objCName = it.objCFqName,
                     swiftName = it.swiftFqName,
                     bridgeSwiftName = it.bridgeFqName,
+                    importAsNonGeneric = it.importAsNonGeneric,
                 )
             }
             .filter { it.swiftName != null || it.bridgeSwiftName != null }
@@ -75,15 +77,15 @@ class ConfigureExternalOirTypesBridgingPhase(
     private fun configureBridging(apiNotesEntry: ApiNotesEntry) {
         val oirClass = oirProvider.findExistingExternalOirClass(apiNotesEntry.moduleName, apiNotesEntry.objCName) ?: return
 
-        val module = sirProvider.getExternalModule(apiNotesEntry.moduleName)
-
         if (oirClass.bridgedSirClass == null && apiNotesEntry.bridgeSwiftName != null) {
-            val bridgeFqName = SirFqName(module, apiNotesEntry.bridgeSwiftName)
+            val bridgeFqName = apiNotesEntry.bridgeSwiftName.asApiNotesSirFqName()
 
             oirClass.bridgedSirClass = getOrCreateSirClass(bridgeFqName)
         }
 
         if (apiNotesEntry.swiftName != null) {
+            val module = sirProvider.getExternalModule(apiNotesEntry.moduleName)
+
             val fqName = SirFqName(module, apiNotesEntry.swiftName)
 
             if (fqName.parent != null) {
@@ -93,7 +95,22 @@ class ConfigureExternalOirTypesBridgingPhase(
             oirClass.originalSirClass.baseName = fqName.simpleName
         }
 
-        // WIP importAsNonGeneric
+        if (apiNotesEntry.importAsNonGeneric) {
+            oirClass.originalSirClass.typeParameters.toList().forEach {
+                it.parent = SirTypeParameterParent.None
+            }
+        }
+    }
+
+    private fun String.asApiNotesSirFqName(): SirFqName {
+        val parts = split('.')
+
+        check(parts.size == 2) { "Invalid ApiNotes fq name: $this. Expected format is \$moduleName.\$className" }
+
+        val module = sirProvider.getExternalModule(parts[0])
+        val className = parts[1]
+
+        return SirFqName(module, className)
     }
 
     private fun getOrCreateSirClass(fqName: SirFqName): SirClass {
@@ -120,5 +137,11 @@ class ConfigureExternalOirTypesBridgingPhase(
         }
     }
 
-    private data class ApiNotesEntry(val moduleName: String, val objCName: String, val swiftName: String?, val bridgeSwiftName: String?)
+    private data class ApiNotesEntry(
+        val moduleName: String,
+        val objCName: String,
+        val swiftName: String?,
+        val bridgeSwiftName: String?,
+        val importAsNonGeneric: Boolean,
+    )
 }
