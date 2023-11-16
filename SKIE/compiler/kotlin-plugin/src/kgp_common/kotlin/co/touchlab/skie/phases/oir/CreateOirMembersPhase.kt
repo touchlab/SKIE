@@ -2,9 +2,11 @@
 
 package co.touchlab.skie.phases.oir
 
+import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
+import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirOverridableDeclaration
 import co.touchlab.skie.kir.element.KirProperty
@@ -39,6 +41,7 @@ class CreateOirMembersPhase(
     context(SirPhase.Context)
     override fun execute() {
         createAllMembers()
+        createAllEnumEntries()
         initializeOverridesForAllMembers()
     }
 
@@ -83,7 +86,7 @@ class CreateOirMembersPhase(
     }
 
     private fun createProperty(property: KirProperty) {
-        val oirProperty = OirProperty(
+        property.oirProperty = OirProperty(
             name = namer.getPropertyName(property.baseDescriptor).objCName,
             type = oirTypeTranslator.mapType(property.type, property.owner.oirClass.genericsScope),
             isVar = property.isVar,
@@ -91,8 +94,6 @@ class CreateOirMembersPhase(
             scope = property.oirScope,
             deprecationLevel = property.deprecationLevel,
         )
-
-        property.oirProperty = oirProperty
     }
 
     private fun getOirCallableDeclarationParent(kirCallableDeclaration: KirCallableDeclaration<*>): OirCallableDeclarationParent =
@@ -148,6 +149,25 @@ class CreateOirMembersPhase(
         usedNames.add(uniqueName)
 
         return uniqueName
+    }
+
+    private fun createAllEnumEntries() {
+        kirProvider.allEnums.forEach(::createEnumEntries)
+    }
+
+    private fun createEnumEntries(kirClass: KirClass) {
+        kirClass.enumEntries.forEach(::createEnumEntry)
+    }
+
+    private fun createEnumEntry(enumEntry: KirEnumEntry) {
+        enumEntry.oirEnumEntry = OirProperty(
+            name = namer.getEnumEntrySelector(enumEntry.descriptor),
+            type = enumEntry.owner.oirClass.defaultType,
+            isVar = false,
+            parent = enumEntry.owner.oirClass,
+            scope = OirScope.Static,
+            deprecationLevel = DeprecationLevel.None,
+        )
     }
 
     private fun initializeOverridesForAllMembers() {

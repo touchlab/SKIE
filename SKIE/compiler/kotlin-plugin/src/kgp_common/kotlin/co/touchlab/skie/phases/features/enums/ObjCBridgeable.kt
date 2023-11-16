@@ -133,9 +133,9 @@ private fun KirEnumEntry.getSwiftBridgeCase(enum: SirClass): CodeBlock {
 
     return CodeBlock.of(
         "case .%N: return %T.%N as %T",
-        swiftName,
+        sirEnumEntry.name,
         typeName,
-        swiftName,
+        sirEnumEntry.name,
         typeName,
     )
 }
@@ -197,7 +197,7 @@ private fun CodeBlock.Builder.addFromObjectiveCBodyCase(
     val typeName = enum.defaultType.evaluate().swiftPoetTypeName
 
     val controlFlowCode = "source == %T.%N as %T"
-    val controlFlowArguments = arrayOf(typeName, entry.swiftName, typeName)
+    val controlFlowArguments = arrayOf(typeName, entry.sirEnumEntry.name, typeName)
 
     if (index == 0) {
         beginControlFlow("if", controlFlowCode, *controlFlowArguments)
@@ -205,7 +205,7 @@ private fun CodeBlock.Builder.addFromObjectiveCBodyCase(
         nextControlFlow("else if", controlFlowCode, *controlFlowArguments)
     }
 
-    addStatement("return .%N", entry.swiftName)
+    addStatement("return .%N", entry.sirEnumEntry.name)
 }
 
 private val SirClass.fatalErrorFromObjectiveC: CodeBlock

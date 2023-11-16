@@ -110,7 +110,7 @@ private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
 private fun SirClass.addEnumCases(enum: KirClass) {
     enum.enumEntries.forEach {
         SirEnumCase(
-            simpleName = it.swiftName,
+            simpleName = it.sirEnumEntry.name,
         )
     }
 }

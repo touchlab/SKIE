@@ -4,6 +4,7 @@ import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirProperty
@@ -16,17 +17,81 @@ import co.touchlab.skie.sir.type.OirDeclaredSirType
 import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 
-data class Signature(
-    val receiver: Receiver,
-    val identifierAfterVisibilityChanges: String,
-    val valueParameters: List<ValueParameter>,
-    val returnType: ReturnType,
-    val scope: Scope,
-) {
+sealed class Signature {
+
+    abstract val receiver: Receiver
+    abstract val identifier: String
+    abstract val valueParameters: List<ValueParameter>
+    abstract val returnType: ReturnType
+    abstract val scope: Scope
+
+    class Function(
+        override val receiver: Receiver,
+        override val identifier: String,
+        override val valueParameters: List<ValueParameter>,
+        override val returnType: ReturnType,
+        override val scope: Scope,
+    ) : Signature()
+
+    class Property(
+        override val receiver: Receiver,
+        override val identifier: String,
+        override val scope: Scope,
+    ) : Signature() {
+
+        override val valueParameters: List<ValueParameter> = emptyList()
+
+        override val returnType: ReturnType = ReturnType.Any
+    }
+
+    class EnumCase(
+        override val receiver: Receiver,
+        override val identifier: String,
+    ) : Signature() {
+
+        override val valueParameters: List<ValueParameter> = emptyList()
+
+        override val returnType: ReturnType = ReturnType.Any
+
+        override val scope: Scope = Scope.Static
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Signature) return false
+
+        if (receiver != other.receiver) return false
+        if (identifier != other.identifier) return false
+        if (valueParameters != other.valueParameters) return false
+        if (returnType != other.returnType) return false
+        if (scope != other.scope) return false
+
+        if (this is EnumCase && other is Function || this is Function && other is EnumCase) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = receiver.hashCode()
+        result = 31 * result + identifier.hashCode()
+        result = 31 * result + valueParameters.hashCode()
+        result = 31 * result + returnType.hashCode()
+        result = 31 * result + scope.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "Signature.${this::class.simpleName}(" +
+            "receiver=$receiver, " +
+            "identifier='$identifier', " +
+            "valueParameters=$valueParameters, " +
+            "returnType=$returnType, " +
+            "scope=$scope" +
+            ")"
 
     sealed interface Receiver {
 
-        data class Simple(val type: Type, val constraints: Set<Constraint>) : Receiver
+        data class Simple(val type: Type.Class, val constraints: Set<Constraint>) : Receiver
 
         data class Constructor(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver
 
@@ -143,6 +208,12 @@ data class Signature(
 
     companion object {
 
+        operator fun invoke(enumCase: SirEnumCase): Signature =
+            EnumCase(
+                receiver = Receiver.Simple(enumCase.parent.asReceiverType, emptySet()),
+                identifier = enumCase.simpleName,
+            )
+
         operator fun invoke(callableDeclaration: SirCallableDeclaration): Signature =
             when (callableDeclaration) {
                 is SirSimpleFunction -> Signature(callableDeclaration)
@@ -151,9 +222,9 @@ data class Signature(
             }
 
         operator fun invoke(function: SirSimpleFunction): Signature =
-            Signature(
+            Function(
                 receiver = function.receiver,
-                identifierAfterVisibilityChanges = function.identifierAfterVisibilityChanges,
+                identifier = function.identifierAfterVisibilityChanges,
                 valueParameters = function.signatureValueParameters,
                 returnType = ReturnType.Specific(function.returnType.signatureType),
                 scope = function.signatureScope,
@@ -166,9 +237,9 @@ data class Signature(
                 "Constructors should always have a constructor receiver. Was: $receiver"
             }
 
-            return Signature(
+            return Function(
                 receiver = receiver,
-                identifierAfterVisibilityChanges = constructor.identifierAfterVisibilityChanges,
+                identifier = constructor.identifierAfterVisibilityChanges,
                 valueParameters = constructor.signatureValueParameters,
                 returnType = ReturnType.Specific(receiver.sirClass.defaultType.signatureType),
                 scope = constructor.signatureScope,
@@ -176,11 +247,9 @@ data class Signature(
         }
 
         operator fun invoke(property: SirProperty): Signature =
-            Signature(
+            Property(
                 receiver = property.receiver,
-                identifierAfterVisibilityChanges = property.identifierAfterVisibilityChanges,
-                valueParameters = emptyList(),
-                returnType = ReturnType.Any,
+                identifier = property.identifierAfterVisibilityChanges,
                 scope = property.signatureScope,
             )
 
@@ -224,9 +293,12 @@ data class Signature(
 
                 return when (this) {
                     is SirConstructor -> Receiver.Constructor(sirClass, constraints)
-                    is SirSimpleFunction, is SirProperty -> Receiver.Simple(sirClass.defaultType.signatureType, constraints)
+                    is SirSimpleFunction, is SirProperty -> Receiver.Simple(sirClass.asReceiverType, constraints)
                 }
             }
+
+        private val SirClass.asReceiverType: Type.Class
+            get() = Type.Class(this, emptyList())
 
         private val SirCallableDeclaration.signatureScope: Scope
             get() = when (this.scope) {
@@ -237,4 +309,7 @@ data class Signature(
 }
 
 val SirCallableDeclaration.signature: Signature
+    get() = Signature(this)
+
+val SirEnumCase.signature: Signature
     get() = Signature(this)

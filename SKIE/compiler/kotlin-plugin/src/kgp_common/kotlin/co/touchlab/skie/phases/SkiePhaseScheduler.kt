@@ -11,6 +11,7 @@ import co.touchlab.skie.phases.apinotes.MoveBridgesToTopLevelPhase
 import co.touchlab.skie.phases.debug.DumpSwiftApiPhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.features.defaultarguments.RemoveConflictingDefaultArgumentOverloadsPhase
+import co.touchlab.skie.phases.features.enums.EnumEntryRenamingPhase
 import co.touchlab.skie.phases.features.enums.ExhaustiveEnumsGenerator
 import co.touchlab.skie.phases.features.flow.ConfigureFlowConversionPhase
 import co.touchlab.skie.phases.features.flow.ConvertFlowsPhase
@@ -158,6 +159,7 @@ class SkiePhaseScheduler {
             FlowBridgingConfigurationPhase,
             FlowConversionConstructorsGenerator(context),
 
+            EnumEntryRenamingPhase,
             ExhaustiveEnumsGenerator,
             SealedInteropGenerator(context),
 

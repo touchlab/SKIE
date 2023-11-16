@@ -5,6 +5,7 @@ import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
+import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirModule
 import co.touchlab.skie.kir.element.KirOverridableDeclaration
@@ -16,6 +17,7 @@ import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.phases.runtime.isSkieKotlinRuntime
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -48,10 +50,15 @@ class KirProvider(
 
     private lateinit var sirToCallableDeclarationsCache: Map<SirCallableDeclaration, KirCallableDeclaration<*>>
 
+    private lateinit var sirToEnumEntryCache: Map<SirProperty, KirEnumEntry>
+
     val allModules: Collection<KirModule>
         get() = modulesMap.values
 
     lateinit var allClasses: Set<KirClass>
+        private set
+
+    lateinit var allEnums: Set<KirClass>
         private set
 
     lateinit var allCallableDeclarations: List<KirCallableDeclaration<*>>
@@ -103,6 +110,7 @@ class KirProvider(
         }
 
         allClasses = visitedClasses.toSet()
+        allEnums = allClasses.filter { it.kind == KirClass.Kind.Enum }.toSet()
 
         classDescriptorCache = allClasses.mapNotNull { kirClass -> kirClass.classDescriptorOrNull?.let { it to kirClass } }.toMap()
         fileCache = allClasses.mapNotNull { kirClass -> kirClass.sourceFileOrNull?.let { it to kirClass } }.toMap()
@@ -138,6 +146,8 @@ class KirProvider(
     fun initializeSirCallableDeclarationsCache() {
         sirToCallableDeclarationsCache = allCallableDeclarations.associateBy { it.originalSirDeclaration } +
             allCallableDeclarations.filter { it.bridgedSirDeclaration != null }.associateBy { it.bridgedSirDeclaration!! }
+
+        sirToEnumEntryCache = allEnums.flatMap { it.enumEntries }.associateBy { it.sirEnumEntry }
     }
 
     fun getClass(classDescriptor: ClassDescriptor): KirClass =
@@ -192,4 +202,7 @@ class KirProvider(
 
     fun findConstructor(constructorDescriptor: ClassConstructorDescriptor): KirConstructor? =
         descriptorsToCallableDeclarationsCache[constructorDescriptor] as? KirConstructor
+
+    fun findEnumEntry(property: SirProperty): KirEnumEntry? =
+        sirToEnumEntryCache[property]
 }

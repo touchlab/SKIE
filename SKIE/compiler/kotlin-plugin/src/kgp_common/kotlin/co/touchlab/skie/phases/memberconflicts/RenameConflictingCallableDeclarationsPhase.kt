@@ -13,6 +13,7 @@ import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirDeclarationParent
+import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirProperty
@@ -30,17 +31,31 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
+        val sortedEnumCases = getSortedEnumCases()
+        val sortedCallableDeclarations = getSortedCallableDeclarations()
+
+        val uniqueSignatureSet = UniqueSignatureSet()
+
+        uniqueSignatureSet.addEnumCases(sortedEnumCases)
+        uniqueSignatureSet.addCallableDeclarations(sortedCallableDeclarations)
+    }
+
+    context(SirPhase.Context)
+    private fun getSortedEnumCases(): List<SirEnumCase> =
+        sirProvider.allLocalEnums.flatMap { it.enumCases }
+
+    context(SirPhase.Context)
+    private fun getSortedCallableDeclarations(): List<SirCallableDeclaration> {
         val comparator = getCollisionResolutionPriorityComparator()
 
-        val sortedCallableDeclarations = sirProvider.allLocalDeclarations
+        return sirProvider.allLocalDeclarations
             .filterIsInstance<SirCallableDeclaration>()
             .sortedWith(comparator)
-
-        buildUniqueSignatureSet(sortedCallableDeclarations)
     }
 
     /**
      * constructors without value parameters are processed first because they cannot be renamed
+     * Kotlin enum entries are prioritized and sorted by index
      * Non-removed declarations are prioritized
      * visibility (exported is prioritized)
      * originating from Kotlin stdlib (is prioritized)
@@ -58,6 +73,9 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
         compareByDescending<SirCallableDeclaration> {
             it is SirConstructor && it.valueParameters.isEmpty()
         }
+            .thenBy { declaration ->
+                (declaration as? SirProperty)?.let { kirProvider.findEnumEntry(it)?.index } ?: Int.MAX_VALUE
+            }
             .thenBy { it.isRemoved }
             .thenBy {
                 when (it.visibility) {
@@ -123,11 +141,15 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
     private val SirDeclarationParent.containerFqName: String
         get() = (this.parent?.containerFqName ?: "") + this.toString()
 
-    private fun buildUniqueSignatureSet(callableDeclarations: List<SirCallableDeclaration>) {
-        val signatureSet = UniqueSignatureSet()
+    private fun UniqueSignatureSet.addEnumCases(enumCases: List<SirEnumCase>) {
+        enumCases.forEach {
+            this.add(it)
+        }
+    }
 
+    private fun UniqueSignatureSet.addCallableDeclarations(callableDeclarations: List<SirCallableDeclaration>) {
         callableDeclarations.forEach {
-            signatureSet.add(it)
+            this.add(it)
         }
     }
 }

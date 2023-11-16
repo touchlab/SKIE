@@ -10,7 +10,7 @@ object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
 
         var collisionExists = false
 
-        sirProvider.allLocalPublicTypeDeclarations.forEach { type ->
+        sirProvider.allLocalTypeDeclarations.forEach { type ->
             if (type.fqName.toString() == moduleName) {
                 type.baseName += "_"
                 collisionExists = true

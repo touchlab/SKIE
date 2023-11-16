@@ -85,11 +85,11 @@ class CreateKirTypesPhase(
             return
         }
 
-        descriptor.enumEntries.forEach {
+        descriptor.enumEntries.forEachIndexed { index, classDescriptor ->
             KirEnumEntry(
-                descriptor = it.original,
-                parent = kirClass,
-                swiftName = namer.getEnumEntrySwiftName(it),
+                descriptor = classDescriptor.original,
+                owner = kirClass,
+                index = index,
             )
         }
     }

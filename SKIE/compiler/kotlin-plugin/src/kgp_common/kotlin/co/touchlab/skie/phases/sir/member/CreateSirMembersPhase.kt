@@ -1,7 +1,9 @@
 package co.touchlab.skie.phases.sir.member
 
 import co.touchlab.skie.kir.element.KirCallableDeclaration
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
+import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirProperty
 import co.touchlab.skie.kir.element.KirSimpleFunction
@@ -27,11 +29,17 @@ class CreateSirMembersPhase(
 ) : SirPhase {
 
     private val namer = context.namer
+    private val kirProvider = context.kirProvider
     private val sirProvider = context.sirProvider
     private val sirTypeTranslator = context.sirTypeTranslator
 
     context(SirPhase.Context)
     override fun execute() {
+        createAllMembers()
+        createAllEnumEntries()
+    }
+
+    private fun createAllMembers() {
         kirProvider.allCallableDeclarations.forEach(::createCallableDeclaration)
     }
 
@@ -138,8 +146,7 @@ class CreateSirMembersPhase(
             }
     }
 
-    private fun KirFunction<*>.getExportedValueParameters()
-        : List<KirValueParameter> =
+    private fun KirFunction<*>.getExportedValueParameters(): List<KirValueParameter> =
         this.valueParameters.filter {
             when (it.kind) {
                 KirValueParameter.Kind.ErrorOut -> false
@@ -147,8 +154,7 @@ class CreateSirMembersPhase(
             }
         }
 
-    private val KirFunction<*>.swiftFunctionName
-        : SwiftFunctionName
+    private val KirFunction<*>.swiftFunctionName: SwiftFunctionName
         get() {
             val swiftName = namer.getSwiftName(this.baseDescriptor)
 
@@ -160,8 +166,31 @@ class CreateSirMembersPhase(
             return SwiftFunctionName(identifier, argumentLabels)
         }
 
-    private data
-    class SwiftFunctionName(
+    private fun createAllEnumEntries() {
+        kirProvider.allEnums.forEach(::createEnumEntries)
+    }
+
+    private fun createEnumEntries(kirClass: KirClass) {
+        kirClass.enumEntries.forEach(::createEnumEntry)
+    }
+
+    private fun createEnumEntry(enumEntry: KirEnumEntry) {
+        val oirEnumEntry = enumEntry.oirEnumEntry
+
+        oirEnumEntry.originalSirProperty = SirProperty(
+            identifier = namer.getEnumEntrySwiftName(enumEntry.descriptor),
+            parent = enumEntry.owner.originalSirClass,
+            type = sirTypeTranslator.mapType(oirEnumEntry.type),
+            scope = oirEnumEntry.scope.sirScope,
+            deprecationLevel = oirEnumEntry.deprecationLevel,
+        ).apply {
+            SirGetter(
+                throws = false,
+            )
+        }
+    }
+
+    private data class SwiftFunctionName(
         val identifier: String,
         val argumentLabels
         : List<String>,

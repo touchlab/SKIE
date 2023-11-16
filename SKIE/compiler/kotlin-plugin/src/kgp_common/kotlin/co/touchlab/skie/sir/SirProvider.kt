@@ -14,6 +14,7 @@ import co.touchlab.skie.sir.element.SirTopLevelDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
+import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 import co.touchlab.skie.util.FrameworkLayout
 import java.nio.file.Path
 
@@ -45,8 +46,11 @@ class SirProvider(
     val allLocalTypeDeclarations: List<SirTypeDeclaration>
         get() = allLocalDeclarations.filterIsInstance<SirTypeDeclaration>()
 
-    val allLocalPublicTypeDeclarations: List<SirTypeDeclaration>
-        get() = allLocalTypeDeclarations.filter { it.visibility == SirVisibility.Public }
+    val allLocalClasses: List<SirClass>
+        get() = allLocalTypeDeclarations.filterIsInstance<SirClass>()
+
+    val allLocalEnums: List<SirClass>
+        get() = allLocalClasses.filter { it.kind == SirClass.Kind.Enum }
 
     val allExternalTypeDeclarations: List<SirTypeDeclaration>
         get() = externalModuleCache.values
