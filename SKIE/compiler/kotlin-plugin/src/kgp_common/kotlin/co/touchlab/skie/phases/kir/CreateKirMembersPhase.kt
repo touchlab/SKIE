@@ -268,7 +268,7 @@ class CreateKirMembersPhase(
             return when (deprecationInfo?.deprecationLevel) {
                 DeprecationLevelValue.ERROR -> DeprecationLevel.Error(deprecationInfo.message)
                 DeprecationLevelValue.WARNING -> DeprecationLevel.Warning(deprecationInfo.message)
-                DeprecationLevelValue.HIDDEN -> error("Hidden Kir declarations should not be created: $deprecationInfo")
+                DeprecationLevelValue.HIDDEN -> DeprecationLevel.Error(deprecationInfo.message)
                 null -> DeprecationLevel.None
             }
         }
