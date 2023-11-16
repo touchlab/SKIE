@@ -5,6 +5,7 @@ import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.sir.type.hasStableNameTypeAlias
 import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
@@ -46,6 +47,8 @@ object ExhaustiveEnumsGenerator : SirPhase {
     private fun generate(kirClass: KirClass) {
         val skieClass = kirClass.generateBridge()
 
+        createStableNameTypeAliasIfRequested(skieClass, kirClass)
+
         kirClass.configureBridging(skieClass)
     }
 
@@ -80,14 +83,6 @@ private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
         } ?: skieNamespaceProvider.getNamespaceFile(enumKirClass),
         kind = SirClass.Kind.Enum,
     ).apply {
-        internalTypeAlias = SirTypeAlias(
-            baseName = "Enum",
-            parent = skieNamespaceProvider.getNamespace(enumKirClass),
-            visibility = SirVisibility.PublicButReplaced,
-        ) {
-            defaultType.withFqName()
-        }
-
         addEnumCases(enumKirClass)
 
         superTypes += listOf(
@@ -194,5 +189,20 @@ private fun SirExtension.addToSwiftConversionMethod(bridgedEnum: SirClass) {
         bodyBuilder.add {
             addStatement("return %T._unconditionallyBridgeFromObjectiveC(self)", bridgedEnum.defaultType.evaluate().swiftPoetTypeName)
         }
+    }
+}
+
+context(SirPhase.Context)
+private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass: KirClass) {
+    if (!kirClass.hasStableNameTypeAlias) {
+        return
+    }
+
+    SirTypeAlias(
+        baseName = "Enum",
+        parent = skieNamespaceProvider.getNamespace(kirClass),
+        visibility = SirVisibility.PublicButReplaced,
+    ) {
+        bridgedEnum.defaultType.withFqName()
     }
 }

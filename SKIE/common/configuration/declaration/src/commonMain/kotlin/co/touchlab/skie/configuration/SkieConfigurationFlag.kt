@@ -16,6 +16,7 @@ enum class SkieConfigurationFlag {
     Debug_PrintSkiePerformanceLogs,
     Debug_CrashOnSoftErrors,
     Debug_LoadAllPlatformApiNotes,
+    Debug_GenerateFileForEachExportedClass,
 
     Analytics_GradlePerformance,
     Analytics_GradleEnvironment,

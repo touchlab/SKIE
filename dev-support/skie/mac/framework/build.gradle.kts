@@ -27,6 +27,7 @@ skie {
         group {
             ExperimentalFeatures.Enabled(true)
             DefaultArgumentInterop.Enabled(true)
+            ClassInterop.StableTypeAliases(true)
         }
     }
 
@@ -36,6 +37,7 @@ skie {
         printSkiePerformanceLogs.set(true)
         crashOnSoftErrors.set(true)
         loadAllPlatformApiNotes.set(true)
+        generateFileForEachExportedClass.set(true)
     }
 }
 

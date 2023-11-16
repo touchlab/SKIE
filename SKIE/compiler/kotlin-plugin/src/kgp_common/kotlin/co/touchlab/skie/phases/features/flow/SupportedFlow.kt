@@ -24,6 +24,12 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
     val variants: List<Variant> = listOf(requiredVariant, optionalVariant)
 
+    fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass =
+        kirProvider.getClassByFqName(coroutinesFlowFqName)
+
+    context(SirPhase.Context)
+    fun getCoroutinesKirClass(): KirClass = getCoroutinesKirClass(kirProvider)
+
     sealed interface Variant {
 
         val owner: SupportedFlow

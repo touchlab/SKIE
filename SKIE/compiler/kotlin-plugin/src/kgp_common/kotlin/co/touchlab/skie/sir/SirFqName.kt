@@ -16,11 +16,7 @@ class SirFqName private constructor(
         parent?.toLocalString()?.let { "$it.$simpleName" } ?: simpleName
 
     override fun toString(): String =
-        if (module is SirModule.External) {
-            module.name + "." + toLocalString()
-        } else {
-            toLocalString()
-        }
+        module.name + "." + toLocalString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -45,6 +45,7 @@ import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverridenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
+import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRuntimePhase
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.phases.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.phases.sir.member.CreateAsyncSirFunctionsPhase
@@ -54,7 +55,7 @@ import co.touchlab.skie.phases.sir.member.InitializeSirOverridesPhase
 import co.touchlab.skie.phases.sir.member.StripKonanCallableDeclarationManglingPhase
 import co.touchlab.skie.phases.sir.type.CreateExternalSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirTypesPhase
-import co.touchlab.skie.phases.sir.type.CreateSirInternalTypeAliasesPhase
+import co.touchlab.skie.phases.sir.type.CreateStableNameTypeAliasesPhase
 import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
 import co.touchlab.skie.phases.sir.type.InitializeSirTypesCachePhase
 import co.touchlab.skie.phases.sir.type.InitializeSirTypesSuperTypesForOirPhase
@@ -125,7 +126,9 @@ class SkiePhaseScheduler {
             InitializeSirTypesCachePhase,
             InitializeSirTypesSuperTypesForOirPhase,
             ConfigureExternalOirTypesBridgingPhase(context),
-            CreateSirInternalTypeAliasesPhase,
+
+            ConfigureStableNameTypeAliasesForKotlinRuntimePhase,
+            CreateStableNameTypeAliasesPhase(context),
 
             CreateSirMembersPhase(context),
             CreateAsyncSirFunctionsPhase,

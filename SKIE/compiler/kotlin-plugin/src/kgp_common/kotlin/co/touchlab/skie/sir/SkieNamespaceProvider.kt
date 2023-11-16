@@ -22,13 +22,17 @@ class SkieNamespaceProvider(
 
     private val moduleNamespaceCache = mutableMapOf<KirModule, SirClass>()
 
-    private val skieNamespaceFile = sirProvider.getFile(kirProvider.skieModule.name, "Namespace")
+    private val skieNamespaceFile by lazy {
+        sirProvider.getFile(kirProvider.skieModule.name, "Namespace")
+    }
 
-    private val skieNamespaceBaseClass: SirClass = SirClass(
-        baseName = "Skie",
-        parent = skieNamespaceFile,
-        kind = SirClass.Kind.Enum,
-    )
+    private val skieNamespaceBaseClass: SirClass by lazy {
+        SirClass(
+            baseName = "Skie",
+            parent = skieNamespaceFile,
+            kind = SirClass.Kind.Enum,
+        )
+    }
 
     private val modulesWithShortNameCollision =
         kirProvider.allModules

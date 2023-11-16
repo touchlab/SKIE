@@ -2,11 +2,9 @@ package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirTypeParameter
-import co.touchlab.skie.util.swift.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.parameterizedBy
@@ -54,7 +52,7 @@ data class SirDeclaredSirType(
     }
 
     fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName =
-        if (pointsToInternalName) declaration.internalName.toSwiftPoetName() else declaration.fqName.toExternalSwiftPoetName()
+        if (pointsToInternalName) declaration.internalName.toSwiftPoetName() else declaration.fqName.toSwiftPoetName()
 
     private fun getCanonicalName(evaluatedTypeArguments: List<EvaluatedSirType<SirType>>): String {
         val typeArgumentSuffix = if (evaluatedTypeArguments.isEmpty()) {
@@ -85,14 +83,6 @@ data class SirDeclaredSirType(
 
     private fun SirFqName.toSwiftPoetName(): DeclaredTypeName =
         parent?.toSwiftPoetName()?.nestedType(simpleName)
-            ?: if (module is SirModule.External) {
-                DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)
-            } else {
-                DeclaredTypeName.qualifiedLocalTypeName(simpleName)
-            }
-
-    private fun SirFqName.toExternalSwiftPoetName(): DeclaredTypeName =
-        parent?.toExternalSwiftPoetName()?.nestedType(simpleName)
             ?: DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)
 
     override fun withFqName(): SirDeclaredSirType =

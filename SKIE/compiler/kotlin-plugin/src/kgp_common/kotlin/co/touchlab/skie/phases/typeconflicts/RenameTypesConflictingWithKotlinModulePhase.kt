@@ -11,7 +11,7 @@ object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
         var collisionExists = false
 
         sirProvider.allLocalTypeDeclarations.forEach { type ->
-            if (type.fqName.toString() == moduleName) {
+            if (type.simpleName == moduleName) {
                 type.baseName += "_"
                 collisionExists = true
             }
