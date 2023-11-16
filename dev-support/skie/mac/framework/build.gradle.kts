@@ -27,7 +27,7 @@ skie {
         group {
             ExperimentalFeatures.Enabled(true)
             DefaultArgumentInterop.Enabled(true)
-            ClassInterop.StableTypeAliases(true)
+            ClassInterop.StableTypeAlias(true)
         }
     }
 

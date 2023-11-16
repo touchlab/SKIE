@@ -16,10 +16,10 @@ annotation class FunctionInterop {
     }
 
     /**
-     * See [co.touchlab.skie.configuration.FunctionInterop.LegacyNames]
+     * See [co.touchlab.skie.configuration.FunctionInterop.LegacyName]
      */
     @Target
-    annotation class LegacyNames {
+    annotation class LegacyName {
 
         @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
         @Retention(AnnotationRetention.BINARY)

@@ -44,4 +44,4 @@ class CreateStableNameTypeAliasesPhase(
 context(SirPhase.Context)
 val KirClass.hasStableNameTypeAlias: Boolean
     get() = this.originalSirClass.isExported &&
-        this.getConfiguration(ClassInterop.StableTypeAliases)
+        this.getConfiguration(ClassInterop.StableTypeAlias)

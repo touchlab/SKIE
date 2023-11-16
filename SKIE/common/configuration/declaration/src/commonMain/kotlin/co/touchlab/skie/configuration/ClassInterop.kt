@@ -11,7 +11,7 @@ object ClassInterop {
      *
      * (Both Kotlin compiler and SKIE rename classes to avoid name conflicts.)
      */
-    object StableTypeAliases : ConfigurationKey.Boolean {
+    object StableTypeAlias : ConfigurationKey.Boolean {
 
         override val defaultValue: Boolean = false
 
@@ -19,8 +19,8 @@ object ClassInterop {
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
-                configurationTarget.hasAnnotation<ClassInterop.StableTypeAliases.Enabled>() -> true
-                configurationTarget.hasAnnotation<ClassInterop.StableTypeAliases.Disabled>() -> false
+                configurationTarget.hasAnnotation<ClassInterop.StableTypeAlias.Enabled>() -> true
+                configurationTarget.hasAnnotation<ClassInterop.StableTypeAlias.Disabled>() -> false
                 else -> null
             }
     }

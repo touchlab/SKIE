@@ -12,10 +12,10 @@ annotation class EnumInterop {
     annotation class Disabled
 
     /**
-     * See [co.touchlab.skie.configuration.EnumInterop.LegacyCaseNames]
+     * See [co.touchlab.skie.configuration.EnumInterop.LegacyCaseName]
      */
     @Target
-    annotation class LegacyCaseNames {
+    annotation class LegacyCaseName {
 
         @Target(AnnotationTarget.CLASS)
         @Retention(AnnotationRetention.BINARY)

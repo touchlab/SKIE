@@ -25,7 +25,7 @@ object StripKonanCallableDeclarationManglingPhase : SirPhase {
 
     context(SkiePhase.Context)
     private val KirCallableDeclaration<*>.isSupported: Boolean
-        get() = !this.getConfiguration(FunctionInterop.LegacyNames)
+        get() = !this.getConfiguration(FunctionInterop.LegacyName)
 
     private fun KirCallableDeclaration<*>.stripMangling() {
         when (this) {

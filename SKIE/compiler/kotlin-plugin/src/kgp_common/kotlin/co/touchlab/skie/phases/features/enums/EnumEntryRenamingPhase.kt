@@ -23,7 +23,7 @@ object EnumEntryRenamingPhase : SirPhase {
 
     context(SkiePhase.Context)
     private val KirClass.isSupported: Boolean
-        get() = this.originalSirClass.isExported && !this.getConfiguration(EnumInterop.LegacyCaseNames)
+        get() = this.originalSirClass.isExported && !this.getConfiguration(EnumInterop.LegacyCaseName)
 
     context(SkiePhase.Context)
     private val KirEnumEntry.isSupported: Boolean

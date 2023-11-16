@@ -51,7 +51,7 @@ object EnumInterop {
      *   case none
      * ```
      */
-    object LegacyCaseNames : ConfigurationKey.Boolean {
+    object LegacyCaseName : ConfigurationKey.Boolean {
 
         override val defaultValue: Boolean = false
 
@@ -59,8 +59,8 @@ object EnumInterop {
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
-                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseNames.Enabled>() -> true
-                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseNames.Disabled>() -> false
+                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Enabled>() -> true
+                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Disabled>() -> false
                 else -> null
             }
     }

@@ -25,6 +25,6 @@ object ConfigureStableNameTypeAliasesForKotlinRuntimePhase : SirPhase {
 
     context(SirPhase.Context)
     private fun KirClass.enableStableNameTypeAlias() {
-        classDescriptorOrError.overrideConfiguration(ClassInterop.StableTypeAliases, true)
+        classDescriptorOrError.overrideConfiguration(ClassInterop.StableTypeAlias, true)
     }
 }

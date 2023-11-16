@@ -82,7 +82,7 @@ object FunctionInterop {
      * These constructs do not conflict in Obj-C, but they do in Swift.
      * Therefore, SKIE has to resolve the conflict even though Kotlin compiler doesn't have to.
      */
-    object LegacyNames : ConfigurationKey.Boolean {
+    object LegacyName : ConfigurationKey.Boolean {
 
         override val defaultValue: Boolean = false
 
@@ -90,8 +90,8 @@ object FunctionInterop {
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
-                configurationTarget.hasAnnotation<FunctionInterop.LegacyNames.Enabled>() -> true
-                configurationTarget.hasAnnotation<FunctionInterop.LegacyNames.Disabled>() -> false
+                configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Enabled>() -> true
+                configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Disabled>() -> false
                 else -> null
             }
     }

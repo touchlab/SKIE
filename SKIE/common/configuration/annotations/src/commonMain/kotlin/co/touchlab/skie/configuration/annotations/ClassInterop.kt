@@ -4,10 +4,10 @@ package co.touchlab.skie.configuration.annotations
 annotation class ClassInterop {
 
     /**
-     * See [co.touchlab.skie.configuration.ClassInterop.StableTypeAliases]
+     * See [co.touchlab.skie.configuration.ClassInterop.StableTypeAlias]
      */
     @Target
-    annotation class StableTypeAliases {
+    annotation class StableTypeAlias {
 
         @Target(AnnotationTarget.CLASS)
         @Retention(AnnotationRetention.BINARY)
