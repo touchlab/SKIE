@@ -45,7 +45,7 @@ object EnumInterop {
      *
      * SKIE provides an improved naming algorithm that produces the following:
      *
-     * ```
+     * ```swift
      *   case termsOfUse
      *   case privacyPolicy
      *   case none
@@ -59,8 +59,8 @@ object EnumInterop {
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
-                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseNames>() -> true
-                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseNames>() -> false
+                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseNames.Enabled>() -> true
+                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseNames.Disabled>() -> false
                 else -> null
             }
     }
