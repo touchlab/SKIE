@@ -14,4 +14,19 @@ annotation class FunctionInterop {
         @Retention(AnnotationRetention.BINARY)
         annotation class Disabled
     }
+
+    /**
+     * See [co.touchlab.skie.configuration.FunctionInterop.LegacyNames]
+     */
+    @Target
+    annotation class LegacyNames {
+
+        @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
+        @Retention(AnnotationRetention.BINARY)
+        annotation class Enabled
+
+        @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
+        @Retention(AnnotationRetention.BINARY)
+        annotation class Disabled
+    }
 }

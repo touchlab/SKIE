@@ -1,20 +1,31 @@
 package co.touchlab.skie.phases.sir.member
 
+import co.touchlab.skie.configuration.FunctionInterop
+import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirConstructor
 import co.touchlab.skie.kir.element.KirProperty
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.SkiePhase
+import org.jetbrains.kotlin.backend.konan.KonanFqNames
+import org.jetbrains.kotlin.resolve.annotations.argumentValue
 
 object StripKonanCallableDeclarationManglingPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        kirProvider.allCallableDeclarations.forEach {
-            it.stripMangling()
-        }
+        kirProvider.allCallableDeclarations
+            .filter { it.isSupported }
+            .forEach {
+                it.stripMangling()
+            }
     }
+
+    context(SkiePhase.Context)
+    private val KirCallableDeclaration<*>.isSupported: Boolean
+        get() = !this.getConfiguration(FunctionInterop.LegacyNames)
 
     private fun KirCallableDeclaration<*>.stripMangling() {
         when (this) {

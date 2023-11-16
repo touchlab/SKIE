@@ -7,6 +7,7 @@ import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSimpleFunction
 
+// TODO This does not work for nested classes
 object RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase : SirPhase {
 
     context(SirPhase.Context)
