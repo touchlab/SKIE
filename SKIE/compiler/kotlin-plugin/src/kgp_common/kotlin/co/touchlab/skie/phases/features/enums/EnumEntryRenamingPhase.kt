@@ -12,6 +12,29 @@ import org.jetbrains.kotlin.backend.konan.KonanFqNames
 
 object EnumEntryRenamingPhase : SirPhase {
 
+    private val forbiddenNames = setOf(
+        "alloc",
+        "copy",
+        "mutableCopy",
+        "new",
+        "init",
+        "isProxy",
+        "retainCount",
+        "zone",
+        "release",
+        "initialize",
+        "load",
+        "class",
+        "superclass",
+        "classFallbacksForKeyedArchiver",
+        "classForKeyedUnarchiver",
+        "description",
+        "debugDescription",
+        "version",
+        "hash",
+        "useStoredAccessor",
+    )
+
     context(SirPhase.Context)
     override fun execute() {
         kirProvider.allEnums
@@ -51,7 +74,15 @@ object EnumEntryRenamingPhase : SirPhase {
 
         val lowerCaseWords = words.map { it.lowercase() }
 
-        return lowerCaseWords.first() + lowerCaseWords.drop(1).joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
+        val nameCandidate = lowerCaseWords.first() + lowerCaseWords.drop(1).joinToString("") {
+            it.replaceFirstChar(Char::uppercaseChar)
+        }
+
+        return if (nameCandidate in forbiddenNames) {
+            "the" + nameCandidate.replaceFirstChar(Char::uppercaseChar)
+        } else {
+            nameCandidate
+        }
     }
 
     private class NameParser(
