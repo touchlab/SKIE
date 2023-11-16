@@ -78,7 +78,7 @@ class ConfigureExternalOirTypesBridgingPhase(
         val oirClass = oirProvider.findExistingExternalOirClass(apiNotesEntry.moduleName, apiNotesEntry.objCName) ?: return
 
         if (oirClass.bridgedSirClass == null && apiNotesEntry.bridgeSwiftName != null) {
-            val bridgeFqName = apiNotesEntry.bridgeSwiftName.asApiNotesSirFqName()
+            val bridgeFqName = apiNotesEntry.bridgeSwiftName.asApiNotesSirFqName(apiNotesEntry.moduleName)
 
             oirClass.bridgedSirClass = getOrCreateSirClass(bridgeFqName)
         }
@@ -102,13 +102,16 @@ class ConfigureExternalOirTypesBridgingPhase(
         }
     }
 
-    private fun String.asApiNotesSirFqName(): SirFqName {
+    private fun String.asApiNotesSirFqName(defaultModuleName: String): SirFqName {
         val parts = split('.')
 
-        check(parts.size == 2) { "Invalid ApiNotes fq name: $this. Expected format is \$moduleName.\$className" }
+        val (moduleName, className) = when (parts.size) {
+            1 -> defaultModuleName to parts[0]
+            2 -> parts[0] to parts[1]
+            else -> error("Invalid ApiNotes fq name: $this. Expected format is \$moduleName.\$className")
+        }
 
-        val module = sirProvider.getExternalModule(parts[0])
-        val className = parts[1]
+        val module = sirProvider.getExternalModule(moduleName)
 
         return SirFqName(module, className)
     }
