@@ -35,7 +35,6 @@ object SuspendGenerator : DescriptorModificationPhase {
     context(SkiePhase.Context)
     private val MutableDescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
         get() = this.allExposedMembers.filterIsInstance<SimpleFunctionDescriptor>()
-            // WIP Remove and fix overrides that change return type but generate only for those that change the type
             .filter { this.isBaseMethod(it) }
             .filter { it.isSupported }
             .filter { it.isSuspendInteropEnabled }
@@ -49,8 +48,6 @@ object SuspendGenerator : DescriptorModificationPhase {
 
     object SwiftBridgeGeneratorPhase : StatefulSirPhase()
 }
-
-// WIP Must be the same for the whole hierarchy
 
 context(SkiePhase.Context)
 val FunctionDescriptor.isSuspendInteropEnabled: Boolean
