@@ -79,8 +79,10 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         }
                     }
 
-                    testDependencies(project(":acceptance-tests:test-dependencies:regular-dependency"))
-                    exportedTestDependencies(project(":acceptance-tests:test-dependencies:exported-dependency"))
+                    if (acceptanceTestType == AcceptanceTestsComponent.typeMapping) {
+                        testDependencies(project(":acceptance-tests:test-dependencies:regular-dependency"))
+                        exportedTestDependencies(project(":acceptance-tests:test-dependencies:exported-dependency"))
+                    }
                 }
 
                 kotlinTarget.testRuns.configureEach {
