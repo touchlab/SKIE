@@ -5,6 +5,7 @@ import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.forEachAssociatedExportedSirDeclaration
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.features.flow.SupportedFlow
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
@@ -15,12 +16,14 @@ import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
 import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.sir.element.toSwiftVisibility
+import co.touchlab.skie.sir.type.NullableSirType
+import co.touchlab.skie.sir.type.OirDeclaredSirType
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.TypeName
-import io.outfoxx.swiftpoet.joinToCode
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 class SwiftSuspendGeneratorDelegate(
@@ -72,17 +75,32 @@ class SwiftSuspendGeneratorDelegate(
         }
 }
 
+context(SirPhase.Context)
 private fun SirExtension.createSwiftBridgingFunction(bridgeModel: BridgeModel): SirSimpleFunction =
     bridgeModel.originalFunction.shallowCopy(
         parent = this,
         isAsync = true,
         throws = true,
         visibility = bridgeModel.originalFunction.visibility.toSwiftVisibility(),
+        returnType = bridgeModel.originalFunction.returnType.revertFlowMappingIfNeeded(),
     ).apply {
         copyValueParametersFrom(bridgeModel.originalFunction)
 
         addSwiftBridgingFunctionBody(bridgeModel)
     }
+
+context(SirPhase.Context)
+private fun SirType.revertFlowMappingIfNeeded(): SirType {
+    when (this) {
+        is OirDeclaredSirType -> {
+            val flowVariant = SupportedFlow.allVariants.firstOrNull { declaration == it.getKotlinKirClass().oirClass } ?: return this
+
+            return flowVariant.kind.getCoroutinesKirClass().originalSirClass.toType()
+        }
+        is NullableSirType -> return copy(type = type.revertFlowMappingIfNeeded())
+        else -> return this
+    }
+}
 
 private fun SirSimpleFunction.addSwiftBridgingFunctionBody(bridgeModel: BridgeModel) {
     addFunctionDeclarationBodyWithErrorTypeHandling(bridgeModel.kotlinBridgingFunction) {
