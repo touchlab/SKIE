@@ -88,7 +88,7 @@ class SkieNamespaceProvider(
 
     private val KirModule.namespaceModuleName: String
         get() {
-            val canUseShortName = !this.shortNameCollides && shortNamespaceModuleName != sirProvider.sirBuiltins.Skie.module.name.toValidNamespaceIdentifier()
+            val canUseShortName = !this.shortNameCollides && shortNamespaceModuleName != sirProvider.sirBuiltins.Skie.module.name.toValidSwiftIdentifier()
 
             return if (canUseShortName) this.shortNamespaceModuleName else this.fullNamespaceModuleName
         }
@@ -103,15 +103,8 @@ class SkieNamespaceProvider(
     private val KirModule.shortNameCollides: Boolean
         get() = this in modulesWithShortNameCollision
 
-    // WIP Remove after renaming all classes to avoid collision with ModuleName
-    private fun String.toValidNamespaceIdentifier(): String {
-        val defaultName = this.toValidSwiftIdentifier()
-
-        return if (defaultName == sirProvider.sirBuiltins.Skie.module.name) defaultName + "_" else defaultName
-    }
-
     private val KirClass.skieNamespaceSimpleName: String
-        get() = this.classDescriptorOrNull?.name?.identifier?.toValidNamespaceIdentifier() ?: this.name.swiftName
+        get() = this.classDescriptorOrNull?.name?.identifier?.toValidSwiftIdentifier() ?: this.name.swiftName
 
     @Suppress("RecursivePropertyAccessor")
     private val KirClass.skieFileName: String
@@ -121,12 +114,12 @@ class SkieNamespaceProvider(
         get() = this.name
             .substringAfter(":")
             .changeNamingConventionToPascalCase()
-            .toValidNamespaceIdentifier()
+            .toValidSwiftIdentifier()
 
     private val KirModule.fullNamespaceModuleName: String
         get() = this.name
             .replace(":", "__")
-            .toValidNamespaceIdentifier()
+            .toValidSwiftIdentifier()
 }
 
 private fun String.changeNamingConventionToPascalCase(): String =
