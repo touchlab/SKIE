@@ -49,6 +49,9 @@ sealed class SirFunction(
         return "$identifierForReference($argumentsWithLabels)"
     }
 
+    fun call(vararg arguments: String): String =
+        call(arguments.toList())
+
     protected abstract val identifierForReference: String
 
     override fun toString(): String = this.signature.toString()

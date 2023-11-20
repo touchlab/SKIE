@@ -20,10 +20,15 @@ class SirValueParameter(
             label = label
         }
 
-    var label: String? = if (label != name) label else null
+    var label: String? = null
         set(value) {
             field = if (value != name && value?.isNotBlank() == true) value else null
         }
+
+    init {
+        // Calls setter
+        this.label = label
+    }
 
     val labelOrName: String
         get() = label ?: name

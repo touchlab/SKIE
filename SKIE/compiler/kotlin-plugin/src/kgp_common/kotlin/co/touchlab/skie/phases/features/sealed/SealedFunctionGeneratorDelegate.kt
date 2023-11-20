@@ -11,6 +11,8 @@ import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 import co.touchlab.skie.sir.element.toTypeParameterUsage
+import co.touchlab.skie.sir.type.SirType
+import co.touchlab.skie.sir.type.toNullable
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.TypeName
 
@@ -20,10 +22,36 @@ class SealedFunctionGeneratorDelegate(
 
     context(SirPhase.Context)
     fun generate(kirClass: KirClass, enum: SirClass) {
+        val requiredFunction = generateRequiredOverload(kirClass, enum)
+        generateOptionalOverload(kirClass, enum, requiredFunction)
+    }
+
+    private fun generateRequiredOverload(kirClass: KirClass, enum: SirClass): SirSimpleFunction =
+        createFunctionDeclaration(kirClass, enum).apply {
+            addRequiredFunctionBody(kirClass, enum)
+        }
+
+    private fun generateOptionalOverload(kirClass: KirClass, enum: SirClass, requiredFunction: SirSimpleFunction) {
+        createFunctionDeclaration(
+            kirClass = kirClass,
+            enum = enum,
+            valueParameterType = { it.toNullable() },
+            returnTypeModifier = { it.toNullable() },
+        ).apply {
+            addOptionalFunctionBody(requiredFunction)
+        }
+    }
+
+    private fun createFunctionDeclaration(
+        kirClass: KirClass,
+        enum: SirClass,
+        valueParameterType: (SirType) -> SirType = { it },
+        returnTypeModifier: (SirType) -> SirType = { it },
+    ): SirSimpleFunction =
         SirSimpleFunction(
             identifier = kirClass.enumConstructorFunctionName,
-            parent = skieNamespaceProvider.getNamespaceFile(kirClass),
-            returnType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters),
+            parent = context.skieNamespaceProvider.getNamespaceFile(kirClass),
+            returnType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).let(returnTypeModifier),
         ).apply {
             copyTypeParametersFrom(enum)
 
@@ -37,12 +65,9 @@ class SealedFunctionGeneratorDelegate(
             SirValueParameter(
                 label = kirClass.enumConstructorArgumentLabel,
                 name = kirClass.enumConstructorParameterName,
-                type = sealedTypeParameter.toTypeParameterUsage(),
+                type = sealedTypeParameter.toTypeParameterUsage().let(valueParameterType),
             )
-
-            addFunctionBody(kirClass, enum)
         }
-    }
 
     private val KirClass.enumConstructorFunctionName: String
         get() = configurationProvider.getConfiguration(this, SealedInterop.Function.Name)
@@ -53,7 +78,7 @@ class SealedFunctionGeneratorDelegate(
     private val KirClass.enumConstructorParameterName: String
         get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ParameterName)
 
-    private fun SirSimpleFunction.addFunctionBody(
+    private fun SirSimpleFunction.addRequiredFunctionBody(
         kirClass: KirClass,
         enum: SirClass,
     ) {
@@ -131,5 +156,23 @@ class SealedFunctionGeneratorDelegate(
 
     private fun CodeBlock.Builder.addReturnElse(kirClass: KirClass, enumType: TypeName) {
         add("return %T.%N\n", enumType, kirClass.elseCaseName)
+    }
+
+    private fun SirSimpleFunction.addOptionalFunctionBody(requiredFunction: SirSimpleFunction) {
+        bodyBuilder.add {
+            val valueParameter = valueParameters.first()
+
+            val escapedParameterName = CodeBlock.toString("%N", valueParameter.name)
+
+            addCode(
+                CodeBlock.builder()
+                    .beginControlFlow("if", "let $escapedParameterName")
+                    .add("return %L as %T", requiredFunction.call(escapedParameterName), requiredFunction.returnType.evaluate().swiftPoetTypeName)
+                    .nextControlFlow("else")
+                    .add("return nil")
+                    .endControlFlow("else")
+                    .build(),
+            )
+        }
     }
 }

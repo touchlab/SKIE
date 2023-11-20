@@ -38,7 +38,7 @@ sealed class Signature {
         override fun toString(): String =
             ("static ".takeIf { scope == Scope.Static } ?: "") +
                 "func " +
-                "$receiver.".takeIf { receiver !is Receiver.None } +
+                ("$receiver.".takeIf { receiver !is Receiver.None } ?: "") +
                 identifier +
                 "(${valueParameters.joinToString()})" +
                 " -> $returnType"
@@ -75,7 +75,7 @@ sealed class Signature {
         override fun toString(): String =
             ("static ".takeIf { scope == Scope.Static } ?: "") +
                 "var " +
-                "$receiver.".takeIf { receiver !is Receiver.None } +
+                ("$receiver.".takeIf { receiver !is Receiver.None } ?: "") +
                 identifier
     }
 
