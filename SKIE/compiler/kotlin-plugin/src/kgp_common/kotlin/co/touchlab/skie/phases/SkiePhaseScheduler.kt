@@ -173,6 +173,8 @@ class SkiePhaseScheduler {
             AddAvailabilityBasedDeprecationLevelPhase,
             AddAvailabilityToAsyncFunctionsPhase,
             MoveBridgesToTopLevelPhase,
+            RenameTypesConflictingWithKeywordsPhase,
+            RenameTypesConflictingWithKotlinModulePhase,
             RenameTypesConflictsWithOtherTypesPhase,
             RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase,
             RenameParametersNamedSelfPhase,
