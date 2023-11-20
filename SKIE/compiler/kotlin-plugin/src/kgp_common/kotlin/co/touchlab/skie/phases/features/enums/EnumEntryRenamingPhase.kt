@@ -8,6 +8,7 @@ import co.touchlab.skie.kir.util.hasArgumentValue
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.sir.element.isExported
+import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 
 object EnumEntryRenamingPhase : SirPhase {
@@ -74,9 +75,9 @@ object EnumEntryRenamingPhase : SirPhase {
 
         val lowerCaseWords = words.map { it.lowercase() }
 
-        val nameCandidate = lowerCaseWords.first() + lowerCaseWords.drop(1).joinToString("") {
-            it.replaceFirstChar(Char::uppercaseChar)
-        }
+        val rawNameCandidate = lowerCaseWords.first() + lowerCaseWords.drop(1).joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
+
+        val nameCandidate = rawNameCandidate.toValidSwiftIdentifier()
 
         return if (nameCandidate in forbiddenNames) {
             "the" + nameCandidate.replaceFirstChar(Char::uppercaseChar)
