@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.typeconflicts
 
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.util.resolveCollisionWithWarning
 
 object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
 
@@ -8,25 +9,10 @@ object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
     override fun execute() {
         val moduleName = sirProvider.kotlinModule.name
 
-        var collisionExists = false
-
         sirProvider.allLocalTypeDeclarations.forEach { type ->
-            if (type.simpleName == moduleName) {
-                type.baseName += "_"
-                collisionExists = true
+            type.resolveCollisionWithWarning {
+                if (type.simpleName == moduleName) "the framework name '$moduleName'" else null
             }
         }
-
-        if (collisionExists) {
-            logModuleNameCollisionWarning(moduleName)
-        }
-    }
-
-    context(SirPhase.Context)
-    private fun logModuleNameCollisionWarning(moduleName: String) {
-        reporter.warning(
-            "Type '$moduleName' was renamed to '${moduleName}_' " +
-                "because it has the same name as the produced framework which is forbidden.",
-        )
     }
 }

@@ -25,13 +25,42 @@ sealed class Signature {
     abstract val returnType: ReturnType
     abstract val scope: Scope
 
-    class Function(
+    sealed class Function : Signature()
+
+    class SimpleFunction(
         override val receiver: Receiver,
         override val identifier: String,
         override val valueParameters: List<ValueParameter>,
         override val returnType: ReturnType,
         override val scope: Scope,
-    ) : Signature()
+    ) : Function() {
+
+        override fun toString(): String =
+            ("static ".takeIf { scope == Scope.Static } ?: "") +
+                "func " +
+                "$receiver.".takeIf { receiver !is Receiver.None } +
+                identifier +
+                "(${valueParameters.joinToString()})" +
+                " -> $returnType"
+    }
+
+    class Constructor(
+        override val receiver: Receiver.Constructor,
+        override val valueParameters: List<ValueParameter>,
+    ) : Function() {
+
+        override val identifier: String = "init"
+
+        override val returnType: ReturnType = ReturnType.Specific(receiver.sirClass.defaultType.signatureType)
+
+        override val scope: Scope = Scope.Static
+
+        override fun toString(): String =
+            "func " +
+                "$receiver." +
+                identifier +
+                "(${valueParameters.joinToString()})"
+    }
 
     class Property(
         override val receiver: Receiver,
@@ -42,10 +71,16 @@ sealed class Signature {
         override val valueParameters: List<ValueParameter> = emptyList()
 
         override val returnType: ReturnType = ReturnType.Any
+
+        override fun toString(): String =
+            ("static ".takeIf { scope == Scope.Static } ?: "") +
+                "var " +
+                "$receiver.".takeIf { receiver !is Receiver.None } +
+                identifier
     }
 
     class EnumCase(
-        override val receiver: Receiver,
+        override val receiver: Receiver.Simple,
         override val identifier: String,
     ) : Signature() {
 
@@ -54,6 +89,9 @@ sealed class Signature {
         override val returnType: ReturnType = ReturnType.Any
 
         override val scope: Scope = Scope.Static
+
+        override fun toString(): String =
+            "case $receiver.$identifier"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -80,22 +118,32 @@ sealed class Signature {
         return result
     }
 
-    override fun toString(): String =
-        "Signature.${this::class.simpleName}(" +
-            "receiver=$receiver, " +
-            "identifier='$identifier', " +
-            "valueParameters=$valueParameters, " +
-            "returnType=$returnType, " +
-            "scope=$scope" +
-            ")"
-
     sealed interface Receiver {
 
-        data class Simple(val type: Type.Class, val constraints: Set<Constraint>) : Receiver
+        data class Simple(val type: Type.Class, val constraints: Set<Constraint>) : Receiver {
 
-        data class Constructor(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver
+            override fun toString(): String =
+                if (constraints.isEmpty()) {
+                    type.toString()
+                } else {
+                    "($type" + "where ${constraints.joinToString(", ")})"
+                }
+        }
 
-        object None : Receiver
+        data class Constructor(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver {
+
+            override fun toString(): String =
+                if (constraints.isEmpty()) {
+                    sirClass.fqName.toString()
+                } else {
+                    "(${sirClass.fqName}" + "where ${constraints.joinToString(", ")})"
+                }
+        }
+
+        object None : Receiver {
+
+            override fun toString(): String = "None"
+        }
 
         data class Constraint(val typeParameterName: String, val bounds: Set<Type>) {
 
@@ -103,10 +151,16 @@ sealed class Signature {
                 typeParameterName = conditionalConstraint.typeParameter.name,
                 bounds = conditionalConstraint.bounds.map { it.signatureType }.toSet(),
             )
+
+            override fun toString(): String =
+                "$typeParameterName: ${bounds.joinToString(" & ")}"
         }
     }
 
-    data class ValueParameter(val argumentLabel: String, val type: String)
+    data class ValueParameter(val argumentLabel: String, val type: String) {
+
+        override fun toString(): String = "$argumentLabel: $type"
+    }
 
     sealed interface ReturnType {
 
@@ -123,6 +177,8 @@ sealed class Signature {
             }
 
             override fun hashCode(): Int = 0
+
+            override fun toString(): String = type.toString()
         }
 
         object Any : ReturnType {
@@ -134,6 +190,8 @@ sealed class Signature {
             }
 
             override fun hashCode(): Int = 0
+
+            override fun toString(): String = "AnyType"
         }
     }
 
@@ -153,9 +211,11 @@ sealed class Signature {
             }
 
             override fun hashCode(): Int = 0
+
+            override fun toString(): String = sirClass.fqName.toString() + ("<${typeArguments.joinToString()}>".takeIf { typeArguments.isNotEmpty() } ?: "")
         }
 
-        class Optional(val nested: Type) : Type {
+        data class Optional(val nested: Type) : Type {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -167,9 +227,11 @@ sealed class Signature {
             }
 
             override fun hashCode(): Int = 1
+
+            override fun toString(): String = "$nested?"
         }
 
-        class Special(val name: String) : Type {
+        data class Special(val name: String) : Type {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -181,6 +243,8 @@ sealed class Signature {
             }
 
             override fun hashCode(): Int = name.hashCode()
+
+            override fun toString(): String = name
         }
 
         class TypeArgument(val type: SirType) {
@@ -197,6 +261,8 @@ sealed class Signature {
             }
 
             override fun hashCode(): Int = canonicalName.hashCode()
+
+            override fun toString(): String = canonicalName
         }
     }
 
@@ -222,7 +288,7 @@ sealed class Signature {
             }
 
         operator fun invoke(function: SirSimpleFunction): Signature =
-            Function(
+            SimpleFunction(
                 receiver = function.receiver,
                 identifier = function.identifierAfterVisibilityChanges,
                 valueParameters = function.signatureValueParameters,
@@ -237,12 +303,9 @@ sealed class Signature {
                 "Constructors should always have a constructor receiver. Was: $receiver"
             }
 
-            return Function(
+            return Constructor(
                 receiver = receiver,
-                identifier = constructor.identifierAfterVisibilityChanges,
                 valueParameters = constructor.signatureValueParameters,
-                returnType = ReturnType.Specific(receiver.sirClass.defaultType.signatureType),
-                scope = constructor.signatureScope,
             )
         }
 

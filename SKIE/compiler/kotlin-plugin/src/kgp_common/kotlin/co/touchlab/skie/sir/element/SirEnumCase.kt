@@ -11,6 +11,9 @@ class SirEnumCase(
 
     val associatedValues: MutableList<SirEnumCaseAssociatedValue> = mutableListOf()
 
+    val index: Int
+        get() = parent.enumCases.indexOf(this)
+
     override fun toString(): String = "${this::class.simpleName}: $simpleName"
 
     companion object {

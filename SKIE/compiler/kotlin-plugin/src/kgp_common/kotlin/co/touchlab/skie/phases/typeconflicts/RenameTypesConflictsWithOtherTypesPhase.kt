@@ -8,6 +8,7 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isRemoved
+import co.touchlab.skie.util.resolveCollisionWithWarning
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
@@ -85,8 +86,12 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
         val existingFqNames = mutableSetOf<String>()
 
         typeDeclarations.forEach { typeDeclaration ->
-            while (typeDeclaration.fqName.toString() in existingFqNames) {
-                typeDeclaration.baseName += "_"
+            typeDeclaration.resolveCollisionWithWarning {
+                if (typeDeclaration.fqName.toString() in existingFqNames) {
+                    "an another type named '${typeDeclaration.fqName}'"
+                } else {
+                    null
+                }
             }
 
             existingFqNames.add(typeDeclaration.fqName.toString())

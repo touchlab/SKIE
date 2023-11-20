@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.typeconflicts
 
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.util.resolveCollisionWithWarning
 
 object RenameTypesConflictingWithKeywordsPhase : SirPhase {
 
@@ -13,9 +14,10 @@ object RenameTypesConflictingWithKeywordsPhase : SirPhase {
     context(SirPhase.Context)
     override fun execute() {
         sirProvider.allLocalTypeDeclarations
-            .filter { it.simpleName in problematicKeywords }
-            .forEach {
-                it.baseName += "_"
+            .forEach { declaration ->
+                declaration.resolveCollisionWithWarning {
+                    if (declaration.simpleName in problematicKeywords) "a reserved Swift keyword '${declaration.simpleName}'" else null
+                }
             }
     }
 }

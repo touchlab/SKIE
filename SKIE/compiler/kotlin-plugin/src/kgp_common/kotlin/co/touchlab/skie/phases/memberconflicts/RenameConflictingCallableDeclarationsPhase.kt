@@ -141,12 +141,14 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
     private val SirDeclarationParent.containerFqName: String
         get() = (this.parent?.containerFqName ?: "") + this.toString()
 
+    context(SirPhase.Context)
     private fun UniqueSignatureSet.addEnumCases(enumCases: List<SirEnumCase>) {
         enumCases.forEach {
             this.add(it)
         }
     }
 
+    context(SirPhase.Context)
     private fun UniqueSignatureSet.addCallableDeclarations(callableDeclarations: List<SirCallableDeclaration>) {
         callableDeclarations.forEach {
             this.add(it)

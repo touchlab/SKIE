@@ -4,6 +4,7 @@ import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.Modifier
 import co.touchlab.skie.kir.element.DeprecationLevel
+import co.touchlab.skie.phases.memberconflicts.signature
 import io.outfoxx.swiftpoet.CodeBlock
 
 class SirSimpleFunction(
@@ -61,7 +62,7 @@ class SirSimpleFunction(
         overridableDeclarationDelegate.removeOverriddenBy(declaration)
     }
 
-    override fun toString(): String = "${this::class.simpleName}: $name"
+    override fun toString(): String = this.signature.toString()
 
     companion object {
 

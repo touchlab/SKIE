@@ -1,5 +1,6 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.phases.memberconflicts.signature
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
@@ -49,6 +50,8 @@ sealed class SirFunction(
     }
 
     protected abstract val identifierForReference: String
+
+    override fun toString(): String = this.signature.toString()
 }
 
 fun SirFunction.copyValueParametersFrom(other: SirFunction) {

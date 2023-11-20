@@ -28,8 +28,6 @@ class SirConstructor(
 
     override val valueParameters: MutableList<SirValueParameter> = mutableListOf()
 
-    override fun toString(): String = "${this::class.simpleName}: $name"
-
     companion object {
 
         context(SirDeclarationNamespace)

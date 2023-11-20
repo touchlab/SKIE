@@ -1,18 +1,22 @@
 package co.touchlab.skie.phases.memberconflicts
 
+import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.getEntireOverrideHierarchy
+import co.touchlab.skie.util.resolveCollisionWithWarning
 
 class UniqueSignatureSet {
 
     private val alreadyAddedDeclarations = mutableSetOf<SirCallableDeclaration>()
     private val alreadyAddedEnumCase = mutableSetOf<SirEnumCase>()
-    private val existingSignatures = mutableSetOf<Signature>()
+    // Map so that we can get the signatures for conflicts
+    private val existingSignaturesMap = mutableMapOf<Signature, Signature>()
 
+    context(SirPhase.Context)
     fun add(callableDeclaration: SirCallableDeclaration) {
         if (callableDeclaration in alreadyAddedDeclarations) {
             return
@@ -20,27 +24,37 @@ class UniqueSignatureSet {
 
         val group = Group(callableDeclaration)
 
-        while (group.createsConflict) {
-            group.mangle()
+        group.resolveCollisionWithWarning {
+            val signature = signature
+
+            if (signature in existingSignaturesMap) {
+                "an another declaration '${existingSignaturesMap[signature]}'"
+            } else {
+                null
+            }
         }
 
-        group.addToAlreadyAdded()
+        group.addToCaches()
     }
 
+    context(SirPhase.Context)
     fun add(enumCase: SirEnumCase) {
         if (enumCase in alreadyAddedEnumCase) {
             return
         }
 
-        var signature = enumCase.signature
+        enumCase.resolveCollisionWithWarning {
+            val signature = signature
 
-        while (signature in existingSignatures) {
-            enumCase.simpleName += "_"
-
-            signature = enumCase.signature
+            if (signature in existingSignaturesMap) {
+                "an another declaration '${existingSignaturesMap[signature]}'"
+            } else {
+                null
+            }
         }
 
-        existingSignatures.add(signature)
+        val signature = enumCase.signature
+        existingSignaturesMap[signature] = signature
         alreadyAddedEnumCase.add(enumCase)
     }
 
@@ -50,39 +64,39 @@ class UniqueSignatureSet {
 
         private val callableDeclarations = representative.getEntireOverrideHierarchy()
 
-        private var signatures = callableDeclarations.map { it.signature }
+        context(SirPhase.Context)
+        fun resolveCollisionWithWarning(collisionReasonProvider: SirCallableDeclaration.() -> String?) {
+            do {
+                var changed = false
 
-        val createsConflict: Boolean
-            get() = signatures.any { it in existingSignatures }
+                callableDeclarations.forEach {
+                    // Avoid short-circuiting
+                    changed = it.resolveCollisionWithWarning(collisionReasonProvider) || changed
 
-        fun mangle() {
-            callableDeclarations.forEach {
-                it.mangle()
-            }
-
-            signatures = callableDeclarations.map { it.signature }
+                    unifyNames(it)
+                }
+            } while (changed)
         }
 
-        private fun SirCallableDeclaration.mangle() {
-            when (this) {
-                is SirSimpleFunction -> this.identifier += "_"
-                is SirProperty -> this.identifier += "_"
-                is SirConstructor -> {
-                    val lastValueParameter = this.valueParameters.lastOrNull()
-                        ?: error(
-                            "Cannot mangle $this because it does not have any value parameters. " +
-                                "This should never happen because constructors without value parameters " +
-                                "shouldn't create conflicts (as they are processed first).",
-                        )
-
-                    lastValueParameter.label = lastValueParameter.labelOrName + "_"
+        private fun unifyNames(basedOn: SirCallableDeclaration) {
+            callableDeclarations.forEach {
+                when (it) {
+                    is SirSimpleFunction -> it.identifier = basedOn.identifier
+                    is SirProperty -> it.identifier = basedOn.identifier
+                    is SirConstructor -> {
+                        it.valueParameters.lastOrNull()?.label = (basedOn as SirConstructor).valueParameters.lastOrNull()?.label
+                    }
                 }
             }
         }
 
-        fun addToAlreadyAdded() {
+        fun addToCaches() {
             alreadyAddedDeclarations.addAll(callableDeclarations)
-            existingSignatures.addAll(signatures)
+            callableDeclarations.forEach {
+                val signature = it.signature
+
+                existingSignaturesMap[signature] = signature
+            }
         }
     }
 }
