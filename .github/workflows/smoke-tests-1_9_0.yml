@@ -1,0 +1,129 @@
+name: Smoke Tests 1.9.0
+
+on:
+  workflow_dispatch:
+    inputs:
+      linkage:
+        type: choice
+        options:
+          - static
+          - dynamic
+        required: true
+        default: static
+        description:
+          'The linkage mode to use for the tests. "static" will produce static frameworks, "dynamic" will produce dynamic frameworks.'
+      configuration:
+        type: choice
+        options:
+          - release
+          - debug
+        required: true
+        default: release
+        description:
+          'The configuration to use for the tests. "release" will produce release builds, "debug" will produce debug builds (and skip type mapping tests for now).'
+      target:
+        type: choice
+        options:
+          - ios_arm64
+          - ios_x64
+          - ios_simulator_arm64
+          - macos_arm64
+          - macos_x64
+        required: true
+        default: ios_arm64
+        description:
+          'The target to use for the type mapping tests.'
+
+permissions:
+  contents: read
+  checks: write
+
+concurrency:
+  group: ci-smoke-tests-${{ github.ref }}
+
+jobs:
+  acceptance-tests:
+    name: Acceptance Tests
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Acceptance Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:functional__kgp_1.9.0Test'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: ${{ failure() || success() }}
+        with:
+          check_name: "Smoke Test Reports - Functional Tests"
+          report_paths: 'SKIE/acceptance-tests/build/test-results/functional__*/TEST-*.xml'
+          require_tests: true
+
+  type-mapping-tests:
+    name: Type Mapping Tests
+    needs: [acceptance-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Type Mapping Tests
+        uses: gradle/gradle-build-action@v2
+        id: run-tests
+        if: ${{ inputs.configuration != 'debug' }}
+        with:
+          arguments: ':acceptance-tests:type-mapping__kgp_1.9.0Test'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_TARGET: ${{ inputs.target }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
+        with:
+          check_name: "Smoke Test Reports - Type Mapping Tests"
+          report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
+          require_tests: true
+
+  external-libraries-tests:
+    name: External Libraries Tests
+    needs: [type-mapping-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ':acceptance-tests:libraries__kgp_1.9.0Test'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: ${{ failure() || success() }}
+        with:
+          check_name: "Smoke Test Reports - External Libraries Tests"
+          report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+          require_tests: true
