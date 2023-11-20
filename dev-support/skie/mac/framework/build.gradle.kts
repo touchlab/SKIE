@@ -1,3 +1,4 @@
+import co.touchlab.skie.configuration.ClassInterop
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.ExperimentalFeatures
 import co.touchlab.skie.configuration.SealedInterop
