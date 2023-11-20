@@ -73,6 +73,8 @@ class FunctionSpec private constructor(
       codeWriter.emitCode(body)
       codeWriter.unindent()
       codeWriter.emit("}\n")
+    } else {
+      codeWriter.emit("\n")
     }
   }
 

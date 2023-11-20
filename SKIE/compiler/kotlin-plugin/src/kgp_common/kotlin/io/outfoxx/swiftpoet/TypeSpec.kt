@@ -81,71 +81,61 @@ class TypeSpec private constructor(
       }
 
       codeWriter.emitWhereBlock(typeVariables)
-      codeWriter.emit(" {\n")
+      codeWriter.emit(" {\n\n")
 
       codeWriter.pushType(this)
       codeWriter.indent()
 
       if (associatedTypes.isNotEmpty()) {
-        codeWriter.emit("\n")
         for (associatedType in associatedTypes) {
           codeWriter.emit("associatedtype ")
           associatedType.emit(codeWriter)
           associatedType.bounds.forEach { it.emit(codeWriter) }
           codeWriter.emit("\n")
         }
+
+        codeWriter.emit("\n")
       }
 
       if (enumCases.isNotEmpty()) {
-        codeWriter.emit("\n")
-        val i = enumCases.iterator()
-        while (i.hasNext()) {
-          i.next().emit(codeWriter)
+        for (enumCase in enumCases) {
+          enumCase.emit(codeWriter)
           codeWriter.emit("\n")
         }
+
+        codeWriter.emit("\n")
       }
 
       // Properties.
-      if (propertySpecs.isNotEmpty()) {
+      for (propertySpec in propertySpecs) {
+        propertySpec.emit(codeWriter, kind.implicitPropertyModifiers)
         codeWriter.emit("\n")
-        for (propertySpec in propertySpecs) {
-          propertySpec.emit(codeWriter, kind.implicitPropertyModifiers)
-          codeWriter.emit("\n")
-        }
       }
 
       // Constructors.
       val constructors = funSpecs.filter { it.isConstructor }
-      if (constructors.isNotEmpty()) {
-        constructors.forEachIndexed { index, funSpec ->
-          codeWriter.emit("\n")
-          funSpec.emit(codeWriter, name, kind.implicitFunctionModifiers)
-          if (index == constructors.size - 1 && funSpec.body === CodeBlock.ABSTRACT) codeWriter.emit("\n")
-        }
+      constructors.forEach { funSpec ->
+        funSpec.emit(codeWriter, name, kind.implicitFunctionModifiers)
+        codeWriter.emit("\n")
       }
 
       // Functions.
       val functions = funSpecs.filterNot { it.isConstructor }
-      if (functions.isNotEmpty()) {
-        functions.forEachIndexed { index, funSpec ->
-          codeWriter.emit("\n")
-          funSpec.emit(codeWriter, name, kind.implicitFunctionModifiers)
-          if (index == functions.size - 1 && funSpec.body === CodeBlock.ABSTRACT) codeWriter.emit("\n")
-        }
+      functions.forEach { funSpec ->
+        funSpec.emit(codeWriter, name, kind.implicitFunctionModifiers)
+        codeWriter.emit("\n")
       }
 
       // Types.
-      if (typeSpecs.isNotEmpty()) {
-        typeSpecs.forEach { typeSpec ->
-          codeWriter.emit("\n")
-          typeSpec.emit(codeWriter)
-        }
+      typeSpecs.forEach { typeSpec ->
+        typeSpec.emit(codeWriter)
+        codeWriter.emit("\n")
       }
 
       codeWriter.unindent()
       codeWriter.popType()
 
-      codeWriter.emit("\n}\n")
+      codeWriter.emit("}\n")
     } finally {
       codeWriter.statementLine = previousStatementLine
     }

@@ -46,6 +46,8 @@ class ImportSpec internal constructor(
       out.emit("#endif")
     }
 
+    out.emit("\n")
+
     return out
   }
 

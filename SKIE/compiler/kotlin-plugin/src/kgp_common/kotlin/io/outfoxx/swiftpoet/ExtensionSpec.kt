@@ -64,7 +64,7 @@ class ExtensionSpec private constructor(
       }
 
       codeWriter.emitWhereBlock(conditionalConstraints, true)
-      codeWriter.emit(" {\n")
+      codeWriter.emit(" {\n\n")
 
       val typeName =
         if (extendedTypeOrName is AnyTypeSpec) {
@@ -81,35 +81,35 @@ class ExtensionSpec private constructor(
 
       // Types.
       for (typeSpec in typeSpecs) {
-        codeWriter.emit("\n")
         typeSpec.emit(codeWriter)
+        codeWriter.emit("\n")
       }
 
       // Properties.
       for (propertySpec in propertySpecs) {
-        codeWriter.emit("\n")
         propertySpec.emit(codeWriter, setOf(INTERNAL))
+        codeWriter.emit("\n")
       }
 
       // Constructors.
       for (funSpec in funSpecs) {
         if (!funSpec.isConstructor) continue
-        codeWriter.emit("\n")
         funSpec.emit(codeWriter, typeName, setOf(INTERNAL))
+        codeWriter.emit("\n")
       }
 
       // Functions.
       for (funSpec in funSpecs) {
         if (funSpec.isConstructor) continue
-        codeWriter.emit("\n")
         funSpec.emit(codeWriter, typeName, setOf(INTERNAL))
+        codeWriter.emit("\n")
       }
 
       codeWriter.unindent()
       codeWriter.popType()
       codeWriter.popModule()
 
-      codeWriter.emit("\n}\n")
+      codeWriter.emit("}\n")
     } finally {
       codeWriter.statementLine = previousStatementLine
     }

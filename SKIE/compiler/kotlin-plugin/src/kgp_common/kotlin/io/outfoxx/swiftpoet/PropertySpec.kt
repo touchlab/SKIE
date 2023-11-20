@@ -57,7 +57,7 @@ class PropertySpec private constructor(
         codeWriter.emit(" { ")
         if (getter != null) codeWriter.emit("${getter.name} ")
         if (setter != null) codeWriter.emit("${setter.name} ")
-        codeWriter.emit("}")
+        codeWriter.emit("}\n")
         return
       }
 
@@ -73,7 +73,9 @@ class PropertySpec private constructor(
         codeWriter.emitCode("%<")
       }
 
-      codeWriter.emit("}")
+      codeWriter.emit("}\n")
+    } else {
+      codeWriter.emit("\n")
     }
   }
 

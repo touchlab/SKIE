@@ -77,6 +77,7 @@ class FileSpec private constructor(
   private fun emit(codeWriter: CodeWriter) {
     if (comment.isNotEmpty()) {
       codeWriter.emitComment(comment)
+      codeWriter.emit("\n")
     }
 
     codeWriter.pushModule(moduleName)
@@ -98,14 +99,18 @@ class FileSpec private constructor(
       }
       for (import in flattenedImports.values.sorted()) {
         import.emit(codeWriter)
+      }
+
+      if (members.isNotEmpty()) {
         codeWriter.emit("\n")
       }
-      codeWriter.emit("\n")
     }
 
     members.forEachIndexed { index, member ->
-      if (index > 0) codeWriter.emit("\n")
       member.emit(codeWriter)
+      if (index != members.lastIndex) {
+        codeWriter.emit("\n")
+      }
     }
 
     codeWriter.popModule()
