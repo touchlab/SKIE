@@ -30,16 +30,13 @@ on:
           - macos_arm64
           - macos_x64
         required: true
-        default: ios_arm64
+        default: macos_arm64
         description:
           'The target to use for the type mapping tests.'
 
 permissions:
   contents: read
   checks: write
-
-concurrency:
-  group: ci-smoke-tests-${{ github.ref }}
 
 jobs:
   acceptance-tests:
@@ -61,13 +58,6 @@ jobs:
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v3
-        if: ${{ failure() || success() }}
-        with:
-          check_name: "Smoke Test Reports - Functional Tests"
-          report_paths: 'SKIE/acceptance-tests/build/test-results/functional__*/TEST-*.xml'
-          require_tests: true
 
   type-mapping-tests:
     name: Type Mapping Tests
@@ -92,13 +82,6 @@ jobs:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_TARGET: ${{ inputs.target }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v3
-        if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
-        with:
-          check_name: "Smoke Test Reports - Type Mapping Tests"
-          report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
-          require_tests: true
 
   external-libraries-tests:
     name: External Libraries Tests
@@ -120,10 +103,3 @@ jobs:
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v3
-        if: ${{ failure() || success() }}
-        with:
-          check_name: "Smoke Test Reports - External Libraries Tests"
-          report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-          require_tests: true
