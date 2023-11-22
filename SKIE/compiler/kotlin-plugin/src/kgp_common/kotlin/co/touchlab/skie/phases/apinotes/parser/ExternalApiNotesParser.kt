@@ -140,10 +140,7 @@ object ExternalApiNotesParser {
 
                 when {
                     parsedLineLevel == null -> {}
-                    parsedLineLevel <= currentParserLevel -> {
-                        currentParserLevel--
-                        return
-                    }
+                    parsedLineLevel <= currentParserLevel -> return
                     parsedArrayStartLevel == currentParserLevel -> {
                         currentParserLevel = parsedLineLevel
                         arrayStartLevel = null
