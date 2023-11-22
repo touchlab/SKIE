@@ -12,7 +12,6 @@ import co.touchlab.skie.sir.element.SirClass
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 class OirProvider(
     skieModule: KirModule,
@@ -20,9 +19,6 @@ class OirProvider(
     private val kirProvider: KirProvider,
     private val namer: ObjCExportNamer,
 ) {
-
-    val allExternalModules: Collection<OirModule.External>
-        get() = externalModuleCache.values
 
     lateinit var allKotlinClasses: List<OirClass>
         private set
@@ -58,27 +54,23 @@ class OirProvider(
 
     private val kotlinModuleCache = mutableMapOf<KirModule, OirModule.Kotlin>()
 
-    private val externalModuleCache = mutableMapOf<String, OirModule.External>()
-
     private val fileCache = mutableMapOf<Pair<OirModule, String>, OirFile>()
 
     private val externalClassesAndProtocolsCache = mutableMapOf<ClassDescriptor, OirClass>()
 
-    private val externalClassesAndProtocolsFqNameCache = mutableMapOf<Pair<String, String>, OirClass>()
-
     val skieModule: OirModule.Kotlin = getModule(skieModule)
 
-    // Must be last stored property - cannot be initialized lazily but requires OirProvider to be fully initialized
-    val oirBuiltins: OirBuiltins = OirBuiltins(this, extraDescriptorBuiltins)
+    val externalModule: OirModule.External by lazy {
+        OirModule.External()
+    }
+
+    val oirBuiltins: OirBuiltins by lazy {
+        OirBuiltins(this, extraDescriptorBuiltins)
+    }
 
     fun getModule(kirModule: KirModule): OirModule.Kotlin =
         kotlinModuleCache.getOrPut(kirModule) {
             OirModule.Kotlin(kirModule.name)
-        }
-
-    fun getExternalModule(moduleName: String): OirModule.External =
-        externalModuleCache.getOrPut(moduleName) {
-            OirModule.External(moduleName)
         }
 
     fun getFile(oirModule: OirModule.Kotlin, name: String): OirFile =
@@ -86,25 +78,22 @@ class OirProvider(
             OirFile(name, oirModule)
         }
 
-    fun getExternalClass(descriptor: ClassDescriptor, module: OirModule.External? = null): OirClass =
+    fun getExternalClass(descriptor: ClassDescriptor): OirClass =
         externalClassesAndProtocolsCache.getOrPut(descriptor.original) {
-            val externalModule = module ?: run {
-                val moduleName = descriptor.fqNameSafe.pathSegments()[1].asString()
-
-                getExternalModule(moduleName)
-            }
-
             val (name, kind) = if (descriptor.kind.isInterface) {
                 descriptor.name.asString().removeSuffix("Protocol") to OirClass.Kind.Protocol
             } else {
                 descriptor.name.asString() to OirClass.Kind.Class
             }
 
-            val oirClass = OirClass(name, externalModule, kind)
+            val oirClass = OirClass(
+                name = name,
+                parent = externalModule,
+                kind = kind,
+                origin = OirClass.Origin.CinteropType(descriptor),
+            )
 
             CreateOirTypesPhase.createTypeParameters(oirClass, descriptor.declaredTypeParameters, namer)
-
-            externalClassesAndProtocolsFqNameCache[externalModule.name to name] = oirClass
 
             oirClass
         }
@@ -119,9 +108,6 @@ class OirProvider(
     fun initializeSirClassCache() {
         sirClassCache = allClassesAndProtocols.associateBy { it.originalSirClass }
     }
-
-    fun findExistingExternalOirClass(moduleName: String, name: String): OirClass? =
-        externalClassesAndProtocolsFqNameCache[moduleName to name]
 
     fun findClass(sirClass: SirClass): OirClass? =
         sirClassCache[sirClass]

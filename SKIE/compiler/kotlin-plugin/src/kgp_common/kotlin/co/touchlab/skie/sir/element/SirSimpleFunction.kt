@@ -35,9 +35,6 @@ class SirSimpleFunction(
 
     override val valueParameters: MutableList<SirValueParameter> = mutableListOf()
 
-    override val hasValidSignature: Boolean
-        get() = returnType.evaluate().isValid && super.hasValidSignature
-
     private val overridableDeclarationDelegate = SirOverridableDeclarationDelegate(this)
 
     override val memberOwner: SirClass? by overridableDeclarationDelegate::memberOwner

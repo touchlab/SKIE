@@ -6,6 +6,7 @@ import co.touchlab.skie.kir.type.translation.KirTypeTranslator
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.builtin.OirBuiltins
 import co.touchlab.skie.oir.type.translation.OirTypeTranslator
+import co.touchlab.skie.phases.oir.util.ExternalApiNotesProvider
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.SkieNamespaceProvider
 import co.touchlab.skie.sir.builtin.SirBuiltins
@@ -31,6 +32,8 @@ interface SirPhase : SkiePhase<SirPhase.Context> {
         val sirBuiltins: SirBuiltins
 
         val skieNamespaceProvider: SkieNamespaceProvider
+
+        val externalApiNotesProvider: ExternalApiNotesProvider
 
         val namer: ObjCExportNamer
 

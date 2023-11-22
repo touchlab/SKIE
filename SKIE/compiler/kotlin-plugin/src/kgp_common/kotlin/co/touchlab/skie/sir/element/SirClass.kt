@@ -1,5 +1,6 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
@@ -17,6 +18,7 @@ class SirClass(
     var internalTypeAlias: SirTypeAlias? = null,
     var isInherentlyHashable: Boolean = false,
     var isAlwaysAReference: Boolean = false,
+    val origin: Origin = Origin.Generated,
 ) : SirTypeDeclaration, SirDeclarationNamespace, SirTypeParameterParent, SirElementWithAttributes {
 
     override val classDeclaration: SirClass
@@ -64,6 +66,17 @@ class SirClass(
 
     override fun toString(): String = "${this::class.simpleName}: $fqName${if (fqName != publicName) "($publicName)" else ""}"
 
+    sealed interface Origin {
+
+        object ExternalSwiftFramework : Origin
+
+        object Generated : Origin
+
+        data class Oir(val oirClass: OirClass) : Origin
+
+        data class Kir(val kirClass: KirClass) : Origin
+    }
+
     enum class Kind {
         Class,
         Enum,
@@ -83,6 +96,7 @@ class SirClass(
             publicTypeAlias: SirTypeAlias? = null,
             internalTypeAlias: SirTypeAlias? = null,
             isInherentlyHashable: Boolean = false,
+            origin: Origin = Origin.Generated,
         ): SirClass =
             SirClass(
                 baseName = baseName,
@@ -94,6 +108,7 @@ class SirClass(
                 publicTypeAlias = publicTypeAlias,
                 internalTypeAlias = internalTypeAlias,
                 isInherentlyHashable = isInherentlyHashable,
+                origin = origin,
             )
     }
 }
@@ -131,3 +146,11 @@ fun SirClass.inheritsFrom(other: SirClass): Boolean =
 
 fun SirClass.sharesDirectInheritanceHierarchy(other: SirClass): Boolean =
     this == other || this.inheritsFrom(other) || other.inheritsFrom(this)
+
+val SirClass.oirClassOrNull: OirClass?
+    get() = when (origin) {
+        is SirClass.Origin.Kir -> origin.kirClass.oirClass
+        is SirClass.Origin.Oir -> origin.oirClass
+        SirClass.Origin.Generated -> null
+        SirClass.Origin.ExternalSwiftFramework -> null
+    }

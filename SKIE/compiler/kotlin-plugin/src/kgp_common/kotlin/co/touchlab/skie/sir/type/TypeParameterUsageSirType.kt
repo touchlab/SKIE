@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.util.map
 import io.outfoxx.swiftpoet.TypeVariableName
 
 data class TypeParameterUsageSirType(
@@ -14,16 +15,16 @@ data class TypeParameterUsageSirType(
     override val isReference: Boolean
         get() = typeParameter.bounds.any { it.isReference }
 
-    override fun evaluate(): EvaluatedSirType<TypeParameterUsageSirType> {
-        val evaluatedParentScope = parentScope?.evaluate()
-        val evaluatedTypeParameterBounds = typeParameter.bounds.map { it.evaluate() }
+    override fun evaluate(): EvaluatedSirType {
+        val evaluatedParentScope = lazy { parentScope?.evaluate() }
+        val evaluatedTypeParameterBounds = lazy { typeParameter.bounds.map { it.evaluate() } }
 
-        return EvaluatedSirType(
-            type = copy(parentScope = evaluatedParentScope?.type),
-            isValid = evaluatedTypeParameterBounds.all { it.isValid } && (evaluatedParentScope?.isValid ?: true),
-            canonicalName = "[${typeParameter.name}: ${evaluatedTypeParameterBounds.joinToString { it.canonicalName }}]",
-            swiftPoetTypeName = evaluatedParentScope?.let { TypeVariableName(it.swiftPoetTypeName.name + "." + typeParameter.name) }
-                ?: TypeVariableName(typeParameter.name),
+        return EvaluatedSirType.Lazy(
+            typeProvider = evaluatedParentScope.map { copy(parentScope = it?.type as TypeParameterUsageSirType?) },
+            canonicalNameProvider = evaluatedTypeParameterBounds.map { bounds -> "[${typeParameter.name}: ${bounds.joinToString { it.canonicalName }}]" },
+            swiftPoetTypeNameProvider = evaluatedParentScope.map {
+                it?.let { TypeVariableName(it.swiftPoetTypeName.name + "." + typeParameter.name) } ?: TypeVariableName(typeParameter.name)
+            },
         )
     }
 

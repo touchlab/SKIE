@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.util.map
 
 data class NullableSirType(
     val type: SirType,
@@ -11,14 +12,13 @@ data class NullableSirType(
 
     override val isReference: Boolean = false
 
-    override fun evaluate(): EvaluatedSirType<NullableSirType> {
-        val evaluatedType = type.evaluate()
+    override fun evaluate(): EvaluatedSirType {
+        val evaluatedType = lazy { type.evaluate() }
 
-        return EvaluatedSirType(
-            type = copy(type = evaluatedType.type),
-            isValid = evaluatedType.isValid,
-            canonicalName = evaluatedType.canonicalName + "?",
-            swiftPoetTypeName = evaluatedType.swiftPoetTypeName.makeOptional(),
+        return EvaluatedSirType.Lazy(
+            typeProvider = evaluatedType.map { copy(type = it.type) },
+            canonicalNameProvider = evaluatedType.map { it.canonicalName + "?" },
+            swiftPoetTypeNameProvider = evaluatedType.map { it.swiftPoetTypeName.makeOptional() },
         )
     }
 

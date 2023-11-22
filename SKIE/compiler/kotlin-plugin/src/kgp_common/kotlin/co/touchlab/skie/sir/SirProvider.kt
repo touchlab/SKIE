@@ -1,6 +1,10 @@
 package co.touchlab.skie.sir
 
+import co.touchlab.skie.configuration.ClassInterop
+import co.touchlab.skie.configuration.ConfigurationProvider
+import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirCallableDeclaration
@@ -14,13 +18,13 @@ import co.touchlab.skie.sir.element.SirTopLevelDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
-import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 import co.touchlab.skie.util.FrameworkLayout
 import java.nio.file.Path
 
 class SirProvider(
     framework: FrameworkLayout,
     private val kirProvider: KirProvider,
+    private val configurationProvider: ConfigurationProvider,
 ) {
 
     val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
@@ -115,6 +119,14 @@ class SirProvider(
     fun getClassByFqName(fqName: SirFqName): SirClass =
         findClassByFqName(fqName)
             ?: error("SirClass with fqName $fqName not found.")
+
+    fun findExternalModule(oirClass: OirClass): SirModule? {
+        val origin = oirClass.origin as? OirClass.Origin.CinteropType ?: error("Invalid origin for OirClass: $oirClass")
+
+        val moduleName = configurationProvider.getConfiguration(origin.classDescriptor)[ClassInterop.CInteropFrameworkName] ?: return null
+
+        return getExternalModule(moduleName)
+    }
 }
 
 context(SirProvider)

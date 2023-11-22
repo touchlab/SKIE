@@ -1,26 +1,24 @@
 package co.touchlab.skie.oir.element
 
 // Instantiate only in OirProvider
-sealed class OirModule(
-    val name: String,
-) : OirElement {
+sealed interface OirModule : OirElement {
 
     class Kotlin(
-        name: String,
-    ) : OirModule(name) {
+        val name: String,
+    ) : OirModule {
 
         val files: MutableList<OirFile> = mutableListOf()
+
+        override fun toString(): String = "OirModule.${this::class.simpleName}: $name"
     }
 
-    class External(
-        name: String,
-    ) : OirModule(name), OirTopLevelDeclarationParent {
+    class External : OirModule, OirTopLevelDeclarationParent {
 
         override val module: OirModule
             get() = this
 
         override var declarations: MutableList<OirTopLevelDeclaration> = mutableListOf()
-    }
 
-    override fun toString(): String = "OirModule${this::class.simpleName}: $name"
+        override fun toString(): String = "OirModule.${this::class.simpleName}"
+    }
 }

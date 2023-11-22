@@ -15,23 +15,28 @@ data class LambdaSirType(
 
     override val isReference: Boolean = false
 
-    override fun evaluate(): EvaluatedSirType<LambdaSirType> {
-        val evaluatedValueParameterTypes = valueParameterTypes.map { it.evaluate() }
-        val evaluatedReturnType = returnType.evaluate()
+    override fun evaluate(): EvaluatedSirType {
+        val evaluatedValueParameterTypes = lazy { valueParameterTypes.map { it.evaluate() } }
+        val evaluatedReturnType = lazy { returnType.evaluate() }
 
-        return EvaluatedSirType(
-            type = copy(valueParameterTypes = evaluatedValueParameterTypes.map { it.type }, returnType = evaluatedReturnType.type),
-            isValid = (evaluatedValueParameterTypes + evaluatedReturnType).all { it.isValid },
-            canonicalName = "((${evaluatedValueParameterTypes.joinToString { it.canonicalName }}) -> ${evaluatedReturnType.canonicalName})",
-            swiftPoetTypeName = FunctionTypeName.get(
-                parameters = evaluatedValueParameterTypes.map { ParameterSpec.unnamed(it.swiftPoetTypeName) },
-                returnType = evaluatedReturnType.swiftPoetTypeName,
-                attributes = if (isEscaping) {
-                    listOf(AttributeSpec.ESCAPING)
-                } else {
-                    emptyList()
-                },
-            ),
+        return EvaluatedSirType.Lazy(
+            typeProvider = lazy {
+                copy(valueParameterTypes = evaluatedValueParameterTypes.value.map { it.type }, returnType = evaluatedReturnType.value.type)
+            },
+            canonicalNameProvider = lazy {
+                "((${evaluatedValueParameterTypes.value.joinToString { it.canonicalName }}) -> ${evaluatedReturnType.value.canonicalName})"
+            },
+            swiftPoetTypeNameProvider = lazy {
+                FunctionTypeName.get(
+                    parameters = evaluatedValueParameterTypes.value.map { ParameterSpec.unnamed(it.swiftPoetTypeName) },
+                    returnType = evaluatedReturnType.value.swiftPoetTypeName,
+                    attributes = if (isEscaping) {
+                        listOf(AttributeSpec.ESCAPING)
+                    } else {
+                        emptyList()
+                    },
+                )
+            },
         )
     }
 

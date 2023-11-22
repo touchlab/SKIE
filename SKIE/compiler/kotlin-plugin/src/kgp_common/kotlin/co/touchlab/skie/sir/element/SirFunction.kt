@@ -16,9 +16,6 @@ sealed class SirFunction(
 
     override val bodyBuilder = mutableListOf<FunctionSpec.Builder.() -> Unit>()
 
-    override val hasValidSignature: Boolean
-        get() = valueParameters.all { it.type.evaluate().isValid }
-
     override val reference: String
         get() = if (valueParameters.isEmpty()) {
             identifierForReference

@@ -79,11 +79,11 @@ class FileScopeConversionParentProvider(
     private fun createExtension(callableDeclaration: KirCallableDeclaration<*>, parentType: SirType): List<SirExtension> {
         val namespace = getExtensionNamespace(callableDeclaration, parentType)
 
-        return when (parentType) {
-            is DeclaredSirType -> {
+        return when (val type = parentType.evaluate().type) {
+            is SirDeclaredSirType -> {
                 createNonOptionalExtension(
                     file = namespace,
-                    sirClass = parentType.evaluateAsExtensionClass() ?: return emptyList(),
+                    sirClass = type.resolveAsSirClass().takeIf { it !in unsupportedExtensionTypes } ?: return emptyList(),
                 ).let(::listOfNotNull)
             }
             is SpecialSirType.Any -> {
@@ -92,13 +92,10 @@ class FileScopeConversionParentProvider(
                     sirClass = oirBuiltins.NSObject.originalSirClass,
                 ).let(::listOfNotNull)
             }
-            is NullableSirType -> getOptionalExtensions(callableDeclaration, parentType, namespace)
+            is NullableSirType -> getOptionalExtensions(callableDeclaration, type, namespace)
             else -> return emptyList()
         }
     }
-
-    private fun DeclaredSirType.evaluateAsExtensionClass(): SirClass? =
-        evaluate().type.resolveAsSirClass()?.takeIf { it !in unsupportedExtensionTypes }
 
     private fun getExtensionNamespace(
         callableDeclaration: KirCallableDeclaration<*>,

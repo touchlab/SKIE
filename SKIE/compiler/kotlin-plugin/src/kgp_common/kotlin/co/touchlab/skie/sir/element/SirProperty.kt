@@ -42,9 +42,6 @@ class SirProperty(
 
     override val modifiers: MutableList<Modifier> = modifiers.toMutableList()
 
-    override val hasValidSignature: Boolean
-        get() = type.evaluate().isValid
-
     private val overridableDeclarationDelegate = SirOverridableDeclarationDelegate(this)
 
     override val memberOwner: SirClass? by overridableDeclarationDelegate::memberOwner

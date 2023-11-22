@@ -13,9 +13,7 @@ class OirBuiltins(
     extraDescriptorBuiltins: ExtraDescriptorBuiltins,
 ) {
 
-    private val Foundation: OirModule.External = oirProvider.getExternalModule("Foundation")
-
-    val NSObject: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSObject, Foundation)
+    val NSObject: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSObject)
 
     val NSError: OirClass = oirProvider.getExternalClass(extraDescriptorBuiltins.NSError).apply {
         superTypes.add(NSObject.defaultType)

@@ -1,28 +1,27 @@
 package co.touchlab.skie.phases.sir.type
 
 import co.touchlab.skie.oir.element.OirClass
-import co.touchlab.skie.oir.element.OirModule
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.toSirKind
 
 object CreateExternalSirTypesPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        oirProvider.allExternalModules.forEach { module ->
-            module.declarations.filterIsInstance<OirClass>().forEach {
-                createClass(it, module)
-            }
+        oirProvider.allExternalClassesAndProtocols.forEach {
+            createClass(it)
         }
     }
 
     context(SirPhase.Context)
-    private fun createClass(oirClass: OirClass, module: OirModule.External): SirClass {
+    private fun createClass(oirClass: OirClass): SirClass {
         val sirClass = SirClass(
             baseName = oirClass.name,
-            parent = sirProvider.getExternalModule(module.name),
+            parent = sirProvider.findExternalModule(oirClass) ?: SirModule.Unknown,
             kind = oirClass.kind.toSirKind(),
+            origin = SirClass.Origin.Oir(oirClass),
         )
 
         oirClass.originalSirClass = sirClass

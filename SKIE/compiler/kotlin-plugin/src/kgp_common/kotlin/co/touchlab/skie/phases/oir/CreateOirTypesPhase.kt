@@ -47,6 +47,7 @@ class CreateOirTypesPhase(
                 KirClass.Kind.Interface -> OirClass.Kind.Protocol
                 else -> OirClass.Kind.Class
             },
+            origin = OirClass.Origin.Kir(kirClass),
         )
 
         createTypeParameters(oirClass, kirClass)

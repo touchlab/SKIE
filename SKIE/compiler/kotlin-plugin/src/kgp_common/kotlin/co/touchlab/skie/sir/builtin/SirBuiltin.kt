@@ -29,6 +29,8 @@ class SirBuiltins(
 
             override val module = sirProvider.getExternalModule("Swift")
 
+            override val origin: SirClass.Origin = SirClass.Origin.ExternalSwiftFramework
+
             val Hashable by Protocol {
                 isInherentlyHashable = true
             }
@@ -94,12 +96,16 @@ class SirBuiltins(
 
             override val module = sirProvider.getExternalModule("Foundation")
 
+            override val origin = SirClass.Origin.ExternalSwiftFramework
+
             val unichar by TypeAlias { swift.UInt16.defaultType }
         }
 
         class Skie(
             override val module: SirModule.Skie,
         ) : ModuleBase() {
+
+            override val origin: SirClass.Origin = SirClass.Origin.Generated
 
             // The SkieSwiftFlow classes are only stubs (correct super types, and content are currently not needed)
 
@@ -147,6 +153,8 @@ class SirBuiltins(
         abstract class ModuleBase {
 
             abstract val module: SirDeclarationParent
+
+            abstract val origin: SirClass.Origin
 
             protected fun Class(
                 superTypes: List<SirDeclaredSirType> = emptyList(),
@@ -224,6 +232,7 @@ class SirBuiltins(
                     kind = kind,
                     parent = parent,
                     superTypes = superTypes,
+                    origin = origin,
                 ).apply(apply)
 
                 override fun getValue(thisRef: Any?, property: KProperty<*>): SirClass =

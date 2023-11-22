@@ -32,7 +32,7 @@ data class OirDeclaredSirType(
         }
     }
 
-    override fun evaluate(): EvaluatedSirType<SirDeclaredSirType> =
+    override fun evaluate(): EvaluatedSirType =
         getType(declaration.primarySirClass).evaluate()
 
     override fun inlineTypeAliases(): SirType =

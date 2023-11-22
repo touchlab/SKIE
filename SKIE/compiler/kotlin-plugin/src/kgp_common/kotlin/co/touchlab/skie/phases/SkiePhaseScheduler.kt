@@ -20,7 +20,7 @@ import co.touchlab.skie.phases.features.flow.FlowConversionConstructorsGenerator
 import co.touchlab.skie.phases.features.functions.FileScopeConvertor
 import co.touchlab.skie.phases.features.sealed.SealedInteropGenerator
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
-import co.touchlab.skie.phases.header.AddLambdaTypeArgumentErrorTypePhase
+import co.touchlab.skie.phases.header.DeclareSkieErrorTypesPhase
 import co.touchlab.skie.phases.header.AddTypeDefPhase
 import co.touchlab.skie.phases.header.FixForwardDeclarationsPhase
 import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
@@ -31,6 +31,7 @@ import co.touchlab.skie.phases.memberconflicts.RenameCallableDeclarationsConflic
 import co.touchlab.skie.phases.memberconflicts.RenameConflictingCallableDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameParametersNamedSelfPhase
 import co.touchlab.skie.phases.oir.ConfigureExternalOirTypesBridgingPhase
+import co.touchlab.skie.phases.oir.ConfigureCInteropFrameworkNameForPlatformTypesPhase
 import co.touchlab.skie.phases.oir.CreateFakeObjCConstructorsPhase
 import co.touchlab.skie.phases.oir.CreateOirMembersPhase
 import co.touchlab.skie.phases.oir.CreateOirTypesPhase
@@ -120,6 +121,7 @@ class SkiePhaseScheduler {
 
             CreateOirTypesPhase(context),
             CreateOirMembersPhase(context),
+            ConfigureCInteropFrameworkNameForPlatformTypesPhase,
 
             CreateKotlinSirTypesPhase(context),
             CreateExternalSirTypesPhase,
@@ -189,7 +191,7 @@ class SkiePhaseScheduler {
 
             DeleteSkieFrameworkContentPhase,
             FixHeaderFilePropertyOrderingPhase,
-            AddLambdaTypeArgumentErrorTypePhase,
+            DeclareSkieErrorTypesPhase,
             ApiNotesGenerationPhase.ForSwiftCompilation,
             FixForwardDeclarationsPhase(context),
             AddTypeDefPhase(context),

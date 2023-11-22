@@ -1,9 +1,9 @@
 package co.touchlab.skie.phases.header
 
 import co.touchlab.skie.oir.element.OirClass
-import co.touchlab.skie.oir.element.OirModule
 import co.touchlab.skie.oir.element.renderForwardDeclaration
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 
 object GenerateFakeObjCDependenciesPhase : SirPhase {
@@ -11,21 +11,22 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
     context(SirPhase.Context)
     override fun execute() {
         oirProvider.allExternalClassesAndProtocols
-            .filter { it.module.name != "Foundation" }
-            .groupBy { it.module }
+            .groupBy { it.originalSirClass.module }
+            .filterKeys { it is SirModule.External && it.name != "Foundation" }
+            .mapKeys { it.key as SirModule.External }
             .forEach { (module, types) ->
                 generateFakeFramework(module, types)
             }
     }
 
     context(SirPhase.Context)
-    private fun generateFakeFramework(module: OirModule, classes: List<OirClass>) {
+    private fun generateFakeFramework(module: SirModule.External, classes: List<OirClass>) {
         generateModuleMap(module)
         generateHeader(module, classes)
     }
 
     context(SirPhase.Context)
-    private fun generateModuleMap(module: OirModule) {
+    private fun generateModuleMap(module: SirModule) {
         val moduleMapContent =
             """
             framework module ${module.name} {
@@ -37,7 +38,7 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
     }
 
     context(SirPhase.Context)
-    private fun generateHeader(module: OirModule, classes: List<OirClass>) {
+    private fun generateHeader(module: SirModule, classes: List<OirClass>) {
         val foundationImport = "#import <Foundation/NSObject.h>"
 
         val declarations = classes

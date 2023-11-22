@@ -40,6 +40,7 @@ class CreateKotlinSirTypesPhase(
             baseName = kirClass.sirFqName.simpleName,
             parent = kirClass.sirParent,
             kind = kirClass.oirClass.kind.toSirKind(),
+            origin = SirClass.Origin.Kir(kirClass),
         )
 
         sirClass.addTypeParameters(kirClass)

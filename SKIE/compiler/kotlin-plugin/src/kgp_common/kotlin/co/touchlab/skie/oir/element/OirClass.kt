@@ -1,13 +1,17 @@
 package co.touchlab.skie.oir.element
 
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.oir.type.DeclaredOirType
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirClass
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.types.KotlinType
 
 class OirClass(
     override val name: String,
     override val parent: OirTopLevelDeclarationParent,
     val kind: Kind,
+    val origin: Origin,
 ) : OirTypeDeclaration, OirCallableDeclarationParent {
 
     lateinit var originalSirClass: SirClass
@@ -52,6 +56,13 @@ class OirClass(
         Class,
         Protocol,
     }
+
+    sealed interface Origin {
+
+        data class CinteropType(val classDescriptor: ClassDescriptor) : Origin
+
+        data class Kir(val kirClass: KirClass) : Origin
+    }
 }
 
 val OirClass.superClassType: DeclaredOirType?
@@ -77,3 +88,10 @@ val OirClass.allFunctions: List<OirFunction>
 
 val OirClass.allSimpleFunctions: List<OirSimpleFunction>
     get() = callableDeclarationsIncludingExtensions.filterIsInstance<OirSimpleFunction>()
+
+val OirClass.kirClassOrNull: KirClass?
+    get() = (origin as? OirClass.Origin.Kir)?.kirClass
+
+val OirClass.cinteropClassDescriptorOrNull: ClassDescriptor?
+    get() = (origin as? OirClass.Origin.CinteropType)?.classDescriptor
+

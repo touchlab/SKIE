@@ -6,7 +6,7 @@ import io.outfoxx.swiftpoet.ProtocolTypeName
 import io.outfoxx.swiftpoet.SelfTypeName
 import io.outfoxx.swiftpoet.TypeName
 
-sealed class SpecialSirType<SELF : SirType>(
+sealed class SpecialSirType(
     private val typeName: TypeName,
 ) : NonNullSirType() {
 
@@ -14,31 +14,28 @@ sealed class SpecialSirType<SELF : SirType>(
 
     override val isReference: Boolean = false
 
-    @Suppress("UNCHECKED_CAST")
-    override fun evaluate(): EvaluatedSirType<SELF> =
-        EvaluatedSirType(
+    private val evaluatedSirType by lazy {
+        EvaluatedSirType.Eager(
             type = this,
-            isValid = true,
             canonicalName = typeName.name,
             swiftPoetTypeName = typeName,
-        ) as EvaluatedSirType<SELF>
+        )
+    }
+
+    override fun evaluate(): EvaluatedSirType = evaluatedSirType
 
     override fun inlineTypeAliases(): SirType =
         this
 
-    @Suppress("UNCHECKED_CAST")
-    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SELF =
-        this as SELF
+    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SirType = this
 
-    @Suppress("UNCHECKED_CAST")
-    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SELF =
-        this as SELF
+    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SirType = this
 
-    object Self : SpecialSirType<Self>(SelfTypeName.INSTANCE)
+    object Self : SpecialSirType(SelfTypeName.INSTANCE)
 
-    object Any : SpecialSirType<Any>(AnyTypeName.INSTANCE)
+    object Any : SpecialSirType(AnyTypeName.INSTANCE)
 
-    object Protocol : SpecialSirType<Protocol>(ProtocolTypeName.INSTANCE) {
+    object Protocol : SpecialSirType(ProtocolTypeName.INSTANCE) {
 
         override val isReference: Boolean = true
 

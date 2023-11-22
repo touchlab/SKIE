@@ -35,7 +35,12 @@ sealed class SirModule(
         override val files: List<SirFile> = emptyList()
     }
 
-    object None : SirModule("__None") {
+    object Unknown : SirModule("<Unknown>") {
+
+        override val files: List<SirFile> = emptyList()
+    }
+
+    object None : SirModule("<None>") {
 
         override val files: List<SirFile> = emptyList()
     }

@@ -44,14 +44,6 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      */
     val name: String
 
-    /**
-     * Signature is not valid if and only if it references a SkieErrorType.
-     * Only valid signatures can be used in generated Swift code.
-     * Invalid signatures can be used only for generating placeholder declaration that cannot be called.
-     * Example of such situation is if the signature contains a lambda type argument, such as A<() -> Unit>.
-     */
-    val hasValidSignature: Boolean
-
     val deprecationLevel: DeprecationLevel
 }
 

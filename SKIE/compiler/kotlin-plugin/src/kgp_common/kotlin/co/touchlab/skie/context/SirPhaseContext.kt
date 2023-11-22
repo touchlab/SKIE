@@ -9,6 +9,7 @@ import co.touchlab.skie.oir.type.translation.OirCustomTypeMappers
 import co.touchlab.skie.oir.type.translation.OirTypeTranslator
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.oir.util.ExternalApiNotesProvider
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.SkieNamespaceProvider
 import co.touchlab.skie.sir.builtin.SirBuiltins
@@ -27,7 +28,7 @@ class SirPhaseContext(
 
     override val oirProvider: OirProvider = OirProvider(kirProvider.skieModule, extraDescriptorBuiltins, kirProvider, namer)
 
-    override val sirProvider: SirProvider = SirProvider(framework, kirProvider)
+    override val sirProvider: SirProvider = SirProvider(framework, kirProvider, configurationProvider)
 
     override val kirBuiltins: KirBuiltins = kirProvider.kirBuiltins
 
@@ -39,6 +40,11 @@ class SirPhaseContext(
         kirProvider = kirProvider,
         sirProvider = sirProvider,
         mainModuleDescriptor = mainSkieContext.mainModuleDescriptor,
+    )
+
+    override val externalApiNotesProvider: ExternalApiNotesProvider = ExternalApiNotesProvider(
+        sdkPath = configurables.absoluteTargetSysRoot,
+        sirProvider = sirProvider,
     )
 
     override val kirTypeTranslator: KirTypeTranslator = KirTypeTranslator()

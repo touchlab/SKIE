@@ -11,12 +11,15 @@ sealed class SirType {
     /**
      * Replaces OirDeclaredSirType with their corresponding SirType.
      */
-    abstract fun evaluate(): EvaluatedSirType<SirType>
+    abstract fun evaluate(): EvaluatedSirType
 
     /**
      * Replace all type aliases with their underlying types.
      */
     abstract fun inlineTypeAliases(): SirType
+
+    fun normalize(): SirType =
+        inlineTypeAliases().evaluate().type
 
     open fun asHashableType(): SirType? = null
 
