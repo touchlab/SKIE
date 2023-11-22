@@ -8,12 +8,13 @@ import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.kir.element.classDescriptorOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCallableDeclaration
-import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeDeclaration
+import co.touchlab.skie.sir.element.kirClassOrNull
+import co.touchlab.skie.sir.element.resolveAsKirClass
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 
 context(SirPhase.Context)
@@ -57,7 +58,7 @@ fun SirEnumCase.resolveCollisionWithWarning(collisionReasonProvider: SirEnumCase
         collisionReasonProvider = collisionReasonProvider,
         rename = { simpleName += "_" },
         getName = { parent.fqName.toLocalString() + "." + simpleName },
-        findKirElement = { kirProvider.findClass(parent)?.enumEntries?.get(index) },
+        findKirElement = { parent.kirClassOrNull?.enumEntries?.get(index) },
         getDescriptor = { descriptor },
     )
 
@@ -92,7 +93,7 @@ private inline fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(
         collisionReasonProvider = collisionReasonProvider,
         rename = rename,
         getName = { fqName.toLocalString() },
-        findKirElement = { (this as? SirClass)?.let { kirProvider.findClass(it) } },
+        findKirElement = { resolveAsKirClass() },
         getDescriptor = { classDescriptorOrNull },
     )
 

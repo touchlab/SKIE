@@ -58,7 +58,6 @@ import co.touchlab.skie.phases.sir.type.CreateExternalSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateStableNameTypeAliasesPhase
 import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
-import co.touchlab.skie.phases.sir.type.InitializeSirTypesCachePhase
 import co.touchlab.skie.phases.sir.type.InitializeSirTypesSuperTypesForOirPhase
 import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.GenerateSirFileCodePhase
@@ -125,7 +124,6 @@ class SkiePhaseScheduler {
 
             CreateKotlinSirTypesPhase(context),
             CreateExternalSirTypesPhase,
-            InitializeSirTypesCachePhase,
             InitializeSirTypesSuperTypesForOirPhase,
             ConfigureExternalOirTypesBridgingPhase(context),
 

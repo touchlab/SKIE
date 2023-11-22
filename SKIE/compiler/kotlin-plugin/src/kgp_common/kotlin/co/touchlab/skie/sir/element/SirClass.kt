@@ -2,6 +2,7 @@ package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirDeclaredSirType
@@ -154,3 +155,6 @@ val SirClass.oirClassOrNull: OirClass?
         SirClass.Origin.Generated -> null
         SirClass.Origin.ExternalSwiftFramework -> null
     }
+
+val SirClass.kirClassOrNull: KirClass?
+    get() = oirClassOrNull?.kirClassOrNull

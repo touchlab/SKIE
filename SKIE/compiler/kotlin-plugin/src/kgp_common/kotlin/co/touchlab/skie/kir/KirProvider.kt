@@ -42,10 +42,6 @@ class KirProvider(
 
     private lateinit var fqNameCache: Map<String, KirClass>
 
-    private lateinit var oirClassCache: Map<OirClass, KirClass>
-
-    private lateinit var sirClassCache: Map<SirClass, KirClass>
-
     private lateinit var descriptorsToCallableDeclarationsCache: Map<CallableMemberDescriptor, KirCallableDeclaration<*>>
 
     private lateinit var sirToCallableDeclarationsCache: Map<SirCallableDeclaration, KirCallableDeclaration<*>>
@@ -124,14 +120,6 @@ class KirProvider(
         kirClass.classes.forEach { cacheClassesRecursively(it, visitedClasses) }
     }
 
-    fun initializeOirClassCache() {
-        oirClassCache = allClasses.associateBy { it.oirClass }
-    }
-
-    fun initializeSirClassCache() {
-        sirClassCache = allClasses.associateBy { it.originalSirClass }
-    }
-
     fun initializeCallableDeclarationsCache() {
         descriptorsToCallableDeclarationsCache = allClasses.flatMap { it.callableDeclarations }.associateBy { it.descriptor }
 
@@ -158,14 +146,6 @@ class KirProvider(
         findClass(sourceFile)
             ?: error("Class not found: $sourceFile. This error usually means that the class is not exposed to Objective-C.")
 
-    fun getClass(oirClass: OirClass): KirClass =
-        findClass(oirClass)
-            ?: error("Class not found: $oirClass. This error usually means that the class is not exposed to Objective-C.")
-
-    fun getClass(sirClass: SirClass): KirClass =
-        findClass(sirClass)
-            ?: error("Class not found: $sirClass. This error usually means that the class is not exposed to Objective-C.")
-
     fun getClassByFqName(fqName: String): KirClass =
         findClassByFqName(fqName)
             ?: error("Class not found: $fqName. This error usually means that the class is not exposed to Objective-C.")
@@ -183,12 +163,6 @@ class KirProvider(
 
     fun findClass(sourceFile: SourceFile): KirClass? =
         fileCache[sourceFile]
-
-    fun findClass(oirClass: OirClass): KirClass? =
-        oirClassCache[oirClass]
-
-    fun findClass(sirClass: SirClass): KirClass? =
-        sirClassCache[sirClass]
 
     fun findClassByFqName(fqName: String): KirClass? =
         fqNameCache[fqName]

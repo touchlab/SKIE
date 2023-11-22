@@ -2,18 +2,17 @@ package co.touchlab.skie.phases.features.functions
 
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.receiverDeclaration
+import co.touchlab.skie.sir.element.resolveAsKirClass
 import co.touchlab.skie.sir.element.resolveAsSirClass
-import co.touchlab.skie.sir.element.resolveAsSirClassType
-import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.OirDeclaredSirType
 import co.touchlab.skie.sir.type.SirDeclaredSirType
@@ -109,8 +108,8 @@ class FileScopeConversionParentProvider(
 
     private fun getExtensionReceiverKirClassIfExists(parentType: SirType): KirClass? =
         when (parentType) {
-            is SirDeclaredSirType -> parentType.declaration.resolveAsSirClass()?.let { context.kirProvider.findClass(it) }
-            is OirDeclaredSirType -> context.kirProvider.findClass(parentType.declaration)
+            is SirDeclaredSirType -> parentType.declaration.resolveAsKirClass()
+            is OirDeclaredSirType -> parentType.declaration.kirClassOrNull
             is NullableSirType -> getExtensionReceiverKirClassIfExists(parentType.type)
             else -> null
         }

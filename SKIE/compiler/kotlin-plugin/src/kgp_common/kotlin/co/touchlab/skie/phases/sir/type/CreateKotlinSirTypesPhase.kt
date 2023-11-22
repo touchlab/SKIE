@@ -17,16 +17,10 @@ class CreateKotlinSirTypesPhase(
     private val sirProvider = context.sirProvider
     private val sirBuiltins = context.sirBuiltins
 
-    context(SirPhase.Context)
-    override fun execute() {
-        createClasses()
-
-        kirProvider.initializeSirClassCache()
-    }
-
     private val kirToSirClasses = mutableMapOf<KirClass, SirClass>()
 
-    private fun createClasses() {
+    context(SirPhase.Context)
+    override fun execute() {
         kirProvider.allClasses.forEach(::getOrCreateClass)
     }
 

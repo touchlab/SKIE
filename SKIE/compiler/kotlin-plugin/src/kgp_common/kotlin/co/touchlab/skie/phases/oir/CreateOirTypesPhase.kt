@@ -28,8 +28,6 @@ class CreateOirTypesPhase(
 
         initializeSuperTypesForAllClasses()
 
-        kirProvider.initializeOirClassCache()
-
         oirProvider.initializeKotlinClassCache()
     }
 

@@ -1,5 +1,6 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.SirDeclaredSirType
@@ -76,3 +77,6 @@ fun SirTypeDeclaration.resolveAsSirClass(): SirClass? =
             }
         }
     }
+
+fun SirTypeDeclaration.resolveAsKirClass(): KirClass? =
+    resolveAsSirClass()?.kirClassOrNull

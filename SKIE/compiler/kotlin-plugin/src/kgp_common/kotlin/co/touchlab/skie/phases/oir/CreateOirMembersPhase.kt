@@ -21,6 +21,7 @@ import co.touchlab.skie.oir.element.OirProperty
 import co.touchlab.skie.oir.element.OirScope
 import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirValueParameter
+import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.oir.type.translation.OirTypeParameterScope
 import co.touchlab.skie.oir.type.translation.typeParameterScope
 import co.touchlab.skie.phases.SirPhase
@@ -201,5 +202,5 @@ class CreateOirMembersPhase(
         }
 
     private val OirClass.genericsScope: OirTypeParameterScope
-        get() = kirProvider.getClass(this).typeParameterScope
+        get() = this.kirClassOrNull?.typeParameterScope ?: error("OirClass $this does not originate from KirClass.")
 }

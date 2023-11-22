@@ -20,6 +20,7 @@ import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isExported
+import co.touchlab.skie.sir.element.oirClassOrNull
 import co.touchlab.skie.sir.getExtension
 
 object ExhaustiveEnumsGenerator : SirPhase {
@@ -110,14 +111,13 @@ private fun SirClass.addEnumCases(enum: KirClass) {
     }
 }
 
-context(SirPhase.Context)
 private fun SirClass.addNestedClassTypeAliases(enum: KirClass) {
     enum.originalSirClass.declarations
         .filterIsInstance<SirClass>()
         .forEach { nestedClass ->
             addNestedClassTypeAlias(nestedClass)
 
-            oirProvider.findClass(nestedClass)?.bridgedSirClass?.let { addNestedClassTypeAlias(it) }
+            nestedClass.oirClassOrNull?.bridgedSirClass?.let { addNestedClassTypeAlias(it) }
         }
 }
 

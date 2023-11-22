@@ -8,7 +8,6 @@ import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.OirFile
 import co.touchlab.skie.oir.element.OirModule
 import co.touchlab.skie.phases.oir.CreateOirTypesPhase
-import co.touchlab.skie.sir.element.SirClass
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.isInterface
@@ -28,8 +27,6 @@ class OirProvider(
 
     lateinit var allKotlinClassesAndProtocols: List<OirClass>
         private set
-
-    private lateinit var sirClassCache: Map<SirClass, OirClass>
 
     val allExternalClasses: List<OirClass>
         get() = allExternalClassesAndProtocols.filter { it.kind == OirClass.Kind.Class }
@@ -104,11 +101,4 @@ class OirProvider(
         allKotlinClasses = allKotlinClassesAndProtocols.filter { it.kind == OirClass.Kind.Class }
         allKotlinProtocols = allKotlinClassesAndProtocols.filter { it.kind == OirClass.Kind.Protocol }
     }
-
-    fun initializeSirClassCache() {
-        sirClassCache = allClassesAndProtocols.associateBy { it.originalSirClass }
-    }
-
-    fun findClass(sirClass: SirClass): OirClass? =
-        sirClassCache[sirClass]
 }

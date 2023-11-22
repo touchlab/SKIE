@@ -8,6 +8,9 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isRemoved
+import co.touchlab.skie.sir.element.kirClassOrNull
+import co.touchlab.skie.sir.element.oirClassOrNull
+import co.touchlab.skie.sir.element.resolveAsKirClass
 import co.touchlab.skie.util.resolveCollisionWithWarning
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -16,7 +19,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        val sortedTypeDeclarations = sirProvider.allLocalTypeDeclarations.sortedWith(getCollisionResolutionPriorityComparator())
+        val sortedTypeDeclarations = sirProvider.allLocalTypeDeclarations.sortedWith(collisionResolutionPriorityComparator)
 
         buildUniqueSignatureSet(sortedTypeDeclarations)
     }
@@ -32,9 +35,8 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
      * Kotlin fqName if available
      * Kotlin SirClasses with shorter Obj-C names are prioritized
      */
-    context(SirPhase.Context)
-    private fun getCollisionResolutionPriorityComparator(): Comparator<SirTypeDeclaration> =
-        compareBy<SirTypeDeclaration> {
+    private val collisionResolutionPriorityComparator: Comparator<SirTypeDeclaration>
+        get() = compareBy<SirTypeDeclaration> {
             it.fqName.depth
         }
             .thenBy { it.isRemoved }
@@ -49,18 +51,14 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
                 }
             }
             .thenByDescending { it is SirClass }
-            .thenByDescending { it.getKirClassOrNull() != null }
-            .thenByDescending { it.getKirClassOrNull()?.kind != KirClass.Kind.File }
-            .thenBy { it.getKirClassOrNull()?.kotlinClassNestingLevel ?: 0 }
-            .thenBy { it.getKirClassOrNull()?.kotlinName ?: "" }
+            .thenByDescending { it.resolveAsKirClass() != null }
+            .thenByDescending { it.resolveAsKirClass()?.kind != KirClass.Kind.File }
+            .thenBy { it.resolveAsKirClass()?.kotlinClassNestingLevel ?: 0 }
+            .thenBy { it.resolveAsKirClass()?.kotlinName ?: "" }
             .thenBy { it.getOirClassOrNull()?.name?.length ?: Int.MAX_VALUE }
 
     private val SirFqName.depth: Int
         get() = 1 + (this.parent?.depth ?: 0)
-
-    context(SirPhase.Context)
-    private fun SirTypeDeclaration.getKirClassOrNull(): KirClass? =
-        (this as? SirClass)?.let { kirProvider.findClass(it) }
 
     private val KirClass.kotlinName: String
         get() = when (val descriptor = this.descriptor) {
@@ -77,9 +75,8 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
     private val ClassDescriptor.kotlinClassNestingLevel: Int
         get() = 1 + ((this.containingDeclaration as? ClassDescriptor)?.kotlinClassNestingLevel ?: 0)
 
-    context(SirPhase.Context)
     private fun SirTypeDeclaration.getOirClassOrNull(): OirClass? =
-        (this as? SirClass)?.let { oirProvider.findClass(it) }
+        (this as? SirClass)?.oirClassOrNull
 
     context(SirPhase.Context)
     private fun buildUniqueSignatureSet(typeDeclarations: List<SirTypeDeclaration>) {
