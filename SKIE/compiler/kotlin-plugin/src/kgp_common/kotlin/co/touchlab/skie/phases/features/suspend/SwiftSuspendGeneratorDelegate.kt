@@ -18,6 +18,7 @@ import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.OirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
+import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionTypeName
@@ -162,10 +163,10 @@ private fun MutableList<String>.addValueParameters(bridgeModel: BridgeModel) {
             if (parameter.type.evaluate().swiftPoetTypeName != erasedParameterType) {
                 add(CodeBlock.toString("%N as! %T", parameter.name, erasedParameterType))
             } else {
-                add(CodeBlock.toString("%N", parameter.name))
+                add(parameter.name.escapeSwiftIdentifier())
             }
         } else {
-            add(CodeBlock.toString("%N", parameter.name))
+            add(parameter.name.escapeSwiftIdentifier())
         }
     }
 }

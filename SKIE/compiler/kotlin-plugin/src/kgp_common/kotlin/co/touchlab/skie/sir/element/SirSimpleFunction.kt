@@ -5,6 +5,7 @@ import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.Modifier
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.phases.memberconflicts.signature
+import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.CodeBlock
 
 class SirSimpleFunction(
@@ -27,7 +28,7 @@ class SirSimpleFunction(
         }
 
     override val identifierForReference: String
-        get() = CodeBlock.toString("%N", identifierAfterVisibilityChange)
+        get() = identifierAfterVisibilityChange.escapeSwiftIdentifier()
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 

@@ -7,11 +7,10 @@ import co.touchlab.skie.sir.element.SirGetter
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.sir.element.call
 import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
-import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.joinToCode
 
 class GlobalMembersConvertorDelegate(
     private val parentProvider: FileScopeConversionParentProvider,
@@ -42,7 +41,7 @@ class GlobalMembersConvertorDelegate(
                 if (function.throws) "try " else "",
                 if (function.isAsync) "await " else "",
                 function.kotlinStaticMemberOwnerTypeName,
-                function.call(valueParameters.map { CodeBlock.toString("%N", it.name) }),
+                function.call(valueParameters),
             )
         }
     }

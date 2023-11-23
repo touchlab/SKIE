@@ -8,11 +8,13 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.call
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.toNullable
+import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.TypeName
 
@@ -162,12 +164,10 @@ class SealedFunctionGeneratorDelegate(
         bodyBuilder.add {
             val valueParameter = valueParameters.first()
 
-            val escapedParameterName = CodeBlock.toString("%N", valueParameter.name)
-
             addCode(
                 CodeBlock.builder()
-                    .beginControlFlow("if", "let $escapedParameterName")
-                    .add("return %L as %T", requiredFunction.call(escapedParameterName), requiredFunction.returnType.evaluate().swiftPoetTypeName)
+                    .beginControlFlow("if", "let ${valueParameter.name.escapeSwiftIdentifier()}")
+                    .add("return %L as %T", requiredFunction.call(valueParameter), requiredFunction.returnType.evaluate().swiftPoetTypeName)
                     .nextControlFlow("else")
                     .add("return nil")
                     .endControlFlow("else")

@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.phases.memberconflicts.signature
+import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
@@ -53,6 +54,12 @@ sealed class SirFunction(
 
     override fun toString(): String = this.signature.toString()
 }
+
+fun SirFunction.call(arguments: List<SirValueParameter>): String =
+    call(arguments.map { it.name.escapeSwiftIdentifier() })
+
+fun SirFunction.call(vararg arguments: SirValueParameter): String =
+    call(arguments.toList())
 
 fun SirFunction.copyValueParametersFrom(other: SirFunction) {
     copyValueParametersFrom(other.valueParameters)

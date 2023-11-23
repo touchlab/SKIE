@@ -11,6 +11,7 @@ import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.isExported
 import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
+import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.joinToCode
 
@@ -44,7 +45,7 @@ class InterfaceExtensionMembersConvertorDelegate(
                 if (function.isAsync) "await " else "",
                 // Interfaces cannot be bridged
                 function.kotlinStaticMemberOwnerTypeName,
-                function.call(listOf("self") + valueParameters.map { CodeBlock.toString("%N", it.name) }),
+                function.call(listOf("self") + valueParameters.map { it.name.escapeSwiftIdentifier() }),
             )
         }
     }
@@ -92,9 +93,9 @@ class InterfaceExtensionMembersConvertorDelegate(
         ).apply {
             addFunctionDeclarationBodyWithErrorTypeHandling(getter) {
                 addStatement(
-                    "return %T.%N(self)",
+                    "return %T.%L",
                     getter.kotlinStaticMemberOwnerTypeName,
-                    getter.reference,
+                    getter.call("self"),
                 )
             }
         }
@@ -108,10 +109,9 @@ class InterfaceExtensionMembersConvertorDelegate(
         ).apply {
             addFunctionDeclarationBodyWithErrorTypeHandling(setter) {
                 addStatement(
-                    "%T.%N(self, %N)",
+                    "%T.%L",
                     setter.kotlinStaticMemberOwnerTypeName,
-                    setter.reference,
-                    parameterName,
+                    setter.call("self", parameterName.escapeSwiftIdentifier()),
                 )
             }
         }
