@@ -30,11 +30,9 @@ object AddAvailabilityBasedDeprecationLevelPhase : SirPhase {
     }
 
     private fun SirCallableDeclaration.addAvailableAttribute(type: String, message: String?) {
-        val messagePrefix = "Deprecated in Kotlin"
+        val messageParameter = if (message != null) ", message: ${message.quoteAsSwiftLiteral()}" else ""
 
-        val fullMessage = if (message != null) "$messagePrefix: $message" else messagePrefix
-
-        this.attributes.add("available(*, $type, message: ${fullMessage.quoteAsSwiftLiteral()})")
+        this.attributes.add("available(*, $type$messageParameter)")
     }
 
     private fun SirCallableDeclaration.replaceBodyWithError() {
