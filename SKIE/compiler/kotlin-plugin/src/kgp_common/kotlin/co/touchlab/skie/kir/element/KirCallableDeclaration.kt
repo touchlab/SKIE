@@ -23,6 +23,8 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     val oirCallableDeclaration: OirCallableDeclaration
 
+    val isRefinedInSwift: Boolean
+
     val module: KirModule
         get() = owner.module
 

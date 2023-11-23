@@ -18,6 +18,8 @@ class KirConstructor(
 
     override val scope: KirScope = KirScope.Static
 
+    override val isRefinedInSwift: Boolean = false
+
     override val origin: KirCallableDeclaration.Origin = KirCallableDeclaration.Origin.Member
 
     lateinit var oirConstructor: OirConstructor

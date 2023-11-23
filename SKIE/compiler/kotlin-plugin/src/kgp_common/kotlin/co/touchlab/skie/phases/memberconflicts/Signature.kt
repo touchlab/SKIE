@@ -290,7 +290,7 @@ sealed class Signature {
         operator fun invoke(function: SirSimpleFunction): Signature =
             SimpleFunction(
                 receiver = function.receiver,
-                identifier = function.identifierAfterVisibilityChanges,
+                identifier = function.identifierAfterVisibilityChange,
                 valueParameters = function.signatureValueParameters,
                 returnType = ReturnType.Specific(function.returnType.signatureType),
                 scope = function.signatureScope,
@@ -312,7 +312,7 @@ sealed class Signature {
         operator fun invoke(property: SirProperty): Signature =
             Property(
                 receiver = property.receiver,
-                identifier = property.identifierAfterVisibilityChanges,
+                identifier = property.identifierAfterVisibilityChange,
                 scope = property.signatureScope,
             )
 

@@ -25,9 +25,9 @@ sealed class SirFunction(
 
     override val name: String
         get() = if (valueParameters.isEmpty()) {
-            "$identifierAfterVisibilityChanges()"
+            "$identifierAfterVisibilityChange()"
         } else {
-            "$identifierAfterVisibilityChanges(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
+            "$identifierAfterVisibilityChange(${valueParameters.joinToString("") { "${it.labelOrName}:" }})"
         }
 
     /**

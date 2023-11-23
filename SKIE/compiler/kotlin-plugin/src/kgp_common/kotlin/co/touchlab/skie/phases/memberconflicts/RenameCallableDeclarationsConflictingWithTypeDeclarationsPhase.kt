@@ -25,7 +25,7 @@ object RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase : SirPhase
     context(SirPhase.Context)
     private fun SirCallableDeclaration.renameIfConflictsWith(reservedNames: Set<String>) {
         this.resolveCollisionWithWarning {
-            if (identifierAfterVisibilityChanges in reservedNames) "a type name '$identifierAfterVisibilityChanges'" else null
+            if (identifierAfterVisibilityChange in reservedNames) "a type name '$identifierAfterVisibilityChange'" else null
         }
     }
 }

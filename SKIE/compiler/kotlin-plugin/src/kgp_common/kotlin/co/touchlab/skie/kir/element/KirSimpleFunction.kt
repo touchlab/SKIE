@@ -20,6 +20,7 @@ class KirSimpleFunction(
     override val scope: KirScope,
     override val errorHandlingStrategy: OirFunction.ErrorHandlingStrategy,
     override val deprecationLevel: DeprecationLevel,
+    override val isRefinedInSwift: Boolean,
 ) : KirFunction<SirSimpleFunction>(), KirOverridableDeclaration<KirSimpleFunction, SirSimpleFunction> {
 
     lateinit var oirSimpleFunction: OirSimpleFunction

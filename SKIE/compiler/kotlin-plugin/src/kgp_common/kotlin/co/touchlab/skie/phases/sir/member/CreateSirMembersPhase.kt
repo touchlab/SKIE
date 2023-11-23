@@ -21,6 +21,7 @@ import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
@@ -56,6 +57,7 @@ class CreateSirMembersPhase(
             parent = constructor.getSirParent(),
             throws = constructor.errorHandlingStrategy.isThrowing,
             deprecationLevel = constructor.deprecationLevel,
+            visibility = constructor.visibility,
         ).apply {
             createValueParameters(constructor, constructor.swiftFunctionName)
         }
@@ -74,6 +76,7 @@ class CreateSirMembersPhase(
             scope = oirSimpleFunction.scope.sirScope,
             throws = function.errorHandlingStrategy.isThrowing,
             deprecationLevel = function.deprecationLevel,
+            visibility = function.visibility,
         ).apply {
             createValueParameters(function, swiftFunctionName)
         }
@@ -90,6 +93,7 @@ class CreateSirMembersPhase(
             type = sirTypeTranslator.mapType(oirProperty.type),
             scope = oirProperty.scope.sirScope,
             deprecationLevel = property.deprecationLevel,
+            visibility = property.visibility,
         ).apply {
             property.descriptor.getter?.let {
                 SirGetter(
@@ -152,6 +156,13 @@ class CreateSirMembersPhase(
                 KirValueParameter.Kind.ErrorOut -> false
                 else -> true
             }
+        }
+
+    private val KirCallableDeclaration<*>.visibility: SirVisibility
+        get() = if (this.isRefinedInSwift) {
+            SirVisibility.PublicButReplaced
+        } else {
+            SirVisibility.Public
         }
 
     private val KirFunction<*>.swiftFunctionName: SwiftFunctionName

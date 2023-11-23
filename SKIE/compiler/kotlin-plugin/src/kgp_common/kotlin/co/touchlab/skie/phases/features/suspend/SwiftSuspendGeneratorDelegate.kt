@@ -2,7 +2,6 @@ package co.touchlab.skie.phases.features.suspend
 
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirSimpleFunction
-import co.touchlab.skie.kir.element.forEachAssociatedExportedSirDeclaration
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.features.flow.SupportedFlow
@@ -15,7 +14,6 @@ import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
 import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.shallowCopy
-import co.touchlab.skie.sir.element.toSwiftVisibility
 import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.OirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
@@ -47,19 +45,21 @@ class SwiftSuspendGeneratorDelegate(
                 parent = skieNamespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
             )
 
-            markOriginalFunctionAsReplaced(bridgeModel.suspendKirFunction)
-
             bridgeModel.suspendKirFunction.bridgedSirFunction = extension.createSwiftBridgingFunction(bridgeModel)
+
+            hideOriginalFunction(bridgeModel)
         }
     }
 
     context(SirPhase.Context)
-    private fun markOriginalFunctionAsReplaced(
-        suspendKirFunction: KirSimpleFunction,
-    ) {
-        suspendKirFunction.forEachAssociatedExportedSirDeclaration {
+    private fun hideOriginalFunction(bridgeModel: BridgeModel) {
+        bridgeModel.suspendKirFunctionAssociatedDeclarations.forEach {
             it.applyToEntireOverrideHierarchy {
-                visibility = SirVisibility.PublicButReplaced
+                // Cannot use PublicButReplaced because the function might be annotated with @ShouldRefineInSwift
+                if (visibility == SirVisibility.Public) {
+                    visibility = SirVisibility.PublicButHidden
+                }
+                identifier = "__$identifier"
             }
         }
     }
@@ -81,7 +81,6 @@ private fun SirExtension.createSwiftBridgingFunction(bridgeModel: BridgeModel): 
         parent = this,
         isAsync = true,
         throws = true,
-        visibility = bridgeModel.originalFunction.visibility.toSwiftVisibility(),
         returnType = bridgeModel.originalFunction.returnType.revertFlowMappingIfNeeded(),
     ).apply {
         copyValueParametersFrom(bridgeModel.originalFunction)
@@ -189,6 +188,10 @@ private data class BridgeModel(
 
     val originalFunction: SirSimpleFunction =
         suspendKirFunction.bridgedSirFunction ?: error("Suspend function $suspendKirFunction does not have an async bridge.")
+
+    val suspendKirFunctionAssociatedDeclarations: List<SirSimpleFunction> =
+        // TODO Change after bridged declarations are replaced with async function
+        listOfNotNull(suspendKirFunction.originalSirFunction, suspendKirFunction.bridgedSirFunction)
 
     val kotlinBridgingFunction: SirSimpleFunction = kotlinBridgingKirFunction.originalSirFunction
 

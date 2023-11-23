@@ -266,7 +266,7 @@ object GenerateSirFileCodePhase : SirPhase {
         }
 
         addFunction(
-            FunctionSpec.builder(function.identifier)
+            FunctionSpec.builder(function.identifierAfterVisibilityChange)
                 .addFunctionProperties(function)
                 .addOverrideIfNeeded(function)
                 .addScope(function)
@@ -283,7 +283,7 @@ object GenerateSirFileCodePhase : SirPhase {
         }
 
         addProperty(
-            PropertySpec.builder(property.identifier, property.type.toSwiftPoetTypeName())
+            PropertySpec.builder(property.identifierAfterVisibilityChange, property.type.toSwiftPoetTypeName())
                 .addCallableDeclarationProperties(property)
                 .addOverrideIfNeeded(property)
                 .addScope(property)

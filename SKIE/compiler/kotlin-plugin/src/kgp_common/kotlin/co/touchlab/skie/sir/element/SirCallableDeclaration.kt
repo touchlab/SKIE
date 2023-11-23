@@ -20,7 +20,7 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      * foo
      * __foo (visibility == PublicButReplaced && !constructor)
      */
-    val identifierAfterVisibilityChanges: String
+    val identifierAfterVisibilityChange: String
 
     /**
      * Use to obtain declaration `reference` in generated Swift code.

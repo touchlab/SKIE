@@ -16,6 +16,7 @@ class KirProperty(
     var type: KirType,
     val isVar: Boolean,
     override val deprecationLevel: DeprecationLevel,
+    override val isRefinedInSwift: Boolean,
 ) : KirOverridableDeclaration<KirProperty, SirProperty> {
 
     val name: String

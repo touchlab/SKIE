@@ -20,14 +20,14 @@ class SirSimpleFunction(
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
 ) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction> {
 
-    override val identifierAfterVisibilityChanges: String
+    override val identifierAfterVisibilityChange: String
         get() = when (visibility) {
             SirVisibility.PublicButReplaced -> "__$identifier"
             else -> identifier
         }
 
     override val identifierForReference: String
-        get() = CodeBlock.toString("%N", identifierAfterVisibilityChanges)
+        get() = CodeBlock.toString("%N", identifierAfterVisibilityChange)
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 

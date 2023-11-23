@@ -15,6 +15,7 @@ import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.phases.SirPhase
+import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
 import org.jetbrains.kotlin.backend.konan.objcexport.getDeprecation
@@ -31,6 +32,7 @@ import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
+import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 
 class CreateKirMembersPhase(
     context: SirPhase.Context,
@@ -154,6 +156,7 @@ class CreateKirMembersPhase(
             scope = kirClass.callableDeclarationScope,
             errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
             deprecationLevel = descriptor.kirDeprecationLevel,
+            isRefinedInSwift = baseDescriptor.isRefinedInSwift,
         )
 
         getDirectParents(descriptor)
@@ -202,6 +205,7 @@ class CreateKirMembersPhase(
             type = kirTypeTranslator.mapReturnType(originalDescriptor.getter!!, getterBridge.returnBridge),
             isVar = descriptor.isVar,
             deprecationLevel = descriptor.kirDeprecationLevel,
+            isRefinedInSwift = baseDescriptor.isRefinedInSwift,
         )
 
         getDirectParents(descriptor)
@@ -271,6 +275,11 @@ class CreateKirMembersPhase(
                 DeprecationLevelValue.HIDDEN -> DeprecationLevel.Error(deprecationInfo.message)
                 null -> DeprecationLevel.None
             }
+        }
+
+    private val CallableMemberDescriptor.isRefinedInSwift: Boolean
+        get() = annotations.any { annotation ->
+            annotation.annotationClass?.annotations?.any { it.fqName == KonanFqNames.refinesInSwift } == true
         }
 
     private val MethodBridge.ReturnValue.errorHandlingStrategy: OirFunction.ErrorHandlingStrategy

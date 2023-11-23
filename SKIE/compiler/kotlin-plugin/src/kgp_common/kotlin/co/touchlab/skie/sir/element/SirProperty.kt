@@ -20,17 +20,17 @@ class SirProperty(
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
 
-    override val identifierAfterVisibilityChanges: String
+    override val identifierAfterVisibilityChange: String
         get() = when (visibility) {
             SirVisibility.PublicButReplaced -> "__$identifier"
             else -> identifier
         }
 
     override val reference: String
-        get() = CodeBlock.toString("%N", identifierAfterVisibilityChanges)
+        get() = CodeBlock.toString("%N", identifierAfterVisibilityChange)
 
     override val name: String
-        get() = identifierAfterVisibilityChanges
+        get() = identifierAfterVisibilityChange
 
     var getter: SirGetter? = null
         private set

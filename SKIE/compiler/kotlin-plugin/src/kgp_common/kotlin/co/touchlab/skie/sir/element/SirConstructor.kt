@@ -16,7 +16,7 @@ class SirConstructor(
 
     override val identifier = "init"
 
-    override val identifierAfterVisibilityChanges: String
+    override val identifierAfterVisibilityChange: String
         get() = identifier
 
     override val identifierForReference: String
