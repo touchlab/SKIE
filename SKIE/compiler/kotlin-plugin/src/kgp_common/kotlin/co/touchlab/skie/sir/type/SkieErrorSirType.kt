@@ -69,7 +69,7 @@ sealed class SkieErrorSirType(
         )
 
         override val errorMessage: String =
-            "Unknown Swift module for type '$replacedTypeKotlinName'. " +
+            "Unknown Swift framework for type '$replacedTypeKotlinName'. " +
                 "This problem occurs when custom Cinterop bindings are used because those do not contain the name of the Framework that provides implementation for those binding. " +
                 "The name can be configured manually using the SKIE Gradle configuration key 'ClassInterop.CInteropFrameworkName' in the same way as other SKIE features."
     }
