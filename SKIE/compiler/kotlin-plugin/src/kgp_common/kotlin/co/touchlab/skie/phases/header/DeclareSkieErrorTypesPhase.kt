@@ -9,7 +9,7 @@ object DeclareSkieErrorTypesPhase : BaseHeaderInsertionPhase() {
         get() =
             listOf(
                 SkieErrorSirType.Lambda,
-                SkieErrorSirType.UnknownCInteropModule(""),
+                SkieErrorSirType.UnknownCInteropFramework(""),
             )
                 .flatMap {
                     it.headerCommentLines + listOf(

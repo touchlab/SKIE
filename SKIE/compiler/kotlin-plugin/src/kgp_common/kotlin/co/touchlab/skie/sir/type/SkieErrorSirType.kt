@@ -58,14 +58,14 @@ sealed class SkieErrorSirType(
                 "The original declarations can still be used in the same way as other declarations hidden by SKIE (and with the same limitations as without SKIE)."
     }
 
-    data class UnknownCInteropModule(val replacedTypeKotlinName: String) : SkieErrorSirType("__SkieUnknownCInteropModuleErrorType") {
+    data class UnknownCInteropFramework(val replacedTypeKotlinName: String) : SkieErrorSirType("__SkieUnknownCInteropFrameworkErrorType") {
 
         override val headerCommentLines: List<String> = listOf(
             "// Due to an Obj-C/Swift interop limitation, SKIE cannot generate Swift code that uses external Obj-C types for which SKIE doesn't know a fully qualified name.",
             "// This problem occurs when custom Cinterop bindings are used because those do not contain the name of the Framework that provides implementation for those binding.",
             "// The name can be configured manually using the SKIE Gradle configuration key 'ClassInterop.CInteropFrameworkName' in the same way as other SKIE features.",
-            "// To avoid compilation errors SKIE replaces types with unknown Framework name with __SkieUnknownCInteropModuleErrorType.",
-            "// Generated declarations that reference __SkieUnknownCInteropModuleErrorType cannot be called in any way and the __SkieUnknownCInteropModuleErrorType class cannot be used.",
+            "// To avoid compilation errors SKIE replaces types with unknown Framework name with __SkieUnknownCInteropFrameworkErrorType.",
+            "// Generated declarations that reference __SkieUnknownCInteropFrameworkErrorType cannot be called in any way and the __SkieUnknownCInteropFrameworkErrorType class cannot be used.",
         )
 
         override val errorMessage: String =

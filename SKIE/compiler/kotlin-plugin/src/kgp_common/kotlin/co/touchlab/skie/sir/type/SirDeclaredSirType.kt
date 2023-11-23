@@ -63,14 +63,14 @@ data class SirDeclaredSirType(
         )
     }
 
-    private fun getUnknownCInteropModuleType(): SkieErrorSirType.UnknownCInteropModule {
+    private fun getUnknownCInteropModuleType(): SkieErrorSirType.UnknownCInteropFramework {
         val oirClass = declaration.resolveAsSirClass()?.oirClassOrNull
 
         val classDescriptor = oirClass?.cinteropClassDescriptorOrNull
 
         val name = classDescriptor?.fqNameSafe?.asString() ?: declaration.fqName.toLocalString()
 
-        return SkieErrorSirType.UnknownCInteropModule(name)
+        return SkieErrorSirType.UnknownCInteropFramework(name)
     }
 
     override fun inlineTypeAliases(): SirType {
