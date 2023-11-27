@@ -1,5 +1,7 @@
 package co.touchlab.skie.sir.builtin
 
+import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationParent
@@ -15,13 +17,14 @@ import kotlin.reflect.KProperty
 @Suppress("PropertyName", "FunctionName")
 class SirBuiltins(
     sirProvider: SirProvider,
+    skieConfiguration: SkieConfiguration,
 ) {
 
     val Swift = Modules.Swift(sirProvider)
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
-    val Skie = Modules.Skie(sirProvider.skieModule)
+    val Skie = Modules.Skie(skieConfiguration, sirProvider.skieModule)
 
     object Modules {
 
@@ -102,6 +105,7 @@ class SirBuiltins(
         }
 
         class Skie(
+            private val skieConfiguration: SkieConfiguration,
             override val module: SirModule.Skie,
         ) : ModuleBase() {
 
@@ -109,45 +113,63 @@ class SirBuiltins(
 
             // The SkieSwiftFlow classes are only stubs (correct super types, and content are currently not needed)
 
-            val SkieSwiftFlow by Class {
+            val SkieSwiftFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftSharedFlow by Class {
+            val SkieSwiftSharedFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftMutableSharedFlow by Class {
+            val SkieSwiftMutableSharedFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftStateFlow by Class {
+            val SkieSwiftStateFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftMutableStateFlow by Class {
+            val SkieSwiftMutableStateFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftOptionalFlow by Class {
+            val SkieSwiftOptionalFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftOptionalSharedFlow by Class {
+            val SkieSwiftOptionalSharedFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftOptionalMutableSharedFlow by Class {
+            val SkieSwiftOptionalMutableSharedFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftOptionalStateFlow by Class {
+            val SkieSwiftOptionalStateFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
 
-            val SkieSwiftOptionalMutableStateFlow by Class {
+            val SkieSwiftOptionalMutableStateFlow by RuntimeClass {
                 SirTypeParameter("T")
             }
+
+            private fun RuntimeClass(
+                superTypes: List<SirDeclaredSirType> = emptyList(),
+                parent: SirDeclarationParent = module,
+                nameOverride: String? = null,
+                apply: (SirClass.() -> Unit) = { },
+            ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SirClass?>> =
+                if (SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags) {
+                    ClassDeclarationPropertyProvider(
+                        kind = SirClass.Kind.Class,
+                        parent = parent,
+                        superTypes = superTypes,
+                        nameOverride = nameOverride,
+                        apply = apply,
+                    )
+                } else {
+                    NoClassDeclarationPropertyProvider
+                }
         }
 
         abstract class ModuleBase {
@@ -201,7 +223,7 @@ class SirBuiltins(
                 typeFactory = typeFactory,
             )
 
-            inner class ClassDeclarationPropertyProvider(
+            protected inner class ClassDeclarationPropertyProvider(
                 private val kind: SirClass.Kind,
                 private val parent: SirDeclarationParent,
                 private val superTypes: List<SirDeclaredSirType> = emptyList(),
@@ -217,6 +239,18 @@ class SirBuiltins(
                         superTypes = superTypes,
                         apply = apply,
                     )
+            }
+
+            protected object NoClassDeclarationPropertyProvider : PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SirClass?>> {
+
+                override fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, SirClass?> =
+                    NoClassDeclarationProperty
+
+                private object NoClassDeclarationProperty : ReadOnlyProperty<Any?, SirClass?> {
+
+                    override fun getValue(thisRef: Any?, property: KProperty<*>): SirClass? =
+                        null
+                }
             }
 
             private inner class ClassDeclarationProperty(

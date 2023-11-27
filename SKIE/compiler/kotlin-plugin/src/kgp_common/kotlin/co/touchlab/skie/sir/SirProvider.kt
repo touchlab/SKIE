@@ -26,6 +26,7 @@ class SirProvider(
     framework: FrameworkLayout,
     private val kirProvider: KirProvider,
     private val configurationProvider: ConfigurationProvider,
+    skieConfiguration: SkieConfiguration,
 ) {
 
     val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
@@ -33,7 +34,7 @@ class SirProvider(
     val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
 
     val sirBuiltins by lazy {
-        SirBuiltins(this)
+        SirBuiltins(this, skieConfiguration)
     }
 
     private val externalModuleCache = mutableMapOf<String, SirModule.External>()

@@ -26,7 +26,7 @@ class KirBuiltins(
     private val extraDescriptorBuiltins: ExtraDescriptorBuiltins,
     private val namer: ObjCExportNamer,
 ) {
-    // TODO Builtin methods are not supported yet
+    // TODO Not all Builtin methods are not supported yet (supported are only those converted from Kotlin equivalents in Any)
 
     val Base by Class(
         name = namer.kotlinAnyName,

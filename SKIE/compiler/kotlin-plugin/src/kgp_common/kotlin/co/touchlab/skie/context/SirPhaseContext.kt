@@ -28,7 +28,7 @@ class SirPhaseContext(
 
     override val oirProvider: OirProvider = OirProvider(kirProvider.skieModule, extraDescriptorBuiltins, kirProvider, namer)
 
-    override val sirProvider: SirProvider = SirProvider(framework, kirProvider, configurationProvider)
+    override val sirProvider: SirProvider = SirProvider(framework, kirProvider, configurationProvider, skieConfiguration)
 
     override val kirBuiltins: KirBuiltins = kirProvider.kirBuiltins
 
