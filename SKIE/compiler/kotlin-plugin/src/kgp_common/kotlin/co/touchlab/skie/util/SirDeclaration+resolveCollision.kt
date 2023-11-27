@@ -57,7 +57,7 @@ fun SirEnumCase.resolveCollisionWithWarning(collisionReasonProvider: SirEnumCase
     resolveCollisionWithWarning(
         collisionReasonProvider = collisionReasonProvider,
         rename = { simpleName += "_" },
-        getName = { parent.fqName.toLocalString() + "." + simpleName },
+        getName = { toReadableString() },
         findKirElement = { parent.kirClassOrNull?.enumEntries?.get(index) },
         getDescriptor = { descriptor },
     )
@@ -70,7 +70,7 @@ private inline fun <T : SirCallableDeclaration> T.resolveCollisionWithWarning(
     resolveCollisionWithWarning(
         collisionReasonProvider = collisionReasonProvider,
         rename = rename,
-        getName = { name },
+        getName = { toReadableString() },
         findKirElement = {
             kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
                 ?: if (this is SirProperty) kirProvider.findEnumEntry(this) else null
@@ -92,7 +92,7 @@ private inline fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(
     resolveCollisionWithWarning(
         collisionReasonProvider = collisionReasonProvider,
         rename = rename,
-        getName = { fqName.toLocalString() },
+        getName = { toReadableString() },
         findKirElement = { resolveAsKirClass() },
         getDescriptor = { classDescriptorOrNull },
     )
@@ -105,34 +105,35 @@ private inline fun <T, K : KirElement> T.resolveCollisionWithWarning(
     findKirElement: T.() -> K?,
     getDescriptor: K.() -> DeclarationDescriptor?,
 ): Boolean {
+    val collisionReason = collisionReasonProvider() ?: return false
+
     val originalName = getName()
 
-    val collisionReason = resolveCollision(collisionReasonProvider, rename) ?: return false
+    resolveCollision(collisionReasonProvider, rename)
 
     val newName = getName()
 
     val kirElement = findKirElement()
     if (kirElement != null) {
-        reportCollision(originalName, newName, collisionReason, kirElement.getDescriptor())
+        reportCollision(
+            originalName = originalName,
+            newName = newName,
+            collisionReason = collisionReason,
+            declarationDescriptor = kirElement.getDescriptor(),
+        )
     }
 
     return true
 }
 
-private inline fun <T> T.resolveCollision(collisionReasonProvider: T.() -> String?, rename: () -> Unit): String? {
-    val firstCollisionReason = collisionReasonProvider()
-
-    var nextCollisionReason: String? = firstCollisionReason
-    while (nextCollisionReason != null) {
+private inline fun <T> T.resolveCollision(collisionReasonProvider: T.() -> String?, rename: () -> Unit) {
+    do {
         rename()
-
-        nextCollisionReason = collisionReasonProvider()
-    }
-
-    return firstCollisionReason
+    } while (collisionReasonProvider() != null)
 }
 
-private fun SirPhase.Context.reportCollision(
+context(SirPhase.Context)
+private fun reportCollision(
     originalName: String,
     newName: String,
     collisionReason: String,

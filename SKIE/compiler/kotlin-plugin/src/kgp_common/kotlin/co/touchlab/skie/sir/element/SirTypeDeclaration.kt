@@ -62,6 +62,8 @@ sealed interface SirTypeDeclaration : SirDeclaration {
 
     fun toType(vararg typeArguments: SirType): SirDeclaredSirType =
         toType(typeArguments.toList())
+
+    fun toReadableString(): String
 }
 
 fun SirTypeDeclaration.toTypeFromEnclosingTypeParameters(typeParameters: List<SirTypeParameter>): DeclaredSirType =

@@ -54,12 +54,12 @@ class UniqueSignatureSet {
         }
 
         val signature = enumCase.signature
-        existingSignaturesMap[signature] = signature
+        existingSignaturesMap.putIfAbsent(signature, signature)
         alreadyAddedEnumCase.add(enumCase)
     }
 
     private inner class Group(
-        representative: SirCallableDeclaration,
+        private val representative: SirCallableDeclaration,
     ) {
 
         private val callableDeclarations = representative.getEntireOverrideHierarchy()
@@ -91,11 +91,14 @@ class UniqueSignatureSet {
         }
 
         fun addToCaches() {
+            val representativeSignature = representative.signature
+            existingSignaturesMap.putIfAbsent(representativeSignature, representativeSignature)
+
             alreadyAddedDeclarations.addAll(callableDeclarations)
             callableDeclarations.forEach {
                 val signature = it.signature
 
-                existingSignaturesMap[signature] = signature
+                existingSignaturesMap.putIfAbsent(signature, signature)
             }
         }
     }

@@ -51,6 +51,9 @@ class SirTypeAlias(
         type = type
     }
 
+    override fun toReadableString(): String =
+        "typealias $fqName"
+
     override fun toString(): String = "${this::class.simpleName}: $fqName"
 
     companion object {

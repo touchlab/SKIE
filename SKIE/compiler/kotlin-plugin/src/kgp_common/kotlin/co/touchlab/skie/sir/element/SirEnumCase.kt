@@ -16,6 +16,9 @@ class SirEnumCase(
 
     override fun toString(): String = "${this::class.simpleName}: $simpleName"
 
+    fun toReadableString(): String =
+        "case " + parent.fqName.toString() + "." + simpleName
+
     companion object {
 
         context(SirClass)

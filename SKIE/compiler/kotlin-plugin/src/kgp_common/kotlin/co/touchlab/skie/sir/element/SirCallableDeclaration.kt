@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.kir.element.DeprecationLevel
+import co.touchlab.skie.phases.memberconflicts.signature
 
 sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {
 
@@ -45,6 +46,9 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
     val name: String
 
     val deprecationLevel: DeprecationLevel
+
+    fun toReadableString(): String =
+        signature.toString()
 }
 
 val SirCallableDeclaration.receiverDeclaration: SirClass?

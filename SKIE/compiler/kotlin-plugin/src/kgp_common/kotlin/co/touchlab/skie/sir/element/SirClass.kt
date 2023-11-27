@@ -65,6 +65,9 @@ class SirClass(
     override val internalName: SirFqName
         get() = internalTypeAlias?.internalName ?: publicName
 
+    override fun toReadableString(): String =
+        kind.toString().lowercase() + " " + fqName.toString()
+
     override fun toString(): String = "${this::class.simpleName}: $fqName${if (fqName != publicName) "($publicName)" else ""}"
 
     sealed interface Origin {
