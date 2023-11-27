@@ -2,7 +2,10 @@
 
 package co.touchlab.skie.util
 
+import co.touchlab.skie.configuration.SuppressSkieWarning
+import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirCallableDeclaration
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirElement
 import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.kir.element.classDescriptorOrNull
@@ -114,7 +117,7 @@ private inline fun <T, K : KirElement> T.resolveCollisionWithWarning(
     val newName = getName()
 
     val kirElement = findKirElement()
-    if (kirElement != null) {
+    if (kirElement != null && kirElement.shouldReportCollision) {
         reportCollision(
             originalName = originalName,
             newName = newName,
@@ -133,6 +136,15 @@ private inline fun <T> T.resolveCollision(collisionReasonProvider: T.() -> Strin
 }
 
 context(SirPhase.Context)
+private val KirElement.shouldReportCollision: Boolean
+    get() = when (this) {
+        is KirCallableDeclaration<*> -> !getConfiguration(SuppressSkieWarning.NameCollision)
+        is KirClass -> !getConfiguration(SuppressSkieWarning.NameCollision)
+        is KirEnumEntry -> owner.shouldReportCollision
+        else -> true
+    }
+
+context(SirPhase.Context)
 private fun reportCollision(
     originalName: String,
     newName: String,
@@ -142,7 +154,8 @@ private fun reportCollision(
     reporter.warning(
         message = "'$originalName' was renamed to '$newName' because of a name collision with $collisionReason. " +
             "Consider resolving the conflict either by changing the name in Kotlin, or via the @ObjCName annotation. " +
-            "Using renamed declarations from Swift is not recommended because their name will change if the conflict is resolved.",
+            "You can also suppress this warning using the 'SuppressSkieWarning.NameCollision' configuration. " +
+            "However using renamed declarations from Swift is not recommended because their name will change if the conflict is resolved.",
         declaration = declarationDescriptor,
     )
 }
