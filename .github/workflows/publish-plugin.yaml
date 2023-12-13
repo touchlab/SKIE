@@ -35,7 +35,7 @@ jobs:
       - name: Publish to Maven Central
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: 'publishToSonatype closeSonatypeStagingRepository'
+          arguments: 'publishToSonatype closeAndReleaseSonatypeStagingRepository'
           build-root-directory: SKIE
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
