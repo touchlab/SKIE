@@ -24,7 +24,7 @@ jobs:
       - name: Prepare Worker
         uses: ./.github/actions/prepare-worker
       - name: Run External Libraries Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: ':acceptance-tests:external-libraries:pureTest'
         env:

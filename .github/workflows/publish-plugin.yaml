@@ -26,14 +26,14 @@ jobs:
           java-version: 11
       # TODO Ensure all tests pass
       - name: Replace data
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: 'replaceData'
           build-root-directory: SKIE
         env:
           SKIE_REPLACEMENT_STRING: ${{ secrets.SKIE_REPLACEMENT_STRING }}
       - name: Publish to Maven Central
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: 'publishToSonatype closeAndReleaseSonatypeStagingRepository'
           build-root-directory: SKIE

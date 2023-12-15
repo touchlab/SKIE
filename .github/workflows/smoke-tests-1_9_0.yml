@@ -51,7 +51,7 @@ jobs:
       - name: Prepare Worker
         uses: ./.github/actions/prepare-worker
       - name: Run Acceptance Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: ':acceptance-tests:functional__kgp_1.9.0Test'
           build-root-directory: SKIE
@@ -72,7 +72,7 @@ jobs:
       - name: Prepare Worker
         uses: ./.github/actions/prepare-worker
       - name: Run Type Mapping Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         id: run-tests
         if: ${{ inputs.configuration != 'debug' }}
         with:
@@ -96,7 +96,7 @@ jobs:
       - name: Prepare Worker
         uses: ./.github/actions/prepare-worker
       - name: Run External Libraries Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: ':acceptance-tests:libraries__kgp_1.9.0Test'
           build-root-directory: SKIE
