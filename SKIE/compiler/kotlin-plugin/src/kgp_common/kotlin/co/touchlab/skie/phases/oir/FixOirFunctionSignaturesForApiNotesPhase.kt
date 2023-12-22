@@ -75,7 +75,7 @@ class FixOirFunctionSignaturesForApiNotesPhase(
             is SpecialReferenceOirType -> substituteLeafType(reservedIdentifiers)
             is NullableReferenceOirType -> {
                 when (val innerType = nonNullType.substituteReservedIdentifiers(reservedIdentifiers)) {
-                    is NonNullReferenceOirType -> NullableReferenceOirType(innerType)
+                    is NonNullReferenceOirType -> copy(nonNullType = innerType)
                     is TypeDefOirType -> getOrCreateTypeDef(this).toType(innerType.typeArguments)
                     else -> error("Unexpected inner type: $innerType")
                 }
