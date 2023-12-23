@@ -52,7 +52,7 @@ class CompileSwiftPhase(
     }
 
     private fun createSwiftFileList(sourceFiles: List<File>) {
-        val content = sourceFiles.joinToString("\n") { it.absolutePath }
+        val content = sourceFiles.joinToString("\n") { "'${it.absolutePath}'" }
 
         swiftFileList.writeText(content)
     }
