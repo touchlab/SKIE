@@ -100,7 +100,8 @@ class CreateSirMembersPhase(
                     throws = false,
                 )
             }
-            property.descriptor.setter?.let {
+
+            if (property.isVar) {
                 SirSetter(
                     throws = false,
                 )

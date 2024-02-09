@@ -177,7 +177,7 @@ class CreateKirMembersPhase(
             createProperty(descriptor, kirClass, origin)
         }
 
-    private fun getOrCreateOverridenProperty(descriptor: PropertyDescriptor, origin: Origin): KirProperty {
+    private fun getOrCreateOverriddenProperty(descriptor: PropertyDescriptor, origin: Origin): KirProperty {
         val classDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(descriptor)
             ?: error("Unsupported property $descriptor")
 
@@ -203,13 +203,13 @@ class CreateKirMembersPhase(
             origin = origin,
             scope = kirClass.callableDeclarationScope,
             type = kirTypeTranslator.mapReturnType(originalDescriptor.getter!!, getterBridge.returnBridge),
-            isVar = descriptor.isVar,
+            isVar = descriptor.setter?.let { descriptorProvider.isExposable(it) } ?: false,
             deprecationLevel = descriptor.kirDeprecationLevel,
             isRefinedInSwift = baseDescriptor.isRefinedInSwift,
         )
 
         getDirectParents(descriptor)
-            .map { getOrCreateOverridenProperty(it, origin) }
+            .map { getOrCreateOverriddenProperty(it, origin) }
             .let { property.addOverrides(it) }
 
         return property

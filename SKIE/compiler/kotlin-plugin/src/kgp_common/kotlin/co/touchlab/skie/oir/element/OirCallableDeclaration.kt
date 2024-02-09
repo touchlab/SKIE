@@ -17,6 +17,7 @@ sealed interface OirCallableDeclaration : OirElement {
 
     val deprecationLevel: DeprecationLevel
 
+    // TODO This is likely not needed
     val visibility: OirVisibility
         get() = originalSirCallableDeclaration.visibility.toOirVisibility()
 
