@@ -12,7 +12,18 @@ plugins {
     id("dev.settings")
 }
 
-include(
+fun modules(vararg names: String) {
+    names.forEach { name ->
+        val path = name.drop(1).split(":")
+        val joinedName = path.joinToString("-", prefix = ":")
+        include(joinedName)
+        project(joinedName).projectDir = path.fold(rootDir) { acc, directoryName ->
+            acc.resolve(directoryName)
+        }
+    }
+}
+
+modules(
     ":skie:mac",
     ":skie:mac:framework",
     ":skie:mac:dependency",

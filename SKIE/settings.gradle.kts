@@ -63,8 +63,8 @@ buildSetup {
 
     val gradle by group("skie-gradle") {
         val plugin by module
-        val `plugin-api` by module
-        val `plugin-loader` by module
+        val `plugin-shim-api` by module
+        val `plugin-shim-impl` by module
     }
 
     val `acceptance-tests` by module {
