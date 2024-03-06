@@ -26,7 +26,6 @@ class SealedFunctionGeneratorDelegate(
     fun generate(kirClass: KirClass, enum: SirClass) {
         val requiredFunction = generateRequiredOverload(kirClass, enum)
         generateOptionalOverload(kirClass, enum, requiredFunction)
-        generateRequiredOverloadWithOptionalReturnType(kirClass, enum, requiredFunction)
     }
 
     private fun generateRequiredOverload(kirClass: KirClass, enum: SirClass): SirSimpleFunction =
@@ -41,17 +40,9 @@ class SealedFunctionGeneratorDelegate(
             valueParameterType = { it.toNullable() },
             returnTypeModifier = { it.toNullable() },
         ).apply {
-            addOptionalFunctionBody(requiredFunction)
-        }
-    }
+            attributes.add("_disfavoredOverload")
 
-    private fun generateRequiredOverloadWithOptionalReturnType(kirClass: KirClass, enum: SirClass, requiredFunction: SirSimpleFunction) {
-        createFunctionDeclaration(
-            kirClass = kirClass,
-            enum = enum,
-            returnTypeModifier = { it.toNullable() },
-        ).apply {
-            addRequiredOverloadWithOptionalReturnTypeFunctionBody(requiredFunction)
+            addOptionalFunctionBody(requiredFunction)
         }
     }
 
@@ -182,18 +173,6 @@ class SealedFunctionGeneratorDelegate(
                     .nextControlFlow("else")
                     .add("return nil")
                     .endControlFlow("else")
-                    .build(),
-            )
-        }
-    }
-
-    private fun SirSimpleFunction.addRequiredOverloadWithOptionalReturnTypeFunctionBody(requiredFunction: SirSimpleFunction) {
-        bodyBuilder.add {
-            val valueParameter = valueParameters.first()
-
-            addCode(
-                CodeBlock.builder()
-                    .add("return %L as %T", requiredFunction.call(valueParameter), requiredFunction.returnType.evaluate().swiftPoetTypeName)
                     .build(),
             )
         }
