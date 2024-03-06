@@ -46,6 +46,7 @@ import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverridenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
+import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
 import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRuntimePhase
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.phases.runtime.SwiftRuntimeGenerator
@@ -78,6 +79,7 @@ class SkiePhaseScheduler {
             ClassExportAnalyticsPhase,
             ExtraClassExportPhase(context),
             VerifyMinOSVersionPhase,
+            VerifyNoBitcodeEmbeddingPhase,
         )
     }
 
