@@ -3,11 +3,11 @@ package co.touchlab.skie.phases.other
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.belongsToSkieRuntime
-import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.descriptor.allExposedMembers
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.ClassExportPhase
+import co.touchlab.skie.phases.features.flow.SupportedFlow
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
@@ -32,52 +32,54 @@ class ExtraClassExportPhase(
 
     context(ClassExportPhase.Context)
     override fun execute() {
-        val additionallyExportedClasses = getAllAdditionallyExportedClasses()
+        val alreadyVisitedClasses = mutableSetOf<ClassDescriptor>()
 
-        val stubFunction = generateStubFunction(additionallyExportedClasses)
-
-        stubFunction.removeFromSwift()
-
-        stubFunction.belongsToSkieRuntime = true
-    }
-
-    private fun getAllAdditionallyExportedClasses(): Set<ClassDescriptor> {
-        val originallyExportedClasses = descriptorProvider.exposedClasses.toSet()
-        val allExportedClasses = originallyExportedClasses.toMutableSet()
+        var iteration = 0
 
         do {
-            val lastIterationResult = allExportedClasses.toSet()
+            val currentlyExportedClasses = descriptorProvider.exposedClasses
+            val allExportedClasses = currentlyExportedClasses.toMutableSet()
 
-            allExportedClasses.addClassesForExport()
+            allExportedClasses.addClassesForExport(alreadyVisitedClasses)
 
-            val newlyDiscoveredClasses = allExportedClasses - lastIterationResult
+            val newlyDiscoveredClasses = allExportedClasses - currentlyExportedClasses
 
-            descriptorProvider.registerExportedClasses(newlyDiscoveredClasses)
+            alreadyVisitedClasses.addAll(currentlyExportedClasses)
+
+            exportClasses(newlyDiscoveredClasses, iteration)
+
+            iteration++
         } while (newlyDiscoveredClasses.isNotEmpty())
-
-        return allExportedClasses - originallyExportedClasses
     }
 
-    private fun MutableSet<ClassDescriptor>.addClassesForExport() {
-        addClassesForExportFromFlowArguments()
-        addClassesForExportFromSealedHierarchies()
+    private fun MutableSet<ClassDescriptor>.addClassesForExport(alreadyVisitedClasses: Set<ClassDescriptor>) {
+        addClassesForExportFromFlowArguments(alreadyVisitedClasses)
+        addClassesForExportFromSealedHierarchies(alreadyVisitedClasses)
     }
 
-    private fun MutableSet<ClassDescriptor>.addClassesForExportFromFlowArguments() {
+    private fun MutableSet<ClassDescriptor>.addClassesForExportFromFlowArguments(alreadyVisitedClasses: Set<ClassDescriptor>) {
         if (SkieConfigurationFlag.Feature_CoroutinesInterop !in context.skieConfiguration.enabledConfigurationFlags) {
             return
         }
 
-        val allFlowArguments = descriptorProvider.allExposedMembers.flatMap { it.getAllFlowArgumentClasses() } +
-            descriptorProvider.exposedClasses.flatMap { it.getAllFlowArgumentClasses() }
+        val flowArgumentsFromMembers = if (alreadyVisitedClasses.isEmpty()) {
+            descriptorProvider.allExposedMembers.flatMap { it.getAllFlowArgumentClasses() }
+        } else {
+            // Newly exported classes do not add new exposed members, so we can skip this step.
+            emptyList()
+        }
+
+        val flowArgumentsFromClasses = (descriptorProvider.exposedClasses - alreadyVisitedClasses).flatMap { it.getAllFlowArgumentClasses() }
+
+        val allFlowArguments = flowArgumentsFromMembers + flowArgumentsFromClasses
 
         val allExposableFlowArguments = allFlowArguments.filter { descriptorProvider.isExposable(it) }
 
         this.addAll(allExposableFlowArguments)
     }
 
-    private fun MutableSet<ClassDescriptor>.addClassesForExportFromSealedHierarchies() {
-        val allExportedSealedChildren = descriptorProvider.exposedClasses.getAllExportedSealedChildren()
+    private fun MutableSet<ClassDescriptor>.addClassesForExportFromSealedHierarchies(alreadyVisitedClasses: Set<ClassDescriptor>) {
+        val allExportedSealedChildren = (descriptorProvider.exposedClasses - alreadyVisitedClasses).getAllExportedSealedChildren()
 
         this.addAll(allExportedSealedChildren)
     }
@@ -95,9 +97,24 @@ class ExtraClassExportPhase(
     private fun Collection<ClassDescriptor>.getAllExportedSealedChildren(): List<ClassDescriptor> =
         this.flatMap { it.getAllExportedSealedChildren() }
 
-    private fun generateStubFunction(exportedClasses: Collection<ClassDescriptor>): FunctionDescriptor =
+    context(ClassExportPhase.Context)
+    private fun exportClasses(classes: Set<ClassDescriptor>, iteration: Int) {
+        if (classes.isEmpty()) {
+            return
+        }
+
+        val stubFunction = generateStubFunction(classes, iteration)
+
+        stubFunction.removeFromSwift()
+
+        stubFunction.belongsToSkieRuntime = true
+
+        descriptorProvider.recalculateExports()
+    }
+
+    private fun generateStubFunction(exportedClasses: Collection<ClassDescriptor>, iteration: Int): FunctionDescriptor =
         context.declarationBuilder.createFunction(
-            name = "skieTypeExports",
+            name = "skieTypeExports_$iteration",
             namespace = context.declarationBuilder.getCustomNamespace("__SkieTypeExports"),
             annotations = Annotations.EMPTY,
         ) {
@@ -124,14 +141,6 @@ class ExtraClassExportPhase(
     }
 
     object FinalizePhase : StatefulSirPhase()
-}
-
-private fun MutableDescriptorProvider.registerExportedClasses(exportedClasses: Collection<ClassDescriptor>) {
-    mutate {
-        exportedClasses.forEach {
-            registerExposedDescriptor(it)
-        }
-    }
 }
 
 private fun ClassDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
@@ -176,4 +185,4 @@ private fun KotlinType.getAllReferencedClasses(visitedTypes: Set<KotlinType> = e
 }
 
 private val KotlinType.isSupportedFlow: Boolean
-    get() = co.touchlab.skie.phases.features.flow.SupportedFlow.from(this) != null
+    get() = SupportedFlow.from(this) != null

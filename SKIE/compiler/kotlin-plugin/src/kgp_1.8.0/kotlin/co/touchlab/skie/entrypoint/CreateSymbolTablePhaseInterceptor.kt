@@ -28,6 +28,6 @@ internal class CreateSymbolTablePhaseInterceptor : SameTypePhaseInterceptor<Kona
             produceObjCExportInterface = ::produceObjCExportInterface,
         )
 
-        EntrypointUtils.runClassExportPhases(mainSkieContext, ::produceObjCExportInterface)
+        EntrypointUtils.runClassExportPhases(mainSkieContext)
     }
 }

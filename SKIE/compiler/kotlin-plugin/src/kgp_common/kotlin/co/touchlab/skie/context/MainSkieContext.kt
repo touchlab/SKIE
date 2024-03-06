@@ -77,8 +77,8 @@ class MainSkieContext(
     lateinit var declarationBuilder: DeclarationBuilderImpl
         private set
 
-    lateinit var namer: ObjCExportNamer
-        private set
+    val namer: ObjCExportNamer
+        get() = nativeMutableDescriptorProvider.objCExportedInterface.namer
 
     internal fun initialize(
         konanConfig: KonanConfig,
@@ -92,30 +92,20 @@ class MainSkieContext(
             setOf(mainModuleDescriptor) + exportedDependencies
         }
 
-        val objCExportedInterface = produceObjCExportInterface()
-
         nativeMutableDescriptorProvider = NativeMutableDescriptorProvider(
             exposedModulesProvider,
             konanConfig,
-            objCExportedInterface,
+            produceObjCExportInterface,
         )
-
-        namer = objCExportedInterface.namer
 
         this.mainModuleDescriptor = mainModuleDescriptor
 
         declarationBuilder = DeclarationBuilderImpl(mainModuleDescriptor, nativeMutableDescriptorProvider)
     }
 
-    internal fun reloadDescriptorProvider(objCExportedInterface: ObjCExportedInterface) {
-        nativeMutableDescriptorProvider.reload(objCExportedInterface)
+    internal fun finalizeDescriptorProvider(): ObjCExportedInterface {
+        nativeMutableDescriptorProvider.finalize()
 
-        namer = objCExportedInterface.namer
-    }
-
-    internal fun finalizeDescriptorProvider(objCExportedInterface: ObjCExportedInterface) {
-        nativeMutableDescriptorProvider.preventFurtherMutations(objCExportedInterface)
-
-        namer = objCExportedInterface.namer
+        return nativeMutableDescriptorProvider.objCExportedInterface
     }
 }

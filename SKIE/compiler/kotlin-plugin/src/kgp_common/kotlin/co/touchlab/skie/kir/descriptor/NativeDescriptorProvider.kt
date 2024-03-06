@@ -3,12 +3,12 @@
 package co.touchlab.skie.kir.descriptor
 
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
-import co.touchlab.skie.compilerinject.reflection.reflectors.ObjcExportedInterfaceReflector
 import co.touchlab.skie.compilerinject.reflection.reflectors.UserVisibleIrModulesSupportReflector
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.ir.konanLibrary
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
@@ -37,10 +37,10 @@ fun interface ExposedModulesProvider {
     fun exposedModules(): Set<ModuleDescriptor>
 }
 
-class NativeDescriptorProvider(
+internal class NativeDescriptorProvider(
     private val exposedModulesProvider: ExposedModulesProvider,
     private val konanConfig: KonanConfig,
-    private val exportedInterface: ObjcExportedInterfaceReflector,
+    val objCExportedInterface: ObjCExportedInterface,
 ) : DescriptorProvider {
 
     override val builtIns: KotlinBuiltIns by lazy {
@@ -56,13 +56,13 @@ class NativeDescriptorProvider(
     }
 
     private val mutableExposedClasses by lazy {
-        exportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableSet()
+        objCExportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableSet()
     }
 
     override val exposedClasses: Set<ClassDescriptor> by ::mutableExposedClasses
 
     private val mutableTopLevel by lazy {
-        exportedInterface.topLevel
+        objCExportedInterface.topLevel
             .mapValues { it.value.toMutableList() }
             .filter { it.value.isNotEmpty() }
             .toMutableMap()
@@ -72,7 +72,7 @@ class NativeDescriptorProvider(
         get() = mutableTopLevel.keys.toSet()
 
     private val mutableExposedCategoryMembers by lazy {
-        exportedInterface.categoryMembers
+        objCExportedInterface.categoryMembers
             .mapValues { it.value.toMutableList() }
             .filter { it.value.isNotEmpty() }
             .toMutableMap()
@@ -85,7 +85,7 @@ class NativeDescriptorProvider(
         get() = mutableTopLevel.values.flatten().toSet()
 
     private val mapper: ObjCExportMapper by lazy {
-        exportedInterface.mapper
+        objCExportedInterface.mapper
     }
 
     override val externalDependencies: Set<ResolvedDependency> by lazy {

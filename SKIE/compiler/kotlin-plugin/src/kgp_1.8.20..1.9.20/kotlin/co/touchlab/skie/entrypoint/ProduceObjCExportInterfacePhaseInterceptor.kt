@@ -32,8 +32,8 @@ internal class ProduceObjCExportInterfacePhaseInterceptor :
             produceObjCExportInterface = ::produceObjCExportInterface,
         )
 
-        EntrypointUtils.runClassExportPhases(mainSkieContext, ::produceObjCExportInterface)
+        EntrypointUtils.runClassExportPhases(mainSkieContext)
 
-        return EntrypointUtils.runDescriptorModificationPhases(mainSkieContext, ::produceObjCExportInterface)
+        return EntrypointUtils.runDescriptorModificationPhases(mainSkieContext)
     }
 }

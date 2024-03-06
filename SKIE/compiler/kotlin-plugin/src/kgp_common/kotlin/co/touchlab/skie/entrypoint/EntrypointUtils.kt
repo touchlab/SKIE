@@ -14,26 +14,18 @@ internal object EntrypointUtils {
 
     fun runClassExportPhases(
         mainSkieContext: MainSkieContext,
-        produceObjCExportInterface: () -> ObjCExportedInterface,
     ) {
         val classExportPhaseContext = ClassExportPhaseContext(mainSkieContext)
         classExportPhaseContext.skiePhaseScheduler.runClassExportPhases(classExportPhaseContext)
-
-        val updatedExportedInterface = produceObjCExportInterface()
-        mainSkieContext.reloadDescriptorProvider(updatedExportedInterface)
     }
 
     fun runDescriptorModificationPhases(
         mainSkieContext: MainSkieContext,
-        produceObjCExportInterface: () -> ObjCExportedInterface,
     ): ObjCExportedInterface {
         val descriptorModificationPhaseContext = DescriptorModificationPhaseContext(mainSkieContext)
         descriptorModificationPhaseContext.skiePhaseScheduler.runDescriptorModificationPhases(descriptorModificationPhaseContext)
 
-        val finalExportedInterface = produceObjCExportInterface()
-        mainSkieContext.finalizeDescriptorProvider(finalExportedInterface)
-
-        return finalExportedInterface
+        return mainSkieContext.finalizeDescriptorProvider()
     }
 
     fun runSymbolTablePhases(mainSkieContext: MainSkieContext, symbolTable: SymbolTable) {

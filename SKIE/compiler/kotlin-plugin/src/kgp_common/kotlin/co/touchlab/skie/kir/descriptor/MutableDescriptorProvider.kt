@@ -4,6 +4,8 @@ interface MutableDescriptorProvider : DescriptorProvider {
 
     fun mutate(block: DescriptorRegistrationScope.() -> Unit)
 
+    fun recalculateExports()
+
     /**
      * Register a listener that will be called each time the provider is mutated.
      */
