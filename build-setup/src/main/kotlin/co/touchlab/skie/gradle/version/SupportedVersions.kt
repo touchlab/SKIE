@@ -68,6 +68,7 @@ fun Project.darwinPlatformDimension(): Target.Dimension<DarwinPlatformComponent>
             "watchos" to setOf(
                 DarwinPlatformComponent.watchosArm32,
                 DarwinPlatformComponent.watchosArm64,
+                DarwinPlatformComponent.watchosDeviceArm64,
                 DarwinPlatformComponent.watchosX86,
                 DarwinPlatformComponent.watchosX64,
                 DarwinPlatformComponent.watchosSimulatorArm64,

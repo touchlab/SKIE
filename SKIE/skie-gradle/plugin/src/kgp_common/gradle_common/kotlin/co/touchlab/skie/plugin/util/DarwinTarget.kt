@@ -24,6 +24,7 @@ internal data class DarwinTarget(
             DarwinTarget(KonanTarget.IOS_SIMULATOR_ARM64, "arm64-apple-ios-simulator", "iphonesimulator"),
             DarwinTarget(KonanTarget.WATCHOS_ARM32, "armv7k-apple-watchos", "watchos"),
             DarwinTarget(KonanTarget.WATCHOS_ARM64, "arm64_32-apple-watchos", "watchos"),
+            DarwinTarget(KonanTarget.WATCHOS_DEVICE_ARM64, "arm64-apple-watchos", "watchos"),
             DarwinTarget(KonanTarget.WATCHOS_X86, "i386-apple-watchos-simulator", "watchsimulator"),
             DarwinTarget(KonanTarget.WATCHOS_X64, "x86_64-apple-watchos-simulator", "watchsimulator"),
             DarwinTarget(KonanTarget.WATCHOS_SIMULATOR_ARM64, "arm64-apple-watchos-simulator", "watchsimulator"),

@@ -62,7 +62,7 @@ private val KonanTarget.dependencyPresetName: String
 
         KonanTarget.WATCHOS_ARM32 -> "watchosArm32"
         KonanTarget.WATCHOS_ARM64 -> "watchosArm64"
-        KonanTarget.WATCHOS_DEVICE_ARM64 -> "watchosArm64"
+        KonanTarget.WATCHOS_DEVICE_ARM64 -> "watchosDeviceArm64"
         KonanTarget.WATCHOS_X86 -> "watchosX86"
         KonanTarget.WATCHOS_X64 -> "watchosX64"
         KonanTarget.WATCHOS_SIMULATOR_ARM64 -> "watchosSimulatorArm64"

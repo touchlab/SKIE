@@ -10,6 +10,7 @@ enum class DarwinPlatformComponent : Target.Component {
 
     watchosArm32,
     watchosArm64,
+    watchosDeviceArm64,
     watchosX86,
     watchosX64,
     watchosSimulatorArm64,
