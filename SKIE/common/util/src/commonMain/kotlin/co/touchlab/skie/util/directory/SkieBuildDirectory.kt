@@ -24,8 +24,6 @@ class SkieBuildDirectory(
 
     val skieConfiguration: File = directory.resolve("configuration.json")
 
-    val license: File = directory.resolve("license.json")
-
     class Analytics(parent: Directory) : TemporaryDirectory(parent, "analytics") {
 
         fun file(name: String): File = directory.resolve("$name.json")

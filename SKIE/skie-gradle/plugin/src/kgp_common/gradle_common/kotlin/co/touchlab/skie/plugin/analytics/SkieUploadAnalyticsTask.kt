@@ -22,6 +22,10 @@ internal abstract class SkieUploadAnalyticsTask : DefaultTask() {
     @get:Internal
     abstract val applicationSupportDirectory: Property<SkieApplicationSupportDirectory>
 
+    init {
+        this.doNotTrackState("The task has a side effect.")
+    }
+
     @TaskAction
     fun runTask() {
         try {
