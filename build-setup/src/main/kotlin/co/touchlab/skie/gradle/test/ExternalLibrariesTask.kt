@@ -201,9 +201,9 @@ abstract class ExternalLibrariesTask : DefaultTask() {
                             version {
                                 ${
                                     if (kotlinVersion.get() == "1.8.0") {
-                                        """"strictly("[1.6.4,)")"""
+                                        """strictly("[1.6.4,)")"""
                                     } else {
-                                        """"strictly("[1.7.0,)")"""
+                                        """strictly("[1.7.0,)")"""
                                     }
                                 }
                             }
