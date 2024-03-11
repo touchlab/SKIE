@@ -7,7 +7,7 @@ buildconfig = "4.1.1"
 ktor = "2.2.3"
 nexusPublish = "2.0.0-rc-1"
 gradleDoctor = "0.8.1"
-coroutines = "1.6.4"
+coroutines = "1.7.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
