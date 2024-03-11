@@ -199,7 +199,13 @@ abstract class ExternalLibrariesTask : DefaultTask() {
                         api(library)
                         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                             version {
-                                strictly("[1.6.4,)")
+                                ${
+                                    if (kotlinVersion.get() == "1.8.0") {
+                                        """"strictly("[1.6.4,)")"""
+                                    } else {
+                                        """"strictly("[1.7.0,)")"""
+                                    }
+                                }
                             }
                         }
                     }

@@ -20,11 +20,11 @@ abstract class MultiDimensionTargetExtension @Inject constructor(
         sourceSetConfigureActions.convention(emptyList())
     }
 
-    fun dimensions(vararg dimensions: Target.Dimension<*>, createTarget: KotlinMultiplatformExtension.(Target) -> KotlinTarget) {
+    fun dimensions(vararg dimensions: Target.Dimension<*>, filter: (Target) -> Boolean = { true },  createTarget: KotlinMultiplatformExtension.(Target) -> KotlinTarget) {
         val dimensionList = dimensions.toList()
         this.dimensions.set(dimensionList)
         this.dimensions.disallowChanges()
-        targetConfigurer.configure(dimensionList, createTarget)
+        targetConfigurer.configure(dimensionList, filter, createTarget)
     }
 
     fun configureSourceSet(block: ConfigureSourceSetScope.(SourceSet) -> Unit) {

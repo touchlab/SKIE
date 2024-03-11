@@ -14,19 +14,22 @@ class MultiDimensionTargetConfigurer(
 
     fun configure(
         dimensions: List<Target.Dimension<*>>,
+        filter: (Target) -> Boolean,
         createTarget: KotlinMultiplatformExtension.(Target) -> KotlinTarget,
     ) {
         dimensions
             .fold(tupleSpaceOf<Target.ComponentInDimension<*>>(tupleOf())) { acc, dimension ->
                 acc * dimension.componentsWithDimension
             }
-            .forEach { tuple ->
-                allTargets.add(
-                    Target(
-                        tuple.joinToString("__") { it.componentName },
-                        tuple.map { it.component },
-                    ),
+            .map { tuple ->
+                Target(
+                    tuple.joinToString("__") { it.componentName },
+                    tuple.map { it.component },
                 )
+            }
+            .filter { filter(it) }
+            .forEach {
+                allTargets.add(it)
             }
 
         val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()

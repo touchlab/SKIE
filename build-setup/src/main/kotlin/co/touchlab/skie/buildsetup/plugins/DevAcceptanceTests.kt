@@ -232,6 +232,8 @@ abstract class DevAcceptanceTests : Plugin<Project> {
             isCanBeResolved = true
 
             exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+            exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+            exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
             exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
 
             attributes {
