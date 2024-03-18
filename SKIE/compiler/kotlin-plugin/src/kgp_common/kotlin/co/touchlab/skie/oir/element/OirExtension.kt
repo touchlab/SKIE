@@ -7,6 +7,7 @@ class OirExtension(
     override val parent: OirTopLevelDeclarationParent,
 ) : OirTopLevelDeclaration, OirCallableDeclarationParent {
 
+    // WIP Should be set
     lateinit var sirExtension: SirExtension
 
     override val callableDeclarations: MutableList<OirCallableDeclaration> = mutableListOf()

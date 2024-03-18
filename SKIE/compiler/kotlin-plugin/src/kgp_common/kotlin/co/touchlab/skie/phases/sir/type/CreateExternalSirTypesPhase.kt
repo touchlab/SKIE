@@ -19,7 +19,7 @@ object CreateExternalSirTypesPhase : SirPhase {
     private fun createClass(oirClass: OirClass): SirClass {
         val sirClass = SirClass(
             baseName = oirClass.name,
-            parent = sirProvider.findExternalModule(oirClass) ?: SirModule.Unknown,
+            parent = sirProvider.findExternalModule(oirClass)?.builtInFile ?: SirModule.Unknown.builtInFile,
             kind = oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Oir(oirClass),
         )

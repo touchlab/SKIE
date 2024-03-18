@@ -7,12 +7,12 @@ import co.touchlab.skie.kir.element.KirModule
 import co.touchlab.skie.kir.element.classDescriptorOrNull
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
-import co.touchlab.skie.sir.element.SirFile
+import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
-class SkieNamespaceProvider(
+class ClassNamespaceProvider(
     private val kirProvider: KirProvider,
     private val sirProvider: SirProvider,
     private val mainModuleDescriptor: ModuleDescriptor,
@@ -22,14 +22,14 @@ class SkieNamespaceProvider(
 
     private val moduleNamespaceCache = mutableMapOf<KirModule, SirClass>()
 
-    private val skieNamespaceFile by lazy {
-        sirProvider.getFile(kirProvider.skieModule.name, "Namespace")
+    private val classNamespaceFile by lazy {
+        sirProvider.fileProvider.getIrFile(kirProvider.skieModule.name, "Namespace")
     }
 
-    private val skieNamespaceBaseClass: SirClass by lazy {
+    private val classNamespaceBaseClass: SirClass by lazy {
         SirClass(
             baseName = "Skie",
-            parent = skieNamespaceFile,
+            parent = classNamespaceFile,
             kind = SirClass.Kind.Enum,
         )
     }
@@ -42,8 +42,8 @@ class SkieNamespaceProvider(
             .flatten()
             .toSet()
 
-    fun getNamespaceFile(kirClass: KirClass): SirFile =
-        sirProvider.getFile(kirClass.skieFileNamespaceName, kirClass.skieFileName)
+    fun getNamespaceFile(kirClass: KirClass): SirIrFile =
+        sirProvider.fileProvider.getIrFile(kirClass.skieFileNamespaceName, kirClass.skieFileName)
 
     fun getNamespace(kirClass: KirClass): SirExtension =
         sirProvider.getExtension(
@@ -54,7 +54,7 @@ class SkieNamespaceProvider(
     fun getNamespaceClass(kirClass: KirClass): SirClass =
         namespaceClassCache.getOrPut(kirClass) {
             SirClass(
-                baseName = kirClass.skieNamespaceSimpleName,
+                baseName = kirClass.classNamespaceSimpleName,
                 parent = getNamespaceClass(kirClass.parent),
                 kind = SirClass.Kind.Enum,
             )
@@ -70,14 +70,14 @@ class SkieNamespaceProvider(
         moduleNamespaceCache.getOrPut(module) {
             val sirClass = SirClass(
                 baseName = module.namespaceModuleName,
-                parent = skieNamespaceBaseClass,
+                parent = classNamespaceBaseClass,
                 kind = SirClass.Kind.Enum,
             )
 
             if (!module.shortNameCollides) {
                 SirTypeAlias(
                     baseName = module.fullNamespaceModuleName,
-                    parent = skieNamespaceBaseClass,
+                    parent = classNamespaceBaseClass,
                 ) {
                     sirClass.defaultType
                 }
@@ -88,7 +88,7 @@ class SkieNamespaceProvider(
 
     private val KirModule.namespaceModuleName: String
         get() {
-            val canUseShortName = !this.shortNameCollides && shortNamespaceModuleName != sirProvider.sirBuiltins.Skie.module.name.toValidSwiftIdentifier()
+            val canUseShortName = !this.shortNameCollides && shortNamespaceModuleName != sirProvider.skieModule.name.toValidSwiftIdentifier()
 
             return if (canUseShortName) this.shortNamespaceModuleName else this.fullNamespaceModuleName
         }
@@ -103,12 +103,12 @@ class SkieNamespaceProvider(
     private val KirModule.shortNameCollides: Boolean
         get() = this in modulesWithShortNameCollision
 
-    private val KirClass.skieNamespaceSimpleName: String
+    private val KirClass.classNamespaceSimpleName: String
         get() = this.classDescriptorOrNull?.name?.identifier?.toValidSwiftIdentifier() ?: this.name.swiftName
 
     @Suppress("RecursivePropertyAccessor")
     private val KirClass.skieFileName: String
-        get() = ((this.parent as? KirClass)?.skieFileName?.let { "$it." } ?: "") + this.skieNamespaceSimpleName
+        get() = ((this.parent as? KirClass)?.skieFileName?.let { "$it." } ?: "") + this.classNamespaceSimpleName
 
     private val KirModule.shortNamespaceModuleName: String
         get() = this.name

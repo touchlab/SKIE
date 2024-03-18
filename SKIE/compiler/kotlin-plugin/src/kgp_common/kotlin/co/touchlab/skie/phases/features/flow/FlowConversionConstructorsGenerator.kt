@@ -6,7 +6,7 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirExtension
-import co.touchlab.skie.sir.element.SirFile
+import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirValueParameter
@@ -28,34 +28,34 @@ class FlowConversionConstructorsGenerator(
 
     context(SirPhase.Context)
     override fun execute() {
-        val file = sirProvider.getSkieNamespaceFile("FlowConversions")
+        val file = sirFileProvider.getIrFileFromSkieNamespace("FlowConversions")
 
         SupportedFlow.values().forEach {
             it.generateAllConversions(file)
         }
     }
 
-    private fun SupportedFlow.generateAllConversions(file: SirFile) {
+    private fun SupportedFlow.generateAllConversions(file: SirIrFile) {
         requiredVariant.generateAllConversions(file)
         optionalVariant.generateAllConversions(file)
     }
 
-    private fun SupportedFlow.Variant.generateAllConversions(file: SirFile) {
+    private fun SupportedFlow.Variant.generateAllConversions(file: SirIrFile) {
         generateAllKotlinClassConversions(this, file)
         generateAllSwiftClassConversions(this, file)
     }
 
-    private fun generateAllKotlinClassConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    private fun generateAllKotlinClassConversions(variant: SupportedFlow.Variant, file: SirIrFile) {
         generateKotlinClassWithAnyObjectConversions(variant, file)
         generateKotlinClassWithBridgeableConversions(variant, file)
     }
 
-    private fun generateAllSwiftClassConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    private fun generateAllSwiftClassConversions(variant: SupportedFlow.Variant, file: SirIrFile) {
         generateSwiftClassWithAnyObjectConversions(variant, file)
         generateSwiftClassWithBridgeableConversions(variant, file)
     }
 
-    private fun generateKotlinClassWithAnyObjectConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    private fun generateKotlinClassWithAnyObjectConversions(variant: SupportedFlow.Variant, file: SirIrFile) {
         file.addConversions(variant) { from ->
             addSwiftToKotlinConversion(
                 from,
@@ -65,7 +65,7 @@ class FlowConversionConstructorsGenerator(
         }
     }
 
-    private fun generateKotlinClassWithBridgeableConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    private fun generateKotlinClassWithBridgeableConversions(variant: SupportedFlow.Variant, file: SirIrFile) {
         file.addConversions(variant) { from ->
             addSwiftToKotlinConversion(
                 from,
@@ -75,7 +75,7 @@ class FlowConversionConstructorsGenerator(
         }
     }
 
-    private fun generateSwiftClassWithAnyObjectConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    private fun generateSwiftClassWithAnyObjectConversions(variant: SupportedFlow.Variant, file: SirIrFile) {
         generateSwiftClassConversions(
             variant,
             file,
@@ -88,7 +88,7 @@ class FlowConversionConstructorsGenerator(
         }
     }
 
-    private fun generateSwiftClassWithBridgeableConversions(variant: SupportedFlow.Variant, file: SirFile) {
+    private fun generateSwiftClassWithBridgeableConversions(variant: SupportedFlow.Variant, file: SirIrFile) {
         generateSwiftClassConversions(
             variant,
             file,
@@ -107,7 +107,7 @@ class FlowConversionConstructorsGenerator(
 
     private fun generateSwiftClassConversions(
         variant: SupportedFlow.Variant,
-        file: SirFile,
+        file: SirIrFile,
         typeBound: SirType,
         bodyFactory: SirExtension.(SirTypeParameter) -> Unit,
     ) {
@@ -143,7 +143,7 @@ class FlowConversionConstructorsGenerator(
             .forEach(action)
     }
 
-    private fun SirFile.addSwiftToKotlinConversion(
+    private fun SirIrFile.addSwiftToKotlinConversion(
         from: SupportedFlow.Variant,
         to: SupportedFlow.Variant,
         typeBound: SirType,

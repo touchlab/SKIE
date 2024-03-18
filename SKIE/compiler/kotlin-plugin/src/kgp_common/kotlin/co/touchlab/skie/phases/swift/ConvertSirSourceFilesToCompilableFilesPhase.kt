@@ -1,28 +1,25 @@
 package co.touchlab.skie.phases.swift
 
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import java.io.File
-import java.nio.file.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.pathString
 
-object WriteSirFileContentToDiskPhase : SirPhase {
+// WIP Extra phase for generating debug files, this should convert and write to cache directory only files that already do not have a object file associated from cache
+object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
         val cacheAwareFileGenerator = CacheAwareFileGenerator(skieBuildDirectory.swift.generated)
 
         with(cacheAwareFileGenerator) {
-            sirProvider.files
-                .groupBy { it.relativePath.absolutePathString().lowercase() }
-                .values
-                .forEach { fileGroup ->
-                    val sourceCode = fileGroup.joinToString(separator = "\n\n") { it.content }
-
-                    writeFile(fileGroup.first().relativePath, sourceCode)
+            sirProvider.skieModuleFiles
+                .filterIsInstance<SirSourceFile>()
+                .forEach {
+                    it.convertToCompilableFile()
                 }
         }
 
@@ -35,14 +32,18 @@ object WriteSirFileContentToDiskPhase : SirPhase {
 
         private val generatedFiles = mutableSetOf<File>()
 
-        fun writeFile(relativePath: Path, content: String) {
+        context(SirPhase.Context)
+        fun SirSourceFile.convertToCompilableFile() {
             val file = generatedSwiftDirectory.directory.resolve(relativePath.pathString)
 
             file.parentFile.mkdirs()
 
+            // WIP Can be written directly after adding support for proper incremental compilation
             file.writeTextIfDifferent(content)
 
             generatedFiles.add(file)
+
+            sirFileProvider.createCompilableFile(this, file.toPath().toAbsolutePath())
         }
 
         fun deleteOldFiles() {

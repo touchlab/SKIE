@@ -8,12 +8,12 @@ import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationWithScope
 import co.touchlab.skie.sir.element.SirElementWithAttributes
-import co.touchlab.skie.sir.element.SirElementWithModifiers
 import co.touchlab.skie.sir.element.SirElementWithFunctionBodyBuilder
+import co.touchlab.skie.sir.element.SirElementWithModifiers
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
-import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirFunction
+import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirOverridableDeclaration
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
@@ -43,28 +43,29 @@ import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
-object GenerateSirFileCodePhase : SirPhase {
+object ConvertSirIrFilesToSourceFilesPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {
-        sirProvider.files.forEach {
-            it.generateCode()
-        }
+        sirProvider.skieModuleFiles
+            .filterIsInstance<SirIrFile>()
+            .forEach {
+                it.generateCode()
+            }
     }
 
     context(SirPhase.Context)
-    private fun SirFile.generateCode() {
+    private fun SirIrFile.generateCode() {
         val fileBuilder = FileSpec.builder(framework.moduleName, this.name)
 
         this.generateCodeUsing(fileBuilder)
 
-        val contentOrNull = this.content.takeIf { it.isNotBlank() }
-        val generatedCode = fileBuilder.build().toString()
+        val sourceFile = sirFileProvider.getGeneratedSourceFile(this)
 
-        this.content = listOfNotNull(contentOrNull, generatedCode).joinToString("\n\n")
+        sourceFile.content = fileBuilder.build().toString()
     }
 
-    private fun SirFile.generateCodeUsing(fileBuilder: FileSpec.Builder) {
+    private fun SirIrFile.generateCodeUsing(fileBuilder: FileSpec.Builder) {
         fileBuilder.apply {
             generateImports()
 
@@ -72,14 +73,14 @@ object GenerateSirFileCodePhase : SirPhase {
         }
     }
 
-    context(SirFile)
+    context(SirIrFile)
     private fun FileSpec.Builder.generateImports() {
         imports.forEach {
             addImport(it)
         }
     }
 
-    context(SirFile)
+    context(SirIrFile)
     private fun FileSpec.Builder.generateDeclarations() {
         declarations.forEach {
             generateDeclaration(it)

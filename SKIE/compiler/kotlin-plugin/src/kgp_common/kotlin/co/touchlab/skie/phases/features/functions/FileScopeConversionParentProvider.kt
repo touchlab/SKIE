@@ -9,6 +9,7 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
+import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.receiverDeclaration
 import co.touchlab.skie.sir.element.resolveAsKirClass
@@ -54,7 +55,7 @@ class FileScopeConversionParentProvider(
         return when (callableDeclaration.origin) {
             KirCallableDeclaration.Origin.Member -> error("Member callable are not supported. Was: $callableDeclaration")
             KirCallableDeclaration.Origin.Extension -> getExtensions(callableDeclaration, sirCallableDeclaration)
-            KirCallableDeclaration.Origin.Global -> context.skieNamespaceProvider.getNamespaceFile(callableDeclaration.owner).let(::listOf)
+            KirCallableDeclaration.Origin.Global -> context.classNamespaceProvider.getNamespaceFile(callableDeclaration.owner).let(::listOf)
         }
     }
 
@@ -99,11 +100,11 @@ class FileScopeConversionParentProvider(
     private fun getExtensionNamespace(
         callableDeclaration: KirCallableDeclaration<*>,
         parentType: SirType,
-    ): SirFile {
+    ): SirIrFile {
         val extensionReceiverKirClass = getExtensionReceiverKirClassIfExists(parentType)
 
-        return extensionReceiverKirClass?.let { context.skieNamespaceProvider.getNamespaceFile(it) }
-            ?: context.skieNamespaceProvider.getNamespaceFile(callableDeclaration.owner)
+        return extensionReceiverKirClass?.let { context.classNamespaceProvider.getNamespaceFile(it) }
+            ?: context.classNamespaceProvider.getNamespaceFile(callableDeclaration.owner)
     }
 
     private fun getExtensionReceiverKirClassIfExists(parentType: SirType): KirClass? =
@@ -114,7 +115,7 @@ class FileScopeConversionParentProvider(
             else -> null
         }
 
-    private fun createNonOptionalExtension(file: SirFile, sirClass: SirClass): SirExtension? =
+    private fun createNonOptionalExtension(file: SirIrFile, sirClass: SirClass): SirExtension? =
         if (sirClass.typeParameters.isEmpty()) {
             sirProvider.getExtension(
                 classDeclaration = sirClass,
@@ -125,6 +126,7 @@ class FileScopeConversionParentProvider(
             null
         }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun getOptionalExtensions(callableDeclaration: KirCallableDeclaration<*>, type: NullableSirType, namespace: SirFile): List<SirExtension> {
 //         val nonNullType = type.type
 //

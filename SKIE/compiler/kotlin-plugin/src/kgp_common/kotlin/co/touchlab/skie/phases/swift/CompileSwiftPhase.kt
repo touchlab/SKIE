@@ -31,6 +31,7 @@ class CompileSwiftPhase(
 
     context(SirPhase.Context)
     override fun execute() {
+        // WIP Replace with load written files phase
         val sourceFiles = skieBuildDirectory.swift.allSwiftFiles
         if (sourceFiles.isEmpty()) {
             return

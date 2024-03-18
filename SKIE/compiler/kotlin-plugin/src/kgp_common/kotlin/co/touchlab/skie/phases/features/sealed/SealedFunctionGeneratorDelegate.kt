@@ -54,7 +54,7 @@ class SealedFunctionGeneratorDelegate(
     ): SirSimpleFunction =
         SirSimpleFunction(
             identifier = kirClass.enumConstructorFunctionName,
-            parent = context.skieNamespaceProvider.getNamespaceFile(kirClass),
+            parent = context.classNamespaceProvider.getNamespaceFile(kirClass),
             returnType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).let(returnTypeModifier),
         ).apply {
             copyTypeParametersFrom(enum)

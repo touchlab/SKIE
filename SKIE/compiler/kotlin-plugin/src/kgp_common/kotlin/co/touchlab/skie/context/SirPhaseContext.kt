@@ -10,8 +10,9 @@ import co.touchlab.skie.oir.type.translation.OirTypeTranslator
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.oir.util.ExternalApiNotesProvider
+import co.touchlab.skie.sir.ClassNamespaceProvider
+import co.touchlab.skie.sir.SirFileProvider
 import co.touchlab.skie.sir.SirProvider
-import co.touchlab.skie.sir.SkieNamespaceProvider
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.type.translation.SirTypeTranslator
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -30,13 +31,15 @@ class SirPhaseContext(
 
     override val sirProvider: SirProvider = SirProvider(framework, kirProvider, configurationProvider, skieConfiguration)
 
+    override val sirFileProvider: SirFileProvider = sirProvider.fileProvider
+
     override val kirBuiltins: KirBuiltins = kirProvider.kirBuiltins
 
     override val oirBuiltins: OirBuiltins = oirProvider.oirBuiltins
 
     override val sirBuiltins: SirBuiltins = sirProvider.sirBuiltins
 
-    override val skieNamespaceProvider: SkieNamespaceProvider = SkieNamespaceProvider(
+    override val classNamespaceProvider: ClassNamespaceProvider = ClassNamespaceProvider(
         kirProvider = kirProvider,
         sirProvider = sirProvider,
         mainModuleDescriptor = mainSkieContext.mainModuleDescriptor,

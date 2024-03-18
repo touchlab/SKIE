@@ -69,7 +69,7 @@ class CreateKotlinSirTypesPhase(
         }
 
     private val KirClass.sirParent: SirDeclarationParent
-        get() = sirFqName.parent?.simpleName?.let { findSirParentRecursively(this, it) } ?: sirProvider.kotlinModule.module
+        get() = sirFqName.parent?.simpleName?.let { findSirParentRecursively(this, it) } ?: sirProvider.kotlinModule.builtInFile
 
     private fun findSirParentRecursively(kirClass: KirClass, parentName: String): SirClass? =
         when (val parent = kirClass.parent) {

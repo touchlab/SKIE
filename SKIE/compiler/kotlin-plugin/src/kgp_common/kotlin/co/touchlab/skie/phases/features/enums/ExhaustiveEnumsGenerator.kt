@@ -12,8 +12,8 @@ import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirExtension
-import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirGetter
+import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirSimpleFunction
@@ -79,9 +79,9 @@ private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
         parent = enumKirClass.originalSirClass.namespace?.let { namespace ->
             sirProvider.getExtension(
                 classDeclaration = namespace.classDeclaration,
-                parent = skieNamespaceProvider.getNamespaceFile(enumKirClass),
+                parent = classNamespaceProvider.getNamespaceFile(enumKirClass),
             )
-        } ?: skieNamespaceProvider.getNamespaceFile(enumKirClass),
+        } ?: classNamespaceProvider.getNamespaceFile(enumKirClass),
         kind = SirClass.Kind.Enum,
     ).apply {
         addEnumCases(enumKirClass)
@@ -146,14 +146,14 @@ private fun SirClass.addCompanionObjectPropertyIfNeeded(enum: KirClass) {
 
 context(SirPhase.Context)
 private fun KirClass.addConversionExtensions(bridgedEnum: SirClass) {
-    skieNamespaceProvider.getNamespaceFile(this).apply {
+    classNamespaceProvider.getNamespaceFile(this).apply {
         addToKotlinConversionExtension(originalSirClass, bridgedEnum)
         addToSwiftConversionExtension(originalSirClass, bridgedEnum)
     }
 }
 
 context(SirPhase.Context)
-private fun SirFile.addToKotlinConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
+private fun SirIrFile.addToKotlinConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
     this.getExtension(
         classDeclaration = bridgedEnum,
     ).apply {
@@ -173,7 +173,7 @@ private fun SirExtension.addToKotlinConversionMethod(enum: SirClass) {
 }
 
 context(SirPhase.Context)
-private fun SirFile.addToSwiftConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
+private fun SirIrFile.addToSwiftConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
     this.getExtension(
         classDeclaration = enum,
     ).apply {
@@ -200,7 +200,7 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
 
     SirTypeAlias(
         baseName = "Enum",
-        parent = skieNamespaceProvider.getNamespace(kirClass),
+        parent = classNamespaceProvider.getNamespace(kirClass),
         visibility = SirVisibility.PublicButReplaced,
     ) {
         bridgedEnum.defaultType.withFqName()

@@ -121,7 +121,7 @@ class CreateKirMembersPhase(
             createFunction(descriptor, kirClass, origin)
         }
 
-    private fun getOrCreateOverridenFunction(descriptor: FunctionDescriptor, origin: Origin): KirSimpleFunction {
+    private fun getOrCreateOverriddenFunction(descriptor: FunctionDescriptor, origin: Origin): KirSimpleFunction {
         val classDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(descriptor)
             ?: error("Unsupported function $descriptor")
 
@@ -160,7 +160,7 @@ class CreateKirMembersPhase(
         )
 
         getDirectParents(descriptor)
-            .map { getOrCreateOverridenFunction(it, origin) }
+            .map { getOrCreateOverriddenFunction(it, origin) }
             .let { function.addOverrides(it) }
 
         createValueParameters(function, descriptor, methodBridge)

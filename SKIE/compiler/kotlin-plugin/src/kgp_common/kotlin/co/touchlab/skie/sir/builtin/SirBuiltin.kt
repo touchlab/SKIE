@@ -30,7 +30,7 @@ class SirBuiltins(
 
         class Swift(sirProvider: SirProvider) : ModuleBase() {
 
-            override val module = sirProvider.getExternalModule("Swift")
+            override val declarationParent = sirProvider.getExternalModule("Swift").builtInFile
 
             override val origin: SirClass.Origin = SirClass.Origin.ExternalSwiftFramework
 
@@ -97,7 +97,7 @@ class SirBuiltins(
 
         class Foundation(sirProvider: SirProvider, swift: Swift) : ModuleBase() {
 
-            override val module = sirProvider.getExternalModule("Foundation")
+            override val declarationParent = sirProvider.getExternalModule("Foundation").builtInFile
 
             override val origin = SirClass.Origin.ExternalSwiftFramework
 
@@ -106,8 +106,10 @@ class SirBuiltins(
 
         class Skie(
             private val skieConfiguration: SkieConfiguration,
-            override val module: SirModule.Skie,
+            val module: SirModule.Skie,
         ) : ModuleBase() {
+
+            override val declarationParent: SirDeclarationParent = module.builtInFile
 
             override val origin: SirClass.Origin = SirClass.Origin.Generated
 
@@ -155,7 +157,7 @@ class SirBuiltins(
 
             private fun RuntimeClass(
                 superTypes: List<SirDeclaredSirType> = emptyList(),
-                parent: SirDeclarationParent = module,
+                parent: SirDeclarationParent = declarationParent,
                 nameOverride: String? = null,
                 apply: (SirClass.() -> Unit) = { },
             ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SirClass?>> =
@@ -174,13 +176,13 @@ class SirBuiltins(
 
         abstract class ModuleBase {
 
-            abstract val module: SirDeclarationParent
+            abstract val declarationParent: SirDeclarationParent
 
             abstract val origin: SirClass.Origin
 
             protected fun Class(
                 superTypes: List<SirDeclaredSirType> = emptyList(),
-                parent: SirDeclarationParent = module,
+                parent: SirDeclarationParent = declarationParent,
                 nameOverride: String? = null,
                 apply: (SirClass.() -> Unit) = { },
             ) = ClassDeclarationPropertyProvider(
@@ -193,7 +195,7 @@ class SirBuiltins(
 
             protected fun Protocol(
                 superTypes: List<SirDeclaredSirType> = emptyList(),
-                parent: SirDeclarationParent = module,
+                parent: SirDeclarationParent = declarationParent,
                 apply: (SirClass.() -> Unit) = { },
             ) = ClassDeclarationPropertyProvider(
                 kind = SirClass.Kind.Protocol,
@@ -204,7 +206,7 @@ class SirBuiltins(
 
             protected fun Struct(
                 superTypes: List<SirDeclaredSirType> = emptyList(),
-                parent: SirDeclarationParent = module,
+                parent: SirDeclarationParent = declarationParent,
                 apply: (SirClass.() -> Unit) = { },
             ) = ClassDeclarationPropertyProvider(
                 kind = SirClass.Kind.Struct,
@@ -214,7 +216,7 @@ class SirBuiltins(
             )
 
             protected fun TypeAlias(
-                parent: SirDeclarationParent = module,
+                parent: SirDeclarationParent = declarationParent,
                 apply: (SirTypeAlias.() -> Unit) = { },
                 typeFactory: ((SirTypeAlias) -> SirType),
             ) = TypeAliasDeclarationPropertyProvider(

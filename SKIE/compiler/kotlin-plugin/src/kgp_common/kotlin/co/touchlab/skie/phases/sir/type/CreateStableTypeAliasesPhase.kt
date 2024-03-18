@@ -30,9 +30,9 @@ class CreateStableNameTypeAliasesPhase(
         SirTypeAlias(
             baseName = "Kotlin",
             parent = if (shouldGenerateFileForEachExportedClass) {
-                skieNamespaceProvider.getNamespace(kirClass)
+                classNamespaceProvider.getNamespace(kirClass)
             } else {
-                skieNamespaceProvider.getNamespaceClass(kirClass)
+                classNamespaceProvider.getNamespaceClass(kirClass)
             },
             visibility = SirVisibility.PublicButReplaced,
         ) {

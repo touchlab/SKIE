@@ -11,7 +11,7 @@ import co.touchlab.skie.sir.element.shallowCopy
 // Fix for SKIE-395.
 // The implementation is somewhat hacky because it creates a fake function that is used to remove the duplicates.
 // This fake function is not properly linked with the overrides and as a result this phase needs to run after all other phases that rename functions.
-object FixDuplicatedOverridenFunctionsPhase : SirPhase {
+object FixDuplicatedOverriddenFunctionsPhase : SirPhase {
 
     context(SirPhase.Context)
     override fun execute() {

@@ -51,7 +51,7 @@ class ConfigureExternalOirTypesBridgingPhase(
             baseName = fqName.simpleName,
             parent = when {
                 fqName.parent != null -> getOrCreateSirClass(fqName.parent)
-                else -> sirProvider.getExternalModule(fqName.module.name)
+                else -> sirProvider.getExternalModule(fqName.module.name).builtInFile
             },
             // TODO All builtin bridges are structs or enums (not classes which is important for type mapping of reference types, however we do not know if this will be true for 3rd party libraries)
             kind = SirClass.Kind.Struct,

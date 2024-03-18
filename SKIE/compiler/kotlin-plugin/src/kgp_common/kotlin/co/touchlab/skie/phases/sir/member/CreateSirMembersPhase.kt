@@ -22,6 +22,7 @@ import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.topLevelParent
 import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
@@ -120,7 +121,8 @@ class CreateSirMembersPhase(
     private fun KirCallableDeclaration<*>.getSirParent(): SirDeclarationNamespace =
         when (val parent = oirCallableDeclaration.parent) {
             is OirClass -> parent.originalSirClass
-            is OirExtension -> sirProvider.getExtension(parent.classDeclaration.originalSirClass, parent.classDeclaration.originalSirClass.module)
+            // WIP parent.sirExtension should be used instead
+            is OirExtension -> sirProvider.getExtension(parent.classDeclaration.originalSirClass, parent.classDeclaration.originalSirClass.topLevelParent)
         }
 
     private fun SirFunction.createValueParameters(

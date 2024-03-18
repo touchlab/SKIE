@@ -11,10 +11,13 @@ import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclaration
+import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
+import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.sir.element.SirTopLevelDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
@@ -33,17 +36,17 @@ class SirProvider(
 
     val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
 
+    val fileProvider: SirFileProvider = SirFileProvider(skieModule, kirProvider)
+
     val sirBuiltins by lazy {
         SirBuiltins(this, skieConfiguration)
     }
 
     private val externalModuleCache = mutableMapOf<String, SirModule.External>()
 
-    private val fileByPathCache = mutableMapOf<Path, SirFile>()
-
     private val extensionCache = mutableMapOf<Pair<SirClass, SirTopLevelDeclarationParent>, SirExtension>()
 
-    val files: Collection<SirFile>
+    val skieModuleFiles: Collection<SirFile>
         get() = skieModule.files
 
     val allLocalDeclarations: List<SirDeclaration>
@@ -67,21 +70,13 @@ class SirProvider(
         get() = skieModule.getAllDeclarationsRecursively()
 
     val allSkieGeneratedTopLevelDeclarations: List<SirDeclaration>
-        get() = skieModule.declarations + files.flatMap { it.declarations }
+        get() = skieModuleFiles.filterIsInstance<SirDeclarationParent>().flatMap { it.declarations }
 
     val allSkieGeneratedCallableDeclarations: List<SirCallableDeclaration>
         get() = allSkieGeneratedDeclarations.filterIsInstance<SirCallableDeclaration>()
 
     val allSkieGeneratedSimpleFunctions: List<SirSimpleFunction>
         get() = allSkieGeneratedCallableDeclarations.filterIsInstance<SirSimpleFunction>()
-
-    fun getSkieNamespaceFile(name: String): SirFile =
-        getFile(kirProvider.skieModule.name, name)
-
-    fun getFile(namespace: String, name: String): SirFile =
-        fileByPathCache.getOrPut(SirFile.relativePath(namespace, name)) {
-            SirFile(namespace, name, skieModule)
-        }
 
     // Do not use for Extensions with ConditionalConstraints as that would break caching.
     fun getExtension(
@@ -104,7 +99,7 @@ class SirProvider(
         val possibleParentDeclarations = if (parent != null) {
             listOf(parent)
         } else {
-            fqName.module.files + fqName.module
+            fqName.module.files.filterIsInstance<SirDeclarationParent>()
         }
 
         possibleParentDeclarations.forEach { possibleParent ->
@@ -122,7 +117,7 @@ class SirProvider(
         findClassByFqName(fqName)
             ?: error("SirClass with fqName $fqName not found.")
 
-    fun findExternalModule(oirClass: OirClass): SirModule? {
+    fun findExternalModule(oirClass: OirClass): SirModule.External? {
         val classDescriptor = oirClass.cinteropClassDescriptorOrNull ?: error("Invalid origin for OirClass: $oirClass")
 
         val moduleName = configurationProvider.getConfiguration(classDescriptor)[ClassInterop.CInteropFrameworkName] ?: return null

@@ -12,7 +12,7 @@ object SwiftRuntimeGenerator : SirPhase {
     context(SirPhase.Context)
     override fun execute() {
         getSwiftRuntimeFiles().forEach {
-            sirProvider.getSkieNamespaceFile(it.swiftFileName).content = it.readText()
+            sirFileProvider.getWrittenSourceFileFromSkieNamespace(it.swiftFileName).content = it.readText()
         }
     }
 

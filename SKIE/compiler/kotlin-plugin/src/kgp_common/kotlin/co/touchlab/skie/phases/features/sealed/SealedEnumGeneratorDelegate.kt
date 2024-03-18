@@ -17,7 +17,7 @@ class SealedEnumGeneratorDelegate(
         SirClass(
             baseName = "Sealed",
             kind = SirClass.Kind.Enum,
-            parent = skieNamespaceProvider.getNamespace(kirClass),
+            parent = classNamespaceProvider.getNamespace(kirClass),
             visibility = SirVisibility.PublicButReplaced,
         ).apply {
             addConformanceToHashableIfPossible(kirClass)

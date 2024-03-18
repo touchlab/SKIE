@@ -25,11 +25,11 @@ val SirDeclarationParent.firstParentThatIsNotNamespace: SirDeclarationParent
     get() = if (this is SirDeclarationNamespace) (parent as? SirDeclarationNamespace)?.firstParentThatIsNotNamespace ?: parent ?: this else this
 
 @Suppress("RecursivePropertyAccessor")
-val SirDeclarationParent.topLevelParent: SirTopLevelDeclarationParent
-    get() = (parent as? SirTopLevelDeclarationParent) ?: parent?.topLevelParent ?: module
+val SirDeclarationParent.topLevelParent: SirTopLevelDeclarationParent?
+    get() = (parent as? SirTopLevelDeclarationParent) ?: parent?.topLevelParent
 
 fun SirDeclarationParent.getAllDeclarationsRecursively(): List<SirDeclaration> {
-    val declarationParents = ((this as? SirModule)?.files ?: emptyList()) + declarations.filterIsInstance<SirDeclarationParent>()
+    val declarationParents = declarations.filterIsInstance<SirDeclarationParent>()
 
     return declarations + declarationParents.flatMap { it.getAllDeclarationsRecursively() }
 }

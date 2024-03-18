@@ -3,47 +3,33 @@ package co.touchlab.skie.sir.element
 // Instantiate only in SirProvider
 sealed class SirModule(
     val name: String,
-) : SirElement, SirTopLevelDeclarationParent {
+) : SirElement {
 
-    override val module: SirModule
-        get() = this
-
-    override val parent: SirDeclarationParent? = null
-
-    abstract val files: List<SirFile>
-
-    override var declarations: MutableList<SirDeclaration> = mutableListOf()
-
-    class Kotlin(
-        name: String,
-    ) : SirModule(name) {
-
-        override val files: List<SirFile> = emptyList()
+    val builtInFile by lazy {
+        SirBuiltInFile(this)
     }
 
-    class Skie(
-        name: String,
-    ) : SirModule(name) {
-
-        override val files: MutableList<SirFile> = mutableListOf()
+    open val files: List<SirFile> by lazy {
+        listOf(builtInFile)
     }
 
-    class External(
-        name: String,
-    ) : SirModule(name) {
+    class Kotlin(name: String) : SirModule(name)
 
-        override val files: List<SirFile> = emptyList()
+    class Skie(name: String) : SirModule(name) {
+
+        override val files: MutableList<SirFile> by lazy {
+            mutableListOf(builtInFile)
+        }
     }
 
-    object Unknown : SirModule("<Unknown>") {
+    class External(name: String) : SirModule(name)
 
-        override val files: List<SirFile> = emptyList()
-    }
+    object Unknown : SirModule("<Unknown>")
 
-    object None : SirModule("<None>") {
-
-        override val files: List<SirFile> = emptyList()
-    }
+    object None : SirModule("<None>")
 
     override fun toString(): String = "SirModule${this::class.simpleName}: $name"
 }
+
+fun SirModule.getAllDeclarationsRecursively(): List<SirDeclaration> =
+    files.filterIsInstance<SirDeclarationParent>().flatMap { it.getAllDeclarationsRecursively() }
