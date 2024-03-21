@@ -30,8 +30,9 @@ internal abstract class CreateSkieConfigurationTask : DefaultTask() {
 
         val configuration = project.skieExtension.buildConfiguration()
         val serializedConfiguration = JsonOutput.toJson(configuration)
+        val readableSerializedConfiguration = JsonOutput.prettyPrint(serializedConfiguration)
 
-        configurationFile.writeText(serializedConfiguration)
+        configurationFile.writeText(readableSerializedConfiguration)
     }
 
     companion object {
