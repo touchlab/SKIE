@@ -12,8 +12,6 @@ import co.touchlab.skie.sir.element.isExported
 import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import co.touchlab.skie.util.swift.escapeSwiftIdentifier
-import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.joinToCode
 
 class InterfaceExtensionMembersConvertorDelegate(
     private val parentProvider: FileScopeConversionParentProvider,

@@ -13,10 +13,8 @@ import co.touchlab.skie.kir.element.KirProject
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.classDescriptorOrNull
 import co.touchlab.skie.kir.element.sourceFileOrNull
-import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.phases.runtime.isSkieKotlinRuntime
 import co.touchlab.skie.sir.element.SirCallableDeclaration
-import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns

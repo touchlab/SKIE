@@ -14,17 +14,14 @@ import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFile
-import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirSimpleFunction
-import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.sir.element.SirTopLevelDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.directory.SkieBuildDirectory
-import java.nio.file.Path
 
 class SirProvider(
     framework: FrameworkLayout,

@@ -5,7 +5,6 @@ import co.touchlab.skie.oir.type.DeclaredOirType
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirClass
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.types.KotlinType
 
 class OirClass(
     override val name: String,

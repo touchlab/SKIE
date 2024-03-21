@@ -3,7 +3,6 @@ package co.touchlab.skie.oir.builtin
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.element.OirClass
-import co.touchlab.skie.oir.element.OirModule
 import co.touchlab.skie.oir.element.OirTypeParameter
 import co.touchlab.skie.oir.element.toTypeParameterUsage
 

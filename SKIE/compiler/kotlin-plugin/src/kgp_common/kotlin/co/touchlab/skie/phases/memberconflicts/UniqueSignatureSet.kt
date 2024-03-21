@@ -13,6 +13,7 @@ class UniqueSignatureSet {
 
     private val alreadyAddedDeclarations = mutableSetOf<SirCallableDeclaration>()
     private val alreadyAddedEnumCase = mutableSetOf<SirEnumCase>()
+
     // Map so that we can get the signatures for conflicts
     private val existingSignaturesMap = mutableMapOf<Signature, Signature>()
 

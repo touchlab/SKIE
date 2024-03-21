@@ -20,8 +20,8 @@ import co.touchlab.skie.phases.features.flow.FlowConversionConstructorsGenerator
 import co.touchlab.skie.phases.features.functions.FileScopeConvertor
 import co.touchlab.skie.phases.features.sealed.SealedInteropGenerator
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
-import co.touchlab.skie.phases.header.DeclareSkieErrorTypesPhase
 import co.touchlab.skie.phases.header.AddTypeDefPhase
+import co.touchlab.skie.phases.header.DeclareSkieErrorTypesPhase
 import co.touchlab.skie.phases.header.FixForwardDeclarationsPhase
 import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
@@ -30,8 +30,8 @@ import co.touchlab.skie.phases.kir.CreateKirTypesPhase
 import co.touchlab.skie.phases.memberconflicts.RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameConflictingCallableDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameParametersNamedSelfPhase
-import co.touchlab.skie.phases.oir.ConfigureExternalOirTypesBridgingPhase
 import co.touchlab.skie.phases.oir.ConfigureCInteropFrameworkNameForPlatformTypesPhase
+import co.touchlab.skie.phases.oir.ConfigureExternalOirTypesBridgingPhase
 import co.touchlab.skie.phases.oir.CreateFakeObjCConstructorsPhase
 import co.touchlab.skie.phases.oir.CreateOirMembersPhase
 import co.touchlab.skie.phases.oir.CreateOirTypesPhase
@@ -63,8 +63,8 @@ import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
 import co.touchlab.skie.phases.sir.type.InitializeSirTypesSuperTypesForOirPhase
 import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.ConvertSirIrFilesToSourceFilesPhase
-import co.touchlab.skie.phases.swift.SwiftKotlinFrameworkCacheSetupPhase
 import co.touchlab.skie.phases.swift.ConvertSirSourceFilesToCompilableFilesPhase
+import co.touchlab.skie.phases.swift.SwiftKotlinFrameworkCacheSetupPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKeywordsPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKotlinModulePhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictsWithOtherTypesPhase

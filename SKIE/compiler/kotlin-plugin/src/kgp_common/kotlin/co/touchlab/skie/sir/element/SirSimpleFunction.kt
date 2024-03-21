@@ -1,12 +1,11 @@
 package co.touchlab.skie.sir.element
 
-import co.touchlab.skie.sir.element.util.sirDeclarationParent
-import co.touchlab.skie.sir.type.SirType
-import io.outfoxx.swiftpoet.Modifier
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.phases.memberconflicts.signature
+import co.touchlab.skie.sir.element.util.sirDeclarationParent
+import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.util.swift.escapeSwiftIdentifier
-import io.outfoxx.swiftpoet.CodeBlock
+import io.outfoxx.swiftpoet.Modifier
 
 class SirSimpleFunction(
     override var identifier: String,

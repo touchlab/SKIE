@@ -7,7 +7,7 @@ class SirSourceFile(
     override val module: SirModule.Skie,
     // Relative to the SKIE Swift generated directory
     val relativePath: Path,
-    val originFile: SirIrFile? = null
+    val originFile: SirIrFile? = null,
 ) : SirFile {
 
     var content: String = ""

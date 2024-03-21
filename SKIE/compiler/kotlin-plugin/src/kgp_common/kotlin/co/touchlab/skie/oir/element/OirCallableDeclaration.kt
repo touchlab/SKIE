@@ -1,7 +1,7 @@
 package co.touchlab.skie.oir.element
 
-import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.kir.element.DeprecationLevel
+import co.touchlab.skie.sir.element.SirCallableDeclaration
 
 sealed interface OirCallableDeclaration : OirElement {
 

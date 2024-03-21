@@ -5,7 +5,6 @@ import co.touchlab.skie.phases.memberconflicts.signature
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.util.swift.escapeSwiftIdentifier
-import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.Modifier
 
 class SirProperty(

@@ -7,9 +7,9 @@ import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.builtin.OirBuiltins
 import co.touchlab.skie.oir.type.translation.OirTypeTranslator
 import co.touchlab.skie.phases.oir.util.ExternalApiNotesProvider
-import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.ClassNamespaceProvider
 import co.touchlab.skie.sir.SirFileProvider
+import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.type.translation.SirTypeTranslator
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer

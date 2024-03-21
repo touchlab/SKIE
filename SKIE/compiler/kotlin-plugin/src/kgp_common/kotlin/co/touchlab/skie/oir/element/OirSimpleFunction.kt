@@ -1,8 +1,8 @@
 package co.touchlab.skie.oir.element
 
+import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirSimpleFunction
-import co.touchlab.skie.kir.element.DeprecationLevel
 
 class OirSimpleFunction(
     override val selector: String,

@@ -8,7 +8,6 @@ import co.touchlab.skie.context.FinalizePhaseContext
 import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.context.SirPhaseContext
 import co.touchlab.skie.context.SymbolTablePhaseContext
-import co.touchlab.skie.phases.FinalizePhase
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.ir.util.SymbolTable
 

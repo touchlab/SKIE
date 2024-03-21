@@ -1,8 +1,8 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import io.outfoxx.swiftpoet.Modifier
-import co.touchlab.skie.kir.element.DeprecationLevel
 
 class SirConstructor(
     parent: SirDeclarationNamespace,
