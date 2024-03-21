@@ -27,7 +27,7 @@ class CreateKirTypesPhase(
     private val descriptorsToClasses = mutableMapOf<ClassDescriptor, KirClass>()
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         createRegularClasses()
         createFileClasses()
         configureSealedSubclasses()

@@ -9,7 +9,7 @@ import co.touchlab.skie.util.cache.writeTextIfDifferent
 object GenerateFakeObjCDependenciesPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         oirProvider.allExternalClassesAndProtocols
             .groupBy { it.originalSirClass.module }
             .filterKeys { it is SirModule.External && it.name != "Foundation" }

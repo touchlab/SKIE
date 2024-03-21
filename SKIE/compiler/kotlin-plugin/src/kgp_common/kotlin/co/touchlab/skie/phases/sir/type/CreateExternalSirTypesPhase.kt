@@ -9,7 +9,7 @@ import co.touchlab.skie.sir.element.toSirKind
 object CreateExternalSirTypesPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         oirProvider.allExternalClassesAndProtocols.forEach {
             createClass(it)
         }

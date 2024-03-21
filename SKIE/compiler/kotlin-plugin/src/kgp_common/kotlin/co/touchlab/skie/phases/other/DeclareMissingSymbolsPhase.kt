@@ -5,7 +5,7 @@ import co.touchlab.skie.phases.SymbolTablePhase
 object DeclareMissingSymbolsPhase : SymbolTablePhase {
 
     context(SymbolTablePhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         declarationBuilder.declareSymbols()
     }
 }

@@ -10,7 +10,7 @@ object SwiftRuntimeGenerator : SirPhase {
         SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         getSwiftRuntimeFiles().forEach {
             sirFileProvider.getWrittenSourceFileFromSkieNamespace(it.swiftFileName).content = it.readText()
         }

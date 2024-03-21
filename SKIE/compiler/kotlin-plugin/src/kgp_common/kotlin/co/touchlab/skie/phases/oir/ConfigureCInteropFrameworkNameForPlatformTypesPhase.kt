@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 object ConfigureCInteropFrameworkNameForPlatformTypesPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         oirProvider.allExternalClassesAndProtocols.forEach {
             configureIfPlatformType(it)
         }

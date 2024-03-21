@@ -1,12 +1,11 @@
 package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.SirSimpleFunction
 
 object AddAvailabilityToAsyncFunctionsPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         sirProvider.allSkieGeneratedSimpleFunctions
             .filter { it.isAsync }
             .forEach {

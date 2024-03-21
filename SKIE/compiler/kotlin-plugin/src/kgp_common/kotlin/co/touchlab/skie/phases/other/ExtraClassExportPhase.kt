@@ -31,7 +31,7 @@ class ExtraClassExportPhase(
     private val descriptorProvider = context.descriptorProvider
 
     context(ClassExportPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val alreadyVisitedClasses = mutableSetOf<ClassDescriptor>()
 
         var iteration = 0

@@ -10,7 +10,7 @@ object DisableWildcardExportPhase : SirPhase {
         SkieConfigurationFlag.Migration_WildcardExport !in skieConfiguration.enabledConfigurationFlags
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         framework.modulemapFile.writeText(
             framework.modulemapFile.readLines().filterNot { it.contains("export *") }.joinToString(System.lineSeparator()),
         )

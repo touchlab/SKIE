@@ -36,7 +36,7 @@ object SkiePerformanceAnalytics {
         }
 
         @OptIn(ExperimentalTime::class)
-        fun <T> log(name: String, block: () -> T): T {
+        inline fun <T> log(name: String, block: () -> T): T {
             val timedValue = measureTimedValue {
                 block()
             }
@@ -46,7 +46,7 @@ object SkiePerformanceAnalytics {
             return timedValue.value
         }
 
-        private fun log(name: String, duration: Duration) {
+        fun log(name: String, duration: Duration) {
             entries[name] = duration.toDouble(DurationUnit.SECONDS)
 
             printFormattedLogIfEnabled(name, duration)

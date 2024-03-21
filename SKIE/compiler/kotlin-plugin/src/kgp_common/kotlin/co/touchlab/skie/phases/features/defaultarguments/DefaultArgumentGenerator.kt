@@ -22,7 +22,7 @@ class DefaultArgumentGenerator(
     ).map { it(context, sharedCounter) }
 
     context(DescriptorModificationPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         delegates.forEach {
             it.generate()
         }

@@ -19,7 +19,7 @@ class FileScopeConvertor(
     private val interfaceExtensionMembersDelegate = InterfaceExtensionMembersConvertorDelegate(parentProvider)
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses
             .filter { it.kind == KirClass.Kind.File }
             .flatMap { it.callableDeclarations }

@@ -32,7 +32,7 @@ class FixOirFunctionSignaturesForApiNotesPhase(
     }
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         oirProvider.allKotlinClassesAndProtocols.forEach {
             fixFunctionSignatures(it)
         }

@@ -11,7 +11,7 @@ import co.touchlab.skie.sir.element.module
 object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val conflictingModules = sirProvider.allExternalTypeDeclarations.map { it.module.name }
         val conflictingNames = conflictingModules.toMutableSet()
 

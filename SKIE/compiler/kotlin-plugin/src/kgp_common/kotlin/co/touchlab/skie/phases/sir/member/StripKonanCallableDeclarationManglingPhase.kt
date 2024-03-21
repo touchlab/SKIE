@@ -9,13 +9,11 @@ import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
-import org.jetbrains.kotlin.backend.konan.KonanFqNames
-import org.jetbrains.kotlin.resolve.annotations.argumentValue
 
 object StripKonanCallableDeclarationManglingPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allCallableDeclarations
             .filter { it.isSupported }
             .forEach {

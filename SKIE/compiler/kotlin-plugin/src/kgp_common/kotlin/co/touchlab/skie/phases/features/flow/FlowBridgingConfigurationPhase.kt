@@ -10,7 +10,7 @@ object FlowBridgingConfigurationPhase : SirPhase {
         SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         SupportedFlow.values().forEach {
             configureFlowBridging(it)
         }

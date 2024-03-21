@@ -31,7 +31,7 @@ class CompileSwiftPhase(
     private val isDebug = konanConfig.debug
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         // WIP Replace with load written files phase
         val sourceFiles = sirProvider.skieModuleFiles.filterIsInstance<SirCompilableFile>().map { it.absolutePath.toFile() }
         if (sourceFiles.isEmpty()) {

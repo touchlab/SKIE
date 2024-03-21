@@ -8,7 +8,6 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isRemoved
-import co.touchlab.skie.sir.element.kirClassOrNull
 import co.touchlab.skie.sir.element.oirClassOrNull
 import co.touchlab.skie.sir.element.resolveAsKirClass
 import co.touchlab.skie.util.resolveCollisionWithWarning
@@ -18,7 +17,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val sortedTypeDeclarations = sirProvider.allLocalTypeDeclarations.sortedWith(collisionResolutionPriorityComparator)
 
         buildUniqueSignatureSet(sortedTypeDeclarations)

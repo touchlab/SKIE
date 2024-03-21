@@ -12,7 +12,7 @@ import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 object MoveBridgesToTopLevelPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses
             .mapNotNull { it.bridgedSirClass }
             .forEach {

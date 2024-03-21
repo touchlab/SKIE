@@ -46,7 +46,7 @@ import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 object ConvertSirIrFilesToSourceFilesPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         sirProvider.skieModuleFiles
             .filterIsInstance<SirIrFile>()
             .forEach {

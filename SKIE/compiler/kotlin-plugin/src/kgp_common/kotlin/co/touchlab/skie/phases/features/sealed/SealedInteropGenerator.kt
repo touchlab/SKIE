@@ -16,7 +16,7 @@ class SealedInteropGenerator(
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(context)
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses
             .filter { it.isSupported }
             .forEach {

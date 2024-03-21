@@ -10,7 +10,7 @@ import co.touchlab.skie.sir.element.shallowCopy
 object CreateAsyncSirFunctionsPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allSimpleFunctions
             .filter { it.isSuspend && it.isSuspendInteropEnabled }
             .forEach {

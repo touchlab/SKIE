@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.util
 
 import co.touchlab.skie.phases.SkiePhase
+import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
 
 class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
@@ -14,17 +15,19 @@ class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
     }
 
     fun run(context: C) {
-        with(context) {
-            buildPhases(context)
-                .forEach {
-                    if (it.isActive()) {
-                        context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
-                            it.execute()
+        runBlocking {
+            with(context) {
+                buildPhases(context)
+                    .forEach {
+                        if (it.isActive()) {
+                            context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
+                                it.execute()
+                            }
+                        } else {
+                            context.skiePerformanceAnalyticsProducer.logSkipped(it::class.nameForLogger)
                         }
-                    } else {
-                        context.skiePerformanceAnalyticsProducer.logSkipped(it::class.nameForLogger)
                     }
-                }
+            }
         }
     }
 

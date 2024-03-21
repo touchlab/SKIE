@@ -21,7 +21,7 @@ object SuspendGenerator : DescriptorModificationPhase {
         SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(DescriptorModificationPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val kotlinDelegate = KotlinSuspendGeneratorDelegate(context)
         val swiftDelegate = SwiftSuspendGeneratorDelegate(context)
 

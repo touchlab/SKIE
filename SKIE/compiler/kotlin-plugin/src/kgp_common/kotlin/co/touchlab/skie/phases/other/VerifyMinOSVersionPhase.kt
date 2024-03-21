@@ -13,7 +13,7 @@ object VerifyMinOSVersionPhase : ClassExportPhase {
         SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(ClassExportPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val configurables = konanConfig.platform.configurables as AppleConfigurables
 
         val currentMinVersion = configurables.osVersionMin

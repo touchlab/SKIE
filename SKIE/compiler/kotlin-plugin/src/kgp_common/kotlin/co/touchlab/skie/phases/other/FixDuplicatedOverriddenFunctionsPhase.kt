@@ -14,7 +14,7 @@ import co.touchlab.skie.sir.element.shallowCopy
 object FixDuplicatedOverriddenFunctionsPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         oirProvider.allKotlinClassesAndProtocols
             .flatMap { it.memberSimpleFunctions }
             .forEach {

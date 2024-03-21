@@ -6,7 +6,7 @@ import co.touchlab.skie.util.resolveCollisionWithWarning
 object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val moduleName = sirProvider.kotlinModule.name
 
         sirProvider.allLocalTypeDeclarations.forEach { type ->

@@ -23,7 +23,7 @@ class CreateOirTypesPhase(
     private val oirTypeTranslator = context.oirTypeTranslator
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         createClasses()
 
         initializeSuperTypesForAllClasses()

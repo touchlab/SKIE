@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.types.KotlinType
 object RenameConflictingCallableDeclarationsPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val sortedEnumCases = getSortedEnumCases()
         val sortedCallableDeclarations = getSortedCallableDeclarations()
 

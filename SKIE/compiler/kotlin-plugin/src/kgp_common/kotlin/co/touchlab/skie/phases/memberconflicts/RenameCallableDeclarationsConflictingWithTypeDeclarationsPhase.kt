@@ -9,7 +9,7 @@ import co.touchlab.skie.util.resolveCollisionWithWarning
 object RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val topLevelDeclarations = sirProvider.allSkieGeneratedTopLevelDeclarations
 
         val topLevelClasses = topLevelDeclarations.filterIsInstance<SirClass>()

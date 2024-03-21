@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.library.uniqueName
 object FixLibrariesShortNamePhase : ClassExportPhase {
 
     context(ClassExportPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         descriptorProvider.resolvedLibraries.forEach { library ->
             if (library.shortName == null) {
                 library.manifestProperties.setProperty(

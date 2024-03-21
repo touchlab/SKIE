@@ -22,7 +22,7 @@ class ConfigureFlowConversionPhase(
         SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         copyFlowConfiguration()
 
         unifyConfigurationForOverrides()

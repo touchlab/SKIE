@@ -37,7 +37,7 @@ object EnumEntryRenamingPhase : SirPhase {
     )
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allEnums
             .filter { it.isSupported }
             .forEach {

@@ -10,7 +10,7 @@ abstract class StatefulSkiePhase<C : SkiePhase.Context> : SkiePhase<C> {
         object : CompilerConfigurationKey<StateHolder<C.() -> Unit>>("StatefulSkiePhase(${this::class.qualifiedName}) actions") {}
 
     context(C)
-    override fun execute() {
+    override suspend fun execute() {
         val state = context.getOrNull(key) ?: StateHolder()
 
         state.forEach {

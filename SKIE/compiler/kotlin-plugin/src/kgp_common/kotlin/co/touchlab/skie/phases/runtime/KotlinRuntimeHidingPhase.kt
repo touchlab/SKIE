@@ -11,7 +11,7 @@ object KotlinRuntimeHidingPhase : SirPhase {
         SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses
             .filter { it.belongsToSkieKotlinRuntime }
             .forEach {

@@ -12,7 +12,7 @@ object RenameTypesConflictingWithKeywordsPhase : SirPhase {
     )
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         sirProvider.allLocalTypeDeclarations
             .forEach { declaration ->
                 declaration.resolveCollisionWithWarning {

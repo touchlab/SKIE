@@ -5,7 +5,7 @@ import co.touchlab.skie.phases.FinalizePhase
 object LogSkiePerformanceAnalyticsPhase : FinalizePhase {
 
     context(FinalizePhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         analyticsCollector.collectAsync(skiePerformanceAnalyticsProducer)
     }
 }

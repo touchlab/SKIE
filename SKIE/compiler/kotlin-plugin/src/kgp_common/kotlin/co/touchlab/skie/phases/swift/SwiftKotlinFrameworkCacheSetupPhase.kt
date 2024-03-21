@@ -7,7 +7,7 @@ import co.touchlab.skie.util.cache.copyFileToIfDifferent
 object SwiftKotlinFrameworkCacheSetupPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val wasChanged = synchronizeDummyKotlinFramework()
 
         if (wasChanged) {

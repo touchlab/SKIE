@@ -5,7 +5,7 @@ import co.touchlab.skie.phases.SirPhase
 abstract class BaseHeaderModificationPhase : SirPhase {
 
     context(SirPhase.Context)
-    final override fun execute() {
+    final override suspend fun execute() {
         val content = framework.kotlinHeader.readLines()
 
         val modifiedContent = modifyHeaderContent(content)

@@ -9,7 +9,7 @@ import co.touchlab.skie.phases.analytics.environment.CompilerEnvironmentAnalytic
 object ClassExportAnalyticsPhase : ClassExportPhase {
 
     context(ClassExportPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         analyticsCollector.collectAsync(
             CommonCompilerConfigurationAnalytics.Producer(konanConfig),
             SpecificCompilerConfigurationAnalytics.Producer(konanConfig),

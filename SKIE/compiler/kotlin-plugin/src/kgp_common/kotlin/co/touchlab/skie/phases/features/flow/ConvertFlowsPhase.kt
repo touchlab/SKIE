@@ -30,7 +30,7 @@ class ConvertFlowsPhase(
     private val kirProvider = context.kirProvider
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses.forEach {
             it.convertFlows()
         }

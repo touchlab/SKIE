@@ -11,7 +11,7 @@ sealed class ApiNotesGenerationPhase(
 ) : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val apiNotes = ApiNotesFactory(exposeInternalMembers).create()
 
         apiNotes.createApiNotesFile()

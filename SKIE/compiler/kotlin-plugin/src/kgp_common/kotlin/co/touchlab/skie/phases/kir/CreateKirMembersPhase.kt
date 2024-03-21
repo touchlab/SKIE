@@ -47,7 +47,7 @@ class CreateKirMembersPhase(
     private val propertyCache = mutableMapOf<PropertyDescriptor, KirProperty>()
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses.forEach(::createMembers)
 
         kirProvider.initializeCallableDeclarationsCache()

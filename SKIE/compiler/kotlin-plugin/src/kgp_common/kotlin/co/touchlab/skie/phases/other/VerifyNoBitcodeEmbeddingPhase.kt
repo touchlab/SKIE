@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 object VerifyNoBitcodeEmbeddingPhase : ClassExportPhase {
 
     context(ClassExportPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val bitcodeEmbeddingMode = compilerConfiguration[KonanConfigKeys.BITCODE_EMBEDDING_MODE]
 
         if (bitcodeEmbeddingMode == BitcodeEmbedding.Mode.FULL) {

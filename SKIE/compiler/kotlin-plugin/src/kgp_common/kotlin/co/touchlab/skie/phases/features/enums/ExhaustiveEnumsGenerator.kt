@@ -26,7 +26,7 @@ import co.touchlab.skie.sir.getExtension
 object ExhaustiveEnumsGenerator : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses
             .filter { it.isSupported }
             .forEach {

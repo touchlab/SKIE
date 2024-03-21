@@ -11,7 +11,7 @@ import co.touchlab.skie.util.swift.quoteAsSwiftLiteral
 object AddAvailabilityBasedDeprecationLevelPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         sirProvider.allSkieGeneratedCallableDeclarations.forEach {
             it.applyDeprecationLevel()
         }

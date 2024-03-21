@@ -7,7 +7,7 @@ import co.touchlab.skie.sir.type.SirDeclaredSirType
 object InitializeSirTypesSuperTypesForOirPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         oirProvider.allClassesAndProtocols.forEach {
             initializeSuperTypes(it)
         }

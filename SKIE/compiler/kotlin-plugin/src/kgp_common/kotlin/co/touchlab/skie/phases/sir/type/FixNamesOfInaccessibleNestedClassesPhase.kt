@@ -9,7 +9,7 @@ import co.touchlab.skie.phases.SirPhase
 object FixNamesOfInaccessibleNestedClassesPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         kirProvider.allClasses.forEach(::fixNameOfInaccessibleNestedClass)
     }
 

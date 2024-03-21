@@ -16,7 +16,7 @@ class ConfigureExternalOirTypesBridgingPhase(
     private val externalApiNotesProvider = context.externalApiNotesProvider
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         configureBridging()
 
         loadAllPlatformApiNotesIfEnabled()

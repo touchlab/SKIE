@@ -23,7 +23,7 @@ interface SkiePhase<C : SkiePhase.Context> {
     fun isActive(): Boolean = true
 
     context(C)
-    fun execute()
+    suspend fun execute()
 
     interface Context {
 

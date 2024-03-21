@@ -26,7 +26,7 @@ sealed class DumpSwiftApiPhase : SirPhase {
     }
 
     context(SirPhase.Context)
-    override fun execute() {
+    override suspend fun execute() {
         val moduleName = framework.moduleName
         val apiFileBaseName = "${moduleName}_${this::class.simpleName}"
         val apiFile = skieBuildDirectory.debug.dumps.apiFile(apiFileBaseName)
