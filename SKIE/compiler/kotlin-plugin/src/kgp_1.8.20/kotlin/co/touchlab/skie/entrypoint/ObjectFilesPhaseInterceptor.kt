@@ -19,6 +19,8 @@ internal class ObjectFilesPhaseInterceptor : SameTypePhaseInterceptor<KonanConte
 
         EntrypointUtils.runSirPhases(mainSkieContext)
 
+        EntrypointUtils.runFinalizePhases(mainSkieContext)
+
         context.generationState.compilerOutput += mainSkieContext.skieDirectories.objectFilePaths
     }
 }

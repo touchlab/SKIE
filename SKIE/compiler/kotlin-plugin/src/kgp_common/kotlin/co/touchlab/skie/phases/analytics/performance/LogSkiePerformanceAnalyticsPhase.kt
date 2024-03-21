@@ -1,10 +1,10 @@
 package co.touchlab.skie.phases.analytics.performance
 
-import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.FinalizePhase
 
-object LogSkiePerformanceAnalyticsPhase : SirPhase {
+object LogSkiePerformanceAnalyticsPhase : FinalizePhase {
 
-    context(SirPhase.Context)
+    context(FinalizePhase.Context)
     override fun execute() {
         analyticsCollector.collectAsync(skiePerformanceAnalyticsProducer)
     }

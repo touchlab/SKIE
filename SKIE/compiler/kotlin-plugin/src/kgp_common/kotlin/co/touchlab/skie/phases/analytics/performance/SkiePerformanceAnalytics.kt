@@ -8,6 +8,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
+import kotlin.time.toDuration
 
 object SkiePerformanceAnalytics {
 
@@ -22,8 +23,13 @@ object SkiePerformanceAnalytics {
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_SkiePerformance
 
-        override fun produce(): String =
-            entries.toPrettyJson()
+        override fun produce(): String {
+            val total = entries.values.sum()
+
+            log("Total", total.toDuration(DurationUnit.SECONDS))
+
+            return entries.toPrettyJson()
+        }
 
         fun logSkipped(name: String) {
             printLogIfEnabled("$name: Skipped")
@@ -35,11 +41,15 @@ object SkiePerformanceAnalytics {
                 block()
             }
 
-            entries[name] = timedValue.duration.toDouble(DurationUnit.SECONDS)
-
-            printFormattedLogIfEnabled(name, timedValue.duration)
+            log(name, timedValue.duration)
 
             return timedValue.value
+        }
+
+        private fun log(name: String, duration: Duration) {
+            entries[name] = duration.toDouble(DurationUnit.SECONDS)
+
+            printFormattedLogIfEnabled(name, duration)
         }
 
         private fun printFormattedLogIfEnabled(name: String, duration: Duration) {

@@ -209,6 +209,11 @@ class SkiePhaseScheduler {
             // Debug(after)
 
             DumpSwiftApiPhase.AfterApiNotes,
+        )
+    }
+
+    val finalizePhases = SkiePhaseGroup<FinalizePhase, FinalizePhase.Context> { context ->
+        addAll(
             LogSkiePerformanceAnalyticsPhase,
         )
     }
@@ -231,5 +236,9 @@ class SkiePhaseScheduler {
 
     fun runSirPhases(context: SirPhase.Context) {
         sirPhases.run(context)
+    }
+
+    fun runFinalizePhases(context: FinalizePhase.Context) {
+        finalizePhases.run(context)
     }
 }

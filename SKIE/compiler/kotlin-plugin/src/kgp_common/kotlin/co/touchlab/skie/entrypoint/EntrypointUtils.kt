@@ -4,9 +4,11 @@ package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.context.ClassExportPhaseContext
 import co.touchlab.skie.context.DescriptorModificationPhaseContext
+import co.touchlab.skie.context.FinalizePhaseContext
 import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.context.SirPhaseContext
 import co.touchlab.skie.context.SymbolTablePhaseContext
+import co.touchlab.skie.phases.FinalizePhase
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
@@ -41,5 +43,11 @@ internal object EntrypointUtils {
         val sirPhaseContext = SirPhaseContext(mainSkieContext)
 
         sirPhaseContext.skiePhaseScheduler.runSirPhases(sirPhaseContext)
+    }
+
+    fun runFinalizePhases(mainSkieContext: MainSkieContext) {
+        val finalizePhaseContext = FinalizePhaseContext(mainSkieContext)
+
+        finalizePhaseContext.skiePhaseScheduler.runFinalizePhases(finalizePhaseContext)
     }
 }

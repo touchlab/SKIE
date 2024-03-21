@@ -14,10 +14,16 @@ internal class LinkerPhaseInterceptor : PhaseInterceptor<PhaseContext, LinkerPha
     override fun getInterceptedPhase(): Any = LinkerPhase
 
     override fun intercept(context: PhaseContext, input: LinkerPhaseInput, next: (PhaseContext, LinkerPhaseInput) -> Unit) {
+        val mainSkieContext = context.config.configuration.mainSkieContext
+
         val inputWithSwiftObjectFiles = input.copy(
-            objectFiles = input.objectFiles + context.config.configuration.mainSkieContext.skieDirectories.objectFilePaths,
+            objectFiles = input.objectFiles + mainSkieContext.skieDirectories.objectFilePaths,
         )
 
-        next(context, inputWithSwiftObjectFiles)
+        mainSkieContext.skiePerformanceAnalyticsProducer.log("ObjCLinkPhase") {
+            next(context, inputWithSwiftObjectFiles)
+        }
+
+        EntrypointUtils.runFinalizePhases(mainSkieContext)
     }
 }
