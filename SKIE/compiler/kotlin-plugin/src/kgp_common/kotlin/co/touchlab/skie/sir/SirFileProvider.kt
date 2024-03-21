@@ -5,11 +5,16 @@ import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirSourceFile
+import co.touchlab.skie.util.cache.writeTextIfDifferent
+import co.touchlab.skie.util.directory.SkieBuildDirectory
 import java.nio.file.Path
+import kotlin.io.path.absolute
+import kotlin.io.path.extension
 
 class SirFileProvider(
     private val skieModule: SirModule.Skie,
     private val kirProvider: KirProvider,
+    private val skieBuildDirectory: SkieBuildDirectory,
 ) {
 
     private val irFileByPathCache = mutableMapOf<Path, SirIrFile>()
@@ -51,8 +56,33 @@ class SirFileProvider(
             SirIrFile(namespace, name, skieModule)
         }
 
-    fun createCompilableFile(sourceFile: SirSourceFile, absoluteFile: Path): SirCompilableFile =
-        SirCompilableFile(sourceFile, absoluteFile)
+    fun createCompilableFile(sourceFile: SirSourceFile): SirCompilableFile {
+        val absolutePath = skieBuildDirectory.swift.generated.path.resolve(sourceFile.relativePath)
+
+        absolutePath.parent.toFile().mkdirs()
+
+        absolutePath.writeTextIfDifferent(sourceFile.content)
+
+        return SirCompilableFile(sourceFile.module, absolutePath, sourceFile)
+    }
+
+    fun loadCompilableFile(path: Path): SirCompilableFile {
+        val absolutePath = path.absolute()
+
+        check(absolutePath.startsWith(skieBuildDirectory.swift.path)) {
+            "Custom source file must be located in the swift directory. Was: $absolutePath."
+        }
+
+        check(!absolutePath.startsWith(skieBuildDirectory.swift.generated.path)) {
+            "Custom source file must not be located in the generated directory. Was: $absolutePath."
+        }
+
+        check(absolutePath.extension == "swift") {
+            "Custom source file must have the swift extension. Was: $absolutePath."
+        }
+
+        return SirCompilableFile(skieModule, absolutePath, null)
+    }
 
     companion object {
 

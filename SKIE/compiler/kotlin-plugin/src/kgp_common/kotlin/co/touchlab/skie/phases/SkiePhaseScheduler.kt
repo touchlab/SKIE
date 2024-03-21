@@ -45,6 +45,7 @@ import co.touchlab.skie.phases.other.DisableWildcardExportPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverriddenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
+import co.touchlab.skie.phases.other.LoadCustomSwiftSourceFilesPhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
 import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
 import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRuntimePhase
@@ -62,7 +63,7 @@ import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
 import co.touchlab.skie.phases.sir.type.InitializeSirTypesSuperTypesForOirPhase
 import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.ConvertSirIrFilesToSourceFilesPhase
-import co.touchlab.skie.phases.swift.SwiftCacheSetupPhase
+import co.touchlab.skie.phases.swift.SwiftKotlinFrameworkCacheSetupPhase
 import co.touchlab.skie.phases.swift.ConvertSirSourceFilesToCompilableFilesPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKeywordsPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKotlinModulePhase
@@ -145,7 +146,7 @@ class SkiePhaseScheduler {
 
             KotlinRuntimeHidingPhase,
             SwiftRuntimeGenerator,
-            // WIP Load custom files
+            LoadCustomSwiftSourceFilesPhase,
 
             RenameConflictingCallableDeclarationsPhase,
 
@@ -200,7 +201,7 @@ class SkiePhaseScheduler {
             ConvertSirSourceFilesToCompilableFilesPhase,
             GenerateFakeObjCDependenciesPhase,
             DisableWildcardExportPhase,
-            SwiftCacheSetupPhase,
+            SwiftKotlinFrameworkCacheSetupPhase,
             CompileSwiftPhase(context),
             TemporarilyRenameTypesConflictingWithExternalModulesPhase.RevertPhase,
             ApiNotesGenerationPhase.ForFramework,

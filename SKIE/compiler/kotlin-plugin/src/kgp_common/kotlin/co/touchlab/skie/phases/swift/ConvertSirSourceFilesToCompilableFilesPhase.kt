@@ -1,10 +1,12 @@
 package co.touchlab.skie.phases.swift
 
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import java.io.File
+import java.nio.file.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.pathString
 
@@ -34,16 +36,9 @@ object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
 
         context(SirPhase.Context)
         fun SirSourceFile.convertToCompilableFile() {
-            val file = generatedSwiftDirectory.directory.resolve(relativePath.pathString)
+            val compilableFile = sirFileProvider.createCompilableFile(this)
 
-            file.parentFile.mkdirs()
-
-            // WIP Can be written directly after adding support for proper incremental compilation
-            file.writeTextIfDifferent(content)
-
-            generatedFiles.add(file)
-
-            sirFileProvider.createCompilableFile(this, file.toPath().toAbsolutePath())
+            generatedFiles.add(compilableFile.absolutePath.toFile())
         }
 
         fun deleteOldFiles() {

@@ -23,20 +23,22 @@ import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
 import co.touchlab.skie.util.FrameworkLayout
+import co.touchlab.skie.util.directory.SkieBuildDirectory
 import java.nio.file.Path
 
 class SirProvider(
     framework: FrameworkLayout,
-    private val kirProvider: KirProvider,
+    kirProvider: KirProvider,
     private val configurationProvider: ConfigurationProvider,
     skieConfiguration: SkieConfiguration,
+    skieBuildDirectory: SkieBuildDirectory,
 ) {
 
     val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
 
     val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
 
-    val fileProvider: SirFileProvider = SirFileProvider(skieModule, kirProvider)
+    val fileProvider: SirFileProvider = SirFileProvider(skieModule, kirProvider, skieBuildDirectory)
 
     val sirBuiltins by lazy {
         SirBuiltins(this, skieConfiguration)

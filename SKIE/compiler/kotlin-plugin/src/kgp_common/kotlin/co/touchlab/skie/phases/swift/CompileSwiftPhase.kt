@@ -2,6 +2,7 @@ package co.touchlab.skie.phases.swift
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.util.Command
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
@@ -32,7 +33,7 @@ class CompileSwiftPhase(
     context(SirPhase.Context)
     override fun execute() {
         // WIP Replace with load written files phase
-        val sourceFiles = skieBuildDirectory.swift.allSwiftFiles
+        val sourceFiles = sirProvider.skieModuleFiles.filterIsInstance<SirCompilableFile>().map { it.absolutePath.toFile() }
         if (sourceFiles.isEmpty()) {
             return
         }

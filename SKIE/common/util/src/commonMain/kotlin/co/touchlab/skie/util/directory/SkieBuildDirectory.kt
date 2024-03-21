@@ -5,6 +5,9 @@ import co.touchlab.skie.util.directory.structure.PermanentDirectory
 import co.touchlab.skie.util.directory.structure.RootDirectory
 import co.touchlab.skie.util.directory.structure.TemporaryDirectory
 import java.io.File
+import kotlin.io.path.isDirectory
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 
 class SkieBuildDirectory(
     rootDirectory: File,
@@ -68,9 +71,10 @@ class SkieBuildDirectory(
 
     class Swift(parent: Directory) : PermanentDirectory(parent, "swift") {
 
-        val allSwiftFiles: List<File>
+        val allNonGeneratedSwiftFiles: List<File>
             get() = directory.walkTopDown()
                 .filter { it.extension == "swift" }
+                .filterNot { it.toPath().startsWith(generated.path) }
                 .toList()
 
         val generated: Generated = Generated(this)

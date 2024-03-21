@@ -4,12 +4,10 @@ import java.nio.file.Path
 
 // Instantiate only in SirFileProvider
 class SirCompilableFile(
-    val originFile: SirSourceFile,
+    override val module: SirModule.Skie,
     val absolutePath: Path,
+    val originFile: SirSourceFile?,
 ) : SirFile {
-
-    override val module: SirModule.Skie
-        get() = originFile.module
 
     init {
         module.files.add(this)
