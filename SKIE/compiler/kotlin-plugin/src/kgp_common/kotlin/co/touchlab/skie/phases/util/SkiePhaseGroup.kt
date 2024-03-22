@@ -14,19 +14,38 @@ class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
         modifications.add(modification)
     }
 
-    fun run(context: C) {
+    context(SkiePhase.Context)
+    inline fun <reified RC : C> run(noinline contextFactory: () -> RC): RC =
+        run(RC::class, contextFactory)
+
+    context(SkiePhase.Context)
+    fun <RC : C> run(contextClass: KClass<RC>, contextFactory: () -> RC): RC {
+        val (context, phases) = skiePerformanceAnalyticsProducer.log("Initialize${contextClass.nameForLogger.removeSuffix("Phase.Context")}Phases") {
+            val context = contextFactory()
+
+            val phases = buildPhases(context)
+
+            context to phases
+        }
+
         runBlocking {
             with(context) {
-                buildPhases(context)
-                    .forEach {
-                        if (it.isActive()) {
-                            context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
-                                it.execute()
-                            }
-                        } else {
-                            context.skiePerformanceAnalyticsProducer.logSkipped(it::class.nameForLogger)
-                        }
-                    }
+                phases.execute()
+            }
+        }
+
+        return context
+    }
+
+    context(C)
+    private suspend fun List<P>.execute() {
+        this.forEach {
+            if (it.isActive()) {
+                context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
+                    it.execute()
+                }
+            } else {
+                context.skiePerformanceAnalyticsProducer.logSkipped(it::class.nameForLogger)
             }
         }
     }

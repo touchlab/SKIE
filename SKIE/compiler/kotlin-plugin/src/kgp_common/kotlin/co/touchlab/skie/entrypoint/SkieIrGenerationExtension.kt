@@ -10,12 +10,10 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 class SkieIrGenerationExtension(private val configuration: CompilerConfiguration) : IrGenerationExtension {
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-        val context = KotlinIrPhaseContext(
+        EntrypointUtils.runKotlinIrPhases(
             mainSkieContext = configuration.mainSkieContext,
             moduleFragment = moduleFragment,
             pluginContext = pluginContext,
         )
-
-        context.skiePhaseScheduler.runKotlinIrPhases(context)
     }
 }

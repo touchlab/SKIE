@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.entrypoint
 
+import co.touchlab.skie.compilerinject.compilerplugin.initPhaseContext
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
@@ -23,17 +24,18 @@ internal class ProduceObjCExportInterfacePhaseInterceptor :
     ): ObjCExportedInterface {
         fun produceObjCExportInterface() = produceObjCExportInterface(context, input.moduleDescriptor, input.frontendServices)
 
-        val mainSkieContext = context.config.configuration.mainSkieContext
-
-        mainSkieContext.initialize(
+        val mainSkieContext = EntrypointUtils.createMainSkieContext(
+            initPhaseContext = context.config.configuration.initPhaseContext,
             konanConfig = context.config,
             mainModuleDescriptor = input.moduleDescriptor,
-            exportedDependencies = input.moduleDescriptor.getExportedDependencies(context.config),
+            exportedDependencies = lazy { input.moduleDescriptor.getExportedDependencies(context.config) },
             produceObjCExportInterface = ::produceObjCExportInterface,
         )
 
         EntrypointUtils.runClassExportPhases(mainSkieContext)
 
-        return EntrypointUtils.runDescriptorModificationPhases(mainSkieContext)
+        EntrypointUtils.runDescriptorModificationPhases(mainSkieContext)
+
+        return mainSkieContext.objCExportedInterface
     }
 }

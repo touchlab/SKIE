@@ -2,51 +2,102 @@
 
 package co.touchlab.skie.entrypoint
 
+import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.context.ClassExportPhaseContext
 import co.touchlab.skie.context.DescriptorModificationPhaseContext
-import co.touchlab.skie.context.FinalizePhaseContext
+import co.touchlab.skie.context.KotlinIrPhaseContext
+import co.touchlab.skie.context.LinkPhaseContext
 import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.context.SirPhaseContext
 import co.touchlab.skie.context.SymbolTablePhaseContext
+import co.touchlab.skie.phases.InitPhase
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import java.nio.file.Path
 
 internal object EntrypointUtils {
+
+    fun createMainSkieContext(
+        initPhaseContext: InitPhase.Context,
+        konanConfig: KonanConfig,
+        mainModuleDescriptor: ModuleDescriptor,
+        exportedDependencies: Lazy<Collection<ModuleDescriptor>>,
+        produceObjCExportInterface: () -> ObjCExportedInterface,
+    ): MainSkieContext =
+        initPhaseContext.skiePerformanceAnalyticsProducer.log("CreateMainSkieContextPhase") {
+            val mainSkieContext = MainSkieContext(
+                initPhaseContext = initPhaseContext,
+                konanConfig = konanConfig,
+                mainModuleDescriptor = mainModuleDescriptor,
+                exportedDependencies = exportedDependencies.value,
+                produceObjCExportInterface = produceObjCExportInterface,
+            )
+
+            initPhaseContext.compilerConfiguration.mainSkieContext = mainSkieContext
+
+            mainSkieContext
+        }
 
     fun runClassExportPhases(
         mainSkieContext: MainSkieContext,
     ) {
-        val classExportPhaseContext = ClassExportPhaseContext(mainSkieContext)
-        classExportPhaseContext.skiePhaseScheduler.runClassExportPhases(classExportPhaseContext)
+        with(mainSkieContext) {
+            skiePhaseScheduler.runClassExportPhases {
+                ClassExportPhaseContext(mainSkieContext)
+            }
+        }
     }
 
     fun runDescriptorModificationPhases(
         mainSkieContext: MainSkieContext,
-    ): ObjCExportedInterface {
-        val descriptorModificationPhaseContext = DescriptorModificationPhaseContext(mainSkieContext)
-        descriptorModificationPhaseContext.skiePhaseScheduler.runDescriptorModificationPhases(descriptorModificationPhaseContext)
-
-        return mainSkieContext.finalizeDescriptorProvider()
+    ) {
+        with(mainSkieContext) {
+            skiePhaseScheduler.runDescriptorModificationPhases {
+                DescriptorModificationPhaseContext(mainSkieContext)
+            }
+        }
     }
 
     fun runSymbolTablePhases(mainSkieContext: MainSkieContext, symbolTable: SymbolTable) {
-        val symbolTableContext = SymbolTablePhaseContext(
-            mainSkieContext = mainSkieContext,
-            symbolTable = symbolTable,
-        )
+        with(mainSkieContext) {
+            skiePhaseScheduler.runSymbolTablePhases {
+                SymbolTablePhaseContext(
+                    mainSkieContext = mainSkieContext,
+                    symbolTable = symbolTable,
+                )
+            }
+        }
+    }
 
-        symbolTableContext.skiePhaseScheduler.runSymbolTablePhases(symbolTableContext)
+    fun runKotlinIrPhases(mainSkieContext: MainSkieContext, moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+        with(mainSkieContext) {
+            skiePhaseScheduler.runKotlinIrPhases {
+                KotlinIrPhaseContext(
+                    mainSkieContext = mainSkieContext,
+                    moduleFragment = moduleFragment,
+                    pluginContext = pluginContext,
+                )
+            }
+        }
     }
 
     fun runSirPhases(mainSkieContext: MainSkieContext) {
-        val sirPhaseContext = SirPhaseContext(mainSkieContext)
-
-        sirPhaseContext.skiePhaseScheduler.runSirPhases(sirPhaseContext)
+        with(mainSkieContext) {
+            skiePhaseScheduler.runSirPhases {
+                SirPhaseContext(mainSkieContext)
+            }
+        }
     }
 
-    fun runFinalizePhases(mainSkieContext: MainSkieContext) {
-        val finalizePhaseContext = FinalizePhaseContext(mainSkieContext)
-
-        finalizePhaseContext.skiePhaseScheduler.runFinalizePhases(finalizePhaseContext)
+    fun runLinkPhases(mainSkieContext: MainSkieContext, link: (additionalObjectFiles: List<Path>) -> Unit) {
+        with(mainSkieContext) {
+            skiePhaseScheduler.runLinkPhases {
+                LinkPhaseContext(mainSkieContext, link)
+            }
+        }
     }
 }

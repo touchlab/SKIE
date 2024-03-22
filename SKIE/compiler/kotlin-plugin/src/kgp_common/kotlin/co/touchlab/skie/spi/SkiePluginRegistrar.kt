@@ -1,8 +1,8 @@
 package co.touchlab.skie.spi
 
-import co.touchlab.skie.context.MainSkieContext
+import co.touchlab.skie.phases.InitPhase
 
 interface SkiePluginRegistrar {
 
-    fun register(mainSkieContext: MainSkieContext)
+    fun register(initPhaseContext: InitPhase.Context)
 }

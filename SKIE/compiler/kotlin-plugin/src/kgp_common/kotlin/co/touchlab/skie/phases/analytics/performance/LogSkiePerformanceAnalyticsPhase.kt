@@ -1,10 +1,10 @@
 package co.touchlab.skie.phases.analytics.performance
 
-import co.touchlab.skie.phases.FinalizePhase
+import co.touchlab.skie.phases.LinkPhase
 
-object LogSkiePerformanceAnalyticsPhase : FinalizePhase {
+object LogSkiePerformanceAnalyticsPhase : LinkPhase {
 
-    context(FinalizePhase.Context)
+    context(LinkPhase.Context)
     override suspend fun execute() {
         analyticsCollector.collectAsync(skiePerformanceAnalyticsProducer)
     }

@@ -10,4 +10,6 @@ interface MutableDescriptorProvider : DescriptorProvider {
      * Register a listener that will be called each time the provider is mutated.
      */
     fun onMutated(listener: () -> Unit)
+
+    fun finalize()
 }

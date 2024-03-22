@@ -4,10 +4,10 @@ package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
-import co.touchlab.skie.util.objectFilePaths
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.phases.LinkerPhase
 import org.jetbrains.kotlin.backend.konan.driver.phases.LinkerPhaseInput
+import kotlin.io.path.absolutePathString
 
 internal class LinkerPhaseInterceptor : PhaseInterceptor<PhaseContext, LinkerPhaseInput, Unit> {
 
@@ -16,14 +16,12 @@ internal class LinkerPhaseInterceptor : PhaseInterceptor<PhaseContext, LinkerPha
     override fun intercept(context: PhaseContext, input: LinkerPhaseInput, next: (PhaseContext, LinkerPhaseInput) -> Unit) {
         val mainSkieContext = context.config.configuration.mainSkieContext
 
-        val inputWithSwiftObjectFiles = input.copy(
-            objectFiles = input.objectFiles + mainSkieContext.skieDirectories.objectFilePaths,
-        )
+        EntrypointUtils.runLinkPhases(mainSkieContext) { additionalObjectFiles ->
+            val inputWithSwiftObjectFiles = input.copy(
+                objectFiles = input.objectFiles + additionalObjectFiles.map { it.absolutePathString() },
+            )
 
-        mainSkieContext.skiePerformanceAnalyticsProducer.log("ObjCLinkPhase") {
             next(context, inputWithSwiftObjectFiles)
         }
-
-        EntrypointUtils.runFinalizePhases(mainSkieContext)
     }
 }

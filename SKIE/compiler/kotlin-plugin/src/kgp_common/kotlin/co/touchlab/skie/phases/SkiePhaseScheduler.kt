@@ -43,8 +43,10 @@ import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.DisableWildcardExportPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
+import co.touchlab.skie.phases.other.FinalizeDescriptorProviderPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverriddenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
+import co.touchlab.skie.phases.other.LinkObjectFilesPhase
 import co.touchlab.skie.phases.other.LoadCustomSwiftSourceFilesPhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
 import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
@@ -88,6 +90,7 @@ class SkiePhaseScheduler {
         addAll(
             DefaultArgumentGenerator(context),
             SuspendGenerator,
+            FinalizeDescriptorProviderPhase,
         )
     }
 
@@ -212,33 +215,40 @@ class SkiePhaseScheduler {
         )
     }
 
-    val finalizePhases = SkiePhaseGroup<FinalizePhase, FinalizePhase.Context> { context ->
+    val linkPhases = SkiePhaseGroup<LinkPhase, LinkPhase.Context> { context ->
         addAll(
+            LinkObjectFilesPhase,
             LogSkiePerformanceAnalyticsPhase,
         )
     }
 
-    fun runClassExportPhases(context: ClassExportPhase.Context) {
-        classExportPhases.run(context)
+    context(SkiePhase.Context)
+    fun runClassExportPhases(contextFactory: () -> ClassExportPhase.Context) {
+        classExportPhases.run(contextFactory)
     }
 
-    fun runDescriptorModificationPhases(context: DescriptorModificationPhase.Context) {
-        descriptorModificationPhases.run(context)
+    context(SkiePhase.Context)
+    fun runDescriptorModificationPhases(contextFactory: () -> DescriptorModificationPhase.Context) {
+        descriptorModificationPhases.run(contextFactory)
     }
 
-    fun runSymbolTablePhases(context: SymbolTablePhase.Context) {
-        symbolTablePhases.run(context)
+    context(SkiePhase.Context)
+    fun runSymbolTablePhases(contextFactory: () -> SymbolTablePhase.Context) {
+        symbolTablePhases.run(contextFactory)
     }
 
-    fun runKotlinIrPhases(context: KotlinIrPhase.Context) {
-        kotlinIrPhases.run(context)
+    context(SkiePhase.Context)
+    fun runKotlinIrPhases(contextFactory: () -> KotlinIrPhase.Context) {
+        kotlinIrPhases.run(contextFactory)
     }
 
-    fun runSirPhases(context: SirPhase.Context) {
-        sirPhases.run(context)
+    context(SkiePhase.Context)
+    fun runSirPhases(contextFactory: () -> SirPhase.Context) {
+        sirPhases.run(contextFactory)
     }
 
-    fun runFinalizePhases(context: FinalizePhase.Context) {
-        finalizePhases.run(context)
+    context(SkiePhase.Context)
+    fun runLinkPhases(contextFactory: () -> LinkPhase.Context) {
+        linkPhases.run(contextFactory)
     }
 }

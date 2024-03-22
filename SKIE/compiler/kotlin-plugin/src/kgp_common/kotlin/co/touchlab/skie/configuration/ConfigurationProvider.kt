@@ -8,13 +8,13 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import kotlin.properties.Delegates
 
 class ConfigurationProvider(
-    private val context: SkiePhase.Context,
+    private val skieConfiguration: SkieConfiguration,
 ) {
 
     private val declarationConfigurationMap = mutableMapOf<DeclarationDescriptor, DeclarationConfiguration>()
 
     fun <T> getDefaultConfiguration(key: ConfigurationKey<T>): T =
-        context.skieConfiguration[NoConfigurationTarget, key]
+        skieConfiguration[NoConfigurationTarget, key]
 
     fun <T> getConfiguration(descriptor: DeclarationDescriptor, key: ConfigurationKey<T>): T =
         getConfiguration(descriptor)[key]
@@ -31,7 +31,7 @@ class ConfigurationProvider(
         declarationConfigurationMap.getOrPut(descriptor) {
             DeclarationConfiguration(
                 descriptor,
-                context.skieConfiguration,
+                skieConfiguration,
                 this@ConfigurationProvider,
             )
         }

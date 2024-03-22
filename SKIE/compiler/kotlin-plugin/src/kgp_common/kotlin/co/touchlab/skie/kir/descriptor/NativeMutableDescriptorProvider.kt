@@ -84,7 +84,7 @@ internal class NativeMutableDescriptorProvider(
         mutationListeners.forEach { it() }
     }
 
-    fun finalize() {
+    override fun finalize() {
         when (val witnessState = state.compareAndExchange(State.MUTABLE, State.IMMUTABLE)) {
             State.MUTABLE -> {
                 // Create a fresh provider with all the descriptors we've seen so far.

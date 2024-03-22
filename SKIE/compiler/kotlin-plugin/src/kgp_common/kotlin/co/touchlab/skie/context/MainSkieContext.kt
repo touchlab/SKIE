@@ -2,110 +2,42 @@
 
 package co.touchlab.skie.context
 
-import co.touchlab.skie.compilerinject.compilerplugin.SkieConfigurationKeys
-import co.touchlab.skie.configuration.ConfigurationProvider
-import co.touchlab.skie.configuration.SkieConfiguration
-import co.touchlab.skie.kir.descriptor.ExposedModulesProvider
 import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.descriptor.NativeMutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
+import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.SkiePhase
-import co.touchlab.skie.phases.SkiePhaseScheduler
-import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
-import co.touchlab.skie.phases.swift.SwiftCompilerConfiguration
-import co.touchlab.skie.plugin.analytics.AnalyticsCollector
-import co.touchlab.skie.util.FrameworkLayout
-import co.touchlab.skie.util.Reporter
-import co.touchlab.skie.util.directory.SkieDirectories
 import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
-import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
-class MainSkieContext(
-    override val compilerConfiguration: CompilerConfiguration,
-) : SkiePhase.Context {
+class MainSkieContext internal constructor(
+    initPhaseContext: InitPhase.Context,
+    override val konanConfig: KonanConfig,
+    val mainModuleDescriptor: ModuleDescriptor,
+    exportedDependencies: Collection<ModuleDescriptor>,
+    produceObjCExportInterface: () -> ObjCExportedInterface,
+) : SkiePhase.Context, InitPhase.Context by initPhaseContext {
 
     override val context: SkiePhase.Context
         get() = this
 
-    override val skiePhaseScheduler: SkiePhaseScheduler = SkiePhaseScheduler()
-
-    override val skieDirectories: SkieDirectories = compilerConfiguration.getNotNull(SkieConfigurationKeys.SkieDirectories)
-
-    override val skieConfiguration: SkieConfiguration = run {
-        val serializedUserConfiguration = skieDirectories.buildDirectory.skieConfiguration.readText()
-
-        SkieConfiguration.deserialize(serializedUserConfiguration)
-    }
-
-    override val configurationProvider: ConfigurationProvider = ConfigurationProvider(this)
-
-    override val swiftCompilerConfiguration: SwiftCompilerConfiguration = SwiftCompilerConfiguration(
-        sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
-        swiftVersion = compilerConfiguration.get(SkieConfigurationKeys.SwiftCompiler.swiftVersion, "5"),
-        additionalFlags = compilerConfiguration.getList(SkieConfigurationKeys.SwiftCompiler.additionalFlags),
+    private val nativeMutableDescriptorProvider = NativeMutableDescriptorProvider(
+        exposedModulesProvider = {
+            setOf(mainModuleDescriptor) + exportedDependencies
+        },
+        config = konanConfig,
+        produceObjCExportInterface = produceObjCExportInterface,
     )
-
-    override val analyticsCollector: AnalyticsCollector = AnalyticsCollector(
-        skieBuildDirectory = skieDirectories.buildDirectory,
-        skieConfiguration = skieConfiguration,
-    )
-
-    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(skieConfiguration)
-
-    override val reporter: Reporter = Reporter(compilerConfiguration)
-
-    override val framework: FrameworkLayout = run {
-        val frameworkPath = compilerConfiguration.getNotNull(KonanConfigKeys.OUTPUT)
-
-        FrameworkLayout(frameworkPath)
-    }
-
-    override lateinit var konanConfig: KonanConfig
-        private set
-
-    private lateinit var nativeMutableDescriptorProvider: NativeMutableDescriptorProvider
 
     override val descriptorProvider: MutableDescriptorProvider by ::nativeMutableDescriptorProvider
 
-    lateinit var mainModuleDescriptor: ModuleDescriptor
-        private set
+    val declarationBuilder: DeclarationBuilderImpl = DeclarationBuilderImpl(mainModuleDescriptor, nativeMutableDescriptorProvider)
 
-    lateinit var declarationBuilder: DeclarationBuilderImpl
-        private set
+    internal val objCExportedInterface: ObjCExportedInterface
+        get() = nativeMutableDescriptorProvider.objCExportedInterface
 
     val namer: ObjCExportNamer
         get() = nativeMutableDescriptorProvider.objCExportedInterface.namer
-
-    internal fun initialize(
-        konanConfig: KonanConfig,
-        mainModuleDescriptor: ModuleDescriptor,
-        exportedDependencies: Collection<ModuleDescriptor>,
-        produceObjCExportInterface: () -> ObjCExportedInterface,
-    ) {
-        this.konanConfig = konanConfig
-
-        val exposedModulesProvider = ExposedModulesProvider {
-            setOf(mainModuleDescriptor) + exportedDependencies
-        }
-
-        nativeMutableDescriptorProvider = NativeMutableDescriptorProvider(
-            exposedModulesProvider,
-            konanConfig,
-            produceObjCExportInterface,
-        )
-
-        this.mainModuleDescriptor = mainModuleDescriptor
-
-        declarationBuilder = DeclarationBuilderImpl(mainModuleDescriptor, nativeMutableDescriptorProvider)
-    }
-
-    internal fun finalizeDescriptorProvider(): ObjCExportedInterface {
-        nativeMutableDescriptorProvider.finalize()
-
-        return nativeMutableDescriptorProvider.objCExportedInterface
-    }
 }

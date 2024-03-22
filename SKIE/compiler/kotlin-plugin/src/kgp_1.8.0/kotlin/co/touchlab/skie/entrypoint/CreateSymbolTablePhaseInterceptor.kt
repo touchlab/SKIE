@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.entrypoint
 
-import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
+import co.touchlab.skie.compilerinject.compilerplugin.initPhaseContext
 import co.touchlab.skie.compilerinject.interceptor.SameTypePhaseInterceptor
 import co.touchlab.skie.compilerinject.reflection.reflectors.ObjCExportReflector
 import org.jetbrains.kotlin.backend.konan.createSymbolTablePhase
@@ -19,12 +19,11 @@ internal class CreateSymbolTablePhaseInterceptor : SameTypePhaseInterceptor<Kona
 
         fun produceObjCExportInterface() = ObjCExportReflector.new(context).exportedInterface as ObjCExportedInterface
 
-        val mainSkieContext = context.config.configuration.mainSkieContext
-
-        mainSkieContext.initialize(
+        val mainSkieContext = EntrypointUtils.createMainSkieContext(
+            initPhaseContext = context.config.configuration.initPhaseContext,
             konanConfig = context.config,
             mainModuleDescriptor = context.moduleDescriptor,
-            exportedDependencies = context.getExportedDependencies(),
+            exportedDependencies = lazy { context.getExportedDependencies() },
             produceObjCExportInterface = ::produceObjCExportInterface,
         )
 
