@@ -3,7 +3,7 @@ package co.touchlab.skie.phases.other
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.belongsToSkieRuntime
-import co.touchlab.skie.kir.descriptor.allExposedMembers
+import co.touchlab.skie.kir.descriptor.getAllExposedMembers
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.ClassExportPhase
@@ -11,6 +11,7 @@ import co.touchlab.skie.phases.features.flow.SupportedFlow
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.util.parallel.parallelFlatMap
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -32,19 +33,18 @@ class ExtraClassExportPhase(
 
     context(ClassExportPhase.Context)
     override suspend fun execute() {
-        val alreadyVisitedClasses = mutableSetOf<ClassDescriptor>()
+        val previouslyVisitedClasses = mutableSetOf<ClassDescriptor>()
 
         var iteration = 0
 
         do {
             val currentlyExportedClasses = descriptorProvider.exposedClasses
-            val allExportedClasses = currentlyExportedClasses.toMutableSet()
 
-            allExportedClasses.addClassesForExport(alreadyVisitedClasses)
+            val classesForExport = getClassesForExport(previouslyVisitedClasses)
 
-            val newlyDiscoveredClasses = allExportedClasses - currentlyExportedClasses
+            previouslyVisitedClasses.addAll(currentlyExportedClasses)
 
-            alreadyVisitedClasses.addAll(currentlyExportedClasses)
+            val newlyDiscoveredClasses = classesForExport - currentlyExportedClasses
 
             exportClasses(newlyDiscoveredClasses, iteration)
 
@@ -52,36 +52,50 @@ class ExtraClassExportPhase(
         } while (newlyDiscoveredClasses.isNotEmpty())
     }
 
-    private fun MutableSet<ClassDescriptor>.addClassesForExport(alreadyVisitedClasses: Set<ClassDescriptor>) {
-        addClassesForExportFromFlowArguments(alreadyVisitedClasses)
-        addClassesForExportFromSealedHierarchies(alreadyVisitedClasses)
-    }
+    private suspend fun getClassesForExport(previouslyVisitedClasses: Set<ClassDescriptor>): Set<ClassDescriptor> =
+        listOf(
+            ::getClassesForExportFromFlowArguments,
+            ::getClassesForExportFromSealedHierarchies,
+        )
+            .parallelFlatMap { it(previouslyVisitedClasses) }
+            .toSet()
 
-    private fun MutableSet<ClassDescriptor>.addClassesForExportFromFlowArguments(alreadyVisitedClasses: Set<ClassDescriptor>) {
+    private suspend fun getClassesForExportFromFlowArguments(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         if (SkieConfigurationFlag.Feature_CoroutinesInterop !in context.skieConfiguration.enabledConfigurationFlags) {
-            return
+            return emptyList()
         }
 
-        val flowArgumentsFromMembers = if (alreadyVisitedClasses.isEmpty()) {
-            descriptorProvider.allExposedMembers.flatMap { it.getAllFlowArgumentClasses() }
+        return listOf(
+            ::getFlowArgumentsFromTopLevelMembers,
+            ::getFlowArgumentsFromNewClasses,
+        )
+            .parallelFlatMap { it(previouslyVisitedClasses) }
+            .distinct()
+            .filter { descriptorProvider.isExposable(it) }
+    }
+
+    private suspend fun getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> =
+        if (previouslyVisitedClasses.isEmpty()) {
+            descriptorProvider.exposedTopLevelMembers.parallelFlatMap { it.getAllFlowArgumentClasses() }
         } else {
-            // Newly exported classes do not add new exposed members, so we can skip this step.
+            // Extra exported classes do not add new top level members, so we can skip this step.
             emptyList()
         }
 
-        val flowArgumentsFromClasses = (descriptorProvider.exposedClasses - alreadyVisitedClasses).flatMap { it.getAllFlowArgumentClasses() }
+    private suspend fun getFlowArgumentsFromNewClasses(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
+        val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
 
-        val allFlowArguments = flowArgumentsFromMembers + flowArgumentsFromClasses
-
-        val allExposableFlowArguments = allFlowArguments.filter { descriptorProvider.isExposable(it) }
-
-        this.addAll(allExposableFlowArguments)
+        return newClasses.parallelFlatMap { it.getAllFlowArgumentClasses() }
     }
 
-    private fun MutableSet<ClassDescriptor>.addClassesForExportFromSealedHierarchies(alreadyVisitedClasses: Set<ClassDescriptor>) {
-        val allExportedSealedChildren = (descriptorProvider.exposedClasses - alreadyVisitedClasses).getAllExportedSealedChildren()
+    private fun ClassDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
+        declaredTypeParameters.flatMap { it.getAllFlowArgumentClasses() } +
+            descriptorProvider.getAllExposedMembers(this).flatMap { it.getAllFlowArgumentClasses() }
 
-        this.addAll(allExportedSealedChildren)
+    private suspend fun getClassesForExportFromSealedHierarchies(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
+        val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
+
+        return newClasses.parallelFlatMap { it.getAllExportedSealedChildren() }
     }
 
     private fun ClassDescriptor.getAllExportedSealedChildren(): List<ClassDescriptor> {
@@ -142,9 +156,6 @@ class ExtraClassExportPhase(
 
     object FinalizePhase : StatefulSirPhase()
 }
-
-private fun ClassDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
-    declaredTypeParameters.flatMap { it.getAllFlowArgumentClasses() }
 
 private fun CallableMemberDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
     typeParameters.flatMap { it.getAllFlowArgumentClasses() } +
