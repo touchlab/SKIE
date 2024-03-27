@@ -11,6 +11,7 @@ enum class SkieConfigurationFlag {
 
     Migration_WildcardExport,
 
+    Debug_VerifyDescriptorProviderConsistency,
     Debug_DumpSwiftApiBeforeApiNotes,
     Debug_DumpSwiftApiAfterApiNotes,
     Debug_PrintSkiePerformanceLogs,

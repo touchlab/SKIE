@@ -1,5 +1,6 @@
 package co.touchlab.skie.kir.irbuilder.impl.template
 
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.FunctionBuilder
 import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrSimpleFunction
@@ -54,6 +55,11 @@ class FunctionTemplate(
 
         descriptor.isInline = functionBuilder.isInline
         descriptor.isSuspend = functionBuilder.isSuspend
+    }
+
+    context(MutableDescriptorProvider)
+    override fun registerExposedDescriptor() {
+        this@MutableDescriptorProvider.exposeCallableMember(descriptor)
     }
 
     context(SymbolTablePhase.Context)

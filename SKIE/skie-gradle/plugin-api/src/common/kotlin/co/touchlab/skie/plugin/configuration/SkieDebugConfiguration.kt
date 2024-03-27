@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory) {
 
+    val verifyDescriptorProviderConsistency: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
     val dumpSwiftApiBeforeApiNotes: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val dumpSwiftApiAfterApiNotes: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val printSkiePerformanceLogs: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
@@ -17,6 +18,7 @@ abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory
 
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(
+            SkieConfigurationFlag.Debug_VerifyDescriptorProviderConsistency takeIf verifyDescriptorProviderConsistency,
             SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes takeIf dumpSwiftApiBeforeApiNotes,
             SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes takeIf dumpSwiftApiAfterApiNotes,
             SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs takeIf printSkiePerformanceLogs,

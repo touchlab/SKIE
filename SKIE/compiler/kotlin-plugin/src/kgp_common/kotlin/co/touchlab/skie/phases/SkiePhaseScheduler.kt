@@ -9,6 +9,7 @@ import co.touchlab.skie.phases.analytics.performance.LogSkiePerformanceAnalytics
 import co.touchlab.skie.phases.apinotes.ApiNotesGenerationPhase
 import co.touchlab.skie.phases.apinotes.MoveBridgesToTopLevelPhase
 import co.touchlab.skie.phases.debug.DumpSwiftApiPhase
+import co.touchlab.skie.phases.debug.VerifyDescriptorProviderConsistencyPhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.features.defaultarguments.RemoveConflictingDefaultArgumentOverloadsPhase
 import co.touchlab.skie.phases.features.enums.EnumEntryRenamingPhase
@@ -43,7 +44,6 @@ import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.DisableWildcardExportPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
-import co.touchlab.skie.phases.other.FinalizeDescriptorProviderPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverriddenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
 import co.touchlab.skie.phases.other.LinkObjectFilesPhase
@@ -90,7 +90,6 @@ class SkiePhaseScheduler {
         addAll(
             DefaultArgumentGenerator(context),
             SuspendGenerator,
-            FinalizeDescriptorProviderPhase,
         )
     }
 
@@ -111,6 +110,7 @@ class SkiePhaseScheduler {
         addAll(
             // Debug(before)
 
+            VerifyDescriptorProviderConsistencyPhase,
             DumpSwiftApiPhase.BeforeApiNotes,
 
             // IR Setup

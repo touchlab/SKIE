@@ -10,10 +10,11 @@ import co.touchlab.skie.context.LinkPhaseContext
 import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.context.SirPhaseContext
 import co.touchlab.skie.context.SymbolTablePhaseContext
+import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
 import co.touchlab.skie.phases.InitPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
@@ -24,17 +25,17 @@ internal object EntrypointUtils {
     fun createMainSkieContext(
         initPhaseContext: InitPhase.Context,
         konanConfig: KonanConfig,
+        frontendServices: FrontendServices,
         mainModuleDescriptor: ModuleDescriptor,
         exportedDependencies: Lazy<Collection<ModuleDescriptor>>,
-        produceObjCExportInterface: () -> ObjCExportedInterface,
     ): MainSkieContext =
         initPhaseContext.skiePerformanceAnalyticsProducer.log("CreateMainSkieContextPhase") {
             val mainSkieContext = MainSkieContext(
                 initPhaseContext = initPhaseContext,
                 konanConfig = konanConfig,
+                frontendServices = frontendServices,
                 mainModuleDescriptor = mainModuleDescriptor,
                 exportedDependencies = exportedDependencies.value,
-                produceObjCExportInterface = produceObjCExportInterface,
             )
 
             initPhaseContext.compilerConfiguration.mainSkieContext = mainSkieContext
@@ -85,10 +86,10 @@ internal object EntrypointUtils {
         }
     }
 
-    fun runSirPhases(mainSkieContext: MainSkieContext) {
+    fun runSirPhases(mainSkieContext: MainSkieContext, objCExportedInterfaceProvider: ObjCExportedInterfaceProvider) {
         with(mainSkieContext) {
             skiePhaseScheduler.runSirPhases {
-                SirPhaseContext(mainSkieContext)
+                SirPhaseContext(mainSkieContext, objCExportedInterfaceProvider)
             }
         }
     }

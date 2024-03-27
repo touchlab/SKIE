@@ -2,6 +2,7 @@ package co.touchlab.skie.context
 
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.builtin.KirBuiltins
+import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
 import co.touchlab.skie.kir.type.translation.KirTypeTranslator
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.builtin.OirBuiltins
@@ -19,11 +20,13 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
 class SirPhaseContext(
     mainSkieContext: MainSkieContext,
+    override val objCExportedInterfaceProvider: ObjCExportedInterfaceProvider,
 ) : SirPhase.Context, SkiePhase.Context by mainSkieContext {
 
-    override val context: SirPhase.Context = this
+    override val namer: ObjCExportNamer
+        get() = objCExportedInterfaceProvider.namer
 
-    override val namer: ObjCExportNamer = mainSkieContext.namer
+    override val context: SirPhase.Context = this
 
     override val kirProvider: KirProvider = KirProvider(kotlinBuiltins, extraDescriptorBuiltins, namer)
 

@@ -2,6 +2,7 @@ package co.touchlab.skie.phases
 
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.builtin.KirBuiltins
+import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
 import co.touchlab.skie.kir.type.translation.KirTypeTranslator
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.builtin.OirBuiltins
@@ -45,5 +46,7 @@ interface SirPhase : SkiePhase<SirPhase.Context> {
         val oirTypeTranslator: OirTypeTranslator
 
         val sirTypeTranslator: SirTypeTranslator
+
+        val objCExportedInterfaceProvider: ObjCExportedInterfaceProvider
     }
 }

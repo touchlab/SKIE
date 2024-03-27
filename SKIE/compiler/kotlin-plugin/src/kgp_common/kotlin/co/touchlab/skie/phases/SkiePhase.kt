@@ -2,6 +2,7 @@ package co.touchlab.skie.phases
 
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
+import co.touchlab.skie.kir.descriptor.cache.CachedObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
@@ -24,6 +25,9 @@ interface SkiePhase<C : SkiePhase.Context> {
             get() = konanConfig.platform.configurables as AppleConfigurables
 
         val descriptorProvider: DescriptorProvider
+
+        val mapper: CachedObjCExportMapper
+            get() = descriptorProvider.mapper
 
         val kotlinBuiltins: KotlinBuiltIns
             get() = descriptorProvider.builtIns

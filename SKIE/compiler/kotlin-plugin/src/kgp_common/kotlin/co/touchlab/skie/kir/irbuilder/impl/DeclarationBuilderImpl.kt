@@ -55,14 +55,6 @@ class DeclarationBuilderImpl(
     private val classNamespacesByDescriptor = mutableMapOf<ClassDescriptor, DeserializedClassNamespace>()
     private val originalPackageNamespacesByFile = mutableMapOf<SourceFile, DeserializedPackageNamespace>()
 
-    private var originalExposedFiles: Set<SourceFile> = mutableDescriptorProvider.exposedFiles.toSet()
-
-    init {
-        mutableDescriptorProvider.onMutated {
-            originalExposedFiles = mutableDescriptorProvider.exposedFiles.toSet()
-        }
-    }
-
     private val allNamespaces: List<Namespace<*>>
         get() = listOf(
             newFileNamespacesByName,
@@ -88,7 +80,7 @@ class DeclarationBuilderImpl(
         val sourceFile = existingMember.findSourceFileOrNull()
 
         val hasOriginalPackage = existingMember.findPackage() is DeserializedPackageFragment &&
-            sourceFile in originalExposedFiles
+            sourceFile in mutableDescriptorProvider.exposedFiles
 
         return when {
             sourceFile == null -> getCustomNamespace(existingMember.findPackage().name.asStringStripSpecialMarkers())
@@ -127,7 +119,7 @@ class DeclarationBuilderImpl(
     ): D {
         val declarationTemplate = templateBuilder()
 
-        mutableDescriptorProvider.mutate {
+        with(mutableDescriptorProvider) {
             namespace.addTemplate(declarationTemplate)
         }
 

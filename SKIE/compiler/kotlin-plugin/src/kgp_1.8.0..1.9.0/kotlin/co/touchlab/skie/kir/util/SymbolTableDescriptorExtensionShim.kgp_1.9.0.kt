@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.util.referenceFunction
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 actual class SymbolTableDescriptorExtensionShim actual constructor(
-    private val symbolTable: ReferenceSymbolTable
+    private val symbolTable: ReferenceSymbolTable,
 ) {
 
     actual fun referenceFunction(callable: CallableDescriptor): IrFunctionSymbol =

@@ -224,7 +224,7 @@ object ModulesAnalytics {
 
             if (declaration.descriptor in descriptorProvider.exposedClasses) {
                 exportedClasses++
-            } else if (descriptorProvider.isExposable(declaration.descriptor)) {
+            } else if (descriptorProvider.mapper.shouldBeExposed(declaration.descriptor)) {
                 exportableNonExportedClasses++
             } else {
                 nonExportableClasses++
@@ -245,7 +245,7 @@ object ModulesAnalytics {
             if ((declaration as? IrOverridableDeclaration<*>)?.overriddenSymbols?.isNotEmpty() != true) {
                 if (descriptorProvider.isExposed(declaration.descriptor)) {
                     exportedCallableMembers++
-                } else if (descriptorProvider.isExposable(declaration.descriptor)) {
+                } else if (descriptorProvider.mapper.shouldBeExposed(declaration.descriptor)) {
                     exportableNonExportedCallableMembers++
                 } else {
                     nonExportableCallableMembers++
@@ -274,7 +274,7 @@ object ModulesAnalytics {
                     declaration.setter?.descriptor?.let { descriptorProvider.isExposed(it) } == true
                 ) {
                     exportedCallableMembers++
-                } else if (descriptorProvider.isExposable(declaration.descriptor)) {
+                } else if (descriptorProvider.mapper.shouldBeExposed(declaration.descriptor)) {
                     exportableNonExportedCallableMembers++
                 } else {
                     nonExportableCallableMembers++

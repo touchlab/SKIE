@@ -3,7 +3,7 @@ package co.touchlab.skie.phases.features.suspend
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.SuspendInterop
 import co.touchlab.skie.configuration.getConfiguration
-import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
+import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.allExposedMembers
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.phases.DescriptorModificationPhase
@@ -33,9 +33,9 @@ object SuspendGenerator : DescriptorModificationPhase {
     }
 
     context(SkiePhase.Context)
-    private val MutableDescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
+    private val DescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
         get() = this.allExposedMembers.filterIsInstance<SimpleFunctionDescriptor>()
-            .filter { this.isBaseMethod(it) }
+            .filter { mapper.isBaseMethod(it) }
             .filter { it.isSupported }
             .filter { it.isSuspendInteropEnabled }
 

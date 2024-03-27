@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 abstract class MultiDimensionTargetExtension @Inject constructor(
     objects: ObjectFactory,
-    private val targetConfigurer: MultiDimensionTargetConfigurer,
+    val targetConfigurer: MultiDimensionTargetConfigurer,
 ) {
 
     internal val dimensions: ListProperty<Target.Dimension<*>> = objects.listProperty()

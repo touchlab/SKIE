@@ -2,6 +2,7 @@ package co.touchlab.skie.kir.irbuilder.impl.template
 
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.DeclarationDescriptorImplReflector
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.kir.irbuilder.SecondaryConstructorBuilder
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrConstructor
@@ -50,6 +51,11 @@ class SecondaryConstructorTemplate(
         )
 
         descriptor.returnType = namespace.descriptor.defaultType
+    }
+
+    context(MutableDescriptorProvider)
+    override fun registerExposedDescriptor() {
+        this@MutableDescriptorProvider.exposeCallableMember(descriptor)
     }
 
     context(SymbolTablePhase.Context)

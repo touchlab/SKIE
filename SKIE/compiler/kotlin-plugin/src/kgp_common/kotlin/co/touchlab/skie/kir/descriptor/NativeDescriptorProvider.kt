@@ -4,89 +4,56 @@ package co.touchlab.skie.kir.descriptor
 
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.UserVisibleIrModulesSupportReflector
-import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
+import co.touchlab.skie.kir.descriptor.cache.CachedObjCExportMapper
+import co.touchlab.skie.kir.descriptor.cache.ExposedDescriptorsCache
+import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
+import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.ir.konanLibrary
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
-import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
-import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
-import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
-import org.jetbrains.kotlin.resolve.isRecursiveInlineOrValueClassType
-import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
-fun interface ExposedModulesProvider {
-
-    fun exposedModules(): Set<ModuleDescriptor>
-}
-
 internal class NativeDescriptorProvider(
-    private val exposedModulesProvider: ExposedModulesProvider,
+    override val exposedModules: Set<ModuleDescriptor>,
     private val konanConfig: KonanConfig,
-    val objCExportedInterface: ObjCExportedInterface,
-) : DescriptorProvider {
+    frontendServices: FrontendServices,
+) : MutableDescriptorProvider {
 
-    override val builtIns: KotlinBuiltIns by lazy {
-        exposedModules.first().builtIns
+    override val mapper = CachedObjCExportMapper(konanConfig, frontendServices)
+
+    override val builtIns: KotlinBuiltIns = exposedModules.first().builtIns
+
+    private val exposedDescriptorsCache = ExposedDescriptorsCache(
+        mapper = mapper,
+        builtIns = builtIns,
+        objcGenerics = konanConfig.configuration.getBoolean(KonanConfigKeys.OBJC_GENERICS),
+    ).also {
+        it.exposeModules(exposedModules)
     }
 
-    override val extraDescriptorBuiltins: ExtraDescriptorBuiltins by lazy {
-        ExtraDescriptorBuiltins(exposedModules)
-    }
+    override val extraDescriptorBuiltins: ExtraDescriptorBuiltins = ExtraDescriptorBuiltins(exposedModules)
 
-    override val exposedModules: Set<ModuleDescriptor> by lazy {
-        exposedModulesProvider.exposedModules()
-    }
-
-    private val mutableExposedClasses by lazy {
-        objCExportedInterface.generatedClasses.filterNot { it.defaultType.isRecursiveInlineOrValueClassType() }.toMutableSet()
-    }
-
-    override val exposedClasses: Set<ClassDescriptor> by ::mutableExposedClasses
-
-    private val mutableTopLevel by lazy {
-        objCExportedInterface.topLevel
-            .mapValues { it.value.toMutableList() }
-            .filter { it.value.isNotEmpty() }
-            .toMutableMap()
-    }
+    override val exposedClasses: Set<ClassDescriptor>
+        get() = exposedDescriptorsCache.exposedClasses
 
     override val exposedFiles: Set<SourceFile>
-        get() = mutableTopLevel.keys.toSet()
-
-    private val mutableExposedCategoryMembers by lazy {
-        objCExportedInterface.categoryMembers
-            .mapValues { it.value.toMutableList() }
-            .filter { it.value.isNotEmpty() }
-            .toMutableMap()
-    }
+        get() = exposedDescriptorsCache.exposedTopLevelMembersByFile.keys
 
     override val exposedCategoryMembers: Set<CallableMemberDescriptor>
-        get() = mutableExposedCategoryMembers.values.flatten().toSet()
+        get() = exposedDescriptorsCache.exposedCategoryMembers
 
     override val exposedTopLevelMembers: Set<CallableMemberDescriptor>
-        get() = mutableTopLevel.values.flatten().toSet()
-
-    private val mapper: ObjCExportMapper by lazy {
-        objCExportedInterface.mapper
-    }
+        get() = exposedDescriptorsCache.exposedTopLevelMembers
 
     override val externalDependencies: Set<ResolvedDependency> by lazy {
         konanConfig.userVisibleIrModulesSupport
@@ -121,76 +88,17 @@ internal class NativeDescriptorProvider(
     override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
         callableMemberDescriptor.isExposed
 
-    override fun isExposable(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
-        callableMemberDescriptor.isExposable
-
-    override fun isExposable(classDescriptor: ClassDescriptor): Boolean =
-        classDescriptor.isExposable
-
-    override fun isBaseMethod(functionDescriptor: FunctionDescriptor): Boolean =
-        mapper.isBaseMethod(functionDescriptor)
-
-    override fun isBaseProperty(propertyDescriptor: PropertyDescriptor): Boolean =
-        mapper.isBaseProperty(propertyDescriptor)
-
-    @get:JvmName("isExposableExtension")
-    private val CallableMemberDescriptor.isExposable: Boolean
-        get() = mapper.shouldBeExposed(this)
-
-    @get:JvmName("isExposableExtension")
-    private val ClassDescriptor.isExposable: Boolean
-        get() = mapper.shouldBeExposed(this)
-
     @get:JvmName("isExposedExtension")
     private val CallableMemberDescriptor.isExposed: Boolean
         get() = this in exposedTopLevelMembers ||
             this in exposedCategoryMembers ||
-            (this.containingDeclaration in exposedClasses && this.isExposable)
-
-    fun registerExposedDescriptor(descriptor: DeclarationDescriptor) {
-        when (descriptor) {
-            is ClassDescriptor -> registerDescriptor(descriptor)
-            is CallableMemberDescriptor -> registerDescriptor(descriptor)
-            else -> error("Unsupported descriptor type: $descriptor.")
-        }
-    }
-
-    private fun registerDescriptor(descriptor: ClassDescriptor) {
-        if (!descriptor.isExposable) {
-            return
-        }
-
-        mutableExposedClasses.add(descriptor)
-    }
-
-    private fun registerDescriptor(descriptor: CallableMemberDescriptor) {
-        if (!descriptor.isExposable) {
-            return
-        }
-
-        if (descriptor.containingDeclaration is ClassDescriptor) {
-            return
-        }
-
-        if (mapper.isTopLevel(descriptor)) {
-            val descriptors = mutableTopLevel.getOrPut(descriptor.findSourceFile()) {
-                mutableListOf()
-            }
-
-            descriptors.add(descriptor)
-        } else {
-            val categoryClass = mapper.getClassIfCategory(descriptor) ?: error("$descriptor is neither top level nor category.")
-            val descriptors = mutableExposedCategoryMembers.getOrPut(categoryClass) {
-                mutableListOf()
-            }
-
-            descriptors.add(descriptor)
-        }
-    }
+            (this.containingDeclaration in exposedClasses && mapper.shouldBeExposed(this))
 
     override fun getFileModule(file: SourceFile): ModuleDescriptor =
-        mutableTopLevel[file]?.firstOrNull()?.module ?: error("File $file is not known to contain exported top level declarations.")
+        exposedDescriptorsCache.exposedTopLevelMembersByFile[file]?.firstOrNull()?.module
+            ?: error("File $file is not known to contain exported top level declarations.")
 
+    // WIP Cache?
     override fun getExposedClassMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
         classDescriptor.unsubstitutedMemberScope
             .getDescriptorsFiltered()
@@ -198,13 +106,14 @@ internal class NativeDescriptorProvider(
             .filter { it.isExposed }
 
     override fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
-        mutableExposedCategoryMembers[classDescriptor] ?: emptyList()
+        exposedDescriptorsCache.exposedCategoryMembersByClass[classDescriptor] ?: emptyList()
 
+    // WIP Cache?
     override fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ClassConstructorDescriptor> =
         classDescriptor.constructors.filter { it.isExposed }
 
     override fun getExposedStaticMembers(file: SourceFile): List<CallableMemberDescriptor> =
-        mutableTopLevel[file] ?: emptyList()
+        exposedDescriptorsCache.exposedTopLevelMembersByFile[file] ?: emptyList()
 
     override fun getReceiverClassDescriptorOrNull(descriptor: CallableMemberDescriptor): ClassDescriptor? {
         val categoryClass = mapper.getClassIfCategory(descriptor)
@@ -218,19 +127,7 @@ internal class NativeDescriptorProvider(
         }
     }
 
-    override fun getExposedCompanionObject(classDescriptor: ClassDescriptor): ClassDescriptor? =
-        classDescriptor.companionObjectDescriptor?.takeIf { it.isExposable }
-
-    override fun getExposedNestedClasses(classDescriptor: ClassDescriptor): List<ClassDescriptor> =
-        classDescriptor.unsubstitutedInnerClassesScope
-            .getDescriptorsFiltered(DescriptorKindFilter.CLASSIFIERS)
-            .filterIsInstance<ClassDescriptor>()
-            .filter { it.kind == ClassKind.CLASS || it.kind == ClassKind.OBJECT || it.kind == ClassKind.ENUM_CLASS }
-            .filter { it.isExposable }
-
-    override fun getExposedEnumEntries(classDescriptor: ClassDescriptor): List<ClassDescriptor> =
-        classDescriptor.unsubstitutedInnerClassesScope
-            .getDescriptorsFiltered(DescriptorKindFilter.CLASSIFIERS)
-            .filterIsInstance<ClassDescriptor>()
-            .filter { it.kind == ClassKind.ENUM_ENTRY }
+    override fun exposeCallableMember(callableDeclaration: CallableMemberDescriptor) {
+        exposedDescriptorsCache.exposeAnyMember(callableDeclaration)
+    }
 }

@@ -30,6 +30,7 @@ class ExtraClassExportPhase(
 ) : ClassExportPhase {
 
     private val descriptorProvider = context.descriptorProvider
+    private val mapper = context.mapper
 
     context(ClassExportPhase.Context)
     override suspend fun execute() {
@@ -71,7 +72,7 @@ class ExtraClassExportPhase(
         )
             .parallelFlatMap { it(previouslyVisitedClasses) }
             .distinct()
-            .filter { descriptorProvider.isExposable(it) }
+            .filter { mapper.shouldBeExposed(it) }
     }
 
     private suspend fun getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> =
@@ -103,7 +104,7 @@ class ExtraClassExportPhase(
             return emptyList()
         }
 
-        val topLevelSealedChildren = sealedSubclasses.filter { descriptorProvider.isExposable(it) }
+        val topLevelSealedChildren = sealedSubclasses.filter { mapper.shouldBeExposed(it) }
 
         return topLevelSealedChildren + topLevelSealedChildren.getAllExportedSealedChildren()
     }
@@ -122,8 +123,6 @@ class ExtraClassExportPhase(
         stubFunction.removeFromSwift()
 
         stubFunction.belongsToSkieRuntime = true
-
-        descriptorProvider.recalculateExports()
     }
 
     private fun generateStubFunction(exportedClasses: Collection<ClassDescriptor>, iteration: Int): FunctionDescriptor =

@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.irbuilder
 
-import co.touchlab.skie.kir.descriptor.DescriptorRegistrationScope
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -12,7 +12,7 @@ interface Namespace<D : DeclarationDescriptor> {
 
     val sourceElement: SourceElement
 
-    context(DescriptorRegistrationScope)
+    context(MutableDescriptorProvider)
     fun addTemplate(declarationTemplate: DeclarationTemplate<*>)
 
     context(SymbolTablePhase.Context)

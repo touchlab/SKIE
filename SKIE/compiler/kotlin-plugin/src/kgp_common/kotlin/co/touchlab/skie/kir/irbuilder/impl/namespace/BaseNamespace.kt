@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.irbuilder.impl.namespace
 
-import co.touchlab.skie.kir.descriptor.DescriptorRegistrationScope
+import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
 import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.phases.KotlinIrPhase
@@ -16,11 +16,11 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
 
     private val templates = mutableListOf<DeclarationTemplate<*>>()
 
-    context(DescriptorRegistrationScope)
+    context(MutableDescriptorProvider)
     override fun addTemplate(declarationTemplate: DeclarationTemplate<*>) {
         templates.add(declarationTemplate)
 
-        registerDescriptorProvider(declarationTemplate.descriptor)
+        registerDescriptorProvider(declarationTemplate)
     }
 
     context(SymbolTablePhase.Context)
@@ -30,15 +30,15 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
         }
     }
 
-    context(DescriptorRegistrationScope)
-    private fun registerDescriptorProvider(declarationDescriptor: DeclarationDescriptor) {
-        addDescriptorIntoDescriptorHierarchy(declarationDescriptor)
-        addDescriptorIntoDescriptorProvider(declarationDescriptor)
+    context(MutableDescriptorProvider)
+    private fun registerDescriptorProvider(declarationTemplate: DeclarationTemplate<*>) {
+        addDescriptorIntoDescriptorHierarchy(declarationTemplate.descriptor)
+        addDescriptorIntoDescriptorProvider(declarationTemplate)
     }
 
-    context(DescriptorRegistrationScope)
-    private fun addDescriptorIntoDescriptorProvider(declarationDescriptor: DeclarationDescriptor) {
-        registerExposedDescriptor(declarationDescriptor)
+    context(MutableDescriptorProvider)
+    private fun addDescriptorIntoDescriptorProvider(declarationTemplate: DeclarationTemplate<*>) {
+        declarationTemplate.registerExposedDescriptor()
     }
 
     context(KotlinIrPhase.Context)

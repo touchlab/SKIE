@@ -1,15 +1,8 @@
 package co.touchlab.skie.kir.descriptor
 
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+
 interface MutableDescriptorProvider : DescriptorProvider {
 
-    fun mutate(block: DescriptorRegistrationScope.() -> Unit)
-
-    fun recalculateExports()
-
-    /**
-     * Register a listener that will be called each time the provider is mutated.
-     */
-    fun onMutated(listener: () -> Unit)
-
-    fun finalize()
+    fun exposeCallableMember(callableDeclaration: CallableMemberDescriptor)
 }

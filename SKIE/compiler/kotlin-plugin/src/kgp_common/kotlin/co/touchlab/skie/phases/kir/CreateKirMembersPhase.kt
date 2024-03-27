@@ -2,7 +2,6 @@
 
 package co.touchlab.skie.phases.kir
 
-import co.touchlab.skie.compilerinject.reflection.reflectors.mapper
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.kir.element.KirCallableDeclaration.Origin
 import co.touchlab.skie.kir.element.KirClass
@@ -18,8 +17,6 @@ import co.touchlab.skie.phases.SirPhase
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
-import org.jetbrains.kotlin.backend.konan.objcexport.getDeprecation
-import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.valueParametersAssociated
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -40,7 +37,7 @@ class CreateKirMembersPhase(
 
     private val descriptorProvider = context.descriptorProvider
     private val kirProvider = context.kirProvider
-    private val mapper = context.namer.mapper
+    private val mapper = context.mapper
     private val kirTypeTranslator = context.kirTypeTranslator
 
     private val functionCache = mutableMapOf<FunctionDescriptor, KirSimpleFunction>()
@@ -203,7 +200,7 @@ class CreateKirMembersPhase(
             origin = origin,
             scope = kirClass.callableDeclarationScope,
             type = kirTypeTranslator.mapReturnType(originalDescriptor.getter!!, getterBridge.returnBridge),
-            isVar = descriptor.setter?.let { descriptorProvider.isExposable(it) } ?: false,
+            isVar = descriptor.setter?.let { mapper.shouldBeExposed(it) } ?: false,
             deprecationLevel = descriptor.kirDeprecationLevel,
             isRefinedInSwift = baseDescriptor.isRefinedInSwift,
         )
@@ -240,24 +237,24 @@ class CreateKirMembersPhase(
     }
 
     private val FunctionDescriptor.baseFunction: FunctionDescriptor
-        get() = (getAllParents(this) + this.original).first { descriptorProvider.isBaseMethod(it) }
+        get() = (getAllParents(this) + this.original).first { mapper.isBaseMethod(it) }
 
     private fun getAllParents(descriptor: FunctionDescriptor): List<FunctionDescriptor> =
         getDirectParents(descriptor).flatMap { getAllParents(it) + it.original }
 
     private fun getDirectParents(descriptor: FunctionDescriptor): List<FunctionDescriptor> =
         descriptor.overriddenDescriptors.map { it.original }
-            .filter { descriptorProvider.isExposable(it) }
+            .filter { mapper.shouldBeExposed(it) }
 
     private val PropertyDescriptor.baseProperty: PropertyDescriptor
-        get() = (getAllParents(this) + this.original).first { descriptorProvider.isBaseProperty(it) }
+        get() = (getAllParents(this) + this.original).first { mapper.isBaseProperty(it) }
 
     private fun getAllParents(descriptor: PropertyDescriptor): List<PropertyDescriptor> =
         getDirectParents(descriptor).flatMap { getAllParents(it) + it.original }
 
     private fun getDirectParents(descriptor: PropertyDescriptor): List<PropertyDescriptor> =
         descriptor.overriddenDescriptors.map { it.original }
-            .filter { descriptorProvider.isExposable(it) }
+            .filter { mapper.shouldBeExposed(it) }
 
     private val KirClass.callableDeclarationScope: KirScope
         get() = when (this.kind) {

@@ -38,7 +38,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
-            .filter { descriptorProvider.isBaseMethod(it) }
+            .filter { mapper.isBaseMethod(it) }
             .forEach {
                 generateOverloads(it)
             }
