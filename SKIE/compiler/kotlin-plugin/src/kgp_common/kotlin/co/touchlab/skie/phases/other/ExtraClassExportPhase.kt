@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.irUnit
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 
@@ -118,7 +119,9 @@ class ExtraClassExportPhase(
             return
         }
 
-        val stubFunction = generateStubFunction(classes, iteration)
+        val sortedClasses = classes.sortedBy { it.fqNameUnsafe.asString() }
+
+        val stubFunction = generateStubFunction(sortedClasses, iteration)
 
         stubFunction.removeFromSwift()
 
