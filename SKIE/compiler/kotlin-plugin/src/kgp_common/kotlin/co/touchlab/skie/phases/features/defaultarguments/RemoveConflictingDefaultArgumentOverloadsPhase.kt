@@ -3,7 +3,7 @@ package co.touchlab.skie.phases.features.defaultarguments
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.memberconflicts.Signature
-import co.touchlab.skie.phases.memberconflicts.signature
+import co.touchlab.skie.phases.memberconflicts.SirHierarchyCache
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirVisibility
@@ -20,7 +20,9 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
 
         val allNonOverloads = allBaseFunctions - allDefaultArgumentOverloads
 
-        val functionsWithOverloadsHierarchy = allNonOverloads.map { FunctionWithOverloadsHierarchy(it) }
+        val sirHierarchyCache = SirHierarchyCache()
+
+        val functionsWithOverloadsHierarchy = allNonOverloads.map { FunctionWithOverloadsHierarchy(it, sirHierarchyCache) }
 
         val uniqueSignatureSet = UniqueSignatureSet()
 
@@ -80,6 +82,7 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
 
     private class FunctionWithOverloadsHierarchy(
         representative: KirFunction<*>,
+        sirHierarchyCache: SirHierarchyCache,
     ) {
 
         private val baseNumberOfSirValueParameters: Int = representative.originalSirDeclaration.valueParameters.size
@@ -91,6 +94,7 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
                 FunctionHierarchy(
                     representative = it,
                     numberOfSkippedDefaultArguments = baseNumberOfSirValueParameters - it.valueParameters.size,
+                    sirHierarchyCache = sirHierarchyCache,
                 )
             }
     }
@@ -98,11 +102,12 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
     private class FunctionHierarchy(
         representative: SirFunction,
         val numberOfSkippedDefaultArguments: Int,
+        sirHierarchyCache: SirHierarchyCache,
     ) {
 
         private val overrideHierarchy = representative.getEntireOverrideHierarchy()
 
-        val allDeclarationsWithSignature = overrideHierarchy.map { DeclarationWithSignature(it, it.signature) }
+        val allDeclarationsWithSignature = overrideHierarchy.map { DeclarationWithSignature(it, Signature(it, sirHierarchyCache)) }
 
         init {
             check(numberOfSkippedDefaultArguments >= 0) {

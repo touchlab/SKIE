@@ -11,7 +11,6 @@ import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
-import co.touchlab.skie.sir.element.sharesDirectInheritanceHierarchy
 import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.OirDeclaredSirType
 import co.touchlab.skie.sir.type.SirDeclaredSirType
@@ -47,11 +46,14 @@ sealed class Signature {
     class Constructor(
         override val receiver: Receiver.Constructor,
         override val valueParameters: List<ValueParameter>,
+        sirHierarchyCache: SirHierarchyCache,
     ) : Function() {
 
         override val identifier: String = "init"
 
-        override val returnType: ReturnType = ReturnType.Specific(receiver.sirClass.defaultType.signatureType)
+        override val returnType: ReturnType = with(sirHierarchyCache) {
+            ReturnType.Specific(receiver.sirClass.defaultType.signatureType)
+        }
 
         override val scope: Scope = Scope.Static
 
@@ -147,9 +149,11 @@ sealed class Signature {
 
         data class Constraint(val typeParameterName: String, val bounds: Set<Type>) {
 
-            constructor(conditionalConstraint: SirConditionalConstraint) : this(
+            constructor(conditionalConstraint: SirConditionalConstraint, sirHierarchyCache: SirHierarchyCache) : this(
                 typeParameterName = conditionalConstraint.typeParameter.name,
-                bounds = conditionalConstraint.bounds.map { it.signatureType }.toSet(),
+                bounds = with(sirHierarchyCache) {
+                    conditionalConstraint.bounds.map { it.signatureType }.toSet()
+                },
             )
 
             override fun toString(): String =
@@ -197,7 +201,11 @@ sealed class Signature {
 
     sealed interface Type {
 
-        class Class(val sirClass: SirClass, val typeArguments: List<TypeArgument>) : Type {
+        class Class(
+            val sirClass: SirClass,
+            val typeArguments: List<TypeArgument>,
+            private val sirHierarchyCache: SirHierarchyCache,
+        ) : Type {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -207,10 +215,12 @@ sealed class Signature {
 
                 if (typeArguments != other.typeArguments) return false
 
-                return sirClass.sharesDirectInheritanceHierarchy(other.sirClass)
+                return with(sirHierarchyCache) {
+                    sirClass.sharesDirectInheritanceHierarchy(other.sirClass)
+                }
             }
 
-            override fun hashCode(): Int = 0
+            override fun hashCode(): Int = typeArguments.hashCode()
 
             override fun toString(): String = sirClass.fqName.toString() + ("<${typeArguments.joinToString()}>".takeIf { typeArguments.isNotEmpty() } ?: "")
         }
@@ -226,7 +236,7 @@ sealed class Signature {
                 return nested == other.nested
             }
 
-            override fun hashCode(): Int = 1
+            override fun hashCode(): Int = nested.hashCode() + 1
 
             override fun toString(): String = "$nested?"
         }
@@ -274,30 +284,36 @@ sealed class Signature {
 
     companion object {
 
-        operator fun invoke(enumCase: SirEnumCase): Signature =
-            EnumCase(
-                receiver = Receiver.Simple(enumCase.parent.asReceiverType, emptySet()),
-                identifier = enumCase.simpleName,
-            )
-
-        operator fun invoke(callableDeclaration: SirCallableDeclaration): Signature =
-            when (callableDeclaration) {
-                is SirSimpleFunction -> Signature(callableDeclaration)
-                is SirConstructor -> Signature(callableDeclaration)
-                is SirProperty -> Signature(callableDeclaration)
+        operator fun invoke(enumCase: SirEnumCase, sirHierarchyCache: SirHierarchyCache): Signature =
+            with(sirHierarchyCache) {
+                EnumCase(
+                    receiver = Receiver.Simple(enumCase.parent.asReceiverType, emptySet()),
+                    identifier = enumCase.simpleName,
+                )
             }
 
-        operator fun invoke(function: SirSimpleFunction): Signature =
-            SimpleFunction(
-                receiver = function.receiver,
-                identifier = function.identifierAfterVisibilityChange,
-                valueParameters = function.signatureValueParameters,
-                returnType = ReturnType.Specific(function.returnType.signatureType),
-                scope = function.signatureScope,
-            )
+        operator fun invoke(callableDeclaration: SirCallableDeclaration, sirHierarchyCache: SirHierarchyCache): Signature =
+            when (callableDeclaration) {
+                is SirSimpleFunction -> Signature(callableDeclaration, sirHierarchyCache)
+                is SirConstructor -> Signature(callableDeclaration, sirHierarchyCache)
+                is SirProperty -> Signature(callableDeclaration, sirHierarchyCache)
+            }
 
-        operator fun invoke(constructor: SirConstructor): Signature {
-            val receiver = constructor.receiver
+        operator fun invoke(function: SirSimpleFunction, sirHierarchyCache: SirHierarchyCache): Signature =
+            with(sirHierarchyCache) {
+                SimpleFunction(
+                    receiver = function.receiver,
+                    identifier = function.identifierAfterVisibilityChange,
+                    valueParameters = function.signatureValueParameters,
+                    returnType = ReturnType.Specific(function.returnType.signatureType),
+                    scope = function.signatureScope,
+                )
+            }
+
+        operator fun invoke(constructor: SirConstructor, sirHierarchyCache: SirHierarchyCache): Signature {
+            val receiver = with(sirHierarchyCache) {
+                constructor.receiver
+            }
 
             check(receiver is Receiver.Constructor) {
                 "Constructors should always have a constructor receiver. Was: $receiver"
@@ -306,19 +322,23 @@ sealed class Signature {
             return Constructor(
                 receiver = receiver,
                 valueParameters = constructor.signatureValueParameters,
+                sirHierarchyCache = sirHierarchyCache,
             )
         }
 
-        operator fun invoke(property: SirProperty): Signature =
-            Property(
-                receiver = property.receiver,
-                identifier = property.identifierAfterVisibilityChange,
-                scope = property.signatureScope,
-            )
+        operator fun invoke(property: SirProperty, sirHierarchyCache: SirHierarchyCache): Signature =
+            with(sirHierarchyCache) {
+                Property(
+                    receiver = property.receiver,
+                    identifier = property.identifierAfterVisibilityChange,
+                    scope = property.signatureScope,
+                )
+            }
 
         private val SirFunction.signatureValueParameters: List<ValueParameter>
             get() = valueParameters.map { it.toSignatureParameter() }
 
+        context(SirHierarchyCache)
         private val SirType.signatureType: Type
             get() {
                 val evaluatedType = this.evaluate()
@@ -332,6 +352,7 @@ sealed class Signature {
                         Type.Class(
                             sirClass = typeWithoutTypeAliases.declaration,
                             typeArguments = typeWithoutTypeAliases.typeArguments.map { Type.TypeArgument(it) },
+                            sirHierarchyCache = this@SirHierarchyCache,
                         )
                     }
                     is NullableSirType -> Type.Optional(typeWithoutTypeAliases.type.signatureType)
@@ -346,11 +367,14 @@ sealed class Signature {
                 type = this.type.evaluate().canonicalName,
             )
 
+        context(SirHierarchyCache)
         private val SirCallableDeclaration.receiver: Receiver
             get() {
                 val (sirClass, constraints) = when (val parent = parent) {
                     is SirClass -> parent.classDeclaration to emptySet()
-                    is SirExtension -> parent.classDeclaration to parent.conditionalConstraints.map { Receiver.Constraint(it) }.toSet()
+                    is SirExtension -> parent.classDeclaration to parent.conditionalConstraints.map {
+                        Receiver.Constraint(it, this@SirHierarchyCache)
+                    }.toSet()
                     else -> return Receiver.None
                 }
 
@@ -360,8 +384,9 @@ sealed class Signature {
                 }
             }
 
+        context(SirHierarchyCache)
         private val SirClass.asReceiverType: Type.Class
-            get() = Type.Class(this, emptyList())
+            get() = Type.Class(this, emptyList(), this@SirHierarchyCache)
 
         private val SirCallableDeclaration.signatureScope: Scope
             get() = when (this.scope) {
@@ -370,9 +395,3 @@ sealed class Signature {
             }
     }
 }
-
-val SirCallableDeclaration.signature: Signature
-    get() = Signature(this)
-
-val SirEnumCase.signature: Signature
-    get() = Signature(this)

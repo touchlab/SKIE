@@ -22,6 +22,8 @@ class SirClass(
     val origin: Origin = Origin.Generated,
 ) : SirTypeDeclaration, SirDeclarationNamespace, SirTypeParameterParent, SirElementWithAttributes {
 
+    // TODO If modality is added update [SirHierarchyCache.canTheoreticallyInheritFrom]
+
     override val classDeclaration: SirClass
         get() = this
 
@@ -85,7 +87,19 @@ class SirClass(
         Class,
         Enum,
         Struct,
-        Protocol,
+        Protocol;
+
+        val isClass: Boolean
+            get() = this == Class
+
+        val isEnum: Boolean
+            get() = this == Enum
+
+        val isStruct: Boolean
+            get() = this == Struct
+
+        val isProtocol: Boolean
+            get() = this == Protocol
     }
 
     companion object {
@@ -143,13 +157,6 @@ fun SirDeclaredSirType.resolveAsSirClassType(): SirDeclaredSirType? =
 
 fun SirDeclaredSirType.resolveAsSirClass(): SirClass? =
     resolveAsSirClassType()?.declaration as? SirClass
-
-fun SirClass.inheritsFrom(other: SirClass): Boolean =
-    superTypes.mapNotNull { it.resolveAsSirClass() }
-        .any { it == other || it.inheritsFrom(other) }
-
-fun SirClass.sharesDirectInheritanceHierarchy(other: SirClass): Boolean =
-    this == other || this.inheritsFrom(other) || other.inheritsFrom(this)
 
 val SirClass.oirClassOrNull: OirClass?
     get() = when (origin) {

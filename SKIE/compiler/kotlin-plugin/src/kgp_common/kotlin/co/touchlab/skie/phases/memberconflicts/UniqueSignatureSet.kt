@@ -17,6 +17,8 @@ class UniqueSignatureSet {
     // Map so that we can get the signatures for conflicts
     private val existingSignaturesMap = mutableMapOf<Signature, Signature>()
 
+    private val sirHierarchyCache = SirHierarchyCache()
+
     context(SirPhase.Context)
     fun add(callableDeclaration: SirCallableDeclaration) {
         if (callableDeclaration in alreadyAddedDeclarations) {
@@ -103,4 +105,10 @@ class UniqueSignatureSet {
             }
         }
     }
+
+    private val SirCallableDeclaration.signature: Signature
+        get() = Signature(this@signature, sirHierarchyCache)
+
+    private val SirEnumCase.signature: Signature
+        get() = Signature(this@signature, sirHierarchyCache)
 }

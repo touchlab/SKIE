@@ -1,7 +1,8 @@
 package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.kir.element.DeprecationLevel
-import co.touchlab.skie.phases.memberconflicts.signature
+import co.touchlab.skie.phases.memberconflicts.Signature
+import co.touchlab.skie.phases.memberconflicts.SirHierarchyCache
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.util.swift.escapeSwiftIdentifier
@@ -74,7 +75,8 @@ class SirProperty(
         this.setter = setter
     }
 
-    override fun toString(): String = this.signature.toString()
+    override fun toString(): String =
+        Signature(this, SirHierarchyCache()).toString()
 
     companion object {
 
