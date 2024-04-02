@@ -31,6 +31,6 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
             SkiePluginLoader.load(initContext)
         }
 
-        initContext.skiePerformanceAnalyticsProducer.log("InitSkiePhase", time)
+        initContext.skiePerformanceAnalyticsProducer.logBlocking("InitSkiePhase", time)
     }
 }

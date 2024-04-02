@@ -102,11 +102,9 @@ class SkieBuildDirectory(
 
         class ObjectFiles(parent: Directory) : PermanentDirectory(parent, "object-files") {
 
-            // WIP Replace
             val allFiles: List<File>
                 get() = directory.walkTopDown().toList()
 
-            // WIP Replace
             val allObjectFiles: List<File>
                 get() = allFiles.filter { it.extension == "o" }
 

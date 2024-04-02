@@ -4,6 +4,9 @@ import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -16,6 +19,8 @@ object SkiePerformanceAnalytics {
         private val skieConfiguration: SkieConfiguration,
     ) : AnalyticsProducer {
 
+        private val mutex = Mutex()
+
         override val name: String = "skie-performance"
 
         // Name : Time in seconds
@@ -23,20 +28,30 @@ object SkiePerformanceAnalytics {
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_SkiePerformance
 
-        override fun produce(): String {
-            val total = entries.values.sum()
+        override fun produce(): String =
+            runBlocking {
+                mutex.withLock {
+                    val total = entries.values.sum()
 
-            log("Total", total.toDuration(DurationUnit.SECONDS))
+                    logLocked("Total", total.toDuration(DurationUnit.SECONDS))
 
-            return entries.toPrettyJson()
+                    entries.toPrettyJson()
+                }
+            }
+
+        suspend fun logSkipped(name: String) {
+            mutex.withLock {
+                printLogIfEnabled("$name: Skipped")
+            }
         }
 
-        fun logSkipped(name: String) {
-            printLogIfEnabled("$name: Skipped")
-        }
+        inline fun <T> logBlocking(name: String, crossinline block: () -> T): T =
+            runBlocking {
+                log(name, block)
+            }
 
         @OptIn(ExperimentalTime::class)
-        inline fun <T> log(name: String, block: () -> T): T {
+        suspend inline fun <T> log(name: String, block: () -> T): T {
             val timedValue = measureTimedValue {
                 block()
             }
@@ -46,7 +61,19 @@ object SkiePerformanceAnalytics {
             return timedValue.value
         }
 
-        fun log(name: String, duration: Duration) {
+        fun logBlocking(name: String, duration: Duration) {
+            runBlocking {
+                log(name, duration)
+            }
+        }
+
+        suspend fun log(name: String, duration: Duration) {
+            mutex.withLock {
+                logLocked(name, duration)
+            }
+        }
+
+        private fun logLocked(name: String, duration: Duration) {
             entries[name] = duration.toDouble(DurationUnit.SECONDS)
 
             printFormattedLogIfEnabled(name, duration)

@@ -9,5 +9,7 @@ interface LinkPhase : SkiePhase<LinkPhase.Context> {
         override val context: Context
 
         fun link(additionalObjectFiles: List<Path>)
+
+        suspend fun awaitAllBackgroundJobs()
     }
 }

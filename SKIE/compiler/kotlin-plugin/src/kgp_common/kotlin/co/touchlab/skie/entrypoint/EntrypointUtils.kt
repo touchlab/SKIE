@@ -29,7 +29,7 @@ internal object EntrypointUtils {
         mainModuleDescriptor: ModuleDescriptor,
         exportedDependencies: Lazy<Collection<ModuleDescriptor>>,
     ): MainSkieContext =
-        initPhaseContext.skiePerformanceAnalyticsProducer.log("CreateMainSkieContextPhase") {
+        initPhaseContext.skiePerformanceAnalyticsProducer.logBlocking("CreateMainSkieContextPhase") {
             val mainSkieContext = MainSkieContext(
                 initPhaseContext = initPhaseContext,
                 konanConfig = konanConfig,
@@ -86,9 +86,9 @@ internal object EntrypointUtils {
         }
     }
 
-    fun runSirPhases(mainSkieContext: MainSkieContext, objCExportedInterfaceProvider: ObjCExportedInterfaceProvider) {
+    fun launchSirPhases(mainSkieContext: MainSkieContext, objCExportedInterfaceProvider: ObjCExportedInterfaceProvider) {
         with(mainSkieContext) {
-            skiePhaseScheduler.runSirPhases {
+            skiePhaseScheduler.launchSirPhases {
                 SirPhaseContext(mainSkieContext, objCExportedInterfaceProvider)
             }
         }

@@ -8,6 +8,7 @@ enum class SkieConfigurationFlag {
     Feature_DefaultArgumentsInExternalLibraries,
 
     Build_ParallelSwiftCompilation,
+    Build_ConcurrentSkieCompilation,
 
     Migration_WildcardExport,
 

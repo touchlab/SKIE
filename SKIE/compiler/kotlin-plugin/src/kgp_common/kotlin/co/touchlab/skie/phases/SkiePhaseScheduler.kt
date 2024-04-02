@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.phases
 
+import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.kir.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.phases.analytics.ClassExportAnalyticsPhase
 import co.touchlab.skie.phases.analytics.KotlinIrAnalyticsPhase
@@ -40,6 +41,7 @@ import co.touchlab.skie.phases.oir.FixOirFunctionSignaturesForApiNotesPhase
 import co.touchlab.skie.phases.other.AddAvailabilityBasedDeprecationLevelPhase
 import co.touchlab.skie.phases.other.AddAvailabilityToAsyncFunctionsPhase
 import co.touchlab.skie.phases.other.AddFoundationImportsPhase
+import co.touchlab.skie.phases.other.AwaitAllBackgroundJobsPhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.DisableWildcardExportPhase
@@ -217,6 +219,7 @@ class SkiePhaseScheduler {
 
     val linkPhases = SkiePhaseGroup<LinkPhase, LinkPhase.Context> { context ->
         addAll(
+            AwaitAllBackgroundJobsPhase,
             LinkObjectFilesPhase,
             LogSkiePerformanceAnalyticsPhase,
         )
@@ -243,8 +246,8 @@ class SkiePhaseScheduler {
     }
 
     context(SkiePhase.Context)
-    fun runSirPhases(contextFactory: () -> SirPhase.Context) {
-        sirPhases.run(contextFactory)
+    fun launchSirPhases(contextFactory: () -> SirPhase.Context) {
+        sirPhases.launch(contextFactory)
     }
 
     context(SkiePhase.Context)

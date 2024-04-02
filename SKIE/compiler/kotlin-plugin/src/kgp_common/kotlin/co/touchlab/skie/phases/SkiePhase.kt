@@ -34,5 +34,7 @@ interface SkiePhase<C : SkiePhase.Context> {
 
         val extraDescriptorBuiltins: ExtraDescriptorBuiltins
             get() = descriptorProvider.extraDescriptorBuiltins
+
+        fun launch(action: suspend () -> Unit)
     }
 }

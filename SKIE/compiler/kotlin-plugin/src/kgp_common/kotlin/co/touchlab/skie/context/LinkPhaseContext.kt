@@ -5,7 +5,7 @@ import co.touchlab.skie.phases.SkiePhase
 import java.nio.file.Path
 
 class LinkPhaseContext(
-    mainSkieContext: MainSkieContext,
+    private val mainSkieContext: MainSkieContext,
     private val link: (additionalObjectFiles: List<Path>) -> Unit,
 ) : LinkPhase.Context, SkiePhase.Context by mainSkieContext {
 
@@ -13,5 +13,9 @@ class LinkPhaseContext(
 
     override fun link(additionalObjectFiles: List<Path>) {
         link.invoke(additionalObjectFiles)
+    }
+
+    override suspend fun awaitAllBackgroundJobs() {
+        mainSkieContext.awaitAllBackgroundJobs()
     }
 }
