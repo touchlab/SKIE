@@ -7,6 +7,6 @@ object LogSkiePerformanceAnalyticsPhase : LinkPhase {
 
     context(LinkPhase.Context)
     override suspend fun execute() {
-        analyticsCollector.collectAsync(skiePerformanceAnalyticsProducer)
+        analyticsCollector.collectSynchronously(skiePerformanceAnalyticsProducer)
     }
 }

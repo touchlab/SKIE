@@ -4,12 +4,11 @@ import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -22,7 +21,7 @@ object SkiePerformanceAnalytics {
         private val skieConfiguration: SkieConfiguration,
     ) : AnalyticsProducer {
 
-        val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        val dispatcher: CoroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
         override val name: String = "skie-performance"
 
