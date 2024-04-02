@@ -1,12 +1,19 @@
 package co.touchlab.skie.util.parallel
 
+import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.phases.SkiePhase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
+context(SkiePhase.Context)
 suspend fun <T, R> Collection<T>.parallelMap(optimalChunkSize: Int = 100, transform: suspend (T) -> R): List<R> {
+    if (SkieConfigurationFlag.Build_ParallelSkieCompilation !in skieConfiguration.enabledConfigurationFlags) {
+        return map { transform(it) }
+    }
+
     val input = this@parallelMap
 
     if (input.size <= 1) {

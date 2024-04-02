@@ -54,14 +54,16 @@ class ExtraClassExportPhase(
         } while (newlyDiscoveredClasses.isNotEmpty())
     }
 
+    context(ClassExportPhase.Context)
     private suspend fun getClassesForExport(previouslyVisitedClasses: Set<ClassDescriptor>): Set<ClassDescriptor> =
         listOf(
             ::getClassesForExportFromFlowArguments,
             ::getClassesForExportFromSealedHierarchies,
         )
-            .parallelFlatMap { it(previouslyVisitedClasses) }
+            .parallelFlatMap { it(this@Context, previouslyVisitedClasses) }
             .toSet()
 
+    context(ClassExportPhase.Context)
     private suspend fun getClassesForExportFromFlowArguments(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         if (SkieConfigurationFlag.Feature_CoroutinesInterop !in context.skieConfiguration.enabledConfigurationFlags) {
             return emptyList()
@@ -71,11 +73,12 @@ class ExtraClassExportPhase(
             ::getFlowArgumentsFromTopLevelMembers,
             ::getFlowArgumentsFromNewClasses,
         )
-            .parallelFlatMap { it(previouslyVisitedClasses) }
+            .parallelFlatMap { it(this@Context, previouslyVisitedClasses) }
             .distinct()
             .filter { mapper.shouldBeExposed(it) }
     }
 
+    context(ClassExportPhase.Context)
     private suspend fun getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> =
         if (previouslyVisitedClasses.isEmpty()) {
             descriptorProvider.exposedTopLevelMembers.parallelFlatMap { it.getAllFlowArgumentClasses() }
@@ -84,6 +87,7 @@ class ExtraClassExportPhase(
             emptyList()
         }
 
+    context(ClassExportPhase.Context)
     private suspend fun getFlowArgumentsFromNewClasses(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
 
@@ -94,6 +98,7 @@ class ExtraClassExportPhase(
         declaredTypeParameters.flatMap { it.getAllFlowArgumentClasses() } +
             descriptorProvider.getAllExposedMembers(this).flatMap { it.getAllFlowArgumentClasses() }
 
+    context(ClassExportPhase.Context)
     private suspend fun getClassesForExportFromSealedHierarchies(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
 
