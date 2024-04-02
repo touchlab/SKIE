@@ -29,6 +29,7 @@ class CompileSwiftPhase(
     private val moduleDirectory = skieBuildDirectory.swiftCompiler.module
 
     private val isDebug = konanConfig.debug
+    private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in skieConfiguration.enabledConfigurationFlags
 
     context(SirPhase.Context)
     override suspend fun execute() {
@@ -47,6 +48,8 @@ class CompileSwiftPhase(
         deleteOldObjectFiles(sourceFiles)
 
         copySwiftModuleFiles()
+
+        copySwiftLibraryEvolutionFiles()
 
         addSwiftSubmoduleToModuleMap()
 
@@ -97,15 +100,17 @@ class CompileSwiftPhase(
             +cacheableKotlinFramework.parentDir.absolutePath
             +"-F"
             +skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.directory.absolutePath
-            +"-enable-library-evolution"
             +"-verify-emitted-module-interface"
             +"-emit-module"
             +"-emit-module-path"
             +swiftFrameworkHeader.swiftModule
-            +"-emit-module-interface-path"
-            +swiftFrameworkHeader.swiftInterface
-            +"-emit-private-module-interface-path"
-            +swiftFrameworkHeader.privateSwiftInterface
+            if (isLibraryEvolutionEnabled) {
+                +"-enable-library-evolution"
+                +"-emit-module-interface-path"
+                +swiftFrameworkHeader.swiftInterface
+                +"-emit-private-module-interface-path"
+                +swiftFrameworkHeader.privateSwiftInterface
+            }
             +"-emit-objc-header"
             +"-emit-objc-header-path"
             +swiftFrameworkHeader.swiftHeader
@@ -168,8 +173,6 @@ class CompileSwiftPhase(
     private fun copySwiftModuleFiles() {
         val copyFiles = mapOf(
             swiftFrameworkHeader.swiftModule to framework.swiftModule(targetTriple),
-            swiftFrameworkHeader.swiftInterface to framework.swiftInterface(targetTriple),
-            swiftFrameworkHeader.privateSwiftInterface to framework.privateSwiftInterface(targetTriple),
             swiftFrameworkHeader.swiftDoc to framework.swiftDoc(targetTriple),
             swiftFrameworkHeader.abiJson to framework.abiJson(targetTriple),
             swiftFrameworkHeader.swiftSourceInfo to framework.swiftSourceInfo(targetTriple),
@@ -178,6 +181,16 @@ class CompileSwiftPhase(
 
         copyFiles.forEach { (source, target) ->
             source.copyTo(target, overwrite = true)
+        }
+    }
+
+    private fun copySwiftLibraryEvolutionFiles() {
+        if (isLibraryEvolutionEnabled) {
+            swiftFrameworkHeader.swiftInterface.copyTo(framework.swiftInterface(targetTriple), overwrite = true)
+            swiftFrameworkHeader.privateSwiftInterface.copyTo(framework.privateSwiftInterface(targetTriple), overwrite = true)
+        } else {
+            framework.swiftInterface(targetTriple).delete()
+            framework.privateSwiftInterface(targetTriple).delete()
         }
     }
 
