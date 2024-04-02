@@ -260,7 +260,6 @@ internal class ExposedDescriptorsCache(
     private fun exposeThrownClasses(method: FunctionDescriptor) {
         if (method.isSuspend && method.overriddenDescriptors.isEmpty()) {
             exposeClass(KonanFqNames.cancellationException, method)
-            return
         }
 
         (method.annotations.findAnnotation(KonanFqNames.throws)?.firstArgument() as? ArrayValue?)
