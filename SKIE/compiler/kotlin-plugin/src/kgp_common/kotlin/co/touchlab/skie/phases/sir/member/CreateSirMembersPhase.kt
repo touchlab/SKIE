@@ -121,8 +121,7 @@ class CreateSirMembersPhase(
     private fun KirCallableDeclaration<*>.getSirParent(): SirDeclarationNamespace =
         when (val parent = oirCallableDeclaration.parent) {
             is OirClass -> parent.originalSirClass
-            // WIP parent.sirExtension should be used instead
-            is OirExtension -> sirProvider.getExtension(parent.classDeclaration.originalSirClass, parent.classDeclaration.originalSirClass.topLevelParent)
+            is OirExtension -> parent.sirExtension
         }
 
     private fun SirFunction.createValueParameters(

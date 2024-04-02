@@ -5,6 +5,7 @@ import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.element.KirModule
 import co.touchlab.skie.oir.builtin.OirBuiltins
 import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.OirExtension
 import co.touchlab.skie.oir.element.OirFile
 import co.touchlab.skie.oir.element.OirModule
 import co.touchlab.skie.phases.oir.CreateOirTypesPhase
@@ -27,6 +28,9 @@ class OirProvider(
 
     lateinit var allKotlinClassesAndProtocols: List<OirClass>
         private set
+
+    val allKotlinExtensions: List<OirExtension>
+        get() = allFiles.flatMap { it.declarations }.filterIsInstance<OirExtension>()
 
     val allExternalClasses: List<OirClass>
         get() = allExternalClassesAndProtocols.filter { it.kind == OirClass.Kind.Class }

@@ -6,7 +6,6 @@ import co.touchlab.skie.util.directory.SkieBuildDirectory
 import java.io.File
 import kotlin.io.path.listDirectoryEntries
 
-// WIP Extra phase for generating debug files, this should convert and write to cache directory only files that already do not have a object file associated from cache
 object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
 
     context(SirPhase.Context)

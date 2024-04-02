@@ -2,7 +2,6 @@
 
 package co.touchlab.skie.phases
 
-import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.kir.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.phases.analytics.ClassExportAnalyticsPhase
 import co.touchlab.skie.phases.analytics.KotlinIrAnalyticsPhase
@@ -61,6 +60,7 @@ import co.touchlab.skie.phases.sir.member.InitializeSirMembersCachePhase
 import co.touchlab.skie.phases.sir.member.InitializeSirOverridesPhase
 import co.touchlab.skie.phases.sir.member.StripKonanCallableDeclarationManglingPhase
 import co.touchlab.skie.phases.sir.type.CreateExternalSirTypesPhase
+import co.touchlab.skie.phases.sir.type.CreateKotlinSirExtensionsPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateStableNameTypeAliasesPhase
 import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
@@ -131,6 +131,7 @@ class SkiePhaseScheduler {
             ConfigureCInteropFrameworkNameForPlatformTypesPhase,
 
             CreateKotlinSirTypesPhase(context),
+            CreateKotlinSirExtensionsPhase,
             CreateExternalSirTypesPhase,
             InitializeSirTypesSuperTypesForOirPhase,
             ConfigureExternalOirTypesBridgingPhase(context),

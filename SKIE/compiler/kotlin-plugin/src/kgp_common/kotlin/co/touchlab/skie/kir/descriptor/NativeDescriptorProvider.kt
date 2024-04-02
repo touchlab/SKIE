@@ -98,7 +98,6 @@ internal class NativeDescriptorProvider(
         exposedDescriptorsCache.exposedTopLevelMembersByFile[file]?.firstOrNull()?.module
             ?: error("File $file is not known to contain exported top level declarations.")
 
-    // WIP Cache?
     override fun getExposedClassMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
         classDescriptor.unsubstitutedMemberScope
             .getDescriptorsFiltered()
@@ -108,7 +107,6 @@ internal class NativeDescriptorProvider(
     override fun getExposedCategoryMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
         exposedDescriptorsCache.exposedCategoryMembersByClass[classDescriptor] ?: emptyList()
 
-    // WIP Cache?
     override fun getExposedConstructors(classDescriptor: ClassDescriptor): List<ClassConstructorDescriptor> =
         classDescriptor.constructors.filter { it.isExposed }
 
