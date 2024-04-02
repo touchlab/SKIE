@@ -43,7 +43,9 @@ class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
 
     context(SkiePhase.Context)
     private suspend fun <RC : C> prepareAndExecute(contextClass: KClass<RC>, contextFactory: () -> RC): RC {
-        val (context, phases) = skiePerformanceAnalyticsProducer.log("Initialize${contextClass.nameForLogger.removeSuffix("Phase.Context")}Phases") {
+        val phasesName = contextClass.nameForLogger.removeSuffix("Phase.Context") + "Phases"
+
+        val (context, phases) = skiePerformanceAnalyticsProducer.log("Initialize$phasesName") {
             val context = contextFactory()
 
             val phases = buildPhases(context)

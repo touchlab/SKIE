@@ -4,9 +4,12 @@ import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.analytics.util.toPrettyJson
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -19,7 +22,7 @@ object SkiePerformanceAnalytics {
         private val skieConfiguration: SkieConfiguration,
     ) : AnalyticsProducer {
 
-        private val mutex = Mutex()
+        val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
         override val name: String = "skie-performance"
 
@@ -29,18 +32,16 @@ object SkiePerformanceAnalytics {
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_SkiePerformance
 
         override fun produce(): String =
-            runBlocking {
-                mutex.withLock {
-                    val total = entries.values.sum()
+            runBlocking(dispatcher) {
+                val total = entries.values.sum()
 
-                    logLocked("Total", total.toDuration(DurationUnit.SECONDS))
+                logLocked("Total", total.toDuration(DurationUnit.SECONDS))
 
-                    entries.toPrettyJson()
-                }
+                entries.toPrettyJson()
             }
 
         suspend fun logSkipped(name: String) {
-            mutex.withLock {
+            withContext(dispatcher) {
                 printLogIfEnabled("$name: Skipped")
             }
         }
@@ -68,7 +69,7 @@ object SkiePerformanceAnalytics {
         }
 
         suspend fun log(name: String, duration: Duration) {
-            mutex.withLock {
+            withContext(dispatcher) {
                 logLocked(name, duration)
             }
         }
