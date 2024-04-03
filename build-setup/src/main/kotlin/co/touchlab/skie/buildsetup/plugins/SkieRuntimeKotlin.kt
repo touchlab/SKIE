@@ -30,10 +30,16 @@ abstract class SkieRuntimeKotlin : Plugin<Project> {
             }
 
             configureSourceSet { sourceSet ->
+                val kotlinVersion = sourceSet.kotlinToolingVersion.value
+
                 configureRelatedConfigurations {
                     attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(sourceSet.kotlinToolingVersion.value))
+                        attribute(KotlinCompilerVersion.attribute, objects.named(kotlinVersion))
                     }
+                }
+
+                dependencies {
+                    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
                 }
             }
         }
