@@ -9,6 +9,7 @@ import co.touchlab.skie.util.cache.writeTextIfDifferent
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import java.nio.file.Path
 import kotlin.io.path.absolute
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
 
 class SirFileProvider(
@@ -17,11 +18,11 @@ class SirFileProvider(
     private val skieBuildDirectory: SkieBuildDirectory,
 ) {
 
-    private val irFileByPathCache = mutableMapOf<Path, SirIrFile>()
+    private val irFileByPathCache = mutableMapOf<String, SirIrFile>()
 
-    private val writtenSourceFileByPathCache = mutableMapOf<Path, SirSourceFile>()
+    private val writtenSourceFileByPathCache = mutableMapOf<String, SirSourceFile>()
 
-    private val generatedSourceFileByPathCache = mutableMapOf<Path, SirSourceFile>()
+    private val generatedSourceFileByPathCache = mutableMapOf<String, SirSourceFile>()
 
     private val skieNamespace: String
         get() = kirProvider.skieModule.name
@@ -29,21 +30,21 @@ class SirFileProvider(
     fun getWrittenSourceFileFromSkieNamespace(name: String): SirSourceFile {
         val path = relativePath(skieNamespace, name)
 
-        check(path !in generatedSourceFileByPathCache) {
+        check(path.asCacheKey !in generatedSourceFileByPathCache) {
             "Generated source file for $path already exists. Combining written and generated source files is not supported."
         }
 
-        return writtenSourceFileByPathCache.getOrPut(path) {
+        return writtenSourceFileByPathCache.getOrPut(path.asCacheKey) {
             SirSourceFile(skieModule, path)
         }
     }
 
     fun getGeneratedSourceFile(irFile: SirIrFile): SirSourceFile {
-        check(irFile.relativePath !in writtenSourceFileByPathCache) {
+        check(irFile.relativePath.asCacheKey !in writtenSourceFileByPathCache) {
             "Written source file for ${irFile.relativePath} already exists. Combining written and generated source files is not supported."
         }
 
-        return generatedSourceFileByPathCache.getOrPut(irFile.relativePath) {
+        return generatedSourceFileByPathCache.getOrPut(irFile.relativePath.asCacheKey) {
             SirSourceFile(irFile.module, irFile.relativePath, irFile)
         }
     }
@@ -52,7 +53,7 @@ class SirFileProvider(
         getIrFile(skieNamespace, name)
 
     fun getIrFile(namespace: String, name: String): SirIrFile =
-        irFileByPathCache.getOrPut(relativePath(namespace, name)) {
+        irFileByPathCache.getOrPut(relativePath(namespace, name).asCacheKey) {
             SirIrFile(namespace, name, skieModule)
         }
 
@@ -83,6 +84,9 @@ class SirFileProvider(
 
         return SirCompilableFile(skieModule, absolutePath, null)
     }
+
+    private val Path.asCacheKey: String
+        get() = this.normalize().absolutePathString().lowercase()
 
     companion object {
 
