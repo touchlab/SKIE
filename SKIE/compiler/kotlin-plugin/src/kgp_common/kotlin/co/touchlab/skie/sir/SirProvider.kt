@@ -4,6 +4,7 @@ import co.touchlab.skie.configuration.ClassInterop
 import co.touchlab.skie.configuration.ConfigurationProvider
 import co.touchlab.skie.configuration.SkieConfiguration
 import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.cinteropClassDescriptorOrNull
 import co.touchlab.skie.phases.SirPhase
@@ -26,6 +27,7 @@ import co.touchlab.skie.util.directory.SkieBuildDirectory
 class SirProvider(
     framework: FrameworkLayout,
     kirProvider: KirProvider,
+    private val oirProvider: OirProvider,
     private val configurationProvider: ConfigurationProvider,
     skieConfiguration: SkieConfiguration,
     skieBuildDirectory: SkieBuildDirectory,
@@ -59,6 +61,12 @@ class SirProvider(
 
     val allLocalEnums: List<SirClass>
         get() = allLocalClasses.filter { it.kind == SirClass.Kind.Enum }
+
+    val allUsedExternalModules: List<SirModule.External>
+        get() = oirProvider.allExternalClassesAndProtocols
+            .map { it.originalSirClass.module }
+            .filterIsInstance<SirModule.External>()
+            .distinct()
 
     val allExternalTypeDeclarations: List<SirTypeDeclaration>
         get() = externalModuleCache.values

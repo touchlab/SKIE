@@ -25,6 +25,7 @@ import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isRemoved
 import co.touchlab.skie.sir.type.SirType
+import co.touchlab.skie.util.GeneratedBySkieComment
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.AttributedSpec
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -67,10 +68,16 @@ object ConvertSirIrFilesToSourceFilesPhase : SirPhase {
 
     private fun SirIrFile.generateCodeUsing(fileBuilder: FileSpec.Builder) {
         fileBuilder.apply {
+            generateGeneratedComment()
+
             generateImports()
 
             generateDeclarations()
         }
+    }
+
+    private fun FileSpec.Builder.generateGeneratedComment() {
+        addComment(GeneratedBySkieComment)
     }
 
     context(SirIrFile)

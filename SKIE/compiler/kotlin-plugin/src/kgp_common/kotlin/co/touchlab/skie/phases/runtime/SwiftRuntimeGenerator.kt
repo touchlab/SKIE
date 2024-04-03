@@ -2,6 +2,7 @@ package co.touchlab.skie.phases.runtime
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.util.GeneratedBySkieComment
 
 object SwiftRuntimeGenerator : SirPhase {
 
@@ -12,7 +13,9 @@ object SwiftRuntimeGenerator : SirPhase {
     context(SirPhase.Context)
     override suspend fun execute() {
         getSwiftRuntimeFiles().forEach {
-            sirFileProvider.getWrittenSourceFileFromSkieNamespace(it.swiftFileName).content = it.readText()
+            val baseFileContent = it.readText()
+
+            sirFileProvider.getWrittenSourceFileFromSkieNamespace(it.swiftFileName).content = "// $GeneratedBySkieComment\n\n$baseFileContent"
         }
     }
 

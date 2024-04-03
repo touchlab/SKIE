@@ -43,7 +43,7 @@ import co.touchlab.skie.phases.other.AddFoundationImportsPhase
 import co.touchlab.skie.phases.other.AwaitAllBackgroundJobsPhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
-import co.touchlab.skie.phases.other.DisableWildcardExportPhase
+import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverriddenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
@@ -206,10 +206,11 @@ class SkiePhaseScheduler {
             ConvertSirIrFilesToSourceFilesPhase,
             ConvertSirSourceFilesToCompilableFilesPhase,
             GenerateFakeObjCDependenciesPhase,
-            DisableWildcardExportPhase,
+            GenerateModulemapFilePhase.ForSwiftCompilation,
             SwiftKotlinFrameworkCacheSetupPhase,
             CompileSwiftPhase(context),
             TemporarilyRenameTypesConflictingWithExternalModulesPhase.RevertPhase,
+            GenerateModulemapFilePhase.ForFramework,
             ApiNotesGenerationPhase.ForFramework,
 
             // Debug(after)

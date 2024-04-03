@@ -50,8 +50,6 @@ class CompileSwiftPhase(
 
         copySwiftLibraryEvolutionFiles()
 
-        addSwiftSubmoduleToModuleMap()
-
         addSwiftSpecificLinkerArgs()
     }
 
@@ -191,19 +189,6 @@ class CompileSwiftPhase(
             framework.swiftInterface(targetTriple).delete()
             framework.privateSwiftInterface(targetTriple).delete()
         }
-    }
-
-    private fun addSwiftSubmoduleToModuleMap() {
-        framework.modulemapFile.appendText(
-            """
-
-
-            module ${framework.moduleName}.Swift {
-                header "${framework.swiftHeader.name}"
-                requires objc
-            }
-            """.trimIndent(),
-        )
     }
 
     private fun addSwiftSpecificLinkerArgs() {
