@@ -50,19 +50,19 @@ class SirClass(
     val enumCases: MutableList<SirEnumCase> = mutableListOf()
 
     /**
-     * Name used to generate SKIE code.
+     * Actual fully qualified name (including module) of the declaration. Used by SKIE to generate code if possible.
      */
     override val fqName: SirFqName
         get() = super.fqName
 
     /**
-     * Name that is expected to be used by external Swift code.
+     * Name that is expected to be used by external Swift code. Used primarily for comments, logs, etc.
      */
     override val publicName: SirFqName
         get() = publicTypeAlias?.publicName ?: fqName
 
     /**
-     * Name used by SKIE generated code to avoid many problems with ambiguous identifiers and bugs in Swift compiler.
+     * Name used by SKIE generated code in cases it cannot use fqName.
      */
     override val internalName: SirFqName
         get() = internalTypeAlias?.internalName ?: publicName

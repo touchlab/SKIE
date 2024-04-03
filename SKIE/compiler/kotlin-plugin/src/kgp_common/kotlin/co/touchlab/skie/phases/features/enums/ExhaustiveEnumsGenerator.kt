@@ -139,7 +139,8 @@ private fun SirClass.addCompanionObjectPropertyIfNeeded(enum: KirClass) {
         scope = SirScope.Static,
     ).apply {
         SirGetter().bodyBuilder.add {
-            addStatement("return _ObjectiveCType.companion")
+            // TODO Refactor and use SirProperty reference once Sir contains the shared property for companion objects
+            addStatement("return ${companion.primarySirClass.defaultType.evaluate().swiftPoetTypeName.name}.shared")
         }
     }
 }

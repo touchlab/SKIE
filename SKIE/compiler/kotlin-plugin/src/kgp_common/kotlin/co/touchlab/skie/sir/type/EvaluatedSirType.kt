@@ -6,8 +6,10 @@ sealed interface EvaluatedSirType {
 
     val type: SirType
 
+    // Always points to FqName. Used for signature matching.
     val canonicalName: String
 
+    // Uses either FqName or internal name depending on context. Used for generating code.
     val swiftPoetTypeName: TypeName
 
     class Eager(
