@@ -41,6 +41,7 @@ import co.touchlab.skie.phases.other.AddAvailabilityBasedDeprecationLevelPhase
 import co.touchlab.skie.phases.other.AddAvailabilityToAsyncFunctionsPhase
 import co.touchlab.skie.phases.other.AddFoundationImportsPhase
 import co.touchlab.skie.phases.other.AwaitAllBackgroundJobsPhase
+import co.touchlab.skie.phases.other.VerifyModuleNamePhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
@@ -80,6 +81,7 @@ class SkiePhaseScheduler {
 
     val classExportPhases = SkiePhaseGroup<ClassExportPhase, ClassExportPhase.Context> { context ->
         addAll(
+            VerifyModuleNamePhase,
             FixLibrariesShortNamePhase,
             ClassExportAnalyticsPhase,
             ExtraClassExportPhase(context),
