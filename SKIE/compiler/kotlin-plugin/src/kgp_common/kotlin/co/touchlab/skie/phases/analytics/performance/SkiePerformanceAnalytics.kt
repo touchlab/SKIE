@@ -28,6 +28,8 @@ object SkiePerformanceAnalytics {
         // Name : Time in seconds
         private val entries = mutableMapOf<String, Double>()
 
+        private var collected = false
+
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_SkiePerformance
 
         override fun produce(): String =
@@ -35,6 +37,8 @@ object SkiePerformanceAnalytics {
                 val total = entries.values.sum()
 
                 logLocked("Total", total.toDuration(DurationUnit.SECONDS))
+
+                collected = true
 
                 entries.toPrettyJson()
             }
@@ -74,6 +78,10 @@ object SkiePerformanceAnalytics {
         }
 
         private fun logLocked(name: String, duration: Duration) {
+            if (collected) {
+                return
+            }
+
             entries[name] = duration.toDouble(DurationUnit.SECONDS)
 
             printFormattedLogIfEnabled(name, duration)
@@ -88,6 +96,10 @@ object SkiePerformanceAnalytics {
         }
 
         private fun printLogIfEnabled(content: String) {
+            if (collected) {
+                return
+            }
+
             if (SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs in skieConfiguration.enabledConfigurationFlags) {
                 println(content)
             }
