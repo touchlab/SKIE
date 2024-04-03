@@ -16,6 +16,9 @@ class CreateStableNameTypeAliasesPhase(
     private val shouldGenerateFileForEachExportedClass: Boolean =
         SkieConfigurationFlag.Debug_GenerateFileForEachExportedClass in context.skieConfiguration.enabledConfigurationFlags
 
+    private val useStableTypeAliases: Boolean =
+        SkieConfigurationFlag.Debug_UseStableTypeAliases in context.skieConfiguration.enabledConfigurationFlags
+
     context(SirPhase.Context)
     override suspend fun execute() {
         kirProvider.allClasses
@@ -27,7 +30,7 @@ class CreateStableNameTypeAliasesPhase(
 
     context(SirPhase.Context)
     private fun createTypeAlias(kirClass: KirClass) {
-        SirTypeAlias(
+        val typeAlias = SirTypeAlias(
             baseName = "Kotlin",
             parent = if (shouldGenerateFileForEachExportedClass) {
                 classNamespaceProvider.getNamespace(kirClass)
@@ -37,6 +40,10 @@ class CreateStableNameTypeAliasesPhase(
             visibility = SirVisibility.PublicButReplaced,
         ) {
             kirClass.originalSirClass.defaultType.withFqName()
+        }
+
+        if (useStableTypeAliases && kirClass.originalSirClass.internalTypeAlias == null) {
+            kirClass.originalSirClass.internalTypeAlias = typeAlias
         }
     }
 }

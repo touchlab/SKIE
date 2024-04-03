@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.enums
 
 import co.touchlab.skie.configuration.EnumInterop
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
@@ -199,11 +200,15 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
         return
     }
 
-    SirTypeAlias(
+    val typeAlias = SirTypeAlias(
         baseName = "Enum",
         parent = classNamespaceProvider.getNamespace(kirClass),
         visibility = SirVisibility.PublicButReplaced,
     ) {
         bridgedEnum.defaultType.withFqName()
+    }
+
+    if (SkieConfigurationFlag.Debug_UseStableTypeAliases in context.skieConfiguration.enabledConfigurationFlags) {
+        bridgedEnum.internalTypeAlias = typeAlias
     }
 }

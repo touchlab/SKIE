@@ -15,6 +15,7 @@ abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory
     val crashOnSoftErrors: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val loadAllPlatformApiNotes: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val generateFileForEachExportedClass: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val useStableTypeAliases: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(
@@ -25,5 +26,6 @@ abstract class SkieDebugConfiguration @Inject constructor(objects: ObjectFactory
             SkieConfigurationFlag.Debug_CrashOnSoftErrors takeIf crashOnSoftErrors,
             SkieConfigurationFlag.Debug_LoadAllPlatformApiNotes takeIf loadAllPlatformApiNotes,
             SkieConfigurationFlag.Debug_GenerateFileForEachExportedClass takeIf generateFileForEachExportedClass,
+            SkieConfigurationFlag.Debug_UseStableTypeAliases takeIf useStableTypeAliases,
         )
 }
