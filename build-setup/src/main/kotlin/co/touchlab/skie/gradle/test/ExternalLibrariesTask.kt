@@ -275,7 +275,7 @@ abstract class ExternalLibrariesTask : DefaultTask() {
         projectDir.resolve("settings.gradle.kts").writeText("")
         projectDir.resolve("gradle.properties").writeText(
             """
-            org.gradle.jvmargs=-Xmx8g -XX:+UseParallelGC
+            org.gradle.jvmargs=-Xmx12g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC
             org.gradle.parallel=true
             kotlin.native.cacheKind=none
         """.trimIndent(),
