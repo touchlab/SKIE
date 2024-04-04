@@ -30,6 +30,8 @@ class CompileSwiftPhase(
 
     private val isDebug = konanConfig.debug
     private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in skieConfiguration.enabledConfigurationFlags
+    private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in skieConfiguration.enabledConfigurationFlags
+    private val isConcurrentSkieCompilationEnabled = SkieConfigurationFlag.Build_ConcurrentSkieCompilation in skieConfiguration.enabledConfigurationFlags
 
     context(SirPhase.Context)
     override suspend fun execute() {
@@ -206,9 +208,17 @@ class CompileSwiftPhase(
     }
 
     private val parallelizationArgument: String
-        get() = if (SkieConfigurationFlag.Build_ParallelSwiftCompilation in skieConfiguration.enabledConfigurationFlags) {
-            "-j${Runtime.getRuntime().availableProcessors()}"
-        } else {
-            "-j1"
+        get() {
+            val numberOfAvailableProcessors = if (isParallelSwiftCompilationEnabled) {
+                if (isConcurrentSkieCompilationEnabled) {
+                    (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
+                } else {
+                    Runtime.getRuntime().availableProcessors()
+                }
+            } else {
+                1
+            }
+
+            return "-j$numberOfAvailableProcessors"
         }
 }
