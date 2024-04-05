@@ -101,12 +101,16 @@ abstract class PrepareTestClasspathsTask : DefaultTask() {
                         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                             version {
                                 ${
-                                    if (kotlinVersion.get() == "1.8.0") {
-                                        """strictly("[1.6.4,)")"""
-                                    } else {
-                                        """strictly("[1.7.0,)")"""
-                                    }
-                                }
+                // TODO The 1.8.0 upper bound is needed due to Coroutines 1.8.0 being built with 1.9.21 which is not backward compatible with 1.9.0 and older
+                // Replace with max(lower_bound, min(naturaly_resolved_version, upper_bound)) once we have lock file with transitive dependencies
+                if (kotlinVersion.get() == "1.8.0") {
+                    """strictly("[1.6.4, 1.8.0)")"""
+                } else if (kotlinVersion.get() == "1.8.20" || kotlinVersion.get() == "1.9.0") {
+                    """strictly("[1.7.0, 1.8.0)")"""
+                } else {
+                    """strictly("[1.7.0,)")"""
+                }
+            }
                             }
                         }
                     }
