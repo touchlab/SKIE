@@ -41,7 +41,7 @@ permissions:
 jobs:
   acceptance-tests:
     name: Acceptance Tests
-    runs-on: self-hosted
+    runs-on: macos-14
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -61,8 +61,7 @@ jobs:
 
   type-mapping-tests:
     name: Type Mapping Tests
-    needs: [acceptance-tests]
-    runs-on: self-hosted
+    runs-on: macos-14
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -84,7 +83,6 @@ jobs:
 
   external-libraries-tests:
     name: External Libraries Tests
-    needs: [type-mapping-tests]
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
