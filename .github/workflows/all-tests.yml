@@ -14,7 +14,7 @@ permissions:
 jobs:
   acceptance-tests:
     name: Acceptance Tests
-    runs-on: self-hosted
+    runs-on: macos-14
     strategy:
       fail-fast: false
       matrix:
@@ -47,7 +47,7 @@ jobs:
 
   type-mapping-tests:
     name: Type Mapping Tests
-    runs-on: self-hosted
+    runs-on: macos-14
     strategy:
       fail-fast: false
       matrix:
