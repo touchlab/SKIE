@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 
 context(SkiePhase.Context)
 suspend fun <T, R> Collection<T>.parallelMap(optimalChunkSize: Int = 100, transform: suspend (T) -> R): List<R> {
-    if (SkieConfigurationFlag.Build_ParallelSkieCompilation !in skieConfiguration.enabledConfigurationFlags) {
+    if (SkieConfigurationFlag.Build_ParallelSkieCompilation.isDisabled) {
         return map { transform(it) }
     }
 

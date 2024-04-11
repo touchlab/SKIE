@@ -7,13 +7,13 @@ object EnumInterop {
     /**
      * If true, the interop code is generated for the given enum.
      */
-    object Enabled : ConfigurationKey.Boolean {
+    object Enabled : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = true
 
         override val skieRuntimeValue: Boolean = true
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<EnumInterop.Enabled>() -> true
                 configurationTarget.hasAnnotation<EnumInterop.Disabled>() -> false
@@ -51,13 +51,13 @@ object EnumInterop {
      *   case none
      * ```
      */
-    object LegacyCaseName : ConfigurationKey.Boolean {
+    object LegacyCaseName : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = false
 
         override val skieRuntimeValue: Boolean = false
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Enabled>() -> true
                 configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Disabled>() -> false

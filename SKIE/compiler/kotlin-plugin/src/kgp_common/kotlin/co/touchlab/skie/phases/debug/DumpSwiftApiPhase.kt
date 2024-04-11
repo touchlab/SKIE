@@ -12,15 +12,13 @@ sealed class DumpSwiftApiPhase : SirPhase {
     object BeforeApiNotes : DumpSwiftApiPhase() {
 
         context(SirPhase.Context)
-        override fun isActive(): Boolean =
-            SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes in skieConfiguration.enabledConfigurationFlags
+        override fun isActive(): Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes.isEnabled
     }
 
     object AfterApiNotes : DumpSwiftApiPhase() {
 
         context(SirPhase.Context)
-        override fun isActive(): Boolean =
-            SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes in skieConfiguration.enabledConfigurationFlags
+        override fun isActive(): Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes.isEnabled
     }
 
     context(SirPhase.Context)

@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
+import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.getNamespace
@@ -46,12 +47,14 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     protected abstract fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor>
 
+    context(SkiePhase.Context)
     private fun generateOverloads(function: SimpleFunctionDescriptor) {
         function.forEachDefaultArgumentOverload { overloadParameters ->
             generateOverload(function, overloadParameters)
         }
     }
 
+    context(SkiePhase.Context)
     private fun generateOverload(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -63,6 +66,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         removeManglingOfOverload(newFunction, function)
     }
 
+    context(SkiePhase.Context)
     private fun generateOverloadWithUniqueName(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -81,7 +85,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
                 ),
             )
 
-            context.configurationProvider.inheritConfiguration(function, descriptor)
+            descriptor.configuration.overwriteBy(function.configuration)
 
             dispatchReceiverParameter = function.dispatchReceiverParameter
             extensionReceiverParameter = function.extensionReceiverParameter

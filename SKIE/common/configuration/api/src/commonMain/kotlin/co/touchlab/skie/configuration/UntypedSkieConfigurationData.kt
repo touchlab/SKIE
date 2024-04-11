@@ -1,6 +1,6 @@
 package co.touchlab.skie.configuration
 
-interface TypedSkieConfiguration<FLAGS> {
+interface UntypedSkieConfigurationData<FLAGS> {
 
     val enabledConfigurationFlags: Set<FLAGS>
 

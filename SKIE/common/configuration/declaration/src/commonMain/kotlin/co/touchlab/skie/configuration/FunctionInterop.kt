@@ -10,13 +10,13 @@ object FunctionInterop {
          * If true, SKIE generates wrappers for global functions and interface extensions which allows them to be called with conventional syntax.
          * Original functions are still available under their original scope (class named after the file in which they are declared).
          */
-        object Enabled : ConfigurationKey.Boolean {
+        object Enabled : ConfigurationKey.Boolean, ConfigurationScope.All {
 
             override val defaultValue: Boolean = true
 
             override val skieRuntimeValue: Boolean = false
 
-            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
                 when {
                     configurationTarget.hasAnnotation<FunctionInterop.FileScopeConversion.Enabled>() -> true
                     configurationTarget.hasAnnotation<FunctionInterop.FileScopeConversion.Disabled>() -> false
@@ -82,13 +82,13 @@ object FunctionInterop {
      * These constructs do not conflict in Obj-C, but they do in Swift.
      * Therefore, SKIE has to resolve the conflict even though Kotlin compiler doesn't have to.
      */
-    object LegacyName : ConfigurationKey.Boolean {
+    object LegacyName : ConfigurationKey.Boolean, ConfigurationScope.All {
 
         override val defaultValue: Boolean = false
 
         override val skieRuntimeValue: Boolean = false
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Enabled>() -> true
                 configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Disabled>() -> false

@@ -209,8 +209,7 @@ internal class CodeWriter(
     var a = 0
     val partIterator = codeBlock.formatParts.listIterator()
     while (partIterator.hasNext()) {
-      val part = partIterator.next()
-      when (part) {
+      when (val part = partIterator.next()) {
         "%L" -> emitLiteral(codeBlock.args[a++])
 
         "%N" -> emit(codeBlock.args[a++] as String)

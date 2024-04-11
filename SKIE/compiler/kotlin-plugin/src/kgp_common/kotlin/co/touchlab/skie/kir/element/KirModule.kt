@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.kir.configuration.KirConfiguration
+import co.touchlab.skie.configuration.ModuleConfiguration
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 // Instantiate only in KirProvider
@@ -9,14 +9,13 @@ class KirModule(
     val project: KirProject,
     val descriptor: ModuleDescriptor?,
     val isSkieKotlinRuntime: Boolean,
+    val configuration: ModuleConfiguration,
 ) : KirClassParent {
 
     override val classes: MutableList<KirClass> = mutableListOf()
 
     override val module: KirModule
         get() = this
-
-    override val configuration: KirConfiguration = KirConfiguration(project.configuration)
 
     init {
         project.modules.add(this)

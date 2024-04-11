@@ -62,7 +62,7 @@ class ConfigureExternalOirTypesBridgingPhase(
 
     context(SirPhase.Context)
     private fun loadAllPlatformApiNotesIfEnabled() {
-        if (SkieConfigurationFlag.Debug_LoadAllPlatformApiNotes in skieConfiguration.enabledConfigurationFlags) {
+        if (SkieConfigurationFlag.Debug_LoadAllPlatformApiNotes.isEnabled) {
             externalApiNotesProvider.getAllApiNotesEntries()
         }
     }

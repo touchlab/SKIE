@@ -1,7 +1,7 @@
 package co.touchlab.skie.phases.oir
 
 import co.touchlab.skie.configuration.ClassInterop
-import co.touchlab.skie.configuration.configuration
+import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.phases.SirPhase
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

@@ -20,26 +20,43 @@ interface ConfigurationKey<T> {
 
     val skieRuntimeValue: T
 
-    fun getAnnotationValue(configurationTarget: ConfigurationTarget): T?
+    val isInheritable: kotlin.Boolean
+        get() = false
+
+    fun hasAnnotationValue(configurationTarget: ConfigurationTarget): kotlin.Boolean
+
+    fun getAnnotationValue(configurationTarget: ConfigurationTarget): T
 
     fun deserialize(value: kotlin.String?): T
 
     fun serialize(value: T): kotlin.String? =
         value?.toString()
 
-    interface String : ConfigurationKey<kotlin.String> {
+    interface NonOptional<T : Any> : ConfigurationKey<T> {
+
+        override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): kotlin.Boolean =
+            findAnnotationValue(configurationTarget) != null
+
+        fun findAnnotationValue(configurationTarget: ConfigurationTarget): T?
+
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): T =
+            findAnnotationValue(configurationTarget)
+                ?: throw IllegalStateException("Target $configurationTarget does not have an annotation value.")
+    }
+
+    interface String : NonOptional<kotlin.String> {
 
         override fun deserialize(value: kotlin.String?): kotlin.String =
             value.throwIfNull()
     }
 
-    interface Boolean : ConfigurationKey<kotlin.Boolean> {
+    interface Boolean : NonOptional<kotlin.Boolean> {
 
         override fun deserialize(value: kotlin.String?): kotlin.Boolean =
             value.throwIfNull().toBooleanStrict()
     }
 
-    interface Int : ConfigurationKey<kotlin.Int> {
+    interface Int : NonOptional<kotlin.Int> {
 
         override fun deserialize(value: kotlin.String?): kotlin.Int =
             value.throwIfNull().toInt()

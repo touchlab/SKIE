@@ -1,7 +1,6 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
@@ -74,13 +73,13 @@ class SealedFunctionGeneratorDelegate(
         }
 
     private val KirClass.enumConstructorFunctionName: String
-        get() = configurationProvider.getConfiguration(this, SealedInterop.Function.Name)
+        get() = this.configuration[SealedInterop.Function.Name]
 
     private val KirClass.enumConstructorArgumentLabel: String
-        get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ArgumentLabel)
+        get() = this.configuration[SealedInterop.Function.ArgumentLabel]
 
     private val KirClass.enumConstructorParameterName: String
-        get() = configurationProvider.getConfiguration(this, SealedInterop.Function.ParameterName)
+        get() = this.configuration[SealedInterop.Function.ParameterName]
 
     private fun SirSimpleFunction.addRequiredFunctionBody(
         kirClass: KirClass,

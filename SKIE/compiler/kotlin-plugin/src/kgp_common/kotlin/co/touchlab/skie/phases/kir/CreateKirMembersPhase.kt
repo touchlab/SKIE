@@ -2,6 +2,8 @@
 
 package co.touchlab.skie.phases.kir
 
+import co.touchlab.skie.configuration.SimpleFunctionConfiguration
+import co.touchlab.skie.configuration.ValueParameterConfiguration
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.kir.element.KirCallableDeclaration.Origin
 import co.touchlab.skie.kir.element.KirClass
@@ -22,6 +24,8 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ParameterDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
@@ -39,6 +43,7 @@ class CreateKirMembersPhase(
     private val kirProvider = context.kirProvider
     private val mapper = context.mapper
     private val kirTypeTranslator = context.kirTypeTranslator
+    private val descriptorConfigurationProvider = context.descriptorConfigurationProvider
 
     private val functionCache = mutableMapOf<FunctionDescriptor, KirSimpleFunction>()
     private val propertyCache = mutableMapOf<PropertyDescriptor, KirProperty>()
@@ -89,6 +94,7 @@ class CreateKirMembersPhase(
             owner = kirClass,
             errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
             deprecationLevel = descriptor.kirDeprecationLevel,
+            configuration = descriptorConfigurationProvider.getConfiguration(originalDescriptor),
         )
 
         createValueParameters(constructor, originalDescriptor, methodBridge)
@@ -154,6 +160,7 @@ class CreateKirMembersPhase(
             errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
             deprecationLevel = descriptor.kirDeprecationLevel,
             isRefinedInSwift = baseDescriptor.isRefinedInSwift,
+            configuration = getFunctionConfiguration(descriptor),
         )
 
         getDirectParents(descriptor)
@@ -164,6 +171,21 @@ class CreateKirMembersPhase(
 
         return function
     }
+
+    private fun getFunctionConfiguration(descriptor: FunctionDescriptor): SimpleFunctionConfiguration =
+        when (descriptor) {
+            is SimpleFunctionDescriptor -> descriptorConfigurationProvider.getConfiguration(descriptor)
+            is PropertyAccessorDescriptor -> {
+                val propertyConfiguration = descriptorConfigurationProvider.getConfiguration(descriptor.correspondingProperty)
+
+                val functionConfiguration = SimpleFunctionConfiguration(propertyConfiguration.parent)
+
+                functionConfiguration.overwriteBy(propertyConfiguration)
+
+                functionConfiguration
+            }
+            else -> error("Unsupported function type: $descriptor")
+        }
 
     private fun getOrCreateProperty(
         descriptor: PropertyDescriptor,
@@ -203,6 +225,7 @@ class CreateKirMembersPhase(
             isVar = descriptor.setter?.let { mapper.shouldBeExposed(it) } ?: false,
             deprecationLevel = descriptor.kirDeprecationLevel,
             isRefinedInSwift = baseDescriptor.isRefinedInSwift,
+            configuration = descriptorConfigurationProvider.getConfiguration(originalDescriptor),
         )
 
         getDirectParents(descriptor)
@@ -232,9 +255,20 @@ class CreateKirMembersPhase(
                         MethodBridgeValueParameter.ErrorOutParameter -> KirValueParameter.Kind.ErrorOut
                         is MethodBridgeValueParameter.SuspendCompletion -> KirValueParameter.Kind.SuspendCompletion
                     },
+                    configuration = getValueParameterConfiguration(parameterDescriptor, function),
                 )
             }
     }
+
+    private fun getValueParameterConfiguration(
+        parameterDescriptor: ParameterDescriptor?,
+        function: KirFunction<*>,
+    ): ValueParameterConfiguration =
+        if (parameterDescriptor != null) {
+            descriptorConfigurationProvider.getConfiguration(parameterDescriptor)
+        } else {
+            ValueParameterConfiguration(function.configuration)
+        }
 
     private val FunctionDescriptor.baseFunction: FunctionDescriptor
         get() = (getAllParents(this) + this.original).first { mapper.isBaseMethod(it) }

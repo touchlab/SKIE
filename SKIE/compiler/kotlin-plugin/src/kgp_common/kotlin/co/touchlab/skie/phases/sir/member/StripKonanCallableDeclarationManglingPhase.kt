@@ -1,14 +1,12 @@
 package co.touchlab.skie.phases.sir.member
 
 import co.touchlab.skie.configuration.FunctionInterop
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirConstructor
 import co.touchlab.skie.kir.element.KirProperty
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.SkiePhase
 
 object StripKonanCallableDeclarationManglingPhase : SirPhase {
 
@@ -21,9 +19,8 @@ object StripKonanCallableDeclarationManglingPhase : SirPhase {
             }
     }
 
-    context(SkiePhase.Context)
     private val KirCallableDeclaration<*>.isSupported: Boolean
-        get() = !this.getConfiguration(FunctionInterop.LegacyName)
+        get() = !this.configuration[FunctionInterop.LegacyName]
 
     private fun KirCallableDeclaration<*>.stripMangling() {
         when (this) {

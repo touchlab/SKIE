@@ -1,7 +1,9 @@
 package co.touchlab.skie.phases
 
-import co.touchlab.skie.configuration.ConfigurationProvider
-import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
+import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.phases.swift.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
@@ -22,9 +24,11 @@ object InitPhase {
 
         val compilerConfiguration: CompilerConfiguration
 
-        val skieConfiguration: SkieConfiguration
+        val skieConfigurationData: CompilerSkieConfigurationData
 
-        val configurationProvider: ConfigurationProvider
+        val descriptorConfigurationProvider: DescriptorConfigurationProvider
+
+        val rootConfiguration: RootConfiguration
 
         val swiftCompilerConfiguration: SwiftCompilerConfiguration
 
@@ -59,5 +63,11 @@ object InitPhase {
         fun <T : Any> put(key: CompilerConfigurationKey<T>, value: T) {
             compilerConfiguration.put(key, value)
         }
+
+        val SkieConfigurationFlag.isEnabled: Boolean
+            get() = rootConfiguration.isFlagEnabled(this)
+
+        val SkieConfigurationFlag.isDisabled: Boolean
+            get() = this.isEnabled.not()
     }
 }

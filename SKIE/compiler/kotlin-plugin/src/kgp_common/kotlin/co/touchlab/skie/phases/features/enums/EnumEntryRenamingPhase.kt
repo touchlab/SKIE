@@ -1,7 +1,6 @@
 package co.touchlab.skie.phases.features.enums
 
 import co.touchlab.skie.configuration.EnumInterop
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.kir.util.hasArgumentValue
@@ -47,7 +46,7 @@ object EnumEntryRenamingPhase : SirPhase {
 
     context(SkiePhase.Context)
     private val KirClass.isSupported: Boolean
-        get() = this.originalSirClass.isExported && !this.getConfiguration(EnumInterop.LegacyCaseName)
+        get() = this.originalSirClass.isExported && !this.configuration[EnumInterop.LegacyCaseName]
 
     context(SkiePhase.Context)
     private val KirEnumEntry.isSupported: Boolean

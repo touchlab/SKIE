@@ -1,5 +1,8 @@
 package co.touchlab.skie.kir
 
+import co.touchlab.skie.configuration.ModuleConfiguration
+import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.builtin.KirBuiltins
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.element.KirCallableDeclaration
@@ -31,6 +34,8 @@ class KirProvider(
     kotlinBuiltIns: KotlinBuiltIns,
     extraDescriptorBuiltins: ExtraDescriptorBuiltins,
     namer: ObjCExportNamer,
+    private val rootConfiguration: RootConfiguration,
+    private val descriptorConfigurationProvider: DescriptorConfigurationProvider,
 ) {
 
     private val modulesMap = mutableMapOf<String, KirModule>()
@@ -70,7 +75,7 @@ class KirProvider(
     lateinit var allOverridableDeclaration: List<KirOverridableDeclaration<*, *>>
         private set
 
-    val project = KirProject()
+    val project = KirProject(rootConfiguration)
 
     val skieModule = getModule("Skie")
 
@@ -81,6 +86,7 @@ class KirProvider(
         kotlinBuiltIns = kotlinBuiltIns,
         extraDescriptorBuiltins = extraDescriptorBuiltins,
         namer = namer,
+        descriptorConfigurationProvider = descriptorConfigurationProvider,
     )
 
     private fun getModule(name: String, descriptor: ModuleDescriptor? = null): KirModule =
@@ -90,6 +96,7 @@ class KirProvider(
                 project = project,
                 descriptor = descriptor,
                 isSkieKotlinRuntime = descriptor?.isSkieKotlinRuntime ?: false,
+                configuration = descriptor?.let { descriptorConfigurationProvider.getConfiguration(it) } ?: ModuleConfiguration(rootConfiguration),
             )
         }
 

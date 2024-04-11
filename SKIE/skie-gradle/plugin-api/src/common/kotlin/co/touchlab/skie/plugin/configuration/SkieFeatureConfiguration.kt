@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.ConfigurationKey
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.configuration.util.GradleSkieConfiguration
+import co.touchlab.skie.plugin.configuration.util.GradleSkieConfigurationData
 import co.touchlab.skie.plugin.configuration.util.takeIf
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -46,14 +46,14 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
             items[this.name] = this.serialize(value)
         }
 
-        internal fun build(): GradleSkieConfiguration.Group = GradleSkieConfiguration.Group(
+        internal fun build(): GradleSkieConfigurationData.Group = GradleSkieConfigurationData.Group(
             target = targetFqNamePrefix,
             overridesAnnotations = overridesAnnotations,
             items = items.toMap(),
         )
     }
 
-    internal fun buildGroups(): List<GradleSkieConfiguration.Group> =
+    internal fun buildGroups(): List<GradleSkieConfigurationData.Group> =
         groupConfigurations.map { it.build() }
 
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =

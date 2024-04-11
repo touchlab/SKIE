@@ -1,7 +1,6 @@
 package co.touchlab.skie.phases.util
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.phases.SkiePhase
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
@@ -32,7 +31,7 @@ class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
 
     context(SkiePhase.Context)
     fun <RC : C> launch(contextClass: KClass<RC>, contextFactory: () -> RC) {
-        if (SkieConfigurationFlag.Build_ConcurrentSkieCompilation in skieConfiguration.enabledConfigurationFlags) {
+        if (SkieConfigurationFlag.Build_ConcurrentSkieCompilation.isEnabled) {
             this@Context.launch {
                 prepareAndExecute(contextClass, contextFactory)
             }

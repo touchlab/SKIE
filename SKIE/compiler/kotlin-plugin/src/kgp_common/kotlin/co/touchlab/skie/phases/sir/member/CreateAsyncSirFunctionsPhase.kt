@@ -1,9 +1,9 @@
 package co.touchlab.skie.phases.sir.member
 
+import co.touchlab.skie.configuration.isSuspendInteropEnabled
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.features.suspend.isSuspendInteropEnabled
 import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.shallowCopy
 
@@ -12,7 +12,7 @@ object CreateAsyncSirFunctionsPhase : SirPhase {
     context(SirPhase.Context)
     override suspend fun execute() {
         kirProvider.allSimpleFunctions
-            .filter { it.isSuspend && it.isSuspendInteropEnabled }
+            .filter { it.isSuspend && it.configuration.isSuspendInteropEnabled }
             .forEach {
                 createAsyncFunction(it)
             }

@@ -7,13 +7,13 @@ object SuspendInterop {
     /**
      * If true, the interop code is generated for the given suspend function.
      */
-    object Enabled : ConfigurationKey.Boolean {
+    object Enabled : ConfigurationKey.Boolean, ConfigurationScope.AllExceptConstructorsAndProperties {
 
         override val defaultValue: Boolean = true
 
         override val skieRuntimeValue: Boolean = true
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<SuspendInterop.Enabled>() -> true
                 configurationTarget.hasAnnotation<SuspendInterop.Disabled>() -> false

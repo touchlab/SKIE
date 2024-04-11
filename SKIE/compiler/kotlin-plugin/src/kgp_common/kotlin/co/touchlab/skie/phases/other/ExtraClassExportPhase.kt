@@ -2,7 +2,7 @@ package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.configuration.belongsToSkieRuntime
+import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.getAllExposedMembers
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
@@ -65,7 +65,7 @@ class ExtraClassExportPhase(
 
     context(ClassExportPhase.Context)
     private suspend fun getClassesForExportFromFlowArguments(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
-        if (SkieConfigurationFlag.Feature_CoroutinesInterop !in context.skieConfiguration.enabledConfigurationFlags) {
+        if (SkieConfigurationFlag.Feature_CoroutinesInterop.isDisabled) {
             return emptyList()
         }
 
@@ -105,8 +105,9 @@ class ExtraClassExportPhase(
         return newClasses.parallelFlatMap { it.getAllExportedSealedChildren() }
     }
 
+    context(ClassExportPhase.Context)
     private fun ClassDescriptor.getAllExportedSealedChildren(): List<ClassDescriptor> {
-        if (!context.configurationProvider.getConfiguration(this, SealedInterop.ExportEntireHierarchy)) {
+        if (!this.configuration[SealedInterop.ExportEntireHierarchy]) {
             return emptyList()
         }
 
@@ -115,6 +116,7 @@ class ExtraClassExportPhase(
         return topLevelSealedChildren + topLevelSealedChildren.getAllExportedSealedChildren()
     }
 
+    context(ClassExportPhase.Context)
     private fun Collection<ClassDescriptor>.getAllExportedSealedChildren(): List<ClassDescriptor> =
         this.flatMap { it.getAllExportedSealedChildren() }
 
@@ -130,7 +132,7 @@ class ExtraClassExportPhase(
 
         stubFunction.removeFromSwift()
 
-        stubFunction.belongsToSkieRuntime = true
+        stubFunction.configuration.useDefaultsForSkieRuntime = true
     }
 
     private fun generateStubFunction(exportedClasses: Collection<ClassDescriptor>, iteration: Int): FunctionDescriptor =

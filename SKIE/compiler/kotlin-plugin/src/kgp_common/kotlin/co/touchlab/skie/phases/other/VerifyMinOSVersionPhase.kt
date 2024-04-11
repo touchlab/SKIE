@@ -9,8 +9,7 @@ import org.jetbrains.kotlin.konan.target.AppleConfigurables
 object VerifyMinOSVersionPhase : ClassExportPhase {
 
     context(ClassExportPhase.Context)
-    override fun isActive(): Boolean =
-        SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
+    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
     context(ClassExportPhase.Context)
     override suspend fun execute() {

@@ -28,11 +28,12 @@ class SirPhaseContext(
 
     override val context: SirPhase.Context = this
 
-    override val kirProvider: KirProvider = KirProvider(kotlinBuiltins, extraDescriptorBuiltins, namer)
+    override val kirProvider: KirProvider = KirProvider(kotlinBuiltins, extraDescriptorBuiltins, namer, rootConfiguration, descriptorConfigurationProvider)
 
     override val oirProvider: OirProvider = OirProvider(kirProvider.skieModule, extraDescriptorBuiltins, kirProvider, namer)
 
-    override val sirProvider: SirProvider = SirProvider(framework, kirProvider, oirProvider, configurationProvider, skieConfiguration, skieBuildDirectory)
+    override val sirProvider: SirProvider =
+        SirProvider(framework, kirProvider, oirProvider, descriptorConfigurationProvider, rootConfiguration, skieBuildDirectory)
 
     override val sirFileProvider: SirFileProvider = sirProvider.fileProvider
 

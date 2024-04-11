@@ -1,12 +1,12 @@
 package co.touchlab.skie.plugin.analytics
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.configuration.TypedSkieConfiguration
+import co.touchlab.skie.configuration.UntypedSkieConfigurationData
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 
 class AnalyticsCollector(
     private val skieBuildDirectory: SkieBuildDirectory,
-    private val skieConfiguration: TypedSkieConfiguration<SkieConfigurationFlag>,
+    private val skieConfiguration: UntypedSkieConfigurationData<SkieConfigurationFlag>,
 ) {
 
     fun collectAsync(producers: List<AnalyticsProducer>) {

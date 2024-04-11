@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.kir.configuration.KirConfiguration
+import co.touchlab.skie.configuration.ConstructorConfiguration
 import co.touchlab.skie.oir.element.OirConstructor
 import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.sir.element.SirConstructor
@@ -11,6 +11,7 @@ class KirConstructor(
     override val owner: KirClass,
     override val errorHandlingStrategy: OirFunction.ErrorHandlingStrategy,
     override val deprecationLevel: DeprecationLevel,
+    override val configuration: ConstructorConfiguration,
 ) : KirFunction<SirConstructor>() {
 
     override val baseDescriptor: ConstructorDescriptor
@@ -28,8 +29,6 @@ class KirConstructor(
         get() = oirConstructor
 
     override val valueParameters: MutableList<KirValueParameter> = mutableListOf()
-
-    override val configuration: KirConfiguration = KirConfiguration(owner.configuration)
 
     override val defaultArgumentsOverloads: MutableList<KirConstructor> = mutableListOf()
 

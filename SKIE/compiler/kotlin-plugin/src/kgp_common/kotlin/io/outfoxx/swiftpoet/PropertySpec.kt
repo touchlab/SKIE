@@ -16,7 +16,6 @@
 
 package io.outfoxx.swiftpoet
 
-import co.touchlab.skie.sir.element.SirElementWithAttributes
 import io.outfoxx.swiftpoet.CodeBlock.Companion.ABSTRACT
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
 

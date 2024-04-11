@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.kir.builtin
 
+import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirModule
@@ -25,6 +26,7 @@ class KirBuiltins(
     private val kotlinBuiltIns: KotlinBuiltIns,
     private val extraDescriptorBuiltins: ExtraDescriptorBuiltins,
     private val namer: ObjCExportNamer,
+    private val descriptorConfigurationProvider: DescriptorConfigurationProvider,
 ) {
     // TODO Not all Builtin methods are not supported yet (supported are only those converted from Kotlin equivalents in Any)
 
@@ -89,6 +91,7 @@ class KirBuiltins(
                     isSealed = false,
                     hasUnexposedSealedSubclasses = false,
                     belongsToSkieKotlinRuntime = false,
+                    configuration = descriptorConfigurationProvider.getConfiguration(descriptor),
                 )
             }
 
@@ -109,6 +112,7 @@ class KirBuiltins(
                 isSealed = false,
                 hasUnexposedSealedSubclasses = false,
                 belongsToSkieKotlinRuntime = false,
+                configuration = descriptorConfigurationProvider.getConfiguration(classDescriptor),
             ).apply {
                 classDescriptor.declaredTypeParameters.forEach { typeParameter ->
                     KirTypeParameter(typeParameter, this)

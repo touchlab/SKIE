@@ -14,10 +14,10 @@ import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerato
 import co.touchlab.skie.phases.features.defaultarguments.RemoveConflictingDefaultArgumentOverloadsPhase
 import co.touchlab.skie.phases.features.enums.EnumEntryRenamingPhase
 import co.touchlab.skie.phases.features.enums.ExhaustiveEnumsGenerator
-import co.touchlab.skie.phases.features.flow.ConfigureFlowConversionPhase
 import co.touchlab.skie.phases.features.flow.ConvertFlowsPhase
 import co.touchlab.skie.phases.features.flow.FlowBridgingConfigurationPhase
 import co.touchlab.skie.phases.features.flow.FlowConversionConstructorsGenerator
+import co.touchlab.skie.phases.features.flow.UnifyFlowConfigurationForOverridesPhase
 import co.touchlab.skie.phases.features.functions.FileScopeConvertor
 import co.touchlab.skie.phases.features.sealed.SealedInteropGenerator
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
@@ -41,16 +41,16 @@ import co.touchlab.skie.phases.other.AddAvailabilityBasedDeprecationLevelPhase
 import co.touchlab.skie.phases.other.AddAvailabilityToAsyncFunctionsPhase
 import co.touchlab.skie.phases.other.AddFoundationImportsPhase
 import co.touchlab.skie.phases.other.AwaitAllBackgroundJobsPhase
-import co.touchlab.skie.phases.other.VerifyModuleNamePhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
-import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverriddenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
+import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
 import co.touchlab.skie.phases.other.LinkObjectFilesPhase
 import co.touchlab.skie.phases.other.LoadCustomSwiftSourceFilesPhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
+import co.touchlab.skie.phases.other.VerifyModuleNamePhase
 import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
 import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRuntimePhase
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
@@ -123,7 +123,7 @@ class SkiePhaseScheduler {
             CreateKirMembersPhase(context),
 
             // Flows ->
-            ConfigureFlowConversionPhase(context),
+            UnifyFlowConfigurationForOverridesPhase(context),
             SuspendGenerator.FlowMappingConfigurationPhase,
             ConvertFlowsPhase(context),
             // <- Flows
@@ -139,7 +139,7 @@ class SkiePhaseScheduler {
             ConfigureExternalOirTypesBridgingPhase(context),
 
             ConfigureStableNameTypeAliasesForKotlinRuntimePhase,
-            CreateStableNameTypeAliasesPhase(context),
+            CreateStableNameTypeAliasesPhase,
 
             CreateSirMembersPhase(context),
             CreateAsyncSirFunctionsPhase,

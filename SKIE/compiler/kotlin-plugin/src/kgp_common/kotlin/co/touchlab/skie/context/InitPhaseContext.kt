@@ -3,8 +3,10 @@
 package co.touchlab.skie.context
 
 import co.touchlab.skie.compilerinject.compilerplugin.SkieConfigurationKeys
-import co.touchlab.skie.configuration.ConfigurationProvider
-import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
+import co.touchlab.skie.configuration.provider.ConfigurationProvider
+import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
@@ -27,13 +29,17 @@ class InitPhaseContext(
 
     override val skieDirectories: SkieDirectories = compilerConfiguration.getNotNull(SkieConfigurationKeys.SkieDirectories)
 
-    override val skieConfiguration: SkieConfiguration = run {
+    override val skieConfigurationData: CompilerSkieConfigurationData = run {
         val serializedUserConfiguration = skieDirectories.buildDirectory.skieConfiguration.readText()
 
-        SkieConfiguration.deserialize(serializedUserConfiguration)
+        CompilerSkieConfigurationData.deserialize(serializedUserConfiguration)
     }
 
-    override val configurationProvider: ConfigurationProvider = ConfigurationProvider(skieConfiguration)
+    private val configurationProvider = ConfigurationProvider(skieConfigurationData)
+
+    override val rootConfiguration: RootConfiguration = configurationProvider.rootConfiguration
+
+    override val descriptorConfigurationProvider: DescriptorConfigurationProvider = DescriptorConfigurationProvider(configurationProvider)
 
     override val swiftCompilerConfiguration: SwiftCompilerConfiguration = SwiftCompilerConfiguration(
         sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
@@ -43,10 +49,10 @@ class InitPhaseContext(
 
     override val analyticsCollector: AnalyticsCollector = AnalyticsCollector(
         skieBuildDirectory = skieDirectories.buildDirectory,
-        skieConfiguration = skieConfiguration,
+        skieConfiguration = skieConfigurationData,
     )
 
-    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(skieConfiguration)
+    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(rootConfiguration)
 
     override val reporter: Reporter = Reporter(compilerConfiguration)
 

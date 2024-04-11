@@ -2,7 +2,7 @@ package co.touchlab.skie.phases.features.defaultarguments.delegate
 
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.configuration.getConfiguration
+import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 import co.touchlab.skie.phases.DescriptorModificationPhase
@@ -32,17 +32,17 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
 
     private val isInteropEnabledForExternalModules: Boolean =
-        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in context.skieConfiguration.enabledConfigurationFlags
+        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in context.rootConfiguration.enabledFlags
 
     context(SkiePhase.Context)
     protected val FunctionDescriptor.isInteropEnabled: Boolean
-        get() = this.getConfiguration(DefaultArgumentInterop.Enabled) &&
+        get() = this.configuration[DefaultArgumentInterop.Enabled] &&
             this.satisfiesMaximumDefaultArgumentCount &&
             (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
 
     context(SkiePhase.Context)
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean
-        get() = this.defaultArgumentCount <= this.getConfiguration(DefaultArgumentInterop.MaximumDefaultArgumentCount)
+        get() = this.defaultArgumentCount <= this.configuration[DefaultArgumentInterop.MaximumDefaultArgumentCount]
 
     private val FunctionDescriptor.defaultArgumentCount: Int
         get() = this.valueParameters.count { it.declaresOrInheritsDefaultValue() }

@@ -9,8 +9,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 object VerifyDescriptorProviderConsistencyPhase : SirPhase {
 
     context(SirPhase.Context)
-    override fun isActive(): Boolean =
-        SkieConfigurationFlag.Debug_VerifyDescriptorProviderConsistency in skieConfiguration.enabledConfigurationFlags
+    override fun isActive(): Boolean = SkieConfigurationFlag.Debug_VerifyDescriptorProviderConsistency.isEnabled
 
     context(SirPhase.Context)
     override suspend fun execute() {

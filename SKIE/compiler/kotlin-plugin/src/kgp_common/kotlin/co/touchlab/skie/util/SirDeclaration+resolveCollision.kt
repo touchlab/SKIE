@@ -3,7 +3,6 @@
 package co.touchlab.skie.util
 
 import co.touchlab.skie.configuration.SuppressSkieWarning
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirElement
@@ -138,8 +137,8 @@ private inline fun <T> T.resolveCollision(collisionReasonProvider: T.() -> Strin
 context(SirPhase.Context)
 private val KirElement.shouldReportCollision: Boolean
     get() = when (this) {
-        is KirCallableDeclaration<*> -> !getConfiguration(SuppressSkieWarning.NameCollision)
-        is KirClass -> !getConfiguration(SuppressSkieWarning.NameCollision)
+        is KirCallableDeclaration<*> -> !configuration[SuppressSkieWarning.NameCollision]
+        is KirClass -> !configuration[SuppressSkieWarning.NameCollision]
         is KirEnumEntry -> owner.shouldReportCollision
         else -> true
     }

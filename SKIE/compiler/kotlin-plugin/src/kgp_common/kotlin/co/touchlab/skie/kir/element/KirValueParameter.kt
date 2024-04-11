@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.kir.configuration.KirConfiguration
+import co.touchlab.skie.configuration.ValueParameterConfiguration
 import co.touchlab.skie.kir.type.KirType
 import co.touchlab.skie.oir.element.OirValueParameter
 import co.touchlab.skie.sir.element.SirValueParameter
@@ -10,9 +10,8 @@ class KirValueParameter(
     val parent: KirFunction<*>,
     var type: KirType,
     val kind: Kind,
+    val configuration: ValueParameterConfiguration,
 ) : KirElement {
-
-    val configuration: KirConfiguration = KirConfiguration(parent.configuration)
 
     lateinit var oirValueParameter: OirValueParameter
 

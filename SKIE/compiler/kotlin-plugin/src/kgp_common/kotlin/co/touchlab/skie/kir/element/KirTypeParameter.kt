@@ -1,6 +1,5 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.kir.configuration.KirConfiguration
 import co.touchlab.skie.oir.element.OirTypeParameter
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 
@@ -10,8 +9,6 @@ class KirTypeParameter(
 ) : KirElement {
 
     lateinit var oirTypeParameter: OirTypeParameter
-
-    val configuration: KirConfiguration = KirConfiguration(parent.configuration)
 
     init {
         parent.typeParameters.add(this)

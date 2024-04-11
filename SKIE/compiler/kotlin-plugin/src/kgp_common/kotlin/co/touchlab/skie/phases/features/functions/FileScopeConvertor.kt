@@ -1,7 +1,6 @@
 package co.touchlab.skie.phases.features.functions
 
 import co.touchlab.skie.configuration.FunctionInterop
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
@@ -29,9 +28,8 @@ class FileScopeConvertor(
             }
     }
 
-    context(SirPhase.Context)
     private val KirCallableDeclaration<*>.isInteropEnabled: Boolean
-        get() = this.getConfiguration(FunctionInterop.FileScopeConversion.Enabled)
+        get() = this.configuration[FunctionInterop.FileScopeConversion.Enabled]
 
     private fun generateCallableDeclarationWrapper(callableDeclaration: KirCallableDeclaration<*>) {
         when (callableDeclaration) {

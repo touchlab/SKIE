@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.kir.configuration.KirConfiguration
+import co.touchlab.skie.configuration.PropertyConfiguration
 import co.touchlab.skie.kir.type.KirType
 import co.touchlab.skie.oir.element.OirCallableDeclaration
 import co.touchlab.skie.oir.element.OirProperty
@@ -17,6 +17,7 @@ class KirProperty(
     val isVar: Boolean,
     override val deprecationLevel: DeprecationLevel,
     override val isRefinedInSwift: Boolean,
+    override val configuration: PropertyConfiguration,
 ) : KirOverridableDeclaration<KirProperty, SirProperty> {
 
     val name: String
@@ -32,8 +33,6 @@ class KirProperty(
     override val overriddenDeclarations: List<KirProperty> by overridableDeclarationDelegate::overriddenDeclarations
 
     override val overriddenBy: List<KirProperty> by overridableDeclarationDelegate::overriddenBy
-
-    override val configuration: KirConfiguration = KirConfiguration(owner.configuration)
 
     override val originalSirDeclaration: SirProperty
         get() = oirProperty.originalSirProperty

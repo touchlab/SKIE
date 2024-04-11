@@ -13,7 +13,7 @@ object ClassExportAnalyticsPhase : ClassExportPhase {
         analyticsCollector.collectAsync(
             CommonCompilerConfigurationAnalytics.Producer(konanConfig),
             SpecificCompilerConfigurationAnalytics.Producer(konanConfig),
-            SkieConfigurationAnalytics.Producer(skieConfiguration),
+            SkieConfigurationAnalytics.Producer(skieConfigurationData),
             CompilerEnvironmentAnalytics.Producer(konanConfig),
         )
     }

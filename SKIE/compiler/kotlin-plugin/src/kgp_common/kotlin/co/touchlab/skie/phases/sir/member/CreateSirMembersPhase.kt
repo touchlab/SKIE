@@ -22,7 +22,6 @@ import co.touchlab.skie.sir.element.SirSetter
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
-import co.touchlab.skie.sir.element.topLevelParent
 import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 

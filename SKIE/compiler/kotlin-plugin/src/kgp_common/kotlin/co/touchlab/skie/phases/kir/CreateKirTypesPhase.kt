@@ -1,5 +1,10 @@
 package co.touchlab.skie.phases.kir
 
+import co.touchlab.skie.configuration.ClassConfiguration
+import co.touchlab.skie.configuration.FileConfiguration
+import co.touchlab.skie.configuration.FileOrClassConfiguration
+import co.touchlab.skie.configuration.ModuleConfiguration
+import co.touchlab.skie.configuration.PackageConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirEnumEntry
 import co.touchlab.skie.kir.element.KirTypeParameter
@@ -21,10 +26,18 @@ class CreateKirTypesPhase(
     private val kirProvider = context.kirProvider
     private val kotlinBuiltins = context.kotlinBuiltins
     private val namer = context.namer
+    private val descriptorConfigurationProvider = context.descriptorConfigurationProvider
+    private val rootConfiguration = context.rootConfiguration
 
     private val baseType = ReferenceKirType(kotlinBuiltins.anyType)
 
     private val descriptorsToClasses = mutableMapOf<ClassDescriptor, KirClass>()
+
+    private val sourceFileConfiguration = ClassConfiguration(
+        FileOrClassConfiguration.File(
+            FileConfiguration(PackageConfiguration(ModuleConfiguration(rootConfiguration))),
+        ),
+    )
 
     context(SirPhase.Context)
     override suspend fun execute() {
@@ -69,6 +82,7 @@ class CreateKirTypesPhase(
             isSealed = descriptor.isSealed(),
             hasUnexposedSealedSubclasses = descriptor.sealedSubclasses.any { !it.isExposed },
             belongsToSkieKotlinRuntime = descriptor.belongsToSkieKotlinRuntime,
+            configuration = descriptorConfigurationProvider.getConfiguration(descriptor),
         )
 
         configureClassParent(kirClass)
@@ -127,6 +141,7 @@ class CreateKirTypesPhase(
             isSealed = false,
             hasUnexposedSealedSubclasses = false,
             belongsToSkieKotlinRuntime = module.isSkieKotlinRuntime,
+            configuration = sourceFileConfiguration,
         )
     }
 

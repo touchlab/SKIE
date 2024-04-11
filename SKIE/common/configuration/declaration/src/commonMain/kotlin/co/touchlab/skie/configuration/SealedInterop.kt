@@ -7,13 +7,13 @@ object SealedInterop {
     /**
      * If true, the interop code is generated for the given sealed class/interface.
      */
-    object Enabled : ConfigurationKey.Boolean {
+    object Enabled : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = true
 
         override val skieRuntimeValue: Boolean = true
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<SealedInterop.Enabled>() -> true
                 configurationTarget.hasAnnotation<SealedInterop.Disabled>() -> false
@@ -25,13 +25,13 @@ object SealedInterop {
      * If true, SKIE exports all sealed children of this class/interface to Obj-C even if they wouldn't be exported by Kotlin compiler.
      * Otherwise, SKIE does not modify the default behavior.
      */
-    object ExportEntireHierarchy : ConfigurationKey.Boolean {
+    object ExportEntireHierarchy : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = true
 
         override val skieRuntimeValue: Boolean = true
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Enabled>() -> true
                 configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Disabled>() -> false
@@ -44,13 +44,13 @@ object SealedInterop {
         /**
          * The name for the function used inside `switch`.
          */
-        object Name : ConfigurationKey.String {
+        object Name : ConfigurationKey.String, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: String = "onEnum"
 
             override val skieRuntimeValue: String = "onEnum"
 
-            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
+            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
                 configurationTarget.findAnnotation<SealedInterop.Function.Name>()?.name
         }
 
@@ -59,26 +59,26 @@ object SealedInterop {
          * Disable the argument label by passing "_".
          * No argumentLabel is generated if the name is empty.
          */
-        object ArgumentLabel : ConfigurationKey.String {
+        object ArgumentLabel : ConfigurationKey.String, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: String = "of"
 
             override val skieRuntimeValue: String = "of"
 
-            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
+            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
                 configurationTarget.findAnnotation<SealedInterop.Function.ArgumentLabel>()?.argumentLabel
         }
 
         /**
          * The parameter name for the function used inside `switch`.
          */
-        object ParameterName : ConfigurationKey.String {
+        object ParameterName : ConfigurationKey.String, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: String = "sealed"
 
             override val skieRuntimeValue: String = "sealed"
 
-            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
+            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
                 configurationTarget.findAnnotation<SealedInterop.Function.ParameterName>()?.parameterName
         }
     }
@@ -86,13 +86,13 @@ object SealedInterop {
     /**
      * The name for the custom `else` case that is generated if some children are hidden / not accessible from Swift.
      */
-    object ElseName : ConfigurationKey.String {
+    object ElseName : ConfigurationKey.String, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: String = "else"
 
         override val skieRuntimeValue: String = "else"
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
             configurationTarget.findAnnotation<SealedInterop.ElseName>()?.elseName
     }
 
@@ -101,13 +101,13 @@ object SealedInterop {
         /**
          * If false, given subclass will be hidden from the generated code, which means no dedicated enum case will be generated for it.
          */
-        object Visible : ConfigurationKey.Boolean {
+        object Visible : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: Boolean = true
 
             override val skieRuntimeValue: Boolean = true
 
-            override fun getAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
+            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
                 when {
                     configurationTarget.hasAnnotation<SealedInterop.Case.Visible>() -> true
                     configurationTarget.hasAnnotation<SealedInterop.Case.Hidden>() -> false
@@ -118,11 +118,14 @@ object SealedInterop {
         /**
          * Overrides the name of the enum case generated for given subclass.
          */
-        object Name : ConfigurationKey.OptionalString {
+        object Name : ConfigurationKey.OptionalString, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: String? = null
 
             override val skieRuntimeValue: String? = null
+
+            override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): Boolean =
+                configurationTarget.findAnnotation<SealedInterop.Case.Name>() != null
 
             override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? =
                 configurationTarget.findAnnotation<SealedInterop.Case.Name>()?.name

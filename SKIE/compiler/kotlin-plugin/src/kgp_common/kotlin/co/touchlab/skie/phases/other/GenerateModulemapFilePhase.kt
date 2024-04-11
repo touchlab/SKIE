@@ -20,7 +20,7 @@ sealed class GenerateModulemapFilePhase(private val generateSwiftModule: Boolean
             appendLine("framework module ${framework.moduleName} {")
             appendLine("    umbrella header \"${framework.moduleName}.h\"")
 
-            if (SkieConfigurationFlag.Migration_WildcardExport in skieConfiguration.enabledConfigurationFlags) {
+            if (SkieConfigurationFlag.Migration_WildcardExport.isEnabled) {
                 appendLine()
                 appendLine("    export *")
                 appendLine("    module * { export * }")

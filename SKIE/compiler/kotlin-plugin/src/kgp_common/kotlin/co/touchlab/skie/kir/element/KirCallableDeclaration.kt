@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.kir.configuration.KirConfiguration
+import co.touchlab.skie.configuration.CallableDeclarationConfiguration
 import co.touchlab.skie.oir.element.OirCallableDeclaration
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -19,7 +19,7 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     val deprecationLevel: DeprecationLevel
 
-    val configuration: KirConfiguration
+    val configuration: CallableDeclarationConfiguration
 
     val oirCallableDeclaration: OirCallableDeclaration
 

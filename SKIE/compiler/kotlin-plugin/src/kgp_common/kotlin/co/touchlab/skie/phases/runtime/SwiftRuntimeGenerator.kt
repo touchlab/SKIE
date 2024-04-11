@@ -7,8 +7,7 @@ import co.touchlab.skie.util.GeneratedBySkieComment
 object SwiftRuntimeGenerator : SirPhase {
 
     context(SirPhase.Context)
-    override fun isActive(): Boolean =
-        SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
+    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
     context(SirPhase.Context)
     override suspend fun execute() {

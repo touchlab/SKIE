@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.kir.configuration.KirConfiguration
+import co.touchlab.skie.configuration.ClassConfiguration
 import co.touchlab.skie.kir.type.ReferenceKirType
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.sir.element.SirClass
@@ -17,6 +17,7 @@ class KirClass(
     val isSealed: Boolean,
     val hasUnexposedSealedSubclasses: Boolean,
     val belongsToSkieKotlinRuntime: Boolean,
+    val configuration: ClassConfiguration,
 ) : KirClassParent, KirBridgeableDeclaration<SirClass> {
 
     lateinit var oirClass: OirClass
@@ -37,8 +38,6 @@ class KirClass(
 
     override val module: KirModule
         get() = parent.module
-
-    override val configuration: KirConfiguration = KirConfiguration(parent.configuration)
 
     override val originalSirDeclaration: SirClass
         get() = oirClass.originalSirClass

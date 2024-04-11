@@ -23,8 +23,7 @@ class FlowConversionConstructorsGenerator(
     private val sirBuiltins = context.sirBuiltins
 
     context(SirPhase.Context)
-    override fun isActive(): Boolean =
-        SkieConfigurationFlag.Feature_CoroutinesInterop in skieConfiguration.enabledConfigurationFlags
+    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
     context(SirPhase.Context)
     override suspend fun execute() {

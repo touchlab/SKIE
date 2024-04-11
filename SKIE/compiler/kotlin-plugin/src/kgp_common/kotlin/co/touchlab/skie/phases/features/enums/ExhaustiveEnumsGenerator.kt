@@ -2,7 +2,6 @@ package co.touchlab.skie.phases.features.enums
 
 import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.SkiePhase
@@ -43,7 +42,7 @@ object ExhaustiveEnumsGenerator : SirPhase {
 
     context(SkiePhase.Context)
     private val KirClass.isEnumInteropEnabled: Boolean
-        get() = this.getConfiguration(EnumInterop.Enabled)
+        get() = this.configuration[EnumInterop.Enabled]
 
     context(SirPhase.Context)
     private fun generate(kirClass: KirClass) {
@@ -208,7 +207,7 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
         bridgedEnum.defaultType.withFqName()
     }
 
-    if (SkieConfigurationFlag.Debug_UseStableTypeAliases in context.skieConfiguration.enabledConfigurationFlags) {
+    if (SkieConfigurationFlag.Debug_UseStableTypeAliases.isEnabled) {
         bridgedEnum.internalTypeAlias = typeAlias
     }
 }

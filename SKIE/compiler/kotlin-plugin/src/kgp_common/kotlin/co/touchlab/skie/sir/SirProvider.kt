@@ -1,8 +1,8 @@
 package co.touchlab.skie.sir
 
 import co.touchlab.skie.configuration.ClassInterop
-import co.touchlab.skie.configuration.ConfigurationProvider
-import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.element.OirClass
@@ -28,8 +28,8 @@ class SirProvider(
     framework: FrameworkLayout,
     kirProvider: KirProvider,
     private val oirProvider: OirProvider,
-    private val configurationProvider: ConfigurationProvider,
-    skieConfiguration: SkieConfiguration,
+    private val descriptorConfigurationProvider: DescriptorConfigurationProvider,
+    rootConfiguration: RootConfiguration,
     skieBuildDirectory: SkieBuildDirectory,
 ) {
 
@@ -40,7 +40,7 @@ class SirProvider(
     val fileProvider: SirFileProvider = SirFileProvider(skieModule, kirProvider, skieBuildDirectory)
 
     val sirBuiltins by lazy {
-        SirBuiltins(this, skieConfiguration)
+        SirBuiltins(this, rootConfiguration)
     }
 
     private val externalModuleCache = mutableMapOf<String, SirModule.External>()
@@ -127,7 +127,7 @@ class SirProvider(
     fun findExternalModule(oirClass: OirClass): SirModule.External? {
         val classDescriptor = oirClass.cinteropClassDescriptorOrNull ?: error("Invalid origin for OirClass: $oirClass")
 
-        val moduleName = configurationProvider.getConfiguration(classDescriptor)[ClassInterop.CInteropFrameworkName] ?: return null
+        val moduleName = descriptorConfigurationProvider.getConfiguration(classDescriptor)[ClassInterop.CInteropFrameworkName] ?: return null
 
         return getExternalModule(moduleName)
     }

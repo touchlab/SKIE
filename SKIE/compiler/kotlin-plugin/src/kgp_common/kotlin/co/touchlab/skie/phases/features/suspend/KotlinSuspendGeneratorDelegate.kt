@@ -1,8 +1,7 @@
 package co.touchlab.skie.phases.features.suspend
 
 import co.touchlab.skie.configuration.FlowInterop
-import co.touchlab.skie.configuration.belongsToSkieRuntime
-import co.touchlab.skie.configuration.configuration
+import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.element.KirScope
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
@@ -56,7 +55,7 @@ class KotlinSuspendGeneratorDelegate(
 
     context(DescriptorModificationPhase.Context)
     private fun FunctionDescriptor.changeSkieConfiguration(originalFunctionDescriptor: FunctionDescriptor) {
-        this.belongsToSkieRuntime = true
+        this.configuration.useDefaultsForSkieRuntime = true
 
         this.configuration[FlowInterop.Enabled] = originalFunctionDescriptor.configuration[FlowInterop.Enabled]
     }

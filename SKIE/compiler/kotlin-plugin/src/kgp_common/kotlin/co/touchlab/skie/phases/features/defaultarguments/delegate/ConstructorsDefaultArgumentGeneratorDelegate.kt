@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
+import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.createSecondaryConstructor
 import co.touchlab.skie.kir.irbuilder.getNamespace
@@ -52,6 +53,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
 
+    context(SkiePhase.Context)
     private fun generateOverloads(constructor: ClassConstructorDescriptor, classDescriptor: ClassDescriptor) {
         constructor.forEachDefaultArgumentOverload { overloadParameters ->
             if (overloadParameters.isNotEmpty() || classDescriptor.generateOverloadWithNoParameters) {
@@ -67,12 +69,14 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassConstructorDescriptor.hasNoParametersIgnoringDefaultArguments: Boolean
         get() = this.valueParameters.count { !it.hasDefaultValue() } == 0
 
+    context(SkiePhase.Context)
     private fun generateOverload(constructor: ClassConstructorDescriptor, parameters: List<ValueParameterDescriptor>) {
         val overload = generateOverloadWithUniqueName(constructor, parameters)
 
         registerOverload(overload, constructor)
     }
 
+    context(SkiePhase.Context)
     private fun generateOverloadWithUniqueName(
         constructor: ClassConstructorDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -84,7 +88,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
             namespace = declarationBuilder.getNamespace(constructor),
             annotations = constructor.annotations,
         ) {
-            context.configurationProvider.inheritConfiguration(constructor, descriptor)
+            descriptor.configuration.overwriteBy(constructor.configuration)
 
             valueParameters = parameters.copyWithoutDefaultValue(descriptor).withUniqueLastParameter(overloadId)
             body = { overloadIr ->

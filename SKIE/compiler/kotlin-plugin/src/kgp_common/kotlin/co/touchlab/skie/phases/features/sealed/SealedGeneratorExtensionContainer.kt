@@ -1,8 +1,6 @@
 package co.touchlab.skie.phases.features.sealed
 
-import co.touchlab.skie.configuration.ConfigurationProvider
 import co.touchlab.skie.configuration.SealedInterop
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.classDescriptorOrError
 import co.touchlab.skie.phases.SirPhase
@@ -18,11 +16,8 @@ interface SealedGeneratorExtensionContainer {
 
     val context: SirPhase.Context
 
-    val configurationProvider: ConfigurationProvider
-        get() = context.configurationProvider
-
     val KirClass.elseCaseName: String
-        get() = configurationProvider.getConfiguration(this, SealedInterop.ElseName)
+        get() = this.configuration[SealedInterop.ElseName]
 
     fun KirClass.enumCaseName(preferredNamesCollide: Boolean): String =
         if (preferredNamesCollide) this.enumCaseNameBasedOnSwiftIdentifier else this.enumCaseNameBasedOnKotlinIdentifier
@@ -36,14 +31,14 @@ interface SealedGeneratorExtensionContainer {
 
     val KirClass.enumCaseNameBasedOnKotlinIdentifier: String
         get() {
-            val configuredName = configurationProvider.getConfiguration(this, SealedInterop.Case.Name)
+            val configuredName = this.configuration[SealedInterop.Case.Name]
 
             return configuredName ?: classDescriptorOrError.name.identifier.replaceFirstChar { it.lowercase() }.toValidSwiftIdentifier()
         }
 
     val KirClass.enumCaseNameBasedOnSwiftIdentifier: String
         get() {
-            val configuredName = configurationProvider.getConfiguration(this, SealedInterop.Case.Name)
+            val configuredName = this.configuration[SealedInterop.Case.Name]
 
             return configuredName ?: this.originalSirClass.publicName.toLocalString().toValidSwiftIdentifier()
         }
@@ -54,7 +49,7 @@ interface SealedGeneratorExtensionContainer {
             this.visibleSealedSubclasses.isEmpty()
 
     val KirClass.visibleSealedSubclasses: List<KirClass>
-        get() = this.sealedSubclasses.filter { configurationProvider.getConfiguration(it, SealedInterop.Case.Visible) }
+        get() = this.sealedSubclasses.filter { it.configuration[SealedInterop.Case.Visible] }
 
     fun SirClass.getSealedSubclassType(
         enum: SirClass,

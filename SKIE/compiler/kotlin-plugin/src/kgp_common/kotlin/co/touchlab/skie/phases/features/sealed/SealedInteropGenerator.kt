@@ -1,7 +1,6 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
-import co.touchlab.skie.configuration.getConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
@@ -30,7 +29,7 @@ class SealedInteropGenerator(
             this.isSealedInteropEnabled
 
     private val KirClass.isSealedInteropEnabled: Boolean
-        get() = configurationProvider.getConfiguration(this, SealedInterop.Enabled)
+        get() = this.configuration[SealedInterop.Enabled]
 
     context(SirPhase.Context)
     private fun generate(kirClass: KirClass) {
