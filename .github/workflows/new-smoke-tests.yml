@@ -1,0 +1,74 @@
+name: Smoke Tests [New]
+
+# on:
+#   push:
+#     branches:
+#       - '**'
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  demo:
+    name: Demo Tests
+    runs-on: ${{ matrix.host }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ios_arm64, macos_arm64 ... ]
+        link_mode: [static, dynamic]
+        build_configuration: [debug, release]
+        kotlin: [1.8.0, 1.8.10, 1.8.20, 1.8.21, 1.8.22, 1.9.0, 1.9.10, 1.9.20, 1.9.21, 1.9.22]
+        k2enabled: [true, false]
+        xcode: ["15.0"]
+        host: [macos-14, macos-13, macos-12, ubuntu-latest, windows-latest]
+        include:
+        - host: green
+        - color: pink
+          animal: cat
+        - fruit: apple
+          shape: circle
+        - fruit: banana
+        - fruit: banana
+          animal: cat
+
+    steps:
+      - uses: touchlab/SKIE@tk/smoke-tests
+        with:
+          github-token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+  gradle:
+    name: Gradle Tests
+    runs-on: self-hosted
+    steps:
+      - uses: touchlab/SKIE@tk/smoke-tests
+        with:
+          github-token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+  acceptance:
+    name: Acceptance Tests
+    runs-on: self-hosted
+    steps:
+      - uses: touchlab/SKIE@tk/smoke-tests
+        with:
+          github-token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+  type-mapping:
+    name: Type Mapping Tests
+    runs-on: self-hosted
+    steps:
+      - uses: touchlab/SKIE@tk/smoke-tests
+        with:
+          github-token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+  libraries:
+    name: External Libraries Tests
+    runs-on: self-hosted
+    steps:
+      - uses: touchlab/SKIE@tk/smoke-tests
+        with:
+          github-token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+  performance:
+    name: Performance Tests
+    runs-on: self-hosted
+    steps:
+      - uses: touchlab/SKIE@tk/smoke-tests
+        with:
+          github-token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}

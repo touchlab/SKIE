@@ -237,7 +237,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
             attributes {
                 attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
                 attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
-                attribute(KotlinNativeTarget.konanTargetAttribute, MacOsCpuArchitecture.getCurrent().konanTarget)
+                attributeProvider(KotlinNativeTarget.konanTargetAttribute, provider { MacOsCpuArchitecture.getCurrent().konanTarget })
                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
             }
         }
