@@ -108,7 +108,7 @@ jobs:
 
   external-libraries-tests:
     name: External Libraries Tests
-    needs: [acceptance-tests]
+    needs: [acceptance-tests, gradle-tests]
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -137,7 +137,8 @@ jobs:
 
   gradle-tests:
     name: Gradle Tests
-    runs-on: macos-14
+    needs: [acceptance-tests]
+    runs-on: self-hosted
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
