@@ -10,24 +10,21 @@ import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.constants.EnumValue
 import org.jetbrains.kotlin.resolve.constants.KClassValue
+import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 
 inline fun <reified T : Annotation> Annotated.hasAnnotation(): Boolean =
     hasAnnotation(T::class)
 
-fun <T : Annotation> Annotated.hasAnnotation(annotation: KClass<T>): Boolean {
-    val annotationName = FqName(annotation.qualifiedName!!)
-
-    return this.annotations.hasAnnotation(annotationName)
-}
+fun <T : Annotation> Annotated.hasAnnotation(annotation: KClass<T>): Boolean =
+    this.annotations.any { it.fqName?.asString() == annotation.qualifiedName }
 
 inline fun <reified T : Annotation> Annotated.findAnnotation(): T? =
     findAnnotation(T::class)
 
 fun <T : Annotation> Annotated.findAnnotation(annotationClass: KClass<T>): T? {
-    val annotationName = FqName(annotationClass.qualifiedName!!)
-    val annotation = this.annotations.findAnnotation(annotationName) ?: return null
+    val annotation = this.annotations.firstOrNull { it.fqName?.asString() == annotationClass.qualifiedName } ?: return null
 
     val constructor = annotationClass.constructors.first()
 

@@ -98,11 +98,14 @@ class SirTypeTranslator(
             isEscaping = isEscaping,
         )
 
+    // Optimization - prevents re-creating the lambda type argument mapper for every invocation
+    private val cachedMapTypeArgument = ::mapTypeArgument
+
     private fun mapType(oirType: DeclaredOirType): SirType =
         OirDeclaredSirType(
             declaration = oirType.declaration,
             typeArguments = oirType.typeArguments,
-            mapTypeArgument = ::mapTypeArgument,
+            mapTypeArgument = cachedMapTypeArgument,
         )
 
     private fun mapType(

@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.KClassValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.firstArgument
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 
 // Based on ObjCExportTranslatorImpl and ObjCExportHeaderGenerator
 internal class ExposedDescriptorsCache(
@@ -79,18 +80,22 @@ internal class ExposedDescriptorsCache(
     }
 
     private fun exposePackageFragment(packageFragment: PackageFragmentDescriptor) {
-        val contributedDescriptors = packageFragment.getMemberScope().getContributedDescriptors()
+        val memberScope = packageFragment.getMemberScope()
 
-        contributedDescriptors
-            .filterIsInstance<CallableMemberDescriptor>()
+        memberScope
+            .getContributedDescriptors(kindFilter = DescriptorKindFilter.CALLABLES)
             .forEach {
-                exposeGlobalMemberOrExtension(it)
+                if (it is CallableMemberDescriptor) {
+                    exposeGlobalMemberOrExtension(it)
+                }
             }
 
-        contributedDescriptors
-            .filterIsInstance<ClassDescriptor>()
+        memberScope
+            .getContributedDescriptors(kindFilter = DescriptorKindFilter.CLASSIFIERS)
             .forEach {
-                exposeClassIncludingNestedClasses(it)
+                if (it is ClassDescriptor) {
+                    exposeClassIncludingNestedClasses(it)
+                }
             }
     }
 
@@ -139,9 +144,12 @@ internal class ExposedDescriptorsCache(
         exposeClass(classDescriptor)
 
         classDescriptor.unsubstitutedMemberScope
-            .getContributedDescriptors()
-            .filterIsInstance<ClassDescriptor>()
-            .forEach(::exposeClassIncludingNestedClasses)
+            .getContributedDescriptors(kindFilter = DescriptorKindFilter.CLASSIFIERS)
+            .forEach {
+                if (it is ClassDescriptor) {
+                    exposeClassIncludingNestedClasses(it)
+                }
+            }
     }
 
     private fun exposeClass(classDescriptor: ClassDescriptor) {
@@ -191,10 +199,11 @@ internal class ExposedDescriptorsCache(
         }
 
         classDescriptor.unsubstitutedMemberScope
-            .getContributedDescriptors()
-            .filterIsInstance<CallableMemberDescriptor>()
+            .getContributedDescriptors(kindFilter = DescriptorKindFilter.CALLABLES)
             .forEach {
-                exposeCallableMember(it, typeParameterScope)
+                if (it is CallableMemberDescriptor) {
+                    exposeCallableMember(it, typeParameterScope)
+                }
             }
 
         if (classDescriptor.kind.isEnumClass) {

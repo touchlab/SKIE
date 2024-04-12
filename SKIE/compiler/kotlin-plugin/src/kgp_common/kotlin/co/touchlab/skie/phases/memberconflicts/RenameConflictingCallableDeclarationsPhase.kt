@@ -18,7 +18,10 @@ import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.sir.element.receiverDeclaration
 import co.touchlab.skie.sir.element.resolveAsSirClass
 
-object RenameConflictingCallableDeclarationsPhase : SirPhase {
+class RenameConflictingCallableDeclarationsPhase : SirPhase {
+
+    private val highestDistanceToInheritanceHierarchyRootCache = mutableMapOf<SirClass, Int>()
+    private val containerFqNameCache = mutableMapOf<SirDeclarationParent, String>()
 
     context(SirPhase.Context)
     override suspend fun execute() {
@@ -100,7 +103,7 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
         get() = module is SirModule.Kotlin
 
     private val SirClass.highestDistanceToInheritanceHierarchyRoot: Int
-        get() {
+        get() = highestDistanceToInheritanceHierarchyRootCache.getOrPut(this) {
             val maxFromSuperTypes = superTypes.maxOfOrNull {
                 it.resolveAsSirClass()?.highestDistanceToInheritanceHierarchyRoot ?: Int.MAX_VALUE
             }
@@ -114,7 +117,9 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
 
     @Suppress("RecursivePropertyAccessor")
     private val SirDeclarationParent.containerFqName: String
-        get() = (this.parent?.containerFqName ?: "") + this.toString()
+        get() = containerFqNameCache.getOrPut(this) {
+            (this.parent?.containerFqName ?: "") + this.toString()
+        }
 
     context(SirPhase.Context)
     private fun UniqueSignatureSet.addEnumCases(enumCases: List<SirEnumCase>) {

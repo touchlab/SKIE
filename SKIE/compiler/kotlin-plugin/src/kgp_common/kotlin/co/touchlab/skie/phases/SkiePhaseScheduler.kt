@@ -176,7 +176,7 @@ class SkiePhaseScheduler {
             SwiftRuntimeGenerator,
             LoadCustomSwiftSourceFilesPhase,
 
-            RenameConflictingCallableDeclarationsPhase,
+            RenameConflictingCallableDeclarationsPhase(),
 
             // Features
 
@@ -209,7 +209,7 @@ class SkiePhaseScheduler {
             RenameTypesConflictsWithOtherTypesPhase,
             RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase,
             RenameParametersNamedSelfPhase,
-            RenameConflictingCallableDeclarationsPhase,
+            RenameConflictingCallableDeclarationsPhase(),
             FixDuplicatedOverriddenFunctionsPhase,
             TemporarilyRenameTypesConflictingWithExternalModulesPhase,
             FixOirFunctionSignaturesForApiNotesPhase(context),
