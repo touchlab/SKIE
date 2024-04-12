@@ -50,6 +50,7 @@ concurrency:
 jobs:
   acceptance-tests:
     name: Acceptance Tests
+    needs: [gradle-tests]
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -137,7 +138,6 @@ jobs:
 
   gradle-tests:
     name: Gradle Tests
-    needs: [acceptance-tests]
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
