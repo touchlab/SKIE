@@ -54,7 +54,7 @@ sealed class SirFunction(
     protected abstract val identifierForReference: String
 
     override fun toString(): String =
-        Signature(this, SirHierarchyCache()).toString()
+        Signature(this).toString()
 }
 
 fun SirFunction.call(arguments: List<SirValueParameter>): String =

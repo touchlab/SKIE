@@ -49,7 +49,7 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
     val deprecationLevel: DeprecationLevel
 
     fun toReadableString(): String =
-        Signature(this, SirHierarchyCache()).toString()
+        Signature(this).toString()
 }
 
 val SirCallableDeclaration.receiverDeclaration: SirClass?

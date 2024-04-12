@@ -14,7 +14,9 @@ class UniqueSignatureSet {
     private val alreadyAddedDeclarations = mutableSetOf<SirCallableDeclaration>()
     private val alreadyAddedEnumCase = mutableSetOf<SirEnumCase>()
 
-    // Map so that we can get the signatures for conflicts
+    // Map so that we can get the signatures for conflicts by identifier (for performance reasons)
+    // Map of signature to signature instead of set because we need to know which declaration is conflicting
+    // The algorithm utilises custom equality which checks if the signature is the same from the overload resolution perspective.
     private val existingSignaturesMap = mutableMapOf<Signature, Signature>()
 
     private val sirHierarchyCache = SirHierarchyCache()
@@ -30,8 +32,10 @@ class UniqueSignatureSet {
         group.resolveCollisionWithWarning {
             val signature = signature
 
-            if (signature in existingSignaturesMap) {
-                "an another declaration '${existingSignaturesMap[signature]}'"
+            val conflictingSignature = findConflictingSignature(signature)
+
+            if (conflictingSignature != null) {
+                "an another declaration '$conflictingSignature'"
             } else {
                 null
             }
@@ -49,16 +53,25 @@ class UniqueSignatureSet {
         enumCase.resolveCollisionWithWarning {
             val signature = signature
 
-            if (signature in existingSignaturesMap) {
-                "an another declaration '${existingSignaturesMap[signature]}'"
+            val conflictingSignature = findConflictingSignature(signature)
+
+            if (conflictingSignature != null) {
+                "an another declaration '${conflictingSignature}'"
             } else {
                 null
             }
         }
 
-        val signature = enumCase.signature
-        existingSignaturesMap.putIfAbsent(signature, signature)
+        addSignature(enumCase.signature)
+
         alreadyAddedEnumCase.add(enumCase)
+    }
+
+    private fun findConflictingSignature(signature: Signature): Signature? =
+        existingSignaturesMap[signature]
+
+    private fun addSignature(signature: Signature) {
+        existingSignaturesMap[signature] = signature
     }
 
     private inner class Group(
@@ -72,11 +85,14 @@ class UniqueSignatureSet {
             do {
                 var changed = false
 
-                callableDeclarations.forEach {
-                    // Avoid short-circuiting
-                    changed = it.resolveCollisionWithWarning(collisionReasonProvider) || changed
+                for (callableDeclaration in callableDeclarations) {
+                    changed = callableDeclaration.resolveCollisionWithWarning(collisionReasonProvider)
 
-                    unifyNames(it)
+                    if (changed) {
+                        unifyNames(callableDeclaration)
+
+                        break
+                    }
                 }
             } while (changed)
         }
@@ -94,14 +110,12 @@ class UniqueSignatureSet {
         }
 
         fun addToCaches() {
-            val representativeSignature = representative.signature
-            existingSignaturesMap.putIfAbsent(representativeSignature, representativeSignature)
+            addSignature(representative.signature)
 
             alreadyAddedDeclarations.addAll(callableDeclarations)
-            callableDeclarations.forEach {
-                val signature = it.signature
 
-                existingSignaturesMap.putIfAbsent(signature, signature)
+            callableDeclarations.forEach {
+                addSignature(it.signature)
             }
         }
     }

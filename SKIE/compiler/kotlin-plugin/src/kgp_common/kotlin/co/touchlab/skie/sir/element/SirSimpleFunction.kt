@@ -61,7 +61,7 @@ class SirSimpleFunction(
     }
 
     override fun toString(): String =
-        Signature(this, SirHierarchyCache()).toString()
+        Signature(this).toString()
 
     companion object {
 

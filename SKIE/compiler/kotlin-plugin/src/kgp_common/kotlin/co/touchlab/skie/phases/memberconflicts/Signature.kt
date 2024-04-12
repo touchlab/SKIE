@@ -100,13 +100,13 @@ sealed class Signature {
         if (this === other) return true
         if (other !is Signature) return false
 
-        if (receiver != other.receiver) return false
-        if (identifier != other.identifier) return false
-        if (valueParameters != other.valueParameters) return false
-        if (returnType != other.returnType) return false
-        if (scope != other.scope) return false
-
         if (this is EnumCase && other is Function || this is Function && other is EnumCase) return false
+
+        if (receiver != other.receiver) return false
+        if (returnType != other.returnType) return false
+        if (valueParameters != other.valueParameters) return false
+        if (scope != other.scope) return false
+        if (identifier != other.identifier) return false
 
         return true
     }
@@ -213,11 +213,11 @@ sealed class Signature {
 
                 other as Class
 
-                if (typeArguments != other.typeArguments) return false
-
-                return with(sirHierarchyCache) {
-                    sirClass.sharesDirectInheritanceHierarchy(other.sirClass)
+                with(sirHierarchyCache) {
+                    if (!sirClass.sharesDirectInheritanceHierarchy(other.sirClass)) return false
                 }
+
+                return typeArguments == other.typeArguments
             }
 
             override fun hashCode(): Int = typeArguments.hashCode()
@@ -284,7 +284,7 @@ sealed class Signature {
 
     companion object {
 
-        operator fun invoke(enumCase: SirEnumCase, sirHierarchyCache: SirHierarchyCache): Signature =
+        operator fun invoke(enumCase: SirEnumCase, sirHierarchyCache: SirHierarchyCache = SirHierarchyCache()): Signature =
             with(sirHierarchyCache) {
                 EnumCase(
                     receiver = Receiver.Simple(enumCase.parent.asReceiverType, emptySet()),
@@ -292,14 +292,14 @@ sealed class Signature {
                 )
             }
 
-        operator fun invoke(callableDeclaration: SirCallableDeclaration, sirHierarchyCache: SirHierarchyCache): Signature =
+        operator fun invoke(callableDeclaration: SirCallableDeclaration, sirHierarchyCache: SirHierarchyCache = SirHierarchyCache()): Signature =
             when (callableDeclaration) {
                 is SirSimpleFunction -> Signature(callableDeclaration, sirHierarchyCache)
                 is SirConstructor -> Signature(callableDeclaration, sirHierarchyCache)
                 is SirProperty -> Signature(callableDeclaration, sirHierarchyCache)
             }
 
-        operator fun invoke(function: SirSimpleFunction, sirHierarchyCache: SirHierarchyCache): Signature =
+        operator fun invoke(function: SirSimpleFunction, sirHierarchyCache: SirHierarchyCache = SirHierarchyCache()): Signature =
             with(sirHierarchyCache) {
                 SimpleFunction(
                     receiver = function.receiver,
@@ -310,7 +310,7 @@ sealed class Signature {
                 )
             }
 
-        operator fun invoke(constructor: SirConstructor, sirHierarchyCache: SirHierarchyCache): Signature {
+        operator fun invoke(constructor: SirConstructor, sirHierarchyCache: SirHierarchyCache = SirHierarchyCache()): Signature {
             val receiver = with(sirHierarchyCache) {
                 constructor.receiver
             }
