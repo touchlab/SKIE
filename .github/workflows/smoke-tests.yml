@@ -134,3 +134,27 @@ jobs:
       #     check_name: "Smoke Test Reports - External Libraries Tests"
       #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
       #     require_tests: true
+
+  gradle-tests:
+    name: Gradle Tests
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Gradle Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        id: run-tests
+        with:
+          arguments: >-
+            :test
+            -PtestLevel=smoke
+            -PtestType=gradle
+            -Pmatrix.targets=${{ inputs.target }}
+            -Pmatrix.configurations=${{ inputs.configuration}}
+            -Pmatrix.linkModes=${{ inputs.linkage }}
+          build-root-directory: test-runner
