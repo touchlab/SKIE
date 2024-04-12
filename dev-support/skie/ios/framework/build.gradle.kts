@@ -49,7 +49,7 @@ kotlin {
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 
-                export(projects.devSupport.skie.ios.dependency)
+                export(projects.devSupport.skieIosDependency)
 
                 exportedLibraries.forEach {
                     export(it)
@@ -63,7 +63,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation("co.touchlab.skie:configuration-annotations")
 
-            api(projects.devSupport.skie.ios.dependency)
+            api(projects.devSupport.skieIosDependency)
 
             exportedLibraries.forEach {
                 api(it)

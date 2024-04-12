@@ -2,7 +2,7 @@
 java = "11"
 kotlin = "1.8.21"
 pluginPublish = "1.2.0"
-kotest = "5.4.0"
+kotest = "5.8.0"
 buildconfig = "4.1.1"
 ktor = "2.2.3"
 nexusPublish = "2.0.0-rc-1"
@@ -35,7 +35,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-core-legacy = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines-legacy" }
 kotlinx-coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
 jackson-databind = { module = " com.fasterxml.jackson.core:jackson-databind", version = "2.14.2" }
-kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.12.0" }
+kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.15.1" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 apache-compress = { module = "org.apache.commons:commons-compress", version = "1.22" }
 logback = { module = "ch.qos.logback:logback-classic", version = "1.4.14" }
@@ -47,6 +47,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest-jvm", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version = "1.12.5" }
 
 [bundles]
@@ -54,6 +55,7 @@ kotest = [
     "kotest-runner-junit5",
     "kotest-assertions-core",
     "kotest-framework-datatest",
+    "kotest-property",
 ]
 testing-jvm = [
     "kotlin-test",

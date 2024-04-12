@@ -1,94 +1,133 @@
+import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyName
 import co.touchlab.skie.gradle.util.enquoted
-import co.touchlab.skie.gradle.version.gradleApiVersion
-import co.touchlab.skie.gradle.version.kotlinToolingVersion
-import co.touchlab.skie.gradle.version.target.ExpectActualBuildConfigGenerator
+import co.touchlab.skie.gradle.util.stringListProperty
+import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
+import co.touchlab.skie.gradle.version.gradleApiVersionDimension
+import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
 plugins {
-    id("skie.shim")
+    id("skie.gradle.plugin")
     id("skie.publishable")
-
     id("dev.buildconfig")
 }
 
 skiePublishing {
     name = "SKIE Gradle Plugin"
-    description = "Gradle plugin for configuring SKIE compiler plugin.."
+    description = "Gradle plugin for configuring SKIE compiler plugin."
+}
+
+buildConfig {
+    val shimImpl = project.provider { projects.gradle.gradlePluginShimImpl.dependencyProject }
+    buildConfigField("String", "SKIE_GRADLE_PLUGIN", shimImpl.map { it.dependencyName.enquoted() })
+
+    val kotlinToSkieKgpVersion = project.kotlinToolingVersionDimension().components
+        .flatMap { versionComponent ->
+            versionComponent.supportedVersions.map { version ->
+                version to versionComponent.name
+            }
+        }
+        .joinToString { (version, name) ->
+            "${version.toString().enquoted()} to ${name.toString().enquoted()}"
+        }
+
+    buildConfigField("co.touchlab.skie.plugin.util.StringMap", "KOTLIN_TO_SKIE_KGP_VERSION", "mapOf($kotlinToSkieKgpVersion)")
+
+    buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
+
+    val kotlinPlugin = project.provider { projects.compiler.kotlinPlugin.dependencyProject }
+    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", kotlinPlugin.map { it.group.toString().enquoted() })
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", kotlinPlugin.map { it.name.enquoted() })
+    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", kotlinPlugin.map { it.version.toString().enquoted() })
+
+    val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
+    buildConfigField("String", "RUNTIME_DEPENDENCY_GROUP", runtime.map { it.group.toString().enquoted() })
+    buildConfigField("String", "RUNTIME_DEPENDENCY_NAME", runtime.map { it.name.enquoted() })
+    buildConfigField("String", "RUNTIME_DEPENDENCY_VERSION", runtime.map { it.version.toString().enquoted() })
+
+    val pluginId: String by properties
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
+
+    buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
 }
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                // TODO: It might be worthwhile to make this compile-time safe, so we don't have to manually check. Or at least a test?
-                // Whichever dependency is brought in by `gradle-plugin-loader` has to be `compileOnly` as we don't want duplicate classes.
-                compileOnly(projects.gradle.gradlePluginApi)
-                compileOnly(projects.common.configuration.configurationDeclaration)
-
-                implementation(libs.ci.info)
-                implementation(libs.jgit)
-                implementation(libs.mixpanel)
-
-                implementation(projects.common.analytics)
-                implementation(projects.common.util)
-            }
+        main {
+            kotlin.srcDirs(
+                "src/main/kotlin-compiler-attribute",
+            )
         }
     }
 }
 
-buildConfig {
-    generator(
-        ExpectActualBuildConfigGenerator(
-            isActualImplementation = false,
-            internalVisibility = false,
-        )
-    )
-
-    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "")
-    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "")
-    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "")
-    buildConfigField("String", "KOTLIN_TOOLING_VERSION", "")
-    buildConfigField("String", "GRADLE_API_VERSION", "")
-    buildConfigField("String", "RUNTIME_DEPENDENCY_GROUP", "")
-    buildConfigField("String", "RUNTIME_DEPENDENCY_NAME", "")
-    buildConfigField("String", "RUNTIME_DEPENDENCY_VERSION", "")
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "")
-    buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "")
-}
-
-multiDimensionTarget.configureSourceSet { sourceSet ->
-    if (sourceSet.isRoot) {
-        kotlinSourceSet.kotlin.srcDir(
-            "src/kgp_common/gradle_common/kotlin-compiler-attribute-local",
-        )
+configurations.configureEach {
+    attributes {
+        @Suppress("UnstableApiUsage")
+        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersionDimension().components.min().value))
     }
 }
 
-multiDimensionTarget.configureSourceSet { sourceSet ->
-    if (!sourceSet.isTarget || compilation.isTest) { return@configureSourceSet }
+dependencies {
+    api(projects.gradle.gradlePluginShimApi)
+    api(projects.common.configuration.configurationDeclaration)
+    compileOnly("dev.gradleplugins:gradle-api:${gradleApiVersionDimension().components.min().value}")
+    compileOnly(libs.plugin.kotlin.gradle.api)
+    compileOnly(libs.plugin.kotlin.gradle)
 
-    buildConfig {
-        this.sourceSets.named(kotlinSourceSet.name).configure {
-            generator(ExpectActualBuildConfigGenerator(isActualImplementation = true, internalVisibility = false))
-            className.set("BuildConfig")
+    implementation(libs.ci.info)
+    implementation(libs.jgit)
+    implementation(libs.mixpanel)
 
-            val kotlinPlugin = projects.compiler.kotlinPlugin.dependencyProject
+    implementation(projects.common.analytics)
+    implementation(projects.common.util)
 
-            buildConfigField("String", "KOTLIN_PLUGIN_GROUP", kotlinPlugin.group.toString().enquoted())
-            buildConfigField("String", "KOTLIN_PLUGIN_NAME", kotlinPlugin.name.enquoted())
-            buildConfigField("String", "KOTLIN_PLUGIN_VERSION", kotlinPlugin.version.toString().enquoted())
-            buildConfigField("String", "KOTLIN_TOOLING_VERSION", sourceSet.kotlinToolingVersion.value.enquoted())
-            buildConfigField("String", "GRADLE_API_VERSION", sourceSet.gradleApiVersion.value.enquoted())
+    testImplementation(kotlin("test"))
+}
 
-            val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
-            buildConfigField("String", "RUNTIME_DEPENDENCY_GROUP", runtime.map { it.group.toString().enquoted() })
-            buildConfigField("String", "RUNTIME_DEPENDENCY_NAME", runtime.map { it.name.enquoted() })
-            buildConfigField("String", "RUNTIME_DEPENDENCY_VERSION", runtime.map { it.version.toString().enquoted() })
+tasks.named("compileKotlin").configure {
+    val gradleApiVersions = project.gradleApiVersionDimension()
+    val kotlinToolingVersions = project.kotlinToolingVersionDimension()
 
-            val pluginId: String by properties
-            buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
+    gradleApiVersions.components.forEach { gradleApiVersion ->
+        kotlinToolingVersions.components.forEach { kotlinToolingVersion ->
+            val shimConfiguration = configurations.detachedConfiguration(
+                projects.gradle.gradlePluginShimImpl,
+            ).apply {
+                attributes {
+                    attribute(
+                        KotlinCompilerVersion.attribute,
+                        objects.named(KotlinCompilerVersion::class.java, kotlinToolingVersion.value),
+                    )
+                    attribute(
+                        GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+                        objects.named(GradlePluginApiVersion::class.java, gradleApiVersion.value),
+                    )
+                }
+            }
+            dependsOn(shimConfiguration)
+        }
+    }
+}
 
-            buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
+gradlePlugin {
+    website = "https://skie.touchlab.co"
+    vcsUrl = "https://github.com/touchlab/SKIE.git"
+
+    this.plugins {
+        create("co.touchlab.skie") {
+            id = "co.touchlab.skie"
+            displayName = "Swift and Kotlin, unified"
+            implementationClass = "co.touchlab.skie.plugin.SkieGradlePlugin"
+            version = project.version
+
+            description = "A Gradle plugin to add Swift into Kotlin/Native framework."
+            tags = listOf(
+                "swift",
+                "kotlin",
+                "native",
+                "compiler",
+            )
         }
     }
 }
