@@ -11,7 +11,6 @@ import co.touchlab.skie.test.util.KotlinVersion
 @Smoke
 @GradleTests
 class NoArtifact_SingleTargetTests: BaseGradleTests() {
-
     @MatrixTest
     fun `no artifact`(
         kotlinVersion: KotlinVersion,

@@ -1,12 +1,10 @@
 package co.touchlab.skie.test.runner
 
-import co.touchlab.skie.test.*
 import co.touchlab.skie.test.util.*
-import kotlin.properties.PropertyDelegateProvider
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
+import org.slf4j.LoggerFactory
 
 object SkieTestRunnerConfiguration {
+    private val logger = LoggerFactory.getLogger(SkieTestRunnerConfiguration::class.java)
 
     val testLevel = value<TestLevel>("testLevel") ?: TestLevel.Thorough
     val testTypes = set<TestType>("testTypes")
@@ -46,84 +44,50 @@ object SkieTestRunnerConfiguration {
         this += SkieTestMatrix.Axis("Preset", filteredPresets.filterIsInstance<KotlinTarget.Preset.Native.Darwin>())
     }.associateBy { it.type }
 
-
-//     private operator fun <E: Enum<E>> getValue(skieTestMatrix: SkieTestMatrix, property: KProperty<*>): E {
-// //         return System.getProperty(property.name, "").toBoolean()
-//         TODO()
-//     }
-
     private fun <T: Any> value(property: String, deserialize: (String) -> T?): T? {
         val properties = System.getProperties()
         return if (properties.containsKey(property)) {
-            val rawValue = properties.getProperty(property)
+            val rawValue = properties.getProperty(property).trim()
             deserialize(rawValue)
+                .logErrorOnUnknownValue(property, rawValue)
         } else {
             null
         }
     }
 
-    private inline fun <reified E: Enum<E>> value(property: String): E? = value(property) {
-        enumValueOf<E>(it)
+    private inline fun <reified E: Enum<E>> value(property: String): E? = value(property) { rawValue ->
+        enumValues<E>().singleOrNull { enumEntry ->
+            enumEntry.name.equals(rawValue, ignoreCase = true)
+        }
     }
 
     private fun <T: Any> list(property: String, deserialize: (String) -> T?): List<T>? {
         val properties = System.getProperties()
         return if (properties.containsKey(property)) {
             val rawValue = properties.getProperty(property)
-            rawValue.split(',').mapNotNull {
-                deserialize(it.trim())
-            }
+            rawValue.split(',').mapNotNull { listItem ->
+                val trimmedListItem = listItem.trim()
+                deserialize(trimmedListItem)
+                    .logErrorOnUnknownValue(property, trimmedListItem)
+            }.takeIf { it.isNotEmpty() }
         } else {
             null
         }
     }
 
-    private fun <T: Any> nestedList(property: String, deserialize: (String) -> List<T>): List<T>? {
-        val properties = System.getProperties()
-        return if (properties.containsKey(property)) {
-            val rawValue = properties.getProperty(property)
-            rawValue.split(',').flatMap {
-                deserialize(it.trim())
-            }
-        } else {
-            null
+    private inline fun <reified E: Enum<E>> list(property: String): List<E> = list(property) { rawValue ->
+        enumValues<E>().singleOrNull { enumEntry ->
+            enumEntry.name.equals(rawValue, ignoreCase = true)
         }
-    }
-
-    private inline fun <reified E: Enum<E>> list(property: String): List<E> = list(property) {
-        enumValueOf<E>(it)
     } ?: enumValues<E>().toList()
 
     private fun <T: Any> set(property: String, deserialize: (String) -> T?): Set<T>? = list(property, deserialize)?.toSet()
 
-    private inline fun <reified E: Enum<E>> set(property: String): Set<E> = set(property) {
-        enumValueOf<E>(it)
+    private inline fun <reified E: Enum<E>> set(property: String): Set<E> = set(property) { rawValue ->
+        enumValues<E>().singleOrNull { enumEntry ->
+            enumEntry.name.equals(rawValue, ignoreCase = true)
+        }
     } ?: enumValues<E>().toSet()
-
-    private inline fun <reified E: Enum<E>> singleValue(crossinline default: () -> E) = PropertyDelegateProvider { _: SkieTestRunnerConfiguration, property ->
-        val properties = System.getProperties()
-        val value = if (properties.containsKey(property.name)) {
-            val rawValue = properties.getProperty(property.name)
-            enumValueOf<E>(rawValue)
-        } else {
-            default()
-        }
-        PropertyStorage(value)
-    }
-
-    private inline fun <reified E: Enum<E>> multipleValues(crossinline default: () -> List<E> = { enumValues<E>().toList() }) = PropertyDelegateProvider { _: SkieTestRunnerConfiguration, property ->
-        val properties = System.getProperties()
-        val values = if (properties.containsKey(property.name)) {
-            val rawValue = properties.getProperty(property.name)
-            rawValue.split(',').map {
-                enumValueOf<E>(it)
-            }
-
-        } else {
-            default()
-        }
-        PropertyStorage(values)
-    }
 
     private fun <T> List<T>.intersectOrKeepIfEmpty(other: List<T>): List<T> {
         return if (other.isNotEmpty()) {
@@ -134,7 +98,10 @@ object SkieTestRunnerConfiguration {
         }
     }
 
-    private data class PropertyStorage<T>(val value: T): ReadOnlyProperty<SkieTestRunnerConfiguration, T> {
-        override operator fun getValue(thisRef: SkieTestRunnerConfiguration, property: KProperty<*>): T = value
+    private fun <T: Any> T?.logErrorOnUnknownValue(property: String, rawValue: String): T? {
+        if (this == null) {
+            logger.error("Couldn't deserialize value $rawValue for property $property")
+        }
+        return this
     }
 }

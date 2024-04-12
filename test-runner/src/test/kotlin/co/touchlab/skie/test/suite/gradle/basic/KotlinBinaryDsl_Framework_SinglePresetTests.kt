@@ -11,10 +11,9 @@ import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
 
 @Suppress("ClassName")
+@Smoke
 @GradleTests
 class KotlinBinaryDsl_Framework_SinglePresetTests: BaseGradleTests() {
-
-    @Smoke
     @MatrixTest
     fun `basic project, single preset`(
         kotlinVersion: KotlinVersion,

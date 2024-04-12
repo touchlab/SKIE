@@ -4,19 +4,16 @@ sealed interface KotlinTargetOrPreset {
     val id: String
 }
 
-
-fun KotlinTargetOrPreset(id: String): KotlinTargetOrPreset {
+fun KotlinTargetOrPreset(id: String): KotlinTargetOrPreset? {
     fun KotlinTargetOrPreset.findById(id: String): KotlinTargetOrPreset? {
         return when {
-            this.id == id -> this
+            this.id.equals(id, ignoreCase = true) -> this
             this is KotlinTarget.Preset -> this.children.firstNotNullOfOrNull { it.findById(id) }
             else -> null
         }
     }
 
-    return checkNotNull(KotlinTarget.Preset.Root.findById(id)) {
-        "Could not find target or preset with id '$id'"
-    }
+    return KotlinTarget.Preset.Root.findById(id)
 }
 
 val List<KotlinTargetOrPreset>.targets: List<KotlinTarget>

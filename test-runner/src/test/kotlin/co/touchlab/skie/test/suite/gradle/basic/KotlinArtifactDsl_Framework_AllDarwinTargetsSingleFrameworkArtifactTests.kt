@@ -14,7 +14,6 @@ import co.touchlab.skie.test.util.LinkMode
 @Smoke
 @GradleTests
 class KotlinArtifactDsl_Framework_AllDarwinTargetsSingleFrameworkArtifactTests: BaseGradleTests() {
-
     @MatrixTest
     fun `all darwin targets and single framework artifact`(
         kotlinVersion: KotlinVersion,

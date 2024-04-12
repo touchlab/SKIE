@@ -14,7 +14,6 @@ import co.touchlab.skie.test.util.LinkMode
 @Smoke
 @GradleTests
 class KotlinArtifactDsl_XCFramework_AllDarwinTargetsTests: BaseGradleTests() {
-
     @MatrixTest
     fun `all darwin targets and single xcframework artifact`(
         kotlinVersion: KotlinVersion,
