@@ -20,7 +20,7 @@ object CreateStableNameTypeAliasesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses
+        kirProvider.kotlinClasses
             .filter { it.hasStableNameTypeAlias || shouldGenerateFileForEachExportedClass }
             .forEach {
                 createTypeAlias(it)

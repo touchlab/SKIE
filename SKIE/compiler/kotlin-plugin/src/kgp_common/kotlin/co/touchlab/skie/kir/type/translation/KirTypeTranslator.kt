@@ -1,132 +1,154 @@
-@file:Suppress("invisible_reference", "invisible_member")
-
 package co.touchlab.skie.kir.type.translation
 
+import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.type.BlockPointerKirType
-import co.touchlab.skie.kir.type.ErrorOutKirType
-import co.touchlab.skie.kir.type.KirType
-import co.touchlab.skie.kir.type.OirBasedKirType
+import co.touchlab.skie.kir.type.NonNullReferenceKirType
 import co.touchlab.skie.kir.type.ReferenceKirType
-import co.touchlab.skie.kir.type.SuspendCompletionKirType
-import co.touchlab.skie.oir.type.OirType
-import co.touchlab.skie.oir.type.PointerOirType
-import co.touchlab.skie.oir.type.PrimitiveOirType
+import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 import co.touchlab.skie.oir.type.SpecialReferenceOirType
 import co.touchlab.skie.oir.type.VoidOirType
-import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
-import org.jetbrains.kotlin.backend.konan.objcexport.BlockPointerBridge
-import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
-import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCValueType
-import org.jetbrains.kotlin.backend.konan.objcexport.ReferenceBridge
-import org.jetbrains.kotlin.backend.konan.objcexport.TypeBridge
-import org.jetbrains.kotlin.backend.konan.objcexport.ValueTypeBridge
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.ParameterDescriptor
+import co.touchlab.skie.phases.features.flow.SupportedFlow
+import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
+import org.jetbrains.kotlin.backend.konan.isInlined
+import org.jetbrains.kotlin.backend.konan.isKotlinObjCClass
+import org.jetbrains.kotlin.backend.konan.isObjCForwardDeclaration
+import org.jetbrains.kotlin.backend.konan.isObjCMetaClass
+import org.jetbrains.kotlin.backend.konan.isObjCObjectType
+import org.jetbrains.kotlin.backend.konan.isObjCProtocolClass
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns.isAny
+import org.jetbrains.kotlin.builtins.getReceiverTypeFromFunctionType
+import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
+import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.resolve.descriptorUtil.classId
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeUtils
-import org.jetbrains.kotlin.types.typeUtil.builtIns
-import org.jetbrains.kotlin.types.typeUtil.makeNullable
-import org.jetbrains.kotlin.types.typeUtil.supertypes
+import org.jetbrains.kotlin.types.isNullable
+import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 
-class KirTypeTranslator {
+// Logic mostly copied from ObjCExportTranslatorImpl (including TODOs)
+class KirTypeTranslator(
+    private val descriptorKirProvider: DescriptorKirProvider,
+    private val customTypeMappers: KirCustomTypeMappers,
+) : KirTypeTranslatorUtilityScope() {
 
-    internal fun mapValueParameterType(
-        functionDescriptor: FunctionDescriptor,
-        valueParameterDescriptor: ParameterDescriptor?,
-        bridge: MethodBridgeValueParameter,
-    ): KirType =
-        when (bridge) {
-            is MethodBridgeValueParameter.Mapped -> mapType(valueParameterDescriptor!!.type, bridge.bridge)
-            MethodBridgeValueParameter.ErrorOutParameter -> ErrorOutKirType
-            is MethodBridgeValueParameter.SuspendCompletion -> {
-                SuspendCompletionKirType(functionDescriptor.returnType!!, useUnitCompletion = bridge.useUnitCompletion)
-            }
+    context(KirTypeParameterScope)
+    fun mapReferenceType(kotlinType: KotlinType): ReferenceKirType =
+        mapReferenceTypeIgnoringNullability(kotlinType).withNullabilityOf(kotlinType)
+
+    context(KirTypeParameterScope)
+    fun mapReferenceTypeIgnoringNullability(kotlinType: KotlinType): NonNullReferenceKirType {
+        mapTypeIfFlow(kotlinType)?.let {
+            return it
         }
 
-    internal fun mapReturnType(
-        descriptor: FunctionDescriptor,
-        returnBridge: MethodBridge.ReturnValue,
-    ): KirType =
-        when (returnBridge) {
-            MethodBridge.ReturnValue.Suspend,
-            MethodBridge.ReturnValue.Void,
-            -> VoidOirType.toKirType()
-            MethodBridge.ReturnValue.HashCode -> PrimitiveOirType.NSUInteger.toKirType()
-            is MethodBridge.ReturnValue.Mapped -> mapType(descriptor.returnType!!, returnBridge.bridge)
-            MethodBridge.ReturnValue.WithError.Success -> PrimitiveOirType.BOOL.toKirType()
-            is MethodBridge.ReturnValue.WithError.ZeroForError -> {
-                val successReturnType = mapReturnType(descriptor, returnBridge.successBridge)
+        customTypeMappers.mapTypeIfApplicable(kotlinType)?.let {
+            return it
+        }
 
-                successReturnType.makeNullableIfReferenceOrPointer()
+        if (kotlinType.isTypeParameter()) {
+            val genericTypeUsage = with(descriptorKirProvider) {
+                getTypeParameterUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
             }
 
-            MethodBridge.ReturnValue.Instance.InitResult,
-            MethodBridge.ReturnValue.Instance.FactoryResult,
-            -> SpecialReferenceOirType.InstanceType.toKirType()
+            if (genericTypeUsage != null)
+                return genericTypeUsage
         }
 
-    private fun mapType(kotlinType: KotlinType, typeBridge: TypeBridge): KirType =
-        when (typeBridge) {
-            ReferenceBridge -> ReferenceKirType(kotlinType)
-            is BlockPointerBridge -> mapFunctionType(kotlinType, typeBridge)
-            is ValueTypeBridge -> mapValueType(kotlinType, typeBridge)
+        val classDescriptor = kotlinType.getErasedTypeClass()
+
+        // TODO: translate `where T : BaseClass, T : SomeInterface` to `BaseClass* <SomeInterface>`
+
+        // TODO: expose custom inline class boxes properly.
+        if (isAny(classDescriptor) || classDescriptor.classId in customTypeMappers.hiddenTypes || classDescriptor.isInlined()) {
+            return SpecialReferenceOirType.Id.toKirType()
         }
 
-    private fun mapFunctionType(
-        kotlinType: KotlinType,
-        typeBridge: BlockPointerBridge,
-    ): KirType {
-        val expectedDescriptor = kotlinType.builtIns.getFunction(typeBridge.numberOfParameters)
+        if (classDescriptor.defaultType.isObjCObjectType()) {
+            return mapObjCObjectReferenceTypeIgnoringNullability(classDescriptor)
+        }
 
-        // Somewhat similar to mapType:
-        val functionType = if (TypeUtils.getClassDescriptor(kotlinType) == expectedDescriptor) {
-            kotlinType
+        // There are number of tricky corner cases getting here.
+        val kirClass = descriptorKirProvider.findClass(classDescriptor) ?: return SpecialReferenceOirType.Id.toKirType()
+
+        val typeArgs = if (kirClass.kind == KirClass.Kind.Interface) {
+            emptyList()
         } else {
-            kotlinType.supertypes().singleOrNull { TypeUtils.getClassDescriptor(it) == expectedDescriptor }
-                ?: expectedDescriptor.defaultType // Should not happen though.
+            kotlinType.arguments.map { typeProjection ->
+                mapTypeArgument(typeProjection)
+            }
         }
 
-        return BlockPointerKirType(functionType, typeBridge.returnsVoid)
+        return kirClass.toType(typeArgs)
     }
 
-    private fun mapValueType(
-        kotlinType: KotlinType,
-        typeBridge: ValueTypeBridge,
-    ): KirType =
-        when (typeBridge.objCValueType) {
-            ObjCValueType.BOOL -> PrimitiveOirType.BOOL
-            ObjCValueType.UNICHAR -> PrimitiveOirType.unichar
-            ObjCValueType.CHAR -> PrimitiveOirType.int8_t
-            ObjCValueType.SHORT -> PrimitiveOirType.int16_t
-            ObjCValueType.INT -> PrimitiveOirType.int32_t
-            ObjCValueType.LONG_LONG -> PrimitiveOirType.int64_t
-            ObjCValueType.UNSIGNED_CHAR -> PrimitiveOirType.uint8_t
-            ObjCValueType.UNSIGNED_SHORT -> PrimitiveOirType.uint16_t
-            ObjCValueType.UNSIGNED_INT -> PrimitiveOirType.uint32_t
-            ObjCValueType.UNSIGNED_LONG_LONG -> PrimitiveOirType.uint64_t
-            ObjCValueType.FLOAT -> PrimitiveOirType.float
-            ObjCValueType.DOUBLE -> PrimitiveOirType.double
-            ObjCValueType.POINTER -> PointerOirType(VoidOirType, kotlinType.binaryRepresentationIsNullable())
-        }.toKirType()
+    context(KirTypeParameterScope)
+    private fun mapTypeIfFlow(kotlinType: KotlinType): UnresolvedFlowKirType? {
+        val supportedFlow = SupportedFlow.from(kotlinType) ?: return null
 
-    private fun OirType.toKirType(): KirType =
-        OirBasedKirType(this)
+        val flowTypeArgument = kotlinType.arguments.single()
 
-    private fun KirType.makeNullableIfReferenceOrPointer(): KirType =
-        when (this) {
-            is BlockPointerKirType -> this.copy(kotlinType = kotlinType.makeNullable())
-            is OirBasedKirType -> this.makeNullableIfReferenceOrPointer()
-            is ReferenceKirType -> this.copy(kotlinType = kotlinType.makeNullable())
-            is SuspendCompletionKirType -> this.copy(kotlinType = kotlinType.makeNullable())
-            ErrorOutKirType -> this
+        val supportedFlowVariant = if (flowTypeArgument.type.isNullable()) {
+            supportedFlow.optionalVariant
+        } else {
+            supportedFlow.requiredVariant
         }
 
-    private fun OirBasedKirType.makeNullableIfReferenceOrPointer(): KirType =
-        when (this.oirType) {
-            is PointerOirType -> this.oirType.copy(nullable = true).toKirType()
-            is PrimitiveOirType -> this
-            VoidOirType -> this
-            else -> error("Unsupported OirBasedKirType type: $this")
+        return UnresolvedFlowKirType(supportedFlowVariant) {
+            mapTypeArgument(flowTypeArgument)
         }
+    }
+
+    context(KirTypeParameterScope)
+    private fun KirTypeTranslator.mapTypeArgument(typeProjection: TypeProjection): NonNullReferenceKirType =
+        if (typeProjection.isStarProjection) {
+            SpecialReferenceOirType.Id.toKirType() // TODO: use Kotlin upper bound.
+        } else {
+            mapReferenceTypeIgnoringNullability(typeProjection.type)
+        }
+
+    private tailrec fun mapObjCObjectReferenceTypeIgnoringNullability(descriptor: ClassDescriptor): NonNullReferenceKirType {
+        // TODO: more precise types can be used.
+
+        if (descriptor.isObjCMetaClass()) return SpecialReferenceOirType.Class.toKirType()
+        if (descriptor.isObjCProtocolClass()) return SpecialReferenceOirType.Protocol.toKirType()
+
+        if (descriptor.isExternalObjCClass() || descriptor.isObjCForwardDeclaration()) {
+            return descriptorKirProvider.getExternalClass(descriptor).defaultType
+        }
+
+        if (descriptor.isKotlinObjCClass()) {
+            return mapObjCObjectReferenceTypeIgnoringNullability(descriptor.getSuperClassOrAny())
+        }
+
+        return SpecialReferenceOirType.Id.toKirType()
+    }
+
+    context(KirTypeParameterScope)
+    fun mapFunctionType(kotlinType: KotlinType, returnsVoid: Boolean): ReferenceKirType =
+        mapFunctionTypeIgnoringNullability(kotlinType, returnsVoid).withNullabilityOf(kotlinType)
+
+    context(KirTypeParameterScope)
+    fun mapFunctionTypeIgnoringNullability(
+        functionType: KotlinType,
+        returnsVoid: Boolean,
+    ): NonNullReferenceKirType {
+        val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
+            functionType.getValueParameterTypesFromFunctionType().map { it.type }
+
+        return BlockPointerKirType(
+            valueParameterTypes = parameterTypes.map { mapReferenceType(it) },
+            returnType = if (returnsVoid) {
+                VoidOirType.toKirType()
+            } else {
+                mapReferenceType(functionType.getReturnTypeFromFunctionType())
+            },
+        )
+    }
+
+    private tailrec fun KotlinType.getErasedTypeClass(): ClassDescriptor =
+        TypeUtils.getClassDescriptor(this) ?: this.constructor.supertypes.first().getErasedTypeClass()
 }

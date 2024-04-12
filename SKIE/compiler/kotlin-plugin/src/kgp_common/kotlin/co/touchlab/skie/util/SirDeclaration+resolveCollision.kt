@@ -7,7 +7,6 @@ import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirElement
 import co.touchlab.skie.kir.element.KirEnumEntry
-import co.touchlab.skie.kir.element.classDescriptorOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirConstructor
@@ -17,7 +16,6 @@ import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.kirClassOrNull
 import co.touchlab.skie.sir.element.resolveAsKirClass
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 
 context(SirPhase.Context)
 fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(collisionReasonProvider: T.() -> String?): Boolean =
@@ -61,7 +59,6 @@ fun SirEnumCase.resolveCollisionWithWarning(collisionReasonProvider: SirEnumCase
         rename = { simpleName += "_" },
         getName = { toReadableString() },
         findKirElement = { parent.kirClassOrNull?.enumEntries?.get(index) },
-        getDescriptor = { descriptor },
     )
 
 context(SirPhase.Context)
@@ -77,13 +74,6 @@ private inline fun <T : SirCallableDeclaration> T.resolveCollisionWithWarning(
             kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
                 ?: if (this is SirProperty) kirProvider.findEnumEntry(this) else null
         },
-        getDescriptor = {
-            when (this) {
-                is KirCallableDeclaration<*> -> descriptor
-                is KirEnumEntry -> descriptor
-                else -> null
-            }
-        },
     )
 
 context(SirPhase.Context)
@@ -96,7 +86,6 @@ private inline fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(
         rename = rename,
         getName = { toReadableString() },
         findKirElement = { resolveAsKirClass() },
-        getDescriptor = { classDescriptorOrNull },
     )
 
 context(SirPhase.Context)
@@ -105,7 +94,6 @@ private inline fun <T, K : KirElement> T.resolveCollisionWithWarning(
     rename: () -> Unit,
     getName: T.() -> String,
     findKirElement: T.() -> K?,
-    getDescriptor: K.() -> DeclarationDescriptor?,
 ): Boolean {
     val collisionReason = collisionReasonProvider() ?: return false
 
@@ -121,7 +109,7 @@ private inline fun <T, K : KirElement> T.resolveCollisionWithWarning(
             originalName = originalName,
             newName = newName,
             collisionReason = collisionReason,
-            declarationDescriptor = kirElement.getDescriptor(),
+            source = kirElement,
         )
     }
 
@@ -148,13 +136,13 @@ private fun reportCollision(
     originalName: String,
     newName: String,
     collisionReason: String,
-    declarationDescriptor: DeclarationDescriptor?,
+    source: KirElement,
 ) {
     reporter.warning(
         message = "'$originalName' was renamed to '$newName' because of a name collision with $collisionReason. " +
             "Consider resolving the conflict either by changing the name in Kotlin, or via the @ObjCName annotation. " +
             "You can also suppress this warning using the 'SuppressSkieWarning.NameCollision' configuration. " +
             "However using renamed declarations from Swift is not recommended because their name will change if the conflict is resolved.",
-        declaration = declarationDescriptor,
+        source = source,
     )
 }

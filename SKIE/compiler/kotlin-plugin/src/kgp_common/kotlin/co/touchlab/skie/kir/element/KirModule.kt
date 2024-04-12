@@ -1,15 +1,13 @@
 package co.touchlab.skie.kir.element
 
 import co.touchlab.skie.configuration.ModuleConfiguration
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 // Instantiate only in KirProvider
 class KirModule(
     val name: String,
     val project: KirProject,
-    val descriptor: ModuleDescriptor?,
-    val isSkieKotlinRuntime: Boolean,
     val configuration: ModuleConfiguration,
+    val origin: Origin,
 ) : KirClassParent {
 
     override val classes: MutableList<KirClass> = mutableListOf()
@@ -22,4 +20,8 @@ class KirModule(
     }
 
     override fun toString(): String = "${this::class.simpleName}: $name"
+
+    enum class Origin {
+        Kotlin, SkieRuntime, SkieGenerated, External
+    }
 }

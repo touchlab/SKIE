@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.sir.type
 
 import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirModule
@@ -10,22 +11,22 @@ object CreateExternalSirTypesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.allExternalClassesAndProtocols.forEach {
+        oirProvider.externalClassesAndProtocols.forEach {
             createClass(it)
         }
     }
 
     context(SirPhase.Context)
-    private fun createClass(oirClass: OirClass): SirClass {
+    private fun createClass(oirClass: OirClass) {
         val sirClass = SirClass(
             baseName = oirClass.name,
-            parent = sirProvider.findExternalModule(oirClass)?.builtInFile ?: SirModule.Unknown.builtInFile,
+            parent = oirClass.kirClassOrNull?.let { sirProvider.findExternalModule(it) }?.builtInFile ?: SirModule.Unknown.builtInFile,
             kind = oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Oir(oirClass),
         )
 
         oirClass.originalSirClass = sirClass
 
-        return sirClass
+        CreateKotlinSirTypesPhase.createTypeParameters(oirClass, sirClass)
     }
 }

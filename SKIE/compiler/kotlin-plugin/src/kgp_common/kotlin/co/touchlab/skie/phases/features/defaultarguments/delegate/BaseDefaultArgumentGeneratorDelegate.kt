@@ -6,7 +6,6 @@ import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 import co.touchlab.skie.phases.DescriptorModificationPhase
-import co.touchlab.skie.phases.SkiePhase
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
@@ -34,13 +33,13 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
     private val isInteropEnabledForExternalModules: Boolean =
         SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in context.rootConfiguration.enabledFlags
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     protected val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.configuration[DefaultArgumentInterop.Enabled] &&
             this.satisfiesMaximumDefaultArgumentCount &&
             (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean
         get() = this.defaultArgumentCount <= this.configuration[DefaultArgumentInterop.MaximumDefaultArgumentCount]
 

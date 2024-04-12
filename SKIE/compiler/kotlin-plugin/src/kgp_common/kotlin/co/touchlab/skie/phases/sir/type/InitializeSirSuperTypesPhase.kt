@@ -4,7 +4,7 @@ import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.type.SirDeclaredSirType
 
-object InitializeSirTypesSuperTypesForOirPhase : SirPhase {
+object InitializeSirSuperTypesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {

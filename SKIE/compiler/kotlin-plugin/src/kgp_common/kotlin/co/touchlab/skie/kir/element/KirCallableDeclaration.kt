@@ -3,13 +3,8 @@ package co.touchlab.skie.kir.element
 import co.touchlab.skie.configuration.CallableDeclarationConfiguration
 import co.touchlab.skie.oir.element.OirCallableDeclaration
 import co.touchlab.skie.sir.element.SirCallableDeclaration
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 
 sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement, KirBridgeableDeclaration<S> {
-
-    val baseDescriptor: CallableMemberDescriptor
-
-    val descriptor: CallableMemberDescriptor
 
     val owner: KirClass
 
@@ -24,6 +19,8 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
     val oirCallableDeclaration: OirCallableDeclaration
 
     val isRefinedInSwift: Boolean
+
+    val kotlinSignature: String
 
     val module: KirModule
         get() = owner.module

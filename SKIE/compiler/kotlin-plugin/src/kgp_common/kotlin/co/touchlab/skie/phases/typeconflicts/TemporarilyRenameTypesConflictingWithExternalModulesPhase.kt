@@ -7,6 +7,7 @@ import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.module
 
 // Needed for ApiNotes used for the Swift files compilation but not for the final ApiNotes in the framework
+// Allows us to not rename types that conflict with external modules
 // Must be the last phase that renames SirTypeDeclarations
 object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
 

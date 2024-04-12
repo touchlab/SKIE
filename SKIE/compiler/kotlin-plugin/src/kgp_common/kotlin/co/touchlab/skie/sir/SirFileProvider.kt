@@ -1,6 +1,6 @@
 package co.touchlab.skie.sir
 
-import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirModule
@@ -14,7 +14,7 @@ import kotlin.io.path.extension
 
 class SirFileProvider(
     private val skieModule: SirModule.Skie,
-    private val kirProvider: KirProvider,
+    private val oirProvider: OirProvider,
     private val skieBuildDirectory: SkieBuildDirectory,
 ) {
 
@@ -25,7 +25,7 @@ class SirFileProvider(
     private val generatedSourceFileByPathCache = mutableMapOf<String, SirSourceFile>()
 
     private val skieNamespace: String
-        get() = kirProvider.skieModule.name
+        get() = oirProvider.skieModule.name
 
     fun getWrittenSourceFileFromSkieNamespace(name: String): SirSourceFile {
         val path = relativePath(skieNamespace, name)

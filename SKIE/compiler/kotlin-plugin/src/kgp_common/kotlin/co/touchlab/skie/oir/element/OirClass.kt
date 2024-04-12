@@ -4,7 +4,6 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.oir.type.DeclaredOirType
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirClass
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 
 class OirClass(
     override val name: String,
@@ -15,9 +14,11 @@ class OirClass(
 
     lateinit var originalSirClass: SirClass
 
+    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
     val primarySirClass: SirClass
         get() = bridgedSirClass ?: originalSirClass
 
+    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
     var bridgedSirClass: SirClass? = null
 
     override val visibility: OirVisibility
@@ -58,11 +59,15 @@ class OirClass(
 
     sealed interface Origin {
 
-        data class CinteropType(val classDescriptor: ClassDescriptor) : Origin
-
         data class Kir(val kirClass: KirClass) : Origin
     }
 }
+
+fun KirClass.Kind.toOirKind(): OirClass.Kind =
+    when (this) {
+        KirClass.Kind.Interface -> OirClass.Kind.Protocol
+        else -> OirClass.Kind.Class
+    }
 
 val OirClass.superClassType: DeclaredOirType?
     get() = superTypes.firstOrNull { it.declaration.kind == OirClass.Kind.Class }
@@ -90,7 +95,3 @@ val OirClass.allSimpleFunctions: List<OirSimpleFunction>
 
 val OirClass.kirClassOrNull: KirClass?
     get() = (origin as? OirClass.Origin.Kir)?.kirClass
-
-val OirClass.cinteropClassDescriptorOrNull: ClassDescriptor?
-    get() = (origin as? OirClass.Origin.CinteropType)?.classDescriptor
-

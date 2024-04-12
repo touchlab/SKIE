@@ -10,7 +10,7 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.allExternalClassesAndProtocols
+        oirProvider.externalClassesAndProtocols
             .groupBy { it.originalSirClass.module }
             .filterKeys { it is SirModule.External && it.name != "Foundation" }
             .mapKeys { it.key as SirModule.External }

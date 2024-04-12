@@ -4,9 +4,8 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.util.Command
+import co.touchlab.skie.util.SwiftCompilerConfiguration.BuildType
 import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
-import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
-import org.jetbrains.kotlin.konan.target.platformName
 import org.jetbrains.kotlin.konan.target.withOSVersion
 import java.io.File
 
@@ -16,19 +15,16 @@ class CompileSwiftPhase(
 
     private val framework = context.framework
     private val cacheableKotlinFramework = context.cacheableKotlinFramework
-    private val konanConfig = context.konanConfig
     private val swiftCompilerConfiguration = context.swiftCompilerConfiguration
     private val rootConfiguration = context.rootConfiguration
-    private val configurables = context.configurables
     private val skieBuildDirectory = context.skieBuildDirectory
-    private val targetTriple = context.configurables.targetTriple
     private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.moduleName)
     private val swiftFileList = context.skieBuildDirectory.swiftCompiler.config.swiftFileList(framework.moduleName)
     private val outputFileMap = context.skieBuildDirectory.swiftCompiler.config.outputFileMap
     private val objectFiles = skieBuildDirectory.swiftCompiler.objectFiles
     private val moduleDirectory = skieBuildDirectory.swiftCompiler.module
+    private val targetTriple = swiftCompilerConfiguration.targetTriple
 
-    private val isDebug = konanConfig.debug
     private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in rootConfiguration.enabledFlags
     private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in rootConfiguration.enabledFlags
     private val isConcurrentSkieCompilationEnabled = SkieConfigurationFlag.Build_ConcurrentSkieCompilation in rootConfiguration.enabledFlags
@@ -51,8 +47,6 @@ class CompileSwiftPhase(
         copySwiftModuleFiles()
 
         copySwiftLibraryEvolutionFiles()
-
-        addSwiftSpecificLinkerArgs()
     }
 
     private fun createSwiftFileList(sourceFiles: List<File>) {
@@ -62,7 +56,7 @@ class CompileSwiftPhase(
     }
 
     private fun createOutputFileMap(sourceFiles: List<File>) {
-        if (!isDebug) {
+        if (swiftCompilerConfiguration.buildType != BuildType.Debug) {
             return
         }
 
@@ -92,7 +86,7 @@ class CompileSwiftPhase(
     }
 
     private fun callSwiftCompiler() {
-        Command("${configurables.absoluteTargetToolchain}/usr/bin/swiftc").apply {
+        Command("${swiftCompilerConfiguration.absoluteTargetToolchainPath}/usr/bin/swiftc").apply {
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
             +"-F"
@@ -117,14 +111,17 @@ class CompileSwiftPhase(
             +"-emit-object"
             +"-parse-as-library"
             +"-enable-batch-mode"
-            if (isDebug) {
-                +"-Onone"
-                +"-incremental"
-                +"-output-file-map"
-                +outputFileMap.absolutePath
-            } else {
-                +"-O"
-                +"-whole-module-optimization"
+            when (swiftCompilerConfiguration.buildType) {
+                BuildType.Debug -> {
+                    +"-Onone"
+                    +"-incremental"
+                    +"-output-file-map"
+                    +outputFileMap.absolutePath
+                }
+                BuildType.Release -> {
+                    +"-O"
+                    +"-whole-module-optimization"
+                }
             }
             +"-g"
             +"-module-cache-path"
@@ -133,9 +130,10 @@ class CompileSwiftPhase(
             +swiftCompilerConfiguration.swiftVersion
             +parallelizationArgument
             +"-sdk"
-            +configurables.absoluteTargetSysRoot
+            +swiftCompilerConfiguration.absoluteTargetSysRootPath
             +"-target"
-            +configurables.targetTriple.withOSVersion(configurables.osVersionMin).toString()
+            +swiftCompilerConfiguration.targetTriple.withOSVersion(swiftCompilerConfiguration.osVersionMin).toString()
+            +swiftCompilerConfiguration.additionalFlags
             +"@${swiftFileList.absolutePath}"
 
             workingDirectory = objectFiles.directory
@@ -145,26 +143,29 @@ class CompileSwiftPhase(
     }
 
     private fun deleteOldObjectFiles(sourceFiles: List<File>) {
-        if (isDebug) {
-            val sourceFilesNames = sourceFiles.map { it.nameWithoutExtension }.toSet()
+        when (swiftCompilerConfiguration.buildType) {
+            BuildType.Debug -> {
+                val sourceFilesNames = sourceFiles.map { it.nameWithoutExtension }.toSet()
 
-            objectFiles.allFiles
-                .filterNot { it.nameWithoutExtension in sourceFilesNames }
-                .forEach {
-                    it.delete()
-                }
-        } else {
-            objectFiles.allFiles
-                .filter { it.nameWithoutExtension != framework.moduleName }
-                .forEach {
-                    it.delete()
-                }
+                objectFiles.allFiles
+                    .filterNot { it.nameWithoutExtension in sourceFilesNames }
+                    .forEach {
+                        it.delete()
+                    }
+            }
+            BuildType.Release -> {
+                objectFiles.allFiles
+                    .filter { it.nameWithoutExtension != framework.moduleName }
+                    .forEach {
+                        it.delete()
+                    }
+            }
         }
     }
 
     private fun getSwiftcBitcodeArg() =
-        when (konanConfig.configuration.get(KonanConfigKeys.BITCODE_EMBEDDING_MODE)) {
-            BitcodeEmbedding.Mode.NONE, null -> null
+        when (swiftCompilerConfiguration.bitcodeEmbeddingMode) {
+            BitcodeEmbedding.Mode.NONE -> null
             BitcodeEmbedding.Mode.FULL -> "-embed-bitcode"
             BitcodeEmbedding.Mode.MARKER -> "-embed-bitcode-marker"
         }
@@ -188,23 +189,10 @@ class CompileSwiftPhase(
             swiftFrameworkHeader.swiftInterface.copyTo(framework.swiftInterface(targetTriple), overwrite = true)
             swiftFrameworkHeader.privateSwiftInterface.copyTo(framework.privateSwiftInterface(targetTriple), overwrite = true)
         } else {
+            // WIP Check what happens with swiftFrameworkHeader
             framework.swiftInterface(targetTriple).delete()
             framework.privateSwiftInterface(targetTriple).delete()
         }
-    }
-
-    private fun addSwiftSpecificLinkerArgs() {
-        val swiftLibSearchPaths = listOf(
-            File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),
-            File(configurables.absoluteTargetSysRoot, "usr/lib/swift"),
-        ).flatMap { listOf("-L", it.absolutePath) }
-
-        val otherLinkerFlags = listOf(
-            "-rpath", "/usr/lib/swift", "-dead_strip",
-        )
-
-        konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
-        konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
     }
 
     private val parallelizationArgument: String

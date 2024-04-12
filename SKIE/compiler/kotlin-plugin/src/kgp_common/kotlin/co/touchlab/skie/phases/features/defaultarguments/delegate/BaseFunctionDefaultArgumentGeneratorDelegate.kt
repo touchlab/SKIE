@@ -8,7 +8,6 @@ import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.KotlinIrPhase
-import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.util.SharedCounter
@@ -34,7 +33,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
@@ -47,14 +46,14 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     protected abstract fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor>
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private fun generateOverloads(function: SimpleFunctionDescriptor) {
         function.forEachDefaultArgumentOverload { overloadParameters ->
             generateOverload(function, overloadParameters)
         }
     }
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private fun generateOverload(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -66,7 +65,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         removeManglingOfOverload(newFunction, function)
     }
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private fun generateOverloadWithUniqueName(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -127,19 +126,21 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     private fun registerOverload(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
         context.doInPhase(DefaultArgumentGenerator.RegisterOverloadsPhase) {
-            val overloadKirFunction = kirProvider.getFunction(overloadDescriptor)
+            val overloadKirFunction = descriptorKirProvider.getFunction(overloadDescriptor)
 
-            kirProvider.getFunction(function).defaultArgumentsOverloads.add(overloadKirFunction)
+            descriptorKirProvider.getFunction(function).defaultArgumentsOverloads.add(overloadKirFunction)
         }
     }
 
     private fun removeManglingOfOverload(overloadDescriptor: FunctionDescriptor, function: SimpleFunctionDescriptor) {
-        context.doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsPhase) {
-            val overloadFunction = kirProvider.getFunction(overloadDescriptor)
-            val baseFunction = kirProvider.getFunction(function)
+        context.doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsInitPhase) {
+            val overloadFunction = descriptorKirProvider.getFunction(overloadDescriptor)
+            val baseFunction = descriptorKirProvider.getFunction(function)
 
-            overloadFunction.originalSirFunction.identifier = baseFunction.originalSirFunction.identifier
-            overloadFunction.primarySirFunction.identifier = baseFunction.primarySirFunction.identifier
+            doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsFinalizePhase) {
+                overloadFunction.originalSirFunction.identifier = baseFunction.originalSirFunction.identifier
+                overloadFunction.primarySirFunction.identifier = baseFunction.primarySirFunction.identifier
+            }
         }
     }
 }

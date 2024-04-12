@@ -1,40 +1,26 @@
 package co.touchlab.skie.phases.oir
 
 import co.touchlab.skie.configuration.ClassInterop
-import co.touchlab.skie.configuration.provider.descriptor.configuration
-import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 object ConfigureCInteropFrameworkNameForPlatformTypesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.allExternalClassesAndProtocols.forEach {
-            configureIfPlatformType(it)
+        kirProvider.allPlatformClasses.forEach {
+            configureFrameworkName(it)
         }
     }
 
     context(SirPhase.Context)
-    private fun configureIfPlatformType(oirClass: OirClass) {
-        val origin = oirClass.origin as? OirClass.Origin.CinteropType ?: error("Invalid origin for OirClass: $oirClass")
-
-        val classDescriptor = origin.classDescriptor
-
-        if (!classDescriptor.isPlatformType) {
-            return
-        }
-
-        classDescriptor.configuration[ClassInterop.CInteropFrameworkName] = classDescriptor.cinteropFrameworkName
+    private fun configureFrameworkName(kirClass: KirClass) {
+        kirClass.configuration[ClassInterop.CInteropFrameworkName] = kirClass.cinteropFrameworkName
     }
 
-    private val ClassDescriptor.isPlatformType: Boolean
-        get() = this.fqNameSafe.pathSegments()[0].asString() == "platform"
-
-    private val ClassDescriptor.cinteropFrameworkName: String
-        get() = if (name.asString() != "NSObject") {
-            this.fqNameSafe.pathSegments()[1].asString()
+    private val KirClass.cinteropFrameworkName: String
+        get() = if (this.kotlinIdentifier != "NSObject") {
+            this.kotlinFqName.split(".")[1]
         } else {
             "Foundation"
         }

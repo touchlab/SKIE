@@ -6,9 +6,9 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
-interface KotlinIrPhase : SkiePhase<KotlinIrPhase.Context> {
+interface KotlinIrPhase : ForegroundPhase<KotlinIrPhase.Context> {
 
-    interface Context : SkiePhase.Context {
+    interface Context : ForegroundPhase.Context {
 
         override val context: Context
 

@@ -13,13 +13,18 @@ import co.touchlab.skie.kir.element.KirProperty
 import co.touchlab.skie.kir.element.KirScope
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirValueParameter
+import co.touchlab.skie.kir.type.translation.KirTypeParameterScope
+import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.oir.element.OirFunction
-import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.oir.util.getOirValueParameterName
+import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
 import org.jetbrains.kotlin.backend.konan.objcexport.valueParametersAssociated
+import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
@@ -34,31 +39,42 @@ import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
+import org.jetbrains.kotlin.resolve.isValueClass
 
 class CreateKirMembersPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+    context: DescriptorConversionPhase.Context,
+) : DescriptorConversionPhase {
 
     private val descriptorProvider = context.descriptorProvider
+    private val descriptorKirProvider = context.descriptorKirProvider
     private val kirProvider = context.kirProvider
     private val mapper = context.mapper
-    private val kirTypeTranslator = context.kirTypeTranslator
     private val descriptorConfigurationProvider = context.descriptorConfigurationProvider
+    private val namer = context.namer
+    private val kirDeclarationTypeTranslator = context.kirDeclarationTypeTranslator
 
     private val functionCache = mutableMapOf<FunctionDescriptor, KirSimpleFunction>()
     private val propertyCache = mutableMapOf<PropertyDescriptor, KirProperty>()
 
-    context(SirPhase.Context)
+    private val convertedPropertyKindLazyInitializers = mutableListOf<() -> Unit>()
+
+    context(DescriptorConversionPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses.forEach(::createMembers)
+        kirProvider.kotlinClasses.forEach(::createMembers)
 
         kirProvider.initializeCallableDeclarationsCache()
+
+        initializeConvertedPropertyKinds()
+    }
+
+    private fun initializeConvertedPropertyKinds() {
+        convertedPropertyKindLazyInitializers.forEach { it() }
     }
 
     private fun createMembers(kirClass: KirClass) {
-        when (kirClass.descriptor) {
-            is KirClass.Descriptor.Class -> createMembers(kirClass.descriptor.value, kirClass)
-            is KirClass.Descriptor.File -> createMembers(kirClass.descriptor.value, kirClass)
+        when (kirClass.kind) {
+            KirClass.Kind.File -> createMembers(descriptorKirProvider.getClassSourceFile(kirClass), kirClass)
+            else -> createMembers(descriptorKirProvider.getClassDescriptor(kirClass), kirClass)
         }
     }
 
@@ -90,14 +106,21 @@ class CreateKirMembersPhase(
         val methodBridge = mapper.bridgeMethod(originalDescriptor)
 
         val constructor = KirConstructor(
-            descriptor = originalDescriptor,
+            kotlinName = descriptor.name.asString(),
+            kotlinSignature = descriptor.signature,
+            objCSelector = namer.getSelector(descriptor),
+            swiftName = namer.getSwiftName(descriptor),
             owner = kirClass,
             errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
             deprecationLevel = descriptor.kirDeprecationLevel,
-            configuration = descriptorConfigurationProvider.getConfiguration(originalDescriptor),
+            configuration = descriptorConfigurationProvider.getConfiguration(descriptor),
         )
 
-        createValueParameters(constructor, originalDescriptor, methodBridge)
+        descriptorKirProvider.registerCallableDeclaration(constructor, descriptor)
+
+        kirClass.withTypeParameterScope {
+            createValueParameters(constructor, originalDescriptor, methodBridge)
+        }
     }
 
     private fun createMember(descriptor: CallableMemberDescriptor, kirClass: KirClass, origin: Origin) {
@@ -128,7 +151,7 @@ class CreateKirMembersPhase(
         val classDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(descriptor)
             ?: error("Unsupported function $descriptor")
 
-        val kirClass = kirProvider.getClass(classDescriptor)
+        val kirClass = descriptorKirProvider.getClass(classDescriptor)
 
         return getOrCreateFunction(descriptor, kirClass, origin)
     }
@@ -143,34 +166,66 @@ class CreateKirMembersPhase(
 
         val methodBridge = mapper.bridgeMethod(baseDescriptor)
 
-        val function = KirSimpleFunction(
-            baseDescriptor = baseDescriptor,
-            descriptor = originalDescriptor,
-            owner = kirClass,
-            origin = origin,
-            isSuspend = descriptor.isSuspend,
-            returnType = kirTypeTranslator.mapReturnType(originalDescriptor, methodBridge.returnBridge),
-            kind = when (descriptor) {
-                is SimpleFunctionDescriptor -> KirSimpleFunction.Kind.Function
-                is PropertyGetterDescriptor -> KirSimpleFunction.Kind.PropertyGetter(descriptor.correspondingProperty.original)
-                is PropertySetterDescriptor -> KirSimpleFunction.Kind.PropertySetter(descriptor.correspondingProperty.original)
-                else -> error("Unsupported function type: $descriptor")
-            },
-            scope = kirClass.callableDeclarationScope,
-            errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
-            deprecationLevel = descriptor.kirDeprecationLevel,
-            isRefinedInSwift = baseDescriptor.isRefinedInSwift,
-            configuration = getFunctionConfiguration(descriptor),
-        )
+        kirClass.withTypeParameterScope {
+            val function = KirSimpleFunction(
+                kotlinName = descriptor.name.asString(),
+                kotlinSignature = descriptor.signature,
+                objCSelector = namer.getSelector(baseDescriptor),
+                swiftName = namer.getSwiftName(baseDescriptor),
+                owner = kirClass,
+                origin = origin,
+                isSuspend = descriptor.isSuspend,
+                kind = descriptor.getKind(kirClass, origin),
+                returnType = kirDeclarationTypeTranslator.mapReturnType(
+                    originalDescriptor,
+                    methodBridge.returnBridge,
+                ),
+                scope = kirClass.callableDeclarationScope,
+                errorHandlingStrategy = methodBridge.returnBridge.errorHandlingStrategy,
+                deprecationLevel = descriptor.kirDeprecationLevel,
+                isRefinedInSwift = baseDescriptor.isRefinedInSwift,
+                configuration = getFunctionConfiguration(descriptor),
+            )
 
-        getDirectParents(descriptor)
-            .map { getOrCreateOverriddenFunction(it, origin) }
-            .let { function.addOverrides(it) }
+            descriptorKirProvider.registerCallableDeclaration(function, descriptor)
 
-        createValueParameters(function, descriptor, methodBridge)
+            getDirectParents(descriptor)
+                .map { getOrCreateOverriddenFunction(it, origin) }
+                .let { function.addOverrides(it) }
 
-        return function
+            createValueParameters(function, descriptor, methodBridge)
+
+            return function
+        }
     }
+
+    private fun FunctionDescriptor.getKind(kirClass: KirClass, origin: Origin): KirSimpleFunction.Kind =
+        when (this) {
+            is SimpleFunctionDescriptor -> KirSimpleFunction.Kind.Function
+            is PropertyGetterDescriptor -> {
+                val kind = KirSimpleFunction.Kind.PropertyGetter(null)
+
+                this.correspondingProperty.setter?.let {
+                    convertedPropertyKindLazyInitializers.add {
+                        kind.associatedSetter = getOrCreateFunction(it, kirClass, origin)
+                    }
+                }
+
+                kind
+            }
+            is PropertySetterDescriptor -> {
+                val kind = KirSimpleFunction.Kind.PropertySetter(null)
+
+                this.correspondingProperty.getter?.let {
+                    convertedPropertyKindLazyInitializers.add {
+                        kind.associatedGetter = getOrCreateFunction(it, kirClass, origin)
+                    }
+                }
+
+                kind
+            }
+            else -> error("Unsupported function type: $this")
+        }
 
     private fun getFunctionConfiguration(descriptor: FunctionDescriptor): SimpleFunctionConfiguration =
         when (descriptor) {
@@ -200,7 +255,7 @@ class CreateKirMembersPhase(
         val classDescriptor = descriptorProvider.getReceiverClassDescriptorOrNull(descriptor)
             ?: error("Unsupported property $descriptor")
 
-        val kirClass = kirProvider.getClass(classDescriptor)
+        val kirClass = descriptorKirProvider.getClass(classDescriptor)
 
         return getOrCreateProperty(descriptor, kirClass, origin)
     }
@@ -215,26 +270,35 @@ class CreateKirMembersPhase(
 
         val getterBridge = mapper.bridgeMethod(baseDescriptor.getter!!)
 
-        val property = KirProperty(
-            baseDescriptor = baseDescriptor,
-            descriptor = originalDescriptor,
-            owner = kirClass,
-            origin = origin,
-            scope = kirClass.callableDeclarationScope,
-            type = kirTypeTranslator.mapReturnType(originalDescriptor.getter!!, getterBridge.returnBridge),
-            isVar = descriptor.setter?.let { mapper.shouldBeExposed(it) } ?: false,
-            deprecationLevel = descriptor.kirDeprecationLevel,
-            isRefinedInSwift = baseDescriptor.isRefinedInSwift,
-            configuration = descriptorConfigurationProvider.getConfiguration(originalDescriptor),
-        )
+        val propertyName = namer.getPropertyName(baseDescriptor)
 
-        getDirectParents(descriptor)
-            .map { getOrCreateOverriddenProperty(it, origin) }
-            .let { property.addOverrides(it) }
+        kirClass.withTypeParameterScope {
+            val property = KirProperty(
+                kotlinName = descriptor.name.asString(),
+                kotlinSignature = descriptor.signature,
+                objCName = propertyName.objCName,
+                swiftName = propertyName.swiftName,
+                owner = kirClass,
+                origin = origin,
+                scope = kirClass.callableDeclarationScope,
+                type = kirDeclarationTypeTranslator.mapReturnType(originalDescriptor.getter!!, getterBridge.returnBridge),
+                isVar = descriptor.setter?.let { mapper.shouldBeExposed(it) } ?: false,
+                deprecationLevel = descriptor.kirDeprecationLevel,
+                isRefinedInSwift = baseDescriptor.isRefinedInSwift,
+                configuration = descriptorConfigurationProvider.getConfiguration(originalDescriptor),
+            )
 
-        return property
+            descriptorKirProvider.registerCallableDeclaration(property, descriptor)
+
+            getDirectParents(descriptor)
+                .map { getOrCreateOverriddenProperty(it, origin) }
+                .let { property.addOverrides(it) }
+
+            return property
+        }
     }
 
+    context(KirTypeParameterScope)
     private fun createValueParameters(
         function: KirFunction<*>,
         descriptor: FunctionDescriptor,
@@ -242,22 +306,52 @@ class CreateKirMembersPhase(
     ) {
         methodBridge.valueParametersAssociated(descriptor)
             .forEach { (parameterBridge, parameterDescriptor) ->
-                KirValueParameter(
-                    parent = function,
-                    type = kirTypeTranslator.mapValueParameterType(descriptor, parameterDescriptor, parameterBridge),
-                    kind = when (parameterBridge) {
-                        is MethodBridgeValueParameter.Mapped -> when (parameterDescriptor) {
-                            null -> error("Mapped ValueParameter $parameterBridge has no descriptor.")
-                            is ReceiverParameterDescriptor -> KirValueParameter.Kind.Receiver
-                            is PropertySetterDescriptor -> KirValueParameter.Kind.PropertySetterValue
-                            else -> KirValueParameter.Kind.ValueParameter(parameterDescriptor)
-                        }
-                        MethodBridgeValueParameter.ErrorOutParameter -> KirValueParameter.Kind.ErrorOut
-                        is MethodBridgeValueParameter.SuspendCompletion -> KirValueParameter.Kind.SuspendCompletion
-                    },
-                    configuration = getValueParameterConfiguration(parameterDescriptor, function),
-                )
+                createValueParameter(parameterBridge, parameterDescriptor, function, descriptor)
             }
+    }
+
+    context(KirTypeParameterScope)
+    private fun createValueParameter(
+        parameterBridge: MethodBridgeValueParameter,
+        parameterDescriptor: ParameterDescriptor?,
+        function: KirFunction<*>,
+        functionDescriptor: FunctionDescriptor,
+    ) {
+        val kind = when (parameterBridge) {
+            is MethodBridgeValueParameter.Mapped -> when (parameterDescriptor) {
+                null -> error("Mapped ValueParameter $parameterBridge has no descriptor.")
+                is ReceiverParameterDescriptor -> KirValueParameter.Kind.Receiver
+                is PropertySetterDescriptor -> KirValueParameter.Kind.PropertySetterValue
+                else -> KirValueParameter.Kind.ValueParameter
+            }
+            MethodBridgeValueParameter.ErrorOutParameter -> KirValueParameter.Kind.ErrorOut
+            is MethodBridgeValueParameter.SuspendCompletion -> KirValueParameter.Kind.SuspendCompletion
+        }
+
+        val kotlinName = when (kind) {
+            is KirValueParameter.Kind.ValueParameter -> parameterDescriptor!!.name.asString()
+            KirValueParameter.Kind.Receiver -> "receiver"
+            KirValueParameter.Kind.PropertySetterValue -> "value"
+            KirValueParameter.Kind.ErrorOut -> "error"
+            KirValueParameter.Kind.SuspendCompletion -> "completionHandler"
+        }
+
+        val valueParameter = KirValueParameter(
+            kotlinName = kotlinName,
+            objCName = when (kind) {
+                is KirValueParameter.Kind.ValueParameter -> namer.getOirValueParameterName(parameterDescriptor!!)
+                else -> kotlinName
+            }.toValidSwiftIdentifier(),
+            parent = function,
+            type = kirDeclarationTypeTranslator.mapValueParameterType(functionDescriptor, parameterDescriptor, parameterBridge),
+            kind = kind,
+            configuration = getValueParameterConfiguration(parameterDescriptor, function),
+            wasTypeInlined = parameterDescriptor?.type?.constructor?.declarationDescriptor?.isValueClass() == true,
+        )
+
+        parameterDescriptor?.let {
+            descriptorKirProvider.registerValueParameter(valueParameter, parameterDescriptor)
+        }
     }
 
     private fun getValueParameterConfiguration(
@@ -311,6 +405,11 @@ class CreateKirMembersPhase(
     private val CallableMemberDescriptor.isRefinedInSwift: Boolean
         get() = annotations.any { annotation ->
             annotation.annotationClass?.annotations?.any { it.fqName == KonanFqNames.refinesInSwift } == true
+        }
+
+    private val CallableMemberDescriptor.signature: String
+        get() = with(KonanManglerDesc) {
+            this@signature.signatureString(false)
         }
 
     private val MethodBridge.ReturnValue.errorHandlingStrategy: OirFunction.ErrorHandlingStrategy

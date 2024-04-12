@@ -10,11 +10,11 @@ object FixNamesOfInaccessibleNestedClassesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses.forEach(::fixNameOfInaccessibleNestedClass)
+        kirProvider.kotlinClasses.forEach(::fixNameOfInaccessibleNestedClass)
     }
 
     private fun fixNameOfInaccessibleNestedClass(kirClass: KirClass) {
-        val swiftName = kirClass.name.swiftName
+        val swiftName = kirClass.swiftName
 
         val hasIncorrectName = swiftName.contains(".") && swiftName != kirClass.originalSirClass.fqName.toLocalString()
 

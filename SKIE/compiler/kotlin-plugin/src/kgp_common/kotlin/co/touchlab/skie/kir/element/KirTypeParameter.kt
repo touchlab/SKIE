@@ -1,11 +1,12 @@
 package co.touchlab.skie.kir.element
 
+import co.touchlab.skie.kir.type.TypeParameterUsageKirType
 import co.touchlab.skie.oir.element.OirTypeParameter
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 
 class KirTypeParameter(
-    val descriptor: TypeParameterDescriptor,
+    val name: String,
     val parent: KirClass,
+    val variance: OirTypeParameter.Variance,
 ) : KirElement {
 
     lateinit var oirTypeParameter: OirTypeParameter
@@ -14,5 +15,8 @@ class KirTypeParameter(
         parent.typeParameters.add(this)
     }
 
-    override fun toString(): String = "${this::class.simpleName}: $descriptor>"
+    override fun toString(): String = "${this::class.simpleName}: $name"
 }
+
+fun KirTypeParameter.toTypeParameterUsage(): TypeParameterUsageKirType =
+    TypeParameterUsageKirType(this)

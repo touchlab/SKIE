@@ -8,7 +8,7 @@ object CreateKotlinSirExtensionsPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.allKotlinExtensions.forEach {
+        oirProvider.kotlinExtensions.forEach {
             createExtension(it)
         }
     }

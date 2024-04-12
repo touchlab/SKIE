@@ -1,6 +1,6 @@
 package co.touchlab.skie.configuration
 
-import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.CommonSkieContext
 
 class SimpleFunctionConfiguration(
     parent: FileOrClassConfiguration,
@@ -18,6 +18,6 @@ class SimpleFunctionConfiguration(
     }
 }
 
-context(SkiePhase.Context)
+context(CommonSkieContext)
 val SimpleFunctionConfiguration.isSuspendInteropEnabled: Boolean
     get() = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled && this[SuspendInterop.Enabled]

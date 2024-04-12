@@ -7,7 +7,6 @@ import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.KotlinIrPhase
-import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.util.SharedCounter
@@ -32,7 +31,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedClasses.forEach { classDescriptor ->
             classDescriptor.allSupportedConstructors.forEach {
@@ -47,13 +46,13 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassDescriptor.isSupported: Boolean
         get() = this.kind == ClassKind.CLASS
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private val ClassDescriptor.allSupportedConstructors: List<ClassConstructorDescriptor>
         get() = descriptorProvider.getExposedConstructors(this)
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private fun generateOverloads(constructor: ClassConstructorDescriptor, classDescriptor: ClassDescriptor) {
         constructor.forEachDefaultArgumentOverload { overloadParameters ->
             if (overloadParameters.isNotEmpty() || classDescriptor.generateOverloadWithNoParameters) {
@@ -69,14 +68,14 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassConstructorDescriptor.hasNoParametersIgnoringDefaultArguments: Boolean
         get() = this.valueParameters.count { !it.hasDefaultValue() } == 0
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private fun generateOverload(constructor: ClassConstructorDescriptor, parameters: List<ValueParameterDescriptor>) {
         val overload = generateOverloadWithUniqueName(constructor, parameters)
 
         registerOverload(overload, constructor)
     }
 
-    context(SkiePhase.Context)
+    context(DescriptorModificationPhase.Context)
     private fun generateOverloadWithUniqueName(
         constructor: ClassConstructorDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -97,7 +96,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
         }
 
         if (parameters.isNotEmpty()) {
-            removeManglingOfOverload(overload, constructor, overload.valueParameters.last(), parameters.last())
+            removeManglingOfOverload(overload.valueParameters.last(), parameters.last())
         }
 
         return overload
@@ -147,33 +146,31 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
 
     private fun registerOverload(overloadDescriptor: ClassConstructorDescriptor, constructor: ClassConstructorDescriptor) {
         context.doInPhase(DefaultArgumentGenerator.RegisterOverloadsPhase) {
-            val overloadKirConstructor = kirProvider.getConstructor(overloadDescriptor)
+            val overloadKirConstructor = descriptorKirProvider.getConstructor(overloadDescriptor)
 
-            kirProvider.getConstructor(constructor).defaultArgumentsOverloads.add(overloadKirConstructor)
+            descriptorKirProvider.getConstructor(constructor).defaultArgumentsOverloads.add(overloadKirConstructor)
         }
     }
 
     private fun removeManglingOfOverload(
-        overloadDescriptor: ClassConstructorDescriptor,
-        constructor: ClassConstructorDescriptor,
         mangledValueParameterDescriptorFromOverload: ValueParameterDescriptor,
         mangledValueParameterDescriptorFromConstructor: ValueParameterDescriptor,
     ) {
-        context.doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsPhase) {
-            val overloadKirConstructor = kirProvider.getConstructor(overloadDescriptor)
-            val baseKirConstructor = kirProvider.getConstructor(constructor)
+        context.doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsInitPhase) {
+            val mangledValueParameterFromOverload = descriptorKirProvider.getValueParameter(mangledValueParameterDescriptorFromOverload)
+            val mangledValueParameterFromConstructor = descriptorKirProvider.getValueParameter(mangledValueParameterDescriptorFromConstructor)
 
-            val mangledValueParameterFromOverload = overloadKirConstructor.valueParameters
-                .single { it.kind.descriptorOrNull == mangledValueParameterDescriptorFromOverload }
-                .oirValueParameter
-                .originalSirValueParameter
+            doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsFinalizePhase) {
+                val sirMangledValueParameterFromOverload = mangledValueParameterFromOverload
+                    .oirValueParameter
+                    .originalSirValueParameter
 
-            val mangledValueParameterFromConstructor = baseKirConstructor.valueParameters
-                .single { it.kind.descriptorOrNull == mangledValueParameterDescriptorFromConstructor }
-                .oirValueParameter
-                .originalSirValueParameter
+                val sirMangledValueParameterFromConstructor = mangledValueParameterFromConstructor
+                    .oirValueParameter
+                    .originalSirValueParameter
 
-            mangledValueParameterFromOverload?.label = mangledValueParameterFromConstructor?.labelOrName
+                sirMangledValueParameterFromOverload?.label = sirMangledValueParameterFromConstructor?.labelOrName
+            }
         }
     }
 }

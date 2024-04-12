@@ -24,8 +24,8 @@ class FileScopeConversionParentProvider(
     private val context: SirPhase.Context,
 ) {
 
+    private val kirBuiltins = context.kirBuiltins
     private val sirProvider = context.sirProvider
-    private val oirBuiltins = context.oirBuiltins
     private val sirBuiltins = context.sirBuiltins
 
     private val cache: MutableMap<SirType, List<SirExtension>> = mutableMapOf()
@@ -89,7 +89,7 @@ class FileScopeConversionParentProvider(
             is SpecialSirType.Any -> {
                 createNonOptionalExtension(
                     file = namespace,
-                    sirClass = oirBuiltins.NSObject.originalSirClass,
+                    sirClass = kirBuiltins.NSObject.originalSirClass,
                 ).let(::listOfNotNull)
             }
             is NullableSirType -> getOptionalExtensions(callableDeclaration, type, namespace)

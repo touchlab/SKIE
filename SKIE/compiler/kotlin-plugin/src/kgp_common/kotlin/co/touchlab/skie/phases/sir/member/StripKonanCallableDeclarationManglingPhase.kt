@@ -12,7 +12,7 @@ object StripKonanCallableDeclarationManglingPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allCallableDeclarations
+        kirProvider.kotlinCallableDeclarations
             .filter { it.isSupported }
             .forEach {
                 it.stripMangling()
@@ -31,7 +31,7 @@ object StripKonanCallableDeclarationManglingPhase : SirPhase {
     }
 
     private fun KirSimpleFunction.stripMangling() {
-        originalSirFunction.identifier = originalSirFunction.identifier.stripMangling(name)
+        originalSirFunction.identifier = originalSirFunction.identifier.stripMangling(kotlinName)
 
         valueParameters.forEach {
             it.stripMangling()
@@ -47,11 +47,11 @@ object StripKonanCallableDeclarationManglingPhase : SirPhase {
     private fun KirValueParameter.stripMangling() {
         val sirValueParameter = originalSirValueParameter ?: return
 
-        sirValueParameter.label = sirValueParameter.labelOrName.stripMangling(this.name)
+        sirValueParameter.label = sirValueParameter.labelOrName.stripMangling(this.kotlinName)
     }
 
     private fun KirProperty.stripMangling() {
-        originalSirProperty.identifier = originalSirProperty.identifier.stripMangling(name)
+        originalSirProperty.identifier = originalSirProperty.identifier.stripMangling(kotlinName)
     }
 
     private fun String.stripMangling(kotlinName: String): String {

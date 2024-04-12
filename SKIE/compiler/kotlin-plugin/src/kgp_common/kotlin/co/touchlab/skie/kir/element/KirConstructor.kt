@@ -4,18 +4,17 @@ import co.touchlab.skie.configuration.ConstructorConfiguration
 import co.touchlab.skie.oir.element.OirConstructor
 import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.sir.element.SirConstructor
-import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 
 class KirConstructor(
-    override val descriptor: ConstructorDescriptor,
+    override val kotlinName: String,
+    override val kotlinSignature: String,
+    override val objCSelector: String,
+    override val swiftName: String,
     override val owner: KirClass,
     override val errorHandlingStrategy: OirFunction.ErrorHandlingStrategy,
     override val deprecationLevel: DeprecationLevel,
     override val configuration: ConstructorConfiguration,
 ) : KirFunction<SirConstructor>() {
-
-    override val baseDescriptor: ConstructorDescriptor
-        get() = descriptor
 
     override val scope: KirScope = KirScope.Static
 
@@ -59,6 +58,4 @@ class KirConstructor(
     init {
         owner.callableDeclarations.add(this)
     }
-
-    override fun toString(): String = "${this::class.simpleName}: $descriptor"
 }

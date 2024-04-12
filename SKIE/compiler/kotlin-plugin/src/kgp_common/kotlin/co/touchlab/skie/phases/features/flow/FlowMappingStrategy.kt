@@ -1,9 +1,9 @@
 package co.touchlab.skie.phases.features.flow
 
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.typeUtil.supertypes
+import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.kir.type.DeclarationBackedKirType
+import co.touchlab.skie.kir.type.DeclaredKirType
+import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 
 enum class FlowMappingStrategy {
     Full, TypeArgumentsOnly, None;
@@ -14,18 +14,25 @@ enum class FlowMappingStrategy {
         "kotlin.collections.Map",
     )
 
-    fun limitedToTypeArguments(): FlowMappingStrategy =
+    fun limitFlowMappingToTypeArguments(): FlowMappingStrategy =
         when (this) {
             Full, TypeArgumentsOnly -> TypeArgumentsOnly
             None -> None
         }
 
-    fun forTypeArgumentsOf(kotlinType: KotlinType): FlowMappingStrategy =
-        if (kotlinType.isIncompatibleWithSkieFlows) limitedToTypeArguments() else forTypeArgumentsOfCompatibleType()
+    inline fun <T> KirClass.withFlowMappingForTypeArguments(action: FlowMappingStrategy.() -> T): T =
+        flowMappingForTypeArgumentsOf(this).action()
 
-    private val KotlinType.isIncompatibleWithSkieFlows: Boolean
-        get() = (listOf(this) + supertypes()).any {
-            (it.constructor.declarationDescriptor as? ClassDescriptor)?.fqNameSafe?.asString() in incompatibleTypeFqNames
+    fun flowMappingForTypeArgumentsOf(kirClass: KirClass): FlowMappingStrategy =
+        if (kirClass.isIncompatibleWithSkieFlows) limitFlowMappingToTypeArguments() else forTypeArgumentsOfCompatibleType()
+
+    private val KirClass.isIncompatibleWithSkieFlows: Boolean
+        get() = kotlinFqName in incompatibleTypeFqNames || superTypes.any { it.isIncompatibleWithSkieFlows }
+
+    private val DeclarationBackedKirType.isIncompatibleWithSkieFlows: Boolean
+        get() = when (this) {
+            is DeclaredKirType -> declaration.isIncompatibleWithSkieFlows
+            is UnresolvedFlowKirType -> true
         }
 
     private fun forTypeArgumentsOfCompatibleType(): FlowMappingStrategy =

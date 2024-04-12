@@ -6,11 +6,9 @@ import co.touchlab.skie.compilerinject.compilerplugin.SkieConfigurationKeys
 import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.configuration.provider.ConfigurationProvider
-import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
-import co.touchlab.skie.phases.swift.SwiftCompilerConfiguration
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.Reporter
@@ -35,17 +33,9 @@ class InitPhaseContext(
         CompilerSkieConfigurationData.deserialize(serializedUserConfiguration)
     }
 
-    private val configurationProvider = ConfigurationProvider(skieConfigurationData)
+    val configurationProvider = ConfigurationProvider(skieConfigurationData)
 
     override val rootConfiguration: RootConfiguration = configurationProvider.rootConfiguration
-
-    override val descriptorConfigurationProvider: DescriptorConfigurationProvider = DescriptorConfigurationProvider(configurationProvider)
-
-    override val swiftCompilerConfiguration: SwiftCompilerConfiguration = SwiftCompilerConfiguration(
-        sourceFilesDirectory = skieDirectories.buildDirectory.swift.directory,
-        swiftVersion = compilerConfiguration.get(SkieConfigurationKeys.SwiftCompiler.swiftVersion, "5"),
-        additionalFlags = compilerConfiguration.getList(SkieConfigurationKeys.SwiftCompiler.additionalFlags),
-    )
 
     override val analyticsCollector: AnalyticsCollector = AnalyticsCollector(
         skieBuildDirectory = skieDirectories.buildDirectory,
@@ -54,7 +44,7 @@ class InitPhaseContext(
 
     override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(rootConfiguration)
 
-    override val reporter: Reporter = Reporter(compilerConfiguration)
+    override val reporter: Reporter = Reporter()
 
     override val framework: FrameworkLayout = run {
         val frameworkPath = compilerConfiguration.getNotNull(KonanConfigKeys.OUTPUT)

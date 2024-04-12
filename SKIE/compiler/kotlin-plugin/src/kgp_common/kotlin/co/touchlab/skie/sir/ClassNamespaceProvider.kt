@@ -4,18 +4,17 @@ import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirClassParent
 import co.touchlab.skie.kir.element.KirModule
-import co.touchlab.skie.kir.element.classDescriptorOrNull
+import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 
 class ClassNamespaceProvider(
-    private val kirProvider: KirProvider,
+    kirProvider: KirProvider,
+    private val oirProvider: OirProvider,
     private val sirProvider: SirProvider,
-    private val mainModuleDescriptor: ModuleDescriptor,
 ) {
 
     private val namespaceClassCache = mutableMapOf<KirClass, SirClass>()
@@ -23,7 +22,7 @@ class ClassNamespaceProvider(
     private val moduleNamespaceCache = mutableMapOf<KirModule, SirClass>()
 
     private val classNamespaceFile by lazy {
-        sirProvider.fileProvider.getIrFile(kirProvider.skieModule.name, "Namespace")
+        sirProvider.fileProvider.getIrFile(oirProvider.skieModule.name, "Namespace")
     }
 
     private val classNamespaceBaseClass: SirClass by lazy {
@@ -34,8 +33,8 @@ class ClassNamespaceProvider(
         )
     }
 
-    private val modulesWithShortNameCollision =
-        kirProvider.allModules
+    private val kotlinModulesWithShortNameCollision =
+        kirProvider.kotlinModules
             .groupBy { it.shortNamespaceModuleName }
             .filter { it.value.size > 1 }
             .values
@@ -95,16 +94,19 @@ class ClassNamespaceProvider(
 
     private val KirClass.skieFileNamespaceName: String
         get() {
-            val isProducedBySkie = this.belongsToSkieKotlinRuntime || this.module.descriptor == mainModuleDescriptor
+            val isProducedBySkie = when (this.module.origin) {
+                KirModule.Origin.SkieRuntime, KirModule.Origin.SkieGenerated -> true
+                KirModule.Origin.Kotlin, KirModule.Origin.External -> false
+            }
 
-            return if (isProducedBySkie) kirProvider.skieModule.name else module.namespaceModuleName
+            return if (isProducedBySkie) oirProvider.skieModule.name else module.namespaceModuleName
         }
 
     private val KirModule.shortNameCollides: Boolean
-        get() = this in modulesWithShortNameCollision
+        get() = this in kotlinModulesWithShortNameCollision
 
     private val KirClass.classNamespaceSimpleName: String
-        get() = this.classDescriptorOrNull?.name?.identifier?.toValidSwiftIdentifier() ?: this.name.swiftName
+        get() = this.kotlinIdentifier.toValidSwiftIdentifier()
 
     @Suppress("RecursivePropertyAccessor")
     private val KirClass.skieFileName: String

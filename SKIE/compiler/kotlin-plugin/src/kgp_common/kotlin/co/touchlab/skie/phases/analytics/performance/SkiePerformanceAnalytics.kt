@@ -21,7 +21,7 @@ object SkiePerformanceAnalytics {
         private val rootConfiguration: RootConfiguration,
     ) : AnalyticsProducer {
 
-        val dispatcher: CoroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        private val dispatcher: CoroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
         override val name: String = "skie-performance"
 

@@ -16,7 +16,7 @@ class SealedInteropGenerator(
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses
+        kirProvider.kotlinClasses
             .filter { it.isSupported }
             .forEach {
                 generate(it)

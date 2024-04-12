@@ -1,6 +1,5 @@
 package co.touchlab.skie.sir.type
 
-import co.touchlab.skie.oir.element.cinteropClassDescriptorOrNull
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirModule
@@ -8,12 +7,10 @@ import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.module
-import co.touchlab.skie.sir.element.oirClassOrNull
-import co.touchlab.skie.sir.element.resolveAsSirClass
+import co.touchlab.skie.sir.element.resolveAsKirClass
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.parameterizedBy
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 data class SirDeclaredSirType(
     val declaration: SirTypeDeclaration,
@@ -64,11 +61,7 @@ data class SirDeclaredSirType(
     }
 
     private fun getUnknownCInteropModuleType(): SkieErrorSirType.UnknownCInteropFramework {
-        val oirClass = declaration.resolveAsSirClass()?.oirClassOrNull
-
-        val classDescriptor = oirClass?.cinteropClassDescriptorOrNull
-
-        val name = classDescriptor?.fqNameSafe?.asString() ?: declaration.fqName.toLocalString()
+        val name = declaration.resolveAsKirClass()?.kotlinFqName ?: declaration.fqName.toLocalString()
 
         return SkieErrorSirType.UnknownCInteropFramework(name)
     }

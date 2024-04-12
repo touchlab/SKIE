@@ -19,9 +19,15 @@ internal class ObjectFilesPhaseInterceptor : SameTypePhaseInterceptor<KonanConte
     override fun intercept(context: KonanContext, input: Unit, next: (KonanContext, Unit) -> Unit) {
         val objCExportedInterface = context.objCExport.reflectedBy<ObjCExportReflector>().exportedInterface as ObjCExportedInterface
 
-        EntrypointUtils.launchSirPhases(
-            mainSkieContext = context.config.configuration.mainSkieContext,
+        val mainSkieContext = context.config.configuration.mainSkieContext
+
+        EntrypointUtils.runDescriptorConversionPhases(
+            mainSkieContext = mainSkieContext,
             objCExportedInterfaceProvider = ObjCExportedInterfaceProvider(objCExportedInterface),
+        )
+
+        EntrypointUtils.runSirPhases(
+            mainSkieContext = mainSkieContext,
         )
 
         return next(context, input)

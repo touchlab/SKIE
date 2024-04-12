@@ -2,6 +2,7 @@ package co.touchlab.skie.phases.sir.type
 
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirModule
+import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
@@ -9,26 +10,24 @@ import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.toSirKind
 
-class CreateKotlinSirTypesPhase(
-    val context: SirPhase.Context,
-) : SirPhase {
-
-    private val kirProvider = context.kirProvider
-    private val sirProvider = context.sirProvider
-    private val sirBuiltins = context.sirBuiltins
+object CreateKotlinSirTypesPhase : SirPhase {
 
     private val kirToSirClasses = mutableMapOf<KirClass, SirClass>()
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses.forEach(::getOrCreateClass)
+        kirProvider.kotlinClasses.forEach {
+            getOrCreateClass(it)
+        }
     }
 
+    context(SirPhase.Context)
     private fun getOrCreateClass(kirClass: KirClass): SirClass =
         kirToSirClasses.getOrPut(kirClass) {
             createClass(kirClass)
         }
 
+    context(SirPhase.Context)
     private fun createClass(kirClass: KirClass): SirClass {
         val sirClass = SirClass(
             baseName = kirClass.sirFqName.simpleName,
@@ -37,28 +36,18 @@ class CreateKotlinSirTypesPhase(
             origin = SirClass.Origin.Kir(kirClass),
         )
 
-        sirClass.addTypeParameters(kirClass)
+        createTypeParameters(kirClass.oirClass, sirClass)
 
         kirClass.oirClass.originalSirClass = sirClass
 
         return sirClass
     }
 
-    private fun SirClass.addTypeParameters(kirClass: KirClass) {
-        kirClass.typeParameters.forEach { typeParameter ->
-            typeParameter.oirTypeParameter.sirTypeParameter = SirTypeParameter(
-                name = typeParameter.oirTypeParameter.name,
-                bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType),
-            )
-        }
-    }
-
+    context(SirPhase.Context)
     private val KirClass.sirFqName: SirFqName
         get() {
-            val swiftName = name.swiftName
-
-            val firstComponent = swiftName.substringBefore(".")
-            val secondComponent = swiftName.substringAfter(".").takeIf { it.isNotBlank() }
+            val firstComponent = this.swiftName.substringBefore(".")
+            val secondComponent = this.swiftName.substringAfter(".").takeIf { it.isNotBlank() }
 
             val firstName = SirFqName(
                 module = sirProvider.kotlinModule,
@@ -68,12 +57,25 @@ class CreateKotlinSirTypesPhase(
             return if (secondComponent != null) firstName.nested(secondComponent) else firstName
         }
 
+    context(SirPhase.Context)
     private val KirClass.sirParent: SirDeclarationParent
         get() = sirFqName.parent?.simpleName?.let { findSirParentRecursively(this, it) } ?: sirProvider.kotlinModule.builtInFile
 
+    context(SirPhase.Context)
     private fun findSirParentRecursively(kirClass: KirClass, parentName: String): SirClass? =
         when (val parent = kirClass.parent) {
-            is KirClass -> if (parent.name.swiftName == parentName) getOrCreateClass(parent) else findSirParentRecursively(parent, parentName)
+            is KirClass -> if (parent.swiftName == parentName) getOrCreateClass(parent) else findSirParentRecursively(parent, parentName)
             is KirModule -> null
         }
+
+    context(SirPhase.Context)
+    fun createTypeParameters(oirClass: OirClass, sirClass: SirClass) {
+        oirClass.typeParameters.forEach { typeParameter ->
+            typeParameter.sirTypeParameter = SirTypeParameter(
+                name = typeParameter.name,
+                parent = sirClass,
+                bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType),
+            )
+        }
+    }
 }

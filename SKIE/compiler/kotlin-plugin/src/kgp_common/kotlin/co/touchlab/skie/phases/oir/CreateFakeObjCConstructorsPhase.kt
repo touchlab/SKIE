@@ -14,7 +14,7 @@ object CreateFakeObjCConstructorsPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.allKotlinClasses.forEach {
+        oirProvider.kotlinClasses.forEach {
             it.addFakeObjCConstructors()
         }
     }

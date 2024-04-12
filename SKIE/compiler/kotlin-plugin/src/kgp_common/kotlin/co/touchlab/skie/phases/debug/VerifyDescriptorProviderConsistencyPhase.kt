@@ -3,15 +3,15 @@
 package co.touchlab.skie.phases.debug
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.DescriptorConversionPhase
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 
-object VerifyDescriptorProviderConsistencyPhase : SirPhase {
+object VerifyDescriptorProviderConsistencyPhase : DescriptorConversionPhase {
 
-    context(SirPhase.Context)
+    context(DescriptorConversionPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Debug_VerifyDescriptorProviderConsistency.isEnabled
 
-    context(SirPhase.Context)
+    context(DescriptorConversionPhase.Context)
     override suspend fun execute() {
         val objCExportedInterface = objCExportedInterfaceProvider.objCExportedInterface
 

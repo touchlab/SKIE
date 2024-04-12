@@ -1,10 +1,7 @@
 package co.touchlab.skie.kir
 
-import co.touchlab.skie.configuration.ModuleConfiguration
 import co.touchlab.skie.configuration.RootConfiguration
-import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.builtin.KirBuiltins
-import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
@@ -14,109 +11,74 @@ import co.touchlab.skie.kir.element.KirModule
 import co.touchlab.skie.kir.element.KirOverridableDeclaration
 import co.touchlab.skie.kir.element.KirProject
 import co.touchlab.skie.kir.element.KirSimpleFunction
-import co.touchlab.skie.kir.element.classDescriptorOrNull
-import co.touchlab.skie.kir.element.sourceFileOrNull
-import co.touchlab.skie.phases.runtime.isSkieKotlinRuntime
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.SourceFile
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class KirProvider(
-    kotlinBuiltIns: KotlinBuiltIns,
-    extraDescriptorBuiltins: ExtraDescriptorBuiltins,
-    namer: ObjCExportNamer,
-    private val rootConfiguration: RootConfiguration,
-    private val descriptorConfigurationProvider: DescriptorConfigurationProvider,
+    delegate: Lazy<KirProviderDelegate>,
+    rootConfiguration: RootConfiguration,
 ) {
 
-    private val modulesMap = mutableMapOf<String, KirModule>()
-
-    private lateinit var classDescriptorCache: Map<ClassDescriptor, KirClass>
-    private lateinit var fileCache: Map<SourceFile, KirClass>
-
     private lateinit var fqNameCache: Map<String, KirClass>
-
-    private lateinit var descriptorsToCallableDeclarationsCache: Map<CallableMemberDescriptor, KirCallableDeclaration<*>>
 
     private lateinit var sirToCallableDeclarationsCache: Map<SirCallableDeclaration, KirCallableDeclaration<*>>
 
     private lateinit var sirToEnumEntryCache: Map<SirProperty, KirEnumEntry>
 
-    val allModules: Collection<KirModule>
-        get() = modulesMap.values
+    private val delegate by delegate
 
-    lateinit var allClasses: Set<KirClass>
+    val kotlinModules: Collection<KirModule>
+        get() = delegate.kotlinModules
+
+    val allExternalClasses: Collection<KirClass>
+        get() = delegate.allExternalClassesAndProtocols
+
+    val allPlatformClasses: Collection<KirClass>
+        get() = delegate.allExternalClassesAndProtocols.filter { it.origin == KirClass.Origin.PlatformType }
+
+    val allClasses: Set<KirClass>
+        get() = kotlinClasses + allExternalClasses
+
+    lateinit var kotlinClasses: Set<KirClass>
         private set
 
-    lateinit var allEnums: Set<KirClass>
+    lateinit var kotlinEnums: Set<KirClass>
         private set
 
-    lateinit var allCallableDeclarations: List<KirCallableDeclaration<*>>
+    lateinit var kotlinCallableDeclarations: List<KirCallableDeclaration<*>>
         private set
 
-    lateinit var allFunctions: List<KirFunction<*>>
+    lateinit var kotlinFunctions: List<KirFunction<*>>
         private set
 
-    lateinit var allSimpleFunctions: List<KirSimpleFunction>
+    lateinit var kotlinSimpleFunctions: List<KirSimpleFunction>
         private set
 
-    lateinit var allConstructors: List<KirConstructor>
+    lateinit var kotlinConstructors: List<KirConstructor>
         private set
 
-    lateinit var allOverridableDeclaration: List<KirOverridableDeclaration<*, *>>
+    lateinit var kotlinOverridableDeclaration: List<KirOverridableDeclaration<*, *>>
         private set
 
     val project = KirProject(rootConfiguration)
 
-    val skieModule = getModule("Skie")
+    val kirBuiltins: KirBuiltins
+        get() = delegate.kirBuiltins
 
-    private val stdlibModule = getModule(kotlinBuiltIns.string.module)
+    val stdlibModule: KirModule
+        get() = delegate.stdlibModule
 
-    val kirBuiltins: KirBuiltins = KirBuiltins(
-        stdlibModule = stdlibModule,
-        kotlinBuiltIns = kotlinBuiltIns,
-        extraDescriptorBuiltins = extraDescriptorBuiltins,
-        namer = namer,
-        descriptorConfigurationProvider = descriptorConfigurationProvider,
-    )
-
-    private fun getModule(name: String, descriptor: ModuleDescriptor? = null): KirModule =
-        modulesMap.getOrPut(name) {
-            KirModule(
-                name = name,
-                project = project,
-                descriptor = descriptor,
-                isSkieKotlinRuntime = descriptor?.isSkieKotlinRuntime ?: false,
-                configuration = descriptor?.let { descriptorConfigurationProvider.getConfiguration(it) } ?: ModuleConfiguration(rootConfiguration),
-            )
-        }
-
-    fun getModule(moduleDescriptor: ModuleDescriptor): KirModule =
-        getModule((moduleDescriptor.stableName ?: moduleDescriptor.name).asStringStripSpecialMarkers(), moduleDescriptor)
-
-    fun initializeClassCache() {
+    fun initializeKotlinClassCache() {
         val visitedClasses = mutableSetOf<KirClass>()
 
-        allModules.flatMap { it.classes }.forEach {
+        kotlinModules.flatMap { it.classes }.forEach {
             cacheClassesRecursively(it, visitedClasses)
         }
 
-        allClasses = visitedClasses.toSet()
-        allEnums = allClasses.filter { it.kind == KirClass.Kind.Enum }.toSet()
+        kotlinClasses = visitedClasses.toSet()
+        kotlinEnums = kotlinClasses.filter { it.kind == KirClass.Kind.Enum }.toSet()
 
-        classDescriptorCache = allClasses.mapNotNull { kirClass -> kirClass.classDescriptorOrNull?.let { it to kirClass } }.toMap()
-        fileCache = allClasses.mapNotNull { kirClass -> kirClass.sourceFileOrNull?.let { it to kirClass } }.toMap()
-
-        fqNameCache = classDescriptorCache.mapKeys { it.key.fqNameSafe.asString() }
+        fqNameCache = kotlinClasses.associateBy { it.kotlinFqName }
     }
 
     private fun cacheClassesRecursively(kirClass: KirClass, visitedClasses: MutableSet<KirClass>) {
@@ -126,48 +88,24 @@ class KirProvider(
     }
 
     fun initializeCallableDeclarationsCache() {
-        descriptorsToCallableDeclarationsCache = allClasses.flatMap { it.callableDeclarations }.associateBy { it.descriptor }
+        kotlinCallableDeclarations = kotlinClasses.flatMap { it.callableDeclarations }
 
-        allCallableDeclarations = descriptorsToCallableDeclarationsCache.values.toList()
-
-        allFunctions = allCallableDeclarations.filterIsInstance<KirFunction<*>>()
-        allSimpleFunctions = allFunctions.filterIsInstance<KirSimpleFunction>()
-        allConstructors = allFunctions.filterIsInstance<KirConstructor>()
-        allOverridableDeclaration = allCallableDeclarations.filterIsInstance<KirOverridableDeclaration<*, *>>()
+        kotlinFunctions = kotlinCallableDeclarations.filterIsInstance<KirFunction<*>>()
+        kotlinSimpleFunctions = kotlinFunctions.filterIsInstance<KirSimpleFunction>()
+        kotlinConstructors = kotlinFunctions.filterIsInstance<KirConstructor>()
+        kotlinOverridableDeclaration = kotlinCallableDeclarations.filterIsInstance<KirOverridableDeclaration<*, *>>()
     }
 
     fun initializeSirCallableDeclarationsCache() {
-        sirToCallableDeclarationsCache = allCallableDeclarations.associateBy { it.originalSirDeclaration } +
-            allCallableDeclarations.filter { it.bridgedSirDeclaration != null }.associateBy { it.bridgedSirDeclaration!! }
+        sirToCallableDeclarationsCache = kotlinCallableDeclarations.associateBy { it.originalSirDeclaration } +
+            kotlinCallableDeclarations.filter { it.bridgedSirDeclaration != null }.associateBy { it.bridgedSirDeclaration!! }
 
-        sirToEnumEntryCache = allEnums.flatMap { it.enumEntries }.associateBy { it.sirEnumEntry }
+        sirToEnumEntryCache = kotlinEnums.flatMap { it.enumEntries }.associateBy { it.sirEnumEntry }
     }
-
-    fun getClass(classDescriptor: ClassDescriptor): KirClass =
-        findClass(classDescriptor)
-            ?: error("Class not found: $classDescriptor. This error usually means that the class is not exposed to Objective-C.")
-
-    fun getClass(sourceFile: SourceFile): KirClass =
-        findClass(sourceFile)
-            ?: error("Class not found: $sourceFile. This error usually means that the class is not exposed to Objective-C.")
 
     fun getClassByFqName(fqName: String): KirClass =
         findClassByFqName(fqName)
             ?: error("Class not found: $fqName. This error usually means that the class is not exposed to Objective-C.")
-
-    fun getFunction(functionDescriptor: FunctionDescriptor): KirSimpleFunction =
-        findFunction(functionDescriptor)
-            ?: error("Function not found: $functionDescriptor. This error usually means that the function is not exposed to Objective-C.")
-
-    fun getConstructor(constructorDescriptor: ClassConstructorDescriptor): KirConstructor =
-        findConstructor(constructorDescriptor)
-            ?: error("Constructor not found: $constructorDescriptor. This error usually means that the constructor is not exposed to Objective-C.")
-
-    fun findClass(classDescriptor: ClassDescriptor): KirClass? =
-        classDescriptorCache[classDescriptor.original]
-
-    fun findClass(sourceFile: SourceFile): KirClass? =
-        fileCache[sourceFile]
 
     fun findClassByFqName(fqName: String): KirClass? =
         fqNameCache[fqName]
@@ -175,12 +113,6 @@ class KirProvider(
     @Suppress("UNCHECKED_CAST")
     fun <S : SirCallableDeclaration> findCallableDeclaration(callableDeclaration: SirCallableDeclaration): KirCallableDeclaration<S>? =
         sirToCallableDeclarationsCache[callableDeclaration] as KirCallableDeclaration<S>?
-
-    fun findFunction(functionDescriptor: FunctionDescriptor): KirSimpleFunction? =
-        descriptorsToCallableDeclarationsCache[functionDescriptor] as? KirSimpleFunction
-
-    fun findConstructor(constructorDescriptor: ClassConstructorDescriptor): KirConstructor? =
-        descriptorsToCallableDeclarationsCache[constructorDescriptor] as? KirConstructor
 
     fun findEnumEntry(property: SirProperty): KirEnumEntry? =
         sirToEnumEntryCache[property]

@@ -19,7 +19,7 @@ class FileScopeConvertor(
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses
+        kirProvider.kotlinClasses
             .filter { it.kind == KirClass.Kind.File }
             .flatMap { it.callableDeclarations }
             .filter { it.isInteropEnabled }
@@ -53,7 +53,7 @@ class FileScopeConvertor(
             is KirSimpleFunction.Kind.PropertyGetter -> interfaceExtensionMembersDelegate.generateInterfaceExtensionPropertyWrapper(function)
             is KirSimpleFunction.Kind.PropertySetter -> {
                 // Property wrapper must be generated only once
-                if (function.kind.propertyDescriptor.getter == null) {
+                if (function.kind.associatedGetter == null) {
                     interfaceExtensionMembersDelegate.generateInterfaceExtensionPropertyWrapper(function)
                 }
             }

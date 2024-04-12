@@ -9,7 +9,7 @@ import co.touchlab.skie.configuration.SimpleFunctionConfiguration
 import co.touchlab.skie.configuration.ValueParameterConfiguration
 import co.touchlab.skie.configuration.provider.ConfigurationProvider
 import co.touchlab.skie.configuration.provider.IdentifiedConfigurationTarget
-import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.ForegroundPhase
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
@@ -138,19 +138,19 @@ class DescriptorConfigurationProvider(
         }
 }
 
-context(SkiePhase.Context)
+context(ForegroundPhase.Context)
 val ClassDescriptor.configuration: ClassConfiguration
     get() = descriptorConfigurationProvider.getConfiguration(this)
 
-context(SkiePhase.Context)
+context(ForegroundPhase.Context)
 val SimpleFunctionDescriptor.configuration: SimpleFunctionConfiguration
     get() = descriptorConfigurationProvider.getConfiguration(this)
 
-context(SkiePhase.Context)
+context(ForegroundPhase.Context)
 val ConstructorDescriptor.configuration: ConstructorConfiguration
     get() = descriptorConfigurationProvider.getConfiguration(this)
 
-context(SkiePhase.Context)
+context(ForegroundPhase.Context)
 val FunctionDescriptor.configuration: FunctionConfiguration
     get() = when (this) {
         is SimpleFunctionDescriptor -> configuration

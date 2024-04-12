@@ -6,12 +6,12 @@ import co.touchlab.skie.oir.element.OirCallableDeclaration
 import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.sir.element.SirSimpleFunction
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class KirSimpleFunction(
-    override val baseDescriptor: FunctionDescriptor,
-    override val descriptor: FunctionDescriptor,
+    override val kotlinName: String,
+    override val kotlinSignature: String,
+    override val objCSelector: String,
+    override val swiftName: String,
     override val owner: KirClass,
     override val origin: KirCallableDeclaration.Origin,
     val isSuspend: Boolean,
@@ -83,14 +83,12 @@ class KirSimpleFunction(
         overridableDeclarationDelegate.removeOverriddenBy(declaration)
     }
 
-    override fun toString(): String = "${this::class.simpleName}: $descriptor"
-
     sealed interface Kind {
 
         object Function : Kind
 
-        data class PropertyGetter(val propertyDescriptor: PropertyDescriptor) : Kind
+        data class PropertyGetter(var associatedSetter: KirSimpleFunction?) : Kind
 
-        data class PropertySetter(val propertyDescriptor: PropertyDescriptor) : Kind
+        data class PropertySetter(var associatedGetter: KirSimpleFunction?) : Kind
     }
 }

@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.oir.util
 
 import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.phases.apinotes.builder.ApiNotes
 import co.touchlab.skie.phases.apinotes.builder.ApiNotesType
 import co.touchlab.skie.phases.apinotes.parser.ExternalApiNotesParser
@@ -26,7 +27,7 @@ class ExternalApiNotesProvider(
         apiNotesModuleProvidersByModuleName.values.map { it.value }.flatMap { it.getAllApiNotesEntries() }
 
     fun findApiNotesEntry(oirClass: OirClass): ApiNotesEntry? {
-        val module = sirProvider.findExternalModule(oirClass) ?: return null
+        val module = oirClass.kirClassOrNull?.let { sirProvider.findExternalModule(it) } ?: return null
 
         return apiNotesModuleProvidersByModuleName[module.name]?.value?.findApiNotesEntry(oirClass)
     }

@@ -8,14 +8,14 @@ import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.shallowCopy
 
-// Fix for SKIE-395.
+// Fix for a compiler bug (SKIE-395).
 // The implementation is somewhat hacky because it creates a fake function that is used to remove the duplicates.
 // This fake function is not properly linked with the overrides and as a result this phase needs to run after all other phases that rename functions.
 object FixDuplicatedOverriddenFunctionsPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.allKotlinClassesAndProtocols
+        oirProvider.kotlinClassesAndProtocols
             .flatMap { it.memberSimpleFunctions }
             .forEach {
                 fixDuplicates(it)

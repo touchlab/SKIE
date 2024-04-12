@@ -50,12 +50,8 @@ class InterfaceExtensionMembersConvertorDelegate(
 
     fun generateInterfaceExtensionPropertyWrapper(function: KirSimpleFunction) {
         val (kirGetter, kirSetter) = when (val kind = function.kind) {
-            is KirSimpleFunction.Kind.PropertyGetter -> {
-                function to function.owner.findFunctionWithKind(KirSimpleFunction.Kind.PropertySetter(kind.propertyDescriptor))
-            }
-            is KirSimpleFunction.Kind.PropertySetter -> {
-                function.owner.findFunctionWithKind(KirSimpleFunction.Kind.PropertyGetter(kind.propertyDescriptor)) to function
-            }
+            is KirSimpleFunction.Kind.PropertyGetter -> function to kind.associatedSetter
+            is KirSimpleFunction.Kind.PropertySetter -> kind.associatedGetter to function
             KirSimpleFunction.Kind.Function -> error("Function is not a converted property. Was: $function")
         }
 

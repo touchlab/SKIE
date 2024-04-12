@@ -35,20 +35,25 @@ class SwiftSuspendGeneratorDelegate(
         originalFunctionDescriptor: FunctionDescriptor,
         kotlinBridgingFunctionDescriptor: FunctionDescriptor,
     ) {
-        context.doInPhase(SuspendGenerator.SwiftBridgeGeneratorPhase) {
-            val bridgeModel = BridgeModel(
-                suspendKirFunction = kirProvider.getFunction(originalFunctionDescriptor),
-                kotlinBridgingKirFunction = kirProvider.getFunction(kotlinBridgingFunctionDescriptor),
-            )
+        context.doInPhase(SuspendGenerator.SwiftBridgeGeneratorInitPhase) {
+            val suspendKirFunction = descriptorKirProvider.getFunction(originalFunctionDescriptor)
+            val kotlinBridgingKirFunction = descriptorKirProvider.getFunction(kotlinBridgingFunctionDescriptor)
 
-            val extension = sirProvider.getExtension(
-                classDeclaration = bridgeModel.extensionTypeDeclarationForBridgingFunction,
-                parent = classNamespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
-            )
+            doInPhase(SuspendGenerator.SwiftBridgeGeneratorFinalizePhase) {
+                val bridgeModel = BridgeModel(
+                    suspendKirFunction = suspendKirFunction,
+                    kotlinBridgingKirFunction = kotlinBridgingKirFunction,
+                )
 
-            bridgeModel.suspendKirFunction.bridgedSirFunction = extension.createSwiftBridgingFunction(bridgeModel)
+                val extension = sirProvider.getExtension(
+                    classDeclaration = bridgeModel.extensionTypeDeclarationForBridgingFunction,
+                    parent = classNamespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
+                )
 
-            hideOriginalFunction(bridgeModel)
+                bridgeModel.suspendKirFunction.bridgedSirFunction = extension.createSwiftBridgingFunction(bridgeModel)
+
+                hideOriginalFunction(bridgeModel)
+            }
         }
     }
 

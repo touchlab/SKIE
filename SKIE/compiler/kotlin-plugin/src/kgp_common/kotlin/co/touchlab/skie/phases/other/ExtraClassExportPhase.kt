@@ -8,6 +8,7 @@ import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.phases.features.flow.SupportedFlow
+import co.touchlab.skie.phases.util.StatefulDescriptorConversionPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
@@ -158,12 +159,18 @@ class ExtraClassExportPhase(
         }
 
     private fun FunctionDescriptor.removeFromSwift() {
-        context.doInPhase(FinalizePhase) {
-            kirProvider.getFunction(this@removeFromSwift).originalSirFunction.visibility = SirVisibility.Private
+        context.doInPhase(HideExportFunctionsInitPhase) {
+            val kirFunction = descriptorKirProvider.getFunction(this@removeFromSwift)
+
+            doInPhase(HideExportFunctionsFinalizePhase) {
+                kirFunction.originalSirFunction.visibility = SirVisibility.Private
+            }
         }
     }
 
-    object FinalizePhase : StatefulSirPhase()
+    object HideExportFunctionsInitPhase : StatefulDescriptorConversionPhase()
+
+    object HideExportFunctionsFinalizePhase : StatefulSirPhase()
 }
 
 private fun CallableMemberDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =

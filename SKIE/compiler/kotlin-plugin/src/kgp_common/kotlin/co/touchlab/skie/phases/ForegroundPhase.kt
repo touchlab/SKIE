@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases
 
+import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.descriptor.cache.CachedObjCExportMapper
@@ -7,24 +8,17 @@ import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 
-interface SkiePhase<C : SkiePhase.Context> {
+interface ForegroundPhase<C : ForegroundPhase.Context> : ScheduledPhase<C> {
 
-    context(C)
-    fun isActive(): Boolean = true
-
-    context(C)
-    suspend fun execute()
-
-    interface Context : InitPhase.Context {
+    interface Context : ScheduledPhase.Context {
 
         override val context: Context
 
-        val konanConfig: KonanConfig
-
-        val configurables: AppleConfigurables
-            get() = konanConfig.platform.configurables as AppleConfigurables
-
         val descriptorProvider: DescriptorProvider
+
+        val descriptorConfigurationProvider: DescriptorConfigurationProvider
+
+        val konanConfig: KonanConfig
 
         val mapper: CachedObjCExportMapper
             get() = descriptorProvider.mapper
@@ -35,6 +29,7 @@ interface SkiePhase<C : SkiePhase.Context> {
         val extraDescriptorBuiltins: ExtraDescriptorBuiltins
             get() = descriptorProvider.extraDescriptorBuiltins
 
-        fun launch(action: suspend () -> Unit)
+        val configurables: AppleConfigurables
+            get() = konanConfig.platform.configurables as AppleConfigurables
     }
 }

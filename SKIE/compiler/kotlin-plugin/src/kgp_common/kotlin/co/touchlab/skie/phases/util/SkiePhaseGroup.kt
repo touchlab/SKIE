@@ -1,11 +1,13 @@
 package co.touchlab.skie.phases.util
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.BackgroundPhase
+import co.touchlab.skie.phases.ForegroundPhase
+import co.touchlab.skie.phases.ScheduledPhase
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
 
-class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
+class SkiePhaseGroup<P : ScheduledPhase<C>, C : ScheduledPhase.Context>(
     defaultPhasesBuilder: MutableList<P>.(C) -> Unit,
 ) {
 
@@ -15,52 +17,8 @@ class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
         modifications.add(modification)
     }
 
-    context(SkiePhase.Context)
-    inline fun <reified RC : C> run(noinline contextFactory: () -> RC): RC =
-        run(RC::class, contextFactory)
-
-    context(SkiePhase.Context)
-    fun <RC : C> run(contextClass: KClass<RC>, contextFactory: () -> RC): RC =
-        runBlocking {
-            prepareAndExecute(contextClass, contextFactory)
-        }
-
-    context(SkiePhase.Context)
-    inline fun <reified RC : C> launch(noinline contextFactory: () -> RC) =
-        launch(RC::class, contextFactory)
-
-    context(SkiePhase.Context)
-    fun <RC : C> launch(contextClass: KClass<RC>, contextFactory: () -> RC) {
-        if (SkieConfigurationFlag.Build_ConcurrentSkieCompilation.isEnabled) {
-            this@Context.launch {
-                prepareAndExecute(contextClass, contextFactory)
-            }
-        } else {
-            run(contextClass, contextFactory)
-        }
-    }
-
-    context(SkiePhase.Context)
-    private suspend fun <RC : C> prepareAndExecute(contextClass: KClass<RC>, contextFactory: () -> RC): RC {
-        val phasesName = contextClass.nameForLogger.removeSuffix("Phase.Context") + "Phases"
-
-        val (context, phases) = skiePerformanceAnalyticsProducer.log("Initialize$phasesName") {
-            val context = contextFactory()
-
-            val phases = buildPhases(context)
-
-            context to phases
-        }
-
-        with(context) {
-            phases.execute()
-        }
-
-        return context
-    }
-
     context(C)
-    private suspend fun List<P>.execute() {
+    internal suspend fun List<P>.execute() {
         this.forEach {
             if (it.isActive()) {
                 context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
@@ -72,7 +30,7 @@ class SkiePhaseGroup<P : SkiePhase<C>, C : SkiePhase.Context>(
         }
     }
 
-    private fun buildPhases(context: C): List<P> {
+    internal fun buildPhases(context: C): List<P> {
         val phases = mutableListOf<P>()
 
         modifications.forEach { modification ->
@@ -90,3 +48,65 @@ private val KClass<*>.nameForLogger: String
         ?.joinToString(".")
         ?.takeUnless { it.isBlank() }
         ?: "<Unknown>"
+
+context(ScheduledPhase.Context)
+inline fun <P, reified C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
+    noinline contextFactory: () -> C,
+) where P : ScheduledPhase<C>, P : BackgroundPhase<C> {
+    run(C::class, contextFactory)
+}
+
+context(ScheduledPhase.Context)
+fun <P, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
+    contextClass: KClass<C>,
+    contextFactory: () -> C,
+) where P : ScheduledPhase<C>, P : BackgroundPhase<C> {
+    if (SkieConfigurationFlag.Build_ConcurrentSkieCompilation.isEnabled) {
+        this@Context.launch {
+            prepareAndExecute(contextClass, contextFactory)
+        }
+    } else {
+        runBlocking(contextClass, contextFactory)
+    }
+}
+
+context(ScheduledPhase.Context)
+inline fun <P, reified C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
+    noinline contextFactory: () -> C,
+): C where P : ScheduledPhase<C>, P : ForegroundPhase<C> =
+    run(C::class, contextFactory)
+
+context(ScheduledPhase.Context)
+fun <P, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
+    contextClass: KClass<C>,
+    contextFactory: () -> C,
+): C where P : ScheduledPhase<C>, P : ForegroundPhase<C> =
+    runBlocking(contextClass, contextFactory)
+
+context(ScheduledPhase.Context)
+private fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.runBlocking(contextClass: KClass<C>, contextFactory: () -> C): C =
+    runBlocking {
+        prepareAndExecute(contextClass, contextFactory)
+    }
+
+context(ScheduledPhase.Context)
+private suspend fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.prepareAndExecute(
+    contextClass: KClass<C>,
+    contextFactory: () -> C,
+): C {
+    val phasesName = contextClass.nameForLogger.removeSuffix("Phase.Context") + "Phases"
+
+    val (context, phases) = skiePerformanceAnalyticsProducer.log("Initialize$phasesName") {
+        val context = contextFactory()
+
+        val phases = buildPhases(context)
+
+        context to phases
+    }
+
+    with(context) {
+        phases.execute()
+    }
+
+    return context
+}

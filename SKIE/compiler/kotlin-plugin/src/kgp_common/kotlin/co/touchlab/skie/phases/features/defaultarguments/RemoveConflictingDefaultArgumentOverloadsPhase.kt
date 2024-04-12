@@ -14,7 +14,7 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        val allBaseFunctions = kirProvider.allConstructors + kirProvider.allSimpleFunctions.filter { it.overriddenDeclarations.isEmpty() }
+        val allBaseFunctions = kirProvider.kotlinConstructors + kirProvider.kotlinSimpleFunctions.filter { it.overriddenDeclarations.isEmpty() }
 
         val allDefaultArgumentOverloads = allBaseFunctions.flatMap { it.defaultArgumentsOverloads }.toSet()
 

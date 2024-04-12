@@ -5,20 +5,20 @@ import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirOverridableDeclaration
 import co.touchlab.skie.kir.util.getEntireOverrideHierarchy
-import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.DescriptorConversionPhase
 
 class UnifyFlowConfigurationForOverridesPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+    context: DescriptorConversionPhase.Context,
+) : DescriptorConversionPhase {
 
     private val kirProvider = context.kirProvider
 
-    context(SirPhase.Context)
+    context(DescriptorConversionPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
-    context(SirPhase.Context)
+    context(DescriptorConversionPhase.Context)
     override suspend fun execute() {
-        kirProvider.allOverridableDeclaration
+        kirProvider.kotlinOverridableDeclaration
             .filter { it.overriddenDeclarations.isEmpty() && it.overriddenBy.isNotEmpty() }
             .forEach {
                 it.unifyConfigurationForOverrides()

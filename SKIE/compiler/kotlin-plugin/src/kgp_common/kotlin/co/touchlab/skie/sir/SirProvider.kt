@@ -2,11 +2,8 @@ package co.touchlab.skie.sir
 
 import co.touchlab.skie.configuration.ClassInterop
 import co.touchlab.skie.configuration.RootConfiguration
-import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
-import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.oir.OirProvider
-import co.touchlab.skie.oir.element.OirClass
-import co.touchlab.skie.oir.element.cinteropClassDescriptorOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirCallableDeclaration
@@ -26,18 +23,16 @@ import co.touchlab.skie.util.directory.SkieBuildDirectory
 
 class SirProvider(
     framework: FrameworkLayout,
-    kirProvider: KirProvider,
     private val oirProvider: OirProvider,
-    private val descriptorConfigurationProvider: DescriptorConfigurationProvider,
-    rootConfiguration: RootConfiguration,
     skieBuildDirectory: SkieBuildDirectory,
+    rootConfiguration: RootConfiguration,
 ) {
 
     val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
 
     val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
 
-    val fileProvider: SirFileProvider = SirFileProvider(skieModule, kirProvider, skieBuildDirectory)
+    val fileProvider: SirFileProvider = SirFileProvider(skieModule, oirProvider, skieBuildDirectory)
 
     val sirBuiltins by lazy {
         SirBuiltins(this, rootConfiguration)
@@ -63,7 +58,7 @@ class SirProvider(
         get() = allLocalClasses.filter { it.kind == SirClass.Kind.Enum }
 
     val allUsedExternalModules: List<SirModule.External>
-        get() = oirProvider.allExternalClassesAndProtocols
+        get() = oirProvider.externalClassesAndProtocols
             .map { it.originalSirClass.module }
             .filterIsInstance<SirModule.External>()
             .distinct()
@@ -121,13 +116,14 @@ class SirProvider(
     }
 
     fun getClassByFqName(fqName: SirFqName): SirClass =
-        findClassByFqName(fqName)
-            ?: error("SirClass with fqName $fqName not found.")
+        findClassByFqName(fqName) ?: error("SirClass with fqName $fqName not found.")
 
-    fun findExternalModule(oirClass: OirClass): SirModule.External? {
-        val classDescriptor = oirClass.cinteropClassDescriptorOrNull ?: error("Invalid origin for OirClass: $oirClass")
+    fun findExternalModule(kirClass: KirClass): SirModule.External? {
+        if (kirClass.origin == KirClass.Origin.Kotlin) {
+            error("KirClass is not external: $kirClass")
+        }
 
-        val moduleName = descriptorConfigurationProvider.getConfiguration(classDescriptor)[ClassInterop.CInteropFrameworkName] ?: return null
+        val moduleName = kirClass.configuration[ClassInterop.CInteropFrameworkName] ?: return null
 
         return getExternalModule(moduleName)
     }

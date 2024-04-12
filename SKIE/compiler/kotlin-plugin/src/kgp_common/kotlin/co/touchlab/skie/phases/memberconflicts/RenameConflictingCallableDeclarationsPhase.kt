@@ -2,12 +2,6 @@ package co.touchlab.skie.phases.memberconflicts
 
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirFunction
-import co.touchlab.skie.kir.type.BlockPointerKirType
-import co.touchlab.skie.kir.type.ErrorOutKirType
-import co.touchlab.skie.kir.type.KirType
-import co.touchlab.skie.kir.type.OirBasedKirType
-import co.touchlab.skie.kir.type.ReferenceKirType
-import co.touchlab.skie.kir.type.SuspendCompletionKirType
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
@@ -23,9 +17,6 @@ import co.touchlab.skie.sir.element.isRemoved
 import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.sir.element.receiverDeclaration
 import co.touchlab.skie.sir.element.resolveAsSirClass
-import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
-import org.jetbrains.kotlin.resolve.isValueClass
-import org.jetbrains.kotlin.types.KotlinType
 
 object RenameConflictingCallableDeclarationsPhase : SirPhase {
 
@@ -100,14 +91,10 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
                 }
             }
             .thenBy { declaration ->
-                (declaration.getKirDeclarationOrNull() as? KirFunction<*>)?.valueParameters?.count { it.type.isInlinedType } ?: 0
+                (declaration.getKirDeclarationOrNull() as? KirFunction<*>)?.valueParameters?.count { it.wasTypeInlined } ?: 0
             }
             .thenBy { it.parent.containerFqName }
-            .thenBy {
-                with(KonanManglerDesc) {
-                    it.getKirDeclarationOrNull()?.descriptor?.signatureString(false)
-                } ?: ""
-            }
+            .thenBy { it.getKirDeclarationOrNull()?.kotlinSignature ?: "" }
 
     private val SirCallableDeclaration.isFromKotlin: Boolean
         get() = module is SirModule.Kotlin
@@ -124,18 +111,6 @@ object RenameConflictingCallableDeclarationsPhase : SirPhase {
     context(SirPhase.Context)
     private fun SirCallableDeclaration.getKirDeclarationOrNull(): KirCallableDeclaration<*>? =
         kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
-
-    private val KirType.isInlinedType: Boolean
-        get() = when (this) {
-            is BlockPointerKirType -> this.kotlinType.isInlinedType
-            ErrorOutKirType -> false
-            is OirBasedKirType -> false
-            is ReferenceKirType -> this.kotlinType.isInlinedType
-            is SuspendCompletionKirType -> this.kotlinType.isInlinedType
-        }
-
-    private val KotlinType.isInlinedType: Boolean
-        get() = this.constructor.declarationDescriptor?.isValueClass() == true
 
     @Suppress("RecursivePropertyAccessor")
     private val SirDeclarationParent.containerFqName: String

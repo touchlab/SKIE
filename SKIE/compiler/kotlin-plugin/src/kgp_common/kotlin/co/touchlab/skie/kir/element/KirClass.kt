@@ -1,28 +1,32 @@
 package co.touchlab.skie.kir.element
 
 import co.touchlab.skie.configuration.ClassConfiguration
-import co.touchlab.skie.kir.type.ReferenceKirType
+import co.touchlab.skie.kir.type.DeclarationBackedKirType
+import co.touchlab.skie.kir.type.DeclaredKirType
+import co.touchlab.skie.kir.type.KirType
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.sir.element.SirClass
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.SourceFile
 
 class KirClass(
-    val descriptor: Descriptor,
-    val name: ObjCExportNamer.ClassOrProtocolName,
+    val kotlinFqName: String,
+    val objCName: String,
+    val swiftName: String,
     val parent: KirClassParent,
     val kind: Kind,
-    superTypes: List<ReferenceKirType>,
+    val origin: Origin,
+    superTypes: List<DeclarationBackedKirType>,
     val isSealed: Boolean,
     val hasUnexposedSealedSubclasses: Boolean,
-    val belongsToSkieKotlinRuntime: Boolean,
     val configuration: ClassConfiguration,
 ) : KirClassParent, KirBridgeableDeclaration<SirClass> {
 
     lateinit var oirClass: OirClass
 
     override val classes: MutableList<KirClass> = mutableListOf()
+
+    val kotlinIdentifier: String by lazy {
+        kotlinFqName.substringAfterLast('.')
+    }
 
     var companionObject: KirClass? = null
 
@@ -32,7 +36,7 @@ class KirClass(
 
     val sealedSubclasses: MutableList<KirClass> = mutableListOf()
 
-    val superTypes: MutableList<ReferenceKirType> = superTypes.toMutableList()
+    val superTypes: MutableList<DeclarationBackedKirType> = superTypes.toMutableList()
 
     val typeParameters: MutableList<KirTypeParameter> = mutableListOf()
 
@@ -42,9 +46,11 @@ class KirClass(
     override val originalSirDeclaration: SirClass
         get() = oirClass.originalSirClass
 
+    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
     override val primarySirDeclaration: SirClass
         get() = oirClass.primarySirClass
 
+    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
     override var bridgedSirDeclaration: SirClass?
         get() = oirClass.bridgedSirClass
         set(value) {
@@ -61,40 +67,38 @@ class KirClass(
         parent.classes.add(this)
     }
 
-    override fun toString(): String = "${this::class.simpleName}: $descriptorString"
+    val defaultType: DeclaredKirType by lazy {
+        toType(emptyList())
+    }
 
-    private val descriptorString: String
-        get() = when (descriptor) {
-            is Descriptor.Class -> descriptor.value.toString()
-            is Descriptor.File -> descriptor.value.name ?: descriptor.value.toString()
-        }
+    fun toType(typeArguments: List<KirType>): DeclaredKirType =
+        DeclaredKirType(this, typeArguments = typeArguments)
+
+    fun toType(vararg typeArguments: KirType): DeclaredKirType =
+        toType(typeArguments.toList())
+
+    override fun toString(): String = "${this::class.simpleName}: $kotlinFqName"
 
     enum class Kind {
         Class, Interface, File, Enum, Object, CompanionObject
     }
 
-    sealed interface Descriptor {
+    sealed interface Origin {
 
-        data class Class(val value: ClassDescriptor) : Descriptor
+        object Kotlin : Origin
 
-        data class File(val value: SourceFile) : Descriptor
+        object PlatformType : Origin
+
+        object ExternalCinteropType : Origin
     }
 }
 
-val KirClass.classDescriptorOrNull: ClassDescriptor?
-    get() = when (val descriptor = descriptor) {
-        is KirClass.Descriptor.Class -> descriptor.value
-        is KirClass.Descriptor.File -> null
-    }
+val KirClass.superClassType: DeclaredKirType?
+    get() = superTypes.firstOrNull {
+        val declaredType = it as? DeclaredKirType ?: return@firstOrNull false
 
-val KirClass.classDescriptorOrError: ClassDescriptor
-    get() = classDescriptorOrNull ?: error("Class descriptor is not available for file classes. Was: $this")
+        declaredType.declaration.kind != KirClass.Kind.Interface
+    } as DeclaredKirType?
 
-val KirClass.sourceFileOrNull: SourceFile?
-    get() = when (val descriptor = descriptor) {
-        is KirClass.Descriptor.Class -> null
-        is KirClass.Descriptor.File -> descriptor.value
-    }
-
-val KirClass.sourceFileOrError: SourceFile
-    get() = sourceFileOrNull ?: error("Source file is not available for real classes. Was: $this")
+val KirClass.superClass: KirClass?
+    get() = superClassType?.declaration

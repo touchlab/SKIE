@@ -20,7 +20,6 @@ object ConfigureStableNameTypeAliasesForKotlinRuntimePhase : SirPhase {
         kirProvider.getClassByFqName("kotlinx.coroutines.Runnable").enableStableNameTypeAlias()
     }
 
-    context(SirPhase.Context)
     private fun KirClass.enableStableNameTypeAlias() {
         configuration[ClassInterop.StableTypeAlias] = true
     }

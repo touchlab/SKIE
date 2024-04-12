@@ -11,7 +11,7 @@ object CreateAsyncSirFunctionsPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allSimpleFunctions
+        kirProvider.kotlinSimpleFunctions
             .filter { it.isSuspend && it.configuration.isSuspendInteropEnabled }
             .forEach {
                 createAsyncFunction(it)

@@ -29,9 +29,7 @@ class CreateSirMembersPhase(
     val context: SirPhase.Context,
 ) : SirPhase {
 
-    private val namer = context.namer
     private val kirProvider = context.kirProvider
-    private val sirProvider = context.sirProvider
     private val sirTypeTranslator = context.sirTypeTranslator
 
     context(SirPhase.Context)
@@ -41,7 +39,7 @@ class CreateSirMembersPhase(
     }
 
     private fun createAllMembers() {
-        kirProvider.allCallableDeclarations.forEach(::createCallableDeclaration)
+        kirProvider.kotlinCallableDeclarations.forEach(::createCallableDeclaration)
     }
 
     private fun createCallableDeclaration(kirCallableDeclaration: KirCallableDeclaration<*>) {
@@ -88,18 +86,16 @@ class CreateSirMembersPhase(
         val oirProperty = property.oirProperty
 
         val sirProperty = SirProperty(
-            identifier = namer.getPropertyName(property.baseDescriptor).swiftName,
+            identifier = property.swiftName,
             parent = property.getSirParent(),
             type = sirTypeTranslator.mapType(oirProperty.type),
             scope = oirProperty.scope.sirScope,
             deprecationLevel = property.deprecationLevel,
             visibility = property.visibility,
         ).apply {
-            property.descriptor.getter?.let {
-                SirGetter(
-                    throws = false,
-                )
-            }
+            SirGetter(
+                throws = false,
+            )
 
             if (property.isVar) {
                 SirSetter(
@@ -141,7 +137,7 @@ class CreateSirMembersPhase(
 
                 val sirValueParameter = SirValueParameter(
                     label = argumentLabel,
-                    name = valueParameter.name.toValidSwiftIdentifier().collisionFreeIdentifier(usedParameterNames),
+                    name = valueParameter.kotlinName.toValidSwiftIdentifier().collisionFreeIdentifier(usedParameterNames),
                     type = sirTypeTranslator.mapType(oirValueParameter.type, isEscaping = true),
                 )
 
@@ -168,10 +164,8 @@ class CreateSirMembersPhase(
 
     private val KirFunction<*>.swiftFunctionName: SwiftFunctionName
         get() {
-            val swiftName = namer.getSwiftName(this.baseDescriptor)
-
-            val (identifier, argumentLabelsString) = swiftNameComponentsRegex.matchEntire(swiftName)?.destructured
-                ?: error("Unable to parse swift name: $swiftName")
+            val (identifier, argumentLabelsString) = swiftNameComponentsRegex.matchEntire(this.swiftName)?.destructured
+                ?: error("Unable to parse swift name: ${this.swiftName}")
 
             val argumentLabels = argumentLabelsString.split(":").map { it.trim() }.filter { it.isNotEmpty() }
 
@@ -179,7 +173,7 @@ class CreateSirMembersPhase(
         }
 
     private fun createAllEnumEntries() {
-        kirProvider.allEnums.forEach(::createEnumEntries)
+        kirProvider.kotlinEnums.forEach(::createEnumEntries)
     }
 
     private fun createEnumEntries(kirClass: KirClass) {
@@ -190,7 +184,7 @@ class CreateSirMembersPhase(
         val oirEnumEntry = enumEntry.oirEnumEntry
 
         oirEnumEntry.originalSirProperty = SirProperty(
-            identifier = namer.getEnumEntrySwiftName(enumEntry.descriptor),
+            identifier = enumEntry.swiftName,
             parent = enumEntry.owner.originalSirClass,
             type = sirTypeTranslator.mapType(oirEnumEntry.type),
             scope = oirEnumEntry.scope.sirScope,

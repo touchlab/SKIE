@@ -2,7 +2,6 @@ package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.kir.element.KirClass
-import co.touchlab.skie.kir.element.classDescriptorOrError
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.superClassType
@@ -33,7 +32,7 @@ interface SealedGeneratorExtensionContainer {
         get() {
             val configuredName = this.configuration[SealedInterop.Case.Name]
 
-            return configuredName ?: classDescriptorOrError.name.identifier.replaceFirstChar { it.lowercase() }.toValidSwiftIdentifier()
+            return configuredName ?: kotlinIdentifier.replaceFirstChar { it.lowercase() }.toValidSwiftIdentifier()
         }
 
     val KirClass.enumCaseNameBasedOnSwiftIdentifier: String

@@ -3,12 +3,10 @@ package co.touchlab.skie.phases.features.enums
 import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirEnumEntry
-import co.touchlab.skie.kir.util.hasArgumentValue
+import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.sir.element.isExported
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
-import org.jetbrains.kotlin.backend.konan.KonanFqNames
 
 object EnumEntryRenamingPhase : SirPhase {
 
@@ -37,22 +35,20 @@ object EnumEntryRenamingPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allEnums
+        kirProvider.kotlinEnums
             .filter { it.isSupported }
             .forEach {
                 it.renameEnumEntries()
             }
     }
 
-    context(SkiePhase.Context)
+    context(ScheduledPhase.Context)
     private val KirClass.isSupported: Boolean
         get() = this.originalSirClass.isExported && !this.configuration[EnumInterop.LegacyCaseName]
 
-    context(SkiePhase.Context)
+    context(ScheduledPhase.Context)
     private val KirEnumEntry.isSupported: Boolean
-        get() = this.descriptor.annotations.findAnnotation(KonanFqNames.objCName)
-            ?.let { !it.hasArgumentValue("name") && !it.hasArgumentValue("swiftName") }
-            ?: true
+        get() = !this.hasUserDefinedName
 
     context(SirPhase.Context)
     private fun KirClass.renameEnumEntries() {
@@ -68,9 +64,7 @@ object EnumEntryRenamingPhase : SirPhase {
     }
 
     private fun getNewEnumEntryName(enumEntry: KirEnumEntry): String {
-        val kotlinName = enumEntry.descriptor.name.asString()
-
-        val words = NameParser(kotlinName).parse()
+        val words = NameParser(enumEntry.kotlinName).parse()
 
         val lowerCaseWords = words.map { it.lowercase() }
 

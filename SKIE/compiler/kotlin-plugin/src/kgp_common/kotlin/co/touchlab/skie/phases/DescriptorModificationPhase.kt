@@ -2,9 +2,9 @@ package co.touchlab.skie.phases
 
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 
-interface DescriptorModificationPhase : SkiePhase<DescriptorModificationPhase.Context> {
+interface DescriptorModificationPhase : ForegroundPhase<DescriptorModificationPhase.Context> {
 
-    interface Context : SkiePhase.Context {
+    interface Context : ForegroundPhase.Context {
 
         override val context: Context
 

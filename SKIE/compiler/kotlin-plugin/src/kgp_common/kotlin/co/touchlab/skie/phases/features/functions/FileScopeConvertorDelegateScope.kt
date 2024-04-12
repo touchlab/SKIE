@@ -1,8 +1,6 @@
 package co.touchlab.skie.phases.features.functions
 
 import co.touchlab.skie.kir.element.KirBridgeableDeclaration
-import co.touchlab.skie.kir.element.KirClass
-import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.receiverDeclaration
 import io.outfoxx.swiftpoet.TypeName
@@ -21,9 +19,6 @@ interface FileScopeConvertorDelegateScope {
             }
         }
     }
-
-    fun KirClass.findFunctionWithKind(kind: KirSimpleFunction.Kind): KirSimpleFunction? =
-        callableDeclarations.filterIsInstance<KirSimpleFunction>().firstOrNull { it.kind == kind }
 
     val SirCallableDeclaration.kotlinStaticMemberOwnerTypeName: TypeName
         get() {

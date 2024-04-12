@@ -2,11 +2,19 @@
 
 package co.touchlab.skie.context
 
+import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
+import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
 import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.descriptor.NativeDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
+import co.touchlab.skie.phases.BackgroundPhase
+import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.phases.InitPhase
-import co.touchlab.skie.phases.SkiePhase
+import co.touchlab.skie.phases.ScheduledPhase
+import co.touchlab.skie.phases.util.StatefulScheduledPhase
+import co.touchlab.skie.util.SwiftCompilerConfiguration
+import co.touchlab.skie.util.SwiftCompilerConfiguration.BuildType
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,25 +22,30 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
+import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import java.util.Collections
 
 class MainSkieContext internal constructor(
-    initPhaseContext: InitPhase.Context,
+    initPhaseContext: InitPhaseContext,
     override val konanConfig: KonanConfig,
     frontendServices: FrontendServices,
     val mainModuleDescriptor: ModuleDescriptor,
     exportedDependencies: Collection<ModuleDescriptor>,
-) : SkiePhase.Context, InitPhase.Context by initPhaseContext {
+) : ForegroundPhase.Context, BackgroundPhase.Context, InitPhase.Context by initPhaseContext {
 
     private val skieCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + CoroutineExceptionHandler { _, _ ->
-        // Hide default stderr output because the exception is handled at the end of the job
+        // Hides default stderr output because the exception is handled at the end of the job
     }
 
-    private val jobs = mutableListOf<Job>()
+    private val jobs = Collections.synchronizedList(mutableListOf<Job>())
 
-    override val context: SkiePhase.Context
+    private val statefulScheduledPhaseBodies = Collections.synchronizedMap(mutableMapOf<StatefulScheduledPhase<*>, MutableList<Any>>())
+
+    override val context: MainSkieContext
         get() = this
 
     override val descriptorProvider: MutableDescriptorProvider = NativeDescriptorProvider(
@@ -41,7 +54,26 @@ class MainSkieContext internal constructor(
         frontendServices = frontendServices,
     )
 
+    override val descriptorConfigurationProvider: DescriptorConfigurationProvider = DescriptorConfigurationProvider(initPhaseContext.configurationProvider)
+
     val declarationBuilder: DeclarationBuilderImpl = DeclarationBuilderImpl(mainModuleDescriptor, descriptorProvider)
+
+    lateinit var kirProvider: KirProvider
+
+    lateinit var descriptorKirProvider: DescriptorKirProvider
+
+    override val swiftCompilerConfiguration: SwiftCompilerConfiguration = SwiftCompilerConfiguration(
+        // TODO To SkieConfiguration via RootScope Key
+        swiftVersion = "5",
+        // TODO To SkieConfiguration via RootScope Key
+        additionalFlags = emptyList(),
+        buildType = if (konanConfig.debug) BuildType.Debug else BuildType.Release,
+        targetTriple = configurables.targetTriple,
+        bitcodeEmbeddingMode = compilerConfiguration[KonanConfigKeys.BITCODE_EMBEDDING_MODE] ?: BitcodeEmbedding.Mode.NONE,
+        absoluteTargetToolchainPath = configurables.absoluteTargetToolchain,
+        absoluteTargetSysRootPath = configurables.absoluteTargetSysRoot,
+        osVersionMin = configurables.osVersionMin,
+    )
 
     override fun launch(action: suspend () -> Unit) {
         val job = skieCoroutineScope.launch {
@@ -49,6 +81,21 @@ class MainSkieContext internal constructor(
         }
 
         jobs.add(job)
+    }
+
+    override fun <CONTEXT : ScheduledPhase.Context> storeStatefulScheduledPhaseBody(phase: StatefulScheduledPhase<CONTEXT>, action: CONTEXT.() -> Unit) {
+        val bodies = statefulScheduledPhaseBodies.getOrPut(phase) { mutableListOf() }
+
+        bodies.add(action)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <CONTEXT : ScheduledPhase.Context> executeStatefulScheduledPhase(phase: StatefulScheduledPhase<CONTEXT>, context: CONTEXT) {
+        val phaseBodies = statefulScheduledPhaseBodies[phase] ?: return
+
+        phaseBodies.forEach { phaseBody ->
+            (phaseBody as CONTEXT.() -> Unit).invoke(context)
+        }
     }
 
     suspend fun awaitAllBackgroundJobs() {

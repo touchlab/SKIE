@@ -5,11 +5,12 @@ import co.touchlab.skie.kir.type.KirType
 import co.touchlab.skie.oir.element.OirCallableDeclaration
 import co.touchlab.skie.oir.element.OirProperty
 import co.touchlab.skie.sir.element.SirProperty
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
 class KirProperty(
-    override val baseDescriptor: PropertyDescriptor,
-    override val descriptor: PropertyDescriptor,
+    val kotlinName: String,
+    override val kotlinSignature: String,
+    val objCName: String,
+    val swiftName: String,
     override val owner: KirClass,
     override val origin: KirCallableDeclaration.Origin,
     override val scope: KirScope,
@@ -19,9 +20,6 @@ class KirProperty(
     override val isRefinedInSwift: Boolean,
     override val configuration: PropertyConfiguration,
 ) : KirOverridableDeclaration<KirProperty, SirProperty> {
-
-    val name: String
-        get() = descriptor.name.asString()
 
     lateinit var oirProperty: OirProperty
 
@@ -78,5 +76,5 @@ class KirProperty(
         overridableDeclarationDelegate.removeOverriddenBy(declaration)
     }
 
-    override fun toString(): String = "${this::class.simpleName}: $descriptor"
+    override fun toString(): String = "${this::class.simpleName}: $kotlinName"
 }

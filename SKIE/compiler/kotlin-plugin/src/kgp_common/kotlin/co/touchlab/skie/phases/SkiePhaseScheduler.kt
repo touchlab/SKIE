@@ -26,21 +26,24 @@ import co.touchlab.skie.phases.header.DeclareSkieErrorTypesPhase
 import co.touchlab.skie.phases.header.FixForwardDeclarationsPhase
 import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
+import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
 import co.touchlab.skie.phases.kir.CreateKirMembersPhase
-import co.touchlab.skie.phases.kir.CreateKirTypesPhase
 import co.touchlab.skie.phases.memberconflicts.RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameConflictingCallableDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameParametersNamedSelfPhase
 import co.touchlab.skie.phases.oir.ConfigureCInteropFrameworkNameForPlatformTypesPhase
 import co.touchlab.skie.phases.oir.ConfigureExternalOirTypesBridgingPhase
+import co.touchlab.skie.phases.oir.CreateExternalOirTypesPhase
 import co.touchlab.skie.phases.oir.CreateFakeObjCConstructorsPhase
+import co.touchlab.skie.phases.oir.CreateKotlinOirTypesPhase
 import co.touchlab.skie.phases.oir.CreateOirMembersPhase
-import co.touchlab.skie.phases.oir.CreateOirTypesPhase
 import co.touchlab.skie.phases.oir.FixOirFunctionSignaturesForApiNotesPhase
+import co.touchlab.skie.phases.oir.InitializeOirSuperTypesPhase
 import co.touchlab.skie.phases.other.AddAvailabilityBasedDeprecationLevelPhase
 import co.touchlab.skie.phases.other.AddAvailabilityToAsyncFunctionsPhase
 import co.touchlab.skie.phases.other.AddFoundationImportsPhase
 import co.touchlab.skie.phases.other.AwaitAllBackgroundJobsPhase
+import co.touchlab.skie.phases.other.ConfigureSwiftSpecificLinkerArgsPhase
 import co.touchlab.skie.phases.other.DeclareMissingSymbolsPhase
 import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
@@ -49,6 +52,7 @@ import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
 import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
 import co.touchlab.skie.phases.other.LinkObjectFilesPhase
 import co.touchlab.skie.phases.other.LoadCustomSwiftSourceFilesPhase
+import co.touchlab.skie.phases.other.ProcessReportedMessagesPhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
 import co.touchlab.skie.phases.other.VerifyModuleNamePhase
 import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
@@ -65,7 +69,7 @@ import co.touchlab.skie.phases.sir.type.CreateKotlinSirExtensionsPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateStableNameTypeAliasesPhase
 import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
-import co.touchlab.skie.phases.sir.type.InitializeSirTypesSuperTypesForOirPhase
+import co.touchlab.skie.phases.sir.type.InitializeSirSuperTypesPhase
 import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.ConvertSirIrFilesToSourceFilesPhase
 import co.touchlab.skie.phases.swift.ConvertSirSourceFilesToCompilableFilesPhase
@@ -75,6 +79,7 @@ import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKotlinMod
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictsWithOtherTypesPhase
 import co.touchlab.skie.phases.typeconflicts.TemporarilyRenameTypesConflictingWithExternalModulesPhase
 import co.touchlab.skie.phases.util.SkiePhaseGroup
+import co.touchlab.skie.phases.util.run
 import co.touchlab.skie.util.addAll
 
 class SkiePhaseScheduler {
@@ -110,32 +115,47 @@ class SkiePhaseScheduler {
         )
     }
 
+    val descriptorConversionPhases = SkiePhaseGroup<DescriptorConversionPhase, DescriptorConversionPhase.Context> { context ->
+        addAll(
+            VerifyDescriptorProviderConsistencyPhase,
+
+            CreateExposedKirTypesPhase(context),
+            CreateKirMembersPhase(context),
+
+            // Flows
+            UnifyFlowConfigurationForOverridesPhase(context),
+            SuspendGenerator.FlowMappingConfigurationPhase,
+            ConvertFlowsPhase(context),
+
+            ExtraClassExportPhase.HideExportFunctionsInitPhase,
+
+            DefaultArgumentGenerator.RegisterOverloadsPhase,
+            DefaultArgumentGenerator.RemoveManglingOfOverloadsInitPhase,
+
+            SuspendGenerator.KotlinBridgingFunctionVisibilityConfigurationInitPhase,
+            SuspendGenerator.SwiftBridgeGeneratorInitPhase,
+        )
+    }
+
     val sirPhases = SkiePhaseGroup<SirPhase, SirPhase.Context> { context ->
         addAll(
             // Debug(before)
 
-            VerifyDescriptorProviderConsistencyPhase,
             DumpSwiftApiPhase.BeforeApiNotes,
 
             // IR Setup
 
-            CreateKirTypesPhase(context),
-            CreateKirMembersPhase(context),
+            CreateKotlinOirTypesPhase(context),
+            CreateExternalOirTypesPhase,
+            InitializeOirSuperTypesPhase,
 
-            // Flows ->
-            UnifyFlowConfigurationForOverridesPhase(context),
-            SuspendGenerator.FlowMappingConfigurationPhase,
-            ConvertFlowsPhase(context),
-            // <- Flows
-
-            CreateOirTypesPhase(context),
             CreateOirMembersPhase(context),
             ConfigureCInteropFrameworkNameForPlatformTypesPhase,
 
-            CreateKotlinSirTypesPhase(context),
+            CreateKotlinSirTypesPhase,
             CreateKotlinSirExtensionsPhase,
             CreateExternalSirTypesPhase,
-            InitializeSirTypesSuperTypesForOirPhase,
+            InitializeSirSuperTypesPhase,
             ConfigureExternalOirTypesBridgingPhase(context),
 
             ConfigureStableNameTypeAliasesForKotlinRuntimePhase,
@@ -160,14 +180,13 @@ class SkiePhaseScheduler {
 
             // Features
 
-            ExtraClassExportPhase.FinalizePhase,
+            ExtraClassExportPhase.HideExportFunctionsFinalizePhase,
 
-            DefaultArgumentGenerator.RegisterOverloadsPhase,
-            DefaultArgumentGenerator.RemoveManglingOfOverloadsPhase,
+            DefaultArgumentGenerator.RemoveManglingOfOverloadsFinalizePhase,
             RemoveConflictingDefaultArgumentOverloadsPhase,
 
-            SuspendGenerator.KotlinBridgingFunctionVisibilityConfigurationPhase,
-            SuspendGenerator.SwiftBridgeGeneratorPhase,
+            SuspendGenerator.KotlinBridgingFunctionVisibilityConfigurationFinalizePhase,
+            SuspendGenerator.SwiftBridgeGeneratorFinalizePhase,
 
             FlowBridgingConfigurationPhase,
             FlowConversionConstructorsGenerator(context),
@@ -223,38 +242,45 @@ class SkiePhaseScheduler {
 
     val linkPhases = SkiePhaseGroup<LinkPhase, LinkPhase.Context> { context ->
         addAll(
+            ConfigureSwiftSpecificLinkerArgsPhase,
             AwaitAllBackgroundJobsPhase,
             LinkObjectFilesPhase,
+            ProcessReportedMessagesPhase,
             LogSkiePerformanceAnalyticsPhase,
         )
     }
 
-    context(SkiePhase.Context)
+    context(ScheduledPhase.Context)
     fun runClassExportPhases(contextFactory: () -> ClassExportPhase.Context) {
         classExportPhases.run(contextFactory)
     }
 
-    context(SkiePhase.Context)
+    context(ScheduledPhase.Context)
     fun runDescriptorModificationPhases(contextFactory: () -> DescriptorModificationPhase.Context) {
         descriptorModificationPhases.run(contextFactory)
     }
 
-    context(SkiePhase.Context)
+    context(ScheduledPhase.Context)
     fun runSymbolTablePhases(contextFactory: () -> SymbolTablePhase.Context) {
         symbolTablePhases.run(contextFactory)
     }
 
-    context(SkiePhase.Context)
+    context(ScheduledPhase.Context)
     fun runKotlinIrPhases(contextFactory: () -> KotlinIrPhase.Context) {
         kotlinIrPhases.run(contextFactory)
     }
 
-    context(SkiePhase.Context)
-    fun launchSirPhases(contextFactory: () -> SirPhase.Context) {
-        sirPhases.launch(contextFactory)
+    context(ScheduledPhase.Context)
+    fun runDescriptorConversionPhases(contextFactory: () -> DescriptorConversionPhase.Context) {
+        descriptorConversionPhases.run(contextFactory)
     }
 
-    context(SkiePhase.Context)
+    context(ScheduledPhase.Context)
+    fun runSirPhases(contextFactory: () -> SirPhase.Context) {
+        sirPhases.run(contextFactory)
+    }
+
+    context(ScheduledPhase.Context)
     fun runLinkPhases(contextFactory: () -> LinkPhase.Context) {
         linkPhases.run(contextFactory)
     }

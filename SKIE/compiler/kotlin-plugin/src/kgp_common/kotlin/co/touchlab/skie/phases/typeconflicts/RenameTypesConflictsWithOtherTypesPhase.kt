@@ -11,8 +11,6 @@ import co.touchlab.skie.sir.element.isRemoved
 import co.touchlab.skie.sir.element.oirClassOrNull
 import co.touchlab.skie.sir.element.resolveAsKirClass
 import co.touchlab.skie.util.resolveCollisionWithWarning
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 
@@ -30,7 +28,6 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
      * classes are prioritized over type aliases
      * originating from Kotlin (is prioritized)
      * Kotlin class vs file (class is prioritized)
-     * Kotlin class nesting level if available (lower is prioritized)
      * Kotlin fqName if available
      * Kotlin SirClasses with shorter Obj-C names are prioritized
      */
@@ -52,27 +49,11 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
             .thenByDescending { it is SirClass }
             .thenByDescending { it.resolveAsKirClass() != null }
             .thenByDescending { it.resolveAsKirClass()?.kind != KirClass.Kind.File }
-            .thenBy { it.resolveAsKirClass()?.kotlinClassNestingLevel ?: 0 }
-            .thenBy { it.resolveAsKirClass()?.kotlinName ?: "" }
+            .thenBy { it.resolveAsKirClass()?.kotlinFqName ?: "" }
             .thenBy { it.getOirClassOrNull()?.name?.length ?: Int.MAX_VALUE }
 
     private val SirFqName.depth: Int
         get() = 1 + (this.parent?.depth ?: 0)
-
-    private val KirClass.kotlinName: String
-        get() = when (val descriptor = this.descriptor) {
-            is KirClass.Descriptor.Class -> descriptor.value.fqNameSafe.asString()
-            is KirClass.Descriptor.File -> descriptor.value.name ?: ""
-        }
-
-    private val KirClass.kotlinClassNestingLevel: Int
-        get() = when (val descriptor = this.descriptor) {
-            is KirClass.Descriptor.Class -> descriptor.value.kotlinClassNestingLevel
-            is KirClass.Descriptor.File -> 0
-        }
-
-    private val ClassDescriptor.kotlinClassNestingLevel: Int
-        get() = 1 + ((this.containingDeclaration as? ClassDescriptor)?.kotlinClassNestingLevel ?: 0)
 
     private fun SirTypeDeclaration.getOirClassOrNull(): OirClass? =
         (this as? SirClass)?.oirClassOrNull

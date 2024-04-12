@@ -1,41 +1,29 @@
 package co.touchlab.skie.util
 
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.cli.common.messages.MessageUtil
-import org.jetbrains.kotlin.cli.jvm.compiler.report
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
-import org.jetbrains.kotlin.renderer.DescriptorRenderer
+import co.touchlab.skie.kir.element.KirElement
+import java.util.Collections
 
-class Reporter(private val compilerConfiguration: CompilerConfiguration) {
+class Reporter {
 
-    fun report(severity: Severity, message: String, declaration: DeclarationDescriptor? = null) {
-        val location = MessageUtil.psiElementToMessageLocation(declaration?.findPsi())?.let {
-            CompilerMessageLocation.create(it.path, it.line, it.column, it.lineContent)
-        }
+    private val mutableReports = Collections.synchronizedList(mutableListOf<Report>())
 
-        if (declaration != null && location == null) {
-            return report(severity, "$message\n    (at ${DescriptorRenderer.COMPACT_WITH_SHORT_TYPES.render(declaration)})", null)
-        }
+    val reports: List<Report> by ::mutableReports
 
-        when (severity) {
-            Severity.Error -> compilerConfiguration.report(CompilerMessageSeverity.ERROR, message, location)
-            Severity.Warning -> compilerConfiguration.report(CompilerMessageSeverity.WARNING, message, location)
-            Severity.None -> {}
-        }
+    fun report(severity: Severity, message: String, source: KirElement? = null) {
+        mutableReports.add(Report(message, severity, source))
     }
 
-    fun error(message: String, declaration: DeclarationDescriptor? = null) {
-        report(Severity.Error, message, declaration)
+    fun error(message: String, source: KirElement? = null) {
+        report(Severity.Error, message, source)
     }
 
-    fun warning(message: String, declaration: DeclarationDescriptor? = null) {
-        report(Severity.Warning, message, declaration)
+    fun warning(message: String, source: KirElement? = null) {
+        report(Severity.Warning, message, source)
     }
 
     enum class Severity {
-        Error, Warning, None
+        Error, Warning
     }
+
+    data class Report(val message: String, val severity: Severity, val source: KirElement?)
 }

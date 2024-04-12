@@ -4,7 +4,6 @@ import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.SkiePhase
 import co.touchlab.skie.phases.sir.type.hasStableNameTypeAlias
 import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
 import co.touchlab.skie.phases.util.StatefulSirPhase
@@ -27,20 +26,20 @@ object ExhaustiveEnumsGenerator : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses
+        kirProvider.kotlinClasses
             .filter { it.isSupported }
             .forEach {
                 generate(it)
             }
     }
 
-    context(SkiePhase.Context)
+    context(SirPhase.Context)
     private val KirClass.isSupported: Boolean
         get() = this.originalSirClass.isExported &&
             this.kind == KirClass.Kind.Enum &&
             this.isEnumInteropEnabled
 
-    context(SkiePhase.Context)
+    context(SirPhase.Context)
     private val KirClass.isEnumInteropEnabled: Boolean
         get() = this.configuration[EnumInterop.Enabled]
 

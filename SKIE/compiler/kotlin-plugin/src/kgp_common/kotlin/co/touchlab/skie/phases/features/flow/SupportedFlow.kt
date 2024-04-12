@@ -34,6 +34,9 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         val kind: SupportedFlow
 
+        fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass =
+            kind.getCoroutinesKirClass(kirProvider)
+
         fun getKotlinKirClass(kirProvider: KirProvider): KirClass
 
         fun getSwiftClass(sirProvider: SirProvider): SirClass

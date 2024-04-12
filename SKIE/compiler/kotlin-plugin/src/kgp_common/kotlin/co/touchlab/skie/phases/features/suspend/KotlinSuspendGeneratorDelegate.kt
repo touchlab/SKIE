@@ -7,8 +7,8 @@ import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
+import co.touchlab.skie.phases.DescriptorConversionPhase
 import co.touchlab.skie.phases.DescriptorModificationPhase
-import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.features.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
@@ -61,9 +61,13 @@ class KotlinSuspendGeneratorDelegate(
     }
 
     private fun FunctionDescriptor.hide() {
-        context.doInPhase(SuspendGenerator.KotlinBridgingFunctionVisibilityConfigurationPhase) {
-            kirProvider.getFunction(this@hide).originalSirFunction.applyToEntireOverrideHierarchy {
-                visibility = SirVisibility.Internal
+        context.doInPhase(SuspendGenerator.KotlinBridgingFunctionVisibilityConfigurationInitPhase) {
+            val kirFunction = descriptorKirProvider.getFunction(this@hide)
+
+            doInPhase(SuspendGenerator.KotlinBridgingFunctionVisibilityConfigurationFinalizePhase) {
+                kirFunction.originalSirFunction.applyToEntireOverrideHierarchy {
+                    visibility = SirVisibility.Internal
+                }
             }
         }
     }
@@ -76,6 +80,7 @@ class KotlinSuspendGeneratorDelegate(
             namespace = context.declarationBuilder.getCustomNamespace("__SkieSuspendWrappers"),
             annotations = Annotations.EMPTY,
         ) {
+            // WIP Replace with typeConstructor.parameters
             fun DeclarationDescriptor.typeParametersInScope(): List<TypeParameterDescriptor> {
                 return when (this) {
                     is ClassifierDescriptorWithTypeParameters -> {
@@ -138,23 +143,20 @@ class KotlinSuspendGeneratorDelegate(
             )
 
             context.doInPhase(SuspendGenerator.FlowMappingConfigurationPhase) {
-                configureFlowMappingForReceiver(bridgingFunctionDescriptor, dispatchReceiverParameter)
+                configureFlowMappingForReceiver(dispatchReceiverParameter)
             }
 
             this.add(dispatchReceiverParameter)
         }
     }
 
-    context(SirPhase.Context)
+    context(DescriptorConversionPhase.Context)
     private fun configureFlowMappingForReceiver(
-        bridgingFunctionDescriptor: FunctionDescriptor,
         dispatchReceiverParameter: ValueParameterDescriptor,
     ) {
-        val configuration = kirProvider.getFunction(bridgingFunctionDescriptor).valueParameters
-            .single { it.descriptorOrNull == dispatchReceiverParameter }
-            .configuration
+        val kirValueParameter = descriptorKirProvider.getValueParameter(dispatchReceiverParameter)
 
-        configuration.flowMappingStrategy = configuration.flowMappingStrategy.limitedToTypeArguments()
+        kirValueParameter.configuration.flowMappingStrategy = kirValueParameter.configuration.flowMappingStrategy.limitFlowMappingToTypeArguments()
     }
 
     private fun MutableList<ValueParameterDescriptor>.addExtensionReceiver(
@@ -170,7 +172,7 @@ class KotlinSuspendGeneratorDelegate(
                 type = typeSubstitutor.safeSubstitute(extensionReceiver.type, Variance.INVARIANT),
             )
 
-            configureFlowMappingForExtensionReceiver(originalFunctionDescriptor, bridgingFunctionDescriptor, extensionReceiverParameter)
+            configureFlowMappingForExtensionReceiver(originalFunctionDescriptor, extensionReceiverParameter)
 
             this.add(extensionReceiverParameter)
         }
@@ -178,17 +180,16 @@ class KotlinSuspendGeneratorDelegate(
 
     private fun configureFlowMappingForExtensionReceiver(
         originalFunctionDescriptor: FunctionDescriptor,
-        bridgingFunctionDescriptor: FunctionDescriptor,
         extensionReceiverParameter: ValueParameterDescriptor,
     ) {
         context.doInPhase(SuspendGenerator.FlowMappingConfigurationPhase) {
-            val function = kirProvider.getFunction(originalFunctionDescriptor)
+            val function = descriptorKirProvider.getFunction(originalFunctionDescriptor)
 
             val isExtensionReceiverUsedAsSwiftReceiver = function.scope == KirScope.Member &&
                 originalFunctionDescriptor.dispatchReceiverParameter == null
 
             if (isExtensionReceiverUsedAsSwiftReceiver) {
-                configureFlowMappingForReceiver(bridgingFunctionDescriptor, extensionReceiverParameter)
+                configureFlowMappingForReceiver(extensionReceiverParameter)
             }
         }
     }

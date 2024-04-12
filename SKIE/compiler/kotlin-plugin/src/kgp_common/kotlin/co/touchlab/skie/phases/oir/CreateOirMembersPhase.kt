@@ -21,12 +21,7 @@ import co.touchlab.skie.oir.element.OirProperty
 import co.touchlab.skie.oir.element.OirScope
 import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirValueParameter
-import co.touchlab.skie.oir.element.kirClassOrNull
-import co.touchlab.skie.oir.type.translation.OirTypeParameterScope
-import co.touchlab.skie.oir.type.translation.typeParameterScope
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.oir.util.getOirValueParameterName
-import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.cKeywords
 
 class CreateOirMembersPhase(
@@ -34,7 +29,6 @@ class CreateOirMembersPhase(
 ) : SirPhase {
 
     private val kirProvider = context.kirProvider
-    private val namer = context.namer
     private val oirTypeTranslator = context.oirTypeTranslator
 
     private val extensionCache = mutableMapOf<OirClass, OirExtension>()
@@ -47,7 +41,7 @@ class CreateOirMembersPhase(
     }
 
     private fun createAllMembers() {
-        kirProvider.allCallableDeclarations.forEach(::createCallableDeclaration)
+        kirProvider.kotlinCallableDeclarations.forEach(::createCallableDeclaration)
     }
 
     private fun createCallableDeclaration(kirCallableDeclaration: KirCallableDeclaration<*>) {
@@ -60,7 +54,7 @@ class CreateOirMembersPhase(
 
     private fun createConstructor(constructor: KirConstructor) {
         val oirConstructor = OirConstructor(
-            selector = namer.getSelector(constructor.baseDescriptor),
+            selector = constructor.objCSelector,
             parent = constructor.owner.oirClass,
             errorHandlingStrategy = constructor.errorHandlingStrategy,
             deprecationLevel = constructor.deprecationLevel,
@@ -73,10 +67,10 @@ class CreateOirMembersPhase(
 
     private fun createFunction(function: KirSimpleFunction) {
         val oirSimpleFunction = OirSimpleFunction(
-            selector = namer.getSelector(function.baseDescriptor),
+            selector = function.objCSelector,
             parent = getOirCallableDeclarationParent(function),
             scope = function.oirScope,
-            returnType = oirTypeTranslator.mapType(function.returnType, function.owner.oirClass.genericsScope),
+            returnType = oirTypeTranslator.mapType(function.returnType),
             errorHandlingStrategy = function.errorHandlingStrategy,
             deprecationLevel = function.deprecationLevel,
         )
@@ -88,8 +82,8 @@ class CreateOirMembersPhase(
 
     private fun createProperty(property: KirProperty) {
         property.oirProperty = OirProperty(
-            name = namer.getPropertyName(property.baseDescriptor).objCName,
-            type = oirTypeTranslator.mapType(property.type, property.owner.oirClass.genericsScope),
+            name = property.objCName,
+            type = oirTypeTranslator.mapType(property.type),
             isVar = property.isVar,
             parent = getOirCallableDeclarationParent(property),
             scope = property.oirScope,
@@ -121,13 +115,11 @@ class CreateOirMembersPhase(
         val labels = listOf("") + oirFunction.selector.trimEnd(':').split(':').drop(1)
         val usedNames = mutableSetOf<String>()
 
-        val oirGenericsScope = oirFunction.owner.genericsScope
-
         valueParameters.forEachIndexed { index, valueParameter ->
             val oirValueParameter = OirValueParameter(
                 label = labels[index],
                 name = getValueParameterName(valueParameter, usedNames),
-                type = oirTypeTranslator.mapType(valueParameter.type, oirGenericsScope),
+                type = oirTypeTranslator.mapType(valueParameter.type),
                 parent = oirFunction,
                 index = index,
             )
@@ -137,12 +129,7 @@ class CreateOirMembersPhase(
     }
 
     private fun getValueParameterName(kirValueParameter: KirValueParameter, usedNames: MutableSet<String>): String {
-        val candidateName = when (kirValueParameter.kind) {
-            is KirValueParameter.Kind.ValueParameter -> namer.getOirValueParameterName(kirValueParameter.kind.descriptor)
-            else -> kirValueParameter.name
-        }
-
-        var uniqueName = candidateName.toValidSwiftIdentifier()
+        var uniqueName = kirValueParameter.objCName
         while (uniqueName in usedNames || uniqueName in cKeywords) {
             uniqueName += "_"
         }
@@ -153,7 +140,7 @@ class CreateOirMembersPhase(
     }
 
     private fun createAllEnumEntries() {
-        kirProvider.allEnums.forEach(::createEnumEntries)
+        kirProvider.kotlinEnums.forEach(::createEnumEntries)
     }
 
     private fun createEnumEntries(kirClass: KirClass) {
@@ -162,7 +149,7 @@ class CreateOirMembersPhase(
 
     private fun createEnumEntry(enumEntry: KirEnumEntry) {
         enumEntry.oirEnumEntry = OirProperty(
-            name = namer.getEnumEntrySelector(enumEntry.descriptor),
+            name = enumEntry.objCSelector,
             type = enumEntry.owner.oirClass.defaultType,
             isVar = false,
             parent = enumEntry.owner.oirClass,
@@ -172,7 +159,7 @@ class CreateOirMembersPhase(
     }
 
     private fun initializeOverridesForAllMembers() {
-        kirProvider.allOverridableDeclaration.forEach(::initializeOverrides)
+        kirProvider.kotlinOverridableDeclaration.forEach(::initializeOverrides)
     }
 
     private fun initializeOverrides(overridableDeclaration: KirOverridableDeclaration<*, *>) {
@@ -200,7 +187,4 @@ class CreateOirMembersPhase(
         } else {
             OirScope.Member
         }
-
-    private val OirClass.genericsScope: OirTypeParameterScope
-        get() = this.kirClassOrNull?.typeParameterScope ?: error("OirClass $this does not originate from KirClass.")
 }

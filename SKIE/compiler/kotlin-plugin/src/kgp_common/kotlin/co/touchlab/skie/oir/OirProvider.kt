@@ -1,51 +1,44 @@
 package co.touchlab.skie.oir
 
 import co.touchlab.skie.kir.KirProvider
-import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.element.KirModule
-import co.touchlab.skie.oir.builtin.OirBuiltins
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.OirExtension
 import co.touchlab.skie.oir.element.OirFile
 import co.touchlab.skie.oir.element.OirModule
-import co.touchlab.skie.phases.oir.CreateOirTypesPhase
-import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.isInterface
 
 class OirProvider(
-    skieModule: KirModule,
-    extraDescriptorBuiltins: ExtraDescriptorBuiltins,
     private val kirProvider: KirProvider,
-    private val namer: ObjCExportNamer,
 ) {
 
-    lateinit var allKotlinClasses: List<OirClass>
+    val externalModule = OirModule.External()
+
+    lateinit var kotlinClasses: List<OirClass>
         private set
 
-    lateinit var allKotlinProtocols: List<OirClass>
+    lateinit var kotlinProtocols: List<OirClass>
         private set
 
-    lateinit var allKotlinClassesAndProtocols: List<OirClass>
+    lateinit var kotlinClassesAndProtocols: List<OirClass>
         private set
 
-    val allKotlinExtensions: List<OirExtension>
+    val kotlinExtensions: List<OirExtension>
         get() = allFiles.flatMap { it.declarations }.filterIsInstance<OirExtension>()
 
-    val allExternalClasses: List<OirClass>
-        get() = allExternalClassesAndProtocols.filter { it.kind == OirClass.Kind.Class }
+    lateinit var externalClasses: List<OirClass>
+        private set
 
-    val allExternalProtocols: List<OirClass>
-        get() = allExternalClassesAndProtocols.filter { it.kind == OirClass.Kind.Protocol }
+    lateinit var externalProtocols: List<OirClass>
+        private set
 
-    val allExternalClassesAndProtocols: Collection<OirClass>
-        get() = externalClassesAndProtocolsCache.values
+    lateinit var externalClassesAndProtocols: List<OirClass>
+        private set
 
     val allClasses: List<OirClass>
-        get() = allKotlinClasses + allExternalClasses
+        get() = kotlinClasses + externalClasses
 
     val allProtocols: List<OirClass>
-        get() = allKotlinProtocols + allExternalProtocols
+        get() = kotlinProtocols + externalProtocols
 
     val allClassesAndProtocols: List<OirClass>
         get() = allClasses + allProtocols
@@ -57,20 +50,15 @@ class OirProvider(
 
     private val fileCache = mutableMapOf<Pair<OirModule, String>, OirFile>()
 
-    private val externalClassesAndProtocolsCache = mutableMapOf<ClassDescriptor, OirClass>()
+    // TODO Remove after not needed for ApiNotes, do not use to store classes
+    val skieModule: OirModule.Kotlin = OirModule.Kotlin("Skie")
 
-    val skieModule: OirModule.Kotlin = getModule(skieModule)
-
-    val externalModule: OirModule.External by lazy {
-        OirModule.External()
-    }
-
-    val oirBuiltins: OirBuiltins by lazy {
-        OirBuiltins(this, extraDescriptorBuiltins)
-    }
-
-    fun getModule(kirModule: KirModule): OirModule.Kotlin =
+    fun getKotlinModule(kirModule: KirModule): OirModule.Kotlin =
         kotlinModuleCache.getOrPut(kirModule) {
+            assert(kirModule.origin != KirModule.Origin.External) {
+                "External modules are not supported: $kirModule."
+            }
+
             OirModule.Kotlin(kirModule.name)
         }
 
@@ -79,30 +67,17 @@ class OirProvider(
             OirFile(name, oirModule)
         }
 
-    fun getExternalClass(descriptor: ClassDescriptor): OirClass =
-        externalClassesAndProtocolsCache.getOrPut(descriptor.original) {
-            val (name, kind) = if (descriptor.kind.isInterface) {
-                descriptor.name.asString().removeSuffix("Protocol") to OirClass.Kind.Protocol
-            } else {
-                descriptor.name.asString() to OirClass.Kind.Class
-            }
-
-            val oirClass = OirClass(
-                name = name,
-                parent = externalModule,
-                kind = kind,
-                origin = OirClass.Origin.CinteropType(descriptor),
-            )
-
-            CreateOirTypesPhase.createTypeParameters(oirClass, descriptor.declaredTypeParameters, namer)
-
-            oirClass
-        }
-
     fun initializeKotlinClassCache() {
-        allKotlinClassesAndProtocols = kirProvider.allClasses.map { it.oirClass }
+        kotlinClassesAndProtocols = kirProvider.kotlinClasses.map { it.oirClass }
 
-        allKotlinClasses = allKotlinClassesAndProtocols.filter { it.kind == OirClass.Kind.Class }
-        allKotlinProtocols = allKotlinClassesAndProtocols.filter { it.kind == OirClass.Kind.Protocol }
+        kotlinClasses = kotlinClassesAndProtocols.filter { it.kind == OirClass.Kind.Class }
+        kotlinProtocols = kotlinClassesAndProtocols.filter { it.kind == OirClass.Kind.Protocol }
+    }
+
+    fun initializeExternalClassCache() {
+        externalClassesAndProtocols = kirProvider.allExternalClasses.map { it.oirClass }
+
+        externalClasses = externalClassesAndProtocols.filter { it.kind == OirClass.Kind.Class }
+        externalProtocols = externalClassesAndProtocols.filter { it.kind == OirClass.Kind.Protocol }
     }
 }

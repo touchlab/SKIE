@@ -9,7 +9,7 @@ object InitializeSirOverridesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allOverridableDeclaration.forEach(::initializeOverrides)
+        kirProvider.kotlinOverridableDeclaration.forEach(::initializeOverrides)
     }
 
     private fun initializeOverrides(overridableDeclaration: KirOverridableDeclaration<*, *>) {

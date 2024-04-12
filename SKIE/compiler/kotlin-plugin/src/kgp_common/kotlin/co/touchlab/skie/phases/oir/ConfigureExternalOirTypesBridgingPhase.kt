@@ -23,7 +23,7 @@ class ConfigureExternalOirTypesBridgingPhase(
     }
 
     private fun configureBridging() {
-        oirProvider.allExternalClassesAndProtocols.forEach(::configureBridging)
+        oirProvider.externalClassesAndProtocols.forEach(::configureBridging)
     }
 
     private fun configureBridging(oirClass: OirClass) {

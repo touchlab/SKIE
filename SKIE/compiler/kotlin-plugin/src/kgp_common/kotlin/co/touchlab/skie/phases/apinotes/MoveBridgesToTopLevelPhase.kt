@@ -13,7 +13,7 @@ object MoveBridgesToTopLevelPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allClasses
+        kirProvider.kotlinClasses
             .mapNotNull { it.bridgedSirClass }
             .forEach {
                 it.moveToTopLevel()
