@@ -11,30 +11,44 @@ import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
 
 @Suppress("ClassName")
+@Smoke
 @GradleTests
-class BasicGradle_SingleTarget: BaseGradleTests() {
-    @Smoke
+class KotlinArtifactDsl_Framework_AllDarwinTargetsSingleFrameworkArtifactTests: BaseGradleTests() {
+
     @MatrixTest
-    fun `basic project, single target`(
+    fun `all darwin targets and single framework artifact`(
         kotlinVersion: KotlinVersion,
         target: KotlinTarget.Native.Darwin,
-        buildConfiguration: BuildConfiguration,
         linkMode: LinkMode,
+        configuration: BuildConfiguration,
     ) {
         rootBuildFile(kotlinVersion) {
             kotlin {
-                target(target)
-
-                registerNativeFrameworks(kotlinVersion, buildConfiguration, linkMode)
+                allDarwin()
             }
 
-            workaroundFatFrameworkConfigurationIfNeeded(kotlinVersion)
+            kotlinArtifacts {
+                framework(
+                    kotlinVersion = kotlinVersion,
+                    target = target,
+                    linkMode = linkMode,
+                    buildConfiguration = configuration,
+                )
+            }
         }
 
         copyToCommonMain(Templates.basic)
 
         runGradle()
 
-        buildSwift(target, Templates.basic, buildConfiguration)
+        buildSwift(
+            target = target,
+            template = Templates.basic,
+            frameworkParentPath = builtFrameworkParentDir(target, configuration, isArtifactDsl = true),
+        )
+
+        if (target is KotlinTarget.Native.MacOS) {
+            runSwift()
+        }
     }
 }

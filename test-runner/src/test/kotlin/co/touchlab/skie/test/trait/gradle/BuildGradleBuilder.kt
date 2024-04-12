@@ -4,6 +4,7 @@ import co.touchlab.skie.test.runner.BuildConfiguration
 import co.touchlab.skie.test.util.KotlinTarget
 import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
+import org.intellij.lang.annotations.Language
 
 class BuildGradleBuilder(
     val kotlinVersion: KotlinVersion,
@@ -12,29 +13,30 @@ class BuildGradleBuilder(
         Plugin.skie,
     ),
 ) {
-    private val imports = mutableListOf<String>()
+    private val imports = mutableSetOf<String>()
     private val builder = StringBuilder()
+    private var builderIndentationLevel = 0
 
     init {
         if (plugins.isNotEmpty()) {
-            +"plugins {"
-            plugins.forEach {
-                +"    ${it.application}"
+            "plugins" {
+                plugins.forEach {
+                    +it.application
+                }
             }
-            +"}"
         }
     }
 
     fun kotlin(block: KotlinExtensionScope.() -> Unit) {
-        +"kotlin {"
-        KotlinExtensionScope().block()
-        +"}"
+        "kotlin" {
+            KotlinExtensionScope().block()
+        }
     }
 
     fun kotlinArtifacts(block: KotlinArtifactsExtensionScope.() -> Unit) {
-        +"kotlinArtifacts {"
-        KotlinArtifactsExtensionScope().block()
-        +"}"
+        "kotlinArtifacts" {
+            KotlinArtifactsExtensionScope().block()
+        }
     }
 
     fun workaroundFatFrameworkConfigurationIfNeeded(
@@ -43,29 +45,54 @@ class BuildGradleBuilder(
         if (kotlinVersion.value.startsWith("1.8.")) {
             imports.add("org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask")
 
-            +"tasks.withType<FatFrameworkTask>().configureEach {"
-            +"    configurations.getByName("
-            +"        name.substringAfter(\"link\").replaceFirstChar { it.lowercase() }"
-            +"    ).attributes {"
-            +"        attribute(Attribute.of(\"fat-framework\", String::class.java), \"true\")"
-            +"    }"
-            +"}"
+            appendLines("""
+                tasks.withType<FatFrameworkTask>().configureEach {
+                    configurations.getByName(
+                        name.substringAfter("link").replaceFirstChar { it.lowercase() }
+                    ).attributes {
+                        attribute(Attribute.of("fat-framework", String::class.java), "true")
+                    }
+                }
+            """.trimIndent())
         }
     }
 
-    operator fun String.unaryPlus() {
+    fun appendLines(@Language("kotlin") code: String) {
+        code.lines().forEach {
+            +it
+        }
+    }
+
+    operator fun @receiver:Language("kotlin") String.unaryPlus() {
+        appendIndentation()
         builder.appendLine(this)
     }
 
+    operator fun @receiver:Language("kotlin") String.invoke(block: () -> Unit) {
+        appendIndentation()
+        builder.append(this)
+        builder.appendLine(" {")
+        builderIndentationLevel += 1
+        block()
+        builderIndentationLevel -= 1
+        builder.appendLine("}")
+    }
+
+    private fun appendIndentation() {
+        repeat(builderIndentationLevel) {
+            builder.append("    ")
+        }
+    }
+
     override fun toString(): String {
-        return co.touchlab.skie.test.util.buildString {
-            imports.forEach {
-                +"import $it\n"
+        return buildString {
+            imports.sorted().forEach {
+                this.appendLine("import $it")
             }
             if (imports.isNotEmpty()) {
-                +"\n"
+                this.appendLine()
             }
-            +builder
+            this.append(builder)
         }
     }
 
@@ -86,11 +113,12 @@ class BuildGradleBuilder(
 
         fun allMacos() = targets(KotlinTarget.Native.MacOS)
 
-//         fun allTvos() = targets(Native.Tvos)
+        fun allTvos() = targets(KotlinTarget.Native.Tvos)
 
         fun allDarwin() {
             allIos()
             allMacos()
+            allTvos()
             // TODO: allTvos()
             // TODO: allWatchos()
         }
@@ -115,44 +143,63 @@ class BuildGradleBuilder(
         ) {
             imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget")
             imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType")
-            +"targets.withType<KotlinNativeTarget> {"
-            +"    binaries {"
-            +"        framework(buildTypes = listOf(NativeBuildType.${buildConfiguration.name.uppercase()})) {"
-            +"            isStatic = ${linkMode.isStatic}"
-            +"            freeCompilerArgs = freeCompilerArgs + listOf(\"-Xbinary=bundleId=gradle_test\")"
-            if (kotlinVersion.value.startsWith("1.8.") || kotlinVersion.value.startsWith("1.9.0")) {
-            +"            linkerOpts += \"-ld64\""
-            }
-            +"        }"
-            +"    }"
-            +"}"
-        }
 
-        operator fun String.unaryPlus() {
-            builder.appendLine("    $this")
+            "targets.withType<KotlinNativeTarget>" {
+                "binaries" {
+                    "framework(buildTypes = listOf(NativeBuildType.${buildConfiguration.name.uppercase()}))" {
+                        +"isStatic = ${linkMode.isStatic}"
+                        +"""freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=gradle_test")"""
+                        if (kotlinVersion.value.startsWith("1.8.") || kotlinVersion.value.startsWith("1.9.0")) {
+                            +"""linkerOpts += "-ld64""""
+                        }
+                    }
+                }
+            }
         }
     }
 
     inner class KotlinArtifactsExtensionScope {
 
         fun framework(
+            kotlinVersion: KotlinVersion,
             target: KotlinTarget.Native,
             linkMode: LinkMode,
             buildConfiguration: BuildConfiguration,
         ) {
             imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType")
-            +"""Native.Framework {"""
-            +"    target = ${target.id}"
-            +"    isStatic = ${linkMode.isStatic}"
-            +"    modes(NativeBuildTye.${buildConfiguration.name.uppercase()})"
-            +"    toolOptions {"
-            +"        freeCompilerArgs.add(\"-Xbinary=bundleId=gradle_test\")"
-            +"    }"
-            +"}"
+
+            "Native.Framework" {
+                +"target = ${target.id}"
+                +"isStatic = ${linkMode.isStatic}"
+                +"modes(NativeBuildType.${buildConfiguration.name.uppercase()})"
+                "toolOptions" {
+                    +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
+                }
+                if (kotlinVersion.value.startsWith("1.8.") || kotlinVersion.value.startsWith("1.9.0")) {
+                    +"""linkerOptions += "-ld64""""
+                }
+            }
         }
 
-        operator fun String.unaryPlus() {
-            builder.appendLine("    $this")
+        fun xcframework(
+            kotlinVersion: KotlinVersion,
+            targets: List<KotlinTarget.Native>,
+            linkMode: LinkMode,
+            buildConfiguration: BuildConfiguration,
+        ) {
+            imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType")
+
+            "Native.XCFramework" {
+                +"targets(${targets.joinToString { it.id }})"
+                +"modes(${buildConfiguration.toString().uppercase()})"
+                +"isStatic = ${linkMode.isStatic}"
+                "toolOptions" {
+                    +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
+                }
+                if (kotlinVersion.value.startsWith("1.8.") || kotlinVersion.value.startsWith("1.9.0")) {
+                    +"""linkerOptions += "-ld64""""
+                }
+            }
         }
     }
 

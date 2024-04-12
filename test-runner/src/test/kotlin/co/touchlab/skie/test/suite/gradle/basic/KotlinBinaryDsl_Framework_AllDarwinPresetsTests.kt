@@ -12,19 +12,17 @@ import co.touchlab.skie.test.util.LinkMode
 
 @Suppress("ClassName")
 @GradleTests
-class BasicGradle_SinglePreset: BaseGradleTests() {
-
+class KotlinBinaryDsl_Framework_AllDarwinPresetsTests: BaseGradleTests() {
     @Smoke
     @MatrixTest
-    fun `basic project, single preset`(
+    fun `basic project, all darwin presets`(
         kotlinVersion: KotlinVersion,
-        preset: KotlinTarget.Preset.Native.Darwin,
         buildConfiguration: BuildConfiguration,
         linkMode: LinkMode,
     ) {
         rootBuildFile(kotlinVersion) {
             kotlin {
-                targets(preset)
+                targets(KotlinTarget.Native.Darwin)
 
                 registerNativeFrameworks(kotlinVersion, buildConfiguration, linkMode)
             }
@@ -34,8 +32,8 @@ class BasicGradle_SinglePreset: BaseGradleTests() {
 
         runGradle()
 
-        preset.targets.forEach { target ->
-            buildSwift(target, Templates.basic, buildConfiguration)
+        KotlinTarget.Native.Darwin.targets.forEach { target ->
+            buildSwift(target, Templates.basic, builtFrameworkParentDir(target, buildConfiguration, isArtifactDsl = false))
         }
     }
 }

@@ -86,8 +86,7 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
     fun buildSwift(
         target: KotlinTarget.Native.Darwin,
         template: Template,
-        configuration: BuildConfiguration,
-        frameworkParentPath: String = "build/bin/${target.id}/${configuration.name.lowercase()}Framework",
+        frameworkParentPath: String,
         assertResult: ((CommandResult) -> Unit)? = {
             assertEquals(0, it.exitCode)
         },
@@ -115,7 +114,7 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
     }
 
     fun runSwift() {
-
+        // TODO: Implement running binaries
     }
 
     fun commonMain(fqdn: String): File {
@@ -131,6 +130,18 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
                 .resolve(file.relativePath)
             targetFile.parentFile.mkdirs()
             file.file.copyTo(targetFile)
+        }
+    }
+
+    fun builtFrameworkParentDir(
+        target: KotlinTarget.Native.Darwin,
+        configuration: BuildConfiguration,
+        isArtifactDsl: Boolean,
+    ): String {
+        return if (isArtifactDsl) {
+            "build/out/framework/${target.frameworkTarget}/${configuration.name.lowercase()}"
+        } else {
+            "build/bin/${target.id}/${configuration.name.lowercase()}Framework"
         }
     }
 }
