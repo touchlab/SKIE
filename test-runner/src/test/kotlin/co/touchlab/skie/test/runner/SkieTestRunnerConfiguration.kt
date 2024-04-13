@@ -38,10 +38,12 @@ object SkieTestRunnerConfiguration {
         this += SkieTestMatrix.Axis("Target", filteredTargets.filterIsInstance<KotlinTarget.Native.MacOS>())
 
         // TODO: Add filtering
-        val filteredPresets = targets.presets
-        this += SkieTestMatrix.Axis("Preset", filteredPresets)
-        this += SkieTestMatrix.Axis("Preset", filteredPresets.filterIsInstance<KotlinTarget.Preset.Native>())
-        this += SkieTestMatrix.Axis("Preset", filteredPresets.filterIsInstance<KotlinTarget.Preset.Native.Darwin>())
+        val presets = targets.presets.takeIf { it.isNotEmpty() } ?: KotlinTarget.Preset.Root.children.presets.filter { preset ->
+            targets.targets.toSet().intersect(preset.targets.toSet()).isNotEmpty()
+        }
+        this += SkieTestMatrix.Axis("Preset", presets)
+        this += SkieTestMatrix.Axis("Preset", presets.filterIsInstance<KotlinTarget.Preset.Native>())
+        this += SkieTestMatrix.Axis("Preset", presets.filterIsInstance<KotlinTarget.Preset.Native.Darwin>())
     }.associateBy { it.type }
 
     private fun <T: Any> value(property: String, deserialize: (String) -> T?): T? {

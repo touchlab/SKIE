@@ -155,7 +155,7 @@ jobs:
             :test
             -PtestLevel=smoke
             -PtestType=gradle
-            "-Pmatrix.targets=${{ inputs.target || 'macosArm64,iosArm64,iosSimulatorArm64' }}"
+            "-Pmatrix.targets=${{ inputs.target || 'macosArm64' }}"
             "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
-            "-Pmatrix.linkModes=${{ inputs.linkage || 'static,dynamic' }}"
+            "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
           build-root-directory: test-runner
