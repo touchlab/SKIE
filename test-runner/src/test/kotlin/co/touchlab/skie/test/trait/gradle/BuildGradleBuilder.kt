@@ -4,6 +4,7 @@ import co.touchlab.skie.test.runner.BuildConfiguration
 import co.touchlab.skie.test.util.KotlinTarget
 import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
+import co.touchlab.skie.test.util.needsOldLinker
 import org.intellij.lang.annotations.Language
 
 class BuildGradleBuilder(
@@ -149,7 +150,7 @@ class BuildGradleBuilder(
                     "framework(buildTypes = listOf(NativeBuildType.${buildConfiguration.name.uppercase()}))" {
                         +"isStatic = ${linkMode.isStatic}"
                         +"""freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=gradle_test")"""
-                        if (kotlinVersion.value.startsWith("1.8.") || kotlinVersion.value.startsWith("1.9.0")) {
+                        if (kotlinVersion.needsOldLinker) {
                             +"""linkerOpts += "-ld64""""
                         }
                     }
@@ -175,7 +176,7 @@ class BuildGradleBuilder(
                 "toolOptions" {
                     +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
                 }
-                if (kotlinVersion.value.startsWith("1.8.") || kotlinVersion.value.startsWith("1.9.0")) {
+                if (kotlinVersion.needsOldLinker) {
                     +"""linkerOptions += "-ld64""""
                 }
             }
@@ -196,7 +197,28 @@ class BuildGradleBuilder(
                 "toolOptions" {
                     +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
                 }
-                if (kotlinVersion.value.startsWith("1.8.") || kotlinVersion.value.startsWith("1.9.0")) {
+                if (kotlinVersion.needsOldLinker) {
+                    +"""linkerOptions += "-ld64""""
+                }
+            }
+        }
+
+        fun universalFramework(
+            kotlinVersion: KotlinVersion,
+            targets: List<KotlinTarget.Native>,
+            linkMode: LinkMode,
+            buildConfiguration: BuildConfiguration,
+        ) {
+            imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType")
+
+            "Native.FatFramework" {
+                +"targets(${targets.joinToString { it.id }})"
+                +"modes(${buildConfiguration.toString().uppercase()})"
+                +"isStatic = ${linkMode.isStatic}"
+                "toolOptions" {
+                    +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
+                }
+                if (kotlinVersion.needsOldLinker) {
                     +"""linkerOptions += "-ld64""""
                 }
             }
