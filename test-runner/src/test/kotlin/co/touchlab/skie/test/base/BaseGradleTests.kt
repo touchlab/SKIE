@@ -73,11 +73,14 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
         },
     ): BuildResult {
         val result: BuildResult = GradleRunner.create()
-            .withProjectDir(testProjectDir)
-            .withGradleVersion(gradleVersion)
-            .withArguments(*arguments)
-            .forwardOutput()
-//             .withDebug(true)
+            .apply {
+                withProjectDir(testProjectDir)
+                withGradleVersion(gradleVersion)
+                withArguments(*arguments)
+                if (!isCI) {
+                    forwardOutput()
+                }
+            }
             .build()
 
         assertResult?.invoke(result)
@@ -108,7 +111,9 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
         }
 
         val result = command.joinToString(" ").execute(testProjectDir)
-        println(result.stdOut)
+        if (!isCI) {
+            println(result.stdOut)
+        }
 
         assertResult?.invoke(result)
 

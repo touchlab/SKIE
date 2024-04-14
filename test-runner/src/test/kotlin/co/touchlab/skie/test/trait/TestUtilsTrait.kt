@@ -10,6 +10,8 @@ interface TestUtilsTrait {
         get() = File(System.getProperty("user.dir"))
     val tempRepository: File
         get() = File(System.getProperty("smokeTestRepository"))
+    val isCI: Boolean
+        get() = System.getenv("CI") == "true"
 
     operator fun File.invoke(content: String) = writeText(content)
 
