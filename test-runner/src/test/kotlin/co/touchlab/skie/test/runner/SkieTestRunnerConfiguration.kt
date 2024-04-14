@@ -15,35 +15,34 @@ object SkieTestRunnerConfiguration {
     val kotlinVersions = list("matrix.kotlinVersions", ::KotlinVersion) ?: listOf("1.8.0", "1.8.20", "1.9.20").map(::KotlinVersion)
     val gradleVersions = list("matrix.gradleVersions", ::GradleVersion) ?: listOf("8.6").map(::GradleVersion)
 
-    fun filteredMatrixAxes(filter: MatrixFilter) = buildList<SkieTestMatrix.Axis<*>> {
-        this += SkieTestMatrix.Axis<BuildConfiguration>(
-            "Configuration",
-            configurations.intersectOrKeepIfEmpty(filter.configurations.toList())
+    fun buildMatrixSource(): SkieTestMatrixSource {
+        val allTargets = targets.targets
+        return SkieTestMatrixSource(
+            targets = allTargets.toMutableList(),
+            presets = targets.presets.takeIf { it.isNotEmpty() }?.toMutableList()
+                ?: KotlinTarget.Preset.Root.children.presets.filter { preset ->
+                    allTargets.toSet().intersect(preset.targets.toSet()).isNotEmpty()
+                }.toMutableList(),
+            configurations = configurations.toMutableList(),
+            linkModes = linkModes.toMutableList(),
+            kotlinVersions = kotlinVersions.toMutableList(),
         )
-        this += SkieTestMatrix.Axis<LinkMode>("Linkage", linkModes.intersectOrKeepIfEmpty(filter.linkModes.toList()))
-        this += SkieTestMatrix.Axis<KotlinVersion>(
-            "Kotlin",
-            kotlinVersions.intersectOrKeepIfEmpty(filter.kotlinVersions.map(::KotlinVersion))
-        )
+    }
 
-        val filteredTargets = if (filter.targets.isNotEmpty()) {
-            targets.targets.filter(filter.targets::contains)
-        } else {
-            targets.targets
-        }
-        this += SkieTestMatrix.Axis("Target", filteredTargets)
-        this += SkieTestMatrix.Axis("Target", filteredTargets.filterIsInstance<KotlinTarget.Native>())
-        this += SkieTestMatrix.Axis("Target", filteredTargets.filterIsInstance<KotlinTarget.Native.Darwin>())
-        this += SkieTestMatrix.Axis("Target", filteredTargets.filterIsInstance<KotlinTarget.Native.Ios>())
-        this += SkieTestMatrix.Axis("Target", filteredTargets.filterIsInstance<KotlinTarget.Native.MacOS>())
+    fun buildMatrixAxes(source: SkieTestMatrixSource) = buildList<SkieTestMatrix.Axis<*>> {
+        this += SkieTestMatrix.Axis<BuildConfiguration>("Configuration", source.configurations)
+        this += SkieTestMatrix.Axis<LinkMode>("Linkage", source.linkModes)
+        this += SkieTestMatrix.Axis<KotlinVersion>("Kotlin", source.kotlinVersions)
 
-        // TODO: Add filtering
-        val presets = targets.presets.takeIf { it.isNotEmpty() } ?: KotlinTarget.Preset.Root.children.presets.filter { preset ->
-            targets.targets.toSet().intersect(preset.targets.toSet()).isNotEmpty()
-        }
-        this += SkieTestMatrix.Axis("Preset", presets)
-        this += SkieTestMatrix.Axis("Preset", presets.filterIsInstance<KotlinTarget.Preset.Native>())
-        this += SkieTestMatrix.Axis("Preset", presets.filterIsInstance<KotlinTarget.Preset.Native.Darwin>())
+        this += SkieTestMatrix.Axis("Target", source.targets)
+        this += SkieTestMatrix.Axis("Target", source.targets.filterIsInstance<KotlinTarget.Native>())
+        this += SkieTestMatrix.Axis("Target", source.targets.filterIsInstance<KotlinTarget.Native.Darwin>())
+        this += SkieTestMatrix.Axis("Target", source.targets.filterIsInstance<KotlinTarget.Native.Ios>())
+        this += SkieTestMatrix.Axis("Target", source.targets.filterIsInstance<KotlinTarget.Native.MacOS>())
+
+        this += SkieTestMatrix.Axis("Preset", source.presets)
+        this += SkieTestMatrix.Axis("Preset", source.presets.filterIsInstance<KotlinTarget.Preset.Native>())
+        this += SkieTestMatrix.Axis("Preset", source.presets.filterIsInstance<KotlinTarget.Preset.Native.Darwin>())
     }.associateBy { it.type }
 
     private fun <T: Any> value(property: String, deserialize: (String) -> T?): T? {

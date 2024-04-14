@@ -1,7 +1,8 @@
 package co.touchlab.skie.test.runner
 
 import co.touchlab.skie.test.annotation.MatrixTest
-import co.touchlab.skie.test.annotation.filter.OnlyFor
+import co.touchlab.skie.test.annotation.filter.FilterMatrixWith
+import io.kotest.mpp.newInstanceNoArgConstructorOrObjectInstance
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider
@@ -15,13 +16,27 @@ class SkieTestRunner: TestTemplateInvocationContextProvider {
 
     override fun provideTestTemplateInvocationContexts(context: ExtensionContext): Stream<TestTemplateInvocationContext> {
         val testMethod = context.requiredTestMethod
-        val parentClassFilterAnnotations =
-            AnnotationUtils.findRepeatableAnnotations(context.requiredTestClass, OnlyFor::class.java)
-        val methodFilterAnnotations = AnnotationUtils.findRepeatableAnnotations(testMethod, OnlyFor::class.java)
-        val matrixFilter = (parentClassFilterAnnotations + methodFilterAnnotations).fold(MatrixFilter.empty) { acc, onlyFor ->
-            acc.apply(onlyFor)
+        val parentClassFilterAnnotations = AnnotationUtils.findRepeatableAnnotations(
+            context.requiredTestClass,
+            FilterMatrixWith::class.java
+        )
+        val methodFilterAnnotations = AnnotationUtils.findRepeatableAnnotations(
+            testMethod,
+            FilterMatrixWith::class.java
+        )
+        val uniqueMatrixFilterClasses = (parentClassFilterAnnotations + methodFilterAnnotations).map {
+            it.value
+        }.toSet()
+
+        val uniqueMatrixFilters = uniqueMatrixFilterClasses.map {
+            it.newInstanceNoArgConstructorOrObjectInstance()
         }
-        val filteredAxes = SkieTestRunnerConfiguration.filteredMatrixAxes(matrixFilter)
+
+        val matrixSource = SkieTestRunnerConfiguration.buildMatrixSource()
+        uniqueMatrixFilters.forEach { filter ->
+            filter.apply(context, matrixSource)
+        }
+        val filteredAxes = SkieTestRunnerConfiguration.buildMatrixAxes(matrixSource)
 
         val matrixAxes = testMethod.parameterTypes.mapNotNull { requestedAxisType ->
             filteredAxes[requestedAxisType]

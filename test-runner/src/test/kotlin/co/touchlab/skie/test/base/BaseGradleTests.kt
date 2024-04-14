@@ -8,6 +8,7 @@ import co.touchlab.skie.test.trait.TestUtilsTrait
 import co.touchlab.skie.test.trait.gradle.GradleBuildFileBuilderTrait
 import co.touchlab.skie.test.util.CommandResult
 import co.touchlab.skie.test.util.KotlinTarget
+import co.touchlab.skie.test.util.StringBuilderScope
 import co.touchlab.skie.test.util.execute
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -58,9 +59,10 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
 
     @BeforeEach
     fun createGradlePropertiesFile() {
-        gradlePropertiesFile("""
-            org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC
-        """.trimIndent())
+        gradlePropertiesFile {
+            +"org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC\n"
+            appendAdditionalGradleProperties()
+        }
     }
 
     fun runGradle(
@@ -144,4 +146,6 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
             "build/bin/${target.id}/${configuration.name.lowercase()}Framework"
         }
     }
+
+    protected open fun StringBuilderScope.appendAdditionalGradleProperties() { }
 }

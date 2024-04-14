@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
-import co.touchlab.skie.plugin.configuration.util.GradleSkieConfiguration
+import co.touchlab.skie.plugin.configuration.util.GradleSkieConfigurationData
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 import co.touchlab.skie.plugin.util.skieBuildDirectory
@@ -20,7 +20,7 @@ import java.io.File
 internal abstract class CreateSkieConfigurationTask : DefaultTask() {
 
     @get:Input
-    abstract val configuration: Property<GradleSkieConfiguration>
+    abstract val configuration: Property<GradleSkieConfigurationData>
 
     @get:OutputFile
     abstract val configurationFile: Property<File>
