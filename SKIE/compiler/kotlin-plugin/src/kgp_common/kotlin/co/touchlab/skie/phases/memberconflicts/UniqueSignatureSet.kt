@@ -71,7 +71,7 @@ class UniqueSignatureSet {
         existingSignaturesMap[signature]
 
     private fun addSignature(signature: Signature) {
-        existingSignaturesMap[signature] = signature
+        existingSignaturesMap.putIfAbsent(signature, signature)
     }
 
     private inner class Group(
