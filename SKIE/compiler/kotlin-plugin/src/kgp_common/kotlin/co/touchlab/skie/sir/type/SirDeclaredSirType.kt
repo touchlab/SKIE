@@ -34,7 +34,7 @@ data class SirDeclaredSirType(
         val evaluatedTypeArguments = lazy { typeArguments.map { it.evaluate() } }
 
         val evaluatedType = lazy {
-            if (declaration.module != SirModule.Unknown) {
+            if (declaration.module !is SirModule.Unknown) {
                 copy(typeArguments = evaluatedTypeArguments.value.map { it.type })
             } else {
                 getUnknownCInteropModuleType()

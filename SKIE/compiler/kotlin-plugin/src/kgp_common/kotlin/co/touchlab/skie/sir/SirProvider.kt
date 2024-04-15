@@ -5,6 +5,7 @@ import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.features.flow.LargeObject
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
@@ -31,6 +32,8 @@ class SirProvider(
     val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
 
     val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
+
+    val unknownModule: SirModule.Unknown = SirModule.Unknown()
 
     val fileProvider: SirFileProvider = SirFileProvider(skieModule, oirProvider, skieBuildDirectory)
 

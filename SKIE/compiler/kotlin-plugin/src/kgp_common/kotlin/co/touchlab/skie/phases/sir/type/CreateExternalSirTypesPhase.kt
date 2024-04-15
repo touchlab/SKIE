@@ -4,7 +4,6 @@ import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.toSirKind
 
 object CreateExternalSirTypesPhase : SirPhase {
@@ -20,7 +19,7 @@ object CreateExternalSirTypesPhase : SirPhase {
     private fun createClass(oirClass: OirClass) {
         val sirClass = SirClass(
             baseName = oirClass.name,
-            parent = oirClass.kirClassOrNull?.let { sirProvider.findExternalModule(it) }?.builtInFile ?: SirModule.Unknown.builtInFile,
+            parent = oirClass.kirClassOrNull?.let { sirProvider.findExternalModule(it) }?.builtInFile ?: sirProvider.unknownModule.builtInFile,
             kind = oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Oir(oirClass),
         )

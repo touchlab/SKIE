@@ -10,7 +10,7 @@ import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.toSirKind
 
-object CreateKotlinSirTypesPhase : SirPhase {
+class CreateKotlinSirTypesPhase : SirPhase {
 
     private val kirToSirClasses = mutableMapOf<KirClass, SirClass>()
 
@@ -68,14 +68,17 @@ object CreateKotlinSirTypesPhase : SirPhase {
             is KirModule -> null
         }
 
-    context(SirPhase.Context)
-    fun createTypeParameters(oirClass: OirClass, sirClass: SirClass) {
-        oirClass.typeParameters.forEach { typeParameter ->
-            typeParameter.sirTypeParameter = SirTypeParameter(
-                name = typeParameter.name,
-                parent = sirClass,
-                bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType),
-            )
+    companion object {
+
+        context(SirPhase.Context)
+        fun createTypeParameters(oirClass: OirClass, sirClass: SirClass) {
+            oirClass.typeParameters.forEach { typeParameter ->
+                typeParameter.sirTypeParameter = SirTypeParameter(
+                    name = typeParameter.name,
+                    parent = sirClass,
+                    bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType),
+                )
+            }
         }
     }
 }

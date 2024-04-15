@@ -5,7 +5,7 @@ sealed class SirModule(
     val name: String,
 ) : SirElement {
 
-    val builtInFile by lazy {
+    open val builtInFile by lazy {
         SirBuiltInFile(this)
     }
 
@@ -24,9 +24,16 @@ sealed class SirModule(
 
     class External(name: String) : SirModule(name)
 
-    object Unknown : SirModule("<Unknown>")
+    class Unknown : SirModule("<Unknown>")
 
-    object None : SirModule("<None>")
+    object None : SirModule("<None>") {
+
+        override val files: List<SirFile> = emptyList()
+
+        override val builtInFile: SirBuiltInFile by lazy<SirBuiltInFile> {
+            error("None module does not have a built-in file.")
+        }
+    }
 
     override fun toString(): String = "SirModule${this::class.simpleName}: $name"
 }

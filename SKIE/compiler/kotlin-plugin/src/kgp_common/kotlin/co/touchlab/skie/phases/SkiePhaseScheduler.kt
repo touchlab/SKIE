@@ -152,7 +152,7 @@ class SkiePhaseScheduler {
             CreateOirMembersPhase(context),
             ConfigureCInteropFrameworkNameForPlatformTypesPhase,
 
-            CreateKotlinSirTypesPhase,
+            CreateKotlinSirTypesPhase(),
             CreateKotlinSirExtensionsPhase,
             CreateExternalSirTypesPhase,
             InitializeSirSuperTypesPhase,
