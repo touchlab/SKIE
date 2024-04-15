@@ -97,6 +97,7 @@ class CreateExposedKirTypesPhase(
             superTypes = emptyList(),
             isSealed = descriptor.isSealed(),
             hasUnexposedSealedSubclasses = descriptor.sealedSubclasses.any { !it.isExposed },
+            nestingLevel = getNestingLevel(descriptor),
             configuration = descriptorConfigurationProvider.getConfiguration(descriptor),
         )
 
@@ -157,6 +158,7 @@ class CreateExposedKirTypesPhase(
             superTypes = listOf(kirBuiltins.Base.defaultType),
             isSealed = false,
             hasUnexposedSealedSubclasses = false,
+            nestingLevel = 0,
             configuration = sourceFileConfiguration,
         )
 
@@ -236,5 +238,8 @@ class CreateExposedKirTypesPhase(
 
             this@DescriptorKirProvider.registerTypeParameter(typeParameter, typeParameterDescriptor)
         }
+
+        fun getNestingLevel(classDescriptor: ClassDescriptor): Int =
+            1 + ((classDescriptor.containingDeclaration as? ClassDescriptor)?.let { getNestingLevel(it) } ?: 0)
     }
 }

@@ -17,6 +17,8 @@ class KirClass(
     superTypes: List<DeclarationBackedKirType>,
     val isSealed: Boolean,
     val hasUnexposedSealedSubclasses: Boolean,
+    // In how many classes is this class nested (from Kotlin point of view).
+    val nestingLevel: Int,
     val configuration: ClassConfiguration,
 ) : KirClassParent, KirBridgeableDeclaration<SirClass> {
 

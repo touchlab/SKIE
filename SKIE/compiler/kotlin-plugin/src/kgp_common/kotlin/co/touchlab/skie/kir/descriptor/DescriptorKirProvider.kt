@@ -19,6 +19,7 @@ import co.touchlab.skie.kir.element.KirModule
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirTypeParameter
 import co.touchlab.skie.kir.element.KirValueParameter
+import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
 import co.touchlab.skie.phases.runtime.belongsToSkieKotlinRuntime
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -239,6 +240,7 @@ class DescriptorKirProvider(
                 },
                 isSealed = false,
                 hasUnexposedSealedSubclasses = false,
+                nestingLevel = CreateExposedKirTypesPhase.getNestingLevel(descriptor),
                 configuration = externalClassConfiguration,
             )
 

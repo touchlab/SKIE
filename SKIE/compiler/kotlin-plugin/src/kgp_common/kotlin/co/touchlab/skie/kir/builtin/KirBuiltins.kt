@@ -11,6 +11,7 @@ import co.touchlab.skie.kir.element.KirTypeParameter
 import co.touchlab.skie.kir.element.toTypeParameterUsage
 import co.touchlab.skie.kir.type.DeclaredKirType
 import co.touchlab.skie.oir.element.OirTypeParameter
+import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
 import org.jetbrains.kotlin.backend.konan.objcexport.NSNumberKind
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -215,6 +216,7 @@ class KirBuiltins(
         superTypes = superTypes,
         isSealed = false,
         hasUnexposedSealedSubclasses = false,
+        nestingLevel = CreateExposedKirTypesPhase.getNestingLevel(classDescriptor),
         configuration = descriptorConfigurationProvider.getConfiguration(classDescriptor),
     ).apply {
         descriptorKirProvider.registerClass(this, classDescriptor)

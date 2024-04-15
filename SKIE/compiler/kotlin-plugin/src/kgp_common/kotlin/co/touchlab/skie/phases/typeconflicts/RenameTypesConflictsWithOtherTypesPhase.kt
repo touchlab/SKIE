@@ -28,6 +28,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
      * classes are prioritized over type aliases
      * originating from Kotlin (is prioritized)
      * Kotlin class vs file (class is prioritized)
+     * Kotlin class nesting level if available (lower is prioritized)
      * Kotlin fqName if available
      * Kotlin SirClasses with shorter Obj-C names are prioritized
      */
@@ -49,6 +50,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
             .thenByDescending { it is SirClass }
             .thenByDescending { it.resolveAsKirClass() != null }
             .thenByDescending { it.resolveAsKirClass()?.kind != KirClass.Kind.File }
+            .thenBy { it.resolveAsKirClass()?.nestingLevel ?: 0 }
             .thenBy { it.resolveAsKirClass()?.kotlinFqName ?: "" }
             .thenBy { it.getOirClassOrNull()?.name?.length ?: Int.MAX_VALUE }
 
