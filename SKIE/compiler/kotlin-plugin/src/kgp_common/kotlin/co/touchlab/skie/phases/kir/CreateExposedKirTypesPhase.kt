@@ -201,8 +201,8 @@ class CreateExposedKirTypesPhase(
 
     private val ClassDescriptor.hasUserDefinedName: Boolean
         get() = this.annotations.findAnnotation(KonanFqNames.objCName)
-            ?.let { !it.hasArgumentValue("name") && !it.hasArgumentValue("swiftName") }
-            ?: true
+            ?.let { it.hasArgumentValue("name") || it.hasArgumentValue("swiftName") }
+            ?: false
 
     companion object {
 

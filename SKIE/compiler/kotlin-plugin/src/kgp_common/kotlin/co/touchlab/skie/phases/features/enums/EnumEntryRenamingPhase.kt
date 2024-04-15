@@ -42,11 +42,9 @@ object EnumEntryRenamingPhase : SirPhase {
             }
     }
 
-    context(ScheduledPhase.Context)
     private val KirClass.isSupported: Boolean
         get() = this.originalSirClass.isExported && !this.configuration[EnumInterop.LegacyCaseName]
 
-    context(ScheduledPhase.Context)
     private val KirEnumEntry.isSupported: Boolean
         get() = !this.hasUserDefinedName
 
