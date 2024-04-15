@@ -5,7 +5,6 @@ import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.features.flow.LargeObject
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
