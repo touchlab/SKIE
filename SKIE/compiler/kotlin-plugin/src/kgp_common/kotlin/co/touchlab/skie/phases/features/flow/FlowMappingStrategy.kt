@@ -10,8 +10,8 @@ enum class FlowMappingStrategy {
 
     private val incompatibleTypeFqNames = listOf(
         "kotlinx.coroutines.flow.Flow",
-        "kotlin.collections.List",
-        "kotlin.collections.Map",
+        "platform.Foundation.NSArray",
+        "platform.Foundation.NSDictionary",
     )
 
     fun limitFlowMappingToTypeArguments(): FlowMappingStrategy =
