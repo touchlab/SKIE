@@ -108,7 +108,7 @@ jobs:
 
   external-libraries-tests:
     name: External Libraries Tests
-    needs: [acceptance-tests, gradle-tests]
+    needs: [acceptance-tests]
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
