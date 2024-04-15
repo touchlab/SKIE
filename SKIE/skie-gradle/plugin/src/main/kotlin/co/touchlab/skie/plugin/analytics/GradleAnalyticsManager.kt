@@ -25,7 +25,7 @@ internal class GradleAnalyticsManager(
         val analyticsCollectorProvider = target.skieDirectories.map { skieDirectories ->
             AnalyticsCollector(
                 skieBuildDirectory = skieDirectories.buildDirectory,
-                skieConfiguration = project.skieExtension.buildConfiguration(),
+                skieConfiguration = project.skieExtension.buildConfiguration(target.outputKind),
             )
         }
 

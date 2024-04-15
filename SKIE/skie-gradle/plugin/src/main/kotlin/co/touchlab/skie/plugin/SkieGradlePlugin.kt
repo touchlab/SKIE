@@ -229,6 +229,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
                         project = project,
                         target = target,
                         binary = binary,
+                        outputKind = SkieTarget.OutputKind.Framework,
                     )
                 )
             }

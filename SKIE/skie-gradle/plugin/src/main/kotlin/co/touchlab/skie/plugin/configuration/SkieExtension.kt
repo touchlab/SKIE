@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.configuration.util.GradleSkieConfigurationData
+import co.touchlab.skie.plugin.util.SkieTarget
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -58,15 +59,15 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         fun Project.createExtension(): SkieExtension =
             project.extensions.create("skie", SkieExtension::class.java)
 
-        fun SkieExtension.buildConfiguration(): GradleSkieConfigurationData =
+        fun SkieExtension.buildConfiguration(outputKind: SkieTarget.OutputKind): GradleSkieConfigurationData =
             GradleSkieConfigurationData(
-                enabledConfigurationFlags = (mergeConfigurationSetsFromConfigurations() + additionalConfigurationFlags.get()) - suppressedConfigurationFlags.get(),
+                enabledConfigurationFlags = (mergeConfigurationSetsFromConfigurations(outputKind) + additionalConfigurationFlags.get()) - suppressedConfigurationFlags.get(),
                 groups = features.buildGroups(),
             )
 
-        private fun SkieExtension.mergeConfigurationSetsFromConfigurations() =
+        private fun SkieExtension.mergeConfigurationSetsFromConfigurations(outputKind: SkieTarget.OutputKind) =
             analytics.buildConfigurationFlags() +
-                    build.buildConfigurationFlags() +
+                    build.buildConfigurationFlags(outputKind) +
                     debug.buildConfigurationFlags() +
                     features.buildConfigurationFlags() +
                     migration.buildConfigurationFlags()

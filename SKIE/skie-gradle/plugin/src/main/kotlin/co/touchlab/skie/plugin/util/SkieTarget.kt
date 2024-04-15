@@ -27,6 +27,7 @@ sealed interface SkieTarget {
     val task: TaskProvider<out Task>
     val konanTarget: KonanTarget
     val buildType: NativeBuildType
+    val outputKind: OutputKind
 
     val skieDirectories: Provider<SkieDirectories>
 
@@ -42,6 +43,7 @@ sealed interface SkieTarget {
         override val project: Project,
         val target: KotlinNativeTarget,
         val binary: NativeBinary,
+        override val outputKind: OutputKind,
     ): SkieTarget {
         override val konanTarget: KonanTarget = target.konanTarget
 
@@ -89,6 +91,7 @@ sealed interface SkieTarget {
         val artifact: KotlinNativeArtifact,
         override val konanTarget: KonanTarget,
         override val buildType: NativeBuildType,
+        override val outputKind: OutputKind,
     ): SkieTarget {
         override val name: String = "artifact: ${artifact.artifactName}, target: $konanTarget, buildType: $buildType"
 
@@ -161,6 +164,13 @@ sealed interface SkieTarget {
                 }
             }
         }
+    }
+
+    enum class OutputKind {
+        Framework,
+        XCFramework,
+        UniversalFramework,
+        Library,
     }
 }
 

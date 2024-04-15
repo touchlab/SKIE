@@ -26,6 +26,7 @@ internal fun Project.skieTargetsOf(artifact: KotlinNativeArtifact): List<SkieTar
                     artifact = artifact,
                     konanTarget = artifact.target,
                     buildType = buildType,
+                    outputKind = SkieTarget.OutputKind.Library,
                 )
             }
         } else {
@@ -39,6 +40,7 @@ internal fun Project.skieTargetsOf(artifact: KotlinNativeArtifact): List<SkieTar
                     artifact = artifact,
                     konanTarget = artifact.target,
                     buildType = buildType,
+                    outputKind = SkieTarget.OutputKind.Framework,
                 )
             }
         } else {
@@ -52,6 +54,7 @@ internal fun Project.skieTargetsOf(artifact: KotlinNativeArtifact): List<SkieTar
                     artifact = artifact,
                     konanTarget = target,
                     buildType = buildType,
+                    outputKind = SkieTarget.OutputKind.UniversalFramework,
                 )
             }
         }
@@ -63,6 +66,7 @@ internal fun Project.skieTargetsOf(artifact: KotlinNativeArtifact): List<SkieTar
                     artifact = artifact,
                     konanTarget = target,
                     buildType = buildType,
+                    outputKind = SkieTarget.OutputKind.XCFramework,
                 )
             }
         }
