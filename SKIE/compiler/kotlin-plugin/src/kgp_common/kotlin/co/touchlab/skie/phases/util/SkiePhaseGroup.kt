@@ -4,6 +4,7 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.BackgroundPhase
 import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.phases.ScheduledPhase
+import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
 
@@ -18,10 +19,10 @@ class SkiePhaseGroup<P : ScheduledPhase<C>, C : ScheduledPhase.Context>(
     }
 
     context(C)
-    internal suspend fun List<P>.execute() {
+    internal suspend fun List<P>.execute(kind: SkiePerformanceAnalytics.Kind) {
         this.forEach {
             if (it.isActive()) {
-                context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger) {
+                context.skiePerformanceAnalyticsProducer.log(it::class.nameForLogger, kind) {
                     it.execute()
                 }
             } else {
@@ -63,7 +64,7 @@ fun <P, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
 ) where P : ScheduledPhase<C>, P : BackgroundPhase<C> {
     if (SkieConfigurationFlag.Build_ConcurrentSkieCompilation.isEnabled) {
         this@Context.launch {
-            prepareAndExecute(contextClass, contextFactory)
+            prepareAndExecute(contextClass, contextFactory, SkiePerformanceAnalytics.Kind.Background)
         }
     } else {
         runBlocking(contextClass, contextFactory)
@@ -86,17 +87,18 @@ fun <P, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
 context(ScheduledPhase.Context)
 private fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.runBlocking(contextClass: KClass<C>, contextFactory: () -> C): C =
     runBlocking {
-        prepareAndExecute(contextClass, contextFactory)
+        prepareAndExecute(contextClass, contextFactory, SkiePerformanceAnalytics.Kind.Foreground)
     }
 
 context(ScheduledPhase.Context)
 private suspend fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.prepareAndExecute(
     contextClass: KClass<C>,
     contextFactory: () -> C,
+    kind: SkiePerformanceAnalytics.Kind,
 ): C {
     val phasesName = contextClass.nameForLogger.removeSuffix("Phase.Context") + "Phases"
 
-    val (context, phases) = skiePerformanceAnalyticsProducer.log("Initialize$phasesName") {
+    val (context, phases) = skiePerformanceAnalyticsProducer.log("Initialize$phasesName", kind) {
         val context = contextFactory()
 
         val phases = buildPhases(context)
@@ -105,7 +107,7 @@ private suspend fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhas
     }
 
     with(context) {
-        phases.execute()
+        phases.execute(kind)
     }
 
     return context
