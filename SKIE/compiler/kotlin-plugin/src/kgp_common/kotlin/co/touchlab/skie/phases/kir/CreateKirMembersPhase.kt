@@ -72,6 +72,11 @@ class CreateKirMembersPhase(
     }
 
     private fun createMembers(kirClass: KirClass) {
+        if (kirClass in kirProvider.kirBuiltins.builtinClasses) {
+            // TODO Implement accurate way to generate builtin members once needed
+            return
+        }
+
         when (kirClass.kind) {
             KirClass.Kind.File -> createMembers(descriptorKirProvider.getClassSourceFile(kirClass), kirClass)
             else -> createMembers(descriptorKirProvider.getClassDescriptor(kirClass), kirClass)
@@ -174,7 +179,12 @@ class CreateKirMembersPhase(
                 swiftName = namer.getSwiftName(baseDescriptor),
                 owner = kirClass,
                 origin = origin,
-                isFakeOverride = !descriptor.kind.isReal,
+                isFakeOverride = if (kirClass == kirProvider.kirBuiltins.Base) {
+                    // TODO Solves issue with methods from Any which are technically a fake override - remove once the builtins have correct members
+                    true
+                } else {
+                    !descriptor.kind.isReal
+                },
                 isSuspend = descriptor.isSuspend,
                 kind = descriptor.getKind(kirClass, origin),
                 returnType = kirDeclarationTypeTranslator.mapReturnType(

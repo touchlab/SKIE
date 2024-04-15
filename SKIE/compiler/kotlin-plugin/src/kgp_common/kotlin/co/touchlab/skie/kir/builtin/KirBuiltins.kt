@@ -31,6 +31,10 @@ class KirBuiltins(
 ) {
     // TODO Not all Builtin methods are supported yet (supported are only those converted from Kotlin equivalents in Any)
 
+    private val mutableBuiltinClasses = mutableSetOf<KirClass>()
+
+    val builtinClasses: Set<KirClass> by ::mutableBuiltinClasses
+
     val NSObject: KirClass = Class(extraDescriptorBuiltins.NSObject)
 
     val NSCopying: KirClass = Class(extraDescriptorBuiltins.NSCopying)
@@ -221,9 +225,15 @@ class KirBuiltins(
     ).apply {
         descriptorKirProvider.registerClass(this, classDescriptor)
 
+        mutableBuiltinClasses.add(this)
+
         apply()
     }
 
     fun Class(descriptor: ClassDescriptor, apply: KirClass.() -> Unit = {}): KirClass =
-        descriptorKirProvider.getExternalBuiltinClass(descriptor).apply(apply)
+        descriptorKirProvider.getExternalBuiltinClass(descriptor).apply {
+            mutableBuiltinClasses.add(this)
+
+            apply()
+        }
 }
