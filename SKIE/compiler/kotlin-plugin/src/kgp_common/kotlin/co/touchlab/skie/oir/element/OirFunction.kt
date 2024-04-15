@@ -2,7 +2,7 @@ package co.touchlab.skie.oir.element
 
 import co.touchlab.skie.oir.type.OirType
 
-abstract class OirFunction(
+sealed class OirFunction(
     final override val parent: OirCallableDeclarationParent,
 ) : OirCallableDeclaration {
 

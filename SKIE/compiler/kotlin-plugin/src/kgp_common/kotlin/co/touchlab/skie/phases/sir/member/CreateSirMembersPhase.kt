@@ -72,6 +72,7 @@ class CreateSirMembersPhase(
             parent = function.getSirParent(),
             returnType = sirTypeTranslator.mapReturnType(oirSimpleFunction.returnType, function.errorHandlingStrategy),
             scope = oirSimpleFunction.scope.sirScope,
+            isFakeOverride = function.isFakeOverride,
             throws = function.errorHandlingStrategy.isThrowing,
             deprecationLevel = function.deprecationLevel,
             visibility = function.visibility,
@@ -92,6 +93,7 @@ class CreateSirMembersPhase(
             scope = oirProperty.scope.sirScope,
             deprecationLevel = property.deprecationLevel,
             visibility = property.visibility,
+            isFakeOverride = property.isFakeOverride,
         ).apply {
             SirGetter(
                 throws = false,

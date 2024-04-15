@@ -174,6 +174,7 @@ class CreateKirMembersPhase(
                 swiftName = namer.getSwiftName(baseDescriptor),
                 owner = kirClass,
                 origin = origin,
+                isFakeOverride = !descriptor.kind.isReal,
                 isSuspend = descriptor.isSuspend,
                 kind = descriptor.getKind(kirClass, origin),
                 returnType = kirDeclarationTypeTranslator.mapReturnType(
@@ -281,6 +282,7 @@ class CreateKirMembersPhase(
                 owner = kirClass,
                 origin = origin,
                 scope = kirClass.callableDeclarationScope,
+                isFakeOverride = !descriptor.kind.isReal,
                 type = kirDeclarationTypeTranslator.mapReturnType(originalDescriptor.getter!!, getterBridge.returnBridge),
                 isVar = descriptor.setter?.let { mapper.shouldBeExposed(it) } ?: false,
                 deprecationLevel = descriptor.kirDeprecationLevel,

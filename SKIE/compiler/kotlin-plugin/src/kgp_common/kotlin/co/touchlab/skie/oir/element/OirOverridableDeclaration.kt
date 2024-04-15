@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.backend.common.pop
 
 sealed interface OirOverridableDeclaration<T : OirOverridableDeclaration<T>> : OirCallableDeclaration {
 
+    val isFakeOverride: Boolean
+
     val overriddenDeclarations: List<T>
 
     val overriddenBy: List<T>

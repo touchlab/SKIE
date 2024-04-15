@@ -1,9 +1,11 @@
 package co.touchlab.skie.phases.apinotes.builder
 
 import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.OirConstructor
 import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.oir.element.OirProperty
 import co.touchlab.skie.oir.element.OirScope
+import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirValueParameter
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirVisibility
@@ -29,8 +31,8 @@ class ApiNotesFactory(
             swiftFqName = this.originalSirClass.publicName.toLocalString(),
             isHidden = this.originalSirClass.visibility.isHiddenInApiNotes,
             availability = this.originalSirClass.visibility.availability,
-            methods = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirFunction>().map { it.toApiNote() },
-            properties = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirProperty>().map { it.toApiNote() },
+            methods = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirFunction>().filterNot { it.isFakeOverride }.map { it.toApiNote() },
+            properties = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirProperty>().filterNot { it.isFakeOverride }.map { it.toApiNote() },
         )
 
     context(SirPhase.Context)
@@ -86,5 +88,11 @@ class ApiNotesFactory(
         when (this) {
             OirScope.Member -> ApiNotesTypeMemberKind.Instance
             OirScope.Static -> ApiNotesTypeMemberKind.Class
+        }
+
+    private val OirFunction.isFakeOverride: Boolean
+        get() = when (this) {
+            is OirConstructor -> false
+            is OirSimpleFunction -> this.isFakeOverride
         }
 }

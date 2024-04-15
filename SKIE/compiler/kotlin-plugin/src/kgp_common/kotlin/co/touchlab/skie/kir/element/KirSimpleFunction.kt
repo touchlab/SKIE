@@ -14,6 +14,7 @@ class KirSimpleFunction(
     override val swiftName: String,
     override val owner: KirClass,
     override val origin: KirCallableDeclaration.Origin,
+    override val isFakeOverride: Boolean,
     val isSuspend: Boolean,
     var returnType: KirType,
     val kind: Kind,

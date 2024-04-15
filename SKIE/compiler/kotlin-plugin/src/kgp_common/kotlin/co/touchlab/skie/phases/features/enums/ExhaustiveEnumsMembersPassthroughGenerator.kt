@@ -56,7 +56,7 @@ object ExhaustiveEnumsMembersPassthroughGenerator {
             return
         }
 
-        function.shallowCopy(parent = this).apply {
+        function.shallowCopy(parent = this, isFakeOverride = false).apply {
             copyValueParametersFrom(function)
 
             addFunctionBody(function)
@@ -84,6 +84,7 @@ object ExhaustiveEnumsMembersPassthroughGenerator {
     private fun SirClass.addPassthroughForProperty(property: SirProperty) {
         property.shallowCopy(
             parent = this,
+            isFakeOverride = false,
         ).apply {
             addGetter(property)
             addSetter(property)

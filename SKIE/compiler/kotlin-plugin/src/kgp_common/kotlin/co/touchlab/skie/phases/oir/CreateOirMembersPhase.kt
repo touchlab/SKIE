@@ -73,6 +73,7 @@ class CreateOirMembersPhase(
             returnType = oirTypeTranslator.mapType(function.returnType),
             errorHandlingStrategy = function.errorHandlingStrategy,
             deprecationLevel = function.deprecationLevel,
+            isFakeOverride = function.isFakeOverride,
         )
 
         createValueParameters(function, oirSimpleFunction)
@@ -88,6 +89,7 @@ class CreateOirMembersPhase(
             parent = getOirCallableDeclarationParent(property),
             scope = property.oirScope,
             deprecationLevel = property.deprecationLevel,
+            isFakeOverride = property.isFakeOverride,
         )
     }
 
@@ -155,6 +157,7 @@ class CreateOirMembersPhase(
             parent = enumEntry.owner.oirClass,
             scope = OirScope.Static,
             deprecationLevel = DeprecationLevel.None,
+            isFakeOverride = false,
         )
     }
 

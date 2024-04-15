@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.backend.common.pop
 
 interface BaseOverridableDeclaration<T : BaseOverridableDeclaration<T>> {
 
+    val isFakeOverride: Boolean
+
     val overriddenDeclarations: List<T>
 
     val overriddenBy: List<T>

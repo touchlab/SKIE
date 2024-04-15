@@ -44,6 +44,7 @@ object FixDuplicatedOverriddenFunctionsPhase : SirPhase {
             returnType = function.returnType,
             errorHandlingStrategy = function.errorHandlingStrategy,
             deprecationLevel = function.deprecationLevel,
+            isFakeOverride = false,
         )
 
         override.copyValueParametersFrom(baseFunctionToOverride)
@@ -51,6 +52,7 @@ object FixDuplicatedOverriddenFunctionsPhase : SirPhase {
         override.originalSirFunction = baseFunctionToOverride.originalSirFunction.shallowCopy(
             parent = function.originalSirFunction.parent,
             visibility = SirVisibility.Private,
+            isFakeOverride = false,
         ).apply {
             copyValueParametersFrom(baseFunctionToOverride.originalSirFunction)
         }

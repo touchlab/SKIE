@@ -2,7 +2,6 @@ package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.phases.memberconflicts.Signature
-import co.touchlab.skie.phases.memberconflicts.SirHierarchyCache
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.util.swift.escapeSwiftIdentifier
@@ -15,6 +14,7 @@ class SirProperty(
     override var visibility: SirVisibility = SirVisibility.Public,
     override var scope: SirScope = parent.coerceScope(SirScope.Member),
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
+    override val isFakeOverride: Boolean = false,
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
 ) : SirOverridableDeclaration<SirProperty>, SirCallableDeclaration {
@@ -87,6 +87,7 @@ class SirProperty(
             visibility: SirVisibility = SirVisibility.Public,
             scope: SirScope = coerceScope(SirScope.Member),
             deprecationLevel: DeprecationLevel = DeprecationLevel.None,
+            isFakeOverride: Boolean = false,
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
         ): SirProperty =
@@ -97,6 +98,7 @@ class SirProperty(
                 visibility = visibility,
                 scope = scope,
                 deprecationLevel = deprecationLevel,
+                isFakeOverride = isFakeOverride,
                 attributes = attributes,
                 modifiers = modifiers,
             )
@@ -110,6 +112,7 @@ fun SirProperty.shallowCopy(
     visibility: SirVisibility = this.visibility,
     scope: SirScope = parent.coerceScope(this.scope),
     deprecationLevel: DeprecationLevel = this.deprecationLevel,
+    isFakeOverride: Boolean = this.isFakeOverride,
     attributes: List<String> = this.attributes,
     modifiers: List<Modifier> = this.modifiers,
 ): SirProperty =
@@ -120,6 +123,7 @@ fun SirProperty.shallowCopy(
         visibility = visibility,
         scope = scope,
         deprecationLevel = deprecationLevel,
+        isFakeOverride = isFakeOverride,
         attributes = attributes,
         modifiers = modifiers,
     )

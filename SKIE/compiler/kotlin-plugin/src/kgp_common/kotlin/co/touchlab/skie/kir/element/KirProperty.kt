@@ -14,6 +14,7 @@ class KirProperty(
     override val owner: KirClass,
     override val origin: KirCallableDeclaration.Origin,
     override val scope: KirScope,
+    override val isFakeOverride: Boolean,
     var type: KirType,
     val isVar: Boolean,
     override val deprecationLevel: DeprecationLevel,

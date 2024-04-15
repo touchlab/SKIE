@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.backend.common.pop
 
 sealed interface SirOverridableDeclaration<T : SirOverridableDeclaration<T>> : SirCallableDeclaration {
 
+    val isFakeOverride: Boolean
+
     val memberOwner: SirClass?
 
     val overriddenDeclarations: List<T>

@@ -11,6 +11,7 @@ class OirSimpleFunction(
     override var returnType: OirType,
     override val errorHandlingStrategy: ErrorHandlingStrategy,
     override val deprecationLevel: DeprecationLevel,
+    override val isFakeOverride: Boolean,
 ) : OirFunction(parent), OirOverridableDeclaration<OirSimpleFunction> {
 
     lateinit var originalSirFunction: SirSimpleFunction
