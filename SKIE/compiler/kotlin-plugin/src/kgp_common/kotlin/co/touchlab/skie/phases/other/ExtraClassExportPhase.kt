@@ -13,7 +13,6 @@ import co.touchlab.skie.phases.util.StatefulDescriptorConversionPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
-import co.touchlab.skie.util.parallel.parallelFlatMap
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -57,43 +56,38 @@ class ExtraClassExportPhase(
     }
 
     context(ClassExportPhase.Context)
-    private suspend fun getClassesForExport(previouslyVisitedClasses: Set<ClassDescriptor>): Set<ClassDescriptor> =
-        listOf(
-            ::getClassesForExportFromFlowArguments,
-            ::getClassesForExportFromSealedHierarchies,
-        )
-            .parallelFlatMap { it(this@Context, previouslyVisitedClasses) }
-            .toSet()
+    private fun getClassesForExport(previouslyVisitedClasses: Set<ClassDescriptor>): Set<ClassDescriptor> {
+        val result = getClassesForExportFromFlowArguments(previouslyVisitedClasses) +
+            getClassesForExportFromSealedHierarchies(previouslyVisitedClasses)
+
+        return result.toSet()
+    }
 
     context(ClassExportPhase.Context)
-    private suspend fun getClassesForExportFromFlowArguments(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
+    private fun getClassesForExportFromFlowArguments(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         if (SkieConfigurationFlag.Feature_CoroutinesInterop.isDisabled) {
             return emptyList()
         }
 
-        return listOf(
-            ::getFlowArgumentsFromTopLevelMembers,
-            ::getFlowArgumentsFromNewClasses,
-        )
-            .parallelFlatMap { it(this@Context, previouslyVisitedClasses) }
-            .distinct()
-            .filter { mapper.shouldBeExposed(it) }
+        val allFlowArguments = getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses) + getFlowArgumentsFromNewClasses(previouslyVisitedClasses)
+
+        return allFlowArguments.distinct().filter { mapper.shouldBeExposed(it) }
     }
 
     context(ClassExportPhase.Context)
-    private suspend fun getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> =
+    private fun getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> =
         if (previouslyVisitedClasses.isEmpty()) {
-            descriptorProvider.exposedTopLevelMembers.parallelFlatMap { it.getAllFlowArgumentClasses() }
+            descriptorProvider.exposedTopLevelMembers.flatMap { it.getAllFlowArgumentClasses() }
         } else {
             // Extra exported classes do not add new top level members, so we can skip this step.
             emptyList()
         }
 
     context(ClassExportPhase.Context)
-    private suspend fun getFlowArgumentsFromNewClasses(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
+    private fun getFlowArgumentsFromNewClasses(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
 
-        return newClasses.parallelFlatMap { it.getAllFlowArgumentClasses() }
+        return newClasses.flatMap { it.getAllFlowArgumentClasses() }
     }
 
     private fun ClassDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
@@ -101,10 +95,10 @@ class ExtraClassExportPhase(
             descriptorProvider.getAllExposedMembers(this).flatMap { it.getAllFlowArgumentClasses() }
 
     context(ClassExportPhase.Context)
-    private suspend fun getClassesForExportFromSealedHierarchies(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
+    private fun getClassesForExportFromSealedHierarchies(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
 
-        return newClasses.parallelFlatMap { it.getAllExportedSealedChildren() }
+        return newClasses.flatMap { it.getAllExportedSealedChildren() }
     }
 
     context(ClassExportPhase.Context)
