@@ -1,5 +1,5 @@
 plugins {
-    id("skie.compiler")
+    id("skie.compiler.core")
     id("skie.publishable")
     id("experimental.context-receivers")
 
@@ -7,8 +7,8 @@ plugins {
 }
 
 skiePublishing {
-    name = "SKIE Kotlin compiler plugin"
-    description = "Kotlin compiler plugin that improves Swift interface of a Kotlin Multiplatform framework."
+    name = "SKIE Kotlin compiler plugin core"
+    description = "Module containing compiler independent code for SKIE compiler plugin."
 }
 
 kotlin {
@@ -16,8 +16,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 // WIP Remove unused
-                implementation(projects.compiler.kotlinPluginCore)
-
                 implementation(projects.common.analytics)
                 api(projects.common.configuration.configurationApi)
                 implementation(projects.common.configuration.configurationAnnotations)

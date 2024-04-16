@@ -134,6 +134,9 @@ class KotlinToolingVersion(
     }
 }
 
+fun KotlinToolingVersion.toIdentifier(): String =
+    "`" + toString().replace(".", "_") + "`"
+
 fun KotlinToolingVersion.toKotlinVersion(): KotlinVersion =
     KotlinVersion(major, minor, patch)
 
