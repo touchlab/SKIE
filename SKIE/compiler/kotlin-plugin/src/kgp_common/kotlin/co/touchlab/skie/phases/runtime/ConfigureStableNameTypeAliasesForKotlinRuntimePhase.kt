@@ -4,7 +4,7 @@ import co.touchlab.skie.configuration.ClassInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.features.flow.SupportedFlow
+import co.touchlab.skie.kir.type.SupportedFlow
 
 object ConfigureStableNameTypeAliasesForKotlinRuntimePhase : SirPhase {
 

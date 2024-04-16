@@ -7,6 +7,8 @@ import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.getEntireOverrideHierarchy
+import co.touchlab.skie.sir.signature.Signature
+import co.touchlab.skie.sir.signature.SirHierarchyCache
 import co.touchlab.skie.util.resolveCollisionWithWarning
 
 class UniqueSignatureSet {

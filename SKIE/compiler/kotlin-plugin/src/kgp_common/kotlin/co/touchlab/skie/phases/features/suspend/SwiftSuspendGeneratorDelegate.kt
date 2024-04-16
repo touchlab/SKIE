@@ -4,7 +4,7 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.phases.features.flow.SupportedFlow
+import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension

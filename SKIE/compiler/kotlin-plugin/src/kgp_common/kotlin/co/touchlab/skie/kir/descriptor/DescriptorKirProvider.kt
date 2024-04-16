@@ -9,6 +9,7 @@ import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.KirProviderDelegate
+import co.touchlab.skie.kir.builtin.DescriptorBasedKirBuiltins
 import co.touchlab.skie.kir.builtin.KirBuiltins
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
@@ -84,7 +85,7 @@ class DescriptorKirProvider(
         FileOrClassConfiguration.File(FileConfiguration(PackageConfiguration(externalModule.configuration))),
     )
 
-    override val kirBuiltins: KirBuiltins = KirBuiltins(
+    override val kirBuiltins: DescriptorBasedKirBuiltins = DescriptorBasedKirBuiltins(
         stdlibModule = this.stdlibModule,
         kotlinBuiltIns = kotlinBuiltIns,
         extraDescriptorBuiltins = extraDescriptorBuiltins,

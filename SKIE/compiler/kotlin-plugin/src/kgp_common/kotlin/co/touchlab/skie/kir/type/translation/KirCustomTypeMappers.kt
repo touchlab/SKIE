@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.kir.type.translation
 
-import co.touchlab.skie.kir.builtin.KirBuiltins
+import co.touchlab.skie.kir.builtin.DescriptorBasedKirBuiltins
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.type.NonNullReferenceKirType
 import co.touchlab.skie.kir.type.SpecialOirKirType
@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 class KirCustomTypeMappers(
-    private val kirBuiltins: KirBuiltins,
+    private val kirBuiltins: DescriptorBasedKirBuiltins,
     translator: Lazy<KirTypeTranslator>,
 ) {
 

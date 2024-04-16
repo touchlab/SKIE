@@ -149,8 +149,8 @@ class KirDeclarationTypeTranslator(
         }
 
     private fun OirBasedKirType.makeNullableIfReferenceOrPointer(): KirType =
-        when (this.oirType) {
-            is PointerOirType -> this.oirType.copy(nullable = true).toKirType()
+        when (val oirType = this.oirType) {
+            is PointerOirType -> oirType.copy(nullable = true).toKirType()
             is PrimitiveOirType -> this
             VoidOirType -> this
             else -> error("Unsupported OirBasedKirType type: $this")

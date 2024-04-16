@@ -136,10 +136,10 @@ class CreateExposedKirTypesPhase(
     }
 
     private fun configureClassParent(kirClass: KirClass) {
-        if (kirClass.parent is KirClass) {
-            if (kirClass.kind == KirClass.Kind.CompanionObject) {
-                kirClass.parent.companionObject = kirClass
-            }
+        val parentKirClass = kirClass.parent as? KirClass ?: return
+
+        if (kirClass.kind == KirClass.Kind.CompanionObject) {
+            parentKirClass.companionObject = kirClass
         }
     }
 

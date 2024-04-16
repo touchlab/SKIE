@@ -8,7 +8,7 @@ import co.touchlab.skie.kir.type.ReferenceKirType
 import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 import co.touchlab.skie.oir.type.SpecialReferenceOirType
 import co.touchlab.skie.oir.type.VoidOirType
-import co.touchlab.skie.phases.features.flow.SupportedFlow
+import co.touchlab.skie.kir.type.SupportedFlow
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
 import org.jetbrains.kotlin.backend.konan.isInlined
 import org.jetbrains.kotlin.backend.konan.isKotlinObjCClass

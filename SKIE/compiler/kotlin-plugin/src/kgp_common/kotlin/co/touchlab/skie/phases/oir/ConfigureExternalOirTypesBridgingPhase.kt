@@ -29,12 +29,12 @@ class ConfigureExternalOirTypesBridgingPhase(
     private fun configureBridging(oirClass: OirClass) {
         val apiNotesEntry = externalApiNotesProvider.findApiNotesEntry(oirClass) ?: return
 
-        if (apiNotesEntry.bridgeSwiftName != null) {
-            oirClass.bridgedSirClass = getOrCreateSirClass(apiNotesEntry.bridgeSwiftName)
+        apiNotesEntry.bridgeSwiftName?.let {
+            oirClass.bridgedSirClass = getOrCreateSirClass(it)
         }
 
-        if (apiNotesEntry.swiftName != null) {
-            oirClass.originalSirClass.baseName = apiNotesEntry.swiftName.simpleName
+        apiNotesEntry.swiftName?.let {
+            oirClass.originalSirClass.baseName = it.simpleName
         }
 
         if (apiNotesEntry.importAsNonGeneric) {
@@ -47,10 +47,12 @@ class ConfigureExternalOirTypesBridgingPhase(
     private fun getOrCreateSirClass(fqName: SirFqName): SirClass {
         sirProvider.findClassByFqName(fqName)?.let { return it }
 
+        val parentFqName = fqName.parent
+
         return SirClass(
             baseName = fqName.simpleName,
             parent = when {
-                fqName.parent != null -> getOrCreateSirClass(fqName.parent)
+                parentFqName != null -> getOrCreateSirClass(parentFqName)
                 else -> sirProvider.getExternalModule(fqName.module.name).builtInFile
             },
             // TODO All builtin bridges are structs or enums (not classes which is important for type mapping of reference types, however we do not know if this will be true for 3rd party libraries)

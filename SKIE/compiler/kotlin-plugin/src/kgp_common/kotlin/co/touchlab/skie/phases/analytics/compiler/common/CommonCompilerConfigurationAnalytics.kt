@@ -3,7 +3,7 @@
 package co.touchlab.skie.phases.analytics.compiler.common
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.analytics.util.toPrettyJson
+import co.touchlab.skie.util.toPrettyJson
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.backend.konan.BinaryOptions

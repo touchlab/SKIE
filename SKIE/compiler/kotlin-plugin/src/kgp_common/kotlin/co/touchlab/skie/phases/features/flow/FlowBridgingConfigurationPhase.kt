@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.flow
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.phases.SirPhase
 
 object FlowBridgingConfigurationPhase : SirPhase {

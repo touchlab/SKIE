@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.features.flow
 
+import co.touchlab.skie.configuration.common.FlowMappingStrategy
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
@@ -136,7 +137,7 @@ class ConvertFlowsPhase(
         val kirClass = flowType.getKotlinKirClass(kirProvider)
 
         val typeArgument = kirClass.withFlowMappingForTypeArguments {
-            kirTypeTranslator.evaluateFlowTypeArgument().substituteFlows()
+            evaluateFlowTypeArgument().substituteFlows()
         }
 
         return DeclaredKirType(

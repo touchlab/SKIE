@@ -48,12 +48,12 @@ class FileScopeConvertor(
     }
 
     private fun generateInterfaceExtensionWrapper(function: KirSimpleFunction) {
-        when (function.kind) {
+        when (val kind = function.kind) {
             KirSimpleFunction.Kind.Function -> interfaceExtensionMembersDelegate.generateInterfaceExtensionFunctionWrapper(function)
             is KirSimpleFunction.Kind.PropertyGetter -> interfaceExtensionMembersDelegate.generateInterfaceExtensionPropertyWrapper(function)
             is KirSimpleFunction.Kind.PropertySetter -> {
                 // Property wrapper must be generated only once
-                if (function.kind.associatedGetter == null) {
+                if (kind.associatedGetter == null) {
                     interfaceExtensionMembersDelegate.generateInterfaceExtensionPropertyWrapper(function)
                 }
             }

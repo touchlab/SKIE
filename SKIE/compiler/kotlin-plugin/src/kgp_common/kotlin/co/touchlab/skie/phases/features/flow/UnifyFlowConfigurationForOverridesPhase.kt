@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.flow
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.configuration.common.FlowMappingStrategy
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirOverridableDeclaration

@@ -1,12 +1,11 @@
 package co.touchlab.skie.phases.swift
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.configuration.SwiftCompilerConfiguration
+import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.util.Command
-import co.touchlab.skie.util.SwiftCompilerConfiguration.BuildType
-import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
-import org.jetbrains.kotlin.konan.target.withOSVersion
 import java.io.File
 
 class CompileSwiftPhase(
@@ -132,7 +131,7 @@ class CompileSwiftPhase(
             +"-sdk"
             +swiftCompilerConfiguration.absoluteTargetSysRootPath
             +"-target"
-            +swiftCompilerConfiguration.targetTriple.withOSVersion(swiftCompilerConfiguration.osVersionMin).toString()
+            +swiftCompilerConfiguration.targetTriple.withOsVersion(swiftCompilerConfiguration.osVersionMin).toString()
             +swiftCompilerConfiguration.additionalFlags
             +"@${swiftFileList.absolutePath}"
 
@@ -165,9 +164,9 @@ class CompileSwiftPhase(
 
     private fun getSwiftcBitcodeArg() =
         when (swiftCompilerConfiguration.bitcodeEmbeddingMode) {
-            BitcodeEmbedding.Mode.NONE -> null
-            BitcodeEmbedding.Mode.FULL -> "-embed-bitcode"
-            BitcodeEmbedding.Mode.MARKER -> "-embed-bitcode-marker"
+            SwiftCompilerConfiguration.BitcodeEmbeddingMode.None -> null
+            SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker -> "-embed-bitcode-marker"
+            SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full -> "-embed-bitcode"
         }
 
     private fun copySwiftModuleFiles() {

@@ -1,6 +1,7 @@
 package co.touchlab.skie.context
 
 import co.touchlab.skie.kir.KirProvider
+import co.touchlab.skie.kir.builtin.DescriptorBasedKirBuiltins
 import co.touchlab.skie.kir.builtin.KirBuiltins
 import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
 import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
@@ -34,7 +35,7 @@ class DescriptorConversionPhaseContext(
         mainSkieContext.descriptorKirProvider = it
     }
 
-    override val kirBuiltins: KirBuiltins = descriptorKirProvider.kirBuiltins
+    override val kirBuiltins: DescriptorBasedKirBuiltins = descriptorKirProvider.kirBuiltins
 
     private val kirCustomTypeMappers = KirCustomTypeMappers(kirBuiltins, lazy { kirTypeTranslator })
 

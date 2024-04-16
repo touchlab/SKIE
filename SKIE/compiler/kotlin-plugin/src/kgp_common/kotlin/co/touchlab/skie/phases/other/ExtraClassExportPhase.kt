@@ -7,7 +7,8 @@ import co.touchlab.skie.kir.descriptor.getAllExposedMembers
 import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.ClassExportPhase
-import co.touchlab.skie.phases.features.flow.SupportedFlow
+import co.touchlab.skie.kir.type.SupportedFlow
+import co.touchlab.skie.kir.type.translation.from
 import co.touchlab.skie.phases.util.StatefulDescriptorConversionPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase

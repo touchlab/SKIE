@@ -13,8 +13,8 @@ import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
-import co.touchlab.skie.util.SwiftCompilerConfiguration
-import co.touchlab.skie.util.SwiftCompilerConfiguration.BuildType
+import co.touchlab.skie.configuration.SwiftCompilerConfiguration
+import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,14 +62,25 @@ class MainSkieContext internal constructor(
 
     lateinit var descriptorKirProvider: DescriptorKirProvider
 
+    private val kotlinTargetTriple = configurables.targetTriple
+
     override val swiftCompilerConfiguration: SwiftCompilerConfiguration = SwiftCompilerConfiguration(
         // TODO To SkieConfiguration via RootScope Key
         swiftVersion = "5",
         // TODO To SkieConfiguration via RootScope Key
         additionalFlags = emptyList(),
         buildType = if (konanConfig.debug) BuildType.Debug else BuildType.Release,
-        targetTriple = configurables.targetTriple,
-        bitcodeEmbeddingMode = compilerConfiguration[KonanConfigKeys.BITCODE_EMBEDDING_MODE] ?: BitcodeEmbedding.Mode.NONE,
+        targetTriple = SwiftCompilerConfiguration.TargetTriple(
+            architecture = kotlinTargetTriple.architecture,
+            vendor = kotlinTargetTriple.vendor,
+            os = kotlinTargetTriple.os,
+            environment = kotlinTargetTriple.environment,
+        ),
+        bitcodeEmbeddingMode = when (compilerConfiguration[KonanConfigKeys.BITCODE_EMBEDDING_MODE]) {
+            BitcodeEmbedding.Mode.FULL -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full
+            BitcodeEmbedding.Mode.MARKER -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker
+            BitcodeEmbedding.Mode.NONE, null -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.None
+        },
         absoluteTargetToolchainPath = configurables.absoluteTargetToolchain,
         absoluteTargetSysRootPath = configurables.absoluteTargetSysRoot,
         osVersionMin = configurables.osVersionMin,
