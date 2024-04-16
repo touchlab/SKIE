@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.analytics.compiler.specific
+package co.touchlab.skie.analytics.compiler.specific
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer

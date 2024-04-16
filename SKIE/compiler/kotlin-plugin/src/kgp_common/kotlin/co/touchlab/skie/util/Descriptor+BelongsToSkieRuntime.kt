@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.runtime
+package co.touchlab.skie.util
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor

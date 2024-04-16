@@ -1,6 +1,6 @@
 @file:Suppress("invisible_reference", "invisible_member")
 
-package co.touchlab.skie.phases.analytics.environment
+package co.touchlab.skie.analytics.environment
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.util.toPrettyJson

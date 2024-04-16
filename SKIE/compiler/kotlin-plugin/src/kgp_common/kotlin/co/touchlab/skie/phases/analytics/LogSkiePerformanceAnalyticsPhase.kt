@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.analytics.performance
+package co.touchlab.skie.phases.analytics
 
 import co.touchlab.skie.phases.LinkPhase
 

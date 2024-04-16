@@ -5,7 +5,7 @@ package co.touchlab.skie.phases
 import co.touchlab.skie.kir.irbuilder.impl.GenerateIrPhase
 import co.touchlab.skie.phases.analytics.ClassExportAnalyticsPhase
 import co.touchlab.skie.phases.analytics.KotlinIrAnalyticsPhase
-import co.touchlab.skie.phases.analytics.performance.LogSkiePerformanceAnalyticsPhase
+import co.touchlab.skie.phases.analytics.LogSkiePerformanceAnalyticsPhase
 import co.touchlab.skie.phases.apinotes.ApiNotesGenerationPhase
 import co.touchlab.skie.phases.apinotes.MoveBridgesToTopLevelPhase
 import co.touchlab.skie.phases.debug.DumpSwiftApiPhase

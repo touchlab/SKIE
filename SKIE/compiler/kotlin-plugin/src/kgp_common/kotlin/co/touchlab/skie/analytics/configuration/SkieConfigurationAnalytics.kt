@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.analytics.configuration
+package co.touchlab.skie.analytics.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData

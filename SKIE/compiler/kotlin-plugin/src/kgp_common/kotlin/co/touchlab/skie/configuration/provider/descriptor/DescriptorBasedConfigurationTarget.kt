@@ -3,7 +3,7 @@ package co.touchlab.skie.configuration.provider.descriptor
 import co.touchlab.skie.configuration.provider.IdentifiedConfigurationTarget
 import co.touchlab.skie.kir.util.findAnnotation
 import co.touchlab.skie.kir.util.hasAnnotation
-import co.touchlab.skie.phases.runtime.belongsToSkieKotlinRuntime
+import co.touchlab.skie.util.belongsToSkieKotlinRuntime
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor

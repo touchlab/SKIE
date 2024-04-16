@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.analytics.modules
+package co.touchlab.skie.analytics.modules
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.descriptor.DescriptorProvider

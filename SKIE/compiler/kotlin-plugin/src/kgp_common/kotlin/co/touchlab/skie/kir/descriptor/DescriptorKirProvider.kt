@@ -10,7 +10,6 @@ import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfiguratio
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.KirProviderDelegate
 import co.touchlab.skie.kir.builtin.DescriptorBasedKirBuiltins
-import co.touchlab.skie.kir.builtin.KirBuiltins
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
@@ -21,7 +20,7 @@ import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirTypeParameter
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
-import co.touchlab.skie.phases.runtime.belongsToSkieKotlinRuntime
+import co.touchlab.skie.util.belongsToSkieKotlinRuntime
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
