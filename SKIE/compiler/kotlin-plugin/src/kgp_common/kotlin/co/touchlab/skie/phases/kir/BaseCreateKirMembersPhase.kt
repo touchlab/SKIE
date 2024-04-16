@@ -48,7 +48,6 @@ internal abstract class BaseCreateKirMembersPhase(
     protected fun getDirectParents(descriptor: FunctionDescriptor): List<FunctionDescriptor> =
         descriptor.overriddenDescriptors.map { it.original }
             .filter { mapper.shouldBeExposed(it) }
-            .filterIsInstance<SimpleFunctionDescriptor>()
 
     protected val CallableMemberDescriptor.kirDeprecationLevel: DeprecationLevel
         get() {
