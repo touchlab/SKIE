@@ -27,7 +27,11 @@ import co.touchlab.skie.phases.header.FixForwardDeclarationsPhase
 import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
 import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
-import co.touchlab.skie.phases.kir.CreateKirMembersPhase
+import co.touchlab.skie.phases.kir.BaseCreateKirMembersPhase
+import co.touchlab.skie.phases.kir.CreateKirConstructorsPhase
+import co.touchlab.skie.phases.kir.CreateKirPropertiesPhase
+import co.touchlab.skie.phases.kir.CreateKirSimpleFunctionsPhase
+import co.touchlab.skie.phases.kir.InitializeKirMembersCachePhase
 import co.touchlab.skie.phases.memberconflicts.RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameConflictingCallableDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameParametersNamedSelfPhase
@@ -120,7 +124,11 @@ class SkiePhaseScheduler {
             VerifyDescriptorProviderConsistencyPhase,
 
             CreateExposedKirTypesPhase(context),
-            CreateKirMembersPhase(context),
+
+            CreateKirConstructorsPhase(context),
+            CreateKirPropertiesPhase(context),
+            CreateKirSimpleFunctionsPhase(context),
+            InitializeKirMembersCachePhase,
 
             // Flows
             UnifyFlowConfigurationForOverridesPhase(context),

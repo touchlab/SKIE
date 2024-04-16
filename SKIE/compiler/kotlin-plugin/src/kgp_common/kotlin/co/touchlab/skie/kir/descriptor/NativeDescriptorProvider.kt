@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
@@ -100,7 +101,7 @@ internal class NativeDescriptorProvider(
 
     override fun getExposedClassMembers(classDescriptor: ClassDescriptor): List<CallableMemberDescriptor> =
         classDescriptor.unsubstitutedMemberScope
-            .getDescriptorsFiltered()
+            .getDescriptorsFiltered(kindFilter = DescriptorKindFilter.CALLABLES)
             .filterIsInstance<CallableMemberDescriptor>()
             .filter { it.isExposed }
 
