@@ -33,7 +33,7 @@ internal data class DarwinTarget(
             DarwinTarget(KonanTarget.TVOS_SIMULATOR_ARM64, "arm64-apple-tvos-simulator", "appletvsimulator"),
             DarwinTarget(KonanTarget.MACOS_X64, "x86_64-apple-macos", "macosx"),
             DarwinTarget(KonanTarget.MACOS_ARM64, "arm64-apple-macos", "macosx"),
-        ).associateBy { it.konanTarget }
+        ).associateBy { it.konanTarget.name }
     }
 }
 
@@ -41,4 +41,5 @@ internal val FrameworkDescriptor.darwinTarget: DarwinTarget
     get() = target.darwinTarget
 
 internal val KonanTarget.darwinTarget: DarwinTarget
-    get() = DarwinTarget.allTargets[this] ?: error("Unknown konan target: $this")
+    // We can't use `KotlinTarget` directly as the instance can differ when Gradle Configuration Cache is used
+    get() = DarwinTarget.allTargets[name] ?: error("Unknown konan target: $this")

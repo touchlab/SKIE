@@ -6,19 +6,17 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
 import org.jetbrains.kotlin.konan.target.Architecture
-import org.jetbrains.kotlin.konan.target.Family
 import java.io.File
 
 internal object FatFrameworkConfigurator {
-
     fun configureSkieForFatFrameworks(project: Project) {
-        project.fixFatFrameworkNameForCocoaPodsPlugin()
-        project.configureFatFrameworkPatching()
+        fixFatFrameworkNameForCocoaPodsPlugin(project)
+        configureFatFrameworkPatching(project)
     }
 
-    private fun Project.fixFatFrameworkNameForCocoaPodsPlugin() {
-        pluginManager.withPlugin("kotlin-native-cocoapods") {
-            tasks.withType<FatFrameworkTask>().matching { it.name == "fatFramework" }.configureEach {
+    private fun fixFatFrameworkNameForCocoaPodsPlugin(project: Project) {
+        project.pluginManager.withPlugin("kotlin-native-cocoapods") {
+            project.tasks.withType<FatFrameworkTask>().matching { it.name == "fatFramework" }.configureEach {
                 // Unfortunately has to be done in `doFirst` to make sure the task is already configured by the plugin when we run our code
                 doFirstOptimized {
                     val commonFrameworkName = frameworks.map { it.name }.distinct().singleOrNull() ?: return@doFirstOptimized
@@ -28,8 +26,9 @@ internal object FatFrameworkConfigurator {
         }
     }
 
-    private fun Project.configureFatFrameworkPatching() {
-        tasks.withType<FatFrameworkTask>().configureEach {
+    private fun configureFatFrameworkPatching(project: Project) {
+        val injectedFileSystemOperations = project.objects.newInstance<InjectedFileSystemOperations>()
+        project.tasks.withType<FatFrameworkTask>().configureEach {
             doLastOptimized {
                 // There shouldn't be any real difference between the frameworks except for architecture, so we consider the first one "primary"
                 val primaryFramework = frameworks.first()
@@ -38,7 +37,7 @@ internal object FatFrameworkConfigurator {
                     isMacosFramework = primaryFramework.files.isMacosFramework,
                 )
 
-                // FatFramewrokTask writes its own
+                // FatFrameworkTask writes its own
                 target.moduleFile.writeText(
                     primaryFramework.files.moduleFile.readText()
                 )
@@ -74,12 +73,12 @@ internal object FatFrameworkConfigurator {
                 target.swiftModuleDir.mkdirs()
 
                 frameworksByArchs.toList().forEach { (_, framework) ->
-                    project.copy {
+                    injectedFileSystemOperations.fileSystemOperations.copy {
                         from(framework.files.apiNotes)
                         into(target.headerDir)
                     }
                     framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
-                        project.copy {
+                        injectedFileSystemOperations.fileSystemOperations.copy {
                             from(swiftmoduleFile)
                             into(target.swiftModuleDir)
                         }

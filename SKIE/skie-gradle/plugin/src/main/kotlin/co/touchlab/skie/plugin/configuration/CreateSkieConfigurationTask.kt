@@ -45,8 +45,9 @@ internal abstract class CreateSkieConfigurationTask : DefaultTask() {
 
         fun registerTask(target: SkieTarget) {
             val createConfiguration = target.registerSkieTargetBasedTask<CreateSkieConfigurationTask>("createConfiguration") {
+                val skieExtension = project.skieExtension
                 configurationFile.set(target.skieBuildDirectory.skieConfiguration)
-                configuration.set(project.provider { project.skieExtension.buildConfiguration() })
+                configuration.set(project.provider { skieExtension.buildConfiguration() })
 
                 dependsOn(target.createSkieBuildDirectoryTask)
             }

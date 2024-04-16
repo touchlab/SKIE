@@ -6,6 +6,7 @@ import co.touchlab.skie.test.annotation.filter.Smoke
 import co.touchlab.skie.test.annotation.type.GradleTests
 import co.touchlab.skie.test.base.BaseGradleTests
 import co.touchlab.skie.test.runner.BuildConfiguration
+import co.touchlab.skie.test.template.Templates
 import co.touchlab.skie.test.util.KotlinTarget
 import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
@@ -21,9 +22,9 @@ import kotlin.test.assertEquals
 class GradleConfigurationCacheTests: BaseGradleTests() {
 
     // We don't need to run the whole build to check configuration cache
-    private val gradleArguments = arrayOf("dependencies")
+    private val gradleArguments = arrayOf("assemble")
     private val assertGradleResult = { result: BuildResult ->
-        assertEquals(TaskOutcome.SUCCESS, result.task(":dependencies")?.outcome)
+        assertEquals(TaskOutcome.SUCCESS, result.task(":assemble")?.outcome)
     }
 
     @MatrixTest
@@ -35,6 +36,8 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
                 targets(KotlinTarget.Native)
             }
         }
+
+        copyToCommonMain(Templates.basic)
 
         runGradle(
             arguments = gradleArguments,
@@ -59,6 +62,8 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
                 )
             }
         }
+
+        copyToCommonMain(Templates.basic)
 
         runGradle(
             arguments = gradleArguments,
@@ -89,6 +94,8 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
             }
         }
 
+        copyToCommonMain(Templates.basic)
+
         runGradle(
             arguments = gradleArguments,
             assertResult = assertGradleResult,
@@ -115,6 +122,8 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
                 )
             }
         }
+
+        copyToCommonMain(Templates.basic)
 
         runGradle(
             arguments = gradleArguments,
