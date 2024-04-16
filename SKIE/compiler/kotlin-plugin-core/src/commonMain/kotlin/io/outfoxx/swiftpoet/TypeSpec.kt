@@ -223,7 +223,7 @@ class TypeSpec private constructor(
     }
   }
 
-  class Builder internal constructor(
+  class Builder(
     internal var kind: Kind,
     internal val name: String,
   ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters, BuilderWithTypeSpecs, BuilderWithMembers {
