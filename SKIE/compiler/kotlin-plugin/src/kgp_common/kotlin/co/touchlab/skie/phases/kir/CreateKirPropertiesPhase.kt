@@ -10,9 +10,9 @@ import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.phases.DescriptorConversionPhase
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
-class CreateKirPropertiesPhase(
+internal class CreateKirPropertiesPhase(
     context: DescriptorConversionPhase.Context,
-) : BaseCreateKirMembersPhase(context, supportsProperties = true) {
+) : BaseCreateRegularKirMembersPhase(context, supportsProperties = true) {
 
     private val propertyCache = mutableMapOf<PropertyDescriptor, KirProperty>()
 

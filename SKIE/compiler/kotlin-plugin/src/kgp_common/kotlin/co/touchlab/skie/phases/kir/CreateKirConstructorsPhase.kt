@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 
 internal class CreateKirConstructorsPhase(
     context: DescriptorConversionPhase.Context,
-) : BaseCreateKirFunctionPhase(context, supportsConstructors = true) {
+) : BaseCreateRegularKirFunctionPhase(context, supportsConstructors = true) {
 
     override fun visitConstructor(descriptor: ConstructorDescriptor, kirClass: KirClass) {
         val originalDescriptor = descriptor.original

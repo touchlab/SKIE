@@ -3,7 +3,7 @@ package co.touchlab.skie.configuration
 import co.touchlab.skie.phases.CommonSkieContext
 
 class SimpleFunctionConfiguration(
-    parent: FileOrClassConfiguration,
+    val parent: FileOrClassConfiguration,
 ) : FunctionConfiguration(parent) {
 
     operator fun <KEY, VALUE> get(configurationKey: KEY): VALUE where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.SimpleFunction =

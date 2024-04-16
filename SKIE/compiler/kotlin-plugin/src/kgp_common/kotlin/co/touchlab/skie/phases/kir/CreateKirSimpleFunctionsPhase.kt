@@ -3,6 +3,7 @@
 package co.touchlab.skie.phases.kir
 
 import co.touchlab.skie.configuration.SimpleFunctionConfiguration
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.element.KirCallableDeclaration.Origin
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirSimpleFunction
@@ -17,11 +18,13 @@ import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 internal class CreateKirSimpleFunctionsPhase(
     context: DescriptorConversionPhase.Context,
-) : BaseCreateKirFunctionPhase(context, supportsSimpleFunctions = true) {
+) : BaseCreateRegularKirFunctionPhase(context, supportsSimpleFunctions = true) {
 
     private val functionCache = mutableMapOf<FunctionDescriptor, KirSimpleFunction>()
 
     private val convertedPropertyKindLazyInitializers = mutableListOf<() -> Unit>()
+
+    private val needsDescriptionAndHashFunctions = SkieConfigurationFlag.Migration_AnyMethodsAsFunctions in context.rootConfiguration.enabledFlags
 
     context(DescriptorConversionPhase.Context)
     override suspend fun execute() {
@@ -34,7 +37,11 @@ internal class CreateKirSimpleFunctionsPhase(
         convertedPropertyKindLazyInitializers.forEach { it() }
     }
 
-    override fun visitSimpleFunction(descriptor: FunctionDescriptor, kirClass: KirClass, origin: Origin) {
+    override fun visitFunction(descriptor: FunctionDescriptor, kirClass: KirClass, origin: Origin) {
+        if (CreateKirDescriptionAndHashPropertyPhase.isToStringOrEquals(descriptor) && !needsDescriptionAndHashFunctions) {
+            return
+        }
+
         getOrCreateFunction(descriptor, kirClass, origin)
     }
 
@@ -147,14 +154,4 @@ internal class CreateKirSimpleFunctionsPhase(
             }
             else -> error("Unsupported function type: $descriptor")
         }
-
-    private val FunctionDescriptor.baseFunction: FunctionDescriptor
-        get() = (getAllParents(this) + this.original).first { mapper.isBaseMethod(it) }
-
-    private fun getAllParents(descriptor: FunctionDescriptor): List<FunctionDescriptor> =
-        getDirectParents(descriptor).flatMap { getAllParents(it) + it.original }
-
-    private fun getDirectParents(descriptor: FunctionDescriptor): List<FunctionDescriptor> =
-        descriptor.overriddenDescriptors.map { it.original }
-            .filter { mapper.shouldBeExposed(it) }
 }

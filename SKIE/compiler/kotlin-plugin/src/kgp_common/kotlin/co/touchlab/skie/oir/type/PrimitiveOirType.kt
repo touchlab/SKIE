@@ -5,6 +5,8 @@ sealed class PrimitiveOirType(
     val name: String,
 ) : OirType() {
 
+    // Does not directly exist in Obj-C - used when the type should be mapped to Swift.Int instead of Swift.UInt
+    object NSConvertedUInteger : PrimitiveOirType("NSUInteger")
     object NSUInteger : PrimitiveOirType("NSUInteger")
     object BOOL : PrimitiveOirType("BOOL")
     object unichar : PrimitiveOirType("unichar")

@@ -6,7 +6,6 @@ import co.touchlab.skie.configuration.ValueParameterConfiguration
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.kir.type.translation.KirTypeParameterScope
-import co.touchlab.skie.oir.element.OirFunction
 import co.touchlab.skie.phases.DescriptorConversionPhase
 import co.touchlab.skie.phases.oir.util.getOirValueParameterName
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
@@ -19,11 +18,11 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.resolve.isValueClass
 
-internal abstract class BaseCreateKirFunctionPhase(
+internal abstract class BaseCreateRegularKirFunctionPhase(
     context: DescriptorConversionPhase.Context,
     supportsConstructors: Boolean = false,
     supportsSimpleFunctions: Boolean = false,
-) : BaseCreateKirMembersPhase(
+) : BaseCreateRegularKirMembersPhase(
     context = context,
     supportsConstructors = supportsConstructors,
     supportsSimpleFunctions = supportsSimpleFunctions,
@@ -93,18 +92,5 @@ internal abstract class BaseCreateKirFunctionPhase(
             descriptorConfigurationProvider.getConfiguration(parameterDescriptor)
         } else {
             ValueParameterConfiguration(function.configuration)
-        }
-
-    protected val MethodBridge.ReturnValue.errorHandlingStrategy: OirFunction.ErrorHandlingStrategy
-        get() = when (this) {
-            MethodBridge.ReturnValue.WithError.Success -> OirFunction.ErrorHandlingStrategy.ReturnsBoolean
-            is MethodBridge.ReturnValue.WithError.ZeroForError -> {
-                if (this.successMayBeZero) {
-                    OirFunction.ErrorHandlingStrategy.SetsErrorOut
-                } else {
-                    OirFunction.ErrorHandlingStrategy.ReturnsZero
-                }
-            }
-            else -> OirFunction.ErrorHandlingStrategy.Crashes
         }
 }

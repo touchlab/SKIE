@@ -27,8 +27,8 @@ import co.touchlab.skie.phases.header.FixForwardDeclarationsPhase
 import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
 import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
-import co.touchlab.skie.phases.kir.BaseCreateKirMembersPhase
 import co.touchlab.skie.phases.kir.CreateKirConstructorsPhase
+import co.touchlab.skie.phases.kir.CreateKirDescriptionAndHashPropertyPhase
 import co.touchlab.skie.phases.kir.CreateKirPropertiesPhase
 import co.touchlab.skie.phases.kir.CreateKirSimpleFunctionsPhase
 import co.touchlab.skie.phases.kir.InitializeKirMembersCachePhase
@@ -128,6 +128,7 @@ class SkiePhaseScheduler {
             CreateKirConstructorsPhase(context),
             CreateKirPropertiesPhase(context),
             CreateKirSimpleFunctionsPhase(context),
+            CreateKirDescriptionAndHashPropertyPhase(context),
             InitializeKirMembersCachePhase,
 
             // Flows

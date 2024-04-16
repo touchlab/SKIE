@@ -10,8 +10,12 @@ import javax.inject.Inject
 abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory) {
 
     /**
-     * Swift Library Evolution is required by XCFramework artifacts,
-     * so this flag is always true for any XCFramework target.
+     * Enables Swift Library Evolution.
+     *
+     * Building with Swift Library Evolution increases compilation time, so it's recommended to use it only if you really need it.
+     *
+     * Note that Swift Library Evolution is required for building XCFrameworks so SKIE ignores this property in that case.
+     * However, you should explicitly set this property to true if you need Swift Library Evolution for your XCFrameworks as this behavior might change in the future.
      */
     val enableSwiftLibraryEvolution: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val enableParallelSwiftCompilation: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
