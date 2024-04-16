@@ -8,9 +8,9 @@ import co.touchlab.skie.kir.type.translation.KirDeclarationTypeTranslator
 import co.touchlab.skie.kir.type.translation.KirTypeTranslator
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
-interface DescriptorConversionPhase : ForegroundPhase<DescriptorConversionPhase.Context> {
+interface DescriptorConversionPhase : CompilerDependentForegroundPhase<DescriptorConversionPhase.Context> {
 
-    interface Context : ForegroundPhase.Context {
+    interface Context : CompilerDependentForegroundPhase.Context {
 
         override val context: Context
 

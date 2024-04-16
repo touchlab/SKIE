@@ -1,4 +1,4 @@
-package co.touchlab.skie.phases.analytics.performance
+package co.touchlab.skie.analytics.performance
 
 import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag

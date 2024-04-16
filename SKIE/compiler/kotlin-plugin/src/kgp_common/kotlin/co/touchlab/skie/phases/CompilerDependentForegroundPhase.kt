@@ -8,9 +8,9 @@ import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 
-interface ForegroundPhase<C : ForegroundPhase.Context> : ScheduledPhase<C> {
+interface CompilerDependentForegroundPhase<in C : CompilerDependentForegroundPhase.Context> : ForegroundPhase<C> {
 
-    interface Context : ScheduledPhase.Context {
+    interface Context : ForegroundPhase.Context {
 
         override val context: Context
 

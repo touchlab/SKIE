@@ -8,6 +8,7 @@ import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
 import co.touchlab.skie.kir.type.translation.KirCustomTypeMappers
 import co.touchlab.skie.kir.type.translation.KirDeclarationTypeTranslator
 import co.touchlab.skie.kir.type.translation.KirTypeTranslator
+import co.touchlab.skie.phases.CompilerDependentForegroundPhase
 import co.touchlab.skie.phases.DescriptorConversionPhase
 import co.touchlab.skie.phases.ForegroundPhase
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -15,7 +16,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 class DescriptorConversionPhaseContext(
     mainSkieContext: MainSkieContext,
     override val objCExportedInterfaceProvider: ObjCExportedInterfaceProvider,
-) : DescriptorConversionPhase.Context, ForegroundPhase.Context by mainSkieContext {
+) : DescriptorConversionPhase.Context, CompilerDependentForegroundPhase.Context by mainSkieContext {
 
     override val context: DescriptorConversionPhase.Context = this
 

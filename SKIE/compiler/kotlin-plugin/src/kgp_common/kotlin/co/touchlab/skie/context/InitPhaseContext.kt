@@ -8,7 +8,7 @@ import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.configuration.provider.ConfigurationProvider
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.SkiePhaseScheduler
-import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
+import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.util.ActualCompilerShim
 import co.touchlab.skie.util.CompilerShim

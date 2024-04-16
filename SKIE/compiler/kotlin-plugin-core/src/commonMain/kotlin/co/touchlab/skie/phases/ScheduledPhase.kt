@@ -4,7 +4,7 @@ import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.context.CommonSkieContext
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
 
-interface ScheduledPhase<C : ScheduledPhase.Context> {
+interface ScheduledPhase<in C : ScheduledPhase.Context> {
 
     context(C)
     fun isActive(): Boolean = true

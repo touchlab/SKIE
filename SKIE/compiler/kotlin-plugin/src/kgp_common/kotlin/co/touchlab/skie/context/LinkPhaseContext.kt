@@ -1,16 +1,16 @@
 package co.touchlab.skie.context
 
 import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
-import co.touchlab.skie.phases.ForegroundPhase
-import co.touchlab.skie.phases.LinkPhase
+import co.touchlab.skie.phases.CompilerDependentForegroundPhase
+import co.touchlab.skie.phases.CompilerDependentLinkPhase
 import java.nio.file.Path
 
 class LinkPhaseContext(
     private val mainSkieContext: MainSkieContext,
     private val link: (additionalObjectFiles: List<Path>) -> Unit,
-) : LinkPhase.Context, ForegroundPhase.Context by mainSkieContext {
+) : CompilerDependentLinkPhase.Context, CompilerDependentForegroundPhase.Context by mainSkieContext {
 
-    override val context: LinkPhase.Context = this
+    override val context: CompilerDependentLinkPhase.Context = this
 
     override val descriptorKirProvider: DescriptorKirProvider = mainSkieContext.descriptorKirProvider
 

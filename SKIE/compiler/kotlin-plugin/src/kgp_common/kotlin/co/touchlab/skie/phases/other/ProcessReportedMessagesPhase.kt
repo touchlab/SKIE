@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases.other
 
-import co.touchlab.skie.phases.LinkPhase
+import co.touchlab.skie.phases.CompilerDependentLinkPhase
 import co.touchlab.skie.util.Reporter
 import co.touchlab.skie.util.Reporter.Severity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
@@ -10,16 +10,16 @@ import org.jetbrains.kotlin.cli.jvm.compiler.report
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 
-object ProcessReportedMessagesPhase : LinkPhase {
+object ProcessReportedMessagesPhase : CompilerDependentLinkPhase {
 
-    context(LinkPhase.Context)
+    context(CompilerDependentLinkPhase.Context)
     override suspend fun execute() {
         reporter.reports.forEach {
             report(it)
         }
     }
 
-    context(LinkPhase.Context)
+    context(CompilerDependentLinkPhase.Context)
     private fun report(report: Reporter.Report) {
         val declaration = report.source?.let { descriptorKirProvider.findDeclarationDescriptor(it) }
 

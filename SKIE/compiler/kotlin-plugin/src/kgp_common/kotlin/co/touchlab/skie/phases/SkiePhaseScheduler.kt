@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.phases
 
-import co.touchlab.skie.kir.irbuilder.impl.GenerateIrPhase
+import co.touchlab.skie.phases.other.GenerateIrPhase
 import co.touchlab.skie.phases.analytics.ClassExportAnalyticsPhase
 import co.touchlab.skie.phases.analytics.KotlinIrAnalyticsPhase
 import co.touchlab.skie.phases.analytics.LogSkiePerformanceAnalyticsPhase
@@ -249,7 +249,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val linkPhases = SkiePhaseGroup<LinkPhase, LinkPhase.Context> { context ->
+    val linkPhases = SkiePhaseGroup<LinkPhase<CompilerDependentLinkPhase.Context>, CompilerDependentLinkPhase.Context> { context ->
         addAll(
             ConfigureSwiftSpecificLinkerArgsPhase,
             AwaitAllBackgroundJobsPhase,
@@ -290,7 +290,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runLinkPhases(contextFactory: () -> LinkPhase.Context) {
+    fun runLinkPhases(contextFactory: () -> CompilerDependentLinkPhase.Context) {
         linkPhases.run(contextFactory)
     }
 }

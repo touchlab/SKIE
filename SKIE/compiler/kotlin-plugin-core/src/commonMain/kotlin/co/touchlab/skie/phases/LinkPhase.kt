@@ -1,15 +1,12 @@
 package co.touchlab.skie.phases
 
-import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
 import java.nio.file.Path
 
-interface LinkPhase : ForegroundPhase<LinkPhase.Context> {
+interface LinkPhase<in C : LinkPhase.Context> : ForegroundPhase<C> {
 
     interface Context : ForegroundPhase.Context {
 
         override val context: Context
-
-        val descriptorKirProvider: DescriptorKirProvider
 
         fun link(additionalObjectFiles: List<Path>)
 

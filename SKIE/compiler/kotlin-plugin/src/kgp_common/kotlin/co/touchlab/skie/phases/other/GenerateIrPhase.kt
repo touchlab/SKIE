@@ -1,4 +1,4 @@
-package co.touchlab.skie.kir.irbuilder.impl
+package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.phases.KotlinIrPhase
 

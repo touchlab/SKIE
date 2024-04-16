@@ -15,6 +15,7 @@ import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
+import co.touchlab.skie.phases.CompilerDependentForegroundPhase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +36,7 @@ class MainSkieContext internal constructor(
     frontendServices: FrontendServices,
     val mainModuleDescriptor: ModuleDescriptor,
     exportedDependencies: Collection<ModuleDescriptor>,
-) : ForegroundPhase.Context, BackgroundPhase.Context, InitPhase.Context by initPhaseContext {
+) : CompilerDependentForegroundPhase.Context, BackgroundPhase.Context, InitPhase.Context by initPhaseContext {
 
     private val skieCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + CoroutineExceptionHandler { _, _ ->
         // Hides default stderr output because the exception is handled at the end of the job
