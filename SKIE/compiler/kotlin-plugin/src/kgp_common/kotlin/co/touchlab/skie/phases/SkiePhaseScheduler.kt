@@ -18,7 +18,7 @@ import co.touchlab.skie.phases.features.flow.ConvertFlowsPhase
 import co.touchlab.skie.phases.features.flow.FlowBridgingConfigurationPhase
 import co.touchlab.skie.phases.features.flow.FlowConversionConstructorsGenerator
 import co.touchlab.skie.phases.features.flow.UnifyFlowConfigurationForOverridesPhase
-import co.touchlab.skie.phases.features.functions.FileScopeConvertor
+import co.touchlab.skie.phases.features.functions.FileScopeConvertorPhase
 import co.touchlab.skie.phases.features.sealed.SealedInteropGenerator
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
 import co.touchlab.skie.phases.header.AddTypeDefPhase
@@ -204,7 +204,7 @@ class SkiePhaseScheduler {
             ExhaustiveEnumsGenerator,
             SealedInteropGenerator(context),
 
-            FileScopeConvertor(context),
+            FileScopeConvertorPhase(context),
 
             ExhaustiveEnumsGenerator.NestedTypeDeclarationsPhase,
 

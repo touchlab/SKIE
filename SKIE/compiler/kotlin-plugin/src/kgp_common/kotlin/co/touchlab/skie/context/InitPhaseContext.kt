@@ -10,6 +10,8 @@ import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
+import co.touchlab.skie.util.ActualCompilerShim
+import co.touchlab.skie.util.CompilerShim
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.Reporter
 import co.touchlab.skie.util.directory.SkieDirectories
@@ -45,6 +47,8 @@ class InitPhaseContext(
     override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(rootConfiguration)
 
     override val reporter: Reporter = Reporter()
+
+    override val compilerShim: CompilerShim = ActualCompilerShim()
 
     override val framework: FrameworkLayout = run {
         val frameworkPath = compilerConfiguration.getNotNull(KonanConfigKeys.OUTPUT)

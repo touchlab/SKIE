@@ -26,7 +26,6 @@ class ConvertFlowsPhase(
 ) : DescriptorConversionPhase {
 
     private val kirProvider = context.kirProvider
-    private val kirTypeTranslator = context.kirTypeTranslator
 
     context(DescriptorConversionPhase.Context)
     override suspend fun execute() {

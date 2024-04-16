@@ -5,6 +5,7 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.phases.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
+import co.touchlab.skie.util.CompilerShim
 import co.touchlab.skie.util.FrameworkLayout
 import co.touchlab.skie.util.Reporter
 import co.touchlab.skie.util.directory.SkieBuildDirectory
@@ -27,6 +28,8 @@ interface CommonSkieContext {
     val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer
 
     val reporter: Reporter
+
+    val compilerShim: CompilerShim
 
     val skieBuildDirectory: SkieBuildDirectory
         get() = skieDirectories.buildDirectory

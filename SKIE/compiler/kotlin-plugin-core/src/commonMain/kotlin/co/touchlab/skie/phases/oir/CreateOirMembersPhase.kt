@@ -22,7 +22,6 @@ import co.touchlab.skie.oir.element.OirScope
 import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirValueParameter
 import co.touchlab.skie.phases.SirPhase
-import org.jetbrains.kotlin.backend.konan.cKeywords
 
 class CreateOirMembersPhase(
     context: SirPhase.Context,
@@ -30,6 +29,7 @@ class CreateOirMembersPhase(
 
     private val kirProvider = context.kirProvider
     private val oirTypeTranslator = context.oirTypeTranslator
+    private val compilerShim = context.compilerShim
 
     private val extensionCache = mutableMapOf<OirClass, OirExtension>()
 
@@ -132,7 +132,7 @@ class CreateOirMembersPhase(
 
     private fun getValueParameterName(kirValueParameter: KirValueParameter, usedNames: MutableSet<String>): String {
         var uniqueName = kirValueParameter.objCName
-        while (uniqueName in usedNames || uniqueName in cKeywords) {
+        while (uniqueName in usedNames || uniqueName in compilerShim.cKeywords) {
             uniqueName += "_"
         }
 
