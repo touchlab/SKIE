@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.dependencies
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.util.exclude
 import co.touchlab.skie.plugin.util.named
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -23,12 +24,11 @@ internal object SkieCompilerPluginDependencyProvider {
                 attribute(KotlinCompilerVersion.attribute, project.objects.named(kotlinToolingVersion))
             }
 
-            exclude(
-                mapOf(
-                    "group" to "org.jetbrains.kotlin",
-                    "module" to "kotlin-stdlib-common",
-                )
-            )
+            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib-common")
+            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib-jdk8")
+            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib-jdk7")
+            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib")
+            exclude(group = "org.jetbrains", module= "annotations")
         }
 
         project.dependencies.add(configurationName, mapOf(

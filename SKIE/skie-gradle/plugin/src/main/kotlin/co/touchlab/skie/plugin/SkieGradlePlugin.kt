@@ -127,11 +127,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
             this.isCanBeConsumed = false
             this.isCanBeResolved = true
 
-            exclude(
-                mapOf(
-                    "group" to "org.jetbrains.kotlin",
-                ),
-            )
+            exclude(group = "org.jetbrains.kotlin")
 
             attributes {
                 attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))

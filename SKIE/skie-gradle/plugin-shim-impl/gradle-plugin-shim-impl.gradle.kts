@@ -12,9 +12,6 @@ plugins {
 }
 
 skiePublishing {
-    name = "SKIE Gradle Plugin"
-    description = "Gradle plugin for configuring SKIE compiler plugin.."
-
     name = "SKIE Gradle Plugin Shim Implementation"
     description = "Implementation of the SKIE Gradle Plugin Shim API, used by the main plugin module to interact with Kotlin Gradle Plugin."
 }
@@ -23,17 +20,16 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                // TODO: It might be worthwhile to make this compile-time safe, so we don't have to manually check. Or at least a test?
-                // Whichever dependency is brought in by `gradle-plugin-loader` has to be `compileOnly` as we don't want duplicate classes.
+                // All dependencies should be `compileOnly` and instead brought in by `gradle-plugin` to minimize the amount of runtime-loaded artifacts.
                 compileOnly(projects.gradle.gradlePluginShimApi)
                 compileOnly(projects.common.configuration.configurationDeclaration)
 
-                implementation(libs.ci.info)
-                implementation(libs.jgit)
-                implementation(libs.mixpanel)
+                compileOnly(libs.ci.info)
+                compileOnly(libs.jgit)
+                compileOnly(libs.mixpanel)
 
-                implementation(projects.common.analytics)
-                implementation(projects.common.util)
+                compileOnly(projects.common.analytics)
+                compileOnly(projects.common.util)
             }
         }
     }
@@ -57,14 +53,6 @@ buildConfig {
     buildConfigField("String", "RUNTIME_DEPENDENCY_VERSION", "")
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "")
     buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "")
-}
-
-multiDimensionTarget.configureSourceSet { sourceSet ->
-    if (sourceSet.isRoot) {
-        kotlinSourceSet.kotlin.srcDir(
-            "src/kgp_common/gradle_common/kotlin-compiler-attribute-local",
-        )
-    }
 }
 
 multiDimensionTarget.configureSourceSet { sourceSet ->

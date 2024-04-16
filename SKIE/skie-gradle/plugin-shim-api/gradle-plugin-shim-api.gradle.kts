@@ -12,9 +12,6 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(projects.common.configuration.configurationDeclaration)
-                implementation(projects.common.configuration.configurationApi)
-
                 compileOnly(libs.plugin.kotlin.gradle)
                 compileOnly(libs.plugin.kotlin.gradle.api)
             }
