@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.coroutines
 import co.touchlab.skie.plugin.shim.ShimEntrypoint
 import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.getKonanHome
-import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
 import org.gradle.api.provider.Provider
@@ -12,26 +11,27 @@ import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.*
 
-internal fun SkieTarget.configureMinOsVersionIfNeeded(shims: ShimEntrypoint) {
-    if (!project.isCoroutinesInteropEnabled) {
-        return
-    }
-
-    val distribution = distribution(shims).get()
-
-    fun overrideVersion(name: String) {
-        val currentMinVersion = distribution.properties.targetString(name, konanTarget)
-        val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(konanTarget.name)
-
-        if (currentMinVersion == null || currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
-            addFreeCompilerArgs("$overrideKonanPropertiesKey=${name}.${konanTarget.name}=$minRequiredVersion")
+internal fun SkieTarget.configureMinOsVersionIfNeeded(shims: ShimEntrypoint) = with(shims.launchScheduler) {
+    project.afterEvaluateOrAfterFinaliseRefinesEdges {
+        if (!project.isCoroutinesInteropEnabled) {
+            return@afterEvaluateOrAfterFinaliseRefinesEdges
         }
+
+        val distribution = distribution(shims).get()
+
+        fun overrideVersion(name: String) {
+            val currentMinVersion = distribution.properties.targetString(name, konanTarget)
+            val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(konanTarget.name)
+
+            if (currentMinVersion == null || currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
+                addFreeCompilerArgs("$overrideKonanPropertiesKey=${name}.${konanTarget.name}=$minRequiredVersion")
+            }
+        }
+
+        overrideVersion("osVersionMin")
+        overrideVersion("osVersionMinSinceXcode15")
     }
-
-    overrideVersion("osVersionMin")
-    overrideVersion("osVersionMinSinceXcode15")
 }
-
 
 private fun SkieTarget.distribution(shims: ShimEntrypoint): Provider<Distribution> = freeCompilerArgs.map {
     val overrideKonanProperties = parseOverrideKonanProperties(it)

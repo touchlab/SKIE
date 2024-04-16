@@ -4,4 +4,6 @@ interface ShimEntrypoint {
     val distributionProvider: DistributionProvider
 
     val nativeCompilerDownloaderProvider: NativeCompilerDownloaderProvider
+
+    val launchScheduler: LaunchScheduler
 }

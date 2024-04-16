@@ -5,4 +5,5 @@ package co.touchlab.skie.plugin.shim
 class ShimEntrypointImpl: ShimEntrypoint {
     override val distributionProvider = DistributionProviderImpl
     override val nativeCompilerDownloaderProvider = NativeCompilerDownloaderProviderImpl
+    override val launchScheduler = LaunchScheduler()
 }
