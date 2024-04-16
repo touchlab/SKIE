@@ -1,7 +1,5 @@
 package co.touchlab.skie.util
 
-import org.jetbrains.kotlin.backend.common.pop
-
 class SafeRecursionEngine<INPUT>(private val block: (INPUT) -> Unit) {
 
     private var isActive = false
