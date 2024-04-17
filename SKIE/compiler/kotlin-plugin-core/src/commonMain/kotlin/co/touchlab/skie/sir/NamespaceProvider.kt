@@ -4,31 +4,34 @@ import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirClassParent
 import co.touchlab.skie.kir.element.KirModule
-import co.touchlab.skie.oir.OirProvider
+import co.touchlab.skie.kir.element.KirModule.Origin
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirIrFile
+import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
 class NamespaceProvider(
     kirProvider: KirProvider,
-    private val oirProvider: OirProvider,
     private val sirProvider: SirProvider,
+    private val sirFileProvider: SirFileProvider,
 ) {
+
+    private val skieDirectoryName = "Skie"
 
     private val namespaceClassCache = mutableMapOf<KirClass, SirClass>()
 
     private val moduleNamespaceCache = mutableMapOf<KirModule, SirClass>()
 
-    private val namespaceDeclarationFile by lazy {
-        sirProvider.fileProvider.getIrFile(oirProvider.skieModule.name, "Namespace")
+    private val namespaceClassDeclarationFile by lazy {
+        getSkieNamespaceFile("Namespace")
     }
 
     private val namespaceBaseClass: SirClass by lazy {
         SirClass(
             baseName = "Skie",
-            parent = namespaceDeclarationFile,
+            parent = namespaceClassDeclarationFile,
             kind = SirClass.Kind.Enum,
         )
     }
@@ -41,8 +44,14 @@ class NamespaceProvider(
             .flatten()
             .toSet()
 
+    fun getSkieNamespaceWrittenSourceFile(name: String): SirSourceFile =
+        sirFileProvider.getWrittenSourceFile(skieDirectoryName, name)
+
+    fun getSkieNamespaceFile(name: String): SirIrFile =
+        sirFileProvider.getIrFile(skieDirectoryName, name)
+
     fun getNamespaceFile(kirClass: KirClass): SirIrFile =
-        sirProvider.fileProvider.getIrFile(kirClass.module.moduleNamespaceName, kirClass.swiftFileName)
+        sirFileProvider.getIrFile(kirClass.module.moduleDirectoryName, kirClass.swiftFileName)
 
     fun getNamespaceExtension(kirClass: KirClass): SirExtension =
         sirProvider.getExtension(
@@ -92,6 +101,12 @@ class NamespaceProvider(
             return if (canUseShortName) this.shortModuleNamespaceName else this.fullModuleNamespaceName
         }
 
+    private val KirModule.moduleDirectoryName: String
+        get() = when (this.module.origin) {
+            Origin.SkieGenerated, Origin.SkieRuntime -> skieDirectoryName
+            Origin.KnownExternal, Origin.UnknownExternal, Origin.Kotlin -> moduleNamespaceName
+        }
+
     private val KirModule.shortModuleNamespaceNameCollides: Boolean
         get() = this in kotlinModulesWithShortModuleNamespaceNameCollision
 
@@ -104,10 +119,10 @@ class NamespaceProvider(
 
     private val KirModule.shortModuleNamespaceName: String
         get() = when (this.module.origin) {
-            KirModule.Origin.SkieRuntime, KirModule.Origin.SkieGenerated -> oirProvider.skieModule.name
-            KirModule.Origin.KnownExternal -> this.name.toValidSwiftIdentifier()
-            KirModule.Origin.UnknownExternal -> "_unknown_"
-            KirModule.Origin.Kotlin -> {
+            Origin.SkieGenerated -> "SkieGenerated"
+            Origin.KnownExternal -> this.name.toValidSwiftIdentifier()
+            Origin.UnknownExternal -> "_unknown_"
+            Origin.SkieRuntime, Origin.Kotlin -> {
                 this.name
                     .substringAfter(":")
                     .changeNamingConventionToPascalCase()
@@ -117,14 +132,13 @@ class NamespaceProvider(
 
     private val KirModule.fullModuleNamespaceName: String
         get() = when (this.module.origin) {
-            KirModule.Origin.SkieRuntime,
-            KirModule.Origin.SkieGenerated,
-            KirModule.Origin.KnownExternal,
-            KirModule.Origin.UnknownExternal,
+            Origin.SkieGenerated,
+            Origin.KnownExternal,
+            Origin.UnknownExternal,
             -> {
                 this.shortModuleNamespaceName
             }
-            KirModule.Origin.Kotlin -> {
+            Origin.SkieRuntime, Origin.Kotlin -> {
                 this.name
                     .replace(":", "__")
                     .toValidSwiftIdentifier()

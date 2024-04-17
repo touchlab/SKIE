@@ -14,7 +14,7 @@ object SwiftRuntimeGenerator : SirPhase {
         getSwiftRuntimeFiles().forEach {
             val baseFileContent = it.readText()
 
-            sirFileProvider.getWrittenSourceFileFromSkieNamespace(it.swiftFileName).content = "// $GeneratedBySkieComment\n\n$baseFileContent"
+            namespaceProvider.getSkieNamespaceWrittenSourceFile(it.swiftFileName).content = "// $GeneratedBySkieComment\n\n$baseFileContent"
         }
     }
 

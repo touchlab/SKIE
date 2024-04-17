@@ -33,8 +33,8 @@ class SirPhaseContext(
 
     override val namespaceProvider: NamespaceProvider = NamespaceProvider(
         kirProvider = kirProvider,
-        oirProvider = oirProvider,
         sirProvider = sirProvider,
+        sirFileProvider = sirFileProvider,
     )
 
     override val externalApiNotesProvider: ExternalApiNotesProvider = ExternalApiNotesProvider(

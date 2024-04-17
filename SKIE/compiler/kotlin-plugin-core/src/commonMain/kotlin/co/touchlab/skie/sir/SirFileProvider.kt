@@ -1,6 +1,5 @@
 package co.touchlab.skie.sir
 
-import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirModule
@@ -14,7 +13,6 @@ import kotlin.io.path.extension
 
 class SirFileProvider(
     private val skieModule: SirModule.Skie,
-    private val oirProvider: OirProvider,
     private val skieBuildDirectory: SkieBuildDirectory,
 ) {
 
@@ -24,11 +22,8 @@ class SirFileProvider(
 
     private val generatedSourceFileByPathCache = mutableMapOf<String, SirSourceFile>()
 
-    private val skieNamespace: String
-        get() = oirProvider.skieModule.name
-
-    fun getWrittenSourceFileFromSkieNamespace(name: String): SirSourceFile {
-        val path = relativePath(skieNamespace, name)
+    fun getWrittenSourceFile(namespace: String, name: String): SirSourceFile {
+        val path = relativePath(namespace, name)
 
         check(path.asCacheKey !in generatedSourceFileByPathCache) {
             "Generated source file for $path already exists. Combining written and generated source files is not supported."
@@ -48,9 +43,6 @@ class SirFileProvider(
             SirSourceFile(irFile.module, irFile.relativePath, irFile)
         }
     }
-
-    fun getIrFileFromSkieNamespace(name: String): SirIrFile =
-        getIrFile(skieNamespace, name)
 
     fun getIrFile(namespace: String, name: String): SirIrFile =
         irFileByPathCache.getOrPut(relativePath(namespace, name).asCacheKey) {

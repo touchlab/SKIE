@@ -28,7 +28,7 @@ class FlowConversionConstructorsGenerator(
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        val file = sirFileProvider.getIrFileFromSkieNamespace("FlowConversions")
+        val file = namespaceProvider.getSkieNamespaceFile("FlowConversions")
 
         SupportedFlow.values().forEach {
             it.generateAllConversions(file)

@@ -33,9 +33,9 @@ class SirProvider(
 
     val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
 
-    val unknownModule: SirModule.Unknown = SirModule.Unknown()
+    private val unknownModule: SirModule.Unknown = SirModule.Unknown()
 
-    val fileProvider: SirFileProvider = SirFileProvider(skieModule, oirProvider, skieBuildDirectory)
+    val fileProvider: SirFileProvider = SirFileProvider(skieModule, skieBuildDirectory)
 
     val sirBuiltins by lazy {
         SirBuiltins(this, rootConfiguration)
