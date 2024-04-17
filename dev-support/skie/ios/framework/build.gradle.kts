@@ -1,37 +1,15 @@
 import co.touchlab.skie.configuration.DefaultArgumentInterop
+import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.configuration.ExperimentalFeatures
+import co.touchlab.skie.configuration.FunctionInterop
+import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.SuppressSkieWarning
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     id("dev.multiplatform")
 
     id("co.touchlab.skie")
-}
-
-skie {
-//     isEnabled = false
-    analytics {
-//        enabled = false
-        disableUpload = true
-    }
-
-    build {
-        enableParallelSwiftCompilation = true
-    }
-
-    features {
-       defaultArgumentsInExternalLibraries = true
-//         coroutinesInterop.set(false)
-        group {
-            ExperimentalFeatures.Enabled(true)
-            DefaultArgumentInterop.Enabled(true)
-        }
-    }
-
-    debug {
-        printSkiePerformanceLogs.set(true)
-        crashOnSoftErrors.set(true)
-    }
 }
 
 val performanceBenchmarkLibraries = listOf(
@@ -75,13 +53,45 @@ val performanceBenchmarkLibraries = listOf(
     "com.splendo.kaluga:system-iosarm64:1.2.1",
 )
 
+skie {
+//     isEnabled = false
+    analytics {
+//        enabled = false
+        disableUpload = true
+    }
+
+    build {
+        enableParallelSwiftCompilation = true
+    }
+
+    features {
+//        defaultArgumentsInExternalLibraries = true
+//         coroutinesInterop.set(false)
+        group {
+            SuppressSkieWarning.NameCollision(true)
+            ExperimentalFeatures.Enabled(true)
+//             DefaultArgumentInterop.Enabled(false)
+//             SealedInterop.Enabled(false)
+//             EnumInterop.Enabled(false)
+//             FunctionInterop.FileScopeConversion.Enabled(false)
+//             FunctionInterop.LegacyName(true)
+        }
+    }
+
+    debug {
+        printSkiePerformanceLogs.set(true)
+        crashOnSoftErrors.set(true)
+    }
+}
+
 kotlin {
     ios()
     iosSimulatorArm64()
 
+//     val exportedLibraries = performanceBenchmarkLibraries
     val exportedLibraries = listOf<String>(
-//         "com.soywiz.korge:korge-core:5.0.6"
     )
+//     ) + performanceBenchmarkLibraries
 
     targets.withType<KotlinNativeTarget> {
         binaries {
