@@ -96,9 +96,11 @@ class NamespaceProvider(
 
     private val KirModule.moduleNamespaceName: String
         get() {
-            val canUseShortName = !this.shortModuleNamespaceNameCollides
+            val shortModuleNamespaceName = this.shortModuleNamespaceName
 
-            return if (canUseShortName) this.shortModuleNamespaceName else this.fullModuleNamespaceName
+            val canUseShortName = !this.shortModuleNamespaceNameCollides && shortModuleNamespaceName != sirProvider.skieModule.name.toValidSwiftIdentifier()
+
+            return if (canUseShortName) shortModuleNamespaceName else this.fullModuleNamespaceName
         }
 
     private val KirModule.moduleDirectoryName: String
