@@ -13,6 +13,11 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
 abstract class SkieRuntime : Plugin<Project> {
 
+    /*
+     * We add dependency on stdlib as `compileOnly` as we don't want to override users'
+     * stdlib version in their projects. We also can't use `MultiDimensionTargetExtension` here,
+     * as it's not to be used with user-consumable dependencies.
+     */
     override fun apply(target: Project): Unit = with(target) {
         apply<SkieBase>()
         apply<KotlinMultiplatformPluginWrapper>()
@@ -20,7 +25,7 @@ abstract class SkieRuntime : Plugin<Project> {
         extensions.configure<KotlinMultiplatformExtension> {
             val commonMain by sourceSets.getting {
                 dependencies {
-                    implementation(kotlin("stdlib-common"))
+                    compileOnly(kotlin("stdlib-common"))
                 }
             }
         }
@@ -28,11 +33,11 @@ abstract class SkieRuntime : Plugin<Project> {
         afterEvaluate {
             extensions.getByType<KotlinMultiplatformExtension>().apply {
                 sourceSets["jvmMain"].dependencies {
-                    implementation(kotlin("stdlib"))
+                    compileOnly(kotlin("stdlib"))
                 }
 
                 sourceSets["jsMain"].dependencies {
-                    implementation(kotlin("stdlib-js"))
+                    compileOnly(kotlin("stdlib-js"))
                 }
             }
         }
