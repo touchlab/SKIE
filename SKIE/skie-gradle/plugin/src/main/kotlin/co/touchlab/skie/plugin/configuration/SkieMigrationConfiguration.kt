@@ -23,8 +23,7 @@ abstract class SkieMigrationConfiguration @Inject constructor(objects: ObjectFac
      * SKIE corrects this behavior and always exports `toString()` as `description` and `hashCode()` as `hash`.
      * To enable the original behavior, set this flag to `true`.
      */
-    // TODO Set this to false once we generate custom headers
-    val anyMethodsAsFunctions: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
+    val anyMethodsAsFunctions: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(

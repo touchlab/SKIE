@@ -24,7 +24,9 @@ internal class CreateKirSimpleFunctionsPhase(
 
     private val convertedPropertyKindLazyInitializers = mutableListOf<() -> Unit>()
 
-    private val needsDescriptionAndHashFunctions = SkieConfigurationFlag.Migration_AnyMethodsAsFunctions in context.rootConfiguration.enabledFlags
+    // WIP Change back once we generate custom header
+//     private val needsDescriptionAndHashFunctions = SkieConfigurationFlag.Migration_AnyMethodsAsFunctions in context.rootConfiguration.enabledFlags
+    private val needsDescriptionAndHashFunctions = true
 
     context(KirCompilerPhase.Context)
     override suspend fun execute() {

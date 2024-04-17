@@ -28,7 +28,10 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
 
     context(KirPhase.Context)
     override fun isActive(): Boolean =
-        SkieConfigurationFlag.Migration_AnyMethodsAsFunctions.isDisabled
+        // WIP Change back once we generate custom header
+        // WIP Add tests for this flag and functionality
+        false
+//         SkieConfigurationFlag.Migration_AnyMethodsAsFunctions.isDisabled
 
     private val cache = mutableMapOf<FunctionDescriptor, KirProperty>()
 

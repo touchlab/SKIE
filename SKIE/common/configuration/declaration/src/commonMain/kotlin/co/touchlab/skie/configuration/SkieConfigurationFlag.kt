@@ -13,7 +13,6 @@ enum class SkieConfigurationFlag {
     Build_ConcurrentSkieCompilation,
 
     Migration_WildcardExport,
-    // TODO Add tests once we implement custom header generation
     Migration_AnyMethodsAsFunctions,
 
     Debug_VerifyDescriptorProviderConsistency,
