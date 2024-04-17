@@ -32,9 +32,9 @@ object CreateStableNameTypeAliasesPhase : SirPhase {
         val typeAlias = SirTypeAlias(
             baseName = "Kotlin",
             parent = if (shouldGenerateFileForEachExportedClass) {
-                classNamespaceProvider.getNamespace(kirClass)
+                namespaceProvider.getNamespaceExtension(kirClass)
             } else {
-                classNamespaceProvider.getNamespaceClass(kirClass)
+                namespaceProvider.getNamespaceClass(kirClass)
             },
             visibility = SirVisibility.PublicButReplaced,
         ) {

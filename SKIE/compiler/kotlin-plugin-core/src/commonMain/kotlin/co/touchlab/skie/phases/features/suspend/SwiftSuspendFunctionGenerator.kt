@@ -37,7 +37,7 @@ class SwiftSuspendFunctionGenerator {
 
         val extension = sirProvider.getExtension(
             classDeclaration = bridgeModel.extensionTypeDeclarationForBridgingFunction,
-            parent = classNamespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
+            parent = namespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
         )
 
         bridgeModel.suspendKirFunction.bridgedSirFunction = extension.createSwiftBridgingFunction(bridgeModel)

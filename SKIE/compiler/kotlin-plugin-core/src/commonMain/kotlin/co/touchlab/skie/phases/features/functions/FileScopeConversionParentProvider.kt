@@ -55,7 +55,7 @@ class FileScopeConversionParentProvider(
         return when (callableDeclaration.origin) {
             KirCallableDeclaration.Origin.Member -> error("Member callable are not supported. Was: $callableDeclaration")
             KirCallableDeclaration.Origin.Extension -> getExtensions(callableDeclaration, sirCallableDeclaration)
-            KirCallableDeclaration.Origin.Global -> context.classNamespaceProvider.getNamespaceFile(callableDeclaration.owner).let(::listOf)
+            KirCallableDeclaration.Origin.Global -> context.namespaceProvider.getNamespaceFile(callableDeclaration.owner).let(::listOf)
         }
     }
 
@@ -103,8 +103,8 @@ class FileScopeConversionParentProvider(
     ): SirIrFile {
         val extensionReceiverKirClass = getExtensionReceiverKirClassIfExists(parentType)
 
-        return extensionReceiverKirClass?.let { context.classNamespaceProvider.getNamespaceFile(it) }
-            ?: context.classNamespaceProvider.getNamespaceFile(callableDeclaration.owner)
+        return extensionReceiverKirClass?.let { context.namespaceProvider.getNamespaceFile(it) }
+            ?: context.namespaceProvider.getNamespaceFile(callableDeclaration.owner)
     }
 
     private fun getExtensionReceiverKirClassIfExists(parentType: SirType): KirClass? =

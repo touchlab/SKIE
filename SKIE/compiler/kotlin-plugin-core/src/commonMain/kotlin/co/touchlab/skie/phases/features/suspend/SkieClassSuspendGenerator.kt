@@ -29,7 +29,7 @@ class SkieClassSuspendGenerator {
     private fun createSkieClass(suspendFunctionOwner: KirClass): SirClass =
         SirClass(
             baseName = "Suspend",
-            parent = classNamespaceProvider.getNamespace(suspendFunctionOwner),
+            parent = namespaceProvider.getNamespaceExtension(suspendFunctionOwner),
             visibility = SirVisibility.PublicButReplaced,
             kind = SirClass.Kind.Struct,
         ).apply {
@@ -42,7 +42,7 @@ class SkieClassSuspendGenerator {
     private fun generateNamespaceProvider(suspendFunctionOwner: KirClass, skieClass: SirClass) {
         SirSimpleFunction(
             identifier = "skie",
-            parent = classNamespaceProvider.getNamespaceFile(suspendFunctionOwner),
+            parent = namespaceProvider.getNamespaceFile(suspendFunctionOwner),
             returnType = sirBuiltins.Swift.Void.defaultType,
         ).apply {
             copyTypeParametersFrom(skieClass)

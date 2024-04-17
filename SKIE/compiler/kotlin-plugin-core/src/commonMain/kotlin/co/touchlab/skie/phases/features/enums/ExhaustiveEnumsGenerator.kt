@@ -78,9 +78,9 @@ private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
         parent = enumKirClass.originalSirClass.namespace?.let { namespace ->
             sirProvider.getExtension(
                 classDeclaration = namespace.classDeclaration,
-                parent = classNamespaceProvider.getNamespaceFile(enumKirClass),
+                parent = namespaceProvider.getNamespaceFile(enumKirClass),
             )
-        } ?: classNamespaceProvider.getNamespaceFile(enumKirClass),
+        } ?: namespaceProvider.getNamespaceFile(enumKirClass),
         kind = SirClass.Kind.Enum,
     ).apply {
         addEnumCases(enumKirClass)
@@ -146,7 +146,7 @@ private fun SirClass.addCompanionObjectPropertyIfNeeded(enum: KirClass) {
 
 context(SirPhase.Context)
 private fun KirClass.addConversionExtensions(bridgedEnum: SirClass) {
-    classNamespaceProvider.getNamespaceFile(this).apply {
+    namespaceProvider.getNamespaceFile(this).apply {
         addToKotlinConversionExtension(originalSirClass, bridgedEnum)
         addToSwiftConversionExtension(originalSirClass, bridgedEnum)
     }
@@ -200,7 +200,7 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
 
     val typeAlias = SirTypeAlias(
         baseName = "Enum",
-        parent = classNamespaceProvider.getNamespace(kirClass),
+        parent = namespaceProvider.getNamespaceExtension(kirClass),
         visibility = SirVisibility.PublicButReplaced,
     ) {
         bridgedEnum.defaultType.withFqName()

@@ -7,7 +7,7 @@ import co.touchlab.skie.oir.type.translation.OirTypeTranslator
 import co.touchlab.skie.phases.BackgroundPhase
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.oir.util.ExternalApiNotesProvider
-import co.touchlab.skie.sir.ClassNamespaceProvider
+import co.touchlab.skie.sir.NamespaceProvider
 import co.touchlab.skie.sir.SirFileProvider
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.builtin.SirBuiltins
@@ -31,7 +31,7 @@ class SirPhaseContext(
 
     override val sirBuiltins: SirBuiltins = sirProvider.sirBuiltins
 
-    override val classNamespaceProvider: ClassNamespaceProvider = ClassNamespaceProvider(
+    override val namespaceProvider: NamespaceProvider = NamespaceProvider(
         kirProvider = kirProvider,
         oirProvider = oirProvider,
         sirProvider = sirProvider,

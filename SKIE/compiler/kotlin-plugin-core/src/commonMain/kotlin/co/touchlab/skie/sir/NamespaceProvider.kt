@@ -11,7 +11,7 @@ import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
-class ClassNamespaceProvider(
+class NamespaceProvider(
     kirProvider: KirProvider,
     private val oirProvider: OirProvider,
     private val sirProvider: SirProvider,
@@ -21,30 +21,30 @@ class ClassNamespaceProvider(
 
     private val moduleNamespaceCache = mutableMapOf<KirModule, SirClass>()
 
-    private val classNamespaceFile by lazy {
+    private val namespaceDeclarationFile by lazy {
         sirProvider.fileProvider.getIrFile(oirProvider.skieModule.name, "Namespace")
     }
 
-    private val classNamespaceBaseClass: SirClass by lazy {
+    private val namespaceBaseClass: SirClass by lazy {
         SirClass(
             baseName = "Skie",
-            parent = classNamespaceFile,
+            parent = namespaceDeclarationFile,
             kind = SirClass.Kind.Enum,
         )
     }
 
-    private val kotlinModulesWithShortNameCollision =
+    private val kotlinModulesWithShortModuleNamespaceNameCollision =
         kirProvider.kotlinModules
-            .groupBy { it.shortNamespaceModuleName }
+            .groupBy { it.shortModuleNamespaceName }
             .filter { it.value.size > 1 }
             .values
             .flatten()
             .toSet()
 
     fun getNamespaceFile(kirClass: KirClass): SirIrFile =
-        sirProvider.fileProvider.getIrFile(kirClass.skieFileNamespaceName, kirClass.skieFileName)
+        sirProvider.fileProvider.getIrFile(kirClass.module.moduleNamespaceName, kirClass.swiftFileName)
 
-    fun getNamespace(kirClass: KirClass): SirExtension =
+    fun getNamespaceExtension(kirClass: KirClass): SirExtension =
         sirProvider.getExtension(
             classDeclaration = getNamespaceClass(kirClass),
             parent = getNamespaceFile(kirClass),
@@ -62,21 +62,21 @@ class ClassNamespaceProvider(
     private fun getNamespaceClass(classParent: KirClassParent): SirClass =
         when (classParent) {
             is KirClass -> this.getNamespaceClass(classParent)
-            is KirModule -> getModuleNamespace(classParent)
+            is KirModule -> getModuleNamespaceClass(classParent)
         }
 
-    private fun getModuleNamespace(module: KirModule): SirClass =
+    private fun getModuleNamespaceClass(module: KirModule): SirClass =
         moduleNamespaceCache.getOrPut(module) {
             val sirClass = SirClass(
-                baseName = module.namespaceModuleName,
-                parent = classNamespaceBaseClass,
+                baseName = module.moduleNamespaceName,
+                parent = namespaceBaseClass,
                 kind = SirClass.Kind.Enum,
             )
 
-            if (!module.shortNameCollides) {
+            if (!module.shortModuleNamespaceNameCollides) {
                 SirTypeAlias(
-                    baseName = module.fullNamespaceModuleName,
-                    parent = classNamespaceBaseClass,
+                    baseName = module.fullModuleNamespaceName,
+                    parent = namespaceBaseClass,
                 ) {
                     sirClass.defaultType
                 }
@@ -85,43 +85,44 @@ class ClassNamespaceProvider(
             sirClass
         }
 
-    private val KirModule.namespaceModuleName: String
+    private val KirModule.moduleNamespaceName: String
         get() {
-            val canUseShortName = !this.shortNameCollides && shortNamespaceModuleName != sirProvider.skieModule.name.toValidSwiftIdentifier()
+            val canUseShortName = !this.shortModuleNamespaceNameCollides
 
-            return if (canUseShortName) this.shortNamespaceModuleName else this.fullNamespaceModuleName
+            return if (canUseShortName) this.shortModuleNamespaceName else this.fullModuleNamespaceName
         }
 
-    private val KirClass.skieFileNamespaceName: String
-        get() {
-            val isProducedBySkie = when (this.module.origin) {
-                KirModule.Origin.SkieRuntime, KirModule.Origin.SkieGenerated -> true
-                KirModule.Origin.Kotlin, KirModule.Origin.External -> false
-            }
-
-            return if (isProducedBySkie) oirProvider.skieModule.name else module.namespaceModuleName
-        }
-
-    private val KirModule.shortNameCollides: Boolean
-        get() = this in kotlinModulesWithShortNameCollision
+    private val KirModule.shortModuleNamespaceNameCollides: Boolean
+        get() = this in kotlinModulesWithShortModuleNamespaceNameCollision
 
     private val KirClass.classNamespaceSimpleName: String
         get() = this.kotlinIdentifier.toValidSwiftIdentifier()
 
     @Suppress("RecursivePropertyAccessor")
-    private val KirClass.skieFileName: String
-        get() = ((this.parent as? KirClass)?.skieFileName?.let { "$it." } ?: "") + this.classNamespaceSimpleName
+    private val KirClass.swiftFileName: String
+        get() = ((this.parent as? KirClass)?.swiftFileName?.let { "$it." } ?: "") + this.classNamespaceSimpleName
 
-    private val KirModule.shortNamespaceModuleName: String
-        get() = this.name
-            .substringAfter(":")
-            .changeNamingConventionToPascalCase()
-            .toValidSwiftIdentifier()
+    private val KirModule.shortModuleNamespaceName: String
+        get() = when (this.module.origin) {
+            KirModule.Origin.SkieRuntime, KirModule.Origin.SkieGenerated -> oirProvider.skieModule.name
+            KirModule.Origin.External -> this.name.toValidSwiftIdentifier()
+            KirModule.Origin.Kotlin -> {
+                this.name
+                    .substringAfter(":")
+                    .changeNamingConventionToPascalCase()
+                    .toValidSwiftIdentifier()
+            }
+        }
 
-    private val KirModule.fullNamespaceModuleName: String
-        get() = this.name
-            .replace(":", "__")
-            .toValidSwiftIdentifier()
+    private val KirModule.fullModuleNamespaceName: String
+        get() = when (this.module.origin) {
+            KirModule.Origin.SkieRuntime, KirModule.Origin.SkieGenerated, KirModule.Origin.External -> this.shortModuleNamespaceName
+            KirModule.Origin.Kotlin -> {
+                this.name
+                    .replace(":", "__")
+                    .toValidSwiftIdentifier()
+            }
+        }
 }
 
 private fun String.changeNamingConventionToPascalCase(): String =
