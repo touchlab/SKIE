@@ -3,7 +3,6 @@ package co.touchlab.skie.phases.features.enums
 import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirEnumEntry
-import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.isExported
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier

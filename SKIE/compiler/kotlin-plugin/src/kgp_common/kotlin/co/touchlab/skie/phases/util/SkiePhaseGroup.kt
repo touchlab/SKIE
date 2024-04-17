@@ -1,10 +1,10 @@
 package co.touchlab.skie.phases.util
 
+import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.BackgroundPhase
 import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.phases.ScheduledPhase
-import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
 

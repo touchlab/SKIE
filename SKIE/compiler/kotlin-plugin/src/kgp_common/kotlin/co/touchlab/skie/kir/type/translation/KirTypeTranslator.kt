@@ -5,10 +5,10 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.type.BlockPointerKirType
 import co.touchlab.skie.kir.type.NonNullReferenceKirType
 import co.touchlab.skie.kir.type.ReferenceKirType
+import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 import co.touchlab.skie.oir.type.SpecialReferenceOirType
 import co.touchlab.skie.oir.type.VoidOirType
-import co.touchlab.skie.kir.type.SupportedFlow
 import org.jetbrains.kotlin.backend.konan.isExternalObjCClass
 import org.jetbrains.kotlin.backend.konan.isInlined
 import org.jetbrains.kotlin.backend.konan.isKotlinObjCClass

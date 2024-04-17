@@ -2,6 +2,8 @@
 
 package co.touchlab.skie.context
 
+import co.touchlab.skie.configuration.SwiftCompilerConfiguration
+import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
 import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
@@ -9,12 +11,10 @@ import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.descriptor.NativeDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.BackgroundPhase
+import co.touchlab.skie.phases.ForegroundCompilerPhase
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
-import co.touchlab.skie.configuration.SwiftCompilerConfiguration
-import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
-import co.touchlab.skie.phases.ForegroundCompilerPhase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

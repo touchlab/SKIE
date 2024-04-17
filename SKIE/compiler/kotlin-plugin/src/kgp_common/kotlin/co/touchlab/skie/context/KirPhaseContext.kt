@@ -7,8 +7,8 @@ import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
 import co.touchlab.skie.kir.type.translation.KirCustomTypeMappers
 import co.touchlab.skie.kir.type.translation.KirDeclarationTypeTranslator
 import co.touchlab.skie.kir.type.translation.KirTypeTranslator
-import co.touchlab.skie.phases.KirCompilerPhase
 import co.touchlab.skie.phases.ForegroundCompilerPhase
+import co.touchlab.skie.phases.KirCompilerPhase
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
 class KirPhaseContext(

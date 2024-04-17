@@ -2,13 +2,13 @@ package co.touchlab.skie.phases.features.defaultarguments
 
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.signature.Signature
-import co.touchlab.skie.sir.signature.SirHierarchyCache
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.getEntireOverrideHierarchy
 import co.touchlab.skie.sir.element.isExported
+import co.touchlab.skie.sir.signature.Signature
+import co.touchlab.skie.sir.signature.SirHierarchyCache
 
 object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
 

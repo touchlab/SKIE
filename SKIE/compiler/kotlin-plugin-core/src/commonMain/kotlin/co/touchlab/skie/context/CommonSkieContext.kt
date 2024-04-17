@@ -1,9 +1,9 @@
 package co.touchlab.skie.context
 
+import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
-import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.util.CompilerShim
 import co.touchlab.skie.util.FrameworkLayout

@@ -1,8 +1,8 @@
 package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
-import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.phases.ClassExportCorePhase
+import co.touchlab.skie.phases.ClassExportPhase
 
 object VerifyNoBitcodeEmbeddingPhase : ClassExportCorePhase {
 

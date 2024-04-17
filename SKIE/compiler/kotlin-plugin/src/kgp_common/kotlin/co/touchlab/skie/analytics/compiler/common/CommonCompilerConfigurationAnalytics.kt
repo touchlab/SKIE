@@ -3,8 +3,8 @@
 package co.touchlab.skie.analytics.compiler.common
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.util.toPrettyJson
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
+import co.touchlab.skie.util.toPrettyJson
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.backend.konan.BinaryOptions
 import org.jetbrains.kotlin.backend.konan.KonanConfig

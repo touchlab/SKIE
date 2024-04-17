@@ -1,8 +1,8 @@
 package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.phases.ClassExportCompilerPhase
+import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
 
