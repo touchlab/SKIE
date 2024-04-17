@@ -105,7 +105,8 @@ class NamespaceProvider(
     private val KirModule.shortModuleNamespaceName: String
         get() = when (this.module.origin) {
             KirModule.Origin.SkieRuntime, KirModule.Origin.SkieGenerated -> oirProvider.skieModule.name
-            KirModule.Origin.External -> this.name.toValidSwiftIdentifier()
+            KirModule.Origin.KnownExternal -> this.name.toValidSwiftIdentifier()
+            KirModule.Origin.UnknownExternal -> "_unknown_"
             KirModule.Origin.Kotlin -> {
                 this.name
                     .substringAfter(":")
@@ -116,7 +117,13 @@ class NamespaceProvider(
 
     private val KirModule.fullModuleNamespaceName: String
         get() = when (this.module.origin) {
-            KirModule.Origin.SkieRuntime, KirModule.Origin.SkieGenerated, KirModule.Origin.External -> this.shortModuleNamespaceName
+            KirModule.Origin.SkieRuntime,
+            KirModule.Origin.SkieGenerated,
+            KirModule.Origin.KnownExternal,
+            KirModule.Origin.UnknownExternal,
+            -> {
+                this.shortModuleNamespaceName
+            }
             KirModule.Origin.Kotlin -> {
                 this.name
                     .replace(":", "__")

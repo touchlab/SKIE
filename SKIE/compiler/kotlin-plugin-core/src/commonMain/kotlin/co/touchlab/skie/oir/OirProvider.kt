@@ -55,8 +55,13 @@ class OirProvider(
 
     fun getKotlinModule(kirModule: KirModule): OirModule.Kotlin =
         kotlinModuleCache.getOrPut(kirModule) {
-            assert(kirModule.origin != KirModule.Origin.External) {
-                "External modules are not supported: $kirModule."
+            when (kirModule.origin) {
+                KirModule.Origin.Kotlin,
+                KirModule.Origin.SkieRuntime,
+                KirModule.Origin.SkieGenerated,
+                -> {
+                }
+                KirModule.Origin.KnownExternal, KirModule.Origin.UnknownExternal -> error("External modules are not supported: $kirModule.")
             }
 
             OirModule.Kotlin(kirModule.name)

@@ -22,6 +22,6 @@ class KirModule(
     override fun toString(): String = "${this::class.simpleName}: $name"
 
     enum class Origin {
-        Kotlin, SkieRuntime, SkieGenerated, External
+        Kotlin, SkieRuntime, SkieGenerated, KnownExternal, UnknownExternal
     }
 }

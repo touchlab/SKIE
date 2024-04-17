@@ -27,7 +27,7 @@ class ExternalApiNotesProvider(
         apiNotesModuleProvidersByModuleName.values.map { it.value }.flatMap { it.getAllApiNotesEntries() }
 
     fun findApiNotesEntry(oirClass: OirClass): ApiNotesEntry? {
-        val module = oirClass.kirClassOrNull?.let { sirProvider.findExternalModule(it) } ?: return null
+        val module = sirProvider.findModuleForKnownExternalClass(oirClass) ?: return null
 
         return apiNotesModuleProvidersByModuleName[module.name]?.value?.findApiNotesEntry(oirClass)
     }

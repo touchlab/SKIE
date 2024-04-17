@@ -46,6 +46,13 @@ class DescriptorKirProvider(
     rootConfiguration: RootConfiguration,
 ) : KirProviderDelegate {
 
+    private val externalDescriptorKirProvider = ExternalDescriptorKirProvider(
+        kirProject = kirProvider.project,
+        rootConfiguration = rootConfiguration,
+        descriptorConfigurationProvider = descriptorConfigurationProvider,
+        descriptorKirProvider = lazy { this },
+    )
+
     private val kotlinModulesMap = mutableMapOf<String, KirModule>()
 
     private val kirElementToDescriptorCache = mutableMapOf<KirElement, DeclarationDescriptor>()
@@ -64,23 +71,12 @@ class DescriptorKirProvider(
     private val kirToValueParameterDescriptorsCache = mutableMapOf<ParameterDescriptor, KirValueParameter>()
 
     override val allExternalClassesAndProtocols: Collection<KirClass>
-        get() = externalClassesAndProtocolsCache.values
-
-    private val externalClassesAndProtocolsCache = mutableMapOf<ClassDescriptor, KirClass>()
+        get() = externalDescriptorKirProvider.allExternalClassesAndProtocols
 
     override val kotlinModules: Collection<KirModule>
         get() = kotlinModulesMap.values
 
-    private val externalModule: KirModule = KirModule(
-        name = "<external>",
-        project = kirProvider.project,
-        configuration = ModuleConfiguration(rootConfiguration),
-        origin = KirModule.Origin.External,
-    )
-
     override val stdlibModule: KirModule = getKotlinModule(kotlinBuiltIns.string.module)
-
-    private val externalClassParentConfiguration = FileOrClassConfiguration.File(FileConfiguration(PackageConfiguration(externalModule.configuration)))
 
     override val kirBuiltins: DescriptorBasedKirBuiltins = DescriptorBasedKirBuiltins(
         stdlibModule = this.stdlibModule,
@@ -208,44 +204,8 @@ class DescriptorKirProvider(
         kirElementToDescriptorCache[kirElement]
 
     fun getExternalClass(descriptor: ClassDescriptor): KirClass =
-        getExternalClass(descriptor, addNSObjectSuperType = true)
+        externalDescriptorKirProvider.getExternalClass(descriptor)
 
     fun getExternalBuiltinClass(descriptor: ClassDescriptor): KirClass =
-        getExternalClass(descriptor, addNSObjectSuperType = false)
-
-    private fun getExternalClass(descriptor: ClassDescriptor, addNSObjectSuperType: Boolean): KirClass =
-        externalClassesAndProtocolsCache.getOrPut(descriptor.original) {
-            val (name, kind) = if (descriptor.kind.isInterface) {
-                descriptor.name.asString().removeSuffix("Protocol") to KirClass.Kind.Interface
-            } else {
-                descriptor.name.asString() to KirClass.Kind.Class
-            }
-
-            val kirClass = KirClass(
-                kotlinFqName = descriptor.fqNameSafe.asString(),
-                objCName = name,
-                swiftName = name,
-                parent = externalModule,
-                kind = kind,
-                origin = when {
-                    descriptor.fqNameSafe.pathSegments()[0].asString() == "platform" -> KirClass.Origin.PlatformType
-                    else -> KirClass.Origin.ExternalCinteropType
-                },
-                superTypes = if (addNSObjectSuperType && kind != KirClass.Kind.Interface) {
-                    listOf(kirBuiltins.NSObject.defaultType)
-                } else {
-                    emptyList()
-                },
-                isSealed = false,
-                hasUnexposedSealedSubclasses = false,
-                nestingLevel = CreateExposedKirTypesPhase.getNestingLevel(descriptor),
-                configuration = ClassConfiguration(externalClassParentConfiguration),
-            )
-
-            registerClass(kirClass, descriptor)
-
-            // Obj-C classes do not have type parameters in Kotlin
-
-            kirClass
-        }
+        externalDescriptorKirProvider.getExternalBuiltinClass(descriptor)
 }

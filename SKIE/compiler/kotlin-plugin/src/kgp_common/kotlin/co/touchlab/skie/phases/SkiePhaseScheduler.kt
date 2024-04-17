@@ -34,7 +34,6 @@ import co.touchlab.skie.phases.kir.InitializeKirMembersCachePhase
 import co.touchlab.skie.phases.memberconflicts.RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameConflictingCallableDeclarationsPhase
 import co.touchlab.skie.phases.memberconflicts.RenameParametersNamedSelfPhase
-import co.touchlab.skie.phases.oir.ConfigureCInteropFrameworkNameForPlatformTypesPhase
 import co.touchlab.skie.phases.oir.ConfigureExternalOirTypesBridgingPhase
 import co.touchlab.skie.phases.oir.CreateExternalOirTypesPhase
 import co.touchlab.skie.phases.oir.CreateFakeObjCConstructorsPhase
@@ -159,7 +158,6 @@ class SkiePhaseScheduler {
             InitializeOirSuperTypesPhase,
 
             CreateOirMembersPhase(context),
-            ConfigureCInteropFrameworkNameForPlatformTypesPhase,
 
             CreateKotlinSirTypesPhase(),
             CreateKotlinSirExtensionsPhase,

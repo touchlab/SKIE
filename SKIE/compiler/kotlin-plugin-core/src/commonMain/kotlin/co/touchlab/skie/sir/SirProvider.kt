@@ -1,9 +1,10 @@
 package co.touchlab.skie.sir
 
-import co.touchlab.skie.configuration.ClassInterop
 import co.touchlab.skie.configuration.RootConfiguration
-import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.kir.element.KirModule.Origin
 import co.touchlab.skie.oir.OirProvider
+import co.touchlab.skie.oir.element.OirClass
+import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirCallableDeclaration
@@ -120,17 +121,18 @@ class SirProvider(
     fun getClassByFqName(fqName: SirFqName): SirClass =
         findClassByFqName(fqName) ?: error("SirClass with fqName $fqName not found.")
 
-    fun findExternalModule(kirClass: KirClass): SirModule.External? {
-        when (kirClass.origin) {
-            KirClass.Origin.Kotlin -> error("KirClass is not external: $kirClass")
-            KirClass.Origin.ExternalCinteropType -> {}
-            KirClass.Origin.PlatformType -> {}
+    fun findModuleForKnownExternalClass(oirClass: OirClass): SirModule? {
+        val kirModule = oirClass.kirClassOrNull?.module
+
+        return if (kirModule?.origin == Origin.KnownExternal) {
+            getExternalModule(kirModule.name)
+        } else {
+            null
         }
-
-        val moduleName = kirClass.configuration[ClassInterop.CInteropFrameworkName] ?: return null
-
-        return getExternalModule(moduleName)
     }
+
+    fun getModuleForExternalClass(oirClass: OirClass): SirModule =
+        findModuleForKnownExternalClass(oirClass) ?: unknownModule
 }
 
 context(SirProvider)
