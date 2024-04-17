@@ -63,7 +63,7 @@ multiDimensionTarget.configureSourceSet { sourceSet ->
             generator(ExpectActualBuildConfigGenerator(isActualImplementation = true, internalVisibility = false))
             className.set("BuildConfig")
 
-            val kotlinPlugin = projects.compiler.kotlinPlugin.dependencyProject
+            val kotlinPlugin = projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject
 
             buildConfigField("String", "KOTLIN_PLUGIN_GROUP", kotlinPlugin.group.toString().enquoted())
             buildConfigField("String", "KOTLIN_PLUGIN_NAME", kotlinPlugin.name.enquoted())

@@ -16,7 +16,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 // WIP Remove unused
-                api(projects.compiler.kotlinPluginCore)
+                api(projects.kotlinCompiler.kotlinCompilerCore)
 
                 implementation(projects.common.analytics)
                 api(projects.common.configuration.configurationApi)

@@ -57,9 +57,9 @@ buildSetup {
         val swift by module
     }
 
-    val compiler by module {
-        val `kotlin-plugin` by module
-        val `kotlin-plugin-core` by module
+    val `kotlin-compiler` by group {
+        val core by module
+        val `linker-plugin` by module
     }
 
     val gradle by group("skie-gradle") {

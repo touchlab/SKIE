@@ -35,7 +35,7 @@ buildConfig {
 
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 
-    val kotlinPlugin = project.provider { projects.compiler.kotlinPlugin.dependencyProject }
+    val kotlinPlugin = project.provider { projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject }
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", kotlinPlugin.map { it.group.toString().enquoted() })
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", kotlinPlugin.map { it.name.enquoted() })
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", kotlinPlugin.map { it.version.toString().enquoted() })
