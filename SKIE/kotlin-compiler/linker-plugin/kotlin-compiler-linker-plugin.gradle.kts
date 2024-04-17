@@ -15,25 +15,17 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                // WIP Remove unused
                 api(projects.kotlinCompiler.kotlinCompilerCore)
 
-                implementation(projects.common.analytics)
+                api(projects.common.analytics)
                 api(projects.common.configuration.configurationApi)
                 implementation(projects.common.configuration.configurationAnnotations)
-                implementation(projects.common.configuration.configurationDeclaration)
-                implementation(projects.common.util)
+                api(projects.common.configuration.configurationDeclaration)
+                api(projects.common.util)
 
                 implementation(libs.kotlinx.coroutines.jvm)
-                implementation(projects.runtime.runtimeSwift)
 
-                implementation(libs.logback)
                 implementation(libs.kotlinx.serialization.json)
-                implementation(libs.kotlinx.serialization.yaml)
-
-                implementation(libs.jackson.databind)
-                implementation(libs.ktor.client.java)
-                implementation(libs.apache.compress)
             }
         }
     }
