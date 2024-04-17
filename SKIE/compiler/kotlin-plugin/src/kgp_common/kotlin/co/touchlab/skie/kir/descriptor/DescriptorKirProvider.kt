@@ -80,9 +80,7 @@ class DescriptorKirProvider(
 
     override val stdlibModule: KirModule = getKotlinModule(kotlinBuiltIns.string.module)
 
-    private val externalClassConfiguration = ClassConfiguration(
-        FileOrClassConfiguration.File(FileConfiguration(PackageConfiguration(externalModule.configuration))),
-    )
+    private val externalClassParentConfiguration = FileOrClassConfiguration.File(FileConfiguration(PackageConfiguration(externalModule.configuration)))
 
     override val kirBuiltins: DescriptorBasedKirBuiltins = DescriptorBasedKirBuiltins(
         stdlibModule = this.stdlibModule,
@@ -241,7 +239,7 @@ class DescriptorKirProvider(
                 isSealed = false,
                 hasUnexposedSealedSubclasses = false,
                 nestingLevel = CreateExposedKirTypesPhase.getNestingLevel(descriptor),
-                configuration = externalClassConfiguration,
+                configuration = ClassConfiguration(externalClassParentConfiguration),
             )
 
             registerClass(kirClass, descriptor)

@@ -121,8 +121,10 @@ class SirProvider(
         findClassByFqName(fqName) ?: error("SirClass with fqName $fqName not found.")
 
     fun findExternalModule(kirClass: KirClass): SirModule.External? {
-        if (kirClass.origin == KirClass.Origin.Kotlin) {
-            error("KirClass is not external: $kirClass")
+        when (kirClass.origin) {
+            KirClass.Origin.Kotlin -> error("KirClass is not external: $kirClass")
+            KirClass.Origin.ExternalCinteropType -> {}
+            KirClass.Origin.PlatformType -> {}
         }
 
         val moduleName = kirClass.configuration[ClassInterop.CInteropFrameworkName] ?: return null
