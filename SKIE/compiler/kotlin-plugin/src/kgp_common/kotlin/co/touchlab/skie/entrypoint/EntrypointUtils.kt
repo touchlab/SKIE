@@ -4,7 +4,7 @@ package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.context.ClassExportPhaseContext
-import co.touchlab.skie.context.DescriptorConversionPhaseContext
+import co.touchlab.skie.context.KirPhaseContext
 import co.touchlab.skie.context.DescriptorModificationPhaseContext
 import co.touchlab.skie.context.InitPhaseContext
 import co.touchlab.skie.context.KotlinIrPhaseContext
@@ -87,10 +87,10 @@ internal object EntrypointUtils {
         }
     }
 
-    fun runDescriptorConversionPhases(mainSkieContext: MainSkieContext, objCExportedInterfaceProvider: ObjCExportedInterfaceProvider) {
+    fun runKirPhases(mainSkieContext: MainSkieContext, objCExportedInterfaceProvider: ObjCExportedInterfaceProvider) {
         with(mainSkieContext) {
-            skiePhaseScheduler.runDescriptorConversionPhases {
-                DescriptorConversionPhaseContext(mainSkieContext, objCExportedInterfaceProvider)
+            skiePhaseScheduler.runKirPhases {
+                KirPhaseContext(mainSkieContext, objCExportedInterfaceProvider)
             }
         }
     }

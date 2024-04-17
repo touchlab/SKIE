@@ -1,3 +1,0 @@
-package co.touchlab.skie.phases
-
-interface CompilerIndependentDescriptorConversionPhase : DescriptorConversionPhase<DescriptorConversionPhase.Context>

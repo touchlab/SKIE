@@ -21,7 +21,7 @@ internal class ObjectFilesPhaseInterceptor : SameTypePhaseInterceptor<KonanConte
 
         val mainSkieContext = context.config.configuration.mainSkieContext
 
-        EntrypointUtils.runDescriptorConversionPhases(
+        EntrypointUtils.runKirPhases(
             mainSkieContext = mainSkieContext,
             objCExportedInterfaceProvider = ObjCExportedInterfaceProvider(objCExportedInterface),
         )

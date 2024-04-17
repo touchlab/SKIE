@@ -6,11 +6,11 @@ import co.touchlab.skie.kir.type.translation.KirDeclarationTypeTranslator
 import co.touchlab.skie.kir.type.translation.KirTypeTranslator
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
-interface CompilerDependentDescriptorConversionPhase :
-    DescriptorConversionPhase<CompilerDependentDescriptorConversionPhase.Context>,
-    CompilerDependentForegroundPhase<CompilerDependentDescriptorConversionPhase.Context> {
+interface CompilerDependentKirPhase :
+    KirPhase<CompilerDependentKirPhase.Context>,
+    CompilerDependentForegroundPhase<CompilerDependentKirPhase.Context> {
 
-    interface Context : DescriptorConversionPhase.Context, CompilerDependentForegroundPhase.Context {
+    interface Context : KirPhase.Context, CompilerDependentForegroundPhase.Context {
 
         override val context: Context
 

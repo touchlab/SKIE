@@ -1,11 +1,11 @@
 package co.touchlab.skie.phases.kir
 
-import co.touchlab.skie.phases.CompilerIndependentDescriptorConversionPhase
-import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.CompilerIndependentKirPhase
+import co.touchlab.skie.phases.KirPhase
 
-object InitializeKirMembersCachePhase : CompilerIndependentDescriptorConversionPhase {
+object InitializeKirMembersCachePhase : CompilerIndependentKirPhase {
 
-    context(DescriptorConversionPhase.Context)
+    context(KirPhase.Context)
     override suspend fun execute() {
         kirProvider.initializeCallableDeclarationsCache()
     }

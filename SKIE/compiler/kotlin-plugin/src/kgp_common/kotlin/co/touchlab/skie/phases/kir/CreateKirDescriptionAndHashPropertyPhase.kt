@@ -12,8 +12,8 @@ import co.touchlab.skie.kir.type.OirBasedKirType
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.oir.type.PrimitiveOirType
-import co.touchlab.skie.phases.CompilerDependentDescriptorConversionPhase
-import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.CompilerDependentKirPhase
+import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
@@ -23,23 +23,23 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
 internal class CreateKirDescriptionAndHashPropertyPhase(
-    context: CompilerDependentDescriptorConversionPhase.Context,
+    context: CompilerDependentKirPhase.Context,
 ) : BaseCreateKirMembersPhase(context) {
 
-    context(DescriptorConversionPhase.Context)
+    context(KirPhase.Context)
     override fun isActive(): Boolean =
         SkieConfigurationFlag.Migration_AnyMethodsAsFunctions.isDisabled
 
     private val cache = mutableMapOf<FunctionDescriptor, KirProperty>()
 
-    context(DescriptorConversionPhase.Context)
+    context(KirPhase.Context)
     override suspend fun execute() {
         kirProvider.kotlinClasses.forEach {
             createDescriptionProperty(it)
         }
     }
 
-    context(DescriptorConversionPhase.Context)
+    context(KirPhase.Context)
     private fun createDescriptionProperty(kirClass: KirClass) {
         if (kirClass in kirProvider.kirBuiltins.builtinClasses) {
             // TODO Implement accurate way to generate builtin members once needed

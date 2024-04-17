@@ -119,8 +119,8 @@ class SkiePhaseScheduler {
         )
     }
 
-    val descriptorConversionPhases = SkiePhaseGroup<
-            DescriptorConversionPhase<CompilerDependentDescriptorConversionPhase.Context>, CompilerDependentDescriptorConversionPhase.Context,
+    val kirPhases = SkiePhaseGroup<
+            KirPhase<CompilerDependentKirPhase.Context>, CompilerDependentKirPhase.Context,
             > { context ->
         addAll(
             VerifyDescriptorProviderConsistencyPhase,
@@ -282,8 +282,8 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runDescriptorConversionPhases(contextFactory: () -> CompilerDependentDescriptorConversionPhase.Context) {
-        descriptorConversionPhases.run(contextFactory)
+    fun runKirPhases(contextFactory: () -> CompilerDependentKirPhase.Context) {
+        kirPhases.run(contextFactory)
     }
 
     context(ScheduledPhase.Context)

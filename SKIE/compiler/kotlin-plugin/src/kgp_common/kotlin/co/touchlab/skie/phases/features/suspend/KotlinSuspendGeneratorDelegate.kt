@@ -7,8 +7,7 @@ import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
-import co.touchlab.skie.phases.CompilerDependentDescriptorConversionPhase
-import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.CompilerDependentKirPhase
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.features.suspend.kotlin.SuspendKotlinBridgeBodyGenerator
 import co.touchlab.skie.phases.util.doInPhase
@@ -151,7 +150,7 @@ class KotlinSuspendGeneratorDelegate(
         }
     }
 
-    context(CompilerDependentDescriptorConversionPhase.Context)
+    context(CompilerDependentKirPhase.Context)
     private fun configureFlowMappingForReceiver(
         dispatchReceiverParameter: ValueParameterDescriptor,
     ) {

@@ -6,7 +6,7 @@ import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.allExposedMembers
 import co.touchlab.skie.phases.DescriptorModificationPhase
-import co.touchlab.skie.phases.util.StatefulCompilerDependentDescriptorConversionPhase
+import co.touchlab.skie.phases.util.StatefulCompilerDependentKirPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
@@ -37,13 +37,13 @@ object SuspendGenerator : DescriptorModificationPhase {
     private val SimpleFunctionDescriptor.isSupported: Boolean
         get() = this.isSuspend
 
-    object FlowMappingConfigurationPhase : StatefulCompilerDependentDescriptorConversionPhase()
+    object FlowMappingConfigurationPhase : StatefulCompilerDependentKirPhase()
 
-    object KotlinBridgingFunctionVisibilityConfigurationInitPhase : StatefulCompilerDependentDescriptorConversionPhase()
+    object KotlinBridgingFunctionVisibilityConfigurationInitPhase : StatefulCompilerDependentKirPhase()
 
     object KotlinBridgingFunctionVisibilityConfigurationFinalizePhase : StatefulSirPhase()
 
-    object SwiftBridgeGeneratorInitPhase : StatefulCompilerDependentDescriptorConversionPhase()
+    object SwiftBridgeGeneratorInitPhase : StatefulCompilerDependentKirPhase()
 
     object SwiftBridgeGeneratorFinalizePhase : StatefulSirPhase()
 }

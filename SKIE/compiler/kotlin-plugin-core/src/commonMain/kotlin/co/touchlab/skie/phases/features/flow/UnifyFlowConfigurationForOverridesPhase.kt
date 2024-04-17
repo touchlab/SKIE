@@ -6,19 +6,19 @@ import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirOverridableDeclaration
 import co.touchlab.skie.kir.util.getEntireOverrideHierarchy
-import co.touchlab.skie.phases.CompilerIndependentDescriptorConversionPhase
-import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.CompilerIndependentKirPhase
+import co.touchlab.skie.phases.KirPhase
 
 class UnifyFlowConfigurationForOverridesPhase(
-    context: DescriptorConversionPhase.Context,
-) : CompilerIndependentDescriptorConversionPhase {
+    context: KirPhase.Context,
+) : CompilerIndependentKirPhase {
 
     private val kirProvider = context.kirProvider
 
-    context(DescriptorConversionPhase.Context)
+    context(KirPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
-    context(DescriptorConversionPhase.Context)
+    context(KirPhase.Context)
     override suspend fun execute() {
         kirProvider.kotlinOverridableDeclaration
             .filter { it.overriddenDeclarations.isEmpty() && it.overriddenBy.isNotEmpty() }

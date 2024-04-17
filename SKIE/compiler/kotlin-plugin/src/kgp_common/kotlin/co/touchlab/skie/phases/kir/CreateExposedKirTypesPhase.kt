@@ -14,8 +14,8 @@ import co.touchlab.skie.kir.type.DeclarationBackedKirType
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.hasArgumentValue
 import co.touchlab.skie.oir.element.OirTypeParameter
-import co.touchlab.skie.phases.CompilerDependentDescriptorConversionPhase
-import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.CompilerDependentKirPhase
+import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -30,8 +30,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.Variance
 
 class CreateExposedKirTypesPhase(
-    context: CompilerDependentDescriptorConversionPhase.Context,
-) : CompilerDependentDescriptorConversionPhase {
+    context: CompilerDependentKirPhase.Context,
+) : CompilerDependentKirPhase {
 
     private val descriptorProvider = context.descriptorProvider
     private val kirProvider = context.kirProvider
@@ -50,7 +50,7 @@ class CreateExposedKirTypesPhase(
         ),
     )
 
-    context(DescriptorConversionPhase.Context)
+    context(KirPhase.Context)
     override suspend fun execute() {
         createRegularClasses()
         createFileClasses()

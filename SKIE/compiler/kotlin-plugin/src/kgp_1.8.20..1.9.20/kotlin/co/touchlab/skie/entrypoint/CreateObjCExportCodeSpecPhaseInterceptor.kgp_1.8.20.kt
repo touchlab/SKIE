@@ -26,7 +26,7 @@ internal class CreateObjCExportCodeSpecPhaseInterceptor : PhaseInterceptor<PsiTo
             symbolTable = context.symbolTable!!,
         )
 
-        EntrypointUtils.runDescriptorConversionPhases(
+        EntrypointUtils.runKirPhases(
             mainSkieContext = mainSkieContext,
             objCExportedInterfaceProvider = ObjCExportedInterfaceProvider(input),
         )
