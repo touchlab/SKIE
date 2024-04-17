@@ -1,6 +1,6 @@
 package co.touchlab.skie.configuration
 
-import co.touchlab.skie.configuration.common.FlowMappingStrategy
+import co.touchlab.skie.configuration.common.CommonSkieConfiguration
 
 class ValueParameterConfiguration(
     parent: ValueParameterConfigurationParent,
@@ -9,11 +9,9 @@ class ValueParameterConfiguration(
     constructor(parent: CallableDeclarationConfiguration) : this(ValueParameterConfigurationParent.CallableDeclaration(parent))
 
     var flowMappingStrategy by value {
-        val isFlowInteropEnabled = parent.configuration.getUnsafe(FlowInterop.Enabled)
+        CommonSkieConfiguration.getDefaultFlowMappingStrategy(parent.configuration)
 
-        if (isFlowInteropEnabled) FlowMappingStrategy.Full else FlowMappingStrategy.None
-
-        // TODO Use this instead after Flow configuration is hierarchical
+        // TODO Use this instead after Flow annotations allow ValueParameters and the configuration is hierarchical
 //         CommonSkieConfiguration.getDefaultFlowMappingStrategy(this)
     }
 

@@ -5,6 +5,9 @@ class RootConfiguration(
     private val supportedKeys: Set<ConfigurationKey<*>>,
 ) : SkieConfiguration(null) {
 
+    override val rootConfiguration: RootConfiguration
+        get() = this
+
     fun isFlagEnabled(flag: SkieConfigurationFlag): Boolean =
         flag in enabledFlags
 
