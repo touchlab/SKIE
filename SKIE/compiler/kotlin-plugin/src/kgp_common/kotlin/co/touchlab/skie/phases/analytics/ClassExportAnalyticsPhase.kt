@@ -1,14 +1,14 @@
 package co.touchlab.skie.phases.analytics
 
-import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.analytics.compiler.common.CommonCompilerConfigurationAnalytics
 import co.touchlab.skie.analytics.compiler.specific.SpecificCompilerConfigurationAnalytics
 import co.touchlab.skie.analytics.configuration.SkieConfigurationAnalytics
 import co.touchlab.skie.analytics.environment.CompilerEnvironmentAnalytics
+import co.touchlab.skie.phases.CompilerDependentClassExportPhase
 
-object ClassExportAnalyticsPhase : ClassExportPhase {
+object ClassExportAnalyticsPhase : CompilerDependentClassExportPhase {
 
-    context(ClassExportPhase.Context)
+    context(CompilerDependentClassExportPhase.Context)
     override suspend fun execute() {
         analyticsCollector.collectAsync(
             CommonCompilerConfigurationAnalytics.Producer(konanConfig),

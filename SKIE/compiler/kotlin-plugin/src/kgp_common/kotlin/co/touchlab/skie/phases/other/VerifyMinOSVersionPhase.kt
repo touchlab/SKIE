@@ -2,19 +2,18 @@ package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.ClassExportPhase
+import co.touchlab.skie.phases.CompilerDependentClassExportPhase
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 
-object VerifyMinOSVersionPhase : ClassExportPhase {
+object VerifyMinOSVersionPhase : CompilerDependentClassExportPhase {
 
     context(ClassExportPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
-    context(ClassExportPhase.Context)
+    context(CompilerDependentClassExportPhase.Context)
     override suspend fun execute() {
-        val configurables = konanConfig.platform.configurables as AppleConfigurables
-
         val currentMinVersion = configurables.osVersionMin
         val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(configurables.target.name)
 

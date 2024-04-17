@@ -2,7 +2,6 @@
 
 package co.touchlab.skie.phases
 
-import co.touchlab.skie.phases.other.GenerateIrPhase
 import co.touchlab.skie.phases.analytics.ClassExportAnalyticsPhase
 import co.touchlab.skie.phases.analytics.KotlinIrAnalyticsPhase
 import co.touchlab.skie.phases.analytics.LogSkiePerformanceAnalyticsPhase
@@ -53,6 +52,7 @@ import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverriddenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
+import co.touchlab.skie.phases.other.GenerateIrPhase
 import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
 import co.touchlab.skie.phases.other.LinkObjectFilesPhase
 import co.touchlab.skie.phases.other.LoadCustomSwiftSourceFilesPhase
@@ -88,14 +88,14 @@ import co.touchlab.skie.util.addAll
 
 class SkiePhaseScheduler {
 
-    val classExportPhases = SkiePhaseGroup<ClassExportPhase, ClassExportPhase.Context> { context ->
+    val classExportPhases = SkiePhaseGroup<ClassExportPhase<CompilerDependentClassExportPhase.Context>, CompilerDependentClassExportPhase.Context> { context ->
         addAll(
             VerifyModuleNamePhase,
+            VerifyMinOSVersionPhase,
+            VerifyNoBitcodeEmbeddingPhase,
             FixLibrariesShortNamePhase,
             ClassExportAnalyticsPhase,
             ExtraClassExportPhase(context),
-            VerifyMinOSVersionPhase,
-            VerifyNoBitcodeEmbeddingPhase,
         )
     }
 
@@ -260,7 +260,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runClassExportPhases(contextFactory: () -> ClassExportPhase.Context) {
+    fun runClassExportPhases(contextFactory: () -> CompilerDependentClassExportPhase.Context) {
         classExportPhases.run(contextFactory)
     }
 
