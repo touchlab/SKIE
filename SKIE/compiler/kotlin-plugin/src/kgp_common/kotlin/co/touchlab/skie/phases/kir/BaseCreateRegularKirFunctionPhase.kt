@@ -6,7 +6,7 @@ import co.touchlab.skie.configuration.ValueParameterConfiguration
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.kir.type.translation.KirTypeParameterScope
-import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.CompilerDependentDescriptorConversionPhase
 import co.touchlab.skie.phases.kir.util.getKirValueParameterName
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.resolve.isValueClass
 
 internal abstract class BaseCreateRegularKirFunctionPhase(
-    context: DescriptorConversionPhase.Context,
+    context: CompilerDependentDescriptorConversionPhase.Context,
     supportsConstructors: Boolean = false,
     supportsSimpleFunctions: Boolean = false,
 ) : BaseCreateRegularKirMembersPhase(

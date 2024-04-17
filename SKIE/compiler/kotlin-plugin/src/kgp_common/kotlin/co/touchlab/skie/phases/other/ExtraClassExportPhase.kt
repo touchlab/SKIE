@@ -10,7 +10,7 @@ import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.kir.type.translation.from
 import co.touchlab.skie.phases.CompilerDependentClassExportPhase
-import co.touchlab.skie.phases.util.StatefulDescriptorConversionPhase
+import co.touchlab.skie.phases.util.StatefulCompilerDependentDescriptorConversionPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
@@ -162,7 +162,7 @@ class ExtraClassExportPhase(
         }
     }
 
-    object HideExportFunctionsInitPhase : StatefulDescriptorConversionPhase()
+    object HideExportFunctionsInitPhase : StatefulCompilerDependentDescriptorConversionPhase()
 
     object HideExportFunctionsFinalizePhase : StatefulSirPhase()
 }

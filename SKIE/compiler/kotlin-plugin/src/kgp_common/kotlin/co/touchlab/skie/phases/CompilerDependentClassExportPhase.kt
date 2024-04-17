@@ -7,7 +7,7 @@ interface CompilerDependentClassExportPhase :
     ClassExportPhase<CompilerDependentClassExportPhase.Context>,
     CompilerDependentForegroundPhase<CompilerDependentClassExportPhase.Context> {
 
-    interface Context : CompilerIndependentClassExportPhase.Context, CompilerDependentForegroundPhase.Context {
+    interface Context : ClassExportPhase.Context, CompilerDependentForegroundPhase.Context {
 
         override val context: Context
 

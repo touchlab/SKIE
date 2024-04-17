@@ -6,11 +6,12 @@ import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirOverridableDeclaration
 import co.touchlab.skie.kir.util.getEntireOverrideHierarchy
+import co.touchlab.skie.phases.CompilerIndependentDescriptorConversionPhase
 import co.touchlab.skie.phases.DescriptorConversionPhase
 
 class UnifyFlowConfigurationForOverridesPhase(
     context: DescriptorConversionPhase.Context,
-) : DescriptorConversionPhase {
+) : CompilerIndependentDescriptorConversionPhase {
 
     private val kirProvider = context.kirProvider
 

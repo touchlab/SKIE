@@ -5,7 +5,7 @@ import co.touchlab.skie.phases.features.defaultarguments.delegate.ClassMethodsDe
 import co.touchlab.skie.phases.features.defaultarguments.delegate.ConstructorsDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.phases.features.defaultarguments.delegate.ExtensionFunctionDefaultArgumentGeneratorDelegate
 import co.touchlab.skie.phases.features.defaultarguments.delegate.TopLevelFunctionDefaultArgumentGeneratorDelegate
-import co.touchlab.skie.phases.util.StatefulDescriptorConversionPhase
+import co.touchlab.skie.phases.util.StatefulCompilerDependentDescriptorConversionPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.util.SharedCounter
 
@@ -29,9 +29,9 @@ class DefaultArgumentGenerator(
         }
     }
 
-    object RegisterOverloadsPhase : StatefulDescriptorConversionPhase()
+    object RegisterOverloadsPhase : StatefulCompilerDependentDescriptorConversionPhase()
 
-    object RemoveManglingOfOverloadsInitPhase : StatefulDescriptorConversionPhase()
+    object RemoveManglingOfOverloadsInitPhase : StatefulCompilerDependentDescriptorConversionPhase()
 
     object RemoveManglingOfOverloadsFinalizePhase : StatefulSirPhase()
 }

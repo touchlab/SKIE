@@ -19,11 +19,12 @@ import co.touchlab.skie.kir.type.PointerKirType
 import co.touchlab.skie.kir.type.SpecialOirKirType
 import co.touchlab.skie.kir.type.TypeParameterUsageKirType
 import co.touchlab.skie.kir.type.UnresolvedFlowKirType
+import co.touchlab.skie.phases.CompilerIndependentDescriptorConversionPhase
 import co.touchlab.skie.phases.DescriptorConversionPhase
 
 class ConvertFlowsPhase(
     context: DescriptorConversionPhase.Context,
-) : DescriptorConversionPhase {
+) : CompilerIndependentDescriptorConversionPhase {
 
     private val kirProvider = context.kirProvider
 

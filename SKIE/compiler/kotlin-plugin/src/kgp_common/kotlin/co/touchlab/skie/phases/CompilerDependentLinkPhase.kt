@@ -2,9 +2,11 @@ package co.touchlab.skie.phases
 
 import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
 
-interface CompilerDependentLinkPhase : LinkPhase<CompilerDependentLinkPhase.Context>, CompilerDependentForegroundPhase<CompilerDependentLinkPhase.Context> {
+interface CompilerDependentLinkPhase :
+    LinkPhase<CompilerDependentLinkPhase.Context>,
+    CompilerDependentForegroundPhase<CompilerDependentLinkPhase.Context> {
 
-    interface Context : CompilerIndependentLinkPhase.Context, CompilerDependentForegroundPhase.Context {
+    interface Context : LinkPhase.Context, CompilerDependentForegroundPhase.Context {
 
         override val context: Context
 

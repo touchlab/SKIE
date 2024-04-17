@@ -6,20 +6,19 @@ import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirScope
 import co.touchlab.skie.oir.element.OirFunction
-import co.touchlab.skie.phases.DescriptorConversionPhase
+import co.touchlab.skie.phases.CompilerDependentDescriptorConversionPhase
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 
 internal abstract class BaseCreateKirMembersPhase(
-    context: DescriptorConversionPhase.Context,
-) : DescriptorConversionPhase {
+    context: CompilerDependentDescriptorConversionPhase.Context,
+) : CompilerDependentDescriptorConversionPhase {
 
     protected val descriptorProvider = context.descriptorProvider
     protected val mapper = context.mapper
