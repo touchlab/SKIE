@@ -88,7 +88,7 @@ import co.touchlab.skie.util.addAll
 
 class SkiePhaseScheduler {
 
-    val classExportPhases = SkiePhaseGroup<ClassExportPhase<CompilerDependentClassExportPhase.Context>, CompilerDependentClassExportPhase.Context> { context ->
+    val classExportPhases = SkiePhaseGroup<ClassExportPhase<ClassExportCompilerPhase.Context>, ClassExportCompilerPhase.Context> { context ->
         addAll(
             VerifyModuleNamePhase,
             VerifyMinOSVersionPhase,
@@ -119,9 +119,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val kirPhases = SkiePhaseGroup<
-            KirPhase<CompilerDependentKirPhase.Context>, CompilerDependentKirPhase.Context,
-            > { context ->
+    val kirPhases = SkiePhaseGroup<KirPhase<KirCompilerPhase.Context>, KirCompilerPhase.Context> { context ->
         addAll(
             VerifyDescriptorProviderConsistencyPhase,
 
@@ -251,7 +249,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val linkPhases = SkiePhaseGroup<LinkPhase<CompilerDependentLinkPhase.Context>, CompilerDependentLinkPhase.Context> { context ->
+    val linkPhases = SkiePhaseGroup<LinkPhase<LinkCompilerPhase.Context>, LinkCompilerPhase.Context> { context ->
         addAll(
             ConfigureSwiftSpecificLinkerArgsPhase,
             AwaitAllBackgroundJobsPhase,
@@ -262,7 +260,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runClassExportPhases(contextFactory: () -> CompilerDependentClassExportPhase.Context) {
+    fun runClassExportPhases(contextFactory: () -> ClassExportCompilerPhase.Context) {
         classExportPhases.run(contextFactory)
     }
 
@@ -282,7 +280,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runKirPhases(contextFactory: () -> CompilerDependentKirPhase.Context) {
+    fun runKirPhases(contextFactory: () -> KirCompilerPhase.Context) {
         kirPhases.run(contextFactory)
     }
 
@@ -292,7 +290,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runLinkPhases(contextFactory: () -> CompilerDependentLinkPhase.Context) {
+    fun runLinkPhases(contextFactory: () -> LinkCompilerPhase.Context) {
         linkPhases.run(contextFactory)
     }
 }

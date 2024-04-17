@@ -1,9 +1,9 @@
 package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.phases.ClassExportPhase
-import co.touchlab.skie.phases.CompilerIndependentClassExportPhase
+import co.touchlab.skie.phases.ClassExportCorePhase
 
-object VerifyModuleNamePhase : CompilerIndependentClassExportPhase {
+object VerifyModuleNamePhase : ClassExportCorePhase {
 
     private val problematicKeywords = listOf(
         "associatedtype",

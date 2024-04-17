@@ -12,7 +12,7 @@ import co.touchlab.skie.kir.type.OirBasedKirType
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.oir.type.PrimitiveOirType
-import co.touchlab.skie.phases.CompilerDependentKirPhase
+import co.touchlab.skie.phases.KirCompilerPhase
 import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
 internal class CreateKirDescriptionAndHashPropertyPhase(
-    context: CompilerDependentKirPhase.Context,
+    context: KirCompilerPhase.Context,
 ) : BaseCreateKirMembersPhase(context) {
 
     context(KirPhase.Context)

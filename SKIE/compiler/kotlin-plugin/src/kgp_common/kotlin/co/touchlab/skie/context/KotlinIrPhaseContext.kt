@@ -4,8 +4,7 @@ package co.touchlab.skie.context
 
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.kir.util.SkieSymbolTable
-import co.touchlab.skie.phases.CompilerDependentForegroundPhase
-import co.touchlab.skie.phases.ForegroundPhase
+import co.touchlab.skie.phases.ForegroundCompilerPhase
 import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
@@ -17,7 +16,7 @@ class KotlinIrPhaseContext(
     mainSkieContext: MainSkieContext,
     override val moduleFragment: IrModuleFragment,
     override val pluginContext: IrPluginContext,
-) : KotlinIrPhase.Context, CompilerDependentForegroundPhase.Context by mainSkieContext {
+) : KotlinIrPhase.Context, ForegroundCompilerPhase.Context by mainSkieContext {
 
     override val context: KotlinIrPhaseContext = this
 

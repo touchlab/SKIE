@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 
-interface CompilerDependentForegroundPhase<in C : CompilerDependentForegroundPhase.Context> : ForegroundPhase<C> {
+interface ForegroundCompilerPhase<in C : ForegroundCompilerPhase.Context> : ForegroundPhase<C> {
 
     interface Context : ForegroundPhase.Context {
 

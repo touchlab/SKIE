@@ -2,7 +2,7 @@ package co.touchlab.skie.phases.kir
 
 import co.touchlab.skie.kir.element.KirCallableDeclaration.Origin
 import co.touchlab.skie.kir.element.KirClass
-import co.touchlab.skie.phases.CompilerDependentKirPhase
+import co.touchlab.skie.phases.KirCompilerPhase
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
@@ -12,13 +12,13 @@ import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 
 internal abstract class BaseCreateRegularKirMembersPhase(
-    context: CompilerDependentKirPhase.Context,
+    context: KirCompilerPhase.Context,
     private val supportsConstructors: Boolean = false,
     private val supportsSimpleFunctions: Boolean = false,
     private val supportsProperties: Boolean = false,
 ) : BaseCreateKirMembersPhase(context) {
 
-    context(CompilerDependentKirPhase.Context)
+    context(KirCompilerPhase.Context)
     override suspend fun execute() {
         kirProvider.kotlinClasses.forEach(::createMembers)
     }

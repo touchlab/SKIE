@@ -3,11 +3,11 @@ package co.touchlab.skie.phases
 import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 
-interface CompilerDependentClassExportPhase :
-    ClassExportPhase<CompilerDependentClassExportPhase.Context>,
-    CompilerDependentForegroundPhase<CompilerDependentClassExportPhase.Context> {
+interface ClassExportCompilerPhase :
+    ClassExportPhase<ClassExportCompilerPhase.Context>,
+    ForegroundCompilerPhase<ClassExportCompilerPhase.Context> {
 
-    interface Context : ClassExportPhase.Context, CompilerDependentForegroundPhase.Context {
+    interface Context : ClassExportPhase.Context, ForegroundCompilerPhase.Context {
 
         override val context: Context
 

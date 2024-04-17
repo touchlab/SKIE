@@ -9,7 +9,7 @@ import co.touchlab.skie.kir.irbuilder.util.createValueParameter
 import co.touchlab.skie.phases.ClassExportPhase
 import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.kir.type.translation.from
-import co.touchlab.skie.phases.CompilerDependentClassExportPhase
+import co.touchlab.skie.phases.ClassExportCompilerPhase
 import co.touchlab.skie.phases.util.StatefulCompilerDependentKirPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
@@ -29,13 +29,13 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 
 class ExtraClassExportPhase(
-    private val context: CompilerDependentClassExportPhase.Context,
-) : CompilerDependentClassExportPhase {
+    private val context: ClassExportCompilerPhase.Context,
+) : ClassExportCompilerPhase {
 
     private val descriptorProvider = context.descriptorProvider
     private val mapper = context.mapper
 
-    context(CompilerDependentClassExportPhase.Context)
+    context(ClassExportCompilerPhase.Context)
     override suspend fun execute() {
         val previouslyVisitedClasses = mutableSetOf<ClassDescriptor>()
 
@@ -56,7 +56,7 @@ class ExtraClassExportPhase(
         } while (newlyDiscoveredClasses.isNotEmpty())
     }
 
-    context(CompilerDependentClassExportPhase.Context)
+    context(ClassExportCompilerPhase.Context)
     private fun getClassesForExport(previouslyVisitedClasses: Set<ClassDescriptor>): Set<ClassDescriptor> {
         val result = getClassesForExportFromFlowArguments(previouslyVisitedClasses) +
             getClassesForExportFromSealedHierarchies(previouslyVisitedClasses)
@@ -93,14 +93,14 @@ class ExtraClassExportPhase(
         declaredTypeParameters.flatMap { it.getAllFlowArgumentClasses() } +
             descriptorProvider.getAllExposedMembers(this).flatMap { it.getAllFlowArgumentClasses() }
 
-    context(CompilerDependentClassExportPhase.Context)
+    context(ClassExportCompilerPhase.Context)
     private fun getClassesForExportFromSealedHierarchies(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
 
         return newClasses.flatMap { it.getAllExportedSealedChildren() }
     }
 
-    context(CompilerDependentClassExportPhase.Context)
+    context(ClassExportCompilerPhase.Context)
     private fun ClassDescriptor.getAllExportedSealedChildren(): List<ClassDescriptor> {
         if (!this.configuration[SealedInterop.ExportEntireHierarchy]) {
             return emptyList()
@@ -111,11 +111,11 @@ class ExtraClassExportPhase(
         return topLevelSealedChildren + topLevelSealedChildren.getAllExportedSealedChildren()
     }
 
-    context(CompilerDependentClassExportPhase.Context)
+    context(ClassExportCompilerPhase.Context)
     private fun Collection<ClassDescriptor>.getAllExportedSealedChildren(): List<ClassDescriptor> =
         this.flatMap { it.getAllExportedSealedChildren() }
 
-    context(CompilerDependentClassExportPhase.Context)
+    context(ClassExportCompilerPhase.Context)
     private fun exportClasses(classes: Set<ClassDescriptor>, iteration: Int) {
         if (classes.isEmpty()) {
             return

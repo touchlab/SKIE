@@ -1,13 +1,13 @@
 package co.touchlab.skie.phases.other
 
-import co.touchlab.skie.phases.CompilerDependentLinkPhase
+import co.touchlab.skie.phases.LinkCompilerPhase
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.konan.target.platformName
 import java.io.File
 
-object ConfigureSwiftSpecificLinkerArgsPhase : CompilerDependentLinkPhase {
+object ConfigureSwiftSpecificLinkerArgsPhase : LinkCompilerPhase {
 
-    context(CompilerDependentLinkPhase.Context)
+    context(LinkCompilerPhase.Context)
     override suspend fun execute() {
         val swiftLibSearchPaths = listOf(
             File(configurables.absoluteTargetToolchain, "usr/lib/swift/${configurables.platformName().lowercase()}"),

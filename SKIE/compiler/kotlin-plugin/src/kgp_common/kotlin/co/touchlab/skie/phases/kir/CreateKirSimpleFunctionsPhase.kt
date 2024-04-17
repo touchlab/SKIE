@@ -9,7 +9,7 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.addOverrides
-import co.touchlab.skie.phases.CompilerDependentKirPhase
+import co.touchlab.skie.phases.KirCompilerPhase
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 internal class CreateKirSimpleFunctionsPhase(
-    context: CompilerDependentKirPhase.Context,
+    context: KirCompilerPhase.Context,
 ) : BaseCreateRegularKirFunctionPhase(context, supportsSimpleFunctions = true) {
 
     private val functionCache = mutableMapOf<FunctionDescriptor, KirSimpleFunction>()
@@ -26,7 +26,7 @@ internal class CreateKirSimpleFunctionsPhase(
 
     private val needsDescriptionAndHashFunctions = SkieConfigurationFlag.Migration_AnyMethodsAsFunctions in context.rootConfiguration.enabledFlags
 
-    context(CompilerDependentKirPhase.Context)
+    context(KirCompilerPhase.Context)
     override suspend fun execute() {
         super.execute()
 

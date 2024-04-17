@@ -2,9 +2,9 @@ package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.phases.ClassExportPhase
-import co.touchlab.skie.phases.CompilerIndependentClassExportPhase
+import co.touchlab.skie.phases.ClassExportCorePhase
 
-object VerifyNoBitcodeEmbeddingPhase : CompilerIndependentClassExportPhase {
+object VerifyNoBitcodeEmbeddingPhase : ClassExportCorePhase {
 
     context(ClassExportPhase.Context)
     override suspend fun execute() {

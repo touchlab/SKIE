@@ -9,13 +9,12 @@ import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.descriptor.NativeDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.BackgroundPhase
-import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
-import co.touchlab.skie.phases.CompilerDependentForegroundPhase
+import co.touchlab.skie.phases.ForegroundCompilerPhase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +35,7 @@ class MainSkieContext internal constructor(
     frontendServices: FrontendServices,
     val mainModuleDescriptor: ModuleDescriptor,
     exportedDependencies: Collection<ModuleDescriptor>,
-) : CompilerDependentForegroundPhase.Context, BackgroundPhase.Context, InitPhase.Context by initPhaseContext {
+) : ForegroundCompilerPhase.Context, BackgroundPhase.Context, InitPhase.Context by initPhaseContext {
 
     private val skieCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + CoroutineExceptionHandler { _, _ ->
         // Hides default stderr output because the exception is handled at the end of the job
