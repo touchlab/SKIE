@@ -19,6 +19,11 @@ plugins {
 
 dependencyResolutionManagement {
     repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
+            content {
+                includeVersion("org.jetbrains.kotlin", "kotlin-native-compiler-embeddable", "2.0.0-RC1")
+            }
+        }
         maven("https://api.touchlab.dev/public") {
             content {
                 includeModule("org.jetbrains.kotlin", "kotlin-native-compiler-embeddable")

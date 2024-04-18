@@ -134,6 +134,13 @@ class KotlinToolingVersion(
     }
 }
 
+val KotlinToolingVersion.kotlinNativePrebuiltRepositoryBaseUrl: String
+    get() = if (this >= KotlinToolingVersion("1.9.20")) {
+        "https://repo.maven.apache.org/maven2"
+    } else {
+        "https://download.jetbrains.com/kotlin/native/builds"
+    }
+
 fun KotlinToolingVersion.toIdentifier(): String =
     "`" + toString().replace(".", "_") + "`"
 
