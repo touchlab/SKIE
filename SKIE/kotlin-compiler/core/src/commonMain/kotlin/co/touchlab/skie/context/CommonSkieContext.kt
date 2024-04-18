@@ -4,6 +4,7 @@ import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
+import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.util.CompilerShim
 import co.touchlab.skie.util.FrameworkLayout
@@ -28,6 +29,8 @@ interface CommonSkieContext {
     val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer
 
     val reporter: Reporter
+
+    val skiePhaseScheduler: SkiePhaseScheduler
 
     val compilerShim: CompilerShim
 

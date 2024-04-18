@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "RemoveExplicitTypeArguments", "UNUSED_ANONYMOUS_PARAMETER")
+@file:Suppress("RemoveExplicitTypeArguments", "UNUSED_ANONYMOUS_PARAMETER")
 
 package co.touchlab.skie.phases
 
@@ -82,12 +82,11 @@ import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKotlinMod
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictsWithOtherTypesPhase
 import co.touchlab.skie.phases.typeconflicts.TemporarilyRenameTypesConflictingWithExternalModulesPhase
 import co.touchlab.skie.phases.util.SkiePhaseGroup
-import co.touchlab.skie.phases.util.run
 import co.touchlab.skie.util.addAll
 
-class SkiePhaseScheduler {
+class LinkerPhaseScheduler : SkiePhaseScheduler {
 
-    val classExportPhases = SkiePhaseGroup<ClassExportPhase, ClassExportPhase.Context> { context ->
+    override val classExportPhases = SkiePhaseGroup<ClassExportPhase, ClassExportPhase.Context> { context ->
         addAll(
             VerifyModuleNamePhase,
             VerifyMinOSVersionPhase,
@@ -98,27 +97,27 @@ class SkiePhaseScheduler {
         )
     }
 
-    val frontendIrPhases = SkiePhaseGroup<FrontendIrPhase, FrontendIrPhase.Context> { context ->
+    override val frontendIrPhases = SkiePhaseGroup<FrontendIrPhase, FrontendIrPhase.Context> { context ->
         addAll(
             DefaultArgumentGenerator(context),
             SuspendGenerator,
         )
     }
 
-    val symbolTablePhases = SkiePhaseGroup<SymbolTablePhase, SymbolTablePhase.Context> { context ->
+    override val symbolTablePhases = SkiePhaseGroup<SymbolTablePhase, SymbolTablePhase.Context> { context ->
         addAll(
             DeclareMissingSymbolsPhase,
         )
     }
 
-    val kotlinIrPhases = SkiePhaseGroup<KotlinIrPhase, KotlinIrPhase.Context> { context ->
+    override val kotlinIrPhases = SkiePhaseGroup<KotlinIrPhase, KotlinIrPhase.Context> { context ->
         addAll(
             KotlinIrAnalyticsPhase,
             GenerateIrPhase,
         )
     }
 
-    val kirPhases = SkiePhaseGroup<KirPhase, KirPhase.Context> { context ->
+    override val kirPhases = SkiePhaseGroup<KirPhase, KirPhase.Context> { context ->
         addAll(
             VerifyDescriptorProviderConsistencyPhase,
 
@@ -145,7 +144,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val sirPhases = SkiePhaseGroup<SirPhase, SirPhase.Context> { context ->
+    override val sirPhases = SkiePhaseGroup<SirPhase, SirPhase.Context> { context ->
         addAll(
             // Debug(before)
 
@@ -247,7 +246,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val linkPhases = SkiePhaseGroup<LinkPhase, LinkPhase.Context> { context ->
+    override val linkPhases = SkiePhaseGroup<LinkPhase, LinkPhase.Context> { context ->
         addAll(
             ConfigureSwiftSpecificLinkerArgsPhase,
             AwaitAllBackgroundJobsPhase,
@@ -255,40 +254,5 @@ class SkiePhaseScheduler {
             ProcessReportedMessagesPhase,
             LogSkiePerformanceAnalyticsPhase,
         )
-    }
-
-    context(ScheduledPhase.Context)
-    fun runClassExportPhases(contextFactory: () -> ClassExportPhase.Context) {
-        classExportPhases.run(contextFactory)
-    }
-
-    context(ScheduledPhase.Context)
-    fun runFrontendIrPhases(contextFactory: () -> FrontendIrPhase.Context) {
-        frontendIrPhases.run(contextFactory)
-    }
-
-    context(ScheduledPhase.Context)
-    fun runSymbolTablePhases(contextFactory: () -> SymbolTablePhase.Context) {
-        symbolTablePhases.run(contextFactory)
-    }
-
-    context(ScheduledPhase.Context)
-    fun runKotlinIrPhases(contextFactory: () -> KotlinIrPhase.Context) {
-        kotlinIrPhases.run(contextFactory)
-    }
-
-    context(ScheduledPhase.Context)
-    fun runKirPhases(contextFactory: () -> KirPhase.Context) {
-        kirPhases.run(contextFactory)
-    }
-
-    context(ScheduledPhase.Context)
-    fun runSirPhases(contextFactory: () -> SirPhase.Context) {
-        sirPhases.run(contextFactory)
-    }
-
-    context(ScheduledPhase.Context)
-    fun runLinkPhases(contextFactory: () -> LinkPhase.Context) {
-        linkPhases.run(contextFactory)
     }
 }

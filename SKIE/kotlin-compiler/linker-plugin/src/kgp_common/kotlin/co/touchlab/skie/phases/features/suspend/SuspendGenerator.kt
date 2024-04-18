@@ -7,7 +7,7 @@ import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.allExposedMembers
 import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.phases.descriptorProvider
-import co.touchlab.skie.phases.util.StatefulCompilerDependentKirPhase
+import co.touchlab.skie.phases.util.StatefulKirPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
@@ -38,13 +38,13 @@ object SuspendGenerator : FrontendIrPhase {
     private val SimpleFunctionDescriptor.isSupported: Boolean
         get() = this.isSuspend
 
-    object FlowMappingConfigurationPhase : StatefulCompilerDependentKirPhase()
+    object FlowMappingConfigurationPhase : StatefulKirPhase()
 
-    object KotlinBridgingFunctionVisibilityConfigurationInitPhase : StatefulCompilerDependentKirPhase()
+    object KotlinBridgingFunctionVisibilityConfigurationInitPhase : StatefulKirPhase()
 
     object KotlinBridgingFunctionVisibilityConfigurationFinalizePhase : StatefulSirPhase()
 
-    object SwiftBridgeGeneratorInitPhase : StatefulCompilerDependentKirPhase()
+    object SwiftBridgeGeneratorInitPhase : StatefulKirPhase()
 
     object SwiftBridgeGeneratorFinalizePhase : StatefulSirPhase()
 }

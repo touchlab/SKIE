@@ -13,7 +13,7 @@ import co.touchlab.skie.phases.declarationBuilder
 import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.descriptorProvider
 import co.touchlab.skie.phases.mapper
-import co.touchlab.skie.phases.util.StatefulCompilerDependentKirPhase
+import co.touchlab.skie.phases.util.StatefulKirPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.sir.element.SirVisibility
@@ -165,7 +165,7 @@ class ExtraClassExportPhase(
         }
     }
 
-    object HideExportFunctionsInitPhase : StatefulCompilerDependentKirPhase()
+    object HideExportFunctionsInitPhase : StatefulKirPhase()
 
     object HideExportFunctionsFinalizePhase : StatefulSirPhase()
 }

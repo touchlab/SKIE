@@ -12,7 +12,6 @@ import co.touchlab.skie.kir.descriptor.NativeDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.BackgroundPhase
 import co.touchlab.skie.phases.ScheduledPhase
-import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.phases.configurables
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -36,8 +35,6 @@ class MainSkieContext internal constructor(
     val mainModuleDescriptor: ModuleDescriptor,
     exportedDependencies: Collection<ModuleDescriptor>,
 ) : ForegroundPhaseCompilerContext, BackgroundPhase.Context, CommonSkieContext by initPhaseContext {
-
-    val skiePhaseScheduler: SkiePhaseScheduler = initPhaseContext.skiePhaseScheduler
 
     private val skieCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + CoroutineExceptionHandler { _, _ ->
         // Hides default stderr output because the exception is handled at the end of the job

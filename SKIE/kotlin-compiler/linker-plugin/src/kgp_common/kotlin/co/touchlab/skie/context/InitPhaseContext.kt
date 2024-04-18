@@ -8,6 +8,7 @@ import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.configuration.provider.ConfigurationProvider
 import co.touchlab.skie.phases.InitPhase
+import co.touchlab.skie.phases.LinkerPhaseScheduler
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.util.ActualCompilerShim
@@ -25,7 +26,7 @@ class InitPhaseContext(
     override val context: InitPhase.Context
         get() = this
 
-    val skiePhaseScheduler: SkiePhaseScheduler = SkiePhaseScheduler()
+    override val skiePhaseScheduler: SkiePhaseScheduler = LinkerPhaseScheduler()
 
     override val skieDirectories: SkieDirectories = compilerConfiguration.getNotNull(SkieConfigurationKeys.SkieDirectories)
 
