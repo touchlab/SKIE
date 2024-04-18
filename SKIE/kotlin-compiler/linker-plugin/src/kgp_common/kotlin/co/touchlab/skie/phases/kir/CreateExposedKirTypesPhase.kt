@@ -14,8 +14,12 @@ import co.touchlab.skie.kir.type.DeclarationBackedKirType
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.hasArgumentValue
 import co.touchlab.skie.oir.element.OirTypeParameter
-import co.touchlab.skie.phases.KirCompilerPhase
 import co.touchlab.skie.phases.KirPhase
+import co.touchlab.skie.phases.descriptorConfigurationProvider
+import co.touchlab.skie.phases.descriptorKirProvider
+import co.touchlab.skie.phases.descriptorProvider
+import co.touchlab.skie.phases.kirTypeTranslator
+import co.touchlab.skie.phases.namer
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
@@ -30,8 +34,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.Variance
 
 class CreateExposedKirTypesPhase(
-    context: KirCompilerPhase.Context,
-) : KirCompilerPhase {
+    context: KirPhase.Context,
+) : KirPhase {
 
     private val descriptorProvider = context.descriptorProvider
     private val kirProvider = context.kirProvider

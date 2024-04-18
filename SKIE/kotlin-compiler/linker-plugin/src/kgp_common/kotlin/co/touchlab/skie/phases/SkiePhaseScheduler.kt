@@ -87,7 +87,7 @@ import co.touchlab.skie.util.addAll
 
 class SkiePhaseScheduler {
 
-    val classExportPhases = SkiePhaseGroup<ClassExportPhase<ClassExportCompilerPhase.Context>, ClassExportCompilerPhase.Context> { context ->
+    val classExportPhases = SkiePhaseGroup<ClassExportPhase, ClassExportPhase.Context> { context ->
         addAll(
             VerifyModuleNamePhase,
             VerifyMinOSVersionPhase,
@@ -118,7 +118,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val kirPhases = SkiePhaseGroup<KirPhase<KirCompilerPhase.Context>, KirCompilerPhase.Context> { context ->
+    val kirPhases = SkiePhaseGroup<KirPhase, KirPhase.Context> { context ->
         addAll(
             VerifyDescriptorProviderConsistencyPhase,
 
@@ -247,7 +247,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val linkPhases = SkiePhaseGroup<LinkPhase<LinkCompilerPhase.Context>, LinkCompilerPhase.Context> { context ->
+    val linkPhases = SkiePhaseGroup<LinkPhase, LinkPhase.Context> { context ->
         addAll(
             ConfigureSwiftSpecificLinkerArgsPhase,
             AwaitAllBackgroundJobsPhase,
@@ -258,7 +258,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runClassExportPhases(contextFactory: () -> ClassExportCompilerPhase.Context) {
+    fun runClassExportPhases(contextFactory: () -> ClassExportPhase.Context) {
         classExportPhases.run(contextFactory)
     }
 
@@ -278,7 +278,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runKirPhases(contextFactory: () -> KirCompilerPhase.Context) {
+    fun runKirPhases(contextFactory: () -> KirPhase.Context) {
         kirPhases.run(contextFactory)
     }
 
@@ -288,7 +288,7 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runLinkPhases(contextFactory: () -> LinkCompilerPhase.Context) {
+    fun runLinkPhases(contextFactory: () -> LinkPhase.Context) {
         linkPhases.run(contextFactory)
     }
 }

@@ -4,6 +4,7 @@ package co.touchlab.skie.kir.irbuilder.impl.template
 
 import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
 import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.pluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration

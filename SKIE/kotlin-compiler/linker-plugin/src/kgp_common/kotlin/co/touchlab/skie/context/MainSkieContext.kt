@@ -11,9 +11,9 @@ import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.descriptor.NativeDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.BackgroundPhase
-import co.touchlab.skie.phases.ForegroundCompilerPhase
-import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.ScheduledPhase
+import co.touchlab.skie.phases.SkiePhaseScheduler
+import co.touchlab.skie.phases.configurables
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +35,9 @@ class MainSkieContext internal constructor(
     frontendServices: FrontendServices,
     val mainModuleDescriptor: ModuleDescriptor,
     exportedDependencies: Collection<ModuleDescriptor>,
-) : ForegroundCompilerPhase.Context, BackgroundPhase.Context, InitPhase.Context by initPhaseContext {
+) : ForegroundPhaseCompilerContext, BackgroundPhase.Context, CommonSkieContext by initPhaseContext {
+
+    val skiePhaseScheduler: SkiePhaseScheduler = initPhaseContext.skiePhaseScheduler
 
     private val skieCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + CoroutineExceptionHandler { _, _ ->
         // Hides default stderr output because the exception is handled at the end of the job
@@ -76,7 +78,7 @@ class MainSkieContext internal constructor(
             os = kotlinTargetTriple.os,
             environment = kotlinTargetTriple.environment,
         ),
-        bitcodeEmbeddingMode = when (compilerConfiguration[KonanConfigKeys.BITCODE_EMBEDDING_MODE]) {
+        bitcodeEmbeddingMode = when (konanConfig.configuration[KonanConfigKeys.BITCODE_EMBEDDING_MODE]) {
             BitcodeEmbedding.Mode.FULL -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full
             BitcodeEmbedding.Mode.MARKER -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker
             BitcodeEmbedding.Mode.NONE, null -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.None

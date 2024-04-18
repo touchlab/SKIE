@@ -19,12 +19,11 @@ import co.touchlab.skie.kir.type.PointerKirType
 import co.touchlab.skie.kir.type.SpecialOirKirType
 import co.touchlab.skie.kir.type.TypeParameterUsageKirType
 import co.touchlab.skie.kir.type.UnresolvedFlowKirType
-import co.touchlab.skie.phases.KirCorePhase
 import co.touchlab.skie.phases.KirPhase
 
 class ConvertFlowsPhase(
     context: KirPhase.Context,
-) : KirCorePhase {
+) : KirPhase {
 
     private val kirProvider = context.kirProvider
 

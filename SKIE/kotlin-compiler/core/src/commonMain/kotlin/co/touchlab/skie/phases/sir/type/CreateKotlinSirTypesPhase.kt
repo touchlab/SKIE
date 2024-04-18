@@ -10,9 +10,8 @@ import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.toSirKind
 
-class CreateKotlinSirTypesPhase(
-    // Must be class because it has state
-) : SirPhase {
+// Must be class because it has state
+class CreateKotlinSirTypesPhase : SirPhase {
 
     private val kirToSirClasses = mutableMapOf<KirClass, SirClass>()
 

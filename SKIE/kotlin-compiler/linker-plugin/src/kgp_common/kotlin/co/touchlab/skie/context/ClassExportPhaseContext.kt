@@ -1,17 +1,13 @@
 package co.touchlab.skie.context
 
-import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
-import co.touchlab.skie.phases.ClassExportCompilerPhase
-import co.touchlab.skie.phases.ForegroundCompilerPhase
+import co.touchlab.skie.phases.ClassExportPhase
 
 class ClassExportPhaseContext(
     mainSkieContext: MainSkieContext,
-) : ClassExportCompilerPhase.Context, ForegroundCompilerPhase.Context by mainSkieContext {
+) : ClassExportPhase.Context, ForegroundPhaseCompilerContext by mainSkieContext {
 
     override val context: ClassExportPhaseContext = this
 
-    override val descriptorProvider: MutableDescriptorProvider = mainSkieContext.descriptorProvider
-
-    override val declarationBuilder: DeclarationBuilderImpl = mainSkieContext.declarationBuilder
+    val declarationBuilder: DeclarationBuilderImpl = mainSkieContext.declarationBuilder
 }

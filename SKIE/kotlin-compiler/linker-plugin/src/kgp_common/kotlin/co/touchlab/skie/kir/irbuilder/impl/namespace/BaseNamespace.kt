@@ -5,6 +5,8 @@ import co.touchlab.skie.kir.irbuilder.DeclarationTemplate
 import co.touchlab.skie.kir.irbuilder.Namespace
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
+import co.touchlab.skie.phases.pluginContext
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration

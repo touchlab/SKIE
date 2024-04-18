@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases
 
-interface ForegroundPhase<in C : ForegroundPhase.Context> : ScheduledPhase<C> {
+interface ForegroundPhase<C : ForegroundPhase.Context> : ScheduledPhase<C> {
 
     interface Context : ScheduledPhase.Context {
 

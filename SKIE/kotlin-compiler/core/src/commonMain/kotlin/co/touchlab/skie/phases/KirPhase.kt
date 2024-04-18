@@ -3,7 +3,7 @@ package co.touchlab.skie.phases
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.builtin.KirBuiltins
 
-interface KirPhase<in C : KirPhase.Context> : ForegroundPhase<C> {
+interface KirPhase : ForegroundPhase<KirPhase.Context> {
 
     interface Context : ForegroundPhase.Context {
 

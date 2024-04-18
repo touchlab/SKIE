@@ -8,7 +8,10 @@ import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.phases.DescriptorModificationPhase
 import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
+import co.touchlab.skie.phases.mapper
+import co.touchlab.skie.phases.skieSymbolTable
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder

@@ -1,10 +1,5 @@
 package co.touchlab.skie.kir.descriptor
 
-import co.touchlab.skie.configuration.ClassConfiguration
-import co.touchlab.skie.configuration.FileConfiguration
-import co.touchlab.skie.configuration.FileOrClassConfiguration
-import co.touchlab.skie.configuration.ModuleConfiguration
-import co.touchlab.skie.configuration.PackageConfiguration
 import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.KirProvider
@@ -19,7 +14,6 @@ import co.touchlab.skie.kir.element.KirModule
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.element.KirTypeParameter
 import co.touchlab.skie.kir.element.KirValueParameter
-import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
 import co.touchlab.skie.util.belongsToSkieKotlinRuntime
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -32,8 +26,6 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
-import org.jetbrains.kotlin.descriptors.isInterface
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class DescriptorKirProvider(

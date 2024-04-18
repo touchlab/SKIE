@@ -1,17 +1,17 @@
 package co.touchlab.skie.phases.other
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.phases.ClassExportCompilerPhase
 import co.touchlab.skie.phases.ClassExportPhase
+import co.touchlab.skie.phases.configurables
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
 
-object VerifyMinOSVersionPhase : ClassExportCompilerPhase {
+object VerifyMinOSVersionPhase : ClassExportPhase {
 
     context(ClassExportPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
-    context(ClassExportCompilerPhase.Context)
+    context(ClassExportPhase.Context)
     override suspend fun execute() {
         val currentMinVersion = configurables.osVersionMin
         val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(configurables.target.name)

@@ -3,6 +3,9 @@ package co.touchlab.skie.phases.features.suspend.kotlin
 import co.touchlab.skie.kir.irbuilder.util.SUSPEND_WRAPPER_CHECKED_EXCEPTIONS
 import co.touchlab.skie.kir.irbuilder.util.addChild
 import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.irBuiltIns
+import co.touchlab.skie.phases.pluginContext
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

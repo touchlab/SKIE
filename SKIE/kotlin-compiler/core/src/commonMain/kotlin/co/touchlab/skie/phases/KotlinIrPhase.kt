@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases
 
-interface ClassExportPhase : ForegroundPhase<ClassExportPhase.Context> {
+interface KotlinIrPhase : ForegroundPhase<KotlinIrPhase.Context> {
 
     interface Context : ForegroundPhase.Context {
 

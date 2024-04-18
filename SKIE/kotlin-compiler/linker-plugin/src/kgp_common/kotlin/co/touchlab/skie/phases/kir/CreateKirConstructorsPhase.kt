@@ -5,11 +5,11 @@ package co.touchlab.skie.phases.kir
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
-import co.touchlab.skie.phases.KirCompilerPhase
+import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 
 internal class CreateKirConstructorsPhase(
-    context: KirCompilerPhase.Context,
+    context: KirPhase.Context,
 ) : BaseCreateRegularKirFunctionPhase(context, supportsConstructors = true) {
 
     override fun visitConstructor(descriptor: ConstructorDescriptor, kirClass: KirClass) {

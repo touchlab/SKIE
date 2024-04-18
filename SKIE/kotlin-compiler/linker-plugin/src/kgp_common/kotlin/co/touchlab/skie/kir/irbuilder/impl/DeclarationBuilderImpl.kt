@@ -19,6 +19,8 @@ import co.touchlab.skie.kir.irbuilder.impl.template.SecondaryConstructorTemplate
 import co.touchlab.skie.kir.util.SkieSymbolTable
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
+import co.touchlab.skie.phases.moduleFragment
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer

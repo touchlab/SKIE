@@ -6,6 +6,8 @@ import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.declarationBuilder
+import co.touchlab.skie.phases.descriptorProvider
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope

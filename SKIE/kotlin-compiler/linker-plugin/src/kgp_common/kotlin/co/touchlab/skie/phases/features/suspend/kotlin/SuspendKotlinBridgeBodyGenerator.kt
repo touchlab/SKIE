@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.suspend.kotlin
 
 import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

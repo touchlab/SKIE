@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases.util
 
-import co.touchlab.skie.phases.KirCompilerPhase
+import co.touchlab.skie.phases.KirPhase
 
-abstract class StatefulCompilerDependentKirPhase : KirCompilerPhase,
-    StatefulScheduledPhase<KirCompilerPhase.Context>()
+abstract class StatefulCompilerDependentKirPhase : KirPhase,
+    StatefulScheduledPhase<KirPhase.Context>()

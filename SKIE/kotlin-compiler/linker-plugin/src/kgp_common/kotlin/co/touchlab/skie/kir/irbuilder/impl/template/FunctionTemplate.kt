@@ -7,6 +7,7 @@ import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrSimpleFunction
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.IrRebindableSimpleFunctionPublicSymbol
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor

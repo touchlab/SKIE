@@ -2,6 +2,7 @@ package co.touchlab.skie.kir.irbuilder.impl.namespace
 
 import co.touchlab.skie.kir.irbuilder.UnsupportedDeclarationDescriptorException
 import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.serialization.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor

@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases
 
-interface ClassExportPhase : ForegroundPhase<ClassExportPhase.Context> {
+interface SymbolTablePhase : ForegroundPhase<SymbolTablePhase.Context> {
 
     interface Context : ForegroundPhase.Context {
 

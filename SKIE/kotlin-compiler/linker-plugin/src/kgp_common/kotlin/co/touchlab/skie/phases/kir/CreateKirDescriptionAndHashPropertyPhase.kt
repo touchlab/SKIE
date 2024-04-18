@@ -3,7 +3,6 @@
 package co.touchlab.skie.phases.kir
 
 import co.touchlab.skie.configuration.PropertyConfiguration
-import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirProperty
@@ -12,7 +11,6 @@ import co.touchlab.skie.kir.type.OirBasedKirType
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.oir.type.PrimitiveOirType
-import co.touchlab.skie.phases.KirCompilerPhase
 import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -23,12 +21,12 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
 internal class CreateKirDescriptionAndHashPropertyPhase(
-    context: KirCompilerPhase.Context,
+    context: KirPhase.Context,
 ) : BaseCreateKirMembersPhase(context) {
 
     context(KirPhase.Context)
     override fun isActive(): Boolean =
-        // WIP Change back once we generate custom header
+    // WIP Change back once we generate custom header
         // WIP Add tests for this flag and functionality
         false
 //         SkieConfigurationFlag.Migration_AnyMethodsAsFunctions.isDisabled

@@ -1,7 +1,6 @@
 package co.touchlab.skie.phases.oir.util
 
 import co.touchlab.skie.oir.element.OirClass
-import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.phases.apinotes.builder.ApiNotes
 import co.touchlab.skie.phases.apinotes.builder.ApiNotesType
 import co.touchlab.skie.phases.apinotes.parser.ExternalApiNotesParser

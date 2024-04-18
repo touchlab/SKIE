@@ -9,6 +9,7 @@ import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrConstructor
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.IrRebindableConstructorPublicSymbol
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

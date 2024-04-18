@@ -19,13 +19,13 @@ import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
 class InitPhaseContext(
-    override val compilerConfiguration: CompilerConfiguration,
+    val compilerConfiguration: CompilerConfiguration,
 ) : InitPhase.Context {
 
     override val context: InitPhase.Context
         get() = this
 
-    override val skiePhaseScheduler: SkiePhaseScheduler = SkiePhaseScheduler()
+    val skiePhaseScheduler: SkiePhaseScheduler = SkiePhaseScheduler()
 
     override val skieDirectories: SkieDirectories = compilerConfiguration.getNotNull(SkieConfigurationKeys.SkieDirectories)
 

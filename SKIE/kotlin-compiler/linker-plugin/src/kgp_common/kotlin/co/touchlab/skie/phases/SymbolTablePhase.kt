@@ -1,16 +1,14 @@
 package co.touchlab.skie.phases
 
+import co.touchlab.skie.context.SymbolTablePhaseContext
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.kir.util.SkieSymbolTable
 
-interface SymbolTablePhase : ForegroundCompilerPhase<SymbolTablePhase.Context> {
+val SymbolTablePhase.Context.declarationBuilder: DeclarationBuilderImpl
+    get() = typedContext.declarationBuilder
 
-    interface Context : ForegroundCompilerPhase.Context {
+val SymbolTablePhase.Context.skieSymbolTable: SkieSymbolTable
+    get() = typedContext.skieSymbolTable
 
-        override val context: Context
-
-        val declarationBuilder: DeclarationBuilderImpl
-
-        val skieSymbolTable: SkieSymbolTable
-    }
-}
+private val SymbolTablePhase.Context.typedContext: SymbolTablePhaseContext
+    get() = context as SymbolTablePhaseContext

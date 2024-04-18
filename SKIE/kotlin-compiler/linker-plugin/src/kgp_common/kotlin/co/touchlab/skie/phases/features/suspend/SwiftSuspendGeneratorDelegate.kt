@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.suspend
 
 import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.util.doInPhase
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 

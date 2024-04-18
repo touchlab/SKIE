@@ -3,6 +3,8 @@ package co.touchlab.skie.analytics.modules
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.allModules
+import co.touchlab.skie.phases.descriptorProvider
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.util.hash.hashed
 import co.touchlab.skie.util.toPrettyJson

@@ -3,6 +3,8 @@ package co.touchlab.skie.phases.features.suspend.kotlin
 import co.touchlab.skie.kir.irbuilder.util.irFunctionExpression
 import co.touchlab.skie.kir.irbuilder.util.irSimpleFunction
 import co.touchlab.skie.phases.KotlinIrPhase
+import co.touchlab.skie.phases.irBuiltIns
+import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
