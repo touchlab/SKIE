@@ -12,7 +12,7 @@ internal class ObjCExportPhaseInterceptor : SameTypePhaseInterceptor<KonanContex
     override fun getInterceptedPhase(): Any = objCExportPhase
 
     override fun intercept(context: KonanContext, input: Unit, next: (KonanContext, Unit) -> Unit) {
-        EntrypointUtils.runDescriptorModificationPhases(context.config.configuration.mainSkieContext)
+        EntrypointUtils.runFrontendIrPhases(context.config.configuration.mainSkieContext)
 
         next(context, input)
     }

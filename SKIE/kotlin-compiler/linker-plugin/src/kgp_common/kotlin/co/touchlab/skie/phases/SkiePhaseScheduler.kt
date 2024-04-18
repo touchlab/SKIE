@@ -98,7 +98,7 @@ class SkiePhaseScheduler {
         )
     }
 
-    val descriptorModificationPhases = SkiePhaseGroup<DescriptorModificationPhase, DescriptorModificationPhase.Context> { context ->
+    val frontendIrPhases = SkiePhaseGroup<FrontendIrPhase, FrontendIrPhase.Context> { context ->
         addAll(
             DefaultArgumentGenerator(context),
             SuspendGenerator,
@@ -263,8 +263,8 @@ class SkiePhaseScheduler {
     }
 
     context(ScheduledPhase.Context)
-    fun runDescriptorModificationPhases(contextFactory: () -> DescriptorModificationPhase.Context) {
-        descriptorModificationPhases.run(contextFactory)
+    fun runFrontendIrPhases(contextFactory: () -> FrontendIrPhase.Context) {
+        frontendIrPhases.run(contextFactory)
     }
 
     context(ScheduledPhase.Context)

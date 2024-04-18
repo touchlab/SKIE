@@ -5,18 +5,18 @@ import co.touchlab.skie.configuration.isSuspendInteropEnabled
 import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.allExposedMembers
-import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.phases.descriptorProvider
 import co.touchlab.skie.phases.util.StatefulCompilerDependentKirPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
-object SuspendGenerator : DescriptorModificationPhase {
+object SuspendGenerator : FrontendIrPhase {
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     override suspend fun execute() {
         val kotlinDelegate = KotlinSuspendGeneratorDelegate(context)
         val swiftDelegate = SwiftSuspendGeneratorDelegate(context)
@@ -28,7 +28,7 @@ object SuspendGenerator : DescriptorModificationPhase {
         }
     }
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private val DescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
         get() = this.allExposedMembers.filterIsInstance<SimpleFunctionDescriptor>()
             .filter { mapper.isBaseMethod(it) }

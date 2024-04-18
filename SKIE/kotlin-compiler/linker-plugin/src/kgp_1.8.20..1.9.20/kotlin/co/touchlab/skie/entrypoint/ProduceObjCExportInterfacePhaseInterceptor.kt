@@ -30,7 +30,7 @@ internal class ProduceObjCExportInterfacePhaseInterceptor :
 
         EntrypointUtils.runClassExportPhases(mainSkieContext)
 
-        EntrypointUtils.runDescriptorModificationPhases(mainSkieContext)
+        EntrypointUtils.runFrontendIrPhases(mainSkieContext)
 
         return next(context, input)
     }

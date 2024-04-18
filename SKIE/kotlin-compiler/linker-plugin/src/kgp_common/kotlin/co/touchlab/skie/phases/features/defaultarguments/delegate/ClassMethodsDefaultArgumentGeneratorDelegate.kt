@@ -1,14 +1,14 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
-import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 class ClassMethodsDefaultArgumentGeneratorDelegate(
-    context: DescriptorModificationPhase.Context,
+    context: FrontendIrPhase.Context,
     sharedCounter: SharedCounter,
 ) : BaseFunctionDefaultArgumentGeneratorDelegate(context, sharedCounter) {
 

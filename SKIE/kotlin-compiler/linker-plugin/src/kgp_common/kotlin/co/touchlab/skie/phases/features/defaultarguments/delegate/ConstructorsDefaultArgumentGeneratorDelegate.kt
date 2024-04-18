@@ -5,7 +5,7 @@ import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.createSecondaryConstructor
 import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
-import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
@@ -29,11 +29,11 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 
 class ConstructorsDefaultArgumentGeneratorDelegate(
-    context: DescriptorModificationPhase.Context,
+    context: FrontendIrPhase.Context,
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedClasses.forEach { classDescriptor ->
             classDescriptor.allSupportedConstructors.forEach {
@@ -48,13 +48,13 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassDescriptor.isSupported: Boolean
         get() = this.kind == ClassKind.CLASS
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private val ClassDescriptor.allSupportedConstructors: List<ClassConstructorDescriptor>
         get() = descriptorProvider.getExposedConstructors(this)
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private fun generateOverloads(constructor: ClassConstructorDescriptor, classDescriptor: ClassDescriptor) {
         constructor.forEachDefaultArgumentOverload { overloadParameters ->
             if (overloadParameters.isNotEmpty() || classDescriptor.generateOverloadWithNoParameters) {
@@ -70,14 +70,14 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassConstructorDescriptor.hasNoParametersIgnoringDefaultArguments: Boolean
         get() = this.valueParameters.count { !it.hasDefaultValue() } == 0
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private fun generateOverload(constructor: ClassConstructorDescriptor, parameters: List<ValueParameterDescriptor>) {
         val overload = generateOverloadWithUniqueName(constructor, parameters)
 
         registerOverload(overload, constructor)
     }
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private fun generateOverloadWithUniqueName(
         constructor: ClassConstructorDescriptor,
         parameters: List<ValueParameterDescriptor>,

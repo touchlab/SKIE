@@ -6,7 +6,7 @@ import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.getNamespace
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
-import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.features.defaultarguments.DefaultArgumentGenerator
@@ -32,11 +32,11 @@ import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
 abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
-    context: DescriptorModificationPhase.Context,
+    context: FrontendIrPhase.Context,
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
@@ -49,14 +49,14 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     protected abstract fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor>
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private fun generateOverloads(function: SimpleFunctionDescriptor) {
         function.forEachDefaultArgumentOverload { overloadParameters ->
             generateOverload(function, overloadParameters)
         }
     }
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private fun generateOverload(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -68,7 +68,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         removeManglingOfOverload(newFunction, function)
     }
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private fun generateOverloadWithUniqueName(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,

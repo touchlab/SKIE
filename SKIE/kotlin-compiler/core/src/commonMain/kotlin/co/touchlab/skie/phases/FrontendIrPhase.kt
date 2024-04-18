@@ -1,6 +1,6 @@
 package co.touchlab.skie.phases
 
-interface DescriptorModificationPhase : ForegroundPhase<DescriptorModificationPhase.Context> {
+interface FrontendIrPhase : ForegroundPhase<FrontendIrPhase.Context> {
 
     interface Context : ForegroundPhase.Context {
 

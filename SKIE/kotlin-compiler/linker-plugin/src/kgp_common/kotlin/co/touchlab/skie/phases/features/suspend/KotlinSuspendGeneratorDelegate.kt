@@ -7,7 +7,7 @@ import co.touchlab.skie.kir.irbuilder.createFunction
 import co.touchlab.skie.kir.irbuilder.util.copyIndexing
 import co.touchlab.skie.kir.irbuilder.util.copyWithoutDefaultValue
 import co.touchlab.skie.kir.irbuilder.util.createValueParameter
-import co.touchlab.skie.phases.DescriptorModificationPhase
+import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.phases.KirPhase
 import co.touchlab.skie.phases.declarationBuilder
 import co.touchlab.skie.phases.descriptorKirProvider
@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
 class KotlinSuspendGeneratorDelegate(
-    private val context: DescriptorModificationPhase.Context,
+    private val context: FrontendIrPhase.Context,
 ) {
 
     private var nextBridgingFunctionIndex = 0
@@ -46,7 +46,7 @@ class KotlinSuspendGeneratorDelegate(
 
     private val bodyGenerator = SuspendKotlinBridgeBodyGenerator(suspendHandlerDescriptor)
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     fun generateKotlinBridgingFunction(functionDescriptor: FunctionDescriptor): FunctionDescriptor {
         val bridgingFunctionDescriptor = createBridgingFunction(functionDescriptor)
 
@@ -56,7 +56,7 @@ class KotlinSuspendGeneratorDelegate(
         return bridgingFunctionDescriptor
     }
 
-    context(DescriptorModificationPhase.Context)
+    context(FrontendIrPhase.Context)
     private fun FunctionDescriptor.changeSkieConfiguration(originalFunctionDescriptor: FunctionDescriptor) {
         this.configuration.useDefaultsForSkieRuntime = true
 
