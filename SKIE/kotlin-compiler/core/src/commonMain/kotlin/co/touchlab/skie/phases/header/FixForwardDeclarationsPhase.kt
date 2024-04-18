@@ -28,7 +28,20 @@ class FixForwardDeclarationsPhase(
             return null
         }
 
-        return "@class " + classes.joinToString(", ") { it.renderForwardDeclaration() } + ";"
+        // The sorting by name length should prevent a bug in the Swift compiler where it confuses Obj-C name and Swift name which leads to compilation errors.
+        // This can happen if there are two types and the name of the first type is in the form `$FrameworkName$OtherTypeName`.
+        // In that case the Swift name of this type collides with the Obj-C name of the other type due to Kotlin adding the prefix of the framework name.
+        // For example, this forward declaration order works:
+        //     ```
+        //     @protocol SharedSharedFlow; // Is SharedFlow in Kotlin and Swift
+        //     @protocol SharedFlow;       // Is Flow in Kotlin and Swift
+        //     ```
+        // but this does not:
+        //     ```
+        //     @protocol SharedFlow;
+        //     @protocol SharedSharedFlow;
+        //     ```
+        return "@class " + classes.sortedByDescending { it.name }.joinToString(", ") { it.renderForwardDeclaration() } + ";"
     }
 
     private fun getProtocolForwardDeclarations(): String? {
@@ -37,6 +50,6 @@ class FixForwardDeclarationsPhase(
             return null
         }
 
-        return "@protocol " + protocols.joinToString(", ") { it.renderForwardDeclaration() } + ";"
+        return "@protocol " + protocols.sortedByDescending { it.name }.joinToString(", ") { it.renderForwardDeclaration() } + ";"
     }
 }
