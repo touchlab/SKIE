@@ -85,7 +85,7 @@ class CompileSwiftPhase(
     }
 
     private fun callSwiftCompiler() {
-        Command("${swiftCompilerConfiguration.absoluteTargetToolchainPath}/usr/bin/swiftc").apply {
+        Command(swiftCompilerConfiguration.absoluteSwiftcPath).apply {
             +listOf("-module-name", framework.moduleName)
             +"-import-underlying-module"
             +"-F"

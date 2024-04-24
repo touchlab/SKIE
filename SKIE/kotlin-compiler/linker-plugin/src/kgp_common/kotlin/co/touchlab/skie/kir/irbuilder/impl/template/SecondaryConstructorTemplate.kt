@@ -61,7 +61,7 @@ class SecondaryConstructorTemplate(
 
     context(SymbolTablePhase.Context)
     override fun declareSymbol() {
-        val signature = skieSymbolTable.kotlinSymbolTable.signaturer.composeSignature(descriptor)
+        val signature = skieSymbolTable.signaturer.composeSignature(descriptor)
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
         // IrRebindableConstructorPublicSymbol is used so that we can later bind it to the correct declaration which cannot be created before the symbol table is validated to not contain any unbound symbols.

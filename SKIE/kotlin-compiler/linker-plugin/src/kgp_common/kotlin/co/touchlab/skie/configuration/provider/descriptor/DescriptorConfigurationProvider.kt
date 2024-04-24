@@ -11,7 +11,7 @@ import co.touchlab.skie.configuration.provider.ConfigurationProvider
 import co.touchlab.skie.configuration.provider.IdentifiedConfigurationTarget
 import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.phases.descriptorConfigurationProvider
-import org.jetbrains.kotlin.backend.common.serialization.findPackage
+import co.touchlab.skie.shim.findPackage
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor

@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.kir.descriptor.cache
 
+import co.touchlab.skie.shim.isObjCObjectType
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
+import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeVisible
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -62,7 +64,8 @@ class CachedObjCExportMapper internal constructor(
 
     fun shouldBeExposed(descriptor: ClassDescriptor): Boolean =
         shouldBeExposedClassCache.getOrPut(descriptor) {
-            kotlinMapper.shouldBeExposed(descriptor)
+            // shouldBeExposed cannot be called directly starting from Kotlin 2.0.0 because it is internal and the other overload is public
+            kotlinMapper.shouldBeVisible(descriptor) && !kotlinMapper.isSpecialMapped(descriptor) && !descriptor.defaultType.isObjCObjectType()
         }
 
     fun isTopLevel(descriptor: CallableMemberDescriptor): Boolean =

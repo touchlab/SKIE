@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.irbuilder.util
 
-import org.jetbrains.kotlin.backend.common.serialization.findPackage
+import co.touchlab.skie.shim.findPackage
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary

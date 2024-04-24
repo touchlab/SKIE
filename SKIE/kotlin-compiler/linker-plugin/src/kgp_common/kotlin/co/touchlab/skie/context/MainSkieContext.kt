@@ -14,6 +14,8 @@ import co.touchlab.skie.phases.BackgroundPhase
 import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.configurables
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
+import co.touchlab.skie.util.KotlinCompilerVersion
+import co.touchlab.skie.util.current
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +82,11 @@ class MainSkieContext internal constructor(
             BitcodeEmbedding.Mode.MARKER -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker
             BitcodeEmbedding.Mode.NONE, null -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.None
         },
-        absoluteTargetToolchainPath = configurables.absoluteTargetToolchain,
+        absoluteSwiftcPath = if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`2_0_0`) {
+            configurables.absoluteTargetToolchain + "/bin/swiftc"
+        } else {
+            configurables.absoluteTargetToolchain + "/usr/bin/swiftc"
+        },
         absoluteTargetSysRootPath = configurables.absoluteTargetSysRoot,
         osVersionMin = configurables.osVersionMin,
     )

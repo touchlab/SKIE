@@ -21,7 +21,7 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
 import co.touchlab.skie.phases.moduleFragment
 import co.touchlab.skie.phases.skieSymbolTable
-import org.jetbrains.kotlin.backend.common.serialization.findPackage
+import co.touchlab.skie.shim.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerIr

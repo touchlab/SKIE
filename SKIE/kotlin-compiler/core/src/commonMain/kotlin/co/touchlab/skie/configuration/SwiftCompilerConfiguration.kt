@@ -6,7 +6,7 @@ data class SwiftCompilerConfiguration(
     val buildType: BuildType,
     val targetTriple: TargetTriple,
     val bitcodeEmbeddingMode: BitcodeEmbeddingMode,
-    val absoluteTargetToolchainPath: String,
+    val absoluteSwiftcPath: String,
     val absoluteTargetSysRootPath: String,
     val osVersionMin: String,
 ) {

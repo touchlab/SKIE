@@ -12,11 +12,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 abstract class OptInExperimentalCompilerApi : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
+        val annotations = listOf(
+            "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
+            "org.jetbrains.kotlin.backend.konan.InternalKotlinNativeApi",
+        )
+
         plugins.withType<KotlinMultiplatformPluginWrapper> {
             extensions.configure<KotlinMultiplatformExtension> {
                 sourceSets.configureEach {
                     languageSettings {
-                        optIn("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+                        annotations.forEach {
+                            optIn(it)
+                        }
                     }
                 }
             }
@@ -24,7 +31,9 @@ abstract class OptInExperimentalCompilerApi : Plugin<Project> {
 
         plugins.withType<KotlinPluginWrapper> {
             project.tasks.withType<KotlinCompilationTask<*>>().configureEach {
-                compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+                annotations.forEach {
+                    compilerOptions.freeCompilerArgs.add("-opt-in=$it")
+                }
             }
         }
     }
