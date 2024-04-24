@@ -36,7 +36,7 @@ abstract class SkieCompiler : Plugin<Project> {
             configureSourceSet { sourceSet ->
                 val kotlinVersion = sourceSet.kotlinToolingVersion.primaryVersion
 
-                generateKotlinCompilerVersionEnum(sourceSet, kotlinVersion, project)
+                generateKotlinCompilerVersionEnum(sourceSet, sourceSet.kotlinToolingVersion.name, project)
 
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")

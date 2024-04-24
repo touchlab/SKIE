@@ -22,7 +22,7 @@ abstract class SkieCompilerCore : Plugin<Project> {
         apply<KotlinMultiplatformPluginWrapper>()
         apply<OptInExperimentalCompilerApi>()
 
-        val primaryKotlinVersions = kotlinToolingVersionDimension().components.map { it.primaryVersion }.distinct().sorted()
+        val primaryKotlinVersions = kotlinToolingVersionDimension().components.map { it.name }.distinct().sorted()
 
         val minimumKotlinVersion = primaryKotlinVersions.min()
 
