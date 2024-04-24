@@ -20,3 +20,5 @@ local.properties
 Pods
 
 .DS_Store
+
+.kotlin/
