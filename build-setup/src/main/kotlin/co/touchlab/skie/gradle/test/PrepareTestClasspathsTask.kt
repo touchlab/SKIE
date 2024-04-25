@@ -126,8 +126,8 @@ abstract class PrepareTestClasspathsTask : DefaultTask() {
                         val target = kotlin.targets.getByName("library_${'$'}index") as KotlinNativeTarget
                         val framework = target.binaries.filterIsInstance<Framework>().single()
                         library to mapOf(
-                            "files" to framework.linkTask.libraries.filter { (it.extension == "klib" || it.isDirectory) && it.exists() }.map { it.absolutePath },
-                            "exported-files" to framework.linkTask.exportLibraries.filter { (it.extension == "klib" || it.isDirectory) && it.exists() }.map { it.absolutePath },
+                            "files" to framework.linkTask.libraries.filter { it.extension == "klib" && it.exists() }.map { it.absolutePath },
+                            "exported-files" to framework.linkTask.exportLibraries.filter { it.extension == "klib" && it.exists() }.map { it.absolutePath },
                         )
                     }
                     project.file("output").writeText(JsonOutput.prettyPrint(JsonOutput.toJson(json)))
