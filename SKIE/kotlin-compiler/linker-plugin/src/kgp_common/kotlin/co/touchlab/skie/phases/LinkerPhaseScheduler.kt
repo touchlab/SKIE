@@ -25,6 +25,7 @@ import co.touchlab.skie.phases.header.DeclareSkieErrorTypesPhase
 import co.touchlab.skie.phases.header.FixForwardDeclarationsPhase
 import co.touchlab.skie.phases.header.FixHeaderFilePropertyOrderingPhase
 import co.touchlab.skie.phases.header.GenerateFakeObjCDependenciesPhase
+import co.touchlab.skie.phases.header.ImportFakeObjCDependenciesPhase
 import co.touchlab.skie.phases.kir.CreateExposedKirTypesPhase
 import co.touchlab.skie.phases.kir.CreateKirConstructorsPhase
 import co.touchlab.skie.phases.kir.CreateKirDescriptionAndHashPropertyPhase
@@ -233,8 +234,10 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             ConvertSirIrFilesToSourceFilesPhase,
             ConvertSirSourceFilesToCompilableFilesPhase,
             GenerateFakeObjCDependenciesPhase,
+            ImportFakeObjCDependenciesPhase,
             GenerateModulemapFilePhase.ForSwiftCompilation,
             SwiftKotlinFrameworkCacheSetupPhase,
+            ImportFakeObjCDependenciesPhase.RevertPhase,
             CompileSwiftPhase(context),
             TemporarilyRenameTypesConflictingWithExternalModulesPhase.RevertPhase,
             GenerateModulemapFilePhase.ForFramework,
