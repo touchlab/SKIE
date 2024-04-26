@@ -117,22 +117,26 @@ abstract class PrepareTestClasspathsTask : DefaultTask() {
                 }
             }
             tasks.register("downloadAllArtifacts") {
-                val nativeTargets = kotlin.targets.filterIsInstance<KotlinNativeTarget>()
-                // dependsOn(
-                //     nativeTargets.flatMap { it.binaries.map { it.linkTaskProvider } }
-                // )
                 doLast {
                     val json = libraries.withIndex().associate { (index, library) ->
                         val target = kotlin.targets.getByName("library_${'$'}index") as KotlinNativeTarget
                         val framework = target.binaries.filterIsInstance<Framework>().single()
+
+                        val files = framework.linkTask.libraries.filter { it.extension == "klib" && it.exists() }.map { it.absolutePath }
+                        val exportedFiles = framework.linkTask.exportLibraries.filter { it.extension == "klib" && it.exists() }.map { it.absolutePath }
+
                         library to mapOf(
-                            "files" to framework.linkTask.libraries.filter { it.extension == "klib" && it.exists() }.map { it.absolutePath },
-                            "exported-files" to framework.linkTask.exportLibraries.filter { it.extension == "klib" && it.exists() }.map { it.absolutePath },
+                            // The runtime is added manually, so it needs to be excluded to prevent potential duplication
+                            "files" to files.withoutSkieKotlinRuntime(),
+                            "exported-files" to exportedFiles.withoutSkieKotlinRuntime(),
                         )
                     }
                     project.file("output").writeText(JsonOutput.prettyPrint(JsonOutput.toJson(json)))
                 }
             }
+
+            private fun List<String>.withoutSkieKotlinRuntime(): List<String> =
+                this.filterNot { it.contains("co.touchlab.skie/runtime-kotlin") }
             """.trimIndent(),
         )
 
@@ -144,8 +148,10 @@ abstract class PrepareTestClasspathsTask : DefaultTask() {
 
         val updatedJson = json.mapValues { (library, artifacts) ->
             val cacheDirectory = libraryCacheDirectory.dir(library.replace(":", "/")).get().asFile
+
             val files = artifacts["files"] ?: emptyList()
             val exportedFiles = artifacts["exported-files"] ?: emptyList()
+
             val filePathMap = files.withIndex().associate { (index, path) ->
                 val oldFile = File(path)
                 val newFile = cacheDirectory.resolve("${index}-${oldFile.name}")
