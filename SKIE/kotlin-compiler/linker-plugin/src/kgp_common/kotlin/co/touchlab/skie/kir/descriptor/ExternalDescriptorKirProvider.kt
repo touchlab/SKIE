@@ -84,19 +84,11 @@ class ExternalDescriptorKirProvider(
         }
 
     private fun getExternalModule(descriptor: ClassDescriptor): KirModule {
-        val moduleName = if (descriptor.isPlatformType) {
-            descriptor.cinteropFrameworkNameForPlatformType
-        } else {
-            descriptorConfigurationProvider.getConfiguration(descriptor)[ClassInterop.CInteropFrameworkName]
-        }
+        val swiftFrameworkName = getExternalClassSwiftFrameworkName(descriptor) ?: return unknownModule
 
-        if (moduleName == null) {
-            return unknownModule
-        }
-
-        return externalModulesByName.getOrPut(moduleName) {
+        return externalModulesByName.getOrPut(swiftFrameworkName) {
             KirModule(
-                name = moduleName,
+                name = swiftFrameworkName,
                 project = kirProject,
                 configuration = ModuleConfiguration(rootConfiguration),
                 origin = KirModule.Origin.KnownExternal,
@@ -104,10 +96,21 @@ class ExternalDescriptorKirProvider(
         }
     }
 
+    private fun getExternalClassSwiftFrameworkName(descriptor: ClassDescriptor): String? =
+        descriptorConfigurationProvider.getConfiguration(descriptor)[ClassInterop.CInteropFrameworkName] ?:
+            if (descriptor.isPlatformType || descriptor.isCocoapodsType) {
+                descriptor.cinteropFrameworkNameForWellKnownExternalType
+            } else {
+                null
+            }
+
     private val ClassDescriptor.isPlatformType: Boolean
         get() = this.fqNameUnsafe.pathSegments()[0].asString() == "platform"
 
-    private val ClassDescriptor.cinteropFrameworkNameForPlatformType: String
+    private val ClassDescriptor.isCocoapodsType: Boolean
+        get() = this.fqNameUnsafe.pathSegments()[0].asString() == "cocoapods"
+
+    private val ClassDescriptor.cinteropFrameworkNameForWellKnownExternalType: String
         get() = if (this.fqNameUnsafe.shortName().asString() != "NSObject") {
             this.fqNameUnsafe.asString().split(".")[1]
         } else {
