@@ -8,8 +8,12 @@ import co.touchlab.skie.phases.pluginContext
 import co.touchlab.skie.phases.skieSymbolTable
 import co.touchlab.skie.shim.SUSPEND_WRAPPER_CHECKED_EXCEPTIONS
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
+import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
+import org.jetbrains.kotlin.descriptors.findClassifierAcrossModuleDependencies
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irExprBody
@@ -23,14 +27,15 @@ import org.jetbrains.kotlin.ir.expressions.IrClassReference
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrClassReferenceImpl
+import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrFieldSymbolImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.referenceClassifier
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.constants.KClassValue
+import org.jetbrains.kotlin.resolve.constants.KClassValue.Value
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -100,14 +105,11 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
         }
 
     context(KotlinIrPhase.Context)
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun createCheckedExceptionClassReferences(
         originalFunctionDescriptor: FunctionDescriptor,
     ): List<IrClassReference> =
         originalFunctionDescriptor.declaredThrownExceptions
-            .map { exceptionType ->
-                val exceptionTypeSymbol = skieSymbolTable.kotlinSymbolTable.referenceClassifier(exceptionType.constructor.declarationDescriptor!!)
-
+            .map { exceptionTypeSymbol ->
                 IrClassReferenceImpl(
                     startOffset = 0,
                     endOffset = 0,
@@ -117,13 +119,30 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
                 )
             }
 
-    private val FunctionDescriptor.declaredThrownExceptions: List<KotlinType>
+    context(KotlinIrPhase.Context)
+    private val FunctionDescriptor.declaredThrownExceptions: List<IrClassifierSymbol>
         get() {
-            val throwsAnnotation = this.annotations.findAnnotation(FqName("kotlin.Throws")) ?: return emptyList()
+            val throwsAnnotation = this.annotations.findAnnotation(KonanFqNames.throws) ?: return emptyList()
 
             @Suppress("UNCHECKED_CAST")
             val exceptionClasses = throwsAnnotation.argumentValue("exceptionClasses")?.value as List<KClassValue>
 
-            return exceptionClasses.map { it.getArgumentType(this.module) }
+            return exceptionClasses.map { it.getClassifierSymbol(this.module) }
+        }
+
+    context(KotlinIrPhase.Context)
+    private fun KClassValue.getClassifierSymbol(module: ModuleDescriptor): IrClassifierSymbol =
+        when (val value = this.value) {
+            is Value.LocalClass -> value.type.toIrSymbol()
+            is Value.NormalClass -> module.findClassifierAcrossModuleDependencies(value.classId)!!.defaultType.toIrSymbol()
+        }
+
+    context(KotlinIrPhase.Context)
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun KotlinType.toIrSymbol(): IrClassifierSymbol =
+        when (val classifier = this.constructor.declarationDescriptor) {
+            null -> error("No declaration descriptor for type $this.")
+            is TypeAliasDescriptor -> classifier.expandedType.toIrSymbol()
+            else -> skieSymbolTable.kotlinSymbolTable.referenceClassifier(classifier)
         }
 }
