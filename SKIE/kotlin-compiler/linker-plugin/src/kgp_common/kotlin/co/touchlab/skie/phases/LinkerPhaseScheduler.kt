@@ -19,6 +19,7 @@ import co.touchlab.skie.phases.features.flow.FlowConversionConstructorsGenerator
 import co.touchlab.skie.phases.features.flow.UnifyFlowConfigurationForOverridesPhase
 import co.touchlab.skie.phases.features.functions.FileScopeConvertorPhase
 import co.touchlab.skie.phases.features.sealed.SealedInteropGenerator
+import co.touchlab.skie.phases.features.suspend.CheckSkieRuntimePresencePhase
 import co.touchlab.skie.phases.features.suspend.SuspendGenerator
 import co.touchlab.skie.phases.header.AddTypeDefPhase
 import co.touchlab.skie.phases.header.DeclareSkieErrorTypesPhase
@@ -92,6 +93,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             VerifyModuleNamePhase,
             VerifyMinOSVersionPhase,
             VerifyNoBitcodeEmbeddingPhase,
+            CheckSkieRuntimePresencePhase,
             FixLibrariesShortNamePhase,
             ClassExportAnalyticsPhase,
             ExtraClassExportPhase(context),

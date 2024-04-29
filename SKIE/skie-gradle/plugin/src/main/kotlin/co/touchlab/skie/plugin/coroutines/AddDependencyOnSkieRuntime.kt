@@ -1,11 +1,17 @@
 package co.touchlab.skie.plugin.coroutines
 
+import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
-import co.touchlab.skie.plugin.skieInternal
 import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
-import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractNativeLibrary
-import org.jetbrains.kotlin.konan.target.KonanTarget
+import co.touchlab.skie.plugin.util.named
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ModuleIdentifier
+import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.attributes.Usage
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.konan.target.presetName
 
 internal fun SkieTarget.addDependencyOnSkieRuntime(kotlinToolingVersion: String) {
@@ -13,63 +19,111 @@ internal fun SkieTarget.addDependencyOnSkieRuntime(kotlinToolingVersion: String)
         return
     }
 
-    val configurationNames = when (this) {
-        is SkieTarget.TargetBinary -> listOfNotNull(
-            binary.compilation.apiConfigurationName,
-            (binary as? AbstractNativeLibrary)?.exportConfigurationName,
-        )
-        is SkieTarget.Artifact -> {
-            val nameSuffix = SkieTarget.Artifact.artifactNameSuffix(artifact)
-            listOf(
-                lowerCamelCaseName(konanTarget.presetName, artifact.artifactName + nameSuffix, "linkLibrary"),
-                lowerCamelCaseName(konanTarget.presetName, artifact.artifactName + nameSuffix, "linkExport"),
-            )
+    val skieRuntimeConfiguration = getOrCreateSkieRuntimeConfiguration(kotlinToolingVersion)
+
+    linkerConfiguration.incoming.afterResolve {
+        registerSkieRuntime(skieRuntimeConfiguration)
+    }
+}
+
+private fun SkieTarget.registerSkieRuntime(
+    skieRuntimeConfiguration: Configuration,
+) {
+    val skieRuntimeDependency = skieRuntimeConfiguration.getSkieRuntimeDependency()
+
+    val skieRuntimeDirectDependencies = skieRuntimeDependency.getSkieRuntimeDirectDependencies()
+
+    val linkerDependenciesIds = linkerConfiguration.resolvedConfiguration.resolvedArtifacts.map { it.moduleVersion.id.module }
+
+    if (!areCoroutinesUsedInProject(skieRuntimeDirectDependencies, linkerDependenciesIds)) {
+        return
+    }
+
+    verifyAllRuntimeDependenciesAreAvailable(skieRuntimeDirectDependencies, linkerDependenciesIds)
+
+    passRuntimeDependencyToCompiler(skieRuntimeDependency)
+}
+
+private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(kotlinToolingVersion: String): Configuration {
+    val skieRuntimeConfigurationName = skieRuntimeConfigurationName
+
+    project.configurations.findByName(skieRuntimeConfigurationName)?.let {
+        return it
+    }
+
+    val skieRuntimeConfiguration = project.configurations.create(skieRuntimeConfigurationName) {
+        attributes {
+            attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+            attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget.name)
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(KotlinUsages.KOTLIN_API))
+            attribute(KotlinCompilerVersion.attribute, project.objects.named(kotlinToolingVersion))
         }
     }
 
-    val dependency = if (project.skieInternal.runtimeVariantFallback.get()) {
-        BuildConfig.DEFAULT_RUNTIME_DEPENDENCY
-    } else {
-        BuildConfig.SPECIFIC_RUNTIME_DEPENDENCY(konanTarget, kotlinToolingVersion)
-    }
-    configurationNames.forEach { configurationName ->
-        project.dependencies.add(configurationName, dependency)
+    project.dependencies.add(skieRuntimeConfigurationName, BuildConfig.SKIE_KOTLIN_RUNTIME_COORDINATES)
+
+    return skieRuntimeConfiguration
+}
+
+private fun Configuration.getSkieRuntimeDependency(): ResolvedDependency =
+    resolvedConfiguration.firstLevelModuleDependencies
+        .single()
+        .unwrapCommonKMPModule()
+        .single()
+
+private fun ResolvedDependency.getSkieRuntimeDirectDependencies(): List<ModuleIdentifier> =
+    children.flatMap { it.unwrapCommonKMPModule() }.map { it.module.id.module }
+
+private fun areCoroutinesUsedInProject(
+    skieRuntimeDirectDependencies: List<ModuleIdentifier>,
+    linkerDependenciesIds: List<ModuleIdentifier>,
+): Boolean {
+    val coroutinesDependency = skieRuntimeDirectDependencies.single { it.name.startsWith("kotlinx-coroutines") }
+
+    return coroutinesDependency in linkerDependenciesIds
+}
+
+private fun SkieTarget.verifyAllRuntimeDependenciesAreAvailable(
+    skieRuntimeDirectDependencies: List<ModuleIdentifier>,
+    linkerDependenciesIds: List<ModuleIdentifier>,
+) {
+    skieRuntimeDirectDependencies.forEach {
+        if (it !in linkerDependenciesIds) {
+            throw IllegalStateException(
+                "SKIE runtime requires a dependency '$it' which the target's configuration '${linkerConfigurationName}' does not have. " +
+                    "This is most likely a bug in SKIE.",
+            )
+        }
     }
 }
 
-private val BuildConfig.DEFAULT_RUNTIME_DEPENDENCY: String
-    get() = "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME:$RUNTIME_DEPENDENCY_VERSION"
-
-@Suppress("FunctionName")
-private fun BuildConfig.SPECIFIC_RUNTIME_DEPENDENCY(konanTarget: KonanTarget, kotlinVersion: String): String {
-    return "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME-${konanTarget.dependencyPresetName}__kgp_${kotlinVersion}:$RUNTIME_DEPENDENCY_VERSION"
+private fun SkieTarget.passRuntimeDependencyToCompiler(skieRuntimeDependency: ResolvedDependency) {
+    skieRuntimeDependency.moduleArtifacts
+        .single { it.file.extension == "klib" }
+        .let { moduleArtifact ->
+            addFreeCompilerArgs(
+                "-Xexport-library=${moduleArtifact.file.absolutePath}",
+                "-library=${moduleArtifact.file.absolutePath}",
+            )
+        }
 }
 
-private val KonanTarget.dependencyPresetName: String
+private val SkieTarget.linkerConfiguration: Configuration
+    get() = project.configurations.getByName(linkerConfigurationName)
+
+private val SkieTarget.linkerConfigurationName: String
     get() = when (this) {
-        KonanTarget.IOS_ARM32 -> "iosArm32"
-        KonanTarget.IOS_ARM64 -> "iosArm64"
-        KonanTarget.IOS_X64 -> "iosX64"
-        KonanTarget.IOS_SIMULATOR_ARM64 -> "iosSimulatorArm64"
+        is SkieTarget.TargetBinary -> binary.compilation.compileDependencyConfigurationName
+        is SkieTarget.Artifact -> {
+            val nameSuffix = SkieTarget.Artifact.artifactNameSuffix(artifact)
 
-        KonanTarget.MACOS_ARM64 -> "macosArm64"
-        KonanTarget.MACOS_X64 -> "macosX64"
+            lowerCamelCaseName(konanTarget.presetName, artifact.artifactName + nameSuffix, "linkLibrary")
+        }
+    }
 
-        KonanTarget.TVOS_ARM64 -> "tvosArm64"
-        KonanTarget.TVOS_SIMULATOR_ARM64 -> "tvosSimulatorArm64"
-        KonanTarget.TVOS_X64 -> "tvosX64"
+private val SkieTarget.skieRuntimeConfigurationName: String
+    get() = "skieRuntimeFor" + linkerConfigurationName.replaceFirstChar { it.uppercase() }
 
-        KonanTarget.WATCHOS_ARM32 -> "watchosArm32"
-        KonanTarget.WATCHOS_ARM64 -> "watchosArm64"
-        KonanTarget.WATCHOS_DEVICE_ARM64 -> "watchosDeviceArm64"
-        KonanTarget.WATCHOS_X86 -> "watchosX86"
-        KonanTarget.WATCHOS_X64 -> "watchosX64"
-        KonanTarget.WATCHOS_SIMULATOR_ARM64 -> "watchosSimulatorArm64"
-
-        KonanTarget.ANDROID_ARM32, KonanTarget.ANDROID_ARM64, KonanTarget.ANDROID_X64, KonanTarget.ANDROID_X86, KonanTarget.LINUX_ARM32_HFP,
-        KonanTarget.LINUX_ARM64, KonanTarget.LINUX_MIPS32, KonanTarget.LINUX_MIPSEL32, KonanTarget.LINUX_X64, KonanTarget.MINGW_X64,
-        KonanTarget.MINGW_X86, KonanTarget.WASM32, is KonanTarget.ZEPHYR,
-        -> error(
-            "SKIE doesn't support these platforms, so it should never ask for the preset name of this target.",
-        )
-    }.lowercase()
+// Due to how KMP dependencies work there is a difference in the behavior of local and remote dependencies.
+private fun ResolvedDependency.unwrapCommonKMPModule(): Set<ResolvedDependency> =
+    if (moduleArtifacts.isEmpty()) children else setOf(this)

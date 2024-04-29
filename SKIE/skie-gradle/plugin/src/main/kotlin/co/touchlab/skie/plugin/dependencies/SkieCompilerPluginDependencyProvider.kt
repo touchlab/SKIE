@@ -31,14 +31,7 @@ internal object SkieCompilerPluginDependencyProvider {
             exclude(group = "org.jetbrains", module = "annotations")
         }
 
-        project.dependencies.add(
-            configurationName,
-            mapOf(
-                "group" to BuildConfig.KOTLIN_PLUGIN_GROUP,
-                "name" to BuildConfig.KOTLIN_PLUGIN_NAME,
-                "version" to BuildConfig.KOTLIN_PLUGIN_VERSION,
-            ),
-        )
+        project.dependencies.add(configurationName, BuildConfig.SKIE_KOTLIN_PLUGIN_COORDINATES)
 
         return skieCompilerPluginConfiguration
     }

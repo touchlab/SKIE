@@ -1,15 +1,27 @@
 package co.touchlab.skie.configuration
 
 class RootConfiguration(
-    val enabledFlags: Set<SkieConfigurationFlag>,
+    enabledFlags: Set<SkieConfigurationFlag>,
     private val supportedKeys: Set<ConfigurationKey<*>>,
 ) : SkieConfiguration(null) {
+
+    private val mutableEnabledFlags = enabledFlags.toMutableSet()
+
+    val enabledFlags: Set<SkieConfigurationFlag> by ::mutableEnabledFlags
 
     override val rootConfiguration: RootConfiguration
         get() = this
 
     fun isFlagEnabled(flag: SkieConfigurationFlag): Boolean =
         flag in enabledFlags
+
+    fun disableFlag(flag: SkieConfigurationFlag) {
+        mutableEnabledFlags.remove(flag)
+    }
+
+    fun enableFlag(flag: SkieConfigurationFlag) {
+        mutableEnabledFlags.add(flag)
+    }
 
     operator fun <KEY, VALUE> get(configurationKey: KEY): VALUE where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Root =
         getUnsafe(configurationKey)

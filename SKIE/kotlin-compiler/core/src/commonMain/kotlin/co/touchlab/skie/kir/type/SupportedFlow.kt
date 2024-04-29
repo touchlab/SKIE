@@ -29,6 +29,8 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
     sealed interface Variant {
 
+        val kotlinClassFqName: String
+
         val kind: SupportedFlow
 
         fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass =
@@ -48,8 +50,10 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         class Required(override val kind: SupportedFlow) : Variant {
 
+            override val kotlinClassFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlin${kind.name}"
+
             override fun getKotlinKirClass(kirProvider: KirProvider): KirClass =
-                kirProvider.getClassByFqName("co.touchlab.skie.runtime.coroutines.flow.SkieKotlin${kind.name}")
+                kirProvider.getClassByFqName(kotlinClassFqName)
 
             override fun getSwiftClass(sirProvider: SirProvider): SirClass =
                 sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwift${kind.name}"))
@@ -61,8 +65,10 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         class Optional(override val kind: SupportedFlow) : Variant {
 
+            override val kotlinClassFqName: String = "co.touchlab.skie.runtime.coroutines.flow.SkieKotlinOptional${kind.name}"
+
             override fun getKotlinKirClass(kirProvider: KirProvider): KirClass =
-                kirProvider.getClassByFqName("co.touchlab.skie.runtime.coroutines.flow.SkieKotlinOptional${kind.name}")
+                kirProvider.getClassByFqName(kotlinClassFqName)
 
             override fun getSwiftClass(sirProvider: SirProvider): SirClass =
                 sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftOptional${kind.name}"))

@@ -42,4 +42,12 @@ interface CommonSkieContext {
 
     val SkieConfigurationFlag.isDisabled: Boolean
         get() = this.isEnabled.not()
+
+    fun SkieConfigurationFlag.enable() {
+        rootConfiguration.enableFlag(this)
+    }
+
+    fun SkieConfigurationFlag.disable() {
+        rootConfiguration.disableFlag(this)
+    }
 }

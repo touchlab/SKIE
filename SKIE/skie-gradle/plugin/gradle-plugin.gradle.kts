@@ -34,14 +34,10 @@ buildConfig {
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 
     val kotlinPlugin = project.provider { projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject }
-    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", kotlinPlugin.map { it.group.toString().enquoted() })
-    buildConfigField("String", "KOTLIN_PLUGIN_NAME", kotlinPlugin.map { it.name.enquoted() })
-    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", kotlinPlugin.map { it.version.toString().enquoted() })
+    buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATES", kotlinPlugin.map { it.dependencyName.enquoted() })
 
     val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
-    buildConfigField("String", "RUNTIME_DEPENDENCY_GROUP", runtime.map { it.group.toString().enquoted() })
-    buildConfigField("String", "RUNTIME_DEPENDENCY_NAME", runtime.map { it.name.enquoted() })
-    buildConfigField("String", "RUNTIME_DEPENDENCY_VERSION", runtime.map { it.version.toString().enquoted() })
+    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATES", runtime.map { it.dependencyName.enquoted() })
 
     val pluginId: String by properties
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")

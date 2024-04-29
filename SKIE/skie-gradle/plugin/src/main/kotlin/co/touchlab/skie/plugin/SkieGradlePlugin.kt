@@ -56,7 +56,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         project.configureSkieGradlePlugin()
 
         project.afterEvaluate {
-            project.configureRuntimeVariantFallback()
             project.configureSkieCompilerPlugin(shims, kotlinVersion)
         }
     }
@@ -202,15 +201,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
     }
 
-    private fun Project.configureRuntimeVariantFallback() {
-        if (!skieInternal.runtimeVariantFallback.isPresent) {
-            val extraPropertiesKey = "skieRuntimeVariantFallback"
-            skieInternal.runtimeVariantFallback.set(
-                project.properties[extraPropertiesKey]?.toString().toBoolean(),
-            )
-        }
-    }
-
     private fun Project.configureSkieCompilerPlugin(shims: ShimEntrypoint, kotlinToolingVersion: String) {
         if (!isSkieEnabled) {
             return
@@ -220,10 +210,12 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
-        kotlinMultiplatformExtension?.appleTargets?.all {
+        kotlinMultiplatformExtension?.appleTargets?.configureEach {
             val target = this
-            binaries.withType<Framework>().all {
+
+            binaries.withType<Framework>().configureEach {
                 val binary = this
+
                 skieInternal.targets.add(
                     SkieTarget.TargetBinary(
                         project = project,
@@ -235,11 +227,11 @@ abstract class SkieGradlePlugin : Plugin<Project> {
             }
         }
 
-        kotlinArtifactsExtension.artifacts.withType<KotlinNativeArtifact>().all {
+        kotlinArtifactsExtension.artifacts.withType<KotlinNativeArtifact>().configureEach {
             skieInternal.targets.addAll(skieTargetsOf(this))
         }
 
-        skieInternal.targets.all {
+        skieInternal.targets.configureEach {
             configureSkie(shims, kotlinToolingVersion)
         }
     }
