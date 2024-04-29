@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.configuration.util
 
-import co.touchlab.skie.configuration.UntypedSkieConfigurationData
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.configuration.UntypedSkieConfigurationData
 
 data class GradleSkieConfigurationData(
     override val enabledConfigurationFlags: Set<SkieConfigurationFlag>,

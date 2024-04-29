@@ -67,9 +67,9 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
 
         private fun SkieExtension.mergeConfigurationSetsFromConfigurations(outputKind: SkieTarget.OutputKind) =
             analytics.buildConfigurationFlags() +
-                    build.buildConfigurationFlags(outputKind) +
-                    debug.buildConfigurationFlags() +
-                    features.buildConfigurationFlags() +
-                    migration.buildConfigurationFlags()
+                build.buildConfigurationFlags(outputKind) +
+                debug.buildConfigurationFlags() +
+                features.buildConfigurationFlags() +
+                migration.buildConfigurationFlags()
     }
 }

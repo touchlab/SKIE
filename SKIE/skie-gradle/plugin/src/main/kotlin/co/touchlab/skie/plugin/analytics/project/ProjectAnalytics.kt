@@ -4,7 +4,6 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.hash.hashed
-import org.gradle.api.Project
 
 internal data class ProjectAnalytics(
     val projectId: String,

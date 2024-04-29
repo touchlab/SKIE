@@ -3,7 +3,11 @@ package co.touchlab.skie.plugin.util
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.kotlin.gradle.dsl.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeFatFramework
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeFramework
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeLibrary
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeXCFramework
 
 internal fun SkieTarget.skieTargetBasedTaskName(baseName: String): String {
     val linkTaskNameWithoutPrefix = when (this) {
@@ -92,7 +96,7 @@ private fun String.capitalizeAsciiOnly(): String {
         this
 }
 
-internal inline fun <reified T: Task> SkieTarget.registerSkieTargetBasedTask(
+internal inline fun <reified T : Task> SkieTarget.registerSkieTargetBasedTask(
     baseName: String,
     crossinline configurationAction: T.() -> Unit,
 ): TaskProvider<T> {

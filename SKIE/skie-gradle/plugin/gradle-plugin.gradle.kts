@@ -1,8 +1,6 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyName
 import co.touchlab.skie.gradle.util.enquoted
-import co.touchlab.skie.gradle.util.stringListProperty
-import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 

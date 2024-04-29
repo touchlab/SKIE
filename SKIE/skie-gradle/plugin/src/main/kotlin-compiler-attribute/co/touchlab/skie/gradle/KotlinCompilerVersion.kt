@@ -24,7 +24,8 @@ interface KotlinCompilerVersion : Named {
 
     class DisambiguationRule @Inject constructor(
         private val currentKotlinVersion: String,
-    ): AttributeDisambiguationRule<KotlinCompilerVersion> {
+    ) : AttributeDisambiguationRule<KotlinCompilerVersion> {
+
         override fun execute(details: MultipleCandidatesDetails<KotlinCompilerVersion>) {
             val correctCandidate = details.candidateValues.lastOrNull {
                 it.name == currentKotlinVersion
@@ -39,6 +40,7 @@ interface KotlinCompilerVersion : Named {
         }
 
         companion object {
+
             val log = Logging.getLogger("KotlinCompilerVersion.DisambiguationRule")
         }
     }

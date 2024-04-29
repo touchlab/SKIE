@@ -9,7 +9,7 @@ import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
-import java.util.*
+import java.util.Properties
 
 internal fun SkieTarget.configureMinOsVersionIfNeeded(shims: ShimEntrypoint) = with(shims.launchScheduler) {
     project.afterEvaluateOrAfterFinaliseRefinesEdges {
@@ -45,7 +45,6 @@ private fun Properties.targetString(name: String, target: KonanTarget): String? 
     resolvablePropertyString(name, target.name)
 
 private const val overrideKonanPropertiesKey = "-Xoverride-konan-properties"
-
 
 private fun parseOverrideKonanProperties(
     arguments: List<String>,

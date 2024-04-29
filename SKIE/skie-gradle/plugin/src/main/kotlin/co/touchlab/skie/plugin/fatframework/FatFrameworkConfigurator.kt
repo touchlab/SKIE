@@ -1,7 +1,12 @@
 package co.touchlab.skie.plugin.fatframework
 
-import co.touchlab.skie.plugin.util.*
+import co.touchlab.skie.plugin.util.InjectedFileSystemOperations
 import co.touchlab.skie.plugin.util.TargetTriple
+import co.touchlab.skie.plugin.util.darwinTarget
+import co.touchlab.skie.plugin.util.doFirstOptimized
+import co.touchlab.skie.plugin.util.doLastOptimized
+import co.touchlab.skie.plugin.util.newInstance
+import co.touchlab.skie.plugin.util.withType
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
@@ -9,6 +14,7 @@ import org.jetbrains.kotlin.konan.target.Architecture
 import java.io.File
 
 internal object FatFrameworkConfigurator {
+
     fun configureSkieForFatFrameworks(project: Project) {
         fixFatFrameworkNameForCocoaPodsPlugin(project)
         configureFatFrameworkPatching(project)
@@ -39,7 +45,7 @@ internal object FatFrameworkConfigurator {
 
                 // FatFrameworkTask writes its own
                 target.moduleFile.writeText(
-                    primaryFramework.files.moduleFile.readText()
+                    primaryFramework.files.moduleFile.readText(),
                 )
 
                 val frameworksByArchs = frameworks.associateBy { it.target.architecture }

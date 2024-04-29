@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.coroutines
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
-import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.skieInternal
+import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractNativeLibrary
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -18,7 +18,6 @@ internal fun SkieTarget.addDependencyOnSkieRuntime(kotlinToolingVersion: String)
             binary.compilation.apiConfigurationName,
             (binary as? AbstractNativeLibrary)?.exportConfigurationName,
         )
-
         is SkieTarget.Artifact -> {
             val nameSuffix = SkieTarget.Artifact.artifactNameSuffix(artifact)
             listOf(
@@ -41,6 +40,7 @@ internal fun SkieTarget.addDependencyOnSkieRuntime(kotlinToolingVersion: String)
 private val BuildConfig.DEFAULT_RUNTIME_DEPENDENCY: String
     get() = "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME:$RUNTIME_DEPENDENCY_VERSION"
 
+@Suppress("FunctionName")
 private fun BuildConfig.SPECIFIC_RUNTIME_DEPENDENCY(konanTarget: KonanTarget, kotlinVersion: String): String {
     return "$RUNTIME_DEPENDENCY_GROUP:$RUNTIME_DEPENDENCY_NAME-${konanTarget.dependencyPresetName}__kgp_${kotlinVersion}:$RUNTIME_DEPENDENCY_VERSION"
 }
@@ -68,7 +68,8 @@ private val KonanTarget.dependencyPresetName: String
 
         KonanTarget.ANDROID_ARM32, KonanTarget.ANDROID_ARM64, KonanTarget.ANDROID_X64, KonanTarget.ANDROID_X86, KonanTarget.LINUX_ARM32_HFP,
         KonanTarget.LINUX_ARM64, KonanTarget.LINUX_MIPS32, KonanTarget.LINUX_MIPSEL32, KonanTarget.LINUX_X64, KonanTarget.MINGW_X64,
-        KonanTarget.MINGW_X86, KonanTarget.WASM32, is KonanTarget.ZEPHYR -> error(
-            "SKIE doesn't support these platforms, so it should never ask for the preset name of this target."
+        KonanTarget.MINGW_X86, KonanTarget.WASM32, is KonanTarget.ZEPHYR,
+        -> error(
+            "SKIE doesn't support these platforms, so it should never ask for the preset name of this target.",
         )
     }.lowercase()

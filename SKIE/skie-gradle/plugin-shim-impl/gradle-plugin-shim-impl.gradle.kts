@@ -1,4 +1,3 @@
-import co.touchlab.skie.gradle.publish.dependencyName
 import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.version.gradleApiVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
@@ -40,7 +39,7 @@ buildConfig {
         ExpectActualBuildConfigGenerator(
             isActualImplementation = false,
             internalVisibility = false,
-        )
+        ),
     )
 
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "")
@@ -56,7 +55,9 @@ buildConfig {
 }
 
 multiDimensionTarget.configureSourceSet { sourceSet ->
-    if (!sourceSet.isTarget || compilation.isTest) { return@configureSourceSet }
+    if (!sourceSet.isTarget || compilation.isTest) {
+        return@configureSourceSet
+    }
 
     buildConfig {
         this.sourceSets.named(kotlinSourceSet.name).configure {

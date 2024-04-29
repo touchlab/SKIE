@@ -1,9 +1,9 @@
 package co.touchlab.skie.plugin.switflink
 
-import co.touchlab.skie.plugin.util.SkieTarget
-import co.touchlab.skie.plugin.util.skieBuildDirectory
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
+import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
+import co.touchlab.skie.plugin.util.skieBuildDirectory
 import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project

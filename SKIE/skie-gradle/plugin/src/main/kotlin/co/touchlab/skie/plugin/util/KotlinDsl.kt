@@ -21,8 +21,8 @@ internal fun Configuration.exclude(group: String? = null, module: String? = null
     exclude(
         mapOfNonNullValuesOf(
             "group" to group,
-            "module" to module
-        )
+            "module" to module,
+        ),
     )
 
 internal

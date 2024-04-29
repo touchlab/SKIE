@@ -42,7 +42,7 @@ internal data class TargetTriple(
                 architecture = components[0],
                 vendor = components[1],
                 os = components[2],
-                environment = components.getOrNull(3)
+                environment = components.getOrNull(3),
             )
         }
     }

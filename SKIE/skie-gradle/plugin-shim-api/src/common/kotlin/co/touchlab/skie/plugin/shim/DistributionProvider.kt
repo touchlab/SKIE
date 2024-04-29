@@ -6,6 +6,6 @@ interface DistributionProvider {
 
     fun provideDistribution(
         konanHome: String,
-        propertyOverrides: Map<String, String>?
+        propertyOverrides: Map<String, String>?,
     ): Distribution
 }

@@ -5,9 +5,7 @@ import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.BuildConfig
 import io.cloudflight.ci.info.CI
-import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 internal data class GradleEnvironmentAnalytics(
     val jvmVersion: String,
@@ -23,7 +21,6 @@ internal data class GradleEnvironmentAnalytics(
         private val gradleVersion: Provider<String>,
         private val kotlinPluginVersion: Provider<String>,
     ) : AnalyticsProducer {
-
 
         override val name: String = "gradle-environment"
 

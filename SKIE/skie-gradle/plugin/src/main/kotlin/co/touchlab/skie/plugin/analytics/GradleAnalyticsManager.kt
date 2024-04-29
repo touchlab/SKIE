@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin.analytics
 
-import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.analytics.environment.GradleEnvironmentAnalytics
 import co.touchlab.skie.plugin.analytics.git.GitAnalytics
 import co.touchlab.skie.plugin.analytics.git.getGitRoot
@@ -10,7 +9,9 @@ import co.touchlab.skie.plugin.analytics.project.ProjectAnalytics
 import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
-import co.touchlab.skie.plugin.util.*
+import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.util.configureDoFirstOptimized
+import co.touchlab.skie.plugin.util.configureDoLastOptimized
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider

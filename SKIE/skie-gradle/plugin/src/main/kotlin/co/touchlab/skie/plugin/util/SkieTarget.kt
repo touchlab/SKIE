@@ -7,7 +7,11 @@ import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.kotlin.gradle.dsl.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeFatFramework
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeFramework
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeLibrary
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeXCFramework
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
@@ -22,6 +26,7 @@ import org.jetbrains.kotlin.konan.util.visibleName
 import java.io.File
 
 sealed interface SkieTarget {
+
     val name: String
     val project: Project
     val task: TaskProvider<out Task>
@@ -44,7 +49,8 @@ sealed interface SkieTarget {
         val target: KotlinNativeTarget,
         val binary: NativeBinary,
         override val outputKind: OutputKind,
-    ): SkieTarget {
+    ) : SkieTarget {
+
         override val konanTarget: KonanTarget = target.konanTarget
 
         override val buildType: NativeBuildType = binary.buildType
@@ -92,7 +98,8 @@ sealed interface SkieTarget {
         override val konanTarget: KonanTarget,
         override val buildType: NativeBuildType,
         override val outputKind: OutputKind,
-    ): SkieTarget {
+    ) : SkieTarget {
+
         override val name: String = "artifact: ${artifact.artifactName}, target: $konanTarget, buildType: $buildType"
 
         override val task = project.tasks.named<KotlinNativeLinkArtifactTask>(linkTaskName(artifact, konanTarget, buildType))
@@ -109,7 +116,7 @@ sealed interface SkieTarget {
             task.configure {
                 toolOptions.freeCompilerArgs.addAll(
                     "-P",
-                    "plugin:${pluginId}:${option.key}=${option.value}"
+                    "plugin:${pluginId}:${option.key}=${option.value}",
                 )
             }
         }
@@ -119,7 +126,7 @@ sealed interface SkieTarget {
                 toolOptions.freeCompilerArgs.addAll(
                     project.provider {
                         fileCollection.files.map { it.canonicalPath }.sorted().map { "-Xplugin=$it" }
-                    }
+                    },
                 )
             }
         }
@@ -127,12 +134,13 @@ sealed interface SkieTarget {
         override fun addFreeCompilerArgs(vararg args: String) {
             task.configure {
                 toolOptions.freeCompilerArgs.addAll(
-                    *args
+                    *args,
                 )
             }
         }
 
         companion object {
+
             fun artifactNameSuffix(artifact: KotlinNativeArtifact): String = when (artifact) {
                 is KotlinNativeFatFramework -> "ForFat"
                 is KotlinNativeXCFramework -> "ForXCF"

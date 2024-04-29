@@ -5,7 +5,6 @@ import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
 import co.touchlab.skie.plugin.configuration.CreateSkieConfigurationTask
 import co.touchlab.skie.plugin.configuration.SkieExtension
-import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.createExtension
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.coroutines.addDependencyOnSkieRuntime
 import co.touchlab.skie.plugin.coroutines.configureMinOsVersionIfNeeded
@@ -16,7 +15,13 @@ import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.shim.ShimEntrypoint
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
-import co.touchlab.skie.plugin.util.*
+import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.util.appleTargets
+import co.touchlab.skie.plugin.util.exclude
+import co.touchlab.skie.plugin.util.named
+import co.touchlab.skie.plugin.util.skieTargetsOf
+import co.touchlab.skie.plugin.util.subpluginOption
+import co.touchlab.skie.plugin.util.withType
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -28,9 +33,9 @@ import org.gradle.configurationcache.extensions.serviceOf
 import org.gradle.internal.classloader.HashingClassLoaderFactory
 import org.gradle.internal.classpath.DefaultClassPath
 import org.gradle.util.GradleVersion
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -55,7 +60,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
             project.configureSkieCompilerPlugin(shims, kotlinVersion)
         }
     }
-
 
     private fun Project.getValidKotlinVersion(): String? {
         val kotlinVersion = getKotlinVersionString()
@@ -202,7 +206,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         if (!skieInternal.runtimeVariantFallback.isPresent) {
             val extraPropertiesKey = "skieRuntimeVariantFallback"
             skieInternal.runtimeVariantFallback.set(
-                project.properties[extraPropertiesKey]?.toString().toBoolean()
+                project.properties[extraPropertiesKey]?.toString().toBoolean(),
             )
         }
     }
@@ -226,7 +230,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
                         target = target,
                         binary = binary,
                         outputKind = SkieTarget.OutputKind.Framework,
-                    )
+                    ),
                 )
             }
         }
@@ -267,7 +271,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         )
 
         addToCompilerClasspath(
-            SkieCompilerPluginDependencyProvider.getOrCreateDependencyConfiguration(project, kotlinToolingVersion)
+            SkieCompilerPluginDependencyProvider.getOrCreateDependencyConfiguration(project, kotlinToolingVersion),
         )
     }
 }

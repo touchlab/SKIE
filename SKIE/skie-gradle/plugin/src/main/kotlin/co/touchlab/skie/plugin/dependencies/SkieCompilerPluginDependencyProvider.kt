@@ -24,18 +24,21 @@ internal object SkieCompilerPluginDependencyProvider {
                 attribute(KotlinCompilerVersion.attribute, project.objects.named(kotlinToolingVersion))
             }
 
-            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib-common")
-            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib-jdk8")
-            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib-jdk7")
-            exclude(group = "org.jetbrains.kotlin", module= "kotlin-stdlib")
-            exclude(group = "org.jetbrains", module= "annotations")
+            exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
+            exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
+            exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk7")
+            exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
+            exclude(group = "org.jetbrains", module = "annotations")
         }
 
-        project.dependencies.add(configurationName, mapOf(
-            "group" to BuildConfig.KOTLIN_PLUGIN_GROUP,
-            "name" to BuildConfig.KOTLIN_PLUGIN_NAME,
-            "version" to BuildConfig.KOTLIN_PLUGIN_VERSION,
-        ))
+        project.dependencies.add(
+            configurationName,
+            mapOf(
+                "group" to BuildConfig.KOTLIN_PLUGIN_GROUP,
+                "name" to BuildConfig.KOTLIN_PLUGIN_NAME,
+                "version" to BuildConfig.KOTLIN_PLUGIN_VERSION,
+            ),
+        )
 
         return skieCompilerPluginConfiguration
     }
