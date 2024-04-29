@@ -19,7 +19,7 @@ plugins {
 
 dependencyResolutionManagement {
     repositories {
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
+        mavenCentral() {
             content {
                 includeVersion("org.jetbrains.kotlin", "kotlin-native-compiler-embeddable", "2.0.0-RC1")
             }

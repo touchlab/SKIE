@@ -1,7 +1,6 @@
 package co.touchlab.skie.gradle.util
 
 import co.touchlab.skie.gradle.KotlinToolingVersion
-import co.touchlab.skie.gradle.kotlinNativePrebuiltRepositoryBaseUrl
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.kotlin.dsl.extra
@@ -23,24 +22,20 @@ private object KotlinNativeDownloaderProperties {
 
     const val main = "kotlin.native.version"
     const val deprecated = "org.jetbrains.kotlin.native.version"
-    const val base_repository_url = "kotlin.native.distribution.baseDownloadUrl"
 }
 
 fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File {
     return NativeCompilerDownloader(project, CompilerVersion.fromString(kotlinVersion.toString()))
         .also { downloader ->
             val originalVersionProperty = backupProperty<String?>(getKotlinNativeVersionPropertyName())
-            val originalBaseRepositoryUrlProperty = backupProperty<String>(KotlinNativeDownloaderProperties.base_repository_url)
 
             extra.set(KotlinNativeDownloaderProperties.main, kotlinVersion.toString())
-            extra.set(KotlinNativeDownloaderProperties.base_repository_url, kotlinVersion.kotlinNativePrebuiltRepositoryBaseUrl)
 
             downloader.downloadIfNeeded()
 
             extra.set(KotlinNativeDownloaderProperties.main, null)
 
             restoreProperty(originalVersionProperty)
-            restoreProperty(originalBaseRepositoryUrlProperty)
         }
         .compilerDirectory
 }
