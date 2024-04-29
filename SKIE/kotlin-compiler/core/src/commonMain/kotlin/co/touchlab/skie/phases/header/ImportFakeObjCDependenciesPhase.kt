@@ -45,7 +45,7 @@ object ImportFakeObjCDependenciesPhase : SirPhase {
     context(SirPhase.Context)
     private fun importFakeFrameworks(fakeExternalModules: List<SirModule.External>, originalHeader: String) {
         val fakeImports = fakeExternalModules.joinToString("\n") {
-            "#import \"${skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(it.name)}\""
+            "#import <${it.name}/${skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(it.name).name}>"
         }
 
         val updatedContent = originalHeader + "\n$fakeImports"
