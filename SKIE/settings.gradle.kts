@@ -17,23 +17,6 @@ plugins {
     id("dev.settings")
 }
 
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral() {
-            content {
-                includeVersion("org.jetbrains.kotlin", "kotlin-native-compiler-embeddable", "2.0.0-RC1")
-            }
-        }
-        maven("https://api.touchlab.dev/public") {
-            content {
-                includeModule("org.jetbrains.kotlin", "kotlin-native-compiler-embeddable")
-            }
-        }
-        mavenCentral()
-        google()
-    }
-}
-
 val skieProperties = Properties()
 file("skie.gradle.properties").inputStream().use {
     skieProperties.load(it)

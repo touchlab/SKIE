@@ -15,6 +15,7 @@ class DevSettings : Plugin<Settings> {
                     }
                 }
                 mavenCentral()
+                google()
             }
         }
 
