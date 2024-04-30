@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
@@ -35,6 +36,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
+import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
 import java.io.File
 
@@ -68,14 +70,28 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     }
                 }
 
-                val exportedTestDependencies = createTestDependencyConfiguration(target, "AcceptanceTestExportedDependencies").apply {
+                val skieIosArm64KotlinRuntimeDependency = maybeCreateTestDependencyConfiguration(
+                    target = target,
+                    name = "SkieKotlinRuntimeDependency",
+                    konanTarget = KonanTarget.IOS_ARM64.name,
+                ).apply {
                     isTransitive = false
                 }
-                val testDependencies = createTestDependencyConfiguration(target, "AcceptanceTestDependencies").apply {
+
+                val exportedTestDependencies = maybeCreateTestDependencyConfiguration(target, "AcceptanceTestExportedDependencies").apply {
+                    isTransitive = false
+                }
+                val testDependencies = maybeCreateTestDependencyConfiguration(target, "AcceptanceTestDependencies").apply {
                     extendsFrom(exportedTestDependencies)
                 }
                 dependencies {
                     testDependencies(project(":common:configuration:configuration-annotations"))
+                    skieIosArm64KotlinRuntimeDependency(project(":runtime:runtime-kotlin")) {
+                        attributes {
+                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+                        }
+                    }
+
                     exportedTestDependencies(project(":runtime:runtime-kotlin")) {
                         attributes {
                             attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
@@ -129,6 +145,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     acceptanceTestType = acceptanceTestType,
                     testDependencies = testDependencies,
                     exportedTestDependencies = exportedTestDependencies,
+                    skieIosArm64KotlinRuntimeDependency = skieIosArm64KotlinRuntimeDependency,
                     kotlinToolingVersion = kotlinToolingVersion,
                     kotlinTarget = kotlinTarget,
                 )
@@ -177,6 +194,21 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     name = "EXPORTED_DEPENDENCIES",
                     value = "",
                 )
+                buildConfigField(
+                    type = "String",
+                    name = "GRADLEW_PATH",
+                    value = "",
+                )
+                buildConfigField(
+                    type = "String",
+                    name = "LIBRARY_TESTS_DEPENDENCY_RESOLVER_PATH",
+                    value = "",
+                )
+                buildConfigField(
+                    type = "String",
+                    name = "SKIE_IOS_ARM64_KOTLIN_RUNTIME_KLIB_PATH",
+                    value = "",
+                )
             }
         }
     }
@@ -185,6 +217,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
         target: Target,
         testDependencies: Configuration,
         exportedTestDependencies: Configuration,
+        skieIosArm64KotlinRuntimeDependency: Configuration,
         acceptanceTestType: AcceptanceTestsComponent,
         kotlinToolingVersion: KotlinToolingVersionComponent,
         kotlinTarget: KotlinJvmTarget,
@@ -199,6 +232,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
 
                 val resolvedDependencies = provider { testDependencies.resolve() }
                 val exportedDependencies = provider { exportedTestDependencies.resolve() }
+                val skieIosArm64KotlinRuntimeKlib = provider { skieIosArm64KotlinRuntimeDependency.resolve().single() }
 
                 buildConfigField(
                     type = "String",
@@ -225,12 +259,38 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     name = "EXPORTED_DEPENDENCIES",
                     value = exportedDependencies.map { "arrayOf(${it.toListString()})" },
                 )
+                buildConfigField(
+                    type = "String",
+                    name = "GRADLEW_PATH",
+                    value = rootDir.resolve("gradlew").absolutePath.enquoted(),
+                )
+                buildConfigField(
+                    type = "String",
+                    name = "LIBRARY_TESTS_DEPENDENCY_RESOLVER_PATH",
+                    value = layout.projectDirectory.dir("library-tests-dependency-resolver").asFile.absolutePath.enquoted(),
+                )
+                buildConfigField(
+                    type = "String",
+                    name = "SKIE_IOS_ARM64_KOTLIN_RUNTIME_KLIB_PATH",
+                    value = skieIosArm64KotlinRuntimeKlib.map { it.absolutePath.enquoted() },
+                )
             }
         }
     }
 
-    private fun Project.createTestDependencyConfiguration(target: Target, name: String): Configuration {
-        return configurations.create(target.name + name.replaceFirstChar { it.uppercase() }) {
+    private fun Project.maybeCreateTestDependencyConfiguration(target: Target, name: String): Configuration =
+        maybeCreateTestDependencyConfiguration(
+            target = target,
+            name = name,
+            konanTarget = MacOsCpuArchitecture.getCurrent().konanTarget,
+        )
+
+    private fun Project.maybeCreateTestDependencyConfiguration(
+        target: Target,
+        name: String,
+        konanTarget: String,
+    ): Configuration =
+        configurations.maybeCreate(target.name + name.replaceFirstChar { it.uppercase() }).apply {
             isCanBeConsumed = false
             isCanBeResolved = true
 
@@ -242,11 +302,10 @@ abstract class DevAcceptanceTests : Plugin<Project> {
             attributes {
                 attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
                 attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
-                attributeProvider(KotlinNativeTarget.konanTargetAttribute, provider { MacOsCpuArchitecture.getCurrent().konanTarget })
+                attributeProvider(KotlinNativeTarget.konanTargetAttribute, provider { konanTarget })
                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
             }
         }
-    }
 
     companion object {
 
