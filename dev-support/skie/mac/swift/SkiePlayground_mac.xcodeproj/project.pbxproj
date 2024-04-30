@@ -182,7 +182,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DEV_SUPPORT_ROOT=../../../\n\n\"$DEV_SUPPORT_ROOT/gradlew\" :skie:mac:framework:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "DEV_SUPPORT_ROOT=../../../\n\n\"$DEV_SUPPORT_ROOT/gradlew\" :skie-mac-framework:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
