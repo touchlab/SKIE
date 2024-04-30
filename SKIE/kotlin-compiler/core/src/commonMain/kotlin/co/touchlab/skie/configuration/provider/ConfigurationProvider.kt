@@ -33,6 +33,7 @@ class ConfigurationProvider(
     private val allKeys = setOf<ConfigurationKey<*>>(
         ClassInterop.StableTypeAlias,
         ClassInterop.CInteropFrameworkName,
+        ClassInterop.DeriveCInteropFrameworkNameFromCocoapods,
         DefaultArgumentInterop.Enabled,
         DefaultArgumentInterop.MaximumDefaultArgumentCount,
         EnumInterop.Enabled,

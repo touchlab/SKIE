@@ -96,13 +96,18 @@ class ExternalDescriptorKirProvider(
         }
     }
 
-    private fun getExternalClassSwiftFrameworkName(descriptor: ClassDescriptor): String? =
-        descriptorConfigurationProvider.getConfiguration(descriptor)[ClassInterop.CInteropFrameworkName] ?:
-            if (descriptor.isPlatformType || descriptor.isCocoapodsType) {
+    private fun getExternalClassSwiftFrameworkName(descriptor: ClassDescriptor): String? {
+        val configuration = descriptorConfigurationProvider.getConfiguration(descriptor)
+
+        return configuration[ClassInterop.CInteropFrameworkName]
+            ?: if (descriptor.isPlatformType) {
+                descriptor.cinteropFrameworkNameForWellKnownExternalType
+            } else if (descriptor.isCocoapodsType && configuration[ClassInterop.DeriveCInteropFrameworkNameFromCocoapods]) {
                 descriptor.cinteropFrameworkNameForWellKnownExternalType
             } else {
                 null
             }
+    }
 
     private val ClassDescriptor.isPlatformType: Boolean
         get() = this.fqNameUnsafe.pathSegments()[0].asString() == "platform"

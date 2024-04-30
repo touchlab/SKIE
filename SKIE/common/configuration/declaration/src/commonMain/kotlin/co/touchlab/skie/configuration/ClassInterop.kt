@@ -41,4 +41,17 @@ object ClassInterop {
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? = null
     }
+
+    /**
+     * If enabled, SKIE automatically configures CInteropFrameworkName for external Obj-C classes originating from Cocoapods.
+     * The framework name can be overridden by using the CInteropFrameworkName configuration.
+     */
+    object DeriveCInteropFrameworkNameFromCocoapods : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
+
+        override val defaultValue: Boolean = true
+
+        override val skieRuntimeValue: Boolean = true
+
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = null
+    }
 }
