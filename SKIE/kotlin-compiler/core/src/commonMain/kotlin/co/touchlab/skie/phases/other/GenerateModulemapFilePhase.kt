@@ -37,7 +37,7 @@ sealed class GenerateModulemapFilePhase(private val generateSwiftModule: Boolean
 
             appendLine("}")
 
-            if (generateSwiftModule) {
+            if (generateSwiftModule && framework.swiftHeader.exists()) {
                 appendLine()
                 appendLine("module ${framework.moduleName}.Swift {")
                 appendLine("    header \"${framework.swiftHeader.name}\"")

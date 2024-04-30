@@ -9,6 +9,7 @@ import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirExtension
@@ -47,6 +48,9 @@ class SirProvider(
 
     val skieModuleFiles: Collection<SirFile>
         get() = skieModule.files
+
+    val compilableFiles: List<SirCompilableFile>
+        get() = skieModuleFiles.filterIsInstance<SirCompilableFile>()
 
     val allLocalDeclarations: List<SirDeclaration>
         get() = listOf(skieModule, kotlinModule).flatMap { it.getAllDeclarationsRecursively() }

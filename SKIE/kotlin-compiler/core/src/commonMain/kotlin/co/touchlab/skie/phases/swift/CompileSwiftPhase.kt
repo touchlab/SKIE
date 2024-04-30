@@ -22,7 +22,6 @@ class CompileSwiftPhase(
     private val outputFileMap = context.skieBuildDirectory.swiftCompiler.config.outputFileMap
     private val objectFiles = skieBuildDirectory.swiftCompiler.objectFiles
     private val moduleDirectory = skieBuildDirectory.swiftCompiler.module
-    private val targetTriple = swiftCompilerConfiguration.targetTriple
 
     private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in rootConfiguration.enabledFlags
     private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in rootConfiguration.enabledFlags
@@ -30,7 +29,8 @@ class CompileSwiftPhase(
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        val sourceFiles = sirProvider.skieModuleFiles.filterIsInstance<SirCompilableFile>().map { it.absolutePath.toFile() }
+        val sourceFiles = sirProvider.compilableFiles.map { it.absolutePath.toFile() }
+
         if (sourceFiles.isEmpty()) {
             return
         }
@@ -42,10 +42,6 @@ class CompileSwiftPhase(
         callSwiftCompiler()
 
         deleteOldObjectFiles(sourceFiles)
-
-        copySwiftModuleFiles()
-
-        copySwiftLibraryEvolutionFiles()
     }
 
     private fun createSwiftFileList(sourceFiles: List<File>) {
@@ -168,31 +164,6 @@ class CompileSwiftPhase(
             SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker -> "-embed-bitcode-marker"
             SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full -> "-embed-bitcode"
         }
-
-    private fun copySwiftModuleFiles() {
-        val copyFiles = mapOf(
-            swiftFrameworkHeader.swiftModule to framework.swiftModule(targetTriple),
-            swiftFrameworkHeader.swiftDoc to framework.swiftDoc(targetTriple),
-            swiftFrameworkHeader.abiJson to framework.abiJson(targetTriple),
-            swiftFrameworkHeader.swiftSourceInfo to framework.swiftSourceInfo(targetTriple),
-            swiftFrameworkHeader.swiftHeader to framework.swiftHeader,
-        )
-
-        copyFiles.forEach { (source, target) ->
-            source.copyTo(target, overwrite = true)
-        }
-    }
-
-    private fun copySwiftLibraryEvolutionFiles() {
-        if (isLibraryEvolutionEnabled) {
-            swiftFrameworkHeader.swiftInterface.copyTo(framework.swiftInterface(targetTriple), overwrite = true)
-            swiftFrameworkHeader.privateSwiftInterface.copyTo(framework.privateSwiftInterface(targetTriple), overwrite = true)
-        } else {
-            // WIP Check what happens with swiftFrameworkHeader
-            framework.swiftInterface(targetTriple).delete()
-            framework.privateSwiftInterface(targetTriple).delete()
-        }
-    }
 
     private val parallelizationArgument: String
         get() {

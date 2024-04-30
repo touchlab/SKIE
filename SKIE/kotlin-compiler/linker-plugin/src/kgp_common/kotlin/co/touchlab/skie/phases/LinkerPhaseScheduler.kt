@@ -78,6 +78,7 @@ import co.touchlab.skie.phases.sir.type.InitializeSirSuperTypesPhase
 import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.ConvertSirIrFilesToSourceFilesPhase
 import co.touchlab.skie.phases.swift.ConvertSirSourceFilesToCompilableFilesPhase
+import co.touchlab.skie.phases.swift.CopySwiftOutputFilesToFrameworkPhase
 import co.touchlab.skie.phases.swift.SwiftKotlinFrameworkCacheSetupPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKeywordsPhase
 import co.touchlab.skie.phases.typeconflicts.RenameTypesConflictingWithKotlinModulePhase
@@ -241,6 +242,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             SwiftKotlinFrameworkCacheSetupPhase,
             ImportFakeObjCDependenciesPhase.RevertPhase,
             CompileSwiftPhase(context),
+            CopySwiftOutputFilesToFrameworkPhase(context),
             TemporarilyRenameTypesConflictingWithExternalModulesPhase.RevertPhase,
             GenerateModulemapFilePhase.ForFramework,
             ApiNotesGenerationPhase.ForFramework,
