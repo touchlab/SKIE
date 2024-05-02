@@ -9,6 +9,8 @@ nexusPublish = "2.0.0-rc-1"
 gradleDoctor = "0.8.1"
 coroutines = "1.7.0"
 coroutines-legacy = "1.6.4"
+# Update also gradle-wrapper.properties
+gradle = "8.7"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -39,6 +41,8 @@ ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.5.0.202303070854-r" }
 ci-info = { module = "io.cloudflight.ci.info:ci-info", version = "1.0.1" }
 mixpanel = { module = "com.mixpanel:mixpanel-java", version = "1.5.2" }
+gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle" }
+slf4j = { module = "org.slf4j:slf4j-simple", version = "1.7.10" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }

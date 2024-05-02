@@ -196,11 +196,6 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 )
                 buildConfigField(
                     type = "String",
-                    name = "GRADLEW_PATH",
-                    value = "",
-                )
-                buildConfigField(
-                    type = "String",
                     name = "LIBRARY_TESTS_DEPENDENCY_RESOLVER_PATH",
                     value = "",
                 )
@@ -258,11 +253,6 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     type = "co.touchlab.skie.acceptancetests.util.StringArray",
                     name = "EXPORTED_DEPENDENCIES",
                     value = exportedDependencies.map { "arrayOf(${it.toListString()})" },
-                )
-                buildConfigField(
-                    type = "String",
-                    name = "GRADLEW_PATH",
-                    value = rootDir.resolve("gradlew").absolutePath.enquoted(),
                 )
                 buildConfigField(
                     type = "String",

@@ -3,6 +3,7 @@ package co.touchlab.skie.buildsetup.plugins
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.maven
+import java.net.URI
 
 class DevSettings : Plugin<Settings> {
 
@@ -16,6 +17,7 @@ class DevSettings : Plugin<Settings> {
                 }
                 mavenCentral()
                 google()
+                maven { url = URI("https://repo.gradle.org/gradle/libs-releases") }
             }
         }
 
