@@ -139,6 +139,12 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     inputs.property(
                         "disableSkie", System.getenv("disableSkie"),
                     ).optional(true)
+                    inputs.property(
+                        "ignoreExpectedFailures", System.getenv("ignoreExpectedFailures"),
+                    ).optional(true)
+                    inputs.property(
+                        "skipSwiftCompilation", System.getenv("skipSwiftCompilation"),
+                    ).optional(true)
 
                     outputs.dir(
                         testDirectory(project, acceptanceTestType, kotlinToolingVersion),
