@@ -6,6 +6,7 @@ data class SourceSet(
     val name: String,
     val components: List<ComponentSet<out Target.Component>>,
     val sourceDirs: List<RelativePath>,
+    val target: Target? = null,
     val isRoot: Boolean = false,
 ) {
 
@@ -18,17 +19,9 @@ data class SourceSet(
         return componentsByType[COMPONENT::class] as ComponentSet<COMPONENT>
     }
 
-//     val isRoot: Boolean by lazy {
-//         components.all { it is ComponentSet.Common }
-//     }
+    val isTarget: Boolean = target != null
 
-    val isIntermediate: Boolean by lazy {
-        !isTarget && !isRoot
-    }
-
-    val isTarget: Boolean by lazy {
-        components.all { it is ComponentSet.Specific }
-    }
+    val isIntermediate: Boolean = !isTarget && !isRoot
 
     fun isCommonFor(component: Target.Component): Boolean {
         return components.all {

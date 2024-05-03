@@ -1,7 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.plugins.extensions.DevAcceptanceTestsExtension
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
@@ -26,6 +26,7 @@ import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.named
@@ -48,6 +49,8 @@ abstract class DevAcceptanceTests : Plugin<Project> {
         apply<OptInExperimentalCompilerApi>()
         apply<DevBuildconfig>()
         apply<SerializationGradleSubplugin>()
+
+        val devAcceptanceTests = project.extensions.create<DevAcceptanceTestsExtension>("devAcceptanceTests")
 
         configureExpectedBuildConfig()
 
@@ -104,39 +107,53 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     }
                 }
 
+                devAcceptanceTests.getTests(target).configureEach {
+                    group = "verification"
+
+                    useJUnitPlatform()
+
+                    dependsOn(
+                        testDependencies.buildDependencies,
+                        exportedTestDependencies.buildDependencies,
+                        skieIosArm64KotlinRuntimeDependency.buildDependencies,
+                    )
+
+                    inputs.property(
+                        "failedOnly", System.getenv("failedOnly"),
+                    ).optional(true)
+                    inputs.property(
+                        "acceptanceTest", System.getenv("acceptanceTest"),
+                    ).optional(true)
+                    inputs.property(
+                        "libraryTest", System.getenv("libraryTest"),
+                    ).optional(true)
+                    inputs.property(
+                        "onlyIndices", System.getenv("onlyIndices"),
+                    ).optional(true)
+                    inputs.property(
+                        "kotlinLinkMode", System.getenv("KOTLIN_LINK_MODE"),
+                    ).optional(true)
+                    inputs.property(
+                        "kotlinBuildConfiguration", System.getenv("KOTLIN_BUILD_CONFIGURATION"),
+                    ).optional(true)
+                    inputs.property(
+                        "disableSkie", System.getenv("disableSkie"),
+                    ).optional(true)
+
+                    outputs.dir(
+                        testDirectory(project, acceptanceTestType, kotlinToolingVersion),
+                    )
+
+                    maxHeapSize = "12g"
+
+                    testLogging {
+                        showStandardStreams = true
+                    }
+                }
+
                 kotlinTarget.testRuns.configureEach {
                     executionTask.configure {
-                        dependsOn(
-                            testDependencies.buildDependencies,
-                            exportedTestDependencies.buildDependencies,
-                        )
-                        inputs.property(
-                            "failedOnly", System.getenv("failedOnly"),
-                        ).optional(true)
-                        inputs.property(
-                            "acceptanceTest", System.getenv("acceptanceTest"),
-                        ).optional(true)
-                        inputs.property(
-                            "libraryTest", System.getenv("libraryTest"),
-                        ).optional(true)
-                        inputs.property(
-                            "onlyIndices", System.getenv("onlyIndices"),
-                        ).optional(true)
-                        inputs.property(
-                            "kotlinLinkMode", System.getenv("KOTLIN_LINK_MODE"),
-                        ).optional(true)
-                        inputs.property(
-                            "kotlinBuildConfiguration", System.getenv("KOTLIN_BUILD_CONFIGURATION"),
-                        ).optional(true)
-                        outputs.dir(
-                            testDirectory(project, acceptanceTestType, kotlinToolingVersion),
-                        )
-
-                        maxHeapSize = "12g"
-
-                        testLogging {
-                            showStandardStreams = true
-                        }
+                        devAcceptanceTests.getTests(target).add(this)
                     }
                 }
 

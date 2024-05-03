@@ -1,5 +1,6 @@
 package co.touchlab.skie.gradle.version.target
 
+import co.touchlab.skie.gradle.version.target.SourceSet.ComponentSet
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -62,39 +63,9 @@ class MultiDimensionSourceSetConfigurer(
         dimensions: List<Target.Dimension<*>>,
         targets: List<Target>,
     ): Set<SourceSet> {
-        fun List<SourceSet.Directory>.sourceSets(dimensions: List<Target.Dimension<*>>): Set<SourceSet> {
-            return flatMap { directory ->
-                if (directory.children.isEmpty()) {
-                    if (dimensions.size == 1) {
-                        setOf(
-                            SourceSet(
-                                name = directory.name,
-                                components = listOf(directory.components),
-                                sourceDirs = listOf(RelativePath(listOf(directory.name))),
-                            ),
-                        )
-                    } else {
-                        emptySet()
-                    }
-                } else {
-                    directory.children.sourceSets(dimensions.drop(1)).map { childSourceSet ->
-                        SourceSet(
-                            name = directory.name + "__" + childSourceSet.name,
-                            components = listOf(directory.components) + childSourceSet.components,
-                            sourceDirs = childSourceSet.sourceDirs.map {
-                                it.copy(components = listOf(directory.name) + it.components)
-                            },
-                        )
-                    }
-                }
-            }.toSet()
-        }
-
-        val sourceSetDirectories = resolveSourceSetDirectories(directory, dimensions.first(), dimensions.drop(1))
-
         val targetSourceSets = targets.map { target ->
             val components = target.components.zip(dimensions).map { (component, dimension) ->
-                SourceSet.ComponentSet.Specific.unsafe(
+                ComponentSet.Specific.unsafe(
                     name = dimension.prefix + component.value,
                     dimension = dimension,
                     component = component,
@@ -107,16 +78,14 @@ class MultiDimensionSourceSetConfigurer(
                 sourceDirs = listOf(
                     RelativePath(components.map { it.name }),
                 ),
+                target = target,
             )
         }
-
-        val sourceSetsFromDirectories = sourceSetDirectories.sourceSets(dimensions)
-        val intermediateSourceSets = sourceSetsFromDirectories.filter { it.isIntermediate }
 
         val rootSourceSet = SourceSet(
             name = "common",
             components = dimensions.map { dimension ->
-                SourceSet.ComponentSet.Common(
+                ComponentSet.Common(
                     name = dimension.prefix + dimension.commonName,
                     dimension = dimension,
                 )
@@ -129,7 +98,9 @@ class MultiDimensionSourceSetConfigurer(
             isRoot = true,
         )
 
-        val allCommonSourceSets = setOf(rootSourceSet) + intermediateSourceSets
+        val sourceSetDirectories = resolveSourceSetDirectories(directory, dimensions.first(), dimensions.drop(1))
+        val usedIntermediateSourceSets = sourceSetDirectories.toIntermediateSourceSets(dimensions)
+        val allCommonSourceSets = setOf(rootSourceSet) + usedIntermediateSourceSets
 
         val flattenedCommonSourceSets = allCommonSourceSets
             .groupBy { sourceSet ->
@@ -176,4 +147,33 @@ class MultiDimensionSourceSetConfigurer(
             )
         }
     }
+
+    private fun List<SourceSet.Directory>.toIntermediateSourceSets(dimensions: List<Target.Dimension<*>>): Set<SourceSet> =
+        this.flatMap { directory ->
+            if (directory.children.isEmpty()) {
+                if (dimensions.size == 1) {
+                    setOf(
+                        SourceSet(
+                            name = directory.name,
+                            components = listOf(directory.components),
+                            sourceDirs = listOf(RelativePath(listOf(directory.name))),
+                        ),
+                    )
+                } else {
+                    emptySet()
+                }
+            } else {
+                directory.children.toIntermediateSourceSets(dimensions.drop(1)).map { childSourceSet ->
+                    SourceSet(
+                        name = directory.name + "__" + childSourceSet.name,
+                        components = listOf(directory.components) + childSourceSet.components,
+                        sourceDirs = childSourceSet.sourceDirs.map {
+                            it.copy(components = listOf(directory.name) + it.components)
+                        },
+                    )
+                }
+            }
+        }
+            .filterNot { it.components.all { componentSet -> componentSet is ComponentSet.Specific } }
+            .toSet()
 }
