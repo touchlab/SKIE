@@ -143,6 +143,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         "ignoreExpectedFailures", System.getenv("ignoreExpectedFailures"),
                     ).optional(true)
                     inputs.property(
+                        "ignoreDependencyConstraints", System.getenv("ignoreDependencyConstraints"),
+                    ).optional(true)
+                    inputs.property(
                         "skipSwiftCompilation", System.getenv("skipSwiftCompilation"),
                     ).optional(true)
 
