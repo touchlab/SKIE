@@ -148,6 +148,12 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     inputs.property(
                         "skipSwiftCompilation", System.getenv("skipSwiftCompilation"),
                     ).optional(true)
+                    inputs.property(
+                        "updateLockFile", System.getenv("updateLockFile"),
+                    ).optional(true)
+                    inputs.property(
+                        "includeFailedTestsInLockFile", System.getenv("includeFailedTestsInLockFile"),
+                    ).optional(true)
 
                     outputs.dir(
                         testDirectory(project, acceptanceTestType, kotlinToolingVersion),
