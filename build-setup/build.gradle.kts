@@ -21,7 +21,6 @@ dependencies {
     implementation(libs.plugin.kotlin.serialization)
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
-    implementation(libs.ktor.client.java)
     implementation(libs.kotlinPoet)
 }
 
