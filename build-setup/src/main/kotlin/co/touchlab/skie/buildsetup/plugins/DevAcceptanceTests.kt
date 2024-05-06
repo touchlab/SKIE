@@ -155,16 +155,16 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         "skipSwiftCompilation", System.getenv("skipSwiftCompilation"),
                     ).optional(true)
                     inputs.property(
-                        "updateLockFile", System.getenv("updateLockFile"),
+                        "updateLockfile", System.getenv("updateLockfile"),
                     ).optional(true)
                     inputs.property(
-                        "includeFailedTestsInLockFile", System.getenv("includeFailedTestsInLockFile"),
+                        "includeFailedTestsInLockfile", System.getenv("includeFailedTestsInLockfile"),
                     ).optional(true)
                     inputs.property(
                         "queryMavenCentral", System.getenv("queryMavenCentral"),
                     ).optional(true)
                     inputs.property(
-                        "ignoreLockFile", System.getenv("ignoreLockFile"),
+                        "ignoreLockfile", System.getenv("ignoreLockfile"),
                     ).optional(true)
                     inputs.property(
                         "convertLibraryDependenciesToTests", System.getenv("convertLibraryDependenciesToTests"),
