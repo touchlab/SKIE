@@ -169,6 +169,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     inputs.property(
                         "convertLibraryDependenciesToTests", System.getenv("convertLibraryDependenciesToTests"),
                     ).optional(true)
+                    inputs.property(
+                        "skipTestsInLockfile", System.getenv("skipTestsInLockfile"),
+                    ).optional(true)
 
                     outputs.dir(
                         testDirectory(project, acceptanceTestType, kotlinToolingVersion),
