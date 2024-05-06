@@ -1,5 +1,6 @@
 package co.touchlab.skie.util.directory
 
+import co.touchlab.skie.util.SystemProperty
 import co.touchlab.skie.util.directory.structure.RootDirectory
 import java.io.File
 
@@ -14,7 +15,7 @@ class SkieDirectories(
     }
 
     val applicationSupport: SkieApplicationSupportDirectory = rootDirectory {
-        File(System.getProperty("user.home"))
+        File(SystemProperty.get("user.home"))
             .resolve("Library/Application Support/SKIE")
             .let { SkieApplicationSupportDirectory(it) }
     }

@@ -4,6 +4,7 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.BuildConfig
+import co.touchlab.skie.util.SystemProperty
 import io.cloudflight.ci.info.CI
 import org.gradle.api.provider.Provider
 
@@ -32,7 +33,7 @@ internal data class GradleEnvironmentAnalytics(
                 skieVersion = BuildConfig.SKIE_VERSION,
                 gradleVersion = gradleVersion.get(),
                 kotlinVersion = kotlinPluginVersion.get(),
-                macOSVersion = System.getProperty("os.version"),
+                macOSVersion = SystemProperty.find("os.version") ?: "<unknown>",
                 ci = CI.server?.serverName,
                 timestampInMs = System.currentTimeMillis(),
             ).toPrettyJson()
