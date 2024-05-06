@@ -154,6 +154,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     inputs.property(
                         "includeFailedTestsInLockFile", System.getenv("includeFailedTestsInLockFile"),
                     ).optional(true)
+                    inputs.property(
+                        "queryMavenCentral", System.getenv("queryMavenCentral"),
+                    ).optional(true)
 
                     outputs.dir(
                         testDirectory(project, acceptanceTestType, kotlinToolingVersion),

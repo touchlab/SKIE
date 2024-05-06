@@ -4,7 +4,7 @@ kotlin = "1.8.21"
 pluginPublish = "1.2.0"
 kotest = "5.8.0"
 buildconfig = "4.1.1"
-ktor = "2.2.3"
+ktor = "2.3.10"
 nexusPublish = "2.0.0-rc-1"
 gradleDoctor = "0.8.1"
 coroutines = "1.7.0"
@@ -38,6 +38,8 @@ kotlinx-coroutines-core-legacy = { module = "org.jetbrains.kotlinx:kotlinx-corou
 kotlinx-coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
 kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.15.1" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.5.0.202303070854-r" }
 ci-info = { module = "io.cloudflight.ci.info:ci-info", version = "1.0.1" }
 mixpanel = { module = "com.mixpanel:mixpanel-java", version = "1.5.2" }
