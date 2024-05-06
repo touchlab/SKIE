@@ -164,6 +164,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         "queryMavenCentral", System.getenv("queryMavenCentral"),
                     ).optional(true)
                     inputs.property(
+                        "ignoreLockFile", System.getenv("ignoreLockFile"),
+                    ).optional(true)
+                    inputs.property(
                         "convertLibraryDependenciesToTests", System.getenv("convertLibraryDependenciesToTests"),
                     ).optional(true)
 
