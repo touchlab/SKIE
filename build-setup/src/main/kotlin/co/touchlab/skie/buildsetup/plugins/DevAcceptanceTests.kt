@@ -163,6 +163,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     inputs.property(
                         "queryMavenCentral", System.getenv("queryMavenCentral"),
                     ).optional(true)
+                    inputs.property(
+                        "convertLibraryDependenciesToTests", System.getenv("convertLibraryDependenciesToTests"),
+                    ).optional(true)
 
                     outputs.dir(
                         testDirectory(project, acceptanceTestType, kotlinToolingVersion),
