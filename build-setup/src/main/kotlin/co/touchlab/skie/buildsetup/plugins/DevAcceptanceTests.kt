@@ -146,6 +146,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         "ignoreDependencyConstraints", System.getenv("ignoreDependencyConstraints"),
                     ).optional(true)
                     inputs.property(
+                        "skipKotlinCompilation", System.getenv("skipKotlinCompilation"),
+                    ).optional(true)
+                    inputs.property(
                         "skipSwiftCompilation", System.getenv("skipSwiftCompilation"),
                     ).optional(true)
                     inputs.property(
