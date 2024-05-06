@@ -60,7 +60,7 @@ private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(kotlinToolingVersion:
         }
     }
 
-    project.dependencies.add(skieRuntimeConfigurationName, BuildConfig.SKIE_KOTLIN_RUNTIME_COORDINATES)
+    project.dependencies.add(skieRuntimeConfigurationName, BuildConfig.SKIE_KOTLIN_RUNTIME_COORDINATE)
 
     return skieRuntimeConfiguration
 }

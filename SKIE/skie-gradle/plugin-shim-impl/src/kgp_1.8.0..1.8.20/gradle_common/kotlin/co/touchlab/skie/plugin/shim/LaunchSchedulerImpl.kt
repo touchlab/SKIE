@@ -4,8 +4,8 @@ import org.gradle.api.Project
 
 class LaunchSchedulerImpl : LaunchScheduler {
 
-    override fun Project.afterEvaluateOrAfterFinaliseRefinesEdges(block: () -> Unit) {
-        afterEvaluate {
+    override fun afterEvaluateOrAfterFinaliseRefinesEdges(project: Project, block: () -> Unit) {
+        project.afterEvaluate {
             block()
         }
     }

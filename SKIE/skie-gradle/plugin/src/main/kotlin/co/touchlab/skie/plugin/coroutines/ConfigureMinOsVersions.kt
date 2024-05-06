@@ -1,26 +1,23 @@
 package co.touchlab.skie.plugin.coroutines
 
-import co.touchlab.skie.plugin.shim.ShimEntrypoint
+import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.util.SkieTarget
-import co.touchlab.skie.plugin.util.getKonanHome
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
-import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
-import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.Properties
 
-internal fun SkieTarget.configureMinOsVersionIfNeeded(shims: ShimEntrypoint) = with(shims.launchScheduler) {
-    project.afterEvaluateOrAfterFinaliseRefinesEdges {
+internal fun SkieTarget.configureMinOsVersionIfNeeded() {
+    project.kgpShim.launchScheduler.afterEvaluateOrAfterFinaliseRefinesEdges(project) {
         if (!project.isCoroutinesInteropEnabled) {
             return@afterEvaluateOrAfterFinaliseRefinesEdges
         }
 
-        val distribution = distribution(shims).get()
+        val distributionProperties = getDistributionProperties()
 
         fun overrideVersion(name: String) {
-            val currentMinVersion = distribution.properties.targetString(name, konanTarget)
+            val currentMinVersion = distributionProperties.targetString(name, konanTarget)
             val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(konanTarget.name)
 
             if (currentMinVersion == null || currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
@@ -33,13 +30,11 @@ internal fun SkieTarget.configureMinOsVersionIfNeeded(shims: ShimEntrypoint) = w
     }
 }
 
-private fun SkieTarget.distribution(shims: ShimEntrypoint): Provider<Distribution> = freeCompilerArgs.map {
-    val overrideKonanProperties = parseOverrideKonanProperties(it)
-    shims.distributionProvider.provideDistribution(
-        konanHome = project.getKonanHome(shims).absolutePath,
-        propertyOverrides = overrideKonanProperties,
+private fun SkieTarget.getDistributionProperties(): Properties =
+    project.kgpShim.getDistributionProperties(
+        konanHome = project.kgpShim.getKonanHome(project).absolutePath,
+        propertyOverrides = parseOverrideKonanProperties(freeCompilerArgs.get()),
     )
-}
 
 private fun Properties.targetString(name: String, target: KonanTarget): String? =
     resolvablePropertyString(name, target.name)

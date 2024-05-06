@@ -1,5 +1,5 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.publish.dependencyName
+import co.touchlab.skie.gradle.publish.dependencyCoordinate
 import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -17,7 +17,7 @@ skiePublishing {
 
 buildConfig {
     val shimImpl = project.provider { projects.gradle.gradlePluginShimImpl.dependencyProject }
-    buildConfigField("String", "SKIE_GRADLE_PLUGIN", shimImpl.map { it.dependencyName.enquoted() })
+    buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", shimImpl.map { it.dependencyCoordinate.enquoted() })
 
     val kotlinToSkieKgpVersion = project.kotlinToolingVersionDimension().components
         .flatMap { versionComponent ->
@@ -34,10 +34,10 @@ buildConfig {
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 
     val kotlinPlugin = project.provider { projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject }
-    buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATES", kotlinPlugin.map { it.dependencyName.enquoted() })
+    buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", kotlinPlugin.map { it.dependencyCoordinate.enquoted() })
 
     val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
-    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATES", runtime.map { it.dependencyName.enquoted() })
+    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATE", runtime.map { it.dependencyCoordinate.enquoted() })
 
     val pluginId: String by properties
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
@@ -57,7 +57,6 @@ kotlin {
 
 configurations.configureEach {
     attributes {
-        @Suppress("UnstableApiUsage")
         attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersionDimension().components.min().value))
     }
 }
@@ -104,6 +103,7 @@ tasks.named("compileKotlin").configure {
     }
 }
 
+@Suppress("UnstableApiUsage")
 gradlePlugin {
     website = "https://skie.touchlab.co"
     vcsUrl = "https://github.com/touchlab/SKIE.git"

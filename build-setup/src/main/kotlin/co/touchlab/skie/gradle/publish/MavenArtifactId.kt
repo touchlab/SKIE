@@ -5,5 +5,5 @@ import org.gradle.api.Project
 val Project.mavenArtifactId: String
     get() = "skie" + this.path.replace(":", "-")
 
-val Project.dependencyName: String
+val Project.dependencyCoordinate: String
     get() = "$group:$name:$version"

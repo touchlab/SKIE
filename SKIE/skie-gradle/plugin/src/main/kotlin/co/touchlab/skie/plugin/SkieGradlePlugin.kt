@@ -1,6 +1,5 @@
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
 import co.touchlab.skie.plugin.configuration.CreateSkieConfigurationTask
@@ -12,27 +11,18 @@ import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
-import co.touchlab.skie.plugin.shim.ShimEntrypoint
+import co.touchlab.skie.plugin.shim.KgpShimLoader
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
 import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.appleTargets
-import co.touchlab.skie.plugin.util.exclude
-import co.touchlab.skie.plugin.util.named
+import co.touchlab.skie.plugin.util.reportSkieLoaderError
 import co.touchlab.skie.plugin.util.skieTargetsOf
 import co.touchlab.skie.plugin.util.subpluginOption
 import co.touchlab.skie.plugin.util.withType
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.attributes.Category
-import org.gradle.api.attributes.LibraryElements
-import org.gradle.api.attributes.Usage
-import org.gradle.api.attributes.plugin.GradlePluginApiVersion
-import org.gradle.configurationcache.extensions.serviceOf
-import org.gradle.internal.classloader.HashingClassLoaderFactory
-import org.gradle.internal.classpath.DefaultClassPath
-import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
@@ -49,14 +39,15 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         }
 
         val kotlinVersion = project.getValidKotlinVersion() ?: return
-        val shims = project.loadSkieGradlePluginShim(kotlinVersion) ?: return
 
-        project.extensions.create("skieInternal", SkieInternalExtension::class.java)
+        val internalExtension = project.extensions.create("skieInternal", SkieInternalExtension::class.java)
+
+        internalExtension.kgpShim = KgpShimLoader.load(kotlinVersion, project) ?: return
 
         project.configureSkieGradlePlugin()
 
         project.afterEvaluate {
-            project.configureSkieCompilerPlugin(shims, kotlinVersion)
+            project.configureSkieCompilerPlugin(kotlinVersion)
         }
     }
 
@@ -102,74 +93,8 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         return null
     }
 
-    private fun Project.reportSkieLoaderError(error: String) {
-        logger.error("Error:\n$error\nSKIE cannot not be used until this error is resolved.\n")
-
-        gradle.taskGraph.whenReady {
-            val hasLinkTask = allTasks.any { it.name.startsWith("link") && it.project == project }
-            val isSkieEnabled = extensions.findByType(SkieExtension::class.java)?.isEnabled?.get() == true
-
-            if (hasLinkTask && isSkieEnabled) {
-                error("$error\nTo proceed with the compilation, please remove or explicitly disable SKIE by adding 'skie { isEnabled.set(false) }' to your Gradle configuration.")
-            }
-        }
-    }
-
     private fun Project.getKotlinVersionString(): String? =
         (project.kotlinGradlePluginVersionOverride ?: project.kotlinGradlePluginVersion ?: project.rootProject.kotlinGradlePluginVersion)
-
-    private fun Project.loadSkieGradlePluginShim(kotlinVersion: String): ShimEntrypoint? {
-        val gradleVersion = GradleVersion.current().version
-        logger.info("Resolving SKIE gradle plugin for Kotlin plugin version $kotlinVersion and Gradle version $gradleVersion")
-
-        KotlinCompilerVersion.registerIn(project.dependencies, kotlinVersion)
-        KotlinCompilerVersion.registerIn(buildscript.dependencies, kotlinVersion)
-        val skieGradleConfiguration = buildscript.configurations.detachedConfiguration(
-            buildscript.dependencies.create(BuildConfig.SKIE_GRADLE_PLUGIN),
-        ).apply {
-            this.isCanBeConsumed = false
-            this.isCanBeResolved = true
-
-            exclude(group = "org.jetbrains.kotlin")
-
-            attributes {
-                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-                attribute(KotlinCompilerVersion.attribute, objects.named(kotlinVersion))
-                if (GradleVersion.current() >= GradleVersion.version("7.0")) {
-                    attribute(
-                        GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-                        objects.named(GradleVersion.current().version),
-                    )
-                }
-            }
-        }
-
-        skieGradleConfiguration.resolvedConfiguration.rethrowFailure()
-
-        val classLoaderFactory = serviceOf<HashingClassLoaderFactory>()
-        val skieGradleClassLoader = classLoaderFactory.createChildClassLoader(
-            "skieGradleClassLoader",
-            buildscript.classLoader,
-            DefaultClassPath.of(skieGradleConfiguration.resolve()),
-            null,
-        )
-
-        val probablyShimEntrypointImplClass = skieGradleClassLoader.loadClass("co.touchlab.skie.plugin.shim.ShimEntrypointImpl")
-        if (!ShimEntrypoint::class.java.isAssignableFrom(probablyShimEntrypointImplClass)) {
-            reportSkieLoaderError(
-                """
-                    Loaded class ${probablyShimEntrypointImplClass.name} does not implement ${ShimEntrypoint::class.java.name}!
-                    This is a bug in SKIE - please report it to the SKIE developers.
-                """.trimIndent(),
-            )
-            return null
-        }
-
-        return probablyShimEntrypointImplClass.getConstructor().newInstance() as ShimEntrypoint
-    }
 
     private val Project.kotlinGradlePluginVersion: String?
         get() = kotlinGradlePluginVersionFromPlugin() ?: kotlinGradlePluginVersionFromClasspathConfiguration()
@@ -201,7 +126,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
     }
 
-    private fun Project.configureSkieCompilerPlugin(shims: ShimEntrypoint, kotlinToolingVersion: String) {
+    private fun Project.configureSkieCompilerPlugin(kotlinToolingVersion: String) {
         if (!isSkieEnabled) {
             return
         }
@@ -216,7 +141,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
             binaries.withType<Framework>().configureEach {
                 val binary = this
 
-                skieInternal.targets.add(
+                skieInternalExtension.targets.add(
                     SkieTarget.TargetBinary(
                         project = project,
                         target = target,
@@ -228,20 +153,20 @@ abstract class SkieGradlePlugin : Plugin<Project> {
         }
 
         kotlinArtifactsExtension.artifacts.withType<KotlinNativeArtifact>().configureEach {
-            skieInternal.targets.addAll(skieTargetsOf(this))
+            skieInternalExtension.targets.addAll(skieTargetsOf(this))
         }
 
-        skieInternal.targets.configureEach {
-            configureSkie(shims, kotlinToolingVersion)
+        skieInternalExtension.targets.configureEach {
+            configureSkie(kotlinToolingVersion)
         }
     }
 
-    private fun SkieTarget.configureSkie(shims: ShimEntrypoint, kotlinToolingVersion: String) {
+    private fun SkieTarget.configureSkie(kotlinToolingVersion: String) {
         SkieDirectoriesManager.configureCreateSkieBuildDirectoryTask(this)
 
         GradleAnalyticsManager(project).configureAnalytics(this)
 
-        configureMinOsVersionIfNeeded(shims)
+        configureMinOsVersionIfNeeded()
 
         CreateSkieConfigurationTask.registerTask(this)
 
@@ -270,7 +195,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
 internal fun Project.warnOnEmptyFrameworks() {
     gradle.taskGraph.whenReady {
-        if (skieInternal.targets.isEmpty()) {
+        if (skieInternalExtension.targets.isEmpty()) {
             logger.warn("w: No Apple frameworks configured in module ${this@warnOnEmptyFrameworks.path}. Make sure you applied SKIE plugin in the correct module.")
         }
     }
@@ -281,6 +206,3 @@ private val Project.isSkieEnabled: Boolean
 
 internal val Project.kotlinMultiplatformExtension: KotlinMultiplatformExtension?
     get() = project.extensions.findByType(KotlinMultiplatformExtension::class.java)
-
-internal val Project.skieInternal: SkieInternalExtension
-    get() = project.extensions.getByType(SkieInternalExtension::class.java)
