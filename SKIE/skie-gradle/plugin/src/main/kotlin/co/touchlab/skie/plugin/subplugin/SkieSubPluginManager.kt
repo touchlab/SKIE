@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.subplugin
 
-import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.util.exclude
 import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.plugin.util.withType

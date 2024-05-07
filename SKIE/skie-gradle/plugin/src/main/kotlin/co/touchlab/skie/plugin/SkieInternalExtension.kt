@@ -4,7 +4,6 @@ import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.shim.KgpShim
 import co.touchlab.skie.plugin.shim.KgpShimLoader
 import co.touchlab.skie.plugin.util.KotlinVersionResolver
-import co.touchlab.skie.plugin.util.SkieTarget
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import javax.inject.Inject
@@ -15,7 +14,8 @@ internal abstract class SkieInternalExtension @Inject constructor(
     val kgpShim: KgpShim,
 ) {
 
-    abstract val targets: NamedDomainObjectContainer<SkieTarget>
+    val targets: NamedDomainObjectContainer<SkieTarget>
+        get() = kgpShim.targets
 
     val isSkieEnabled: Boolean
         get() = project.skieExtension.isEnabled.get() && kgpShim.hostIsMac

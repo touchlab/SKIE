@@ -2,8 +2,8 @@ package co.touchlab.skie.plugin.coroutines
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.skieInternalExtension
-import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.plugin.util.named
 import org.gradle.api.artifacts.Configuration
@@ -13,7 +13,6 @@ import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
-import org.jetbrains.kotlin.konan.target.presetName
 
 internal fun SkieTarget.addDependencyOnSkieRuntime() {
     if (!project.isCoroutinesInteropEnabled) {
@@ -114,12 +113,8 @@ private val SkieTarget.linkerConfiguration: Configuration
 
 private val SkieTarget.linkerConfigurationName: String
     get() = when (this) {
-        is SkieTarget.TargetBinary -> binary.compilation.compileDependencyConfigurationName
-        is SkieTarget.Artifact -> {
-            val nameSuffix = SkieTarget.Artifact.artifactNameSuffix(artifact)
-
-            lowerCamelCaseName(konanTarget.presetName, artifact.artifactName + nameSuffix, "linkLibrary")
-        }
+        is SkieTarget.Binary -> compileDependencyConfigurationName
+        is SkieTarget.Artifact -> lowerCamelCaseName(konanTarget.presetName, fullArtifactName, "linkLibrary")
     }
 
 private val SkieTarget.skieRuntimeConfigurationName: String

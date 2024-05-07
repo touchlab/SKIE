@@ -11,18 +11,10 @@ import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
-import co.touchlab.skie.plugin.util.SkieTarget
-import co.touchlab.skie.plugin.util.appleTargets
-import co.touchlab.skie.plugin.util.kotlinMultiplatformExtension
-import co.touchlab.skie.plugin.util.skieTargetsOf
 import co.touchlab.skie.plugin.util.toKotlinCompilerPluginOption
-import co.touchlab.skie.plugin.util.withType
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
-import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
-import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
 
 abstract class SkieGradlePlugin : Plugin<Project> {
 
@@ -51,26 +43,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
-        kotlinMultiplatformExtension?.appleTargets?.configureEach {
-            val target = this
-
-            binaries.withType<Framework>().configureEach {
-                val binary = this
-
-                skieInternalExtension.targets.add(
-                    SkieTarget.TargetBinary(
-                        project = project,
-                        target = target,
-                        binary = binary,
-                        outputKind = SkieTarget.OutputKind.Framework,
-                    ),
-                )
-            }
-        }
-
-        kotlinArtifactsExtension.artifacts.withType<KotlinNativeArtifact>().configureEach {
-            skieInternalExtension.targets.addAll(skieTargetsOf(this))
-        }
+        skieInternalExtension.kgpShim.initializeSkieTargets()
 
         skieInternalExtension.targets.configureEach {
             configureSkie()

@@ -1,11 +1,11 @@
 package co.touchlab.skie.plugin.coroutines
 
+import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.kgpShim
-import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.shim.KonanTargetShim
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
-import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.Properties
 
 internal fun SkieTarget.configureMinOsVersionIfNeeded() {
@@ -36,7 +36,7 @@ private fun SkieTarget.getDistributionProperties(): Properties =
         propertyOverrides = parseOverrideKonanProperties(freeCompilerArgs.get()),
     )
 
-private fun Properties.targetString(name: String, target: KonanTarget): String? =
+private fun Properties.targetString(name: String, target: KonanTargetShim): String? =
     resolvablePropertyString(name, target.name)
 
 private const val overrideKonanPropertiesKey = "-Xoverride-konan-properties"

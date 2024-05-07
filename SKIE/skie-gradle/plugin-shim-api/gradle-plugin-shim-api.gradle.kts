@@ -1,3 +1,5 @@
+import co.touchlab.skie.gradle.version.gradleApiVersionDimension
+
 plugins {
     id("skie.gradle")
     id("skie.publishable")
@@ -12,6 +14,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(projects.common.util)
+                compileOnly("dev.gradleplugins:gradle-api:${gradleApiVersionDimension().components.min().value}")
             }
         }
     }

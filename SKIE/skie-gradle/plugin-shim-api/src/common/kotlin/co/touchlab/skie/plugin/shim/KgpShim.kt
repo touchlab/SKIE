@@ -1,9 +1,13 @@
 package co.touchlab.skie.plugin.shim
 
+import co.touchlab.skie.plugin.SkieTarget
+import org.gradle.api.NamedDomainObjectContainer
 import java.io.File
 import java.util.Properties
 
 interface KgpShim {
+
+    val targets: NamedDomainObjectContainer<SkieTarget>
 
     val launchScheduler: LaunchScheduler
 
@@ -17,4 +21,6 @@ interface KgpShim {
     fun getKonanHome(): File
 
     fun getKotlinPluginVersion(): String
+
+    fun initializeSkieTargets()
 }

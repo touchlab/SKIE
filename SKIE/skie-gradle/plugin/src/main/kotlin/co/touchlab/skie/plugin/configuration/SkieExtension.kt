@@ -1,8 +1,8 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.configuration.util.GradleSkieConfigurationData
-import co.touchlab.skie.plugin.util.SkieTarget
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -73,3 +73,6 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
                 migration.buildConfigurationFlags()
     }
 }
+
+internal val Project.skieExtension: SkieExtension
+    get() = project.extensions.getByType(SkieExtension::class.java)

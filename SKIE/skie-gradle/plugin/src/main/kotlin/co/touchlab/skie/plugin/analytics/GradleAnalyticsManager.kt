@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.analytics
 
+import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.analytics.environment.GradleEnvironmentAnalytics
 import co.touchlab.skie.plugin.analytics.git.GitAnalytics
 import co.touchlab.skie.plugin.analytics.git.getGitRoot
@@ -10,7 +11,6 @@ import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfig
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.kgpShim
-import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.configureDoFirstOptimized
 import co.touchlab.skie.plugin.util.configureDoLastOptimized
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask

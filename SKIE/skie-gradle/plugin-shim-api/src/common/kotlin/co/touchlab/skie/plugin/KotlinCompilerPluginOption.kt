@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.util
+package co.touchlab.skie.plugin
 
 data class KotlinCompilerPluginOption(
     val key: String,

@@ -1,7 +1,17 @@
 package co.touchlab.skie.plugin.shim
 
+import co.touchlab.skie.plugin.ActualSkieArtifactTarget
+import co.touchlab.skie.plugin.ActualSkieBinaryTarget
+import co.touchlab.skie.plugin.SkieTarget
+import co.touchlab.skie.plugin.util.appleTargets
+import co.touchlab.skie.plugin.util.kotlinMultiplatformExtension
+import co.touchlab.skie.plugin.util.withType
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -26,4 +36,38 @@ class ActualKgpShim(
 
     override fun getKotlinPluginVersion(): String =
         project.getKotlinPluginVersion()
+
+    override val targets: NamedDomainObjectContainer<SkieTarget> = project.objects.domainObjectContainer(SkieTarget::class.java)
+
+    override fun initializeSkieTargets() {
+        initializeBinaryTargets()
+        initializeArtifactTargets()
+    }
+
+    private fun initializeBinaryTargets() {
+        project.kotlinMultiplatformExtension?.appleTargets?.configureEach {
+            val target = this
+
+            binaries.withType<Framework>().configureEach {
+                val binary = this
+
+                val binaryTarget = ActualSkieBinaryTarget(
+                    project = project,
+                    target = target,
+                    binary = binary,
+                    outputKind = SkieTarget.OutputKind.Framework,
+                )
+
+                targets.add(binaryTarget)
+            }
+        }
+    }
+
+    private fun initializeArtifactTargets() {
+        project.kotlinArtifactsExtension.artifacts.withType<KotlinNativeArtifact>().configureEach {
+            val artifactTargets = ActualSkieArtifactTarget.createFromArtifact(this, project)
+
+            targets.addAll(artifactTargets)
+        }
+    }
 }

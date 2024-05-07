@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.directory
 
-import co.touchlab.skie.plugin.util.SkieTarget
+import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 import co.touchlab.skie.plugin.util.skieTargetBasedTaskName
 import co.touchlab.skie.util.directory.SkieDirectories
