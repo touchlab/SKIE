@@ -12,10 +12,7 @@ dependencies {
     implementation(libs.bundles.kotest)
 }
 
-println("Start: ${gradle.startParameter}")
-
 val smokeTestRepository = layout.buildDirectory.dir("smokeTestRepo")
-
 
 val publishSkieToTempMaven by tasks.registering(PublishSkieToTempMavenTask::class) {
     skieSources = rootDir.resolve("../SKIE")
@@ -42,9 +39,7 @@ testing {
 
                     systemProperty("smokeTestRepository", smokeTestRepository.get().asFile.absolutePath)
                     systemProperty("junit.platform.reporting.open.xml.enabled", "true")
-                    systemProperty("junit.platform.reporting.output.dir", reports.junitXml.outputLocation.get().asFile.absolutePath.also {
-                        println("Junitxml: ${it}")
-                    })
+                    systemProperty("junit.platform.reporting.output.dir", reports.junitXml.outputLocation.get().asFile.absolutePath)
 
                     listOf(
                         "testLevel",

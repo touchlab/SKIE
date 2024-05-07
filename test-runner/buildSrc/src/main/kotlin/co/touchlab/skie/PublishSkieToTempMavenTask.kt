@@ -19,7 +19,13 @@ abstract class PublishSkieToTempMavenTask @Inject constructor(objects: ObjectFac
     val tempRepository: DirectoryProperty = objects.directoryProperty()
 
     init {
-        inputs.files(skieSources.map { it.asFileTree.matching { this.include { it.file.extension == "kt" } }.also { println(it.files.joinToString("\n") { it.absolutePath }) } })
+        inputs.files(skieSources.map {
+            it.asFileTree.matching {
+                exclude("**/build")
+                exclude("acceptance-tests/")
+                exclude("**/.*")
+            }
+        })
     }
 
     @TaskAction

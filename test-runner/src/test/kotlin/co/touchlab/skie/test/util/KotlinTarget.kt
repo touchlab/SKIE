@@ -5,10 +5,12 @@ sealed interface KotlinTarget: KotlinTargetOrPreset {
         val children: List<KotlinTargetOrPreset>
         val targets: List<KotlinTarget>
             get() = children.flatMap {
+                // IDEA says it's redundant, but Kotlin compiler says it's required.
+                @Suppress("REDUNDANT_ELSE_IN_WHEN")
                 when (it) {
                     is Preset -> it.targets
                     is KotlinTarget -> listOf(it)
-                    else -> error("WTF?")
+                    else -> error("This shouldn't happen, but somehow is needed by Kotlin compiler (IDEA is okay without it) - $it")
                 }
             }
 

@@ -45,6 +45,8 @@ class SkieTestRunner: TestTemplateInvocationContextProvider {
         val matrix = SkieTestMatrix(axes = matrixAxes)
 
         return matrix.mapCells {
+            // Oh it's needed, otherwise it's all red-underscored.
+            @Suppress("USELESS_CAST")
             SkieTestMatrixContext(it) as TestTemplateInvocationContext
         }.stream()
     }
