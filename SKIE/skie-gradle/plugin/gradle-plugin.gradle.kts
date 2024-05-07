@@ -29,7 +29,7 @@ buildConfig {
             "${version.toString().enquoted()} to ${name.toString().enquoted()}"
         }
 
-    buildConfigField("co.touchlab.skie.plugin.util.StringMap", "KOTLIN_TO_SKIE_KGP_VERSION", "mapOf($kotlinToSkieKgpVersion)")
+    buildConfigField("co.touchlab.skie.plugin.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "mapOf($kotlinToSkieKgpVersion)")
 
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 

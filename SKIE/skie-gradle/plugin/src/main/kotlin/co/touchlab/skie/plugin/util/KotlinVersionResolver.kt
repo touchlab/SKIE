@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin.util
 
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
 object KotlinVersionResolver {
 
@@ -11,7 +10,7 @@ object KotlinVersionResolver {
 
     private fun Project.getValidKotlinVersion(): String? {
         val kotlinVersion = getKotlinVersionString()
-        val kgpVersion = kotlinVersion?.let { BuildConfig.KOTLIN_TO_SKIE_KGP_VERSION[it] }
+        val skieVersion = kotlinVersion?.let { BuildConfig.KOTLIN_TO_SKIE_VERSION[it] }
 
         if (kotlinGradlePluginVersionOverride != null) {
             logger.error(
@@ -32,8 +31,8 @@ object KotlinVersionResolver {
                     You can try to workaround this issue by providing the Kotlin version manually via 'skie.kgpVersion' property in your gradle.properties.
                 """.trimIndent()
             }
-            kgpVersion == null -> {
-                val supportedKotlinVersions = BuildConfig.KOTLIN_TO_SKIE_KGP_VERSION.keys.sorted()
+            skieVersion == null -> {
+                val supportedKotlinVersions = BuildConfig.KOTLIN_TO_SKIE_VERSION.keys.sorted()
 
                 """
                     SKIE ${BuildConfig.SKIE_VERSION} does not support Kotlin $kotlinVersion.
@@ -43,7 +42,7 @@ object KotlinVersionResolver {
                     Note that there are no plans for supporting early access versions like Beta, RC, etc.
                 """.trimIndent()
             }
-            else -> return kgpVersion
+            else -> return skieVersion
         }
 
         reportSkieLoaderError(error)
@@ -55,28 +54,18 @@ object KotlinVersionResolver {
         (project.kotlinGradlePluginVersionOverride ?: project.kotlinGradlePluginVersion ?: project.rootProject.kotlinGradlePluginVersion)
 
     private val Project.kotlinGradlePluginVersion: String?
-        get() = kotlinGradlePluginVersionFromPlugin() ?: kotlinGradlePluginVersionFromClasspathConfiguration()
+        get() = kotlinGradlePluginVersionFromClasspathConfiguration()
 
     private val Project.kotlinGradlePluginVersionOverride: String?
         get() = findProperty("skie.kgpVersion") as? String
 
-    private fun Project.kotlinGradlePluginVersionFromPlugin(): String? {
-        return try {
-            plugins.filterIsInstance<KotlinBasePlugin>().firstOrNull()?.pluginVersion
-        } catch (e: NoClassDefFoundError) {
-            // This happens when kotlin-gradle-plugin-api is not on classpath. SKIE plugin doesn't add it to make sure we don't lock it to a specific version.
-            null
-        } catch (e: ClassNotFoundException) {
-            // We'll probably never get here, but we want to be sure not to crash when we can't find the KotlinBasePlugin class.
-            null
-        }
-    }
-
     private fun Project.kotlinGradlePluginVersionFromClasspathConfiguration(): String? {
         val classpathConfiguration = buildscript.configurations.getByName("classpath")
+
         val artifact = classpathConfiguration.resolvedConfiguration.resolvedArtifacts.singleOrNull { artifact ->
             artifact.moduleVersion.id.let { it.group == "org.jetbrains.kotlin" && it.name == "kotlin-gradle-plugin" }
         }
+
         return artifact?.moduleVersion?.id?.version
     }
 }
