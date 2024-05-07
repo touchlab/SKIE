@@ -172,6 +172,9 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     inputs.property(
                         "skipTestsInLockfile", System.getenv("skipTestsInLockfile"),
                     ).optional(true)
+                    inputs.property(
+                        "keepTemporaryFiles", System.getenv("keepTemporaryFiles"),
+                    ).optional(true)
 
                     outputs.dir(
                         testDirectory(project, acceptanceTestType, kotlinToolingVersion),
