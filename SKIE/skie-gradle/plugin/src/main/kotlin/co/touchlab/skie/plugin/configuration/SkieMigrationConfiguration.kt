@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag

@@ -24,7 +24,7 @@ internal abstract class CreateSkieConfigurationTask : DefaultTask() {
     abstract val configurationFile: Property<File>
 
     init {
-        doNotTrackState("Tracking configuration changes is currently not supported.")
+        this.doNotTrackState("Tracking configuration changes is currently not supported.")
     }
 
     @TaskAction
