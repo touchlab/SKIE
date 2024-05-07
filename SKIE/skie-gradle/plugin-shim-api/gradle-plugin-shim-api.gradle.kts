@@ -15,6 +15,7 @@ kotlin {
                 api(projects.gradle.gradlePluginApi)
 
                 implementation(projects.common.util)
+                implementation(projects.gradle.gradlePluginUtil)
             }
         }
     }

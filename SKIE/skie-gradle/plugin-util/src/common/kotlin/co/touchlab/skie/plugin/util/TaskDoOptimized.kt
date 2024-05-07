@@ -8,7 +8,7 @@ import org.gradle.api.tasks.TaskProvider
 
 // We need to use an anonymous class instead of lambda to keep execution optimizations.
 // https://docs.gradle.org/7.4.2/userguide/validation_problems.html#implementation_unknown
-internal inline fun Task.doFirstOptimized(crossinline action: () -> Unit): Task =
+inline fun Task.doFirstOptimized(crossinline action: () -> Unit): Task =
     doFirst(
         object : Action<Task> {
             override fun execute(task: Task) {
@@ -17,12 +17,12 @@ internal inline fun Task.doFirstOptimized(crossinline action: () -> Unit): Task 
         },
     )
 
-internal inline fun TaskProvider<out Task>.configureDoFirstOptimized(crossinline action: () -> Unit) =
+inline fun TaskProvider<out Task>.configureDoFirstOptimized(crossinline action: () -> Unit) =
     configure {
         doFirstOptimized(action)
     }
 
-internal inline fun Task.doLastOptimized(crossinline action: () -> Unit): Task =
+inline fun Task.doLastOptimized(crossinline action: () -> Unit): Task =
     doLast(
         object : Action<Task> {
             override fun execute(task: Task) {
@@ -31,7 +31,7 @@ internal inline fun Task.doLastOptimized(crossinline action: () -> Unit): Task =
         },
     )
 
-internal inline fun TaskProvider<out Task>.configureDoLastOptimized(crossinline action: () -> Unit) =
+inline fun TaskProvider<out Task>.configureDoLastOptimized(crossinline action: () -> Unit) =
     configure {
         doLastOptimized(action)
     }

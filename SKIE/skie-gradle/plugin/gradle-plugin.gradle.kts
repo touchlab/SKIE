@@ -67,6 +67,7 @@ dependencies {
     api(projects.common.configuration.configurationDeclaration)
     implementation(projects.gradle.gradleSubPluginApi)
     implementation(projects.gradle.gradlePluginShimApi)
+    implementation(projects.gradle.gradlePluginUtil)
 
     compileOnly(gradlePluginApi())
     compileOnly(libs.plugin.kotlin.gradle.api)

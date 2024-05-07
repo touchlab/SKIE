@@ -22,12 +22,7 @@ kotlin {
                 // All dependencies should be `compileOnly` and instead brought in by `gradle-plugin` to minimize the amount of runtime-loaded artifacts.
                 compileOnly(projects.gradle.gradlePluginShimApi)
                 compileOnly(projects.common.configuration.configurationDeclaration)
-
-                compileOnly(libs.ci.info)
-                compileOnly(libs.jgit)
-                compileOnly(libs.mixpanel)
-
-                compileOnly(projects.common.analytics)
+                compileOnly(projects.gradle.gradlePluginUtil)
                 compileOnly(projects.common.util)
             }
         }

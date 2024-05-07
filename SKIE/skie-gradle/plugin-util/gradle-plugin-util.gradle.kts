@@ -4,15 +4,14 @@ plugins {
 }
 
 skiePublishing {
-    name = "SKIE Gradle Plugin API"
-    description = "Public API for SKIE Gradle plugin."
+    name = "SKIE Gradle Plugin utils"
+    description = "Internal utilities for SKIE Gradle plugin."
 }
 
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(projects.common.configuration.configurationDeclaration)
             }
         }
     }
