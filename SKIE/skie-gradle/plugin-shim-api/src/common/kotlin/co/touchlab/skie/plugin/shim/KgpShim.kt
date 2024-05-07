@@ -28,4 +28,6 @@ interface KgpShim {
     fun resolvablePropertyString(properties: Properties, key: String, suffix: String?): String?
 
     fun addKmpAttributes(attributeContainer: AttributeContainer, konanTarget: KonanTargetShim)
+
+    fun configureSkieForFatFrameworks()
 }

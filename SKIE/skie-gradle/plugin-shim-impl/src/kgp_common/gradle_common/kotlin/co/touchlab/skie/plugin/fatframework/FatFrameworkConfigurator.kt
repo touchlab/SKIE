@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.gradle.tasks.FrameworkLayout
 import org.jetbrains.kotlin.konan.target.Architecture
 import java.io.File
 
-internal object FatFrameworkConfigurator {
+object FatFrameworkConfigurator {
 
     fun configureSkieForFatFrameworks(project: Project) {
         fixFatFrameworkNameForCocoaPodsPlugin(project)

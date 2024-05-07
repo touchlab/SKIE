@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.shim
 import co.touchlab.skie.plugin.ActualSkieArtifactTarget
 import co.touchlab.skie.plugin.ActualSkieBinaryTarget
 import co.touchlab.skie.plugin.SkieTarget
+import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.util.appleTargets
 import co.touchlab.skie.plugin.util.kotlinMultiplatformExtension
 import co.touchlab.skie.plugin.util.named
@@ -87,5 +88,9 @@ class ActualKgpShim(
             attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget.name)
             attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(KotlinUsages.KOTLIN_API))
         }
+    }
+
+    override fun configureSkieForFatFrameworks() {
+        FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
     }
 }

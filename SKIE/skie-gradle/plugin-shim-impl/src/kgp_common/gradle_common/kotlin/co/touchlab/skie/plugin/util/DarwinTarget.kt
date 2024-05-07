@@ -17,7 +17,7 @@ internal data class DarwinTarget(
 
     companion object {
 
-        val allTargets = listOf(
+        val allTargets: Map<String, DarwinTarget> = listOf(
             DarwinTarget(KonanTarget.IOS_ARM32, "armv7-apple-ios", "iphoneos"),
             DarwinTarget(KonanTarget.IOS_ARM64, "arm64-apple-ios", "iphoneos"),
             DarwinTarget(KonanTarget.IOS_X64, "x86_64-apple-ios-simulator", "iphonesimulator"),
