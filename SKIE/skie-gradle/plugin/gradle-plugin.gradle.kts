@@ -70,8 +70,6 @@ dependencies {
     implementation(projects.gradle.gradlePluginUtil)
 
     compileOnly(gradlePluginApi())
-    compileOnly(libs.plugin.kotlin.gradle.api)
-    compileOnly(libs.plugin.kotlin.gradle)
 
     implementation(libs.ci.info)
     implementation(libs.jgit)
