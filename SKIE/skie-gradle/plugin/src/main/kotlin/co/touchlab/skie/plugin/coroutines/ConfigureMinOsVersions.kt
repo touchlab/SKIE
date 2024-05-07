@@ -32,7 +32,7 @@ internal fun SkieTarget.configureMinOsVersionIfNeeded() {
 
 private fun SkieTarget.getDistributionProperties(): Properties =
     project.kgpShim.getDistributionProperties(
-        konanHome = project.kgpShim.getKonanHome(project).absolutePath,
+        konanHome = project.kgpShim.getKonanHome().absolutePath,
         propertyOverrides = parseOverrideKonanProperties(freeCompilerArgs.get()),
     )
 

@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.dependencies
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.skieInternalExtension
 import co.touchlab.skie.plugin.util.exclude
 import co.touchlab.skie.plugin.util.named
 import org.gradle.api.Project
@@ -11,17 +12,17 @@ internal object SkieCompilerPluginDependencyProvider {
 
     private const val configurationName = "skieCompilerPlugin"
 
-    fun getOrCreateDependencyConfiguration(project: Project, kotlinToolingVersion: String): Configuration =
+    fun getOrCreateDependencyConfiguration(project: Project): Configuration =
         project.configurations.findByName(configurationName)
-            ?: createDependencyConfiguration(project, kotlinToolingVersion)
+            ?: createDependencyConfiguration(project)
 
-    private fun createDependencyConfiguration(project: Project, kotlinToolingVersion: String): Configuration {
+    private fun createDependencyConfiguration(project: Project): Configuration {
         val skieCompilerPluginConfiguration = project.configurations.create(configurationName) {
             isCanBeConsumed = false
             isCanBeResolved = true
 
             attributes {
-                attribute(KotlinCompilerVersion.attribute, project.objects.named(kotlinToolingVersion))
+                attribute(KotlinCompilerVersion.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
             }
 
             exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")

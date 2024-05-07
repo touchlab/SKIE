@@ -56,7 +56,7 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
     // Putting these extensions here so that they don't pollute the extension's namespace. They can be used by wrapping in `with(SkieExtension) { ... }`
     companion object {
 
-        fun Project.createExtension(): SkieExtension =
+        fun createExtension(project: Project): SkieExtension =
             project.extensions.create("skie", SkieExtension::class.java)
 
         fun SkieExtension.buildConfiguration(outputKind: SkieTarget.OutputKind): GradleSkieConfigurationData =

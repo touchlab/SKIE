@@ -54,7 +54,7 @@ internal object SkieSubPluginManager {
     private fun SkieTarget.registerSubPluginsToClasspath() {
         addToCompilerClasspath(project.configurations.getByName(subPluginConfigurationName))
     }
-}
 
-private val Project.skieSubPlugins: DomainObjectCollection<SkieSubplugin>
-    get() = plugins.withType()
+    private val Project.skieSubPlugins: DomainObjectCollection<SkieSubplugin>
+        get() = plugins.withType()
+}

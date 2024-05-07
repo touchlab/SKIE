@@ -2,6 +2,7 @@ package co.touchlab.skie.plugin.coroutines
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.plugin.skieInternalExtension
 import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.plugin.util.named
@@ -14,12 +15,12 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.konan.target.presetName
 
-internal fun SkieTarget.addDependencyOnSkieRuntime(kotlinToolingVersion: String) {
+internal fun SkieTarget.addDependencyOnSkieRuntime() {
     if (!project.isCoroutinesInteropEnabled) {
         return
     }
 
-    val skieRuntimeConfiguration = getOrCreateSkieRuntimeConfiguration(kotlinToolingVersion)
+    val skieRuntimeConfiguration = getOrCreateSkieRuntimeConfiguration()
 
     linkerConfiguration.incoming.afterResolve {
         registerSkieRuntime(skieRuntimeConfiguration)
@@ -44,7 +45,7 @@ private fun SkieTarget.registerSkieRuntime(
     passRuntimeDependencyToCompiler(skieRuntimeDependency)
 }
 
-private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(kotlinToolingVersion: String): Configuration {
+private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(): Configuration {
     val skieRuntimeConfigurationName = skieRuntimeConfigurationName
 
     project.configurations.findByName(skieRuntimeConfigurationName)?.let {
@@ -56,7 +57,7 @@ private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(kotlinToolingVersion:
             attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
             attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget.name)
             attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(KotlinUsages.KOTLIN_API))
-            attribute(KotlinCompilerVersion.attribute, project.objects.named(kotlinToolingVersion))
+            attribute(KotlinCompilerVersion.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
         }
     }
 

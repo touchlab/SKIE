@@ -78,7 +78,7 @@ object KgpShimLoader {
 
         val shimClass = loadShimClass(childClassLoader) ?: return null
 
-        return shimClass.getConstructor().newInstance() as KgpShim
+        return shimClass.getConstructor().newInstance(this) as KgpShim
     }
 
     private fun Project.createClassLoaderForShimClass(shimImplJar: Set<File>): ClassLoader {
