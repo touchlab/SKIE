@@ -62,7 +62,7 @@ configurations.configureEach {
 }
 
 dependencies {
-    api(projects.gradle.gradlePluginShimApi)
+    implementation(projects.gradle.gradlePluginShimApi)
     api(projects.common.configuration.configurationDeclaration)
     compileOnly("dev.gradleplugins:gradle-api:${gradleApiVersionDimension().components.min().value}")
     compileOnly(libs.plugin.kotlin.gradle.api)
