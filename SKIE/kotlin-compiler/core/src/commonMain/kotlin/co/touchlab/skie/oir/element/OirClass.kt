@@ -14,11 +14,15 @@ class OirClass(
 
     lateinit var originalSirClass: SirClass
 
-    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+    /**
+     * Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+     */
     val primarySirClass: SirClass
         get() = bridgedSirClass ?: originalSirClass
 
-    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+    /**
+     * Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+     */
     var bridgedSirClass: SirClass? = null
 
     override val visibility: OirVisibility

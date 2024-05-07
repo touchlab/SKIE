@@ -40,6 +40,9 @@ class KirClass(
 
     val superTypes: MutableList<DeclarationBackedKirType> = superTypes.toMutableList()
 
+    val resolvedSuperTypes: List<DeclaredKirType>
+        get() = superTypes.map { it.asDeclaredKirTypeOrError() }
+
     val typeParameters: MutableList<KirTypeParameter> = mutableListOf()
 
     override val module: KirModule
@@ -48,11 +51,15 @@ class KirClass(
     override val originalSirDeclaration: SirClass
         get() = oirClass.originalSirClass
 
-    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+    /**
+     * Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+     */
     override val primarySirDeclaration: SirClass
         get() = oirClass.primarySirClass
 
-    // Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+    /**
+     * Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+     */
     override var bridgedSirDeclaration: SirClass?
         get() = oirClass.bridgedSirClass
         set(value) {
@@ -61,8 +68,14 @@ class KirClass(
 
     val originalSirClass: SirClass by ::originalSirDeclaration
 
+    /**
+     * Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+     */
     val primarySirClass: SirClass by ::primarySirDeclaration
 
+    /**
+     * Should not be directly accessed before all bridging configuration is done. See @MustBeExecutedAfterBridgingConfiguration.
+     */
     var bridgedSirClass: SirClass? by ::bridgedSirDeclaration
 
     init {

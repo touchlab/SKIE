@@ -5,4 +5,7 @@ import co.touchlab.skie.kir.element.KirClass
 data class DeclaredKirType(
     val declaration: KirClass,
     val typeArguments: List<KirType>,
-) : DeclarationBackedKirType()
+) : DeclarationBackedKirType() {
+
+    override fun asDeclaredKirTypeOrError(): DeclaredKirType = this
+}

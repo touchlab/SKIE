@@ -42,14 +42,12 @@ class OirTypeTranslator {
             is TypeParameterUsageKirType -> kirType.typeParameter.oirTypeParameter.toTypeParameterUsage()
         }
 
-    fun mapType(kirType: DeclarationBackedKirType): DeclaredOirType =
-        when (kirType) {
-            is DeclaredKirType -> {
-                DeclaredOirType(
-                    declaration = kirType.declaration.oirClass,
-                    typeArguments = kirType.typeArguments.map { mapType(it) },
-                )
-            }
-            is UnresolvedFlowKirType -> error("UnresolvedFlowKirType must be resolved before translation to Oir.")
-        }
+    fun mapType(kirType: DeclarationBackedKirType): DeclaredOirType {
+        val declaredKirType = kirType.asDeclaredKirTypeOrError()
+
+        return DeclaredOirType(
+            declaration = declaredKirType.declaration.oirClass,
+            typeArguments = declaredKirType.typeArguments.map { mapType(it) },
+        )
+    }
 }
