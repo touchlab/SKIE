@@ -3,16 +3,13 @@ package co.touchlab.skie.plugin.coroutines
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin.BuildConfig
 import co.touchlab.skie.plugin.SkieTarget
+import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.skieInternalExtension
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.plugin.util.named
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleIdentifier
 import org.gradle.api.artifacts.ResolvedDependency
-import org.gradle.api.attributes.Usage
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 
 internal fun SkieTarget.addDependencyOnSkieRuntime() {
     if (!project.isCoroutinesInteropEnabled) {
@@ -53,9 +50,7 @@ private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(): Configuration {
 
     val skieRuntimeConfiguration = project.configurations.create(skieRuntimeConfigurationName) {
         attributes {
-            attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
-            attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget.name)
-            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(KotlinUsages.KOTLIN_API))
+            project.kgpShim.addKmpAttributes(this, konanTarget)
             attribute(KotlinCompilerVersion.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
         }
     }

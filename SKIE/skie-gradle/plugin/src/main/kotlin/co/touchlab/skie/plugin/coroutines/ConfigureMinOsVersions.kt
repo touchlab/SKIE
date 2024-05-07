@@ -5,7 +5,7 @@ import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.shim.KonanTargetShim
 import co.touchlab.skie.util.version.getMinRequiredOsVersionForSwiftAsync
 import co.touchlab.skie.util.version.isLowerVersionThan
-import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
+import org.gradle.api.Project
 import java.util.Properties
 
 internal fun SkieTarget.configureMinOsVersionIfNeeded() {
@@ -17,7 +17,7 @@ internal fun SkieTarget.configureMinOsVersionIfNeeded() {
         val distributionProperties = getDistributionProperties()
 
         fun overrideVersion(name: String) {
-            val currentMinVersion = distributionProperties.targetString(name, konanTarget)
+            val currentMinVersion = distributionProperties.targetString(name, konanTarget, project)
             val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(konanTarget.name)
 
             if (currentMinVersion == null || currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
@@ -36,8 +36,8 @@ private fun SkieTarget.getDistributionProperties(): Properties =
         propertyOverrides = parseOverrideKonanProperties(freeCompilerArgs.get()),
     )
 
-private fun Properties.targetString(name: String, target: KonanTargetShim): String? =
-    resolvablePropertyString(name, target.name)
+private fun Properties.targetString(name: String, target: KonanTargetShim, project: Project): String? =
+    project.kgpShim.resolvablePropertyString(this, name, target.name)
 
 private const val overrideKonanPropertiesKey = "-Xoverride-konan-properties"
 

@@ -5,14 +5,21 @@ import co.touchlab.skie.plugin.ActualSkieBinaryTarget
 import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.util.appleTargets
 import co.touchlab.skie.plugin.util.kotlinMultiplatformExtension
+import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.plugin.util.withType
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.attributes.AttributeContainer
+import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
+import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
@@ -68,6 +75,17 @@ class ActualKgpShim(
             val artifactTargets = ActualSkieArtifactTarget.createFromArtifact(this, project)
 
             targets.addAll(artifactTargets)
+        }
+    }
+
+    override fun resolvablePropertyString(properties: Properties, key: String, suffix: String?): String? =
+        properties.resolvablePropertyString(key, suffix)
+
+    override fun addKmpAttributes(attributeContainer: AttributeContainer, konanTarget: KonanTargetShim) {
+        attributeContainer.apply {
+            attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+            attribute(KotlinNativeTarget.konanTargetAttribute, konanTarget.name)
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(KotlinUsages.KOTLIN_API))
         }
     }
 }
