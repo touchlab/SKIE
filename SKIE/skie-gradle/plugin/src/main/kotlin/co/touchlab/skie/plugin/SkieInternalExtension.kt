@@ -7,7 +7,6 @@ import co.touchlab.skie.plugin.util.KotlinVersionResolver
 import co.touchlab.skie.plugin.util.SkieTarget
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.jetbrains.kotlin.konan.target.HostManager
 import javax.inject.Inject
 
 internal abstract class SkieInternalExtension @Inject constructor(
@@ -19,7 +18,7 @@ internal abstract class SkieInternalExtension @Inject constructor(
     abstract val targets: NamedDomainObjectContainer<SkieTarget>
 
     val isSkieEnabled: Boolean
-        get() = project.skieExtension.isEnabled.get() && HostManager.hostIsMac
+        get() = project.skieExtension.isEnabled.get() && kgpShim.hostIsMac
 
     companion object {
 

@@ -15,7 +15,7 @@ import co.touchlab.skie.plugin.util.SkieTarget
 import co.touchlab.skie.plugin.util.appleTargets
 import co.touchlab.skie.plugin.util.kotlinMultiplatformExtension
 import co.touchlab.skie.plugin.util.skieTargetsOf
-import co.touchlab.skie.plugin.util.subpluginOption
+import co.touchlab.skie.plugin.util.toKotlinCompilerPluginOption
 import co.touchlab.skie.plugin.util.withType
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Plugin
@@ -100,7 +100,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
     private fun SkieTarget.configureKotlinCompiler() {
         addPluginArgument(
             SkiePlugin.id,
-            SkiePlugin.Options.skieDirectories.subpluginOption(skieDirectories.get()),
+            SkiePlugin.Options.skieDirectories.toKotlinCompilerPluginOption(skieDirectories.get()),
         )
 
         addToCompilerClasspath(

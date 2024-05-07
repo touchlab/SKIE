@@ -38,7 +38,7 @@ sealed interface SkieTarget {
 
     val freeCompilerArgs: Provider<List<String>>
 
-    fun addPluginArgument(pluginId: String, option: SubpluginOption)
+    fun addPluginArgument(pluginId: String, option: KotlinCompilerPluginOption)
 
     fun addToCompilerClasspath(fileCollection: FileCollection)
 
@@ -59,19 +59,20 @@ sealed interface SkieTarget {
 
         override val task: TaskProvider<out KotlinNativeLink> = binary.linkTaskProvider
 
-        override val skieDirectories = project.layout.buildDirectory.dir("skie/binaries/${binary.name}/$buildType/${binary.target.targetName}").map {
-            SkieDirectories(it.asFile)
-        }
+        override val skieDirectories: Provider<SkieDirectories> =
+            project.layout.buildDirectory
+                .dir("skie/binaries/${binary.name}/$buildType/${binary.target.targetName}")
+                .map { SkieDirectories(it.asFile) }
 
         override val freeCompilerArgs: Provider<List<String>> = task.map {
             it.binary.freeCompilerArgs
         }
 
-        override fun addPluginArgument(pluginId: String, option: SubpluginOption) {
+        override fun addPluginArgument(pluginId: String, option: KotlinCompilerPluginOption) {
             task.configure {
                 compilerPluginOptions.addPluginArgument(
                     pluginId,
-                    option,
+                    SubpluginOption(option.key, option.value),
                 )
             }
         }
@@ -104,15 +105,16 @@ sealed interface SkieTarget {
 
         override val task = project.tasks.named<KotlinNativeLinkArtifactTask>(linkTaskName(artifact, konanTarget, buildType))
 
-        override val skieDirectories = project.layout.buildDirectory.dir("skie/artifacts/${artifact.artifactName}/$buildType/$konanTarget").map {
-            SkieDirectories(it.asFile)
-        }
+        override val skieDirectories: Provider<SkieDirectories> =
+            project.layout.buildDirectory
+                .dir("skie/artifacts/${artifact.artifactName}/$buildType/$konanTarget")
+                .map { SkieDirectories(it.asFile) }
 
         override val freeCompilerArgs: Provider<List<String>> = task.flatMap {
             it.toolOptions.freeCompilerArgs
         }
 
-        override fun addPluginArgument(pluginId: String, option: SubpluginOption) {
+        override fun addPluginArgument(pluginId: String, option: KotlinCompilerPluginOption) {
             task.configure {
                 toolOptions.freeCompilerArgs.addAll(
                     "-P",
