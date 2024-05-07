@@ -7,7 +7,7 @@ import co.touchlab.skie.plugin.analytics.git.getGitRoot
 import co.touchlab.skie.plugin.analytics.hardware.HardwareAnalytics
 import co.touchlab.skie.plugin.analytics.performance.GradlePerformanceAnalytics
 import co.touchlab.skie.plugin.analytics.project.ProjectAnalytics
-import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
+import co.touchlab.skie.plugin.configuration.buildConfiguration
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.kgpShim

@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.configuration.util
+package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.UntypedSkieConfigurationData

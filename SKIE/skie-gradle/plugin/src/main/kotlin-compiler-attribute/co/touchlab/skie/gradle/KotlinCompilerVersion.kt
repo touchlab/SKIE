@@ -5,13 +5,15 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.AttributeDisambiguationRule
 import org.gradle.api.attributes.MultipleCandidatesDetails
+import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import javax.inject.Inject
 
 interface KotlinCompilerVersion : Named {
+
     companion object {
 
-        val attribute = Attribute.of("co.touchlab.skie.kotlin.compiler.version", KotlinCompilerVersion::class.java)
+        val attribute: Attribute<KotlinCompilerVersion> = Attribute.of("co.touchlab.skie.kotlin.compiler.version", KotlinCompilerVersion::class.java)
 
         fun registerIn(dependencies: DependencyHandler, currentKotlinVersion: String) {
             dependencies.attributesSchema.attribute(attribute) {
@@ -41,7 +43,7 @@ interface KotlinCompilerVersion : Named {
 
         companion object {
 
-            val log = Logging.getLogger("KotlinCompilerVersion.DisambiguationRule")
+            val log: Logger = Logging.getLogger("KotlinCompilerVersion.DisambiguationRule")
         }
     }
 }

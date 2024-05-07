@@ -1,10 +1,10 @@
 package co.touchlab.skie.plugin
 
-import co.touchlab.skie.plugin.SkieTarget.OutputKind
 import co.touchlab.skie.plugin.shim.ActualKonanTargetShim
 import co.touchlab.skie.plugin.shim.ActualKotlinSourceSetShim
 import co.touchlab.skie.plugin.shim.KonanTargetShim
 import co.touchlab.skie.plugin.shim.KotlinSourceSetShim
+import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
@@ -20,7 +20,7 @@ class ActualSkieBinaryTarget(
     override val project: Project,
     target: KotlinNativeTarget,
     private val binary: NativeBinary,
-    override val outputKind: OutputKind,
+    override val outputKind: SkieTarget.OutputKind,
 ) : SkieTarget.Binary {
 
     override val konanTarget: KonanTargetShim = ActualKonanTargetShim(target.konanTarget)

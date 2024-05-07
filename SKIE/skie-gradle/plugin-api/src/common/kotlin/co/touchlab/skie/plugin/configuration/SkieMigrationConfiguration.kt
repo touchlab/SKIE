@@ -3,7 +3,7 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.configuration.util.takeIf
+import co.touchlab.skie.plugin.util.takeIf
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import javax.inject.Inject

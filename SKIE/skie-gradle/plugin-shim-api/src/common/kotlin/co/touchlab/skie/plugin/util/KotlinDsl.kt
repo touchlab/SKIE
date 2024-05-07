@@ -8,7 +8,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.TaskCollection
 
-inline fun <reified S : Any> DomainObjectCollection<in S>.withType() =
+inline fun <reified S : Any> DomainObjectCollection<in S>.withType(): DomainObjectCollection<S> =
     withType(S::class.java)
 
 inline fun <reified S : Any> NamedDomainObjectCollection<in S>.withType(): NamedDomainObjectCollection<S> =

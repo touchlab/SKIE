@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.subplugin
 
-import co.touchlab.skie.plugin.KotlinCompilerPluginOption
 import co.touchlab.skie.plugin.SkieTarget
+import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration

@@ -1,6 +1,7 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyCoordinate
 import co.touchlab.skie.gradle.util.enquoted
+import co.touchlab.skie.gradle.util.gradlePluginApi
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
@@ -62,9 +63,12 @@ configurations.configureEach {
 }
 
 dependencies {
-    implementation(projects.gradle.gradlePluginShimApi)
+    api(projects.gradle.gradlePluginApi)
     api(projects.common.configuration.configurationDeclaration)
-    compileOnly("dev.gradleplugins:gradle-api:${gradleApiVersionDimension().components.min().value}")
+    implementation(projects.gradle.gradleSubPluginApi)
+    implementation(projects.gradle.gradlePluginShimApi)
+
+    compileOnly(gradlePluginApi())
     compileOnly(libs.plugin.kotlin.gradle.api)
     compileOnly(libs.plugin.kotlin.gradle)
 

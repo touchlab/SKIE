@@ -1,8 +1,6 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.plugin.SkieTarget
-import co.touchlab.skie.plugin.configuration.SkieExtension.Companion.buildConfiguration
-import co.touchlab.skie.plugin.configuration.util.GradleSkieConfigurationData
 import co.touchlab.skie.plugin.directory.createSkieBuildDirectoryTask
 import co.touchlab.skie.plugin.skieBuildDirectory
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask

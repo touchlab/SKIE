@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.plugin.analytics.GradleAnalyticsManager
 import co.touchlab.skie.plugin.configuration.CreateSkieConfigurationTask
 import co.touchlab.skie.plugin.configuration.SkieExtension
+import co.touchlab.skie.plugin.configuration.createExtension
 import co.touchlab.skie.plugin.coroutines.addDependencyOnSkieRuntime
 import co.touchlab.skie.plugin.coroutines.configureMinOsVersionIfNeeded
 import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded

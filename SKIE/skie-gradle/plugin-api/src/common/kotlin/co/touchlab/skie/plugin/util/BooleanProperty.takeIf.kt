@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.configuration.util
+package co.touchlab.skie.plugin.util
 
 import org.gradle.api.provider.Property
 

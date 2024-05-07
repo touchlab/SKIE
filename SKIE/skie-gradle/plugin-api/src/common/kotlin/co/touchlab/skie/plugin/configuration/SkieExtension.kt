@@ -3,10 +3,7 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import co.touchlab.skie.plugin.SkieTarget
-import co.touchlab.skie.plugin.configuration.util.GradleSkieConfigurationData
 import org.gradle.api.Action
-import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
@@ -55,26 +52,5 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         action.execute(migration)
     }
 
-    // Putting these extensions here so that they don't pollute the extension's namespace. They can be used by wrapping in `with(SkieExtension) { ... }`
-    companion object {
-
-        fun createExtension(project: Project): SkieExtension =
-            project.extensions.create("skie", SkieExtension::class.java)
-
-        fun SkieExtension.buildConfiguration(outputKind: SkieTarget.OutputKind): GradleSkieConfigurationData =
-            GradleSkieConfigurationData(
-                enabledConfigurationFlags = (mergeConfigurationSetsFromConfigurations(outputKind) + additionalConfigurationFlags.get()) - suppressedConfigurationFlags.get(),
-                groups = features.buildGroups(),
-            )
-
-        private fun SkieExtension.mergeConfigurationSetsFromConfigurations(outputKind: SkieTarget.OutputKind) =
-            analytics.buildConfigurationFlags() +
-                build.buildConfigurationFlags(outputKind) +
-                debug.buildConfigurationFlags() +
-                features.buildConfigurationFlags() +
-                migration.buildConfigurationFlags()
-    }
+    companion object
 }
-
-internal val Project.skieExtension: SkieExtension
-    get() = project.extensions.getByType(SkieExtension::class.java)
