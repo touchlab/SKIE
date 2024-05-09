@@ -2,7 +2,7 @@ package co.touchlab.skie.plugin.util
 
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
-internal actual fun getAllSupportedDarwinTargets(): List<DarwinTarget> =
+actual fun getAllSupportedDarwinTargets(): List<DarwinTarget> =
     listOf(
         DarwinTarget(KonanTarget.IOS_ARM32, "armv7-apple-ios", "iphoneos"),
         DarwinTarget(KonanTarget.IOS_ARM64, "arm64-apple-ios", "iphoneos"),

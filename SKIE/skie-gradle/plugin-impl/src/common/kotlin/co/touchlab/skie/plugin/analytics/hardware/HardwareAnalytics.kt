@@ -6,7 +6,7 @@ import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.Command
 import groovy.json.JsonSlurper
 
-internal object HardwareAnalytics {
+object HardwareAnalytics {
 
     object Producer : AnalyticsProducer {
 

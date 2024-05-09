@@ -18,7 +18,7 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import java.time.Duration
 
-internal class GradleAnalyticsManager(
+class GradleAnalyticsManager(
     private val project: Project,
 ) {
 

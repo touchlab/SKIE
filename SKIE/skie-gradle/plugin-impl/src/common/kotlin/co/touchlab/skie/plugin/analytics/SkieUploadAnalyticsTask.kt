@@ -14,7 +14,7 @@ import org.json.JSONObject
 import java.io.File
 import java.util.UUID
 
-internal abstract class SkieUploadAnalyticsTask : DefaultTask() {
+abstract class SkieUploadAnalyticsTask : DefaultTask() {
 
     @get:InputDirectory
     abstract val analyticsDirectory: Property<File>

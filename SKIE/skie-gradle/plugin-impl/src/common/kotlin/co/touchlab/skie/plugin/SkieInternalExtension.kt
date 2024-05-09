@@ -8,7 +8,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import javax.inject.Inject
 
-internal abstract class SkieInternalExtension @Inject constructor(
+abstract class SkieInternalExtension @Inject constructor(
     private val project: Project,
     val kotlinVersion: String,
     val kgpShim: KgpShim,
@@ -36,8 +36,8 @@ internal abstract class SkieInternalExtension @Inject constructor(
     }
 }
 
-internal val Project.skieInternalExtension: SkieInternalExtension
+val Project.skieInternalExtension: SkieInternalExtension
     get() = extensions.getByType(SkieInternalExtension::class.java)
 
-internal val Project.kgpShim: KgpShim
+val Project.kgpShim: KgpShim
     get() = skieInternalExtension.kgpShim

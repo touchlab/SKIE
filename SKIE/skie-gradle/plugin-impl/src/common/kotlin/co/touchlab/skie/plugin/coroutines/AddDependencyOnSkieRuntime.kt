@@ -11,7 +11,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleIdentifier
 import org.gradle.api.artifacts.ResolvedDependency
 
-internal fun SkieTarget.addDependencyOnSkieRuntime() {
+fun SkieTarget.addDependencyOnSkieRuntime() {
     if (!project.isCoroutinesInteropEnabled) {
         return
     }

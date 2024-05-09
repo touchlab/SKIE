@@ -11,7 +11,7 @@ import org.gradle.api.provider.Provider
 import java.io.File
 import java.text.Normalizer
 
-internal data class GitAnalytics(
+data class GitAnalytics(
     val numberOfContributors: Int,
     val numberOfCommits: Int,
     val numberOfBranches: Int,
@@ -42,7 +42,7 @@ internal data class GitAnalytics(
 private val PersonIdent.normalizedName: String
     get() = Normalizer.normalize(name, Normalizer.Form.NFC)
 
-internal fun Project.getGitRoot(): Provider<File?> = provider {
+fun Project.getGitRoot(): Provider<File?> = provider {
     projectDir.findGitRoot()
 }
 

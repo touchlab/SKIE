@@ -17,7 +17,7 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-internal object SwiftLinkingConfigurator {
+object SwiftLinkingConfigurator {
 
     fun configureCustomSwiftLinking(target: SkieTarget) {
         // TODO: Change this so that it bundles Swift directly to klib

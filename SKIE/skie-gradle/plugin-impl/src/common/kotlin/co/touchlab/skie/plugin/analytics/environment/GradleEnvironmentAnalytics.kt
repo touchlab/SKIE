@@ -8,7 +8,7 @@ import co.touchlab.skie.util.SystemProperty
 import io.cloudflight.ci.info.CI
 import org.gradle.api.provider.Provider
 
-internal data class GradleEnvironmentAnalytics(
+data class GradleEnvironmentAnalytics(
     val jvmVersion: String,
     val skieVersion: String,
     val gradleVersion: String,

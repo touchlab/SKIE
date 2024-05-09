@@ -25,11 +25,11 @@ data class DarwinTarget(
     }
 }
 
-internal expect fun getAllSupportedDarwinTargets(): List<DarwinTarget>
+expect fun getAllSupportedDarwinTargets(): List<DarwinTarget>
 
-internal val FrameworkDescriptor.darwinTarget: DarwinTarget
+val FrameworkDescriptor.darwinTarget: DarwinTarget
     get() = target.darwinTarget
 
-internal val KonanTarget.darwinTarget: DarwinTarget
+val KonanTarget.darwinTarget: DarwinTarget
     // We can't use `KotlinTarget` directly as the instance can differ when Gradle Configuration Cache is used
     get() = DarwinTarget.allTargets[name] ?: error("Unknown konan target: $this")

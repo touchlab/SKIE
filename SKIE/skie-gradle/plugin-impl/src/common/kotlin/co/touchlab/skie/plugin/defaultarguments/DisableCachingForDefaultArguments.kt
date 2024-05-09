@@ -10,5 +10,5 @@ fun SkieTarget.disableCachingIfNeeded() {
     }
 }
 
-internal val Project.areDefaultArgumentsInCachedLibrariesEnabled: Boolean
+val Project.areDefaultArgumentsInCachedLibrariesEnabled: Boolean
     get() = project.skieExtension.features.defaultArgumentsInExternalLibraries.get()

@@ -6,13 +6,13 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.SkieTarget
 import org.gradle.api.Project
 
-internal fun SkieExtension.Companion.createExtension(project: Project): SkieExtension =
+fun SkieExtension.Companion.createExtension(project: Project): SkieExtension =
     project.extensions.create("skie", SkieExtension::class.java)
 
-internal val Project.skieExtension: SkieExtension
+val Project.skieExtension: SkieExtension
     get() = project.extensions.getByType(SkieExtension::class.java)
 
-internal fun SkieExtension.buildConfiguration(outputKind: SkieTarget.OutputKind): GradleSkieConfigurationData =
+fun SkieExtension.buildConfiguration(outputKind: SkieTarget.OutputKind): GradleSkieConfigurationData =
     GradleSkieConfigurationData(
         enabledConfigurationFlags = (mergeConfigurationSetsFromConfigurations(outputKind) + additionalConfigurationFlags.get()) - suppressedConfigurationFlags.get(),
         groups = features.buildGroups(),

@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 
-internal fun SkieTarget.skieTargetBasedTaskName(baseName: String): String {
+fun SkieTarget.skieTargetBasedTaskName(baseName: String): String {
     val linkTaskNameWithoutPrefix = when (this) {
         is SkieTarget.Binary -> task.name.removePrefix("link")
         is SkieTarget.Artifact -> task.name.removePrefix("assemble")
@@ -17,7 +17,7 @@ internal fun SkieTarget.skieTargetBasedTaskName(baseName: String): String {
     )
 }
 
-internal inline fun <reified T : Task> SkieTarget.registerSkieTargetBasedTask(
+inline fun <reified T : Task> SkieTarget.registerSkieTargetBasedTask(
     baseName: String,
     crossinline configurationAction: T.() -> Unit,
 ): TaskProvider<T> {
@@ -26,7 +26,7 @@ internal inline fun <reified T : Task> SkieTarget.registerSkieTargetBasedTask(
     return project.registerSkieTask(taskName, prefix = null, configurationAction = configurationAction)
 }
 
-internal inline fun <reified T : Task> Project.registerSkieTask(
+inline fun <reified T : Task> Project.registerSkieTask(
     baseName: String,
     prefix: String? = "skie",
     crossinline configurationAction: T.() -> Unit,

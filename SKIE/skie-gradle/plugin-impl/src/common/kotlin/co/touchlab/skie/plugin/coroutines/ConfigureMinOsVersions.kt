@@ -8,7 +8,7 @@ import co.touchlab.skie.util.version.isLowerVersionThan
 import org.gradle.api.Project
 import java.util.Properties
 
-internal fun SkieTarget.configureMinOsVersionIfNeeded() {
+fun SkieTarget.configureMinOsVersionIfNeeded() {
     project.kgpShim.launchScheduler.afterEvaluateOrAfterFinaliseRefinesEdges(project) {
         if (!project.isCoroutinesInteropEnabled) {
             return@afterEvaluateOrAfterFinaliseRefinesEdges

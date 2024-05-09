@@ -3,7 +3,7 @@ package co.touchlab.skie.plugin.util
 import co.touchlab.skie.plugin.configuration.SkieExtension
 import org.gradle.api.Project
 
-internal fun Project.reportSkieLoaderError(error: String) {
+fun Project.reportSkieLoaderError(error: String) {
     logger.error("Error:\n$error\nSKIE cannot not be used until this error is resolved.\n")
 
     gradle.taskGraph.whenReady {

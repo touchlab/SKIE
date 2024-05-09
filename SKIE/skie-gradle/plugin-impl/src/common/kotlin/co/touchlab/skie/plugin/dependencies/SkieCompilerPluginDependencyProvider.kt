@@ -8,7 +8,7 @@ import co.touchlab.skie.plugin.util.named
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 
-internal object SkieCompilerPluginDependencyProvider {
+object SkieCompilerPluginDependencyProvider {
 
     private const val configurationName = "skieCompilerPlugin"
 

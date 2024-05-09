@@ -10,7 +10,7 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 
-internal object SkieSubPluginManager {
+object SkieSubPluginManager {
 
     private const val subPluginConfigurationName: String = "skieSubPlugin"
 

@@ -5,7 +5,7 @@ import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import co.touchlab.skie.util.hash.hashed
 
-internal data class ProjectAnalytics(
+data class ProjectAnalytics(
     val projectId: String,
 ) {
 

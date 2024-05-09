@@ -13,7 +13,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-internal abstract class CreateSkieConfigurationTask : DefaultTask() {
+abstract class CreateSkieConfigurationTask : DefaultTask() {
 
     @get:Input
     abstract val configuration: Property<GradleSkieConfigurationData>

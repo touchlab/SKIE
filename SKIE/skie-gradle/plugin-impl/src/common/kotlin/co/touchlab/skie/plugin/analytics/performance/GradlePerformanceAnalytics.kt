@@ -5,7 +5,7 @@ import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
 import java.time.Duration
 
-internal data class GradlePerformanceAnalytics(
+data class GradlePerformanceAnalytics(
     val linkTaskDurationInSeconds: Double,
 ) {
 

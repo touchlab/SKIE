@@ -13,7 +13,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import javax.inject.Inject
 
-internal object SkieDirectoriesManager {
+object SkieDirectoriesManager {
 
     const val baseTaskName: String = "createSkieDirectories"
 
@@ -42,5 +42,5 @@ internal object SkieDirectoriesManager {
     }
 }
 
-internal val SkieTarget.createSkieBuildDirectoryTask: TaskProvider<Task>
+val SkieTarget.createSkieBuildDirectoryTask: TaskProvider<Task>
     get() = project.tasks.named(skieTargetBasedTaskName(SkieDirectoriesManager.baseTaskName))
