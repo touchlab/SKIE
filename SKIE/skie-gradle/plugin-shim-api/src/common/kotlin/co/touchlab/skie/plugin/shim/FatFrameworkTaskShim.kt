@@ -7,8 +7,6 @@ interface FatFrameworkTaskShim {
 
     val task: Task
 
-    var baseName: String
-
     val targetFrameworkLayout: FrameworkLayout
 
     val frameworks: List<FrameworkShim>

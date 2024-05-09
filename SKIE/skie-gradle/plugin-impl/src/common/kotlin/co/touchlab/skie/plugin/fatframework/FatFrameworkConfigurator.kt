@@ -16,18 +16,7 @@ object FatFrameworkConfigurator {
     fun configureSkieForFatFrameworks(project: Project) {
         // There is no better way to ensure the configureEach is called only after the configuration done by the Kotlin compiler
         project.gradle.taskGraph.whenReady {
-            fixFatFrameworkNameForCocoaPodsPlugin(project)
             configureFatFrameworkPatching(project)
-        }
-    }
-
-    private fun fixFatFrameworkNameForCocoaPodsPlugin(project: Project) {
-        project.pluginManager.withPlugin("kotlin-native-cocoapods") {
-            project.kgpShim.configureEachFatFrameworkTask {
-                if (task.name == "fatFramework") {
-                    baseName = frameworks.map { it.name }.distinct().singleOrNull() ?: return@configureEachFatFrameworkTask
-                }
-            }
         }
     }
 
