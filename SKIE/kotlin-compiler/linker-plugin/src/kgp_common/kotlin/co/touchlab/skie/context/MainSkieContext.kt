@@ -15,6 +15,7 @@ import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.configurables
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
 import co.touchlab.skie.util.KotlinCompilerVersion
+import co.touchlab.skie.util.TargetTriple
 import co.touchlab.skie.util.current
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -71,7 +72,7 @@ class MainSkieContext internal constructor(
         // TODO To SkieConfiguration via RootScope Key
         additionalFlags = emptyList(),
         buildType = if (konanConfig.debug) BuildType.Debug else BuildType.Release,
-        targetTriple = SwiftCompilerConfiguration.TargetTriple(
+        targetTriple = TargetTriple(
             architecture = kotlinTargetTriple.architecture,
             vendor = kotlinTargetTriple.vendor,
             os = kotlinTargetTriple.os,

@@ -28,8 +28,6 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         project.afterEvaluate {
             project.configureSkieCompilerPlugin()
-
-            kgpShim.initializeDarwinTargets()
         }
     }
 

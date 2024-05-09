@@ -1,7 +1,7 @@
 package co.touchlab.skie.phases.swift
 
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.util.FrameworkLayout
+import co.touchlab.skie.util.directory.FrameworkLayout
 import co.touchlab.skie.util.cache.copyFileToIfDifferent
 
 object SwiftKotlinFrameworkCacheSetupPhase : SirPhase {

@@ -1,9 +1,10 @@
-package co.touchlab.skie.util
+package co.touchlab.skie.util.directory
 
-import co.touchlab.skie.configuration.SwiftCompilerConfiguration.TargetTriple
+import co.touchlab.skie.util.TargetTriple
 import java.io.File
 
 class FrameworkLayout(val framework: File) {
+
     constructor(frameworkPath: String) : this(File(frameworkPath))
 
     val parentDir by lazy { framework.parentFile }

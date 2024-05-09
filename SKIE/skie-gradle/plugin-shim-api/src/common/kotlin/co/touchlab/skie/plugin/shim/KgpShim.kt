@@ -29,5 +29,5 @@ interface KgpShim {
 
     fun addKmpAttributes(attributeContainer: AttributeContainer, konanTarget: KonanTargetShim)
 
-    fun initializeDarwinTargets()
+    fun configureEachFatFrameworkTask(action: FatFrameworkTaskShim.() -> Unit)
 }

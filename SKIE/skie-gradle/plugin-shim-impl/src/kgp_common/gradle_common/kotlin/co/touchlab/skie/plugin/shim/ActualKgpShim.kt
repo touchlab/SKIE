@@ -3,9 +3,7 @@ package co.touchlab.skie.plugin.shim
 import co.touchlab.skie.plugin.ActualSkieArtifactTarget
 import co.touchlab.skie.plugin.ActualSkieBinaryTarget
 import co.touchlab.skie.plugin.SkieTarget
-import co.touchlab.skie.plugin.util.DarwinTarget
 import co.touchlab.skie.plugin.util.appleTargets
-import co.touchlab.skie.plugin.util.getAllSupportedDarwinTargets
 import co.touchlab.skie.plugin.util.kotlinMultiplatformExtension
 import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.plugin.util.withType
@@ -20,6 +18,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
+import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
@@ -91,7 +90,9 @@ class ActualKgpShim(
         }
     }
 
-    override fun initializeDarwinTargets() {
-        DarwinTarget.allTargets = getAllSupportedDarwinTargets().associateBy { it.konanTargetName }
+    override fun configureEachFatFrameworkTask(action: FatFrameworkTaskShim.() -> Unit) {
+        project.tasks.withType<FatFrameworkTask>().configureEach {
+            ActualFatFrameworkTaskShim(this).action()
+        }
     }
 }

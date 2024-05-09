@@ -1,5 +1,7 @@
 package co.touchlab.skie.configuration
 
+import co.touchlab.skie.util.TargetTriple
+
 data class SwiftCompilerConfiguration(
     val swiftVersion: String,
     val additionalFlags: List<String>,
@@ -17,22 +19,5 @@ data class SwiftCompilerConfiguration(
 
     enum class BitcodeEmbeddingMode {
         None, Marker, Full
-    }
-
-    data class TargetTriple(
-        val architecture: String,
-        val vendor: String,
-        val os: String,
-        val environment: String?,
-    ) {
-
-        override fun toString(): String {
-            val envSuffix = environment?.let { "-$environment" } ?: ""
-
-            return "$architecture-$vendor-$os$envSuffix"
-        }
-
-        fun withOsVersion(osVersion: String): TargetTriple =
-            copy(os = "$os$osVersion")
     }
 }
