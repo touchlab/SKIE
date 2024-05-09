@@ -35,12 +35,10 @@ abstract class SkieShim : Plugin<Project> {
                 val kotlinToolingVersion = sourceSet.kotlinToolingVersion.primaryVersion
                 val gradleApiVersion = sourceSet.gradleApiVersion.value
                 val kotlinVersion = sourceSet.gradleApiVersion.version.kotlinVersion.toString()
-                val groovyVersion = sourceSet.gradleApiVersion.version.groovyVersion
 
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
                     weak("dev.gradleplugins:gradle-api:$gradleApiVersion")
-                    weak("org.codehaus.groovy:groovy-json:$groovyVersion")
                     weak("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlinToolingVersion")
                     weak("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinToolingVersion")
                 }

@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.util
 
-import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import org.gradle.api.Project
 
 object KotlinVersionResolver {

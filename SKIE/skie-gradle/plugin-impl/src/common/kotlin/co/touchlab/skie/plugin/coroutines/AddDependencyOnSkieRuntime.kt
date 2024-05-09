@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.coroutines
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.skieInternalExtension

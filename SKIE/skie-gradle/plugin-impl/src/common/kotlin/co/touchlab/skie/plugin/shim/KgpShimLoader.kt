@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.shim
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.util.exclude
 import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.plugin.util.reportSkieLoaderError

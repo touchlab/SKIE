@@ -3,7 +3,7 @@ package co.touchlab.skie.plugin.analytics.environment
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
-import co.touchlab.skie.util.BuildConfig
+import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.util.SystemProperty
 import io.cloudflight.ci.info.CI
 import org.gradle.api.provider.Provider

@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.analytics
 
-import co.touchlab.skie.gradle_plugin.BuildConfig
+import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.util.directory.SkieApplicationSupportDirectory
 import com.mixpanel.mixpanelapi.MessageBuilder
 import com.mixpanel.mixpanelapi.MixpanelAPI

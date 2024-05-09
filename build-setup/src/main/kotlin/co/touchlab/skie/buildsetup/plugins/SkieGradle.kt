@@ -34,10 +34,12 @@ abstract class SkieGradle : Plugin<Project> {
 
                 val gradleVersion = gradleApiVersion.value
                 val kotlinVersion = gradleApiVersion.version.kotlinVersion.toString()
+                val groovyVersion = sourceSet.gradleApiVersion.version.groovyVersion
 
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
                     weak("dev.gradleplugins:gradle-api:$gradleVersion")
+                    weak("org.codehaus.groovy:groovy-json:$groovyVersion")
                 }
             }
         }

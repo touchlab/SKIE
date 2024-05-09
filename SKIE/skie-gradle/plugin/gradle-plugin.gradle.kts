@@ -46,16 +46,6 @@ buildConfig {
     buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
 }
 
-kotlin {
-    sourceSets {
-        main {
-            kotlin.srcDirs(
-                "src/main/kotlin-compiler-attribute",
-            )
-        }
-    }
-}
-
 configurations.configureEach {
     attributes {
         attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersionDimension().components.min().value))
@@ -64,19 +54,9 @@ configurations.configureEach {
 
 dependencies {
     api(projects.gradle.gradlePluginApi)
-    api(projects.common.configuration.configurationDeclaration)
-    implementation(projects.gradle.gradleSubPluginApi)
-    implementation(projects.gradle.gradlePluginShimApi)
-    implementation(projects.gradle.gradlePluginUtil)
+    implementation(projects.gradle.gradlePluginImpl)
 
     compileOnly(gradlePluginApi())
-
-    implementation(libs.ci.info)
-    implementation(libs.jgit)
-    implementation(libs.mixpanel)
-
-    implementation(projects.common.analytics)
-    implementation(projects.common.util)
 
     testImplementation(kotlin("test"))
 }
