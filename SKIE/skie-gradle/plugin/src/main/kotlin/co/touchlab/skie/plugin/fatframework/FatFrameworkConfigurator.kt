@@ -3,7 +3,6 @@ package co.touchlab.skie.plugin.fatframework
 import co.touchlab.skie.plugin.util.InjectedFileSystemOperations
 import co.touchlab.skie.plugin.util.TargetTriple
 import co.touchlab.skie.plugin.util.darwinTarget
-import co.touchlab.skie.plugin.util.doFirstOptimized
 import co.touchlab.skie.plugin.util.doLastOptimized
 import co.touchlab.skie.plugin.util.newInstance
 import co.touchlab.skie.plugin.util.withType
@@ -16,56 +15,65 @@ import java.io.File
 object FatFrameworkConfigurator {
 
     fun configureSkieForFatFrameworks(project: Project) {
-        fixFatFrameworkNameForCocoaPodsPlugin(project)
-        configureFatFrameworkPatching(project)
+        // There is no better way to ensure the configureEach is called only after the configuration done by the Kotlin compiler
+        project.gradle.taskGraph.whenReady {
+            fixFatFrameworkNameForCocoaPodsPlugin(project)
+            configureFatFrameworkPatching(project)
+        }
     }
 
     private fun fixFatFrameworkNameForCocoaPodsPlugin(project: Project) {
         project.pluginManager.withPlugin("kotlin-native-cocoapods") {
             project.tasks.withType<FatFrameworkTask>().matching { it.name == "fatFramework" }.configureEach {
-                // Unfortunately has to be done in `doFirst` to make sure the task is already configured by the plugin when we run our code
-                doFirstOptimized {
-                    val commonFrameworkName = frameworks.map { it.name }.distinct().singleOrNull() ?: return@doFirstOptimized
-                    baseName = commonFrameworkName
-                }
+                baseName = frameworks.map { it.name }.distinct().singleOrNull() ?: return@configureEach
             }
         }
     }
 
     private fun configureFatFrameworkPatching(project: Project) {
         val injectedFileSystemOperations = project.objects.newInstance<InjectedFileSystemOperations>()
+
         project.tasks.withType<FatFrameworkTask>().configureEach {
+            val primaryFramework = frameworks.firstOrNull() ?: return@configureEach
+
+            // There shouldn't be any real difference between the frameworks except for architecture, so we consider the first one "primary"
+            val target = FrameworkLayout(
+                rootDir = fatFramework,
+                isMacosFramework = primaryFramework.files.isMacosFramework,
+            )
+
+            val targetModuleFile = target.moduleFile
+            val targetHeaderDir = target.headerDir
+            val targetSwiftHeader = target.swiftHeader
+            val targetSwiftModuleDir = target.swiftModuleDir
+            val primaryFrameworkModuleFile = primaryFramework.files.moduleFile
+
+            val frameworkByArchitecture = frameworks.associateBy { it.target.architecture }
+            val swiftHeadersWithArchitectureClangMacro = frameworkByArchitecture.map { it.value.files.swiftHeader to it.key.clangMacro }
+
+            val frameworksFiles = frameworks.map {
+                FrameworkFiles(it.files.swiftModuleDir, it.files.apiNotes, it.files.swiftModuleFiles(it.darwinTarget.targetTriple))
+            }
+
             doLastOptimized {
-                // There shouldn't be any real difference between the frameworks except for architecture, so we consider the first one "primary"
-                val primaryFramework = frameworks.first()
-                val target = FrameworkLayout(
-                    rootDir = fatFramework,
-                    isMacosFramework = primaryFramework.files.isMacosFramework,
-                )
-
                 // FatFrameworkTask writes its own
-                target.moduleFile.writeText(
-                    primaryFramework.files.moduleFile.readText(),
-                )
+                targetModuleFile.writeText(primaryFrameworkModuleFile.readText())
 
-                val frameworksByArchs = frameworks.associateBy { it.target.architecture }
-                target.swiftHeader.writer().use { writer ->
-                    val swiftHeaderContents = frameworksByArchs.mapValues { (_, framework) ->
-                        framework.files.swiftHeader.readText()
-                    }
+                targetSwiftHeader.writer().use { writer ->
+                    val swiftHeaderContentsWithArchitectureClangMacro = swiftHeadersWithArchitectureClangMacro.map { it.first.readText() to it.second }
 
-                    if (swiftHeaderContents.values.distinct().size == 1) {
-                        writer.write(swiftHeaderContents.values.first())
+                    if (swiftHeaderContentsWithArchitectureClangMacro.distinctBy { it.first }.size == 1) {
+                        writer.write(swiftHeaderContentsWithArchitectureClangMacro.first().first)
                     } else {
-                        swiftHeaderContents.toList().forEachIndexed { i, (arch, content) ->
-                            val macro = arch.clangMacro
+                        swiftHeaderContentsWithArchitectureClangMacro.forEachIndexed { i, (content, clangMacro) ->
                             if (i == 0) {
-                                writer.appendLine("#if defined($macro)\n")
+                                writer.appendLine("#if defined($clangMacro)\n")
                             } else {
-                                writer.appendLine("#elif defined($macro)\n")
+                                writer.appendLine("#elif defined($clangMacro)\n")
                             }
                             writer.appendLine(content)
                         }
+
                         writer.appendLine(
                             """
                             #else
@@ -76,23 +84,30 @@ object FatFrameworkConfigurator {
                     }
                 }
 
-                target.swiftModuleDir.mkdirs()
+                targetSwiftModuleDir.mkdirs()
 
-                frameworksByArchs.toList().forEach { (_, framework) ->
+                frameworksFiles.forEach { frameworkFiles ->
                     injectedFileSystemOperations.fileSystemOperations.copy {
-                        from(framework.files.apiNotes)
-                        into(target.headerDir)
+                        from(frameworkFiles.apiNotes)
+                        into(targetHeaderDir)
                     }
-                    framework.files.swiftModuleFiles(framework.darwinTarget.targetTriple).forEach { swiftmoduleFile ->
+
+                    frameworkFiles.swiftModuleFiles.forEach { swiftmoduleFile ->
                         injectedFileSystemOperations.fileSystemOperations.copy {
                             from(swiftmoduleFile)
-                            into(target.swiftModuleDir)
+                            into(targetSwiftModuleDir)
                         }
                     }
                 }
             }
         }
     }
+
+    data class FrameworkFiles(
+        val swiftModuleDir: File,
+        val apiNotes: File,
+        val swiftModuleFiles: List<File>,
+    )
 }
 
 private val FrameworkLayout.frameworkName: String
