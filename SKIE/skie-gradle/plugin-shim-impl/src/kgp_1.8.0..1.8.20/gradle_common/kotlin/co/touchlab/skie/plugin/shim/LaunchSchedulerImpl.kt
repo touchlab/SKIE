@@ -4,9 +4,13 @@ import org.gradle.api.Project
 
 class LaunchSchedulerImpl : LaunchScheduler {
 
-    override fun afterEvaluateOrAfterFinaliseRefinesEdges(project: Project, block: () -> Unit) {
-        project.afterEvaluate {
+    override fun whenMinOsVersionCanBeSafelyChanged(project: Project, block: () -> Unit) {
+        if (project.state.executed) {
             block()
+        } else {
+            project.afterEvaluate {
+                block()
+            }
         }
     }
 }

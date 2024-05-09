@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.plugin.launchInRequiredStage
 
 class LaunchSchedulerImpl : LaunchScheduler {
 
-    override fun afterEvaluateOrAfterFinaliseRefinesEdges(project: Project, block: () -> Unit) {
+    override fun whenMinOsVersionCanBeSafelyChanged(project: Project, block: () -> Unit) {
         project.launchInRequiredStage(KotlinPluginLifecycle.Stage.AfterFinaliseRefinesEdges) {
             block()
         }

@@ -35,7 +35,7 @@ testing {
                     maxHeapSize = "4024m"
                     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 
-                    dependsOn(publishSkieToTempMaven)
+                    inputs.files(publishSkieToTempMaven)
 
                     systemProperty("smokeTestRepository", smokeTestRepository.get().asFile.absolutePath)
                     systemProperty("junit.platform.reporting.open.xml.enabled", "true")

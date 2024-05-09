@@ -9,9 +9,9 @@ import org.gradle.api.Project
 import java.util.Properties
 
 fun SkieTarget.configureMinOsVersionIfNeeded() {
-    project.kgpShim.launchScheduler.afterEvaluateOrAfterFinaliseRefinesEdges(project) {
+    project.kgpShim.launchScheduler.whenMinOsVersionCanBeSafelyChanged(project) {
         if (!project.isCoroutinesInteropEnabled) {
-            return@afterEvaluateOrAfterFinaliseRefinesEdges
+            return@whenMinOsVersionCanBeSafelyChanged
         }
 
         val distributionProperties = getDistributionProperties()
