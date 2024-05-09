@@ -3,8 +3,9 @@ package co.touchlab.skie.plugin.shim
 import co.touchlab.skie.plugin.ActualSkieArtifactTarget
 import co.touchlab.skie.plugin.ActualSkieBinaryTarget
 import co.touchlab.skie.plugin.SkieTarget
-import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
+import co.touchlab.skie.plugin.util.DarwinTarget
 import co.touchlab.skie.plugin.util.appleTargets
+import co.touchlab.skie.plugin.util.getAllSupportedDarwinTargets
 import co.touchlab.skie.plugin.util.kotlinMultiplatformExtension
 import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.plugin.util.withType
@@ -90,7 +91,7 @@ class ActualKgpShim(
         }
     }
 
-    override fun configureSkieForFatFrameworks() {
-        FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
+    override fun initializeDarwinTargets() {
+        DarwinTarget.allTargets = getAllSupportedDarwinTargets().associateBy { it.konanTargetName }
     }
 }

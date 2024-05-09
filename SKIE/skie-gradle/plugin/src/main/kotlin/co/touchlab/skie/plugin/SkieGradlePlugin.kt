@@ -9,6 +9,7 @@ import co.touchlab.skie.plugin.coroutines.configureMinOsVersionIfNeeded
 import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
+import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
 import co.touchlab.skie.plugin.util.toKotlinCompilerPluginOption
@@ -27,6 +28,8 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         project.afterEvaluate {
             project.configureSkieCompilerPlugin()
+
+            kgpShim.initializeDarwinTargets()
         }
     }
 
@@ -41,7 +44,7 @@ abstract class SkieGradlePlugin : Plugin<Project> {
 
         warnOnEmptyFrameworks()
 
-        kgpShim.configureSkieForFatFrameworks()
+        FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
         kgpShim.initializeSkieTargets()
 

@@ -17,7 +17,7 @@ package co.touchlab.skie.plugin.util
  *
  * @see <a href="https://clang.llvm.org/docs/CrossCompilation.html#target-triple">Clang documentation for target triple</a>.
  */
-internal data class TargetTriple(
+data class TargetTriple(
     val architecture: String,
     val vendor: String,
     val os: String,
