@@ -53,7 +53,7 @@ buildConfig {
     )
 
     buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", "")
-    buildConfigField("co.touchlab.skie.plugin.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "")
+    buildConfigField("co.touchlab.skie.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "")
     buildConfigField("String", "SKIE_VERSION", "")
     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", "")
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATE", "")
@@ -83,7 +83,7 @@ multiDimensionTarget.configureSourceSet { sourceSet ->
                     "${version.toString().enquoted()} to ${name.toString().enquoted()}"
                 }
 
-            buildConfigField("co.touchlab.skie.plugin.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "mapOf($kotlinToSkieKgpVersion)")
+            buildConfigField("co.touchlab.skie.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "mapOf($kotlinToSkieKgpVersion)")
 
             buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 

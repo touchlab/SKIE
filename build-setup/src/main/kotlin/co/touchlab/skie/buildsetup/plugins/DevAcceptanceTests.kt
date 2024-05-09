@@ -238,12 +238,12 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     value = "",
                 )
                 buildConfigField(
-                    type = "co.touchlab.skie.acceptancetests.util.StringArray",
+                    type = "co.touchlab.skie.util.StringArray",
                     name = "DEPENDENCIES",
                     value = "",
                 )
                 buildConfigField(
-                    type = "co.touchlab.skie.acceptancetests.util.StringArray",
+                    type = "co.touchlab.skie.util.StringArray",
                     name = "EXPORTED_DEPENDENCIES",
                     value = "",
                 )
@@ -298,12 +298,12 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         .map { it.asFile.absolutePath.enquoted() },
                 )
                 buildConfigField(
-                    type = "co.touchlab.skie.acceptancetests.util.StringArray",
+                    type = "co.touchlab.skie.util.StringArray",
                     name = "DEPENDENCIES",
                     value = resolvedDependencies.map { "arrayOf(${it.toListString()})" },
                 )
                 buildConfigField(
-                    type = "co.touchlab.skie.acceptancetests.util.StringArray",
+                    type = "co.touchlab.skie.util.StringArray",
                     name = "EXPORTED_DEPENDENCIES",
                     value = exportedDependencies.map { "arrayOf(${it.toListString()})" },
                 )
