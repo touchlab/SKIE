@@ -31,7 +31,7 @@ sealed class ApiNotesGenerationPhase(
 
         context(SirPhase.Context)
         override fun getApiNotesFile(): File =
-            skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName)
+            skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.frameworkName)
     }
 
     object ForFramework : ApiNotesGenerationPhase(false) {

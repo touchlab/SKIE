@@ -8,7 +8,7 @@ class CopySwiftOutputFilesToFrameworkPhase(
 ) : SirPhase {
 
     private val framework = context.framework
-    private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.moduleName)
+    private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.frameworkName)
     private val targetTriple = context.swiftCompilerConfiguration.targetTriple
 
     context(SirPhase.Context)

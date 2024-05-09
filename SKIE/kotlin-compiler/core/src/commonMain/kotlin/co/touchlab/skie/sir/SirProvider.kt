@@ -30,9 +30,9 @@ class SirProvider(
     rootConfiguration: RootConfiguration,
 ) {
 
-    val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.moduleName)
+    val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.frameworkName)
 
-    val skieModule: SirModule.Skie = SirModule.Skie(framework.moduleName)
+    val skieModule: SirModule.Skie = SirModule.Skie(framework.frameworkName)
 
     private val unknownModule: SirModule.Unknown = SirModule.Unknown()
 

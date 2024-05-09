@@ -18,7 +18,7 @@ class ApiNotesFactory(
     context(SirPhase.Context)
     fun create(): ApiNotes =
         ApiNotes(
-            moduleName = framework.moduleName,
+            moduleName = framework.frameworkName,
             classes = oirProvider.kotlinClasses.map { it.toApiNote() },
             protocols = oirProvider.kotlinProtocols.map { it.toApiNote() },
         )

@@ -4,7 +4,6 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.util.Command
 import java.io.File
 
@@ -17,8 +16,8 @@ class CompileSwiftPhase(
     private val swiftCompilerConfiguration = context.swiftCompilerConfiguration
     private val rootConfiguration = context.rootConfiguration
     private val skieBuildDirectory = context.skieBuildDirectory
-    private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.moduleName)
-    private val swiftFileList = context.skieBuildDirectory.swiftCompiler.config.swiftFileList(framework.moduleName)
+    private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.frameworkName)
+    private val swiftFileList = context.skieBuildDirectory.swiftCompiler.config.swiftFileList(framework.frameworkName)
     private val outputFileMap = context.skieBuildDirectory.swiftCompiler.config.outputFileMap
     private val objectFiles = skieBuildDirectory.swiftCompiler.objectFiles
     private val moduleDirectory = skieBuildDirectory.swiftCompiler.module
@@ -57,8 +56,8 @@ class CompileSwiftPhase(
 
         val root = """
               "": {
-                "emit-module-dependencies": "${moduleDirectory.dependencies(framework.moduleName).absolutePath}",
-                "swift-dependencies": "${moduleDirectory.swiftDependencies(framework.moduleName).absolutePath}"
+                "emit-module-dependencies": "${moduleDirectory.dependencies(framework.frameworkName).absolutePath}",
+                "swift-dependencies": "${moduleDirectory.swiftDependencies(framework.frameworkName).absolutePath}"
               },
         """.trimIndent()
 
@@ -82,7 +81,7 @@ class CompileSwiftPhase(
 
     private fun callSwiftCompiler() {
         Command(swiftCompilerConfiguration.absoluteSwiftcPath).apply {
-            +listOf("-module-name", framework.moduleName)
+            +listOf("-module-name", framework.frameworkName)
             +"-import-underlying-module"
             +"-F"
             +cacheableKotlinFramework.parentDir.absolutePath
@@ -150,7 +149,7 @@ class CompileSwiftPhase(
             }
             BuildType.Release -> {
                 objectFiles.allFiles
-                    .filter { it.nameWithoutExtension != framework.moduleName }
+                    .filter { it.nameWithoutExtension != framework.frameworkName }
                     .forEach {
                         it.delete()
                     }

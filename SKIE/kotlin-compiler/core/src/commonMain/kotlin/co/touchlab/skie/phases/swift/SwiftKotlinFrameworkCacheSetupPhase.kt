@@ -25,7 +25,7 @@ object SwiftKotlinFrameworkCacheSetupPhase : SirPhase {
         // Must use `or` to prevent short circuit optimization.
         return framework.kotlinHeader.copyFileToIfDifferent(dummyFramework.kotlinHeader) or
             framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
-            skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.moduleName)
+            skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.frameworkName)
                 .copyFileToIfDifferent(dummyFramework.apiNotes)
     }
 
@@ -35,7 +35,7 @@ object SwiftKotlinFrameworkCacheSetupPhase : SirPhase {
     context(SirPhase.Context)
     private fun deleteKotlinFrameworkCache() {
         skieBuildDirectory.cache.swiftModules.directory.walkTopDown()
-            .filter { it.isFile && it.extension == "pcm" && it.name.startsWith(framework.moduleName + "-") }
+            .filter { it.isFile && it.extension == "pcm" && it.name.startsWith(framework.frameworkName + "-") }
             .forEach {
                 it.delete()
             }
@@ -43,4 +43,4 @@ object SwiftKotlinFrameworkCacheSetupPhase : SirPhase {
 }
 
 val SirPhase.Context.cacheableKotlinFramework: FrameworkLayout
-    get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(framework.moduleName))
+    get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(framework.frameworkName))

@@ -3,19 +3,24 @@ package co.touchlab.skie.util.directory
 import co.touchlab.skie.util.TargetTriple
 import java.io.File
 
-class FrameworkLayout(val framework: File) {
+class FrameworkLayout(
+    val frameworkDirectory: File,
+) {
 
     constructor(frameworkPath: String) : this(File(frameworkPath))
 
-    val parentDir by lazy { framework.parentFile }
-    val moduleName by lazy { framework.name.removeSuffix(".framework") }
-    val headersDir by lazy { framework.resolve("Headers") }
-    val kotlinHeader by lazy { headersDir.resolve("$moduleName.h") }
-    val apiNotes by lazy { headersDir.resolve("$moduleName.apinotes") }
-    val swiftHeader by lazy { headersDir.resolve("$moduleName-Swift.h") }
-    val modulesDir by lazy { framework.resolve("Modules") }
-    val swiftModuleParent by lazy { modulesDir.resolve("$moduleName.swiftmodule").also { it.mkdirs() } }
-    val modulemapFile by lazy { modulesDir.resolve("module.modulemap") }
+    val frameworkName: String by lazy { frameworkDirectory.name.removeSuffix(".framework") }
+
+    val parentDir: File by lazy { frameworkDirectory.parentFile }
+
+    val headersDir: File by lazy { frameworkDirectory.resolve("Headers") }
+    val kotlinHeader: File by lazy { headersDir.resolve("$frameworkName.h") }
+    val apiNotes: File by lazy { headersDir.resolve("$frameworkName.apinotes") }
+    val swiftHeader: File by lazy { headersDir.resolve("$frameworkName-Swift.h") }
+
+    val modulesDir: File by lazy { frameworkDirectory.resolve("Modules") }
+    val swiftModuleParent: File by lazy { modulesDir.resolve("$frameworkName.swiftmodule").also { it.mkdirs() } }
+    val modulemapFile: File by lazy { modulesDir.resolve("module.modulemap") }
 
     fun swiftModule(targetTriple: TargetTriple): File = swiftModuleParent.resolve("$targetTriple.swiftmodule")
 

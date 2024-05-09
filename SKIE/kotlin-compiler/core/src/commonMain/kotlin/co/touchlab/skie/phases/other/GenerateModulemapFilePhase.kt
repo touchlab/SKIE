@@ -17,8 +17,8 @@ sealed class GenerateModulemapFilePhase(private val generateSwiftModule: Boolean
         StringBuilder().apply {
             appendLine("// $GeneratedBySkieComment")
             appendLine()
-            appendLine("framework module ${framework.moduleName} {")
-            appendLine("    umbrella header \"${framework.moduleName}.h\"")
+            appendLine("framework module ${framework.frameworkName} {")
+            appendLine("    umbrella header \"${framework.frameworkName}.h\"")
 
             if (SkieConfigurationFlag.Migration_WildcardExport.isEnabled) {
                 appendLine()
@@ -39,7 +39,7 @@ sealed class GenerateModulemapFilePhase(private val generateSwiftModule: Boolean
 
             if (generateSwiftModule && framework.swiftHeader.exists()) {
                 appendLine()
-                appendLine("module ${framework.moduleName}.Swift {")
+                appendLine("module ${framework.frameworkName}.Swift {")
                 appendLine("    header \"${framework.swiftHeader.name}\"")
                 appendLine("    requires objc")
                 appendLine("}")

@@ -57,7 +57,7 @@ object ConvertSirIrFilesToSourceFilesPhase : SirPhase {
 
     context(SirPhase.Context)
     private fun SirIrFile.generateCode() {
-        val fileBuilder = FileSpec.builder(framework.moduleName, this.name)
+        val fileBuilder = FileSpec.builder(framework.frameworkName, this.name)
 
         this.generateCodeUsing(fileBuilder)
 

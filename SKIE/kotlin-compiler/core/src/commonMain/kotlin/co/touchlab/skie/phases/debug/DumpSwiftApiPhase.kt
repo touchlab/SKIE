@@ -23,7 +23,7 @@ sealed class DumpSwiftApiPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        val moduleName = framework.moduleName
+        val moduleName = framework.frameworkName
         val apiFileBaseName = "${moduleName}_${this::class.simpleName}"
         val apiFile = skieBuildDirectory.debug.dumps.apiFile(apiFileBaseName)
         val logFile = skieBuildDirectory.debug.logs.apiFile(apiFileBaseName)
@@ -31,7 +31,7 @@ sealed class DumpSwiftApiPhase : SirPhase {
         val command = Command(
             "zsh",
             "-c",
-            """echo "import Kotlin\n:type lookup $moduleName" | swift repl -F "${framework.framework.parentFile.absolutePath}" > "${apiFile.absolutePath}"""",
+            """echo "import Kotlin\n:type lookup $moduleName" | swift repl -F "${framework.frameworkDirectory.parentFile.absolutePath}" > "${apiFile.absolutePath}"""",
         )
 
         try {
