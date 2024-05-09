@@ -1,6 +1,4 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.publish.dependencyCoordinate
-import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.util.gradlePluginApi
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -8,42 +6,11 @@ import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 plugins {
     id("skie.gradle.plugin")
     id("skie.publishable")
-    id("dev.buildconfig")
 }
 
 skiePublishing {
     name = "SKIE Gradle Plugin"
     description = "Gradle plugin for configuring SKIE compiler plugin."
-}
-
-buildConfig {
-    val shimImpl = project.provider { projects.gradle.gradlePluginShimImpl.dependencyProject }
-    buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", shimImpl.map { it.dependencyCoordinate.enquoted() })
-
-    val kotlinToSkieKgpVersion = project.kotlinToolingVersionDimension().components
-        .flatMap { versionComponent ->
-            versionComponent.supportedVersions.map { version ->
-                version to versionComponent.name
-            }
-        }
-        .joinToString { (version, name) ->
-            "${version.toString().enquoted()} to ${name.toString().enquoted()}"
-        }
-
-    buildConfigField("co.touchlab.skie.plugin.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "mapOf($kotlinToSkieKgpVersion)")
-
-    buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
-
-    val kotlinPlugin = project.provider { projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject }
-    buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", kotlinPlugin.map { it.dependencyCoordinate.enquoted() })
-
-    val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
-    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATE", runtime.map { it.dependencyCoordinate.enquoted() })
-
-    val pluginId: String by properties
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$pluginId\"")
-
-    buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
 }
 
 configurations.configureEach {
@@ -57,8 +24,6 @@ dependencies {
     implementation(projects.gradle.gradlePluginImpl)
 
     compileOnly(gradlePluginApi())
-
-    testImplementation(kotlin("test"))
 }
 
 tasks.named("compileKotlin").configure {

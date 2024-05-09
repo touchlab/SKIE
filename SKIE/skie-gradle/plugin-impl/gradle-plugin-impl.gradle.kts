@@ -26,6 +26,7 @@ kotlin {
             dependencies {
                 api(projects.gradle.gradlePluginApi)
                 api(projects.gradle.gradlePluginShimApi)
+                implementation(projects.common.configuration.configurationDeclaration)
                 implementation(projects.gradle.gradleSubPluginApi)
                 implementation(projects.gradle.gradlePluginUtil)
                 implementation(projects.common.analytics)
