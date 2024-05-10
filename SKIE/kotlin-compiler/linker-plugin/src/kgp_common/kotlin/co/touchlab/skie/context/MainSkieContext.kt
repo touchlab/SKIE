@@ -83,11 +83,12 @@ class MainSkieContext internal constructor(
             BitcodeEmbedding.Mode.MARKER -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker
             BitcodeEmbedding.Mode.NONE, null -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.None
         },
-        absoluteSwiftcPath = if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`2_0_0`) {
-            configurables.absoluteTargetToolchain + "/bin/swiftc"
-        } else {
-            configurables.absoluteTargetToolchain + "/usr/bin/swiftc"
-        },
+//         absoluteSwiftcPath = if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`2_0_0`) {
+//             configurables.absoluteTargetToolchain + "/bin/swiftc"
+//         } else {
+//             configurables.absoluteTargetToolchain + "/usr/bin/swiftc"
+//         },
+        absoluteSwiftcPath = configurables.absoluteTargetToolchain + "/usr/bin/swiftc",
         absoluteTargetSysRootPath = configurables.absoluteTargetSysRoot,
         osVersionMin = configurables.osVersionMin,
     )
