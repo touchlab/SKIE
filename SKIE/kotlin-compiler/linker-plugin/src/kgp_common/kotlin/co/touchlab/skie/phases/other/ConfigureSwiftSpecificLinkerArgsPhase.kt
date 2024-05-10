@@ -16,11 +16,11 @@ object ConfigureSwiftSpecificLinkerArgsPhase : LinkPhase {
         val swiftLibSearchPaths = listOf(
             File(
                 configurables.absoluteTargetToolchain,
-//                 if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`2_0_0`) {
-//                     "lib/swift/${configurables.platformName().lowercase()}"
-//                 } else {
+                if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`2_0_0`) {
+                    "lib/swift/${configurables.platformName().lowercase()}"
+                } else {
                     "usr/lib/swift/${configurables.platformName().lowercase()}"
-//                 },
+                },
             ),
             File(configurables.absoluteTargetSysRoot, "usr/lib/swift"),
         ).flatMap { listOf("-L", it.absolutePath) }
