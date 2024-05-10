@@ -3,7 +3,7 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.shim.KgpShim
 import co.touchlab.skie.plugin.shim.KgpShimLoader
-import co.touchlab.skie.plugin.util.KotlinVersionResolver
+import co.touchlab.skie.plugin.util.SkieKotlinVariantResolver
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import javax.inject.Inject
@@ -22,16 +22,19 @@ abstract class SkieInternalExtension @Inject constructor(
 
     companion object {
 
-        fun createExtension(project: Project): SkieInternalExtension? {
-            val kotlinVersion = KotlinVersionResolver.resolve(project) ?: return null
-            val kgpShim = KgpShimLoader.load(kotlinVersion, project) ?: return null
+        fun withExtension(project: Project, action: (SkieInternalExtension) -> Unit) {
+            SkieKotlinVariantResolver.withSkieKotlinVersion(project) { kotlinVersion ->
+                val kgpShim = KgpShimLoader.load(kotlinVersion, project) ?: return@withSkieKotlinVersion
 
-            return project.extensions.create(
-                "skieInternal",
-                SkieInternalExtension::class.java,
-                kotlinVersion,
-                kgpShim,
-            )
+                val extension = project.extensions.create(
+                    "skieInternal",
+                    SkieInternalExtension::class.java,
+                    kotlinVersion,
+                    kgpShim,
+                )
+
+                action(extension)
+            }
         }
     }
 }

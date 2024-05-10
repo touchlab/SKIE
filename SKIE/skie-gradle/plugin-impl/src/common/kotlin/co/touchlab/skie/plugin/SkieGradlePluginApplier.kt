@@ -21,12 +21,13 @@ object SkieGradlePluginApplier {
     fun apply(project: Project) {
         // We need to register the extensions here, so that Gradle knows the type of it in the build script.
         SkieExtension.createExtension(project)
-        SkieInternalExtension.createExtension(project) ?: return
 
-        project.configureSkieGradlePlugin()
+        SkieInternalExtension.withExtension(project) {
+            project.configureSkieGradlePlugin()
 
-        project.afterEvaluate {
-            project.configureSkieCompilerPlugin()
+            project.afterEvaluate {
+                project.configureSkieCompilerPlugin()
+            }
         }
     }
 
