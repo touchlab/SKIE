@@ -83,7 +83,8 @@ private fun SkieTarget.verifyAllRuntimeDependenciesAreAvailable(
     linkerDependenciesIds: List<ModuleIdentifier>,
 ) {
     skieRuntimeDirectDependencies.forEach {
-        if (it !in linkerDependenciesIds) {
+        // KGP 1.9.10 and older handle stdlib differently and because of this difference the artifact is not present in the linker configuration
+        if (it !in linkerDependenciesIds && it.toString() != "org.jetbrains.kotlin:kotlin-stdlib") {
             throw IllegalStateException(
                 "SKIE runtime requires a dependency '$it' which the target's configuration '${linkerConfigurationName}' does not have. " +
                     "This is most likely a bug in SKIE.",
