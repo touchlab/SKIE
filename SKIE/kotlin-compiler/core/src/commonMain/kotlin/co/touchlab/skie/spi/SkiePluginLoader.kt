@@ -3,12 +3,12 @@ package co.touchlab.skie.spi
 import co.touchlab.skie.phases.InitPhase
 import java.util.ServiceLoader
 
-object SkiePluginLoader {
+class SkiePluginLoader {
 
-    fun load(initPhaseContext: InitPhase.Context) {
-        val loader = ServiceLoader.load(SkiePluginRegistrar::class.java)
+    val pluginRegistrars: List<SkiePluginRegistrar> = ServiceLoader.load(SkiePluginRegistrar::class.java).toList()
 
-        loader.forEach {
+    fun registerAll(initPhaseContext: InitPhase.Context) {
+        pluginRegistrars.forEach {
             it.register(initPhaseContext)
         }
     }

@@ -28,9 +28,10 @@ import co.touchlab.skie.util.toOptional
 
 class ConfigurationProvider(
     private val configurationData: CompilerSkieConfigurationData,
+    pluginConfigurationKeys: Set<ConfigurationKey<*>>,
 ) {
 
-    private val allKeys = setOf<ConfigurationKey<*>>(
+    private val builtInKeys = setOf<ConfigurationKey<*>>(
         ClassInterop.StableTypeAlias,
         ClassInterop.CInteropFrameworkName,
         ClassInterop.DeriveCInteropFrameworkNameFromCocoapods,
@@ -53,6 +54,8 @@ class ConfigurationProvider(
         SuppressSkieWarning.NameCollision,
         SuspendInterop.Enabled,
     )
+
+    private val allKeys = builtInKeys + pluginConfigurationKeys
 
     val rootConfiguration: RootConfiguration by lazy {
         RootConfiguration(configurationData.enabledConfigurationFlags, allKeys).withLoadedKeyValueConfiguration(IdentifiedConfigurationTarget.Root)

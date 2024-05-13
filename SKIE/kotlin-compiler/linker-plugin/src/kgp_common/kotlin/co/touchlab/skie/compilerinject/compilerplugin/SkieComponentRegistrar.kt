@@ -20,7 +20,9 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
         val initContext: InitPhase.Context
 
         val time = measureTime {
-            initContext = InitPhaseContext(configuration)
+            val pluginLoader = SkiePluginLoader()
+
+            initContext = InitPhaseContext(configuration, pluginLoader.pluginRegistrars)
 
             configuration.initPhaseContext = initContext
 
@@ -28,7 +30,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
             PhaseInterceptorRegistrar.setupPhaseInterceptors(configuration)
 
-            SkiePluginLoader.load(initContext)
+            pluginLoader.registerAll(initContext)
         }
 
         initContext.skiePerformanceAnalyticsProducer.logBlocking("InitSkiePhase", time)

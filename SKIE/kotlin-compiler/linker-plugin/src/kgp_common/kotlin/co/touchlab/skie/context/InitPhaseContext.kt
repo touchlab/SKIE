@@ -11,6 +11,7 @@ import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.phases.LinkerPhaseScheduler
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
+import co.touchlab.skie.spi.SkiePluginRegistrar
 import co.touchlab.skie.util.ActualCompilerShim
 import co.touchlab.skie.util.CompilerShim
 import co.touchlab.skie.util.directory.FrameworkLayout
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 
 class InitPhaseContext(
     val compilerConfiguration: CompilerConfiguration,
+    pluginRegistrars: List<SkiePluginRegistrar>,
 ) : InitPhase.Context {
 
     override val context: InitPhase.Context
@@ -36,7 +38,10 @@ class InitPhaseContext(
         CompilerSkieConfigurationData.deserialize(serializedUserConfiguration)
     }
 
-    val configurationProvider = ConfigurationProvider(skieConfigurationData)
+    val configurationProvider = ConfigurationProvider(
+        configurationData = skieConfigurationData,
+        pluginConfigurationKeys = pluginRegistrars.flatMap { it.customConfigurationKeys }.toSet(),
+    )
 
     override val rootConfiguration: RootConfiguration = configurationProvider.rootConfiguration
 
