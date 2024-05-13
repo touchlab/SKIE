@@ -1,6 +1,7 @@
 package co.touchlab.skie.configuration
 
 import co.touchlab.skie.configuration.util.throwIfNull
+import kotlin.io.path.Path
 
 interface ConfigurationKey<T> {
 
@@ -66,5 +67,11 @@ interface ConfigurationKey<T> {
     interface OptionalString : ConfigurationKey<kotlin.String?> {
 
         override fun deserialize(value: kotlin.String?): kotlin.String? = value
+    }
+
+    interface Path : NonOptional<java.nio.file.Path> {
+
+        override fun deserialize(value: kotlin.String?): java.nio.file.Path =
+            Path(value.throwIfNull())
     }
 }
