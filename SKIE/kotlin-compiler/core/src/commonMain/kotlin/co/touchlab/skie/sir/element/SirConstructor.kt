@@ -2,6 +2,7 @@ package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
+import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.Modifier
 
 class SirConstructor(
@@ -27,6 +28,9 @@ class SirConstructor(
     override var parent: SirDeclarationNamespace by sirDeclarationParent(parent)
 
     override val valueParameters: MutableList<SirValueParameter> = mutableListOf()
+
+    val returnType: SirType
+        get() = parent.classDeclaration.toType(parent.classDeclaration.typeParameters.map { it.toTypeParameterUsage() })
 
     companion object {
 
