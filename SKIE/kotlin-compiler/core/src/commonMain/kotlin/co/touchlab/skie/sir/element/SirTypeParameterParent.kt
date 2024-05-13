@@ -13,12 +13,28 @@ sealed interface SirTypeParameterParent {
     }
 }
 
-fun SirTypeParameterParent.copyTypeParametersFrom(other: SirClass) {
-    val copiesWithOriginal = other.typeParameters.map {
+fun SirTypeParameterParent.copyTypeParametersFrom(other: SirTypeParameterParent) {
+    copyTypeParametersFrom(other.typeParameters)
+}
+
+fun SirTypeParameterParent.copyTypeParametersFrom(
+    copiedTypeParameters: List<SirTypeParameter>,
+    allTypeParameters: List<SirTypeParameter> = copiedTypeParameters,
+) {
+    val copiesWithOriginal = copiedTypeParameters.map {
         it to SirTypeParameter(it.name)
     }
 
-    val substitutions = copiesWithOriginal.toMap()
+    val nonCopiedTypeParameters = allTypeParameters - copiedTypeParameters.toSet()
+
+    val nonCopiedSubstitutions = nonCopiedTypeParameters.map { nonCopiedTypeParameter ->
+        val existingTypeParameter = (typeParameters.firstOrNull { it.name == nonCopiedTypeParameter.name }
+            ?: error("Type parameter ${nonCopiedTypeParameter.name} not found in parent scope"))
+
+        nonCopiedTypeParameter to existingTypeParameter
+    }
+
+    val substitutions = (copiesWithOriginal + nonCopiedSubstitutions).toMap()
 
     copiesWithOriginal.forEach { (original, copy) ->
         // TODO This is not entirely correct, because we don't substitute type parameters from parent scope as nested scopes are not implemented yet.

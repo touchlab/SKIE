@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.signature.Signature
+import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -75,5 +76,32 @@ fun SirFunction.copyValueParametersFrom(valueParameters: List<SirValueParameter>
             type = it.type,
             inout = it.inout,
         )
+    }
+
+    fixValueParameterCollisions()
+}
+
+fun SirFunction.fixValueParameterCollisions() {
+    fixValueParameterNameCollisions()
+    fixValueParameterLabelCollisions()
+}
+
+private fun SirFunction.fixValueParameterNameCollisions() {
+    val usedNames = mutableSetOf<String>()
+
+    valueParameters.forEach { parameter ->
+        parameter.name = parameter.name.collisionFreeIdentifier(usedNames)
+
+        usedNames.add(parameter.name)
+    }
+}
+
+private fun SirFunction.fixValueParameterLabelCollisions() {
+    val usedNames = mutableSetOf<String>()
+
+    valueParameters.forEach { parameter ->
+        parameter.label = parameter.labelOrName.collisionFreeIdentifier(usedNames)
+
+        usedNames.add(parameter.labelOrName)
     }
 }
