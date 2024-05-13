@@ -24,9 +24,9 @@ interface ConfigurationKey<T> {
     val isInheritable: kotlin.Boolean
         get() = false
 
-    fun hasAnnotationValue(configurationTarget: ConfigurationTarget): kotlin.Boolean
+    fun hasAnnotationValue(configurationTarget: ConfigurationTarget): kotlin.Boolean = false
 
-    fun getAnnotationValue(configurationTarget: ConfigurationTarget): T
+    fun getAnnotationValue(configurationTarget: ConfigurationTarget): T = throw NotImplementedError()
 
     fun deserialize(value: kotlin.String?): T
 
@@ -38,7 +38,7 @@ interface ConfigurationKey<T> {
         override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): kotlin.Boolean =
             findAnnotationValue(configurationTarget) != null
 
-        fun findAnnotationValue(configurationTarget: ConfigurationTarget): T?
+        fun findAnnotationValue(configurationTarget: ConfigurationTarget): T? = null
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): T =
             findAnnotationValue(configurationTarget)

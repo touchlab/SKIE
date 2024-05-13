@@ -34,10 +34,6 @@ object ClassInterop {
     object CInteropFrameworkName : ConfigurationKey.OptionalString, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: String? = null
-
-        override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): Boolean = false
-
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? = null
     }
 
     /**
@@ -47,7 +43,5 @@ object ClassInterop {
     object DeriveCInteropFrameworkNameFromCocoapods : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = true
-
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = null
     }
 }
