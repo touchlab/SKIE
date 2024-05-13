@@ -46,7 +46,7 @@ import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 object SirCodeGenerator {
 
     fun generate(sirIrFile: SirIrFile): String {
-        val fileBuilder = FileSpec.builder(sirIrFile.module.name, sirIrFile.name)
+        val fileBuilder = FileSpec.builder(sirIrFile.module.name, sirIrFile.fileNameWithoutSuffix)
 
         with(sirIrFile) {
             fileBuilder.generateCode()

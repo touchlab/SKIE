@@ -29,7 +29,7 @@ class SirOverridableDeclarationDelegate<T : SirOverridableDeclaration<T>>(
         get() = when (val parent = self.parent) {
             is SirClass -> parent
             is SirExtension -> parent.classDeclaration
-            else -> null
+            is SirBuiltInFile, is SirIrFile, SirDeclarationParent.None -> null
         }
 
     val overriddenDeclarations = mutableListOf<T>()

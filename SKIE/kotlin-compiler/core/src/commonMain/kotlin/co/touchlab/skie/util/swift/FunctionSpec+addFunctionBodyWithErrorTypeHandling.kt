@@ -31,7 +31,7 @@ fun <T> T.addFunctionDeclarationBodyWithErrorTypeHandling(
     }
 }
 
-private fun SirCallableDeclaration.findFirstSkieErrorType(): SkieErrorSirType? =
+fun SirCallableDeclaration.findFirstSkieErrorType(): SkieErrorSirType? =
     when (this) {
         is SirConstructor -> findFirstSkieErrorType()
         is SirSimpleFunction -> findFirstSkieErrorType()
