@@ -8,8 +8,6 @@ object DefaultArgumentInterop {
 
         override val defaultValue: Boolean = false
 
-        override val skieRuntimeValue: Boolean = false
-
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<DefaultArgumentInterop.Enabled>() -> true
@@ -21,8 +19,6 @@ object DefaultArgumentInterop {
     object MaximumDefaultArgumentCount : ConfigurationKey.Int, ConfigurationScope.All {
 
         override val defaultValue: Int = 5
-
-        override val skieRuntimeValue: Int = 5
 
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Int? =
             configurationTarget.findAnnotation<DefaultArgumentInterop.MaximumDefaultArgumentCount>()?.count

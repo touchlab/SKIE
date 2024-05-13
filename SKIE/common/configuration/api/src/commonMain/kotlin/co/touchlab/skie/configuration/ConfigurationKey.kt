@@ -19,6 +19,7 @@ interface ConfigurationKey<T> {
     val defaultValue: T
 
     val skieRuntimeValue: T
+        get() = defaultValue
 
     val isInheritable: kotlin.Boolean
         get() = false

@@ -86,8 +86,6 @@ object FunctionInterop {
 
         override val defaultValue: Boolean = false
 
-        override val skieRuntimeValue: Boolean = false
-
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Enabled>() -> true

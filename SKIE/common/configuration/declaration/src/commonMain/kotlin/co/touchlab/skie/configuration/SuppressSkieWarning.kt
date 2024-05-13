@@ -11,8 +11,6 @@ object SuppressSkieWarning {
 
         override val defaultValue: Boolean = false
 
-        override val skieRuntimeValue: Boolean = false
-
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             configurationTarget.findAnnotation<SuppressSkieWarning.NameCollision>()?.suppress
     }

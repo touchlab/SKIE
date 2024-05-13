@@ -35,8 +35,6 @@ object ClassInterop {
 
         override val defaultValue: String? = null
 
-        override val skieRuntimeValue: String? = null
-
         override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): Boolean = false
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): String? = null
@@ -49,8 +47,6 @@ object ClassInterop {
     object DeriveCInteropFrameworkNameFromCocoapods : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = true
-
-        override val skieRuntimeValue: Boolean = true
 
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = null
     }

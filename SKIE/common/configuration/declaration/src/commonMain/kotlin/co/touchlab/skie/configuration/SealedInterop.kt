@@ -11,8 +11,6 @@ object SealedInterop {
 
         override val defaultValue: Boolean = true
 
-        override val skieRuntimeValue: Boolean = true
-
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<SealedInterop.Enabled>() -> true
@@ -28,8 +26,6 @@ object SealedInterop {
     object ExportEntireHierarchy : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = true
-
-        override val skieRuntimeValue: Boolean = true
 
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
@@ -48,8 +44,6 @@ object SealedInterop {
 
             override val defaultValue: String = "onEnum"
 
-            override val skieRuntimeValue: String = "onEnum"
-
             override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
                 configurationTarget.findAnnotation<SealedInterop.Function.Name>()?.name
         }
@@ -63,8 +57,6 @@ object SealedInterop {
 
             override val defaultValue: String = "of"
 
-            override val skieRuntimeValue: String = "of"
-
             override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
                 configurationTarget.findAnnotation<SealedInterop.Function.ArgumentLabel>()?.argumentLabel
         }
@@ -75,8 +67,6 @@ object SealedInterop {
         object ParameterName : ConfigurationKey.String, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: String = "sealed"
-
-            override val skieRuntimeValue: String = "sealed"
 
             override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
                 configurationTarget.findAnnotation<SealedInterop.Function.ParameterName>()?.parameterName
@@ -90,8 +80,6 @@ object SealedInterop {
 
         override val defaultValue: String = "else"
 
-        override val skieRuntimeValue: String = "else"
-
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): String? =
             configurationTarget.findAnnotation<SealedInterop.ElseName>()?.elseName
     }
@@ -104,8 +92,6 @@ object SealedInterop {
         object Visible : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: Boolean = true
-
-            override val skieRuntimeValue: Boolean = true
 
             override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
                 when {
@@ -121,8 +107,6 @@ object SealedInterop {
         object Name : ConfigurationKey.OptionalString, ConfigurationScope.AllExceptCallableDeclarations {
 
             override val defaultValue: String? = null
-
-            override val skieRuntimeValue: String? = null
 
             override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): Boolean =
                 configurationTarget.findAnnotation<SealedInterop.Case.Name>() != null

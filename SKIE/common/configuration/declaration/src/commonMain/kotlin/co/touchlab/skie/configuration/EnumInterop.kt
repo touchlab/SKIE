@@ -11,8 +11,6 @@ object EnumInterop {
 
         override val defaultValue: Boolean = true
 
-        override val skieRuntimeValue: Boolean = true
-
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
                 configurationTarget.hasAnnotation<EnumInterop.Enabled>() -> true
@@ -54,8 +52,6 @@ object EnumInterop {
     object LegacyCaseName : ConfigurationKey.Boolean, ConfigurationScope.AllExceptCallableDeclarations {
 
         override val defaultValue: Boolean = false
-
-        override val skieRuntimeValue: Boolean = false
 
         override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
             when {
