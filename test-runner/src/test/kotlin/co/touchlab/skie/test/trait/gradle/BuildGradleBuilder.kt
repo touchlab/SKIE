@@ -48,10 +48,12 @@ class BuildGradleBuilder(
 
             appendLines("""
                 tasks.withType<FatFrameworkTask>().configureEach {
-                    configurations.getByName(
-                        name.substringAfter("link").replaceFirstChar { it.lowercase() }
-                    ).attributes {
-                        attribute(Attribute.of("fat-framework", String::class.java), "true")
+                    if (name.startsWith("link")) {
+                        configurations.getByName(
+                            name.substringAfter("link").replaceFirstChar { it.lowercase() }
+                        ).attributes {
+                            attribute(Attribute.of("fat-framework", String::class.java), "true")
+                        }
                     }
                 }
             """.trimIndent())
@@ -76,6 +78,7 @@ class BuildGradleBuilder(
         builderIndentationLevel += 1
         block()
         builderIndentationLevel -= 1
+        appendIndentation()
         builder.appendLine("}")
     }
 
@@ -141,9 +144,14 @@ class BuildGradleBuilder(
             kotlinVersion: KotlinVersion,
             buildConfiguration: BuildConfiguration,
             linkMode: LinkMode,
+            includeXcframework: Boolean = false,
         ) {
             imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget")
             imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType")
+            if (includeXcframework) {
+                imports.add("org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework")
+                +"val xcframework = XCFramework()"
+            }
 
             "targets.withType<KotlinNativeTarget>" {
                 "binaries" {
@@ -152,6 +160,9 @@ class BuildGradleBuilder(
                         +"""freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=gradle_test")"""
                         if (kotlinVersion.needsOldLinker) {
                             +"""linkerOpts += "-ld64""""
+                        }
+                        if (includeXcframework) {
+                            +"xcframework.add(this)"
                         }
                     }
                 }

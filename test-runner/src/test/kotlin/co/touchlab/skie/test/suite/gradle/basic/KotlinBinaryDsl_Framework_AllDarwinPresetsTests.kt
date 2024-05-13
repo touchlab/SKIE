@@ -34,6 +34,10 @@ class KotlinBinaryDsl_Framework_AllDarwinPresetsTests: BaseGradleTests() {
 
         KotlinTarget.Native.Darwin.targets.forEach { target ->
             buildSwift(target, Templates.basic, builtFrameworkParentDir(target, buildConfiguration, isArtifactDsl = false))
+
+            if (target is KotlinTarget.Native.MacOS) {
+                runSwift()
+            }
         }
     }
 }

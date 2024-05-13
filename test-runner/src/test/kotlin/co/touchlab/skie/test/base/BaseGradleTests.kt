@@ -108,6 +108,8 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
             this += "-parse-as-library"
             // Workaround for missing symbol when compiling with Coroutines for MacosArm64
             this += listOf("-Xlinker", "-dead_strip")
+            // Add the framework parent path as `rpath` so it gets loaded correctly when run
+            this += listOf("-Xlinker", "-rpath", "-Xlinker", frameworkParentPath)
         }
 
         val result = command.joinToString(" ").execute(testProjectDir)
@@ -120,8 +122,23 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
         return result
     }
 
-    fun runSwift() {
-        // TODO: Implement running binaries
+    fun runSwift(
+        assertResult: ((CommandResult) -> Unit)? = {
+            assertEquals(0, it.exitCode)
+        },
+    ): CommandResult {
+        val command = buildList {
+            this += "./swift_executable"
+        }
+
+        val result = command.joinToString(" ").execute(testProjectDir)
+        if (!isCI) {
+            println(result.stdOut)
+        }
+
+        assertResult?.invoke(result)
+
+        return result
     }
 
     fun commonMain(fqdn: String): File {

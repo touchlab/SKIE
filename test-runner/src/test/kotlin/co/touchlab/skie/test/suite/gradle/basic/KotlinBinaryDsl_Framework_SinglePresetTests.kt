@@ -35,6 +35,10 @@ class KotlinBinaryDsl_Framework_SinglePresetTests: BaseGradleTests() {
 
         preset.targets.forEach { target ->
             buildSwift(target, Templates.basic, builtFrameworkParentDir(target, buildConfiguration, isArtifactDsl = false))
+
+            if (target is KotlinTarget.Native.MacOS) {
+                runSwift()
+            }
         }
     }
 }

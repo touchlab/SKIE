@@ -4,6 +4,7 @@ import gradle_test
 @main
 struct Main {
     static func main() async throws {
+        print("Running Swift code")
         let enumValues: [BasicEnum] = [.a, .b, .c]
         for (index, value) in enumValues.enumerated() {
             switch value {
@@ -16,7 +17,8 @@ struct Main {
             }
         }
 
-        // TODO: Add the rest
+        // TODO: Add assertions for the rest of SKIE features
 
+        print("Swift code completed successfully")
     }
 }
