@@ -13,7 +13,7 @@ object SkieTestRunnerConfiguration {
     val configurations = list<BuildConfiguration>("matrix.configurations")
     val linkModes = list<LinkMode>("matrix.linkModes")
     // TODO Automatically derive from Build-setup
-    val kotlinVersions = list("matrix.kotlinVersions", ::KotlinVersion) ?: listOf("1.8.0", "1.8.20", "1.9.0", "1.9.20", "2.0.0-RC2").map(::KotlinVersion)
+    val kotlinVersions = list("matrix.kotlinVersions", ::KotlinVersion) ?: listOf("1.8.0", "1.8.20", "1.9.0", "1.9.20", "2.0.0-RC3").map(::KotlinVersion)
     val gradleVersions = list("matrix.gradleVersions", ::GradleVersion) ?: listOf("8.6").map(::GradleVersion)
 
     fun buildMatrixSource(): SkieTestMatrixSource {
