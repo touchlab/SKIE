@@ -3,13 +3,6 @@ package co.touchlab.skie.sir.element
 sealed interface SirDeclaration : SirElement {
 
     val parent: SirDeclarationParent
-
-    var visibility: SirVisibility
-
-    /**
-     * If true, the "__" will be added to the name.
-     */
-    val isReplaced: Boolean
 }
 
 val SirDeclaration.module: SirModule

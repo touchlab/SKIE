@@ -3,7 +3,7 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.sir.signature.Signature
 
-sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {
+sealed interface SirCallableDeclaration : SirDeclarationWithVisibility, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {
 
     /**
      * Used to derive other names.

@@ -103,16 +103,16 @@ object SirCodeGenerator {
                 name = typeAlias.simpleName,
                 type = typeAlias.type.toSwiftPoetTypeName(),
             )
-                .addVisibility(typeAlias.visibility, typeAlias.defaultVisibility)
+                .addVisibility(typeAlias.visibility)
                 .addTypeParameters(typeAlias)
                 .build(),
         )
     }
 
-    private fun <T : BuilderWithModifiers> T.addVisibility(visibility: SirVisibility, defaultVisibility: SirVisibility): T =
+    private fun <T : BuilderWithModifiers> T.addVisibility(visibility: SirVisibility): T =
         apply {
             val visibilityModifier = visibility.toSwiftPoetVisibility()
-            val defaultVisibilityModifier = defaultVisibility.toSwiftPoetVisibility()
+            val defaultVisibilityModifier = SirVisibility.Internal.toSwiftPoetVisibility()
 
             if (visibilityModifier == defaultVisibilityModifier) {
                 return@apply
@@ -146,13 +146,8 @@ object SirCodeGenerator {
     }
 
     private fun FileSpec.Builder.generateExtension(extension: SirExtension) {
-        if (extension.isRemoved) {
-            return
-        }
-
         addExtension(
             ExtensionSpec.builder(extension.classDeclaration.defaultType.toSwiftPoetDeclaredTypeName())
-                .addVisibility(extension.visibility, extension.defaultVisibility)
                 .addConditionalConstraints(extension)
                 .addExtensionDeclarations(extension)
                 .build(),
@@ -199,7 +194,7 @@ object SirCodeGenerator {
 
         addType(
             TypeSpec.Builder(sirClass.swiftPoetKind, sirClass.simpleName)
-                .addVisibility(sirClass.visibility, sirClass.defaultVisibility)
+                .addVisibility(sirClass.visibility)
                 .addSuperTypes(sirClass.superTypes.map { it.toSwiftPoetTypeName() })
                 .addAttributes(sirClass)
                 .addTypeParameters(sirClass)
@@ -340,7 +335,7 @@ object SirCodeGenerator {
     private fun <T> T.addCallableDeclarationProperties(callableDeclaration: SirCallableDeclaration): T
         where T : BuilderWithModifiers, T : AttributedSpec.Builder<*> =
         this.apply {
-            addVisibility(callableDeclaration.visibility, callableDeclaration.defaultVisibility)
+            addVisibility(callableDeclaration.visibility)
             addAttributes(callableDeclaration)
             addModifiers(callableDeclaration)
         }
@@ -401,9 +396,6 @@ object SirCodeGenerator {
 
     private fun SirType.toSwiftPoetTypeName(): TypeName =
         evaluate().swiftPoetTypeName
-
-    private val SirDeclaration.defaultVisibility: SirVisibility
-        get() = (parent as? SirExtension)?.visibility ?: SirVisibility.Internal
 
     private fun <T : BuilderWithModifiers> T.addOverrideIfNeeded(overridableDeclaration: SirOverridableDeclaration<*>): T =
         applyIf(overridableDeclaration.needsOverride) {

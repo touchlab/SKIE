@@ -91,10 +91,9 @@ class SirProvider(
     fun getExtension(
         classDeclaration: SirClass,
         parent: SirTopLevelDeclarationParent,
-        visibility: SirVisibility = SirVisibility.Public,
     ): SirExtension =
         extensionCache.getOrPut(classDeclaration to parent) {
-            SirExtension(classDeclaration, parent, visibility)
+            SirExtension(classDeclaration, parent)
         }
 
     fun getExternalModule(moduleName: String): SirModule.External =
@@ -142,14 +141,12 @@ class SirProvider(
 context(SirProvider)
 fun SirTopLevelDeclarationParent.getExtension(
     classDeclaration: SirClass,
-    visibility: SirVisibility = SirVisibility.Public,
 ): SirExtension =
-    getExtension(classDeclaration, this, visibility)
+    getExtension(classDeclaration, this)
 
 context(SirPhase.Context)
 fun SirTopLevelDeclarationParent.getExtension(
     classDeclaration: SirClass,
-    visibility: SirVisibility = SirVisibility.Public,
 ): SirExtension =
-    sirProvider.getExtension(classDeclaration, this, visibility)
+    sirProvider.getExtension(classDeclaration, this)
 

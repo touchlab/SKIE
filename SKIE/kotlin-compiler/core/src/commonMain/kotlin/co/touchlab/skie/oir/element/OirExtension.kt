@@ -11,9 +11,6 @@ class OirExtension(
 
     override val callableDeclarations: MutableList<OirCallableDeclaration> = mutableListOf()
 
-    override val visibility: OirVisibility
-        get() = sirExtension.visibility.toOirVisibility()
-
     init {
         parent.declarations.add(this)
         classDeclaration.extensions.add(this)

@@ -7,7 +7,6 @@ import co.touchlab.skie.sir.element.util.sirDeclarationParent
 class SirExtension(
     override val classDeclaration: SirClass,
     parent: SirTopLevelDeclarationParent,
-    override var visibility: SirVisibility = SirVisibility.Public,
 ) : SirDeclaration, SirDeclarationNamespace {
 
     override val parent: SirTopLevelDeclarationParent by sirDeclarationParent(parent)
@@ -15,8 +14,6 @@ class SirExtension(
     override val declarations: MutableList<SirDeclaration> = mutableListOf()
 
     val conditionalConstraints: MutableList<SirConditionalConstraint> = mutableListOf()
-
-    override val isReplaced: Boolean = false
 
     override val fqName: SirFqName
         get() = classDeclaration.fqName

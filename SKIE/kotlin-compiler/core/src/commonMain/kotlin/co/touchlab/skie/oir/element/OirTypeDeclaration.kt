@@ -6,6 +6,8 @@ sealed interface OirTypeDeclaration : OirTopLevelDeclaration {
 
     val name: String
 
+    val visibility: OirVisibility
+
     val defaultType: OirType
 
     fun toType(typeArguments: List<OirType>): OirType

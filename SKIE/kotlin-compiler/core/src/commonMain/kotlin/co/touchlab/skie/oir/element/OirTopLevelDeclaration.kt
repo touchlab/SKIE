@@ -4,8 +4,6 @@ sealed interface OirTopLevelDeclaration {
 
     val parent: OirTopLevelDeclarationParent
 
-    val visibility: OirVisibility
-
     val module: OirModule
         get() = parent.module
 }

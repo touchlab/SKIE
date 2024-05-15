@@ -1,9 +1,9 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.sir.element.SirDeclaration
+import co.touchlab.skie.sir.element.SirDeclarationWithVisibility
 import co.touchlab.skie.sir.element.isExported
 
-sealed interface KirBridgeableDeclaration<T : SirDeclaration> {
+sealed interface KirBridgeableDeclaration<T : SirDeclarationWithVisibility> {
 
     val originalSirDeclaration: T
 
@@ -12,12 +12,12 @@ sealed interface KirBridgeableDeclaration<T : SirDeclaration> {
     var bridgedSirDeclaration: T?
 }
 
-val <T : SirDeclaration> KirBridgeableDeclaration<T>.associatedSirDeclarations: List<T>
+val <T : SirDeclarationWithVisibility> KirBridgeableDeclaration<T>.associatedSirDeclarations: List<T>
     get() = listOfNotNull(originalSirDeclaration, bridgedSirDeclaration)
 
-val <T : SirDeclaration> KirBridgeableDeclaration<T>.associatedExportedSirDeclarations: List<T>
+val <T : SirDeclarationWithVisibility> KirBridgeableDeclaration<T>.associatedExportedSirDeclarations: List<T>
     get() = associatedSirDeclarations.filter { it.isExported }
 
-inline fun <T : SirDeclaration> KirBridgeableDeclaration<T>.forEachAssociatedExportedSirDeclaration(action: (T) -> Unit) {
+inline fun <T : SirDeclarationWithVisibility> KirBridgeableDeclaration<T>.forEachAssociatedExportedSirDeclaration(action: (T) -> Unit) {
     associatedExportedSirDeclarations.forEach(action)
 }

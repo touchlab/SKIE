@@ -3,6 +3,7 @@ package co.touchlab.skie.phases.sir
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirDeclaration
+import co.touchlab.skie.sir.element.SirDeclarationWithVisibility
 import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSimpleFunction
@@ -19,6 +20,7 @@ object CommitSirIsReplacedPhase : SirPhase {
     context(SirPhase.Context)
     override suspend fun execute() {
         sirProvider.allLocalDeclarations
+            .filterIsInstance<SirDeclarationWithVisibility>()
             .filter { it.isReplaced }
             .forEach {
                 it.commitIsReplaced()

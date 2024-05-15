@@ -6,7 +6,7 @@ import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 
-sealed interface SirTypeDeclaration : SirDeclaration {
+sealed interface SirTypeDeclaration : SirDeclarationWithVisibility {
 
     /**
      * Used to derive other names.
@@ -48,9 +48,6 @@ sealed interface SirTypeDeclaration : SirDeclaration {
 
     val typeParameters: List<SirTypeParameter>
 
-    /**
-     * If true, the "__" will be added to the name.
-     */
     override var isReplaced: Boolean
 
     val isHashable: Boolean

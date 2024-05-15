@@ -17,7 +17,7 @@ val SirVisibility.isAccessibleFromOtherModules: Boolean
         else -> false
     }
 
-val SirDeclaration.isExported: Boolean
+val SirDeclarationWithVisibility.isExported: Boolean
     get() = visibility.isAccessibleFromOtherModules
 
 val SirVisibility.isAccessible: Boolean
@@ -26,7 +26,7 @@ val SirVisibility.isAccessible: Boolean
         else -> true
     }
 
-val SirDeclaration.isAccessible: Boolean
+val SirDeclarationWithVisibility.isAccessible: Boolean
     get() = visibility.isAccessible
 
 val SirVisibility.isRemoved: Boolean
@@ -35,10 +35,10 @@ val SirVisibility.isRemoved: Boolean
         else -> false
     }
 
-val SirDeclaration.isRemoved: Boolean
+val SirDeclarationWithVisibility.isRemoved: Boolean
     get() = visibility.isRemoved || parent == SirDeclarationParent.None
 
-private fun SirVisibility.toSwiftVisibility(): SirVisibility = when (this) {
+fun SirVisibility.toSwiftVisibility(): SirVisibility = when (this) {
     SirVisibility.Public,
     SirVisibility.PublicButHidden,
     -> SirVisibility.Public
