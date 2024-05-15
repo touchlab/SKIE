@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.shim.KonanTargetShim
 import co.touchlab.skie.plugin.shim.KotlinSourceSetShim
 import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
@@ -22,6 +23,8 @@ sealed interface SkieTarget {
     val konanTarget: KonanTargetShim
 
     val outputKind: OutputKind
+
+    val requiredConfigurationFlags: Set<SkieConfigurationFlag>
 
     val skieDirectories: Provider<SkieDirectories>
 

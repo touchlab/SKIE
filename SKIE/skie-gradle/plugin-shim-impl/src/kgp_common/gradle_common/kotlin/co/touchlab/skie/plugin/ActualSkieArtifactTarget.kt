@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.shim.ActualKonanTargetShim
 import co.touchlab.skie.plugin.shim.KonanTargetShim
 import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
@@ -34,6 +35,10 @@ class ActualSkieArtifactTarget(
 
     override val fullArtifactName: String
         get() = artifact.artifactName + artifactNameSuffix
+
+    override val requiredConfigurationFlags: Set<SkieConfigurationFlag> = setOfNotNull(
+        SkieConfigurationFlag.Build_SwiftLibraryEvolution.takeIf { outputKind == SkieTarget.OutputKind.XCFramework },
+    )
 
     private val artifactNameSuffix = when (artifact) {
         is KotlinNativeFatFramework -> "ForFat"

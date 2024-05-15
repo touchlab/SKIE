@@ -12,26 +12,21 @@ fun SkieExtension.Companion.createExtension(project: Project): SkieExtension =
 val Project.skieExtension: SkieExtension
     get() = project.extensions.getByType(SkieExtension::class.java)
 
-fun SkieExtension.buildConfiguration(outputKind: SkieTarget.OutputKind): GradleSkieConfigurationData =
+fun SkieExtension.buildConfiguration(target: SkieTarget): GradleSkieConfigurationData =
     GradleSkieConfigurationData(
-        enabledConfigurationFlags = (mergeConfigurationSetsFromConfigurations(outputKind) + additionalConfigurationFlags.get()) - suppressedConfigurationFlags.get(),
+        enabledConfigurationFlags = getUserConfiguredFlags() + target.requiredConfigurationFlags,
         groups = features.buildGroups(),
     )
 
-private fun SkieExtension.mergeConfigurationSetsFromConfigurations(outputKind: SkieTarget.OutputKind): Set<SkieConfigurationFlag> =
+private fun SkieExtension.getUserConfiguredFlags(): Set<SkieConfigurationFlag> =
+    (mergeConfigurationSetsFromConfigurations() + additionalConfigurationFlags.get()) - suppressedConfigurationFlags.get()
+
+private fun SkieExtension.mergeConfigurationSetsFromConfigurations(): Set<SkieConfigurationFlag> =
     analytics.buildConfigurationFlags() +
         build.buildConfigurationFlags() +
         debug.buildConfigurationFlags() +
         features.buildConfigurationFlags() +
-        migration.buildConfigurationFlags() +
-        addSwiftLibraryEvolutionFlagIfNeeded(outputKind)
-
-private fun addSwiftLibraryEvolutionFlagIfNeeded(outputKind: SkieTarget.OutputKind): Set<SkieConfigurationFlag> =
-    if (outputKind == SkieTarget.OutputKind.XCFramework) {
-        setOf(SkieConfigurationFlag.Build_SwiftLibraryEvolution)
-    } else {
-        emptySet()
-    }
+        migration.buildConfigurationFlags()
 
 private fun SkieFeatureConfiguration.buildGroups(): List<GradleSkieConfigurationData.Group> =
     groupConfigurations.map { it.build() }

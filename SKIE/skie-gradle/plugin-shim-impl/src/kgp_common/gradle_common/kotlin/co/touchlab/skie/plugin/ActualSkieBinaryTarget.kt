@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin
 
+import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.shim.ActualKonanTargetShim
 import co.touchlab.skie.plugin.shim.ActualKotlinSourceSetShim
 import co.touchlab.skie.plugin.shim.KonanTargetShim
@@ -20,7 +21,7 @@ class ActualSkieBinaryTarget(
     override val project: Project,
     target: KotlinNativeTarget,
     private val binary: NativeBinary,
-    override val outputKind: SkieTarget.OutputKind,
+    private val isForXCFramework: Boolean,
 ) : SkieTarget.Binary {
 
     override val konanTarget: KonanTargetShim = ActualKonanTargetShim(target.konanTarget)
@@ -28,6 +29,8 @@ class ActualSkieBinaryTarget(
     private val buildType: NativeBuildType = binary.buildType
 
     override val name: String = "binary: ${binary.name}, target: ${target.targetName}, buildType: $buildType"
+
+    override val outputKind: SkieTarget.OutputKind = SkieTarget.OutputKind.Framework
 
     override val task: TaskProvider<out KotlinNativeLink> = binary.linkTaskProvider
 
@@ -45,6 +48,10 @@ class ActualSkieBinaryTarget(
     override val freeCompilerArgs: Provider<List<String>> = task.map {
         it.binary.freeCompilerArgs
     }
+
+    override val requiredConfigurationFlags: Set<SkieConfigurationFlag> = setOfNotNull(
+        SkieConfigurationFlag.Build_SwiftLibraryEvolution.takeIf { isForXCFramework },
+    )
 
     override fun addPluginArgument(pluginId: String, option: KotlinCompilerPluginOption) {
         task.configure {

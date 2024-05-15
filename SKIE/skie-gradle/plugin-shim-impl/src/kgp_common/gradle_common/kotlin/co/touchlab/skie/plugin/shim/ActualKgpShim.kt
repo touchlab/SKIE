@@ -17,8 +17,10 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFrameworkTask
 import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.kotlinArtifactsExtension
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
@@ -53,22 +55,37 @@ class ActualKgpShim(
     }
 
     private fun initializeBinaryTargets() {
+        val frameworksUsedInXCFrameworks = getFrameworksUsedInXCFrameworks()
+
         project.kotlinMultiplatformExtension?.appleTargets?.configureEach {
             val target = this
 
             binaries.withType<Framework>().configureEach {
-                val binary = this
-
-                val binaryTarget = ActualSkieBinaryTarget(
-                    project = project,
-                    target = target,
-                    binary = binary,
-                    outputKind = SkieTarget.OutputKind.Framework,
-                )
-
-                targets.add(binaryTarget)
+                registerBinaryTarget(target, this, frameworksUsedInXCFrameworks)
             }
         }
+    }
+
+    // Must be done eagerly because we need to go through all potential tasks even those that will not be executed.
+    // This is to ensure the Link task configuration will be the same when executed separately or as part of the XCFramework task.
+    private fun getFrameworksUsedInXCFrameworks(): Set<Framework> =
+        project.tasks.withType<XCFrameworkTask>()
+            .toList()
+            .flatMap { xcFrameworkTask ->
+                xcFrameworkTask.taskDependencies.getDependencies(xcFrameworkTask).filterIsInstance<KotlinNativeLink>().map { it.binary }
+            }
+            .filterIsInstance<Framework>()
+            .toSet()
+
+    private fun registerBinaryTarget(target: KotlinNativeTarget, binary: Framework, frameworksUsedInXCFrameworks: Set<Framework>) {
+        val binaryTarget = ActualSkieBinaryTarget(
+            project = project,
+            target = target,
+            binary = binary,
+            isForXCFramework = binary in frameworksUsedInXCFrameworks,
+        )
+
+        targets.add(binaryTarget)
     }
 
     private fun initializeArtifactTargets() {
