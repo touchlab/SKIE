@@ -10,8 +10,7 @@ enum class OirVisibility {
 
 fun SirVisibility.toOirVisibility(): OirVisibility =
     when (this) {
-        SirVisibility.Public, SirVisibility.PublicButHidden, SirVisibility.PublicButReplaced -> OirVisibility.Public
+        SirVisibility.Public, SirVisibility.PublicButHidden -> OirVisibility.Public
         SirVisibility.Internal -> OirVisibility.Internal
         SirVisibility.Private, SirVisibility.Removed -> OirVisibility.Private
     }
-

@@ -49,6 +49,7 @@ private fun SirClass.createReplacementTypeAlias(namespace: SirDeclarationNamespa
 
 private fun SirClass.renameAndRemoveFromNamespace() {
     baseName = "Bridge__${fqName.toLocalString().replace(".", "_")}"
-    visibility = SirVisibility.PublicButReplaced
+    visibility = SirVisibility.PublicButHidden
+    isReplaced = true
     this.namespace = null
 }

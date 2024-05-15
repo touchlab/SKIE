@@ -29,6 +29,8 @@ class SirConstructor(
 
     override val valueParameters: MutableList<SirValueParameter> = mutableListOf()
 
+    override val isReplaced: Boolean = false
+
     val returnType: SirType
         get() = parent.classDeclaration.toType(parent.classDeclaration.typeParameters.map { it.toTypeParameterUsage() })
 

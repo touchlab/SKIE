@@ -49,11 +49,10 @@ class SwiftSuspendFunctionGenerator {
     private fun hideOriginalFunction(bridgeModel: SuspendFunctionBridgeModel) {
         bridgeModel.suspendKirFunctionAssociatedDeclarations.forEach {
             it.applyToEntireOverrideHierarchy {
-                // Cannot use PublicButReplaced because the function might be annotated with @ShouldRefineInSwift
                 if (visibility == SirVisibility.Public) {
                     visibility = SirVisibility.PublicButHidden
                 }
-                identifier = "__$identifier"
+                isReplaced = true
             }
         }
     }

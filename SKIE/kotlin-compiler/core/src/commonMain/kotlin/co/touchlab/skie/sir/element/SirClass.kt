@@ -13,6 +13,7 @@ class SirClass(
     // Class requires explicit declaration of inheritance from AnyObject
     var kind: Kind,
     override var visibility: SirVisibility = SirVisibility.Public,
+    override var isReplaced: Boolean = false,
     superTypes: List<SirDeclaredSirType> = emptyList(),
     attributes: List<String> = emptyList(),
     var publicTypeAlias: SirTypeAlias? = null,
@@ -109,6 +110,7 @@ class SirClass(
             baseName: String,
             kind: Kind = Kind.Class,
             visibility: SirVisibility = SirVisibility.Public,
+            isReplaced: Boolean = false,
             superTypes: List<SirDeclaredSirType> = emptyList(),
             attributes: List<String> = emptyList(),
             publicTypeAlias: SirTypeAlias? = null,
@@ -121,6 +123,7 @@ class SirClass(
                 parent = this@SirDeclarationParent,
                 kind = kind,
                 visibility = visibility,
+                isReplaced = isReplaced,
                 superTypes = superTypes,
                 attributes = attributes,
                 publicTypeAlias = publicTypeAlias,

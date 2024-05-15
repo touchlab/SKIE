@@ -64,6 +64,7 @@ import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
 import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRuntimePhase
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.phases.runtime.SwiftRuntimeGenerator
+import co.touchlab.skie.phases.sir.CommitSirIsReplacedPhase
 import co.touchlab.skie.phases.sir.member.CreateAsyncSirFunctionsPhase
 import co.touchlab.skie.phases.sir.member.CreateSirMembersPhase
 import co.touchlab.skie.phases.sir.member.InitializeSirMembersCachePhase
@@ -176,6 +177,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             InitializeSirOverridesPhase,
             InitializeSirMembersCachePhase,
             StripKonanCallableDeclarationManglingPhase,
+            CommitSirIsReplacedPhase,
 
             FixNamesOfInaccessibleNestedClassesPhase,
 

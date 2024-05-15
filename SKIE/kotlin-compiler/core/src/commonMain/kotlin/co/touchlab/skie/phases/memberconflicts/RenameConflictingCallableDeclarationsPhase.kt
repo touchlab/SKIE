@@ -75,12 +75,12 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
                 when (it.visibility) {
                     SirVisibility.Public -> 0
                     SirVisibility.PublicButHidden -> 1
-                    SirVisibility.PublicButReplaced -> 2
-                    SirVisibility.Internal -> 3
-                    SirVisibility.Private -> 4
-                    SirVisibility.Removed -> 5
+                    SirVisibility.Internal -> 2
+                    SirVisibility.Private -> 3
+                    SirVisibility.Removed -> 4
                 }
             }
+            .thenBy { it.isReplaced }
             .thenByDescending { it.getKirDeclarationOrNull()?.module == context.kirBuiltins.stdlibModule }
             .thenByDescending { it.isFromKotlin }
             .thenBy { it.parent is SirExtension }

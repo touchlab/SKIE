@@ -30,7 +30,8 @@ class SkieClassSuspendGenerator {
         SirClass(
             baseName = "Suspend",
             parent = namespaceProvider.getNamespaceExtension(suspendFunctionOwner),
-            visibility = SirVisibility.PublicButReplaced,
+            visibility = SirVisibility.PublicButHidden,
+            isReplaced = true,
             kind = SirClass.Kind.Struct,
         ).apply {
             copyTypeParametersFrom(suspendFunctionOwner.originalSirClass)

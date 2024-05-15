@@ -10,6 +10,7 @@ class SirTypeAlias(
     override var baseName: String,
     parent: SirDeclarationParent,
     override var visibility: SirVisibility = SirVisibility.Public,
+    override var isReplaced: Boolean = false,
     typeFactory: ((SirTypeAlias) -> SirType),
 ) : SirTypeDeclaration, SirTypeParameterParent {
 
@@ -62,12 +63,14 @@ class SirTypeAlias(
         operator fun invoke(
             baseName: String,
             visibility: SirVisibility = SirVisibility.Public,
+            isReplaced: Boolean = false,
             typeFactory: ((SirTypeAlias) -> SirType),
         ): SirTypeAlias =
             SirTypeAlias(
                 baseName = baseName,
                 parent = this@SirDeclarationParent,
                 visibility = visibility,
+                isReplaced = isReplaced,
                 typeFactory = typeFactory,
             )
     }

@@ -76,6 +76,7 @@ class CreateSirMembersPhase(
             throws = function.errorHandlingStrategy.isThrowing,
             deprecationLevel = function.deprecationLevel,
             visibility = function.visibility,
+            isReplaced = function.isReplaced,
         ).apply {
             createValueParameters(function, swiftFunctionName)
         }
@@ -93,6 +94,7 @@ class CreateSirMembersPhase(
             scope = oirProperty.scope.sirScope,
             deprecationLevel = property.deprecationLevel,
             visibility = property.visibility,
+            isReplaced = property.isReplaced,
             isFakeOverride = property.isFakeOverride,
         ).apply {
             SirGetter(
@@ -159,10 +161,13 @@ class CreateSirMembersPhase(
 
     private val KirCallableDeclaration<*>.visibility: SirVisibility
         get() = if (this.isRefinedInSwift) {
-            SirVisibility.PublicButReplaced
+            SirVisibility.PublicButHidden
         } else {
             SirVisibility.Public
         }
+
+    private val KirCallableDeclaration<*>.isReplaced: Boolean
+        get() = this.isRefinedInSwift
 
     private val KirFunction<*>.swiftFunctionName: SwiftFunctionName
         get() {

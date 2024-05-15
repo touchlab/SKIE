@@ -72,7 +72,6 @@ class ApiNotesFactory(
     private val SirVisibility.isHiddenInApiNotes: Boolean
         get() = when (this) {
             SirVisibility.PublicButHidden -> true
-            SirVisibility.PublicButReplaced -> true
             SirVisibility.Internal -> exposeInternalMembers
             else -> false
         }

@@ -59,7 +59,8 @@ object ExhaustiveEnumsGenerator : SirPhase {
 private fun KirClass.configureBridging(skieClass: SirClass) {
     bridgedSirClass = skieClass
 
-    originalSirClass.visibility = SirVisibility.PublicButReplaced
+    originalSirClass.visibility = SirVisibility.PublicButHidden
+    originalSirClass.isReplaced = true
 }
 
 context(SirPhase.Context)
@@ -201,7 +202,8 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
     val typeAlias = SirTypeAlias(
         baseName = "Enum",
         parent = namespaceProvider.getNamespaceExtension(kirClass),
-        visibility = SirVisibility.PublicButReplaced,
+        visibility = SirVisibility.PublicButHidden,
+        isReplaced = true,
     ) {
         bridgedEnum.defaultType.withFqName()
     }

@@ -12,6 +12,7 @@ class SirProperty(
     parent: SirDeclarationParent,
     var type: SirType,
     override var visibility: SirVisibility = SirVisibility.Public,
+    override var isReplaced: Boolean = false,
     override var scope: SirScope = parent.coerceScope(SirScope.Member),
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
     override val isFakeOverride: Boolean = false,
@@ -22,10 +23,7 @@ class SirProperty(
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
 
     override val identifierAfterVisibilityChange: String
-        get() = when (visibility) {
-            SirVisibility.PublicButReplaced -> "__$identifier"
-            else -> identifier
-        }
+        get() = if (isReplaced) "__$identifier" else identifier
 
     override val reference: String
         get() = identifierAfterVisibilityChange.escapeSwiftIdentifier()
@@ -85,6 +83,7 @@ class SirProperty(
             identifier: String,
             type: SirType,
             visibility: SirVisibility = SirVisibility.Public,
+            isReplaced: Boolean = false,
             scope: SirScope = coerceScope(SirScope.Member),
             deprecationLevel: DeprecationLevel = DeprecationLevel.None,
             isFakeOverride: Boolean = false,
@@ -96,6 +95,7 @@ class SirProperty(
                 parent = this@SirDeclarationParent,
                 type = type,
                 visibility = visibility,
+                isReplaced = isReplaced,
                 scope = scope,
                 deprecationLevel = deprecationLevel,
                 isFakeOverride = isFakeOverride,
@@ -110,6 +110,7 @@ fun SirProperty.shallowCopy(
     parent: SirDeclarationParent = this.parent,
     type: SirType = this.type,
     visibility: SirVisibility = this.visibility,
+    isReplaced: Boolean = this.isReplaced,
     scope: SirScope = parent.coerceScope(this.scope),
     deprecationLevel: DeprecationLevel = this.deprecationLevel,
     isFakeOverride: Boolean = this.isFakeOverride,
@@ -121,6 +122,7 @@ fun SirProperty.shallowCopy(
         parent = parent,
         type = type,
         visibility = visibility,
+        isReplaced = isReplaced,
         scope = scope,
         deprecationLevel = deprecationLevel,
         isFakeOverride = isFakeOverride,

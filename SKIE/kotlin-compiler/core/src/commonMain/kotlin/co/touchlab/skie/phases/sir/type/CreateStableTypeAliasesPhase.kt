@@ -36,7 +36,8 @@ object CreateStableNameTypeAliasesPhase : SirPhase {
             } else {
                 namespaceProvider.getNamespaceClass(kirClass)
             },
-            visibility = SirVisibility.PublicButReplaced,
+            visibility = SirVisibility.PublicButHidden,
+            isReplaced = true,
         ) {
             kirClass.originalSirClass.defaultType.withFqName()
         }

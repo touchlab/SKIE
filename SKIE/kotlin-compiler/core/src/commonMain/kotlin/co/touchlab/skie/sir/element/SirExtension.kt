@@ -16,6 +16,8 @@ class SirExtension(
 
     val conditionalConstraints: MutableList<SirConditionalConstraint> = mutableListOf()
 
+    override val isReplaced: Boolean = false
+
     override val fqName: SirFqName
         get() = classDeclaration.fqName
 

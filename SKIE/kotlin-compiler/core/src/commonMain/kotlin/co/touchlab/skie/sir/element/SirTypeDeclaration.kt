@@ -17,10 +17,7 @@ sealed interface SirTypeDeclaration : SirDeclaration {
      * Use `simpleName` in generated Swift code.
      */
     val simpleName: String
-        get() = when (visibility) {
-            SirVisibility.PublicButReplaced -> "__$baseName"
-            else -> baseName
-        }
+        get() = if (isReplaced) "__$baseName" else baseName
 
     override var parent: SirDeclarationParent
 
@@ -50,6 +47,11 @@ sealed interface SirTypeDeclaration : SirDeclaration {
     val internalName: SirFqName
 
     val typeParameters: List<SirTypeParameter>
+
+    /**
+     * If true, the "__" will be added to the name.
+     */
+    override var isReplaced: Boolean
 
     val isHashable: Boolean
 

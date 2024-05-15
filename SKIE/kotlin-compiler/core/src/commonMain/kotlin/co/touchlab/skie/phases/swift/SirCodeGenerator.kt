@@ -125,7 +125,6 @@ object SirCodeGenerator {
         when (this) {
             SirVisibility.Public,
             SirVisibility.PublicButHidden,
-            SirVisibility.PublicButReplaced,
             -> Modifier.PUBLIC
             SirVisibility.Internal -> Modifier.INTERNAL
             SirVisibility.Private -> Modifier.PRIVATE

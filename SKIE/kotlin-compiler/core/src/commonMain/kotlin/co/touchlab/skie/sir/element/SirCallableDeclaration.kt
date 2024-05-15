@@ -10,7 +10,7 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      *
      * Examples:
      * foo
-     * foo (visibility == PublicButReplaced)
+     * foo (isReplaced)
      */
     val identifier: String
 
@@ -19,7 +19,7 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      *
      * Examples:
      * foo
-     * __foo (visibility == PublicButReplaced && !constructor)
+     * __foo (isReplaced && !constructor)
      */
     val identifierAfterVisibilityChange: String
 
@@ -30,7 +30,7 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      * foo  (for properties)
      * foo (for functions without parameters)
      * foo(param1:)
-     * __foo(param1:) (visibility == PublicButReplaced && !constructor)
+     * __foo(param1:) (isReplaced && !constructor)
      */
     val reference: String
 
@@ -41,7 +41,7 @@ sealed interface SirCallableDeclaration : SirDeclaration, SirElementWithModifier
      * foo  (for properties)
      * foo() (for functions without parameters)
      * foo(param1:)
-     * __foo(param1:) (visibility == PublicButReplaced)
+     * __foo(param1:) (isReplaced)
      */
     val name: String
 

@@ -39,7 +39,8 @@ class SealedEnumGeneratorDelegate(
             baseName = "Sealed",
             kind = SirClass.Kind.Enum,
             parent = namespaceProvider.getNamespaceExtension(kirClass),
-            visibility = SirVisibility.PublicButReplaced,
+            visibility = SirVisibility.PublicButHidden,
+            isReplaced = true,
         ).apply {
             addConformanceToHashableIfPossible(kirClass)
 

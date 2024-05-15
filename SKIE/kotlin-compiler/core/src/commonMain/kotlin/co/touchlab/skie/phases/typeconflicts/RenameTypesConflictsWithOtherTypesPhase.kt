@@ -41,12 +41,12 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
                 when (it.visibility) {
                     SirVisibility.Public -> 0
                     SirVisibility.PublicButHidden -> 1
-                    SirVisibility.PublicButReplaced -> 2
-                    SirVisibility.Internal -> 3
-                    SirVisibility.Private -> 4
-                    SirVisibility.Removed -> 5
+                    SirVisibility.Internal -> 2
+                    SirVisibility.Private -> 3
+                    SirVisibility.Removed -> 4
                 }
             }
+            .thenBy { it.isReplaced }
             .thenByDescending { it is SirClass }
             .thenByDescending { it.resolveAsKirClass() != null }
             .thenByDescending { it.resolveAsKirClass()?.kind != KirClass.Kind.File }

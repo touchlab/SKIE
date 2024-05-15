@@ -12,6 +12,7 @@ class SirSimpleFunction(
     parent: SirDeclarationParent,
     var returnType: SirType,
     override var visibility: SirVisibility = SirVisibility.Public,
+    override var isReplaced: Boolean = false,
     override var scope: SirScope = parent.coerceScope(SirScope.Member),
     override val isFakeOverride: Boolean = false,
     attributes: List<String> = emptyList(),
@@ -22,10 +23,7 @@ class SirSimpleFunction(
 ) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction> {
 
     override val identifierAfterVisibilityChange: String
-        get() = when (visibility) {
-            SirVisibility.PublicButReplaced -> "__$identifier"
-            else -> identifier
-        }
+        get() = if (isReplaced) "__$identifier" else identifier
 
     override val identifierForReference: String
         get() = identifierAfterVisibilityChange.escapeSwiftIdentifier()
@@ -70,6 +68,7 @@ class SirSimpleFunction(
             identifier: String,
             returnType: SirType,
             visibility: SirVisibility = SirVisibility.Public,
+            isReplaced: Boolean = false,
             scope: SirScope = coerceScope(SirScope.Member),
             isFakeOverride: Boolean = false,
             attributes: List<String> = emptyList(),
@@ -83,6 +82,7 @@ class SirSimpleFunction(
                 parent = this@SirDeclarationParent,
                 returnType = returnType,
                 visibility = visibility,
+                isReplaced = isReplaced,
                 scope = scope,
                 isFakeOverride = isFakeOverride,
                 attributes = attributes,
@@ -99,6 +99,7 @@ fun SirSimpleFunction.shallowCopy(
     parent: SirDeclarationParent = this.parent,
     returnType: SirType = this.returnType,
     visibility: SirVisibility = this.visibility,
+    isReplaced: Boolean = this.isReplaced,
     scope: SirScope = parent.coerceScope(this.scope),
     isFakeOverride: Boolean = this.isFakeOverride,
     attributes: List<String> = this.attributes,
@@ -112,6 +113,7 @@ fun SirSimpleFunction.shallowCopy(
         parent = parent,
         returnType = returnType,
         visibility = visibility,
+        isReplaced = isReplaced,
         scope = scope,
         isFakeOverride = isFakeOverride,
         attributes = attributes,
