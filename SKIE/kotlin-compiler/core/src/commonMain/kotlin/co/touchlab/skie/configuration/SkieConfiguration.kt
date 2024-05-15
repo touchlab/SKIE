@@ -58,7 +58,7 @@ abstract class SkieConfiguration(
         if (isKeySupported(configurationKey)) {
             return configurationKey.defaultValue
         } else {
-            error("Configuration key $configurationKey is not supported.")
+            error("Configuration key $configurationKey was not registered in ConfigurationProvider.")
         }
     }
 

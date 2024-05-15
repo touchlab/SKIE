@@ -18,6 +18,7 @@ import co.touchlab.skie.configuration.RootConfiguration
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SimpleFunctionConfiguration
 import co.touchlab.skie.configuration.SkieConfiguration
+import co.touchlab.skie.configuration.SkieVisibility
 import co.touchlab.skie.configuration.SuppressSkieWarning
 import co.touchlab.skie.configuration.SuspendInterop
 import co.touchlab.skie.configuration.ValueParameterConfiguration
@@ -51,6 +52,7 @@ class ConfigurationProvider(
         SealedInterop.ElseName,
         SealedInterop.Case.Visible,
         SealedInterop.Case.Name,
+        SkieVisibility,
         SuppressSkieWarning.NameCollision,
         SuspendInterop.Enabled,
     )

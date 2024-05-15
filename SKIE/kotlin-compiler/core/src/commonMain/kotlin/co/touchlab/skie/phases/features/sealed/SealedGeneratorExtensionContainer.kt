@@ -3,7 +3,9 @@ package co.touchlab.skie.phases.features.sealed
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 import co.touchlab.skie.sir.element.superClassType
 import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirDeclaredSirType
@@ -11,6 +13,7 @@ import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
+@MustBeExecutedAfterBridgingConfiguration
 interface SealedGeneratorExtensionContainer {
 
     val context: SirPhase.Context
@@ -48,7 +51,7 @@ interface SealedGeneratorExtensionContainer {
             this.visibleSealedSubclasses.isEmpty()
 
     val KirClass.visibleSealedSubclasses: List<KirClass>
-        get() = this.sealedSubclasses.filter { it.configuration[SealedInterop.Case.Visible] }
+        get() = this.sealedSubclasses.filter { it.configuration[SealedInterop.Case.Visible] && it.primarySirClass.visibility.isAccessibleFromOtherModules }
 
     fun SirClass.getSealedSubclassType(
         enum: SirClass,

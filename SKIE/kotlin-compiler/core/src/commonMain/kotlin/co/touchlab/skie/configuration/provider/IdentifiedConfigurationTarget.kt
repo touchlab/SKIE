@@ -20,7 +20,7 @@ interface IdentifiedConfigurationTarget : ConfigurationTarget {
 
         override val scopeType: KClass<out ConfigurationScope> = ConfigurationScope.Root::class
 
-        override fun <T : Annotation> hasAnnotation(kClass: KClass<T>): Boolean = false
+        override fun hasAnnotation(kClass: KClass<out Annotation>): Boolean = false
 
         override fun <T : Annotation> findAnnotation(kClass: KClass<T>): T? = null
     }

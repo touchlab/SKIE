@@ -10,6 +10,8 @@ import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
 import co.touchlab.skie.sir.element.copyValueParametersFrom
+import co.touchlab.skie.sir.element.isAccessible
+import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.sir.type.NullableSirType
 import co.touchlab.skie.sir.type.OirDeclaredSirType
@@ -34,6 +36,10 @@ class SwiftSuspendFunctionGenerator {
             suspendKirFunction = suspendKirFunction,
             kotlinBridgingKirFunction = kotlinBridgingKirFunction,
         )
+
+        if (!bridgeModel.originalFunction.visibility.isAccessible) {
+            return
+        }
 
         val extension = sirProvider.getExtension(
             classDeclaration = bridgeModel.extensionTypeDeclarationForBridgingFunction,

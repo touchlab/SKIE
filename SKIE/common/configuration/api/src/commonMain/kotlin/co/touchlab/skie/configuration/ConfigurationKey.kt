@@ -36,10 +36,10 @@ interface ConfigurationKey<T> {
 
     interface NonOptional<T : Any> : ConfigurationKey<T> {
 
+        fun findAnnotationValue(configurationTarget: ConfigurationTarget): T? = null
+
         override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): kotlin.Boolean =
             findAnnotationValue(configurationTarget) != null
-
-        fun findAnnotationValue(configurationTarget: ConfigurationTarget): T? = null
 
         override fun getAnnotationValue(configurationTarget: ConfigurationTarget): T =
             findAnnotationValue(configurationTarget)
@@ -73,5 +73,16 @@ interface ConfigurationKey<T> {
 
         override fun deserialize(value: kotlin.String?): java.nio.file.Path =
             Path(value.throwIfNull())
+    }
+
+    interface Enum<E : kotlin.Enum<E>> : NonOptional<E> {
+
+        override fun deserialize(value: kotlin.String?): E =
+            valueOf(value.throwIfNull())
+
+        override fun serialize(value: E): kotlin.String? =
+            value.name
+
+        fun valueOf(value: kotlin.String): E
     }
 }

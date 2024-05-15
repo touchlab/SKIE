@@ -22,6 +22,7 @@ import co.touchlab.skie.oir.type.TypeDefOirType
 import co.touchlab.skie.oir.type.TypeParameterUsageOirType
 import co.touchlab.skie.oir.type.VoidOirType
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
@@ -29,6 +30,7 @@ import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 
+@MustBeExecutedAfterBridgingConfiguration
 class SealedEnumGeneratorDelegate(
     override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {

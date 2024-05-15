@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.sir.member
 
+import co.touchlab.skie.configuration.SkieVisibility
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirConstructor
@@ -24,12 +25,14 @@ import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
+import co.touchlab.skie.util.toSirVisibility
 
 class CreateSirMembersPhase(
     val context: SirPhase.Context,
 ) : SirPhase {
 
     private val kirProvider = context.kirProvider
+    private val sirProvider = context.sirProvider
     private val sirTypeTranslator = context.sirTypeTranslator
 
     context(SirPhase.Context)
@@ -160,10 +163,14 @@ class CreateSirMembersPhase(
         }
 
     private val KirCallableDeclaration<*>.visibility: SirVisibility
-        get() = if (this.isRefinedInSwift) {
-            SirVisibility.PublicButHidden
-        } else {
-            SirVisibility.Public
+        get() {
+            val configuredVisibility = this.configuration[SkieVisibility].toSirVisibility()
+
+            return if (configuredVisibility == SirVisibility.Public && this.isRefinedInSwift) {
+                SirVisibility.PublicButHidden
+            } else {
+                configuredVisibility
+            }
         }
 
     private val KirCallableDeclaration<*>.isReplaced: Boolean

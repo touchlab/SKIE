@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.sir.type
 
+import co.touchlab.skie.configuration.SkieVisibility
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirModule
 import co.touchlab.skie.oir.element.OirClass
@@ -8,7 +9,9 @@ import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.toSirKind
+import co.touchlab.skie.util.toSirVisibility
 
 // Must be class because it has state
 class CreateKotlinSirTypesPhase : SirPhase {
@@ -35,6 +38,7 @@ class CreateKotlinSirTypesPhase : SirPhase {
             parent = kirClass.sirParent,
             kind = kirClass.oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Kir(kirClass),
+            visibility = kirClass.configuration[SkieVisibility].toSirVisibility(),
         )
 
         createTypeParameters(kirClass.oirClass, sirClass)

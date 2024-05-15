@@ -25,7 +25,7 @@ object DescriptorBasedConfigurationTarget {
 
         override val fqName: String = declarationDescriptor.fqNameSafe.asString()
 
-        override fun <T : Annotation> hasAnnotation(kClass: KClass<T>): Boolean =
+        override fun hasAnnotation(kClass: KClass<out Annotation>): Boolean =
             declarationDescriptor.hasAnnotation(kClass)
 
         override fun <T : Annotation> findAnnotation(kClass: KClass<T>): T? =
@@ -50,7 +50,7 @@ object DescriptorBasedConfigurationTarget {
         // Currently not needed to be implemented because the configuration is not used for files directly and in the case of runtime is not inherited.
         override val belongsToSkieRuntime: Boolean = false
 
-        override fun <T : Annotation> hasAnnotation(kClass: KClass<T>): Boolean = false
+        override fun hasAnnotation(kClass: KClass<out Annotation>): Boolean = false
 
         override fun <T : Annotation> findAnnotation(kClass: KClass<T>): T? = null
     }

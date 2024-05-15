@@ -3,6 +3,7 @@ package co.touchlab.skie.phases.features.sealed
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeParameter
@@ -17,6 +18,7 @@ import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.TypeName
 
+@MustBeExecutedAfterBridgingConfiguration
 class SealedFunctionGeneratorDelegate(
     override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {

@@ -4,7 +4,7 @@ import kotlin.reflect.KClass
 
 interface ConfigurationTarget {
 
-    fun <T : Annotation> hasAnnotation(kClass: KClass<T>): Boolean
+    fun hasAnnotation(kClass: KClass<out Annotation>): Boolean
 
     fun <T : Annotation> findAnnotation(kClass: KClass<T>): T?
 }
