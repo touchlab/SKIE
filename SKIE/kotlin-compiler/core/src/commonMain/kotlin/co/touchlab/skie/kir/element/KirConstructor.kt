@@ -20,6 +20,8 @@ class KirConstructor(
 
     override val isRefinedInSwift: Boolean = false
 
+    override val modality: KirCallableDeclaration.Modality = KirCallableDeclaration.Modality.Final
+
     override val origin: KirCallableDeclaration.Origin = KirCallableDeclaration.Origin.Member
 
     lateinit var oirConstructor: OirConstructor

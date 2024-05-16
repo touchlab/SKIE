@@ -94,6 +94,7 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
                 deprecationLevel = descriptor.kirDeprecationLevel,
                 isRefinedInSwift = baseDescriptor.isRefinedInSwift,
                 configuration = getFunctionConfiguration(descriptor),
+                modality = descriptor.kirModality,
             )
 
             descriptorKirProvider.registerCallableDeclaration(property, descriptor)

@@ -12,6 +12,8 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     val scope: KirScope
 
+    val modality: Modality
+
     val deprecationLevel: DeprecationLevel
 
     val configuration: CallableDeclarationConfiguration
@@ -28,5 +30,9 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
     enum class Origin {
 
         Member, Extension, Global
+    }
+
+    enum class Modality {
+        Final, Open, Abstract
     }
 }

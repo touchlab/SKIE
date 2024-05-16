@@ -3,6 +3,7 @@
 package co.touchlab.skie.phases.kir
 
 import co.touchlab.skie.kir.element.DeprecationLevel
+import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirScope
 import co.touchlab.skie.oir.element.OirFunction
@@ -18,6 +19,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
@@ -75,6 +77,14 @@ internal abstract class BaseCreateKirMembersPhase(
         get() = when (this.kind) {
             KirClass.Kind.File -> KirScope.Static
             else -> KirScope.Member
+        }
+
+    protected val CallableMemberDescriptor.kirModality: KirCallableDeclaration.Modality
+        get() = when (this.modality) {
+            Modality.FINAL -> KirCallableDeclaration.Modality.Final
+            Modality.SEALED -> error("Callable members cannot have sealed modality: $this")
+            Modality.OPEN -> KirCallableDeclaration.Modality.Open
+            Modality.ABSTRACT -> KirCallableDeclaration.Modality.Abstract
         }
 
     protected val CallableMemberDescriptor.isRefinedInSwift: Boolean

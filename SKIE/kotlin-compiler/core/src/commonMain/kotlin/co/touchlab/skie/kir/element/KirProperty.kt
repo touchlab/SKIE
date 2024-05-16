@@ -20,6 +20,7 @@ class KirProperty(
     override val deprecationLevel: DeprecationLevel,
     override val isRefinedInSwift: Boolean,
     override val configuration: PropertyConfiguration,
+    override val modality: KirCallableDeclaration.Modality,
 ) : KirOverridableDeclaration<KirProperty, SirProperty> {
 
     lateinit var oirProperty: OirProperty

@@ -90,6 +90,7 @@ internal class CreateKirSimpleFunctionsPhase(
                 deprecationLevel = descriptor.kirDeprecationLevel,
                 isRefinedInSwift = baseDescriptor.isRefinedInSwift,
                 configuration = getFunctionConfiguration(descriptor),
+                modality = descriptor.kirModality,
             )
 
             descriptorKirProvider.registerCallableDeclaration(function, descriptor)

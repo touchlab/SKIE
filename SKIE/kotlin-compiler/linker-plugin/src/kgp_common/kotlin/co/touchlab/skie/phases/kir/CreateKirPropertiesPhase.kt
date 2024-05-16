@@ -60,6 +60,7 @@ internal class CreateKirPropertiesPhase(
                 deprecationLevel = descriptor.kirDeprecationLevel,
                 isRefinedInSwift = baseDescriptor.isRefinedInSwift,
                 configuration = descriptorConfigurationProvider.getConfiguration(originalDescriptor),
+                modality = descriptor.kirModality,
             )
 
             descriptorKirProvider.registerCallableDeclaration(property, descriptor)
