@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.report
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 object ProcessReportedMessagesPhase : LinkPhase {
 
@@ -43,7 +44,7 @@ object ProcessReportedMessagesPhase : LinkPhase {
         }
 
         val message = if (declaration != null && location == null) {
-            "${report.message}\n    (at ${DescriptorRenderer.COMPACT_WITH_SHORT_TYPES.render(declaration)})"
+            "${report.message}\n    (at ${DescriptorRenderer.COMPACT.render(declaration)} from module ${declaration.module.name})"
         } else {
             report.message
         }
