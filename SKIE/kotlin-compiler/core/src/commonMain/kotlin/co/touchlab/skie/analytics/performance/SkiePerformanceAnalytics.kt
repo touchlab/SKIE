@@ -8,7 +8,9 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -22,7 +24,9 @@ object SkiePerformanceAnalytics {
         private val rootConfiguration: RootConfiguration,
     ) : AnalyticsProducer {
 
-        private val dispatcher: CoroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        private val threadExecutor = ThreadPoolExecutor(0, 1, 1, TimeUnit.MINUTES, LinkedBlockingQueue())
+
+        private val dispatcher: CoroutineContext = threadExecutor.asCoroutineDispatcher()
 
         override val name: String = "skie-performance"
 
@@ -38,6 +42,8 @@ object SkiePerformanceAnalytics {
                 logTotal(Kind.Background)
 
                 collected = true
+
+                threadExecutor.setKeepAliveTime(1, TimeUnit.SECONDS)
 
                 entries.toPrettyJson()
             }
