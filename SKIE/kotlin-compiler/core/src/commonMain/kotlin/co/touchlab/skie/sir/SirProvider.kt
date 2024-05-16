@@ -55,6 +55,9 @@ class SirProvider(
     val allLocalDeclarations: List<SirDeclaration>
         get() = listOf(skieModule, kotlinModule).flatMap { it.getAllDeclarationsRecursively() }
 
+    val allLocalCallableDeclarations: List<SirCallableDeclaration>
+        get() = allLocalDeclarations.filterIsInstance<SirCallableDeclaration>()
+
     val allLocalTypeDeclarations: List<SirTypeDeclaration>
         get() = allLocalDeclarations.filterIsInstance<SirTypeDeclaration>()
 

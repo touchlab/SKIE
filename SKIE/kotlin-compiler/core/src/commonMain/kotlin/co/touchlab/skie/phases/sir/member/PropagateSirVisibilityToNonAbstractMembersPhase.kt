@@ -8,15 +8,13 @@ import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.minimumVisibility
 import co.touchlab.skie.sir.type.visibilityConstraint
 
-object PropagateSirVisibilityToMembersPhase : SirPhase {
+object PropagateSirVisibilityToNonAbstractMembersPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allLocalDeclarations
-            .filterIsInstance<SirCallableDeclaration>()
-            .forEach {
-                updateVisibility(it)
-            }
+        sirProvider.allLocalCallableDeclarations.forEach {
+            updateVisibility(it)
+        }
     }
 
     private fun updateVisibility(sirCallableDeclaration: SirCallableDeclaration) {

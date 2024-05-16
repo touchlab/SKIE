@@ -42,9 +42,7 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
     private fun getSortedCallableDeclarations(): List<SirCallableDeclaration> {
         val comparator = getCollisionResolutionPriorityComparator()
 
-        return sirProvider.allLocalDeclarations
-            .filterIsInstance<SirCallableDeclaration>()
-            .sortedWith(comparator)
+        return sirProvider.allLocalCallableDeclarations.sortedWith(comparator)
     }
 
     /**
