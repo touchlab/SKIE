@@ -5,6 +5,7 @@ import co.touchlab.skie.context.ForegroundPhaseCompilerContext
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.descriptor.cache.CachedObjCExportMapper
+import co.touchlab.skie.util.DescriptorReporter
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
@@ -29,6 +30,9 @@ val ForegroundPhase.Context.extraDescriptorBuiltins: ExtraDescriptorBuiltins
 
 val ForegroundPhase.Context.configurables: AppleConfigurables
     get() = konanConfig.platform.configurables as AppleConfigurables
+
+val ForegroundPhase.Context.descriptorReporter: DescriptorReporter
+    get() = typedContext.descriptorReporter
 
 private val ForegroundPhase.Context.typedContext: ForegroundPhaseCompilerContext
     get() = context as ForegroundPhaseCompilerContext

@@ -8,7 +8,7 @@ import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.util.CompilerShim
 import co.touchlab.skie.util.directory.FrameworkLayout
-import co.touchlab.skie.util.Reporter
+import co.touchlab.skie.util.KirReporter
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 
@@ -28,7 +28,7 @@ interface CommonSkieContext {
 
     val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer
 
-    val reporter: Reporter
+    val kirReporter: KirReporter
 
     val skiePhaseScheduler: SkiePhaseScheduler
 

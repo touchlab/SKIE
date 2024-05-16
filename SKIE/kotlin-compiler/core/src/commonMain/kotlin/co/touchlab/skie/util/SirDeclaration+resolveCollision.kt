@@ -138,7 +138,7 @@ private fun reportCollision(
     collisionReason: String,
     source: KirElement,
 ) {
-    reporter.warning(
+    kirReporter.warning(
         message = "'$originalName' was renamed to '$newName' because of a name collision with $collisionReason. " +
             "Consider resolving the conflict either by changing the name in Kotlin, or via the @ObjCName annotation. " +
             "You can also suppress this warning using the 'SuppressSkieWarning.NameCollision' configuration. " +

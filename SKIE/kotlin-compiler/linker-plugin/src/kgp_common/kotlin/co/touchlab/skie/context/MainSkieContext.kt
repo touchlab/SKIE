@@ -14,9 +14,8 @@ import co.touchlab.skie.phases.BackgroundPhase
 import co.touchlab.skie.phases.ScheduledPhase
 import co.touchlab.skie.phases.configurables
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
-import co.touchlab.skie.util.KotlinCompilerVersion
+import co.touchlab.skie.util.DescriptorReporter
 import co.touchlab.skie.util.TargetTriple
-import co.touchlab.skie.util.current
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,6 +58,8 @@ class MainSkieContext internal constructor(
     override val descriptorConfigurationProvider: DescriptorConfigurationProvider = DescriptorConfigurationProvider(initPhaseContext.configurationProvider)
 
     val declarationBuilder: DeclarationBuilderImpl = DeclarationBuilderImpl(mainModuleDescriptor, descriptorProvider)
+
+    override val descriptorReporter: DescriptorReporter = initPhaseContext.descriptorReporter
 
     lateinit var kirProvider: KirProvider
 

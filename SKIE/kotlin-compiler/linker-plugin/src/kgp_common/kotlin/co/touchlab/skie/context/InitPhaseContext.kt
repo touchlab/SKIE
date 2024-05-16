@@ -14,8 +14,9 @@ import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.spi.SkiePluginRegistrar
 import co.touchlab.skie.util.ActualCompilerShim
 import co.touchlab.skie.util.CompilerShim
+import co.touchlab.skie.util.DescriptorReporter
 import co.touchlab.skie.util.directory.FrameworkLayout
-import co.touchlab.skie.util.Reporter
+import co.touchlab.skie.util.KirReporter
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -52,7 +53,9 @@ class InitPhaseContext(
 
     override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(rootConfiguration)
 
-    override val reporter: Reporter = Reporter()
+    override val kirReporter: KirReporter = KirReporter()
+
+    val descriptorReporter: DescriptorReporter = DescriptorReporter()
 
     override val compilerShim: CompilerShim = ActualCompilerShim()
 

@@ -1,23 +1,22 @@
 package co.touchlab.skie.util
 
-import co.touchlab.skie.kir.element.KirElement
 import java.util.Collections
 
-class Reporter {
+abstract class Reporter<T> {
 
-    private val mutableReports = Collections.synchronizedList(mutableListOf<Report>())
+    private val mutableReports = Collections.synchronizedList(mutableListOf<Report<T>>())
 
-    val reports: List<Report> by ::mutableReports
+    val reports: List<Report<T>> by ::mutableReports
 
-    fun report(severity: Severity, message: String, source: KirElement? = null) {
+    fun report(severity: Severity, message: String, source: T? = null) {
         mutableReports.add(Report(message, severity, source))
     }
 
-    fun error(message: String, source: KirElement? = null) {
+    fun error(message: String, source: T? = null) {
         report(Severity.Error, message, source)
     }
 
-    fun warning(message: String, source: KirElement? = null) {
+    fun warning(message: String, source: T? = null) {
         report(Severity.Warning, message, source)
     }
 
@@ -25,5 +24,5 @@ class Reporter {
         Error, Warning
     }
 
-    data class Report(val message: String, val severity: Severity, val source: KirElement?)
+    data class Report<T>(val message: String, val severity: Severity, val source: T?)
 }
