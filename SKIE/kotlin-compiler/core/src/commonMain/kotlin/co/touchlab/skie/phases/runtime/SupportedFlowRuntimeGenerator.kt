@@ -15,6 +15,8 @@ object SupportedFlowRuntimeGenerator {
 
     context(SirPhase.Context)
     fun generate(skieSwiftFlowIterator: SirClass) {
+        generateBridgeSubscriptionCountWorkaroundFunctions()
+
         val classesForVariants = SupportedFlow.allVariants.associateWith { flowVariant ->
             createSwiftFlowClass(flowVariant)
         }
@@ -22,6 +24,22 @@ object SupportedFlowRuntimeGenerator {
         classesForVariants.forEach { (flowVariant, sirClass) ->
             sirClass.addSwiftFlowMembers(flowVariant, skieSwiftFlowIterator)
         }
+    }
+
+    context(SirPhase.Context)
+    private fun generateBridgeSubscriptionCountWorkaroundFunctions() {
+        // If Flow-interop is disabled globally (or even just for `kotlinx.coroutines.core`),
+        // `subscriptionCount` property falls back to Kotlin's `StateFlow` protocol.
+        // These two functions make sure our Flow runtime code still compiles as expected.
+        namespaceProvider.getSkieNamespaceWrittenSourceFile("bridgeSubscriptionCount").content = """
+            internal func bridgeSubscriptionCount(_ subscriptionCount: SkieSwiftStateFlow<KotlinInt>) -> SkieSwiftStateFlow<KotlinInt> {
+                return subscriptionCount
+            }
+
+            internal func bridgeSubscriptionCount(_ subscriptionCount: any Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.StateFlow.__Kotlin) -> SkieSwiftStateFlow<KotlinInt> {
+                return SkieSwiftStateFlow(internal: subscriptionCount)
+            }
+        """.trimIndent()
     }
 
     context(SirPhase.Context)
@@ -161,6 +179,9 @@ object SupportedFlowRuntimeGenerator {
                 CustomPassthroughDeclaration.Property(
                     identifier = "subscriptionCount",
                     type = sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftStateFlow")).toType(kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType),
+                    transformGetter = {
+                        CodeBlock.of("bridgeSubscriptionCount(%L)", it)
+                    }
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
                     identifier = "emit",
