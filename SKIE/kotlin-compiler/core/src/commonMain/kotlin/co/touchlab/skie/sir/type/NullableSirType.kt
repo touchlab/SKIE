@@ -19,6 +19,8 @@ data class NullableSirType(
             typeProvider = evaluatedType.map { copy(type = it.type) },
             canonicalNameProvider = evaluatedType.map { it.canonicalName + "?" },
             swiftPoetTypeNameProvider = evaluatedType.map { it.swiftPoetTypeName.makeOptional() },
+            lowestVisibility = evaluatedType.map { it.visibilityConstraint },
+            referencedTypeDeclarationsProvider = evaluatedType.map { it.referencedTypeDeclarations },
         )
     }
 

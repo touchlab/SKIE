@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.util.swift.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 
@@ -21,6 +22,8 @@ sealed class SkieErrorSirType(
             type = this,
             canonicalName = objCName,
             swiftPoetTypeName = DeclaredTypeName.qualifiedLocalTypeName(objCName),
+            visibilityConstraint = SirVisibility.Public,
+            referencedTypeDeclarations = emptySet(),
         )
     }
 

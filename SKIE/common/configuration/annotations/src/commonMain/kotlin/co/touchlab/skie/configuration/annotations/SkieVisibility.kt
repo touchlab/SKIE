@@ -54,13 +54,15 @@ annotation class SkieVisibility {
     annotation class InternalAndReplaced
 
     /**
-     * The declaration will either be Public or Internal.
+     * The callable declaration will either be Public or Internal.
      * Which one is chosen depends on whether the declaration is automatically wrapped by SKIE or not.
      *
      * For example, a top-level function originally exposed as `FileKt.functionName` will be internal, if SKIE generated the global function wrapper for it.
+     *
+     * Note that this setting will only affect callable declarations (functions, properties, constructors) - not classes.
      */
     @Retention(AnnotationRetention.BINARY)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
     annotation class InternalIfWrapped
 
     /**

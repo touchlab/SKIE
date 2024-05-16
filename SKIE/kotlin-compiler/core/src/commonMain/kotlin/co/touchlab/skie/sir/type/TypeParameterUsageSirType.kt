@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.util.map
 import io.outfoxx.swiftpoet.TypeVariableName
 
@@ -25,6 +26,8 @@ data class TypeParameterUsageSirType(
             swiftPoetTypeNameProvider = evaluatedParentScope.map {
                 it?.let { TypeVariableName(it.swiftPoetTypeName.name + "." + typeParameter.name) } ?: TypeVariableName(typeParameter.name)
             },
+            lowestVisibility = lazy { SirVisibility.Public },
+            referencedTypeDeclarationsProvider = lazy { emptySet() },
         )
     }
 

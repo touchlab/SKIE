@@ -17,8 +17,8 @@ import co.touchlab.skie.sir.element.SirFile
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTopLevelDeclarationParent
+import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeDeclaration
-import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
 import co.touchlab.skie.util.directory.FrameworkLayout
 import co.touchlab.skie.util.directory.SkieBuildDirectory
@@ -60,6 +60,9 @@ class SirProvider(
 
     val allLocalClasses: List<SirClass>
         get() = allLocalTypeDeclarations.filterIsInstance<SirClass>()
+
+    val allLocalTypeAliases: List<SirTypeAlias>
+        get() = allLocalTypeDeclarations.filterIsInstance<SirTypeAlias>()
 
     val allLocalEnums: List<SirClass>
         get() = allLocalClasses.filter { it.kind == SirClass.Kind.Enum }

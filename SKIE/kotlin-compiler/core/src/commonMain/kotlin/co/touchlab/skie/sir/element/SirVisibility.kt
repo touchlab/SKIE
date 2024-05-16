@@ -3,13 +3,26 @@ package co.touchlab.skie.sir.element
 enum class SirVisibility {
 
     Public,
+
     /** Applicable only to Obj-C code, Swift code will use Public instead. */
     PublicButHidden,
     Internal,
     Private,
+
     /** Applicable only to generated code, existing code cannot be removed and will be marked as private instead. */
     Removed,
 }
+
+fun SirVisibility.coerceAtMostInSwift(limit: SirVisibility): SirVisibility =
+    when (limit) {
+        SirVisibility.Public, SirVisibility.PublicButHidden -> this
+        SirVisibility.Internal -> if (this.toSwiftVisibility() == SirVisibility.Public) SirVisibility.Internal else this
+        SirVisibility.Private -> if (this == SirVisibility.Removed) SirVisibility.Removed else SirVisibility.Private
+        SirVisibility.Removed -> SirVisibility.Removed
+    }
+
+fun List<SirVisibility>.minimumVisibility(): SirVisibility =
+    this.fold(SirVisibility.Public) { acc, visibility -> acc.coerceAtMostInSwift(visibility) }
 
 val SirVisibility.isAccessibleFromOtherModules: Boolean
     get() = when (toSwiftVisibility()) {

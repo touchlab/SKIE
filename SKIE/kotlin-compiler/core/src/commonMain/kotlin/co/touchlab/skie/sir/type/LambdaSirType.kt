@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.minimumVisibility
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.ParameterSpec
@@ -36,6 +37,12 @@ data class LambdaSirType(
                         emptyList()
                     },
                 )
+            },
+            lowestVisibility = lazy {
+                (evaluatedValueParameterTypes.value.map { it.visibilityConstraint } + evaluatedReturnType.value.visibilityConstraint).minimumVisibility()
+            },
+            referencedTypeDeclarationsProvider = lazy {
+                (evaluatedValueParameterTypes.value.flatMap { it.referencedTypeDeclarations } + evaluatedReturnType.value.referencedTypeDeclarations).toSet()
             },
         )
     }

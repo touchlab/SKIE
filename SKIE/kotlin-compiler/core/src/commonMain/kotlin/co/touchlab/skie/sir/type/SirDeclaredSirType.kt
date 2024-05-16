@@ -6,6 +6,8 @@ import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.minimumVisibility
 import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.sir.element.resolveAsKirClass
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -55,6 +57,20 @@ data class SirDeclaredSirType(
                     getSwiftPoetTypeName(evaluatedTypeArguments.value)
                 } else {
                     evaluatedType.value.evaluate().swiftPoetTypeName
+                }
+            },
+            lowestVisibility = lazy {
+                if (evaluatedType.value is SirDeclaredSirType) {
+                    getVisibilityConstraint(evaluatedTypeArguments.value)
+                } else {
+                    evaluatedType.value.evaluate().visibilityConstraint
+                }
+            },
+            referencedTypeDeclarationsProvider = lazy {
+                if (evaluatedType.value is SirDeclaredSirType) {
+                    getReferencedTypeDeclarations(evaluatedTypeArguments.value)
+                } else {
+                    setOf(declaration)
                 }
             },
         )
@@ -108,6 +124,12 @@ data class SirDeclaredSirType(
             baseName.parameterizedBy(evaluatedTypeArguments.map { it.swiftPoetTypeName })
         }
     }
+
+    private fun getVisibilityConstraint(evaluatedTypeArguments: List<EvaluatedSirType>): SirVisibility =
+        (evaluatedTypeArguments.map { it.visibilityConstraint } + declaration.visibility).minimumVisibility()
+
+    private fun getReferencedTypeDeclarations(evaluatedTypeArguments: List<EvaluatedSirType>): Set<SirTypeDeclaration> =
+        evaluatedTypeArguments.flatMap { it.referencedTypeDeclarations }.toSet() + declaration
 
     private fun SirFqName.toSwiftPoetName(): DeclaredTypeName =
         parent?.toSwiftPoetName()?.nestedType(simpleName)

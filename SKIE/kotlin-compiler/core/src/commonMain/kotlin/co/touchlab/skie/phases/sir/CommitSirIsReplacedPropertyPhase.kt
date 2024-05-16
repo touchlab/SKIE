@@ -15,7 +15,7 @@ import co.touchlab.skie.sir.element.SirTypeDeclaration
  * This phase ensures that SKIE can use isReplaced internally without having to worry about the declarations already being replaced.
  * (For example, isReplaced is used by CreateSirMembersPhase to implement isRefinedInSwift and user-configurable SkieVisibility.)
  */
-object CommitSirIsReplacedPhase : SirPhase {
+object CommitSirIsReplacedPropertyPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {

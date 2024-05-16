@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirVisibility
 import io.outfoxx.swiftpoet.AnyTypeName
 import io.outfoxx.swiftpoet.ProtocolTypeName
 import io.outfoxx.swiftpoet.SelfTypeName
@@ -19,6 +20,8 @@ sealed class SpecialSirType(
             type = this,
             canonicalName = typeName.name,
             swiftPoetTypeName = typeName,
+            visibilityConstraint = SirVisibility.Public,
+            referencedTypeDeclarations = emptySet(),
         )
     }
 

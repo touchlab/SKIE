@@ -45,10 +45,12 @@ object SkieVisibility : ConfigurationKey.Enum<co.touchlab.skie.configuration.Ski
         InternalAndReplaced(SkieVisibility.InternalAndReplaced::class),
 
         /**
-         * The declaration will either be Public or Internal.
+         * The callable declaration will either be Public or Internal.
          * Which one is chosen depends on whether the declaration is automatically wrapped by SKIE or not.
          *
          * For example, a top-level function originally exposed as `FileKt.functionName` will be internal, if SKIE generated the global function wrapper for it.
+         *
+         * Note that this setting will only affect callable declarations (functions, properties, constructors) - not classes.
          */
         InternalIfWrapped(SkieVisibility.InternalIfWrapped::class),
 

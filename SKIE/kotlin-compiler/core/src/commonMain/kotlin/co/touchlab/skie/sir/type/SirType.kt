@@ -1,6 +1,7 @@
 package co.touchlab.skie.sir.type
 
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirVisibility
 
 sealed class SirType {
 
@@ -18,8 +19,11 @@ sealed class SirType {
      */
     abstract fun inlineTypeAliases(): SirType
 
+    fun normalizedEvaluatedType(): EvaluatedSirType =
+        inlineTypeAliases().evaluate()
+
     fun normalize(): SirType =
-        inlineTypeAliases().evaluate().type
+        normalizedEvaluatedType().type
 
     open fun asHashableType(): SirType? = null
 
@@ -40,3 +44,5 @@ fun SirType.toNullable(condition: Boolean = true): SirType =
         this
     }
 
+val SirType.visibilityConstraint: SirVisibility
+    get() = this.normalizedEvaluatedType().visibilityConstraint

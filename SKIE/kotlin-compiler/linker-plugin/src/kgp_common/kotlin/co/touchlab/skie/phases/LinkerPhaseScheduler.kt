@@ -64,11 +64,12 @@ import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
 import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRuntimePhase
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.phases.runtime.SwiftRuntimeGenerator
-import co.touchlab.skie.phases.sir.CommitSirIsReplacedPhase
+import co.touchlab.skie.phases.sir.CommitSirIsReplacedPropertyPhase
 import co.touchlab.skie.phases.sir.member.CreateAsyncSirFunctionsPhase
 import co.touchlab.skie.phases.sir.member.CreateSirMembersPhase
 import co.touchlab.skie.phases.sir.member.InitializeSirMembersCachePhase
 import co.touchlab.skie.phases.sir.member.InitializeSirOverridesPhase
+import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToMembersPhase
 import co.touchlab.skie.phases.sir.member.StripKonanCallableDeclarationManglingPhase
 import co.touchlab.skie.phases.sir.type.CreateExternalSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirExtensionsPhase
@@ -76,6 +77,8 @@ import co.touchlab.skie.phases.sir.type.CreateKotlinSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateStableNameTypeAliasesPhase
 import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
 import co.touchlab.skie.phases.sir.type.InitializeSirSuperTypesPhase
+import co.touchlab.skie.phases.sir.type.PropagateSirVisibilityToClassesPhase
+import co.touchlab.skie.phases.sir.type.PropagateSirVisibilityToTypeAliasesPhase
 import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.ConvertSirIrFilesToSourceFilesPhase
 import co.touchlab.skie.phases.swift.ConvertSirSourceFilesToCompilableFilesPhase
@@ -177,7 +180,10 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             InitializeSirOverridesPhase,
             InitializeSirMembersCachePhase,
             StripKonanCallableDeclarationManglingPhase,
-            CommitSirIsReplacedPhase,
+            CommitSirIsReplacedPropertyPhase,
+            PropagateSirVisibilityToClassesPhase,
+            PropagateSirVisibilityToTypeAliasesPhase,
+            PropagateSirVisibilityToMembersPhase,
 
             FixNamesOfInaccessibleNestedClassesPhase,
 

@@ -144,6 +144,10 @@ val SirClass.superClassType: SirDeclaredSirType?
     get() = superTypes.map { it.resolveAsSirClassType() }
         .firstOrNull { (it?.declaration as? SirClass)?.kind == SirClass.Kind.Class }
 
+val SirClass.superProtocolTypes: List<SirDeclaredSirType>
+    get() = superTypes.mapNotNull { it.resolveAsSirClassType() }
+        .filter { (it.declaration as? SirClass)?.kind == SirClass.Kind.Protocol }
+
 val SirClass.superClass: SirClass?
     get() = superClassType?.declaration as? SirClass
 
