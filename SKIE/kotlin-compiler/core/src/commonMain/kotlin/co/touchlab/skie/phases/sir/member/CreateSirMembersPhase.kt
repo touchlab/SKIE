@@ -172,7 +172,7 @@ class CreateSirMembersPhase(
         get() = this.isRefinedInSwift
 
     private val KirCallableDeclaration<*>.isHidden: Boolean
-        get() = this.visibility == SirVisibility.Public && this.isRefinedInSwift
+        get() = this.visibility == SirVisibility.Public && (this.isRefinedInSwift || this.configuration[SkieVisibility] == SkieVisibility.Level.PublicButHidden)
 
     private val KirFunction<*>.swiftFunctionName: SwiftFunctionName
         get() {

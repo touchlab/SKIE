@@ -39,6 +39,7 @@ class CreateKotlinSirTypesPhase : SirPhase {
             kind = kirClass.oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Kir(kirClass),
             visibility = kirClass.configuration[SkieVisibility].toSirVisibility(),
+            isHidden = kirClass.configuration[SkieVisibility] == SkieVisibility.Level.PublicButHidden,
         )
 
         createTypeParameters(kirClass.oirClass, sirClass)
