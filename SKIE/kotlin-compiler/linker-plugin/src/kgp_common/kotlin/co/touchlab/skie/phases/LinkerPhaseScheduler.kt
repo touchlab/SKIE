@@ -78,6 +78,7 @@ import co.touchlab.skie.phases.sir.type.CreateStableNameTypeAliasesPhase
 import co.touchlab.skie.phases.sir.type.FixNamesOfInaccessibleNestedClassesPhase
 import co.touchlab.skie.phases.sir.type.InitializeSirSuperTypesPhase
 import co.touchlab.skie.phases.sir.type.PropagateSirVisibilityToClassesPhase
+import co.touchlab.skie.phases.sir.type.PropagateSirVisibilityToFileClassesPhase
 import co.touchlab.skie.phases.sir.type.PropagateSirVisibilityToTypeAliasesPhase
 import co.touchlab.skie.phases.swift.CompileSwiftPhase
 import co.touchlab.skie.phases.swift.ConvertSirIrFilesToSourceFilesPhase
@@ -233,6 +234,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             FixOirFunctionSignaturesForApiNotesPhase(context),
             CreateFakeObjCConstructorsPhase,
             AddFoundationImportsPhase,
+            PropagateSirVisibilityToFileClassesPhase,
 
             // Compilation
 

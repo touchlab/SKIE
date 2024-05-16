@@ -18,8 +18,19 @@ fun SirVisibility.coerceAtMost(limit: SirVisibility): SirVisibility =
         SirVisibility.Removed -> SirVisibility.Removed
     }
 
+fun SirVisibility.coerceAtLeast(limit: SirVisibility): SirVisibility =
+    when (limit) {
+        SirVisibility.Removed -> this
+        SirVisibility.Private -> if (this == SirVisibility.Removed) SirVisibility.Private else this
+        SirVisibility.Internal -> if (this == SirVisibility.Public) SirVisibility.Public else SirVisibility.Internal
+        SirVisibility.Public -> SirVisibility.Public
+    }
+
 fun List<SirVisibility>.minimumVisibility(): SirVisibility =
     this.fold(SirVisibility.Public) { acc, visibility -> acc.coerceAtMost(visibility) }
+
+fun List<SirVisibility>.maximumVisibility(): SirVisibility =
+    this.fold(SirVisibility.Removed) { acc, visibility -> acc.coerceAtLeast(visibility) }
 
 val SirVisibility.isAccessibleFromOtherModules: Boolean
     get() = this == SirVisibility.Public
