@@ -10,6 +10,9 @@ class ClassConfiguration(
         CommonSkieConfiguration.getDefaultFlowMappingStrategy(this)
     }
 
+    fun <KEY, VALUE> has(configurationKey: KEY): Boolean where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Class =
+        hasUnsafe(configurationKey)
+
     operator fun <KEY, VALUE> get(configurationKey: KEY): VALUE where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Class =
         getUnsafe(configurationKey)
 

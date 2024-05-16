@@ -40,6 +40,9 @@ abstract class SkieConfiguration(
         delegate.reset()
     }
 
+    fun <T> hasUnsafe(configurationKey: ConfigurationKey<T>): Boolean =
+        configurationKey in keyValueConfigurationStorage
+
     @Suppress("UNCHECKED_CAST")
     fun <T> getUnsafe(configurationKey: ConfigurationKey<T>): T {
         if (configurationKey in keyValueConfigurationStorage) {
