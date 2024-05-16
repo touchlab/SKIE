@@ -44,7 +44,7 @@ object ProcessReportedMessagesPhase : LinkPhase {
         }
 
         val message = if (declaration != null && location == null) {
-            "${report.message}\n    (at ${DescriptorRenderer.COMPACT.render(declaration)} from module ${declaration.module.name})"
+            "${report.message}\n    (at ${DescriptorRenderer.DEBUG_TEXT.render(declaration)} from module ${declaration.module.name})"
         } else {
             report.message
         }
