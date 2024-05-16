@@ -8,6 +8,7 @@ import io.outfoxx.swiftpoet.Modifier
 class SirConstructor(
     parent: SirDeclarationNamespace,
     override var visibility: SirVisibility = SirVisibility.Public,
+    override var isHidden: Boolean = false,
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
     var isConvenience: Boolean = false,
@@ -39,6 +40,7 @@ class SirConstructor(
         context(SirDeclarationNamespace)
         operator fun invoke(
             visibility: SirVisibility = SirVisibility.Public,
+            isHidden: Boolean = false,
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
             isConvenience: Boolean = false,
@@ -48,6 +50,7 @@ class SirConstructor(
             SirConstructor(
                 parent = this@SirDeclarationNamespace,
                 visibility = visibility,
+                isHidden = isHidden,
                 attributes = attributes,
                 modifiers = modifiers,
                 isConvenience = isConvenience,
@@ -60,6 +63,7 @@ class SirConstructor(
 fun SirConstructor.shallowCopy(
     parent: SirDeclarationNamespace = this.parent,
     visibility: SirVisibility = this.visibility,
+    isHidden: Boolean = this.isHidden,
     attributes: List<String> = this.attributes,
     modifiers: List<Modifier> = this.modifiers,
     isConvenience: Boolean = this.isConvenience,
@@ -69,6 +73,7 @@ fun SirConstructor.shallowCopy(
     SirConstructor(
         parent = parent,
         visibility = visibility,
+        isHidden = isHidden,
         attributes = attributes,
         modifiers = modifiers,
         isConvenience = isConvenience,

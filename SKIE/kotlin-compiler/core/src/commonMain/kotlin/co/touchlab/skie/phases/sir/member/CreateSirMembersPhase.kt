@@ -59,6 +59,7 @@ class CreateSirMembersPhase(
             throws = constructor.errorHandlingStrategy.isThrowing,
             deprecationLevel = constructor.deprecationLevel,
             visibility = constructor.visibility,
+            isHidden = constructor.isHidden,
         ).apply {
             createValueParameters(constructor, constructor.swiftFunctionName)
         }
@@ -80,6 +81,7 @@ class CreateSirMembersPhase(
             deprecationLevel = function.deprecationLevel,
             visibility = function.visibility,
             isReplaced = function.isReplaced,
+            isHidden = function.isHidden,
         ).apply {
             createValueParameters(function, swiftFunctionName)
         }
@@ -98,6 +100,7 @@ class CreateSirMembersPhase(
             deprecationLevel = property.deprecationLevel,
             visibility = property.visibility,
             isReplaced = property.isReplaced,
+            isHidden = property.isHidden,
             isFakeOverride = property.isFakeOverride,
         ).apply {
             SirGetter(
@@ -163,18 +166,13 @@ class CreateSirMembersPhase(
         }
 
     private val KirCallableDeclaration<*>.visibility: SirVisibility
-        get() {
-            val configuredVisibility = this.configuration[SkieVisibility].toSirVisibility()
-
-            return if (configuredVisibility == SirVisibility.Public && this.isRefinedInSwift) {
-                SirVisibility.PublicButHidden
-            } else {
-                configuredVisibility
-            }
-        }
+        get() = this.configuration[SkieVisibility].toSirVisibility()
 
     private val KirCallableDeclaration<*>.isReplaced: Boolean
         get() = this.isRefinedInSwift
+
+    private val KirCallableDeclaration<*>.isHidden: Boolean
+        get() = this.visibility == SirVisibility.Public && this.isRefinedInSwift
 
     private val KirFunction<*>.swiftFunctionName: SwiftFunctionName
         get() {

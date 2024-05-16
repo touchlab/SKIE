@@ -3,9 +3,6 @@ package co.touchlab.skie.sir.element
 enum class SirVisibility {
 
     Public,
-
-    /** Applicable only to Obj-C code, Swift code will use Public instead. */
-    PublicButHidden,
     Internal,
     Private,
 
@@ -13,28 +10,25 @@ enum class SirVisibility {
     Removed,
 }
 
-fun SirVisibility.coerceAtMostInSwift(limit: SirVisibility): SirVisibility =
+fun SirVisibility.coerceAtMost(limit: SirVisibility): SirVisibility =
     when (limit) {
-        SirVisibility.Public, SirVisibility.PublicButHidden -> this
-        SirVisibility.Internal -> if (this.toSwiftVisibility() == SirVisibility.Public) SirVisibility.Internal else this
+        SirVisibility.Public -> this
+        SirVisibility.Internal -> if (this == SirVisibility.Public) SirVisibility.Internal else this
         SirVisibility.Private -> if (this == SirVisibility.Removed) SirVisibility.Removed else SirVisibility.Private
         SirVisibility.Removed -> SirVisibility.Removed
     }
 
 fun List<SirVisibility>.minimumVisibility(): SirVisibility =
-    this.fold(SirVisibility.Public) { acc, visibility -> acc.coerceAtMostInSwift(visibility) }
+    this.fold(SirVisibility.Public) { acc, visibility -> acc.coerceAtMost(visibility) }
 
 val SirVisibility.isAccessibleFromOtherModules: Boolean
-    get() = when (toSwiftVisibility()) {
-        SirVisibility.Public -> true
-        else -> false
-    }
+    get() = this == SirVisibility.Public
 
 val SirDeclarationWithVisibility.isExported: Boolean
     get() = visibility.isAccessibleFromOtherModules
 
 val SirVisibility.isAccessible: Boolean
-    get() = when (toSwiftVisibility()) {
+    get() = when (this) {
         SirVisibility.Private, SirVisibility.Removed -> false
         else -> true
     }
@@ -43,19 +37,7 @@ val SirDeclarationWithVisibility.isAccessible: Boolean
     get() = visibility.isAccessible
 
 val SirVisibility.isRemoved: Boolean
-    get() = when (this) {
-        SirVisibility.Removed -> true
-        else -> false
-    }
+    get() = this == SirVisibility.Removed
 
 val SirDeclarationWithVisibility.isRemoved: Boolean
     get() = visibility.isRemoved || parent == SirDeclarationParent.None
-
-fun SirVisibility.toSwiftVisibility(): SirVisibility = when (this) {
-    SirVisibility.Public,
-    SirVisibility.PublicButHidden,
-    -> SirVisibility.Public
-    SirVisibility.Internal -> SirVisibility.Internal
-    SirVisibility.Private -> SirVisibility.Private
-    SirVisibility.Removed -> SirVisibility.Removed
-}

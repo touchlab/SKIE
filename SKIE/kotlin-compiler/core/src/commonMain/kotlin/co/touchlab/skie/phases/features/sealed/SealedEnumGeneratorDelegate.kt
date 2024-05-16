@@ -1,15 +1,6 @@
 package co.touchlab.skie.phases.features.sealed
 
 import co.touchlab.skie.kir.element.KirClass
-import co.touchlab.skie.kir.type.BlockPointerKirType
-import co.touchlab.skie.kir.type.DeclaredKirType
-import co.touchlab.skie.kir.type.KirType
-import co.touchlab.skie.kir.type.NullableReferenceKirType
-import co.touchlab.skie.kir.type.OirBasedKirType
-import co.touchlab.skie.kir.type.PointerKirType
-import co.touchlab.skie.kir.type.SpecialOirKirType
-import co.touchlab.skie.kir.type.TypeParameterUsageKirType
-import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 import co.touchlab.skie.oir.element.OirClass
 import co.touchlab.skie.oir.type.BlockPointerOirType
 import co.touchlab.skie.oir.type.DeclaredOirType
@@ -27,7 +18,6 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
 import co.touchlab.skie.sir.element.SirModule
-import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 
 @MustBeExecutedAfterBridgingConfiguration
@@ -41,8 +31,8 @@ class SealedEnumGeneratorDelegate(
             baseName = "Sealed",
             kind = SirClass.Kind.Enum,
             parent = namespaceProvider.getNamespaceExtension(kirClass),
-            visibility = SirVisibility.PublicButHidden,
             isReplaced = true,
+            isHidden = true,
         ).apply {
             addConformanceToHashableIfPossible(kirClass)
 

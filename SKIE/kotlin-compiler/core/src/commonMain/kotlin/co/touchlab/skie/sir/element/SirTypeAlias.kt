@@ -11,6 +11,7 @@ class SirTypeAlias(
     parent: SirDeclarationParent,
     override var visibility: SirVisibility = SirVisibility.Public,
     override var isReplaced: Boolean = false,
+    override var isHidden: Boolean = false,
     typeFactory: ((SirTypeAlias) -> SirType),
 ) : SirTypeDeclaration, SirTypeParameterParent {
 
@@ -64,6 +65,7 @@ class SirTypeAlias(
             baseName: String,
             visibility: SirVisibility = SirVisibility.Public,
             isReplaced: Boolean = false,
+            isHidden: Boolean = false,
             typeFactory: ((SirTypeAlias) -> SirType),
         ): SirTypeAlias =
             SirTypeAlias(
@@ -71,6 +73,7 @@ class SirTypeAlias(
                 parent = this@SirDeclarationParent,
                 visibility = visibility,
                 isReplaced = isReplaced,
+                isHidden = isHidden,
                 typeFactory = typeFactory,
             )
     }

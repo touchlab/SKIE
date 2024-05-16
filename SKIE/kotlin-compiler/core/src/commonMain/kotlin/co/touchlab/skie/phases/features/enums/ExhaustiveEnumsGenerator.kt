@@ -17,7 +17,6 @@ import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirScope
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeAlias
-import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isExported
 import co.touchlab.skie.sir.element.oirClassOrNull
 import co.touchlab.skie.sir.getExtension
@@ -59,7 +58,7 @@ object ExhaustiveEnumsGenerator : SirPhase {
 private fun KirClass.configureBridging(skieClass: SirClass) {
     bridgedSirClass = skieClass
 
-    originalSirClass.visibility = SirVisibility.PublicButHidden
+    originalSirClass.isHidden = true
     originalSirClass.isReplaced = true
 }
 
@@ -202,8 +201,8 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
     val typeAlias = SirTypeAlias(
         baseName = "Enum",
         parent = namespaceProvider.getNamespaceExtension(kirClass),
-        visibility = SirVisibility.PublicButHidden,
         isReplaced = true,
+        isHidden = true,
     ) {
         bridgedEnum.defaultType.withFqName()
     }

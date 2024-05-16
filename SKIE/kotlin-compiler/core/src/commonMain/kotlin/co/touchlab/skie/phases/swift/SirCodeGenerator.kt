@@ -123,9 +123,7 @@ object SirCodeGenerator {
 
     private fun SirVisibility.toSwiftPoetVisibility(): Modifier =
         when (this) {
-            SirVisibility.Public,
-            SirVisibility.PublicButHidden,
-            -> Modifier.PUBLIC
+            SirVisibility.Public -> Modifier.PUBLIC
             SirVisibility.Internal -> Modifier.INTERNAL
             SirVisibility.Private -> Modifier.PRIVATE
             SirVisibility.Removed -> error("Removed declarations should not be generated and must be filtered out sooner.")

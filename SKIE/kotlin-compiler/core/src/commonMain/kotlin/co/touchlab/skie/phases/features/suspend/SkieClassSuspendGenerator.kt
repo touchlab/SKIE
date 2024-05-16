@@ -7,7 +7,6 @@ import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirValueParameter
-import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 
@@ -30,8 +29,8 @@ class SkieClassSuspendGenerator {
         SirClass(
             baseName = "Suspend",
             parent = namespaceProvider.getNamespaceExtension(suspendFunctionOwner),
-            visibility = SirVisibility.PublicButHidden,
             isReplaced = true,
+            isHidden = true,
             kind = SirClass.Kind.Struct,
         ).apply {
             copyTypeParametersFrom(suspendFunctionOwner.originalSirClass)

@@ -8,6 +8,7 @@ import co.touchlab.skie.oir.element.OirScope
 import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirValueParameter
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirDeclarationWithVisibility
 import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 
@@ -29,7 +30,7 @@ class ApiNotesFactory(
             objCFqName = this.name,
             bridgeFqName = this.bridgedSirClass?.fqName?.toLocalString(),
             swiftFqName = this.originalSirClass.publicName.toLocalString(),
-            isHidden = this.originalSirClass.visibility.isHiddenInApiNotes,
+            isHidden = this.originalSirClass.isHiddenInApiNotes,
             availability = this.originalSirClass.visibility.availability,
             methods = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirFunction>().filterNot { it.isFakeOverride }.map { it.toApiNote() },
             properties = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirProperty>().filterNot { it.isFakeOverride }.map { it.toApiNote() },
@@ -41,7 +42,7 @@ class ApiNotesFactory(
             objCSelector = this.selector,
             kind = this.scope.toMemberKind(),
             swiftName = this.originalSirCallableDeclaration.name,
-            isHidden = this.originalSirCallableDeclaration.visibility.isHiddenInApiNotes,
+            isHidden = this.originalSirCallableDeclaration.isHiddenInApiNotes,
             availability = this.originalSirCallableDeclaration.visibility.availability,
             resultType = this.returnType?.render() ?: "",
             // ErrorOut parameters are required for the header, but not strictly required in api notes
@@ -64,14 +65,14 @@ class ApiNotesFactory(
             objCName = this.name,
             kind = this.scope.toMemberKind(),
             swiftName = this.originalSirProperty.name,
-            isHidden = this.originalSirProperty.visibility.isHiddenInApiNotes,
+            isHidden = this.originalSirProperty.isHiddenInApiNotes,
             availability = this.originalSirProperty.visibility.availability,
             type = this.type.render(),
         )
 
-    private val SirVisibility.isHiddenInApiNotes: Boolean
-        get() = when (this) {
-            SirVisibility.PublicButHidden -> true
+    private val SirDeclarationWithVisibility.isHiddenInApiNotes: Boolean
+        get() = when (this.visibility) {
+            SirVisibility.Public -> this.isHidden
             SirVisibility.Internal -> exposeInternalMembers
             else -> false
         }
