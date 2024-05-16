@@ -25,12 +25,16 @@ abstract class ReformatPackagesInFunctionalTests : DefaultTask() {
 
         val indexOfLineWithPackageDeclaration = lines.indexOfFirst { it.trimStart().startsWith("package ") }
 
-        val modifiedLines = lines.mapIndexed { index, line ->
-            if (index == indexOfLineWithPackageDeclaration) {
-                file.correctPackageDeclaration()
-            } else {
-                line
+        val modifiedLines = if (indexOfLineWithPackageDeclaration != -1) {
+            lines.mapIndexed { index, line ->
+                if (index == indexOfLineWithPackageDeclaration) {
+                    file.correctPackageDeclaration()
+                } else {
+                    line
+                }
             }
+        } else {
+            listOf(file.correctPackageDeclaration(), "") + lines
         }
 
         val modifiedText = modifiedLines.joinToString(System.lineSeparator(), postfix = System.lineSeparator())
