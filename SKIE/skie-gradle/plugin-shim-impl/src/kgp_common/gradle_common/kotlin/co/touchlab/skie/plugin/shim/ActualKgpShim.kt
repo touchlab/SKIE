@@ -70,6 +70,7 @@ class ActualKgpShim(
     // This is to ensure the Link task configuration will be the same when executed separately or as part of the XCFramework task.
     private fun getFrameworksUsedInXCFrameworks(): Set<Framework> =
         project.tasks.withType<XCFrameworkTask>()
+            // Prevents concurrent modification exception.
             .toList()
             .flatMap { xcFrameworkTask ->
                 xcFrameworkTask.taskDependencies.getDependencies(xcFrameworkTask).filterIsInstance<KotlinNativeLink>().map { it.binary }

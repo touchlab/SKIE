@@ -110,6 +110,7 @@ class KirProvider(
     fun findClassByFqName(fqName: String): KirClass? =
         fqNameCache[fqName]
 
+    // TODO Refactor to Origin
     @Suppress("UNCHECKED_CAST")
     fun <S : SirCallableDeclaration> findCallableDeclaration(callableDeclaration: SirCallableDeclaration): KirCallableDeclaration<S>? =
         sirToCallableDeclarationsCache[callableDeclaration] as KirCallableDeclaration<S>?

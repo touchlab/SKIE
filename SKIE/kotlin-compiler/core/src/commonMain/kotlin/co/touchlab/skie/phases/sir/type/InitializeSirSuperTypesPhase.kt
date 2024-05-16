@@ -8,6 +8,13 @@ object InitializeSirSuperTypesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
+        initializeSuperTypes()
+
+        // First invocation does not correctly initialize type arguments due to unsatisfied type parameters bounds (because other types do not have the super types yet).
+        initializeSuperTypes()
+    }
+
+    private fun SirPhase.Context.initializeSuperTypes() {
         oirProvider.allClassesAndProtocols.forEach {
             initializeSuperTypes(it)
         }
@@ -22,6 +29,7 @@ object InitializeSirSuperTypesPhase : SirPhase {
             .takeIf { it.isNotEmpty() }
             ?: oirClass.defaultSuperTypes
 
+        oirClass.originalSirClass.superTypes.clear()
         oirClass.originalSirClass.superTypes.addAll(sirSuperTypes)
     }
 
