@@ -6,12 +6,14 @@ import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirDeclaredSirType
+import io.outfoxx.swiftpoet.FunctionSpec
 
 class SirClass(
     override var baseName: String,
     parent: SirDeclarationParent,
     // Class requires explicit declaration of inheritance from AnyObject
     var kind: Kind,
+    override var modality: SirModality = coerceModalityForClass(kind),
     override var visibility: SirVisibility = SirVisibility.Public,
     override var isReplaced: Boolean = false,
     override var isHidden: Boolean = false,
@@ -22,7 +24,7 @@ class SirClass(
     var isInherentlyHashable: Boolean = false,
     var isAlwaysAReference: Boolean = false,
     val origin: Origin = Origin.Generated,
-) : SirTypeDeclaration, SirDeclarationNamespace, SirTypeParameterParent, SirElementWithAttributes {
+) : SirTypeDeclaration, SirDeclarationNamespace, SirTypeParameterParent, SirElementWithAttributes, SirElementWithModality {
 
     // TODO If modality is added update [SirHierarchyCache.canTheoreticallyInheritFrom]
 
@@ -50,6 +52,8 @@ class SirClass(
     override val declarations: MutableList<SirDeclaration> = mutableListOf()
 
     val enumCases: MutableList<SirEnumCase> = mutableListOf()
+
+    val deinitBuilder = mutableListOf<FunctionSpec.Builder.() -> Unit>()
 
     /**
      * Actual fully qualified name (including module) of the declaration. Used by SKIE to generate code if possible.
@@ -111,6 +115,7 @@ class SirClass(
             baseName: String,
             kind: Kind = Kind.Class,
             visibility: SirVisibility = SirVisibility.Public,
+            modality: SirModality = coerceModalityForClass(kind),
             isReplaced: Boolean = false,
             isHidden: Boolean = false,
             superTypes: List<SirDeclaredSirType> = emptyList(),
@@ -124,6 +129,7 @@ class SirClass(
                 baseName = baseName,
                 parent = this@SirDeclarationParent,
                 kind = kind,
+                modality = modality,
                 visibility = visibility,
                 isReplaced = isReplaced,
                 isHidden = isHidden,
@@ -178,3 +184,11 @@ val SirClass.oirClassOrNull: OirClass?
 
 val SirClass.kirClassOrNull: KirClass?
     get() = oirClassOrNull?.kirClassOrNull
+
+fun coerceModalityForClass(kind: SirClass.Kind): SirModality {
+    return when (kind) {
+        SirClass.Kind.Class -> SirModality.ModuleLimited
+        SirClass.Kind.Enum, SirClass.Kind.Struct -> SirModality.Final
+        SirClass.Kind.Protocol -> SirModality.Open
+    }
+}

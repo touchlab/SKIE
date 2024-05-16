@@ -12,6 +12,7 @@ class SirProperty(
     parent: SirDeclarationParent,
     var type: SirType,
     override var visibility: SirVisibility = SirVisibility.Public,
+    override var modality: SirModality = parent.coerceModalityForSimpleFunctionOrProperty(),
     override var isReplaced: Boolean = false,
     override var isHidden: Boolean = false,
     override var scope: SirScope = parent.coerceScope(SirScope.Member),
@@ -19,7 +20,7 @@ class SirProperty(
     override val isFakeOverride: Boolean = false,
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
-) : SirOverridableDeclaration<SirProperty>, SirCallableDeclaration {
+) : SirOverridableDeclaration<SirProperty>, SirCallableDeclaration, SirElementWithModality {
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
 
@@ -84,6 +85,7 @@ class SirProperty(
             identifier: String,
             type: SirType,
             visibility: SirVisibility = SirVisibility.Public,
+            modality: SirModality = coerceModalityForSimpleFunctionOrProperty(),
             isReplaced: Boolean = false,
             isHidden: Boolean = false,
             scope: SirScope = coerceScope(SirScope.Member),
@@ -97,6 +99,7 @@ class SirProperty(
                 parent = this@SirDeclarationParent,
                 type = type,
                 visibility = visibility,
+                modality = modality,
                 isReplaced = isReplaced,
                 isHidden = isHidden,
                 scope = scope,
@@ -113,6 +116,7 @@ fun SirProperty.shallowCopy(
     parent: SirDeclarationParent = this.parent,
     type: SirType = this.type,
     visibility: SirVisibility = this.visibility,
+    modality: SirModality = parent.coerceModalityForSimpleFunctionOrProperty(this.modality),
     isReplaced: Boolean = this.isReplaced,
     isHidden: Boolean = this.isHidden,
     scope: SirScope = parent.coerceScope(this.scope),
@@ -126,6 +130,7 @@ fun SirProperty.shallowCopy(
         parent = parent,
         type = type,
         visibility = visibility,
+        modality = modality,
         isReplaced = isReplaced,
         isHidden = isHidden,
         scope = scope,
@@ -134,3 +139,6 @@ fun SirProperty.shallowCopy(
         attributes = attributes,
         modifiers = modifiers,
     )
+
+val SirProperty.isOverriddenFromReadOnlyProperty: Boolean
+    get() = overriddenDeclarations.any { it.setter == null || it.isOverriddenFromReadOnlyProperty }

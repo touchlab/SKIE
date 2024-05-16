@@ -16,6 +16,9 @@ object SwiftRuntimeGenerator : SirPhase {
 
             namespaceProvider.getSkieNamespaceWrittenSourceFile(it.swiftFileName).content = "// $GeneratedBySkieComment\n\n$baseFileContent"
         }
+
+        val skieSwiftFlowIterator = SkieSwiftFlowIteratorGenerator.generate()
+        SupportedFlowRuntimeGenerator.generate(skieSwiftFlowIterator)
     }
 
     private fun getSwiftRuntimeFiles(): List<Resource> =

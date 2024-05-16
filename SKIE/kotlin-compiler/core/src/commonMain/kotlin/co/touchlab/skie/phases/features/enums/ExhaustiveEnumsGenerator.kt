@@ -94,7 +94,7 @@ private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
         attributes.add("frozen")
 
         ExhaustiveEnumsMembersPassthroughGenerator.generatePassthroughForMembers(enumKirClass, this)
-        addObjcBridgeableImplementation(enumKirClass)
+        ExhaustiveEnumsObjectiveCBridgeableGenerator.addObjcBridgeableImplementation(enumKirClass, this)
 
         doInPhase(ExhaustiveEnumsGenerator.NestedTypeDeclarationsPhase) {
             addNestedClassTypeAliases(enumKirClass)

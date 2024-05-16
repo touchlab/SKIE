@@ -12,6 +12,7 @@ class SirSimpleFunction(
     parent: SirDeclarationParent,
     var returnType: SirType,
     override var visibility: SirVisibility = SirVisibility.Public,
+    override var modality: SirModality = parent.coerceModalityForSimpleFunctionOrProperty(),
     override var isReplaced: Boolean = false,
     override var isHidden: Boolean = false,
     override var scope: SirScope = parent.coerceScope(SirScope.Member),
@@ -21,7 +22,7 @@ class SirSimpleFunction(
     var isAsync: Boolean = false,
     override var throws: Boolean = false,
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
-) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction> {
+) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction>, SirElementWithModality {
 
     override val identifierAfterVisibilityChange: String
         get() = if (isReplaced) "__$identifier" else identifier
@@ -69,6 +70,7 @@ class SirSimpleFunction(
             identifier: String,
             returnType: SirType,
             visibility: SirVisibility = SirVisibility.Public,
+            modality: SirModality = coerceModalityForSimpleFunctionOrProperty(),
             isReplaced: Boolean = false,
             isHidden: Boolean = false,
             scope: SirScope = coerceScope(SirScope.Member),
@@ -102,6 +104,7 @@ fun SirSimpleFunction.shallowCopy(
     parent: SirDeclarationParent = this.parent,
     returnType: SirType = this.returnType,
     visibility: SirVisibility = this.visibility,
+    modality: SirModality = parent.coerceModalityForSimpleFunctionOrProperty(this.modality),
     isReplaced: Boolean = this.isReplaced,
     isHidden: Boolean = this.isHidden,
     scope: SirScope = parent.coerceScope(this.scope),
@@ -117,6 +120,7 @@ fun SirSimpleFunction.shallowCopy(
         parent = parent,
         returnType = returnType,
         visibility = visibility,
+        modality = modality,
         isReplaced = isReplaced,
         isHidden = isHidden,
         scope = scope,
@@ -127,3 +131,13 @@ fun SirSimpleFunction.shallowCopy(
         throws = throws,
         deprecationLevel = deprecationLevel,
     )
+
+fun SirDeclarationParent.coerceModalityForSimpleFunctionOrProperty(modality: SirModality = SirModality.ModuleLimited): SirModality {
+    return when (this) {
+        is SirClass -> when (this.modality) {
+            SirModality.Final -> SirModality.Final
+            SirModality.ModuleLimited, SirModality.Open -> modality
+        }
+        is SirExtension, SirDeclarationParent.None, is SirBuiltInFile, is SirIrFile -> SirModality.Final
+    }
+}

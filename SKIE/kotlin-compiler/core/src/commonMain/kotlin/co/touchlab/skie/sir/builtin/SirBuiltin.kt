@@ -26,6 +26,8 @@ class SirBuiltins(
 
     val Skie = Modules.Skie(globalConfiguration, sirProvider.skieModule)
 
+    val _Concurrency = Modules._Concurrency(sirProvider, Swift)
+
     object Modules {
 
         class Swift(sirProvider: SirProvider) : ModuleBase() {
@@ -104,6 +106,26 @@ class SirBuiltins(
             val unichar by TypeAlias { swift.UInt16.defaultType }
         }
 
+        class _Concurrency(sirProvider: SirProvider, swift: Swift) : ModuleBase() {
+            override val declarationParent = sirProvider.getExternalModule("_Concurrency").builtInFile
+
+            override val origin = SirClass.Origin.ExternalSwiftFramework
+
+            val AsyncIteratorProtocol by Protocol {
+                SirTypeParameter("Element")
+            }
+
+            val AsyncSequence by Protocol {
+                SirTypeParameter("AsyncIterator", AsyncIteratorProtocol)
+                // TODO: Element is `==` bound to `AsyncIterator.Element`, how to represent it?
+                SirTypeParameter("Element")
+            }
+
+            val CancellationError by Struct(
+                superTypes = listOf(swift.Error.defaultType)
+            )
+        }
+
         class Skie(
             private val globalConfiguration: GlobalConfiguration,
             val module: SirModule.Skie,
@@ -112,48 +134,6 @@ class SirBuiltins(
             override val declarationParent: SirDeclarationParent = module.builtInFile
 
             override val origin: SirClass.Origin = SirClass.Origin.Generated
-
-            // The SkieSwiftFlow classes are only stubs (correct super types, and content are currently not needed)
-
-            val SkieSwiftFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftSharedFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftMutableSharedFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftStateFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftMutableStateFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftOptionalFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftOptionalSharedFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftOptionalMutableSharedFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftOptionalStateFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
-
-            val SkieSwiftOptionalMutableStateFlow by RuntimeClass {
-                SirTypeParameter("T")
-            }
 
             private fun RuntimeClass(
                 superTypes: List<SirDeclaredSirType> = emptyList(),
