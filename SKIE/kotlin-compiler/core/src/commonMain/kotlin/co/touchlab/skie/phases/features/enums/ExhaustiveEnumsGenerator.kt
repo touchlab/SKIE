@@ -124,6 +124,8 @@ private fun SirClass.addNestedClassTypeAlias(nestedClass: SirClass) {
     SirTypeAlias(
         baseName = nestedClass.baseName,
         visibility = nestedClass.visibility,
+        isHidden = nestedClass.isHidden,
+        isReplaced = nestedClass.isReplaced,
     ) {
         nestedClass.defaultType
     }
