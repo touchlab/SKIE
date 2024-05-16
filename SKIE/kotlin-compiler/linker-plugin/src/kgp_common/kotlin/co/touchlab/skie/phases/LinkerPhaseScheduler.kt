@@ -58,6 +58,7 @@ import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
 import co.touchlab.skie.phases.other.LinkObjectFilesPhase
 import co.touchlab.skie.phases.other.LoadCustomSwiftSourceFilesPhase
 import co.touchlab.skie.phases.other.ProcessReportedMessagesPhase
+import co.touchlab.skie.phases.other.ValidateSkieVisibilityAnnotationsPhase
 import co.touchlab.skie.phases.other.VerifyMinOSVersionPhase
 import co.touchlab.skie.phases.other.VerifyModuleNamePhase
 import co.touchlab.skie.phases.other.VerifyNoBitcodeEmbeddingPhase
@@ -103,6 +104,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             FixLibrariesShortNamePhase,
             ClassExportAnalyticsPhase,
             ExtraClassExportPhase(context),
+            ValidateSkieVisibilityAnnotationsPhase,
         )
     }
 
