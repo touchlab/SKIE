@@ -184,14 +184,13 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             InitializeSirOverridesPhase,
             InitializeSirMembersCachePhase,
             StripKonanCallableDeclarationManglingPhase,
+            FixNamesOfInaccessibleNestedClassesPhase,
             CommitSirIsReplacedPropertyPhase,
 
             PropagateSirVisibilityToClassesPhase,
             PropagateSirVisibilityToTypeAliasesPhase,
             PropagateSirVisibilityToNonAbstractMembersPhase,
             PropagateSirVisibilityToAbstractMembersPhase,
-
-            FixNamesOfInaccessibleNestedClassesPhase,
 
             RenameTypesConflictingWithKeywordsPhase,
             RenameTypesConflictingWithKotlinModulePhase,

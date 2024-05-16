@@ -16,11 +16,11 @@ object FixNamesOfInaccessibleNestedClassesPhase : SirPhase {
     private fun fixNameOfInaccessibleNestedClass(kirClass: KirClass) {
         val swiftName = kirClass.swiftName
 
-        val hasIncorrectName = swiftName.contains(".") && swiftName != kirClass.originalSirClass.fqName.toLocalString()
+        val hasIncorrectName = swiftName.contains(".") && kirClass.originalSirClass.namespace == null
 
         if (hasIncorrectName) {
             val containingClassName = swiftName.substringBefore(".")
-            val simpleName = swiftName.substringAfter(".")
+            val simpleName = kirClass.originalSirClass.baseName
 
             kirClass.originalSirClass.baseName = containingClassName + simpleName.replaceFirstChar(Char::uppercaseChar)
         }
