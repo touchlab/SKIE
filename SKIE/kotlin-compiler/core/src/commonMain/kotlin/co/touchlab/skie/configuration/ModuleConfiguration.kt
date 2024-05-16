@@ -1,7 +1,7 @@
 package co.touchlab.skie.configuration
 
 class ModuleConfiguration(
-    parent: RootConfiguration,
+    parent: GlobalConfiguration,
 ) : SkieConfiguration(parent) {
 
     operator fun <KEY, VALUE> get(configurationKey: KEY): VALUE where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Module =

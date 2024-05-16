@@ -11,8 +11,8 @@ abstract class SkieConfiguration(
     private var parent: SkieConfiguration?,
 ) {
 
-    open val rootConfiguration: RootConfiguration
-        get() = parent?.rootConfiguration ?: error("SkieConfiguration without parent must override rootConfiguration.")
+    open val globalConfiguration: GlobalConfiguration
+        get() = parent?.globalConfiguration ?: error("SkieConfiguration without parent must override globalConfiguration.")
 
     private val delegatesByName: MutableMap<String, Property<*>> = mutableMapOf()
     private val delegatesByProperty: MutableMap<KProperty<*>, Property<*>> = mutableMapOf()

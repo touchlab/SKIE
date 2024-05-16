@@ -33,7 +33,7 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
         get() = this.valueParameters.any { it.declaresOrInheritsDefaultValue() }
 
     private val isInteropEnabledForExternalModules: Boolean =
-        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in context.rootConfiguration.enabledFlags
+        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in context.globalConfiguration.enabledFlags
 
     context(FrontendIrPhase.Context)
     protected val FunctionDescriptor.isInteropEnabled: Boolean

@@ -19,7 +19,7 @@ class KirPhaseContext(
 
     override val context: KirPhase.Context = this
 
-    override val kirProvider: KirProvider = KirProvider(lazy { descriptorKirProvider }, rootConfiguration).also {
+    override val kirProvider: KirProvider = KirProvider(lazy { descriptorKirProvider }, globalConfiguration).also {
         mainSkieContext.kirProvider = it
     }
 
@@ -30,7 +30,7 @@ class KirPhaseContext(
         extraDescriptorBuiltins = extraDescriptorBuiltins,
         namer = namer,
         descriptorConfigurationProvider = descriptorConfigurationProvider,
-        rootConfiguration = rootConfiguration,
+        globalConfiguration = globalConfiguration,
     ).also {
         mainSkieContext.descriptorKirProvider = it
     }

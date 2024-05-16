@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir.descriptor
 
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.KirProviderDelegate
@@ -35,12 +35,12 @@ class DescriptorKirProvider(
     extraDescriptorBuiltins: ExtraDescriptorBuiltins,
     namer: ObjCExportNamer,
     private val descriptorConfigurationProvider: DescriptorConfigurationProvider,
-    rootConfiguration: RootConfiguration,
+    globalConfiguration: GlobalConfiguration,
 ) : KirProviderDelegate {
 
     private val externalDescriptorKirProvider = ExternalDescriptorKirProvider(
         kirProject = kirProvider.project,
-        rootConfiguration = rootConfiguration,
+        globalConfiguration = globalConfiguration,
         descriptorConfigurationProvider = descriptorConfigurationProvider,
         descriptorKirProvider = lazy { this },
     )

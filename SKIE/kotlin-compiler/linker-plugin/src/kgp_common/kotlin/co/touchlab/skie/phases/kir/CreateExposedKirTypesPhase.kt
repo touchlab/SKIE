@@ -43,14 +43,14 @@ class CreateExposedKirTypesPhase(
     private val kirBuiltins = context.kirBuiltins
     private val namer = context.namer
     private val descriptorConfigurationProvider = context.descriptorConfigurationProvider
-    private val rootConfiguration = context.rootConfiguration
+    private val globalConfiguration = context.globalConfiguration
     private val kirTypeTranslator = context.kirTypeTranslator
 
     private val descriptorsToClasses = mutableMapOf<ClassDescriptor, KirClass>()
 
     private val sourceFileConfiguration = ClassConfiguration(
         FileOrClassConfiguration.File(
-            FileConfiguration(PackageConfiguration(ModuleConfiguration(rootConfiguration))),
+            FileConfiguration(PackageConfiguration(ModuleConfiguration(globalConfiguration))),
         ),
     )
 

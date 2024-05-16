@@ -4,7 +4,7 @@ package co.touchlab.skie.context
 
 import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
 import co.touchlab.skie.compilerinject.compilerplugin.SkieConfigurationKeys
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.configuration.provider.ConfigurationProvider
 import co.touchlab.skie.phases.InitPhase
@@ -44,14 +44,14 @@ class InitPhaseContext(
         pluginConfigurationKeys = pluginRegistrars.flatMap { it.customConfigurationKeys }.toSet(),
     )
 
-    override val rootConfiguration: RootConfiguration = configurationProvider.rootConfiguration
+    override val globalConfiguration: GlobalConfiguration = configurationProvider.globalConfiguration
 
     override val analyticsCollector: AnalyticsCollector = AnalyticsCollector(
         skieBuildDirectory = skieDirectories.buildDirectory,
         skieConfiguration = skieConfigurationData,
     )
 
-    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(rootConfiguration)
+    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(globalConfiguration)
 
     override val kirReporter: KirReporter = KirReporter()
 

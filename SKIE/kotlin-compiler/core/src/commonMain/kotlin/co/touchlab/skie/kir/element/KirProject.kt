@@ -1,9 +1,9 @@
 package co.touchlab.skie.kir.element
 
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 
 class KirProject(
-    val configuration: RootConfiguration,
+    val configuration: GlobalConfiguration,
 ) : KirElement {
 
     val modules: MutableList<KirModule> = mutableListOf()

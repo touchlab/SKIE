@@ -1,6 +1,6 @@
 package co.touchlab.skie.sir.builtin
 
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.element.SirClass
@@ -17,14 +17,14 @@ import kotlin.reflect.KProperty
 @Suppress("PropertyName", "FunctionName")
 class SirBuiltins(
     sirProvider: SirProvider,
-    rootConfiguration: RootConfiguration,
+    globalConfiguration: GlobalConfiguration,
 ) {
 
     val Swift = Modules.Swift(sirProvider)
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
-    val Skie = Modules.Skie(rootConfiguration, sirProvider.skieModule)
+    val Skie = Modules.Skie(globalConfiguration, sirProvider.skieModule)
 
     object Modules {
 
@@ -105,7 +105,7 @@ class SirBuiltins(
         }
 
         class Skie(
-            private val rootConfiguration: RootConfiguration,
+            private val globalConfiguration: GlobalConfiguration,
             val module: SirModule.Skie,
         ) : ModuleBase() {
 
@@ -161,7 +161,7 @@ class SirBuiltins(
                 nameOverride: String? = null,
                 apply: (SirClass.() -> Unit) = { },
             ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SirClass?>> =
-                if (SkieConfigurationFlag.Feature_CoroutinesInterop in rootConfiguration.enabledFlags) {
+                if (SkieConfigurationFlag.Feature_CoroutinesInterop in globalConfiguration.enabledFlags) {
                     ClassDeclarationPropertyProvider(
                         kind = SirClass.Kind.Class,
                         parent = parent,

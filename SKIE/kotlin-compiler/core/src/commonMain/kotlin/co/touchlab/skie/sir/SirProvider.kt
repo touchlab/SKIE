@@ -1,6 +1,6 @@
 package co.touchlab.skie.sir
 
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.kir.element.KirModule.Origin
 import co.touchlab.skie.oir.OirProvider
 import co.touchlab.skie.oir.element.OirClass
@@ -27,7 +27,7 @@ class SirProvider(
     framework: FrameworkLayout,
     private val oirProvider: OirProvider,
     skieBuildDirectory: SkieBuildDirectory,
-    rootConfiguration: RootConfiguration,
+    globalConfiguration: GlobalConfiguration,
 ) {
 
     val kotlinModule: SirModule.Kotlin = SirModule.Kotlin(framework.frameworkName)
@@ -39,7 +39,7 @@ class SirProvider(
     val fileProvider: SirFileProvider = SirFileProvider(skieModule, skieBuildDirectory)
 
     val sirBuiltins by lazy {
-        SirBuiltins(this, rootConfiguration)
+        SirBuiltins(this, globalConfiguration)
     }
 
     private val externalModuleCache = mutableMapOf<String, SirModule.External>()

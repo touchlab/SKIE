@@ -14,7 +14,7 @@ import co.touchlab.skie.configuration.FunctionInterop
 import co.touchlab.skie.configuration.ModuleConfiguration
 import co.touchlab.skie.configuration.PackageConfiguration
 import co.touchlab.skie.configuration.PropertyConfiguration
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SimpleFunctionConfiguration
 import co.touchlab.skie.configuration.SkieConfiguration
@@ -59,15 +59,15 @@ class ConfigurationProvider(
 
     private val allKeys = builtInKeys + pluginConfigurationKeys
 
-    val rootConfiguration: RootConfiguration by lazy {
-        RootConfiguration(configurationData.enabledConfigurationFlags, allKeys).withLoadedKeyValueConfiguration(IdentifiedConfigurationTarget.Root)
+    val globalConfiguration: GlobalConfiguration by lazy {
+        GlobalConfiguration(configurationData.enabledConfigurationFlags, allKeys).withLoadedKeyValueConfiguration(IdentifiedConfigurationTarget.Root)
     }
 
     private val cache = mutableMapOf<IdentifiedConfigurationTarget, SkieConfiguration>()
 
     fun getConfiguration(target: IdentifiedConfigurationTarget.Module): ModuleConfiguration =
         cache.getOrPut(target) {
-            ModuleConfiguration(rootConfiguration).withLoadedKeyValueConfiguration(target)
+            ModuleConfiguration(globalConfiguration).withLoadedKeyValueConfiguration(target)
         } as ModuleConfiguration
 
     fun getConfiguration(target: IdentifiedConfigurationTarget.Package): PackageConfiguration =

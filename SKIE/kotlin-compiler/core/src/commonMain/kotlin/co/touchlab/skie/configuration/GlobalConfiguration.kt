@@ -1,6 +1,6 @@
 package co.touchlab.skie.configuration
 
-class RootConfiguration(
+class GlobalConfiguration(
     enabledFlags: Set<SkieConfigurationFlag>,
     private val supportedKeys: Set<ConfigurationKey<*>>,
 ) : SkieConfiguration(null) {
@@ -9,7 +9,7 @@ class RootConfiguration(
 
     val enabledFlags: Set<SkieConfigurationFlag> by ::mutableEnabledFlags
 
-    override val rootConfiguration: RootConfiguration
+    override val globalConfiguration: GlobalConfiguration
         get() = this
 
     fun isFlagEnabled(flag: SkieConfigurationFlag): Boolean =

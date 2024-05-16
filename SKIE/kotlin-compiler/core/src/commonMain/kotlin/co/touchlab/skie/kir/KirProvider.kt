@@ -1,6 +1,6 @@
 package co.touchlab.skie.kir
 
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.kir.builtin.KirBuiltins
 import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirClass
@@ -16,7 +16,7 @@ import co.touchlab.skie.sir.element.SirProperty
 
 class KirProvider(
     delegate: Lazy<KirProviderDelegate>,
-    rootConfiguration: RootConfiguration,
+    globalConfiguration: GlobalConfiguration,
 ) {
 
     private lateinit var fqNameCache: Map<String, KirClass>
@@ -60,7 +60,7 @@ class KirProvider(
     lateinit var kotlinOverridableDeclaration: List<KirOverridableDeclaration<*, *>>
         private set
 
-    val project = KirProject(rootConfiguration)
+    val project = KirProject(globalConfiguration)
 
     val kirBuiltins: KirBuiltins
         get() = delegate.kirBuiltins

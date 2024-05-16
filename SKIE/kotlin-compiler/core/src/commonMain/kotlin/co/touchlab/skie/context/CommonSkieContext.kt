@@ -1,7 +1,7 @@
 package co.touchlab.skie.context
 
 import co.touchlab.skie.analytics.performance.SkiePerformanceAnalytics
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.phases.SkiePhaseScheduler
@@ -18,7 +18,7 @@ interface CommonSkieContext {
 
     val skieConfigurationData: CompilerSkieConfigurationData
 
-    val rootConfiguration: RootConfiguration
+    val globalConfiguration: GlobalConfiguration
 
     val skieDirectories: SkieDirectories
 
@@ -38,16 +38,16 @@ interface CommonSkieContext {
         get() = skieDirectories.buildDirectory
 
     val SkieConfigurationFlag.isEnabled: Boolean
-        get() = rootConfiguration.isFlagEnabled(this)
+        get() = globalConfiguration.isFlagEnabled(this)
 
     val SkieConfigurationFlag.isDisabled: Boolean
         get() = this.isEnabled.not()
 
     fun SkieConfigurationFlag.enable() {
-        rootConfiguration.enableFlag(this)
+        globalConfiguration.enableFlag(this)
     }
 
     fun SkieConfigurationFlag.disable() {
-        rootConfiguration.disableFlag(this)
+        globalConfiguration.disableFlag(this)
     }
 }

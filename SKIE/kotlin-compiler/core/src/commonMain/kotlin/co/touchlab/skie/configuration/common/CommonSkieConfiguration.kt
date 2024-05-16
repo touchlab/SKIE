@@ -7,7 +7,7 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 object CommonSkieConfiguration {
 
     fun getDefaultFlowMappingStrategy(configuration: SkieConfiguration): FlowMappingStrategy {
-        val isFlowInteropEnabled = configuration.rootConfiguration.isFlagEnabled(SkieConfigurationFlag.Feature_CoroutinesInterop) &&
+        val isFlowInteropEnabled = configuration.globalConfiguration.isFlagEnabled(SkieConfigurationFlag.Feature_CoroutinesInterop) &&
             configuration.getUnsafe(FlowInterop.Enabled)
 
         return if (isFlowInteropEnabled) FlowMappingStrategy.Full else FlowMappingStrategy.None

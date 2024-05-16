@@ -6,7 +6,7 @@ import co.touchlab.skie.configuration.FileConfiguration
 import co.touchlab.skie.configuration.FileOrClassConfiguration
 import co.touchlab.skie.configuration.ModuleConfiguration
 import co.touchlab.skie.configuration.PackageConfiguration
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirModule
@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 
 class ExternalDescriptorKirProvider(
     private val kirProject: KirProject,
-    private val rootConfiguration: RootConfiguration,
+    private val globalConfiguration: GlobalConfiguration,
     private val descriptorConfigurationProvider: DescriptorConfigurationProvider,
     descriptorKirProvider: Lazy<DescriptorKirProvider>,
 ) {
@@ -36,7 +36,7 @@ class ExternalDescriptorKirProvider(
     private val unknownModule: KirModule = KirModule(
         name = "<unknown>",
         project = kirProject,
-        configuration = ModuleConfiguration(rootConfiguration),
+        configuration = ModuleConfiguration(globalConfiguration),
         origin = KirModule.Origin.UnknownExternal,
     )
 
@@ -90,7 +90,7 @@ class ExternalDescriptorKirProvider(
             KirModule(
                 name = swiftFrameworkName,
                 project = kirProject,
-                configuration = ModuleConfiguration(rootConfiguration),
+                configuration = ModuleConfiguration(globalConfiguration),
                 origin = KirModule.Origin.KnownExternal,
             )
         }

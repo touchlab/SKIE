@@ -23,7 +23,7 @@ class SirPhaseContext(
 
     override val oirProvider: OirProvider = OirProvider(kirProvider)
 
-    override val sirProvider: SirProvider = SirProvider(framework, oirProvider, skieBuildDirectory, rootConfiguration)
+    override val sirProvider: SirProvider = SirProvider(framework, oirProvider, skieBuildDirectory, globalConfiguration)
 
     override val sirFileProvider: SirFileProvider = sirProvider.fileProvider
 

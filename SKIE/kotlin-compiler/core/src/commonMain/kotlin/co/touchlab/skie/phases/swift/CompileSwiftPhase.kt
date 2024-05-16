@@ -14,7 +14,7 @@ class CompileSwiftPhase(
     private val framework = context.framework
     private val cacheableKotlinFramework = context.cacheableKotlinFramework
     private val swiftCompilerConfiguration = context.swiftCompilerConfiguration
-    private val rootConfiguration = context.rootConfiguration
+    private val globalConfiguration = context.globalConfiguration
     private val skieBuildDirectory = context.skieBuildDirectory
     private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.frameworkName)
     private val swiftFileList = context.skieBuildDirectory.swiftCompiler.config.swiftFileList(framework.frameworkName)
@@ -22,9 +22,9 @@ class CompileSwiftPhase(
     private val objectFiles = skieBuildDirectory.swiftCompiler.objectFiles
     private val moduleDirectory = skieBuildDirectory.swiftCompiler.module
 
-    private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in rootConfiguration.enabledFlags
-    private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in rootConfiguration.enabledFlags
-    private val isConcurrentSkieCompilationEnabled = SkieConfigurationFlag.Build_ConcurrentSkieCompilation in rootConfiguration.enabledFlags
+    private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in globalConfiguration.enabledFlags
+    private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in globalConfiguration.enabledFlags
+    private val isConcurrentSkieCompilationEnabled = SkieConfigurationFlag.Build_ConcurrentSkieCompilation in globalConfiguration.enabledFlags
 
     context(SirPhase.Context)
     override suspend fun execute() {

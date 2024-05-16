@@ -1,6 +1,6 @@
 package co.touchlab.skie.analytics.performance
 
-import co.touchlab.skie.configuration.RootConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.util.toPrettyJson
@@ -21,7 +21,7 @@ import kotlin.time.toDuration
 object SkiePerformanceAnalytics {
 
     class Producer(
-        private val rootConfiguration: RootConfiguration,
+        private val globalConfiguration: GlobalConfiguration,
     ) : AnalyticsProducer {
 
         private val threadExecutor = ThreadPoolExecutor(0, 1, 1, TimeUnit.MINUTES, LinkedBlockingQueue())
@@ -120,7 +120,7 @@ object SkiePerformanceAnalytics {
                 return
             }
 
-            if (SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs in rootConfiguration.enabledFlags) {
+            if (SkieConfigurationFlag.Debug_PrintSkiePerformanceLogs in globalConfiguration.enabledFlags) {
                 println(content)
             }
         }
