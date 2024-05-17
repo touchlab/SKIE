@@ -244,6 +244,7 @@ object SirCodeGenerator {
             SirClass.Kind.Enum -> TypeSpec.Kind.Enum()
             SirClass.Kind.Struct -> TypeSpec.Kind.Struct()
             SirClass.Kind.Protocol -> TypeSpec.Kind.Protocol()
+            SirClass.Kind.Actor -> TypeSpec.Kind.Actor()
         }
 
     private fun TypeSpec.Builder.addClassDeclarations(sirClass: SirClass): TypeSpec.Builder =

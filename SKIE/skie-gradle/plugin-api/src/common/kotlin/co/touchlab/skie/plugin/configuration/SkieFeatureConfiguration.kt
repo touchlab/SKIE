@@ -26,6 +26,8 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
      */
     val defaultArgumentsInExternalLibraries: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
+    val enableFlowCombineConvertor: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+
     internal val groupConfigurations = mutableListOf<GroupConfiguration>()
 
     fun group(targetFqNamePrefix: String = "", overridesAnnotations: Boolean = false, action: GroupConfiguration.() -> Unit) {
@@ -52,5 +54,6 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
         setOfNotNull(
             SkieConfigurationFlag.Feature_CoroutinesInterop takeIf coroutinesInterop,
             SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries takeIf defaultArgumentsInExternalLibraries,
+            SkieConfigurationFlag.Feature_FlowCombineConvertor takeIf enableFlowCombineConvertor,
         )
 }

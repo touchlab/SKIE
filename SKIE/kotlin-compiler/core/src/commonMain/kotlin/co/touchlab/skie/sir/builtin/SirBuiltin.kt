@@ -24,9 +24,11 @@ class SirBuiltins(
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
-    val Skie = Modules.Skie(globalConfiguration, sirProvider.skieModule)
-
     val _Concurrency = Modules._Concurrency(sirProvider, Swift)
+
+    val Skie = Modules.Skie(globalConfiguration, sirProvider.skieModule, _Concurrency)
+
+    val Combine = Modules.Combine(sirProvider)
 
     object Modules {
 
@@ -126,14 +128,42 @@ class SirBuiltins(
             )
         }
 
+        class Combine(sirProvider: SirProvider) : ModuleBase() {
+            override val declarationParent = sirProvider.getExternalModule("Combine").builtInFile
+
+            override val origin = SirClass.Origin.ExternalSwiftFramework
+
+            val Cancellable by Protocol()
+
+            val CustomCombineIdentifierConvertible by Protocol()
+
+            val Subscription by Protocol(
+                superTypes = listOf(
+                    Cancellable.defaultType,
+                    CustomCombineIdentifierConvertible.defaultType,
+                )
+            )
+        }
+
         class Skie(
             private val globalConfiguration: GlobalConfiguration,
             val module: SirModule.Skie,
+            _concurrency: _Concurrency,
         ) : ModuleBase() {
 
             override val declarationParent: SirDeclarationParent = module.builtInFile
 
             override val origin: SirClass.Origin = SirClass.Origin.Generated
+
+            val SkieSwiftFlowProtocol by Protocol(
+                superTypes = listOf(
+                    _concurrency.AsyncSequence.defaultType
+                ),
+            )
+
+            val SkieSwiftFlowInternalProtocol by Protocol {
+                SirTypeParameter("Element")
+            }
 
             private fun RuntimeClass(
                 superTypes: List<SirDeclaredSirType> = emptyList(),

@@ -17,6 +17,9 @@ object SupportedFlowRuntimeGenerator {
     fun generate(skieSwiftFlowIterator: SirClass) {
         generateBridgeSubscriptionCountWorkaroundFunctions()
 
+        generateSkieSwiftFlowProtocol()
+        generateSkieSwiftFlowInternalProtocol()
+
         val classesForVariants = SupportedFlow.allVariants.associateWith { flowVariant ->
             createSwiftFlowClass(flowVariant)
         }
@@ -24,6 +27,26 @@ object SupportedFlowRuntimeGenerator {
         classesForVariants.forEach { (flowVariant, sirClass) ->
             sirClass.addSwiftFlowMembers(flowVariant, skieSwiftFlowIterator)
         }
+    }
+
+    context(SirPhase.Context)
+    private fun generateSkieSwiftFlowProtocol() {
+        namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieSwiftFlowProtocol").content = """
+            public protocol SkieSwiftFlowProtocol<Element>: _Concurrency.AsyncSequence where AsyncIterator == SkieSwiftFlowIterator<Element> { }
+        """.trimIndent()
+    }
+
+    context(SirPhase.Context)
+    private fun generateSkieSwiftFlowInternalProtocol() {
+        // This has currently no usecase, but is kept as it might help with SwiftUI extensions.
+        namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieSwiftFlowInternalProtocol").content = """
+            internal protocol SkieSwiftFlowInternalProtocol<Element> {
+                associatedtype Element
+                associatedtype Delegate: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.Flow.__Kotlin
+
+                var delegate: Delegate { get }
+            }
+        """.trimIndent()
     }
 
     context(SirPhase.Context)
@@ -48,7 +71,8 @@ object SupportedFlowRuntimeGenerator {
             SirClass(
                 baseName = flowVariant.swiftSimpleName,
                 superTypes = listOf(
-                    sirBuiltins._Concurrency.AsyncSequence.defaultType,
+                    sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType,
+                    sirBuiltins.Skie.SkieSwiftFlowInternalProtocol.defaultType,
                     sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
                 ),
                 modality = SirModality.Final,

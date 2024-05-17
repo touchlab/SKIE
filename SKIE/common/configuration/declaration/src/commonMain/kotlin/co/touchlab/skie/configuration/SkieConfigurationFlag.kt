@@ -7,6 +7,8 @@ enum class SkieConfigurationFlag {
     Feature_CoroutinesInterop,
     Feature_DefaultArgumentsInExternalLibraries,
 
+    Feature_FlowCombineConvertor,
+
     Build_SwiftLibraryEvolution,
     Build_ParallelSwiftCompilation,
     Build_ParallelSkieCompilation,

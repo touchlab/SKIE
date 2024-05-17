@@ -93,7 +93,8 @@ class SirClass(
         Class,
         Enum,
         Struct,
-        Protocol;
+        Protocol,
+        Actor;
 
         val isClass: Boolean
             get() = this == Class
@@ -106,6 +107,9 @@ class SirClass(
 
         val isProtocol: Boolean
             get() = this == Protocol
+
+        val isActor: Boolean
+            get() = this == Actor
     }
 
     companion object {
@@ -187,7 +191,7 @@ val SirClass.kirClassOrNull: KirClass?
 
 fun coerceModalityForClass(kind: SirClass.Kind): SirModality {
     return when (kind) {
-        SirClass.Kind.Class -> SirModality.ModuleLimited
+        SirClass.Kind.Class, SirClass.Kind.Actor -> SirModality.ModuleLimited
         SirClass.Kind.Enum, SirClass.Kind.Struct -> SirModality.Final
         SirClass.Kind.Protocol -> SirModality.Open
     }
