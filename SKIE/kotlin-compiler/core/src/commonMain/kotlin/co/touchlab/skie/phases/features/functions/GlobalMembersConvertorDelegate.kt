@@ -32,6 +32,8 @@ class GlobalMembersConvertorDelegate(
                 configureBridge(function, sirFunction, this)
             }
         }
+
+        sirFunction.isWrappedBySkie = true
     }
 
     private fun SirSimpleFunction.addFunctionBody(function: SirSimpleFunction) {
@@ -66,6 +68,8 @@ class GlobalMembersConvertorDelegate(
                 property.bridgedSirProperty = this
             }
         }
+
+        sirProperty.isWrappedBySkie = true
     }
 
     private fun SirProperty.addPropertyGetter(originalGetter: SirGetter, sirProperty: SirProperty) {

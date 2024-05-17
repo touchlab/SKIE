@@ -8,7 +8,7 @@ import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
 /**
  * Changes `SirVisibility.Private` to `SirVisibility.Removed` in all Kotlin declarations.
  */
-object NormalizeKotlinSirVisibilityPhase : SirPhase {
+object NormalizeKotlinSirPrivateVisibilityPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {

@@ -66,11 +66,12 @@ import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRu
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.phases.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.phases.sir.CommitSirIsReplacedPropertyPhase
+import co.touchlab.skie.phases.sir.member.ConfigureInternalVisibilityForWrappedCallableDeclarationsPhase
 import co.touchlab.skie.phases.sir.member.CreateAsyncSirFunctionsPhase
 import co.touchlab.skie.phases.sir.member.CreateSirMembersPhase
 import co.touchlab.skie.phases.sir.member.InitializeSirMembersCachePhase
 import co.touchlab.skie.phases.sir.member.InitializeSirOverridesPhase
-import co.touchlab.skie.phases.sir.member.NormalizeKotlinSirVisibilityPhase
+import co.touchlab.skie.phases.sir.member.NormalizeKotlinSirPrivateVisibilityPhase
 import co.touchlab.skie.phases.sir.member.VerifySirVisibilityInAbstractMembersPhase
 import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToMembersPhase
 import co.touchlab.skie.phases.sir.member.StripKonanCallableDeclarationManglingPhase
@@ -188,7 +189,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             FixNamesOfInaccessibleNestedClassesPhase,
             CommitSirIsReplacedPropertyPhase,
 
-            NormalizeKotlinSirVisibilityPhase,
+            NormalizeKotlinSirPrivateVisibilityPhase,
             PropagateSirVisibilityToClassesPhase,
             PropagateSirVisibilityToMembersPhase,
             PropagateSirVisibilityToTypeAliasesPhase,
@@ -228,7 +229,8 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
 
             MoveBridgesToTopLevelPhase,
 
-            NormalizeKotlinSirVisibilityPhase,
+            NormalizeKotlinSirPrivateVisibilityPhase,
+            ConfigureInternalVisibilityForWrappedCallableDeclarationsPhase,
             PropagateSirVisibilityToClassesPhase,
             PropagateSirVisibilityToMembersPhase,
             PropagateSirVisibilityToFileClassesPhase,

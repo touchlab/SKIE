@@ -55,6 +55,7 @@ class SwiftSuspendFunctionGenerator {
             it.applyToEntireOverrideHierarchy {
                 isHidden = true
                 isReplaced = true
+                isWrappedBySkie = true
             }
         }
     }

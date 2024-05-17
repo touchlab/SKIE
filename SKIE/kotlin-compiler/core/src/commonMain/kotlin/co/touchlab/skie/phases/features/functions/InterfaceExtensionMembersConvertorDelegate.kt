@@ -33,6 +33,8 @@ class InterfaceExtensionMembersConvertorDelegate(
                 configureBridge(function, sirFunction, this)
             }
         }
+
+        sirFunction.isWrappedBySkie = true
     }
 
     private fun SirSimpleFunction.addFunctionBody(function: SirSimpleFunction) {
@@ -61,6 +63,9 @@ class InterfaceExtensionMembersConvertorDelegate(
         // Bridged converted properties are not supported at the moment as they are not easy to implement and not needed yet
 
         generateInterfaceExtensionPropertyWrapper(getter, setter, kirGetter)
+
+        getter.isWrappedBySkie = true
+        setter?.isWrappedBySkie = true
     }
 
     private fun generateInterfaceExtensionPropertyWrapper(getter: SirSimpleFunction, setter: SirSimpleFunction?, kirGetter: KirSimpleFunction) {

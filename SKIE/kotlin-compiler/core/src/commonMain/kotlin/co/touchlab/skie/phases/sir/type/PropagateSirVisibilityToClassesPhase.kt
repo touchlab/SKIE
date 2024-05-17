@@ -5,7 +5,6 @@ import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirVisibility
-import co.touchlab.skie.sir.element.coerceAtMost
 import co.touchlab.skie.sir.element.kirClassOrNull
 import co.touchlab.skie.sir.element.superClassType
 import co.touchlab.skie.sir.element.superProtocolTypes

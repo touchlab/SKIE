@@ -19,6 +19,7 @@ class SirProperty(
     override var scope: SirScope = parent.coerceScope(SirScope.Member),
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
     override val isFakeOverride: Boolean = false,
+    override var isWrappedBySkie: Boolean = false,
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
 ) : SirOverridableDeclaration<SirProperty>, SirCallableDeclaration, SirElementWithModality {
@@ -93,6 +94,7 @@ class SirProperty(
             scope: SirScope = coerceScope(SirScope.Member),
             deprecationLevel: DeprecationLevel = DeprecationLevel.None,
             isFakeOverride: Boolean = false,
+            isWrappedBySkie: Boolean = false,
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
         ): SirProperty =
@@ -108,6 +110,7 @@ class SirProperty(
                 scope = scope,
                 deprecationLevel = deprecationLevel,
                 isFakeOverride = isFakeOverride,
+                isWrappedBySkie = isWrappedBySkie,
                 attributes = attributes,
                 modifiers = modifiers,
             )
@@ -126,6 +129,7 @@ fun SirProperty.shallowCopy(
     scope: SirScope = parent.coerceScope(this.scope),
     deprecationLevel: DeprecationLevel = this.deprecationLevel,
     isFakeOverride: Boolean = this.isFakeOverride,
+    isWrappedBySkie: Boolean = false,
     attributes: List<String> = this.attributes,
     modifiers: List<Modifier> = this.modifiers,
 ): SirProperty =
@@ -141,6 +145,7 @@ fun SirProperty.shallowCopy(
         scope = scope,
         deprecationLevel = deprecationLevel,
         isFakeOverride = isFakeOverride,
+        isWrappedBySkie = isWrappedBySkie,
         attributes = attributes,
         modifiers = modifiers,
     )

@@ -47,6 +47,9 @@ sealed interface SirCallableDeclaration : SirDeclarationWithVisibility, SirEleme
 
     val deprecationLevel: DeprecationLevel
 
+    // TODO Remove and check wrappedBy functions in Sir instead (once the concept of bridged callable declarations is refactored).
+    var isWrappedBySkie: Boolean
+
     fun toReadableString(): String =
         Signature(this).toString()
 }
@@ -57,3 +60,6 @@ val SirCallableDeclaration.receiverDeclaration: SirClass?
         is SirExtension -> parent.classDeclaration
         else -> null
     }
+
+val SirCallableDeclaration.isAbstract: Boolean
+    get() = (this as? SirOverridableDeclaration<*>)?.isAbstract == true

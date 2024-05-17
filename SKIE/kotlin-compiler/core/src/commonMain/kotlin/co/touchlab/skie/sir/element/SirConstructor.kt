@@ -14,6 +14,7 @@ class SirConstructor(
     var isConvenience: Boolean = false,
     override var throws: Boolean = false,
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
+    override var isWrappedBySkie: Boolean = false,
 ) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()) {
 
     override val identifier = "init"
@@ -46,6 +47,7 @@ class SirConstructor(
             isConvenience: Boolean = false,
             throws: Boolean = false,
             deprecationLevel: DeprecationLevel = DeprecationLevel.None,
+            isWrappedBySkie: Boolean = false,
         ): SirConstructor =
             SirConstructor(
                 parent = this@SirDeclarationNamespace,
@@ -56,6 +58,7 @@ class SirConstructor(
                 isConvenience = isConvenience,
                 throws = throws,
                 deprecationLevel = deprecationLevel,
+                isWrappedBySkie = isWrappedBySkie,
             )
     }
 }
@@ -69,6 +72,7 @@ fun SirConstructor.shallowCopy(
     isConvenience: Boolean = this.isConvenience,
     throws: Boolean = this.throws,
     deprecationLevel: DeprecationLevel = this.deprecationLevel,
+    isWrappedBySkie: Boolean = false,
 ): SirConstructor =
     SirConstructor(
         parent = parent,
@@ -79,4 +83,5 @@ fun SirConstructor.shallowCopy(
         isConvenience = isConvenience,
         throws = throws,
         deprecationLevel = deprecationLevel,
+        isWrappedBySkie = isWrappedBySkie,
     )

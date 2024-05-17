@@ -52,7 +52,7 @@ annotation class SkieVisibility {
      *
      * For example, a top-level function originally exposed as `FileKt.functionName` will be internal, if SKIE generated the global function wrapper for it.
      *
-     * Note that this setting will only affect callable declarations (functions, properties, constructors) - not classes.
+     * Note that this setting will only affect non-abstract callable declarations (functions, properties, constructors) - not classes.
      */
     @Retention(AnnotationRetention.BINARY)
     @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
