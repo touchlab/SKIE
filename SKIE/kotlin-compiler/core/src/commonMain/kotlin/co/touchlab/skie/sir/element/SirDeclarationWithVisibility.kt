@@ -6,6 +6,8 @@ sealed interface SirDeclarationWithVisibility : SirDeclaration {
 
     /**
      * If true, the "__" will be added to the name.
+     *
+     * Must be consistent across all overrides.
      */
     val isReplaced: Boolean
 

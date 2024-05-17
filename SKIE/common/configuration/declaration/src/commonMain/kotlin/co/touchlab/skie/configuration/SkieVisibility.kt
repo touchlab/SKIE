@@ -25,6 +25,8 @@ object SkieVisibility : ConfigurationKey.Enum<co.touchlab.skie.configuration.Ski
          * The declaration will be visible from external modules, but it will be:
          *  - marked as `swift-private` (Xcode will not include it in autocomplete suggestions.),
          *  - renamed in Swift by adding the `__` prefix (Obj-C name remains the same); constructors are not affected.
+         *
+         * The `__` prefix will be added to all overrides of the declaration even if they have different visibility.
          */
         PublicButReplaced(SkieVisibility.PublicButReplaced::class),
 
@@ -36,6 +38,8 @@ object SkieVisibility : ConfigurationKey.Enum<co.touchlab.skie.configuration.Ski
         /**
          * The declaration will be visible only for declarations within the Kotlin module (including custom Swift code bundled by SKIE).
          * Additionally, the declaration will be renamed in Swift by adding the `__` prefix (Obj-C name remains the same); constructors are not affected.
+         *
+         * The `__` prefix will be added to all overrides of the declaration even if they have different visibility.
          */
         InternalAndReplaced(SkieVisibility.InternalAndReplaced::class),
 

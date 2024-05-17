@@ -1,6 +1,5 @@
 package co.touchlab.skie.sir.element
 
-import co.touchlab.skie.kir.util.BaseOverridableDeclaration
 import co.touchlab.skie.util.pop
 
 sealed interface SirOverridableDeclaration<T : SirOverridableDeclaration<T>> : SirCallableDeclaration {
