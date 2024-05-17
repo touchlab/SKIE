@@ -1,32 +1,15 @@
 package co.touchlab.skie.sir.element
 
-enum class SirVisibility {
-
-    Public,
-    Internal,
-
-    /** Obj-C will be handled the same as if it was Removed. */
-    Private,
+enum class SirVisibility : Comparable<SirVisibility> {
 
     /** The code will not be generated, or in the case of Obj-C included in the header file. */
     Removed,
+
+    /** Obj-C will be handled the same as if it was Removed. */
+    Private,
+    Internal,
+    Public;
 }
-
-fun SirVisibility.coerceAtMost(limit: SirVisibility): SirVisibility =
-    when (limit) {
-        SirVisibility.Public -> this
-        SirVisibility.Internal -> if (this == SirVisibility.Public) SirVisibility.Internal else this
-        SirVisibility.Private -> if (this == SirVisibility.Removed) SirVisibility.Removed else SirVisibility.Private
-        SirVisibility.Removed -> SirVisibility.Removed
-    }
-
-fun SirVisibility.coerceAtLeast(limit: SirVisibility): SirVisibility =
-    when (limit) {
-        SirVisibility.Removed -> this
-        SirVisibility.Private -> if (this == SirVisibility.Removed) SirVisibility.Private else this
-        SirVisibility.Internal -> if (this == SirVisibility.Public) SirVisibility.Public else SirVisibility.Internal
-        SirVisibility.Public -> SirVisibility.Public
-    }
 
 fun List<SirVisibility>.minimumVisibility(): SirVisibility =
     this.fold(SirVisibility.Public) { acc, visibility -> acc.coerceAtMost(visibility) }
