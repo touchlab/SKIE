@@ -4,9 +4,11 @@ enum class SirVisibility {
 
     Public,
     Internal,
+
+    /** Obj-C will be handled the same as if it was Removed. */
     Private,
 
-    /** Applicable only to generated code, existing code cannot be removed and will be marked as private instead. */
+    /** The code will not be generated, or in the case of Obj-C included in the header file. */
     Removed,
 }
 

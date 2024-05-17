@@ -70,6 +70,7 @@ import co.touchlab.skie.phases.sir.member.CreateAsyncSirFunctionsPhase
 import co.touchlab.skie.phases.sir.member.CreateSirMembersPhase
 import co.touchlab.skie.phases.sir.member.InitializeSirMembersCachePhase
 import co.touchlab.skie.phases.sir.member.InitializeSirOverridesPhase
+import co.touchlab.skie.phases.sir.member.NormalizeKotlinSirVisibilityPhase
 import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToAbstractMembersPhase
 import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToNonAbstractMembersPhase
 import co.touchlab.skie.phases.sir.member.StripKonanCallableDeclarationManglingPhase
@@ -187,10 +188,11 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             FixNamesOfInaccessibleNestedClassesPhase,
             CommitSirIsReplacedPropertyPhase,
 
+            NormalizeKotlinSirVisibilityPhase,
             PropagateSirVisibilityToClassesPhase,
-            PropagateSirVisibilityToTypeAliasesPhase,
             PropagateSirVisibilityToNonAbstractMembersPhase,
             PropagateSirVisibilityToAbstractMembersPhase,
+            PropagateSirVisibilityToTypeAliasesPhase,
 
             RenameTypesConflictingWithKeywordsPhase,
             RenameTypesConflictingWithKotlinModulePhase,
@@ -224,9 +226,17 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
 
             // IR finalization
 
+            MoveBridgesToTopLevelPhase,
+
+            NormalizeKotlinSirVisibilityPhase,
+            PropagateSirVisibilityToClassesPhase,
+            PropagateSirVisibilityToNonAbstractMembersPhase,
+            PropagateSirVisibilityToAbstractMembersPhase,
+            PropagateSirVisibilityToFileClassesPhase,
+            PropagateSirVisibilityToTypeAliasesPhase,
+
             AddAvailabilityBasedDeprecationLevelPhase,
             AddAvailabilityToAsyncFunctionsPhase,
-            MoveBridgesToTopLevelPhase,
             RenameTypesConflictingWithKeywordsPhase,
             RenameTypesConflictingWithKotlinModulePhase,
             RenameTypesConflictsWithOtherTypesPhase,
@@ -238,7 +248,6 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             FixOirFunctionSignaturesForApiNotesPhase(context),
             CreateFakeObjCConstructorsPhase,
             AddFoundationImportsPhase,
-            PropagateSirVisibilityToFileClassesPhase,
 
             // Compilation
 

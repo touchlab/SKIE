@@ -51,7 +51,7 @@ object FixDuplicatedOverriddenFunctionsPhase : SirPhase {
 
         override.originalSirFunction = baseFunctionToOverride.originalSirFunction.shallowCopy(
             parent = function.originalSirFunction.parent,
-            visibility = SirVisibility.Private,
+            visibility = SirVisibility.Removed,
             isFakeOverride = false,
         ).apply {
             copyValueParametersFrom(baseFunctionToOverride.originalSirFunction)

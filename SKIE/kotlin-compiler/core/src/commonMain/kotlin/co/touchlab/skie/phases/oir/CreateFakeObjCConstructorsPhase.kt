@@ -43,10 +43,7 @@ object CreateFakeObjCConstructorsPhase : SirPhase {
 
         oirConstructor.originalSirConstructor = parentConstructor.originalSirConstructor.shallowCopy(
             parent = this.originalSirClass,
-            visibility = when (parentConstructor.originalSirConstructor.visibility) {
-                SirVisibility.Removed -> SirVisibility.Removed
-                else -> SirVisibility.Private
-            },
+            visibility = SirVisibility.Removed,
         ).apply {
             copyValueParametersFrom(parentConstructor.originalSirConstructor)
         }

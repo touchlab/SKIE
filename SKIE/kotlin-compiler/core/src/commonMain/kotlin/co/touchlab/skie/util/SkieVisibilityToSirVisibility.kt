@@ -11,5 +11,5 @@ fun SkieVisibility.Level.toSirVisibility(isWrapped: Boolean = false): SirVisibil
         SkieVisibility.Level.Internal -> SirVisibility.Internal
         SkieVisibility.Level.InternalAndReplaced -> SirVisibility.Internal
         SkieVisibility.Level.InternalIfWrapped -> if (isWrapped) SirVisibility.Internal else SirVisibility.Public
-        SkieVisibility.Level.Private -> SirVisibility.Private
+        SkieVisibility.Level.Private -> SirVisibility.Removed
     }
