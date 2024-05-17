@@ -76,6 +76,8 @@ private fun SirExtension.createSwiftBridgingFunction(bridgeModel: SuspendFunctio
         parent = this,
         isAsync = true,
         throws = true,
+        isAbstract = false,
+        isFakeOverride = false,
         returnType = bridgeModel.originalFunction.returnType.revertFlowMappingIfNeeded(),
     ).apply {
         copyValueParametersFrom(bridgeModel.originalFunction)

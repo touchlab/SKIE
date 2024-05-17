@@ -6,6 +6,8 @@ sealed interface SirOverridableDeclaration<T : SirOverridableDeclaration<T>> : S
 
     val isFakeOverride: Boolean
 
+    val isAbstract: Boolean
+
     val memberOwner: SirClass?
 
     val overriddenDeclarations: List<T>

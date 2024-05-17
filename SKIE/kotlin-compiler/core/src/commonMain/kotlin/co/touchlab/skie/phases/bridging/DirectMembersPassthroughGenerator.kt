@@ -48,7 +48,7 @@ object DirectMembersPassthroughGenerator {
             return
         }
 
-        function.shallowCopy(parent = this, isFakeOverride = false).apply {
+        function.shallowCopy(parent = this, isFakeOverride = false, isAbstract = false).apply {
             copyValueParametersFrom(function)
 
             addFunctionBody(function, delegateAccessor)
@@ -78,6 +78,7 @@ object DirectMembersPassthroughGenerator {
         property.shallowCopy(
             parent = this,
             isFakeOverride = false,
+            isAbstract = false,
         ).apply {
             addGetter(property, delegateAccessor)
             addSetter(property, delegateAccessor)

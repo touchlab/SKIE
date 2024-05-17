@@ -32,7 +32,6 @@ class CreateSirMembersPhase(
 ) : SirPhase {
 
     private val kirProvider = context.kirProvider
-    private val sirProvider = context.sirProvider
     private val sirTypeTranslator = context.sirTypeTranslator
 
     context(SirPhase.Context)
@@ -77,6 +76,7 @@ class CreateSirMembersPhase(
             returnType = sirTypeTranslator.mapReturnType(oirSimpleFunction.returnType, function.errorHandlingStrategy),
             scope = oirSimpleFunction.scope.sirScope,
             isFakeOverride = function.isFakeOverride,
+            isAbstract = function.isAbstract,
             throws = function.errorHandlingStrategy.isThrowing,
             deprecationLevel = function.deprecationLevel,
             visibility = function.visibility,
@@ -95,6 +95,8 @@ class CreateSirMembersPhase(
         val sirProperty = SirProperty(
             identifier = property.swiftName,
             parent = property.getSirParent(),
+            // WIP Add modality from Kir to all Sir
+            isAbstract = property.isAbstract,
             type = sirTypeTranslator.mapType(oirProperty.type),
             scope = oirProperty.scope.sirScope,
             deprecationLevel = property.deprecationLevel,
@@ -175,6 +177,9 @@ class CreateSirMembersPhase(
     private val KirCallableDeclaration<*>.isHidden: Boolean
         get() = (this.visibility == SirVisibility.Public && this.isRefinedInSwift) ||
             this.configuration[SkieVisibility] in listOf(SkieVisibility.Level.PublicButHidden, SkieVisibility.Level.PublicButReplaced)
+
+    private val KirCallableDeclaration<*>.isAbstract: Boolean
+        get() = this.modality == KirCallableDeclaration.Modality.Abstract || this.owner.kind == KirClass.Kind.Interface
 
     private val KirFunction<*>.swiftFunctionName: SwiftFunctionName
         get() {
