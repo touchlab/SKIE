@@ -88,6 +88,7 @@ class SirSimpleFunction(
                 parent = this@SirDeclarationParent,
                 returnType = returnType,
                 visibility = visibility,
+                modality = modality,
                 isAbstract = isAbstract,
                 isReplaced = isReplaced,
                 isHidden = isHidden,
