@@ -72,9 +72,10 @@ import co.touchlab.skie.phases.sir.member.CreateSirMembersPhase
 import co.touchlab.skie.phases.sir.member.InitializeSirMembersCachePhase
 import co.touchlab.skie.phases.sir.member.InitializeSirOverridesPhase
 import co.touchlab.skie.phases.sir.member.NormalizeKotlinSirPrivateVisibilityPhase
-import co.touchlab.skie.phases.sir.member.VerifySirVisibilityInAbstractMembersPhase
+import co.touchlab.skie.phases.sir.member.PropagateSirIsHiddenPropertyInMembersPhase
 import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToMembersPhase
 import co.touchlab.skie.phases.sir.member.StripKonanCallableDeclarationManglingPhase
+import co.touchlab.skie.phases.sir.member.VerifySirVisibilityInAbstractMembersPhase
 import co.touchlab.skie.phases.sir.type.CreateExternalSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirExtensionsPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirTypesPhase
@@ -188,6 +189,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
             StripKonanCallableDeclarationManglingPhase,
             FixNamesOfInaccessibleNestedClassesPhase,
             CommitSirIsReplacedPropertyPhase,
+            PropagateSirIsHiddenPropertyInMembersPhase,
 
             NormalizeKotlinSirPrivateVisibilityPhase,
             PropagateSirVisibilityToClassesPhase,

@@ -20,6 +20,15 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     val oirCallableDeclaration: OirCallableDeclaration
 
+    val primarySirCallableDeclaration: SirCallableDeclaration
+        get() = oirCallableDeclaration.primarySirCallableDeclaration
+
+    val originalSirCallableDeclaration: SirCallableDeclaration
+        get() = oirCallableDeclaration.originalSirCallableDeclaration
+
+    val bridgedSirCallableDeclaration: SirCallableDeclaration?
+        get() = oirCallableDeclaration.bridgedSirCallableDeclaration
+
     val isRefinedInSwift: Boolean
 
     val kotlinSignature: String

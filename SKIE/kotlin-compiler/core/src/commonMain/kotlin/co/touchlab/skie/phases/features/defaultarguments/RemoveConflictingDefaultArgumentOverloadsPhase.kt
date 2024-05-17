@@ -1,6 +1,7 @@
 package co.touchlab.skie.phases.features.defaultarguments
 
 import co.touchlab.skie.kir.element.KirFunction
+import co.touchlab.skie.kir.util.isBaseDeclaration
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirFunction
@@ -14,7 +15,7 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        val allBaseFunctions = kirProvider.kotlinConstructors + kirProvider.kotlinSimpleFunctions.filter { it.overriddenDeclarations.isEmpty() }
+        val allBaseFunctions = kirProvider.kotlinConstructors + kirProvider.kotlinSimpleFunctions.filter { it.isBaseDeclaration }
 
         val allDefaultArgumentOverloads = allBaseFunctions.flatMap { it.defaultArgumentsOverloads }.toSet()
 

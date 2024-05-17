@@ -6,6 +6,7 @@ import co.touchlab.skie.kir.element.KirCallableDeclaration
 import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirOverridableDeclaration
 import co.touchlab.skie.kir.util.getEntireOverrideHierarchy
+import co.touchlab.skie.kir.util.isBaseDeclaration
 import co.touchlab.skie.phases.KirPhase
 
 class UnifyFlowConfigurationForOverridesPhase(
@@ -20,7 +21,7 @@ class UnifyFlowConfigurationForOverridesPhase(
     context(KirPhase.Context)
     override suspend fun execute() {
         kirProvider.kotlinOverridableDeclaration
-            .filter { it.overriddenDeclarations.isEmpty() && it.overriddenBy.isNotEmpty() }
+            .filter { it.isBaseDeclaration && it.overriddenBy.isNotEmpty() }
             .forEach {
                 it.unifyConfigurationForOverrides()
             }

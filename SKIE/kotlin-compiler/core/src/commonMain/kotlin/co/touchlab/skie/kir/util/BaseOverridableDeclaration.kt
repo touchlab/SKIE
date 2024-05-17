@@ -117,3 +117,6 @@ fun <T : BaseOverridableDeclaration<T>> T.removeOverriddenBy(vararg declarations
 fun <T : BaseOverridableDeclaration<T>> T.removeOverriddenBy(declarations: List<T>) {
     declarations.forEach { removeOverriddenBy(it) }
 }
+
+val BaseOverridableDeclaration<*>.isBaseDeclaration: Boolean
+    get() = overriddenDeclarations.isEmpty()

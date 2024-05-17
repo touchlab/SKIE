@@ -1,5 +1,6 @@
 package co.touchlab.skie.sir.element
 
+import co.touchlab.skie.kir.util.BaseOverridableDeclaration
 import co.touchlab.skie.util.pop
 
 sealed interface SirOverridableDeclaration<T : SirOverridableDeclaration<T>> : SirCallableDeclaration {
@@ -129,3 +130,6 @@ fun <T : SirOverridableDeclaration<T>> T.removeOverriddenBy(vararg declarations:
 fun <T : SirOverridableDeclaration<T>> T.removeOverriddenBy(declarations: List<T>) {
     declarations.forEach { removeOverriddenBy(it) }
 }
+
+val SirOverridableDeclaration<*>.isBaseDeclaration: Boolean
+    get() = overriddenDeclarations.isEmpty()
