@@ -9,7 +9,6 @@ import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeParameter
-import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.toSirKind
 import co.touchlab.skie.util.toSirVisibility
 
@@ -39,7 +38,7 @@ class CreateKotlinSirTypesPhase : SirPhase {
             kind = kirClass.oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Kir(kirClass),
             visibility = kirClass.configuration[SkieVisibility].toSirVisibility(),
-            isReplaced = kirClass.configuration[SkieVisibility] == SkieVisibility.Level.PublicButReplaced,
+            isReplaced = kirClass.configuration[SkieVisibility] in listOf(SkieVisibility.Level.PublicButReplaced, SkieVisibility.Level.InternalAndReplaced),
             isHidden = kirClass.configuration[SkieVisibility] in listOf(SkieVisibility.Level.PublicButHidden, SkieVisibility.Level.PublicButReplaced),
         )
 

@@ -169,7 +169,8 @@ class CreateSirMembersPhase(
         get() = this.configuration[SkieVisibility].toSirVisibility()
 
     private val KirCallableDeclaration<*>.isReplaced: Boolean
-        get() = this.isRefinedInSwift || this.configuration[SkieVisibility] == SkieVisibility.Level.PublicButReplaced
+        get() = this.isRefinedInSwift ||
+            this.configuration[SkieVisibility] in listOf(SkieVisibility.Level.PublicButReplaced, SkieVisibility.Level.InternalAndReplaced)
 
     private val KirCallableDeclaration<*>.isHidden: Boolean
         get() = (this.visibility == SirVisibility.Public && this.isRefinedInSwift) ||
