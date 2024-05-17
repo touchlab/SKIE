@@ -71,8 +71,8 @@ import co.touchlab.skie.phases.sir.member.CreateSirMembersPhase
 import co.touchlab.skie.phases.sir.member.InitializeSirMembersCachePhase
 import co.touchlab.skie.phases.sir.member.InitializeSirOverridesPhase
 import co.touchlab.skie.phases.sir.member.NormalizeKotlinSirVisibilityPhase
-import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToAbstractMembersPhase
-import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToNonAbstractMembersPhase
+import co.touchlab.skie.phases.sir.member.VerifySirVisibilityInAbstractMembersPhase
+import co.touchlab.skie.phases.sir.member.PropagateSirVisibilityToMembersPhase
 import co.touchlab.skie.phases.sir.member.StripKonanCallableDeclarationManglingPhase
 import co.touchlab.skie.phases.sir.type.CreateExternalSirTypesPhase
 import co.touchlab.skie.phases.sir.type.CreateKotlinSirExtensionsPhase
@@ -190,9 +190,9 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
 
             NormalizeKotlinSirVisibilityPhase,
             PropagateSirVisibilityToClassesPhase,
-            PropagateSirVisibilityToNonAbstractMembersPhase,
-            PropagateSirVisibilityToAbstractMembersPhase,
+            PropagateSirVisibilityToMembersPhase,
             PropagateSirVisibilityToTypeAliasesPhase,
+            VerifySirVisibilityInAbstractMembersPhase,
 
             RenameTypesConflictingWithKeywordsPhase,
             RenameTypesConflictingWithKotlinModulePhase,
@@ -230,10 +230,10 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
 
             NormalizeKotlinSirVisibilityPhase,
             PropagateSirVisibilityToClassesPhase,
-            PropagateSirVisibilityToNonAbstractMembersPhase,
-            PropagateSirVisibilityToAbstractMembersPhase,
+            PropagateSirVisibilityToMembersPhase,
             PropagateSirVisibilityToFileClassesPhase,
             PropagateSirVisibilityToTypeAliasesPhase,
+            VerifySirVisibilityInAbstractMembersPhase,
 
             AddAvailabilityBasedDeprecationLevelPhase,
             AddAvailabilityToAsyncFunctionsPhase,

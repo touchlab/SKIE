@@ -8,7 +8,7 @@ import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.minimumVisibility
 import co.touchlab.skie.sir.type.visibilityConstraint
 
-object PropagateSirVisibilityToNonAbstractMembersPhase : SirPhase {
+object PropagateSirVisibilityToMembersPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
