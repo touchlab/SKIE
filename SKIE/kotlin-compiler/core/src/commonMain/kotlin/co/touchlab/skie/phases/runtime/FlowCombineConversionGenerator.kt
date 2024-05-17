@@ -27,8 +27,8 @@ object FlowCombineConversionGenerator {
 
                 internal final actor SkieCombineSubscription<F: SkieSwiftFlowProtocol<S.Input>, S: Combine.Subscriber>: Combine.Subscription where S.Failure == _Concurrency.CancellationError {
                     private var currentDemand: Combine.Subscribers.Demand = .none
-                    private var onDemandUpdated: _Concurrency.CheckedContinuation<Void, Never>? = nil
-                    private var collectingTask: _Concurrency.Task<Void, Never>?
+                    private var onDemandUpdated: _Concurrency.CheckedContinuation<Swift.Void, Swift.Never>? = nil
+                    private var collectingTask: _Concurrency.Task<Swift.Void, Swift.Never>?
 
                     init(flow: F, subscriber: S) {
                         _Concurrency.Task {
@@ -55,7 +55,7 @@ object FlowCombineConversionGenerator {
 
                                 // If we get cancelled, tell subscriber we failed with CancellationError
                                 guard !_Concurrency.Task.isCancelled else {
-                                    subscriber.receive(completion: .failure(CancellationError()))
+                                    subscriber.receive(completion: .failure(_Concurrency.CancellationError()))
                                     return
                                 }
 
@@ -71,7 +71,7 @@ object FlowCombineConversionGenerator {
 
                                 // If we get cancelled, tell subscriber we failed with CancellationError
                                 guard !_Concurrency.Task.isCancelled else {
-                                    subscriber.receive(completion: .failure(CancellationError()))
+                                    subscriber.receive(completion: .failure(_Concurrency.CancellationError()))
                                     return
                                 }
 
