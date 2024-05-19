@@ -6,6 +6,8 @@ object FutureCombineExtensionGenerator {
     context(SirPhase.Context)
     fun generate() {
         namespaceProvider.getSkieNamespaceWrittenSourceFile("Combine.Future+asyncInit").content = """
+            import Combine
+
             extension Combine.Future where Failure == Swift.Error {
                 /**
                  A convenience initializer that can be used to convert Swift async throwing functions into Combine Futures.
