@@ -1,23 +1,18 @@
 package co.touchlab.skie.phases.runtime
 
-import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.SirClass
-import co.touchlab.skie.sir.element.SirModality
-import co.touchlab.skie.sir.element.SirTypeParameter
-import co.touchlab.skie.sir.element.SirVisibility
 
 object FlowCombineConversionGenerator {
 
     context(SirPhase.Context)
     fun generate() {
-        if (SkieConfigurationFlag.Feature_FlowCombineConvertor.isEnabled) {
-            generateSkieCombineSubscription()
+        generateSkieCombineSubscription()
 
-            generateSkieFlowPublisher()
+        generateSkieFlowPublisher()
 
-            generateToPublisherExtension()
-        }
+        generateToPublisherExtension()
+
+        generatePublisherSinkExtension()
     }
 
     context(SirPhase.Context)
@@ -152,10 +147,42 @@ object FlowCombineConversionGenerator {
                 import Combine
 
                 extension SkieSwiftFlowProtocol {
+                    /**
+                     Returns a Published from this Flow. This publisher can fail with a ``CancellationError`` when the underlying flow is cancelled from Kotlin.
+
+                     - Returns: A publisher instance, which you can use Combine operators with. It's cold and won't start collecting the backing flow until a subscriber is attached.
+                    */
                     public func toPublisher() -> some Combine.Publisher<Element, _Concurrency.CancellationError> {
                         SkieFlowPublisher(flow: self)
                     }
                 }
             """.trimIndent()
+    }
+
+    context(SirPhase.Context)
+    private fun generatePublisherSinkExtension() {
+        namespaceProvider.getSkieNamespaceWrittenSourceFile("Combine.Publisher+sink").content = """
+            import Combine
+
+            extension Combine.Publisher where Self.Failure == _Concurrency.CancellationError {
+
+                /**
+                 Attaches a subscriber with closure-based behavior to a publisher that fails with ``CancellationError``.
+
+                 Use ``Publisher/sink(receiveValue:)`` to observe values received by the publisher and print them to the console.
+                 This operator is meant to be used mainly with SKIE Flows, which can fail with ``CancellationError``.
+                 That means the publisher’s ``Publisher/Failure`` type is ``CancellationError``.
+
+                 This method creates the subscriber and immediately requests an unlimited number of values, prior to returning the subscriber.
+                 The return value should be held, otherwise the stream will be canceled.
+
+                 - parameter receiveValue: The closure to execute on receipt of a value.
+                 - Returns: A cancellable instance, which you use when you end assignment of the received value. Deallocation of the result will tear down the subscription stream.
+                */
+                public func sink(receiveValue: @escaping ((Self.Output) -> Swift.Void)) -> Combine.AnyCancellable {
+                    self.sink(receiveCompletion: { _ in }, receiveValue: receiveValue)
+                }
+            }
+        """.trimIndent()
     }
 }

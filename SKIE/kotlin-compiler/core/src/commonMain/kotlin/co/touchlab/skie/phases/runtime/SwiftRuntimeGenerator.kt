@@ -20,7 +20,13 @@ object SwiftRuntimeGenerator : SirPhase {
         val skieSwiftFlowIterator = SkieSwiftFlowIteratorGenerator.generate()
         SupportedFlowRuntimeGenerator.generate(skieSwiftFlowIterator)
 
-        FlowCombineConversionGenerator.generate()
+        if (SkieConfigurationFlag.Feature_FlowCombineConvertor.isEnabled) {
+            FlowCombineConversionGenerator.generate()
+        }
+
+        if (SkieConfigurationFlag.Feature_FutureCombineExtension.isEnabled) {
+            FutureCombineExtensionGenerator.generate()
+        }
     }
 
     private fun getSwiftRuntimeFiles(): List<Resource> =
