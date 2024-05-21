@@ -22,20 +22,26 @@ private object KotlinNativeDownloaderProperties {
 
     const val main = "kotlin.native.version"
     const val deprecated = "org.jetbrains.kotlin.native.version"
+    const val downloadFromMaven = "kotlin.native.distribution.downloadFromMaven"
 }
 
 fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File {
     return NativeCompilerDownloader(project, CompilerVersion.fromString(kotlinVersion.toString()))
         .also { downloader ->
             val originalVersionProperty = backupProperty<String?>(getKotlinNativeVersionPropertyName())
+            val originalDownloadFromMavenProperty = backupProperty<String>(KotlinNativeDownloaderProperties.downloadFromMaven)
 
             extra.set(KotlinNativeDownloaderProperties.main, kotlinVersion.toString())
+            if (kotlinVersion >= KotlinToolingVersion("1.9.20")) {
+                extra.set(KotlinNativeDownloaderProperties.downloadFromMaven, "true")
+            }
 
             downloader.downloadIfNeeded()
 
             extra.set(KotlinNativeDownloaderProperties.main, null)
 
             restoreProperty(originalVersionProperty)
+            restoreProperty(originalDownloadFromMavenProperty)
         }
         .compilerDirectory
 }
