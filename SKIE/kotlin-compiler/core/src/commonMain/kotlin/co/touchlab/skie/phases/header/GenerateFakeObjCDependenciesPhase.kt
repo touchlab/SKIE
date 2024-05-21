@@ -7,13 +7,12 @@ import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 
 object GenerateFakeObjCDependenciesPhase : SirPhase {
-
     context(SirPhase.Context)
     override suspend fun execute() {
         oirProvider.externalClassesAndProtocols
             .groupBy { it.originalSirClass.module }
             // TODO: Replace with two types of external modules (fake and SDK) and handle available SDK modules properly.
-            .filterKeys { it is SirModule.External && it.name !in knownSdkModules }
+            .filterKeys { it is SirModule.External && !isKnownSdkModule(it.name) }
             .mapKeys { it.key as SirModule.External }
             .forEach { (module, types) ->
                 generateFakeFramework(module, types)
@@ -74,7 +73,7 @@ private fun OirClass.getProtocolHeaderEntry(): String =
  find *.platform/Developer/SDKs/*.sdk/System/Library/Frameworks -name '*.framework' -prune -type d -exec basename {} '.framework' \; | sort | uniq | pbcopy
  ``` // this is to match a comment "opening" in the find command: */
 */
-private val knownSdkModules = setOf(
+private val knownTopLevelSdkModules = setOf(
     "AGL",
     "ARKit",
     "AVFAudio",
@@ -384,3 +383,16 @@ private val knownSdkModules = setOf(
     "iTunesLibrary",
     "vmnet",
 )
+
+/*
+ This is a limited list of nested modules that's currently needed to pass all library tests.
+ It's needed because Kotlin imports nested modules directly in the `platform` package,
+ so SKIE has no way to know they are nested.
+ */
+val knownNestedSdkModules = mapOf(
+    "EAGL" to "OpenGLES",
+)
+
+private fun isKnownSdkModule(moduleName: String): Boolean {
+    return moduleName in knownNestedSdkModules.keys || moduleName in knownTopLevelSdkModules
+}

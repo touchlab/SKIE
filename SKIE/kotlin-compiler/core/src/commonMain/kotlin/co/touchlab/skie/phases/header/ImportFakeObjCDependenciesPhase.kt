@@ -45,8 +45,11 @@ object ImportFakeObjCDependenciesPhase : SirPhase {
 
     context(SirPhase.Context)
     private fun importFakeFrameworks(fakeExternalModules: List<SirModule.External>, originalHeader: String) {
-        val fakeImports = fakeExternalModules.joinToString("\n") {
-            "#import <${it.name}/${it.name}.h>"
+        val fakeImports = fakeExternalModules.joinToString("\n") { module ->
+            // TODO: Properly fix this for nested modules as part of work to add distinction between the fake and SDK modules.
+            knownNestedSdkModules[module.name]?.let { parentName ->
+                "#import <$parentName/${module.name}.h>"
+            } ?: "#import <${module.name}/${module.name}.h>"
         }
 
         val updatedContent = originalHeader + "\n$fakeImports"
