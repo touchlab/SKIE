@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import java.io.File
 
 class ActualKotlinNativeCompilationShim(
-    private val kotlinNativeCompilation: KotlinNativeCompilation,
+    val kotlinNativeCompilation: KotlinNativeCompilation,
     override val target: KotlinNativeTargetShim,
 ) : KotlinNativeCompilationShim, Named by kotlinNativeCompilation {
 

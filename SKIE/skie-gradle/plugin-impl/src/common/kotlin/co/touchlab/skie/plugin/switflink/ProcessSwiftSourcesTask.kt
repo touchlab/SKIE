@@ -28,7 +28,10 @@ abstract class ProcessSwiftSourcesTask : DefaultTask() {
         fileSystemOperations.sync {
             duplicatesStrategy = DuplicatesStrategy.FAIL
 
-            from(inputs.files)
+            from(inputs.files) {
+                include("**/*.swift")
+            }
+
             into(output)
         }
     }

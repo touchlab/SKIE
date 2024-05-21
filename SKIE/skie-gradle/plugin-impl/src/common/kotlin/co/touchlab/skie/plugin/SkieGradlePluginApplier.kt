@@ -12,6 +12,7 @@ import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftBundlingConfigurator
+import co.touchlab.skie.plugin.switflink.SwiftUnpackingConfigurator
 import co.touchlab.skie.plugin.util.toKotlinCompilerPluginOption
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Project
@@ -65,6 +66,8 @@ object SkieGradlePluginApplier {
         disableCachingIfNeeded()
 
         addDependencyOnSkieRuntime()
+
+        SwiftUnpackingConfigurator.configureCustomSwiftUnpacking(this)
 
         SkieSubPluginManager.registerSubPlugins(this)
 

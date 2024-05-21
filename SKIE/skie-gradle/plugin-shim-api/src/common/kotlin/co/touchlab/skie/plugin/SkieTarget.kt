@@ -2,8 +2,8 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.shim.KonanTargetShim
+import co.touchlab.skie.plugin.shim.KotlinNativeCompilationShim
 import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
-import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.gradle.api.Project
@@ -39,7 +39,10 @@ sealed interface SkieTarget {
 
     fun addFreeCompilerArgs(vararg args: String)
 
-    interface Binary : SkieTarget
+    interface Binary : SkieTarget {
+
+        val compilationProvider: Provider<KotlinNativeCompilationShim>
+    }
 
     interface Artifact : SkieTarget {
 

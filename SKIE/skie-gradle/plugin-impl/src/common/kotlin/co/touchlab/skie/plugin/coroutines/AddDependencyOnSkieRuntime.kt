@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.skieInternalExtension
 import co.touchlab.skie.plugin.util.named
+import co.touchlab.skie.util.file.isKlib
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleIdentifier
 import org.gradle.api.artifacts.ResolvedDependency
@@ -94,7 +95,7 @@ private fun SkieTarget.verifyAllRuntimeDependenciesAreAvailable(
 
 private fun SkieTarget.passRuntimeDependencyToCompiler(skieRuntimeDependency: ResolvedDependency) {
     skieRuntimeDependency.moduleArtifacts
-        .single { it.file.extension == "klib" }
+        .single { it.file.isKlib }
         .let { moduleArtifact ->
             addFreeCompilerArgs(
                 "-Xexport-library=${moduleArtifact.file.absolutePath}",

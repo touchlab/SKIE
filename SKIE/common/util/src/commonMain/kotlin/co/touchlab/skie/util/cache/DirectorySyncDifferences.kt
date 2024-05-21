@@ -1,5 +1,6 @@
 package co.touchlab.skie.util.cache
 
+import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
@@ -8,6 +9,10 @@ import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
+
+fun File.syncDirectoryContentIfDifferent(destination: File) {
+    toPath().syncDirectoryContentIfDifferent(destination.toPath())
+}
 
 fun Path.syncDirectoryContentIfDifferent(destination: Path) {
     if (!destination.exists()) {

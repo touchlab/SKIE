@@ -14,7 +14,7 @@ import java.io.File
 
 object SwiftBundlingConfigurator {
 
-    private const val klibSkieSwiftDirectory: String = "default/skie/swift"
+    const val KLIB_SKIE_SWIFT_DIRECTORY: String = "default/skie/swift"
 
     fun configureCustomSwiftBundling(project: Project) {
         project.kgpShim.kotlinNativeTargets.configureEach {
@@ -33,7 +33,7 @@ object SwiftBundlingConfigurator {
     private fun Project.createProcessSwiftSourcesTask(compilation: KotlinNativeCompilationShim): Provider<ProcessSwiftSourcesTask> {
         val compilationPrefix = compilation.name.takeIf { it.lowercase() != "main" }
 
-        val baseName = lowerCamelCaseName("process", compilationPrefix, compilation.target.name, "swiftSources")
+        val baseName = lowerCamelCaseName("processSwiftSources", compilationPrefix, compilation.target.name)
 
         val swiftSourceSet = createSwiftSourceSet(compilation)
 
@@ -77,7 +77,7 @@ object SwiftBundlingConfigurator {
         }
 
         klib.writeToZip { fileSystem ->
-            val klibSwiftSourcesDirectory = fileSystem.getPath("/$klibSkieSwiftDirectory")
+            val klibSwiftSourcesDirectory = fileSystem.getPath("/$KLIB_SKIE_SWIFT_DIRECTORY")
 
             swiftSourcesDirectory.toPath().syncDirectoryContentIfDifferent(klibSwiftSourcesDirectory)
         }

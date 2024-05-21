@@ -3,6 +3,7 @@ package co.touchlab.skie.phases.swift
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.util.directory.SkieBuildDirectory
+import co.touchlab.skie.util.file.deleteEmptyDirectoriesRecursively
 import java.io.File
 import kotlin.io.path.listDirectoryEntries
 
@@ -50,11 +51,7 @@ object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
         }
 
         private fun deleteEmptyDirectories() {
-            generatedSwiftDirectory.directory
-                .walkTopDown()
-                .filter { it.isDirectory }
-                .filter { it.toPath().listDirectoryEntries().isEmpty() }
-                .forEach { it.deleteRecursively() }
+            generatedSwiftDirectory.directory.deleteEmptyDirectoriesRecursively()
         }
     }
 }

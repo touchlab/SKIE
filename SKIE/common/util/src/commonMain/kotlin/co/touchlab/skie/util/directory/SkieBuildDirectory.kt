@@ -76,11 +76,11 @@ class SkieBuildDirectory(
 
         val generated: Generated = Generated(this)
 
-        val custom: Custom = Custom(this)
+        val bundled: Bundled = Bundled(this)
 
         class Generated(parent: Directory) : PermanentDirectory(parent, "generated")
 
-        class Custom(parent: Directory) : PermanentDirectory(parent, "custom")
+        class Bundled(parent: Directory) : PermanentDirectory(parent, "bundled")
     }
 
     class SwiftCompiler(parent: Directory) : PermanentDirectory(parent, "swift-compiler") {

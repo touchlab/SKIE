@@ -90,11 +90,22 @@ class ActualKgpShim(
             .filterIsInstance<Framework>()
             .toSet()
 
-    private fun registerBinaryTarget(target: KotlinNativeTarget, binary: Framework, frameworksUsedInXCFrameworks: Set<Framework>) {
+    private fun registerBinaryTarget(
+        target: KotlinNativeTarget,
+        binary: Framework,
+        frameworksUsedInXCFrameworks: Set<Framework>,
+    ) {
+        val compilationShimProvider = project.provider {
+            kotlinNativeTargets
+                .flatMap { it.compilations }
+                .first { (it as? ActualKotlinNativeCompilationShim)?.kotlinNativeCompilation == binary.compilation }
+        }
+
         val binaryTarget = ActualSkieBinaryTarget(
             project = project,
             target = target,
             binary = binary,
+            compilationProvider = compilationShimProvider,
             isForXCFramework = binary in frameworksUsedInXCFrameworks,
         )
 
