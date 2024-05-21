@@ -129,6 +129,16 @@ object SwiftUIFlowObservingGenerator {
                 var initialValue: Element { get }
             }
 
+            extension SkieSwiftFlowWithInitialValue {
+                var flow: Flow {
+                    Swift.fatalError("SkieSwiftFlowWithInitialValue has to be conformed to with @_spi(SKIE) enabled and this property implemented")
+                }
+
+                var initialValue: Element {
+                    Swift.fatalError("SkieSwiftFlowWithInitialValue has to be conformed to with @_spi(SKIE) enabled and this property implemented")
+                }
+            }
+
             internal struct SkieSwiftFlowWithInitialValueImpl<Flow: SkieSwiftFlowProtocol>: SkieSwiftFlowWithInitialValue {
                 let flow: Flow
                 let initialValue: Flow.Element
@@ -148,7 +158,7 @@ object SwiftUIFlowObservingGenerator {
 
             extension SkieSwiftMutableStateFlow: SkieSwiftFlowWithInitialValue {
                 @_spi(SKIE)
-                public var flow: some SkieSwiftMutableStateFlow<Element> {
+                public var flow: SkieSwiftMutableStateFlow<Element> {
                     self
                 }
 
