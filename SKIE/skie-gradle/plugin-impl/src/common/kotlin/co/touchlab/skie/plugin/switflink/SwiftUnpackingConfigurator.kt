@@ -24,8 +24,10 @@ object SwiftUnpackingConfigurator {
             output.set(bundledSwiftDirectory)
         }
 
+        val unpackTaskOutput = unpackTask.flatMap { it.output }
+
         target.task.configure {
-            inputs.files(unpackTask.map { it.output })
+            inputs.files(unpackTaskOutput)
         }
     }
 }

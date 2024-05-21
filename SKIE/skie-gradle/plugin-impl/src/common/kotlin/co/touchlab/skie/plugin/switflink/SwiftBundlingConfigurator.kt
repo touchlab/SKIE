@@ -60,17 +60,21 @@ object SwiftBundlingConfigurator {
     }
 
     private fun KotlinNativeCompilationShim.configureCompileTask(processSwiftSourcesTaskProvider: Provider<ProcessSwiftSourcesTask>) {
+        val processSwiftSourcesTaskOutput = processSwiftSourcesTaskProvider.flatMap { it.output }
+
+        val compileTaskOutputFileProvider = compileTaskOutputFileProvider
+
         compileTaskProvider.configure {
-            inputs.files(processSwiftSourcesTaskProvider.map { it.outputs })
+            inputs.files(processSwiftSourcesTaskOutput)
 
             doLast {
-                copySwiftSourcesToKlib(compileTaskOutputFileProvider.get(), processSwiftSourcesTaskProvider.get())
+                copySwiftSourcesToKlib(compileTaskOutputFileProvider.get(), processSwiftSourcesTaskOutput)
             }
         }
     }
 
-    private fun copySwiftSourcesToKlib(klib: File, processResourcesTask: ProcessSwiftSourcesTask) {
-        val swiftSourcesDirectory = processResourcesTask.output.get()
+    private fun copySwiftSourcesToKlib(klib: File, processSwiftSourcesTaskOutput: Provider<File>) {
+        val swiftSourcesDirectory = processSwiftSourcesTaskOutput.get()
 
         if (!swiftSourcesDirectory.exists()) {
             return
