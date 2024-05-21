@@ -47,7 +47,7 @@ object SwiftUIFlowObservingGenerator {
                     let viewModel = SharedViewModel()
 
                     @State
-                    var counter: Int = 0
+                    var counter: KotlinInt = 0
 
                     var body: some View {
                         Text("Tick #\(counter)")
@@ -62,6 +62,46 @@ object SwiftUIFlowObservingGenerator {
                 public func collect<Flow: SkieSwiftFlowProtocol>(flow: Flow, into binding: SwiftUI.Binding<Flow.Element>) -> some SwiftUI.View {
                     collect(flow: flow) { newValue in
                         binding.wrappedValue = newValue
+                    }
+                }
+
+                /**
+                 A view modifier used to collect a SKIE-bridged Flow into a SwiftUI Binding, transforming the value before assigning.
+
+                 The flow is being collected using the `task` modifier,
+                 sharing the same lifecycle.
+
+                 In the following example we collect a `Flow<Int>` property `counter`
+                 from the `SharedViewModel` into a `@State` property in our view.
+
+                 ```swift
+                 struct ExampleView: View {
+                    let viewModel = SharedViewModel()
+
+                    @State
+                    var counter: Int = 0
+
+                    var body: some View {
+                        Text("Tick #\(counter)")
+                            .collect(flow: viewModel.counter, into: ${'$'}counter)
+                    }
+                 }
+                 ```
+
+                 - parameter flow: A SKIE-bridged Flow you with to collect.
+                 - parameter binding: A binding to a property where each new value will be set to.
+                 - parameter transform: An async closure to transform any value emitted by the flow into a one expected by the binding.
+                                        Returning `nil` from this closure will reject the value.
+                */
+                public func collect<Flow: SkieSwiftFlowProtocol, U>(
+                    flow: Flow,
+                    into binding: SwiftUI.Binding<U>,
+                    transform: @escaping (Flow.Element) async -> U?
+                ) -> some SwiftUI.View {
+                    collect(flow: flow) { newValue in
+                        if let newTransformedValue = await transform(newValue) {
+                            binding.wrappedValue = newTransformedValue
+                        }
                     }
                 }
 
