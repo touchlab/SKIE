@@ -61,7 +61,7 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
      *       This means Futures don't wait for calling `.sink` on them.
      *       Futures also don't support cancellation.
      */
-    val enableFutureCombineExtension: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val enableFutureCombineExtensionPreview: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     /**
      * SKIE has a **preview** support for converting Flows into `Combine.Publisher` types.
@@ -101,7 +101,84 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
      *       The example above doesn't store the cancellable returned by `sink`,
      *       so it would immediately cancel and `receiveValue` wouldn't get called.
      */
-    val enableFlowCombineConvertor: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val enableFlowCombineConvertorPreview: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+
+    /**
+     * SKIE has a **preview** support for observing Flows in SwiftUI views.
+     * When enabled,
+     * SKIE will include two APIs for observing Flows in SwiftUI.
+     * Each has its own uses, and we'd like your feedback on both.
+     *
+     * The first one is a view modifier `collect`,
+     * which you can use to collect a flow inside a view.
+     * Either into a `@State` property directly using a SwiftUI `Binding`,
+     * or through a provided `async` closure.
+     *
+     * The other one is a SwiftUI view `Observing`,
+     * which you can use to collect one or multiple flows and display a view based on the latest values.
+     * This is similar to the builtin SwiftUI view `ForEach`.
+     * Where `ForEach` takes a synchronous sequence (e.g. an array),
+     * `Observing` takes an asynchronous sequence (e.g. a Flow, a SharedFlow, or a StateFlow).
+     *
+     * Let's consider the following Kotlin view model which we'll want to interact with from SwiftUI.
+     *
+     * ```kotlin
+     * class SharedViewModel {
+     *     val counter = flow<Int> {
+     *         var counter = 0
+     *         while (true) {
+     *             emit(counter++)
+     *             delay(1.seconds)
+     *         }
+     *     }
+     *
+     *     val toggle = flow<Boolean> {
+     *         var toggle = false
+     *         while (true) {
+     *             emit(toggle)
+     *             toggle = !toggle
+     *             delay(1.seconds)
+     *         }
+     *     }
+     * }
+     * ```
+     *
+     * Then we can use the SKIE-included helpers to interact with the `SharedViewModel` from SwiftUI.
+     * In the sample below, we'll use all of them as an example, not a real-world scenario.
+     *
+     * ```swift
+     * struct ExampleView: View {
+     *     let viewModel = SharedViewModel()
+     *
+     *     @State
+     *     var boundCounter: KotlinInt = 0
+     *
+     *     @State
+     *     var manuallyUpdatedCounter: Int = 0
+     *
+     *     var body: some View {
+     *         Text("Bound counter using Binding: \(boundCounter)")
+     *             .collect(flow: viewModel.counter, into: $counter)
+     *
+     *         Text("Manually updated counter: \(manuallyUpdatedCounter)")
+     *             .collect(flow: viewModel.counter) { latestValue in
+     *                 manuallyUpdatedCounter = latestValue.intValue
+     *             }
+     *
+     *         Observing(viewModel.counter, viewModel.toggle) {
+     *             ProgressView("Waiting for counters to flows to produce a first value")
+     *         } content: { counter, toggle in
+     *             Text("Counter: \(counter), Toggle: \(toggle)")
+     *         }
+     *
+     *         Observing(viewModel.counter.withInitialValue(0), viewModel.toggle.withInitialValue(false)) { counter, toggle in
+     *             Text("Counter: \(counter), Toggle: \(toggle)")
+     *         }
+     *     }
+     * }
+     * ```
+     */
+    val enableSwiftUIObservingPreview: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     internal val groupConfigurations = mutableListOf<GroupConfiguration>()
 
@@ -129,7 +206,8 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
         setOfNotNull(
             SkieConfigurationFlag.Feature_CoroutinesInterop takeIf coroutinesInterop,
             SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries takeIf defaultArgumentsInExternalLibraries,
-            SkieConfigurationFlag.Feature_FlowCombineConvertor takeIf enableFlowCombineConvertor,
-            SkieConfigurationFlag.Feature_FutureCombineExtension takeIf enableFutureCombineExtension,
+            SkieConfigurationFlag.Feature_FlowCombineConvertor takeIf enableFlowCombineConvertorPreview,
+            SkieConfigurationFlag.Feature_FutureCombineExtension takeIf enableFutureCombineExtensionPreview,
+            SkieConfigurationFlag.Feature_SwiftUIObserving takeIf enableSwiftUIObservingPreview,
         )
 }

@@ -27,6 +27,10 @@ object SwiftRuntimeGenerator : SirPhase {
         if (SkieConfigurationFlag.Feature_FutureCombineExtension.isEnabled) {
             FutureCombineExtensionGenerator.generate()
         }
+
+        if (SkieConfigurationFlag.Feature_SwiftUIObserving.isEnabled) {
+            SwiftUIFlowObservingGenerator.generate()
+        }
     }
 
     private fun getSwiftRuntimeFiles(): List<Resource> =

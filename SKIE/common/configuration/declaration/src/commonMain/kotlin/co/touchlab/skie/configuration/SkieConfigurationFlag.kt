@@ -9,6 +9,7 @@ enum class SkieConfigurationFlag {
 
     Feature_FlowCombineConvertor,
     Feature_FutureCombineExtension,
+    Feature_SwiftUIObserving,
 
     Build_SwiftLibraryEvolution,
     Build_ParallelSwiftCompilation,
