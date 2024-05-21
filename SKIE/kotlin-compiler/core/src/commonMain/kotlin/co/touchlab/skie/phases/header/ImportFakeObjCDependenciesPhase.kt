@@ -29,6 +29,7 @@ object ImportFakeObjCDependenciesPhase : SirPhase {
 
     context(SirPhase.Context)
     override suspend fun execute() {
+        // TODO: Make sure this runs for both 'fake' and SDK modules once support for distinction between the two module types is added.
         val fakeExternalModules = sirProvider.allUsedExternalModules.filter { it.name != "Foundation" }
 
         if (fakeExternalModules.isEmpty()) {
@@ -45,7 +46,7 @@ object ImportFakeObjCDependenciesPhase : SirPhase {
     context(SirPhase.Context)
     private fun importFakeFrameworks(fakeExternalModules: List<SirModule.External>, originalHeader: String) {
         val fakeImports = fakeExternalModules.joinToString("\n") {
-            "#import <${it.name}/${skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(it.name).name}>"
+            "#import <${it.name}/${it.name}.h>"
         }
 
         val updatedContent = originalHeader + "\n$fakeImports"
