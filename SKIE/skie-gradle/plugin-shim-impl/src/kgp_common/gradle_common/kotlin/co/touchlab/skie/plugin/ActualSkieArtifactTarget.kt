@@ -7,6 +7,7 @@ import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeArtifact
@@ -79,6 +80,10 @@ class ActualSkieArtifactTarget(
     override val freeCompilerArgs: Provider<List<String>> = task.flatMap {
         it.toolOptions.freeCompilerArgs
     }
+
+    override val linkerConfiguration: Configuration = project.configurations.getByName(
+        lowerCamelCaseName(konanTarget.presetName, fullArtifactName, "linkLibrary")
+    )
 
     override fun addPluginArgument(pluginId: String, option: KotlinCompilerPluginOption) {
         task.configure {

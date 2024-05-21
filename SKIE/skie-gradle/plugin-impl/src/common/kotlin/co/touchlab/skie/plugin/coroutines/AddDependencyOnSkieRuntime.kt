@@ -5,7 +5,6 @@ import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.skieInternalExtension
-import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.plugin.util.named
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleIdentifier
@@ -86,7 +85,7 @@ private fun SkieTarget.verifyAllRuntimeDependenciesAreAvailable(
         // KGP 1.9.10 and older handle stdlib differently and because of this difference the artifact is not present in the linker configuration
         if (it !in linkerDependenciesIds && it.toString() != "org.jetbrains.kotlin:kotlin-stdlib") {
             throw IllegalStateException(
-                "SKIE runtime requires a dependency '$it' which the target's configuration '${linkerConfigurationName}' does not have. " +
+                "SKIE runtime requires a dependency '$it' which the target's configuration '${linkerConfiguration.name}' does not have. " +
                     "This is most likely a bug in SKIE.",
             )
         }
@@ -104,17 +103,8 @@ private fun SkieTarget.passRuntimeDependencyToCompiler(skieRuntimeDependency: Re
         }
 }
 
-private val SkieTarget.linkerConfiguration: Configuration
-    get() = project.configurations.getByName(linkerConfigurationName)
-
-private val SkieTarget.linkerConfigurationName: String
-    get() = when (this) {
-        is SkieTarget.Binary -> compileDependencyConfigurationName
-        is SkieTarget.Artifact -> lowerCamelCaseName(konanTarget.presetName, fullArtifactName, "linkLibrary")
-    }
-
 private val SkieTarget.skieRuntimeConfigurationName: String
-    get() = "skieRuntimeFor" + linkerConfigurationName.replaceFirstChar { it.uppercase() }
+    get() = "skieRuntimeFor" + linkerConfiguration.name.replaceFirstChar { it.uppercase() }
 
 // Due to how KMP dependencies work there is a difference in the behavior of local and remote dependencies.
 private fun ResolvedDependency.unwrapCommonKMPModule(): Set<ResolvedDependency> =

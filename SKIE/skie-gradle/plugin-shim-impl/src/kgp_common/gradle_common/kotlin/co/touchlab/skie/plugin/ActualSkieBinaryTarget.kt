@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.shim.KonanTargetShim
 import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
@@ -18,7 +19,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 class ActualSkieBinaryTarget(
     override val project: Project,
     target: KotlinNativeTarget,
-    private val binary: NativeBinary,
+    binary: NativeBinary,
     private val isForXCFramework: Boolean,
 ) : SkieTarget.Binary {
 
@@ -32,8 +33,7 @@ class ActualSkieBinaryTarget(
 
     override val task: TaskProvider<out KotlinNativeLink> = binary.linkTaskProvider
 
-    override val compileDependencyConfigurationName: String
-        get() = binary.compilation.compileDependencyConfigurationName
+    override val linkerConfiguration: Configuration = project.configurations.getByName(binary.compilation.compileDependencyConfigurationName)
 
     override val skieDirectories: Provider<SkieDirectories> =
         project.layout.buildDirectory
