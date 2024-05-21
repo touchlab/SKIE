@@ -15,8 +15,14 @@ class ActualKotlinSourceSetShim(
     override fun toString(): String =
         kotlinSourceSet.toString()
 
-    override fun equals(other: Any?): Boolean =
-        kotlinSourceSet == other
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ActualKotlinSourceSetShim) return false
+
+        if (kotlinSourceSet != other.kotlinSourceSet) return false
+
+        return true
+    }
 
     override fun hashCode(): Int =
         kotlinSourceSet.hashCode()

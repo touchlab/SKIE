@@ -24,8 +24,14 @@ class ActualKotlinNativeTargetShim(
     override fun toString(): String =
         kotlinNativeTarget.toString()
 
-    override fun equals(other: Any?): Boolean =
-        kotlinNativeTarget == other
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ActualKotlinNativeTargetShim) return false
+
+        if (kotlinNativeTarget != other.kotlinNativeTarget) return false
+
+        return true
+    }
 
     override fun hashCode(): Int =
         kotlinNativeTarget.hashCode()

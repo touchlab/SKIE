@@ -35,8 +35,14 @@ class ActualKotlinNativeCompilationShim(
     override fun toString(): String =
         kotlinNativeCompilation.toString()
 
-    override fun equals(other: Any?): Boolean =
-        kotlinNativeCompilation == other
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ActualKotlinNativeCompilationShim) return false
+
+        if (kotlinNativeCompilation != other.kotlinNativeCompilation) return false
+
+        return true
+    }
 
     override fun hashCode(): Int =
         kotlinNativeCompilation.hashCode()

@@ -14,8 +14,14 @@ class ActualKonanTargetShim(
     override fun toString(): String =
         konanTarget.toString()
 
-    override fun equals(other: Any?): Boolean =
-        konanTarget == other
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ActualKonanTargetShim) return false
+
+        if (konanTarget != other.konanTarget) return false
+
+        return true
+    }
 
     override fun hashCode(): Int =
         konanTarget.hashCode()
