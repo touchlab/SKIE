@@ -15,7 +15,7 @@ abstract class SkieInternalExtension @Inject constructor(
 ) {
 
     val targets: NamedDomainObjectContainer<SkieTarget>
-        get() = kgpShim.targets
+        get() = kgpShim.skieTargets
 
     val isSkieEnabled: Boolean
         get() = project.skieExtension.isEnabled.get() && kgpShim.hostIsMac

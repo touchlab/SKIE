@@ -11,7 +11,7 @@ import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
-import co.touchlab.skie.plugin.switflink.SwiftLinkingConfigurator
+import co.touchlab.skie.plugin.switflink.SwiftBundlingConfigurator
 import co.touchlab.skie.plugin.util.toKotlinCompilerPluginOption
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Project
@@ -40,11 +40,13 @@ object SkieGradlePluginApplier {
             return
         }
 
+        kgpShim.initializeShim()
+
         warnOnEmptyFrameworks()
 
         FatFrameworkConfigurator.configureSkieForFatFrameworks(project)
 
-        kgpShim.initializeSkieTargets()
+        SwiftBundlingConfigurator.configureCustomSwiftBundling(this)
 
         skieInternalExtension.targets.configureEach {
             configureSkie()
@@ -59,8 +61,6 @@ object SkieGradlePluginApplier {
         configureMinOsVersionIfNeeded()
 
         CreateSkieConfigurationTask.registerTask(this)
-
-        SwiftLinkingConfigurator.configureCustomSwiftLinking(this)
 
         disableCachingIfNeeded()
 

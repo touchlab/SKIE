@@ -47,11 +47,23 @@ class ActualKgpShim(
     override fun getKotlinPluginVersion(): String =
         project.getKotlinPluginVersion()
 
-    override val targets: NamedDomainObjectContainer<SkieTarget> = project.objects.domainObjectContainer(SkieTarget::class.java)
+    override val skieTargets: NamedDomainObjectContainer<SkieTarget> = project.objects.domainObjectContainer(SkieTarget::class.java)
 
-    override fun initializeSkieTargets() {
+    override val kotlinNativeTargets: NamedDomainObjectContainer<KotlinNativeTargetShim> =
+        project.objects.domainObjectContainer(KotlinNativeTargetShim::class.java)
+
+    override fun initializeShim() {
+        initializeKotlinNativeTargets()
         initializeBinaryTargets()
         initializeArtifactTargets()
+    }
+
+    private fun initializeKotlinNativeTargets() {
+        project.kotlinMultiplatformExtension?.appleTargets?.configureEach {
+            val shim = ActualKotlinNativeTargetShim(this, project.objects)
+
+            kotlinNativeTargets.add(shim)
+        }
     }
 
     private fun initializeBinaryTargets() {
@@ -86,14 +98,14 @@ class ActualKgpShim(
             isForXCFramework = binary in frameworksUsedInXCFrameworks,
         )
 
-        targets.add(binaryTarget)
+        skieTargets.add(binaryTarget)
     }
 
     private fun initializeArtifactTargets() {
         project.kotlinArtifactsExtension.artifacts.withType<KotlinNativeArtifact>().configureEach {
             val artifactTargets = ActualSkieArtifactTarget.createFromArtifact(this, project)
 
-            targets.addAll(artifactTargets)
+            skieTargets.addAll(artifactTargets)
         }
     }
 

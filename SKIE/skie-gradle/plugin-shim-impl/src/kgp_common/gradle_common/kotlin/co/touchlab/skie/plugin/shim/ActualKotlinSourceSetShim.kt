@@ -9,6 +9,9 @@ class ActualKotlinSourceSetShim(
     override val name: String
         get() = kotlinSourceSet.name
 
+    override val dependsOn: Set<KotlinSourceSetShim>
+        get() = kotlinSourceSet.dependsOn.map { ActualKotlinSourceSetShim(it) }.toSet()
+
     override fun toString(): String =
         kotlinSourceSet.toString()
 

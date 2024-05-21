@@ -2,7 +2,6 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.shim.KonanTargetShim
-import co.touchlab.skie.plugin.shim.KotlinSourceSetShim
 import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
@@ -39,8 +38,6 @@ sealed interface SkieTarget {
     interface Binary : SkieTarget {
 
         val compileDependencyConfigurationName: String
-
-        val allCompilationKotlinSourceSets: List<KotlinSourceSetShim>
     }
 
     interface Artifact : SkieTarget {

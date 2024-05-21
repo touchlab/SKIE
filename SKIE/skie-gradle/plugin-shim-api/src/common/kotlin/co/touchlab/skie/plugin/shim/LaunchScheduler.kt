@@ -18,5 +18,4 @@ interface LaunchScheduler {
      * - KGP >=1.9.0: Always schedules it using `launchInRequiredStage(KotlinPluginLifecycle.Stage.AfterFinaliseRefinesEdges)`.
      */
     fun whenMinOsVersionCanBeSafelyChanged(project: Project, block: () -> Unit)
-
 }

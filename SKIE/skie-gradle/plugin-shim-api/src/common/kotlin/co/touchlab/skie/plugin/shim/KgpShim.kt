@@ -8,7 +8,9 @@ import java.util.Properties
 
 interface KgpShim {
 
-    val targets: NamedDomainObjectContainer<SkieTarget>
+    val skieTargets: NamedDomainObjectContainer<SkieTarget>
+
+    val kotlinNativeTargets: NamedDomainObjectContainer<KotlinNativeTargetShim>
 
     val launchScheduler: LaunchScheduler
 
@@ -23,7 +25,7 @@ interface KgpShim {
 
     fun getKotlinPluginVersion(): String
 
-    fun initializeSkieTargets()
+    fun initializeShim()
 
     fun resolvablePropertyString(properties: Properties, key: String, suffix: String?): String?
 

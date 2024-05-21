@@ -2,9 +2,7 @@ package co.touchlab.skie.plugin
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.shim.ActualKonanTargetShim
-import co.touchlab.skie.plugin.shim.ActualKotlinSourceSetShim
 import co.touchlab.skie.plugin.shim.KonanTargetShim
-import co.touchlab.skie.plugin.shim.KotlinSourceSetShim
 import co.touchlab.skie.plugin.util.KotlinCompilerPluginOption
 import co.touchlab.skie.util.directory.SkieDirectories
 import org.gradle.api.Project
@@ -36,9 +34,6 @@ class ActualSkieBinaryTarget(
 
     override val compileDependencyConfigurationName: String
         get() = binary.compilation.compileDependencyConfigurationName
-
-    override val allCompilationKotlinSourceSets: List<KotlinSourceSetShim>
-        get() = binary.compilation.allKotlinSourceSets.map { ActualKotlinSourceSetShim(it) }
 
     override val skieDirectories: Provider<SkieDirectories> =
         project.layout.buildDirectory
