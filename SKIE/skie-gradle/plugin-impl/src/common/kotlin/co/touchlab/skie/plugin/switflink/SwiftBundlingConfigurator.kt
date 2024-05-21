@@ -51,7 +51,9 @@ object SwiftBundlingConfigurator {
         }
 
         compilation.allKotlinSourceSets.configureEach {
-            swiftSourceSet.srcDirs(this.swiftSourceDirectory)
+            val swiftDirectory = project.layout.projectDirectory.dir(swiftSourceDirectory)
+
+            swiftSourceSet.srcDirs(swiftDirectory)
         }
 
         return swiftSourceSet
