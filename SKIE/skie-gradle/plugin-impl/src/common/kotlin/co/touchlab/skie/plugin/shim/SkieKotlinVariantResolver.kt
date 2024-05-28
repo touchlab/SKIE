@@ -1,4 +1,4 @@
-package co.touchlab.skie.plugin.util
+package co.touchlab.skie.plugin.shim
 
 import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import org.gradle.api.Project

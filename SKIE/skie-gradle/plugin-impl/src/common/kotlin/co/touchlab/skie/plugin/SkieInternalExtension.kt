@@ -3,7 +3,7 @@ package co.touchlab.skie.plugin
 import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.shim.KgpShim
 import co.touchlab.skie.plugin.shim.KgpShimLoader
-import co.touchlab.skie.plugin.util.SkieKotlinVariantResolver
+import co.touchlab.skie.plugin.shim.SkieKotlinVariantResolver
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import javax.inject.Inject
