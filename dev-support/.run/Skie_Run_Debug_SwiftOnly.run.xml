@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Skie/Run/Debug/SwiftOnly" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Skie/Run/Debug/SwiftOnly" type="GradleRunConfiguration" factoryName="Gradle" folderName="Skie/Mac">
     <ExternalSystemSettings>
       <option name="env">
         <map>

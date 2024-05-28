@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Skie/iOS/Release" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Skie/iOS/Release" type="GradleRunConfiguration" factoryName="Gradle" folderName="Release">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$/skie/ios" />
@@ -19,6 +19,7 @@
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
+    <RunAsTest>false</RunAsTest>
     <method v="2" />
   </configuration>
 </component>
