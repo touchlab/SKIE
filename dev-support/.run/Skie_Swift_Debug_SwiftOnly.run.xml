@@ -1,8 +1,13 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Skie/iOS/Debug" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Skie/Swift/Debug/SwiftOnly" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="swiftOnly" value="" />
+        </map>
+      </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/skie/ios" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/skie/mac" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="--stacktrace" />
       <option name="taskDescriptions">
@@ -10,8 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="clean" />
-          <option value="buildIosDebug" />
+          <option value="buildSwiftDebug" />
         </list>
       </option>
       <option name="vmOptions" />
