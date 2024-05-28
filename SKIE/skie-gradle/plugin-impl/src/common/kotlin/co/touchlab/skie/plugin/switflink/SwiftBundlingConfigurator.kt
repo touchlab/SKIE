@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.switflink
 import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.shim.KotlinNativeCompilationShim
 import co.touchlab.skie.plugin.shim.KotlinSourceSetShim
+import co.touchlab.skie.plugin.util.doLastOptimized
 import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.plugin.util.registerSkieTask
 import co.touchlab.skie.plugin.util.writeToZip
@@ -67,7 +68,7 @@ object SwiftBundlingConfigurator {
         compileTaskProvider.configure {
             inputs.files(processSwiftSourcesTaskOutput)
 
-            doLast {
+            doLastOptimized {
                 copySwiftSourcesToKlib(compileTaskOutputFileProvider.get(), processSwiftSourcesTaskOutput)
             }
         }
