@@ -48,8 +48,8 @@ object ImportFakeObjCDependenciesPhase : SirPhase {
         val fakeImports = fakeExternalModules.joinToString("\n") { module ->
             // TODO: Properly fix this for nested modules as part of work to add distinction between the fake and SDK modules.
             knownNestedSdkModules[module.name]?.let { parentName ->
-                "#import <$parentName/${module.name}.h>"
-            } ?: "#import <${module.name}/${module.name}.h>"
+                "@import $parentName.${module.name};"
+            } ?: "@import ${module.name};"
         }
 
         val updatedContent = originalHeader + "\n$fakeImports"
