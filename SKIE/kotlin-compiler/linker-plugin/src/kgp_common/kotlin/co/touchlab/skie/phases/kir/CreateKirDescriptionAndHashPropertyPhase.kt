@@ -26,8 +26,8 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
 
     context(KirPhase.Context)
     override fun isActive(): Boolean =
-    // WIP Change back once we generate custom header
-        // WIP Add tests for this flag and functionality
+    // TODO Change back once we generate custom header
+        // TODO Add tests for this flag and functionality
         false
 //         SkieConfigurationFlag.Migration_AnyMethodsAsFunctions.isDisabled
 

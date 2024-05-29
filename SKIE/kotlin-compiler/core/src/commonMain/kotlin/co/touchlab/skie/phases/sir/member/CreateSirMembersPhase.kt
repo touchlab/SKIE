@@ -95,7 +95,7 @@ class CreateSirMembersPhase(
         val sirProperty = SirProperty(
             identifier = property.swiftName,
             parent = property.getSirParent(),
-            // WIP Add modality from Kir to all Sir
+            // TODO Add modality from Kir to all Sir
             isAbstract = property.isAbstract,
             type = sirTypeTranslator.mapType(oirProperty.type),
             scope = oirProperty.scope.sirScope,

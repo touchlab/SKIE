@@ -83,7 +83,7 @@ class KotlinSuspendGeneratorDelegate(
             namespace = context.declarationBuilder.getCustomNamespace("__SkieSuspendWrappers"),
             annotations = Annotations.EMPTY,
         ) {
-            // WIP Replace with typeConstructor.parameters
+            // TODO Replace with typeConstructor.parameters
             fun DeclarationDescriptor.typeParametersInScope(): List<TypeParameterDescriptor> {
                 return when (this) {
                     is ClassifierDescriptorWithTypeParameters -> {

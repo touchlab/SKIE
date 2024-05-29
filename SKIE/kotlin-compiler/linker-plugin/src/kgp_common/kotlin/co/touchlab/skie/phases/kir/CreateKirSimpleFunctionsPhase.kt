@@ -23,7 +23,7 @@ internal class CreateKirSimpleFunctionsPhase(
 
     private val convertedPropertyKindLazyInitializers = mutableListOf<() -> Unit>()
 
-    // WIP Change back once we generate custom header
+    // TODO Change back once we generate custom header
 //     private val needsDescriptionAndHashFunctions = SkieConfigurationFlag.Migration_AnyMethodsAsFunctions in context.globalConfiguration.enabledFlags
     private val needsDescriptionAndHashFunctions = true
 

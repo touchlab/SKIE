@@ -11,7 +11,7 @@ expect fun ClassDescriptor.isObjCForwardDeclaration(): Boolean
 
 expect fun ClassDescriptor.isObjCMetaClass(): Boolean
 
-// WIP Optimize by caching super types
+// TODO Optimize by caching super types
 expect fun KotlinType.isObjCObjectType(): Boolean
 
 expect fun ClassDescriptor.isObjCProtocolClass(): Boolean
