@@ -105,21 +105,37 @@ class SealedFunctionGeneratorDelegate(
         enumType: TypeName,
     ): CodeBlock.Builder {
         val preferredNamesCollide = kirClass.enumCaseNamesBasedOnKotlinIdentifiersCollide
+        val parameterName = kirClass.enumConstructorParameterName
+
+        /*
+            When the `onEnum(of:)` gets specialized,
+            the Swift optimizer sees `sealed` as a specific type.
+            When that specific type isn't statically castable to one of the classes in `kirClass.visibleSealedSubclasses`,
+            Swift optimizer removes that code as it's unreachable from its point of view.
+            In certain cases that can result in reaching the `fatalError` in Release mode.
+            Adding a variable with explicit type `Any` and then casting that variable gets past the optimizer.
+         */
+        val sourceVariableName = if (kirClass.typeParameters.isNotEmpty()) {
+            val erasedVariableName = "erased"
+            addStatement("let %N: Any = %N", erasedVariableName, parameterName)
+            erasedVariableName
+        } else {
+            parameterName
+        }
 
         kirClass.visibleSealedSubclasses
             .forEachIndexed { index, subclass ->
-                val parameterName = kirClass.enumConstructorParameterName
                 val subclassName = subclass.primarySirClass.getSealedSubclassType(enum).evaluate().swiftPoetTypeName
 
                 val condition = "let %N = %N as? %T"
 
                 if (index == 0) {
-                    beginControlFlow("if", condition, parameterName, parameterName, subclassName)
+                    beginControlFlow("if", condition, sourceVariableName, sourceVariableName, subclassName)
                 } else {
-                    nextControlFlow("else if", condition, parameterName, parameterName, subclassName)
+                    nextControlFlow("else if", condition, sourceVariableName, sourceVariableName, subclassName)
                 }
 
-                add("return %T.%N(%N)\n", enumType, subclass.enumCaseName(preferredNamesCollide), parameterName)
+                add("return %T.%N(%N)\n", enumType, subclass.enumCaseName(preferredNamesCollide), sourceVariableName)
             }
 
         return this
@@ -149,10 +165,11 @@ class SealedFunctionGeneratorDelegate(
         } else {
             add(
                 "fatalError(" +
-                    "\"Unknown subtype. " +
+                    "\"Unknown subtype \\(%N). " +
                     "This error should not happen under normal circumstances " +
                     "since ${kirClass.originalSirClass} is sealed." +
                     "\")\n",
+                kirClass.enumConstructorParameterName,
             )
         }
 
