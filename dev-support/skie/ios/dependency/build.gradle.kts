@@ -3,7 +3,8 @@ plugins {
 }
 
 kotlin {
-    ios()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
 
     val commonMain by sourceSets.getting {
@@ -11,15 +12,5 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation("co.touchlab.skie:configuration-annotations")
         }
-    }
-
-    val iosMain by sourceSets.getting
-    val iosTest by sourceSets.getting
-
-    val iosSimulatorArm64Main by sourceSets.getting {
-        dependsOn(iosMain)
-    }
-    val iosSimulatorArm64Test by sourceSets.getting {
-        dependsOn(iosTest)
     }
 }

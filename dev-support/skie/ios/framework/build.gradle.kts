@@ -85,7 +85,8 @@ skie {
 }
 
 kotlin {
-    ios()
+    iosArm64()
+    iosX64()
     iosSimulatorArm64()
 
 //     val exportedLibraries = performanceBenchmarkLibraries
@@ -121,15 +122,4 @@ kotlin {
             }
         }
     }
-
-    val iosMain by sourceSets.getting
-    val iosTest by sourceSets.getting
-
-    val iosSimulatorArm64Main by sourceSets.getting {
-        dependsOn(iosMain)
-    }
-    val iosSimulatorArm64Test by sourceSets.getting {
-        dependsOn(iosTest)
-    }
-
 }

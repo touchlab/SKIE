@@ -78,18 +78,6 @@ kotlin {
             }
         }
     }
-
-    val macosMain by sourceSets.creating {
-        dependsOn(commonMain)
-    }
-
-    val macosArm64Main by sourceSets.getting {
-        dependsOn(macosMain)
-    }
-
-    val macosX64Main by sourceSets.getting {
-        dependsOn(macosMain)
-    }
 }
 
 tasks.register("dependenciesForExport") {
