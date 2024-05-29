@@ -3,6 +3,7 @@ package co.touchlab.skie.phases.runtime
 import co.touchlab.skie.phases.SirPhase
 
 object FutureCombineExtensionGenerator {
+
     context(SirPhase.Context)
     fun generate() {
         namespaceProvider.getSkieNamespaceWrittenSourceFile("Combine.Future+asyncInit").content = """

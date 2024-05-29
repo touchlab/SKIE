@@ -7,6 +7,7 @@ import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.util.cache.writeTextIfDifferent
 
 object GenerateFakeObjCDependenciesPhase : SirPhase {
+
     context(SirPhase.Context)
     override suspend fun execute() {
         oirProvider.externalClassesAndProtocols

@@ -2,7 +2,15 @@ package co.touchlab.skie.phases.runtime
 
 import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.*
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.sir.element.SirTypeAlias
+import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.toTypeParameterUsage
 
 object SkieSwiftFlowIteratorGenerator {
 
@@ -66,7 +74,8 @@ object SkieSwiftFlowIteratorGenerator {
             isAsync = true,
         ).apply {
             bodyBuilder.add {
-                addCode("""
+                addCode(
+                    """
                             do {
                                 let hasNext = try await skie(iterator).hasNext()
 
@@ -82,7 +91,8 @@ object SkieSwiftFlowIteratorGenerator {
                             } catch {
                                 Swift.fatalError("Unexpected error: \(error)")
                             }
-                        """.trimIndent())
+                        """.trimIndent(),
+                )
             }
         }
     }
@@ -96,11 +106,13 @@ object SkieSwiftFlowIteratorGenerator {
             isAsync = true,
         ).apply {
             bodyBuilder.add {
-                addCode("""
+                addCode(
+                    """
                     _Concurrency.withUnsafeCurrentTask { task in
                         task?.cancel()
                     }
-                """.trimIndent())
+                """.trimIndent(),
+                )
             }
         }
     }

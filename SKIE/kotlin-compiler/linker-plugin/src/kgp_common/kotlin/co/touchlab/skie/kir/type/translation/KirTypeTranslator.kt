@@ -9,13 +9,13 @@ import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 import co.touchlab.skie.oir.type.SpecialReferenceOirType
 import co.touchlab.skie.oir.type.VoidOirType
-import org.jetbrains.kotlin.backend.konan.isInlined
 import co.touchlab.skie.shim.isExternalObjCClass
 import co.touchlab.skie.shim.isKotlinObjCClass
 import co.touchlab.skie.shim.isObjCForwardDeclaration
 import co.touchlab.skie.shim.isObjCMetaClass
 import co.touchlab.skie.shim.isObjCObjectType
 import co.touchlab.skie.shim.isObjCProtocolClass
+import org.jetbrains.kotlin.backend.konan.isInlined
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.isAny
 import org.jetbrains.kotlin.builtins.getReceiverTypeFromFunctionType
 import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType

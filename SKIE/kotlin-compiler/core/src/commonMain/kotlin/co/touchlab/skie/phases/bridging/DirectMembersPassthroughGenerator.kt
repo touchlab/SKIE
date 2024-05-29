@@ -1,8 +1,21 @@
 package co.touchlab.skie.phases.bridging
 
-import co.touchlab.skie.kir.element.*
+import co.touchlab.skie.kir.element.KirCallableDeclaration
+import co.touchlab.skie.kir.element.KirClass
+import co.touchlab.skie.kir.element.KirConstructor
+import co.touchlab.skie.kir.element.KirProperty
+import co.touchlab.skie.kir.element.KirSimpleFunction
+import co.touchlab.skie.kir.element.forEachAssociatedExportedSirDeclaration
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.*
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirGetter
+import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirSetter
+import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.sir.element.call
+import co.touchlab.skie.sir.element.copyValueParametersFrom
+import co.touchlab.skie.sir.element.isOverriddenFromReadOnlyProperty
+import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.Modifier

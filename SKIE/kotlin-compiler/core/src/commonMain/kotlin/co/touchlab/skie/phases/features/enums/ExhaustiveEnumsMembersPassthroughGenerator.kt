@@ -7,12 +7,13 @@ import co.touchlab.skie.sir.element.SirClass
 import io.outfoxx.swiftpoet.CodeBlock
 
 object ExhaustiveEnumsMembersPassthroughGenerator {
+
     context(SirPhase.Context)
     fun generatePassthroughForMembers(enumKirClass: KirClass, bridgedEnum: SirClass) {
         DirectMembersPassthroughGenerator.generatePassthroughForMembers(
             targetBridge = bridgedEnum,
             bridgedKirClass = enumKirClass,
-            delegateAccessor = CodeBlock.of("(self as _ObjectiveCType)")
+            delegateAccessor = CodeBlock.of("(self as _ObjectiveCType)"),
         )
     }
 }

@@ -7,8 +7,8 @@ import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
 import co.touchlab.skie.util.CompilerShim
-import co.touchlab.skie.util.directory.FrameworkLayout
 import co.touchlab.skie.util.KirReporter
+import co.touchlab.skie.util.directory.FrameworkLayout
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.directory.SkieDirectories
 

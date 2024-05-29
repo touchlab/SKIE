@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 
-// WIP Move to shim package
+// TODO Move to shim package
 expect class SymbolTableDescriptorExtensionShim(symbolTable: ReferenceSymbolTable) {
 
     fun referenceFunction(callable: CallableDescriptor): IrFunctionSymbol

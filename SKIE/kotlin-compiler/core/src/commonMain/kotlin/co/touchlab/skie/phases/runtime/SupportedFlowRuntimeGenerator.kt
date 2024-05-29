@@ -6,7 +6,16 @@ import co.touchlab.skie.phases.bridging.CustomMembersPassthroughGenerator
 import co.touchlab.skie.phases.bridging.CustomPassthroughDeclaration
 import co.touchlab.skie.phases.bridging.ObjCBridgeableGenerator
 import co.touchlab.skie.sir.SirFqName
-import co.touchlab.skie.sir.element.*
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirModality
+import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.sir.element.SirTypeAlias
+import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.toNullable
 import io.outfoxx.swiftpoet.CodeBlock
@@ -38,7 +47,7 @@ object SupportedFlowRuntimeGenerator {
 
     context(SirPhase.Context)
     private fun generateSkieSwiftFlowInternalProtocol() {
-        // This has currently no usecase, but is kept as it might help with SwiftUI extensions.
+        // This has currently no use-case, but is kept as it might help with SwiftUI extensions.
         namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieSwiftFlowInternalProtocol").content = """
             internal protocol SkieSwiftFlowInternalProtocol<Element> {
                 associatedtype Element
@@ -160,7 +169,7 @@ object SupportedFlowRuntimeGenerator {
             },
             bridgeFromObjectiveC = {
                 addStatement("return .init(internal: source)")
-            }
+            },
         )
     }
 
@@ -196,16 +205,17 @@ object SupportedFlowRuntimeGenerator {
                     type = sirBuiltins.Swift.Array.toType(elementType),
                     transformGetter = {
                         CodeBlock.of("%L as! [%T]", it, elementType.evaluate().swiftPoetTypeName)
-                    }
+                    },
                 ),
             )
             SupportedFlow.MutableSharedFlow -> listOf(
                 CustomPassthroughDeclaration.Property(
                     identifier = "subscriptionCount",
-                    type = sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftStateFlow")).toType(kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType),
+                    type = sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftStateFlow"))
+                        .toType(kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType),
                     transformGetter = {
                         CodeBlock.of("bridgeSubscriptionCount(%L)", it)
-                    }
+                    },
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
                     identifier = "emit",
@@ -216,7 +226,7 @@ object SupportedFlowRuntimeGenerator {
                         CustomPassthroughDeclaration.SimpleFunction.ValueParameter(
                             name = "value",
                             type = elementType,
-                        )
+                        ),
                     ),
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
@@ -226,7 +236,7 @@ object SupportedFlowRuntimeGenerator {
                         CustomPassthroughDeclaration.SimpleFunction.ValueParameter(
                             name = "value",
                             type = elementType,
-                        )
+                        ),
                     ),
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
@@ -241,7 +251,7 @@ object SupportedFlowRuntimeGenerator {
                     transformGetter = {
                         CodeBlock.of("%L as! %T", it, elementType.evaluate().swiftPoetTypeName)
                     },
-                )
+                ),
             )
             SupportedFlow.MutableStateFlow -> listOf(
                 CustomPassthroughDeclaration.Property(
@@ -267,7 +277,7 @@ object SupportedFlowRuntimeGenerator {
                             type = elementType,
                         ),
                     ),
-                )
+                ),
             )
         }
 

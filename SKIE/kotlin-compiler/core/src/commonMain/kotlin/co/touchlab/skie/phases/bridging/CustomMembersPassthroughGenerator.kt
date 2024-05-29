@@ -1,13 +1,19 @@
 package co.touchlab.skie.phases.bridging
 
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.*
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirGetter
+import co.touchlab.skie.sir.element.SirProperty
+import co.touchlab.skie.sir.element.SirSetter
+import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.joinToCode
 
 object CustomMembersPassthroughGenerator {
+
     context(SirPhase.Context)
     fun generatePassthroughForDeclarations(
         targetBridge: SirClass,
@@ -26,7 +32,6 @@ object CustomMembersPassthroughGenerator {
             is CustomPassthroughDeclaration.Property -> addPassthroughForProperty(declaration, delegateAccessor)
         }
     }
-
 
     context(SirPhase.Context)
     private fun SirClass.addPassthroughForFunction(function: CustomPassthroughDeclaration.SimpleFunction, delegateAccessor: CodeBlock) {
@@ -60,8 +65,8 @@ object CustomMembersPassthroughGenerator {
                         if (function.isAsync) "await " else "",
                         delegateAccessor,
                         function.call(),
-                    )
-                )
+                    ),
+                ),
             )
         }
     }
@@ -108,8 +113,8 @@ object CustomMembersPassthroughGenerator {
                             "%L.%N",
                             delegateAccessor,
                             property.identifier,
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
         }

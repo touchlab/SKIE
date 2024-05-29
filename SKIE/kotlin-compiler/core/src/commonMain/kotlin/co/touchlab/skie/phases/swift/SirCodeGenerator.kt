@@ -114,7 +114,7 @@ object SirCodeGenerator {
 
     private fun <T : BuilderWithModifiers, E> T.addVisibilityAndModality(
         element: E,
-    ): T where E: SirElementWithModality, E: SirDeclarationWithVisibility =
+    ): T where E : SirElementWithModality, E : SirDeclarationWithVisibility =
         apply {
             if (!element.shouldHaveOpenModifier()) {
                 addVisibility(element)
@@ -123,7 +123,7 @@ object SirCodeGenerator {
         }
 
     private fun <T : BuilderWithModifiers> T.addVisibility(
-        declaration: SirDeclarationWithVisibility
+        declaration: SirDeclarationWithVisibility,
     ): T =
         apply {
             val visibilityModifier = declaration.visibility.toSwiftPoetVisibility()
@@ -144,7 +144,7 @@ object SirCodeGenerator {
             SirVisibility.Removed -> error("Removed declarations should not be generated and must be filtered out sooner.")
         }
 
-    private fun <E> E.shouldHaveOpenModifier(): Boolean where E: SirElementWithModality, E: SirDeclarationWithVisibility =
+    private fun <E> E.shouldHaveOpenModifier(): Boolean where E : SirElementWithModality, E : SirDeclarationWithVisibility =
         modality == SirModality.Open && visibility == SirVisibility.Public && (parent as? SirClass)?.modality == SirModality.Open
 
     private fun SirElementWithModality.shouldHaveFinalModifier(): Boolean =
@@ -157,7 +157,7 @@ object SirCodeGenerator {
             is SirProperty -> false
         }
 
-    private fun <E> E.toSwiftPoetModality(): Set<Modifier> where E: SirElementWithModality, E: SirDeclarationWithVisibility =
+    private fun <E> E.toSwiftPoetModality(): Set<Modifier> where E : SirElementWithModality, E : SirDeclarationWithVisibility =
         setOfNotNull(
             Modifier.FINAL.takeIf { shouldHaveFinalModifier() },
             Modifier.OPEN.takeIf { shouldHaveOpenModifier() },

@@ -1,7 +1,13 @@
 package co.touchlab.skie.phases.bridging
 
 import co.touchlab.skie.phases.SirPhase
-import co.touchlab.skie.sir.element.*
+import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirScope
+import co.touchlab.skie.sir.element.SirSimpleFunction
+import co.touchlab.skie.sir.element.SirTypeAlias
+import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.SpecialSirType

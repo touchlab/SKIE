@@ -24,7 +24,8 @@ class SirSimpleFunction(
     var isAsync: Boolean = false,
     override var throws: Boolean = false,
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
-) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction>, SirElementWithModality {
+) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction>,
+    SirElementWithModality {
 
     override val identifierAfterVisibilityChange: String
         get() = if (isReplaced) "__$identifier" else identifier

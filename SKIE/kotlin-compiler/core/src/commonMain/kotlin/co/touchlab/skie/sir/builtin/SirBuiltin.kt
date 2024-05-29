@@ -109,6 +109,7 @@ class SirBuiltins(
         }
 
         class _Concurrency(sirProvider: SirProvider, swift: Swift) : ModuleBase() {
+
             override val declarationParent = sirProvider.getExternalModule("_Concurrency").builtInFile
 
             override val origin = SirClass.Origin.ExternalSwiftFramework
@@ -124,11 +125,12 @@ class SirBuiltins(
             }
 
             val CancellationError by Struct(
-                superTypes = listOf(swift.Error.defaultType)
+                superTypes = listOf(swift.Error.defaultType),
             )
         }
 
         class Combine(sirProvider: SirProvider) : ModuleBase() {
+
             override val declarationParent = sirProvider.getExternalModule("Combine").builtInFile
 
             override val origin = SirClass.Origin.ExternalSwiftFramework
@@ -141,7 +143,7 @@ class SirBuiltins(
                 superTypes = listOf(
                     Cancellable.defaultType,
                     CustomCombineIdentifierConvertible.defaultType,
-                )
+                ),
             )
         }
 
@@ -157,7 +159,7 @@ class SirBuiltins(
 
             val SkieSwiftFlowProtocol by Protocol(
                 superTypes = listOf(
-                    _concurrency.AsyncSequence.defaultType
+                    _concurrency.AsyncSequence.defaultType,
                 ),
             )
 

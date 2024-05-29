@@ -1,15 +1,10 @@
 package co.touchlab.skie.phases.runtime
 
 import co.touchlab.skie.phases.SirPhase
-import io.outfoxx.swiftpoet.DeclaredTypeName
-import io.outfoxx.swiftpoet.ExtensionSpec
-import io.outfoxx.swiftpoet.FunctionSpec
-import io.outfoxx.swiftpoet.FunctionTypeName
-import io.outfoxx.swiftpoet.ParameterSpec
-import io.outfoxx.swiftpoet.TypeVariableName
 import org.intellij.lang.annotations.Language
 
 object SwiftUIFlowObservingGenerator {
+
     private val availability = "@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)"
     private val maxFlowsOverload = 5
 
@@ -447,7 +442,7 @@ object SwiftUIFlowObservingGenerator {
             |}
         """
 
-        val multipleFlows = (2 .. maxFlowsOverload).map { flowCount ->
+        val multipleFlows = (2..maxFlowsOverload).map { flowCount ->
             val flowRange = (1..flowCount)
             """
                 |    /**
@@ -467,9 +462,11 @@ object SwiftUIFlowObservingGenerator {
                 |            initialContent: initialContent,
                 |            content: content
                 |        ) { values in
-                        ${flowRange.joinToString("\n") {
-                            "|            guard let flowValue$it: Flow$it.Element = assertingSkieSwiftFlowValueUnwrap(value: values[${it - 1}]) else { return nil }"
-                        }}
+                        ${
+                flowRange.joinToString("\n") {
+                    "|            guard let flowValue$it: Flow$it.Element = assertingSkieSwiftFlowValueUnwrap(value: values[${it - 1}]) else { return nil }"
+                }
+            }
                 |            return (${flowRange.joinToString { "flowValue$it" }})
                 |        }
                 |    }"""
@@ -514,7 +511,7 @@ object SwiftUIFlowObservingGenerator {
             |}
         """
 
-        val multipleFlows = (2 .. maxFlowsOverload).map { flowCount ->
+        val multipleFlows = (2..maxFlowsOverload).map { flowCount ->
             val flowRange = (1..flowCount)
             """
                 |    /**
@@ -532,9 +529,11 @@ object SwiftUIFlowObservingGenerator {
                 |            initialContent: SwiftUI.EmptyView.init,
                 |            content: content,
                 |            extractValues: { values in
-                                 ${flowRange.joinToString("\n") {
-                                      "|                let flowValue$it: Flow$it.Element = assertingSkieSwiftFlowValueUnwrap(value: values[${it - 1}]) ?? flow$it.initialValue"
-                                 }}
+                                 ${
+                flowRange.joinToString("\n") {
+                    "|                let flowValue$it: Flow$it.Element = assertingSkieSwiftFlowValueUnwrap(value: values[${it - 1}]) ?? flow$it.initialValue"
+                }
+            }
                 |                return (${flowRange.joinToString { "flowValue$it" }})
                 |            }
                 |        )

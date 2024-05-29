@@ -5,7 +5,6 @@ import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.util.directory.SkieBuildDirectory
 import co.touchlab.skie.util.file.deleteEmptyDirectoriesRecursively
 import java.io.File
-import kotlin.io.path.listDirectoryEntries
 
 object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
 

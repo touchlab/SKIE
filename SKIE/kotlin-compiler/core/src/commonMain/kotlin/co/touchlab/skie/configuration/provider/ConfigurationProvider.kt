@@ -11,10 +11,10 @@ import co.touchlab.skie.configuration.FileConfiguration
 import co.touchlab.skie.configuration.FileOrClassConfiguration
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.FunctionInterop
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.ModuleConfiguration
 import co.touchlab.skie.configuration.PackageConfiguration
 import co.touchlab.skie.configuration.PropertyConfiguration
-import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SimpleFunctionConfiguration
 import co.touchlab.skie.configuration.SkieConfiguration

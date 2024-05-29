@@ -13,14 +13,15 @@ sealed interface CustomPassthroughDeclaration {
         val scope: SirScope = SirScope.Member,
         val transformGetter: (CodeBlock) -> CodeBlock = { it },
         val setter: Setter? = null,
-    ): CustomPassthroughDeclaration {
+    ) : CustomPassthroughDeclaration {
+
         sealed interface Setter {
-            object MutableProperty: Setter
+            object MutableProperty : Setter
 
             data class SimpleFunction(
                 val identifier: String,
                 val parameterLabel: String? = null,
-            ): Setter
+            ) : Setter
         }
     }
 
@@ -33,7 +34,8 @@ sealed interface CustomPassthroughDeclaration {
         val throws: Boolean = false,
         val valueParameters: List<ValueParameter> = emptyList(),
         val transformBody: (CodeBlock) -> CodeBlock = { it },
-    ): CustomPassthroughDeclaration {
+    ) : CustomPassthroughDeclaration {
+
         data class ValueParameter(
             val label: String? = null,
             val name: String,

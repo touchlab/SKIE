@@ -5,7 +5,6 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.sir.element.SirTypeAlias
-import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.isExported
 
 object CreateStableNameTypeAliasesPhase : SirPhase {

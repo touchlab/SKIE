@@ -4,9 +4,9 @@ import co.touchlab.skie.configuration.ClassConfiguration
 import co.touchlab.skie.configuration.ClassInterop
 import co.touchlab.skie.configuration.FileConfiguration
 import co.touchlab.skie.configuration.FileOrClassConfiguration
+import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.ModuleConfiguration
 import co.touchlab.skie.configuration.PackageConfiguration
-import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirModule
