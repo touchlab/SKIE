@@ -72,7 +72,7 @@ class ParameterizedTypeName internal constructor(
       else -> {
         if (enclosingType != null) {
           enclosingType.emit(out)
-          out.emit("." + rawType.simpleName)
+          out.emit("." + escapeKeywords(rawType.simpleName))
         } else {
           rawType.emit(out)
         }
