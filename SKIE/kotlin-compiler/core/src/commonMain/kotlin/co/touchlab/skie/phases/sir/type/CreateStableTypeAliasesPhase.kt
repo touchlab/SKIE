@@ -38,7 +38,7 @@ object CreateStableNameTypeAliasesPhase : SirPhase {
             isReplaced = true,
             isHidden = true,
         ) {
-            kirClass.originalSirClass.defaultType.withFqName()
+            kirClass.originalSirClass.toFqNameType()
         }
 
         if (useStableTypeAliases && kirClass.originalSirClass.internalTypeAlias == null) {

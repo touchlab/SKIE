@@ -168,7 +168,7 @@ class FlowConversionConstructorsGenerator(
             )
 
             bodyBuilder.add {
-                addStatement("return %T(%L)", to.kotlinClass.defaultType.toSwiftPoetDeclaredTypeName(), "flow.delegate")
+                addStatement("return %T(%L)", to.kotlinClass.internalName.toSwiftPoetDeclaredTypeName(), "flow.delegate")
             }
         }
     }

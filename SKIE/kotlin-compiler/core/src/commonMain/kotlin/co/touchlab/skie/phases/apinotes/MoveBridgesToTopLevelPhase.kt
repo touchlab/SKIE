@@ -5,6 +5,7 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationNamespace
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
+import co.touchlab.skie.sir.element.toFqNameTypeFromEnclosingTypeParameters
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 
 // Needed due to a bug in Swift compiler that incorrectly resolves bridges nested in other declarations.
@@ -33,7 +34,7 @@ private fun SirClass.createReplacementTypeAlias(namespace: SirDeclarationNamespa
         baseName = baseName,
         parent = namespace,
         typeFactory = { typeAlias ->
-            this.toTypeFromEnclosingTypeParameters(typeAlias.typeParameters).withFqName()
+            this.toFqNameTypeFromEnclosingTypeParameters(typeAlias.typeParameters)
         },
     )
 

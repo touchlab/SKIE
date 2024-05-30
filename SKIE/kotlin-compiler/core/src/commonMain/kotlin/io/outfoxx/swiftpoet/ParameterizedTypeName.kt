@@ -24,12 +24,6 @@ class ParameterizedTypeName internal constructor(
 
   val typeArguments = typeArguments.toImmutableList()
 
-  init {
-    require(typeArguments.isNotEmpty() || enclosingType != null) {
-      "no type arguments: $rawType"
-    }
-  }
-
   override val optional get() = rawType == OPTIONAL
   override val implicit get() = rawType == IMPLICIT
 

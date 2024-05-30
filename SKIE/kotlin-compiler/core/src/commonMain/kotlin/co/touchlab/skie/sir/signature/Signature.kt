@@ -345,12 +345,14 @@ sealed class Signature {
 
                 return when (val typeWithoutTypeAliases = evaluatedType.type.inlineTypeAliases()) {
                     is SirDeclaredSirType -> {
-                        check(typeWithoutTypeAliases.declaration is SirClass) {
+                        val declaration = typeWithoutTypeAliases.declaration
+
+                        check(declaration is SirClass) {
                             "TypeAliases should have been inlined in the above step. Was: $this"
                         }
 
                         Type.Class(
-                            sirClass = typeWithoutTypeAliases.declaration,
+                            sirClass = declaration,
                             typeArguments = typeWithoutTypeAliases.typeArguments.map { Type.TypeArgument(it) },
                             sirHierarchyCache = this@SirHierarchyCache,
                         )

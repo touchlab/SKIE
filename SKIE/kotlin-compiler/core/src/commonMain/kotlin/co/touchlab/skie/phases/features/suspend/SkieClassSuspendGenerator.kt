@@ -56,7 +56,7 @@ class SkieClassSuspendGenerator {
             returnType = skieClass.toTypeFromEnclosingTypeParameters(typeParameters)
 
             bodyBuilder.add {
-                addCode("return %T(kotlinObject)", skieClass.defaultType.toSwiftPoetDeclaredTypeName())
+                addCode("return %T(kotlinObject)", skieClass.internalName.toSwiftPoetDeclaredTypeName())
             }
         }
     }

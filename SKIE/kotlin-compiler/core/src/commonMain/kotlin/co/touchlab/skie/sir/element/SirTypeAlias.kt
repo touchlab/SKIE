@@ -4,6 +4,7 @@ import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.DeclaredSirType
 import co.touchlab.skie.sir.type.OirDeclaredSirType
+import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 
 class SirTypeAlias(
@@ -55,6 +56,9 @@ class SirTypeAlias(
 
     override fun toReadableString(): String =
         "typealias $fqName"
+
+    override fun toType(typeArguments: List<SirType>): SirDeclaredSirType =
+        toFqNameType(typeArguments)
 
     override fun toString(): String = "${this::class.simpleName}: $fqName"
 

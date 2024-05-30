@@ -1,6 +1,5 @@
 package co.touchlab.skie.sir.type
 
-import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeAlias
@@ -10,15 +9,16 @@ import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.sir.element.minimumVisibility
 import co.touchlab.skie.sir.element.module
 import co.touchlab.skie.sir.element.resolveAsKirClass
-import io.outfoxx.swiftpoet.DeclaredTypeName
-import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.ParameterizedTypeName
 import io.outfoxx.swiftpoet.parameterizedBy
 
-data class SirDeclaredSirType(
-    val declaration: SirTypeDeclaration,
+class SirDeclaredSirType(
+    private val declarationProvider: () -> SirTypeDeclaration,
     val typeArguments: List<SirType> = emptyList(),
-    override val pointsToInternalName: Boolean = true,
 ) : DeclaredSirType() {
+
+    val declaration: SirTypeDeclaration
+        get() = declarationProvider()
 
     override val isHashable: Boolean
         get() = declaration.isHashable
@@ -37,7 +37,7 @@ data class SirDeclaredSirType(
 
         val evaluatedType = lazy {
             if (declaration.module !is SirModule.Unknown) {
-                copy(typeArguments = evaluatedTypeArguments.value.map { it.type })
+                SirDeclaredSirType(declarationProvider, typeArguments = evaluatedTypeArguments.value.map { it.type })
             } else {
                 getUnknownCInteropModuleType()
             }
@@ -46,15 +46,19 @@ data class SirDeclaredSirType(
         return EvaluatedSirType.Lazy(
             typeProvider = evaluatedType,
             canonicalNameProvider = lazy {
-                if (evaluatedType.value is SirDeclaredSirType) {
-                    getCanonicalName(evaluatedTypeArguments.value)
+                val evaluatedTypeValue = evaluatedType.value
+
+                if (evaluatedTypeValue is SirDeclaredSirType) {
+                    getCanonicalName(evaluatedTypeValue, evaluatedTypeArguments.value)
                 } else {
                     evaluatedType.value.evaluate().canonicalName
                 }
             },
             swiftPoetTypeNameProvider = lazy {
-                if (evaluatedType.value is SirDeclaredSirType) {
-                    getSwiftPoetTypeName(evaluatedTypeArguments.value)
+                val evaluatedTypeValue = evaluatedType.value
+
+                if (evaluatedTypeValue is SirDeclaredSirType) {
+                    getSwiftPoetTypeName(evaluatedTypeValue.declaration, evaluatedTypeArguments.value)
                 } else {
                     evaluatedType.value.evaluate().swiftPoetTypeName
                 }
@@ -85,8 +89,8 @@ data class SirDeclaredSirType(
     override fun inlineTypeAliases(): SirType {
         val inlinedTypeArguments = typeArguments.map { it.inlineTypeAliases() }
 
-        return when (declaration) {
-            is SirClass -> copy(typeArguments = inlinedTypeArguments)
+        return when (val declaration = declaration) {
+            is SirClass -> SirDeclaredSirType(declarationProvider, typeArguments = inlinedTypeArguments)
             is SirTypeAlias -> {
                 val substitutions = declaration.typeParameters.zip(inlinedTypeArguments).toMap()
 
@@ -95,34 +99,48 @@ data class SirDeclaredSirType(
         }
     }
 
-    fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName =
-        if (pointsToInternalName) declaration.internalName.toSwiftPoetName() else declaration.fqName.toSwiftPoetName()
+    private fun getCanonicalName(evaluatedType: SirDeclaredSirType, evaluatedTypeArguments: List<EvaluatedSirType>): String =
+        when (val declaration = evaluatedType.declaration) {
+            is SirClass -> getCanonicalName(declaration, evaluatedTypeArguments)
+            is SirTypeAlias -> evaluatedType.normalizedEvaluatedType().canonicalName
+        }
 
-    private fun getCanonicalName(evaluatedTypeArguments: List<EvaluatedSirType>): String {
+    private fun getCanonicalName(sirClass: SirClass, evaluatedTypeArguments: List<EvaluatedSirType>): String {
+        val usedTypeArgumentsCount = sirClass.typeParameters.size
+
+        val remainingTypeArguments = evaluatedTypeArguments.dropLast(usedTypeArgumentsCount)
+
+        val usedTypeArguments = evaluatedTypeArguments.takeLast(usedTypeArgumentsCount)
+
         val typeArgumentSuffix = if (evaluatedTypeArguments.isEmpty()) {
             ""
         } else {
-            "<${evaluatedTypeArguments.joinToString { it.canonicalName }}>"
+            "<${usedTypeArguments.joinToString { it.canonicalName }}>"
         }
 
-        return when (declaration) {
-            is SirClass -> declaration.fqName.toString() + typeArgumentSuffix
-            is SirTypeAlias -> {
-                val substitutions = declaration.typeParameters.zip(typeArguments).toMap()
+        val baseNameComponent = sirClass.namespace?.classDeclaration?.let { getCanonicalName(it, remainingTypeArguments) }
 
-                declaration.type.substituteTypeArguments(substitutions).evaluate().canonicalName + typeArgumentSuffix
-            }
+        return if (baseNameComponent != null) {
+            baseNameComponent + "." + sirClass.simpleName + typeArgumentSuffix
+        } else {
+            sirClass.fqName.toString() + typeArgumentSuffix
         }
     }
 
-    private fun getSwiftPoetTypeName(evaluatedTypeArguments: List<EvaluatedSirType>): TypeName {
-        val baseName = toSwiftPoetDeclaredTypeName()
+    private fun getSwiftPoetTypeName(
+        sirTypeDeclaration: SirTypeDeclaration,
+        evaluatedTypeArguments: List<EvaluatedSirType>,
+    ): ParameterizedTypeName {
+        val usedTypeArgumentsCount = sirTypeDeclaration.typeParameters.size
 
-        return if (evaluatedTypeArguments.isEmpty()) {
-            baseName
-        } else {
-            baseName.parameterizedBy(evaluatedTypeArguments.map { it.swiftPoetTypeName })
-        }
+        val remainingTypeArguments = evaluatedTypeArguments.dropLast(usedTypeArgumentsCount)
+
+        val usedTypeArguments = evaluatedTypeArguments.takeLast(usedTypeArgumentsCount).map { it.swiftPoetTypeName }
+
+        val baseNameComponent = sirTypeDeclaration.namespace?.classDeclaration?.let { getSwiftPoetTypeName(it, remainingTypeArguments) }
+
+        return baseNameComponent?.nestedType(sirTypeDeclaration.simpleName, usedTypeArguments)
+            ?: sirTypeDeclaration.fqName.toSwiftPoetDeclaredTypeName().parameterizedBy(usedTypeArguments)
     }
 
     private fun getVisibilityConstraint(evaluatedTypeArguments: List<EvaluatedSirType>): SirVisibility =
@@ -131,16 +149,29 @@ data class SirDeclaredSirType(
     private fun getReferencedTypeDeclarations(evaluatedTypeArguments: List<EvaluatedSirType>): Set<SirTypeDeclaration> =
         evaluatedTypeArguments.flatMap { it.referencedTypeDeclarations }.toSet() + declaration
 
-    private fun SirFqName.toSwiftPoetName(): DeclaredTypeName =
-        parent?.toSwiftPoetName()?.nestedType(simpleName)
-            ?: DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)
-
-    override fun withFqName(): SirDeclaredSirType =
-        copy(pointsToInternalName = false)
-
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SirDeclaredSirType =
-        copy(typeArguments = typeArguments.map { it.substituteTypeParameters(substitutions) })
+        SirDeclaredSirType(declarationProvider, typeArguments = typeArguments.map { it.substituteTypeParameters(substitutions) })
 
     override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SirDeclaredSirType =
-        copy(typeArguments = typeArguments.map { it.substituteTypeArguments(substitutions) })
+        SirDeclaredSirType(declarationProvider, typeArguments = typeArguments.map { it.substituteTypeArguments(substitutions) })
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SirDeclaredSirType) return false
+
+        if (typeArguments != other.typeArguments) return false
+        if (declaration != other.declaration) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = typeArguments.hashCode()
+        result = 31 * result + declaration.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "SirDeclaredSirType(declaration=$declaration, typeArguments=$typeArguments)"
+    }
 }

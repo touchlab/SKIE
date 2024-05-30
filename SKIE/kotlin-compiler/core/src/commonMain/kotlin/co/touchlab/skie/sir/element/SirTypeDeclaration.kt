@@ -56,17 +56,25 @@ sealed interface SirTypeDeclaration : SirDeclarationWithVisibility {
 
     val defaultType: DeclaredSirType
 
-    fun toType(typeArguments: List<SirType>): SirDeclaredSirType =
-        SirDeclaredSirType(this, typeArguments = typeArguments)
+    fun toType(typeArguments: List<SirType>): SirDeclaredSirType
 
     fun toType(vararg typeArguments: SirType): SirDeclaredSirType =
         toType(typeArguments.toList())
+
+    fun toFqNameType(typeArguments: List<SirType>): SirDeclaredSirType =
+        SirDeclaredSirType({ this }, typeArguments = typeArguments)
+
+    fun toFqNameType(vararg typeArguments: SirType): SirDeclaredSirType =
+        toFqNameType(typeArguments.toList())
 
     fun toReadableString(): String
 }
 
 fun SirTypeDeclaration.toTypeFromEnclosingTypeParameters(typeParameters: List<SirTypeParameter>): DeclaredSirType =
     toType(typeParameters.map { it.toTypeParameterUsage() })
+
+fun SirTypeDeclaration.toFqNameTypeFromEnclosingTypeParameters(typeParameters: List<SirTypeParameter>): DeclaredSirType =
+    toFqNameType(typeParameters.map { it.toTypeParameterUsage() })
 
 fun SirTypeDeclaration.resolveAsSirClass(): SirClass? =
     when (this) {

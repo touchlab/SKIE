@@ -8,7 +8,6 @@ import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.isAccessibleFromOtherModules
 import co.touchlab.skie.sir.element.superClassType
 import co.touchlab.skie.sir.element.toTypeParameterUsage
-import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
@@ -53,12 +52,8 @@ interface SealedGeneratorExtensionContainer {
     val KirClass.visibleSealedSubclasses: List<KirClass>
         get() = this.sealedSubclasses.filter { it.configuration[SealedInterop.Case.Visible] && it.primarySirClass.visibility.isAccessibleFromOtherModules }
 
-    fun SirClass.getSealedSubclassType(
-        enum: SirClass,
-    ): SirType = SirDeclaredSirType(
-        declaration = this,
-        typeArguments = this.getTypeArgumentsForEnumCase(enum),
-    )
+    fun SirClass.getSealedSubclassType(enum: SirClass): SirType =
+        this.toType(this.getTypeArgumentsForEnumCase(enum))
 
     private fun SirClass.getTypeArgumentsForEnumCase(
         enum: SirClass,

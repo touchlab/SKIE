@@ -206,7 +206,7 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
         isReplaced = true,
         isHidden = true,
     ) {
-        bridgedEnum.defaultType.withFqName()
+        bridgedEnum.toFqNameType()
     }
 
     if (SkieConfigurationFlag.Debug_UseStableTypeAliases.isEnabled) {

@@ -1,8 +1,8 @@
 package co.touchlab.skie.sir
 
 import co.touchlab.skie.sir.element.SirModule
+import io.outfoxx.swiftpoet.DeclaredTypeName
 
-// TODO Needs to support type parameters for types nested in generic classes (DeclaredSirType also needs to support this)
 class SirFqName private constructor(
     val module: SirModule,
     val simpleName: String,
@@ -17,6 +17,10 @@ class SirFqName private constructor(
 
     override fun toString(): String =
         module.name + "." + toLocalString()
+
+    fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName =
+        parent?.toSwiftPoetDeclaredTypeName()?.nestedType(simpleName)
+            ?: DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

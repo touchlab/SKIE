@@ -6,6 +6,7 @@ import co.touchlab.skie.oir.element.kirClassOrNull
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirDeclaredSirType
+import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.FunctionSpec
 
 class SirClass(
@@ -71,7 +72,10 @@ class SirClass(
      * Name used by SKIE generated code in cases it cannot use fqName.
      */
     override val internalName: SirFqName
-        get() = internalTypeAlias?.internalName ?: publicName
+        get() = internalTypeAlias?.internalName ?: fqName
+
+    override fun toType(typeArguments: List<SirType>): SirDeclaredSirType =
+        SirDeclaredSirType({ internalTypeAlias ?: this }, typeArguments = typeArguments)
 
     override fun toReadableString(): String =
         kind.toString().lowercase() + " " + fqName.toString()
@@ -165,7 +169,7 @@ val SirClass.superClass: SirClass?
     get() = superClassType?.declaration as? SirClass
 
 fun SirDeclaredSirType.resolveAsSirClassType(): SirDeclaredSirType? =
-    when (declaration) {
+    when (val declaration = declaration) {
         is SirClass -> this
         is SirTypeAlias -> {
             when (val type = declaration.type) {

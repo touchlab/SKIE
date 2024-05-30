@@ -9,7 +9,6 @@ import co.touchlab.skie.sir.element.SirTypeParameter
 data class OirDeclaredSirType(
     val declaration: OirClass,
     private val typeArguments: List<OirType> = emptyList(),
-    override val pointsToInternalName: Boolean = true,
     private val mapTypeArgument: (OirType, SirTypeParameter) -> SirType,
 ) : DeclaredSirType() {
 
@@ -46,14 +45,10 @@ data class OirDeclaredSirType(
             }
 
         return SirDeclaredSirType(
-            declaration = selectedClass,
+            declarationProvider = { selectedClass.internalTypeAlias ?: selectedClass },
             typeArguments = convertedTypeArguments,
-            pointsToInternalName = pointsToInternalName,
         )
     }
-
-    override fun withFqName(): DeclaredSirType =
-        copy(pointsToInternalName = false)
 
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): OirDeclaredSirType =
         this

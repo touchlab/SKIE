@@ -179,7 +179,7 @@ object SirCodeGenerator {
 
     private fun FileSpec.Builder.generateExtension(extension: SirExtension) {
         addExtension(
-            ExtensionSpec.builder(extension.classDeclaration.defaultType.toSwiftPoetDeclaredTypeName())
+            ExtensionSpec.builder(extension.classDeclaration.internalName.toSwiftPoetDeclaredTypeName())
                 .addConditionalConstraints(extension)
                 .addExtensionDeclarations(extension)
                 .build(),
