@@ -81,11 +81,41 @@ object SkieKotlinVariantResolver {
         return skieVersion
     }
 
-    private fun Project.getKotlinVersionString(): String? =
-        (project.kotlinGradlePluginVersionOverride ?: project.kotlinGradlePluginVersion ?: project.rootProject.kotlinGradlePluginVersion)
+    private fun Project.getKotlinVersionString(): String? {
+        logger.debug("[SKIE] Resolving Kotlin Version for project ${project.path}")
+
+        project.kotlinGradlePluginVersionOverride?.let { override ->
+            logger.debug("[SKIE] Found KGP version override: $override, skipping resolution.")
+            return override
+        }
+
+        project.kotlinGradlePluginVersion?.let { projectKotlinVersion ->
+            logger.debug("[SKIE] Found KGP version $projectKotlinVersion directly on project ${project.path}.")
+            return projectKotlinVersion
+        }
+
+        project.rootProject.kotlinGradlePluginVersion?.let { rootProjectKotlinVersion ->
+            logger.debug("[SKIE] Found KGP version $rootProjectKotlinVersion on the root project.")
+            return rootProjectKotlinVersion
+        }
+
+        logger.debug("[SKIE] Couldn't find KGP version.")
+        return null
+    }
 
     private val Project.kotlinGradlePluginVersion: String?
-        get() = kotlinGradlePluginVersionFromClasspathConfiguration() ?: kotlinGradlePluginVersionFromPlugin()
+        get() {
+            logger.debug("[SKIE] Resolving KGP version from classpath configuration on project ${project.path}.")
+            kotlinGradlePluginVersionFromClasspathConfiguration()?.let { versionFromClasspathConfiguration ->
+                logger.debug("[SKIE] Found KGP version $versionFromClasspathConfiguration from classpath configuration in project ${project.path}.")
+                return versionFromClasspathConfiguration
+            }
+
+            logger.debug("[SKIE] Resolving KGP version from KGP plugin on project ${project.path}.")
+            return kotlinGradlePluginVersionFromPlugin()?.also { versionFromPlugin ->
+                logger.debug("[SKIE] Found KGP version $versionFromPlugin from KGP plugin in project ${project.path}.")
+            }
+        }
 
     private val Project.kotlinGradlePluginVersionOverride: String?
         get() = findProperty("skie.kgpVersion") as? String
@@ -104,11 +134,14 @@ object SkieKotlinVariantResolver {
         try {
             val kotlinBasePluginClass = this@SkieKotlinVariantResolver.javaClass.classLoader.loadClass("org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin")
 
-            val plugin = plugins.firstOrNull { kotlinBasePluginClass.isAssignableFrom(it.javaClass) } ?: return null
+            val plugin = plugins.firstOrNull { kotlinBasePluginClass.isAssignableFrom(it.javaClass) } ?: kotlin.run {
+                logger.debug("[SKIE] None of the applied plugins (${plugins.size}) applied to project ${project.path} are assignable from ${kotlinBasePluginClass.name}")
+                return null
+            }
 
             return kotlinBasePluginClass.getDeclaredMethod("getPluginVersion").invoke(plugin) as? String
         } catch (e: Throwable) {
-            logger.debug("SKIE could not determine the Kotlin Gradle plugin version directly from Kotlin Gradle plugin because: $e")
+            logger.debug("[SKIE] SKIE could not determine the Kotlin Gradle plugin version directly from Kotlin Gradle plugin because: $e")
 
             return null
         }
