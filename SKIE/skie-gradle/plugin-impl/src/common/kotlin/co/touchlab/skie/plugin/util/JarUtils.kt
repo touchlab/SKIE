@@ -7,7 +7,10 @@ import java.nio.file.FileSystemNotFoundException
 import java.nio.file.FileSystems
 
 fun File.writeToZip(write: (FileSystem) -> Unit) {
-    val uri = URI.create("jar:file:" + this.absolutePath)
+    val fileUri = this.toURI()
+
+    // Solves an issues with spaces in the path
+    val uri = URI("jar:file", fileUri.userInfo, fileUri.host, fileUri.port, fileUri.path, fileUri.query, fileUri.fragment)
 
     val fileSystem = try {
         FileSystems.getFileSystem(uri)
