@@ -49,8 +49,15 @@ abstract class CreateSkieConfigurationTask : DefaultTask() {
                 dependsOn(target.createSkieBuildDirectoryTask)
             }
 
+            val createConfigurationOutputs = createConfiguration.map { it.outputs.files }
+
             target.task.configure {
-                inputs.files(createConfiguration)
+                // Needed because of a bug in the configuration cache prior to Gradle 8.3
+                // TODO Replace once we set the minimum required Gradle version >= 8.3 which will happen once we drop support for Kotlin 1.9.x
+                inputs.files(createConfigurationOutputs)
+                dependsOn(createConfiguration)
+                // With:
+                // inputs.files(createConfiguration)
             }
         }
     }
