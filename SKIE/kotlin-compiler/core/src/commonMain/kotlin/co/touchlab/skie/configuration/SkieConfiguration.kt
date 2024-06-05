@@ -1,5 +1,6 @@
 package co.touchlab.skie.configuration
 
+import co.touchlab.skie.configuration.provider.ConfigurationProvider
 import co.touchlab.skie.util.Optional
 import co.touchlab.skie.util.orElse
 import co.touchlab.skie.util.toOptional
@@ -61,7 +62,7 @@ abstract class SkieConfiguration(
         if (isKeySupported(configurationKey)) {
             return configurationKey.defaultValue
         } else {
-            error("Configuration key $configurationKey was not registered in ConfigurationProvider.")
+            error("Configuration key '${configurationKey::class.qualifiedName}' was not registered in '${ConfigurationProvider::class.qualifiedName}' nor any SKIE plugin.")
         }
     }
 
