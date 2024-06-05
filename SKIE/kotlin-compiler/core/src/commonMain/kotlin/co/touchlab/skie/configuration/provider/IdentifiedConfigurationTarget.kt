@@ -12,13 +12,13 @@ interface IdentifiedConfigurationTarget : ConfigurationTarget {
 
     val scopeType: KClass<out ConfigurationScope>
 
-    object Root : IdentifiedConfigurationTarget {
+    object Global : IdentifiedConfigurationTarget {
 
         override val belongsToSkieRuntime: Boolean = false
 
         override val fqName: String = ""
 
-        override val scopeType: KClass<out ConfigurationScope> = ConfigurationScope.Root::class
+        override val scopeType: KClass<out ConfigurationScope> = ConfigurationScope.Global::class
 
         override fun hasAnnotation(kClass: KClass<out Annotation>): Boolean = false
 

@@ -2,7 +2,7 @@ package co.touchlab.skie.configuration
 
 interface ConfigurationScope {
 
-    interface Root : ConfigurationScope
+    interface Global : ConfigurationScope
 
     interface Module : ConfigurationScope
 
@@ -24,7 +24,7 @@ interface ConfigurationScope {
 
     interface CallableDeclaration : Function, Property
 
-    interface AllExceptCallableDeclarations : Root, Module, Package, File, Class
+    interface AllExceptCallableDeclarations : Global, Module, Package, File, Class
 
     interface AllExceptConstructorsAndProperties : AllExceptCallableDeclarations, SimpleFunction
 

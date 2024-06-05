@@ -60,7 +60,7 @@ class ConfigurationProvider(
     private val allKeys = builtInKeys + pluginConfigurationKeys
 
     val globalConfiguration: GlobalConfiguration by lazy {
-        GlobalConfiguration(configurationData.enabledConfigurationFlags, allKeys).withLoadedKeyValueConfiguration(IdentifiedConfigurationTarget.Root)
+        GlobalConfiguration(configurationData.enabledConfigurationFlags, allKeys).withLoadedKeyValueConfiguration(IdentifiedConfigurationTarget.Global)
     }
 
     private val cache = mutableMapOf<IdentifiedConfigurationTarget, SkieConfiguration>()
