@@ -3,8 +3,10 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.configuration.internal.SwiftCompilerConfigurationKeys
 import co.touchlab.skie.plugin.util.takeIf
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import javax.inject.Inject
 
@@ -23,6 +25,11 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
     val enableConcurrentSkieCompilation: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
     val enableParallelSkieCompilation: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
 
+    /**
+     * Additional Swift compiler arguments that will be passed to the Swift compiler.
+     */
+    val freeSwiftCompilerArgs: ListProperty<String> = objects.listProperty(String::class.java)
+
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(
             SkieConfigurationFlag.Build_SwiftLibraryEvolution takeIf enableSwiftLibraryEvolution,
@@ -30,4 +37,8 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
             SkieConfigurationFlag.Build_ConcurrentSkieCompilation takeIf enableConcurrentSkieCompilation,
             SkieConfigurationFlag.Build_ParallelSkieCompilation takeIf enableParallelSkieCompilation,
         )
+
+    internal fun buildItems(): Map<String, String?> = mapOf(
+        SwiftCompilerConfigurationKeys.FreeCompilerArgs.name to SwiftCompilerConfigurationKeys.FreeCompilerArgs.serialize(freeSwiftCompilerArgs.get()),
+    )
 }

@@ -15,7 +15,7 @@ val Project.skieExtension: SkieExtension
 fun SkieExtension.buildConfiguration(target: SkieTarget): GradleSkieConfigurationData =
     GradleSkieConfigurationData(
         enabledConfigurationFlags = getUserConfiguredFlags() + target.requiredConfigurationFlags,
-        groups = features.buildGroups(),
+        groups = features.buildGroups() + build.buildGroup(),
     )
 
 private fun SkieExtension.getUserConfiguredFlags(): Set<SkieConfigurationFlag> =
@@ -36,4 +36,11 @@ private fun SkieFeatureConfiguration.GroupConfiguration.build(): GradleSkieConfi
         target = targetFqNamePrefix,
         overridesAnnotations = overridesAnnotations,
         items = items.toMap(),
+    )
+
+private fun SkieBuildConfiguration.buildGroup(): GradleSkieConfigurationData.Group =
+    GradleSkieConfigurationData.Group(
+        target = "",
+        overridesAnnotations = false,
+        items = buildItems(),
     )
