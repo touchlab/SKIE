@@ -6,7 +6,7 @@ object LinkObjectFilesPhase : LinkPhase {
 
     context(LinkPhase.Context)
     override suspend fun execute() {
-        val additionalObjectFiles = skieBuildDirectory.swiftCompiler.objectFiles.allObjectFiles.map { it.toPath() }
+        val additionalObjectFiles = objectFileProvider.allObjectFiles.map { it.absolutePath }
 
         link(additionalObjectFiles)
     }

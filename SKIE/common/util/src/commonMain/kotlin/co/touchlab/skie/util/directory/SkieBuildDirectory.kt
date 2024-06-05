@@ -102,9 +102,6 @@ class SkieBuildDirectory(
             val allFiles: List<File>
                 get() = directory.walkTopDown().toList()
 
-            val allObjectFiles: List<File>
-                get() = allFiles.filter { it.extension == "o" }
-
             fun objectFile(sourceFileName: String): File = directory.resolve("$sourceFileName.o")
 
             fun swiftDependencies(sourceFileName: String): File = directory.resolve("$sourceFileName.swiftdeps")

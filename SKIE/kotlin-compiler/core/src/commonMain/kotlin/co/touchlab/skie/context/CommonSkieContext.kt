@@ -6,6 +6,7 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.phases.SkiePhaseScheduler
 import co.touchlab.skie.plugin.analytics.AnalyticsCollector
+import co.touchlab.skie.sir.compilation.ObjectFileProvider
 import co.touchlab.skie.util.CompilerShim
 import co.touchlab.skie.util.KirReporter
 import co.touchlab.skie.util.directory.FrameworkLayout
@@ -33,6 +34,8 @@ interface CommonSkieContext {
     val skiePhaseScheduler: SkiePhaseScheduler
 
     val compilerShim: CompilerShim
+
+    val objectFileProvider: ObjectFileProvider
 
     val skieBuildDirectory: SkieBuildDirectory
         get() = skieDirectories.buildDirectory

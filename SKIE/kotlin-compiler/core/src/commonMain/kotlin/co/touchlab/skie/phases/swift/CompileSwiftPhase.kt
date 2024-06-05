@@ -4,8 +4,10 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.util.Command
-import java.io.File
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.nameWithoutExtension
 
 class CompileSwiftPhase(
     context: SirPhase.Context,
@@ -21,6 +23,8 @@ class CompileSwiftPhase(
     private val outputFileMap = context.skieBuildDirectory.swiftCompiler.config.outputFileMap
     private val objectFiles = skieBuildDirectory.swiftCompiler.objectFiles
     private val moduleDirectory = skieBuildDirectory.swiftCompiler.module
+    private val objectFileProvider = context.objectFileProvider
+    private val sirProvider = context.sirProvider
 
     private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in globalConfiguration.enabledFlags
     private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in globalConfiguration.enabledFlags
@@ -28,45 +32,48 @@ class CompileSwiftPhase(
 
     context(SirPhase.Context)
     override suspend fun execute() {
-        val sourceFiles = sirProvider.compilableFiles.map { it.absolutePath.toFile() }
+        val compilableFiles = sirProvider.compilableFiles
 
-        if (sourceFiles.isEmpty()) {
+        if (compilableFiles.isEmpty()) {
             return
         }
 
-        createSwiftFileList(sourceFiles)
+        createSwiftFileList(compilableFiles)
 
-        createOutputFileMap(sourceFiles)
+        createOutputFileMap(compilableFiles)
 
         callSwiftCompiler()
-
-        deleteOldObjectFiles(sourceFiles)
     }
 
-    private fun createSwiftFileList(sourceFiles: List<File>) {
-        val content = sourceFiles.joinToString("\n") { "'${it.absolutePath}'" }
+    private fun createSwiftFileList(compilableFiles: List<SirCompilableFile>) {
+        val content = compilableFiles.joinToString("\n") { "'${it.absolutePath.absolutePathString()}'" }
 
         swiftFileList.writeText(content)
     }
 
-    private fun createOutputFileMap(sourceFiles: List<File>) {
-        if (swiftCompilerConfiguration.buildType != BuildType.Debug) {
-            return
+    private fun createOutputFileMap(compilableFiles: List<SirCompilableFile>) {
+        val content = when (swiftCompilerConfiguration.buildType) {
+            BuildType.Debug -> getOutputFileMapContentForDebug(compilableFiles)
+            BuildType.Release -> getOutputFileMapContentForRelease()
         }
 
+        outputFileMap.writeText(content)
+    }
+
+    private fun getOutputFileMapContentForDebug(compilableFiles: List<SirCompilableFile>): String {
         val root = """
-              "": {
+            "": {
                 "emit-module-dependencies": "${moduleDirectory.dependencies(framework.frameworkName).absolutePath}",
                 "swift-dependencies": "${moduleDirectory.swiftDependencies(framework.frameworkName).absolutePath}"
-              },
-        """.trimIndent()
+            },
+            """.trimIndent()
 
-        val body = sourceFiles.joinToString(",\n") { sourceFile ->
-            val sourceFileName = sourceFile.nameWithoutExtension
+        val body = compilableFiles.joinToString(",\n") { compilableFile ->
+            val sourceFileName = compilableFile.absolutePath.nameWithoutExtension
 
             """
-                "${sourceFile.absolutePath}": {
-                    "object": "${objectFiles.objectFile(sourceFileName).absolutePath}",
+                "${compilableFile.absolutePath}": {
+                    "object": "${objectFileProvider.getOrCreate(compilableFile).absolutePath.absolutePathString()}",
                     "dependencies": "${objectFiles.dependencies(sourceFileName).absolutePath}",
                     "swift-dependencies": "${objectFiles.swiftDependencies(sourceFileName).absolutePath}",
                     "swiftmodule": "${objectFiles.partialSwiftModule(sourceFileName).absolutePath}"
@@ -74,9 +81,22 @@ class CompileSwiftPhase(
             """.trimIndent()
         }
 
-        val content = "{\n$root\n$body\n}"
+        return "{\n$root\n$body\n}"
+    }
 
-        outputFileMap.writeText(content)
+    private fun getOutputFileMapContentForRelease(): String {
+        val objectFilePath = objectFiles.directory.resolve(framework.frameworkName + ".o").toPath()
+        val objectFile = objectFileProvider.getOrCreate(objectFilePath)
+
+        return """
+            {
+                "": {
+                    "emit-module-dependencies": "${moduleDirectory.dependencies(framework.frameworkName).absolutePath}",
+                    "swift-dependencies": "${moduleDirectory.swiftDependencies(framework.frameworkName).absolutePath}",
+                    "object": "${objectFile.absolutePath.absolutePathString()}"
+                }
+            }
+            """.trimIndent()
     }
 
     private fun callSwiftCompiler() {
@@ -109,14 +129,14 @@ class CompileSwiftPhase(
                 BuildType.Debug -> {
                     +"-Onone"
                     +"-incremental"
-                    +"-output-file-map"
-                    +outputFileMap.absolutePath
                 }
                 BuildType.Release -> {
                     +"-O"
                     +"-whole-module-optimization"
                 }
             }
+            +"-output-file-map"
+            +outputFileMap.absolutePath
             +"-g"
             +"-module-cache-path"
             +skieBuildDirectory.cache.swiftModules.directory.absolutePath
@@ -133,27 +153,6 @@ class CompileSwiftPhase(
             workingDirectory = objectFiles.directory
 
             execute(logFile = skieBuildDirectory.debug.logs.swiftc)
-        }
-    }
-
-    private fun deleteOldObjectFiles(sourceFiles: List<File>) {
-        when (swiftCompilerConfiguration.buildType) {
-            BuildType.Debug -> {
-                val sourceFilesNames = sourceFiles.map { it.nameWithoutExtension }.toSet()
-
-                objectFiles.allFiles
-                    .filterNot { it.nameWithoutExtension in sourceFilesNames }
-                    .forEach {
-                        it.delete()
-                    }
-            }
-            BuildType.Release -> {
-                objectFiles.allFiles
-                    .filter { it.nameWithoutExtension != framework.frameworkName }
-                    .forEach {
-                        it.delete()
-                    }
-            }
         }
     }
 
