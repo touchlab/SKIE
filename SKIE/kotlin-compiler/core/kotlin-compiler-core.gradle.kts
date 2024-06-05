@@ -20,6 +20,8 @@ kotlin {
                 api(projects.common.configuration.configurationDeclaration)
                 api(projects.common.util)
 
+                implementation(projects.common.configuration.configurationInternal)
+
                 implementation(libs.kotlinx.coroutines.jvm)
                 implementation(projects.runtime.runtimeSwift)
 

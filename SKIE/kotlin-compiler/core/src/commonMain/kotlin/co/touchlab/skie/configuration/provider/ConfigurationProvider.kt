@@ -23,6 +23,7 @@ import co.touchlab.skie.configuration.SuppressSkieWarning
 import co.touchlab.skie.configuration.SuspendInterop
 import co.touchlab.skie.configuration.ValueParameterConfiguration
 import co.touchlab.skie.configuration.ValueParameterConfigurationParent
+import co.touchlab.skie.configuration.internal.SwiftCompilerConfigurationKeys
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData.Group
 import co.touchlab.skie.util.Optional
 import co.touchlab.skie.util.toOptional
@@ -55,6 +56,8 @@ class ConfigurationProvider(
         SkieVisibility,
         SuppressSkieWarning.NameCollision,
         SuspendInterop.Enabled,
+        SwiftCompilerConfigurationKeys.SwiftVersion,
+        SwiftCompilerConfigurationKeys.FreeCompilerArgs,
     )
 
     private val allKeys = builtInKeys + pluginConfigurationKeys
