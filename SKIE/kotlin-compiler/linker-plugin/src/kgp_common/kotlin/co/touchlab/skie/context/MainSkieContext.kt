@@ -4,6 +4,7 @@ package co.touchlab.skie.context
 
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration.BuildType
+import co.touchlab.skie.configuration.internal.SwiftCompilerConfigurationKeys
 import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfigurationProvider
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
@@ -70,10 +71,8 @@ class MainSkieContext internal constructor(
     private val kotlinTargetTriple = configurables.targetTriple
 
     override val swiftCompilerConfiguration: SwiftCompilerConfiguration = SwiftCompilerConfiguration(
-        // TODO To SkieConfiguration via RootScope Key
-        swiftVersion = "5",
-        // TODO To SkieConfiguration via RootScope Key
-        additionalFlags = emptyList(),
+        swiftVersion = globalConfiguration[SwiftCompilerConfigurationKeys.SwiftVersion],
+        freeCompilerArgs = globalConfiguration[SwiftCompilerConfigurationKeys.FreeCompilerArgs],
         buildType = if (konanConfig.debug) BuildType.Debug else BuildType.Release,
         targetTriple = TargetTriple(
             architecture = kotlinTargetTriple.architecture,

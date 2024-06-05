@@ -4,7 +4,7 @@ import co.touchlab.skie.util.TargetTriple
 
 data class SwiftCompilerConfiguration(
     val swiftVersion: String,
-    val additionalFlags: List<String>,
+    val freeCompilerArgs: List<String>,
     val buildType: BuildType,
     val targetTriple: TargetTriple,
     val bitcodeEmbeddingMode: BitcodeEmbeddingMode,

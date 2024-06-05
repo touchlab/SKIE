@@ -20,6 +20,7 @@ kotlin {
                 api(projects.common.analytics)
                 api(projects.common.configuration.configurationApi)
                 implementation(projects.common.configuration.configurationAnnotations)
+                implementation(projects.common.configuration.configurationInternal)
                 api(projects.common.configuration.configurationDeclaration)
                 api(projects.common.util)
 

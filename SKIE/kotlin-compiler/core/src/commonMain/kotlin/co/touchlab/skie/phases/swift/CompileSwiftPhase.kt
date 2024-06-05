@@ -127,7 +127,7 @@ class CompileSwiftPhase(
             +swiftCompilerConfiguration.absoluteTargetSysRootPath
             +"-target"
             +swiftCompilerConfiguration.targetTriple.withOsVersion(swiftCompilerConfiguration.osVersionMin).toString()
-            +swiftCompilerConfiguration.additionalFlags
+            +swiftCompilerConfiguration.freeCompilerArgs
             +"@${swiftFileList.absolutePath}"
 
             workingDirectory = objectFiles.directory

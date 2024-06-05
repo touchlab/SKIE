@@ -36,6 +36,7 @@ buildSetup {
             val api by module
             val annotations by module
             val declaration by module
+            val internal by module
         }
         val util by module
     }
