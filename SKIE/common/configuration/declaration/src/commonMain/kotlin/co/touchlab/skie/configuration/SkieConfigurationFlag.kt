@@ -15,6 +15,7 @@ enum class SkieConfigurationFlag {
     Build_ParallelSwiftCompilation,
     Build_ParallelSkieCompilation,
     Build_ConcurrentSkieCompilation,
+    Build_NoClangModuleBreadcrumbsInStaticFramework,
 
     Migration_WildcardExport,
     Migration_AnyMethodsAsFunctions,

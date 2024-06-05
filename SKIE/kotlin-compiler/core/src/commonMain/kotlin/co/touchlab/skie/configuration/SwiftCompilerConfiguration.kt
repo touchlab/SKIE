@@ -6,6 +6,7 @@ data class SwiftCompilerConfiguration(
     val swiftVersion: String,
     val freeCompilerArgs: List<String>,
     val buildType: BuildType,
+    val linkMode: LinkMode,
     val targetTriple: TargetTriple,
     val bitcodeEmbeddingMode: BitcodeEmbeddingMode,
     val absoluteSwiftcPath: String,
@@ -15,6 +16,11 @@ data class SwiftCompilerConfiguration(
 
     enum class BuildType {
         Debug, Release
+    }
+
+    enum class LinkMode {
+        Dynamic,
+        Static,
     }
 
     enum class BitcodeEmbeddingMode {

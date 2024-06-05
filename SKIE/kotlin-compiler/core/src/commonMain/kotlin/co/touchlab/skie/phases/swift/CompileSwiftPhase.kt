@@ -29,6 +29,8 @@ class CompileSwiftPhase(
     private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in globalConfiguration.enabledFlags
     private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in globalConfiguration.enabledFlags
     private val isConcurrentSkieCompilationEnabled = SkieConfigurationFlag.Build_ConcurrentSkieCompilation in globalConfiguration.enabledFlags
+    private val noClangModuleBreadcrumbsInStaticFramework =
+        SkieConfigurationFlag.Build_NoClangModuleBreadcrumbsInStaticFramework in globalConfiguration.enabledFlags
 
     context(SirPhase.Context)
     override suspend fun execute() {
@@ -117,6 +119,10 @@ class CompileSwiftPhase(
                 +swiftFrameworkHeader.swiftInterface
                 +"-emit-private-module-interface-path"
                 +swiftFrameworkHeader.privateSwiftInterface
+            }
+            if (noClangModuleBreadcrumbsInStaticFramework && swiftCompilerConfiguration.linkMode == SwiftCompilerConfiguration.LinkMode.Static) {
+                +"-Xfrontend"
+                +"-no-clang-module-breadcrumbs"
             }
             +"-emit-objc-header"
             +"-emit-objc-header-path"

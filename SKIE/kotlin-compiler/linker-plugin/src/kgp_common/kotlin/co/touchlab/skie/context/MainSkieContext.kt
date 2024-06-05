@@ -74,6 +74,11 @@ class MainSkieContext internal constructor(
         swiftVersion = globalConfiguration[SwiftCompilerConfigurationKeys.SwiftVersion],
         freeCompilerArgs = globalConfiguration[SwiftCompilerConfigurationKeys.FreeCompilerArgs],
         buildType = if (konanConfig.debug) BuildType.Debug else BuildType.Release,
+        linkMode = if (konanConfig.configuration.getBoolean(KonanConfigKeys.STATIC_FRAMEWORK)) {
+            SwiftCompilerConfiguration.LinkMode.Static
+        } else {
+            SwiftCompilerConfiguration.LinkMode.Dynamic
+        },
         targetTriple = TargetTriple(
             architecture = kotlinTargetTriple.architecture,
             vendor = kotlinTargetTriple.vendor,
