@@ -85,4 +85,20 @@ interface ConfigurationKey<T> {
 
         fun valueOf(value: kotlin.String): E
     }
+
+    interface List<T> : NonOptional<kotlin.collections.List<T>> {
+
+        val separator: kotlin.String
+            get() = "|||"
+
+        override fun deserialize(value: kotlin.String?): kotlin.collections.List<T> =
+            value.throwIfNull().split(separator).map { deserializeElement(it) }
+
+        override fun serialize(value: kotlin.collections.List<T>): kotlin.String? =
+            value.joinToString(separator) { serializeElement(it) }
+
+        fun serializeElement(value: T): kotlin.String
+
+        fun deserializeElement(value: kotlin.String): T
+    }
 }
