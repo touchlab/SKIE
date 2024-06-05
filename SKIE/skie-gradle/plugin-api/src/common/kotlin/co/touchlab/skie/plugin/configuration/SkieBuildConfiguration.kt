@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 package co.touchlab.skie.plugin.configuration
 
@@ -46,6 +46,19 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
      * Additional Swift compiler arguments that will be passed to the Swift compiler.
      */
     val freeSwiftCompilerArgs: ListProperty<String> = objects.listProperty(String::class.java)
+
+    /**
+     * Configures SKIE to produce distributable frameworks.
+     *
+     * This option is only needed when the produced framework will be compiled against on another machine.
+     * On the other hand, this option is unnecessary when the framework is only used locally, including as a dependency for a binary that is then distributed to other machines.
+     *
+     * Enables Swift Library Evolution and `-no-clang-module-breadcrumbs` flag.
+     */
+    fun produceDistributableFramework() {
+        enableSwiftLibraryEvolution.set(true)
+        noClangModuleBreadcrumbsInStaticFrameworks.set(true)
+    }
 
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
         setOfNotNull(
