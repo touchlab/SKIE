@@ -30,7 +30,7 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
      * This flag ensures that the compiler doesn't emit DWARF skeleton CUs for imported Clang modules, which would otherwise likely result in the following warning:
      *
      * ```
-     * ../xyz.pcm: No such file or directory
+     * ...../xyz.pcm: No such file or directory
      * Linking a static library that was built with `-gmodules`, but the module cache was not found.
      * Redistributable static libraries should never be built with module debugging enabled.
      * The debug experience will be degraded due to incomplete debug information.
