@@ -1,5 +1,6 @@
 package co.touchlab.skie.plugin.switflink
 
+import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.shim.KotlinNativeCompilationShim
 import co.touchlab.skie.plugin.shim.KotlinSourceSetShim
@@ -38,9 +39,15 @@ object SwiftBundlingConfigurator {
 
         val swiftSourceSet = createSwiftSourceSet(compilation)
 
+        val isSwiftBundlingEnabledProperty = skieExtension.swiftBundling.enabled
+
         return registerSkieTask<ProcessSwiftSourcesTask>(baseName) {
             inputs.files(swiftSourceSet)
             output.set(compilation.skieCompilationDirectory.map { it.swift.bundled.directory })
+
+            onlyIf {
+                isSwiftBundlingEnabledProperty.get()
+            }
         }
     }
 

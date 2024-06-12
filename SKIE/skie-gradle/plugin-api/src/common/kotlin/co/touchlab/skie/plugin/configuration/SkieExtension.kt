@@ -52,5 +52,11 @@ open class SkieExtension @Inject constructor(objects: ObjectFactory) {
         action.execute(migration)
     }
 
+    val swiftBundling: SkieSwiftBundlingConfiguration = objects.newInstance(SkieSwiftBundlingConfiguration::class.java)
+
+    fun swiftBundling(action: Action<in SkieSwiftBundlingConfiguration>) {
+        action.execute(swiftBundling)
+    }
+
     companion object
 }
