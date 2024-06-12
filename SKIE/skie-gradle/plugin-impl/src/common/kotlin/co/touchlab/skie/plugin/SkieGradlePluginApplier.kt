@@ -6,6 +6,7 @@ import co.touchlab.skie.plugin.configuration.SkieExtension
 import co.touchlab.skie.plugin.configuration.createExtension
 import co.touchlab.skie.plugin.coroutines.addDependencyOnSkieRuntime
 import co.touchlab.skie.plugin.coroutines.configureMinOsVersionIfNeeded
+import co.touchlab.skie.plugin.coroutines.configureSkieRuntimeDependencySubstitution
 import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
@@ -34,6 +35,8 @@ object SkieGradlePluginApplier {
 
     private fun Project.configureSkieGradlePlugin() {
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
+
+        configureSkieRuntimeDependencySubstitution()
     }
 
     private fun Project.configureSkieCompilerPlugin() {

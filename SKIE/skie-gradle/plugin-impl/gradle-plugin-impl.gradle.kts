@@ -4,6 +4,7 @@ import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.target.ExpectActualBuildConfigGenerator
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyCoordinate
+import co.touchlab.skie.gradle.publish.dependencyModule
 import co.touchlab.skie.gradle.util.gradlePluginApi
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -56,6 +57,7 @@ buildConfig {
     buildConfigField("co.touchlab.skie.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "")
     buildConfigField("String", "SKIE_VERSION", "")
     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", "")
+    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_MODULE", "")
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATE", "")
     buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "")
 }
@@ -91,6 +93,7 @@ multiDimensionTarget.configureSourceSet { sourceSet ->
             buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", kotlinPlugin.map { it.dependencyCoordinate.enquoted() })
 
             val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
+            buildConfigField("String", "SKIE_KOTLIN_RUNTIME_MODULE", runtime.map { it.dependencyModule.enquoted() })
             buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATE", runtime.map { it.dependencyCoordinate.enquoted() })
 
             buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")

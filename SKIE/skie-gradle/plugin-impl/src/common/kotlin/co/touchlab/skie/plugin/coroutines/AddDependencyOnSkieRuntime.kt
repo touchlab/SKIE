@@ -7,9 +7,33 @@ import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.skieInternalExtension
 import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.util.file.isKlib
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleIdentifier
+import org.gradle.api.artifacts.ResolvedConfiguration
 import org.gradle.api.artifacts.ResolvedDependency
+
+// Workaround for dependency pollution caused by SKIE prior 0.7.0 where SKIE added the runtime to published configurations.
+// As a result, some libraries have dependencies on the runtime potentially with the wrong version of Kotlin.
+fun Project.configureSkieRuntimeDependencySubstitution() {
+    configurations.configureEach {
+        if (state != Configuration.State.UNRESOLVED) {
+            return@configureEach
+        }
+
+        resolutionStrategy {
+            eachDependency {
+                if (target.module.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) && target.name.contains("__kgp_")) {
+                    val baseTargetModuleId = target.toString().substringBefore("__kgp_")
+
+                    val updatedCoordinate = baseTargetModuleId + "__kgp_" + skieInternalExtension.kotlinVersion + ":" + BuildConfig.SKIE_VERSION
+
+                    useTarget(updatedCoordinate)
+                }
+            }
+        }
+    }
+}
 
 fun SkieTarget.addDependencyOnSkieRuntime() {
     if (!project.isCoroutinesInteropEnabled) {
@@ -38,7 +62,7 @@ private fun SkieTarget.registerSkieRuntime(
 
     verifyAllRuntimeDependenciesAreAvailable(skieRuntimeDirectDependencies, linkerDependenciesIds)
 
-    passRuntimeDependencyToCompiler(skieRuntimeDependency)
+    passRuntimeDependencyToCompiler(skieRuntimeDependency, linkerConfiguration.resolvedConfiguration)
 }
 
 private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(): Configuration {
@@ -93,15 +117,24 @@ private fun SkieTarget.verifyAllRuntimeDependenciesAreAvailable(
     }
 }
 
-private fun SkieTarget.passRuntimeDependencyToCompiler(skieRuntimeDependency: ResolvedDependency) {
-    skieRuntimeDependency.moduleArtifacts
-        .single { it.file.isKlib }
-        .let { moduleArtifact ->
-            addFreeCompilerArgs(
-                "-Xexport-library=${moduleArtifact.file.absolutePath}",
-                "-library=${moduleArtifact.file.absolutePath}",
-            )
-        }
+private fun SkieTarget.passRuntimeDependencyToCompiler(skieRuntimeDependency: ResolvedDependency, linkerResolvedConfiguration: ResolvedConfiguration) {
+    val runtimeArtifact = skieRuntimeDependency.moduleArtifacts.single { it.file.isKlib }
+
+    // Ensures that SKIE does not add the runtime for the second time if it is already present due to the issue with dependency pollution.
+    val existingDependency = linkerResolvedConfiguration.resolvedArtifacts.firstOrNull {
+        it.moduleVersion.id.module == runtimeArtifact.moduleVersion.id.module
+    }
+
+    if (existingDependency == null) {
+        addFreeCompilerArgs(
+            "-Xexport-library=${runtimeArtifact.file.absolutePath}",
+            "-library=${runtimeArtifact.file.absolutePath}",
+        )
+    } else {
+        addFreeCompilerArgs(
+            "-Xexport-library=${existingDependency.file.absolutePath}",
+        )
+    }
 }
 
 private val SkieTarget.skieRuntimeConfigurationName: String
