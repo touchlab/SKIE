@@ -5,7 +5,10 @@ import java.util.ServiceLoader
 
 class SkiePluginLoader {
 
-    val pluginRegistrars: List<SkiePluginRegistrar> = ServiceLoader.load(SkiePluginRegistrar::class.java).toList()
+    val pluginRegistrars: List<SkiePluginRegistrar> = ServiceLoader.load(
+        SkiePluginRegistrar::class.java,
+        SkiePluginRegistrar::class.java.classLoader
+    ).toList()
 
     fun registerAll(initPhaseContext: InitPhase.Context) {
         pluginRegistrars.forEach {
