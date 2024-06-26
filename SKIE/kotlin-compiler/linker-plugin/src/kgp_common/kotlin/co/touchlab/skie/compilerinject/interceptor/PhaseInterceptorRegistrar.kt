@@ -36,7 +36,7 @@ object PhaseInterceptorRegistrar {
 
         val phaseInterceptors =
             (this::class.java.classLoader as? URLClassLoader)?.let { ServiceLoaderLite.loadImplementations(it) }
-                ?: ServiceLoader.load(PhaseInterceptor::class.java)
+                ?: ServiceLoader.load(PhaseInterceptor::class.java, this::class.java.classLoader)
 
         phaseInterceptors
             .groupBy { it.getInterceptedPhase() }
