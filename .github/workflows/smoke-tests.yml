@@ -62,7 +62,7 @@ jobs:
       - name: Run Acceptance Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:functional__kgp_latestTest'
+          arguments: ':acceptance-tests:functional:kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -91,7 +91,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.4.2
         id: run-tests
         with:
-          arguments: ':acceptance-tests:type-mapping__kgp_latestTest'
+          arguments: ':acceptance-tests:type-mapping:kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -121,7 +121,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries__kgp_latestTest'
+          arguments: ':acceptance-tests:libraries:kgp_latestTest'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
