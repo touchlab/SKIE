@@ -68,5 +68,10 @@ buildSetup {
             val `regular-dependency` by module("regular")
             val `exported-dependency` by module("exported")
         }
+
+        val functional by module()
+        val libraries by module()
+        val stdlib by module()
+        val `type-mapping` by module()
     }
 }

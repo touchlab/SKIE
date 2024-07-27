@@ -3,7 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="acceptanceTest" value="tests/coroutines/suspend/objects" />
+          <entry key="acceptanceTest" value="tests/sealed/classes/collision/swift_type/any/works" />
         </map>
       </option>
       <option name="executionName" />
@@ -15,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:functional__kgp_latestTest" />
+          <option value=":acceptance-tests:functional:kgp_latestTest" />
         </list>
       </option>
       <option name="vmOptions" />

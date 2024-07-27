@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="pure__kgp_1.9.20Test" />
+          <option value="pure:kgp_1.9.20Test" />
         </list>
       </option>
       <option name="vmOptions" />

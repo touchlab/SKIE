@@ -88,6 +88,7 @@ kotlin {
     iosArm64()
     iosX64()
     iosSimulatorArm64()
+    watchosDeviceArm64()
 
 //     val exportedLibraries = performanceBenchmarkLibraries
     val exportedLibraries = listOf<String>(

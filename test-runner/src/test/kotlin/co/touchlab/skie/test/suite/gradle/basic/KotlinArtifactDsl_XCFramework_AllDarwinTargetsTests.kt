@@ -23,6 +23,8 @@ class KotlinArtifactDsl_XCFramework_AllDarwinTargetsTests: BaseGradleTests() {
         rootBuildFile(kotlinVersion) {
             kotlin {
                 allDarwin()
+
+                includeCoroutinesDependency()
             }
 
             kotlinArtifacts {

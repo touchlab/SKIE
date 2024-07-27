@@ -6,7 +6,7 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
-import org.jetbrains.kotlin.konan.CompilerVersion
+// import org.jetbrains.kotlin.konan.CompilerVersion
 import java.io.File
 
 private sealed interface BackupProperty<out T> {
@@ -26,24 +26,24 @@ private object KotlinNativeDownloaderProperties {
 }
 
 fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File {
-    return NativeCompilerDownloader(project, CompilerVersion.fromString(kotlinVersion.toString()))
-        .also { downloader ->
-            val originalVersionProperty = backupProperty<String?>(getKotlinNativeVersionPropertyName())
-            val originalDownloadFromMavenProperty = backupProperty<String>(KotlinNativeDownloaderProperties.downloadFromMaven)
+    val originalVersionProperty = backupProperty<String?>(getKotlinNativeVersionPropertyName())
+    val originalDownloadFromMavenProperty = backupProperty<String>(KotlinNativeDownloaderProperties.downloadFromMaven)
 
-            extra.set(KotlinNativeDownloaderProperties.main, kotlinVersion.toString())
-            if (kotlinVersion >= KotlinToolingVersion("1.9.20")) {
-                extra.set(KotlinNativeDownloaderProperties.downloadFromMaven, "true")
-            }
+    extra.set(KotlinNativeDownloaderProperties.main, kotlinVersion.toString())
+    if (kotlinVersion >= KotlinToolingVersion("1.9.20")) {
+        extra.set(KotlinNativeDownloaderProperties.downloadFromMaven, "true")
+    }
 
-            downloader.downloadIfNeeded()
+    val downloader = NativeCompilerDownloader(project)
+    downloader.downloadIfNeeded()
+    val compilerDirectory = downloader.compilerDirectory
 
-            extra.set(KotlinNativeDownloaderProperties.main, null)
+    extra.set(KotlinNativeDownloaderProperties.main, null)
 
-            restoreProperty(originalVersionProperty)
-            restoreProperty(originalDownloadFromMavenProperty)
-        }
-        .compilerDirectory
+    restoreProperty(originalVersionProperty)
+    restoreProperty(originalDownloadFromMavenProperty)
+
+    return compilerDirectory
 }
 
 private fun Project.getKotlinNativeVersionPropertyName(): String =

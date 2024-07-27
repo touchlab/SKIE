@@ -19,6 +19,8 @@ class NoArtifact_SingleTargetTests: BaseGradleTests() {
         rootBuildFile(kotlinVersion) {
             kotlin {
                 target(kotlinTarget)
+
+                includeCoroutinesDependency()
             }
         }
 

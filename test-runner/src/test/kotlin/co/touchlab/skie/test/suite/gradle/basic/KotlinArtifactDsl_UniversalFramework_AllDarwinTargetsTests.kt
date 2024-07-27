@@ -40,6 +40,8 @@ class KotlinArtifactDsl_UniversalFramework_AllDarwinTargetsTests: BaseGradleTest
         rootBuildFile(kotlinVersion) {
             kotlin {
                 allDarwin()
+
+                includeCoroutinesDependency()
             }
 
             kotlinArtifacts {

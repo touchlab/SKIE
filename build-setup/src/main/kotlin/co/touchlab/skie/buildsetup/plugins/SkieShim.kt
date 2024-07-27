@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.version.ToolingVersions
 import co.touchlab.skie.gradle.version.gradleApiVersion
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
@@ -21,24 +22,23 @@ abstract class SkieShim : Plugin<Project> {
         apply<MultiDimensionTargetPlugin>()
         apply<DevGradleImplicitReceiver>()
 
+        val gradleApiVersion = ToolingVersions.Gradle.`7․3`
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(kotlinToolingVersionDimension(), gradleApiVersionDimension()) { target ->
+            dimensions(kotlinToolingVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
                         attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
-                        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(target.gradleApiVersion.value))
                     }
                 }
             }
 
             configureSourceSet { sourceSet ->
                 val kotlinToolingVersion = sourceSet.kotlinToolingVersion.primaryVersion
-                val gradleApiVersion = sourceSet.gradleApiVersion.value
-                val kotlinVersion = sourceSet.gradleApiVersion.version.kotlinVersion.toString()
+                val kotlinVersion = gradleApiVersion.kotlinVersion.toString()
 
                 dependencies {
                     weak("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-                    weak("dev.gradleplugins:gradle-api:$gradleApiVersion")
+                    weak("dev.gradleplugins:gradle-api:${gradleApiVersion.gradleVersion.version}")
                     weak("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlinToolingVersion")
                     weak("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinToolingVersion")
                 }

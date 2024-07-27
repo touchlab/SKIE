@@ -24,6 +24,8 @@ class KotlinArtifactDsl_XCFramework_SingleTargetTests: BaseGradleTests() {
         rootBuildFile(kotlinVersion) {
             kotlin {
                 target(target)
+
+                includeCoroutinesDependency()
             }
 
             kotlinArtifacts {

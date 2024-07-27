@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="stdlib__kgp_2.0.0Test" />
+          <option value="stdlib:kgp_2.0.0Test" />
         </list>
       </option>
       <option name="vmOptions" />

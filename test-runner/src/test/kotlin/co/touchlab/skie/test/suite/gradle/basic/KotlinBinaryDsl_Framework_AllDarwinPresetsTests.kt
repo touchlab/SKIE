@@ -24,6 +24,8 @@ class KotlinBinaryDsl_Framework_AllDarwinPresetsTests: BaseGradleTests() {
             kotlin {
                 targets(KotlinTarget.Native.Darwin)
 
+                includeCoroutinesDependency()
+
                 registerNativeFrameworks(kotlinVersion, buildConfiguration, linkMode)
             }
         }

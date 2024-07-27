@@ -55,6 +55,8 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
             kotlin {
                 targets(KotlinTarget.Native)
 
+                includeCoroutinesDependency()
+
                 registerNativeFrameworks(
                     kotlinVersion = kotlinVersion,
                     buildConfiguration = configuration,

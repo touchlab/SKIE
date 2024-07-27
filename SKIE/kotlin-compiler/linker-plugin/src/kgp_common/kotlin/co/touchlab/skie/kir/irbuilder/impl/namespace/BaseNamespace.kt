@@ -7,7 +7,9 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
 import co.touchlab.skie.phases.pluginContext
 import co.touchlab.skie.phases.skieSymbolTable
+import org.jetbrains.kotlin.backend.common.extensions.FirIncompatiblePluginAPI
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
@@ -44,6 +46,7 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
     }
 
     context(KotlinIrPhase.Context)
+    @OptIn(ObsoleteDescriptorBasedAPI::class, FirIncompatiblePluginAPI::class)
     override fun generateIrDeclarations() {
         val generatorContext = GeneratorContext(
             Psi2IrConfiguration(),

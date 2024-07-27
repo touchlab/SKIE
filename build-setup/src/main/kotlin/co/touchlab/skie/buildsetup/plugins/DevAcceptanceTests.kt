@@ -1,3 +1,5 @@
+@file:OptIn(ExternalKotlinTargetApi::class, ExperimentalKotlinGradlePluginApi::class)
+
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.buildsetup.plugins.extensions.DevAcceptanceTestsExtension
@@ -17,6 +19,7 @@ import co.touchlab.skie.gradle.version.target.MultiDimensionTargetPlugin
 import co.touchlab.skie.gradle.version.target.Target
 import co.touchlab.skie.gradle.version.target.latest
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -33,13 +36,39 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.project
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.jvm.tasks.ProcessResources
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExternalKotlinTargetApi
+// import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
+import org.jetbrains.kotlin.gradle.plugin.mpp.external.DecoratedExternalKotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.external.DecoratedExternalKotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.external.ExternalKotlinCompilationDescriptor
+import org.jetbrains.kotlin.gradle.plugin.mpp.external.ExternalKotlinTargetDescriptor
+import org.jetbrains.kotlin.gradle.plugin.mpp.external.createCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.external.createExternalKotlinTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
 import java.io.File
+
+class MultiDimensionalJvmTarget(delegate: Delegate): DecoratedExternalKotlinTarget(delegate)/*, HasConfigurableKotlinCompilerOptions<KotlinJvmCompilerOptions>*/ {
+    @Suppress("UNCHECKED_CAST")
+    override val compilations: NamedDomainObjectContainer<MultiDimensionalJvmCompilation>
+        get() = super.compilations as NamedDomainObjectContainer<MultiDimensionalJvmCompilation>
+
+//     override val compilerOptions: KotlinJvmCompilerOptions
+//         get() = super.compilerOptions as KotlinJvmCompilerOptions
+}
+
+class MultiDimensionalJvmCompilation(delegate: Delegate): DecoratedExternalKotlinCompilation(delegate) {
+
+}
 
 abstract class DevAcceptanceTests : Plugin<Project> {
 
@@ -55,21 +84,44 @@ abstract class DevAcceptanceTests : Plugin<Project> {
         configureExpectedBuildConfig()
 
         val latestKotlin = kotlinToolingVersionDimension().latest
-        acceptanceTestsDimension().components.forEach { testType ->
-            tasks.register("${testType.value}__kgp_latestTest") {
-                group = LifecycleBasePlugin.VERIFICATION_GROUP
-                dependsOn(tasks.named("${testType.value}__kgp_${latestKotlin.value}Test"))
+        tasks.register("kgp_latestTest") {
+            group = LifecycleBasePlugin.VERIFICATION_GROUP
+            dependsOn(tasks.named("kgp_${latestKotlin.value}Test"))
+        }
+
+        extensions.configure<KotlinMultiplatformExtension>() {
+            sourceSets.commonTest {
+                dependencies {
+                    implementation(project(":acceptance-tests:acceptance-tests-framework"))
+                    implementation(project(":common:util"))
+                }
             }
         }
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(acceptanceTestsDimension(), kotlinToolingVersionDimension()) { target ->
-                val acceptanceTestType = target.acceptanceTest
+            dimensions(kotlinToolingVersionDimension()) { target ->
+//                 val acceptanceTestType = target.acceptanceTest
                 val kotlinToolingVersion = target.kotlinToolingVersion
+                val _kotlinTarget = createExternalKotlinTarget {
+                    this.targetName = "_" + target.name
+                    this.platformType = KotlinPlatformType.jvm
+                    this.targetFactory = ExternalKotlinTargetDescriptor.TargetFactory(::MultiDimensionalJvmTarget)
+
+                    this.configure { target ->
+                        (target as KotlinTarget).attributes {
+                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+                        }
+                    }
+                }
+                val _mainCompilation = _kotlinTarget.createCompilation {
+                    compilationName = KotlinCompilation.MAIN_COMPILATION_NAME
+                    compilationFactory = ExternalKotlinCompilationDescriptor.CompilationFactory(::MultiDimensionalJvmCompilation)
+                    defaultSourceSet = sourceSets.maybeCreate(compilationName)
+                }
+
                 val kotlinTarget = jvm(target.name) {
                     attributes {
                         attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
-                        attribute(Attribute.of("co.touchlab.skie.dev.acceptance-test", String::class.java), acceptanceTestType.value)
                     }
                 }
 
@@ -89,6 +141,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 }
                 dependencies {
                     testDependencies(project(":common:configuration:configuration-annotations"))
+//                     testDependencies(project(":configuration_annotations_impl_2_0_0"))
                     skieIosArm64KotlinRuntimeDependency(project(":runtime:runtime-kotlin")) {
                         attributes {
                             attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
@@ -99,11 +152,6 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         attributes {
                             attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
                         }
-                    }
-
-                    if (acceptanceTestType == AcceptanceTestsComponent.typeMapping) {
-                        testDependencies(project(":acceptance-tests:test-dependencies:regular-dependency"))
-                        exportedTestDependencies(project(":acceptance-tests:test-dependencies:exported-dependency"))
                     }
                 }
 
@@ -177,7 +225,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     ).optional(true)
 
                     outputs.dir(
-                        testDirectory(project, acceptanceTestType, kotlinToolingVersion),
+                        testDirectory(project, kotlinToolingVersion),
                     )
 
                     maxHeapSize = "12g"
@@ -195,7 +243,6 @@ abstract class DevAcceptanceTests : Plugin<Project> {
 
                 configureActualBuildConfig(
                     target = target,
-                    acceptanceTestType = acceptanceTestType,
                     testDependencies = testDependencies,
                     exportedTestDependencies = exportedTestDependencies,
                     skieIosArm64KotlinRuntimeDependency = skieIosArm64KotlinRuntimeDependency,
@@ -266,7 +313,6 @@ abstract class DevAcceptanceTests : Plugin<Project> {
         testDependencies: Configuration,
         exportedTestDependencies: Configuration,
         skieIosArm64KotlinRuntimeDependency: Configuration,
-        acceptanceTestType: AcceptanceTestsComponent,
         kotlinToolingVersion: KotlinToolingVersionComponent,
         kotlinTarget: KotlinJvmTarget,
     ) {
@@ -280,7 +326,10 @@ abstract class DevAcceptanceTests : Plugin<Project> {
 
                 val resolvedDependencies = provider { testDependencies.resolve() }
                 val exportedDependencies = provider { exportedTestDependencies.resolve() }
-                val skieIosArm64KotlinRuntimeKlib = provider { skieIosArm64KotlinRuntimeDependency.resolve().single() }
+                val skieIosArm64KotlinRuntimeKlib = provider {
+                    println(skieIosArm64KotlinRuntimeDependency.resolve().joinToString("\n") { "- ${it.absolutePath}"})
+                    skieIosArm64KotlinRuntimeDependency.resolve().single()
+                }
 
                 buildConfigField(
                     type = "String",
@@ -294,7 +343,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 buildConfigField(
                     type = "String",
                     name = "BUILD",
-                    value = testDirectory(project, acceptanceTestType, kotlinToolingVersion)
+                    value = testDirectory(project, kotlinToolingVersion)
                         .map { it.asFile.absolutePath.enquoted() },
                 )
                 buildConfigField(
@@ -354,11 +403,10 @@ abstract class DevAcceptanceTests : Plugin<Project> {
 
         fun testDirectory(
             project: Project,
-            testType: AcceptanceTestsComponent,
             kotlinToolingVersion: KotlinToolingVersionComponent,
         ): Provider<Directory> {
             return project.layout.buildDirectory.map {
-                it.dir(testType.value).dir(kotlinToolingVersion.value)
+                it.dir(kotlinToolingVersion.value)
             }
         }
     }

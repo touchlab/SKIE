@@ -1,5 +1,6 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.util.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -20,6 +21,8 @@ abstract class SkieBase : Plugin<Project> {
         version = System.getenv("RELEASE_VERSION").orEmpty().ifBlank { "1.0.0-SNAPSHOT" }
 
         plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
+            KotlinCompilerVersion.registerIn(project.dependencies, pluginVersion)
+
             extensions.configure<KotlinMultiplatformExtension> {
                 jvmToolchain(libs.versions.java)
 

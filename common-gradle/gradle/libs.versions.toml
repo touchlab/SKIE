@@ -1,6 +1,6 @@
 [versions]
 java = "11"
-kotlin = "1.8.21"
+kotlin = "2.0.0"
 pluginPublish = "1.2.0"
 kotest = "5.8.0"
 buildconfig = "4.1.1"

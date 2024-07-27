@@ -1,5 +1,6 @@
 plugins {
     id("skie.shim")
+    // TODO: Remove
     id("skie.publishable")
 }
 

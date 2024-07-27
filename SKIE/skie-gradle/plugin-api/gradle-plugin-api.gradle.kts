@@ -9,12 +9,10 @@ skiePublishing {
 }
 
 kotlin {
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api(projects.common.configuration.configurationDeclaration)
-                implementation(projects.common.configuration.configurationInternal)
-            }
+    sourceSets.commonMain {
+        dependencies {
+            api(projects.common.configuration.configurationDeclaration)
+            implementation(projects.common.configuration.configurationInternal)
         }
     }
 }

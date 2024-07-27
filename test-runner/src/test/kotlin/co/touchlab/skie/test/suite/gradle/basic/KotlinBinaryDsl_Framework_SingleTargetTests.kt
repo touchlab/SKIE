@@ -25,6 +25,8 @@ class KotlinBinaryDsl_Framework_SingleTargetTests: BaseGradleTests() {
             kotlin {
                 target(target)
 
+                includeCoroutinesDependency()
+
                 registerNativeFrameworks(kotlinVersion, buildConfiguration, linkMode)
             }
 

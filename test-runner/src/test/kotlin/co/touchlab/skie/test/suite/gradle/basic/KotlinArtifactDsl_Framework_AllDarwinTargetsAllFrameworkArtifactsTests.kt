@@ -24,6 +24,8 @@ class KotlinArtifactDsl_Framework_AllDarwinTargetsAllFrameworkArtifactsTests: Ba
         rootBuildFile(kotlinVersion) {
             kotlin {
                 allDarwin()
+
+                includeCoroutinesDependency()
             }
 
             kotlinArtifacts {

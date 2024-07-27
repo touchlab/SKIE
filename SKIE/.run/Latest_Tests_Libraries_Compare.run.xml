@@ -10,9 +10,9 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="pure__kgp_latestTest" />
-          <option value="libraries__kgp_latestTest" />
-          <option value="comparePureAndSkie__kgp_latest" />
+          <option value="pure:kgp_latestTest" />
+          <option value="libraries:kgp_latestTest" />
+          <option value="comparePureAndSkie:kgp_laTest" />
         </list>
       </option>
       <option name="vmOptions" />

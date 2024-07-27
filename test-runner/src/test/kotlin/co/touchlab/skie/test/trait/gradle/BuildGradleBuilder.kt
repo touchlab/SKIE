@@ -123,7 +123,6 @@ class BuildGradleBuilder(
             allIos()
             allMacos()
             allTvos()
-            // TODO: allTvos()
             // TODO: allWatchos()
         }
 
@@ -139,6 +138,14 @@ class BuildGradleBuilder(
         }
 
         fun target(target: KotlinTarget) = +"${target.id}()"
+
+        fun includeCoroutinesDependency() {
+            "sourceSets.commonMain" {
+                "dependencies" {
+                    +"""implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")"""
+                }
+            }
+        }
 
         fun registerNativeFrameworks(
             kotlinVersion: KotlinVersion,

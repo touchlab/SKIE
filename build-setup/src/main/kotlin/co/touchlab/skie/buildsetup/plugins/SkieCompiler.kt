@@ -16,6 +16,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 abstract class SkieCompiler : Plugin<Project> {
 
@@ -29,6 +30,17 @@ abstract class SkieCompiler : Plugin<Project> {
                 jvm(target.name) {
                     attributes {
                         attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
+                    }
+
+                    this.compilations.all {
+                        this.compileTaskProvider.configure {
+                            withKotlinNativeCompilerEmbeddableDependency(target.kotlinToolingVersion.primaryVersion, isTarget = true) {
+                                val kotlinCompilerApiConfiguration = project.configurations.detachedConfiguration(it)
+                                (this as KotlinCompile).friendPaths.from(
+                                    kotlinCompilerApiConfiguration
+                                )
+                            }
+                        }
                     }
                 }
             }

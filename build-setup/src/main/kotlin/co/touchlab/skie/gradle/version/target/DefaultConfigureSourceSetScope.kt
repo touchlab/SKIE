@@ -27,6 +27,9 @@ class DefaultConfigureSourceSetScope(
         }
     }
 
+    private val KotlinSourceSet.relatedConfigurationNames: List<String>
+        get() = listOf(apiConfigurationName, implementationConfigurationName, compileOnlyConfigurationName, runtimeOnlyConfigurationName)
+
     private inner class DependencyHandler(
         kotlinDependencyHandler: KotlinDependencyHandler,
     ) : MultiDimensionTargetDependencyHandler, KotlinDependencyHandler by kotlinDependencyHandler {

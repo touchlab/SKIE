@@ -60,6 +60,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.OptInExperimentalCompilerApi"
     }
 
+    plugins.register("skie.base") {
+        id = "skie.base"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieBase"
+    }
+
     plugins.register("skie.common") {
         id = "skie.common"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieCommon"

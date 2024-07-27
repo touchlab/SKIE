@@ -76,7 +76,7 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
             .apply {
                 withProjectDir(testProjectDir)
                 withGradleVersion(gradleVersion)
-                withArguments(*arguments, "--stacktrace")
+                withArguments(*arguments, "--stacktrace", "--info")
                 if (!isCI) {
                     forwardOutput()
                 }

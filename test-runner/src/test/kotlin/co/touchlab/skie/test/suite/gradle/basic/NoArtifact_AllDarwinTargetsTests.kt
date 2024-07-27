@@ -15,6 +15,8 @@ class NoArtifact_AllDarwinTargetsTests: BaseGradleTests() {
         rootBuildFile(kotlinVersion) {
             kotlin {
                 allDarwin()
+
+                includeCoroutinesDependency()
             }
         }
 

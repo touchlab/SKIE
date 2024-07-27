@@ -9,14 +9,12 @@ skiePublishing {
 }
 
 kotlin {
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api(projects.gradle.gradlePluginApi)
+    sourceSets.commonMain {
+        dependencies {
+            api(projects.gradle.gradlePluginApi)
 
-                implementation(projects.common.util)
-                implementation(projects.gradle.gradlePluginUtil)
-            }
+            implementation(projects.common.util)
+            implementation(projects.gradle.gradlePluginUtil)
         }
     }
 }

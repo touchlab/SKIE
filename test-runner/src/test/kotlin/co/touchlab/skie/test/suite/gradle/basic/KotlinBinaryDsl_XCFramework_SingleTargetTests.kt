@@ -27,6 +27,8 @@ class KotlinBinaryDsl_XCFramework_SingleTargetTests: BaseGradleTests() {
             kotlin {
                 target(target)
 
+                includeCoroutinesDependency()
+
                 registerNativeFrameworks(kotlinVersion, buildConfiguration, linkMode, includeXcframework = true)
             }
 

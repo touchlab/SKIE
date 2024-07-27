@@ -10,8 +10,8 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="pure__kgp_1.8.20Test" />
-          <option value="libraries__kgp_1.8.20Test" />
+          <option value="pure:kgp_1.8.20Test" />
+          <option value="libraries:kgp_1.8.20Test" />
           <option value="comparePureAndSkie__kgp_1.8.20" />
         </list>
       </option>

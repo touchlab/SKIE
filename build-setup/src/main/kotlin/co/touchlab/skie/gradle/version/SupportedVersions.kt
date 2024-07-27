@@ -60,7 +60,7 @@ fun Project.darwinPlatformDimension(): Target.Dimension<DarwinPlatformComponent>
         components = DarwinPlatformComponent.values().toSet(),
         aliases = mapOf(
             "ios" to setOf(
-                DarwinPlatformComponent.iosArm32,
+//                 DarwinPlatformComponent.iosArm32,
                 DarwinPlatformComponent.iosArm64,
                 DarwinPlatformComponent.iosX64,
                 DarwinPlatformComponent.iosSimulatorArm64,
@@ -69,7 +69,7 @@ fun Project.darwinPlatformDimension(): Target.Dimension<DarwinPlatformComponent>
                 DarwinPlatformComponent.watchosArm32,
                 DarwinPlatformComponent.watchosArm64,
                 DarwinPlatformComponent.watchosDeviceArm64,
-                DarwinPlatformComponent.watchosX86,
+//                 DarwinPlatformComponent.watchosX86,
                 DarwinPlatformComponent.watchosX64,
                 DarwinPlatformComponent.watchosSimulatorArm64,
             ),

@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:functional__kgp_latestTest" />
+          <option value=":acceptance-tests:functional:kgp_latestTest" />
         </list>
       </option>
       <option name="vmOptions" />

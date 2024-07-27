@@ -19,7 +19,7 @@ kotlin {
     targets.withType<KotlinNativeTarget> {
         binaries {
             framework {
-                isStatic = true
+                isStatic = false
                 baseName = "Kotlin"
                 freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
 

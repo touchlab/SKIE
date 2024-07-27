@@ -16,7 +16,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="libraries__kgp_1.9.20Test" />
+          <option value="libraries:kgp_1.9.20Test" />
         </list>
       </option>
       <option name="vmOptions" />

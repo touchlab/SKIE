@@ -33,7 +33,7 @@ abstract class SkiePublishable : Plugin<Project>, HasMavenPublishPlugin, HasSign
         configureMetadata(extension)
         configureKotlinJvmPublicationIfNeeded()
         configureSourcesJar(extension)
-        configureJavadocJar()
+        configureJavadocJar(extension)
     }
 
     private fun Project.configureSmokeTestTmpRepository() {
@@ -146,7 +146,7 @@ abstract class SkiePublishable : Plugin<Project>, HasMavenPublishPlugin, HasSign
                     val sourcesJar = tasks.register("${publication.name}SourcesJar", Jar::class) {
                         archiveClassifier.set("sources")
                         // Each archive name should be distinct.
-                        archiveBaseName.set("${archiveBaseName.get()}-${publication.name}")
+                        archiveBaseName.set("${archiveBaseName.orNull ?: project.name}-${publication.name}")
                     }
                     artifact(sourcesJar)
                 }
@@ -154,21 +154,22 @@ abstract class SkiePublishable : Plugin<Project>, HasMavenPublishPlugin, HasSign
         }
     }
 
-    private fun Project.configureJavadocJar() = afterEvaluate {
+    private fun Project.configureJavadocJar(extension: SkiePublishingExtension) = afterEvaluate {
         // Gradle plugin already sets up Javadoc publishing
         if (plugins.hasPlugin(JavaGradlePluginPlugin::class.java)) {
             return@afterEvaluate
         }
 
-        publishing.publications.withType<MavenPublication> {
-            val publication = this
-            val javadocJar = tasks.register("${publication.name}JavadocJar", Jar::class) {
-                archiveClassifier.set("javadoc")
-                // Each archive name should be distinct. Mirror the format for the sources Jar tasks.
-                archiveBaseName.set("${archiveBaseName.get()}-${publication.name}")
+        if (!extension.publishJavadoc.get()) {
+            publishing.publications.withType<MavenPublication> {
+                val publication = this
+                val javadocJar = tasks.register("${publication.name}JavadocJar", Jar::class) {
+                    archiveClassifier.set("javadoc")
+                    // Each archive name should be distinct. Mirror the format for the sources Jar tasks.
+                    archiveBaseName.set("${archiveBaseName.orNull ?: project.name}-${publication.name}")
+                }
+                artifact(javadocJar)
             }
-            artifact(javadocJar)
         }
-
     }
 }

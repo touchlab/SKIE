@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:reformatPackagesInFunctionalTests" />
+          <option value=":acceptance-tests:functional:reformatPackagesInFunctionalTests" />
         </list>
       </option>
       <option name="vmOptions" />
