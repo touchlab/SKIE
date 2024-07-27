@@ -32,6 +32,8 @@ fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File 
     extra.set(KotlinNativeDownloaderProperties.main, kotlinVersion.toString())
     if (kotlinVersion >= KotlinToolingVersion("1.9.20")) {
         extra.set(KotlinNativeDownloaderProperties.downloadFromMaven, "true")
+    } else {
+        extra.set(KotlinNativeDownloaderProperties.downloadFromMaven, "false")
     }
 
     val downloader = NativeCompilerDownloader(project)
