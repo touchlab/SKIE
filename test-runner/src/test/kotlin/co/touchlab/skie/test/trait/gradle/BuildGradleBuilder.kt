@@ -4,6 +4,7 @@ import co.touchlab.skie.test.runner.BuildConfiguration
 import co.touchlab.skie.test.util.KotlinTarget
 import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
+import co.touchlab.skie.test.util.coroutinesVersion
 import co.touchlab.skie.test.util.needsOldLinker
 import org.intellij.lang.annotations.Language
 
@@ -142,7 +143,7 @@ class BuildGradleBuilder(
         fun includeCoroutinesDependency() {
             "sourceSets.commonMain" {
                 "dependencies" {
-                    +"""implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")"""
+                    +"""implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinVersion.coroutinesVersion}")"""
                 }
             }
         }

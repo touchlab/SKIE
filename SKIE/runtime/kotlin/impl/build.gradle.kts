@@ -92,6 +92,7 @@ kotlin {
 
     sourceSets.commonMain {
         dependencies {
+            compileOnly(kotlin("stdlib-common"))
             @dependencies@
         }
     }

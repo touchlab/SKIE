@@ -124,6 +124,20 @@ kotlin {
 
     @targets@
 
+    sourceSets.commonMain {
+        dependencies {
+            compileOnly(kotlin("stdlib-common"))
+        }
+    }
+
+    sourceSets["jvmMain"].dependencies {
+        compileOnly(kotlin("stdlib"))
+    }
+
+    sourceSets["jsMain"].dependencies {
+        compileOnly(kotlin("stdlib-js"))
+    }
+
 //     jvm()
 //     js {
 //         browser()
