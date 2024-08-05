@@ -8,6 +8,13 @@ repositories {
     gradlePluginPortal()
 }
 
+sourceSets {
+    main {
+        kotlin.srcDir("src/main/kotlin-compiler-attribute-link")
+        kotlin.srcDir("src/main/kotlin-shared-build-setup-link")
+    }
+}
+
 tasks.register("cleanAll") {
     dependsOn(allprojects.mapNotNull { it.tasks.findByName("clean") })
 }

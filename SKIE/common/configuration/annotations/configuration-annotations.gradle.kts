@@ -270,6 +270,21 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
         }
     }
 
+//     supportedTargetsWithDeclarations.forEach { (target, _) ->
+//         val configuration = configurations.create("${target.name.replaceFirstChar { it.lowercase() }}__kgp_${kotlinToolingVersion.primaryVersion}") {
+//             isCanBeConsumed = true
+//             isCanBeResolved = false
+//
+//             attributes {
+//                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+//                 attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
+//                 attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+//                 attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named("non-jvm"))
+//                 attribute(KotlinNativeTarget.konanTargetAttribute, darwinPlatformComponent.kotlinNativeTarget)
+//                 attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.primaryVersion.toString()))
+//             }
+//         }
+//     }
 
 //     if (kotlinToolingVersion.primaryVersion == kotlin_2_0_0) {
 //         val configuration = configurations.create("jvm__kgp_${kotlinToolingVersion.primaryVersion}") {
@@ -311,6 +326,12 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
 //             builtBy(buildTask)
 //         }
 //
+//         kotlin.metadata {
+//             configurations[apiElementsConfigurationName].outgoing.capability(
+//                 "$group:$name-${kotlinToolingVersion.primaryVersion}:$version"
+//             )
+//         }
+
 //         supportedTargetsWithDeclarations.forEach { (target, _) ->
 //             val lowercaseTargetName = target.name.replaceFirstChar { it.lowercase() }
 //             val configuration = configurations.create("${lowercaseTargetName}__kgp_${kotlinToolingVersion.primaryVersion}") {
@@ -332,9 +353,13 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
 //                         )
 //                     )
 //                     attribute(KotlinNativeTarget.konanTargetAttribute, target.targetName)
-//                     if (target.platformType != KotlinPlatformType.jvm) {
-//                         attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.primaryVersion.toString()))
-//                     }
+//                     attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.primaryVersion.toString()))
+//                 }
+//
+//                 outgoing {
+//                     capability("$group:${project.name}:$version")
+//                     capability("$group:${project.name}-${kotlinToolingVersion.primaryVersion}:$version")
+//                     capability("$group:${project.name}-${kotlinToolingVersion.primaryVersion}-${lowercaseTargetName}:$version")
 //                 }
 //             }
 //

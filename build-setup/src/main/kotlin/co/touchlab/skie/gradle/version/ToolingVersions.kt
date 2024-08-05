@@ -24,11 +24,13 @@ object ToolingVersions {
         fun version() = VersionProvider(::KotlinToolingVersion)
 
         /**
+         * ```
          * 1.8.0(1.8.10)
          * 1.8.20(1.8.21, 1.8.22)
          * 1.9.0(1.9.10)
          * 1.9.20[1.9.20-RC]
          * 1.9.20[1.9.20-RC](1.9.20)
+         * ```
          */
         private val kotlinVersionRegex = "([^\\[(\\])]+)(?:\\[([^\\[(\\])]+)\\])?(?:\\(([^\\[(\\])]+)\\))?".toRegex()
 

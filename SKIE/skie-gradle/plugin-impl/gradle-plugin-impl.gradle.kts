@@ -72,6 +72,9 @@ buildConfig {
     val kotlinPlugin = project.provider { projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject }
     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", kotlinPlugin.map { it.dependencyCoordinate.enquoted() })
 //     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", "")
+    val configurationAnnotations = project.provider { projects.common.configuration.configurationAnnotations.dependencyProject }
+    buildConfigField("String", "SKIE_CONFIGURATION_ANNOTATIONS_MODULE", configurationAnnotations.map { it.dependencyModule.enquoted() })
+
     val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_MODULE", runtime.map { it.dependencyModule.enquoted() })
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_GROUP", runtime.map { it.group.toString().enquoted() })

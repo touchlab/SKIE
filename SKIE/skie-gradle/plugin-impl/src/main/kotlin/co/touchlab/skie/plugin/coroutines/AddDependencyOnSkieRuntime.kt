@@ -12,8 +12,34 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleIdentifier
 import org.gradle.api.artifacts.ResolvedConfiguration
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.artifacts.component.ModuleComponentSelector
 
-// TODO: Replace annotations with the correct archive for KGP version here
+fun Project.configureSkieConfigurationAnnotationsDependencySubstitution() {
+    val configurationAnnotationsRegex = "${Regex.escape(BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE)}(?:-[0-9]+\\.[0-9]+\\.[0-9]+)?(-.+)?".toRegex()
+    configurations.configureEach {
+        if (state != Configuration.State.UNRESOLVED) {
+            return@configureEach
+        }
+
+        resolutionStrategy {
+            dependencySubstitution {
+                all {
+                    val requestedModule = requested as? ModuleComponentSelector ?: return@all
+                    val match = configurationAnnotationsRegex.matchEntire(requestedModule.moduleIdentifier.toString())
+                    if (match != null) {
+                        val suffix = match.groupValues[1]
+
+                        val updatedCoordinate = BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE + "-" + skieInternalExtension.kotlinVersion + suffix + ":" + BuildConfig.SKIE_VERSION
+
+                        println("Replacing $requested with ${updatedCoordinate}")
+                        useTarget(updatedCoordinate)
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Workaround for dependency pollution caused by SKIE prior 0.7.0 where SKIE added the runtime to published configurations.
 // As a result, some libraries have dependencies on the runtime potentially with the wrong version of Kotlin.
 fun Project.configureSkieRuntimeDependencySubstitution() {
@@ -23,13 +49,17 @@ fun Project.configureSkieRuntimeDependencySubstitution() {
         }
 
         resolutionStrategy {
-            eachDependency {
-                if (target.module.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) && target.name.contains("__kgp_")) {
-                    val baseTargetModuleId = target.toString().substringBefore("__kgp_")
+            dependencySubstitution {
+                all {
+                    val requestedModule = requested as? ModuleComponentSelector ?: return@all
 
-                    val updatedCoordinate = baseTargetModuleId + "__kgp_" + skieInternalExtension.kotlinVersion + ":" + BuildConfig.SKIE_VERSION
+                    if (requestedModule.moduleIdentifier.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) &&  requestedModule.module.contains("__kgp_")) {
+                        val baseTargetModuleId = requestedModule.toString().substringBefore("__kgp_")
 
-                    useTarget(updatedCoordinate)
+                        val updatedCoordinate = baseTargetModuleId + "__kgp_" + skieInternalExtension.kotlinVersion + ":" + BuildConfig.SKIE_VERSION
+
+                        useTarget(updatedCoordinate)
+                    }
                 }
             }
         }

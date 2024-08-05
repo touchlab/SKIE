@@ -9,5 +9,6 @@ buildscript {
         mavenLocal()
     }
     dependencies {
+        classpath("co.touchlab.skie:gradle-plugin")
     }
 }

@@ -3,10 +3,21 @@ rootProject.name = "dev-support"
 pluginManagement {
     includeBuild("../build-setup")
     includeBuild("../build-setup-settings")
-    includeBuild("../SKIE")
 }
 
-includeBuild("../SKIE")
+includeBuild("../SKIE") {
+    dependencySubstitution {
+        substitute(module("co.touchlab.skie:gradle-plugin")).using(project(":gradle:gradle-plugin"))
+        substitute(module("co.touchlab.skie:kotlin-compiler-linker-plugin")).using(project(":kotlin-compiler:kotlin-compiler-linker-plugin"))
+        substitute(module("co.touchlab.skie:configuration-annotations")).using(project(":common:configuration:configuration-annotations"))
+        all {
+            val requestedModule = requested as? ModuleComponentSelector ?: return@all
+            if (requestedModule.moduleIdentifier.toString().startsWith("co.touchlab.skie:runtime-kotlin-")) {
+                useTarget(project(":runtime:runtime-kotlin"))
+            }
+        }
+    }
+}
 
 plugins {
     id("dev.settings")

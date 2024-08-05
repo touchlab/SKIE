@@ -16,7 +16,11 @@ class DevSettings : Plugin<Settings> {
                     }
                 }
                 mavenCentral()
-                google()
+                google {
+                    content {
+                        includeGroupByRegex("com\\.google(?:\\..+|\\Z)")
+                    }
+                }
                 maven { url = URI("https://repo.gradle.org/gradle/libs-releases") }
             }
         }

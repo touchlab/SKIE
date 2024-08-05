@@ -11,6 +11,7 @@ repositories {
 sourceSets {
     main {
         kotlin.srcDir("src/main/kotlin-compiler-attribute-local")
+        kotlin.srcDir("src/main/kotlin-shared-build-setup")
     }
 }
 
