@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 
 typealias PublishTaskNamesWithTasks = Map<Pair<String, List<String>>, TaskProvider<Task>>
+typealias SupportedTargetsWithDeclarations = List<Pair<MultiCompileTarget, String>>
 
 class SkieMultiCompileRuntime: Plugin<Project> {
 
@@ -42,6 +43,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
 
             kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
                 val pathSafeKotlinVersionName = kotlinToolingVersion.primaryVersion.toString().replace('.', '_')
+                val supportedTargetsWithDeclarations = extension.supportedTargetsWithDeclarations(kotlinToolingVersion.primaryVersion)
                 val copyTask = registerCopyTask(
                     extension = extension,
                     name = kotlinToolingVersion.primaryVersion.toString(),
@@ -51,8 +53,8 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                 )
 
                 val buildTask = registerBuildTask(
-                    extension = extension,
                     name = kotlinToolingVersion.primaryVersion.toString(),
+                    supportedTargetsWithDeclarations = supportedTargetsWithDeclarations,
                     copyTask = copyTask,
                 )
 
@@ -64,7 +66,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                     )
                 }
 
-                extension.supportedTargetsWithDeclarations(kotlinToolingVersion.primaryVersion).forEach { (target, _) ->
+                supportedTargetsWithDeclarations.forEach { (target, _) ->
                     val configuration = configurations.create("${target.name}__kgp_${kotlinToolingVersion.primaryVersion}") {
                         isCanBeConsumed = true
                         isCanBeResolved = false
@@ -173,8 +175,8 @@ class SkieMultiCompileRuntime: Plugin<Project> {
     }
 
     private fun Project.registerBuildTask(
-        extension: MultiCompileRuntimeExtension,
         name: String,
+        supportedTargetsWithDeclarations: SupportedTargetsWithDeclarations,
         copyTask: TaskProvider<Copy>,
     ): TaskProvider<BuildNestedGradle> {
         return tasks.register<BuildNestedGradle>("buildProject__$name") {
@@ -185,7 +187,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
             projectDir.fileProvider(copyTask.map { it.destinationDir })
 
             tasks.set(
-                extension.targets.get().flatMap { target ->
+                supportedTargetsWithDeclarations.flatMap { (target, _) ->
                     listOf(
                         "generateMetadataFileFor${target.capitalizedName}Publication",
                         "generatePomFileFor${target.capitalizedName}Publication",
