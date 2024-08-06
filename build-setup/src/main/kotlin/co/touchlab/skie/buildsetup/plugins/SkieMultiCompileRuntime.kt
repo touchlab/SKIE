@@ -1,5 +1,6 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget.Companion.kotlin_1_9_0
 import co.touchlab.skie.buildsetup.tasks.BuildNestedGradle
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.KotlinToolingVersion
@@ -55,6 +56,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                 val buildTask = registerBuildTask(
                     name = kotlinToolingVersion.primaryVersion.toString(),
                     supportedTargetsWithDeclarations = supportedTargetsWithDeclarations,
+                    kotlinVersion = kotlinToolingVersion.primaryVersion,
                     copyTask = copyTask,
                 )
 
@@ -176,6 +178,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
 
     private fun Project.registerBuildTask(
         name: String,
+        kotlinVersion: KotlinToolingVersion,
         supportedTargetsWithDeclarations: SupportedTargetsWithDeclarations,
         copyTask: TaskProvider<Copy>,
     ): TaskProvider<BuildNestedGradle> {
@@ -188,14 +191,20 @@ class SkieMultiCompileRuntime: Plugin<Project> {
 
             tasks.set(
                 supportedTargetsWithDeclarations.flatMap { (target, _) ->
-                    listOf(
-                        "generateMetadataFileFor${target.capitalizedName}Publication",
-                        "generatePomFileFor${target.capitalizedName}Publication",
-                    )
-                } + listOf(
-                    "generateMetadataFileForKotlinMultiplatformPublication",
-                    "generatePomFileForKotlinMultiplatformPublication",
-                )
+                    when (target.platformType) {
+                        KotlinPlatformType.common -> listOf("metadataMainClasses")
+                        KotlinPlatformType.jvm, KotlinPlatformType.androidJvm -> listOf("${target.name}Jar")
+                        KotlinPlatformType.js -> if (kotlinVersion >= kotlin_1_9_0) {
+                            listOf("${target.name}Jar")
+                        } else {
+                            listOf(
+                                "${target.name}IrJar",
+                                "${target.name}LegacyJar",
+                            )
+                        }
+                        KotlinPlatformType.native, KotlinPlatformType.wasm -> listOf("${target.name}MainKlibrary")
+                    }
+                }
             )
         }
     }

@@ -169,23 +169,34 @@ data class MultiCompileTarget(
             },
         )
 
-        val allDarwin = listOf(
+        val allIos = listOf(
             iosArm32,
             iosArm64,
             iosX64,
             iosSimulatorArm64,
+        )
+
+        val allWatchos = listOf(
             watchosArm32,
             watchosArm64,
             watchosX86,
             watchosX64,
             watchosSimulatorArm64,
             watchosDeviceArm64,
+        )
+
+        val allTvos = listOf(
             tvosArm64,
             tvosX64,
             tvosSimulatorArm64,
+        )
+
+        val allMacos = listOf(
             macosX64,
             macosArm64,
         )
+
+        val allDarwin = allIos + allWatchos + allTvos + allMacos
 
         val all = allDarwin + listOf(
             jvm,
