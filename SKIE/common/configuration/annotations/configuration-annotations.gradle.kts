@@ -12,9 +12,9 @@ multiCompileRuntime {
     rootKotlinVersion = MultiCompileTarget.kotlin_1_8_20
     klibPath = { kotlinVersion, target ->
         if (target.platformType == KotlinPlatformType.jvm) {
-            "build/libs/skie-configuration-annotations-${kotlinVersion}-${target.name.lowercase()}-${version}.jar"
+            "build/libs/configuration-annotations-${kotlinVersion}-${target.name.lowercase()}-${version}.jar"
         } else {
-            "build/classes/kotlin/${target.name}/main/klib/skie-configuration-annotations-${kotlinVersion}.klib"
+            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-${kotlinVersion}.klib"
         }
     }
 }
