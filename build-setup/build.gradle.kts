@@ -101,6 +101,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRoot"
     }
 
+    plugins.register("skie.multicompile") {
+        id = "skie.multicompile"
+        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieMultiCompileRuntime"
+    }
+
     plugins.register("skie.runtime") {
         id = "skie.runtime"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRuntime"
