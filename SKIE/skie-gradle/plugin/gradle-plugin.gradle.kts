@@ -9,11 +9,15 @@ plugins {
     id("skie.gradle.plugin")
     id("skie.publishable")
 
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    alias(libs.plugins.shadow)
 }
 
 tasks.shadowJar {
     archiveClassifier.set("")
+
+    dependencies {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib.*"))
+    }
 }
 
 skiePublishing {
@@ -61,6 +65,7 @@ dependencies {
     implementation(projects.gradle.gradlePluginImpl)
 
     compileOnly(gradlePluginApi())
+    compileOnly(kotlin("stdlib"))
 }
 
 // tasks.named("compileKotlin").configure {
