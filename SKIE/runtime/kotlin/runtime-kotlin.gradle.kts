@@ -11,20 +11,12 @@ multiCompileRuntime {
     klibPath = { kotlinVersion, target ->
         "build/classes/kotlin/${target.name}/main/klib/runtime-kotlin-${kotlinVersion}.klib"
     }
-    dependencies = { kotlinVersion ->
-        if (kotlinVersion == MultiCompileTarget.kotlin_1_8_0) {
-            "implementation(libs.kotlinx.coroutines.core.legacy)"
-        } else {
-            "implementation(libs.kotlinx.coroutines.core)"
-        }
+    dependencies = { _ ->
+        "implementation(libs.kotlinx.coroutines.core)"
     }
-    applyDependencies = { kotlinVersion, configuration ->
+    applyDependencies = { _, configuration ->
         configuration(
-            if (kotlinVersion == MultiCompileTarget.kotlin_1_8_0) {
-                libs.kotlinx.coroutines.core.legacy
-            } else {
-                libs.kotlinx.coroutines.core
-            }
+            libs.kotlinx.coroutines.core
         )
     }
 }
