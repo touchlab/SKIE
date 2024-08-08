@@ -44,7 +44,7 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.9.0.202403050737-r" }
 ci-info = { module = "io.cloudflight.ci.info:ci-info", version = "1.0.1" }
-mixpanel = { module = "com.mixpanel:mixpanel-java", version = "1.5.2" }
+mixpanel = { module = "com.mixpanel:mixpanel-java", version = "1.5.3" }
 gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle" }
 slf4j = { module = "org.slf4j:slf4j-simple", version = "1.7.10" }
 
