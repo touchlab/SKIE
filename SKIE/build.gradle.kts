@@ -8,4 +8,8 @@ nexusPublishing {
     this.repositories {
         sonatype()
     }
+
+    transitionCheckOptions {
+        this.maxRetries = 120
+    }
 }
