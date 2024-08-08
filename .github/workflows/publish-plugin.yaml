@@ -33,10 +33,9 @@ jobs:
         env:
           SKIE_REPLACEMENT_STRING: ${{ secrets.SKIE_REPLACEMENT_STRING }}
       - name: Publish to Maven Central
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: 'publishToSonatype closeAndReleaseSonatypeStagingRepository'
-          build-root-directory: SKIE
+        run: |
+          ./publish.sh
+        working-directory: SKIE
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
