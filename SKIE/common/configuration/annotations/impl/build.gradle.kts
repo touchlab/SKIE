@@ -1,12 +1,8 @@
-// @file:Suppress("invisible_reference", "invisible_member")
-// import org.jetbrains.kotlin.gradle.plugin.KotlinPluginLifecycle
-// import org.jetbrains.kotlin.gradle.plugin.launchInRequiredStage
 import io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
-//     id("skie.runtime")
     kotlin("multiplatform") version "@targetKotlinVersion@"
     `maven-publish`
     alias(libs.plugins.nexusPublish)
@@ -26,12 +22,6 @@ nexusPublishing {
 tasks.withType<InitializeNexusStagingRepository>().configureEach {
     isEnabled = false
 }
-
-// skiePublishing {
-//     name = "SKIE Configuration Annotations"
-//     description = "Annotations to configure SKIE behavior."
-//     publishSources = true
-// }
 
 @smokeTestTmpRepositoryConfiguration@
 
@@ -137,64 +127,4 @@ kotlin {
     sourceSets["jsMain"].dependencies {
         compileOnly(kotlin("stdlib-js"))
     }
-
-//     jvm()
-//     js {
-//         browser()
-//         nodejs()
-//     }
-//
-//     androidNativeArm32()
-//     androidNativeArm64()
-//     androidNativeX86()
-//     androidNativeX64()
-//
-// //     iosArm32()
-//     iosArm64()
-//     iosX64()
-//     iosSimulatorArm64()
-//
-//     watchosArm32()
-//     watchosArm64()
-// //     watchosX86()
-//     watchosX64()
-//     watchosSimulatorArm64()
-//     watchosDeviceArm64()
-//
-//     tvosArm64()
-//     tvosX64()
-//     tvosSimulatorArm64()
-//
-//     macosX64()
-//     macosArm64()
-//
-//     linuxArm64()
-// //     linuxArm32Hfp()
-//     linuxX64()
-//
-//     mingwX64()
-// //     mingwX86()
-//
-// //     wasm32()
 }
-
-// afterEvaluate {
-//     println("Components:")
-//     components.forEach {
-//         println("\t${it.name}")
-//     }
-// }
-
-// val p = project
-// project.launchInRequiredStage(KotlinPluginLifecycle.Stage.ReadyForExecution) {
-//     println("Components: $p")
-//     components.forEach { component ->
-//         println("\t- ${component.name} - $component")
-//     }
-//
-//     println("Publications:")
-//     publishing.publications.forEach { publication ->
-//         println("\t- ${publication.name} - $publication")
-//     }
-//
-// }

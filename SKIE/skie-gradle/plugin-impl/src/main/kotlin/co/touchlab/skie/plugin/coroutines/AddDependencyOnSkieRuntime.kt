@@ -31,7 +31,7 @@ fun Project.configureSkieConfigurationAnnotationsDependencySubstitution() {
 
                         val updatedCoordinate = BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE + "-" + skieInternalExtension.kotlinVersion + suffix + ":" + BuildConfig.SKIE_VERSION
 
-                        println("Replacing $requested with ${updatedCoordinate}")
+                        logger.debug("Replacing {} with {}", requested, updatedCoordinate)
                         useTarget(updatedCoordinate)
                     }
                 }
@@ -58,6 +58,7 @@ fun Project.configureSkieRuntimeDependencySubstitution() {
 
                         val updatedCoordinate = baseTargetModuleId + "__kgp_" + skieInternalExtension.kotlinVersion + ":" + BuildConfig.SKIE_VERSION
 
+                        logger.debug("Replacing {} with {}", requested, updatedCoordinate)
                         useTarget(updatedCoordinate)
                     }
                 }
