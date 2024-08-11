@@ -17,6 +17,7 @@
 package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.CodeBlock.Companion.ABSTRACT
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
 
 /** A generated property declaration.  */
@@ -54,8 +55,8 @@ class PropertySpec private constructor(
         (setter == null || setter.body == ABSTRACT)
       ) {
         codeWriter.emit(" { ")
-        if (getter != null) codeWriter.emit("${getter.name} ")
-        if (setter != null) codeWriter.emit("${setter.name} ")
+        if (getter != null) codeWriter.emit("get ")
+        if (setter != null) codeWriter.emit("set ")
         codeWriter.emit("}\n")
         return
       }
@@ -103,7 +104,7 @@ class PropertySpec private constructor(
   class Builder internal constructor(
     internal val name: String,
     internal val type: TypeName,
-  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithDocs<Builder> {
 
     internal var mutable = false
     internal val doc = CodeBlock.builder()
@@ -116,11 +117,11 @@ class PropertySpec private constructor(
       this.mutable = mutable
     }
 
-    fun addDoc(format: String, vararg args: Any) = apply {
+    override fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
     }
 
-    fun addDoc(block: CodeBlock) = apply {
+    override fun addDoc(block: CodeBlock) = apply {
       doc.add(block)
     }
 

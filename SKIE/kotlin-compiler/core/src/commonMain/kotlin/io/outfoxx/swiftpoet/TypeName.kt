@@ -59,6 +59,9 @@ abstract class TypeName internal constructor() {
 
   open fun makeNonImplicit(): TypeName = this
 
+  open fun makeExistential(): ExistentialTypeName = ExistentialTypeName(this)
+  open fun makeOpaque(): OpaqueTypeName = OpaqueTypeName(this)
+
   open val name: String
     get() {
       val out = StringWriter()

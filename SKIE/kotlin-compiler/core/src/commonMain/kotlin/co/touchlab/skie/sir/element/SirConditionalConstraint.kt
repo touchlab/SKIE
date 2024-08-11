@@ -5,26 +5,26 @@ import co.touchlab.skie.sir.type.SirType
 
 class SirConditionalConstraint(
     val typeParameter: SirTypeParameter,
-    parent: SirExtension,
-    bounds: List<SirType> = emptyList(),
+    parent: SirConditionalConstraintParent,
+    bounds: List<SirTypeParameter.Bound> = emptyList(),
 ) : SirElement {
 
-    val bounds: MutableList<SirType> = bounds.toMutableList()
+    val bounds: MutableList<SirTypeParameter.Bound> = bounds.toMutableList()
 
-    var parent: SirExtension by sirConditionalConstraintParent(parent)
+    var parent: SirConditionalConstraintParent by sirConditionalConstraintParent(parent)
 
     override fun toString(): String = "${this::class.simpleName}: $typeParameter : ${bounds.joinToString("&")}"
 
     companion object {
 
-        context(SirExtension)
+        context(SirConditionalConstraintParent)
         operator fun invoke(
             typeParameter: SirTypeParameter,
-            bounds: List<SirType> = emptyList(),
+            bounds: List<SirTypeParameter.Bound> = emptyList(),
         ): SirConditionalConstraint =
             SirConditionalConstraint(
                 typeParameter = typeParameter,
-                parent = this@SirExtension,
+                parent = this@SirConditionalConstraintParent,
                 bounds = bounds,
             )
     }

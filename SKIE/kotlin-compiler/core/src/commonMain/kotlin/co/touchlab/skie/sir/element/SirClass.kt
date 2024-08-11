@@ -8,6 +8,7 @@ import co.touchlab.skie.sir.element.util.sirDeclarationParent
 import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import io.outfoxx.swiftpoet.FunctionSpec
+import org.intellij.lang.annotations.Language
 
 class SirClass(
     override var baseName: String,
@@ -25,7 +26,7 @@ class SirClass(
     var isInherentlyHashable: Boolean = false,
     var isAlwaysAReference: Boolean = false,
     val origin: Origin = Origin.Generated,
-) : SirTypeDeclaration, SirDeclarationNamespace, SirTypeParameterParent, SirElementWithAttributes, SirElementWithModality {
+) : SirTypeDeclaration, SirDeclarationNamespace, SirDeclarationWithSuperTypes, SirTypeParameterParent, SirElementWithAttributes, SirElementWithModality {
 
     // TODO If modality is added update [SirHierarchyCache.canTheoreticallyInheritFrom]
 
@@ -34,7 +35,10 @@ class SirClass(
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 
-    val superTypes: MutableList<SirDeclaredSirType> = superTypes.toMutableList()
+    @Language("markdown")
+    override var documentation: String = ""
+
+    override val superTypes: MutableList<SirDeclaredSirType> = superTypes.toMutableList()
 
     override val attributes: MutableList<String> = attributes.toMutableList()
 

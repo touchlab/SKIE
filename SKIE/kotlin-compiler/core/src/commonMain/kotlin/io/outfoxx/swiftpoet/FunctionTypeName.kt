@@ -21,6 +21,7 @@ class FunctionTypeName internal constructor(
   val returnType: TypeName = VOID,
   attributes: List<AttributeSpec> = emptyList(),
   val throws: Boolean,
+  val async: Boolean,
 ) : TypeName() {
 
   val parameters = parameters.toImmutableList()
@@ -38,12 +39,22 @@ class FunctionTypeName internal constructor(
     returnType: TypeName = this.returnType,
     attributes: List<AttributeSpec> = this.attributes,
     throws: Boolean = this.throws,
-  ) = FunctionTypeName(parameters, returnType, attributes, throws)
+    async: Boolean = this.async,
+  ) = FunctionTypeName(
+    parameters = parameters,
+    returnType = returnType,
+    attributes = attributes,
+    throws = throws,
+    async = async,
+  )
 
   override fun emit(out: CodeWriter): CodeWriter {
 
     out.emitAttributes(attributes, separator = " ", suffix = " ")
     parameters.emit(out, includeNames = false)
+    if (async) {
+      out.emitCode(" async")
+    }
     if (throws) {
       out.emitCode(" throws")
     }
@@ -61,7 +72,14 @@ class FunctionTypeName internal constructor(
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
       throws: Boolean = false,
-    ) = FunctionTypeName(parameters, returnType, attributes, throws)
+      async: Boolean = false,
+    ) = FunctionTypeName(
+      parameters = parameters,
+      returnType = returnType,
+      attributes = attributes,
+      throws = throws,
+      async = async,
+    )
 
     /** Returns a function type with `returnType` and parameters listed in `parameters`. */
     @JvmStatic
@@ -70,12 +88,14 @@ class FunctionTypeName internal constructor(
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
       throws: Boolean = false,
+      async: Boolean = false,
     ): FunctionTypeName {
       return FunctionTypeName(
-        parameters.toList().map { ParameterSpec.unnamed(it) },
-        returnType,
-        attributes,
-        throws,
+        parameters = parameters.toList().map { ParameterSpec.unnamed(it) },
+        returnType = returnType,
+        attributes = attributes,
+        throws = throws,
+        async = async,
       )
     }
 
@@ -86,6 +106,13 @@ class FunctionTypeName internal constructor(
       returnType: TypeName,
       attributes: List<AttributeSpec> = emptyList(),
       throws: Boolean = false,
-    ) = FunctionTypeName(parameters.toList(), returnType, attributes, throws)
+      async: Boolean = false,
+    ) = FunctionTypeName(
+      parameters = parameters.toList(),
+      returnType = returnType,
+      attributes = attributes,
+      throws = throws,
+      async = async,
+    )
   }
 }

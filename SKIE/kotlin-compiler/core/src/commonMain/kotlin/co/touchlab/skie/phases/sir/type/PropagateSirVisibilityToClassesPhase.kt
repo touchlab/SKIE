@@ -78,7 +78,7 @@ object PropagateSirVisibilityToClassesPhase : SirPhase {
                 sirClass.namespace?.classDeclaration,
                 (sirClass.kirClassOrNull?.parent as? KirClass)?.originalSirClass,
             ) +
-                sirClass.typeParameters.flatMap { typeParameter -> typeParameter.bounds.flatMap { it.referencedClasses } }.toSet() +
+                sirClass.typeParameters.flatMap { typeParameter -> typeParameter.bounds.flatMap { it.type.referencedClasses } }.toSet() +
                 getSuperTypesDependencies()
 
         private fun getSuperTypesDependencies(): List<SirClass> =

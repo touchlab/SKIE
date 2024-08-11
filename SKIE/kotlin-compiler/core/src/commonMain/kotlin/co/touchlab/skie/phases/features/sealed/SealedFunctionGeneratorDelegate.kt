@@ -10,6 +10,7 @@ import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.call
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
+import co.touchlab.skie.sir.element.toConformanceBound
 import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirType
@@ -63,7 +64,7 @@ class SealedFunctionGeneratorDelegate(
             val sealedTypeParameter = SirTypeParameter(
                 name = "__Sealed",
                 bounds = listOf(
-                    kirClass.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
+                    kirClass.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters).toConformanceBound(),
                 ),
             )
 

@@ -16,6 +16,8 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
+
 class ImportSpec internal constructor(
   builder: Builder,
 ) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags), Comparable<ImportSpec> {
@@ -57,16 +59,16 @@ class ImportSpec internal constructor(
 
   class Builder internal constructor(
     internal val name: String,
-  ) : AttributedSpec.Builder<Builder>() {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithDocs<Builder> {
 
     internal val doc = CodeBlock.builder()
     internal val guardTest = CodeBlock.builder()
 
-    fun addDoc(format: String, vararg args: Any) = apply {
+    override fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
     }
 
-    fun addDoc(block: CodeBlock) = apply {
+    override fun addDoc(block: CodeBlock) = apply {
       doc.add(block)
     }
 

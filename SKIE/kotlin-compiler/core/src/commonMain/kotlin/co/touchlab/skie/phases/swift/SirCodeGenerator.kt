@@ -1,11 +1,17 @@
 package co.touchlab.skie.phases.swift
 
+import co.touchlab.skie.phases.swift.SirCodeGenerator.addSuperTypes
+import co.touchlab.skie.phases.swift.SirCodeGenerator.addTypeParameters
+import co.touchlab.skie.phases.swift.SirCodeGenerator.addTypeParametersOrAssociatedTypes
+import co.touchlab.skie.phases.swift.SirCodeGenerator.toSwiftPoetTypeName
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
+import co.touchlab.skie.sir.element.SirConditionalConstraintParent
 import co.touchlab.skie.sir.element.SirConstructor
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationWithScope
+import co.touchlab.skie.sir.element.SirDeclarationWithSuperTypes
 import co.touchlab.skie.sir.element.SirDeclarationWithVisibility
 import co.touchlab.skie.sir.element.SirElementWithAttributes
 import co.touchlab.skie.sir.element.SirElementWithFunctionBodyBuilder
@@ -30,6 +36,7 @@ import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.util.GeneratedBySkieComment
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.AttributedSpec
+import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -41,8 +48,12 @@ import io.outfoxx.swiftpoet.TypeAliasSpec
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.TypeVariableName
+import io.outfoxx.swiftpoet.builder.BuilderWithAssociatedTypes
+import io.outfoxx.swiftpoet.builder.BuilderWithConditionalConstraints
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 import io.outfoxx.swiftpoet.builder.BuilderWithMembers
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
+import io.outfoxx.swiftpoet.builder.BuilderWithSuperTypes
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
@@ -106,10 +117,21 @@ object SirCodeGenerator {
                 name = typeAlias.simpleName,
                 type = typeAlias.type.toSwiftPoetTypeName(),
             )
+                .addDoc(typeAlias)
                 .addVisibility(typeAlias)
                 .addTypeParameters(typeAlias)
                 .build(),
         )
+    }
+
+    private fun <T: BuilderWithDocs<T>, E> T.addDoc(
+        element: E,
+    ): T where E: SirDeclaration = apply {
+        if (element.documentation.isNotBlank()) {
+            addDoc(
+                CodeBlock.of("%L", element.documentation)
+            )
+        }
     }
 
     private fun <T : BuilderWithModifiers, E> T.addVisibilityAndModality(
@@ -163,6 +185,30 @@ object SirCodeGenerator {
             Modifier.OPEN.takeIf { shouldHaveOpenModifier() },
         )
 
+    private fun <B: BuilderWithAssociatedTypes<B>> B.addTypeParametersOrAssociatedTypes(parent: SirClass) = apply {
+        if (parent.kind == SirClass.Kind.Protocol) {
+            parent.typeParameters.forEach {
+                addAssociatedType(it)
+            }
+        } else {
+            this.addTypeParameters(parent)
+        }
+    }
+
+    private fun <B: BuilderWithAssociatedTypes<B>> B.addAssociatedType(typeDeclaration: SirTypeParameter) {
+        val bounds = typeDeclaration.bounds.map { it.toSwiftPoetTypeVariableNameBound() }
+
+        addAssociatedType(
+            TypeVariableName.typeVariable(typeDeclaration.name, bounds)
+        )
+
+        if (typeDeclaration.isPrimaryAssociatedType) {
+            addTypeVariable(
+                TypeVariableName.typeVariable(typeDeclaration.name)
+            )
+        }
+    }
+
     private fun <T : BuilderWithTypeParameters> T.addTypeParameters(parent: SirTypeParameterParent) = apply {
         parent.typeParameters.forEach {
             addTypeParameter(it)
@@ -170,31 +216,42 @@ object SirCodeGenerator {
     }
 
     private fun BuilderWithTypeParameters.addTypeParameter(typeDeclaration: SirTypeParameter) {
-        val bounds = typeDeclaration.bounds.map { it.toSwiftPoetTypeName() }.map { TypeVariableName.Bound(it) }
+        val bounds = typeDeclaration.bounds.map { it.toSwiftPoetTypeVariableNameBound() }
 
         addTypeVariable(
             TypeVariableName.typeVariable(typeDeclaration.name, bounds),
         )
     }
 
+    private fun SirTypeParameter.Bound.toSwiftPoetTypeVariableNameBound(): TypeVariableName.Bound {
+        val constraint = when (this) {
+            is SirTypeParameter.Bound.Conformance -> TypeVariableName.Bound.Constraint.CONFORMS_TO
+            is SirTypeParameter.Bound.Equality -> TypeVariableName.Bound.Constraint.SAME_TYPE
+        }
+        return TypeVariableName.bound(constraint, type.toSwiftPoetTypeName())
+    }
+
     private fun FileSpec.Builder.generateExtension(extension: SirExtension) {
         addExtension(
             ExtensionSpec.builder(extension.classDeclaration.internalName.toSwiftPoetDeclaredTypeName())
+                .addDoc(extension)
+                .addAttributes(extension)
                 .addConditionalConstraints(extension)
                 .addExtensionDeclarations(extension)
+                .addSuperTypes(extension)
                 .build(),
         )
     }
 
-    private fun ExtensionSpec.Builder.addConditionalConstraints(extension: SirExtension): ExtensionSpec.Builder =
+    private fun <B: BuilderWithConditionalConstraints<B>> B.addConditionalConstraints(parent: SirConditionalConstraintParent): B =
         apply {
-            extension.conditionalConstraints.forEach {
+            parent.conditionalConstraints.forEach {
                 addConditionalConstraint(it)
             }
         }
 
-    private fun ExtensionSpec.Builder.addConditionalConstraint(conditionalConstraint: SirConditionalConstraint) {
-        val bounds = conditionalConstraint.bounds.map { it.toSwiftPoetTypeName() }.map { TypeVariableName.Bound(it) }
+    private fun <B: BuilderWithConditionalConstraints<B>> B.addConditionalConstraint(conditionalConstraint: SirConditionalConstraint) {
+        val bounds = conditionalConstraint.bounds.map { it.toSwiftPoetTypeVariableNameBound() }
 
         addConditionalConstraint(
             TypeVariableName.typeVariable(conditionalConstraint.typeParameter.name, bounds),
@@ -226,10 +283,11 @@ object SirCodeGenerator {
 
         addType(
             TypeSpec.Builder(sirClass.swiftPoetKind, sirClass.simpleName)
+                .addDoc(sirClass)
                 .addVisibilityAndModality(sirClass)
-                .addSuperTypes(sirClass.superTypes.map { it.toSwiftPoetTypeName() })
+                .addSuperTypes(sirClass)
                 .addAttributes(sirClass)
-                .addTypeParameters(sirClass)
+                .addTypeParametersOrAssociatedTypes(sirClass)
                 .addClassDeclarations(sirClass)
                 .addEnumCases(sirClass)
                 .addDeinit(sirClass)
@@ -237,6 +295,11 @@ object SirCodeGenerator {
                 .build(),
         )
     }
+
+    private fun <B: BuilderWithSuperTypes<B>> B.addSuperTypes(sirDeclarationWithSuperTypes: SirDeclarationWithSuperTypes) =
+        apply {
+            addSuperTypes(sirDeclarationWithSuperTypes.superTypes.map { it.toSwiftPoetTypeName() })
+        }
 
     private val SirClass.swiftPoetKind: TypeSpec.Kind
         get() = when (kind) {
@@ -309,10 +372,12 @@ object SirCodeGenerator {
 
         addFunction(
             FunctionSpec.builder(function.identifierAfterVisibilityChange)
+                .addDoc(function)
                 .addFunctionProperties(function)
                 .addOverrideIfNeeded(function)
                 .addScope(function)
                 .addTypeParameters(function)
+                .addConditionalConstraints(function)
                 .addVisibilityAndModality(function)
                 .async(function.isAsync)
                 .returns(function.returnType.toSwiftPoetTypeName())
@@ -327,12 +392,14 @@ object SirCodeGenerator {
 
         addProperty(
             PropertySpec.builder(property.identifierAfterVisibilityChange, property.type.toSwiftPoetTypeName())
+                .addDoc(property)
                 .addCallableDeclarationProperties(property)
                 .addOverrideIfNeeded(property)
                 .addScope(property)
                 .addGetter(property)
                 .addSetter(property)
                 .addVisibilityAndModality(property)
+                .mutable(property.isMutable)
                 .build(),
         )
     }
@@ -372,8 +439,11 @@ object SirCodeGenerator {
 
         addFunction(
             FunctionSpec.constructorBuilder()
+                .addDoc(constructor)
                 .addFunctionProperties(constructor)
                 .applyIf(constructor.isConvenience) { addModifiers(Modifier.CONVENIENCE) }
+                .addTypeParameters(constructor)
+                .addConditionalConstraints(constructor)
                 .addVisibility(constructor)
                 .build(),
         )
@@ -398,8 +468,12 @@ object SirCodeGenerator {
         elementWithSwiftPoetBuilderModifications: SirElementWithFunctionBodyBuilder,
     ): FunctionSpec.Builder =
         apply {
-            elementWithSwiftPoetBuilderModifications.bodyBuilder.forEach {
-                it(this)
+            if (elementWithSwiftPoetBuilderModifications.bodyBuilder.isNotEmpty()) {
+                elementWithSwiftPoetBuilderModifications.bodyBuilder.forEach {
+                    it(this)
+                }
+            } else {
+                abstract = true
             }
         }
 
@@ -430,9 +504,13 @@ object SirCodeGenerator {
 
     private fun FunctionSpec.Builder.addValueParameter(valueParameter: SirValueParameter) {
         val builder = ParameterSpec.builder(valueParameter.label, valueParameter.name, valueParameter.type.toSwiftPoetTypeName())
+            .addAttributes(valueParameter)
 
         if (valueParameter.inout) {
             builder.addModifiers(Modifier.INOUT)
+        }
+        valueParameter.defaultValue?.let {
+            builder.defaultValue(it)
         }
 
         addParameter(builder.build())

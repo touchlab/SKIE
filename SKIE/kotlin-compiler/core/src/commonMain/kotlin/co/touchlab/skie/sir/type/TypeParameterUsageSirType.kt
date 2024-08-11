@@ -11,14 +11,14 @@ data class TypeParameterUsageSirType(
 ) : NonNullSirType() {
 
     override val isHashable: Boolean
-        get() = typeParameter.bounds.any { it.isHashable }
+        get() = typeParameter.bounds.any { it.type.isHashable }
 
     override val isReference: Boolean
-        get() = typeParameter.bounds.any { it.isReference }
+        get() = typeParameter.bounds.any { it.type.isReference }
 
     override fun evaluate(): EvaluatedSirType {
         val evaluatedParentScope = lazy { parentScope?.evaluate() }
-        val evaluatedTypeParameterBounds = lazy { typeParameter.bounds.map { it.evaluate() } }
+        val evaluatedTypeParameterBounds = lazy { typeParameter.bounds.map { it.type.evaluate() } }
 
         return EvaluatedSirType.Lazy(
             typeProvider = evaluatedParentScope.map { copy(parentScope = it?.type as TypeParameterUsageSirType?) },
@@ -35,14 +35,14 @@ data class TypeParameterUsageSirType(
         this
 
     override fun asHashableType(): SirType? =
-        if (typeParameter.bounds.any { it.asHashableType() != null }) {
+        if (typeParameter.bounds.any { it.type.asHashableType() != null }) {
             this
         } else {
             null
         }
 
     override fun asReferenceType(): SirType? =
-        if (typeParameter.bounds.any { it.asReferenceType() != null }) {
+        if (typeParameter.bounds.any { it.type.asReferenceType() != null }) {
             this
         } else {
             null

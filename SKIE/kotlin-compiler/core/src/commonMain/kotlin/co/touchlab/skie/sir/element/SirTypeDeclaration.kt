@@ -89,3 +89,6 @@ fun SirTypeDeclaration.resolveAsSirClass(): SirClass? =
 
 fun SirTypeDeclaration.resolveAsKirClass(): KirClass? =
     resolveAsSirClass()?.kirClassOrNull
+
+fun SirTypeDeclaration.getTypeParameter(name: String): SirTypeParameter =
+    typeParameters.singleOrNull { it.name == name } ?: throw NoSuchElementException("$this does not contain type parameter $name")

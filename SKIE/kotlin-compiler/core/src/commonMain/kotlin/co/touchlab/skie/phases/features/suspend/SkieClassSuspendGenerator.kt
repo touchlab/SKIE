@@ -87,7 +87,7 @@ private fun SirClass.addSkieClassConstructor(suspendFunctionOwner: KirClass) {
         SirValueParameter(
             label = "_",
             name = SkieClassSuspendGenerator.kotlinObjectVariableName,
-            type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
+            type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(this@SirClass.typeParameters),
         )
 
         bodyBuilder.add {

@@ -10,6 +10,7 @@ data class LambdaSirType(
     val valueParameterTypes: List<SirType>,
     val returnType: SirType,
     val isEscaping: Boolean,
+    val isAsync: Boolean = false,
 ) : NonNullSirType() {
 
     override val isHashable: Boolean = false
@@ -36,6 +37,7 @@ data class LambdaSirType(
                     } else {
                         emptyList()
                     },
+                    async = isAsync,
                 )
             },
             lowestVisibility = lazy {
@@ -53,17 +55,21 @@ data class LambdaSirType(
             returnType = returnType.inlineTypeAliases(),
         )
 
+    // TODO: Probably use `copy` here to make sure we don't have to manually specify all parameters
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): LambdaSirType =
         LambdaSirType(
             returnType = returnType.substituteTypeParameters(substitutions),
             valueParameterTypes = valueParameterTypes.map { it.substituteTypeParameters(substitutions) },
             isEscaping = isEscaping,
+            isAsync = isAsync,
         )
 
+    // TODO: Probably use `copy` here to make sure we don't have to manually specify all parameters
     override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): LambdaSirType =
         LambdaSirType(
             returnType = returnType.substituteTypeArguments(substitutions),
             valueParameterTypes = valueParameterTypes.map { it.substituteTypeArguments(substitutions) },
             isEscaping = isEscaping,
+            isAsync = isAsync,
         )
 }

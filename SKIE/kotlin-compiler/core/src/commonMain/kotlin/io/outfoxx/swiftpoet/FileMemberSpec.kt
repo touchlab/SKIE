@@ -16,6 +16,8 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
+
 class FileMemberSpec internal constructor(
   builder: Builder,
 ) : Taggable(builder.tags.toImmutableMap()) {
@@ -52,16 +54,16 @@ class FileMemberSpec internal constructor(
 
   class Builder internal constructor(
     internal val member: Any,
-  ) : Taggable.Builder<Builder>() {
+  ) : Taggable.Builder<Builder>(), BuilderWithDocs<Builder> {
 
     internal val doc = CodeBlock.builder()
     internal val guardTest = CodeBlock.builder()
 
-    fun addDoc(format: String, vararg args: Any) = apply {
+    override fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
     }
 
-    fun addDoc(block: CodeBlock) = apply {
+    override fun addDoc(block: CodeBlock) = apply {
       doc.add(block)
     }
 

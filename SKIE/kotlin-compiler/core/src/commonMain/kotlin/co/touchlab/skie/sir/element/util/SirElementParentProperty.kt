@@ -2,11 +2,11 @@ package co.touchlab.skie.sir.element.util
 
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
+import co.touchlab.skie.sir.element.SirConditionalConstraintParent
 import co.touchlab.skie.sir.element.SirDeclaration
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirEnumCase
 import co.touchlab.skie.sir.element.SirEnumCaseAssociatedValue
-import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirFunction
 import co.touchlab.skie.sir.element.SirGetter
 import co.touchlab.skie.sir.element.SirProperty
@@ -87,8 +87,8 @@ fun <T : SirPropertyAccessor> sirPropertyAccessorParent(
 )
 
 fun sirConditionalConstraintParent(
-    initialValue: SirExtension,
-) = parent<SirConditionalConstraint, SirExtension>(
+    initialValue: SirConditionalConstraintParent,
+) = parent<SirConditionalConstraint, SirConditionalConstraintParent>(
     initialValue = initialValue,
     onChange = { oldValue, newValue, thisRef ->
         oldValue?.conditionalConstraints?.remove(thisRef)

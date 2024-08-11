@@ -9,6 +9,7 @@ import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.toConformanceBound
 import co.touchlab.skie.sir.element.toSirKind
 import co.touchlab.skie.util.toSirVisibility
 
@@ -82,7 +83,7 @@ class CreateKotlinSirTypesPhase : SirPhase {
                 typeParameter.sirTypeParameter = SirTypeParameter(
                     name = typeParameter.name,
                     parent = sirClass,
-                    bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType),
+                    bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType.toConformanceBound()),
                 )
             }
         }

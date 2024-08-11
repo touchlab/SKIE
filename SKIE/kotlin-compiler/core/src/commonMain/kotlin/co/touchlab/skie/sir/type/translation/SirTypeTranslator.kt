@@ -136,12 +136,12 @@ class SirTypeTranslator(
 
         var result = mapType(typeArgument)
 
-        val mustBeHashableType = typeParameter.bounds.any { it.asHashableType() != null }
+        val mustBeHashableType = typeParameter.bounds.any { it.type.asHashableType() != null }
         if (mustBeHashableType) {
             result = result.asHashableType() ?: sirBuiltins.Swift.AnyHashable.defaultType
         }
 
-        val mustBeReferenceType = typeParameter.bounds.any { it.asReferenceType() != null }
+        val mustBeReferenceType = typeParameter.bounds.any { it.type.asReferenceType() != null }
         if (mustBeReferenceType) {
             result = result.asReferenceType() ?: sirBuiltins.Swift.AnyObject.defaultType
         }

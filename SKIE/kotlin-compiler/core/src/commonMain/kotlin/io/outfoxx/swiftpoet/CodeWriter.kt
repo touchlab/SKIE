@@ -105,7 +105,7 @@ internal class CodeWriter(
     } finally {
       doc = false
     }
-    emit(" */\n")
+    emit("\n */\n")
   }
 
   /**
@@ -384,7 +384,7 @@ internal class CodeWriter(
       if (!first) {
         if ((doc || comment) && trailingNewline) {
           emitIndentation()
-          out.append(if (doc) " *" else "//")
+          out.append(if (doc) "" else "//")
         }
         out.append("\n")
         trailingNewline = true
@@ -403,7 +403,7 @@ internal class CodeWriter(
       if (trailingNewline) {
         emitIndentation()
         if (doc) {
-          out.append(" * ")
+          out.append(" ")
         } else if (comment) {
           out.append("// ")
         }

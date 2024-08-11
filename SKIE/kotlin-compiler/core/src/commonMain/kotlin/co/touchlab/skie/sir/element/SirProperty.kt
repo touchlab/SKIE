@@ -20,11 +20,14 @@ class SirProperty(
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
     override val isFakeOverride: Boolean = false,
     override var isWrappedBySkie: Boolean = false,
+    var isMutable: Boolean = false,
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
 ) : SirOverridableDeclaration<SirProperty>, SirCallableDeclaration, SirElementWithModality {
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
+
+    override var documentation: String = ""
 
     override val identifierAfterVisibilityChange: String
         get() = if (isReplaced) "__$identifier" else identifier
@@ -95,6 +98,7 @@ class SirProperty(
             deprecationLevel: DeprecationLevel = DeprecationLevel.None,
             isFakeOverride: Boolean = false,
             isWrappedBySkie: Boolean = false,
+            isMutable: Boolean = false,
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
         ): SirProperty =
@@ -111,6 +115,7 @@ class SirProperty(
                 deprecationLevel = deprecationLevel,
                 isFakeOverride = isFakeOverride,
                 isWrappedBySkie = isWrappedBySkie,
+                isMutable = isMutable,
                 attributes = attributes,
                 modifiers = modifiers,
             )
@@ -130,6 +135,7 @@ fun SirProperty.shallowCopy(
     deprecationLevel: DeprecationLevel = this.deprecationLevel,
     isFakeOverride: Boolean = this.isFakeOverride,
     isWrappedBySkie: Boolean = false,
+    isMutable: Boolean = this.isMutable,
     attributes: List<String> = this.attributes,
     modifiers: List<Modifier> = this.modifiers,
 ): SirProperty =
@@ -146,6 +152,7 @@ fun SirProperty.shallowCopy(
         deprecationLevel = deprecationLevel,
         isFakeOverride = isFakeOverride,
         isWrappedBySkie = isWrappedBySkie,
+        isMutable = isMutable,
         attributes = attributes,
         modifiers = modifiers,
     )

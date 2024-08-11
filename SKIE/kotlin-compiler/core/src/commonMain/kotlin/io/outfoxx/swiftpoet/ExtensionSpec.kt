@@ -17,14 +17,17 @@
 package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
+import io.outfoxx.swiftpoet.builder.BuilderWithConditionalConstraints
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 import io.outfoxx.swiftpoet.builder.BuilderWithMembers
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
+import io.outfoxx.swiftpoet.builder.BuilderWithSuperTypes
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
 /** A generated class, protocol, or enum declaration.  */
 class ExtensionSpec private constructor(
   builder: Builder,
-) : Taggable(builder.tags.toImmutableMap()) {
+) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
 
   val doc = builder.doc.build()
   val extendedTypeOrName = builder.extendedTypeOrName
@@ -38,6 +41,7 @@ class ExtensionSpec private constructor(
   fun toBuilder(): Builder {
     val builder = Builder(extendedTypeOrName)
     builder.doc.add(doc)
+    builder.attributes += attributes
     builder.conditionalConstraints += conditionalConstraints
     builder.propertySpecs += propertySpecs
     builder.functionSpecs += funSpecs
@@ -53,6 +57,7 @@ class ExtensionSpec private constructor(
 
     try {
       codeWriter.emitDoc(doc)
+      codeWriter.emitAttributes(attributes)
       codeWriter.emitModifiers(modifiers, setOf(INTERNAL))
       codeWriter.emit("extension")
       codeWriter.emitCode(" %T", extendedTypeOrName)
@@ -128,7 +133,7 @@ class ExtensionSpec private constructor(
 
   class Builder internal constructor(
     internal val extendedTypeOrName: Any,
-  ) : Taggable.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeSpecs, BuilderWithMembers {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeSpecs, BuilderWithMembers, BuilderWithDocs<Builder>, BuilderWithConditionalConstraints<Builder>, BuilderWithSuperTypes<Builder> {
 
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableSetOf<Modifier>()
@@ -138,11 +143,11 @@ class ExtensionSpec private constructor(
     internal val functionSpecs = mutableListOf<FunctionSpec>()
     internal val typeSpecs = mutableListOf<AnyTypeSpec>()
 
-    fun addDoc(format: String, vararg args: Any) = apply {
+    override fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
     }
 
-    fun addDoc(block: CodeBlock) = apply {
+    override fun addDoc(block: CodeBlock) = apply {
       doc.add(block)
     }
 
@@ -150,15 +155,19 @@ class ExtensionSpec private constructor(
       this.modifiers += modifiers
     }
 
-    fun addSuperType(superType: TypeName) = apply {
+    override fun addSuperTypes(superTypes: Iterable<TypeName>) = apply {
+      this.superTypes += superTypes
+    }
+
+    override fun addSuperType(superType: TypeName) = apply {
       superTypes += superType
     }
 
-    fun addConditionalConstraints(typeVariables: Iterable<TypeVariableName>) = apply {
+    override fun addConditionalConstraints(typeVariables: Iterable<TypeVariableName>) = apply {
       this.conditionalConstraints += typeVariables
     }
 
-    fun addConditionalConstraint(typeVariable: TypeVariableName) = apply {
+    override fun addConditionalConstraint(typeVariable: TypeVariableName) = apply {
       conditionalConstraints += typeVariable
     }
 

@@ -38,7 +38,7 @@ fun SirTypeParameterParent.copyTypeParametersFrom(
 
     copiesWithOriginal.forEach { (original, copy) ->
         // TODO This is not entirely correct, because we don't substitute type parameters from parent scope as nested scopes are not implemented yet.
-        val bounds = original.bounds.map { it.substituteTypeParameters(substitutions) }
+        val bounds = original.bounds.map { it.copy(it.type.substituteTypeParameters(substitutions)) }
 
         copy.bounds.addAll(bounds)
     }

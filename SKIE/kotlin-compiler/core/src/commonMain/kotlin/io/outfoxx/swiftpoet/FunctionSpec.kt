@@ -16,6 +16,8 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.builder.BuilderWithConditionalConstraints
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
 
@@ -28,6 +30,7 @@ class FunctionSpec private constructor(
   val doc = builder.doc.build()
   val modifiers = builder.modifiers.toImmutableSet()
   val typeVariables = builder.typeVariables.toImmutableList()
+  val conditionalConstraints = builder.conditionalConstraints.toImmutableList()
   val returnType = builder.returnType
   val parameters = builder.parameters.toImmutableList()
   val throws = builder.throws
@@ -64,7 +67,7 @@ class FunctionSpec private constructor(
     }
 
     emitSignature(codeWriter, enclosingName)
-    codeWriter.emitWhereBlock(typeVariables)
+    codeWriter.emitWhereBlock(typeVariables + conditionalConstraints, conditionalConstraints.isNotEmpty())
 
     if (body !== CodeBlock.ABSTRACT) {
       codeWriter.emit(" {\n")
@@ -166,6 +169,7 @@ class FunctionSpec private constructor(
     builder.attributes += attributes
     builder.modifiers += modifiers
     builder.typeVariables += typeVariables
+    builder.conditionalConstraints += conditionalConstraints
     builder.returnType = returnType
     builder.parameters += parameters
     builder.body.add(body)
@@ -184,11 +188,12 @@ class FunctionSpec private constructor(
   class Builder internal constructor(
     internal val name: String,
     internal val type: Type = Type.Function,
-  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters, BuilderWithDocs<Builder>, BuilderWithConditionalConstraints<Builder> {
 
     internal val doc = CodeBlock.builder()
     internal val modifiers = mutableListOf<Modifier>()
     internal val typeVariables = mutableListOf<TypeVariableName>()
+    internal val conditionalConstraints = mutableListOf<TypeVariableName>()
     internal var returnType: TypeName? = null
     internal val parameters = mutableListOf<ParameterSpec>()
     internal var throws = false
@@ -198,11 +203,11 @@ class FunctionSpec private constructor(
     internal val body: CodeBlock.Builder = CodeBlock.builder()
     internal var abstract = false
 
-    fun addDoc(format: String, vararg args: Any) = apply {
+    override fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
     }
 
-    fun addDoc(block: CodeBlock) = apply {
+    override fun addDoc(block: CodeBlock) = apply {
       doc.add(block)
     }
 
@@ -222,6 +227,14 @@ class FunctionSpec private constructor(
     override fun addTypeVariable(typeVariable: TypeVariableName) = apply {
       check(!type.isAccessor) { "$name cannot have type variables" }
       typeVariables += typeVariable
+    }
+
+    override fun addConditionalConstraints(typeVariables: Iterable<TypeVariableName>) = apply {
+      this.conditionalConstraints += typeVariables
+    }
+
+    override fun addConditionalConstraint(typeVariable: TypeVariableName) = apply {
+      conditionalConstraints += typeVariable
     }
 
     fun returns(returnType: TypeName) = apply {
@@ -316,6 +329,23 @@ class FunctionSpec private constructor(
 
     fun addStatement(format: String, vararg args: Any) = apply {
       body.addStatement(format, *args)
+    }
+
+    operator fun String.unaryPlus() {
+      body.add(this)
+    }
+
+    operator fun String.invoke(block: () -> Unit) {
+      val containsOpening = this.contains("{")
+      addCode("%L%L%>", this, if (containsOpening) "" else " {")
+      block()
+      addCode("%<}")
+    }
+
+    fun indented(block: () -> Unit) {
+      addCode("%>")
+      block()
+      addCode("%<")
     }
 
     fun build() = FunctionSpec(this)

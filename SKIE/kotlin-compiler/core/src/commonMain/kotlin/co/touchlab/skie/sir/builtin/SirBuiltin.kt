@@ -8,6 +8,10 @@ import co.touchlab.skie.sir.element.SirDeclarationParent
 import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeParameter
+import co.touchlab.skie.sir.element.getTypeParameter
+import co.touchlab.skie.sir.element.toConformanceBound
+import co.touchlab.skie.sir.element.toEqualityBound
+import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import kotlin.properties.PropertyDelegateProvider
@@ -21,6 +25,8 @@ class SirBuiltins(
 ) {
 
     val Swift = Modules.Swift(sirProvider)
+
+    val SwiftUI = Modules.SwiftUI(sirProvider, Swift)
 
     val Foundation = Modules.Foundation(sirProvider, Swift)
 
@@ -67,19 +73,21 @@ class SirBuiltins(
             }
 
             val Dictionary by Struct {
-                SirTypeParameter("Key", Hashable.defaultType)
+                SirTypeParameter("Key", Hashable.defaultType.toConformanceBound())
                 SirTypeParameter("Value")
             }
 
             val Set by Struct(superTypes = listOf(Hashable.defaultType)) {
-                SirTypeParameter("Element", Hashable.defaultType)
+                SirTypeParameter("Element", Hashable.defaultType.toConformanceBound())
             }
 
             val Void by Struct()
+            val Never by Struct()
 
             val UnsafeMutableRawPointer by Struct(superTypes = listOf(Hashable.defaultType))
 
             val String by Struct(superTypes = listOf(Hashable.defaultType))
+            val StaticString by Struct()
 
             val Bool by Struct(superTypes = listOf(Hashable.defaultType))
 
@@ -120,8 +128,7 @@ class SirBuiltins(
 
             val AsyncSequence by Protocol {
                 SirTypeParameter("AsyncIterator", AsyncIteratorProtocol)
-                // TODO: Element is `==` bound to `AsyncIterator.Element`, how to represent it?
-                SirTypeParameter("Element")
+                SirTypeParameter("Element", AsyncIteratorProtocol.getTypeParameter("Element").toTypeParameterUsage().toEqualityBound())
             }
 
             val CancellationError by Struct(
@@ -145,6 +152,33 @@ class SirBuiltins(
                     CustomCombineIdentifierConvertible.defaultType,
                 ),
             )
+        }
+
+        class SwiftUI(sirProvider: SirProvider, swift: Swift) : ModuleBase() {
+            override val declarationParent = sirProvider.getExternalModule("SwiftUI").builtInFile
+
+            override val origin = SirClass.Origin.ExternalSwiftFramework
+
+            val View by Protocol()
+
+            val EmptyView by Struct(
+                superTypes = listOf(
+                    View.defaultType
+                )
+            )
+
+            val Binding by Struct {
+                SirTypeParameter("Value")
+            }
+
+            val ObservableObject by Protocol(
+                superTypes = listOf(
+                    swift.AnyObject.defaultType,
+                )
+            ) {
+                // TODO: Declared as: `associatedtype ObjectWillChangePublisher : Publisher = ObservableObjectPublisher where Self.ObjectWillChangePublisher.Failure == Never`
+                SirTypeParameter("ObjectWillChangePublisher")
+            }
         }
 
         class Skie(

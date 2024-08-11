@@ -24,7 +24,7 @@ class SirSimpleFunction(
     var isAsync: Boolean = false,
     override var throws: Boolean = false,
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
-) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirTypeParameterParent, SirOverridableDeclaration<SirSimpleFunction>,
+) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirOverridableDeclaration<SirSimpleFunction>,
     SirElementWithModality {
 
     override val identifierAfterVisibilityChange: String
@@ -34,8 +34,6 @@ class SirSimpleFunction(
         get() = identifierAfterVisibilityChange.escapeSwiftIdentifier()
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
-
-    override val typeParameters: MutableList<SirTypeParameter> = mutableListOf()
 
     override val valueParameters: MutableList<SirValueParameter> = mutableListOf()
 

@@ -42,7 +42,7 @@ object PropagateSirVisibilityToMembersPhase : SirPhase {
             sirFunction.returnType.visibilityConstraint,
         ) +
             sirFunction.valueParameters.map { it.type.visibilityConstraint } +
-            sirFunction.typeParameters.flatMap { typeParameter -> typeParameter.bounds.map { it.visibilityConstraint } }
+            sirFunction.typeParameters.flatMap { typeParameter -> typeParameter.bounds.map { it.type.visibilityConstraint } }
 
         sirFunction.visibility = allConstraints.minimumVisibility()
     }

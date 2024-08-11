@@ -17,8 +17,11 @@
 package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
+import io.outfoxx.swiftpoet.builder.BuilderWithAssociatedTypes
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 import io.outfoxx.swiftpoet.builder.BuilderWithMembers
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
+import io.outfoxx.swiftpoet.builder.BuilderWithSuperTypes
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeParameters
 import io.outfoxx.swiftpoet.builder.BuilderWithTypeSpecs
 
@@ -90,7 +93,11 @@ class TypeSpec private constructor(
         for (associatedType in associatedTypes) {
           codeWriter.emit("associatedtype ")
           associatedType.emit(codeWriter)
-          associatedType.bounds.forEach { it.emit(codeWriter) }
+          if (associatedType.bounds.size > 1 || associatedType.bounds.any { it.constraint == TypeVariableName.Bound.Constraint.SAME_TYPE }) {
+            codeWriter.emitWhereBlock(listOf(associatedType), forceOutput = true)
+          } else {
+            associatedType.bounds.forEach { it.emit(codeWriter) }
+          }
           codeWriter.emit("\n")
         }
 
@@ -226,7 +233,7 @@ class TypeSpec private constructor(
   class Builder(
     internal var kind: Kind,
     internal val name: String,
-  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithTypeParameters, BuilderWithTypeSpecs, BuilderWithMembers {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithAssociatedTypes<Builder>, BuilderWithTypeSpecs, BuilderWithMembers, BuilderWithDocs<Builder>, BuilderWithSuperTypes<Builder> {
 
     internal val doc = CodeBlock.builder()
     internal val typeVariables = mutableListOf<TypeVariableName>()
@@ -241,11 +248,11 @@ class TypeSpec private constructor(
     internal val isStruct = kind is Kind.Struct
     internal val isProtocol = kind is Kind.Protocol
 
-    fun addDoc(format: String, vararg args: Any) = apply {
+    override fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
     }
 
-    fun addDoc(block: CodeBlock) = apply {
+    override fun addDoc(block: CodeBlock) = apply {
       doc.add(block)
     }
 
@@ -266,11 +273,11 @@ class TypeSpec private constructor(
       this.superTypes.add(CLASS)
     }
 
-    fun addSuperTypes(superTypes: Iterable<TypeName>) = apply {
+    override fun addSuperTypes(superTypes: Iterable<TypeName>) = apply {
       this.superTypes += superTypes
     }
 
-    fun addSuperType(superType: TypeName) = apply {
+    override fun addSuperType(superType: TypeName) = apply {
       this.superTypes += superType
     }
 
@@ -342,7 +349,7 @@ class TypeSpec private constructor(
       typeSpecs += typeSpec
     }
 
-    fun addAssociatedType(typeVariable: TypeVariableName) = apply {
+    override fun addAssociatedType(typeVariable: TypeVariableName) = apply {
       check(isProtocol) { "${this.name} is not a protocol, only protocols can have associated types" }
       associatedTypes += typeVariable
     }

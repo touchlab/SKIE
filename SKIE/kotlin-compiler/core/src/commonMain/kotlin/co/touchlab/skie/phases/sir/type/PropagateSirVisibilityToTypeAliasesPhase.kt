@@ -20,7 +20,7 @@ object PropagateSirVisibilityToTypeAliasesPhase : SirPhase {
             sirTypeAlias.namespace?.classDeclaration?.visibility,
         ) +
             sirTypeAlias.type.visibilityConstraint +
-            sirTypeAlias.typeParameters.flatMap { typeParameter -> typeParameter.bounds.map { it.visibilityConstraint } }
+            sirTypeAlias.typeParameters.flatMap { typeParameter -> typeParameter.bounds.map { it.type.visibilityConstraint } }
 
         sirTypeAlias.visibility = allConstraints.minimumVisibility()
     }

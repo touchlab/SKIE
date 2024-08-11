@@ -18,6 +18,8 @@ class SirTypeAlias(
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 
+    override var documentation: String = ""
+
     override val defaultType: DeclaredSirType by lazy {
         toType(emptyList())
     }

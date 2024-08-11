@@ -16,6 +16,8 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.builder.BuilderWithDocs
+
 class EnumerationCaseSpec private constructor(
   builder: Builder,
 ) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
@@ -47,15 +49,15 @@ class EnumerationCaseSpec private constructor(
   class Builder internal constructor(
     internal var name: String,
     internal var typeOrConstant: Any?,
-  ) : AttributedSpec.Builder<Builder>() {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithDocs<Builder> {
 
     internal val doc = CodeBlock.builder()
 
-    fun addDoc(format: String, vararg args: Any) = apply {
+    override fun addDoc(format: String, vararg args: Any) = apply {
       doc.add(format, *args)
     }
 
-    fun addDoc(block: CodeBlock) = apply {
+    override fun addDoc(block: CodeBlock) = apply {
       doc.add(block)
     }
 

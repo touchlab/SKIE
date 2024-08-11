@@ -6,17 +6,25 @@ import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
+import org.intellij.lang.annotations.Language
 
 sealed class SirFunction(
     override val attributes: MutableList<String>,
     override val modifiers: MutableList<Modifier>,
-) : SirCallableDeclaration, SirElementWithFunctionBodyBuilder {
+) : SirCallableDeclaration, SirElementWithFunctionBodyBuilder, SirTypeParameterParent, SirConditionalConstraintParent {
+
+    @Language("markdown")
+    override var documentation: String = ""
 
     abstract var throws: Boolean
 
     abstract val valueParameters: MutableList<SirValueParameter>
 
     override val bodyBuilder = mutableListOf<FunctionSpec.Builder.() -> Unit>()
+
+    override val typeParameters: MutableList<SirTypeParameter> = mutableListOf()
+
+    override val conditionalConstraints: MutableList<SirConditionalConstraint> = mutableListOf()
 
     override val reference: String
         get() = if (valueParameters.isEmpty()) {

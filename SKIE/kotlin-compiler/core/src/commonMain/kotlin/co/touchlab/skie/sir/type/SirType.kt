@@ -44,5 +44,11 @@ fun SirType.toNullable(condition: Boolean = true): SirType =
         this
     }
 
+fun SirType.toExistential(): SirType =
+    ExistentialSirType(this)
+
+fun SirType.toOpaque(): SirType =
+    OpaqueSirType(this)
+
 val SirType.visibilityConstraint: SirVisibility
     get() = this.normalizedEvaluatedType().visibilityConstraint

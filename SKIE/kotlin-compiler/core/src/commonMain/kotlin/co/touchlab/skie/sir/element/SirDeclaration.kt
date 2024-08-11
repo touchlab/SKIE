@@ -1,8 +1,13 @@
 package co.touchlab.skie.sir.element
 
+import org.intellij.lang.annotations.Language
+
 sealed interface SirDeclaration : SirElement {
 
     val parent: SirDeclarationParent
+
+    @set:Language("markdown")
+    var documentation: String
 }
 
 val SirDeclaration.module: SirModule

@@ -11,6 +11,7 @@ import co.touchlab.skie.sir.element.SirIrFile
 import co.touchlab.skie.sir.element.SirSimpleFunction
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirValueParameter
+import co.touchlab.skie.sir.element.toConformanceBound
 import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
@@ -119,7 +120,7 @@ class FlowConversionConstructorsGenerator(
 
             SirConditionalConstraint(
                 typeParameter = typeParameter,
-                bounds = listOf(typeBound),
+                bounds = listOf(typeBound.toConformanceBound()),
             )
 
             bodyFactory(typeParameter)
@@ -155,7 +156,7 @@ class FlowConversionConstructorsGenerator(
         ).apply {
             val typeParameter = SirTypeParameter(
                 name = "T",
-                bounds = listOf(typeBound),
+                bounds = listOf(typeBound.toConformanceBound()),
             )
 
             val flowTypeArgument = flowTypeArgumentFactory(typeParameter.toTypeParameterUsage())

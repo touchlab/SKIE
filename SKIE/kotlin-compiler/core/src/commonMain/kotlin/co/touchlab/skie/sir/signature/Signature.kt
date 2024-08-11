@@ -152,7 +152,7 @@ sealed class Signature {
             constructor(conditionalConstraint: SirConditionalConstraint, sirHierarchyCache: SirHierarchyCache) : this(
                 typeParameterName = conditionalConstraint.typeParameter.name,
                 bounds = with(sirHierarchyCache) {
-                    conditionalConstraint.bounds.map { it.signatureType }.toSet()
+                    conditionalConstraint.bounds.map { it.type.signatureType }.toSet()
                 },
             )
 
