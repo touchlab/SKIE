@@ -1,9 +1,5 @@
 package co.touchlab.skie.phases.swift
 
-import co.touchlab.skie.phases.swift.SirCodeGenerator.addSuperTypes
-import co.touchlab.skie.phases.swift.SirCodeGenerator.addTypeParameters
-import co.touchlab.skie.phases.swift.SirCodeGenerator.addTypeParametersOrAssociatedTypes
-import co.touchlab.skie.phases.swift.SirCodeGenerator.toSwiftPoetTypeName
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
