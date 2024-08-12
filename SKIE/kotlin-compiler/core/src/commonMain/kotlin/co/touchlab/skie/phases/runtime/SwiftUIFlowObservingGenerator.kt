@@ -297,8 +297,6 @@ object SwiftUIFlowObservingGenerator {
                 )
 
                 val flowProperty = SirProperty(
-                    // TODO: Included to make sure visibility is not added, but should be handled automatically
-                    visibility = SirVisibility.Internal,
                     identifier = "flow",
                     type = flowTypeParameter.toTypeParameterUsage(),
                     attributes = listOf("_spi(SKIE)"),
@@ -308,8 +306,6 @@ object SwiftUIFlowObservingGenerator {
                 }
 
                 val initialValueProperty = SirProperty(
-                    // TODO: Included to make sure visibility is not added, but should be handled automatically
-                    visibility = SirVisibility.Internal,
                     identifier = "initialValue",
                     type = elementTypeParameter.toTypeParameterUsage(),
                     attributes = listOf("_spi(SKIE)"),

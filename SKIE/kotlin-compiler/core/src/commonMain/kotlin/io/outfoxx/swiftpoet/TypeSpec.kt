@@ -16,6 +16,10 @@
 
 package io.outfoxx.swiftpoet
 
+import io.outfoxx.swiftpoet.Modifier.OPEN
+import io.outfoxx.swiftpoet.Modifier.PUBLIC
+import io.outfoxx.swiftpoet.Modifier.PRIVATE
+import io.outfoxx.swiftpoet.Modifier.FILEPRIVATE
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
 import io.outfoxx.swiftpoet.builder.BuilderWithAssociatedTypes
 import io.outfoxx.swiftpoet.builder.BuilderWithConditionalConstraints
@@ -207,8 +211,9 @@ class TypeSpec private constructor(
 
     class Protocol(vararg modifiers: Modifier) : Kind(
       "protocol",
-      setOf(INTERNAL),
-      setOf(INTERNAL),
+      // Protocol properties and methods can't specify visibility so we include them all as "implicit" to supress any visibility modifiers.
+      setOf(OPEN, PUBLIC, PRIVATE, FILEPRIVATE, INTERNAL),
+      setOf(OPEN, PUBLIC, PRIVATE, FILEPRIVATE, INTERNAL),
       modifiers.toSet(),
     ) {
 
