@@ -2,6 +2,8 @@ package co.touchlab.skie.phases.runtime
 
 import co.touchlab.skie.kir.type.SupportedFlow
 import co.touchlab.skie.phases.SirPhase
+import co.touchlab.skie.phases.runtime.declarations.Observing
+import co.touchlab.skie.phases.runtime.declarations.SkieSwiftFlowWithInitialValue
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirConstructor
@@ -13,32 +15,19 @@ import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirTypeParameterParent
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
-import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.element.getTypeParameter
 import co.touchlab.skie.sir.element.toConformanceBound
 import co.touchlab.skie.sir.element.toEqualityBound
+import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.LambdaSirType
 import co.touchlab.skie.sir.type.SpecialSirType
 import co.touchlab.skie.sir.type.TupleSirType
 import co.touchlab.skie.sir.type.toExistential
 import co.touchlab.skie.sir.type.toNullable
 import co.touchlab.skie.sir.type.toOpaque
-import org.intellij.lang.annotations.Language
+
 
 object SwiftUIFlowObservingGenerator {
-    data class SkieSwiftFlowWithInitialValue(
-        val self: SirClass,
-        val flowProperty: SirProperty,
-        val initialValueProperty: SirProperty,
-        val elementTypeParameter: SirTypeParameter,
-    )
-
-    data class Observing(
-        val self: SirClass,
-        val valuesTypeParameter: SirTypeParameter,
-        val initialContentTypeParameter: SirTypeParameter,
-        val contentTypeParameter: SirTypeParameter,
-    )
 
     private val availability = "available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)"
     private val maxFlowsOverload = 5

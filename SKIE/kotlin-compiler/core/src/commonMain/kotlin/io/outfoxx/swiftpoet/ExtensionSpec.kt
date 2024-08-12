@@ -163,12 +163,12 @@ class ExtensionSpec private constructor(
       superTypes += superType
     }
 
-    override fun addConditionalConstraints(typeVariables: Iterable<TypeVariableName>) = apply {
-      this.conditionalConstraints += typeVariables
+    override fun addConditionalConstraints(conditionalConstraints: Iterable<TypeVariableName>) = apply {
+      this.conditionalConstraints += conditionalConstraints
     }
 
-    override fun addConditionalConstraint(typeVariable: TypeVariableName) = apply {
-      conditionalConstraints += typeVariable
+    override fun addConditionalConstraint(conditionalConstraint: TypeVariableName) = apply {
+      conditionalConstraints += conditionalConstraint
     }
 
     fun addProperties(propertySpecs: Iterable<PropertySpec>) = apply {

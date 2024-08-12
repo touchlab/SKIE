@@ -76,22 +76,22 @@ object SkieSwiftFlowIteratorGenerator {
             bodyBuilder.add {
                 addCode(
                     """
-                            do {
-                                let hasNext = try await skie(iterator).hasNext()
-
-                                if hasNext.boolValue {
-                                    return .some(iterator.next() as! Element)
-                                } else {
-                                    return nil
-                                }
-                            } catch is _Concurrency.CancellationError {
-                                await cancelTask()
-
-                                return nil
-                            } catch {
-                                Swift.fatalError("Unexpected error: \(error)")
-                            }
-                        """.trimIndent(),
+                        |do {
+                        |    let hasNext = try await skie(iterator).hasNext()
+                        |
+                        |    if hasNext.boolValue {
+                        |        return .some(iterator.next() as! Element)
+                        |    } else {
+                        |        return nil
+                        |    }
+                        |} catch is _Concurrency.CancellationError {
+                        |    await cancelTask()
+                        |
+                        |    return nil
+                        |} catch {
+                        |    Swift.fatalError("Unexpected error: \(error)")
+                        |}
+                    """.trimMargin(),
                 )
             }
         }
@@ -108,10 +108,10 @@ object SkieSwiftFlowIteratorGenerator {
             bodyBuilder.add {
                 addCode(
                     """
-                    _Concurrency.withUnsafeCurrentTask { task in
-                        task?.cancel()
-                    }
-                """.trimIndent(),
+                        |_Concurrency.withUnsafeCurrentTask { task in
+                        |    task?.cancel()
+                        |}
+                    """.trimMargin(),
                 )
             }
         }

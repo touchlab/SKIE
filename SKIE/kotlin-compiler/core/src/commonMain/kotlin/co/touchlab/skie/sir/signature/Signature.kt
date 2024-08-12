@@ -373,6 +373,7 @@ sealed class Signature {
         private val SirCallableDeclaration.receiver: Receiver
             get() {
                 val (sirClass, constraints) = when (val parent = parent) {
+                    // TODO: Now that SirClass can have `conditionalConstraints`, should we put them here?
                     is SirClass -> parent.classDeclaration to emptySet()
                     is SirExtension -> parent.classDeclaration to parent.conditionalConstraints.map {
                         Receiver.Constraint(it, this@SirHierarchyCache)

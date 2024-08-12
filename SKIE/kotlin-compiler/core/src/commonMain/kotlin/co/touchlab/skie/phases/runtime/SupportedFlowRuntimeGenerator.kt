@@ -5,9 +5,13 @@ import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.bridging.CustomMembersPassthroughGenerator
 import co.touchlab.skie.phases.bridging.CustomPassthroughDeclaration
 import co.touchlab.skie.phases.bridging.ObjCBridgeableGenerator
+import co.touchlab.skie.phases.runtime.declarations.SkieSwiftFlowInternalProtocol
+import co.touchlab.skie.phases.runtime.declarations.SkieSwiftFlowProtocol
 import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
+import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirGetter
 import co.touchlab.skie.sir.element.SirModality
 import co.touchlab.skie.sir.element.SirProperty
 import co.touchlab.skie.sir.element.SirSimpleFunction
@@ -15,8 +19,12 @@ import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.sir.element.SirValueParameter
 import co.touchlab.skie.sir.element.SirVisibility
+import co.touchlab.skie.sir.element.getTypeParameter
+import co.touchlab.skie.sir.element.toConformanceBound
+import co.touchlab.skie.sir.element.toEqualityBound
 import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirType
+import co.touchlab.skie.sir.type.toExistential
 import co.touchlab.skie.sir.type.toNullable
 import io.outfoxx.swiftpoet.CodeBlock
 
@@ -24,38 +32,84 @@ object SupportedFlowRuntimeGenerator {
 
     context(SirPhase.Context)
     fun generate(skieSwiftFlowIterator: SirClass) {
-        generateBridgeSubscriptionCountWorkaroundFunctions()
-
-        generateSkieSwiftFlowProtocol()
-        generateSkieSwiftFlowInternalProtocol()
+        val skieSwiftFlowProtocol = generateSkieSwiftFlowProtocol(skieSwiftFlowIterator)
+        val skieSwiftFlowInternalProtocol = generateSkieSwiftFlowInternalProtocol()
 
         val classesForVariants = SupportedFlow.allVariants.associateWith { flowVariant ->
-            createSwiftFlowClass(flowVariant)
+            createSwiftFlowClass(flowVariant, skieSwiftFlowProtocol, skieSwiftFlowInternalProtocol)
         }
 
         classesForVariants.forEach { (flowVariant, sirClass) ->
-            sirClass.addSwiftFlowMembers(flowVariant, skieSwiftFlowIterator)
+            sirClass.addSwiftFlowMembers(flowVariant, skieSwiftFlowIterator, skieSwiftFlowInternalProtocol)
+        }
+
+        // Needs to happen after `createSwiftFlowClass` for StateFlow is run.
+        generateBridgeSubscriptionCountWorkaroundFunctions()
+    }
+
+    context(SirPhase.Context)
+    private fun generateSkieSwiftFlowProtocol(skieSwiftFlowIterator: SirClass): SkieSwiftFlowProtocol {
+        namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowProtocol").apply {
+            SirClass(
+                baseName = "SkieSwiftFlowProtocol",
+                kind = SirClass.Kind.Protocol,
+                superTypes = listOf(sirBuiltins._Concurrency.AsyncSequence.defaultType),
+            ).apply {
+                val elementTypeParameter = SirTypeParameter(
+                    name = "Element",
+                    isPrimaryAssociatedType = true,
+                )
+
+                SirConditionalConstraint(
+                    sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("AsyncIterator"),
+                    bounds = listOf(
+                        skieSwiftFlowIterator.toType(
+                            elementTypeParameter.toTypeParameterUsage(),
+                        ).toEqualityBound(),
+                    )
+                )
+
+                return SkieSwiftFlowProtocol(
+                    self = this,
+                )
+            }
         }
     }
 
     context(SirPhase.Context)
-    private fun generateSkieSwiftFlowProtocol() {
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieSwiftFlowProtocol").content = """
-            public protocol SkieSwiftFlowProtocol<Element>: _Concurrency.AsyncSequence where AsyncIterator == SkieSwiftFlowIterator<Element> { }
-        """.trimIndent()
-    }
-
-    context(SirPhase.Context)
-    private fun generateSkieSwiftFlowInternalProtocol() {
+    private fun generateSkieSwiftFlowInternalProtocol(): SkieSwiftFlowInternalProtocol {
         // This has currently no use-case, but is kept as it might help with SwiftUI extensions.
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieSwiftFlowInternalProtocol").content = """
-            internal protocol SkieSwiftFlowInternalProtocol<Element> {
-                associatedtype Element
-                associatedtype Delegate: Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.Flow.__Kotlin
+        namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowInternalProtocol").apply {
+            SirClass(
+                baseName = "SkieSwiftFlowInternalProtocol",
+                kind = SirClass.Kind.Protocol,
+                visibility = SirVisibility.Internal,
+            ).apply {
+                SirTypeParameter(
+                    name = "Element",
+                    isPrimaryAssociatedType = true,
+                )
 
-                var delegate: Delegate { get }
+                val delegateTypeParameter = SirTypeParameter(
+                    name = "Delegate",
+                    bounds = listOf(
+                        kirProvider.getClassByFqName("kotlinx.coroutines.flow.Flow").primarySirClass.defaultType.toConformanceBound(),
+                    ),
+                )
+
+                val delegateProperty = SirProperty(
+                    identifier = "delegate",
+                    type = delegateTypeParameter.toTypeParameterUsage(),
+                ).apply {
+                    SirGetter()
+                }
+
+                return SkieSwiftFlowInternalProtocol(
+                    self = this,
+                    delegateProperty = delegateProperty,
+                )
             }
-        """.trimIndent()
+        }
     }
 
     context(SirPhase.Context)
@@ -63,25 +117,56 @@ object SupportedFlowRuntimeGenerator {
         // If Flow-interop is disabled globally (or even just for `kotlinx.coroutines.core`),
         // `subscriptionCount` property falls back to Kotlin's `StateFlow` protocol.
         // These two functions make sure our Flow runtime code still compiles as expected.
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("bridgeSubscriptionCount").content = """
-            internal func bridgeSubscriptionCount(_ subscriptionCount: SkieSwiftStateFlow<KotlinInt>) -> SkieSwiftStateFlow<KotlinInt> {
-                return subscriptionCount
+        namespaceProvider.getSkieNamespaceFile("bridgeSubscriptionCount").apply {
+            val skieSwiftStateFlowOfInt = sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftStateFlow"))
+                .toType(kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType)
+
+            SirSimpleFunction(
+                identifier = "bridgeSubscriptionCount",
+                visibility = SirVisibility.Internal,
+                returnType = skieSwiftStateFlowOfInt,
+            ).apply {
+                SirValueParameter(
+                    label = "_",
+                    name = "subscriptionCount",
+                    type = skieSwiftStateFlowOfInt,
+                )
+
+                bodyBuilder.add {
+                    +"return subscriptionCount"
+                }
             }
 
-            internal func bridgeSubscriptionCount(_ subscriptionCount: any Skie.org_jetbrains_kotlinx__kotlinx_coroutines_core.StateFlow.__Kotlin) -> SkieSwiftStateFlow<KotlinInt> {
-                return SkieSwiftStateFlow(internal: subscriptionCount)
+            SirSimpleFunction(
+                identifier = "bridgeSubscriptionCount",
+                visibility = SirVisibility.Internal,
+                returnType = skieSwiftStateFlowOfInt,
+            ).apply {
+                SirValueParameter(
+                    label = "_",
+                    name = "subscriptionCount",
+                    type = kirProvider.getClassByFqName("kotlinx.coroutines.flow.StateFlow").primarySirClass.defaultType.toExistential(),
+                )
+
+                bodyBuilder.add {
+                    addStatement("return %T(internal: subscriptionCount)", skieSwiftStateFlowOfInt.evaluate().swiftPoetTypeName)
+                }
             }
-        """.trimIndent()
+        }
     }
 
     context(SirPhase.Context)
-    private fun createSwiftFlowClass(flowVariant: SupportedFlow.Variant): SirClass {
+    private fun createSwiftFlowClass(
+        flowVariant: SupportedFlow.Variant,
+        skieSwiftFlowProtocol: SkieSwiftFlowProtocol,
+        skieSwiftFlowInternalProtocol: SkieSwiftFlowInternalProtocol,
+    ): SirClass {
         return namespaceProvider.getSkieNamespaceFile(flowVariant.swiftSimpleName).run {
             SirClass(
                 baseName = flowVariant.swiftSimpleName,
                 superTypes = listOf(
-                    sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType,
-                    sirBuiltins.Skie.SkieSwiftFlowInternalProtocol.defaultType,
+                    skieSwiftFlowProtocol.self.defaultType,
+                    skieSwiftFlowInternalProtocol.self.defaultType,
                     sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
                 ),
                 modality = SirModality.Final,
@@ -93,6 +178,7 @@ object SupportedFlowRuntimeGenerator {
     private fun SirClass.addSwiftFlowMembers(
         flowVariant: SupportedFlow.Variant,
         skieSwiftFlowIterator: SirClass,
+        skieSwiftFlowInternalProtocol: SkieSwiftFlowInternalProtocol,
     ) {
         val flowKirClass = flowVariant.getCoroutinesKirClass()
         val flowClass = flowKirClass.originalSirClass
@@ -108,7 +194,7 @@ object SupportedFlowRuntimeGenerator {
             elementType
         }
 
-        addDelegateProperty(flowClass)
+        addDelegateProperty(flowClass, skieSwiftFlowInternalProtocol)
 
         addInternalConstructor(flowClass)
 
@@ -121,12 +207,15 @@ object SupportedFlowRuntimeGenerator {
 
     private fun SirClass.addDelegateProperty(
         flowClass: SirClass,
+        skieSwiftFlowInternalProtocol: SkieSwiftFlowInternalProtocol,
     ) {
         SirProperty(
             identifier = "delegate",
             type = flowClass.defaultType,
             visibility = SirVisibility.Internal,
-        )
+        ).apply {
+            addOverride(skieSwiftFlowInternalProtocol.delegateProperty)
+        }
     }
 
     private fun SirClass.addInternalConstructor(

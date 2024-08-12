@@ -26,7 +26,7 @@ class SirClass(
     var isInherentlyHashable: Boolean = false,
     var isAlwaysAReference: Boolean = false,
     val origin: Origin = Origin.Generated,
-) : SirTypeDeclaration, SirDeclarationNamespace, SirDeclarationWithSuperTypes, SirTypeParameterParent, SirElementWithAttributes, SirElementWithModality {
+) : SirTypeDeclaration, SirDeclarationNamespace, SirDeclarationWithSuperTypes, SirTypeParameterParent, SirElementWithAttributes, SirElementWithModality, SirConditionalConstraintParent {
 
     // TODO If modality is added update [SirHierarchyCache.canTheoreticallyInheritFrom]
 
@@ -41,6 +41,8 @@ class SirClass(
     override val superTypes: MutableList<SirDeclaredSirType> = superTypes.toMutableList()
 
     override val attributes: MutableList<String> = attributes.toMutableList()
+
+    override val conditionalConstraints: MutableList<SirConditionalConstraint> = mutableListOf()
 
     override val defaultType: SirDeclaredSirType by lazy {
         toType(emptyList())

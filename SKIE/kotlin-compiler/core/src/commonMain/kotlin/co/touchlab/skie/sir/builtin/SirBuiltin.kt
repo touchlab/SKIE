@@ -2,6 +2,7 @@ package co.touchlab.skie.sir.builtin
 
 import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirDeclarationParent
@@ -32,7 +33,7 @@ class SirBuiltins(
 
     val _Concurrency = Modules._Concurrency(sirProvider, Swift)
 
-    val Skie = Modules.Skie(globalConfiguration, sirProvider.skieModule, _Concurrency)
+    val Skie = Modules.Skie(sirProvider, globalConfiguration, sirProvider.skieModule, _Concurrency)
 
     val Combine = Modules.Combine(sirProvider)
 
@@ -127,7 +128,7 @@ class SirBuiltins(
             }
 
             val AsyncSequence by Protocol {
-                SirTypeParameter("AsyncIterator", AsyncIteratorProtocol)
+                SirTypeParameter("AsyncIterator", AsyncIteratorProtocol.defaultType.toConformanceBound())
                 SirTypeParameter("Element", AsyncIteratorProtocol.getTypeParameter("Element").toTypeParameterUsage().toEqualityBound())
             }
 
@@ -182,6 +183,7 @@ class SirBuiltins(
         }
 
         class Skie(
+            sirProvider: SirProvider,
             private val globalConfiguration: GlobalConfiguration,
             val module: SirModule.Skie,
             _concurrency: _Concurrency,
@@ -191,15 +193,22 @@ class SirBuiltins(
 
             override val origin: SirClass.Origin = SirClass.Origin.Generated
 
-            val SkieSwiftFlowProtocol by Protocol(
-                superTypes = listOf(
-                    _concurrency.AsyncSequence.defaultType,
-                ),
-            )
-
-            val SkieSwiftFlowInternalProtocol by Protocol {
-                SirTypeParameter("Element")
+            val SkieSwiftFlowProtocol by lazy {
+                sirProvider.getClassByFqName(SirFqName(module, "SkieSwiftFlowProtocol"))
             }
+//             val SkieSwiftFlowProtocol by Protocol(
+//                 superTypes = listOf(
+//                     _concurrency.AsyncSequence.defaultType,
+//                 ),
+//             )
+
+            val SkieSwiftFlowInternalProtocol by lazy {
+                sirProvider.getClassByFqName(SirFqName(module, "SkieSwiftFlowInternalProtocol"))
+            }
+
+//             val SkieSwiftFlowInternalProtocol by Protocol {
+//                 SirTypeParameter("Element")
+//             }
 
             private fun RuntimeClass(
                 superTypes: List<SirDeclaredSirType> = emptyList(),

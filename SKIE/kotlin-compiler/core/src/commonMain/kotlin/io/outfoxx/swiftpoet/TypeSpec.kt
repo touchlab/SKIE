@@ -18,6 +18,7 @@ package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.Modifier.INTERNAL
 import io.outfoxx.swiftpoet.builder.BuilderWithAssociatedTypes
+import io.outfoxx.swiftpoet.builder.BuilderWithConditionalConstraints
 import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 import io.outfoxx.swiftpoet.builder.BuilderWithMembers
 import io.outfoxx.swiftpoet.builder.BuilderWithModifiers
@@ -34,6 +35,7 @@ class TypeSpec private constructor(
   val doc = builder.doc.build()
   val modifiers = kind.modifiers.toImmutableSet()
   val typeVariables = builder.typeVariables.toImmutableList()
+  val conditionalConstraints = builder.conditionalConstraints.toImmutableList()
   val associatedTypes = builder.associatedTypes.toImmutableList()
 
   val isEnum = builder.isEnum
@@ -49,6 +51,7 @@ class TypeSpec private constructor(
     builder.doc.add(doc)
     builder.attributes += attributes
     builder.typeVariables += typeVariables
+    builder.conditionalConstraints += conditionalConstraints
     builder.superTypes += superTypes
     builder.enumCases += enumCases
     builder.propertySpecs += propertySpecs
@@ -83,7 +86,7 @@ class TypeSpec private constructor(
         codeWriter.emitCode(superTypes.joinToCode(separator = ",%W", prefix = " : "))
       }
 
-      codeWriter.emitWhereBlock(typeVariables)
+      codeWriter.emitWhereBlock(typeVariables + conditionalConstraints, forceOutput = conditionalConstraints.isNotEmpty())
       codeWriter.emit(" {\n\n")
 
       codeWriter.pushType(this)
@@ -95,6 +98,12 @@ class TypeSpec private constructor(
           associatedType.emit(codeWriter)
           if (associatedType.bounds.size > 1 || associatedType.bounds.any { it.constraint == TypeVariableName.Bound.Constraint.SAME_TYPE }) {
             codeWriter.emitWhereBlock(listOf(associatedType), forceOutput = true)
+//             codeWriter.emit(" where")
+//             associatedType.bounds.forEach {
+//
+//               associatedType.emit(codeWriter)
+//               it.emit(codeWriter)
+//             }
           } else {
             associatedType.bounds.forEach { it.emit(codeWriter) }
           }
@@ -233,10 +242,13 @@ class TypeSpec private constructor(
   class Builder(
     internal var kind: Kind,
     internal val name: String,
-  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithAssociatedTypes<Builder>, BuilderWithTypeSpecs, BuilderWithMembers, BuilderWithDocs<Builder>, BuilderWithSuperTypes<Builder> {
+  ) : AttributedSpec.Builder<Builder>(), BuilderWithModifiers, BuilderWithAssociatedTypes<Builder>, BuilderWithTypeSpecs, BuilderWithMembers,
+    BuilderWithDocs<Builder>, BuilderWithSuperTypes<Builder>, BuilderWithConditionalConstraints<Builder>
+  {
 
     internal val doc = CodeBlock.builder()
     internal val typeVariables = mutableListOf<TypeVariableName>()
+    internal val conditionalConstraints = mutableListOf<TypeVariableName>()
     internal val superTypes = mutableSetOf<TypeName>()
     internal val enumCases = mutableListOf<EnumerationCaseSpec>()
     internal val propertySpecs = mutableListOf<PropertySpec>()
@@ -266,6 +278,14 @@ class TypeSpec private constructor(
 
     override fun addTypeVariable(typeVariable: TypeVariableName) = apply {
       typeVariables += typeVariable
+    }
+
+    override fun addConditionalConstraint(conditionalConstraint: TypeVariableName) = apply {
+      this.conditionalConstraints += conditionalConstraints
+    }
+
+    override fun addConditionalConstraints(conditionalConstraints: Iterable<TypeVariableName>) = apply {
+      this.conditionalConstraints += conditionalConstraints
     }
 
     fun constrainToClass() = apply {

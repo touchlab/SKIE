@@ -288,6 +288,7 @@ object SirCodeGenerator {
                 .addSuperTypes(sirClass)
                 .addAttributes(sirClass)
                 .addTypeParametersOrAssociatedTypes(sirClass)
+                .addConditionalConstraints(sirClass)
                 .addClassDeclarations(sirClass)
                 .addEnumCases(sirClass)
                 .addDeinit(sirClass)
