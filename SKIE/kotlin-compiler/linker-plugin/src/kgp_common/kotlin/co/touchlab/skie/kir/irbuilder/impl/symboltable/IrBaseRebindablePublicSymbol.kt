@@ -1,30 +1,37 @@
 package co.touchlab.skie.kir.irbuilder.impl.symboltable
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrBindableSymbol
-import org.jetbrains.kotlin.ir.symbols.impl.IrPublicSymbolBase
+import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.util.IdSignature
 
-abstract class IrBaseRebindablePublicSymbol<out D : DeclarationDescriptor, B : IrSymbolOwner>(
+expect fun IrTypeParameterPublicSymbolImpl(
     signature: IdSignature,
-    descriptor: D,
-) : IrBindableSymbol<D, B>, IrPublicSymbolBase<D>(signature, descriptor) {
+    descriptor: TypeParameterDescriptor,
+): IrTypeParameterSymbol
 
-    private var _owner: B? = null
-    override val owner: B
-        get() = _owner ?: throw IllegalStateException("Symbol is not bound")
+expect abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationDescriptor, Owner : IrSymbolOwner>(
+    signature: IdSignature,
+    descriptor: Descriptor,
+) : IrBindableSymbol<Descriptor, Owner> {
+    override val signature: IdSignature
 
-    override fun bind(owner: B) {
-        this._owner = owner
-    }
+    @ObsoleteDescriptorBasedAPI
+    override val descriptor: Descriptor
 
-    fun unbind() {
-        this._owner = null
-    }
+    @ObsoleteDescriptorBasedAPI
+    override val hasDescriptor: Boolean
+
+    override val owner: Owner
+
+    override var privateSignature: IdSignature?
 
     override val isBound: Boolean
-        get() = _owner != null
 
-    override var privateSignature: IdSignature? = null
+    override fun bind(owner: Owner)
+
+    fun unbind()
 }

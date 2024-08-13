@@ -14,6 +14,7 @@ import co.touchlab.skie.kir.irbuilder.impl.namespace.NewFileNamespace
 import co.touchlab.skie.kir.irbuilder.impl.namespace.nameOrError
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrConstructor
 import co.touchlab.skie.kir.irbuilder.impl.symboltable.DummyIrSimpleFunction
+import co.touchlab.skie.kir.irbuilder.impl.symboltable.IrTypeParameterPublicSymbolImpl
 import co.touchlab.skie.kir.irbuilder.impl.template.FunctionTemplate
 import co.touchlab.skie.kir.irbuilder.impl.template.SecondaryConstructorTemplate
 import co.touchlab.skie.kir.util.SkieSymbolTable
@@ -39,7 +40,7 @@ import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
-import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl
+import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
@@ -160,7 +161,7 @@ class DeclarationBuilderImpl(
      */
     private fun fixPrivateTypeParametersSymbolsFromOldKLibs(skieSymbolTable: SkieSymbolTable) {
         skieSymbolTable.allExposedTypeParameters(mutableDescriptorProvider)
-            .filter { it.symbol !is IrTypeParameterPublicSymbolImpl }
+            .filter { it.symbol !is IrTypeParameterSymbol }
             .forEach {
                 skieSymbolTable.declarePrivateTypeParameterAsPublic(it)
             }

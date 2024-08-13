@@ -12,7 +12,9 @@ fun Project.gradleApiVersionDimension(): Target.Dimension<GradleApiVersionCompon
 
 /**
  * Supported format:
+ * ```
  * versionSupport.kotlinTooling=1.8.0, 1.8.20(1.8.21, 1.8.22), 1.9.0[1.9.0-RC](1.9.10), 1.9.20[1.9.20-RC]
+ * ```
  *
  * The first version is used as the name of the component and as the primary version.
  * The [] parentheses can be used to override the primary version which can be useful for testing code

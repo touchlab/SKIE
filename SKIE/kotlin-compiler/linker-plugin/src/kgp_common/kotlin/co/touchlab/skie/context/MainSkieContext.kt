@@ -26,12 +26,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import org.jetbrains.kotlin.backend.konan.BitcodeEmbedding
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import java.util.Collections
+
+expect fun CompilerConfiguration.getBitcodeEmbeddingMode(): SwiftCompilerConfiguration.BitcodeEmbeddingMode
 
 class MainSkieContext internal constructor(
     initPhaseContext: InitPhaseContext,
@@ -85,11 +87,7 @@ class MainSkieContext internal constructor(
             os = kotlinTargetTriple.os,
             environment = kotlinTargetTriple.environment,
         ),
-        bitcodeEmbeddingMode = when (konanConfig.configuration[KonanConfigKeys.BITCODE_EMBEDDING_MODE]) {
-            BitcodeEmbedding.Mode.FULL -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full
-            BitcodeEmbedding.Mode.MARKER -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker
-            BitcodeEmbedding.Mode.NONE, null -> SwiftCompilerConfiguration.BitcodeEmbeddingMode.None
-        },
+        bitcodeEmbeddingMode = konanConfig.configuration.getBitcodeEmbeddingMode(),
         absoluteSwiftcPath = if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`2_0_0`) {
             configurables.absoluteTargetToolchain + "/bin/swiftc"
         } else {

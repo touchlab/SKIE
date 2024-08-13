@@ -87,6 +87,7 @@ class SirTypeTranslator(
             PrimitiveOirType.uint64_t -> sirBuiltins.Swift.UInt64.defaultType
             PrimitiveOirType.NSUInteger -> sirBuiltins.Swift.UInt.defaultType
             PrimitiveOirType.NSConvertedUInteger -> sirBuiltins.Swift.Int.defaultType
+            PrimitiveOirType.vectorFloat128 -> sirBuiltins.Swift.SIMD4.toType(sirBuiltins.Swift.Float.defaultType)
         }
 
     private fun mapType(

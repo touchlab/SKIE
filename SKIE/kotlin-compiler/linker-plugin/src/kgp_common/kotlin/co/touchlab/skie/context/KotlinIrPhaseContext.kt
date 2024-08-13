@@ -8,6 +8,7 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
 import org.jetbrains.kotlin.backend.konan.serialization.KonanIrLinker
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
@@ -25,5 +26,6 @@ class KotlinIrPhaseContext(
 
     val declarationBuilder: DeclarationBuilderImpl = mainSkieContext.declarationBuilder
 
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     val skieSymbolTable: SkieSymbolTable = SkieSymbolTable(pluginContext.symbolTable as SymbolTable)
 }

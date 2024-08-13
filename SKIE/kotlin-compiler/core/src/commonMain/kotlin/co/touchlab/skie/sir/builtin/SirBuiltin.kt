@@ -106,6 +106,24 @@ class SirBuiltins(
 
             val Float by Struct(superTypes = listOf(Hashable.defaultType))
             val Double by Struct(superTypes = listOf(Hashable.defaultType))
+
+            val SIMDScalar by Protocol()
+            // TODO: There are more superTypes, but we don't need them
+            val SIMD by Protocol(superTypes = listOf(Hashable.defaultType)) {
+                SirTypeParameter(
+                    name = "Scalar",
+                    isPrimaryAssociatedType = true,
+                )
+                // TODO: There's also "MaskStorage" associatedtype, but we don't need it.
+            }
+            val SIMD4 by Struct(superTypes = listOf(SIMD.defaultType)) {
+                SirTypeParameter(
+                    "Scalar",
+                    bounds = listOf(
+                        SIMDScalar.defaultType.toConformanceBound(),
+                    ),
+                )
+            }
         }
 
         class Foundation(sirProvider: SirProvider, swift: Swift) : ModuleBase() {

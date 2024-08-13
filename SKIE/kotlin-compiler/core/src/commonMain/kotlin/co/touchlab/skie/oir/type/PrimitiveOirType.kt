@@ -20,6 +20,7 @@ sealed class PrimitiveOirType(
     object uint64_t : PrimitiveOirType("uint64_t")
     object float : PrimitiveOirType("float")
     object double : PrimitiveOirType("double")
+    object vectorFloat128 : PrimitiveOirType("float __attribute__((__vector_size__(16)))")
 
     override fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String =
         name.withAttrsAndName(attrsAndName)

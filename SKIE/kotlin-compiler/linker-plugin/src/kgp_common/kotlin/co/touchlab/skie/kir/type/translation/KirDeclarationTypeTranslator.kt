@@ -9,6 +9,7 @@ import co.touchlab.skie.kir.type.NonNullReferenceKirType
 import co.touchlab.skie.kir.type.NullableReferenceKirType
 import co.touchlab.skie.kir.type.OirBasedKirType
 import co.touchlab.skie.kir.type.PointerKirType
+import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.oir.type.PointerOirType
 import co.touchlab.skie.oir.type.PrimitiveOirType
 import co.touchlab.skie.oir.type.SpecialReferenceOirType
@@ -123,22 +124,7 @@ class KirDeclarationTypeTranslator(
     private fun mapValueType(
         kotlinType: KotlinType,
         typeBridge: ValueTypeBridge,
-    ): KirType =
-        when (typeBridge.objCValueType) {
-            ObjCValueType.BOOL -> PrimitiveOirType.BOOL
-            ObjCValueType.UNICHAR -> PrimitiveOirType.unichar
-            ObjCValueType.CHAR -> PrimitiveOirType.int8_t
-            ObjCValueType.SHORT -> PrimitiveOirType.int16_t
-            ObjCValueType.INT -> PrimitiveOirType.int32_t
-            ObjCValueType.LONG_LONG -> PrimitiveOirType.int64_t
-            ObjCValueType.UNSIGNED_CHAR -> PrimitiveOirType.uint8_t
-            ObjCValueType.UNSIGNED_SHORT -> PrimitiveOirType.uint16_t
-            ObjCValueType.UNSIGNED_INT -> PrimitiveOirType.uint32_t
-            ObjCValueType.UNSIGNED_LONG_LONG -> PrimitiveOirType.uint64_t
-            ObjCValueType.FLOAT -> PrimitiveOirType.float
-            ObjCValueType.DOUBLE -> PrimitiveOirType.double
-            ObjCValueType.POINTER -> PointerOirType(VoidOirType, kotlinType.binaryRepresentationIsNullable())
-        }.toKirType()
+    ): KirType = typeBridge.objCValueType.mapToOir(kotlinType).toKirType()
 
     private fun KirType.makeNullableIfReferenceOrPointer(): KirType =
         when (this) {
@@ -156,3 +142,5 @@ class KirDeclarationTypeTranslator(
             else -> error("Unsupported OirBasedKirType type: $this")
         }
 }
+
+expect fun ObjCValueType.mapToOir(kotlinType: KotlinType): OirType

@@ -43,18 +43,18 @@ class SkieMultiCompileRuntime: Plugin<Project> {
             setupRootTasksIfNeeded(extension, publishTaskNamesWithTasks)
 
             kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
-                val pathSafeKotlinVersionName = kotlinToolingVersion.primaryVersion.toString().replace('.', '_')
-                val supportedTargetsWithDeclarations = extension.supportedTargetsWithDeclarations(kotlinToolingVersion.primaryVersion)
+                val pathSafeKotlinVersionName = kotlinToolingVersion.name.toString().replace('.', '_')
+                val supportedTargetsWithDeclarations = extension.supportedTargetsWithDeclarations(kotlinToolingVersion.name)
                 val copyTask = registerCopyTask(
                     extension = extension,
-                    name = kotlinToolingVersion.primaryVersion.toString(),
+                    name = kotlinToolingVersion.name.toString(),
                     kotlinVersion = kotlinToolingVersion.primaryVersion,
-                    artifactIdSuffix = "-${kotlinToolingVersion.primaryVersion}",
+                    artifactIdSuffix = "-${kotlinToolingVersion.name}",
                     smokeTestTmpRepositoryPath = smokeTestTmpRepositoryPathOrNull,
                 )
 
                 val buildTask = registerBuildTask(
-                    name = kotlinToolingVersion.primaryVersion.toString(),
+                    name = kotlinToolingVersion.name.toString(),
                     supportedTargetsWithDeclarations = supportedTargetsWithDeclarations,
                     kotlinVersion = kotlinToolingVersion.primaryVersion,
                     copyTask = copyTask,
@@ -62,14 +62,14 @@ class SkieMultiCompileRuntime: Plugin<Project> {
 
                 if (publishTaskNamesWithTasks != null) {
                     registerPublishTask(
-                        name = kotlinToolingVersion.primaryVersion.toString(),
+                        name = kotlinToolingVersion.name.toString(),
                         copyTask = copyTask,
                         publishTaskNamesWithTasks = publishTaskNamesWithTasks,
                     )
                 }
 
                 supportedTargetsWithDeclarations.forEach { (target, _) ->
-                    val configuration = configurations.create("${target.name}__kgp_${kotlinToolingVersion.primaryVersion}") {
+                    val configuration = configurations.create("${target.name}__kgp_${kotlinToolingVersion.name}") {
                         isCanBeConsumed = true
                         isCanBeResolved = false
 
@@ -83,15 +83,15 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                                 "non-jvm"
                             }))
                             attribute(KotlinNativeTarget.konanTargetAttribute, target.konanTargetName)
-                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.primaryVersion.toString()))
+                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.name.toString()))
                         }
                     }
 
                     dependencies {
-                        extension.applyDependencies.get().invoke(this, kotlinToolingVersion.primaryVersion, configuration)
+                        extension.applyDependencies.get().invoke(this, kotlinToolingVersion.name, configuration)
                     }
 
-                    val klibPath = extension.klibPath.get().invoke(kotlinToolingVersion.primaryVersion, target)
+                    val klibPath = extension.klibPath.get().invoke(kotlinToolingVersion.name, target)
                     artifacts.add(configuration.name, copyTask.map { it.destinationDir.resolve(klibPath) }) {
                         builtBy(buildTask)
                         classifier = "${target.name}-kgp_${pathSafeKotlinVersionName}"
