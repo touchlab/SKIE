@@ -40,7 +40,6 @@ import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
-import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
@@ -161,7 +160,7 @@ class DeclarationBuilderImpl(
      */
     private fun fixPrivateTypeParametersSymbolsFromOldKLibs(skieSymbolTable: SkieSymbolTable) {
         skieSymbolTable.allExposedTypeParameters(mutableDescriptorProvider)
-            .filter { it.symbol !is IrTypeParameterSymbol }
+            .filterNot { it.symbol.isPublicSymbol }
             .forEach {
                 skieSymbolTable.declarePrivateTypeParameterAsPublic(it)
             }
