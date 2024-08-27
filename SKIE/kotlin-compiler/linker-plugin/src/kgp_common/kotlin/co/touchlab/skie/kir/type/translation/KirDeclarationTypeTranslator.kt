@@ -143,4 +143,4 @@ class KirDeclarationTypeTranslator(
         }
 }
 
-expect fun ObjCValueType.mapToOir(kotlinType: KotlinType): OirType
+internal expect fun ObjCValueType.mapToOir(kotlinType: KotlinType): OirType

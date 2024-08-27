@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCValueType
 import org.jetbrains.kotlin.types.KotlinType
 
-actual fun ObjCValueType.mapToOir(kotlinType: KotlinType): OirType =
+internal actual fun ObjCValueType.mapToOir(kotlinType: KotlinType): OirType =
     when (this) {
         ObjCValueType.BOOL -> PrimitiveOirType.BOOL
         ObjCValueType.UNICHAR -> PrimitiveOirType.unichar
