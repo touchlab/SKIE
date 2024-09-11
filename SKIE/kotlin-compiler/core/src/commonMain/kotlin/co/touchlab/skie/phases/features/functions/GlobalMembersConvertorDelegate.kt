@@ -16,7 +16,17 @@ class GlobalMembersConvertorDelegate(
     private val parentProvider: FileScopeConversionParentProvider,
 ) : FileScopeConvertorDelegateScope {
 
+    private val restrictedPropertyNames = setOf(
+        "version"
+    )
+    private val restrictedSelectors = setOf(
+        "setVersion:"
+    )
+
     fun generateGlobalFunctionWrapper(function: KirSimpleFunction) {
+        // Don't generate for names that aren't callable.
+        if (function.oirSimpleFunction.selector in restrictedSelectors) { return }
+
         function.forEachAssociatedExportedSirDeclaration {
             generateGlobalFunctionWrapper(function, it)
         }
@@ -49,6 +59,9 @@ class GlobalMembersConvertorDelegate(
     }
 
     fun generateGlobalPropertyWrapper(property: KirProperty) {
+        // Don't generate for names that aren't callable.
+        if (property.oirProperty.name in restrictedPropertyNames) { return }
+
         property.forEachAssociatedExportedSirDeclaration {
             generateGlobalPropertyWrapper(property, it)
         }

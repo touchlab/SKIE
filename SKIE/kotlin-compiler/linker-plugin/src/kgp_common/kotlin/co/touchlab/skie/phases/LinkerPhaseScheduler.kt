@@ -66,6 +66,7 @@ import co.touchlab.skie.phases.runtime.ConfigureStableNameTypeAliasesForKotlinRu
 import co.touchlab.skie.phases.runtime.KotlinRuntimeHidingPhase
 import co.touchlab.skie.phases.runtime.SwiftRuntimeGenerator
 import co.touchlab.skie.phases.sir.CommitSirIsReplacedPropertyPhase
+import co.touchlab.skie.phases.sir.RenameNonAsciiDeclarationPhase
 import co.touchlab.skie.phases.sir.member.ConfigureInternalVisibilityForWrappedCallableDeclarationsPhase
 import co.touchlab.skie.phases.sir.member.CreateAsyncSirFunctionsPhase
 import co.touchlab.skie.phases.sir.member.CreateSirMembersPhase
@@ -200,6 +201,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
 
             RenameTypesConflictingWithKeywordsPhase,
             RenameTypesConflictingWithKotlinModulePhase,
+            RenameNonAsciiDeclarationPhase,
 
             KotlinRuntimeHidingPhase,
             SwiftRuntimeGenerator,
