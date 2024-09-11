@@ -89,13 +89,18 @@ publishing {
 
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
-        freeCompilerArgs.addAll("-module-name", "co.touchlab.skie:configuration-annotations")
+        freeCompilerArgs.addAll(
+            "-module-name", "configuration-annotations",
+        )
     }
 }
 
 tasks.withType<KotlinNativeCompile>().configureEach {
     compilerOptions {
-        freeCompilerArgs.addAll("-module-name", "co.touchlab.skie:configuration-annotations")
+        freeCompilerArgs.addAll(
+            "-module-name", "co.touchlab.skie:configuration-annotations",
+            "-Xshort-module-name=configuration-annotations",
+        )
     }
 }
 
