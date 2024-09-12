@@ -78,7 +78,7 @@ jobs:
 
   type-mapping-tests:
     name: Type Mapping Tests
-    runs-on: macos-14
+    runs-on: self-hosted
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
