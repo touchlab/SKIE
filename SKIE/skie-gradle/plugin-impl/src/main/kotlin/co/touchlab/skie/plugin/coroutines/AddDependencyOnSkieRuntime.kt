@@ -16,23 +16,25 @@ import org.gradle.api.artifacts.component.ModuleComponentSelector
 
 fun Project.configureSkieConfigurationAnnotationsDependencySubstitution() {
     val configurationAnnotationsRegex = "${Regex.escape(BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE)}(?:-[0-9]+\\.[0-9]+\\.[0-9]+)?(-.+)?".toRegex()
-    configurations.configureEach {
-        if (state != Configuration.State.UNRESOLVED) {
-            return@configureEach
-        }
+    skieInternalExtension.targets.configureEach {
+        linkerConfiguration.apply {
+            if (state != Configuration.State.UNRESOLVED) {
+                return@configureEach
+            }
 
-        resolutionStrategy {
-            dependencySubstitution {
-                all {
-                    val requestedModule = requested as? ModuleComponentSelector ?: return@all
-                    val match = configurationAnnotationsRegex.matchEntire(requestedModule.moduleIdentifier.toString())
-                    if (match != null) {
-                        val suffix = match.groupValues[1]
+            resolutionStrategy {
+                dependencySubstitution {
+                    all {
+                        val requestedModule = requested as? ModuleComponentSelector ?: return@all
+                        val match = configurationAnnotationsRegex.matchEntire(requestedModule.moduleIdentifier.toString())
+                        if (match != null) {
+                            val suffix = match.groupValues[1]
 
-                        val updatedCoordinate = BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE + "-" + skieInternalExtension.kotlinVersion + suffix + ":" + BuildConfig.SKIE_VERSION
+                            val updatedCoordinate = BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE + "-" + skieInternalExtension.kotlinVersion + suffix + ":" + BuildConfig.SKIE_VERSION
 
-                        logger.debug("Replacing {} with {}", requested, updatedCoordinate)
-                        useTarget(updatedCoordinate)
+                            logger.debug("Replacing {} with {}", requested, updatedCoordinate)
+                            useTarget(updatedCoordinate)
+                        }
                     }
                 }
             }
