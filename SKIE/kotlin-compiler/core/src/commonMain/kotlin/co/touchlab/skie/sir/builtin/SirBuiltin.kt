@@ -84,6 +84,7 @@ class SirBuiltins(
 
             val Void by Struct()
             val Never by Struct()
+            val ObjectIdentifier by Struct()
 
             val UnsafeMutableRawPointer by Struct(superTypes = listOf(Hashable.defaultType))
 

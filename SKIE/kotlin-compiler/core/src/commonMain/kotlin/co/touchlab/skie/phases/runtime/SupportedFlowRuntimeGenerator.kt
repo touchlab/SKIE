@@ -53,7 +53,7 @@ object SupportedFlowRuntimeGenerator {
             SirClass(
                 baseName = "SkieSwiftFlowProtocol",
                 kind = SirClass.Kind.Protocol,
-                superTypes = listOf(sirBuiltins._Concurrency.AsyncSequence.defaultType),
+                superTypes = listOf(sirBuiltins._Concurrency.AsyncSequence.defaultType, sirBuiltins.Swift.AnyObject.defaultType),
             ).apply {
                 val elementTypeParameter = SirTypeParameter(
                     name = "Element",

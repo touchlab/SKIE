@@ -634,7 +634,7 @@ object SwiftUIFlowObservingGenerator {
                     type = skieSwiftFlowObserver.defaultType,
                     visibility = SirVisibility.Private,
                     attributes = listOf(
-                        "SwiftUI.ObservedObject"
+                        "SwiftUI.StateObject"
                     ),
                     isMutable = true,
                 )
@@ -659,7 +659,10 @@ object SwiftUIFlowObservingGenerator {
 
                     bodyBuilder.add {
                         addStatement("self.content = content")
-                        addStatement("self.observer = %T(flows: flows)", skieSwiftFlowObserver.defaultType.evaluate().swiftPoetTypeName)
+                        addStatement(
+                            "self._observer = SwiftUI.StateObject(wrappedValue: %T(flows: flows))",
+                            skieSwiftFlowObserver.defaultType.evaluate().swiftPoetTypeName,
+                        )
                     }
                 }
 
@@ -781,6 +784,11 @@ object SwiftUIFlowObservingGenerator {
                 )
 
                 SirProperty(
+                    identifier = "flowIds",
+                    type = sirBuiltins.Swift.Array.toType(sirBuiltins.Swift.ObjectIdentifier.defaultType),
+                )
+
+                SirProperty(
                     identifier = "initialContent",
                     type = initialContentFactoryType.copy(isEscaping = false),
                 )
@@ -813,6 +821,11 @@ object SwiftUIFlowObservingGenerator {
                     )
 
                     SirValueParameter(
+                        name = "flowIds",
+                        type = sirBuiltins.Swift.Array.toType(sirBuiltins.Swift.ObjectIdentifier.defaultType),
+                    )
+
+                    SirValueParameter(
                         name = "initialContent",
                         type = initialContentFactoryType,
                         attributes = listOf("SwiftUI.ViewBuilder"),
@@ -832,6 +845,7 @@ object SwiftUIFlowObservingGenerator {
                     bodyBuilder.add {
                         addCode("""
                             self.flows = flows
+                            self.flowIds = flowIds
                             self.initialContent = initialContent
                             self.content = content
                             self.extractValues = extractValues
@@ -852,6 +866,7 @@ object SwiftUIFlowObservingGenerator {
                                             initialContent()
                                         }
                                     }
+                                    .id(flowIds)
                                 """.trimIndent())
                             }
                         }
@@ -950,6 +965,7 @@ object SwiftUIFlowObservingGenerator {
                             +"self.init("
                             indented {
                                 +"flows: [${flowValueParameters.joinToString { it.name }}],\n"
+                                +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name})" }}],\n"
                                 +"initialContent: initialContent,\n"
                                 +"content: content\n"
                             }
@@ -1054,6 +1070,7 @@ object SwiftUIFlowObservingGenerator {
                             +"self.init("
                             indented {
                                 +"flows: [${flowValueParameters.joinToString { "${it.name}.flow" }}],\n"
+                                +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name}.flow)" }}],\n"
                                 +"initialContent: SwiftUI.EmptyView.init,\n"
                                 +"content: content\n"
                             }
