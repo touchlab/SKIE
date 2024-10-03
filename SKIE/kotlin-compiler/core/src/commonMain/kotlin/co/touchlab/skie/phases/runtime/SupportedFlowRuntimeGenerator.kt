@@ -10,6 +10,7 @@ import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirConditionalConstraint
 import co.touchlab.skie.sir.element.SirConstructor
+import co.touchlab.skie.sir.element.SirExtension
 import co.touchlab.skie.sir.element.SirGetter
 import co.touchlab.skie.sir.element.SirModality
 import co.touchlab.skie.sir.element.SirProperty
@@ -48,11 +49,11 @@ object SupportedFlowRuntimeGenerator {
     context(SirPhase.Context)
     private fun generateSkieSwiftFlowProtocol(skieSwiftFlowIterator: SirClass): SkieSwiftFlowProtocol {
         namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowProtocol").apply {
-            SirClass(
+            val skieSwiftFlowProtocol = SirClass(
                 baseName = "SkieSwiftFlowProtocol",
                 kind = SirClass.Kind.Protocol,
                 superTypes = listOf(sirBuiltins._Concurrency.AsyncSequence.defaultType),
-            ).apply {
+            ).run {
                 val elementTypeParameter = SirTypeParameter(
                     name = "Element",
                     isPrimaryAssociatedType = true,
@@ -82,11 +83,31 @@ object SupportedFlowRuntimeGenerator {
                     SirGetter()
                 }
 
-                return SkieSwiftFlowProtocol(
+                SkieSwiftFlowProtocol(
                     self = this,
                     delegateProperty = delegateProperty,
                 )
             }
+
+            SirExtension(
+                skieSwiftFlowProtocol.self,
+            ).apply {
+                SirProperty(
+                    skieSwiftFlowProtocol.delegateProperty.identifier,
+                    skieSwiftFlowProtocol.delegateProperty.type,
+                    visibility = SirVisibility.Internal,
+                ).apply {
+                    addOverride(skieSwiftFlowProtocol.delegateProperty)
+
+                    SirGetter().apply {
+                        bodyBuilder.add {
+                            addStatement("""Swift.fatalError("SkieSwiftFlowProtocol has to be conformed to with @_spi(SKIE) enabled and property '${skieSwiftFlowProtocol.delegateProperty.identifier}' implemented")""")
+                        }
+                    }
+                }
+            }
+
+            return skieSwiftFlowProtocol
         }
     }
 
