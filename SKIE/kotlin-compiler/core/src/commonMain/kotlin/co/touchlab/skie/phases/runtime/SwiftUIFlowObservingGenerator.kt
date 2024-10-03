@@ -965,7 +965,7 @@ object SwiftUIFlowObservingGenerator {
                             +"self.init("
                             indented {
                                 +"flows: [${flowValueParameters.joinToString { it.name }}],\n"
-                                +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name})" }}],\n"
+                                +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name}.delegate)" }}],\n"
                                 +"initialContent: initialContent,\n"
                                 +"content: content\n"
                             }
@@ -1070,7 +1070,7 @@ object SwiftUIFlowObservingGenerator {
                             +"self.init("
                             indented {
                                 +"flows: [${flowValueParameters.joinToString { "${it.name}.flow" }}],\n"
-                                +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name}.flow)" }}],\n"
+                                +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name}.flow.delegate)" }}],\n"
                                 +"initialContent: SwiftUI.EmptyView.init,\n"
                                 +"content: content\n"
                             }
