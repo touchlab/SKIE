@@ -41,7 +41,6 @@ actual class DummyIrSimpleFunction actual constructor(
     override var isExpect: Boolean by unsupported()
     override var isInline: Boolean by unsupported()
     override var returnType: IrType by unsupported()
-    override var valueParameters: List<IrValueParameter> by unsupported()
     override val containerSource: DeserializedContainerSource? by unsupported()
     override var metadata: MetadataSource? by unsupported()
     override var annotations: List<IrConstructorCall> by unsupported()

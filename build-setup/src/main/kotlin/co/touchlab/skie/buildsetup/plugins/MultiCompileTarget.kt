@@ -18,6 +18,7 @@ data class MultiCompileTarget(
         val kotlin_1_9_0 = KotlinToolingVersion("1.9.0")
         val kotlin_1_9_20 = KotlinToolingVersion("1.9.20")
         val kotlin_2_0_0 = KotlinToolingVersion("2.0.0")
+        val kotlin_2_1_0 = KotlinToolingVersion("2.1.0")
 
         val jvm = MultiCompileTarget(
             name = "jvm",

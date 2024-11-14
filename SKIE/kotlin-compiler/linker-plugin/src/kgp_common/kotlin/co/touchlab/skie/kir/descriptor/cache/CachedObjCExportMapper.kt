@@ -3,6 +3,7 @@
 package co.touchlab.skie.kir.descriptor.cache
 
 import co.touchlab.skie.shim.isObjCObjectType
+import co.touchlab.skie.shim.ObjCExportMapperShim
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
@@ -10,12 +11,9 @@ import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportMapper
 import org.jetbrains.kotlin.backend.konan.objcexport.getBaseMethods
 import org.jetbrains.kotlin.backend.konan.objcexport.getBaseProperties
-import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.backend.konan.objcexport.getDeprecation
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseMethod
 import org.jetbrains.kotlin.backend.konan.objcexport.isBaseProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
-import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeExposed
 import org.jetbrains.kotlin.backend.konan.objcexport.shouldBeVisible
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -65,17 +63,17 @@ class CachedObjCExportMapper internal constructor(
     fun shouldBeExposed(descriptor: ClassDescriptor): Boolean =
         shouldBeExposedClassCache.getOrPut(descriptor) {
             // shouldBeExposed cannot be called directly starting from Kotlin 2.0.0 because it is internal and the other overload is public
-            kotlinMapper.shouldBeVisible(descriptor) && !kotlinMapper.isSpecialMapped(descriptor) && !descriptor.defaultType.isObjCObjectType()
+            kotlinMapper.shouldBeVisible(descriptor) && !ObjCExportMapperShim.isSpecialMapped(kotlinMapper, descriptor) && !descriptor.defaultType.isObjCObjectType()
         }
 
     fun isTopLevel(descriptor: CallableMemberDescriptor): Boolean =
         isTopLevelCache.getOrPut(descriptor) {
-            kotlinMapper.isTopLevel(descriptor)
+            ObjCExportMapperShim.isTopLevel(kotlinMapper, descriptor)
         }
 
     fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor? =
         getClassIfCategoryCache.getOrPut(descriptor) {
-            kotlinMapper.getClassIfCategory(descriptor)
+            ObjCExportMapperShim.getClassIfCategory(kotlinMapper, descriptor)
         }
 
     fun isBaseMethod(functionDescriptor: FunctionDescriptor): Boolean =
@@ -90,7 +88,7 @@ class CachedObjCExportMapper internal constructor(
 
     fun isObjCProperty(property: PropertyDescriptor): Boolean =
         isObjCPropertyCache.getOrPut(property) {
-            kotlinMapper.isObjCProperty(property)
+            ObjCExportMapperShim.isObjCProperty(kotlinMapper, property)
         }
 
     fun getBaseMethods(descriptor: FunctionDescriptor): List<FunctionDescriptor> =

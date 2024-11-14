@@ -20,7 +20,7 @@ import org.gradle.language.jvm.tasks.ProcessResources
 
 abstract class DevAcceptanceTestsFramework : Plugin<Project> {
 
-    override fun apply(target: Project): Unit = with(target) {
+    override fun apply(project: Project): Unit = with(project) {
         apply<SkieBase>()
         apply<MultiDimensionTargetPlugin>()
         apply<OptInExperimentalCompilerApi>()
@@ -60,7 +60,7 @@ abstract class DevAcceptanceTestsFramework : Plugin<Project> {
                     }
                 }
 
-                extensions.configure<BuildConfigExtension> {
+                project.extensions.configure<BuildConfigExtension> {
                     sourceSets.named(target.name + "Main").configure {
                         generator(ExpectActualBuildConfigGenerator(isActualImplementation = true, internalVisibility = false))
                         className.set("BuildConfig")

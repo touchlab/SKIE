@@ -1,4 +1,5 @@
 import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget
+import co.touchlab.skie.gradle.KotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -14,7 +15,8 @@ multiCompileRuntime {
         if (target.platformType == KotlinPlatformType.jvm) {
             "build/libs/configuration-annotations-${kotlinVersion}-${target.name.lowercase()}-${version}.jar"
         } else {
-            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-${kotlinVersion}.klib"
+            val includeKlibExtension = true // kotlinVersion < MultiCompileTarget.kotlin_2_1_0
+            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-${kotlinVersion}" + if (includeKlibExtension) ".klib" else ""
         }
     }
 }

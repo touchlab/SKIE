@@ -25,19 +25,20 @@ interface KotlinCompilerVersion : Named {
     }
 
     class DisambiguationRule @Inject constructor(
-        private val currentKotlinVersion: String,
+        currentKotlinVersion: String,
     ) : AttributeDisambiguationRule<KotlinCompilerVersion> {
+        private val currentKotlinVersion = KotlinToolingVersion(currentKotlinVersion)
 
         override fun execute(details: MultipleCandidatesDetails<KotlinCompilerVersion>) {
             val correctCandidate = details.candidateValues.lastOrNull {
-                it.name == currentKotlinVersion
+                KotlinToolingVersion(it.name) < currentKotlinVersion
             }
 
             if (correctCandidate != null) {
                 details.closestMatch(correctCandidate)
             } else {
                 // This should've already been caught by SKIE Plugin Loader, but we'll let the user know just in case.
-                log.error("Could not find a Kotlin compiler version matching the current Kotlin version ($currentKotlinVersion)!")
+                log.error("Could not find a Kotlin compiler version matching the current Kotlin version ($currentKotlinVersion)! Candidates: ${details.candidateValues.joinToString { it.name }}")
             }
         }
 
