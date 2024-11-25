@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
-expect object ObjCExportMapperShim {
+internal expect object ObjCExportMapperShim {
     fun isSpecialMapped(mapper: ObjCExportMapper, descriptor: ClassDescriptor): Boolean
 
     fun isTopLevel(mapper: ObjCExportMapper, descriptor: CallableMemberDescriptor): Boolean

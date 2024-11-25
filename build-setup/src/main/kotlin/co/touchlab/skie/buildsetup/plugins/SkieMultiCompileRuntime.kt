@@ -148,17 +148,17 @@ class SkieMultiCompileRuntime: Plugin<Project> {
         smokeTestTmpRepositoryPath: String?,
     ): TaskProvider<Copy> {
         return tasks.register<Copy>("copyProject__$name") {
-            from(extension.sourceDir) {
-                include(extension.sourceIncludes.get())
-                filter(
-                    ReplaceTokens::class,
-                    "tokens" to mapOf(
-                        "targetKotlinVersion" to kotlinVersion.toString(),
-                        "artifactIdSuffix" to artifactIdSuffix,
-                        "targets" to extension.supportedTargetsWithDeclarations(kotlinVersion).joinToString("\n") { (_, declaration) -> declaration },
-                        "dependencies" to extension.dependencies.get().invoke(kotlinVersion),
-                        "smokeTestTmpRepositoryConfiguration" to smokeTestTmpRepositoryPath?.let {
-                            """
+            group = "other"
+            description = "Copy project files for Kotlin $name"
+
+            val tokens = provider {
+                mapOf(
+                    "targetKotlinVersion" to kotlinVersion.toString(),
+                    "artifactIdSuffix" to artifactIdSuffix,
+                    "targets" to extension.supportedTargetsWithDeclarations(kotlinVersion).joinToString("\n") { (_, declaration) -> declaration },
+                    "dependencies" to extension.dependencies.get().invoke(kotlinVersion),
+                    "smokeTestTmpRepositoryConfiguration" to smokeTestTmpRepositoryPath?.let {
+                        """
                             publishing {
                                 repositories {
                                     maven {
@@ -168,8 +168,16 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                                 }
                             }
                         """.trimIndent()
-                        }.orEmpty(),
-                    )
+                    }.orEmpty(),
+                )
+            }
+
+            inputs.property("tokens", tokens)
+            from(extension.sourceDir) {
+                include(extension.sourceIncludes.get())
+                filter(
+                    ReplaceTokens::class,
+                    "tokens" to tokens.get()
                 )
             }
             into(layout.buildDirectory.dir("${this@registerCopyTask.name}_$name"))

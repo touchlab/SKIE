@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory
 import org.jetbrains.kotlin.backend.konan.objcexport.isObjCProperty
 import org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel
 
-actual object ObjCExportMapperShim {
+internal actual object ObjCExportMapperShim {
     actual fun isSpecialMapped(
         mapper: ObjCExportMapper,
         descriptor: ClassDescriptor
