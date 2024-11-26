@@ -14,9 +14,10 @@ multiCompileRuntime {
     klibPath = { kotlinVersion, target ->
         if (target.platformType == KotlinPlatformType.jvm) {
             "build/libs/configuration-annotations-${kotlinVersion}-${target.name.lowercase()}-${version}.jar"
+        } else if (kotlinVersion >= MultiCompileTarget.kotlin_2_1_0) {
+            "build/libs/configuration-annotations-${kotlinVersion}-${target.name}Main-${version}.klib"
         } else {
-            val includeKlibExtension = true // kotlinVersion < MultiCompileTarget.kotlin_2_1_0
-            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-${kotlinVersion}" + if (includeKlibExtension) ".klib" else ""
+            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-${kotlinVersion}.klib"
         }
     }
 }

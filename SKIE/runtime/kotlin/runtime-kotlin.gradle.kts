@@ -10,8 +10,11 @@ multiCompileRuntime {
     isPublishable = true
     targets.set(MultiCompileTarget.allDarwin)
     klibPath = { kotlinVersion, target ->
-        val includeKlibExtension = true // kotlinVersion < MultiCompileTarget.kotlin_2_1_0
-        "build/classes/kotlin/${target.name}/main/klib/runtime-kotlin-${kotlinVersion}" + if (includeKlibExtension) ".klib" else ""
+        if (kotlinVersion >= MultiCompileTarget.kotlin_2_1_0) {
+            "build/libs/runtime-kotlin-${kotlinVersion}-${target.name}Main-${version}.klib"
+        } else {
+            "build/classes/kotlin/${target.name}/main/klib/runtime-kotlin-${kotlinVersion}.klib"
+        }
     }
     dependencies = { _ ->
         "implementation(libs.kotlinx.coroutines.core)"

@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget.Companion.kotlin_1_9_0
+import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget.Companion.kotlin_2_1_0
 import co.touchlab.skie.buildsetup.tasks.BuildNestedGradle
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.KotlinToolingVersion
@@ -56,7 +57,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                 val buildTask = registerBuildTask(
                     name = kotlinToolingVersion.name.toString(),
                     supportedTargetsWithDeclarations = supportedTargetsWithDeclarations,
-                    kotlinVersion = kotlinToolingVersion.primaryVersion,
+                    kotlinVersion = kotlinToolingVersion.name,
                     copyTask = copyTask,
                 )
 
@@ -210,9 +211,14 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                                 "${target.name}LegacyJar",
                             )
                         }
-                        KotlinPlatformType.native, KotlinPlatformType.wasm -> listOf("${target.name}MainKlibrary")
+
+                        KotlinPlatformType.native, KotlinPlatformType.wasm -> if (kotlinVersion >= kotlin_2_1_0) {
+                            listOf("${target.name}Klib")
+                        } else {
+                            listOf("${target.name}MainKlibrary")
+                        }
                     }
-                }
+                },
             )
         }
     }
