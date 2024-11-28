@@ -3,6 +3,7 @@ package co.touchlab.skie.plugin.switflink
 import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
 import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.file.deleteEmptyDirectoriesRecursively
+import co.touchlab.skie.util.file.isKlib
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
@@ -65,7 +66,12 @@ abstract class UnpackSwiftSourcesTask : DefaultTask() {
         }
 
         fileSystemOperations.copy {
-            from(archiveOperations.zipTree(klib)) {
+            val source = if (klib.isKlib) {
+                archiveOperations.zipTree(klib)
+            } else {
+                klib
+            }
+            from(source) {
                 include("${SwiftBundlingConfigurator.KLIB_SKIE_SWIFT_DIRECTORY}/**/*.swift")
             }
 

@@ -57,7 +57,7 @@ internal inline fun Project.withKotlinNativeCompilerEmbeddableDependency(kotlinV
         if (isTarget) {
             project.dependencies.create(
                 files(
-                    kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/kotlin-native.jar"),
+                    kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/kotlin-native-compiler-embeddable.jar"),
                 ),
             )
         } else {

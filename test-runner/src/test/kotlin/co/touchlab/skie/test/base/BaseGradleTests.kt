@@ -149,9 +149,16 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
 
     fun copyToCommonMain(template: Template) {
         template.files.forEach { file ->
-            val targetFile = testProjectDir
-                .resolve("src/commonMain/kotlin")
-                .resolve(file.relativePath)
+            val targetFile = when (file.kind) {
+                TemplateFile.Kind.Kotlin -> testProjectDir
+                    .resolve("src/commonMain/kotlin")
+                    .resolve(file.relativePath)
+                TemplateFile.Kind.BundledSwift -> testProjectDir
+                    .resolve("src/commonMain/swift")
+                    .resolve(file.relativePath)
+                TemplateFile.Kind.Swift -> return@forEach
+            }
+
             targetFile.parentFile.mkdirs()
             file.file.copyTo(targetFile)
         }

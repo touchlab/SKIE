@@ -14,6 +14,7 @@ fun buildTemplate(name: String, builder: TemplateBuilderScope.() -> Unit): Templ
             val targetRelativePath = when (kind) {
                 TemplateFile.Kind.Kotlin -> sourceRelativePath
                 TemplateFile.Kind.Swift -> "templates.$name.$fileName${kind.extension}"
+                TemplateFile.Kind.BundledSwift -> "$fileName${kind.extension}"
             }
 
             files += TemplateFile(
@@ -27,6 +28,7 @@ fun buildTemplate(name: String, builder: TemplateBuilderScope.() -> Unit): Templ
 
         override fun swift(name: String) = template(name, TemplateFile.Kind.Swift)
 
+        override fun bundledSwift(name: String) = template(name, TemplateFile.Kind.BundledSwift)
     }
 
     scope.builder()

@@ -4,4 +4,6 @@ interface TemplateBuilderScope {
     fun kotlin(name: String)
 
     fun swift(name: String)
+
+    fun bundledSwift(name: String)
 }

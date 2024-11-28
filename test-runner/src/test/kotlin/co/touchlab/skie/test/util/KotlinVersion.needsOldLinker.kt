@@ -5,6 +5,7 @@ val KotlinVersion.needsOldLinker: Boolean
 
 val KotlinVersion.coroutinesVersion: String
     get() = when {
+        value.startsWith("2.1.") -> "1.9.0"
         value.startsWith("2.0.") -> "1.9.0-RC"
         value.startsWith("1.9.2") -> "1.8.1"
         value.startsWith("1.9.") || value.startsWith("1.8.2") -> "1.7.3"

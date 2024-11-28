@@ -9,6 +9,7 @@ import co.touchlab.skie.plugin.util.lowerCamelCaseName
 import co.touchlab.skie.plugin.util.registerSkieTask
 import co.touchlab.skie.plugin.util.writeToZip
 import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
+import co.touchlab.skie.util.file.isKlib
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Provider
@@ -88,10 +89,14 @@ object SwiftBundlingConfigurator {
             return
         }
 
-        klib.writeToZip { fileSystem ->
-            val klibSwiftSourcesDirectory = fileSystem.getPath("/$KLIB_SKIE_SWIFT_DIRECTORY")
+        if (klib.isKlib) {
+            klib.writeToZip { fileSystem ->
+                val klibSwiftSourcesDirectory = fileSystem.getPath("/$KLIB_SKIE_SWIFT_DIRECTORY")
 
-            swiftSourcesDirectory.toPath().syncDirectoryContentIfDifferent(klibSwiftSourcesDirectory)
+                swiftSourcesDirectory.toPath().syncDirectoryContentIfDifferent(klibSwiftSourcesDirectory)
+            }
+        } else {
+            swiftSourcesDirectory.toPath().syncDirectoryContentIfDifferent(klib.toPath().resolve(KLIB_SKIE_SWIFT_DIRECTORY))
         }
     }
 

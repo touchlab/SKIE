@@ -9,6 +9,7 @@ data class TemplateFile(
 ) {
     enum class Kind(val extension: String) {
         Kotlin(".kt"),
+        BundledSwift(".swift"),
         Swift(".swift"),
     }
 }
