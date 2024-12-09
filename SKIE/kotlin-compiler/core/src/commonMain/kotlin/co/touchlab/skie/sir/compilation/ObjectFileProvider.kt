@@ -19,7 +19,7 @@ class ObjectFileProvider(
 
     fun getOrCreate(compilableFile: SirCompilableFile): ObjectFile =
         compilableFilesCache.getOrPut(compilableFile) {
-            val objectFilePath = skieBuildDirectory.swiftCompiler.objectFiles.objectFile(compilableFile.absolutePath.nameWithoutExtension).toPath()
+            val objectFilePath = skieBuildDirectory.swiftCompiler.objectFiles.objectFile(compilableFile.relativePath.nameWithoutExtension).toPath()
 
             ObjectFile(objectFilePath)
         }

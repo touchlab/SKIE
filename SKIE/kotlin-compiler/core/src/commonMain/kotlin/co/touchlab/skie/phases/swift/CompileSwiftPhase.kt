@@ -8,6 +8,7 @@ import co.touchlab.skie.sir.element.SirCompilableFile
 import co.touchlab.skie.util.Command
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.pathString
 
 class CompileSwiftPhase(
     context: SirPhase.Context,
@@ -31,6 +32,7 @@ class CompileSwiftPhase(
     private val isConcurrentSkieCompilationEnabled = SkieConfigurationFlag.Build_ConcurrentSkieCompilation in globalConfiguration.enabledFlags
     private val noClangModuleBreadcrumbsInStaticFramework =
         SkieConfigurationFlag.Build_NoClangModuleBreadcrumbsInStaticFramework in globalConfiguration.enabledFlags
+    private val isRelativeSourcePathsInDebugSymbolsEnabled = SkieConfigurationFlag.Build_RelativeSourcePathsInDebugSymbols in globalConfiguration.enabledFlags
 
     context(SirPhase.Context)
     override suspend fun execute() {
@@ -48,7 +50,7 @@ class CompileSwiftPhase(
     }
 
     private fun createSwiftFileList(compilableFiles: List<SirCompilableFile>) {
-        val content = compilableFiles.joinToString("\n") { "'${it.absolutePath.absolutePathString()}'" }
+        val content = compilableFiles.joinToString("\n") { "'${it.relativePath.pathString}'" }
 
         swiftFileList.writeText(content)
     }
@@ -71,10 +73,10 @@ class CompileSwiftPhase(
             """.trimIndent()
 
         val body = compilableFiles.joinToString(",\n") { compilableFile ->
-            val sourceFileName = compilableFile.absolutePath.nameWithoutExtension
+            val sourceFileName = compilableFile.relativePath.nameWithoutExtension
 
             """
-                "${compilableFile.absolutePath}": {
+                "${compilableFile.relativePath.pathString}": {
                     "object": "${objectFileProvider.getOrCreate(compilableFile).absolutePath.absolutePathString()}",
                     "dependencies": "${objectFiles.dependencies(sourceFileName).absolutePath}",
                     "swift-dependencies": "${objectFiles.swiftDependencies(sourceFileName).absolutePath}",
@@ -142,10 +144,10 @@ class CompileSwiftPhase(
                 }
             }
             +"-output-file-map"
-            +outputFileMap.absolutePath
+            +outputFileMap
             +"-g"
             +"-module-cache-path"
-            +skieBuildDirectory.cache.swiftModules.directory.absolutePath
+            +skieBuildDirectory.cache.swiftModules.directory
             +"-swift-version"
             +swiftCompilerConfiguration.swiftVersion
             +parallelizationArgument
@@ -153,10 +155,16 @@ class CompileSwiftPhase(
             +swiftCompilerConfiguration.absoluteTargetSysRootPath
             +"-target"
             +swiftCompilerConfiguration.targetTriple.withOsVersion(swiftCompilerConfiguration.osVersionMin).toString()
+
+            if (isRelativeSourcePathsInDebugSymbolsEnabled) {
+                +"-file-compilation-dir"
+                +"."
+            }
+
             +swiftCompilerConfiguration.freeCompilerArgs
             +"@${swiftFileList.absolutePath}"
 
-            workingDirectory = objectFiles.directory
+            workingDirectory = skieBuildDirectory.swift.directory
 
             execute(logFile = skieBuildDirectory.debug.logs.swiftc)
         }

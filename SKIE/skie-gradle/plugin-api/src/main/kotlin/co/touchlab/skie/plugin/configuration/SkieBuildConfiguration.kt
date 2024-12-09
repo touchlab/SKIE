@@ -43,6 +43,19 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
     val enableParallelSkieCompilation: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
 
     /**
+     * SKIE can configure the Kotlin/Native compiler to make source file paths in the final binary relative.
+     * When enabled,
+     * SKIE will configure `-Xdebug-prefix-map` to replace the value of `rootProject.projectDir.absolutePath` with `.`,
+     * and then workaround a bug in Kotlin/Native compiler that'd otherwise result in the binary missing links to these source files.
+     *
+     * Doing this enables debugging of Kotlin sources built on a different machine,
+     * which compiles the Kotlin code from a different path.
+     * With `xcode-kotlin` (https://github.com/touchlab/xcode-kotlin) you can debug Kotlin code
+     * that's been compiled into a binary .framework on your CI and then distributed through SwiftPM or CocoaPods.
+     */
+    val enableRelativeSourcePathsInDebugSymbols: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+
+    /**
      * Additional Swift compiler arguments that will be passed to the Swift compiler.
      */
     val freeSwiftCompilerArgs: ListProperty<String> = objects.listProperty(String::class.java)
@@ -58,6 +71,7 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
     fun produceDistributableFramework() {
         enableSwiftLibraryEvolution.set(true)
         noClangModuleBreadcrumbsInStaticFrameworks.set(true)
+        enableRelativeSourcePathsInDebugSymbols.set(true)
     }
 
     internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
@@ -67,6 +81,7 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
             SkieConfigurationFlag.Build_ParallelSwiftCompilation takeIf enableParallelSwiftCompilation,
             SkieConfigurationFlag.Build_ConcurrentSkieCompilation takeIf enableConcurrentSkieCompilation,
             SkieConfigurationFlag.Build_ParallelSkieCompilation takeIf enableParallelSkieCompilation,
+            SkieConfigurationFlag.Build_RelativeSourcePathsInDebugSymbols takeIf enableRelativeSourcePathsInDebugSymbols,
         )
 
     internal fun buildItems(): Map<String, String?> = mapOf(

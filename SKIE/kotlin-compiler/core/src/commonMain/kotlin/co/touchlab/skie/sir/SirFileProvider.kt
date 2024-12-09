@@ -56,7 +56,14 @@ class SirFileProvider(
 
         absolutePath.writeTextIfDifferent(sourceFile.content)
 
-        return SirCompilableFile(sourceFile.module, absolutePath, sourceFile)
+        val relativePath = skieBuildDirectory.swift.path.relativize(absolutePath)
+
+        return SirCompilableFile(
+            module = sourceFile.module,
+            absolutePath = absolutePath,
+            relativePath = relativePath,
+            originFile = sourceFile,
+        )
     }
 
     fun loadCompilableFile(path: Path): SirCompilableFile {
@@ -74,7 +81,14 @@ class SirFileProvider(
             "Custom source file must have the swift extension. Was: $absolutePath."
         }
 
-        return SirCompilableFile(skieModule, absolutePath, null)
+        val relativePath = skieBuildDirectory.swift.path.relativize(absolutePath)
+
+        return SirCompilableFile(
+            module = skieModule,
+            absolutePath = absolutePath,
+            relativePath = relativePath,
+            originFile = null
+        )
     }
 
     private val Path.asCacheKey: String
