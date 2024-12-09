@@ -1,3 +1,4 @@
 co.touchlab.skie.entrypoint.CreateObjCExportCodeSpecPhaseInterceptor
 co.touchlab.skie.entrypoint.LinkerPhaseInterceptor
 co.touchlab.skie.entrypoint.ProduceObjCExportInterfacePhaseInterceptor
+co.touchlab.skie.entrypoint.CodegenPhaseInterceptor

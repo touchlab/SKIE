@@ -1,6 +1,6 @@
 plugins {
     id("dev.root")
-    kotlin("multiplatform") version "2.1.0-RC2" apply false
+    kotlin("multiplatform") version "2.1.0" apply false
 }
 
 buildscript {

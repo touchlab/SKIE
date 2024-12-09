@@ -16,6 +16,7 @@ enum class SkieConfigurationFlag {
     Build_ParallelSkieCompilation,
     Build_ConcurrentSkieCompilation,
     Build_NoClangModuleBreadcrumbsInStaticFramework,
+    Build_RelativeSourcePathsInDebugSymbols,
 
     Migration_WildcardExport,
     Migration_AnyMethodsAsFunctions,

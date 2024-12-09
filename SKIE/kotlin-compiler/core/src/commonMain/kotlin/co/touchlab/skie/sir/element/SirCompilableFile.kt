@@ -6,6 +6,8 @@ import java.nio.file.Path
 class SirCompilableFile(
     override val module: SirModule.Skie,
     val absolutePath: Path,
+    // Relative to the SKIE Swift build directory
+    val relativePath: Path,
     val originFile: SirSourceFile?,
 ) : SirFile {
 

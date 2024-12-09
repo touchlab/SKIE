@@ -12,6 +12,7 @@ import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
 import co.touchlab.skie.plugin.directory.SkieDirectoriesManager
 import co.touchlab.skie.plugin.fatframework.FatFrameworkConfigurator
+import co.touchlab.skie.plugin.relativepaths.configureDebugPrefixMap
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftBundlingConfigurator
 import co.touchlab.skie.plugin.switflink.SwiftUnpackingConfigurator
@@ -65,6 +66,7 @@ object SkieGradlePluginApplier {
         GradleAnalyticsManager(project).configureAnalytics(this)
 
         configureMinOsVersionIfNeeded()
+        configureDebugPrefixMap()
 
         CreateSkieConfigurationTask.registerTask(this)
 
