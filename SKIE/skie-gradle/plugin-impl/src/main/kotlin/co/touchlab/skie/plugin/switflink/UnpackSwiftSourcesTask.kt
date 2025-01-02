@@ -4,12 +4,16 @@ import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
 import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.file.deleteEmptyDirectoriesRecursively
 import co.touchlab.skie.util.file.isKlib
+import co.touchlab.skie.util.file.isSwift
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ArchiveOperations
-import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.RelativePath
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -18,11 +22,32 @@ import javax.inject.Inject
 
 abstract class UnpackSwiftSourcesTask : DefaultTask() {
 
+    @get:Input
+    abstract val dependencies: ListProperty<File>
+
     @get:InputFiles
-    abstract val klibs: ConfigurableFileCollection
+    protected val klibs: FileCollection
+        get() = objects.fileCollection().also { files ->
+            dependencies.get().filter { it.isKlib }.forEach {
+                files.from(it)
+            }
+        }
+
+    @get:InputFiles
+    protected val unpackedKlibSwiftFiles: FileCollection
+        get() = objects.fileCollection().also { files ->
+            dependencies.get().filter { it.isDirectory }.forEach {
+                files.from(
+                    objects.fileTree().from(it).filter { it.isSwift }
+                )
+            }
+        }
 
     @get:OutputDirectory
     abstract val output: Property<File>
+
+    @get:Inject
+    abstract val objects: ObjectFactory
 
     @get:Inject
     abstract val fileSystemOperations: FileSystemOperations
@@ -57,7 +82,7 @@ abstract class UnpackSwiftSourcesTask : DefaultTask() {
             return uniqueName
         }
 
-        return klibs.map { it to it.getUniqueName() }
+        return dependencies.get().map { it to it.getUniqueName() }
     }
 
     private fun unpackKlib(klib: File, uniqueName: String, temporaryDirectory: File) {
