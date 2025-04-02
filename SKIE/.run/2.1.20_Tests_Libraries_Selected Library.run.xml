@@ -1,0 +1,31 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="2.1.20/Tests/Libraries/Selected Library" type="GradleRunConfiguration" factoryName="Gradle" folderName="2.1.20">
+    <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="failedOnly" value="" />
+          <entry key="libraryTest" value="" />
+          <entry key="onlyIndices" value="27,69,70,90,107,108,112,113,114,121,123,124,125,126,131,136,142,143,144,145,146,147,148,149,150,151,152,153,154,155,158,160,161,162,163,166,203,204,205,206,207,208,209,210,211,212,213,244,258,262,370,371,372,373,374,375,434,436,449,474,494,495,530,550,557,583,597,598,599,729,733,734,748,749,794,917,918,919,950,982,983,1015,1029,1030,1062,1080,1109,1111,1114,1120,1121,1146,1148,1164,1369,1417,1435,1438,1440,1445,1527,1529,1530,1531,1533,1534,1668,1708,1715,1730,1736,1737,1738,1740,1742,1744,1745,1882,2011,2012,2013,2014,2018,2020,2023,2024,2131,2142,2193,2281,2350,2525,2527,2528,2530,2531,2538,2560,2586,2619,2622,2653,2661,2662,2667,2668,2675,2678,2680,2686,2705,2742,2745,2747,2798,2951,2963,2970,2975,2976,2997,3059,3125,3126,3127,3128,3129,3130,3131,3132,3133,3134,3152,3228,3246,3426,3469,3471,3498,3499,3500,3548,3549,3552,3558,3559,3560,3606,3607,3608,3609,3614,3633,3639,3640,3856" />
+        </map>
+      </option>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="libraries:kgp_2.1.20Test" />
+        </list>
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <DebugAllEnabled>false</DebugAllEnabled>
+    <RunAsTest>false</RunAsTest>
+    <method v="2" />
+  </configuration>
+</component>
