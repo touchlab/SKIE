@@ -15,10 +15,10 @@ import org.gradle.api.tasks.TaskProvider
 
 object SkieDirectoriesManager {
 
-    const val baseTaskName: String = "createSkieDirectories"
+    const val BASE_TASK_NAME: String = "createSkieDirectories"
 
     fun configureCreateSkieBuildDirectoryTask(target: SkieTarget) {
-        target.registerSkieTargetBasedTask<SkieCreateSkieDirectoriesTask>(baseTaskName) {
+        target.registerSkieTargetBasedTask<SkieCreateSkieDirectoriesTask>(BASE_TASK_NAME) {
             skieDirectories.set(target.skieDirectories)
         }
     }
@@ -43,4 +43,4 @@ object SkieDirectoriesManager {
 }
 
 val SkieTarget.createSkieBuildDirectoryTask: TaskProvider<Task>
-    get() = project.tasks.named(skieTargetBasedTaskName(SkieDirectoriesManager.baseTaskName))
+    get() = project.tasks.named(skieTargetBasedTaskName(SkieDirectoriesManager.BASE_TASK_NAME))

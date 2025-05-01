@@ -40,9 +40,10 @@ interface KotlinCompilerVersion : Named {
             } else {
                 // This should've already been caught by SKIE Plugin Loader, but we'll let the user know just in case.
                 log.error(
-                    "Could not find a Kotlin compiler version matching the current Kotlin version ($currentKotlinVersion)! Candidates: ${details.candidateValues.joinToString {
-                        it.name
-                    }}",
+                    "Could not find a Kotlin compiler version matching the current Kotlin version ($currentKotlinVersion)! " +
+                        "Candidates: ${details.candidateValues.joinToString {
+                            it.name
+                        }}",
                 )
             }
         }

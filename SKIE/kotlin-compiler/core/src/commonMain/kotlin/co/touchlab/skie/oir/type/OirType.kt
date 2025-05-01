@@ -9,7 +9,7 @@ sealed class OirType {
     protected fun String.withAttrsAndName(attrsAndName: String) = "${this.trim()} ${attrsAndName.trim()}".trim()
 
     protected fun String.plusNonnullAttributeIfNeeded(needsNonnullAttribute: Boolean) =
-        if (needsNonnullAttribute) objcNonnullAttribute.withAttrsAndName(this) else this
+        if (needsNonnullAttribute) OBJC_NONNULL_ATTRIBUTE.withAttrsAndName(this) else this
 
     protected fun StringBuilder.appendAttrsAndName(attrsAndName: String) {
         if (attrsAndName.isNotBlank()) {
@@ -22,8 +22,8 @@ sealed class OirType {
 
     companion object {
 
-        const val objcNonnullAttribute: String = "_Nonnull"
-        const val objcNullableAttribute = "_Nullable"
-        const val objcNullableResultAttribute = "_Nullable_result"
+        const val OBJC_NONNULL_ATTRIBUTE: String = "_Nonnull"
+        const val OBJC_NULLABLE_ATTRIBUTE = "_Nullable"
+        const val OBJC_NULLABLE_RESULT_ATTRIBUTE = "_Nullable_result"
     }
 }

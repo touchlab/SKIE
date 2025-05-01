@@ -71,4 +71,3 @@ annotation class SkieVisibility {
     @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
     annotation class Private
 }
-

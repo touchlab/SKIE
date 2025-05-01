@@ -1,12 +1,12 @@
 package co.touchlab.skie.compilerinject.interceptor
 
 import co.touchlab.skie.compilerinject.reflection.Reflector
+import kotlin.reflect.jvm.jvmName
 import org.jetbrains.kotlin.backend.konan.ConfigChecks
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.config.LoggingContext
 import org.jetbrains.kotlin.config.phaser.SimpleNamedCompilerPhase
-import kotlin.reflect.jvm.jvmName
 
 class SimpleNamedPhaseInterceptorConfigurer<Context, Input, Output> :
     PhaseInterceptorConfigurer<SimpleNamedCompilerPhase<Context, Input, Output>, Context, Input, Output>
@@ -66,14 +66,18 @@ private class SimpleNamedCompilerPhaseReflector<Context, Input, Output>(
     var op: (Context, Input) -> Output by declaredField("\$op")
 }
 
-private class InterceptedPhaseBodyReflector<Context, Input, Output>(
-    override val instance: (Context, Input) -> Output,
-) : Reflector(instance::class) where Context : LoggingContext, Context : ConfigChecks {
+private class InterceptedPhaseBodyReflector<Context, Input, Output>(override val instance: (Context, Input) -> Output) :
+    Reflector(instance::class) where Context : LoggingContext, Context : ConfigChecks {
 
     val originalPhaseBody: (Context, Input) -> Output by declaredField()
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Input, Output>> by declaredField()
 }
 
-private fun <Context, Input, Output> ((Context, Input) -> Output).isIntercepted(): Boolean where Context : LoggingContext, Context : ConfigChecks {
-    return javaClass.name == InterceptedPhaseBody::class.jvmName
-}
+@Suppress("ktlint:standard:max-line-length")
+private fun <Context, Input, Output> (
+(
+    Context,
+    Input,
+) -> Output
+).isIntercepted(): Boolean where Context : LoggingContext, Context : ConfigChecks =
+    javaClass.name == InterceptedPhaseBody::class.jvmName

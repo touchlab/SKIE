@@ -11,11 +11,10 @@ object SuspendInterop {
 
         override val defaultValue: Boolean = true
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<SuspendInterop.Enabled>() -> true
-                configurationTarget.hasAnnotation<SuspendInterop.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<SuspendInterop.Enabled>() -> true
+            configurationTarget.hasAnnotation<SuspendInterop.Disabled>() -> false
+            else -> null
+        }
     }
 }

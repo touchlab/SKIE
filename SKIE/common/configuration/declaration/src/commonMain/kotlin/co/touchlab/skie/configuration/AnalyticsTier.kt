@@ -15,7 +15,8 @@ enum class AnalyticsTier(val configurationFlags: Set<SkieConfigurationFlag>) {
         SkieConfigurationFlag.Analytics_Git,
         SkieConfigurationFlag.Analytics_Project,
         SkieConfigurationFlag.Analytics_Modules,
-    );
+    ),
+    ;
 
     constructor(vararg configurationFlags: SkieConfigurationFlag) : this(configurationFlags.toSet())
 

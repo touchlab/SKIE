@@ -37,6 +37,7 @@ class NamedPhaseInterceptorConfigurer<Context : CommonBackendContext, Data> :
         }
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     private val <Context : CommonBackendContext, Data> NamedCompilerPhase<Context, Data>.reflector: NamedCompilerPhaseReflector<Context, Data>
         get() = NamedCompilerPhaseReflector(this)
 }

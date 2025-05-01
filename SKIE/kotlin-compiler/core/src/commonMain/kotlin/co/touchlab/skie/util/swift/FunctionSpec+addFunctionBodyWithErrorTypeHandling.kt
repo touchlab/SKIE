@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package co.touchlab.skie.util.swift
 
 import co.touchlab.skie.sir.element.SirCallableDeclaration

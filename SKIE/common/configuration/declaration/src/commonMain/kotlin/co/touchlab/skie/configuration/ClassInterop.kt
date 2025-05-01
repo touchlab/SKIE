@@ -17,12 +17,11 @@ object ClassInterop {
 
         override val skieRuntimeValue: Boolean = true
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<ClassInterop.StableTypeAlias.Enabled>() -> true
-                configurationTarget.hasAnnotation<ClassInterop.StableTypeAlias.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<ClassInterop.StableTypeAlias.Enabled>() -> true
+            configurationTarget.hasAnnotation<ClassInterop.StableTypeAlias.Disabled>() -> false
+            else -> null
+        }
     }
 
     /**

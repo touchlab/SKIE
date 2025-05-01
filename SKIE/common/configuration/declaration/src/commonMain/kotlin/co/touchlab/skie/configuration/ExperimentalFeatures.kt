@@ -13,11 +13,10 @@ object ExperimentalFeatures {
 
         override val skieRuntimeValue: Boolean = true
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<ExperimentalFeatures.Enabled>() -> true
-                configurationTarget.hasAnnotation<ExperimentalFeatures.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<ExperimentalFeatures.Enabled>() -> true
+            configurationTarget.hasAnnotation<ExperimentalFeatures.Disabled>() -> false
+            else -> null
+        }
     }
 }

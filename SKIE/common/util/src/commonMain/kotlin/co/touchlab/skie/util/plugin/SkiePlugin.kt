@@ -5,7 +5,7 @@ import java.io.File
 
 object SkiePlugin {
 
-    const val id = "co.touchlab.skie"
+    const val ID = "co.touchlab.skie"
 
     object Options {
 

@@ -16,12 +16,11 @@ object FunctionInterop {
 
             override val skieRuntimeValue: Boolean = false
 
-            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-                when {
-                    configurationTarget.hasAnnotation<FunctionInterop.FileScopeConversion.Enabled>() -> true
-                    configurationTarget.hasAnnotation<FunctionInterop.FileScopeConversion.Disabled>() -> false
-                    else -> null
-                }
+            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+                configurationTarget.hasAnnotation<FunctionInterop.FileScopeConversion.Enabled>() -> true
+                configurationTarget.hasAnnotation<FunctionInterop.FileScopeConversion.Disabled>() -> false
+                else -> null
+            }
         }
     }
 
@@ -86,11 +85,10 @@ object FunctionInterop {
 
         override val defaultValue: Boolean = false
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Enabled>() -> true
-                configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Enabled>() -> true
+            configurationTarget.hasAnnotation<FunctionInterop.LegacyName.Disabled>() -> false
+            else -> null
+        }
     }
 }

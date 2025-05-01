@@ -20,13 +20,27 @@ interface ConfigurationScope {
 
     interface ValueParameter : ConfigurationScope
 
-    interface Function : SimpleFunction, Constructor
+    interface Function :
+        SimpleFunction,
+        Constructor
 
-    interface CallableDeclaration : Function, Property
+    interface CallableDeclaration :
+        Function,
+        Property
 
-    interface AllExceptCallableDeclarations : Global, Module, Package, File, Class
+    interface AllExceptCallableDeclarations :
+        Global,
+        Module,
+        Package,
+        File,
+        Class
 
-    interface AllExceptConstructorsAndProperties : AllExceptCallableDeclarations, SimpleFunction
+    interface AllExceptConstructorsAndProperties :
+        AllExceptCallableDeclarations,
+        SimpleFunction
 
-    interface All : AllExceptConstructorsAndProperties, CallableDeclaration, ValueParameter
+    interface All :
+        AllExceptConstructorsAndProperties,
+        CallableDeclaration,
+        ValueParameter
 }

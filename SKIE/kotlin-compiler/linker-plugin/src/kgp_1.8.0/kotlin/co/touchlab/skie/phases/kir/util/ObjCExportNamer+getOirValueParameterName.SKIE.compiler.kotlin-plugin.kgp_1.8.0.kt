@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package co.touchlab.skie.phases.kir.util
 
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer

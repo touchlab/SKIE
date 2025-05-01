@@ -31,8 +31,7 @@ interface ConfigurationKey<T> {
 
     fun deserialize(value: kotlin.String?): T
 
-    fun serialize(value: T): kotlin.String? =
-        value?.toString()
+    fun serialize(value: T): kotlin.String? = value?.toString()
 
     interface NonOptional<T : Any> : ConfigurationKey<T> {
 
@@ -41,27 +40,23 @@ interface ConfigurationKey<T> {
         override fun hasAnnotationValue(configurationTarget: ConfigurationTarget): kotlin.Boolean =
             findAnnotationValue(configurationTarget) != null
 
-        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): T =
-            findAnnotationValue(configurationTarget)
-                ?: throw IllegalStateException("Target $configurationTarget does not have an annotation value.")
+        override fun getAnnotationValue(configurationTarget: ConfigurationTarget): T = findAnnotationValue(configurationTarget)
+            ?: throw IllegalStateException("Target $configurationTarget does not have an annotation value.")
     }
 
     interface String : NonOptional<kotlin.String> {
 
-        override fun deserialize(value: kotlin.String?): kotlin.String =
-            value.throwIfNull()
+        override fun deserialize(value: kotlin.String?): kotlin.String = value.throwIfNull()
     }
 
     interface Boolean : NonOptional<kotlin.Boolean> {
 
-        override fun deserialize(value: kotlin.String?): kotlin.Boolean =
-            value.throwIfNull().toBooleanStrict()
+        override fun deserialize(value: kotlin.String?): kotlin.Boolean = value.throwIfNull().toBooleanStrict()
     }
 
     interface Int : NonOptional<kotlin.Int> {
 
-        override fun deserialize(value: kotlin.String?): kotlin.Int =
-            value.throwIfNull().toInt()
+        override fun deserialize(value: kotlin.String?): kotlin.Int = value.throwIfNull().toInt()
     }
 
     interface OptionalString : ConfigurationKey<kotlin.String?> {
@@ -71,17 +66,14 @@ interface ConfigurationKey<T> {
 
     interface Path : NonOptional<java.nio.file.Path> {
 
-        override fun deserialize(value: kotlin.String?): java.nio.file.Path =
-            Path(value.throwIfNull())
+        override fun deserialize(value: kotlin.String?): java.nio.file.Path = Path(value.throwIfNull())
     }
 
     interface Enum<E : kotlin.Enum<E>> : NonOptional<E> {
 
-        override fun deserialize(value: kotlin.String?): E =
-            valueOf(value.throwIfNull())
+        override fun deserialize(value: kotlin.String?): E = valueOf(value.throwIfNull())
 
-        override fun serialize(value: E): kotlin.String? =
-            value.name
+        override fun serialize(value: E): kotlin.String? = value.name
 
         fun valueOf(value: kotlin.String): E
     }
@@ -94,8 +86,7 @@ interface ConfigurationKey<T> {
         override fun deserialize(value: kotlin.String?): kotlin.collections.List<T> =
             value.throwIfNull().split(separator).map { deserializeElement(it) }
 
-        override fun serialize(value: kotlin.collections.List<T>): kotlin.String? =
-            value.joinToString(separator) { serializeElement(it) }
+        override fun serialize(value: kotlin.collections.List<T>): kotlin.String? = value.joinToString(separator) { serializeElement(it) }
 
         fun serializeElement(value: T): kotlin.String
 

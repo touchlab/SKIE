@@ -1,3 +1,4 @@
+@file:Suppress("ktlint:standard:filename")
 @file:Suppress("UNCHECKED_CAST")
 
 package co.touchlab.skie.util

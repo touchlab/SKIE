@@ -19,9 +19,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 
-actual class DummyIrSimpleFunction actual constructor(
-    override val symbol: IrSimpleFunctionSymbol,
-) : IrSimpleFunction() {
+actual class DummyIrSimpleFunction actual constructor(override val symbol: IrSimpleFunctionSymbol) : IrSimpleFunction() {
 
     override var startOffset: Int by unsupported()
     override var endOffset: Int by unsupported()

@@ -226,8 +226,10 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
 
         val artifactName = "runtime-kotlin__kgp_$pathSafeKotlinVersionName"
         val artifactClassifierPrefix = "${darwinPlatformComponent.value}-kgp_$pathSafeKotlinVersionName"
-        val klibPath = "impl_$pathSafeKotlinVersionName/build/classes/kotlin/${darwinPlatformComponent.value}/main/klib/skie-kotlin-runtime.klib"
-        val extraArchiveBaseName = "impl/build/libs/skie-kotlin-runtime__kgp_$pathSafeKotlinVersionName-${darwinPlatformComponent.value.lowercase()}"
+        val klibPath =
+            "impl_$pathSafeKotlinVersionName/build/classes/kotlin/${darwinPlatformComponent.value}/main/klib/skie-kotlin-runtime.klib"
+        val extraArchiveBaseName =
+            "impl/build/libs/skie-kotlin-runtime__kgp_$pathSafeKotlinVersionName-${darwinPlatformComponent.value.lowercase()}"
 
         artifacts.add(configuration.name, layout.buildDirectory.file(klibPath)) {
             builtBy(buildTask)

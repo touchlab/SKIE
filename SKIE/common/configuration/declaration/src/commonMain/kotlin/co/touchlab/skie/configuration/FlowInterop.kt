@@ -13,11 +13,10 @@ object FlowInterop {
 
         override val skieRuntimeValue: Boolean = false
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<FlowInterop.Enabled>() -> true
-                configurationTarget.hasAnnotation<FlowInterop.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<FlowInterop.Enabled>() -> true
+            configurationTarget.hasAnnotation<FlowInterop.Disabled>() -> false
+            else -> null
+        }
     }
 }

@@ -13,11 +13,10 @@ internal actual fun createObjCExportNamerImpl(
     builtIns: KotlinBuiltIns,
     mapper: ObjCExportMapper,
     local: Boolean,
-): ObjCExportNamerImpl =
-    ObjCExportNamerImpl(
-        configuration = configuration,
-        builtIns = builtIns,
-        mapper = mapper,
-        problemCollector = ObjCExportProblemCollector.SILENT,
-        local = local,
-    )
+): ObjCExportNamerImpl = ObjCExportNamerImpl(
+    configuration = configuration,
+    builtIns = builtIns,
+    mapper = mapper,
+    problemCollector = ObjCExportProblemCollector.SILENT,
+    local = local,
+)

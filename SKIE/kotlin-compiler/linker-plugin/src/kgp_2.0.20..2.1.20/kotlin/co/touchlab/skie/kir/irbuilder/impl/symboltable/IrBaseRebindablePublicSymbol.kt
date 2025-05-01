@@ -14,12 +14,9 @@ import org.jetbrains.kotlin.ir.symbols.isPublicApi
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.render
 
-actual fun IrTypeParameterPublicSymbolImpl(
-    signature: IdSignature,
-    descriptor: TypeParameterDescriptor,
-): IrTypeParameterSymbol {
-    return IrTypeParameterSymbolImpl(descriptor, signature)
-}
+@Suppress("ktlint:standard:function-naming")
+actual fun IrTypeParameterPublicSymbolImpl(signature: IdSignature, descriptor: TypeParameterDescriptor): IrTypeParameterSymbol =
+    IrTypeParameterSymbolImpl(descriptor, signature)
 
 actual abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationDescriptor, Owner : IrSymbolOwner> actual constructor(
     actual override val signature: IdSignature,
@@ -74,7 +71,8 @@ actual abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationD
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =
         // TODO fix declaring/referencing value parameters: compute proper original descriptor
-        descriptor is ValueParameterDescriptor && isOriginalDescriptor(descriptor.containingDeclaration) ||
+        descriptor is ValueParameterDescriptor &&
+            isOriginalDescriptor(descriptor.containingDeclaration) ||
             descriptor == descriptor.original
 
     actual override val isBound: Boolean
@@ -90,10 +88,11 @@ actual abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationD
 
     override fun toString(): String {
         if (isBound) return owner.render()
-        return if (isPublicApi)
+        return if (isPublicApi) {
             "Unbound public symbol ${this::class.java.simpleName}: $signature"
-        else
+        } else {
             "Unbound private symbol " +
                 if (_descriptor != null) "${this::class.java.simpleName}: $_descriptor" else super.toString()
+        }
     }
 }

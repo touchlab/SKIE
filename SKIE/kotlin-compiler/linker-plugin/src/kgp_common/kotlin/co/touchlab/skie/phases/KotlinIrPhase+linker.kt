@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package co.touchlab.skie.phases
 
 import co.touchlab.skie.context.KotlinIrPhaseContext

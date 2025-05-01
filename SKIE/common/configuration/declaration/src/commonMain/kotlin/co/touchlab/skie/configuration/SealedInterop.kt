@@ -11,12 +11,11 @@ object SealedInterop {
 
         override val defaultValue: Boolean = true
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<SealedInterop.Enabled>() -> true
-                configurationTarget.hasAnnotation<SealedInterop.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<SealedInterop.Enabled>() -> true
+            configurationTarget.hasAnnotation<SealedInterop.Disabled>() -> false
+            else -> null
+        }
     }
 
     /**
@@ -27,12 +26,11 @@ object SealedInterop {
 
         override val defaultValue: Boolean = true
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Enabled>() -> true
-                configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Enabled>() -> true
+            configurationTarget.hasAnnotation<SealedInterop.EntireHierarchyExport.Disabled>() -> false
+            else -> null
+        }
     }
 
     object Function {
@@ -93,12 +91,11 @@ object SealedInterop {
 
             override val defaultValue: Boolean = true
 
-            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-                when {
-                    configurationTarget.hasAnnotation<SealedInterop.Case.Visible>() -> true
-                    configurationTarget.hasAnnotation<SealedInterop.Case.Hidden>() -> false
-                    else -> null
-                }
+            override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+                configurationTarget.hasAnnotation<SealedInterop.Case.Visible>() -> true
+                configurationTarget.hasAnnotation<SealedInterop.Case.Hidden>() -> false
+                else -> null
+            }
         }
 
         /**

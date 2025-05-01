@@ -11,12 +11,11 @@ object EnumInterop {
 
         override val defaultValue: Boolean = true
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<EnumInterop.Enabled>() -> true
-                configurationTarget.hasAnnotation<EnumInterop.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<EnumInterop.Enabled>() -> true
+            configurationTarget.hasAnnotation<EnumInterop.Disabled>() -> false
+            else -> null
+        }
     }
 
     /**
@@ -53,11 +52,10 @@ object EnumInterop {
 
         override val defaultValue: Boolean = false
 
-        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? =
-            when {
-                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Enabled>() -> true
-                configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Disabled>() -> false
-                else -> null
-            }
+        override fun findAnnotationValue(configurationTarget: ConfigurationTarget): Boolean? = when {
+            configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Enabled>() -> true
+            configurationTarget.hasAnnotation<EnumInterop.LegacyCaseName.Disabled>() -> false
+            else -> null
+        }
     }
 }

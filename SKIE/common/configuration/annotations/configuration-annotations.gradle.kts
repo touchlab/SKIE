@@ -1,5 +1,4 @@
 import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget
-import co.touchlab.skie.gradle.KotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -13,11 +12,11 @@ multiCompileRuntime {
     rootKotlinVersion = MultiCompileTarget.kotlin_1_8_20
     klibPath = { kotlinVersion, target ->
         if (target.platformType == KotlinPlatformType.jvm) {
-            "build/libs/configuration-annotations-${kotlinVersion}-${target.name.lowercase()}-${version}.jar"
+            "build/libs/configuration-annotations-$kotlinVersion-${target.name.lowercase()}-$version.jar"
         } else if (kotlinVersion >= MultiCompileTarget.kotlin_2_1_0) {
-            "build/libs/configuration-annotations-${kotlinVersion}-${target.name}Main-${version}.klib"
+            "build/libs/configuration-annotations-$kotlinVersion-${target.name}Main-$version.klib"
         } else {
-            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-${kotlinVersion}.klib"
+            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-$kotlinVersion.klib"
         }
     }
 }

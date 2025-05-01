@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:filename")
-
 package co.touchlab.skie.compilerinject.interceptor
 
 import org.jetbrains.kotlin.config.CompilerConfiguration

@@ -4,10 +4,10 @@ package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
+import kotlin.io.path.absolutePathString
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.phases.LinkerPhase
 import org.jetbrains.kotlin.backend.konan.driver.phases.LinkerPhaseInput
-import kotlin.io.path.absolutePathString
 
 internal class LinkerPhaseInterceptor : PhaseInterceptor<PhaseContext, LinkerPhaseInput, Unit> {
 

@@ -28,7 +28,8 @@ object ValidateSkieVisibilityAnnotationsPhase : ClassExportPhase {
 
         if (visibilityAnnotations.size > 1) {
             descriptorReporter.warning(
-                "Multiple ${SkieVisibility::class.simpleName} annotations used simultaneously. This is not allowed and may result in undefined behavior. " +
+                "Multiple ${SkieVisibility::class.simpleName} annotations used simultaneously. " +
+                    "This is not allowed and may result in undefined behavior. " +
                     "This warning might become an error in the future.",
                 declarationDescriptor,
             )

@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrPublicSymbolBase
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl as KotlinIrTypeParameterPublicSymbolImpl
 import org.jetbrains.kotlin.ir.util.IdSignature
 
+@Suppress("ktlint:standard:function-naming")
 actual fun IrTypeParameterPublicSymbolImpl(signature: IdSignature, descriptor: TypeParameterDescriptor): IrTypeParameterSymbol =
     KotlinIrTypeParameterPublicSymbolImpl(signature, descriptor)
 

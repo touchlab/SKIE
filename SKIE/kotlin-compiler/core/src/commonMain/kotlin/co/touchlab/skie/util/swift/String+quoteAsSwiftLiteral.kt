@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package co.touchlab.skie.util.swift
 
 fun String.quoteAsSwiftLiteral(): String = buildString {

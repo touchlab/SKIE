@@ -61,7 +61,7 @@ class SkieClassSuspendGenerator {
 
     companion object {
 
-        const val kotlinObjectVariableName: String = "__kotlinObject"
+        const val KOTLIN_OBJECT_VARIABLE_NAME: String = "__kotlinObject"
     }
 }
 
@@ -73,7 +73,7 @@ private fun SirClass.addSkieClassMembers(suspendFunctionOwner: KirClass) {
 
 private fun SirClass.addSkieClassKotlinObjectHolder(suspendFunctionOwner: KirClass) {
     SirProperty(
-        identifier = SkieClassSuspendGenerator.kotlinObjectVariableName,
+        identifier = SkieClassSuspendGenerator.KOTLIN_OBJECT_VARIABLE_NAME,
         type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters),
     )
 }
@@ -82,12 +82,14 @@ private fun SirClass.addSkieClassConstructor(suspendFunctionOwner: KirClass) {
     SirConstructor().apply {
         SirValueParameter(
             label = "_",
-            name = SkieClassSuspendGenerator.kotlinObjectVariableName,
+            name = SkieClassSuspendGenerator.KOTLIN_OBJECT_VARIABLE_NAME,
             type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(this@SirClass.typeParameters),
         )
 
         bodyBuilder.add {
-            addCode("self.${SkieClassSuspendGenerator.kotlinObjectVariableName} = ${SkieClassSuspendGenerator.kotlinObjectVariableName}")
+            addCode(
+                "self.${SkieClassSuspendGenerator.KOTLIN_OBJECT_VARIABLE_NAME} = ${SkieClassSuspendGenerator.KOTLIN_OBJECT_VARIABLE_NAME}",
+            )
         }
     }
 }

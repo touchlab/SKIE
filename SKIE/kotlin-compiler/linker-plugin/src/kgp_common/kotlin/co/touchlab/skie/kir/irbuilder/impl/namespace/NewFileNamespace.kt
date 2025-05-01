@@ -116,7 +116,7 @@ class NewFileNamespace private constructor(private val sourceFile: SourceFile, p
 
     companion object {
 
-        private const val basePackage: String = "co.touchlab.skie.generated"
+        private const val BASE_PACKAGE: String = "co.touchlab.skie.generated"
     }
 }
 
