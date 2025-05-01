@@ -23,9 +23,7 @@ object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
         cacheAwareFileGenerator.deleteOldFiles()
     }
 
-    private class CacheAwareFileGenerator(
-        private val generatedSwiftDirectory: SkieBuildDirectory.Swift.Generated,
-    ) {
+    private class CacheAwareFileGenerator(private val generatedSwiftDirectory: SkieBuildDirectory.Swift.Generated) {
 
         private val generatedFiles = mutableSetOf<File>()
 

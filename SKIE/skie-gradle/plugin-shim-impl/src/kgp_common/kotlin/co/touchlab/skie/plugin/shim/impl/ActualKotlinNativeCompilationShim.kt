@@ -4,18 +4,19 @@ import co.touchlab.skie.plugin.shim.KotlinNativeCompilationShim
 import co.touchlab.skie.plugin.shim.KotlinNativeTargetShim
 import co.touchlab.skie.plugin.shim.KotlinSourceSetShim
 import co.touchlab.skie.util.directory.SkieCompilationDirectory
+import java.io.File
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Named
 import org.gradle.api.Task
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
-import java.io.File
 
 class ActualKotlinNativeCompilationShim(
     val kotlinNativeCompilation: KotlinNativeCompilation,
     override val target: KotlinNativeTargetShim,
-) : KotlinNativeCompilationShim, Named by kotlinNativeCompilation {
+) : KotlinNativeCompilationShim,
+    Named by kotlinNativeCompilation {
 
     override val compileTaskProvider: TaskProvider<out Task> = kotlinNativeCompilation.compileTaskProvider
 
@@ -35,8 +36,7 @@ class ActualKotlinNativeCompilationShim(
         }
     }
 
-    override fun toString(): String =
-        kotlinNativeCompilation.toString()
+    override fun toString(): String = kotlinNativeCompilation.toString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -47,6 +47,5 @@ class ActualKotlinNativeCompilationShim(
         return true
     }
 
-    override fun hashCode(): Int =
-        kotlinNativeCompilation.hashCode()
+    override fun hashCode(): Int = kotlinNativeCompilation.hashCode()
 }

@@ -7,9 +7,7 @@ import co.touchlab.skie.oir.element.OirExtension
 import co.touchlab.skie.oir.element.OirFile
 import co.touchlab.skie.oir.element.OirModule
 
-class OirProvider(
-    private val kirProvider: KirProvider,
-) {
+class OirProvider(private val kirProvider: KirProvider) {
 
     val externalModule = OirModule.External()
 
@@ -53,24 +51,22 @@ class OirProvider(
     // TODO Remove after not needed for ApiNotes, do not use to store classes
     val skieModule: OirModule.Kotlin = OirModule.Kotlin("Skie")
 
-    fun getKotlinModule(kirModule: KirModule): OirModule.Kotlin =
-        kotlinModuleCache.getOrPut(kirModule) {
-            when (kirModule.origin) {
-                KirModule.Origin.Kotlin,
-                KirModule.Origin.SkieRuntime,
-                KirModule.Origin.SkieGenerated,
-                -> {
-                }
-                KirModule.Origin.KnownExternal, KirModule.Origin.UnknownExternal -> error("External modules are not supported: $kirModule.")
+    fun getKotlinModule(kirModule: KirModule): OirModule.Kotlin = kotlinModuleCache.getOrPut(kirModule) {
+        when (kirModule.origin) {
+            KirModule.Origin.Kotlin,
+            KirModule.Origin.SkieRuntime,
+            KirModule.Origin.SkieGenerated,
+            -> {
             }
-
-            OirModule.Kotlin(kirModule.name)
+            KirModule.Origin.KnownExternal, KirModule.Origin.UnknownExternal -> error("External modules are not supported: $kirModule.")
         }
 
-    fun getFile(oirModule: OirModule.Kotlin, name: String): OirFile =
-        fileCache.getOrPut(oirModule to name) {
-            OirFile(name, oirModule)
-        }
+        OirModule.Kotlin(kirModule.name)
+    }
+
+    fun getFile(oirModule: OirModule.Kotlin, name: String): OirFile = fileCache.getOrPut(oirModule to name) {
+        OirFile(name, oirModule)
+    }
 
     fun initializeKotlinClassCache() {
         kotlinClassesAndProtocols = kirProvider.kotlinClasses.map { it.oirClass }

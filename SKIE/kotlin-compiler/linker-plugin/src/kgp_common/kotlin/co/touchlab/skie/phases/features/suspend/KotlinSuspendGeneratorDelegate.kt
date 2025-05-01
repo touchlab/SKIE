@@ -34,9 +34,7 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
-class KotlinSuspendGeneratorDelegate(
-    private val context: FrontendIrPhase.Context,
-) {
+class KotlinSuspendGeneratorDelegate(private val context: FrontendIrPhase.Context) {
 
     private var nextBridgingFunctionIndex = 0
 
@@ -75,29 +73,25 @@ class KotlinSuspendGeneratorDelegate(
         }
     }
 
-    private fun createBridgingFunction(
-        functionDescriptor: FunctionDescriptor,
-    ): FunctionDescriptor =
+    private fun createBridgingFunction(functionDescriptor: FunctionDescriptor): FunctionDescriptor =
         context.declarationBuilder.createFunction(
             name = "Skie_Suspend__${nextBridgingFunctionIndex++}__${functionDescriptor.name.identifier}",
             namespace = context.declarationBuilder.getCustomNamespace("__SkieSuspendWrappers"),
             annotations = Annotations.EMPTY,
         ) {
             // TODO Replace with typeConstructor.parameters
-            fun DeclarationDescriptor.typeParametersInScope(): List<TypeParameterDescriptor> {
-                return when (this) {
-                    is ClassifierDescriptorWithTypeParameters -> {
-                        val declaredParameters = this.declaredTypeParameters
+            fun DeclarationDescriptor.typeParametersInScope(): List<TypeParameterDescriptor> = when (this) {
+                is ClassifierDescriptorWithTypeParameters -> {
+                    val declaredParameters = this.declaredTypeParameters
 
-                        if (!isInner && containingDeclaration !is CallableDescriptor) {
-                            declaredParameters
-                        } else {
-                            declaredParameters + containingDeclaration.typeParametersInScope()
-                        }
+                    if (!isInner && containingDeclaration !is CallableDescriptor) {
+                        declaredParameters
+                    } else {
+                        declaredParameters + containingDeclaration.typeParametersInScope()
                     }
-                    is FunctionDescriptor -> this.typeParameters + this.containingDeclaration.typeParametersInScope()
-                    else -> emptyList()
                 }
+                is FunctionDescriptor -> this.typeParameters + this.containingDeclaration.typeParametersInScope()
+                else -> emptyList()
             }
 
             val allTypeParameters = functionDescriptor.typeParametersInScope()
@@ -154,12 +148,11 @@ class KotlinSuspendGeneratorDelegate(
     }
 
     context(KirPhase.Context)
-    private fun configureFlowMappingForReceiver(
-        dispatchReceiverParameter: ValueParameterDescriptor,
-    ) {
+    private fun configureFlowMappingForReceiver(dispatchReceiverParameter: ValueParameterDescriptor) {
         val kirValueParameter = descriptorKirProvider.getValueParameter(dispatchReceiverParameter)
 
-        kirValueParameter.configuration.flowMappingStrategy = kirValueParameter.configuration.flowMappingStrategy.limitFlowMappingToTypeArguments()
+        kirValueParameter.configuration.flowMappingStrategy =
+            kirValueParameter.configuration.flowMappingStrategy.limitFlowMappingToTypeArguments()
     }
 
     private fun MutableList<ValueParameterDescriptor>.addExtensionReceiver(
@@ -225,12 +218,10 @@ class KotlinSuspendGeneratorDelegate(
     private fun FunctionDescriptor.createSuspendHandlerValueParameter(
         bridgingFunctionDescriptor: FunctionDescriptor,
         index: Int,
-    ): ValueParameterDescriptor =
-        createValueParameter(
-            owner = bridgingFunctionDescriptor,
-            name = "suspendHandler".collisionFreeIdentifier(this.valueParameters),
-            index = index,
-            type = suspendHandlerDescriptor.defaultType,
-        )
+    ): ValueParameterDescriptor = createValueParameter(
+        owner = bridgingFunctionDescriptor,
+        name = "suspendHandler".collisionFreeIdentifier(this.valueParameters),
+        index = index,
+        type = suspendHandlerDescriptor.defaultType,
+    )
 }
-

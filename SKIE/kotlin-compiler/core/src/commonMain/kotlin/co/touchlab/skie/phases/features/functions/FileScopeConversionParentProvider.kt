@@ -20,9 +20,7 @@ import co.touchlab.skie.sir.type.SirDeclaredSirType
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.SpecialSirType
 
-class FileScopeConversionParentProvider(
-    private val context: SirPhase.Context,
-) {
+class FileScopeConversionParentProvider(private val context: SirPhase.Context) {
 
     private val kirBuiltins = context.kirBuiltins
     private val sirProvider = context.sirProvider
@@ -97,37 +95,36 @@ class FileScopeConversionParentProvider(
         }
     }
 
-    private fun getExtensionNamespace(
-        callableDeclaration: KirCallableDeclaration<*>,
-        parentType: SirType,
-    ): SirIrFile {
+    private fun getExtensionNamespace(callableDeclaration: KirCallableDeclaration<*>, parentType: SirType): SirIrFile {
         val extensionReceiverKirClass = getExtensionReceiverKirClassIfExists(parentType)
 
         return extensionReceiverKirClass?.let { context.namespaceProvider.getNamespaceFile(it) }
             ?: context.namespaceProvider.getNamespaceFile(callableDeclaration.owner)
     }
 
-    private fun getExtensionReceiverKirClassIfExists(parentType: SirType): KirClass? =
-        when (parentType) {
-            is SirDeclaredSirType -> parentType.declaration.resolveAsKirClass()
-            is OirDeclaredSirType -> parentType.declaration.kirClassOrNull
-            is NullableSirType -> getExtensionReceiverKirClassIfExists(parentType.type)
-            else -> null
-        }
+    private fun getExtensionReceiverKirClassIfExists(parentType: SirType): KirClass? = when (parentType) {
+        is SirDeclaredSirType -> parentType.declaration.resolveAsKirClass()
+        is OirDeclaredSirType -> parentType.declaration.kirClassOrNull
+        is NullableSirType -> getExtensionReceiverKirClassIfExists(parentType.type)
+        else -> null
+    }
 
-    private fun createNonOptionalExtension(file: SirIrFile, sirClass: SirClass): SirExtension? =
-        if (sirClass.typeParameters.isEmpty()) {
-            sirProvider.getExtension(
-                classDeclaration = sirClass,
-                parent = file,
-            )
-        } else {
-            // Generics is not supported yet
-            null
-        }
+    private fun createNonOptionalExtension(file: SirIrFile, sirClass: SirClass): SirExtension? = if (sirClass.typeParameters.isEmpty()) {
+        sirProvider.getExtension(
+            classDeclaration = sirClass,
+            parent = file,
+        )
+    } else {
+        // Generics is not supported yet
+        null
+    }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun getOptionalExtensions(callableDeclaration: KirCallableDeclaration<*>, type: NullableSirType, namespace: SirFile): List<SirExtension> {
+    private fun getOptionalExtensions(
+        callableDeclaration: KirCallableDeclaration<*>,
+        type: NullableSirType,
+        namespace: SirFile,
+    ): List<SirExtension> {
 //         val nonNullType = type.type
 //
 //         val constraintType = when (nonNullType) {

@@ -8,7 +8,7 @@ enum class SirVisibility : Comparable<SirVisibility> {
     /** Obj-C will be handled the same as if it was Removed. */
     Private,
     Internal,
-    Public;
+    Public,
 }
 
 fun List<SirVisibility>.minimumVisibility(): SirVisibility =

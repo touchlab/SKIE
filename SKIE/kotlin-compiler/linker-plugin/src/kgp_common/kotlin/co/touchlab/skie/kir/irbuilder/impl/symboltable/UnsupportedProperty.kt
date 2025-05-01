@@ -5,11 +5,7 @@ import kotlin.reflect.KProperty
 
 fun <T> unsupported() = object : ReadWriteProperty<Any, T> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>): T {
-        throw UnsupportedOperationException()
-    }
+    override fun getValue(thisRef: Any, property: KProperty<*>): T = throw UnsupportedOperationException()
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
-        throw UnsupportedOperationException()
-    }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: T): Unit = throw UnsupportedOperationException()
 }

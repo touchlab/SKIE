@@ -19,6 +19,7 @@ import co.touchlab.skie.util.DescriptorReporter
 import co.touchlab.skie.util.KotlinCompilerVersion
 import co.touchlab.skie.util.TargetTriple
 import co.touchlab.skie.util.current
+import java.util.Collections
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +32,6 @@ import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import java.util.Collections
 
 expect fun CompilerConfiguration.getBitcodeEmbeddingMode(): SwiftCompilerConfiguration.BitcodeEmbeddingMode
 
@@ -41,7 +41,9 @@ class MainSkieContext internal constructor(
     frontendServices: FrontendServices,
     val mainModuleDescriptor: ModuleDescriptor,
     exportedDependencies: Collection<ModuleDescriptor>,
-) : ForegroundPhaseCompilerContext, BackgroundPhase.Context, CommonSkieContext by initPhaseContext {
+) : ForegroundPhaseCompilerContext,
+    BackgroundPhase.Context,
+    CommonSkieContext by initPhaseContext {
 
     private val skieCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + CoroutineExceptionHandler { _, _ ->
         // Hides default stderr output because the exception is handled at the end of the job
@@ -60,7 +62,8 @@ class MainSkieContext internal constructor(
         frontendServices = frontendServices,
     )
 
-    override val descriptorConfigurationProvider: DescriptorConfigurationProvider = DescriptorConfigurationProvider(initPhaseContext.configurationProvider)
+    override val descriptorConfigurationProvider: DescriptorConfigurationProvider =
+        DescriptorConfigurationProvider(initPhaseContext.configurationProvider)
 
     val declarationBuilder: DeclarationBuilderImpl = DeclarationBuilderImpl(mainModuleDescriptor, descriptorProvider)
 
@@ -105,14 +108,20 @@ class MainSkieContext internal constructor(
         jobs.add(job)
     }
 
-    override fun <CONTEXT : ScheduledPhase.Context> storeStatefulScheduledPhaseBody(phase: StatefulScheduledPhase<CONTEXT>, action: CONTEXT.() -> Unit) {
+    override fun <CONTEXT : ScheduledPhase.Context> storeStatefulScheduledPhaseBody(
+        phase: StatefulScheduledPhase<CONTEXT>,
+        action: CONTEXT.() -> Unit,
+    ) {
         val bodies = statefulScheduledPhaseBodies.getOrPut(phase) { mutableListOf() }
 
         bodies.add(action)
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <CONTEXT : ScheduledPhase.Context> executeStatefulScheduledPhase(phase: StatefulScheduledPhase<CONTEXT>, context: CONTEXT) {
+    override fun <CONTEXT : ScheduledPhase.Context> executeStatefulScheduledPhase(
+        phase: StatefulScheduledPhase<CONTEXT>,
+        context: CONTEXT,
+    ) {
         val phaseBodies = statefulScheduledPhaseBodies[phase] ?: return
 
         phaseBodies.forEach { phaseBody ->

@@ -14,10 +14,7 @@ import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 import co.touchlab.skie.sir.element.SirProperty
 
-class KirProvider(
-    delegate: Lazy<KirProviderDelegate>,
-    globalConfiguration: GlobalConfiguration,
-) {
+class KirProvider(delegate: Lazy<KirProviderDelegate>, globalConfiguration: GlobalConfiguration) {
 
     private lateinit var fqNameCache: Map<String, KirClass>
 
@@ -103,18 +100,15 @@ class KirProvider(
         sirToEnumEntryCache = kotlinEnums.flatMap { it.enumEntries }.associateBy { it.sirEnumEntry }
     }
 
-    fun getClassByFqName(fqName: String): KirClass =
-        findClassByFqName(fqName)
-            ?: error("Class not found: $fqName. This error usually means that the class is not exposed to Objective-C.")
+    fun getClassByFqName(fqName: String): KirClass = findClassByFqName(fqName)
+        ?: error("Class not found: $fqName. This error usually means that the class is not exposed to Objective-C.")
 
-    fun findClassByFqName(fqName: String): KirClass? =
-        fqNameCache[fqName]
+    fun findClassByFqName(fqName: String): KirClass? = fqNameCache[fqName]
 
     // TODO Refactor to Origin
     @Suppress("UNCHECKED_CAST")
     fun <S : SirCallableDeclaration> findCallableDeclaration(callableDeclaration: SirCallableDeclaration): KirCallableDeclaration<S>? =
         sirToCallableDeclarationsCache[callableDeclaration] as KirCallableDeclaration<S>?
 
-    fun findEnumEntry(property: SirProperty): KirEnumEntry? =
-        sirToEnumEntryCache[property]
+    fun findEnumEntry(property: SirProperty): KirEnumEntry? = sirToEnumEntryCache[property]
 }

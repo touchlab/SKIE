@@ -9,7 +9,8 @@ class SirIrFile(
     override val module: SirModule.Skie,
     // Relative to the SKIE Swift generated directory
     val relativePath: Path,
-) : SirFile, SirTopLevelDeclarationParent {
+) : SirFile,
+    SirTopLevelDeclarationParent {
 
     val fileNameWithoutSuffix: String
         get() = relativePath.nameWithoutExtension

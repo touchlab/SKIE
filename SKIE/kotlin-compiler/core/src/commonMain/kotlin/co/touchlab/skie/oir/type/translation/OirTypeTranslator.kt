@@ -19,26 +19,24 @@ import co.touchlab.skie.oir.type.PointerOirType
 
 class OirTypeTranslator {
 
-    fun mapType(kirType: KirType): OirType =
-        when (kirType) {
-            is NonNullReferenceKirType -> mapType(kirType)
-            is OirBasedKirType -> kirType.oirType
-            is PointerKirType -> PointerOirType(mapType(kirType.pointee), kirType.nullable)
-            is NullableReferenceKirType -> NullableReferenceOirType(mapType(kirType.nonNullType), kirType.isNullableResult)
-        }
+    fun mapType(kirType: KirType): OirType = when (kirType) {
+        is NonNullReferenceKirType -> mapType(kirType)
+        is OirBasedKirType -> kirType.oirType
+        is PointerKirType -> PointerOirType(mapType(kirType.pointee), kirType.nullable)
+        is NullableReferenceKirType -> NullableReferenceOirType(mapType(kirType.nonNullType), kirType.isNullableResult)
+    }
 
-    private fun mapType(kirType: NonNullReferenceKirType): NonNullReferenceOirType =
-        when (kirType) {
-            is BlockPointerKirType -> {
-                BlockPointerOirType(
-                    valueParameterTypes = kirType.valueParameterTypes.map { mapType(it) },
-                    returnType = mapType(kirType.returnType),
-                )
-            }
-            is DeclarationBackedKirType -> mapType(kirType)
-            is SpecialOirKirType -> kirType.oirType
-            is TypeParameterUsageKirType -> kirType.typeParameter.oirTypeParameter.toTypeParameterUsage()
+    private fun mapType(kirType: NonNullReferenceKirType): NonNullReferenceOirType = when (kirType) {
+        is BlockPointerKirType -> {
+            BlockPointerOirType(
+                valueParameterTypes = kirType.valueParameterTypes.map { mapType(it) },
+                returnType = mapType(kirType.returnType),
+            )
         }
+        is DeclarationBackedKirType -> mapType(kirType)
+        is SpecialOirKirType -> kirType.oirType
+        is TypeParameterUsageKirType -> kirType.typeParameter.oirTypeParameter.toTypeParameterUsage()
+    }
 
     fun mapType(kirType: DeclarationBackedKirType): DeclaredOirType {
         val declaredKirType = kirType.asDeclaredKirTypeOrError()

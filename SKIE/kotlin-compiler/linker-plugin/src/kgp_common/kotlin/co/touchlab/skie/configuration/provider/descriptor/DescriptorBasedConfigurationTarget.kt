@@ -4,6 +4,7 @@ import co.touchlab.skie.configuration.provider.IdentifiedConfigurationTarget
 import co.touchlab.skie.kir.util.findAnnotation
 import co.touchlab.skie.kir.util.hasAnnotation
 import co.touchlab.skie.util.belongsToSkieKotlinRuntime
+import kotlin.reflect.KClass
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -13,37 +14,29 @@ import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import kotlin.reflect.KClass
 
 object DescriptorBasedConfigurationTarget {
 
-    abstract class Declaration(
-        private val declarationDescriptor: DeclarationDescriptor,
-    ) : IdentifiedConfigurationTarget {
+    abstract class Declaration(private val declarationDescriptor: DeclarationDescriptor) : IdentifiedConfigurationTarget {
 
         override val belongsToSkieRuntime: Boolean = declarationDescriptor.belongsToSkieKotlinRuntime
 
         override val fqName: String = declarationDescriptor.fqNameSafe.asString()
 
-        override fun hasAnnotation(kClass: KClass<out Annotation>): Boolean =
-            declarationDescriptor.hasAnnotation(kClass)
+        override fun hasAnnotation(kClass: KClass<out Annotation>): Boolean = declarationDescriptor.hasAnnotation(kClass)
 
-        override fun <T : Annotation> findAnnotation(kClass: KClass<T>): T? =
-            declarationDescriptor.findAnnotation(kClass)
+        override fun <T : Annotation> findAnnotation(kClass: KClass<T>): T? = declarationDescriptor.findAnnotation(kClass)
     }
 
-    class Module(
-        moduleDescriptor: ModuleDescriptor,
-    ) : Declaration(moduleDescriptor), IdentifiedConfigurationTarget.Module
+    class Module(moduleDescriptor: ModuleDescriptor) :
+        Declaration(moduleDescriptor),
+        IdentifiedConfigurationTarget.Module
 
-    class Package(
-        override val parent: IdentifiedConfigurationTarget.Module,
-        packageFragmentDescriptor: PackageFragmentDescriptor,
-    ) : Declaration(packageFragmentDescriptor), IdentifiedConfigurationTarget.Package
+    class Package(override val parent: IdentifiedConfigurationTarget.Module, packageFragmentDescriptor: PackageFragmentDescriptor) :
+        Declaration(packageFragmentDescriptor),
+        IdentifiedConfigurationTarget.Package
 
-    class File(
-        override val parent: IdentifiedConfigurationTarget.Package,
-    ) : IdentifiedConfigurationTarget.File {
+    class File(override val parent: IdentifiedConfigurationTarget.Package) : IdentifiedConfigurationTarget.File {
 
         override val fqName: String = ""
 
@@ -55,28 +48,25 @@ object DescriptorBasedConfigurationTarget {
         override fun <T : Annotation> findAnnotation(kClass: KClass<T>): T? = null
     }
 
-    class Class(
-        override val parent: IdentifiedConfigurationTarget.FileOrClass,
-        classDescriptor: ClassDescriptor,
-    ) : Declaration(classDescriptor), IdentifiedConfigurationTarget.Class
+    class Class(override val parent: IdentifiedConfigurationTarget.FileOrClass, classDescriptor: ClassDescriptor) :
+        Declaration(classDescriptor),
+        IdentifiedConfigurationTarget.Class
 
-    class Constructor(
-        override val parent: IdentifiedConfigurationTarget.FileOrClass,
-        constructorDescriptor: ConstructorDescriptor,
-    ) : Declaration(constructorDescriptor), IdentifiedConfigurationTarget.Constructor
+    class Constructor(override val parent: IdentifiedConfigurationTarget.FileOrClass, constructorDescriptor: ConstructorDescriptor) :
+        Declaration(constructorDescriptor),
+        IdentifiedConfigurationTarget.Constructor
 
-    class SimpleFunction(
-        override val parent: IdentifiedConfigurationTarget.FileOrClass,
-        functionDescriptor: SimpleFunctionDescriptor,
-    ) : Declaration(functionDescriptor), IdentifiedConfigurationTarget.SimpleFunction
+    class SimpleFunction(override val parent: IdentifiedConfigurationTarget.FileOrClass, functionDescriptor: SimpleFunctionDescriptor) :
+        Declaration(functionDescriptor),
+        IdentifiedConfigurationTarget.SimpleFunction
 
-    class Property(
-        override val parent: IdentifiedConfigurationTarget.FileOrClass,
-        propertyDescriptor: PropertyDescriptor,
-    ) : Declaration(propertyDescriptor), IdentifiedConfigurationTarget.Property
+    class Property(override val parent: IdentifiedConfigurationTarget.FileOrClass, propertyDescriptor: PropertyDescriptor) :
+        Declaration(propertyDescriptor),
+        IdentifiedConfigurationTarget.Property
 
     class ValueParameter(
         override val parent: IdentifiedConfigurationTarget.ValueParameterParent,
         valueParameterDescriptor: ParameterDescriptor,
-    ) : Declaration(valueParameterDescriptor), IdentifiedConfigurationTarget.ValueParameter
+    ) : Declaration(valueParameterDescriptor),
+        IdentifiedConfigurationTarget.ValueParameter
 }

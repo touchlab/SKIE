@@ -42,20 +42,14 @@ import org.jetbrains.kotlin.types.KotlinType
 class SuspendKotlinBridgeCheckedExceptionsGenerator {
 
     context(KotlinIrPhase.Context, DeclarationIrBuilder)
-    fun createGetCheckedExceptions(
-        bridgingFunction: IrSimpleFunction,
-        originalFunctionDescriptor: FunctionDescriptor,
-    ): IrExpression {
+    fun createGetCheckedExceptions(bridgingFunction: IrSimpleFunction, originalFunctionDescriptor: FunctionDescriptor): IrExpression {
         val field = createCheckedExceptionsField(bridgingFunction, originalFunctionDescriptor)
 
         return irGetField(null, field)
     }
 
     context(KotlinIrPhase.Context)
-    private fun createCheckedExceptionsField(
-        bridgingFunction: IrSimpleFunction,
-        originalFunctionDescriptor: FunctionDescriptor,
-    ): IrField {
+    private fun createCheckedExceptionsField(bridgingFunction: IrSimpleFunction, originalFunctionDescriptor: FunctionDescriptor): IrField {
         val fieldSymbol = IrFieldSymbolImpl()
 
         val field = irFactory.createField(
@@ -89,25 +83,22 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
     private fun createCheckExceptionsFieldInitializer(
         fieldSymbol: IrFieldSymbolImpl,
         originalFunctionDescriptor: FunctionDescriptor,
-    ): IrExpressionBody =
-        DeclarationIrBuilder(pluginContext, fieldSymbol, 0, 0).run {
-            irExprBody(
-                irCall(irBuiltIns.arrayOf).apply {
-                    val checkedExceptionClassReferences = createCheckedExceptionClassReferences(originalFunctionDescriptor)
+    ): IrExpressionBody = DeclarationIrBuilder(pluginContext, fieldSymbol, 0, 0).run {
+        irExprBody(
+            irCall(irBuiltIns.arrayOf).apply {
+                val checkedExceptionClassReferences = createCheckedExceptionClassReferences(originalFunctionDescriptor)
 
-                    val varargElementType = irBuiltIns.kClassClass.typeWith(irBuiltIns.throwableType)
-                    val vararg = irVararg(varargElementType, checkedExceptionClassReferences)
+                val varargElementType = irBuiltIns.kClassClass.typeWith(irBuiltIns.throwableType)
+                val vararg = irVararg(varargElementType, checkedExceptionClassReferences)
 
-                    putTypeArgument(0, varargElementType)
-                    putValueArgument(0, vararg)
-                },
-            )
-        }
+                putTypeArgument(0, varargElementType)
+                putValueArgument(0, vararg)
+            },
+        )
+    }
 
     context(KotlinIrPhase.Context)
-    private fun createCheckedExceptionClassReferences(
-        originalFunctionDescriptor: FunctionDescriptor,
-    ): List<IrClassReference> =
+    private fun createCheckedExceptionClassReferences(originalFunctionDescriptor: FunctionDescriptor): List<IrClassReference> =
         originalFunctionDescriptor.declaredThrownExceptions
             .map { exceptionTypeSymbol ->
                 IrClassReferenceImpl(
@@ -131,18 +122,16 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
         }
 
     context(KotlinIrPhase.Context)
-    private fun KClassValue.getClassifierSymbol(module: ModuleDescriptor): IrClassifierSymbol =
-        when (val value = this.value) {
-            is Value.LocalClass -> value.type.toIrSymbol()
-            is Value.NormalClass -> module.findClassifierAcrossModuleDependencies(value.classId)!!.defaultType.toIrSymbol()
-        }
+    private fun KClassValue.getClassifierSymbol(module: ModuleDescriptor): IrClassifierSymbol = when (val value = this.value) {
+        is Value.LocalClass -> value.type.toIrSymbol()
+        is Value.NormalClass -> module.findClassifierAcrossModuleDependencies(value.classId)!!.defaultType.toIrSymbol()
+    }
 
     context(KotlinIrPhase.Context)
     @OptIn(ObsoleteDescriptorBasedAPI::class)
-    private fun KotlinType.toIrSymbol(): IrClassifierSymbol =
-        when (val classifier = this.constructor.declarationDescriptor) {
-            null -> error("No declaration descriptor for type $this.")
-            is TypeAliasDescriptor -> classifier.expandedType.toIrSymbol()
-            else -> skieSymbolTable.kotlinSymbolTable.referenceClassifier(classifier)
-        }
+    private fun KotlinType.toIrSymbol(): IrClassifierSymbol = when (val classifier = this.constructor.declarationDescriptor) {
+        null -> error("No declaration descriptor for type $this.")
+        is TypeAliasDescriptor -> classifier.expandedType.toIrSymbol()
+        else -> skieSymbolTable.kotlinSymbolTable.referenceClassifier(classifier)
+    }
 }

@@ -5,11 +5,11 @@ import co.touchlab.skie.context.InitPhaseContext
 import co.touchlab.skie.entrypoint.SkieIrGenerationExtension
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.spi.SkiePluginLoader
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 class SkieComponentRegistrar : CompilerPluginRegistrar() {
 

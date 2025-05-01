@@ -15,7 +15,9 @@ import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 
 fun Project.configureSkieConfigurationAnnotationsDependencySubstitution() {
-    val configurationAnnotationsRegex = "${Regex.escape(BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE)}(?:-[0-9]+\\.[0-9]+\\.[0-9]+)?(-.+)?".toRegex()
+    val configurationAnnotationsRegex = "${Regex.escape(
+        BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE,
+    )}(?:-[0-9]+\\.[0-9]+\\.[0-9]+)?(-.+)?".toRegex()
     skieInternalExtension.targets.configureEach {
         linkerConfiguration.apply {
             if (state != Configuration.State.UNRESOLVED) {
@@ -30,7 +32,11 @@ fun Project.configureSkieConfigurationAnnotationsDependencySubstitution() {
                         if (match != null) {
                             val suffix = match.groupValues[1]
 
-                            val updatedCoordinate = BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE + "-" + skieInternalExtension.kotlinVersion + suffix + ":" + BuildConfig.SKIE_VERSION
+                            val updatedCoordinate =
+                                BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE +
+                                    "-" + skieInternalExtension.kotlinVersion +
+                                    suffix + ":" +
+                                    BuildConfig.SKIE_VERSION
 
                             logger.debug("Replacing {} with {}", requested, updatedCoordinate)
                             useTarget(updatedCoordinate)
@@ -55,10 +61,13 @@ fun Project.configureSkieRuntimeDependencySubstitution() {
                 all {
                     val requestedModule = requested as? ModuleComponentSelector ?: return@all
 
-                    if (requestedModule.moduleIdentifier.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) &&  requestedModule.module.contains("__kgp_")) {
+                    if (requestedModule.moduleIdentifier.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) &&
+                        requestedModule.module.contains("__kgp_")
+                    ) {
                         val baseTargetModuleId = requestedModule.toString().substringBefore("__kgp_")
 
-                        val updatedCoordinate = baseTargetModuleId + "__kgp_" + skieInternalExtension.kotlinVersion + ":" + BuildConfig.SKIE_VERSION
+                        val updatedCoordinate =
+                            baseTargetModuleId + "__kgp_" + skieInternalExtension.kotlinVersion + ":" + BuildConfig.SKIE_VERSION
 
                         logger.debug("Replacing {} with {}", requested, updatedCoordinate)
                         useTarget(updatedCoordinate)
@@ -81,9 +90,7 @@ fun SkieTarget.addDependencyOnSkieRuntime() {
     }
 }
 
-private fun SkieTarget.registerSkieRuntime(
-    skieRuntimeConfiguration: Configuration,
-) {
+private fun SkieTarget.registerSkieRuntime(skieRuntimeConfiguration: Configuration) {
     val skieRuntimeDependency = skieRuntimeConfiguration.getSkieRuntimeDependency()
 
     val skieRuntimeDirectDependencies = skieRuntimeDependency.getSkieRuntimeDirectDependencies()
@@ -123,11 +130,10 @@ private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(): Configuration {
     return skieRuntimeConfiguration
 }
 
-private fun Configuration.getSkieRuntimeDependency(): ResolvedDependency =
-    resolvedConfiguration.firstLevelModuleDependencies
-        .single()
-        .unwrapCommonKMPModule()
-        .single()
+private fun Configuration.getSkieRuntimeDependency(): ResolvedDependency = resolvedConfiguration.firstLevelModuleDependencies
+    .single()
+    .unwrapCommonKMPModule()
+    .single()
 
 private fun ResolvedDependency.getSkieRuntimeDirectDependencies(): List<ModuleIdentifier> =
     children.flatMap { it.unwrapCommonKMPModule() }.map { it.module.id.module }
@@ -156,7 +162,10 @@ private fun SkieTarget.verifyAllRuntimeDependenciesAreAvailable(
     }
 }
 
-private fun SkieTarget.passRuntimeDependencyToCompiler(skieRuntimeDependency: ResolvedDependency, linkerResolvedConfiguration: ResolvedConfiguration) {
+private fun SkieTarget.passRuntimeDependencyToCompiler(
+    skieRuntimeDependency: ResolvedDependency,
+    linkerResolvedConfiguration: ResolvedConfiguration,
+) {
     val runtimeArtifact = skieRuntimeDependency.moduleArtifacts.single { it.file.isKlib }
 
     // Ensures that SKIE does not add the runtime for the second time if it is already present due to the issue with dependency pollution.
@@ -180,5 +189,4 @@ private val SkieTarget.skieRuntimeConfigurationName: String
     get() = "skieRuntimeFor" + linkerConfiguration.name.replaceFirstChar { it.uppercase() }
 
 // Due to how KMP dependencies work there is a difference in the behavior of local and remote dependencies.
-private fun ResolvedDependency.unwrapCommonKMPModule(): Set<ResolvedDependency> =
-    if (moduleArtifacts.isEmpty()) children else setOf(this)
+private fun ResolvedDependency.unwrapCommonKMPModule(): Set<ResolvedDependency> = if (moduleArtifacts.isEmpty()) children else setOf(this)

@@ -1,11 +1,6 @@
 package co.touchlab.skie.util
 
-data class TargetTriple(
-    val architecture: String,
-    val vendor: String,
-    val os: String,
-    val environment: String?,
-) {
+data class TargetTriple(val architecture: String, val vendor: String, val os: String, val environment: String?) {
 
     override fun toString(): String {
         val envSuffix = environment?.let { "-$environment" } ?: ""
@@ -13,8 +8,7 @@ data class TargetTriple(
         return "$architecture-$vendor-$os$envSuffix"
     }
 
-    fun withOsVersion(osVersion: String): TargetTriple =
-        copy(os = "$os$osVersion")
+    fun withOsVersion(osVersion: String): TargetTriple = copy(os = "$os$osVersion")
 
     companion object {
 

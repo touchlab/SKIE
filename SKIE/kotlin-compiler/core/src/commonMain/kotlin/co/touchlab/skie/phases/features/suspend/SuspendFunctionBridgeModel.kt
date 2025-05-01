@@ -5,10 +5,7 @@ import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirSimpleFunction
 
-data class SuspendFunctionBridgeModel(
-    val suspendKirFunction: KirSimpleFunction,
-    val kotlinBridgingKirFunction: KirSimpleFunction,
-) {
+data class SuspendFunctionBridgeModel(val suspendKirFunction: KirSimpleFunction, val kotlinBridgingKirFunction: KirSimpleFunction) {
 
     val originalFunction: SirSimpleFunction =
         suspendKirFunction.bridgedSirFunction ?: error("Suspend function $suspendKirFunction does not have an async bridge.")

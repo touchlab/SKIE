@@ -120,60 +120,52 @@ object SirCodeGenerator {
         )
     }
 
-    private fun <T: BuilderWithDocs<T>, E> T.addDoc(
-        element: E,
-    ): T where E: SirDeclaration = apply {
+    private fun <T : BuilderWithDocs<T>, E> T.addDoc(element: E): T where E : SirDeclaration = apply {
         if (element.documentation.isNotBlank()) {
             addDoc(
-                CodeBlock.of("%L", element.documentation)
+                CodeBlock.of("%L", element.documentation),
             )
         }
     }
 
     private fun <T : BuilderWithModifiers, E> T.addVisibilityAndModality(
         element: E,
-    ): T where E : SirElementWithModality, E : SirDeclarationWithVisibility =
-        apply {
-            if (!element.shouldHaveOpenModifier()) {
-                addVisibility(element)
-            }
-            addModifiers(*element.toSwiftPoetModality().toTypedArray())
+    ): T where E : SirElementWithModality, E : SirDeclarationWithVisibility = apply {
+        if (!element.shouldHaveOpenModifier()) {
+            addVisibility(element)
+        }
+        addModifiers(*element.toSwiftPoetModality().toTypedArray())
+    }
+
+    private fun <T : BuilderWithModifiers> T.addVisibility(declaration: SirDeclarationWithVisibility): T = apply {
+        val visibilityModifier = declaration.visibility.toSwiftPoetVisibility()
+        val defaultVisibilityModifier = SirVisibility.Internal.toSwiftPoetVisibility()
+
+        if (visibilityModifier == defaultVisibilityModifier) {
+            return@apply
         }
 
-    private fun <T : BuilderWithModifiers> T.addVisibility(
-        declaration: SirDeclarationWithVisibility,
-    ): T =
-        apply {
-            val visibilityModifier = declaration.visibility.toSwiftPoetVisibility()
-            val defaultVisibilityModifier = SirVisibility.Internal.toSwiftPoetVisibility()
+        addModifiers(visibilityModifier)
+    }
 
-            if (visibilityModifier == defaultVisibilityModifier) {
-                return@apply
-            }
-
-            addModifiers(visibilityModifier)
-        }
-
-    private fun SirVisibility.toSwiftPoetVisibility(): Modifier =
-        when (this) {
-            SirVisibility.Public -> Modifier.PUBLIC
-            SirVisibility.Internal -> Modifier.INTERNAL
-            SirVisibility.Private -> Modifier.PRIVATE
-            SirVisibility.Removed -> error("Removed declarations should not be generated and must be filtered out sooner.")
-        }
+    private fun SirVisibility.toSwiftPoetVisibility(): Modifier = when (this) {
+        SirVisibility.Public -> Modifier.PUBLIC
+        SirVisibility.Internal -> Modifier.INTERNAL
+        SirVisibility.Private -> Modifier.PRIVATE
+        SirVisibility.Removed -> error("Removed declarations should not be generated and must be filtered out sooner.")
+    }
 
     private fun <E> E.shouldHaveOpenModifier(): Boolean where E : SirElementWithModality, E : SirDeclarationWithVisibility =
         modality == SirModality.Open && visibility == SirVisibility.Public && (parent as? SirClass)?.modality == SirModality.Open
 
-    private fun SirElementWithModality.shouldHaveFinalModifier(): Boolean =
-        when (this) {
-            is SirClass -> kind == SirClass.Kind.Class && modality == SirModality.Final
-            is SirSimpleFunction -> {
-                val parent = parent
-                modality == SirModality.Final && parent is SirClass && parent.modality != SirModality.Final && scope != SirScope.Static
-            }
-            is SirProperty -> false
+    private fun SirElementWithModality.shouldHaveFinalModifier(): Boolean = when (this) {
+        is SirClass -> kind == SirClass.Kind.Class && modality == SirModality.Final
+        is SirSimpleFunction -> {
+            val parent = parent
+            modality == SirModality.Final && parent is SirClass && parent.modality != SirModality.Final && scope != SirScope.Static
         }
+        is SirProperty -> false
+    }
 
     private fun <E> E.toSwiftPoetModality(): Set<Modifier> where E : SirElementWithModality, E : SirDeclarationWithVisibility =
         setOfNotNull(
@@ -181,7 +173,7 @@ object SirCodeGenerator {
             Modifier.OPEN.takeIf { shouldHaveOpenModifier() },
         )
 
-    private fun <B: BuilderWithAssociatedTypes<B>> B.addTypeParametersOrAssociatedTypes(parent: SirClass) = apply {
+    private fun <B : BuilderWithAssociatedTypes<B>> B.addTypeParametersOrAssociatedTypes(parent: SirClass) = apply {
         if (parent.kind == SirClass.Kind.Protocol) {
             parent.typeParameters.forEach {
                 addAssociatedType(it)
@@ -191,16 +183,16 @@ object SirCodeGenerator {
         }
     }
 
-    private fun <B: BuilderWithAssociatedTypes<B>> B.addAssociatedType(typeDeclaration: SirTypeParameter) {
+    private fun <B : BuilderWithAssociatedTypes<B>> B.addAssociatedType(typeDeclaration: SirTypeParameter) {
         val bounds = typeDeclaration.bounds.map { it.toSwiftPoetTypeVariableNameBound() }
 
         addAssociatedType(
-            TypeVariableName.typeVariable(typeDeclaration.name, bounds)
+            TypeVariableName.typeVariable(typeDeclaration.name, bounds),
         )
 
         if (typeDeclaration.isPrimaryAssociatedType) {
             addTypeVariable(
-                TypeVariableName.typeVariable(typeDeclaration.name)
+                TypeVariableName.typeVariable(typeDeclaration.name),
             )
         }
     }
@@ -239,14 +231,13 @@ object SirCodeGenerator {
         )
     }
 
-    private fun <B: BuilderWithConditionalConstraints<B>> B.addConditionalConstraints(parent: SirConditionalConstraintParent): B =
-        apply {
-            parent.conditionalConstraints.forEach {
-                addConditionalConstraint(it)
-            }
+    private fun <B : BuilderWithConditionalConstraints<B>> B.addConditionalConstraints(parent: SirConditionalConstraintParent): B = apply {
+        parent.conditionalConstraints.forEach {
+            addConditionalConstraint(it)
         }
+    }
 
-    private fun <B: BuilderWithConditionalConstraints<B>> B.addConditionalConstraint(conditionalConstraint: SirConditionalConstraint) {
+    private fun <B : BuilderWithConditionalConstraints<B>> B.addConditionalConstraint(conditionalConstraint: SirConditionalConstraint) {
         val bounds = conditionalConstraint.bounds.map { it.toSwiftPoetTypeVariableNameBound() }
 
         addConditionalConstraint(
@@ -254,12 +245,11 @@ object SirCodeGenerator {
         )
     }
 
-    private fun ExtensionSpec.Builder.addExtensionDeclarations(extension: SirExtension): ExtensionSpec.Builder =
-        apply {
-            extension.declarations.forEach {
-                addExtensionDeclaration(it)
-            }
+    private fun ExtensionSpec.Builder.addExtensionDeclarations(extension: SirExtension): ExtensionSpec.Builder = apply {
+        extension.declarations.forEach {
+            addExtensionDeclaration(it)
         }
+    }
 
     private fun ExtensionSpec.Builder.addExtensionDeclaration(declaration: SirDeclaration) {
         when (declaration) {
@@ -293,10 +283,9 @@ object SirCodeGenerator {
         )
     }
 
-    private fun <B: BuilderWithSuperTypes<B>> B.addSuperTypes(sirDeclarationWithSuperTypes: SirDeclarationWithSuperTypes) =
-        apply {
-            addSuperTypes(sirDeclarationWithSuperTypes.superTypes.map { it.toSwiftPoetTypeName() })
-        }
+    private fun <B : BuilderWithSuperTypes<B>> B.addSuperTypes(sirDeclarationWithSuperTypes: SirDeclarationWithSuperTypes) = apply {
+        addSuperTypes(sirDeclarationWithSuperTypes.superTypes.map { it.toSwiftPoetTypeName() })
+    }
 
     private val SirClass.swiftPoetKind: TypeSpec.Kind
         get() = when (kind) {
@@ -307,36 +296,33 @@ object SirCodeGenerator {
             SirClass.Kind.Actor -> TypeSpec.Kind.Actor()
         }
 
-    private fun TypeSpec.Builder.addClassDeclarations(sirClass: SirClass): TypeSpec.Builder =
-        apply {
-            sirClass.declarations.forEach {
-                addClassDeclaration(it)
-            }
+    private fun TypeSpec.Builder.addClassDeclarations(sirClass: SirClass): TypeSpec.Builder = apply {
+        sirClass.declarations.forEach {
+            addClassDeclaration(it)
+        }
+    }
+
+    private fun TypeSpec.Builder.addEnumCases(sirClass: SirClass): TypeSpec.Builder = apply {
+        sirClass.enumCases.forEach {
+            generateEnumCase(it)
+        }
+    }
+
+    private fun TypeSpec.Builder.addDeinit(sirClass: SirClass): TypeSpec.Builder = apply {
+        if (sirClass.deinitBuilder.isEmpty()) {
+            return@apply
         }
 
-    private fun TypeSpec.Builder.addEnumCases(sirClass: SirClass): TypeSpec.Builder =
-        apply {
-            sirClass.enumCases.forEach {
-                generateEnumCase(it)
-            }
-        }
-
-    private fun TypeSpec.Builder.addDeinit(sirClass: SirClass): TypeSpec.Builder =
-        apply {
-            if (sirClass.deinitBuilder.isEmpty()) {
-                return@apply
-            }
-
-            addFunction(
-                FunctionSpec.deinitializerBuilder()
-                    .apply {
-                        sirClass.deinitBuilder.forEach {
-                            it()
-                        }
+        addFunction(
+            FunctionSpec.deinitializerBuilder()
+                .apply {
+                    sirClass.deinitBuilder.forEach {
+                        it()
                     }
-                    .build(),
-            )
-        }
+                }
+                .build(),
+        )
+    }
 
     private fun TypeSpec.Builder.addClassDeclaration(declaration: SirDeclaration) {
         when (declaration) {
@@ -401,33 +387,31 @@ object SirCodeGenerator {
         )
     }
 
-    private fun PropertySpec.Builder.addGetter(property: SirProperty): PropertySpec.Builder =
-        this.apply {
-            val getter = property.getter ?: return@apply
+    private fun PropertySpec.Builder.addGetter(property: SirProperty): PropertySpec.Builder = this.apply {
+        val getter = property.getter ?: return@apply
 
-            getter(
-                FunctionSpec.getterBuilder()
-                    .throws(getter.throws)
-                    .addAttributes(getter)
-                    .applyBuilderModifications(getter)
-                    .build(),
-            )
-        }
+        getter(
+            FunctionSpec.getterBuilder()
+                .throws(getter.throws)
+                .addAttributes(getter)
+                .applyBuilderModifications(getter)
+                .build(),
+        )
+    }
 
-    private fun PropertySpec.Builder.addSetter(property: SirProperty): PropertySpec.Builder =
-        this.apply {
-            val setter = property.setter ?: return@apply
+    private fun PropertySpec.Builder.addSetter(property: SirProperty): PropertySpec.Builder = this.apply {
+        val setter = property.setter ?: return@apply
 
-            setter(
-                FunctionSpec.setterBuilder()
-                    .addParameter(setter.parameterName, property.type.toSwiftPoetTypeName())
-                    .throws(setter.throws)
-                    .addAttributes(setter)
-                    .addModifiers(setter)
-                    .applyBuilderModifications(setter)
-                    .build(),
-            )
-        }
+        setter(
+            FunctionSpec.setterBuilder()
+                .addParameter(setter.parameterName, property.type.toSwiftPoetTypeName())
+                .throws(setter.throws)
+                .addAttributes(setter)
+                .addModifiers(setter)
+                .applyBuilderModifications(setter)
+                .build(),
+        )
+    }
 
     private fun <T : BuilderWithMembers> T.generateConstructor(constructor: SirConstructor) {
         if (constructor.isRemoved) {
@@ -446,40 +430,38 @@ object SirCodeGenerator {
         )
     }
 
-    private fun FunctionSpec.Builder.addFunctionProperties(function: SirFunction): FunctionSpec.Builder =
-        this.apply {
-            addCallableDeclarationProperties(function)
-            throws(function.throws)
-            addValueParameters(function)
-            applyBuilderModifications(function)
-        }
+    private fun FunctionSpec.Builder.addFunctionProperties(function: SirFunction): FunctionSpec.Builder = this.apply {
+        addCallableDeclarationProperties(function)
+        throws(function.throws)
+        addValueParameters(function)
+        applyBuilderModifications(function)
+    }
 
-    private fun <T> T.addCallableDeclarationProperties(callableDeclaration: SirCallableDeclaration): T
-        where T : BuilderWithModifiers, T : AttributedSpec.Builder<*> =
-        this.apply {
-            addAttributes(callableDeclaration)
-            addModifiers(callableDeclaration)
-        }
+    private fun <T> T.addCallableDeclarationProperties(
+        callableDeclaration: SirCallableDeclaration,
+    ): T
+        where T : BuilderWithModifiers, T : AttributedSpec.Builder<*> = this.apply {
+        addAttributes(callableDeclaration)
+        addModifiers(callableDeclaration)
+    }
 
     private fun FunctionSpec.Builder.applyBuilderModifications(
         elementWithSwiftPoetBuilderModifications: SirElementWithFunctionBodyBuilder,
-    ): FunctionSpec.Builder =
-        apply {
-            if (elementWithSwiftPoetBuilderModifications.bodyBuilder.isNotEmpty()) {
-                elementWithSwiftPoetBuilderModifications.bodyBuilder.forEach {
-                    it(this)
-                }
-            } else {
-                abstract = true
+    ): FunctionSpec.Builder = apply {
+        if (elementWithSwiftPoetBuilderModifications.bodyBuilder.isNotEmpty()) {
+            elementWithSwiftPoetBuilderModifications.bodyBuilder.forEach {
+                it(this)
             }
+        } else {
+            abstract = true
         }
+    }
 
-    private fun <T : AttributedSpec.Builder<*>> T.addAttributes(elementWithAttributes: SirElementWithAttributes): T =
-        this.apply {
-            elementWithAttributes.attributes.forEach {
-                addRawAttribute(it)
-            }
+    private fun <T : AttributedSpec.Builder<*>> T.addAttributes(elementWithAttributes: SirElementWithAttributes): T = this.apply {
+        elementWithAttributes.attributes.forEach {
+            addRawAttribute(it)
         }
+    }
 
     private fun <T : AttributedSpec.Builder<*>> T.addRawAttribute(attribute: String) {
         addAttribute(
@@ -487,17 +469,15 @@ object SirCodeGenerator {
         )
     }
 
-    private fun <T : BuilderWithModifiers> T.addModifiers(elementWithModifiers: SirElementWithModifiers): T =
-        this.apply {
-            addModifiers(*elementWithModifiers.modifiers.toTypedArray())
-        }
+    private fun <T : BuilderWithModifiers> T.addModifiers(elementWithModifiers: SirElementWithModifiers): T = this.apply {
+        addModifiers(*elementWithModifiers.modifiers.toTypedArray())
+    }
 
-    private fun FunctionSpec.Builder.addValueParameters(function: SirFunction): FunctionSpec.Builder =
-        this.apply {
-            function.valueParameters.forEach {
-                addValueParameter(it)
-            }
+    private fun FunctionSpec.Builder.addValueParameters(function: SirFunction): FunctionSpec.Builder = this.apply {
+        function.valueParameters.forEach {
+            addValueParameter(it)
         }
+    }
 
     private fun FunctionSpec.Builder.addValueParameter(valueParameter: SirValueParameter) {
         val builder = ParameterSpec.builder(valueParameter.label, valueParameter.name, valueParameter.type.toSwiftPoetTypeName())
@@ -513,18 +493,16 @@ object SirCodeGenerator {
         addParameter(builder.build())
     }
 
-    private fun <T : BuilderWithModifiers> T.addScope(declarationWithScope: SirDeclarationWithScope): T =
-        this.apply {
-            when (declarationWithScope.scope) {
-                SirScope.Static -> addModifiers(Modifier.STATIC)
-                SirScope.Class -> addModifiers(Modifier.CLASS)
-                SirScope.Member, SirScope.Global -> {
-                }
+    private fun <T : BuilderWithModifiers> T.addScope(declarationWithScope: SirDeclarationWithScope): T = this.apply {
+        when (declarationWithScope.scope) {
+            SirScope.Static -> addModifiers(Modifier.STATIC)
+            SirScope.Class -> addModifiers(Modifier.CLASS)
+            SirScope.Member, SirScope.Global -> {
             }
         }
+    }
 
-    private fun SirType.toSwiftPoetTypeName(): TypeName =
-        evaluate().swiftPoetTypeName
+    private fun SirType.toSwiftPoetTypeName(): TypeName = evaluate().swiftPoetTypeName
 
     private fun <T : BuilderWithModifiers> T.addOverrideIfNeeded(overridableDeclaration: SirOverridableDeclaration<*>): T =
         applyIf(overridableDeclaration.needsOverride) {
@@ -534,10 +512,9 @@ object SirCodeGenerator {
     private val SirOverridableDeclaration<*>.needsOverride: Boolean
         get() = overriddenDeclarations.any { it.memberOwner?.kind == SirClass.Kind.Class }
 
-    private fun <T> T.applyIf(condition: Boolean, action: T.() -> Unit): T =
-        this.apply {
-            if (condition) {
-                action()
-            }
+    private fun <T> T.applyIf(condition: Boolean, action: T.() -> Unit): T = this.apply {
+        if (condition) {
+            action()
         }
+    }
 }

@@ -20,10 +20,7 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 @Suppress("PropertyName", "FunctionName")
-class SirBuiltins(
-    sirProvider: SirProvider,
-    globalConfiguration: GlobalConfiguration,
-) {
+class SirBuiltins(sirProvider: SirProvider, globalConfiguration: GlobalConfiguration) {
 
     val Swift = Modules.Swift(sirProvider)
 
@@ -109,6 +106,7 @@ class SirBuiltins(
             val Double by Struct(superTypes = listOf(Hashable.defaultType))
 
             val SIMDScalar by Protocol()
+
             // TODO: There are more superTypes, but we don't need them
             val SIMD by Protocol(superTypes = listOf(Hashable.defaultType)) {
                 SirTypeParameter(
@@ -183,8 +181,8 @@ class SirBuiltins(
 
             val EmptyView by Struct(
                 superTypes = listOf(
-                    View.defaultType
-                )
+                    View.defaultType,
+                ),
             )
 
             val Binding by Struct {
@@ -194,7 +192,7 @@ class SirBuiltins(
             val ObservableObject by Protocol(
                 superTypes = listOf(
                     swift.AnyObject.defaultType,
-                )
+                ),
             ) {
                 // TODO: Declared as: `associatedtype ObjectWillChangePublisher : Publisher = ObservableObjectPublisher where Self.ObjectWillChangePublisher.Failure == Never`
                 SirTypeParameter("ObjectWillChangePublisher")
@@ -324,8 +322,7 @@ class SirBuiltins(
 
                 private object NoClassDeclarationProperty : ReadOnlyProperty<Any?, SirClass?> {
 
-                    override fun getValue(thisRef: Any?, property: KProperty<*>): SirClass? =
-                        null
+                    override fun getValue(thisRef: Any?, property: KProperty<*>): SirClass? = null
                 }
             }
 
@@ -345,8 +342,7 @@ class SirBuiltins(
                     origin = origin,
                 ).apply(apply)
 
-                override fun getValue(thisRef: Any?, property: KProperty<*>): SirClass =
-                    value
+                override fun getValue(thisRef: Any?, property: KProperty<*>): SirClass = value
             }
 
             inner class TypeAliasDeclarationPropertyProvider(
@@ -378,8 +374,7 @@ class SirBuiltins(
                     typeFactory = typeFactory,
                 ).apply(apply)
 
-                override fun getValue(thisRef: Any?, property: KProperty<*>): SirTypeAlias =
-                    value
+                override fun getValue(thisRef: Any?, property: KProperty<*>): SirTypeAlias = value
             }
         }
     }

@@ -10,9 +10,7 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.pathString
 
-class CompileSwiftPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+class CompileSwiftPhase(context: SirPhase.Context) : SirPhase {
 
     private val framework = context.framework
     private val cacheableKotlinFramework = context.cacheableKotlinFramework
@@ -29,10 +27,12 @@ class CompileSwiftPhase(
 
     private val isLibraryEvolutionEnabled = SkieConfigurationFlag.Build_SwiftLibraryEvolution in globalConfiguration.enabledFlags
     private val isParallelSwiftCompilationEnabled = SkieConfigurationFlag.Build_ParallelSwiftCompilation in globalConfiguration.enabledFlags
-    private val isConcurrentSkieCompilationEnabled = SkieConfigurationFlag.Build_ConcurrentSkieCompilation in globalConfiguration.enabledFlags
+    private val isConcurrentSkieCompilationEnabled =
+        SkieConfigurationFlag.Build_ConcurrentSkieCompilation in globalConfiguration.enabledFlags
     private val noClangModuleBreadcrumbsInStaticFramework =
         SkieConfigurationFlag.Build_NoClangModuleBreadcrumbsInStaticFramework in globalConfiguration.enabledFlags
-    private val isRelativeSourcePathsInDebugSymbolsEnabled = SkieConfigurationFlag.Build_RelativeSourcePathsInDebugSymbols in globalConfiguration.enabledFlags
+    private val isRelativeSourcePathsInDebugSymbolsEnabled =
+        SkieConfigurationFlag.Build_RelativeSourcePathsInDebugSymbols in globalConfiguration.enabledFlags
 
     context(SirPhase.Context)
     override suspend fun execute() {
@@ -70,7 +70,7 @@ class CompileSwiftPhase(
                 "emit-module-dependencies": "${moduleDirectory.dependencies(framework.frameworkName).absolutePath}",
                 "swift-dependencies": "${moduleDirectory.swiftDependencies(framework.frameworkName).absolutePath}"
             },
-            """.trimIndent()
+        """.trimIndent()
 
         val body = compilableFiles.joinToString(",\n") { compilableFile ->
             val sourceFileName = compilableFile.relativePath.nameWithoutExtension
@@ -100,7 +100,7 @@ class CompileSwiftPhase(
                     "object": "${objectFile.absolutePath.absolutePathString()}"
                 }
             }
-            """.trimIndent()
+        """.trimIndent()
     }
 
     private fun callSwiftCompiler() {
@@ -122,7 +122,9 @@ class CompileSwiftPhase(
                 +"-emit-private-module-interface-path"
                 +swiftFrameworkHeader.privateSwiftInterface
             }
-            if (noClangModuleBreadcrumbsInStaticFramework && swiftCompilerConfiguration.linkMode == SwiftCompilerConfiguration.LinkMode.Static) {
+            if (noClangModuleBreadcrumbsInStaticFramework &&
+                swiftCompilerConfiguration.linkMode == SwiftCompilerConfiguration.LinkMode.Static
+            ) {
                 +"-Xfrontend"
                 +"-no-clang-module-breadcrumbs"
             }
@@ -170,12 +172,11 @@ class CompileSwiftPhase(
         }
     }
 
-    private fun getSwiftcBitcodeArg() =
-        when (swiftCompilerConfiguration.bitcodeEmbeddingMode) {
-            SwiftCompilerConfiguration.BitcodeEmbeddingMode.None -> null
-            SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker -> "-embed-bitcode-marker"
-            SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full -> "-embed-bitcode"
-        }
+    private fun getSwiftcBitcodeArg() = when (swiftCompilerConfiguration.bitcodeEmbeddingMode) {
+        SwiftCompilerConfiguration.BitcodeEmbeddingMode.None -> null
+        SwiftCompilerConfiguration.BitcodeEmbeddingMode.Marker -> "-embed-bitcode-marker"
+        SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full -> "-embed-bitcode"
+    }
 
     private val parallelizationArgument: String
         get() {

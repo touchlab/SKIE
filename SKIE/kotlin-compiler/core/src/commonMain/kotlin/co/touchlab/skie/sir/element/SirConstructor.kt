@@ -48,18 +48,17 @@ class SirConstructor(
             throws: Boolean = false,
             deprecationLevel: DeprecationLevel = DeprecationLevel.None,
             isWrappedBySkie: Boolean = false,
-        ): SirConstructor =
-            SirConstructor(
-                parent = this@SirDeclarationNamespace,
-                visibility = visibility,
-                isHidden = isHidden,
-                attributes = attributes,
-                modifiers = modifiers,
-                isConvenience = isConvenience,
-                throws = throws,
-                deprecationLevel = deprecationLevel,
-                isWrappedBySkie = isWrappedBySkie,
-            )
+        ): SirConstructor = SirConstructor(
+            parent = this@SirDeclarationNamespace,
+            visibility = visibility,
+            isHidden = isHidden,
+            attributes = attributes,
+            modifiers = modifiers,
+            isConvenience = isConvenience,
+            throws = throws,
+            deprecationLevel = deprecationLevel,
+            isWrappedBySkie = isWrappedBySkie,
+        )
     }
 }
 
@@ -73,15 +72,14 @@ fun SirConstructor.shallowCopy(
     throws: Boolean = this.throws,
     deprecationLevel: DeprecationLevel = this.deprecationLevel,
     isWrappedBySkie: Boolean = false,
-): SirConstructor =
-    SirConstructor(
-        parent = parent,
-        visibility = visibility,
-        isHidden = isHidden,
-        attributes = attributes,
-        modifiers = modifiers,
-        isConvenience = isConvenience,
-        throws = throws,
-        deprecationLevel = deprecationLevel,
-        isWrappedBySkie = isWrappedBySkie,
-    )
+): SirConstructor = SirConstructor(
+    parent = parent,
+    visibility = visibility,
+    isHidden = isHidden,
+    attributes = attributes,
+    modifiers = modifiers,
+    isConvenience = isConvenience,
+    throws = throws,
+    deprecationLevel = deprecationLevel,
+    isWrappedBySkie = isWrappedBySkie,
+)

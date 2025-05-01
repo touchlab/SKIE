@@ -72,35 +72,34 @@ private fun KirClass.generateBridge(): SirClass {
 }
 
 context(SirPhase.Context)
-private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
-    SirClass(
-        baseName = enumKirClass.originalSirClass.baseName,
-        parent = enumKirClass.originalSirClass.namespace?.let { namespace ->
-            sirProvider.getExtension(
-                classDeclaration = namespace.classDeclaration,
-                parent = namespaceProvider.getNamespaceFile(enumKirClass),
-            )
-        } ?: namespaceProvider.getNamespaceFile(enumKirClass),
-        kind = SirClass.Kind.Enum,
-    ).apply {
-        addEnumCases(enumKirClass)
-
-        superTypes += listOf(
-            sirBuiltins.Swift.Hashable.defaultType,
-            sirBuiltins.Swift.CaseIterable.defaultType,
-            sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
+private fun createBridgingEnum(enumKirClass: KirClass): SirClass = SirClass(
+    baseName = enumKirClass.originalSirClass.baseName,
+    parent = enumKirClass.originalSirClass.namespace?.let { namespace ->
+        sirProvider.getExtension(
+            classDeclaration = namespace.classDeclaration,
+            parent = namespaceProvider.getNamespaceFile(enumKirClass),
         )
+    } ?: namespaceProvider.getNamespaceFile(enumKirClass),
+    kind = SirClass.Kind.Enum,
+).apply {
+    addEnumCases(enumKirClass)
 
-        attributes.add("frozen")
+    superTypes += listOf(
+        sirBuiltins.Swift.Hashable.defaultType,
+        sirBuiltins.Swift.CaseIterable.defaultType,
+        sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
+    )
 
-        ExhaustiveEnumsMembersPassthroughGenerator.generatePassthroughForMembers(enumKirClass, this)
-        ExhaustiveEnumsObjectiveCBridgeableGenerator.addObjcBridgeableImplementation(enumKirClass, this)
+    attributes.add("frozen")
 
-        doInPhase(ExhaustiveEnumsGenerator.NestedTypeDeclarationsPhase) {
-            addNestedClassTypeAliases(enumKirClass)
-            addCompanionObjectPropertyIfNeeded(enumKirClass)
-        }
+    ExhaustiveEnumsMembersPassthroughGenerator.generatePassthroughForMembers(enumKirClass, this)
+    ExhaustiveEnumsObjectiveCBridgeableGenerator.addObjcBridgeableImplementation(enumKirClass, this)
+
+    doInPhase(ExhaustiveEnumsGenerator.NestedTypeDeclarationsPhase) {
+        addNestedClassTypeAliases(enumKirClass)
+        addCompanionObjectPropertyIfNeeded(enumKirClass)
     }
+}
 
 private fun SirClass.addEnumCases(enum: KirClass) {
     enum.enumEntries.forEach {

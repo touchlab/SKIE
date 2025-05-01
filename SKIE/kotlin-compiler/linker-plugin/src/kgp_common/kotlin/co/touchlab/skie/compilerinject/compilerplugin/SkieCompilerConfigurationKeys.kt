@@ -2,9 +2,9 @@ package co.touchlab.skie.compilerinject.compilerplugin
 
 import co.touchlab.skie.context.InitPhaseContext
 import co.touchlab.skie.context.MainSkieContext
+import co.touchlab.skie.util.directory.SkieDirectories as SkieDirectoriesValue
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
-import co.touchlab.skie.util.directory.SkieDirectories as SkieDirectoriesValue
 
 object SkieConfigurationKeys {
 

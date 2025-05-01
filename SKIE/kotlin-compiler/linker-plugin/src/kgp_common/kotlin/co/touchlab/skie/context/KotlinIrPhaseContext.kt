@@ -12,11 +12,9 @@ import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
-class KotlinIrPhaseContext(
-    mainSkieContext: MainSkieContext,
-    val moduleFragment: IrModuleFragment,
-    val pluginContext: IrPluginContext,
-) : KotlinIrPhase.Context, ForegroundPhaseCompilerContext by mainSkieContext {
+class KotlinIrPhaseContext(mainSkieContext: MainSkieContext, val moduleFragment: IrModuleFragment, val pluginContext: IrPluginContext) :
+    KotlinIrPhase.Context,
+    ForegroundPhaseCompilerContext by mainSkieContext {
 
     override val context: KotlinIrPhaseContext = this
 

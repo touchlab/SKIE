@@ -5,10 +5,10 @@ package co.touchlab.skie.plugin.configuration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.configuration.internal.SwiftCompilerConfigurationKeys
 import co.touchlab.skie.plugin.util.takeIf
+import javax.inject.Inject
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import javax.inject.Inject
 
 abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory) {
 
@@ -74,17 +74,17 @@ abstract class SkieBuildConfiguration @Inject constructor(objects: ObjectFactory
         enableRelativeSourcePathsInDebugSymbols.set(true)
     }
 
-    internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
-        setOfNotNull(
-            SkieConfigurationFlag.Build_SwiftLibraryEvolution takeIf enableSwiftLibraryEvolution,
-            SkieConfigurationFlag.Build_NoClangModuleBreadcrumbsInStaticFramework takeIf noClangModuleBreadcrumbsInStaticFrameworks,
-            SkieConfigurationFlag.Build_ParallelSwiftCompilation takeIf enableParallelSwiftCompilation,
-            SkieConfigurationFlag.Build_ConcurrentSkieCompilation takeIf enableConcurrentSkieCompilation,
-            SkieConfigurationFlag.Build_ParallelSkieCompilation takeIf enableParallelSkieCompilation,
-            SkieConfigurationFlag.Build_RelativeSourcePathsInDebugSymbols takeIf enableRelativeSourcePathsInDebugSymbols,
-        )
+    internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> = setOfNotNull(
+        SkieConfigurationFlag.Build_SwiftLibraryEvolution takeIf enableSwiftLibraryEvolution,
+        SkieConfigurationFlag.Build_NoClangModuleBreadcrumbsInStaticFramework takeIf noClangModuleBreadcrumbsInStaticFrameworks,
+        SkieConfigurationFlag.Build_ParallelSwiftCompilation takeIf enableParallelSwiftCompilation,
+        SkieConfigurationFlag.Build_ConcurrentSkieCompilation takeIf enableConcurrentSkieCompilation,
+        SkieConfigurationFlag.Build_ParallelSkieCompilation takeIf enableParallelSkieCompilation,
+        SkieConfigurationFlag.Build_RelativeSourcePathsInDebugSymbols takeIf enableRelativeSourcePathsInDebugSymbols,
+    )
 
     internal fun buildItems(): Map<String, String?> = mapOf(
-        SwiftCompilerConfigurationKeys.FreeCompilerArgs.name to SwiftCompilerConfigurationKeys.FreeCompilerArgs.serialize(freeSwiftCompilerArgs.get()),
+        SwiftCompilerConfigurationKeys.FreeCompilerArgs.name to
+            SwiftCompilerConfigurationKeys.FreeCompilerArgs.serialize(freeSwiftCompilerArgs.get()),
     )
 }

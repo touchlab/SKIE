@@ -31,19 +31,21 @@ fun KotlinToolingVersion(kotlinVersionString: String): KotlinToolingVersion {
     )
 }
 
-fun KotlinToolingVersion(kotlinVersion: KotlinVersion, classifier: String? = null): KotlinToolingVersion {
-    return KotlinToolingVersion(kotlinVersion.major, kotlinVersion.minor, kotlinVersion.patch, classifier)
-}
+fun KotlinToolingVersion(kotlinVersion: KotlinVersion, classifier: String? = null): KotlinToolingVersion =
+    KotlinToolingVersion(kotlinVersion.major, kotlinVersion.minor, kotlinVersion.patch, classifier)
 
-class KotlinToolingVersion(
-    val major: Int,
-    val minor: Int,
-    val patch: Int,
-    val classifier: String?,
-) : Comparable<KotlinToolingVersion>, Serializable {
+class KotlinToolingVersion(val major: Int, val minor: Int, val patch: Int, val classifier: String?) :
+    Comparable<KotlinToolingVersion>,
+    Serializable {
 
     enum class Maturity {
-        SNAPSHOT, DEV, MILESTONE, ALPHA, BETA, RC, STABLE
+        SNAPSHOT,
+        DEV,
+        MILESTONE,
+        ALPHA,
+        BETA,
+        RC,
+        STABLE,
     }
 
     val maturity: Maturity = run {
@@ -129,19 +131,14 @@ class KotlinToolingVersion(
         return result
     }
 
-    override fun toString(): String {
-        return "$major.$minor.$patch" + if (classifier != null) "-$classifier" else ""
-    }
+    override fun toString(): String = "$major.$minor.$patch" + if (classifier != null) "-$classifier" else ""
 }
 
-fun KotlinToolingVersion.toIdentifier(): String =
-    "`" + toString().replace(".", "_") + "`"
+fun KotlinToolingVersion.toIdentifier(): String = "`" + toString().replace(".", "_") + "`"
 
-fun KotlinToolingVersion.toKotlinVersion(): KotlinVersion =
-    KotlinVersion(major, minor, patch)
+fun KotlinToolingVersion.toKotlinVersion(): KotlinVersion = KotlinVersion(major, minor, patch)
 
-fun KotlinVersion.toKotlinToolingVersion(classifier: String? = null): KotlinToolingVersion =
-    KotlinToolingVersion(this, classifier)
+fun KotlinVersion.toKotlinToolingVersion(classifier: String? = null): KotlinToolingVersion = KotlinToolingVersion(this, classifier)
 
 val KotlinToolingVersion.isSnapshot: Boolean
     get() = this.maturity == KotlinToolingVersion.Maturity.SNAPSHOT
@@ -212,10 +209,6 @@ val KotlinToolingVersion.classifierNumber: Int?
         return classifierMatch.groupValues.getOrNull(2)?.toIntOrNull()
     }
 
-operator fun String.compareTo(version: KotlinToolingVersion): Int {
-    return KotlinToolingVersion(this).compareTo(version)
-}
+operator fun String.compareTo(version: KotlinToolingVersion): Int = KotlinToolingVersion(this).compareTo(version)
 
-operator fun KotlinToolingVersion.compareTo(kotlinVersionString: String): Int {
-    return this.compareTo(KotlinToolingVersion(kotlinVersionString))
-}
+operator fun KotlinToolingVersion.compareTo(kotlinVersionString: String): Int = this.compareTo(KotlinToolingVersion(kotlinVersionString))

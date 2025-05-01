@@ -33,9 +33,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.Variance
 
-class CreateExposedKirTypesPhase(
-    context: KirPhase.Context,
-) : KirPhase {
+class CreateExposedKirTypesPhase(context: KirPhase.Context) : KirPhase {
 
     private val descriptorProvider = context.descriptorProvider
     private val kirProvider = context.kirProvider
@@ -73,10 +71,9 @@ class CreateExposedKirTypesPhase(
         descriptorProvider.exposedFiles.forEach(::createClass)
     }
 
-    private fun getOrCreateClass(descriptor: ClassDescriptor): KirClass =
-        descriptorsToClasses.getOrPut(descriptor) {
-            createClass(descriptor)
-        }
+    private fun getOrCreateClass(descriptor: ClassDescriptor): KirClass = descriptorsToClasses.getOrPut(descriptor) {
+        createClass(descriptor)
+    }
 
     private fun createClass(descriptor: ClassDescriptor): KirClass {
         val parent = (descriptor.containingDeclaration as? ClassDescriptor)
@@ -225,11 +222,7 @@ class CreateExposedKirTypesPhase(
         }
 
         context(DescriptorKirProvider)
-        private fun createTypeParameter(
-            kirClass: KirClass,
-            typeParameterDescriptor: TypeParameterDescriptor,
-            namer: ObjCExportNamer,
-        ) {
+        private fun createTypeParameter(kirClass: KirClass, typeParameterDescriptor: TypeParameterDescriptor, namer: ObjCExportNamer) {
             val typeParameter = KirTypeParameter(
                 name = namer.getTypeParameterName(typeParameterDescriptor),
                 parent = kirClass,

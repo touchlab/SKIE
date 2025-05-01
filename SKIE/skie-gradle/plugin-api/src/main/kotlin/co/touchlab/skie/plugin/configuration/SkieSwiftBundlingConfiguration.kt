@@ -2,9 +2,9 @@
 
 package co.touchlab.skie.plugin.configuration
 
+import javax.inject.Inject
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import javax.inject.Inject
 
 abstract class SkieSwiftBundlingConfiguration @Inject constructor(objects: ObjectFactory) {
 

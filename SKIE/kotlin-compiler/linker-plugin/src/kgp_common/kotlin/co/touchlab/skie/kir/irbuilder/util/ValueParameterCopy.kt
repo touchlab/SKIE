@@ -6,9 +6,7 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.types.KotlinType
 
-fun List<ValueParameterDescriptor>.copyWithoutDefaultValue(
-    newOwner: CallableDescriptor,
-): List<ValueParameterDescriptor> =
+fun List<ValueParameterDescriptor>.copyWithoutDefaultValue(newOwner: CallableDescriptor): List<ValueParameterDescriptor> =
     this.mapIndexed { index, valueParameter -> valueParameter.copyWithoutDefaultValue(newOwner, index) }
 
 fun ValueParameterDescriptor.copyWithoutDefaultValue(

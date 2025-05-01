@@ -1,7 +1,7 @@
 package co.touchlab.skie.plugin.util
 
-import org.gradle.api.file.FileSystemOperations
 import javax.inject.Inject
+import org.gradle.api.file.FileSystemOperations
 
 interface InjectedFileSystemOperations {
 

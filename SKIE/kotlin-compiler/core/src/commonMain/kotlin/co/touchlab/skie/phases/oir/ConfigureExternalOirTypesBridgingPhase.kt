@@ -7,9 +7,7 @@ import co.touchlab.skie.sir.SirFqName
 import co.touchlab.skie.sir.element.SirClass
 import co.touchlab.skie.sir.element.SirTypeParameterParent
 
-class ConfigureExternalOirTypesBridgingPhase(
-    val context: SirPhase.Context,
-) : SirPhase {
+class ConfigureExternalOirTypesBridgingPhase(val context: SirPhase.Context) : SirPhase {
 
     private val oirProvider = context.oirProvider
     private val sirProvider = context.sirProvider

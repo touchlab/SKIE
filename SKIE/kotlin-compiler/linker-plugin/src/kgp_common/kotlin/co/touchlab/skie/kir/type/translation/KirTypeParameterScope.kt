@@ -5,10 +5,10 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirTypeParameter
 import co.touchlab.skie.kir.element.toTypeParameterUsage
 import co.touchlab.skie.kir.type.TypeParameterUsageKirType
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
-import org.jetbrains.kotlin.types.KotlinType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.types.KotlinType
 
 interface KirTypeParameterScope {
 
@@ -18,8 +18,7 @@ interface KirTypeParameterScope {
     fun getTypeParameterUsage(typeParameterDescriptor: TypeParameterDescriptor?): TypeParameterUsageKirType? =
         parent?.getTypeParameterUsage(typeParameterDescriptor)
 
-    fun wasTypeAlreadyVisited(type: KotlinType): Boolean =
-        parent?.wasTypeAlreadyVisited(type) ?: false
+    fun wasTypeAlreadyVisited(type: KotlinType): Boolean = parent?.wasTypeAlreadyVisited(type) ?: false
 }
 
 inline fun <T : Any> KirTypeParameterScope.withTypeParameterScopeFor(type: KotlinType, action: KirTypeParameterScope.() -> T): T? =
@@ -44,10 +43,8 @@ object KirTypeParameterRootScope : KirTypeParameterScope {
     override val parent: KirTypeParameterScope? = null
 }
 
-class KirTypeParameterClassScope(
-    override val parent: KirTypeParameterScope,
-    private val typeParameters: List<KirTypeParameter>,
-) : KirTypeParameterScope {
+class KirTypeParameterClassScope(override val parent: KirTypeParameterScope, private val typeParameters: List<KirTypeParameter>) :
+    KirTypeParameterScope {
 
     context(DescriptorKirProvider)
     override fun getTypeParameterUsage(typeParameterDescriptor: TypeParameterDescriptor?): TypeParameterUsageKirType? {
@@ -59,19 +56,17 @@ class KirTypeParameterClassScope(
             .firstOrNull {
                 val descriptor = getTypeParameterDescriptor(it)
 
-                descriptor == typeParameterDescriptor || (descriptor.isCapturedFromOuterDeclaration && descriptor.original == typeParameterDescriptor)
+                descriptor == typeParameterDescriptor ||
+                    (descriptor.isCapturedFromOuterDeclaration && descriptor.original == typeParameterDescriptor)
             }
             ?.toTypeParameterUsage()
     }
 }
 
-class KirTypeParameterTypeScope private constructor(
-    override val parent: KirTypeParameterScope,
-    private val type: KotlinType,
-) : KirTypeParameterScope {
+class KirTypeParameterTypeScope private constructor(override val parent: KirTypeParameterScope, private val type: KotlinType) :
+    KirTypeParameterScope {
 
-    override fun wasTypeAlreadyVisited(type: KotlinType): Boolean =
-        type == this.type || super.wasTypeAlreadyVisited(type)
+    override fun wasTypeAlreadyVisited(type: KotlinType): Boolean = type == this.type || super.wasTypeAlreadyVisited(type)
 
     companion object {
 

@@ -4,7 +4,9 @@ import co.touchlab.skie.configuration.CallableDeclarationConfiguration
 import co.touchlab.skie.oir.element.OirCallableDeclaration
 import co.touchlab.skie.sir.element.SirCallableDeclaration
 
-sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement, KirBridgeableDeclaration<S> {
+sealed interface KirCallableDeclaration<S : SirCallableDeclaration> :
+    KirElement,
+    KirBridgeableDeclaration<S> {
 
     val owner: KirClass
 
@@ -38,10 +40,14 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     enum class Origin {
 
-        Member, Extension, Global
+        Member,
+        Extension,
+        Global,
     }
 
     enum class Modality {
-        Final, Open, Abstract
+        Final,
+        Open,
+        Abstract,
     }
 }

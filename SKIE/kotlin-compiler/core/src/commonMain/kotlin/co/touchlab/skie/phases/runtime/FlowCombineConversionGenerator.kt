@@ -118,7 +118,7 @@ object FlowCombineConversionGenerator {
                         onDemandUpdated?.resume()
                     }
                 }
-            """.trimIndent()
+        """.trimIndent()
     }
 
     context(SirPhase.Context)
@@ -138,7 +138,7 @@ object FlowCombineConversionGenerator {
                         subscriber.receive(subscription: subscription)
                     }
                 }
-            """.trimIndent()
+        """.trimIndent()
     }
 
     context(SirPhase.Context)
@@ -156,7 +156,7 @@ object FlowCombineConversionGenerator {
                         SkieFlowPublisher(flow: self)
                     }
                 }
-            """.trimIndent()
+        """.trimIndent()
     }
 
     context(SirPhase.Context)

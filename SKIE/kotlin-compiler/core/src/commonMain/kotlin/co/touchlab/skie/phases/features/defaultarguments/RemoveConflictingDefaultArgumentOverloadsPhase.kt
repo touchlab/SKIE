@@ -81,10 +81,7 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
         }
     }
 
-    private class FunctionWithOverloadsHierarchy(
-        representative: KirFunction<*>,
-        sirHierarchyCache: SirHierarchyCache,
-    ) {
+    private class FunctionWithOverloadsHierarchy(representative: KirFunction<*>, sirHierarchyCache: SirHierarchyCache) {
 
         private val baseNumberOfSirValueParameters: Int = representative.originalSirDeclaration.valueParameters.size
 
@@ -128,8 +125,5 @@ object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
         }
     }
 
-    private class DeclarationWithSignature(
-        val declaration: SirCallableDeclaration,
-        val signature: Signature,
-    )
+    private class DeclarationWithSignature(val declaration: SirCallableDeclaration, val signature: Signature)
 }

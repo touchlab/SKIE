@@ -3,7 +3,11 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.kir.element.DeprecationLevel
 import co.touchlab.skie.sir.signature.Signature
 
-sealed interface SirCallableDeclaration : SirDeclarationWithVisibility, SirElementWithModifiers, SirElementWithAttributes, SirDeclarationWithScope {
+sealed interface SirCallableDeclaration :
+    SirDeclarationWithVisibility,
+    SirElementWithModifiers,
+    SirElementWithAttributes,
+    SirDeclarationWithScope {
 
     /**
      * Used to derive other names.
@@ -50,8 +54,7 @@ sealed interface SirCallableDeclaration : SirDeclarationWithVisibility, SirEleme
     // TODO Remove and check wrappedBy functions in Sir instead (once the concept of bridged callable declarations is refactored).
     var isWrappedBySkie: Boolean
 
-    fun toReadableString(): String =
-        Signature(this).toString()
+    fun toReadableString(): String = Signature(this).toString()
 }
 
 val SirCallableDeclaration.receiverDeclaration: SirClass?

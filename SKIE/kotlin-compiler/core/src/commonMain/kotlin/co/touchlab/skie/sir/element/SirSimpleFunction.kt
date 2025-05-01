@@ -24,7 +24,8 @@ class SirSimpleFunction(
     var isAsync: Boolean = false,
     override var throws: Boolean = false,
     override val deprecationLevel: DeprecationLevel = DeprecationLevel.None,
-) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()), SirOverridableDeclaration<SirSimpleFunction>,
+) : SirFunction(attributes.toMutableList(), modifiers.toMutableList()),
+    SirOverridableDeclaration<SirSimpleFunction>,
     SirElementWithModality {
 
     override val identifierAfterVisibilityChange: String
@@ -61,8 +62,7 @@ class SirSimpleFunction(
         overridableDeclarationDelegate.removeOverriddenBy(declaration)
     }
 
-    override fun toString(): String =
-        Signature(this).toString()
+    override fun toString(): String = Signature(this).toString()
 
     companion object {
 
@@ -83,25 +83,24 @@ class SirSimpleFunction(
             isAsync: Boolean = false,
             throws: Boolean = false,
             deprecationLevel: DeprecationLevel = DeprecationLevel.None,
-        ): SirSimpleFunction =
-            SirSimpleFunction(
-                identifier = identifier,
-                parent = this@SirDeclarationParent,
-                returnType = returnType,
-                visibility = visibility,
-                modality = modality,
-                isAbstract = isAbstract,
-                isReplaced = isReplaced,
-                isHidden = isHidden,
-                scope = scope,
-                isFakeOverride = isFakeOverride,
-                isWrappedBySkie = isWrappedBySkie,
-                attributes = attributes,
-                modifiers = modifiers,
-                isAsync = isAsync,
-                throws = throws,
-                deprecationLevel = deprecationLevel,
-            )
+        ): SirSimpleFunction = SirSimpleFunction(
+            identifier = identifier,
+            parent = this@SirDeclarationParent,
+            returnType = returnType,
+            visibility = visibility,
+            modality = modality,
+            isAbstract = isAbstract,
+            isReplaced = isReplaced,
+            isHidden = isHidden,
+            scope = scope,
+            isFakeOverride = isFakeOverride,
+            isWrappedBySkie = isWrappedBySkie,
+            attributes = attributes,
+            modifiers = modifiers,
+            isAsync = isAsync,
+            throws = throws,
+            deprecationLevel = deprecationLevel,
+        )
     }
 }
 
@@ -122,32 +121,30 @@ fun SirSimpleFunction.shallowCopy(
     isAsync: Boolean = this.isAsync,
     throws: Boolean = this.throws,
     deprecationLevel: DeprecationLevel = this.deprecationLevel,
-): SirSimpleFunction =
-    SirSimpleFunction(
-        identifier = identifier,
-        parent = parent,
-        returnType = returnType,
-        visibility = visibility,
-        modality = modality,
-        isAbstract = isAbstract,
-        isReplaced = isReplaced,
-        isHidden = isHidden,
-        scope = scope,
-        isFakeOverride = isFakeOverride,
-        isWrappedBySkie = isWrappedBySkie,
-        attributes = attributes,
-        modifiers = modifiers,
-        isAsync = isAsync,
-        throws = throws,
-        deprecationLevel = deprecationLevel,
-    )
+): SirSimpleFunction = SirSimpleFunction(
+    identifier = identifier,
+    parent = parent,
+    returnType = returnType,
+    visibility = visibility,
+    modality = modality,
+    isAbstract = isAbstract,
+    isReplaced = isReplaced,
+    isHidden = isHidden,
+    scope = scope,
+    isFakeOverride = isFakeOverride,
+    isWrappedBySkie = isWrappedBySkie,
+    attributes = attributes,
+    modifiers = modifiers,
+    isAsync = isAsync,
+    throws = throws,
+    deprecationLevel = deprecationLevel,
+)
 
-fun SirDeclarationParent.coerceModalityForSimpleFunctionOrProperty(modality: SirModality = SirModality.ModuleLimited): SirModality {
-    return when (this) {
+fun SirDeclarationParent.coerceModalityForSimpleFunctionOrProperty(modality: SirModality = SirModality.ModuleLimited): SirModality =
+    when (this) {
         is SirClass -> when (this.modality) {
             SirModality.Final -> SirModality.Final
             SirModality.ModuleLimited, SirModality.Open -> modality
         }
         is SirExtension, SirDeclarationParent.None, is SirBuiltInFile, is SirIrFile -> SirModality.Final
     }
-}

@@ -15,7 +15,8 @@ data class SwiftCompilerConfiguration(
 ) {
 
     enum class BuildType {
-        Debug, Release
+        Debug,
+        Release,
     }
 
     enum class LinkMode {
@@ -24,6 +25,8 @@ data class SwiftCompilerConfiguration(
     }
 
     enum class BitcodeEmbeddingMode {
-        None, Marker, Full
+        None,
+        Marker,
+        Full,
     }
 }

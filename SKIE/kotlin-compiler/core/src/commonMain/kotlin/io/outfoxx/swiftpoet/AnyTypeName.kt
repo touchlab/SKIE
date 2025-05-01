@@ -18,13 +18,13 @@ package io.outfoxx.swiftpoet
 
 class AnyTypeName private constructor() : TypeName() {
 
-  override fun emit(out: CodeWriter): CodeWriter {
-    out.emit("Any")
-    return out
-  }
+    override fun emit(out: CodeWriter): CodeWriter {
+        out.emit("Any")
+        return out
+    }
 
-  companion object {
+    companion object {
 
-    val INSTANCE = AnyTypeName()
-  }
+        val INSTANCE = AnyTypeName()
+    }
 }

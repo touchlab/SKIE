@@ -65,7 +65,7 @@ object SupportedFlowRuntimeGenerator {
                         skieSwiftFlowIterator.toType(
                             elementTypeParameter.toTypeParameterUsage(),
                         ).toEqualityBound(),
-                    )
+                    ),
                 )
 
                 val delegateTypeParameter = SirTypeParameter(
@@ -101,7 +101,9 @@ object SupportedFlowRuntimeGenerator {
 
                     SirGetter().apply {
                         bodyBuilder.add {
-                            addStatement("""Swift.fatalError("SkieSwiftFlowProtocol has to be conformed to with @_spi(SKIE) enabled and property '${skieSwiftFlowProtocol.delegateProperty.identifier}' implemented")""")
+                            addStatement(
+                                """Swift.fatalError("SkieSwiftFlowProtocol has to be conformed to with @_spi(SKIE) enabled and property '${skieSwiftFlowProtocol.delegateProperty.identifier}' implemented")""",
+                            )
                         }
                     }
                 }
@@ -155,11 +157,8 @@ object SupportedFlowRuntimeGenerator {
     }
 
     context(SirPhase.Context)
-    private fun createSwiftFlowClass(
-        flowVariant: SupportedFlow.Variant,
-        skieSwiftFlowProtocol: SkieSwiftFlowProtocol,
-    ): SirClass {
-        return namespaceProvider.getSkieNamespaceFile(flowVariant.swiftSimpleName).run {
+    private fun createSwiftFlowClass(flowVariant: SupportedFlow.Variant, skieSwiftFlowProtocol: SkieSwiftFlowProtocol): SirClass =
+        namespaceProvider.getSkieNamespaceFile(flowVariant.swiftSimpleName).run {
             SirClass(
                 baseName = flowVariant.swiftSimpleName,
                 superTypes = listOf(
@@ -169,7 +168,6 @@ object SupportedFlowRuntimeGenerator {
                 modality = SirModality.Final,
             )
         }
-    }
 
     context(SirPhase.Context)
     private fun SirClass.addSwiftFlowMembers(
@@ -202,10 +200,7 @@ object SupportedFlowRuntimeGenerator {
         addMakeAsyncIteratorFunction(asyncIteratorAlias)
     }
 
-    private fun SirClass.addDelegateProperty(
-        flowClass: SirClass,
-        skieSwiftFlowProtocol: SkieSwiftFlowProtocol,
-    ) {
+    private fun SirClass.addDelegateProperty(flowClass: SirClass, skieSwiftFlowProtocol: SkieSwiftFlowProtocol) {
         SirProperty(
             attributes = listOf("_spi(SKIE)"),
             identifier = "delegate",
@@ -216,9 +211,7 @@ object SupportedFlowRuntimeGenerator {
         }
     }
 
-    private fun SirClass.addInternalConstructor(
-        flowClass: SirClass,
-    ) {
+    private fun SirClass.addInternalConstructor(flowClass: SirClass) {
         SirConstructor(
             visibility = SirVisibility.Internal,
         ).apply {
@@ -235,10 +228,7 @@ object SupportedFlowRuntimeGenerator {
     }
 
     context(SirPhase.Context)
-    private fun SirClass.addPassthroughMembers(
-        flowVariant: SupportedFlow.Variant,
-        elementTypeAlias: SirTypeAlias,
-    ) {
+    private fun SirClass.addPassthroughMembers(flowVariant: SupportedFlow.Variant, elementTypeAlias: SirTypeAlias) {
         CustomMembersPassthroughGenerator.generatePassthroughForDeclarations(
             targetBridge = this,
             declarations = flowVariant.kind.passthroughDeclarations(elementTypeAlias.type),

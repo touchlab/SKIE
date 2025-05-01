@@ -27,11 +27,7 @@ object DirectMembersPassthroughGenerator {
         get() = this.name !in unsupportedFunctionNames
 
     context(SirPhase.Context)
-    fun generatePassthroughForMembers(
-        targetBridge: SirClass,
-        bridgedKirClass: KirClass,
-        delegateAccessor: CodeBlock,
-    ) {
+    fun generatePassthroughForMembers(targetBridge: SirClass, bridgedKirClass: KirClass, delegateAccessor: CodeBlock) {
         bridgedKirClass.callableDeclarations
             .forEach {
                 targetBridge.addPassthroughForMember(it, delegateAccessor)
@@ -127,11 +123,7 @@ object DirectMembersPassthroughGenerator {
         ).addSetterBody(property, setter, delegateAccessor)
     }
 
-    private fun SirSetter.addSetterBody(
-        property: SirProperty,
-        setter: SirSetter,
-        delegateAccessor: CodeBlock,
-    ) {
+    private fun SirSetter.addSetterBody(property: SirProperty, setter: SirSetter, delegateAccessor: CodeBlock) {
         this.addFunctionDeclarationBodyWithErrorTypeHandling(property) {
             // TODO Remove this filter once SKIE generates custom header
             val isParentProtocol = (property.parent as? SirClass)?.kind == SirClass.Kind.Protocol

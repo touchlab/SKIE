@@ -54,7 +54,9 @@ interface IdentifiedConfigurationTarget : ConfigurationTarget {
         val parent: FileOrClass
     }
 
-    interface Class : ValueParameterParent, FileOrClass {
+    interface Class :
+        ValueParameterParent,
+        FileOrClass {
 
         override val scopeType: KClass<out ConfigurationScope>
             get() = ConfigurationScope.Class::class

@@ -33,7 +33,7 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
             framework module ${module.name} {
                 umbrella header "${module.name}.h"
             }
-        """.trimIndent()
+            """.trimIndent()
 
         skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module.name).writeTextIfDifferent(moduleMapContent)
     }
@@ -52,17 +52,14 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
     }
 }
 
-private fun OirClass.getHeaderEntry(): String =
-    when (kind) {
-        OirClass.Kind.Class -> getClassHeaderEntry()
-        OirClass.Kind.Protocol -> getProtocolHeaderEntry()
-    }
+private fun OirClass.getHeaderEntry(): String = when (kind) {
+    OirClass.Kind.Class -> getClassHeaderEntry()
+    OirClass.Kind.Protocol -> getProtocolHeaderEntry()
+}
 
-private fun OirClass.getClassHeaderEntry(): String =
-    "@interface ${renderForwardDeclaration()} : NSObject @end"
+private fun OirClass.getClassHeaderEntry(): String = "@interface ${renderForwardDeclaration()} : NSObject @end"
 
-private fun OirClass.getProtocolHeaderEntry(): String =
-    "@protocol ${renderForwardDeclaration()} @end"
+private fun OirClass.getProtocolHeaderEntry(): String = "@protocol ${renderForwardDeclaration()} @end"
 
 /*
  This currently has all non-private frameworks from all darwin platforms.
@@ -394,6 +391,5 @@ val knownNestedSdkModules = mapOf(
     "EAGL" to "OpenGLES",
 )
 
-private fun isKnownSdkModule(moduleName: String): Boolean {
-    return moduleName in knownNestedSdkModules.keys || moduleName in knownTopLevelSdkModules
-}
+private fun isKnownSdkModule(moduleName: String): Boolean =
+    moduleName in knownNestedSdkModules.keys || moduleName in knownTopLevelSdkModules

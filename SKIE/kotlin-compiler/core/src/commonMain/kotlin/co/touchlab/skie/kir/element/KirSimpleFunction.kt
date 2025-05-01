@@ -24,7 +24,8 @@ class KirSimpleFunction(
     override val isRefinedInSwift: Boolean,
     override val configuration: SimpleFunctionConfiguration,
     override val modality: KirCallableDeclaration.Modality,
-) : KirFunction<SirSimpleFunction>(), KirOverridableDeclaration<KirSimpleFunction, SirSimpleFunction> {
+) : KirFunction<SirSimpleFunction>(),
+    KirOverridableDeclaration<KirSimpleFunction, SirSimpleFunction> {
 
     lateinit var oirSimpleFunction: OirSimpleFunction
 

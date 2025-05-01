@@ -41,35 +41,39 @@ data class LambdaSirType(
                 )
             },
             lowestVisibility = lazy {
-                (evaluatedValueParameterTypes.value.map { it.visibilityConstraint } + evaluatedReturnType.value.visibilityConstraint).minimumVisibility()
+                (
+                    evaluatedValueParameterTypes.value.map {
+                        it.visibilityConstraint
+                    } + evaluatedReturnType.value.visibilityConstraint
+                    ).minimumVisibility()
             },
             referencedTypeDeclarationsProvider = lazy {
-                (evaluatedValueParameterTypes.value.flatMap { it.referencedTypeDeclarations } + evaluatedReturnType.value.referencedTypeDeclarations).toSet()
+                (
+                    evaluatedValueParameterTypes.value.flatMap { it.referencedTypeDeclarations } +
+                        evaluatedReturnType.value.referencedTypeDeclarations
+                    ).toSet()
             },
         )
     }
 
-    override fun inlineTypeAliases(): SirType =
-        copy(
-            valueParameterTypes = valueParameterTypes.map { it.inlineTypeAliases() },
-            returnType = returnType.inlineTypeAliases(),
-        )
+    override fun inlineTypeAliases(): SirType = copy(
+        valueParameterTypes = valueParameterTypes.map { it.inlineTypeAliases() },
+        returnType = returnType.inlineTypeAliases(),
+    )
 
     // TODO: Probably use `copy` here to make sure we don't have to manually specify all parameters
-    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): LambdaSirType =
-        LambdaSirType(
-            returnType = returnType.substituteTypeParameters(substitutions),
-            valueParameterTypes = valueParameterTypes.map { it.substituteTypeParameters(substitutions) },
-            isEscaping = isEscaping,
-            isAsync = isAsync,
-        )
+    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): LambdaSirType = LambdaSirType(
+        returnType = returnType.substituteTypeParameters(substitutions),
+        valueParameterTypes = valueParameterTypes.map { it.substituteTypeParameters(substitutions) },
+        isEscaping = isEscaping,
+        isAsync = isAsync,
+    )
 
     // TODO: Probably use `copy` here to make sure we don't have to manually specify all parameters
-    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): LambdaSirType =
-        LambdaSirType(
-            returnType = returnType.substituteTypeArguments(substitutions),
-            valueParameterTypes = valueParameterTypes.map { it.substituteTypeArguments(substitutions) },
-            isEscaping = isEscaping,
-            isAsync = isAsync,
-        )
+    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): LambdaSirType = LambdaSirType(
+        returnType = returnType.substituteTypeArguments(substitutions),
+        valueParameterTypes = valueParameterTypes.map { it.substituteTypeArguments(substitutions) },
+        isEscaping = isEscaping,
+        isAsync = isAsync,
+    )
 }

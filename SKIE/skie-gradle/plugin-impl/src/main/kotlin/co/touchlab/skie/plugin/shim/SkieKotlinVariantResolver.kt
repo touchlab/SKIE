@@ -42,7 +42,7 @@ object SkieKotlinVariantResolver {
                         Make sure you have Kotlin Multiplatform plugin applied in the same module as SKIE and that the plugin works - for example by calling the link task that produces the Obj-C framework.
                         If that is the case, then this problem is likely caused by a bug in SKIE - please report it to the SKIE developers.
                         You can try to workaround this issue by providing the Kotlin version manually via 'skie.kgpVersion' property in your gradle.properties.
-                        """.trimIndent(),
+                    """.trimIndent(),
                 )
             }
         }
@@ -55,7 +55,7 @@ object SkieKotlinVariantResolver {
                     Warning:
                     skie.kgpVersion is used to override automatic Kotlin version resolution for SKIE plugin.
                     Usage of this property in production is highly discouraged as it may lead to non-obvious compiler errors caused by SKIE incompatibility with the used Kotlin compiler version.
-                    """.trimIndent(),
+                """.trimIndent(),
             )
         }
     }
@@ -69,11 +69,11 @@ object SkieKotlinVariantResolver {
             reportSkieLoaderError(
                 """
                     SKIE ${BuildConfig.SKIE_VERSION} does not support Kotlin $kotlinVersion.
-                    Supported versions are: ${supportedKotlinVersions}.
+                    Supported versions are: $supportedKotlinVersions.
                     Check if you have the most recent version of SKIE and if so, please wait for the SKIE developers to add support for this Kotlin version.
                     New Kotlin versions are usually supported within a few days after they are released.
                     Note that there are no plans for supporting early access versions like Beta, RC, etc.
-                    """.trimIndent(),
+                """.trimIndent(),
             )
         }
 
@@ -96,16 +96,17 @@ object SkieKotlinVariantResolver {
         return null
     }
 
-    private fun Project.findKotlinGradlePluginVersionFromOverrideProperty(): String? =
-        (findProperty("skie.kgpVersion") as? String)?.also {
-            logger.debug("[SKIE] Found KGP version override: $it in project '${project.path}', skipping resolution.")
-        }
+    private fun Project.findKotlinGradlePluginVersionFromOverrideProperty(): String? = (findProperty("skie.kgpVersion") as? String)?.also {
+        logger.debug("[SKIE] Found KGP version override: $it in project '${project.path}', skipping resolution.")
+    }
 
     private fun Project.findKotlinGradlePluginVersionFromKotlinBasePlugin(): String? {
         try {
             logger.debug("[SKIE] Resolving KGP version from KGP plugin for project '${project.path}'.")
 
-            val kotlinBasePluginClass = this@SkieKotlinVariantResolver.javaClass.classLoader.loadClass("org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin")
+            val kotlinBasePluginClass = this@SkieKotlinVariantResolver.javaClass.classLoader.loadClass(
+                "org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin",
+            )
 
             val plugin = plugins.firstOrNull { kotlinBasePluginClass.isAssignableFrom(it.javaClass) } ?: kotlin.run {
                 logger.debug(

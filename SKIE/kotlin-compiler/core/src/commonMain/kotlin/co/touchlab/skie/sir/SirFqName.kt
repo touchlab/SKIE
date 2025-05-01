@@ -3,24 +3,16 @@ package co.touchlab.skie.sir
 import co.touchlab.skie.sir.element.SirModule
 import io.outfoxx.swiftpoet.DeclaredTypeName
 
-class SirFqName private constructor(
-    val module: SirModule,
-    val simpleName: String,
-    val parent: SirFqName? = null,
-) {
+class SirFqName private constructor(val module: SirModule, val simpleName: String, val parent: SirFqName? = null) {
 
-    fun nested(name: String): SirFqName =
-        SirFqName(module, name, this)
+    fun nested(name: String): SirFqName = SirFqName(module, name, this)
 
-    fun toLocalString(): String =
-        parent?.toLocalString()?.let { "$it.$simpleName" } ?: simpleName
+    fun toLocalString(): String = parent?.toLocalString()?.let { "$it.$simpleName" } ?: simpleName
 
-    override fun toString(): String =
-        module.name + "." + toLocalString()
+    override fun toString(): String = module.name + "." + toLocalString()
 
-    fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName =
-        parent?.toSwiftPoetDeclaredTypeName()?.nestedType(simpleName)
-            ?: DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)
+    fun toSwiftPoetDeclaredTypeName(): DeclaredTypeName = parent?.toSwiftPoetDeclaredTypeName()?.nestedType(simpleName)
+        ?: DeclaredTypeName.qualifiedTypeName(module.name + "." + simpleName)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -44,10 +36,7 @@ class SirFqName private constructor(
 
     companion object {
 
-        operator fun invoke(
-            module: SirModule,
-            simpleName: String,
-        ): SirFqName {
+        operator fun invoke(module: SirModule, simpleName: String): SirFqName {
             val nameComponents = simpleName.split('.')
 
             return if (nameComponents.size == 1) {

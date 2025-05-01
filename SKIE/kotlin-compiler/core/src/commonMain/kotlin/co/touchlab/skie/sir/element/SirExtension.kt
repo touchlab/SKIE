@@ -10,7 +10,11 @@ class SirExtension(
     parent: SirTopLevelDeclarationParent,
     superTypes: List<SirDeclaredSirType> = emptyList(),
     attributes: List<String> = emptyList(),
-) : SirDeclaration, SirDeclarationNamespace, SirDeclarationWithSuperTypes, SirElementWithAttributes, SirConditionalConstraintParent {
+) : SirDeclaration,
+    SirDeclarationNamespace,
+    SirDeclarationWithSuperTypes,
+    SirElementWithAttributes,
+    SirConditionalConstraintParent {
 
     // Do not add support for SirVisibility, there are many assumptions made on the fact that extensions do not modify visibility of the content inside.
 
@@ -29,8 +33,7 @@ class SirExtension(
     override val fqName: SirFqName
         get() = classDeclaration.fqName
 
-    override fun toString(): String =
-        "${this::class.simpleName}: $fqName"
+    override fun toString(): String = "${this::class.simpleName}: $fqName"
 
     companion object {
 
@@ -39,12 +42,11 @@ class SirExtension(
             classDeclaration: SirClass,
             attributes: List<String> = emptyList(),
             superTypes: List<SirDeclaredSirType> = emptyList(),
-        ): SirExtension =
-            SirExtension(
-                classDeclaration = classDeclaration,
-                parent = this@SirTopLevelDeclarationParent,
-                superTypes = superTypes,
-                attributes = attributes,
-            )
+        ): SirExtension = SirExtension(
+            classDeclaration = classDeclaration,
+            parent = this@SirTopLevelDeclarationParent,
+            superTypes = superTypes,
+            attributes = attributes,
+        )
     }
 }

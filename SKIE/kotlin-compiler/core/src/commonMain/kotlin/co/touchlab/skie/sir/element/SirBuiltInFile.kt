@@ -1,9 +1,9 @@
 package co.touchlab.skie.sir.element
 
 // Instantiate only in SirModule
-class SirBuiltInFile(
-    override val module: SirModule,
-) : SirFile, SirTopLevelDeclarationParent {
+class SirBuiltInFile(override val module: SirModule) :
+    SirFile,
+    SirTopLevelDeclarationParent {
 
     override val parent: SirDeclarationParent?
         get() = null

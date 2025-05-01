@@ -21,9 +21,7 @@ import co.touchlab.skie.kir.type.TypeParameterUsageKirType
 import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 import co.touchlab.skie.phases.KirPhase
 
-class ConvertFlowsPhase(
-    context: KirPhase.Context,
-) : KirPhase {
+class ConvertFlowsPhase(context: KirPhase.Context) : KirPhase {
 
     private val kirProvider = context.kirProvider
 
@@ -93,43 +91,39 @@ class ConvertFlowsPhase(
     }
 
     context(FlowMappingStrategy)
-    private fun KirType.substituteFlows(): KirType =
-        when (this) {
-            is NonNullReferenceKirType -> substituteFlows()
-            is NullableReferenceKirType -> copy(nonNullType = nonNullType.substituteFlows())
-            is OirBasedKirType -> this
-            is PointerKirType -> copy(pointee = pointee.substituteFlows())
-        }
+    private fun KirType.substituteFlows(): KirType = when (this) {
+        is NonNullReferenceKirType -> substituteFlows()
+        is NullableReferenceKirType -> copy(nonNullType = nonNullType.substituteFlows())
+        is OirBasedKirType -> this
+        is PointerKirType -> copy(pointee = pointee.substituteFlows())
+    }
 
     context(FlowMappingStrategy)
-    private fun NonNullReferenceKirType.substituteFlows(): NonNullReferenceKirType =
-        when (this) {
-            is BlockPointerKirType -> copy(
-                valueParameterTypes = valueParameterTypes.map { it.substituteFlows() },
-                returnType = returnType.substituteFlows(),
-            )
-            is DeclarationBackedKirType -> substituteFlows()
-            is SpecialOirKirType -> this
-            is TypeParameterUsageKirType -> this
-        }
+    private fun NonNullReferenceKirType.substituteFlows(): NonNullReferenceKirType = when (this) {
+        is BlockPointerKirType -> copy(
+            valueParameterTypes = valueParameterTypes.map { it.substituteFlows() },
+            returnType = returnType.substituteFlows(),
+        )
+        is DeclarationBackedKirType -> substituteFlows()
+        is SpecialOirKirType -> this
+        is TypeParameterUsageKirType -> this
+    }
 
     context(FlowMappingStrategy)
-    private fun DeclarationBackedKirType.substituteFlows(): DeclaredKirType =
-        when (this) {
-            is DeclaredKirType -> {
-                declaration.withFlowMappingForTypeArguments {
-                    copy(typeArguments = typeArguments.map { it.substituteFlows() })
-                }
+    private fun DeclarationBackedKirType.substituteFlows(): DeclaredKirType = when (this) {
+        is DeclaredKirType -> {
+            declaration.withFlowMappingForTypeArguments {
+                copy(typeArguments = typeArguments.map { it.substituteFlows() })
             }
-            is UnresolvedFlowKirType -> resolve()
         }
+        is UnresolvedFlowKirType -> resolve()
+    }
 
     context(FlowMappingStrategy)
-    private fun UnresolvedFlowKirType.resolve(): DeclaredKirType =
-        when (this@FlowMappingStrategy) {
-            FlowMappingStrategy.Full -> toSkieFlowType()
-            FlowMappingStrategy.TypeArgumentsOnly, FlowMappingStrategy.None -> toCoroutinesFlowType()
-        }
+    private fun UnresolvedFlowKirType.resolve(): DeclaredKirType = when (this@FlowMappingStrategy) {
+        FlowMappingStrategy.Full -> toSkieFlowType()
+        FlowMappingStrategy.TypeArgumentsOnly, FlowMappingStrategy.None -> toCoroutinesFlowType()
+    }
 
     context(FlowMappingStrategy)
     private fun UnresolvedFlowKirType.toSkieFlowType(): DeclaredKirType {
@@ -145,9 +139,8 @@ class ConvertFlowsPhase(
         )
     }
 
-    private fun UnresolvedFlowKirType.toCoroutinesFlowType(): DeclaredKirType =
-        DeclaredKirType(
-            declaration = flowType.getCoroutinesKirClass(kirProvider),
-            typeArguments = emptyList(),
-        )
+    private fun UnresolvedFlowKirType.toCoroutinesFlowType(): DeclaredKirType = DeclaredKirType(
+        declaration = flowType.getCoroutinesKirClass(kirProvider),
+        typeArguments = emptyList(),
+    )
 }

@@ -4,6 +4,7 @@ import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 import co.touchlab.skie.plugin.util.skieTargetBasedTaskName
 import co.touchlab.skie.util.directory.SkieDirectories
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.model.ObjectFactory
@@ -11,7 +12,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import javax.inject.Inject
 
 object SkieDirectoriesManager {
 

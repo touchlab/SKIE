@@ -20,9 +20,7 @@ import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.TypeName
 
 @MustBeExecutedAfterBridgingConfiguration
-class SealedFunctionGeneratorDelegate(
-    override val context: SirPhase.Context,
-) : SealedGeneratorExtensionContainer {
+class SealedFunctionGeneratorDelegate(override val context: SirPhase.Context) : SealedGeneratorExtensionContainer {
 
     context(SirPhase.Context)
     fun generate(kirClass: KirClass, enum: SirClass) {
@@ -53,27 +51,26 @@ class SealedFunctionGeneratorDelegate(
         enum: SirClass,
         valueParameterType: (SirType) -> SirType = { it },
         returnTypeModifier: (SirType) -> SirType = { it },
-    ): SirSimpleFunction =
-        SirSimpleFunction(
-            identifier = kirClass.enumConstructorFunctionName,
-            parent = context.namespaceProvider.getNamespaceFile(kirClass),
-            returnType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).let(returnTypeModifier),
-        ).apply {
-            copyTypeParametersFrom(enum)
+    ): SirSimpleFunction = SirSimpleFunction(
+        identifier = kirClass.enumConstructorFunctionName,
+        parent = context.namespaceProvider.getNamespaceFile(kirClass),
+        returnType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).let(returnTypeModifier),
+    ).apply {
+        copyTypeParametersFrom(enum)
 
-            val sealedTypeParameter = SirTypeParameter(
-                name = "__Sealed",
-                bounds = listOf(
-                    kirClass.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters).toConformanceBound(),
-                ),
-            )
+        val sealedTypeParameter = SirTypeParameter(
+            name = "__Sealed",
+            bounds = listOf(
+                kirClass.originalSirClass.toTypeFromEnclosingTypeParameters(typeParameters).toConformanceBound(),
+            ),
+        )
 
-            SirValueParameter(
-                label = kirClass.enumConstructorArgumentLabel,
-                name = kirClass.enumConstructorParameterName,
-                type = sealedTypeParameter.toTypeParameterUsage().let(valueParameterType),
-            )
-        }
+        SirValueParameter(
+            label = kirClass.enumConstructorArgumentLabel,
+            name = kirClass.enumConstructorParameterName,
+            type = sealedTypeParameter.toTypeParameterUsage().let(valueParameterType),
+        )
+    }
 
     private val KirClass.enumConstructorFunctionName: String
         get() = this.configuration[SealedInterop.Function.Name]
@@ -84,10 +81,7 @@ class SealedFunctionGeneratorDelegate(
     private val KirClass.enumConstructorParameterName: String
         get() = this.configuration[SealedInterop.Function.ParameterName]
 
-    private fun SirSimpleFunction.addRequiredFunctionBody(
-        kirClass: KirClass,
-        enum: SirClass,
-    ) {
+    private fun SirSimpleFunction.addRequiredFunctionBody(kirClass: KirClass, enum: SirClass) {
         bodyBuilder.add {
             val enumType = enum.toTypeFromEnclosingTypeParameters(enum.typeParameters).evaluate().swiftPoetTypeName
 
@@ -100,11 +94,7 @@ class SealedFunctionGeneratorDelegate(
         }
     }
 
-    private fun CodeBlock.Builder.addCaseBranches(
-        kirClass: KirClass,
-        enum: SirClass,
-        enumType: TypeName,
-    ): CodeBlock.Builder {
+    private fun CodeBlock.Builder.addCaseBranches(kirClass: KirClass, enum: SirClass, enumType: TypeName): CodeBlock.Builder {
         val preferredNamesCollide = kirClass.enumCaseNamesBasedOnKotlinIdentifiersCollide
         val parameterName = kirClass.enumConstructorParameterName
 
@@ -142,10 +132,7 @@ class SealedFunctionGeneratorDelegate(
         return this
     }
 
-    private fun CodeBlock.Builder.addFunctionEnd(
-        kirClass: KirClass,
-        enumType: TypeName,
-    ): CodeBlock.Builder {
+    private fun CodeBlock.Builder.addFunctionEnd(kirClass: KirClass, enumType: TypeName): CodeBlock.Builder {
         if (kirClass.hasAnyVisibleSealedSubclasses) {
             addElseBranch(kirClass, enumType)
         } else {

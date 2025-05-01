@@ -1,9 +1,7 @@
 package co.touchlab.skie.sir.element
 
 // Instantiate only in SirProvider
-sealed class SirModule(
-    val name: String,
-) : SirElement {
+sealed class SirModule(val name: String) : SirElement {
 
     open val builtInFile by lazy {
         SirBuiltInFile(this)

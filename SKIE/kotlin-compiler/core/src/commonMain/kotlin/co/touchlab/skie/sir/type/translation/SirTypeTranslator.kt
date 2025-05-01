@@ -23,33 +23,29 @@ import co.touchlab.skie.sir.type.SpecialSirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
 import co.touchlab.skie.sir.type.toNullable
 
-class SirTypeTranslator(
-    private val sirBuiltins: SirBuiltins,
-) {
+class SirTypeTranslator(private val sirBuiltins: SirBuiltins) {
 
-    fun mapType(oirType: OirType, isEscaping: Boolean = false): SirType =
-        when (oirType) {
-            is PointerOirType -> mapType(oirType)
-            is PrimitiveOirType -> mapType(oirType)
-            is BlockPointerOirType -> mapType(oirType, isEscaping)
-            is DeclaredOirType -> mapType(oirType)
-            is TypeDefOirType -> mapType(oirType, isEscaping)
-            is SpecialReferenceOirType -> mapType(oirType)
-            is TypeParameterUsageOirType -> mapType(oirType)
-            is NullableReferenceOirType -> mapType(oirType)
-            VoidOirType -> sirBuiltins.Swift.Void.defaultType
-        }
+    fun mapType(oirType: OirType, isEscaping: Boolean = false): SirType = when (oirType) {
+        is PointerOirType -> mapType(oirType)
+        is PrimitiveOirType -> mapType(oirType)
+        is BlockPointerOirType -> mapType(oirType, isEscaping)
+        is DeclaredOirType -> mapType(oirType)
+        is TypeDefOirType -> mapType(oirType, isEscaping)
+        is SpecialReferenceOirType -> mapType(oirType)
+        is TypeParameterUsageOirType -> mapType(oirType)
+        is NullableReferenceOirType -> mapType(oirType)
+        VoidOirType -> sirBuiltins.Swift.Void.defaultType
+    }
 
-    fun mapReturnType(oirType: OirType, errorHandlingStrategy: OirFunction.ErrorHandlingStrategy): SirType =
-        when (errorHandlingStrategy) {
-            OirFunction.ErrorHandlingStrategy.Crashes -> mapType(oirType)
-            OirFunction.ErrorHandlingStrategy.ReturnsBoolean -> sirBuiltins.Swift.Void.defaultType
-            OirFunction.ErrorHandlingStrategy.SetsErrorOut -> mapType(oirType)
-            OirFunction.ErrorHandlingStrategy.ReturnsZero -> when (val type = mapType(oirType)) {
-                is NullableSirType -> type.type
-                is NonNullSirType -> type
-            }
+    fun mapReturnType(oirType: OirType, errorHandlingStrategy: OirFunction.ErrorHandlingStrategy): SirType = when (errorHandlingStrategy) {
+        OirFunction.ErrorHandlingStrategy.Crashes -> mapType(oirType)
+        OirFunction.ErrorHandlingStrategy.ReturnsBoolean -> sirBuiltins.Swift.Void.defaultType
+        OirFunction.ErrorHandlingStrategy.SetsErrorOut -> mapType(oirType)
+        OirFunction.ErrorHandlingStrategy.ReturnsZero -> when (val type = mapType(oirType)) {
+            is NullableSirType -> type.type
+            is NonNullSirType -> type
         }
+    }
 
     fun mapSuspendCompletionType(oirType: OirType): SirType {
         require(oirType is BlockPointerOirType) { "Suspend completion must be a BlockPointerOirType. Was: $oirType" }
@@ -71,64 +67,52 @@ class SirTypeTranslator(
     private fun mapType(oirType: PointerOirType): SirType =
         sirBuiltins.Swift.UnsafeMutableRawPointer.defaultType.toNullable(oirType.nullable)
 
-    private fun mapType(oirType: PrimitiveOirType): SirType =
-        when (oirType) {
-            PrimitiveOirType.unichar -> sirBuiltins.Foundation.unichar.defaultType
-            PrimitiveOirType.BOOL -> sirBuiltins.Swift.Bool.defaultType
-            PrimitiveOirType.double -> sirBuiltins.Swift.Double.defaultType
-            PrimitiveOirType.float -> sirBuiltins.Swift.Float.defaultType
-            PrimitiveOirType.int8_t -> sirBuiltins.Swift.Int8.defaultType
-            PrimitiveOirType.int16_t -> sirBuiltins.Swift.Int16.defaultType
-            PrimitiveOirType.int32_t -> sirBuiltins.Swift.Int32.defaultType
-            PrimitiveOirType.int64_t -> sirBuiltins.Swift.Int64.defaultType
-            PrimitiveOirType.uint8_t -> sirBuiltins.Swift.UInt8.defaultType
-            PrimitiveOirType.uint16_t -> sirBuiltins.Swift.UInt16.defaultType
-            PrimitiveOirType.uint32_t -> sirBuiltins.Swift.UInt32.defaultType
-            PrimitiveOirType.uint64_t -> sirBuiltins.Swift.UInt64.defaultType
-            PrimitiveOirType.NSUInteger -> sirBuiltins.Swift.UInt.defaultType
-            PrimitiveOirType.NSConvertedUInteger -> sirBuiltins.Swift.Int.defaultType
-            PrimitiveOirType.vectorFloat128 -> sirBuiltins.Swift.SIMD4.toType(sirBuiltins.Swift.Float.defaultType)
-        }
+    private fun mapType(oirType: PrimitiveOirType): SirType = when (oirType) {
+        PrimitiveOirType.unichar -> sirBuiltins.Foundation.unichar.defaultType
+        PrimitiveOirType.BOOL -> sirBuiltins.Swift.Bool.defaultType
+        PrimitiveOirType.double -> sirBuiltins.Swift.Double.defaultType
+        PrimitiveOirType.float -> sirBuiltins.Swift.Float.defaultType
+        PrimitiveOirType.int8_t -> sirBuiltins.Swift.Int8.defaultType
+        PrimitiveOirType.int16_t -> sirBuiltins.Swift.Int16.defaultType
+        PrimitiveOirType.int32_t -> sirBuiltins.Swift.Int32.defaultType
+        PrimitiveOirType.int64_t -> sirBuiltins.Swift.Int64.defaultType
+        PrimitiveOirType.uint8_t -> sirBuiltins.Swift.UInt8.defaultType
+        PrimitiveOirType.uint16_t -> sirBuiltins.Swift.UInt16.defaultType
+        PrimitiveOirType.uint32_t -> sirBuiltins.Swift.UInt32.defaultType
+        PrimitiveOirType.uint64_t -> sirBuiltins.Swift.UInt64.defaultType
+        PrimitiveOirType.NSUInteger -> sirBuiltins.Swift.UInt.defaultType
+        PrimitiveOirType.NSConvertedUInteger -> sirBuiltins.Swift.Int.defaultType
+        PrimitiveOirType.vectorFloat128 -> sirBuiltins.Swift.SIMD4.toType(sirBuiltins.Swift.Float.defaultType)
+    }
 
-    private fun mapType(
-        oirType: BlockPointerOirType,
-        isEscaping: Boolean,
-    ): SirType =
-        LambdaSirType(
-            valueParameterTypes = oirType.valueParameterTypes.map { mapType(it, isEscaping = true) },
-            returnType = mapType(oirType.returnType, isEscaping = false),
-            isEscaping = isEscaping,
-        )
+    private fun mapType(oirType: BlockPointerOirType, isEscaping: Boolean): SirType = LambdaSirType(
+        valueParameterTypes = oirType.valueParameterTypes.map { mapType(it, isEscaping = true) },
+        returnType = mapType(oirType.returnType, isEscaping = false),
+        isEscaping = isEscaping,
+    )
 
     // Optimization - prevents re-creating the lambda type argument mapper for every invocation
     private val cachedMapTypeArgument = ::mapTypeArgument
 
-    private fun mapType(oirType: DeclaredOirType): SirType =
-        OirDeclaredSirType(
-            declaration = oirType.declaration,
-            typeArguments = oirType.typeArguments,
-            mapTypeArgument = cachedMapTypeArgument,
-        )
+    private fun mapType(oirType: DeclaredOirType): SirType = OirDeclaredSirType(
+        declaration = oirType.declaration,
+        typeArguments = oirType.typeArguments,
+        mapTypeArgument = cachedMapTypeArgument,
+    )
 
-    private fun mapType(
-        oirType: TypeDefOirType,
-        isEscaping: Boolean,
-    ): SirType =
-        mapType(oirType.declaration.type, isEscaping = isEscaping)
+    private fun mapType(oirType: TypeDefOirType, isEscaping: Boolean): SirType = mapType(oirType.declaration.type, isEscaping = isEscaping)
 
-    private fun mapType(oirType: SpecialReferenceOirType): SirType =
-        when (oirType) {
-            SpecialReferenceOirType.Class -> sirBuiltins.Swift.AnyClass.defaultType
-            SpecialReferenceOirType.Id -> SpecialSirType.Any
-            SpecialReferenceOirType.InstanceType -> SpecialSirType.Self
-            SpecialReferenceOirType.Protocol -> SpecialSirType.Protocol
-        }
+    private fun mapType(oirType: SpecialReferenceOirType): SirType = when (oirType) {
+        SpecialReferenceOirType.Class -> sirBuiltins.Swift.AnyClass.defaultType
+        SpecialReferenceOirType.Id -> SpecialSirType.Any
+        SpecialReferenceOirType.InstanceType -> SpecialSirType.Self
+        SpecialReferenceOirType.Protocol -> SpecialSirType.Protocol
+    }
 
     private fun mapType(oirType: TypeParameterUsageOirType): SirType =
         oirType.typeParameter.sirTypeParameter?.let { TypeParameterUsageSirType(it) } ?: sirBuiltins.Swift.AnyObject.defaultType
 
-    private fun mapType(oirType: NullableReferenceOirType): SirType =
-        mapType(oirType.nonNullType, isEscaping = false).toNullable()
+    private fun mapType(oirType: NullableReferenceOirType): SirType = mapType(oirType.nonNullType, isEscaping = false).toNullable()
 
     private fun mapTypeArgument(typeArgument: OirType, typeParameter: SirTypeParameter): SirType {
         if (typeArgument is BlockPointerOirType) {

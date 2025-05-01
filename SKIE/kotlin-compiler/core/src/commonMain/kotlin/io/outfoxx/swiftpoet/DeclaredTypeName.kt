@@ -17,89 +17,90 @@
 package io.outfoxx.swiftpoet
 
 /** A fully-qualified type name for top-level and member types.  */
-class DeclaredTypeName internal constructor(
-  names: List<String>,
-  val alwaysQualify: Boolean = false,
-) : TypeName(), Comparable<DeclaredTypeName> {
+class DeclaredTypeName internal constructor(names: List<String>, val alwaysQualify: Boolean = false) :
+    TypeName(),
+    Comparable<DeclaredTypeName> {
 
-  /**
-   * Returns a type name created from the given parts. For example, calling this with module name
-   * `"Swift"` and simple names `"Array"`, `"Iterator"` yields `Swift.Array.Iterator`.
-   */
-  constructor(moduleName: String, simpleName: String, vararg simpleNames: String) :
-    this(listOf(moduleName, simpleName, *simpleNames))
+    /**
+     * Returns a type name created from the given parts. For example, calling this with module name
+     * `"Swift"` and simple names `"Array"`, `"Iterator"` yields `Swift.Array.Iterator`.
+     */
+    constructor(moduleName: String, simpleName: String, vararg simpleNames: String) :
+        this(listOf(moduleName, simpleName, *simpleNames))
 
-  /** From top to bottom. This will be `["Swift", "Array", "Iterator"]` for `Swift.Array.Iterator`.  */
-  private val names = names.toImmutableList()
-  val canonicalName = if (names[0].isEmpty())
-    names.subList(1, names.size).joinToString(".") else
-    names.joinToString(".")
-
-  /** Module name, like `"Swift"` for `Array.Iterator`.  */
-  val moduleName get() = names[0]
-
-  /** Simple name of this type, like `"Iterator"` for `Swift.Array.Iterator`.  */
-  val simpleName get() = names[names.size - 1]
-  val simpleNames get() = names.subList(1, names.size)
-
-  val compoundName get() = simpleNames.joinToString("") { name -> name.replaceFirstChar { it.titlecase() } }
-
-  /**
-   * Returns the enclosing type, like [Map] for `Map.Entry`. Returns null if this type
-   * is not nested in another type.
-   */
-  fun enclosingTypeName(alwaysQualify: Boolean = this.alwaysQualify): DeclaredTypeName? {
-    return if (names.size != 2)
-      DeclaredTypeName(names.subList(0, names.size - 1), alwaysQualify) else
-      null
-  }
-
-  /**
-   * Returns the top type in this nesting group. Equivalent to chained calls to
-   * [DeclaredTypeName.enclosingTypeName] until the result's enclosing type is null.
-   */
-  fun topLevelTypeName(alwaysQualify: Boolean = this.alwaysQualify) =
-    DeclaredTypeName(names.subList(0, 2), alwaysQualify)
-
-  /**
-   * Returns a new [DeclaredTypeName] instance for the specified `name` as nested inside this
-   * type.
-   */
-  fun nestedType(name: String, alwaysQualify: Boolean = this.alwaysQualify) =
-    DeclaredTypeName(names + name, alwaysQualify)
-
-  /**
-   * Returns a type that shares the same enclosing package or type. If this type is enclosed by
-   * another type, this is equivalent to `enclosingTypeName().nestedType(name)`. Otherwise
-   * it is equivalent to `get(packageName(), name)`.
-   */
-  fun peerType(name: String, alwaysQualify: Boolean = this.alwaysQualify): DeclaredTypeName {
-    val result = names.toMutableList()
-    result[result.size - 1] = name
-    return DeclaredTypeName(result, alwaysQualify)
-  }
-
-  override fun compareTo(other: DeclaredTypeName) = canonicalName.compareTo(other.canonicalName)
-
-  override fun emit(out: CodeWriter): CodeWriter {
-    out.importIfNeeded(this)
-    return out.emit(escapeKeywords(if (alwaysQualify) canonicalName else out.lookupName(this)))
-  }
-
-  companion object {
-
-    @JvmStatic
-    fun typeName(qualifiedTypeName: String, alwaysQualify: Boolean = false): DeclaredTypeName {
-      val names = qualifiedTypeName.split('.')
-      if (names.size < 2) {
-        throw IllegalArgumentException("Type names MUST be qualified with their module name; to create a type for the 'current' module start the type with a '.' (e.g. '.MyType')")
-      }
-      return DeclaredTypeName(qualifiedTypeName.split('.'), alwaysQualify)
+    /** From top to bottom. This will be `["Swift", "Array", "Iterator"]` for `Swift.Array.Iterator`.  */
+    private val names = names.toImmutableList()
+    val canonicalName = if (names[0].isEmpty()) {
+        names.subList(1, names.size).joinToString(".")
+    } else {
+        names.joinToString(".")
     }
 
-    @JvmStatic
-    fun qualifiedTypeName(qualifiedTypeName: String) = typeName(qualifiedTypeName, alwaysQualify = true)
-  }
+    /** Module name, like `"Swift"` for `Array.Iterator`.  */
+    val moduleName get() = names[0]
+
+    /** Simple name of this type, like `"Iterator"` for `Swift.Array.Iterator`.  */
+    val simpleName get() = names[names.size - 1]
+    val simpleNames get() = names.subList(1, names.size)
+
+    val compoundName get() = simpleNames.joinToString("") { name -> name.replaceFirstChar { it.titlecase() } }
+
+    /**
+     * Returns the enclosing type, like [Map] for `Map.Entry`. Returns null if this type
+     * is not nested in another type.
+     */
+    fun enclosingTypeName(alwaysQualify: Boolean = this.alwaysQualify): DeclaredTypeName? = if (names.size != 2) {
+        DeclaredTypeName(names.subList(0, names.size - 1), alwaysQualify)
+    } else {
+        null
+    }
+
+    /**
+     * Returns the top type in this nesting group. Equivalent to chained calls to
+     * [DeclaredTypeName.enclosingTypeName] until the result's enclosing type is null.
+     */
+    fun topLevelTypeName(alwaysQualify: Boolean = this.alwaysQualify) = DeclaredTypeName(names.subList(0, 2), alwaysQualify)
+
+    /**
+     * Returns a new [DeclaredTypeName] instance for the specified `name` as nested inside this
+     * type.
+     */
+    fun nestedType(name: String, alwaysQualify: Boolean = this.alwaysQualify) = DeclaredTypeName(names + name, alwaysQualify)
+
+    /**
+     * Returns a type that shares the same enclosing package or type. If this type is enclosed by
+     * another type, this is equivalent to `enclosingTypeName().nestedType(name)`. Otherwise
+     * it is equivalent to `get(packageName(), name)`.
+     */
+    fun peerType(name: String, alwaysQualify: Boolean = this.alwaysQualify): DeclaredTypeName {
+        val result = names.toMutableList()
+        result[result.size - 1] = name
+        return DeclaredTypeName(result, alwaysQualify)
+    }
+
+    override fun compareTo(other: DeclaredTypeName) = canonicalName.compareTo(other.canonicalName)
+
+    override fun emit(out: CodeWriter): CodeWriter {
+        out.importIfNeeded(this)
+        return out.emit(escapeKeywords(if (alwaysQualify) canonicalName else out.lookupName(this)))
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun typeName(qualifiedTypeName: String, alwaysQualify: Boolean = false): DeclaredTypeName {
+            val names = qualifiedTypeName.split('.')
+            if (names.size < 2) {
+                throw IllegalArgumentException(
+                    "Type names MUST be qualified with their module name; to create a type for the 'current' module start the type with a '.' (e.g. '.MyType')",
+                )
+            }
+            return DeclaredTypeName(qualifiedTypeName.split('.'), alwaysQualify)
+        }
+
+        @JvmStatic
+        fun qualifiedTypeName(qualifiedTypeName: String) = typeName(qualifiedTypeName, alwaysQualify = true)
+    }
 }
 
 @JvmField

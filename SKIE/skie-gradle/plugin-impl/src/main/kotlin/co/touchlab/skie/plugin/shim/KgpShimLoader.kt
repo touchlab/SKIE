@@ -6,6 +6,7 @@ import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.util.exclude
 import co.touchlab.skie.plugin.util.named
+import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
@@ -16,7 +17,6 @@ import org.gradle.configurationcache.extensions.serviceOf
 import org.gradle.internal.classloader.HashingClassLoaderFactory
 import org.gradle.internal.classpath.DefaultClassPath
 import org.gradle.util.GradleVersion
-import java.io.File
 
 object KgpShimLoader {
 
@@ -101,7 +101,7 @@ object KgpShimLoader {
                 """
                         Loaded class ${shimClass.name} does not implement ${KgpShim::class.java.name}!
                         This is a bug in SKIE - please report it to the SKIE developers.
-                    """.trimIndent(),
+                """.trimIndent(),
             )
 
             return null

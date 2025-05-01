@@ -6,9 +6,7 @@ import co.touchlab.skie.oir.element.OirTypeParameter
 import co.touchlab.skie.oir.element.toOirKind
 import co.touchlab.skie.phases.SirPhase
 
-class CreateKotlinOirTypesPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+class CreateKotlinOirTypesPhase(context: SirPhase.Context) : SirPhase {
 
     private val kirProvider = context.kirProvider
     private val oirProvider = context.oirProvider

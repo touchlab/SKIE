@@ -22,8 +22,7 @@ sealed interface Optional<out T> {
 
 fun <T> T.toOptional(): Optional<T> = Optional.Some(this)
 
-inline fun <T> Optional<T>.orElse(defaultValue: () -> T): T =
-    when (this) {
-        is Optional.Some -> value
-        Optional.None -> defaultValue()
-    }
+inline fun <T> Optional<T>.orElse(defaultValue: () -> T): T = when (this) {
+    is Optional.Some -> value
+    Optional.None -> defaultValue()
+}

@@ -2,9 +2,7 @@ package co.touchlab.skie.util.directory.structure
 
 import java.io.File
 
-abstract class RootDirectory(
-    directory: File,
-) : Directory(null, directory) {
+abstract class RootDirectory(directory: File) : Directory(null, directory) {
 
     override val isTemporary: Boolean = false
 

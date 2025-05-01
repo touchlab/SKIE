@@ -12,20 +12,20 @@ import co.touchlab.skie.sir.element.copyValueParametersFrom
 import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 
-class GlobalMembersConvertorDelegate(
-    private val parentProvider: FileScopeConversionParentProvider,
-) : FileScopeConvertorDelegateScope {
+class GlobalMembersConvertorDelegate(private val parentProvider: FileScopeConversionParentProvider) : FileScopeConvertorDelegateScope {
 
     private val restrictedPropertyNames = setOf(
-        "version"
+        "version",
     )
     private val restrictedSelectors = setOf(
-        "setVersion:"
+        "setVersion:",
     )
 
     fun generateGlobalFunctionWrapper(function: KirSimpleFunction) {
         // Don't generate for names that aren't callable.
-        if (function.oirSimpleFunction.selector in restrictedSelectors) { return }
+        if (function.oirSimpleFunction.selector in restrictedSelectors) {
+            return
+        }
 
         function.forEachAssociatedExportedSirDeclaration {
             generateGlobalFunctionWrapper(function, it)
@@ -60,7 +60,9 @@ class GlobalMembersConvertorDelegate(
 
     fun generateGlobalPropertyWrapper(property: KirProperty) {
         // Don't generate for names that aren't callable.
-        if (property.oirProperty.name in restrictedPropertyNames) { return }
+        if (property.oirProperty.name in restrictedPropertyNames) {
+            return
+        }
 
         property.forEachAssociatedExportedSirDeclaration {
             generateGlobalPropertyWrapper(property, it)

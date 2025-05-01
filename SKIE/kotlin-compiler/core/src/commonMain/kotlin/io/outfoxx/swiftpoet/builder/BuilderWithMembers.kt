@@ -21,7 +21,7 @@ import io.outfoxx.swiftpoet.PropertySpec
 
 interface BuilderWithMembers {
 
-  fun addProperty(propertySpec: PropertySpec): BuilderWithMembers
+    fun addProperty(propertySpec: PropertySpec): BuilderWithMembers
 
-  fun addFunction(functionSpec: FunctionSpec): BuilderWithMembers
+    fun addFunction(functionSpec: FunctionSpec): BuilderWithMembers
 }

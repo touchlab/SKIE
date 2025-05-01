@@ -12,17 +12,17 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
     SharedFlow(Flow),
     MutableSharedFlow(SharedFlow),
     StateFlow(SharedFlow),
-    MutableStateFlow(StateFlow);
+    MutableStateFlow(StateFlow),
+    ;
 
-    val coroutinesFlowFqName: String = "kotlinx.coroutines.flow.${name}"
+    val coroutinesFlowFqName: String = "kotlinx.coroutines.flow.$name"
 
     val requiredVariant: Variant.Required = Variant.Required(this)
     val optionalVariant: Variant.Optional = Variant.Optional(this)
 
     val variants: List<Variant> = listOf(requiredVariant, optionalVariant)
 
-    fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass =
-        kirProvider.getClassByFqName(coroutinesFlowFqName)
+    fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass = kirProvider.getClassByFqName(coroutinesFlowFqName)
 
     context(SirPhase.Context)
     fun getCoroutinesKirClass(): KirClass = getCoroutinesKirClass(kirProvider)
@@ -35,8 +35,7 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         val kind: SupportedFlow
 
-        fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass =
-            kind.getCoroutinesKirClass(kirProvider)
+        fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass = kind.getCoroutinesKirClass(kirProvider)
 
         fun getKotlinKirClass(kirProvider: KirProvider): KirClass
 
@@ -59,15 +58,12 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
             override val swiftSimpleName: String = "SkieSwift${kind.name}"
 
-            override fun getKotlinKirClass(kirProvider: KirProvider): KirClass =
-                kirProvider.getClassByFqName(kotlinClassFqName)
+            override fun getKotlinKirClass(kirProvider: KirProvider): KirClass = kirProvider.getClassByFqName(kotlinClassFqName)
 
             override fun getSwiftClass(sirProvider: SirProvider): SirClass =
                 sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, swiftSimpleName))
 
-            override fun isCastableTo(variant: Variant): Boolean {
-                return kind.isSelfOrChildOf(variant.kind)
-            }
+            override fun isCastableTo(variant: Variant): Boolean = kind.isSelfOrChildOf(variant.kind)
         }
 
         class Optional(override val kind: SupportedFlow) : Variant {
@@ -76,8 +72,7 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
             override val swiftSimpleName: String = "SkieSwiftOptional${kind.name}"
 
-            override fun getKotlinKirClass(kirProvider: KirProvider): KirClass =
-                kirProvider.getClassByFqName(kotlinClassFqName)
+            override fun getKotlinKirClass(kirProvider: KirProvider): KirClass = kirProvider.getClassByFqName(kotlinClassFqName)
 
             override fun getSwiftClass(sirProvider: SirProvider): SirClass =
                 sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, swiftSimpleName))
@@ -90,8 +85,7 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
         }
     }
 
-    private fun isSelfOrChildOf(flow: SupportedFlow): Boolean =
-        this == flow || (directParent?.isSelfOrChildOf(flow) ?: false)
+    private fun isSelfOrChildOf(flow: SupportedFlow): Boolean = this == flow || (directParent?.isSelfOrChildOf(flow) ?: false)
 
     companion object {
 

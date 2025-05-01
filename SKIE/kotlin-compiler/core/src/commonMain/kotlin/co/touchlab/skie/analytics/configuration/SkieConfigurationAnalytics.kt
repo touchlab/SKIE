@@ -19,13 +19,11 @@ data class SkieConfigurationAnalytics(
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_SkieConfiguration
 
-        override fun produce(): String =
-            SkieConfigurationAnalytics(
-                groups = skieConfigurationData.groups.map { it.anonymized() },
-                enabledConfigurationFlags = skieConfigurationData.enabledConfigurationFlags,
-            ).toPrettyJson()
+        override fun produce(): String = SkieConfigurationAnalytics(
+            groups = skieConfigurationData.groups.map { it.anonymized() },
+            enabledConfigurationFlags = skieConfigurationData.enabledConfigurationFlags,
+        ).toPrettyJson()
     }
 }
 
-private fun CompilerSkieConfigurationData.Group.anonymized(): CompilerSkieConfigurationData.Group =
-    copy(target = target.hashed())
+private fun CompilerSkieConfigurationData.Group.anonymized(): CompilerSkieConfigurationData.Group = copy(target = target.hashed())

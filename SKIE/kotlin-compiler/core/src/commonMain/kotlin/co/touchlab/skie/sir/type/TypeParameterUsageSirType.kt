@@ -5,10 +5,8 @@ import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.util.map
 import io.outfoxx.swiftpoet.TypeVariableName
 
-data class TypeParameterUsageSirType(
-    val typeParameter: SirTypeParameter,
-    val parentScope: TypeParameterUsageSirType? = null,
-) : NonNullSirType() {
+data class TypeParameterUsageSirType(val typeParameter: SirTypeParameter, val parentScope: TypeParameterUsageSirType? = null) :
+    NonNullSirType() {
 
     override val isHashable: Boolean
         get() = typeParameter.bounds.any { it.type.isHashable }
@@ -22,7 +20,9 @@ data class TypeParameterUsageSirType(
 
         return EvaluatedSirType.Lazy(
             typeProvider = evaluatedParentScope.map { copy(parentScope = it?.type as TypeParameterUsageSirType?) },
-            canonicalNameProvider = evaluatedTypeParameterBounds.map { bounds -> "[${typeParameter.name}: ${bounds.joinToString { it.canonicalName }}]" },
+            canonicalNameProvider = evaluatedTypeParameterBounds.map { bounds ->
+                "[${typeParameter.name}: ${bounds.joinToString { it.canonicalName }}]"
+            },
             swiftPoetTypeNameProvider = evaluatedParentScope.map {
                 it?.let { TypeVariableName(it.swiftPoetTypeName.name + "." + typeParameter.name) } ?: TypeVariableName(typeParameter.name)
             },
@@ -31,25 +31,21 @@ data class TypeParameterUsageSirType(
         )
     }
 
-    override fun inlineTypeAliases(): SirType =
+    override fun inlineTypeAliases(): SirType = this
+
+    override fun asHashableType(): SirType? = if (typeParameter.bounds.any { it.type.asHashableType() != null }) {
         this
+    } else {
+        null
+    }
 
-    override fun asHashableType(): SirType? =
-        if (typeParameter.bounds.any { it.type.asHashableType() != null }) {
-            this
-        } else {
-            null
-        }
+    override fun asReferenceType(): SirType? = if (typeParameter.bounds.any { it.type.asReferenceType() != null }) {
+        this
+    } else {
+        null
+    }
 
-    override fun asReferenceType(): SirType? =
-        if (typeParameter.bounds.any { it.type.asReferenceType() != null }) {
-            this
-        } else {
-            null
-        }
-
-    fun typeParameter(typeParameter: SirTypeParameter): TypeParameterUsageSirType =
-        TypeParameterUsageSirType(typeParameter, this)
+    fun typeParameter(typeParameter: SirTypeParameter): TypeParameterUsageSirType = TypeParameterUsageSirType(typeParameter, this)
 
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): TypeParameterUsageSirType {
         val parentScope = parentScope?.substituteTypeParameters(substitutions)
@@ -60,6 +56,5 @@ data class TypeParameterUsageSirType(
         )
     }
 
-    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SirType =
-        substitutions[typeParameter] ?: this
+    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SirType = substitutions[typeParameter] ?: this
 }

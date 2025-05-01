@@ -30,23 +30,18 @@ data class CompilerSkieConfigurationData(
         return json.encodeToString(this)
     }
 
-    operator fun plus(other: CompilerSkieConfigurationData): CompilerSkieConfigurationData =
-        CompilerSkieConfigurationData(
-            (enabledConfigurationFlags - other.disabledConfigurationFlags) + other.enabledConfigurationFlags,
-            other.disabledConfigurationFlags,
-            groups + other.groups,
-        )
+    operator fun plus(other: CompilerSkieConfigurationData): CompilerSkieConfigurationData = CompilerSkieConfigurationData(
+        (enabledConfigurationFlags - other.disabledConfigurationFlags) + other.enabledConfigurationFlags,
+        other.disabledConfigurationFlags,
+        groups + other.groups,
+    )
 
     @Serializable
-    data class Group(
-        override val target: String,
-        override val overridesAnnotations: Boolean,
-        override val items: Map<String, String?>,
-    ) : UntypedSkieConfigurationData.Group
+    data class Group(override val target: String, override val overridesAnnotations: Boolean, override val items: Map<String, String?>) :
+        UntypedSkieConfigurationData.Group
 
     companion object {
 
-        fun deserialize(string: String): CompilerSkieConfigurationData =
-            Json.decodeFromString(string)
+        fun deserialize(string: String): CompilerSkieConfigurationData = Json.decodeFromString(string)
     }
 }

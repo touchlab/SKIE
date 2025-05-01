@@ -18,12 +18,8 @@ import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.name.Name
 
-class FunctionTemplate(
-    name: Name,
-    namespace: Namespace<*>,
-    annotations: Annotations,
-    config: FunctionBuilder.() -> Unit,
-) : BaseDeclarationTemplate<FunctionDescriptor, IrSimpleFunction, IrSimpleFunctionSymbol>() {
+class FunctionTemplate(name: Name, namespace: Namespace<*>, annotations: Annotations, config: FunctionBuilder.() -> Unit) :
+    BaseDeclarationTemplate<FunctionDescriptor, IrSimpleFunction, IrSimpleFunctionSymbol>() {
 
     override val descriptor: SimpleFunctionDescriptorImpl = SimpleFunctionDescriptorImpl.create(
         namespace.descriptor,
@@ -36,7 +32,8 @@ class FunctionTemplate(
     private val functionBuilder = FunctionBuilder(descriptor)
 
     // TODO Change to context(KotlinIrPhase.Context, DeclarationIrBuilder) once are context implemented properly
-    private val irBodyBuilder: context(KotlinIrPhase.Context) DeclarationIrBuilder.(IrSimpleFunction) -> IrBody
+    private val irBodyBuilder: context(KotlinIrPhase.Context)
+    DeclarationIrBuilder.(IrSimpleFunction) -> IrBody
 
     init {
         functionBuilder.config()
@@ -86,8 +83,7 @@ class FunctionTemplate(
     }
 
     context(KotlinIrPhase.Context)
-    override fun getSymbol(): IrSimpleFunctionSymbol =
-        skieSymbolTable.descriptorExtension.referenceSimpleFunction(descriptor)
+    override fun getSymbol(): IrSimpleFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(descriptor)
 
     context(KotlinIrPhase.Context)
     override fun initializeBody(declaration: IrSimpleFunction, declarationIrBuilder: DeclarationIrBuilder) {

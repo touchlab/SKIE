@@ -54,11 +54,7 @@ open class Command(initialCommand: List<String>) {
         return this
     }
 
-    fun execute(
-        withErrors: Boolean = true,
-        handleError: Boolean = true,
-        logFile: File? = null,
-    ): Result {
+    fun execute(withErrors: Boolean = true, handleError: Boolean = true, logFile: File? = null): Result {
         log()
 
         // Note: getting process output could be done without redirecting to temporary file,
@@ -95,12 +91,14 @@ open class Command(initialCommand: List<String>) {
     class Result(val exitCode: Int, val outputLines: List<String>)
 
     private fun handleExitCode(code: Int, output: List<String> = emptyList()) {
-        if (code != 0) error(
-            """
+        if (code != 0) {
+            error(
+                """
             The ${command[0]} command returned non-zero exit code: $code.
             output:
-            """.trimIndent() + "\n${output.joinToString("\n")}"
-        )
+                """.trimIndent() + "\n${output.joinToString("\n")}",
+            )
+        }
     }
 
     private fun log() {

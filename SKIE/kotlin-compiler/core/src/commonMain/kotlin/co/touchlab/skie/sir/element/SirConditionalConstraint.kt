@@ -1,7 +1,6 @@
 package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.element.util.sirConditionalConstraintParent
-import co.touchlab.skie.sir.type.SirType
 
 class SirConditionalConstraint(
     val typeParameter: SirTypeParameter,
@@ -21,11 +20,10 @@ class SirConditionalConstraint(
         operator fun invoke(
             typeParameter: SirTypeParameter,
             bounds: List<SirTypeParameter.Bound> = emptyList(),
-        ): SirConditionalConstraint =
-            SirConditionalConstraint(
-                typeParameter = typeParameter,
-                parent = this@SirConditionalConstraintParent,
-                bounds = bounds,
-            )
+        ): SirConditionalConstraint = SirConditionalConstraint(
+            typeParameter = typeParameter,
+            parent = this@SirConditionalConstraintParent,
+            bounds = bounds,
+        )
     }
 }

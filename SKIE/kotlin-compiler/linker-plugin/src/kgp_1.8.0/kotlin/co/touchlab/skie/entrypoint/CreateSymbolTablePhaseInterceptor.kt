@@ -4,9 +4,9 @@ package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.compilerplugin.initPhaseContext
 import co.touchlab.skie.compilerinject.interceptor.SameTypePhaseInterceptor
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 import org.jetbrains.kotlin.backend.konan.createSymbolTablePhase
 import org.jetbrains.kotlin.backend.konan.getExportedDependencies
-import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
 internal class CreateSymbolTablePhaseInterceptor : SameTypePhaseInterceptor<KonanContext, Unit> {
 

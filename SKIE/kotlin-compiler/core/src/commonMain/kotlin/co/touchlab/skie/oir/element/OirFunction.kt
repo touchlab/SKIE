@@ -2,9 +2,7 @@ package co.touchlab.skie.oir.element
 
 import co.touchlab.skie.oir.type.OirType
 
-sealed class OirFunction(
-    final override val parent: OirCallableDeclarationParent,
-) : OirCallableDeclaration {
+sealed class OirFunction(final override val parent: OirCallableDeclarationParent) : OirCallableDeclaration {
 
     abstract val selector: String
 
@@ -28,7 +26,8 @@ sealed class OirFunction(
         Crashes,
         ReturnsBoolean,
         ReturnsZero,
-        SetsErrorOut;
+        SetsErrorOut,
+        ;
 
         val isThrowing: Boolean
             get() = this != Crashes

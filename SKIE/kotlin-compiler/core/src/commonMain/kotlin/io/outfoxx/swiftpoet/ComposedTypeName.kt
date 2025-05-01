@@ -16,30 +16,22 @@
 
 package io.outfoxx.swiftpoet
 
-class ComposedTypeName private constructor(
-  val types: List<DeclaredTypeName>,
-) : TypeName() {
+class ComposedTypeName private constructor(val types: List<DeclaredTypeName>) : TypeName() {
 
-  override fun emit(out: CodeWriter): CodeWriter {
-    types.forEachIndexed { index, type ->
-      if (index > 0) out.emit(" & ")
-      out.emitCode("%T", type)
-    }
-    return out
-  }
-
-  companion object {
-
-    internal fun composed(types: List<DeclaredTypeName>): ComposedTypeName {
-      return ComposedTypeName(types)
+    override fun emit(out: CodeWriter): CodeWriter {
+        types.forEachIndexed { index, type ->
+            if (index > 0) out.emit(" & ")
+            out.emitCode("%T", type)
+        }
+        return out
     }
 
-    internal fun composed(vararg types: DeclaredTypeName): ComposedTypeName {
-      return ComposedTypeName(types.toList())
-    }
+    companion object {
 
-    internal fun composed(vararg types: String): ComposedTypeName {
-      return ComposedTypeName(types.map { DeclaredTypeName.typeName(it) })
+        internal fun composed(types: List<DeclaredTypeName>): ComposedTypeName = ComposedTypeName(types)
+
+        internal fun composed(vararg types: DeclaredTypeName): ComposedTypeName = ComposedTypeName(types.toList())
+
+        internal fun composed(vararg types: String): ComposedTypeName = ComposedTypeName(types.map { DeclaredTypeName.typeName(it) })
     }
-  }
 }

@@ -28,8 +28,10 @@ fun SirTypeParameterParent.copyTypeParametersFrom(
     val nonCopiedTypeParameters = allTypeParameters - copiedTypeParameters.toSet()
 
     val nonCopiedSubstitutions = nonCopiedTypeParameters.map { nonCopiedTypeParameter ->
-        val existingTypeParameter = (typeParameters.firstOrNull { it.name == nonCopiedTypeParameter.name }
-            ?: error("Type parameter ${nonCopiedTypeParameter.name} not found in parent scope"))
+        val existingTypeParameter = (
+            typeParameters.firstOrNull { it.name == nonCopiedTypeParameter.name }
+                ?: error("Type parameter ${nonCopiedTypeParameter.name} not found in parent scope")
+            )
 
         nonCopiedTypeParameter to existingTypeParameter
     }

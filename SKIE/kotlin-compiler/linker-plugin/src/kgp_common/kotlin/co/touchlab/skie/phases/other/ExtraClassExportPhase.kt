@@ -31,9 +31,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 
-class ExtraClassExportPhase(
-    private val context: ClassExportPhase.Context,
-) : ClassExportPhase {
+class ExtraClassExportPhase(private val context: ClassExportPhase.Context) : ClassExportPhase {
 
     private val descriptorProvider = context.descriptorProvider
     private val mapper = context.mapper
@@ -73,7 +71,8 @@ class ExtraClassExportPhase(
             return emptyList()
         }
 
-        val allFlowArguments = getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses) + getFlowArgumentsFromNewClasses(previouslyVisitedClasses)
+        val allFlowArguments =
+            getFlowArgumentsFromTopLevelMembers(previouslyVisitedClasses) + getFlowArgumentsFromNewClasses(previouslyVisitedClasses)
 
         return allFlowArguments.distinct().filter { mapper.shouldBeExposed(it) }
     }
@@ -142,7 +141,7 @@ class ExtraClassExportPhase(
             valueParameters = exportedClasses.mapIndexed { index: Int, classDescriptor: ClassDescriptor ->
                 createValueParameter(
                     owner = descriptor,
-                    name = Name.identifier("p${index}"),
+                    name = Name.identifier("p$index"),
                     index = index,
                     type = classDescriptor.defaultType.replaceArgumentsWithStarProjections(),
                 )
@@ -174,17 +173,18 @@ private fun CallableMemberDescriptor.getAllFlowArgumentClasses(): List<ClassDesc
     typeParameters.flatMap { it.getAllFlowArgumentClasses() } +
         valueParameters.flatMap { it.type.getAllFlowArgumentClasses() } +
         (returnType?.getAllFlowArgumentClasses() ?: emptyList()) +
-        (contextReceiverParameters + listOfNotNull(
-            dispatchReceiverParameter,
-            extensionReceiverParameter,
-        )).flatMap { it.getAllFlowArgumentClasses() }
+        (
+            contextReceiverParameters + listOfNotNull(
+                dispatchReceiverParameter,
+                extensionReceiverParameter,
+            )
+            ).flatMap { it.getAllFlowArgumentClasses() }
 
 // Sacrifices some completeness for simplicity - otherwise it would have to check all usages of the type parameter.
 private fun TypeParameterDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
     upperBounds.flatMap { it.getAllReferencedClasses() }
 
-private fun ReceiverParameterDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> =
-    type.getAllFlowArgumentClasses()
+private fun ReceiverParameterDescriptor.getAllFlowArgumentClasses(): List<ClassDescriptor> = type.getAllFlowArgumentClasses()
 
 private fun KotlinType.getAllFlowArgumentClasses(visitedTypes: Set<KotlinType> = emptySet()): List<ClassDescriptor> {
     if (this in visitedTypes) return emptyList()

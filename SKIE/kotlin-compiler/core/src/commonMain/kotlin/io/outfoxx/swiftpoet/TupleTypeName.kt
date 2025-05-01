@@ -16,39 +16,36 @@
 
 package io.outfoxx.swiftpoet
 
-class TupleTypeName internal constructor(
-  internal val types: List<Pair<String, TypeName>>,
-) : TypeName() {
+class TupleTypeName internal constructor(internal val types: List<Pair<String, TypeName>>) : TypeName() {
 
-  override fun emit(out: CodeWriter): CodeWriter {
-    out.emit("(")
-    var first = true
-    for ((name, type) in types) {
-      if (!first) {
-        out.emit(", ")
-      }
-      first = false
-      if (name.isEmpty())
-        out.emitCode("%T", type)
-      else
-        out.emitCode("%L: %T", name, type)
-    }
-    out.emit(")")
-    return out
-  }
-
-  companion object {
-
-    fun of(vararg types: Pair<String, TypeName>): TupleTypeName {
-      return TupleTypeName(listOf(*types))
+    override fun emit(out: CodeWriter): CodeWriter {
+        out.emit("(")
+        var first = true
+        for ((name, type) in types) {
+            if (!first) {
+                out.emit(", ")
+            }
+            first = false
+            if (name.isEmpty()) {
+                out.emitCode("%T", type)
+            } else {
+                out.emitCode("%L: %T", name, type)
+            }
+        }
+        out.emit(")")
+        return out
     }
 
-    fun of(types: List<Pair<String, TypeName>>): TupleTypeName {
-      return TupleTypeName(types)
-    }
+    companion object {
 
-    fun from(vararg types: Pair<String, String>): TupleTypeName {
-      return TupleTypeName(listOf(*types).map { it.first to DeclaredTypeName.typeName(it.second) })
+        fun of(vararg types: Pair<String, TypeName>): TupleTypeName = TupleTypeName(listOf(*types))
+
+        fun of(types: List<Pair<String, TypeName>>): TupleTypeName = TupleTypeName(types)
+
+        fun from(vararg types: Pair<String, String>): TupleTypeName = TupleTypeName(
+            listOf(*types).map {
+                it.first to DeclaredTypeName.typeName(it.second)
+            },
+        )
     }
-  }
 }

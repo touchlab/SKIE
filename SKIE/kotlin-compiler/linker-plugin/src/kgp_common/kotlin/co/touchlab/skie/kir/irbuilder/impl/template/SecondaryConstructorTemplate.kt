@@ -37,7 +37,8 @@ class SecondaryConstructorTemplate(
     private val constructorBuilder = SecondaryConstructorBuilder(descriptor)
 
     // TODO Change to context(KotlinIrPhase.Context, DeclarationIrBuilder) once are context implemented properly
-    private val irBodyBuilder: context(KotlinIrPhase.Context) DeclarationIrBuilder.(IrConstructor) -> IrBody
+    private val irBodyBuilder: context(KotlinIrPhase.Context)
+    DeclarationIrBuilder.(IrConstructor) -> IrBody
 
     init {
         descriptor.reflectedBy<DeclarationDescriptorImplReflector>().name = name
@@ -82,8 +83,7 @@ class SecondaryConstructorTemplate(
     }
 
     context(KotlinIrPhase.Context)
-    override fun getSymbol(): IrConstructorSymbol =
-        skieSymbolTable.descriptorExtension.referenceConstructor(descriptor)
+    override fun getSymbol(): IrConstructorSymbol = skieSymbolTable.descriptorExtension.referenceConstructor(descriptor)
 
     context(KotlinIrPhase.Context)
     override fun initializeBody(declaration: IrConstructor, declarationIrBuilder: DeclarationIrBuilder) {

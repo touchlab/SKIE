@@ -8,9 +8,7 @@ import co.touchlab.skie.kir.element.KirProperty
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.phases.SirPhase
 
-class FileScopeConvertorPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+class FileScopeConvertorPhase(context: SirPhase.Context) : SirPhase {
 
     private val parentProvider = FileScopeConversionParentProvider(context)
 
@@ -50,7 +48,9 @@ class FileScopeConvertorPhase(
     private fun generateInterfaceExtensionWrapper(function: KirSimpleFunction) {
         when (val kind = function.kind) {
             KirSimpleFunction.Kind.Function -> interfaceExtensionMembersDelegate.generateInterfaceExtensionFunctionWrapper(function)
-            is KirSimpleFunction.Kind.PropertyGetter -> interfaceExtensionMembersDelegate.generateInterfaceExtensionPropertyWrapper(function)
+            is KirSimpleFunction.Kind.PropertyGetter -> interfaceExtensionMembersDelegate.generateInterfaceExtensionPropertyWrapper(
+                function,
+            )
             is KirSimpleFunction.Kind.PropertySetter -> {
                 // Property wrapper must be generated only once
                 if (kind.associatedGetter == null) {

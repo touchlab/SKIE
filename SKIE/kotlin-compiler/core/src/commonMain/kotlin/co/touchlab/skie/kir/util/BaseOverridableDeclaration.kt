@@ -19,9 +19,7 @@ interface BaseOverridableDeclaration<T : BaseOverridableDeclaration<T>> {
     fun removeOverriddenBy(declaration: T)
 }
 
-abstract class BaseOverridableDeclarationDelegate<T : BaseOverridableDeclaration<T>>(
-    private val self: T,
-) {
+abstract class BaseOverridableDeclarationDelegate<T : BaseOverridableDeclaration<T>>(private val self: T) {
 
     val overriddenDeclarations = mutableListOf<T>()
 

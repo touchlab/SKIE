@@ -15,28 +15,26 @@ class SkieClassSuspendGenerator {
     private val skieClassCache = mutableMapOf<KirClass, SirClass>()
 
     context(SirPhase.Context)
-    fun getOrCreateSuspendClass(suspendFunctionOwner: KirClass): SirClass =
-        skieClassCache.getOrPut(suspendFunctionOwner) {
-            val skieClass = createSkieClass(suspendFunctionOwner)
+    fun getOrCreateSuspendClass(suspendFunctionOwner: KirClass): SirClass = skieClassCache.getOrPut(suspendFunctionOwner) {
+        val skieClass = createSkieClass(suspendFunctionOwner)
 
-            generateNamespaceProvider(suspendFunctionOwner, skieClass)
+        generateNamespaceProvider(suspendFunctionOwner, skieClass)
 
-            skieClass
-        }
+        skieClass
+    }
 
     context(SirPhase.Context)
-    private fun createSkieClass(suspendFunctionOwner: KirClass): SirClass =
-        SirClass(
-            baseName = "Suspend",
-            parent = namespaceProvider.getNamespaceExtension(suspendFunctionOwner),
-            isReplaced = true,
-            isHidden = true,
-            kind = SirClass.Kind.Struct,
-        ).apply {
-            copyTypeParametersFrom(suspendFunctionOwner.originalSirClass)
+    private fun createSkieClass(suspendFunctionOwner: KirClass): SirClass = SirClass(
+        baseName = "Suspend",
+        parent = namespaceProvider.getNamespaceExtension(suspendFunctionOwner),
+        isReplaced = true,
+        isHidden = true,
+        kind = SirClass.Kind.Struct,
+    ).apply {
+        copyTypeParametersFrom(suspendFunctionOwner.originalSirClass)
 
-            addSkieClassMembers(suspendFunctionOwner)
-        }
+        addSkieClassMembers(suspendFunctionOwner)
+    }
 
     context(SirPhase.Context)
     private fun generateNamespaceProvider(suspendFunctionOwner: KirClass, skieClass: SirClass) {
@@ -67,9 +65,7 @@ class SkieClassSuspendGenerator {
     }
 }
 
-private fun SirClass.addSkieClassMembers(
-    suspendFunctionOwner: KirClass,
-) {
+private fun SirClass.addSkieClassMembers(suspendFunctionOwner: KirClass) {
     addSkieClassKotlinObjectHolder(suspendFunctionOwner)
 
     addSkieClassConstructor(suspendFunctionOwner)

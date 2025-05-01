@@ -50,14 +50,14 @@ interface SealedGeneratorExtensionContainer {
             this.visibleSealedSubclasses.isEmpty()
 
     val KirClass.visibleSealedSubclasses: List<KirClass>
-        get() = this.sealedSubclasses.filter { it.configuration[SealedInterop.Case.Visible] && it.primarySirClass.visibility.isAccessibleFromOtherModules }
+        get() = this.sealedSubclasses.filter {
+            it.configuration[SealedInterop.Case.Visible] &&
+                it.primarySirClass.visibility.isAccessibleFromOtherModules
+        }
 
-    fun SirClass.getSealedSubclassType(enum: SirClass): SirType =
-        this.toType(this.getTypeArgumentsForEnumCase(enum))
+    fun SirClass.getSealedSubclassType(enum: SirClass): SirType = this.toType(this.getTypeArgumentsForEnumCase(enum))
 
-    private fun SirClass.getTypeArgumentsForEnumCase(
-        enum: SirClass,
-    ): List<SirType> {
+    private fun SirClass.getTypeArgumentsForEnumCase(enum: SirClass): List<SirType> {
         val superClassTypeArguments = superClassType?.typeArguments
 
         return typeParameters.map { typeParameter ->

@@ -18,7 +18,7 @@ val SirDeclaration.firstParentThatIsNotNamespace: SirDeclarationParent
 
 val SirDeclaration.topLevelParent: SirTopLevelDeclarationParent
     get() = (parent as? SirTopLevelDeclarationParent) ?: parent.topLevelParent
-    ?: error("No top-level parent found for $this. All parent hierarchy should have a top-level parent.")
+        ?: error("No top-level parent found for $this. All parent hierarchy should have a top-level parent.")
 
 @get:JvmName("topLevelParentForCombinedDeclaration")
 val <T> T.topLevelParent: SirTopLevelDeclarationParent where T : SirDeclaration, T : SirDeclarationParent

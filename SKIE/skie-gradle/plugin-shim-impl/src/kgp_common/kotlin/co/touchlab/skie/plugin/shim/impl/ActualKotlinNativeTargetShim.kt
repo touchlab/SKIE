@@ -7,10 +7,9 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
-class ActualKotlinNativeTargetShim(
-    private val kotlinNativeTarget: KotlinNativeTarget,
-    objectFactory: ObjectFactory,
-) : KotlinNativeTargetShim, Named by kotlinNativeTarget {
+class ActualKotlinNativeTargetShim(private val kotlinNativeTarget: KotlinNativeTarget, objectFactory: ObjectFactory) :
+    KotlinNativeTargetShim,
+    Named by kotlinNativeTarget {
 
     override val compilations: NamedDomainObjectContainer<KotlinNativeCompilationShim> =
         objectFactory.domainObjectContainer(KotlinNativeCompilationShim::class.java)
@@ -23,8 +22,7 @@ class ActualKotlinNativeTargetShim(
         }
     }
 
-    override fun toString(): String =
-        kotlinNativeTarget.toString()
+    override fun toString(): String = kotlinNativeTarget.toString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -35,6 +33,5 @@ class ActualKotlinNativeTargetShim(
         return true
     }
 
-    override fun hashCode(): Int =
-        kotlinNativeTarget.hashCode()
+    override fun hashCode(): Int = kotlinNativeTarget.hashCode()
 }

@@ -34,5 +34,4 @@ fun SirDeclarationParent.getAllDeclarationsRecursively(): List<SirDeclaration> {
     return declarations + declarationParents.flatMap { it.getAllDeclarationsRecursively() }
 }
 
-fun SirDeclarationParent.coerceScope(scope: SirScope): SirScope =
-    if (this !is SirDeclarationNamespace) SirScope.Global else scope
+fun SirDeclarationParent.coerceScope(scope: SirScope): SirScope = if (this !is SirDeclarationNamespace) SirScope.Global else scope

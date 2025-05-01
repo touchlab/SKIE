@@ -2,8 +2,8 @@
 
 package co.touchlab.skie.kir.descriptor.cache
 
-import co.touchlab.skie.shim.isObjCObjectType
 import co.touchlab.skie.shim.ObjCExportMapperShim
+import co.touchlab.skie.shim.isObjCObjectType
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
@@ -24,12 +24,10 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationInfo
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 
-class CachedObjCExportMapper internal constructor(
-    konanConfig: KonanConfig,
-    frontendServices: FrontendServices,
-) {
+class CachedObjCExportMapper internal constructor(konanConfig: KonanConfig, frontendServices: FrontendServices) {
 
-    internal val kotlinMapper = ObjCExportMapper(frontendServices.deprecationResolver, unitSuspendFunctionExport = konanConfig.unitSuspendFunctionObjCExport)
+    internal val kotlinMapper =
+        ObjCExportMapper(frontendServices.deprecationResolver, unitSuspendFunctionExport = konanConfig.unitSuspendFunctionObjCExport)
 
     private val isHiddenFromObjCCache = mutableMapOf<ClassDescriptor, Boolean>()
     private val shouldBeExposedMemberCache = mutableMapOf<CallableMemberDescriptor, Boolean>()
@@ -45,69 +43,59 @@ class CachedObjCExportMapper internal constructor(
     private val deprecationCache = mutableMapOf<DeclarationDescriptor, DeprecationInfo?>()
 
     // Not available prior 1.9.0
-    fun isHiddenFromObjC(descriptor: ClassDescriptor): Boolean =
-        isHiddenFromObjCCache.getOrPut(descriptor) {
-            when {
-                (descriptor.containingDeclaration as? ClassDescriptor)?.let { isHiddenFromObjC(it) } == true -> true
-                else -> descriptor.annotations.any { annotation ->
-                    annotation.annotationClass?.annotations?.any { it.fqName == KonanFqNames.hidesFromObjC } == true
-                }
+    fun isHiddenFromObjC(descriptor: ClassDescriptor): Boolean = isHiddenFromObjCCache.getOrPut(descriptor) {
+        when {
+            (descriptor.containingDeclaration as? ClassDescriptor)?.let { isHiddenFromObjC(it) } == true -> true
+            else -> descriptor.annotations.any { annotation ->
+                annotation.annotationClass?.annotations?.any { it.fqName == KonanFqNames.hidesFromObjC } == true
             }
         }
+    }
 
-    fun shouldBeExposed(descriptor: CallableMemberDescriptor): Boolean =
-        shouldBeExposedMemberCache.getOrPut(descriptor) {
-            kotlinMapper.shouldBeExposed(descriptor)
-        }
+    fun shouldBeExposed(descriptor: CallableMemberDescriptor): Boolean = shouldBeExposedMemberCache.getOrPut(descriptor) {
+        kotlinMapper.shouldBeExposed(descriptor)
+    }
 
-    fun shouldBeExposed(descriptor: ClassDescriptor): Boolean =
-        shouldBeExposedClassCache.getOrPut(descriptor) {
-            // shouldBeExposed cannot be called directly starting from Kotlin 2.0.0 because it is internal and the other overload is public
-            kotlinMapper.shouldBeVisible(descriptor) && !ObjCExportMapperShim.isSpecialMapped(kotlinMapper, descriptor) && !descriptor.defaultType.isObjCObjectType()
-        }
+    fun shouldBeExposed(descriptor: ClassDescriptor): Boolean = shouldBeExposedClassCache.getOrPut(descriptor) {
+        // shouldBeExposed cannot be called directly starting from Kotlin 2.0.0 because it is internal and the other overload is public
+        kotlinMapper.shouldBeVisible(descriptor) &&
+            !ObjCExportMapperShim.isSpecialMapped(kotlinMapper, descriptor) &&
+            !descriptor.defaultType.isObjCObjectType()
+    }
 
-    fun isTopLevel(descriptor: CallableMemberDescriptor): Boolean =
-        isTopLevelCache.getOrPut(descriptor) {
-            ObjCExportMapperShim.isTopLevel(kotlinMapper, descriptor)
-        }
+    fun isTopLevel(descriptor: CallableMemberDescriptor): Boolean = isTopLevelCache.getOrPut(descriptor) {
+        ObjCExportMapperShim.isTopLevel(kotlinMapper, descriptor)
+    }
 
-    fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor? =
-        getClassIfCategoryCache.getOrPut(descriptor) {
-            ObjCExportMapperShim.getClassIfCategory(kotlinMapper, descriptor)
-        }
+    fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor? = getClassIfCategoryCache.getOrPut(descriptor) {
+        ObjCExportMapperShim.getClassIfCategory(kotlinMapper, descriptor)
+    }
 
-    fun isBaseMethod(functionDescriptor: FunctionDescriptor): Boolean =
-        isBaseMethodCache.getOrPut(functionDescriptor) {
-            kotlinMapper.isBaseMethod(functionDescriptor)
-        }
+    fun isBaseMethod(functionDescriptor: FunctionDescriptor): Boolean = isBaseMethodCache.getOrPut(functionDescriptor) {
+        kotlinMapper.isBaseMethod(functionDescriptor)
+    }
 
-    fun isBaseProperty(propertyDescriptor: PropertyDescriptor): Boolean =
-        isBasePropertyCache.getOrPut(propertyDescriptor) {
-            kotlinMapper.isBaseProperty(propertyDescriptor)
-        }
+    fun isBaseProperty(propertyDescriptor: PropertyDescriptor): Boolean = isBasePropertyCache.getOrPut(propertyDescriptor) {
+        kotlinMapper.isBaseProperty(propertyDescriptor)
+    }
 
-    fun isObjCProperty(property: PropertyDescriptor): Boolean =
-        isObjCPropertyCache.getOrPut(property) {
-            ObjCExportMapperShim.isObjCProperty(kotlinMapper, property)
-        }
+    fun isObjCProperty(property: PropertyDescriptor): Boolean = isObjCPropertyCache.getOrPut(property) {
+        ObjCExportMapperShim.isObjCProperty(kotlinMapper, property)
+    }
 
-    fun getBaseMethods(descriptor: FunctionDescriptor): List<FunctionDescriptor> =
-        getBaseMethodsCache.getOrPut(descriptor) {
-            kotlinMapper.getBaseMethods(descriptor)
-        }
+    fun getBaseMethods(descriptor: FunctionDescriptor): List<FunctionDescriptor> = getBaseMethodsCache.getOrPut(descriptor) {
+        kotlinMapper.getBaseMethods(descriptor)
+    }
 
-    fun getBaseProperties(descriptor: PropertyDescriptor): List<PropertyDescriptor> =
-        getBasePropertiesCache.getOrPut(descriptor) {
-            kotlinMapper.getBaseProperties(descriptor)
-        }
+    fun getBaseProperties(descriptor: PropertyDescriptor): List<PropertyDescriptor> = getBasePropertiesCache.getOrPut(descriptor) {
+        kotlinMapper.getBaseProperties(descriptor)
+    }
 
-    internal fun bridgeMethod(descriptor: FunctionDescriptor): MethodBridge =
-        bridgeMethodCache.getOrPut(descriptor) {
-            kotlinMapper.bridgeMethod(descriptor)
-        }
+    internal fun bridgeMethod(descriptor: FunctionDescriptor): MethodBridge = bridgeMethodCache.getOrPut(descriptor) {
+        kotlinMapper.bridgeMethod(descriptor)
+    }
 
-    fun getDeprecation(descriptor: DeclarationDescriptor): DeprecationInfo? =
-        deprecationCache.getOrPut(descriptor) {
-            kotlinMapper.getDeprecation(descriptor)
-        }
+    fun getDeprecation(descriptor: DeclarationDescriptor): DeprecationInfo? = deprecationCache.getOrPut(descriptor) {
+        kotlinMapper.getDeprecation(descriptor)
+    }
 }

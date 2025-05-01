@@ -13,8 +13,7 @@ interface SkieSubplugin : Plugin<Project> {
 
     override fun apply(target: Project) {}
 
-    fun getOptions(project: Project, target: SkieTarget): Provider<List<KotlinCompilerPluginOption>> =
-        project.provider { emptyList() }
+    fun getOptions(project: Project, target: SkieTarget): Provider<List<KotlinCompilerPluginOption>> = project.provider { emptyList() }
 
     fun configureDependencies(project: Project, pluginConfiguration: Configuration)
 }

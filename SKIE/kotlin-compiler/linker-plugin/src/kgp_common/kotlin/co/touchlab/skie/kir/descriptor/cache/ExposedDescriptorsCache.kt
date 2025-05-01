@@ -34,11 +34,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 
 // Based on ObjCExportTranslatorImpl and ObjCExportHeaderGenerator
-internal class ExposedDescriptorsCache(
-    private val mapper: CachedObjCExportMapper,
-    builtIns: KotlinBuiltIns,
-    objcGenerics: Boolean,
-) {
+internal class ExposedDescriptorsCache(private val mapper: CachedObjCExportMapper, builtIns: KotlinBuiltIns, objcGenerics: Boolean) {
 
     val exposedClasses: Set<ClassDescriptor> by ::mutableExposedClasses
     val exposedCategoryMembersByClass: Map<ClassDescriptor, List<CallableMemberDescriptor>> by ::mutableExposedCategoryMembersByClass
@@ -243,10 +239,7 @@ internal class ExposedDescriptorsCache(
         }
     }
 
-    private fun exposeFunction(
-        function: FunctionDescriptor,
-        typeParameterScope: TypeParameterScope,
-    ) {
+    private fun exposeFunction(function: FunctionDescriptor, typeParameterScope: TypeParameterScope) {
         if (!mapper.shouldBeExposed(function)) {
             return
         }

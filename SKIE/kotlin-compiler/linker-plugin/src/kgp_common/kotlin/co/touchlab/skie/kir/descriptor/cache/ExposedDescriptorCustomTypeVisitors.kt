@@ -54,12 +54,14 @@ internal object ExposedDescriptorCustomTypeVisitors {
 
         val exposedClassId: ClassId
 
-        fun visitType(mappedSuperType: KotlinType, visitor: ExposedDescriptorTypeVisitor, typeParameterScope: ExposedDescriptorTypeVisitor.TypeParameterScope)
+        fun visitType(
+            mappedSuperType: KotlinType,
+            visitor: ExposedDescriptorTypeVisitor,
+            typeParameterScope: ExposedDescriptorTypeVisitor.TypeParameterScope,
+        )
     }
 
-    private class Simple(
-        override val exposedClassId: ClassId,
-    ) : Visitor {
+    private class Simple(override val exposedClassId: ClassId) : Visitor {
 
         override fun visitType(
             mappedSuperType: KotlinType,
@@ -69,9 +71,7 @@ internal object ExposedDescriptorCustomTypeVisitors {
         }
     }
 
-    private class Collection(
-        exposedClassFqName: FqName,
-    ) : Visitor {
+    private class Collection(exposedClassFqName: FqName) : Visitor {
 
         override val exposedClassId = ClassId.topLevel(exposedClassFqName)
 
@@ -96,8 +96,6 @@ internal object ExposedDescriptorCustomTypeVisitors {
             mappedSuperType: KotlinType,
             visitor: ExposedDescriptorTypeVisitor,
             typeParameterScope: ExposedDescriptorTypeVisitor.TypeParameterScope,
-        ) {
-            return visitor.visitFunctionType(mappedSuperType, typeParameterScope, returnsVoid = false)
-        }
+        ) = visitor.visitFunctionType(mappedSuperType, typeParameterScope, returnsVoid = false)
     }
 }

@@ -4,11 +4,7 @@ import co.touchlab.skie.util.TargetTriple
 import org.jetbrains.kotlin.gradle.tasks.FrameworkDescriptor
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
-data class DarwinTarget(
-    val konanTarget: KonanTarget,
-    val targetTriple: TargetTriple,
-    val sdk: String,
-) {
+data class DarwinTarget(val konanTarget: KonanTarget, val targetTriple: TargetTriple, val sdk: String) {
 
     constructor(
         konanTarget: KonanTarget,
@@ -16,7 +12,8 @@ data class DarwinTarget(
         sdk: String,
     ) : this(
         konanTarget,
-        TargetTriple(targetTripleString), sdk,
+        TargetTriple(targetTripleString),
+        sdk,
     )
 
     companion object {

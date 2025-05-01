@@ -7,9 +7,9 @@ import co.touchlab.skie.plugin.util.doLastOptimized
 import co.touchlab.skie.plugin.util.newInstance
 import co.touchlab.skie.util.cache.copyFileToIfDifferent
 import co.touchlab.skie.util.directory.FrameworkLayout
+import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.Task
-import java.io.File
 
 object FatFrameworkConfigurator {
 
@@ -53,18 +53,12 @@ object FatFrameworkConfigurator {
         }
     }
 
-    private fun copySwiftModulemap(
-        targetFrameworkLayout: FrameworkLayout,
-        frameworks: List<FrameworkShim.Serializable>,
-    ) {
+    private fun copySwiftModulemap(targetFrameworkLayout: FrameworkLayout, frameworks: List<FrameworkShim.Serializable>) {
         // There shouldn't be any real difference between the frameworks except for architecture, so it's possible to use just the first one
         frameworks.firstOrNull()?.layout?.modulemapFile?.copyFileToIfDifferent(targetFrameworkLayout.modulemapFile)
     }
 
-    private fun copySwiftHeader(
-        targetFrameworkLayout: FrameworkLayout,
-        frameworks: List<FrameworkShim.Serializable>,
-    ) {
+    private fun copySwiftHeader(targetFrameworkLayout: FrameworkLayout, frameworks: List<FrameworkShim.Serializable>) {
         val frameworkWithSwiftHeaderContent = frameworks.map { it to it.layout.swiftHeader.readText() }
 
         val needsDifferentHeaders = frameworkWithSwiftHeaderContent.distinctBy { it.second }.size > 1
@@ -96,7 +90,7 @@ object FatFrameworkConfigurator {
                     #else
                     #error Unsupported platform
                     #endif
-                    """.trimIndent(),
+                """.trimIndent(),
             )
         }
     }

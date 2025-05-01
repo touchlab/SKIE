@@ -3,24 +3,17 @@ package co.touchlab.skie.plugin.analytics.git
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
+import java.io.File
+import java.text.Normalizer
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.lib.PersonIdent
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import java.io.File
-import java.text.Normalizer
 
-data class GitAnalytics(
-    val numberOfContributors: Int,
-    val numberOfCommits: Int,
-    val numberOfBranches: Int,
-    val numberOfTags: Int,
-) {
+data class GitAnalytics(val numberOfContributors: Int, val numberOfCommits: Int, val numberOfBranches: Int, val numberOfTags: Int) {
 
-    class Producer(
-        private val gitRoot: Provider<File?>,
-    ) : AnalyticsProducer {
+    class Producer(private val gitRoot: Provider<File?>) : AnalyticsProducer {
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Git
 
@@ -46,5 +39,4 @@ fun Project.getGitRoot(): Provider<File?> = provider {
     projectDir.findGitRoot()
 }
 
-private tailrec fun File.findGitRoot(): File? =
-    if (resolve(".git").exists()) this else parentFile?.findGitRoot()
+private tailrec fun File.findGitRoot(): File? = if (resolve(".git").exists()) this else parentFile?.findGitRoot()

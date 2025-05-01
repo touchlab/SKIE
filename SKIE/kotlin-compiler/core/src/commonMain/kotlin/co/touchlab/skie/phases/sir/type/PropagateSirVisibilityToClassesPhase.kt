@@ -21,9 +21,7 @@ object PropagateSirVisibilityToClassesPhase : SirPhase {
         }
     }
 
-    private class TypeVisibilityUpdaterProvider(
-        sirClasses: List<SirClass>,
-    ) {
+    private class TypeVisibilityUpdaterProvider(sirClasses: List<SirClass>) {
 
         private val cache = sirClasses.associateWith { ClassVisibilityUpdater(it) }
 
@@ -35,8 +33,7 @@ object PropagateSirVisibilityToClassesPhase : SirPhase {
 
         val allTypeVisibilityUpdaters: Collection<ClassVisibilityUpdater> = cache.values
 
-        operator fun get(sirClass: SirClass): ClassVisibilityUpdater =
-            cache.getValue(sirClass)
+        operator fun get(sirClass: SirClass): ClassVisibilityUpdater = cache.getValue(sirClass)
     }
 
     private class ClassVisibilityUpdater(private val sirClass: SirClass) {
@@ -73,25 +70,23 @@ object PropagateSirVisibilityToClassesPhase : SirPhase {
             propagateVisibility()
         }
 
-        private fun getDependencies(): Set<SirClass> =
-            setOfNotNull(
-                sirClass.namespace?.classDeclaration,
-                (sirClass.kirClassOrNull?.parent as? KirClass)?.originalSirClass,
-            ) +
-                sirClass.typeParameters.flatMap { typeParameter -> typeParameter.bounds.flatMap { it.type.referencedClasses } }.toSet() +
-                getSuperTypesDependencies()
+        private fun getDependencies(): Set<SirClass> = setOfNotNull(
+            sirClass.namespace?.classDeclaration,
+            (sirClass.kirClassOrNull?.parent as? KirClass)?.originalSirClass,
+        ) +
+            sirClass.typeParameters.flatMap { typeParameter -> typeParameter.bounds.flatMap { it.type.referencedClasses } }.toSet() +
+            getSuperTypesDependencies()
 
-        private fun getSuperTypesDependencies(): List<SirClass> =
-            if (sirClass.kind != SirClass.Kind.Protocol) {
-                val classSuperType = listOfNotNull(sirClass.superClassType)
-                val protocolSuperTypes = sirClass.superProtocolTypes
+        private fun getSuperTypesDependencies(): List<SirClass> = if (sirClass.kind != SirClass.Kind.Protocol) {
+            val classSuperType = listOfNotNull(sirClass.superClassType)
+            val protocolSuperTypes = sirClass.superProtocolTypes
 
-                val consideredTypes = protocolSuperTypes.flatMap { it.typeArguments } + classSuperType
+            val consideredTypes = protocolSuperTypes.flatMap { it.typeArguments } + classSuperType
 
-                consideredTypes.flatMap { it.referencedClasses }
-            } else {
-                sirClass.superTypes.flatMap { it.referencedClasses }
-            }
+            consideredTypes.flatMap { it.referencedClasses }
+        } else {
+            sirClass.superTypes.flatMap { it.referencedClasses }
+        }
 
         private val SirType.referencedClasses: List<SirClass>
             get() = this.normalizedEvaluatedType().referencedTypeDeclarations

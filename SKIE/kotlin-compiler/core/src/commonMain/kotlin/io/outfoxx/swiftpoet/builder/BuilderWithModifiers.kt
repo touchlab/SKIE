@@ -20,5 +20,5 @@ import io.outfoxx.swiftpoet.Modifier
 
 interface BuilderWithModifiers {
 
-  fun addModifiers(vararg modifiers: Modifier): BuilderWithModifiers
+    fun addModifiers(vararg modifiers: Modifier): BuilderWithModifiers
 }

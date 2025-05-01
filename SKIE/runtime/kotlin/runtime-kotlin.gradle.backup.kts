@@ -1,7 +1,5 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.KotlinToolingVersion
-import co.touchlab.skie.gradle.publish.mavenArtifactId
-import co.touchlab.skie.gradle.version.DarwinPlatformComponent
 import co.touchlab.skie.gradle.version.darwinPlatformDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -24,7 +22,6 @@ skiePublishing {
     publishSources = true
     publishJavadoc = true
 }
-
 
 // kotlin {
 //     sourceSets.commonMain {
@@ -53,7 +50,7 @@ skiePublishing {
 
 KotlinCompilerVersion.registerIn(dependencies, "2.0.0")
 
-abstract class BuildNestedGradle: DefaultTask() {
+abstract class BuildNestedGradle : DefaultTask() {
 
     @get:InputDirectory
     abstract val projectDir: DirectoryProperty
@@ -86,12 +83,10 @@ abstract class BuildNestedGradle: DefaultTask() {
         cProperty: Property<C>,
         dProperty: Property<D>,
         combiner: (a: A, b: B, c: C, d: D) -> RESULT,
-    ): Provider<RESULT> {
-        return aProperty.zip(bProperty) { a, b -> a to b }
-            .zip(cProperty.zip(dProperty) { c, d -> c to d }) { (a, b), (c, d) ->
-                combiner(a, b, c, d)
-            }
-    }
+    ): Provider<RESULT> = aProperty.zip(bProperty) { a, b -> a to b }
+        .zip(cProperty.zip(dProperty) { c, d -> c to d }) { (a, b), (c, d) ->
+            combiner(a, b, c, d)
+        }
 
     @TaskAction
     fun buildNestedGradle() {
@@ -104,18 +99,15 @@ abstract class BuildNestedGradle: DefaultTask() {
             .withSystemProperties(
                 mapOf(
                     "kotlinVersion" to kotlinVersion.get(),
-                )
+                ),
             )
             .setStandardOutput(System.out)
             .setStandardError(System.err)
             .run()
     }
-
 }
 
-abstract class SoftwareComponentFactoryAccessor @Inject constructor(
-    val softwareComponentFactory: SoftwareComponentFactory,
-)
+abstract class SoftwareComponentFactoryAccessor @Inject constructor(val softwareComponentFactory: SoftwareComponentFactory)
 val softwareComponentFactoryAccessor = objects.newInstance<SoftwareComponentFactoryAccessor>()
 
 val rootSoftwareComponent = KotlinSoftwareComponentWithCoordinatesAndPublication(project, "kotlin", emptyList())
@@ -161,8 +153,8 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
                         "implementation(libs.kotlinx.coroutines.core.legacy)"
                     } else {
                         "implementation(libs.kotlinx.coroutines.core)"
-                    }
-                )
+                    },
+                ),
             )
         }
         into(layout.buildDirectory.dir("impl_$pathSafeKotlinVersionName"))
@@ -189,7 +181,6 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
             "generatePomFileForKotlinMultiplatformPublication",
         )
     }
-
 
 //     val buildTask = tasks.register<BuildNestedGradle>("buildKotlin__kgp_${kotlinToolingVersion.primaryVersion}") {
 //         group = "build"
@@ -229,14 +220,14 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
                     libs.kotlinx.coroutines.core.legacy
                 } else {
                     libs.kotlinx.coroutines.core
-                }
+                },
             )
         }
 
-        val artifactName = "runtime-kotlin__kgp_${pathSafeKotlinVersionName}"
-        val artifactClassifierPrefix = "${darwinPlatformComponent.value}-kgp_${pathSafeKotlinVersionName}"
+        val artifactName = "runtime-kotlin__kgp_$pathSafeKotlinVersionName"
+        val artifactClassifierPrefix = "${darwinPlatformComponent.value}-kgp_$pathSafeKotlinVersionName"
         val klibPath = "impl_$pathSafeKotlinVersionName/build/classes/kotlin/${darwinPlatformComponent.value}/main/klib/skie-kotlin-runtime.klib"
-        val extraArchiveBaseName = "impl/build/libs/skie-kotlin-runtime__kgp_${pathSafeKotlinVersionName}-${darwinPlatformComponent.value.lowercase()}"
+        val extraArchiveBaseName = "impl/build/libs/skie-kotlin-runtime__kgp_$pathSafeKotlinVersionName-${darwinPlatformComponent.value.lowercase()}"
 
         artifacts.add(configuration.name, layout.buildDirectory.file(klibPath)) {
             builtBy(buildTask)

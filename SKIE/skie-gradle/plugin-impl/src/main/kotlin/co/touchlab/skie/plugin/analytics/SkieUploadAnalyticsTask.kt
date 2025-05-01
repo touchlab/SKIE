@@ -5,14 +5,14 @@ import co.touchlab.skie.util.directory.SkieApplicationSupportDirectory
 import com.mixpanel.mixpanelapi.MessageBuilder
 import com.mixpanel.mixpanelapi.MixpanelAPI
 import groovy.json.JsonSlurper
+import java.io.File
+import java.util.UUID
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.json.JSONObject
-import java.io.File
-import java.util.UUID
 
 abstract class SkieUploadAnalyticsTask : DefaultTask() {
 
@@ -80,12 +80,11 @@ abstract class SkieUploadAnalyticsTask : DefaultTask() {
             }
     }
 
-    private fun File.parseJsonSafe(): Any =
-        try {
-            val fileContent = this.readText()
+    private fun File.parseJsonSafe(): Any = try {
+        val fileContent = this.readText()
 
-            JsonSlurper().parseText(fileContent)
-        } catch (e: Throwable) {
-            mapOf("error" to e.toString())
-        }
+        JsonSlurper().parseText(fileContent)
+    } catch (e: Throwable) {
+        mapOf("error" to e.toString())
+    }
 }

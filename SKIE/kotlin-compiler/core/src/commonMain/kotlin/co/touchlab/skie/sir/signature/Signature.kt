@@ -34,13 +34,12 @@ sealed class Signature {
         override val scope: Scope,
     ) : Function() {
 
-        override fun toString(): String =
-            ("static ".takeIf { scope == Scope.Static } ?: "") +
-                "func " +
-                ("$receiver.".takeIf { receiver !is Receiver.None } ?: "") +
-                identifier +
-                "(${valueParameters.joinToString()})" +
-                " -> $returnType"
+        override fun toString(): String = ("static ".takeIf { scope == Scope.Static } ?: "") +
+            "func " +
+            ("$receiver.".takeIf { receiver !is Receiver.None } ?: "") +
+            identifier +
+            "(${valueParameters.joinToString()})" +
+            " -> $returnType"
     }
 
     class Constructor(
@@ -57,34 +56,25 @@ sealed class Signature {
 
         override val scope: Scope = Scope.Static
 
-        override fun toString(): String =
-            "func " +
-                "$receiver." +
-                identifier +
-                "(${valueParameters.joinToString()})"
+        override fun toString(): String = "func " +
+            "$receiver." +
+            identifier +
+            "(${valueParameters.joinToString()})"
     }
 
-    class Property(
-        override val receiver: Receiver,
-        override val identifier: String,
-        override val scope: Scope,
-    ) : Signature() {
+    class Property(override val receiver: Receiver, override val identifier: String, override val scope: Scope) : Signature() {
 
         override val valueParameters: List<ValueParameter> = emptyList()
 
         override val returnType: ReturnType = ReturnType.Any
 
-        override fun toString(): String =
-            ("static ".takeIf { scope == Scope.Static } ?: "") +
-                "var " +
-                ("$receiver.".takeIf { receiver !is Receiver.None } ?: "") +
-                identifier
+        override fun toString(): String = ("static ".takeIf { scope == Scope.Static } ?: "") +
+            "var " +
+            ("$receiver.".takeIf { receiver !is Receiver.None } ?: "") +
+            identifier
     }
 
-    class EnumCase(
-        override val receiver: Receiver.Simple,
-        override val identifier: String,
-    ) : Signature() {
+    class EnumCase(override val receiver: Receiver.Simple, override val identifier: String) : Signature() {
 
         override val valueParameters: List<ValueParameter> = emptyList()
 
@@ -92,8 +82,7 @@ sealed class Signature {
 
         override val scope: Scope = Scope.Static
 
-        override fun toString(): String =
-            "case $receiver.$identifier"
+        override fun toString(): String = "case $receiver.$identifier"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -124,22 +113,20 @@ sealed class Signature {
 
         data class Simple(val type: Type.Class, val constraints: Set<Constraint>) : Receiver {
 
-            override fun toString(): String =
-                if (constraints.isEmpty()) {
-                    type.toString()
-                } else {
-                    "($type" + "where ${constraints.joinToString(", ")})"
-                }
+            override fun toString(): String = if (constraints.isEmpty()) {
+                type.toString()
+            } else {
+                "($type" + "where ${constraints.joinToString(", ")})"
+            }
         }
 
         data class Constructor(val sirClass: SirClass, val constraints: Set<Constraint>) : Receiver {
 
-            override fun toString(): String =
-                if (constraints.isEmpty()) {
-                    sirClass.fqName.toString()
-                } else {
-                    "(${sirClass.fqName}" + "where ${constraints.joinToString(", ")})"
-                }
+            override fun toString(): String = if (constraints.isEmpty()) {
+                sirClass.fqName.toString()
+            } else {
+                "(${sirClass.fqName}" + "where ${constraints.joinToString(", ")})"
+            }
         }
 
         object None : Receiver {
@@ -156,8 +143,7 @@ sealed class Signature {
                 },
             )
 
-            override fun toString(): String =
-                "$typeParameterName: ${bounds.joinToString(" & ")}"
+            override fun toString(): String = "$typeParameterName: ${bounds.joinToString(" & ")}"
         }
     }
 
@@ -201,11 +187,8 @@ sealed class Signature {
 
     sealed interface Type {
 
-        class Class(
-            val sirClass: SirClass,
-            val typeArguments: List<TypeArgument>,
-            private val sirHierarchyCache: SirHierarchyCache,
-        ) : Type {
+        class Class(val sirClass: SirClass, val typeArguments: List<TypeArgument>, private val sirHierarchyCache: SirHierarchyCache) :
+            Type {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -222,7 +205,8 @@ sealed class Signature {
 
             override fun hashCode(): Int = typeArguments.hashCode()
 
-            override fun toString(): String = sirClass.fqName.toString() + ("<${typeArguments.joinToString()}>".takeIf { typeArguments.isNotEmpty() } ?: "")
+            override fun toString(): String =
+                sirClass.fqName.toString() + ("<${typeArguments.joinToString()}>".takeIf { typeArguments.isNotEmpty() } ?: "")
         }
 
         data class Optional(val nested: Type) : Type {
@@ -292,12 +276,14 @@ sealed class Signature {
                 )
             }
 
-        operator fun invoke(callableDeclaration: SirCallableDeclaration, sirHierarchyCache: SirHierarchyCache = SirHierarchyCache()): Signature =
-            when (callableDeclaration) {
-                is SirSimpleFunction -> Signature(callableDeclaration, sirHierarchyCache)
-                is SirConstructor -> Signature(callableDeclaration, sirHierarchyCache)
-                is SirProperty -> Signature(callableDeclaration, sirHierarchyCache)
-            }
+        operator fun invoke(
+            callableDeclaration: SirCallableDeclaration,
+            sirHierarchyCache: SirHierarchyCache = SirHierarchyCache(),
+        ): Signature = when (callableDeclaration) {
+            is SirSimpleFunction -> Signature(callableDeclaration, sirHierarchyCache)
+            is SirConstructor -> Signature(callableDeclaration, sirHierarchyCache)
+            is SirProperty -> Signature(callableDeclaration, sirHierarchyCache)
+        }
 
         operator fun invoke(function: SirSimpleFunction, sirHierarchyCache: SirHierarchyCache = SirHierarchyCache()): Signature =
             with(sirHierarchyCache) {
@@ -326,14 +312,13 @@ sealed class Signature {
             )
         }
 
-        operator fun invoke(property: SirProperty, sirHierarchyCache: SirHierarchyCache): Signature =
-            with(sirHierarchyCache) {
-                Property(
-                    receiver = property.receiver,
-                    identifier = property.identifierAfterVisibilityChange,
-                    scope = property.signatureScope,
-                )
-            }
+        operator fun invoke(property: SirProperty, sirHierarchyCache: SirHierarchyCache): Signature = with(sirHierarchyCache) {
+            Property(
+                receiver = property.receiver,
+                identifier = property.identifierAfterVisibilityChange,
+                scope = property.signatureScope,
+            )
+        }
 
         private val SirFunction.signatureValueParameters: List<ValueParameter>
             get() = valueParameters.map { it.toSignatureParameter() }
@@ -363,11 +348,10 @@ sealed class Signature {
                 }
             }
 
-        private fun SirValueParameter.toSignatureParameter(): ValueParameter =
-            ValueParameter(
-                argumentLabel = this.labelOrName,
-                type = this.type.evaluate().canonicalName,
-            )
+        private fun SirValueParameter.toSignatureParameter(): ValueParameter = ValueParameter(
+            argumentLabel = this.labelOrName,
+            type = this.type.evaluate().canonicalName,
+        )
 
         context(SirHierarchyCache)
         private val SirCallableDeclaration.receiver: Receiver

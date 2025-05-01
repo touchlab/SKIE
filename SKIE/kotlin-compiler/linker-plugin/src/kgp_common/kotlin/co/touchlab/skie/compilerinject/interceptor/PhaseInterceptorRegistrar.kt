@@ -1,9 +1,9 @@
 package co.touchlab.skie.compilerinject.interceptor
 
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.util.ServiceLoaderLite
 import java.net.URLClassLoader
 import java.util.ServiceLoader
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.util.ServiceLoaderLite
 
 typealias ErasedPhaseInterceptorConfigurer = PhaseInterceptorConfigurer<*, Nothing, Nothing, Nothing>
 

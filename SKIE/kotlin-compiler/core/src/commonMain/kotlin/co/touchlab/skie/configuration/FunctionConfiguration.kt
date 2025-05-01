@@ -1,8 +1,6 @@
 package co.touchlab.skie.configuration
 
-abstract class FunctionConfiguration(
-    parent: FileOrClassConfiguration,
-) : CallableDeclarationConfiguration(parent) {
+abstract class FunctionConfiguration(parent: FileOrClassConfiguration) : CallableDeclarationConfiguration(parent) {
 
     @JvmName("hasFunction")
     fun <KEY, VALUE> has(configurationKey: KEY): Boolean where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Function =
@@ -13,7 +11,10 @@ abstract class FunctionConfiguration(
         getUnsafe(configurationKey)
 
     @JvmName("setFunction")
-    operator fun <KEY, VALUE> set(configurationKey: KEY, value: VALUE) where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Function {
+    operator fun <KEY, VALUE> set(
+        configurationKey: KEY,
+        value: VALUE,
+    ) where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Function {
         setUnsafe(configurationKey, value)
     }
 

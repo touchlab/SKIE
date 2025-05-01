@@ -5,9 +5,7 @@ import co.touchlab.skie.sir.element.SirVisibility
 import co.touchlab.skie.util.swift.qualifiedLocalTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 
-sealed class SkieErrorSirType(
-    val objCName: String,
-) : NonNullSirType() {
+sealed class SkieErrorSirType(val objCName: String) : NonNullSirType() {
 
     abstract val headerCommentLines: List<String>
 
@@ -29,21 +27,16 @@ sealed class SkieErrorSirType(
 
     override fun evaluate(): EvaluatedSirType = evaluatedSirType
 
-    override fun inlineTypeAliases(): SirType =
-        this
+    override fun inlineTypeAliases(): SirType = this
 
     // To ensure this type is never erased
-    override fun asHashableType(): SirType? =
-        this
+    override fun asHashableType(): SirType? = this
 
-    override fun asReferenceType(): SirType? =
-        this
+    override fun asReferenceType(): SirType? = this
 
-    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SkieErrorSirType =
-        this
+    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SkieErrorSirType = this
 
-    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SkieErrorSirType =
-        this
+    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SkieErrorSirType = this
 
     object Lambda : SkieErrorSirType("__SkieLambdaErrorType") {
 

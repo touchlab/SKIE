@@ -6,12 +6,12 @@ import co.touchlab.skie.plugin.skieBuildDirectory
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
 import co.touchlab.skie.plugin.util.skieConfiguration
 import groovy.json.JsonOutput
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 abstract class CreateSkieConfigurationTask : DefaultTask() {
 

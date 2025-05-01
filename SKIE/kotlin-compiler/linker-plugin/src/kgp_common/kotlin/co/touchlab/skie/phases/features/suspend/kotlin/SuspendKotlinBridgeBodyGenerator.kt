@@ -12,36 +12,30 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 
-class SuspendKotlinBridgeBodyGenerator(
-    private val suspendHandlerDescriptor: ClassDescriptor,
-) {
+class SuspendKotlinBridgeBodyGenerator(private val suspendHandlerDescriptor: ClassDescriptor) {
 
     private val exceptionFieldGenerator = SuspendKotlinBridgeCheckedExceptionsGenerator()
     private val lambdaGenerator = SuspendKotlinBridgeHandlerLambdaGenerator()
 
     context(KotlinIrPhase.Context, DeclarationIrBuilder)
-    fun createBody(
-        bridgingFunction: IrSimpleFunction,
-        originalFunctionDescriptor: FunctionDescriptor,
-    ): IrBody =
-        irBlockBody {
-            val suspendHandlerParameter = bridgingFunction.valueParameters.last()
-            val checkedExceptions = exceptionFieldGenerator.createGetCheckedExceptions(bridgingFunction, originalFunctionDescriptor)
-            val originalFunctionCallLambda = lambdaGenerator.createOriginalFunctionCallLambda(
-                bridgingFunction = bridgingFunction,
-                originalFunctionDescriptor = originalFunctionDescriptor,
-                type = suspendHandlerLaunchMethod.valueParameters.last().type,
-            )
+    fun createBody(bridgingFunction: IrSimpleFunction, originalFunctionDescriptor: FunctionDescriptor): IrBody = irBlockBody {
+        val suspendHandlerParameter = bridgingFunction.valueParameters.last()
+        val checkedExceptions = exceptionFieldGenerator.createGetCheckedExceptions(bridgingFunction, originalFunctionDescriptor)
+        val originalFunctionCallLambda = lambdaGenerator.createOriginalFunctionCallLambda(
+            bridgingFunction = bridgingFunction,
+            originalFunctionDescriptor = originalFunctionDescriptor,
+            type = suspendHandlerLaunchMethod.valueParameters.last().type,
+        )
 
-            +irReturn(
-                irCall(suspendHandlerLaunchMethod).apply {
-                    dispatchReceiver = irGet(suspendHandlerParameter)
+        +irReturn(
+            irCall(suspendHandlerLaunchMethod).apply {
+                dispatchReceiver = irGet(suspendHandlerParameter)
 
-                    putValueArgument(0, checkedExceptions)
-                    putValueArgument(1, originalFunctionCallLambda)
-                },
-            )
-        }
+                putValueArgument(0, checkedExceptions)
+                putValueArgument(1, originalFunctionCallLambda)
+            },
+        )
+    }
 
     context(KotlinIrPhase.Context)
     private val suspendHandlerLaunchMethod: IrSimpleFunction

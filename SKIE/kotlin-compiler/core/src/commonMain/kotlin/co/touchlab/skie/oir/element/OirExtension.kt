@@ -2,10 +2,9 @@ package co.touchlab.skie.oir.element
 
 import co.touchlab.skie.sir.element.SirExtension
 
-class OirExtension(
-    val classDeclaration: OirClass,
-    override val parent: OirTopLevelDeclarationParent,
-) : OirTopLevelDeclaration, OirCallableDeclarationParent {
+class OirExtension(val classDeclaration: OirClass, override val parent: OirTopLevelDeclarationParent) :
+    OirTopLevelDeclaration,
+    OirCallableDeclarationParent {
 
     lateinit var sirExtension: SirExtension
 
@@ -16,6 +15,5 @@ class OirExtension(
         classDeclaration.extensions.add(this)
     }
 
-    override fun toString(): String =
-        "${this::class.simpleName}: ${classDeclaration.name}"
+    override fun toString(): String = "${this::class.simpleName}: ${classDeclaration.name}"
 }

@@ -35,8 +35,7 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
     }
 
     context(SirPhase.Context)
-    private fun getSortedEnumCases(): List<SirEnumCase> =
-        sirProvider.allLocalEnums.flatMap { it.enumCases }
+    private fun getSortedEnumCases(): List<SirEnumCase> = sirProvider.allLocalEnums.flatMap { it.enumCases }
 
     context(SirPhase.Context)
     private fun getSortedCallableDeclarations(): List<SirCallableDeclaration> {

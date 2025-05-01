@@ -15,9 +15,8 @@ import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
-internal class CreateKirSimpleFunctionsPhase(
-    context: KirPhase.Context,
-) : BaseCreateRegularKirFunctionPhase(context, supportsSimpleFunctions = true) {
+internal class CreateKirSimpleFunctionsPhase(context: KirPhase.Context) :
+    BaseCreateRegularKirFunctionPhase(context, supportsSimpleFunctions = true) {
 
     private val functionCache = mutableMapOf<FunctionDescriptor, KirSimpleFunction>()
 
@@ -46,20 +45,12 @@ internal class CreateKirSimpleFunctionsPhase(
         getOrCreateFunction(descriptor, kirClass, origin)
     }
 
-    private fun getOrCreateFunction(
-        descriptor: FunctionDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ): KirSimpleFunction =
+    private fun getOrCreateFunction(descriptor: FunctionDescriptor, kirClass: KirClass, origin: Origin): KirSimpleFunction =
         functionCache.getOrPut(descriptor.original) {
             createFunction(descriptor, kirClass, origin)
         }
 
-    private fun createFunction(
-        descriptor: FunctionDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ): KirSimpleFunction {
+    private fun createFunction(descriptor: FunctionDescriptor, kirClass: KirClass, origin: Origin): KirSimpleFunction {
         val baseDescriptor = descriptor.baseFunction
         val originalDescriptor = descriptor.original
 
@@ -114,46 +105,44 @@ internal class CreateKirSimpleFunctionsPhase(
         return getOrCreateFunction(descriptor, kirClass, origin)
     }
 
-    private fun FunctionDescriptor.getKind(kirClass: KirClass, origin: Origin): KirSimpleFunction.Kind =
-        when (this) {
-            is SimpleFunctionDescriptor -> KirSimpleFunction.Kind.Function
-            is PropertyGetterDescriptor -> {
-                val kind = KirSimpleFunction.Kind.PropertyGetter(null)
+    private fun FunctionDescriptor.getKind(kirClass: KirClass, origin: Origin): KirSimpleFunction.Kind = when (this) {
+        is SimpleFunctionDescriptor -> KirSimpleFunction.Kind.Function
+        is PropertyGetterDescriptor -> {
+            val kind = KirSimpleFunction.Kind.PropertyGetter(null)
 
-                this.correspondingProperty.setter?.let {
-                    convertedPropertyKindLazyInitializers.add {
-                        kind.associatedSetter = getOrCreateFunction(it, kirClass, origin)
-                    }
+            this.correspondingProperty.setter?.let {
+                convertedPropertyKindLazyInitializers.add {
+                    kind.associatedSetter = getOrCreateFunction(it, kirClass, origin)
                 }
-
-                kind
             }
-            is PropertySetterDescriptor -> {
-                val kind = KirSimpleFunction.Kind.PropertySetter(null)
 
-                this.correspondingProperty.getter?.let {
-                    convertedPropertyKindLazyInitializers.add {
-                        kind.associatedGetter = getOrCreateFunction(it, kirClass, origin)
-                    }
+            kind
+        }
+        is PropertySetterDescriptor -> {
+            val kind = KirSimpleFunction.Kind.PropertySetter(null)
+
+            this.correspondingProperty.getter?.let {
+                convertedPropertyKindLazyInitializers.add {
+                    kind.associatedGetter = getOrCreateFunction(it, kirClass, origin)
                 }
-
-                kind
             }
-            else -> error("Unsupported function type: $this")
+
+            kind
         }
+        else -> error("Unsupported function type: $this")
+    }
 
-    private fun getFunctionConfiguration(descriptor: FunctionDescriptor): SimpleFunctionConfiguration =
-        when (descriptor) {
-            is SimpleFunctionDescriptor -> descriptorConfigurationProvider.getConfiguration(descriptor)
-            is PropertyAccessorDescriptor -> {
-                val propertyConfiguration = descriptorConfigurationProvider.getConfiguration(descriptor.correspondingProperty)
+    private fun getFunctionConfiguration(descriptor: FunctionDescriptor): SimpleFunctionConfiguration = when (descriptor) {
+        is SimpleFunctionDescriptor -> descriptorConfigurationProvider.getConfiguration(descriptor)
+        is PropertyAccessorDescriptor -> {
+            val propertyConfiguration = descriptorConfigurationProvider.getConfiguration(descriptor.correspondingProperty)
 
-                val functionConfiguration = SimpleFunctionConfiguration(propertyConfiguration.parent)
+            val functionConfiguration = SimpleFunctionConfiguration(propertyConfiguration.parent)
 
-                functionConfiguration.overwriteBy(propertyConfiguration)
+            functionConfiguration.overwriteBy(propertyConfiguration)
 
-                functionConfiguration
-            }
-            else -> error("Unsupported function type: $descriptor")
+            functionConfiguration
         }
+        else -> error("Unsupported function type: $descriptor")
+    }
 }

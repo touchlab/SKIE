@@ -21,9 +21,7 @@ import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
 // Hack for api notes (they do not support types with the same name as function parameters)
-class FixOirFunctionSignaturesForApiNotesPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+class FixOirFunctionSignaturesForApiNotesPhase(context: SirPhase.Context) : SirPhase {
 
     private val typedefsMap = mutableMapOf<OirType, OirTypeDef>()
 
@@ -56,65 +54,61 @@ class FixOirFunctionSignaturesForApiNotesPhase(
         }
     }
 
-    private fun OirType.substituteReservedIdentifiers(reservedIdentifiers: Set<String>): OirType =
-        when (this) {
-            is BlockPointerOirType -> copy(
-                valueParameterTypes = valueParameterTypes.map { it.substituteReservedIdentifiers(reservedIdentifiers) },
-                returnType = returnType.substituteReservedIdentifiers(reservedIdentifiers),
-            )
-            is DeclaredOirType -> {
-                val typeArguments = typeArguments.map { it.substituteReservedIdentifiers(reservedIdentifiers) }
+    private fun OirType.substituteReservedIdentifiers(reservedIdentifiers: Set<String>): OirType = when (this) {
+        is BlockPointerOirType -> copy(
+            valueParameterTypes = valueParameterTypes.map { it.substituteReservedIdentifiers(reservedIdentifiers) },
+            returnType = returnType.substituteReservedIdentifiers(reservedIdentifiers),
+        )
+        is DeclaredOirType -> {
+            val typeArguments = typeArguments.map { it.substituteReservedIdentifiers(reservedIdentifiers) }
 
-                when (val baseType = DeclaredOirType(declaration).substituteLeafType(reservedIdentifiers)) {
-                    is DeclaredOirType -> baseType.copy(typeArguments = typeArguments)
-                    is TypeDefOirType -> baseType.copy(typeArguments = typeArguments)
-                    else -> error("Unexpected base type: $baseType")
-                }
-            }
-            is TypeParameterUsageOirType -> this
-            is SpecialReferenceOirType -> substituteLeafType(reservedIdentifiers)
-            is NullableReferenceOirType -> {
-                when (val innerType = nonNullType.substituteReservedIdentifiers(reservedIdentifiers)) {
-                    is NonNullReferenceOirType -> copy(nonNullType = innerType)
-                    is TypeDefOirType -> getOrCreateTypeDef(this).toType(innerType.typeArguments)
-                    else -> error("Unexpected inner type: $innerType")
-                }
-            }
-            is PointerOirType -> copy(pointee = pointee.substituteReservedIdentifiers(reservedIdentifiers))
-            is PrimitiveOirType, VoidOirType -> substituteLeafType(reservedIdentifiers)
-            is TypeDefOirType -> {
-                (TypeDefOirType(declaration).substituteLeafType(reservedIdentifiers) as TypeDefOirType)
-                    .copy(typeArguments = typeArguments.map { it.substituteReservedIdentifiers(reservedIdentifiers) })
+            when (val baseType = DeclaredOirType(declaration).substituteLeafType(reservedIdentifiers)) {
+                is DeclaredOirType -> baseType.copy(typeArguments = typeArguments)
+                is TypeDefOirType -> baseType.copy(typeArguments = typeArguments)
+                else -> error("Unexpected base type: $baseType")
             }
         }
+        is TypeParameterUsageOirType -> this
+        is SpecialReferenceOirType -> substituteLeafType(reservedIdentifiers)
+        is NullableReferenceOirType -> {
+            when (val innerType = nonNullType.substituteReservedIdentifiers(reservedIdentifiers)) {
+                is NonNullReferenceOirType -> copy(nonNullType = innerType)
+                is TypeDefOirType -> getOrCreateTypeDef(this).toType(innerType.typeArguments)
+                else -> error("Unexpected inner type: $innerType")
+            }
+        }
+        is PointerOirType -> copy(pointee = pointee.substituteReservedIdentifiers(reservedIdentifiers))
+        is PrimitiveOirType, VoidOirType -> substituteLeafType(reservedIdentifiers)
+        is TypeDefOirType -> {
+            (TypeDefOirType(declaration).substituteLeafType(reservedIdentifiers) as TypeDefOirType)
+                .copy(typeArguments = typeArguments.map { it.substituteReservedIdentifiers(reservedIdentifiers) })
+        }
+    }
 
     private fun OirType.substituteLeafType(reservedIdentifiers: Set<String>): OirType =
         if (this.collidesWith(reservedIdentifiers)) getOrCreateTypeDef(this).defaultType else this
 
-    private fun getOrCreateTypeDef(type: OirType): OirTypeDef =
-        typedefsMap.getOrPut(type) {
-            OirTypeDef(
-                name = "Skie__TypeDef__${typedefsMap.size}__" + type.renderWithoutAttributes().toValidSwiftIdentifier(),
-                type = type,
-                parent = typeDefsFile,
-                visibility = OirVisibility.Private,
-            )
-        }
+    private fun getOrCreateTypeDef(type: OirType): OirTypeDef = typedefsMap.getOrPut(type) {
+        OirTypeDef(
+            name = "Skie__TypeDef__${typedefsMap.size}__" + type.renderWithoutAttributes().toValidSwiftIdentifier(),
+            type = type,
+            parent = typeDefsFile,
+            visibility = OirVisibility.Private,
+        )
+    }
 
-    private fun OirType.collidesWith(reservedIdentifiers: Set<String>): Boolean =
-        when (this) {
-            is DeclaredOirType -> {
-                when (declaration.kind) {
-                    OirClass.Kind.Class -> this.declaration.name in reservedIdentifiers
-                    OirClass.Kind.Protocol -> "id" in reservedIdentifiers || this.declaration.name in reservedIdentifiers
-                }
+    private fun OirType.collidesWith(reservedIdentifiers: Set<String>): Boolean = when (this) {
+        is DeclaredOirType -> {
+            when (declaration.kind) {
+                OirClass.Kind.Class -> this.declaration.name in reservedIdentifiers
+                OirClass.Kind.Protocol -> "id" in reservedIdentifiers || this.declaration.name in reservedIdentifiers
             }
-            is TypeDefOirType -> this.declaration.name in reservedIdentifiers
-            is NullableReferenceOirType -> this.nonNullType.collidesWith(reservedIdentifiers)
-            is SpecialReferenceOirType -> this.name in reservedIdentifiers
-            else -> this.renderWithoutAttributes() in reservedIdentifiers
         }
+        is TypeDefOirType -> this.declaration.name in reservedIdentifiers
+        is NullableReferenceOirType -> this.nonNullType.collidesWith(reservedIdentifiers)
+        is SpecialReferenceOirType -> this.name in reservedIdentifiers
+        else -> this.renderWithoutAttributes() in reservedIdentifiers
+    }
 
-    private fun OirType.renderWithoutAttributes(): String =
-        this.render("", false)
+    private fun OirType.renderWithoutAttributes(): String = this.render("", false)
 }

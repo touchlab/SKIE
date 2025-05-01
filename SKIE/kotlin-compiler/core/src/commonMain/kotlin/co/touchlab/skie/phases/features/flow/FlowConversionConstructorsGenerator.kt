@@ -16,9 +16,7 @@ import co.touchlab.skie.sir.element.toTypeParameterUsage
 import co.touchlab.skie.sir.type.SirType
 import co.touchlab.skie.sir.type.TypeParameterUsageSirType
 
-class FlowConversionConstructorsGenerator(
-    context: SirPhase.Context,
-) : SirPhase {
+class FlowConversionConstructorsGenerator(context: SirPhase.Context) : SirPhase {
 
     private val kirProvider = context.kirProvider
     private val sirProvider = context.sirProvider
@@ -127,10 +125,7 @@ class FlowConversionConstructorsGenerator(
         }
     }
 
-    private fun <T> T.addConversions(
-        variant: SupportedFlow.Variant,
-        conversionBuilder: T.(from: SupportedFlow.Variant) -> Unit,
-    ): T =
+    private fun <T> T.addConversions(variant: SupportedFlow.Variant, conversionBuilder: T.(from: SupportedFlow.Variant) -> Unit): T =
         apply {
             variant.forEachChildVariant {
                 conversionBuilder(this@addConversions, it)

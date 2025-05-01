@@ -20,5 +20,5 @@ import io.outfoxx.swiftpoet.AnyTypeSpec
 
 interface BuilderWithTypeSpecs {
 
-  fun addType(typeSpec: AnyTypeSpec): BuilderWithTypeSpecs
+    fun addType(typeSpec: AnyTypeSpec): BuilderWithTypeSpecs
 }

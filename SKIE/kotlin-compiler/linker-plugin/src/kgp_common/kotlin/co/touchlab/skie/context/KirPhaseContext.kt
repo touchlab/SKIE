@@ -12,10 +12,9 @@ import co.touchlab.skie.phases.extraDescriptorBuiltins
 import co.touchlab.skie.phases.kotlinBuiltins
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
-class KirPhaseContext(
-    mainSkieContext: MainSkieContext,
-    val objCExportedInterfaceProvider: ObjCExportedInterfaceProvider,
-) : KirPhase.Context, ForegroundPhaseCompilerContext by mainSkieContext {
+class KirPhaseContext(mainSkieContext: MainSkieContext, val objCExportedInterfaceProvider: ObjCExportedInterfaceProvider) :
+    KirPhase.Context,
+    ForegroundPhaseCompilerContext by mainSkieContext {
 
     override val context: KirPhase.Context = this
 

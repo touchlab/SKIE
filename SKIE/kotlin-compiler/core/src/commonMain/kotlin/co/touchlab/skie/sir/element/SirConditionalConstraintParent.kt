@@ -10,4 +10,3 @@ sealed interface SirConditionalConstraintParent {
         override fun toString(): String = "${SirConditionalConstraintParent::class.simpleName}.${this::class.simpleName}"
     }
 }
-

@@ -1,13 +1,13 @@
 package co.touchlab.skie.plugin.switflink
 
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
-import javax.inject.Inject
 
 abstract class ProcessSwiftSourcesTask : DefaultTask() {
 

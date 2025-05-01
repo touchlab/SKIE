@@ -1,12 +1,7 @@
-import co.touchlab.skie.gradle.util.enquoted
-import co.touchlab.skie.gradle.version.gradleApiVersion
-import co.touchlab.skie.gradle.version.kotlinToolingVersion
-import co.touchlab.skie.gradle.version.target.ExpectActualBuildConfigGenerator
-import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyCoordinate
 import co.touchlab.skie.gradle.publish.dependencyModule
+import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.util.gradlePluginApi
-import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
 plugins {

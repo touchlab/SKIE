@@ -20,7 +20,8 @@ class KirClass(
     // In how many classes is this class nested (from Kotlin point of view).
     val nestingLevel: Int,
     val configuration: ClassConfiguration,
-) : KirClassParent, KirBridgeableDeclaration<SirClass> {
+) : KirClassParent,
+    KirBridgeableDeclaration<SirClass> {
 
     lateinit var oirClass: OirClass
 
@@ -86,16 +87,19 @@ class KirClass(
         toType(emptyList())
     }
 
-    fun toType(typeArguments: List<KirType>): DeclaredKirType =
-        DeclaredKirType(this, typeArguments = typeArguments)
+    fun toType(typeArguments: List<KirType>): DeclaredKirType = DeclaredKirType(this, typeArguments = typeArguments)
 
-    fun toType(vararg typeArguments: KirType): DeclaredKirType =
-        toType(typeArguments.toList())
+    fun toType(vararg typeArguments: KirType): DeclaredKirType = toType(typeArguments.toList())
 
     override fun toString(): String = "${this::class.simpleName}: $kotlinFqName"
 
     enum class Kind {
-        Class, Interface, File, Enum, Object, CompanionObject
+        Class,
+        Interface,
+        File,
+        Enum,
+        Object,
+        CompanionObject,
     }
 
     sealed interface Origin {

@@ -14,9 +14,8 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.util.getPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 
-class DeserializedPackageNamespace(
-    private val existingMember: FunctionDescriptor,
-) : BaseDeserializedNamespace<PackageFragmentDescriptor>() {
+class DeserializedPackageNamespace(private val existingMember: FunctionDescriptor) :
+    BaseDeserializedNamespace<PackageFragmentDescriptor>() {
 
     override val descriptor: DeserializedPackageFragment = existingMember.findPackage() as? DeserializedPackageFragment
         ?: throw IllegalArgumentException("existingMember must be a member of a deserialized package fragment.")

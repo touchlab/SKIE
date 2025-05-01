@@ -8,4 +8,3 @@ fun String.collisionFreeIdentifier(existingIdentifiers: Collection<String>): Str
 
 private tailrec fun createCollisionFreeString(baseString: String, collides: (String) -> Boolean): String =
     if (!collides(baseString)) baseString else createCollisionFreeString("${baseString}_", collides)
-

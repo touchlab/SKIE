@@ -1,10 +1,10 @@
 package co.touchlab.skie.plugin.shim
 
 import co.touchlab.skie.plugin.SkieTarget
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.attributes.AttributeContainer
 import java.io.File
 import java.util.Properties
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.attributes.AttributeContainer
 
 interface KgpShim {
 
@@ -16,10 +16,7 @@ interface KgpShim {
 
     val hostIsMac: Boolean
 
-    fun getDistributionProperties(
-        konanHome: String,
-        propertyOverrides: Map<String, String>?,
-    ): Properties
+    fun getDistributionProperties(konanHome: String, propertyOverrides: Map<String, String>?): Properties
 
     fun getKonanHome(): File
 

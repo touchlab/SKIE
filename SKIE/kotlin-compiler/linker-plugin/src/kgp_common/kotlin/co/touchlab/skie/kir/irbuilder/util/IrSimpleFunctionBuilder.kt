@@ -34,28 +34,27 @@ fun IrBuilderWithScope.irSimpleFunction(
     isExpect: Boolean = false,
     isFakeOverride: Boolean = origin == IrDeclarationOrigin.FAKE_OVERRIDE,
     body: DeclarationIrBuilder.() -> IrBody,
-): IrSimpleFunction =
-    irFactory.createSimpleFunction(
-        startOffset = startOffset,
-        endOffset = endOffset,
-        origin = origin,
-        symbol = symbol,
-        name = name,
-        visibility = visibility,
-        modality = modality,
-        returnType = returnType,
-        isInline = isInline,
-        isExternal = isExternal,
-        isTailrec = isTailrec,
-        isSuspend = isSuspend,
-        isOperator = isOperator,
-        isInfix = isInfix,
-        isExpect = isExpect,
-        isFakeOverride = isFakeOverride,
-    ).apply {
-        val irDeclarationBuilder = DeclarationIrBuilder(context, symbol, startOffset = startOffset, endOffset = endOffset)
+): IrSimpleFunction = irFactory.createSimpleFunction(
+    startOffset = startOffset,
+    endOffset = endOffset,
+    origin = origin,
+    symbol = symbol,
+    name = name,
+    visibility = visibility,
+    modality = modality,
+    returnType = returnType,
+    isInline = isInline,
+    isExternal = isExternal,
+    isTailrec = isTailrec,
+    isSuspend = isSuspend,
+    isOperator = isOperator,
+    isInfix = isInfix,
+    isExpect = isExpect,
+    isFakeOverride = isFakeOverride,
+).apply {
+    val irDeclarationBuilder = DeclarationIrBuilder(context, symbol, startOffset = startOffset, endOffset = endOffset)
 
-        this.body = irDeclarationBuilder.body()
+    this.body = irDeclarationBuilder.body()
 
-        this.patchDeclarationParents(this@irSimpleFunction.parent)
-    }
+    this.patchDeclarationParents(this@irSimpleFunction.parent)
+}

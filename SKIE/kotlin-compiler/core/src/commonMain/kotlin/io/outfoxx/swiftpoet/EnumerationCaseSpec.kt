@@ -18,72 +18,66 @@ package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 
-class EnumerationCaseSpec private constructor(
-  builder: Builder,
-) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
+class EnumerationCaseSpec private constructor(builder: Builder) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags) {
 
-  val name = builder.name
-  val typeOrConstant = builder.typeOrConstant
-  val doc = builder.doc.build()
+    val name = builder.name
+    val typeOrConstant = builder.typeOrConstant
+    val doc = builder.doc.build()
 
-  fun toBuilder(): Builder {
-    val builder = Builder(name, typeOrConstant)
-    builder.doc.add(doc)
-    builder.attributes += attributes
-    return builder
-  }
-
-  internal fun emit(codeWriter: CodeWriter) {
-
-    codeWriter.emitDoc(doc)
-    codeWriter.emitAttributes(attributes)
-    codeWriter.emitCode("case %L", escapeIfKeyword(name))
-    when (typeOrConstant) {
-      null -> {}
-      is CodeBlock -> codeWriter.emitCode(" = %L", typeOrConstant)
-      is TupleTypeName -> typeOrConstant.emit(codeWriter)
-      else -> throw IllegalStateException("Invalid enum type of constant")
-    }
-  }
-
-  class Builder internal constructor(
-    internal var name: String,
-    internal var typeOrConstant: Any?,
-  ) : AttributedSpec.Builder<Builder>(), BuilderWithDocs<Builder> {
-
-    internal val doc = CodeBlock.builder()
-
-    override fun addDoc(format: String, vararg args: Any) = apply {
-      doc.add(format, *args)
+    fun toBuilder(): Builder {
+        val builder = Builder(name, typeOrConstant)
+        builder.doc.add(doc)
+        builder.attributes += attributes
+        return builder
     }
 
-    override fun addDoc(block: CodeBlock) = apply {
-      doc.add(block)
+    internal fun emit(codeWriter: CodeWriter) {
+        codeWriter.emitDoc(doc)
+        codeWriter.emitAttributes(attributes)
+        codeWriter.emitCode("case %L", escapeIfKeyword(name))
+        when (typeOrConstant) {
+            null -> {}
+            is CodeBlock -> codeWriter.emitCode(" = %L", typeOrConstant)
+            is TupleTypeName -> typeOrConstant.emit(codeWriter)
+            else -> throw IllegalStateException("Invalid enum type of constant")
+        }
     }
 
-    fun build(): EnumerationCaseSpec {
-      return EnumerationCaseSpec(this)
+    class Builder internal constructor(internal var name: String, internal var typeOrConstant: Any?) :
+        AttributedSpec.Builder<Builder>(),
+        BuilderWithDocs<Builder> {
+
+        internal val doc = CodeBlock.builder()
+
+        override fun addDoc(format: String, vararg args: Any) = apply {
+            doc.add(format, *args)
+        }
+
+        override fun addDoc(block: CodeBlock) = apply {
+            doc.add(block)
+        }
+
+        fun build(): EnumerationCaseSpec = EnumerationCaseSpec(this)
     }
-  }
 
-  companion object {
+    companion object {
 
-    @JvmStatic
-    fun builder(name: String) = Builder(name, null)
+        @JvmStatic
+        fun builder(name: String) = Builder(name, null)
 
-    @JvmStatic
-    fun builder(name: String, type: TypeName) = Builder(name, TupleTypeName.of("" to type))
+        @JvmStatic
+        fun builder(name: String, type: TypeName) = Builder(name, TupleTypeName.of("" to type))
 
-    @JvmStatic
-    fun builder(name: String, type: TupleTypeName) = Builder(name, type)
+        @JvmStatic
+        fun builder(name: String, type: TupleTypeName) = Builder(name, type)
 
-    @JvmStatic
-    fun builder(name: String, constant: CodeBlock) = Builder(name, constant)
+        @JvmStatic
+        fun builder(name: String, constant: CodeBlock) = Builder(name, constant)
 
-    @JvmStatic
-    fun builder(name: String, constant: String) = Builder(name, CodeBlock.of("%S", constant))
+        @JvmStatic
+        fun builder(name: String, constant: String) = Builder(name, CodeBlock.of("%S", constant))
 
-    @JvmStatic
-    fun builder(name: String, constant: Int) = Builder(name, CodeBlock.of("%L", constant.toString()))
-  }
+        @JvmStatic
+        fun builder(name: String, constant: Int) = Builder(name, CodeBlock.of("%L", constant.toString()))
+    }
 }

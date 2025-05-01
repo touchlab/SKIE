@@ -12,10 +12,10 @@ import org.gradle.api.attributes.Usage
 
 object SkieSubPluginManager {
 
-    private const val subPluginConfigurationName: String = "skieSubPlugin"
+    private const val SUB_PLUGIN_CONFIGURATION_NAME: String = "skieSubPlugin"
 
     fun configureDependenciesForSubPlugins(project: Project) {
-        val subPluginConfiguration = project.configurations.create(subPluginConfigurationName).apply {
+        val subPluginConfiguration = project.configurations.create(SUB_PLUGIN_CONFIGURATION_NAME).apply {
             isCanBeResolved = true
             isCanBeConsumed = false
             isVisible = false
@@ -52,7 +52,7 @@ object SkieSubPluginManager {
     }
 
     private fun SkieTarget.registerSubPluginsToClasspath() {
-        addToCompilerClasspath(project.configurations.getByName(subPluginConfigurationName))
+        addToCompilerClasspath(project.configurations.getByName(SUB_PLUGIN_CONFIGURATION_NAME))
     }
 
     private val Project.skieSubPlugins: DomainObjectCollection<SkieSubplugin>

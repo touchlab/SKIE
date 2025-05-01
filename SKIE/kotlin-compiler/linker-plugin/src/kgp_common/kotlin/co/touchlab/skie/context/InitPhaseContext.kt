@@ -22,10 +22,7 @@ import co.touchlab.skie.util.directory.SkieDirectories
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-class InitPhaseContext(
-    val compilerConfiguration: CompilerConfiguration,
-    pluginRegistrars: List<SkiePluginRegistrar>,
-) : InitPhase.Context {
+class InitPhaseContext(val compilerConfiguration: CompilerConfiguration, pluginRegistrars: List<SkiePluginRegistrar>) : InitPhase.Context {
 
     override val context: InitPhase.Context
         get() = this
@@ -52,7 +49,9 @@ class InitPhaseContext(
         skieConfiguration = skieConfigurationData,
     )
 
-    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(globalConfiguration)
+    override val skiePerformanceAnalyticsProducer: SkiePerformanceAnalytics.Producer = SkiePerformanceAnalytics.Producer(
+        globalConfiguration,
+    )
 
     override val kirReporter: KirReporter = KirReporter()
 

@@ -19,9 +19,7 @@ import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-fun <T : SirDeclarationParent> sirDeclarationParent(
-    initialValue: T,
-) = parent<SirDeclaration, T>(
+fun <T : SirDeclarationParent> sirDeclarationParent(initialValue: T) = parent<SirDeclaration, T>(
     initialValue = initialValue,
     onChange = { oldValue, newValue, thisRef ->
         oldValue?.declarations?.remove(thisRef)
@@ -30,9 +28,7 @@ fun <T : SirDeclarationParent> sirDeclarationParent(
     },
 )
 
-fun sirEnumCaseParent(
-    initialValue: SirClass,
-) = parent<SirEnumCase, SirClass>(
+fun sirEnumCaseParent(initialValue: SirClass) = parent<SirEnumCase, SirClass>(
     initialValue = initialValue,
     onChange = { oldValue, newValue, thisRef ->
         oldValue?.enumCases?.remove(thisRef)
@@ -41,9 +37,7 @@ fun sirEnumCaseParent(
     },
 )
 
-fun sirEnumCaseAssociatedValueParent(
-    initialValue: SirEnumCase,
-) = parent<SirEnumCaseAssociatedValue, SirEnumCase>(
+fun sirEnumCaseAssociatedValueParent(initialValue: SirEnumCase) = parent<SirEnumCaseAssociatedValue, SirEnumCase>(
     initialValue = initialValue,
     onChange = { oldValue, newValue, thisRef ->
         oldValue?.associatedValues?.remove(thisRef)
@@ -52,9 +46,7 @@ fun sirEnumCaseAssociatedValueParent(
     },
 )
 
-fun sirTypeParameterParent(
-    initialValue: SirTypeParameterParent,
-) = parent<SirTypeParameter, SirTypeParameterParent>(
+fun sirTypeParameterParent(initialValue: SirTypeParameterParent) = parent<SirTypeParameter, SirTypeParameterParent>(
     initialValue = initialValue,
     onChange = { oldValue, newValue, thisRef ->
         oldValue?.typeParameters?.remove(thisRef)
@@ -63,9 +55,7 @@ fun sirTypeParameterParent(
     },
 )
 
-fun sirValueParameterParent(
-    initialValue: SirFunction,
-) = parent<SirValueParameter, SirFunction>(
+fun sirValueParameterParent(initialValue: SirFunction) = parent<SirValueParameter, SirFunction>(
     initialValue = initialValue,
     onChange = { oldValue, newValue, thisRef ->
         oldValue?.valueParameters?.remove(thisRef)
@@ -74,9 +64,7 @@ fun sirValueParameterParent(
     },
 )
 
-fun <T : SirPropertyAccessor> sirPropertyAccessorParent(
-    initialValue: SirProperty,
-) = parent<T, SirProperty>(
+fun <T : SirPropertyAccessor> sirPropertyAccessorParent(initialValue: SirProperty) = parent<T, SirProperty>(
     initialValue = initialValue,
     onChange = { _, newValue, thisRef ->
         when (thisRef) {
@@ -86,16 +74,15 @@ fun <T : SirPropertyAccessor> sirPropertyAccessorParent(
     },
 )
 
-fun sirConditionalConstraintParent(
-    initialValue: SirConditionalConstraintParent,
-) = parent<SirConditionalConstraint, SirConditionalConstraintParent>(
-    initialValue = initialValue,
-    onChange = { oldValue, newValue, thisRef ->
-        oldValue?.conditionalConstraints?.remove(thisRef)
+fun sirConditionalConstraintParent(initialValue: SirConditionalConstraintParent) =
+    parent<SirConditionalConstraint, SirConditionalConstraintParent>(
+        initialValue = initialValue,
+        onChange = { oldValue, newValue, thisRef ->
+            oldValue?.conditionalConstraints?.remove(thisRef)
 
-        newValue.conditionalConstraints.add(thisRef)
-    },
-)
+            newValue.conditionalConstraints.add(thisRef)
+        },
+    )
 
 private fun <CHILD : Any, PARENT : Any> parent(
     initialValue: PARENT,
@@ -110,8 +97,7 @@ private fun <CHILD : Any, PARENT : Any> parent(
                 onChange(null, value, thisRef)
             }
 
-            override fun getValue(thisRef: CHILD, property: KProperty<*>): PARENT =
-                value
+            override fun getValue(thisRef: CHILD, property: KProperty<*>): PARENT = value
 
             override fun setValue(thisRef: CHILD, property: KProperty<*>, value: PARENT) {
                 val oldValue = this.value

@@ -44,10 +44,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
-class DeclarationBuilderImpl(
-    moduleDescriptor: ModuleDescriptor,
-    private val mutableDescriptorProvider: MutableDescriptorProvider,
-) : DeclarationBuilder {
+class DeclarationBuilderImpl(moduleDescriptor: ModuleDescriptor, private val mutableDescriptorProvider: MutableDescriptorProvider) :
+    DeclarationBuilder {
 
     private lateinit var mainIrModuleFragment: IrModuleFragment
 
@@ -64,10 +62,9 @@ class DeclarationBuilderImpl(
             originalPackageNamespacesByFile,
         ).flatMap { it.values }
 
-    override fun getCustomNamespace(name: String): Namespace<PackageFragmentDescriptor> =
-        newFileNamespacesByName.getOrPut(name) {
-            newFileNamespaceFactory.create(name)
-        }
+    override fun getCustomNamespace(name: String): Namespace<PackageFragmentDescriptor> = newFileNamespacesByName.getOrPut(name) {
+        newFileNamespaceFactory.create(name)
+    }
 
     override fun getClassNamespace(classDescriptor: ClassDescriptor): Namespace<ClassDescriptor> =
         classNamespacesByDescriptor.getOrPut(classDescriptor) {
@@ -104,21 +101,16 @@ class DeclarationBuilderImpl(
         namespace: Namespace<*>,
         annotations: Annotations,
         builder: FunctionBuilder.() -> Unit,
-    ): FunctionDescriptor =
-        create(namespace) { FunctionTemplate(name, namespace, annotations, builder) }
+    ): FunctionDescriptor = create(namespace) { FunctionTemplate(name, namespace, annotations, builder) }
 
     override fun createSecondaryConstructor(
         name: Name,
         namespace: Namespace<ClassDescriptor>,
         annotations: Annotations,
         builder: SecondaryConstructorBuilder.() -> Unit,
-    ): ClassConstructorDescriptor =
-        create(namespace) { SecondaryConstructorTemplate(name, namespace, annotations, builder) }
+    ): ClassConstructorDescriptor = create(namespace) { SecondaryConstructorTemplate(name, namespace, annotations, builder) }
 
-    private fun <D : DeclarationDescriptor> create(
-        namespace: Namespace<*>,
-        templateBuilder: () -> DeclarationTemplate<D>,
-    ): D {
+    private fun <D : DeclarationDescriptor> create(namespace: Namespace<*>, templateBuilder: () -> DeclarationTemplate<D>): D {
         val declarationTemplate = templateBuilder()
 
         with(mutableDescriptorProvider) {
@@ -167,19 +159,19 @@ class DeclarationBuilderImpl(
     }
 }
 
-private fun SkieSymbolTable.allExposedTypeParameters(descriptorProvider: DescriptorProvider): List<IrTypeParameter> =
-    (descriptorProvider.allExposedMembers.flatMap { referenceBoundTypeParameterContainer(it) } +
-        descriptorProvider.exposedClasses.flatMap { referenceBoundTypeParameterContainer(it) })
-        .flatMap { it.typeParameters }
+private fun SkieSymbolTable.allExposedTypeParameters(descriptorProvider: DescriptorProvider): List<IrTypeParameter> = (
+    descriptorProvider.allExposedMembers.flatMap { referenceBoundTypeParameterContainer(it) } +
+        descriptorProvider.exposedClasses.flatMap { referenceBoundTypeParameterContainer(it) }
+    )
+    .flatMap { it.typeParameters }
 
 private fun SkieSymbolTable.referenceBoundTypeParameterContainer(
     callableMemberDescriptor: CallableMemberDescriptor,
-): List<IrTypeParametersContainer> =
-    when (callableMemberDescriptor) {
-        is FunctionDescriptor -> referenceBoundTypeParameterContainer(callableMemberDescriptor)
-        is PropertyDescriptor -> referenceBoundTypeParameterContainer(callableMemberDescriptor)
-        else -> error("Unsupported type $callableMemberDescriptor.")
-    }
+): List<IrTypeParametersContainer> = when (callableMemberDescriptor) {
+    is FunctionDescriptor -> referenceBoundTypeParameterContainer(callableMemberDescriptor)
+    is PropertyDescriptor -> referenceBoundTypeParameterContainer(callableMemberDescriptor)
+    else -> error("Unsupported type $callableMemberDescriptor.")
+}
 
 private fun SkieSymbolTable.referenceBoundTypeParameterContainer(functionDescriptor: FunctionDescriptor): List<IrTypeParametersContainer> =
     listOfNotNull(

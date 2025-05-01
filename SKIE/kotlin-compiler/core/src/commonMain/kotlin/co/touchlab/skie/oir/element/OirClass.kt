@@ -5,12 +5,9 @@ import co.touchlab.skie.oir.type.DeclaredOirType
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirClass
 
-class OirClass(
-    override val name: String,
-    override val parent: OirTopLevelDeclarationParent,
-    val kind: Kind,
-    val origin: Origin,
-) : OirTypeDeclaration, OirCallableDeclarationParent {
+class OirClass(override val name: String, override val parent: OirTopLevelDeclarationParent, val kind: Kind, val origin: Origin) :
+    OirTypeDeclaration,
+    OirCallableDeclarationParent {
 
     lateinit var originalSirClass: SirClass
 
@@ -47,14 +44,11 @@ class OirClass(
         toType(emptyList())
     }
 
-    override fun toType(typeArguments: List<OirType>): DeclaredOirType =
-        DeclaredOirType(this, typeArguments = typeArguments)
+    override fun toType(typeArguments: List<OirType>): DeclaredOirType = DeclaredOirType(this, typeArguments = typeArguments)
 
-    override fun toType(vararg typeArguments: OirType): DeclaredOirType =
-        toType(typeArguments.toList())
+    override fun toType(vararg typeArguments: OirType): DeclaredOirType = toType(typeArguments.toList())
 
-    override fun toString(): String =
-        "${this::class.simpleName}: $name"
+    override fun toString(): String = "${this::class.simpleName}: $name"
 
     enum class Kind {
         Class,
@@ -67,11 +61,10 @@ class OirClass(
     }
 }
 
-fun KirClass.Kind.toOirKind(): OirClass.Kind =
-    when (this) {
-        KirClass.Kind.Interface -> OirClass.Kind.Protocol
-        else -> OirClass.Kind.Class
-    }
+fun KirClass.Kind.toOirKind(): OirClass.Kind = when (this) {
+    KirClass.Kind.Interface -> OirClass.Kind.Protocol
+    else -> OirClass.Kind.Class
+}
 
 val OirClass.superClassType: DeclaredOirType?
     get() = superTypes.firstOrNull { it.declaration.kind == OirClass.Kind.Class }

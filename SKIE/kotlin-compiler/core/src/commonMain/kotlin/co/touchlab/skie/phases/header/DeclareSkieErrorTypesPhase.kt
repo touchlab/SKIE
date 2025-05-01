@@ -22,6 +22,5 @@ object DeclareSkieErrorTypesPhase : BaseHeaderInsertionPhase() {
                 }
                 .dropLast(1)
 
-    override fun insertImmediatelyBefore(line: String): Boolean =
-        line.startsWith("NS_ASSUME_NONNULL_BEGIN")
+    override fun insertImmediatelyBefore(line: String): Boolean = line.startsWith("NS_ASSUME_NONNULL_BEGIN")
 }

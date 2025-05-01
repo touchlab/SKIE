@@ -21,8 +21,12 @@ object VerifyDescriptorProviderConsistencyPhase : KirPhase {
 
         val errors = listOfNotNull(
             descriptorProvider.exposedClasses.shouldMatchExposed(objCExportedInterface.generatedClasses) { fqNameUnsafe.asString() },
-            descriptorProvider.exposedCategoryMembers.shouldMatch(objCExportedInterface.categoryMembers.values.flatten().toSet()) { fqNameUnsafe.asString() },
-            descriptorProvider.exposedTopLevelMembers.shouldMatch(objCExportedInterface.topLevel.values.flatten().toSet()) { fqNameUnsafe.asString() },
+            descriptorProvider.exposedCategoryMembers.shouldMatch(objCExportedInterface.categoryMembers.values.flatten().toSet()) {
+                fqNameUnsafe.asString()
+            },
+            descriptorProvider.exposedTopLevelMembers.shouldMatch(objCExportedInterface.topLevel.values.flatten().toSet()) {
+                fqNameUnsafe.asString()
+            },
             descriptorProvider.exposedFiles.shouldMatch(objCExportedInterface.topLevel.keys) { name ?: "<Unknown file>" },
         )
 

@@ -27,4 +27,3 @@ interface FrameworkShim {
         val architectureClangMacro: String,
     )
 }
-

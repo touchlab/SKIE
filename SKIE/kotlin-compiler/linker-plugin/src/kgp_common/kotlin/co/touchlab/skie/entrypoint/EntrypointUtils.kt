@@ -13,13 +13,13 @@ import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.context.SirPhaseContext
 import co.touchlab.skie.context.SymbolTablePhaseContext
 import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
+import java.nio.file.Path
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import java.nio.file.Path
 
 internal object EntrypointUtils {
 
@@ -29,24 +29,21 @@ internal object EntrypointUtils {
         frontendServices: FrontendServices,
         mainModuleDescriptor: ModuleDescriptor,
         exportedDependencies: Lazy<Collection<ModuleDescriptor>>,
-    ): MainSkieContext =
-        initPhaseContext.skiePerformanceAnalyticsProducer.logBlocking("CreateMainSkieContextPhase") {
-            val mainSkieContext = MainSkieContext(
-                initPhaseContext = initPhaseContext,
-                konanConfig = konanConfig,
-                frontendServices = frontendServices,
-                mainModuleDescriptor = mainModuleDescriptor,
-                exportedDependencies = exportedDependencies.value,
-            )
+    ): MainSkieContext = initPhaseContext.skiePerformanceAnalyticsProducer.logBlocking("CreateMainSkieContextPhase") {
+        val mainSkieContext = MainSkieContext(
+            initPhaseContext = initPhaseContext,
+            konanConfig = konanConfig,
+            frontendServices = frontendServices,
+            mainModuleDescriptor = mainModuleDescriptor,
+            exportedDependencies = exportedDependencies.value,
+        )
 
-            initPhaseContext.compilerConfiguration.mainSkieContext = mainSkieContext
+        initPhaseContext.compilerConfiguration.mainSkieContext = mainSkieContext
 
-            mainSkieContext
-        }
+        mainSkieContext
+    }
 
-    fun runClassExportPhases(
-        mainSkieContext: MainSkieContext,
-    ) {
+    fun runClassExportPhases(mainSkieContext: MainSkieContext) {
         with(mainSkieContext) {
             skiePhaseScheduler.runClassExportPhases {
                 ClassExportPhaseContext(mainSkieContext)
@@ -54,9 +51,7 @@ internal object EntrypointUtils {
         }
     }
 
-    fun runFrontendIrPhases(
-        mainSkieContext: MainSkieContext,
-    ) {
+    fun runFrontendIrPhases(mainSkieContext: MainSkieContext) {
         with(mainSkieContext) {
             skiePhaseScheduler.runFrontendIrPhases {
                 FrontendIrPhaseContext(mainSkieContext)

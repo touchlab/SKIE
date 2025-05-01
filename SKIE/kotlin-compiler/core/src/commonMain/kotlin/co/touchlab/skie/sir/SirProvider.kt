@@ -94,18 +94,14 @@ class SirProvider(
         get() = allSkieGeneratedCallableDeclarations.filterIsInstance<SirSimpleFunction>()
 
     // Do not use for Extensions with ConditionalConstraints as that would break caching.
-    fun getExtension(
-        classDeclaration: SirClass,
-        parent: SirTopLevelDeclarationParent,
-    ): SirExtension =
+    fun getExtension(classDeclaration: SirClass, parent: SirTopLevelDeclarationParent): SirExtension =
         extensionCache.getOrPut(classDeclaration to parent) {
             SirExtension(classDeclaration, parent)
         }
 
-    fun getExternalModule(moduleName: String): SirModule.External =
-        externalModuleCache.getOrPut(moduleName) {
-            SirModule.External(moduleName)
-        }
+    fun getExternalModule(moduleName: String): SirModule.External = externalModuleCache.getOrPut(moduleName) {
+        SirModule.External(moduleName)
+    }
 
     fun findClassByFqName(fqName: SirFqName): SirClass? {
         val parent = fqName.parent?.let { findClassByFqName(it) ?: return null }
@@ -127,8 +123,7 @@ class SirProvider(
         return null
     }
 
-    fun getClassByFqName(fqName: SirFqName): SirClass =
-        findClassByFqName(fqName) ?: error("SirClass with fqName $fqName not found.")
+    fun getClassByFqName(fqName: SirFqName): SirClass = findClassByFqName(fqName) ?: error("SirClass with fqName $fqName not found.")
 
     fun findModuleForKnownExternalClass(oirClass: OirClass): SirModule? {
         val kirModule = oirClass.kirClassOrNull?.module
@@ -140,19 +135,11 @@ class SirProvider(
         }
     }
 
-    fun getModuleForExternalClass(oirClass: OirClass): SirModule =
-        findModuleForKnownExternalClass(oirClass) ?: unknownModule
+    fun getModuleForExternalClass(oirClass: OirClass): SirModule = findModuleForKnownExternalClass(oirClass) ?: unknownModule
 }
 
 context(SirProvider)
-fun SirTopLevelDeclarationParent.getExtension(
-    classDeclaration: SirClass,
-): SirExtension =
-    getExtension(classDeclaration, this)
+fun SirTopLevelDeclarationParent.getExtension(classDeclaration: SirClass): SirExtension = getExtension(classDeclaration, this)
 
 context(SirPhase.Context)
-fun SirTopLevelDeclarationParent.getExtension(
-    classDeclaration: SirClass,
-): SirExtension =
-    sirProvider.getExtension(classDeclaration, this)
-
+fun SirTopLevelDeclarationParent.getExtension(classDeclaration: SirClass): SirExtension = sirProvider.getExtension(classDeclaration, this)

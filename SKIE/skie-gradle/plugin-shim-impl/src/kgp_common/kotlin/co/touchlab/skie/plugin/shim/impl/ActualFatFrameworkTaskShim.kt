@@ -5,9 +5,7 @@ import co.touchlab.skie.plugin.shim.FrameworkShim
 import co.touchlab.skie.util.directory.FrameworkLayout
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 
-class ActualFatFrameworkTaskShim(
-    override val task: FatFrameworkTask,
-) : FatFrameworkTaskShim {
+class ActualFatFrameworkTaskShim(override val task: FatFrameworkTask) : FatFrameworkTaskShim {
 
     override val targetFrameworkLayout: FrameworkLayout = FrameworkLayout(task.fatFramework)
 

@@ -26,10 +26,9 @@ class CreateKotlinSirTypesPhase : SirPhase {
     }
 
     context(SirPhase.Context)
-    private fun getOrCreateClass(kirClass: KirClass): SirClass =
-        kirToSirClasses.getOrPut(kirClass) {
-            createClass(kirClass)
-        }
+    private fun getOrCreateClass(kirClass: KirClass): SirClass = kirToSirClasses.getOrPut(kirClass) {
+        createClass(kirClass)
+    }
 
     context(SirPhase.Context)
     private fun createClass(kirClass: KirClass): SirClass {
@@ -39,8 +38,12 @@ class CreateKotlinSirTypesPhase : SirPhase {
             kind = kirClass.oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Kir(kirClass),
             visibility = kirClass.configuration[SkieVisibility].toSirVisibility(),
-            isReplaced = kirClass.configuration[SkieVisibility] in listOf(SkieVisibility.Level.PublicButReplaced, SkieVisibility.Level.InternalAndReplaced),
-            isHidden = kirClass.configuration[SkieVisibility] in listOf(SkieVisibility.Level.PublicButHidden, SkieVisibility.Level.PublicButReplaced),
+            isReplaced =
+            kirClass.configuration[SkieVisibility] in
+                listOf(SkieVisibility.Level.PublicButReplaced, SkieVisibility.Level.InternalAndReplaced),
+            isHidden =
+            kirClass.configuration[SkieVisibility] in
+                listOf(SkieVisibility.Level.PublicButHidden, SkieVisibility.Level.PublicButReplaced),
         )
 
         createTypeParameters(kirClass.oirClass, sirClass)
@@ -69,11 +72,10 @@ class CreateKotlinSirTypesPhase : SirPhase {
         get() = sirFqName.parent?.simpleName?.let { findSirParentRecursively(this, it) } ?: sirProvider.kotlinModule.builtInFile
 
     context(SirPhase.Context)
-    private fun findSirParentRecursively(kirClass: KirClass, parentName: String): SirClass? =
-        when (val parent = kirClass.parent) {
-            is KirClass -> if (parent.swiftName == parentName) getOrCreateClass(parent) else findSirParentRecursively(parent, parentName)
-            is KirModule -> null
-        }
+    private fun findSirParentRecursively(kirClass: KirClass, parentName: String): SirClass? = when (val parent = kirClass.parent) {
+        is KirClass -> if (parent.swiftName == parentName) getOrCreateClass(parent) else findSirParentRecursively(parent, parentName)
+        is KirModule -> null
+    }
 
     companion object {
 

@@ -1,12 +1,12 @@
 package co.touchlab.skie.compilerinject.interceptor
 
 import co.touchlab.skie.compilerinject.reflection.Reflector
+import kotlin.reflect.jvm.jvmName
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase
 import org.jetbrains.kotlin.backend.common.phaser.SameTypeCompilerPhase
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
-import kotlin.reflect.jvm.jvmName
 
 class NamedPhaseInterceptorConfigurer<Context : CommonBackendContext, Data> :
     PhaseInterceptorConfigurer<NamedCompilerPhase<Context, Data>, Context, Data, Data> {
@@ -41,9 +41,8 @@ class NamedPhaseInterceptorConfigurer<Context : CommonBackendContext, Data> :
         get() = NamedCompilerPhaseReflector(this)
 }
 
-private class NamedCompilerPhaseReflector<Context : CommonBackendContext, Data>(
-    override val instance: NamedCompilerPhase<Context, Data>,
-) : Reflector(instance::class) {
+private class NamedCompilerPhaseReflector<Context : CommonBackendContext, Data>(override val instance: NamedCompilerPhase<Context, Data>) :
+    Reflector(instance::class) {
 
     var lower: SameTypeCompilerPhase<Context, Data> by declaredField()
 }
@@ -56,6 +55,5 @@ private class InterceptedSameTypeCompilerPhaseReflector<Context : CommonBackendC
     val interceptorKey: CompilerConfigurationKey<ErasedPhaseInterceptor<Context, Data, Data>> by declaredField()
 }
 
-private fun <Context : CommonBackendContext, Data> SameTypeCompilerPhase<Context, Data>.isIntercepted(): Boolean {
-    return javaClass.name == InterceptedSameTypeCompilerPhase::class.jvmName
-}
+private fun <Context : CommonBackendContext, Data> SameTypeCompilerPhase<Context, Data>.isIntercepted(): Boolean =
+    javaClass.name == InterceptedSameTypeCompilerPhase::class.jvmName

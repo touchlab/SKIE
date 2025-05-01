@@ -4,9 +4,7 @@ import co.touchlab.skie.oir.element.renderForwardDeclaration
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.phases.header.util.BaseHeaderModificationPhase
 
-class FixForwardDeclarationsPhase(
-    private val context: SirPhase.Context,
-) : BaseHeaderModificationPhase() {
+class FixForwardDeclarationsPhase(private val context: SirPhase.Context) : BaseHeaderModificationPhase() {
 
     override fun modifyHeaderContent(content: List<String>): List<String> {
         val forwardDeclarationSectionEnd = content.indexOfFirst { it.startsWith("NS_ASSUME_NONNULL_BEGIN") }

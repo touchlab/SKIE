@@ -3,11 +3,9 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.sir.element.util.sirPropertyAccessorParent
 import io.outfoxx.swiftpoet.FunctionSpec
 
-class SirGetter(
-    property: SirProperty,
-    var throws: Boolean = false,
-    attributes: List<String> = emptyList(),
-) : SirElement, SirPropertyAccessor {
+class SirGetter(property: SirProperty, var throws: Boolean = false, attributes: List<String> = emptyList()) :
+    SirElement,
+    SirPropertyAccessor {
 
     override var property: SirProperty by sirPropertyAccessorParent(property)
 
@@ -20,14 +18,10 @@ class SirGetter(
     companion object {
 
         context(SirProperty)
-        operator fun invoke(
-            throws: Boolean = false,
-            attributes: List<String> = emptyList(),
-        ): SirGetter =
-            SirGetter(
-                property = this@SirProperty,
-                throws = throws,
-                attributes = attributes,
-            )
+        operator fun invoke(throws: Boolean = false, attributes: List<String> = emptyList()): SirGetter = SirGetter(
+            property = this@SirProperty,
+            throws = throws,
+            attributes = attributes,
+        )
     }
 }

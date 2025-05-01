@@ -36,24 +36,25 @@ data class CommonCompilerConfigurationAnalytics(
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_CompilerConfiguration
 
-        override fun produce(): String =
-            CommonCompilerConfigurationAnalytics(
-                kotlinLanguageVersion = config.languageVersionSettings.languageVersion.toString(),
-                kotlinApiVersion = config.languageVersionSettings.apiVersion.toString(),
-                languageVersionString = config.languageVersionSettings.toString(),
-                host = HostManager.host.name,
-                target = config.target.name,
-                overriddenProperties = config.configuration.get(KonanConfigKeys.OVERRIDE_KONAN_PROPERTIES),
-                isDebugBuild = config.configuration.get(KonanConfigKeys.DEBUG),
-                linkerArgs = config.configuration.get(KonanConfigKeys.LINKER_ARGS),
-                overrideClangOptions = config.configuration.get(KonanConfigKeys.OVERRIDE_CLANG_OPTIONS),
-                staticFramework = config.configuration.get(KonanConfigKeys.STATIC_FRAMEWORK),
-                objcGenerics = config.configuration.get(KonanConfigKeys.OBJC_GENERICS),
-                memoryModel = config.configuration.get(BinaryOptions.memoryModel)?.toString(),
-                allocationMode = config.configuration.get(KonanConfigKeys.ALLOCATION_MODE)?.toString(),
-                unitSuspendFunctionObjCExport = config.configuration.get(BinaryOptions.unitSuspendFunctionObjCExport)?.toString(),
-                objcExportSuspendFunctionLaunchThreadRestriction = config.configuration.get(BinaryOptions.objcExportSuspendFunctionLaunchThreadRestriction)
-                    ?.toString(),
-            ).toPrettyJson()
+        override fun produce(): String = CommonCompilerConfigurationAnalytics(
+            kotlinLanguageVersion = config.languageVersionSettings.languageVersion.toString(),
+            kotlinApiVersion = config.languageVersionSettings.apiVersion.toString(),
+            languageVersionString = config.languageVersionSettings.toString(),
+            host = HostManager.host.name,
+            target = config.target.name,
+            overriddenProperties = config.configuration.get(KonanConfigKeys.OVERRIDE_KONAN_PROPERTIES),
+            isDebugBuild = config.configuration.get(KonanConfigKeys.DEBUG),
+            linkerArgs = config.configuration.get(KonanConfigKeys.LINKER_ARGS),
+            overrideClangOptions = config.configuration.get(KonanConfigKeys.OVERRIDE_CLANG_OPTIONS),
+            staticFramework = config.configuration.get(KonanConfigKeys.STATIC_FRAMEWORK),
+            objcGenerics = config.configuration.get(KonanConfigKeys.OBJC_GENERICS),
+            memoryModel = config.configuration.get(BinaryOptions.memoryModel)?.toString(),
+            allocationMode = config.configuration.get(KonanConfigKeys.ALLOCATION_MODE)?.toString(),
+            unitSuspendFunctionObjCExport = config.configuration.get(BinaryOptions.unitSuspendFunctionObjCExport)?.toString(),
+            objcExportSuspendFunctionLaunchThreadRestriction = config.configuration.get(
+                BinaryOptions.objcExportSuspendFunctionLaunchThreadRestriction,
+            )
+                ?.toString(),
+        ).toPrettyJson()
     }
 }

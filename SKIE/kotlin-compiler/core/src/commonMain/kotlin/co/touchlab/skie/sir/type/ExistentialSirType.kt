@@ -3,9 +3,7 @@ package co.touchlab.skie.sir.type
 import co.touchlab.skie.sir.element.SirTypeParameter
 import co.touchlab.skie.util.map
 
-data class ExistentialSirType(
-    val type: SirType,
-) : NonNullSirType() {
+data class ExistentialSirType(val type: SirType) : NonNullSirType() {
     override val isHashable: Boolean
         get() = type.isHashable
 
@@ -24,14 +22,11 @@ data class ExistentialSirType(
         )
     }
 
-    override fun inlineTypeAliases(): ExistentialSirType =
-        copy(type = type.inlineTypeAliases())
+    override fun inlineTypeAliases(): ExistentialSirType = copy(type = type.inlineTypeAliases())
 
-    override fun asHashableType(): ExistentialSirType? =
-        type.asHashableType()?.let(::ExistentialSirType)
+    override fun asHashableType(): ExistentialSirType? = type.asHashableType()?.let(::ExistentialSirType)
 
-    override fun asReferenceType(): ExistentialSirType? =
-        type.asReferenceType()?.let(::ExistentialSirType)
+    override fun asReferenceType(): ExistentialSirType? = type.asReferenceType()?.let(::ExistentialSirType)
 
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): ExistentialSirType =
         copy(type = type.substituteTypeParameters(substitutions))

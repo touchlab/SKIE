@@ -27,9 +27,7 @@ import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import co.touchlab.skie.util.toSirVisibility
 
-class CreateSirMembersPhase(
-    val context: SirPhase.Context,
-) : SirPhase {
+class CreateSirMembersPhase(val context: SirPhase.Context) : SirPhase {
 
     private val kirProvider = context.kirProvider
     private val sirTypeTranslator = context.sirTypeTranslator
@@ -125,16 +123,12 @@ class CreateSirMembersPhase(
             OirScope.Static -> SirScope.Static
         }
 
-    private fun KirCallableDeclaration<*>.getSirParent(): SirDeclarationNamespace =
-        when (val parent = oirCallableDeclaration.parent) {
-            is OirClass -> parent.originalSirClass
-            is OirExtension -> parent.sirExtension
-        }
+    private fun KirCallableDeclaration<*>.getSirParent(): SirDeclarationNamespace = when (val parent = oirCallableDeclaration.parent) {
+        is OirClass -> parent.originalSirClass
+        is OirExtension -> parent.sirExtension
+    }
 
-    private fun SirFunction.createValueParameters(
-        kirFunction: KirFunction<*>,
-        swiftFunctionName: SwiftFunctionName,
-    ) {
+    private fun SirFunction.createValueParameters(kirFunction: KirFunction<*>, swiftFunctionName: SwiftFunctionName) {
         val valueParameters = kirFunction.getExportedValueParameters()
         if (valueParameters.isEmpty()) {
             return
@@ -159,13 +153,12 @@ class CreateSirMembersPhase(
             }
     }
 
-    private fun KirFunction<*>.getExportedValueParameters(): List<KirValueParameter> =
-        this.valueParameters.filter {
-            when (it.kind) {
-                KirValueParameter.Kind.ErrorOut -> false
-                else -> true
-            }
+    private fun KirFunction<*>.getExportedValueParameters(): List<KirValueParameter> = this.valueParameters.filter {
+        when (it.kind) {
+            KirValueParameter.Kind.ErrorOut -> false
+            else -> true
         }
+    }
 
     private val KirCallableDeclaration<*>.visibility: SirVisibility
         get() = this.configuration[SkieVisibility].toSirVisibility()
@@ -215,11 +208,7 @@ class CreateSirMembersPhase(
         }
     }
 
-    private data class SwiftFunctionName(
-        val identifier: String,
-        val argumentLabels
-        : List<String>,
-    )
+    private data class SwiftFunctionName(val identifier: String, val argumentLabels: List<String>)
 
     private companion object {
 

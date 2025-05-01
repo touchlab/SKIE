@@ -20,5 +20,5 @@ import io.outfoxx.swiftpoet.TypeVariableName
 
 interface BuilderWithTypeParameters {
 
-  fun addTypeVariable(typeVariable: TypeVariableName): BuilderWithTypeParameters
+    fun addTypeVariable(typeVariable: TypeVariableName): BuilderWithTypeParameters
 }

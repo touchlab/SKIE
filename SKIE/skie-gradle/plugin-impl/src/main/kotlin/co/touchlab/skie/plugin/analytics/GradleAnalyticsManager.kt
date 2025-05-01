@@ -14,13 +14,11 @@ import co.touchlab.skie.plugin.kgpShim
 import co.touchlab.skie.plugin.util.configureDoFirstOptimized
 import co.touchlab.skie.plugin.util.configureDoLastOptimized
 import co.touchlab.skie.plugin.util.registerSkieTargetBasedTask
+import java.time.Duration
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import java.time.Duration
 
-class GradleAnalyticsManager(
-    private val project: Project,
-) {
+class GradleAnalyticsManager(private val project: Project) {
 
     fun configureAnalytics(target: SkieTarget) {
         val analyticsCollectorProvider = target.skieDirectories.map { skieDirectories ->
@@ -55,10 +53,7 @@ class GradleAnalyticsManager(
         }
     }
 
-    private fun registerAnalyticsProducers(
-        target: SkieTarget,
-        analyticsCollectorProvider: Provider<AnalyticsCollector>,
-    ) {
+    private fun registerAnalyticsProducers(target: SkieTarget, analyticsCollectorProvider: Provider<AnalyticsCollector>) {
         val gradleVersion = project.provider { project.gradle.gradleVersion }
         val kotlinPluginVersion = project.provider { project.kgpShim.getKotlinPluginVersion() }
         val gitRoot = project.getGitRoot()
@@ -89,10 +84,7 @@ class GradleAnalyticsManager(
         registerPerformanceAnalyticsProducer(target, analyticsCollectorProvider)
     }
 
-    private fun registerPerformanceAnalyticsProducer(
-        target: SkieTarget,
-        analyticsCollectorProvider: Provider<AnalyticsCollector>,
-    ) {
+    private fun registerPerformanceAnalyticsProducer(target: SkieTarget, analyticsCollectorProvider: Provider<AnalyticsCollector>) {
         var start: Long = 0
 
         target.task.configureDoFirstOptimized {

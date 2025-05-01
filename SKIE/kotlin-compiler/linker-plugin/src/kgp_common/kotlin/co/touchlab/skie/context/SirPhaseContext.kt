@@ -13,9 +13,9 @@ import co.touchlab.skie.sir.SirProvider
 import co.touchlab.skie.sir.builtin.SirBuiltins
 import co.touchlab.skie.sir.type.translation.SirTypeTranslator
 
-class SirPhaseContext(
-    mainSkieContext: MainSkieContext,
-) : SirPhase.Context, BackgroundPhase.Context by mainSkieContext {
+class SirPhaseContext(mainSkieContext: MainSkieContext) :
+    SirPhase.Context,
+    BackgroundPhase.Context by mainSkieContext {
 
     override val context: SirPhase.Context = this
 

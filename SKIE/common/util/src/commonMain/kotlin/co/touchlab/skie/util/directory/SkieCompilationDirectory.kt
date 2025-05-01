@@ -5,9 +5,7 @@ import co.touchlab.skie.util.directory.structure.PermanentDirectory
 import co.touchlab.skie.util.directory.structure.RootDirectory
 import java.io.File
 
-class SkieCompilationDirectory(
-    rootDirectory: File,
-) : RootDirectory(rootDirectory) {
+class SkieCompilationDirectory(rootDirectory: File) : RootDirectory(rootDirectory) {
 
     val swift: Swift = Swift(this)
 

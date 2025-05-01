@@ -29,11 +29,7 @@ internal abstract class BaseCreateRegularKirFunctionPhase(
 ) {
 
     context(KirTypeParameterScope)
-    protected fun createValueParameters(
-        function: KirFunction<*>,
-        descriptor: FunctionDescriptor,
-        methodBridge: MethodBridge,
-    ) {
+    protected fun createValueParameters(function: KirFunction<*>, descriptor: FunctionDescriptor, methodBridge: MethodBridge) {
         methodBridge.valueParametersAssociated(descriptor)
             .forEach { (parameterBridge, parameterDescriptor) ->
                 createValueParameter(parameterBridge, parameterDescriptor, function, descriptor)
@@ -87,10 +83,9 @@ internal abstract class BaseCreateRegularKirFunctionPhase(
     private fun getValueParameterConfiguration(
         parameterDescriptor: ParameterDescriptor?,
         function: KirFunction<*>,
-    ): ValueParameterConfiguration =
-        if (parameterDescriptor != null) {
-            descriptorConfigurationProvider.getConfiguration(parameterDescriptor)
-        } else {
-            ValueParameterConfiguration(function.configuration)
-        }
+    ): ValueParameterConfiguration = if (parameterDescriptor != null) {
+        descriptorConfigurationProvider.getConfiguration(parameterDescriptor)
+    } else {
+        ValueParameterConfiguration(function.configuration)
+    }
 }

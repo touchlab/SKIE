@@ -4,15 +4,11 @@ import co.touchlab.skie.plugin.configuration.skieExtension
 import co.touchlab.skie.plugin.shim.KgpShim
 import co.touchlab.skie.plugin.shim.KgpShimLoader
 import co.touchlab.skie.plugin.shim.SkieKotlinVariantResolver
+import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import javax.inject.Inject
 
-abstract class SkieInternalExtension @Inject constructor(
-    private val project: Project,
-    val kotlinVersion: String,
-    val kgpShim: KgpShim,
-) {
+abstract class SkieInternalExtension @Inject constructor(private val project: Project, val kotlinVersion: String, val kgpShim: KgpShim) {
 
     val targets: NamedDomainObjectContainer<SkieTarget>
         get() = kgpShim.skieTargets

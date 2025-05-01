@@ -4,9 +4,7 @@ import co.touchlab.skie.util.SystemProperty
 import co.touchlab.skie.util.directory.structure.RootDirectory
 import java.io.File
 
-class SkieDirectories(
-    skieBuildRootDirectory: File,
-) {
+class SkieDirectories(skieBuildRootDirectory: File) {
 
     private val rootDirectories = mutableListOf<RootDirectory>()
 
@@ -23,8 +21,7 @@ class SkieDirectories(
     val directories: List<File>
         get() = rootDirectories.map { it.directory }
 
-    private fun <T : RootDirectory> rootDirectory(action: () -> T): T =
-        action().also { rootDirectories.add(it) }
+    private fun <T : RootDirectory> rootDirectory(action: () -> T): T = action().also { rootDirectories.add(it) }
 
     fun createDirectories() {
         rootDirectories.forEach {

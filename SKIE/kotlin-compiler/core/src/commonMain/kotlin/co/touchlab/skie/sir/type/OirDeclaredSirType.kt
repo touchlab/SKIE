@@ -18,8 +18,7 @@ data class OirDeclaredSirType(
     override val isReference: Boolean
         get() = declaration.primarySirClass.isReference
 
-    override fun asHashableType(): SirType? =
-        getType(declaration.primarySirClass).asHashableType()
+    override fun asHashableType(): SirType? = getType(declaration.primarySirClass).asHashableType()
 
     override fun asReferenceType(): SirType? {
         val bridgedClass = declaration.bridgedSirClass
@@ -31,11 +30,9 @@ data class OirDeclaredSirType(
         }
     }
 
-    override fun evaluate(): EvaluatedSirType =
-        getType(declaration.primarySirClass).evaluate()
+    override fun evaluate(): EvaluatedSirType = getType(declaration.primarySirClass).evaluate()
 
-    override fun inlineTypeAliases(): SirType =
-        this
+    override fun inlineTypeAliases(): SirType = this
 
     private fun getType(selectedClass: SirClass): SirDeclaredSirType {
         val convertedTypeArguments = selectedClass.typeParameters
@@ -50,9 +47,7 @@ data class OirDeclaredSirType(
         )
     }
 
-    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): OirDeclaredSirType =
-        this
+    override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): OirDeclaredSirType = this
 
-    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): OirDeclaredSirType =
-        this
+    override fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): OirDeclaredSirType = this
 }

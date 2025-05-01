@@ -15,9 +15,7 @@ sealed interface OirOverridableDeclaration<T : OirOverridableDeclaration<T>> : O
     fun addOverriddenBy(declaration: T)
 }
 
-class OirOverridableDeclarationDelegate<T : OirOverridableDeclaration<T>>(
-    private val self: T,
-) {
+class OirOverridableDeclarationDelegate<T : OirOverridableDeclaration<T>>(private val self: T) {
 
     val overriddenDeclarations = mutableListOf<T>()
 

@@ -18,13 +18,13 @@ package io.outfoxx.swiftpoet
 
 class ProtocolTypeName private constructor() : TypeName() {
 
-  override fun emit(out: CodeWriter): CodeWriter {
-    out.emit("Protocol")
-    return out
-  }
+    override fun emit(out: CodeWriter): CodeWriter {
+        out.emit("Protocol")
+        return out
+    }
 
-  companion object {
+    companion object {
 
-    val INSTANCE = ProtocolTypeName()
-  }
+        val INSTANCE = ProtocolTypeName()
+    }
 }

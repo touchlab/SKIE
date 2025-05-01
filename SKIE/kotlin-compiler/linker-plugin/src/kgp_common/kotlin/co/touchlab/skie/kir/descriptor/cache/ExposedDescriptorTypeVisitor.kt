@@ -88,7 +88,11 @@ internal class ExposedDescriptorTypeVisitor(
         descriptor.typeConstructor.supertypes.firstOrNull { !it.isInterface() }
 
     fun visitReferenceType(kotlinType: KotlinType, typeParameterScope: TypeParameterScope) {
-        class TypeMappingMatch(val type: KotlinType, val descriptor: ClassDescriptor, val visitor: ExposedDescriptorCustomTypeVisitors.Visitor)
+        class TypeMappingMatch(
+            val type: KotlinType,
+            val descriptor: ClassDescriptor,
+            val visitor: ExposedDescriptorCustomTypeVisitors.Visitor,
+        )
 
         val typeMappingMatches = (listOf(kotlinType) + kotlinType.supertypes()).mapNotNull { type ->
             (type.constructor.declarationDescriptor as? ClassDescriptor)?.let { descriptor ->
@@ -111,7 +115,10 @@ internal class ExposedDescriptorTypeVisitor(
                 } ?: return
             }
 
-        if (objcGenerics && kotlinType.isTypeParameter() && typeParameterScope.isTypeParameterUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))) {
+        if (objcGenerics &&
+            kotlinType.isTypeParameter() &&
+            typeParameterScope.isTypeParameterUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
+        ) {
             return
         }
 
@@ -132,11 +139,7 @@ internal class ExposedDescriptorTypeVisitor(
         onExposedClassDescriptorVisited(classDescriptor)
     }
 
-    private fun visitFunctionType(
-        kotlinType: KotlinType,
-        typeParameterScope: TypeParameterScope,
-        typeBridge: BlockPointerBridge,
-    ) {
+    private fun visitFunctionType(kotlinType: KotlinType, typeParameterScope: TypeParameterScope, typeBridge: BlockPointerBridge) {
         val expectedDescriptor = kotlinType.builtIns.getFunction(typeBridge.numberOfParameters)
 
         val functionType = if (TypeUtils.getClassDescriptor(kotlinType) == expectedDescriptor) {
@@ -149,11 +152,7 @@ internal class ExposedDescriptorTypeVisitor(
         visitFunctionType(functionType, typeParameterScope, typeBridge.returnsVoid)
     }
 
-    fun visitFunctionType(
-        functionType: KotlinType,
-        typeParameterScope: TypeParameterScope,
-        returnsVoid: Boolean,
-    ) {
+    fun visitFunctionType(functionType: KotlinType, typeParameterScope: TypeParameterScope, returnsVoid: Boolean) {
         functionType.getReceiverTypeFromFunctionType()?.let {
             visitReferenceType(it, typeParameterScope)
         }
@@ -174,18 +173,15 @@ internal class ExposedDescriptorTypeVisitor(
         fun isTypeParameterUsage(typeParameterDescriptor: TypeParameterDescriptor?): Boolean =
             parent?.isTypeParameterUsage(typeParameterDescriptor) ?: false
 
-        fun wasTypeAlreadyVisited(type: KotlinType): Boolean =
-            parent?.wasTypeAlreadyVisited(type) ?: false
+        fun wasTypeAlreadyVisited(type: KotlinType): Boolean = parent?.wasTypeAlreadyVisited(type) ?: false
 
-        fun deriveFor(type: KotlinType): TypeParameterTypeScope? =
-            TypeParameterTypeScope(this, type)
+        fun deriveFor(type: KotlinType): TypeParameterTypeScope? = TypeParameterTypeScope(this, type)
 
-        fun deriveFor(classDescriptor: ClassDescriptor): TypeParameterScope =
-            if (classDescriptor.kind.isInterface) {
-                TypeParameterRootScope
-            } else {
-                TypeParameterClassScope(classDescriptor, this)
-            }
+        fun deriveFor(classDescriptor: ClassDescriptor): TypeParameterScope = if (classDescriptor.kind.isInterface) {
+            TypeParameterRootScope
+        } else {
+            TypeParameterClassScope(classDescriptor, this)
+        }
     }
 
     object TypeParameterRootScope : TypeParameterScope {
@@ -193,10 +189,7 @@ internal class ExposedDescriptorTypeVisitor(
         override val parent: TypeParameterScope? = null
     }
 
-    class TypeParameterClassScope(
-        classDescriptor: ClassDescriptor,
-        override val parent: TypeParameterScope,
-    ) : TypeParameterScope {
+    class TypeParameterClassScope(classDescriptor: ClassDescriptor, override val parent: TypeParameterScope) : TypeParameterScope {
 
         private val typeParameterNames = classDescriptor.typeConstructor.parameters
 
@@ -208,13 +201,10 @@ internal class ExposedDescriptorTypeVisitor(
             } != null
     }
 
-    class TypeParameterTypeScope private constructor(
-        override val parent: TypeParameterScope,
-        private val type: KotlinType,
-    ) : TypeParameterScope {
+    class TypeParameterTypeScope private constructor(override val parent: TypeParameterScope, private val type: KotlinType) :
+        TypeParameterScope {
 
-        override fun wasTypeAlreadyVisited(type: KotlinType): Boolean =
-            type == this.type || super.wasTypeAlreadyVisited(type)
+        override fun wasTypeAlreadyVisited(type: KotlinType): Boolean = type == this.type || super.wasTypeAlreadyVisited(type)
 
         companion object {
 

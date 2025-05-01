@@ -58,7 +58,7 @@ class UniqueSignatureSet {
             val conflictingSignature = findConflictingSignature(signature)
 
             if (conflictingSignature != null) {
-                "an another declaration '${conflictingSignature}'"
+                "an another declaration '$conflictingSignature'"
             } else {
                 null
             }
@@ -69,16 +69,13 @@ class UniqueSignatureSet {
         alreadyAddedEnumCase.add(enumCase)
     }
 
-    private fun findConflictingSignature(signature: Signature): Signature? =
-        existingSignaturesMap[signature]
+    private fun findConflictingSignature(signature: Signature): Signature? = existingSignaturesMap[signature]
 
     private fun addSignature(signature: Signature) {
         existingSignaturesMap.putIfAbsent(signature, signature)
     }
 
-    private inner class Group(
-        private val representative: SirCallableDeclaration,
-    ) {
+    private inner class Group(private val representative: SirCallableDeclaration) {
 
         private val callableDeclarations = representative.getEntireOverrideHierarchy()
 

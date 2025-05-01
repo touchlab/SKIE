@@ -20,13 +20,10 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
-internal class CreateKirDescriptionAndHashPropertyPhase(
-    context: KirPhase.Context,
-) : BaseCreateKirMembersPhase(context) {
+internal class CreateKirDescriptionAndHashPropertyPhase(context: KirPhase.Context) : BaseCreateKirMembersPhase(context) {
 
     context(KirPhase.Context)
-    override fun isActive(): Boolean =
-    // TODO Change back once we generate custom header
+    override fun isActive(): Boolean = // TODO Change back once we generate custom header
         // TODO Add tests for this flag and functionality
         false
 //         SkieConfigurationFlag.Migration_AnyMethodsAsFunctions.isDisabled
@@ -58,20 +55,12 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
         }
     }
 
-    private fun getOrCreateProperty(
-        descriptor: FunctionDescriptor,
-        kirClass: KirClass,
-        type: KirType,
-    ): KirProperty =
+    private fun getOrCreateProperty(descriptor: FunctionDescriptor, kirClass: KirClass, type: KirType): KirProperty =
         cache.getOrPut(descriptor.original) {
             createProperty(descriptor, kirClass, type)
         }
 
-    private fun createProperty(
-        descriptor: FunctionDescriptor,
-        kirClass: KirClass,
-        type: KirType,
-    ): KirProperty {
+    private fun createProperty(descriptor: FunctionDescriptor, kirClass: KirClass, type: KirType): KirProperty {
         val baseDescriptor = descriptor.baseFunction
 
         kirClass.withTypeParameterScope {
@@ -130,18 +119,16 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
         return getOrCreateProperty(descriptor, kirClass, type)
     }
 
-    private fun ClassDescriptor.findSpecialFunction(name: Name): FunctionDescriptor? =
-        unsubstitutedMemberScope
-            .getContributedFunctions(name, NoLookupLocation.FROM_BACKEND)
-            .firstOrNull { isToStringOrEquals(it) }
+    private fun ClassDescriptor.findSpecialFunction(name: Name): FunctionDescriptor? = unsubstitutedMemberScope
+        .getContributedFunctions(name, NoLookupLocation.FROM_BACKEND)
+        .firstOrNull { isToStringOrEquals(it) }
 
     companion object {
 
-        fun isToStringOrEquals(descriptor: FunctionDescriptor): Boolean =
-            descriptor is SimpleFunctionDescriptor &&
-                (descriptor.name == OperatorNameConventions.TO_STRING || descriptor.name == OperatorNameConventions.HASH_CODE) &&
-                descriptor.valueParameters.isEmpty() &&
-                descriptor.isInheritedFromAny
+        fun isToStringOrEquals(descriptor: FunctionDescriptor): Boolean = descriptor is SimpleFunctionDescriptor &&
+            (descriptor.name == OperatorNameConventions.TO_STRING || descriptor.name == OperatorNameConventions.HASH_CODE) &&
+            descriptor.valueParameters.isEmpty() &&
+            descriptor.isInheritedFromAny
 
         private val FunctionDescriptor.isInheritedFromAny: Boolean
             get() {

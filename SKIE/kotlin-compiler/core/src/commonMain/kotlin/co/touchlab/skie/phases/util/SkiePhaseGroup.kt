@@ -5,12 +5,10 @@ import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.BackgroundPhase
 import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.phases.ScheduledPhase
-import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
+import kotlinx.coroutines.runBlocking
 
-class SkiePhaseGroup<P : ScheduledPhase<C>, C : ScheduledPhase.Context>(
-    defaultPhasesBuilder: MutableList<P>.(C) -> Unit,
-) {
+class SkiePhaseGroup<P : ScheduledPhase<C>, C : ScheduledPhase.Context>(defaultPhasesBuilder: MutableList<P>.(C) -> Unit) {
 
     private val modifications = mutableListOf(defaultPhasesBuilder)
 
@@ -74,21 +72,21 @@ fun <P, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
 context(ScheduledPhase.Context)
 inline fun <P, reified C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
     noinline contextFactory: () -> C,
-): C where P : ScheduledPhase<C>, P : ForegroundPhase<C> =
-    run(C::class, contextFactory)
+): C where P : ScheduledPhase<C>, P : ForegroundPhase<C> = run(C::class, contextFactory)
 
 context(ScheduledPhase.Context)
 fun <P, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.run(
     contextClass: KClass<C>,
     contextFactory: () -> C,
-): C where P : ScheduledPhase<C>, P : ForegroundPhase<C> =
-    runBlocking(contextClass, contextFactory)
+): C where P : ScheduledPhase<C>, P : ForegroundPhase<C> = runBlocking(contextClass, contextFactory)
 
 context(ScheduledPhase.Context)
-private fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.runBlocking(contextClass: KClass<C>, contextFactory: () -> C): C =
-    runBlocking {
-        prepareAndExecute(contextClass, contextFactory, SkiePerformanceAnalytics.Kind.Foreground)
-    }
+private fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.runBlocking(
+    contextClass: KClass<C>,
+    contextFactory: () -> C,
+): C = runBlocking {
+    prepareAndExecute(contextClass, contextFactory, SkiePerformanceAnalytics.Kind.Foreground)
+}
 
 context(ScheduledPhase.Context)
 private suspend fun <P : ScheduledPhase<C>, C : ScheduledPhase.Context> SkiePhaseGroup<P, C>.prepareAndExecute(

@@ -5,9 +5,7 @@ import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.util.doInPhase
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
-class SwiftSuspendGeneratorDelegate(
-    private val context: FrontendIrPhase.Context,
-) {
+class SwiftSuspendGeneratorDelegate(private val context: FrontendIrPhase.Context) {
 
     private val swiftSuspendFunctionGenerator = SwiftSuspendFunctionGenerator()
 

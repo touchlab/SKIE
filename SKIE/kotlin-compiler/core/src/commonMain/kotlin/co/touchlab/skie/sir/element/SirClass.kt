@@ -26,7 +26,13 @@ class SirClass(
     var isInherentlyHashable: Boolean = false,
     var isAlwaysAReference: Boolean = false,
     val origin: Origin = Origin.Generated,
-) : SirTypeDeclaration, SirDeclarationNamespace, SirDeclarationWithSuperTypes, SirTypeParameterParent, SirElementWithAttributes, SirElementWithModality, SirConditionalConstraintParent {
+) : SirTypeDeclaration,
+    SirDeclarationNamespace,
+    SirDeclarationWithSuperTypes,
+    SirTypeParameterParent,
+    SirElementWithAttributes,
+    SirElementWithModality,
+    SirConditionalConstraintParent {
 
     // TODO If modality is added update [SirHierarchyCache.canTheoreticallyInheritFrom]
 
@@ -83,8 +89,7 @@ class SirClass(
     override fun toType(typeArguments: List<SirType>): SirDeclaredSirType =
         SirDeclaredSirType({ internalTypeAlias ?: this }, typeArguments = typeArguments)
 
-    override fun toReadableString(): String =
-        kind.toString().lowercase() + " " + fqName.toString()
+    override fun toReadableString(): String = kind.toString().lowercase() + " " + fqName.toString()
 
     override fun toString(): String = "${this::class.simpleName}: $fqName${if (fqName != publicName) "($publicName)" else ""}"
 
@@ -104,7 +109,8 @@ class SirClass(
         Enum,
         Struct,
         Protocol,
-        Actor;
+        Actor,
+        ;
 
         val isClass: Boolean
             get() = this == Class
@@ -138,30 +144,28 @@ class SirClass(
             internalTypeAlias: SirTypeAlias? = null,
             isInherentlyHashable: Boolean = false,
             origin: Origin = Origin.Generated,
-        ): SirClass =
-            SirClass(
-                baseName = baseName,
-                parent = this@SirDeclarationParent,
-                kind = kind,
-                modality = modality,
-                visibility = visibility,
-                isReplaced = isReplaced,
-                isHidden = isHidden,
-                superTypes = superTypes,
-                attributes = attributes,
-                publicTypeAlias = publicTypeAlias,
-                internalTypeAlias = internalTypeAlias,
-                isInherentlyHashable = isInherentlyHashable,
-                origin = origin,
-            )
+        ): SirClass = SirClass(
+            baseName = baseName,
+            parent = this@SirDeclarationParent,
+            kind = kind,
+            modality = modality,
+            visibility = visibility,
+            isReplaced = isReplaced,
+            isHidden = isHidden,
+            superTypes = superTypes,
+            attributes = attributes,
+            publicTypeAlias = publicTypeAlias,
+            internalTypeAlias = internalTypeAlias,
+            isInherentlyHashable = isInherentlyHashable,
+            origin = origin,
+        )
     }
 }
 
-fun OirClass.Kind.toSirKind(): SirClass.Kind =
-    when (this) {
-        OirClass.Kind.Class -> SirClass.Kind.Class
-        OirClass.Kind.Protocol -> SirClass.Kind.Protocol
-    }
+fun OirClass.Kind.toSirKind(): SirClass.Kind = when (this) {
+    OirClass.Kind.Class -> SirClass.Kind.Class
+    OirClass.Kind.Protocol -> SirClass.Kind.Protocol
+}
 
 val SirClass.superClassType: SirDeclaredSirType?
     get() = superTypes.map { it.resolveAsSirClassType() }
@@ -174,19 +178,17 @@ val SirClass.superProtocolTypes: List<SirDeclaredSirType>
 val SirClass.superClass: SirClass?
     get() = superClassType?.declaration as? SirClass
 
-fun SirDeclaredSirType.resolveAsSirClassType(): SirDeclaredSirType? =
-    when (val declaration = declaration) {
-        is SirClass -> this
-        is SirTypeAlias -> {
-            when (val type = declaration.type) {
-                is SirDeclaredSirType -> type.resolveAsSirClassType()
-                else -> null
-            }
+fun SirDeclaredSirType.resolveAsSirClassType(): SirDeclaredSirType? = when (val declaration = declaration) {
+    is SirClass -> this
+    is SirTypeAlias -> {
+        when (val type = declaration.type) {
+            is SirDeclaredSirType -> type.resolveAsSirClassType()
+            else -> null
         }
     }
+}
 
-fun SirDeclaredSirType.resolveAsSirClass(): SirClass? =
-    resolveAsSirClassType()?.declaration as? SirClass
+fun SirDeclaredSirType.resolveAsSirClass(): SirClass? = resolveAsSirClassType()?.declaration as? SirClass
 
 val SirClass.oirClassOrNull: OirClass?
     get() = when (origin) {
@@ -199,10 +201,8 @@ val SirClass.oirClassOrNull: OirClass?
 val SirClass.kirClassOrNull: KirClass?
     get() = oirClassOrNull?.kirClassOrNull
 
-fun coerceModalityForClass(kind: SirClass.Kind): SirModality {
-    return when (kind) {
-        SirClass.Kind.Class, SirClass.Kind.Actor -> SirModality.ModuleLimited
-        SirClass.Kind.Enum, SirClass.Kind.Struct -> SirModality.Final
-        SirClass.Kind.Protocol -> SirModality.Open
-    }
+fun coerceModalityForClass(kind: SirClass.Kind): SirModality = when (kind) {
+    SirClass.Kind.Class, SirClass.Kind.Actor -> SirModality.ModuleLimited
+    SirClass.Kind.Enum, SirClass.Kind.Struct -> SirModality.Final
+    SirClass.Kind.Protocol -> SirModality.Open
 }

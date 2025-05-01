@@ -3,11 +3,11 @@
 package co.touchlab.skie.plugin.configuration
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import javax.inject.Inject
 
 open class SkieExtension @Inject constructor(objects: ObjectFactory) {
 

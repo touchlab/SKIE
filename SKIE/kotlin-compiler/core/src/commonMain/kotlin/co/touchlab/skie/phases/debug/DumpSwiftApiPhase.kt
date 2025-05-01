@@ -3,9 +3,9 @@ package co.touchlab.skie.phases.debug
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
 import co.touchlab.skie.util.Command
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.time.Duration.Companion.seconds
 
 sealed class DumpSwiftApiPhase : SirPhase {
 
@@ -39,7 +39,9 @@ sealed class DumpSwiftApiPhase : SirPhase {
                 command.execute(handleError = false, logFile = logFile)
             }
         } catch (e: TimeoutCancellationException) {
-            error("${this::class.qualifiedName} timed out. This is likely due to exporting a type with the same name as the produced framework.")
+            error(
+                "${this::class.qualifiedName} timed out. This is likely due to exporting a type with the same name as the produced framework.",
+            )
         }
     }
 }

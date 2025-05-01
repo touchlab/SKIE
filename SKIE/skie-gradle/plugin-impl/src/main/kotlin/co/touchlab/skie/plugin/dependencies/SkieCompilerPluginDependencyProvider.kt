@@ -10,14 +10,13 @@ import org.gradle.api.artifacts.Configuration
 
 object SkieCompilerPluginDependencyProvider {
 
-    private const val configurationName = "skieCompilerPlugin"
+    private const val CONFIGURATION_NAME = "skieCompilerPlugin"
 
-    fun getOrCreateDependencyConfiguration(project: Project): Configuration =
-        project.configurations.findByName(configurationName)
-            ?: createDependencyConfiguration(project)
+    fun getOrCreateDependencyConfiguration(project: Project): Configuration = project.configurations.findByName(CONFIGURATION_NAME)
+        ?: createDependencyConfiguration(project)
 
     private fun createDependencyConfiguration(project: Project): Configuration {
-        val skieCompilerPluginConfiguration = project.configurations.create(configurationName) {
+        val skieCompilerPluginConfiguration = project.configurations.create(CONFIGURATION_NAME) {
             isCanBeConsumed = false
             isCanBeResolved = true
 
@@ -32,7 +31,7 @@ object SkieCompilerPluginDependencyProvider {
             exclude(group = "org.jetbrains", module = "annotations")
         }
 
-        project.dependencies.add(configurationName, BuildConfig.SKIE_KOTLIN_PLUGIN_COORDINATE)
+        project.dependencies.add(CONFIGURATION_NAME, BuildConfig.SKIE_KOTLIN_PLUGIN_COORDINATE)
 
         return skieCompilerPluginConfiguration
     }

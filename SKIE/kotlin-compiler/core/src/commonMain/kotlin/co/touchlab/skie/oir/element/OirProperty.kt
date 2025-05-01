@@ -12,7 +12,8 @@ class OirProperty(
     override val scope: OirScope,
     override val deprecationLevel: DeprecationLevel,
     override val isFakeOverride: Boolean,
-) : OirCallableDeclaration, OirOverridableDeclaration<OirProperty> {
+) : OirCallableDeclaration,
+    OirOverridableDeclaration<OirProperty> {
 
     lateinit var originalSirProperty: SirProperty
 

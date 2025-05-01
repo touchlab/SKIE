@@ -26,9 +26,7 @@ import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.load.kotlin.toSourceElement
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
-class DescriptorConfigurationProvider(
-    private val configurationProvider: ConfigurationProvider,
-) {
+class DescriptorConfigurationProvider(private val configurationProvider: ConfigurationProvider) {
 
     private val targetCache = mutableMapOf<Any, IdentifiedConfigurationTarget>()
 
@@ -68,55 +66,48 @@ class DescriptorConfigurationProvider(
         return configurationProvider.getConfiguration(target)
     }
 
-    private fun ModuleDescriptor.getTarget(): IdentifiedConfigurationTarget.Module =
-        targetCache.getOrPut(this.original) {
-            DescriptorBasedConfigurationTarget.Module(this)
-        } as IdentifiedConfigurationTarget.Module
+    private fun ModuleDescriptor.getTarget(): IdentifiedConfigurationTarget.Module = targetCache.getOrPut(this.original) {
+        DescriptorBasedConfigurationTarget.Module(this)
+    } as IdentifiedConfigurationTarget.Module
 
-    private fun PackageFragmentDescriptor.getTarget(): IdentifiedConfigurationTarget.Package =
-        targetCache.getOrPut(this.original) {
-            DescriptorBasedConfigurationTarget.Package(module.getTarget(), this)
-        } as IdentifiedConfigurationTarget.Package
+    private fun PackageFragmentDescriptor.getTarget(): IdentifiedConfigurationTarget.Package = targetCache.getOrPut(this.original) {
+        DescriptorBasedConfigurationTarget.Package(module.getTarget(), this)
+    } as IdentifiedConfigurationTarget.Package
 
     private fun SourceFile.getTarget(packageFragmentDescriptor: PackageFragmentDescriptor): IdentifiedConfigurationTarget.File =
         targetCache.getOrPut(this to packageFragmentDescriptor.original) {
             DescriptorBasedConfigurationTarget.File(packageFragmentDescriptor.getTarget())
         } as IdentifiedConfigurationTarget.File
 
-    private fun ClassDescriptor.getTarget(): IdentifiedConfigurationTarget.Class =
-        targetCache.getOrPut(this.original) {
-            val parent = getFileOrClassParent()
+    private fun ClassDescriptor.getTarget(): IdentifiedConfigurationTarget.Class = targetCache.getOrPut(this.original) {
+        val parent = getFileOrClassParent()
 
-            DescriptorBasedConfigurationTarget.Class(parent, this)
-        } as IdentifiedConfigurationTarget.Class
+        DescriptorBasedConfigurationTarget.Class(parent, this)
+    } as IdentifiedConfigurationTarget.Class
 
-    private fun ConstructorDescriptor.getTarget(): IdentifiedConfigurationTarget.Constructor =
-        targetCache.getOrPut(this.original) {
-            val parent = getFileOrClassParent()
+    private fun ConstructorDescriptor.getTarget(): IdentifiedConfigurationTarget.Constructor = targetCache.getOrPut(this.original) {
+        val parent = getFileOrClassParent()
 
-            DescriptorBasedConfigurationTarget.Constructor(parent, this)
-        } as IdentifiedConfigurationTarget.Constructor
+        DescriptorBasedConfigurationTarget.Constructor(parent, this)
+    } as IdentifiedConfigurationTarget.Constructor
 
-    private fun SimpleFunctionDescriptor.getTarget(): IdentifiedConfigurationTarget.SimpleFunction =
-        targetCache.getOrPut(this.original) {
-            val parent = getFileOrClassParent()
+    private fun SimpleFunctionDescriptor.getTarget(): IdentifiedConfigurationTarget.SimpleFunction = targetCache.getOrPut(this.original) {
+        val parent = getFileOrClassParent()
 
-            DescriptorBasedConfigurationTarget.SimpleFunction(parent, this)
-        } as IdentifiedConfigurationTarget.SimpleFunction
+        DescriptorBasedConfigurationTarget.SimpleFunction(parent, this)
+    } as IdentifiedConfigurationTarget.SimpleFunction
 
-    private fun PropertyDescriptor.getTarget(): IdentifiedConfigurationTarget.Property =
-        targetCache.getOrPut(this.original) {
-            val parent = getFileOrClassParent()
+    private fun PropertyDescriptor.getTarget(): IdentifiedConfigurationTarget.Property = targetCache.getOrPut(this.original) {
+        val parent = getFileOrClassParent()
 
-            DescriptorBasedConfigurationTarget.Property(parent, this)
-        } as IdentifiedConfigurationTarget.Property
+        DescriptorBasedConfigurationTarget.Property(parent, this)
+    } as IdentifiedConfigurationTarget.Property
 
-    private fun ParameterDescriptor.getTarget(): IdentifiedConfigurationTarget.ValueParameter =
-        targetCache.getOrPut(this.original) {
-            val parent = getCallableDeclarationParent()
+    private fun ParameterDescriptor.getTarget(): IdentifiedConfigurationTarget.ValueParameter = targetCache.getOrPut(this.original) {
+        val parent = getCallableDeclarationParent()
 
-            DescriptorBasedConfigurationTarget.ValueParameter(parent, this)
-        } as IdentifiedConfigurationTarget.ValueParameter
+        DescriptorBasedConfigurationTarget.ValueParameter(parent, this)
+    } as IdentifiedConfigurationTarget.ValueParameter
 
     private fun DeclarationDescriptor.getFileOrClassParent(): IdentifiedConfigurationTarget.FileOrClass {
         val containingDeclaration = containingDeclaration

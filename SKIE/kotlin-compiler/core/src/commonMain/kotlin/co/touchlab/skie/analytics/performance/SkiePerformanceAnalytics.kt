@@ -4,10 +4,6 @@ import co.touchlab.skie.configuration.GlobalConfiguration
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.util.toPrettyJson
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -17,12 +13,14 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 import kotlin.time.toDuration
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 
 object SkiePerformanceAnalytics {
 
-    class Producer(
-        private val globalConfiguration: GlobalConfiguration,
-    ) : AnalyticsProducer {
+    class Producer(private val globalConfiguration: GlobalConfiguration) : AnalyticsProducer {
 
         private val threadExecutor = ThreadPoolExecutor(0, 1, 1, TimeUnit.MINUTES, LinkedBlockingQueue())
 
@@ -36,17 +34,16 @@ object SkiePerformanceAnalytics {
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_SkiePerformance
 
-        override fun produce(): String =
-            runBlocking(dispatcher) {
-                logTotal(Kind.Foreground)
-                logTotal(Kind.Background)
+        override fun produce(): String = runBlocking(dispatcher) {
+            logTotal(Kind.Foreground)
+            logTotal(Kind.Background)
 
-                collected = true
+            collected = true
 
-                threadExecutor.setKeepAliveTime(1, TimeUnit.SECONDS)
+            threadExecutor.setKeepAliveTime(1, TimeUnit.SECONDS)
 
-                entries.toPrettyJson()
-            }
+            entries.toPrettyJson()
+        }
 
         private fun logTotal(kind: Kind) {
             val totalInSeconds = entries.filter { it.kind == kind }.sumOf { it.duration.toDouble(DurationUnit.SECONDS) }
@@ -62,10 +59,9 @@ object SkiePerformanceAnalytics {
             }
         }
 
-        inline fun <T> logBlocking(name: String, kind: Kind = Kind.Foreground, crossinline block: () -> T): T =
-            runBlocking {
-                log(name, kind, block)
-            }
+        inline fun <T> logBlocking(name: String, kind: Kind = Kind.Foreground, crossinline block: () -> T): T = runBlocking {
+            log(name, kind, block)
+        }
 
         @OptIn(ExperimentalTime::class)
         suspend inline fun <T> log(name: String, kind: Kind = Kind.Foreground, block: () -> T): T {
@@ -127,11 +123,7 @@ object SkiePerformanceAnalytics {
     }
 
     @Serializable
-    private data class Entry(
-        val name: String,
-        val duration: Duration,
-        val kind: Kind,
-    )
+    private data class Entry(val name: String, val duration: Duration, val kind: Kind)
 
     enum class Kind {
         Foreground,

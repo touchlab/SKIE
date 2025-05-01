@@ -20,10 +20,10 @@ class SirTypeParameter(
     sealed interface Bound {
         val type: SirType
 
-        class Equality(override val type: SirType): Bound {
+        class Equality(override val type: SirType) : Bound {
             override fun copy(type: SirType) = Equality(type)
         }
-        class Conformance(override val type: SirType): Bound {
+        class Conformance(override val type: SirType) : Bound {
             override fun copy(type: SirType) = Conformance(type)
         }
 
@@ -33,11 +33,7 @@ class SirTypeParameter(
     companion object {
 
         context(SirTypeParameterParent)
-        operator fun invoke(
-            name: String,
-            bounds: List<Bound> = emptyList(),
-            isPrimaryAssociatedType: Boolean = false,
-        ): SirTypeParameter =
+        operator fun invoke(name: String, bounds: List<Bound> = emptyList(), isPrimaryAssociatedType: Boolean = false): SirTypeParameter =
             SirTypeParameter(
                 name = name,
                 parent = this@SirTypeParameterParent,
@@ -46,11 +42,7 @@ class SirTypeParameter(
             )
 
         context(SirTypeParameterParent)
-        operator fun invoke(
-            name: String,
-            vararg bounds: Bound,
-            isPrimaryAssociatedType: Boolean = false,
-        ): SirTypeParameter =
+        operator fun invoke(name: String, vararg bounds: Bound, isPrimaryAssociatedType: Boolean = false): SirTypeParameter =
             SirTypeParameter(
                 name = name,
                 bounds = bounds.toList(),
@@ -59,11 +51,8 @@ class SirTypeParameter(
     }
 }
 
-fun SirTypeParameter.toTypeParameterUsage(): TypeParameterUsageSirType =
-    TypeParameterUsageSirType(this)
+fun SirTypeParameter.toTypeParameterUsage(): TypeParameterUsageSirType = TypeParameterUsageSirType(this)
 
-fun SirType.toEqualityBound(): SirTypeParameter.Bound.Equality =
-    SirTypeParameter.Bound.Equality(this)
+fun SirType.toEqualityBound(): SirTypeParameter.Bound.Equality = SirTypeParameter.Bound.Equality(this)
 
-fun SirType.toConformanceBound(): SirTypeParameter.Bound.Conformance =
-    SirTypeParameter.Bound.Conformance(this)
+fun SirType.toConformanceBound(): SirTypeParameter.Bound.Conformance = SirTypeParameter.Bound.Conformance(this)

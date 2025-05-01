@@ -23,7 +23,9 @@ class SirProperty(
     var isMutable: Boolean = false,
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
-) : SirOverridableDeclaration<SirProperty>, SirCallableDeclaration, SirElementWithModality {
+) : SirOverridableDeclaration<SirProperty>,
+    SirCallableDeclaration,
+    SirElementWithModality {
 
     override val parent: SirDeclarationParent by sirDeclarationParent(parent)
 
@@ -80,8 +82,7 @@ class SirProperty(
         this.setter = setter
     }
 
-    override fun toString(): String =
-        Signature(this).toString()
+    override fun toString(): String = Signature(this).toString()
 
     companion object {
 
@@ -101,24 +102,23 @@ class SirProperty(
             isMutable: Boolean = false,
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
-        ): SirProperty =
-            SirProperty(
-                identifier = identifier,
-                parent = this@SirDeclarationParent,
-                type = type,
-                visibility = visibility,
-                modality = modality,
-                isAbstract = isAbstract,
-                isReplaced = isReplaced,
-                isHidden = isHidden,
-                scope = scope,
-                deprecationLevel = deprecationLevel,
-                isFakeOverride = isFakeOverride,
-                isWrappedBySkie = isWrappedBySkie,
-                isMutable = isMutable,
-                attributes = attributes,
-                modifiers = modifiers,
-            )
+        ): SirProperty = SirProperty(
+            identifier = identifier,
+            parent = this@SirDeclarationParent,
+            type = type,
+            visibility = visibility,
+            modality = modality,
+            isAbstract = isAbstract,
+            isReplaced = isReplaced,
+            isHidden = isHidden,
+            scope = scope,
+            deprecationLevel = deprecationLevel,
+            isFakeOverride = isFakeOverride,
+            isWrappedBySkie = isWrappedBySkie,
+            isMutable = isMutable,
+            attributes = attributes,
+            modifiers = modifiers,
+        )
     }
 }
 
@@ -138,24 +138,23 @@ fun SirProperty.shallowCopy(
     isMutable: Boolean = this.isMutable,
     attributes: List<String> = this.attributes,
     modifiers: List<Modifier> = this.modifiers,
-): SirProperty =
-    SirProperty(
-        identifier = identifier,
-        parent = parent,
-        type = type,
-        visibility = visibility,
-        modality = modality,
-        isAbstract = isAbstract,
-        isReplaced = isReplaced,
-        isHidden = isHidden,
-        scope = scope,
-        deprecationLevel = deprecationLevel,
-        isFakeOverride = isFakeOverride,
-        isWrappedBySkie = isWrappedBySkie,
-        isMutable = isMutable,
-        attributes = attributes,
-        modifiers = modifiers,
-    )
+): SirProperty = SirProperty(
+    identifier = identifier,
+    parent = parent,
+    type = type,
+    visibility = visibility,
+    modality = modality,
+    isAbstract = isAbstract,
+    isReplaced = isReplaced,
+    isHidden = isHidden,
+    scope = scope,
+    deprecationLevel = deprecationLevel,
+    isFakeOverride = isFakeOverride,
+    isWrappedBySkie = isWrappedBySkie,
+    isMutable = isMutable,
+    attributes = attributes,
+    modifiers = modifiers,
+)
 
 val SirProperty.isOverriddenFromReadOnlyProperty: Boolean
     get() = overriddenDeclarations.any { it.setter == null || it.isOverriddenFromReadOnlyProperty }

@@ -71,46 +71,27 @@ internal abstract class BaseCreateRegularKirMembersPhase(
         }
     }
 
-    private fun createFunctionIfSupported(
-        descriptor: FunctionDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ) {
+    private fun createFunctionIfSupported(descriptor: FunctionDescriptor, kirClass: KirClass, origin: Origin) {
         if (supportsSimpleFunctions) {
             visitFunction(descriptor, kirClass, origin)
         }
     }
 
-    private fun createPropertyIfSupported(
-        descriptor: PropertyDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ) {
+    private fun createPropertyIfSupported(descriptor: PropertyDescriptor, kirClass: KirClass, origin: Origin) {
         if (supportsProperties) {
             visitProperty(descriptor, kirClass, origin)
         }
     }
 
-    protected open fun visitConstructor(
-        descriptor: ConstructorDescriptor,
-        kirClass: KirClass,
-    ) {
+    protected open fun visitConstructor(descriptor: ConstructorDescriptor, kirClass: KirClass) {
         error("Constructors are not supported.")
     }
 
-    protected open fun visitFunction(
-        descriptor: FunctionDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ) {
+    protected open fun visitFunction(descriptor: FunctionDescriptor, kirClass: KirClass, origin: Origin) {
         error("Functions are not supported.")
     }
 
-    protected open fun visitProperty(
-        descriptor: PropertyDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ) {
+    protected open fun visitProperty(descriptor: PropertyDescriptor, kirClass: KirClass, origin: Origin) {
         error("Properties are not supported.")
     }
 }

@@ -5,6 +5,8 @@ import co.touchlab.skie.util.collisionFreeIdentifier
 import co.touchlab.skie.util.file.deleteEmptyDirectoriesRecursively
 import co.touchlab.skie.util.file.isKlib
 import co.touchlab.skie.util.file.isSwift
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.FileCollection
@@ -17,8 +19,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
-import javax.inject.Inject
 
 abstract class UnpackSwiftSourcesTask : DefaultTask() {
 
@@ -38,7 +38,7 @@ abstract class UnpackSwiftSourcesTask : DefaultTask() {
         get() = objects.fileCollection().also { files ->
             dependencies.get().filter { it.isDirectory }.forEach {
                 files.from(
-                    objects.fileTree().from(it).filter { it.isSwift }
+                    objects.fileTree().from(it).filter { it.isSwift },
                 )
             }
         }

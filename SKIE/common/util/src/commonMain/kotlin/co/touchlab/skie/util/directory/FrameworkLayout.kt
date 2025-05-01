@@ -3,9 +3,7 @@ package co.touchlab.skie.util.directory
 import co.touchlab.skie.util.TargetTriple
 import java.io.File
 
-class FrameworkLayout(
-    val frameworkDirectory: File,
-) {
+class FrameworkLayout(val frameworkDirectory: File) {
 
     constructor(frameworkPath: String) : this(File(frameworkPath))
 

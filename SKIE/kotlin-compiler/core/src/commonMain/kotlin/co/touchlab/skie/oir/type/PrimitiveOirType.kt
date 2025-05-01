@@ -1,9 +1,7 @@
 package co.touchlab.skie.oir.type
 
 @Suppress("ClassName")
-sealed class PrimitiveOirType(
-    val name: String,
-) : OirType() {
+sealed class PrimitiveOirType(val name: String) : OirType() {
 
     // Does not directly exist in Obj-C - used when the type should be mapped to Swift.Int instead of Swift.UInt
     object NSConvertedUInteger : PrimitiveOirType("NSUInteger")
@@ -22,6 +20,5 @@ sealed class PrimitiveOirType(
     object double : PrimitiveOirType("double")
     object vectorFloat128 : PrimitiveOirType("float __attribute__((__vector_size__(16)))")
 
-    override fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String =
-        name.withAttrsAndName(attrsAndName)
+    override fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String = name.withAttrsAndName(attrsAndName)
 }

@@ -23,9 +23,7 @@ sealed interface SirOverridableDeclaration<T : SirOverridableDeclaration<T>> : S
     fun removeOverriddenBy(declaration: T)
 }
 
-class SirOverridableDeclarationDelegate<T : SirOverridableDeclaration<T>>(
-    private val self: T,
-) {
+class SirOverridableDeclarationDelegate<T : SirOverridableDeclaration<T>>(private val self: T) {
 
     val memberOwner: SirClass?
         get() = when (val parent = self.parent) {

@@ -13,9 +13,8 @@ import co.touchlab.skie.sir.element.shallowCopy
 import co.touchlab.skie.util.swift.addFunctionDeclarationBodyWithErrorTypeHandling
 import co.touchlab.skie.util.swift.escapeSwiftIdentifier
 
-class InterfaceExtensionMembersConvertorDelegate(
-    private val parentProvider: FileScopeConversionParentProvider,
-) : FileScopeConvertorDelegateScope {
+class InterfaceExtensionMembersConvertorDelegate(private val parentProvider: FileScopeConversionParentProvider) :
+    FileScopeConvertorDelegateScope {
 
     fun generateInterfaceExtensionFunctionWrapper(function: KirSimpleFunction) {
         function.forEachAssociatedExportedSirDeclaration {
@@ -68,7 +67,11 @@ class InterfaceExtensionMembersConvertorDelegate(
         setter?.isWrappedBySkie = true
     }
 
-    private fun generateInterfaceExtensionPropertyWrapper(getter: SirSimpleFunction, setter: SirSimpleFunction?, kirGetter: KirSimpleFunction) {
+    private fun generateInterfaceExtensionPropertyWrapper(
+        getter: SirSimpleFunction,
+        setter: SirSimpleFunction?,
+        kirGetter: KirSimpleFunction,
+    ) {
         parentProvider.forEachParent(kirGetter, getter) {
             SirProperty(
                 identifier = getter.identifier,

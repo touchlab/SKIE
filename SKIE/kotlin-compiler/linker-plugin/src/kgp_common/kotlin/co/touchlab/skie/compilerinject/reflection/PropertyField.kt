@@ -18,7 +18,7 @@ class PropertyField<T : Any, V>(private val originalPropertyName: String) : Read
 
     private inline fun <U> onFieldOf(thisRef: T, run: (Field) -> U): U {
         thisRef.javaClass.getDeclaredField(originalPropertyName).let { field ->
-            check(field.trySetAccessible()) { "Failed to make field `${originalPropertyName}` accessible" }
+            check(field.trySetAccessible()) { "Failed to make field `$originalPropertyName` accessible" }
             return run(field)
         }
     }

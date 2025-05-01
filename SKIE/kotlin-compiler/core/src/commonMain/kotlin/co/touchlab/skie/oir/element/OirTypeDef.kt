@@ -18,11 +18,9 @@ class OirTypeDef(
         toType()
     }
 
-    override fun toType(typeArguments: List<OirType>): TypeDefOirType =
-        TypeDefOirType(this, typeArguments = typeArguments)
+    override fun toType(typeArguments: List<OirType>): TypeDefOirType = TypeDefOirType(this, typeArguments = typeArguments)
 
-    override fun toType(vararg typeArguments: OirType): TypeDefOirType =
-        toType(typeArguments.toList())
+    override fun toType(vararg typeArguments: OirType): TypeDefOirType = toType(typeArguments.toList())
 
     override fun toString(): String = "${this::class.simpleName}: $name"
 }

@@ -42,11 +42,9 @@ class ExternalDescriptorKirProvider(
 
     private val externalClassParentConfigurationByModule = mutableMapOf<KirModule, FileOrClassConfiguration>()
 
-    fun getExternalClass(descriptor: ClassDescriptor): KirClass =
-        getExternalClass(descriptor, addNSObjectSuperType = true)
+    fun getExternalClass(descriptor: ClassDescriptor): KirClass = getExternalClass(descriptor, addNSObjectSuperType = true)
 
-    fun getExternalBuiltinClass(descriptor: ClassDescriptor): KirClass =
-        getExternalClass(descriptor, addNSObjectSuperType = false)
+    fun getExternalBuiltinClass(descriptor: ClassDescriptor): KirClass = getExternalClass(descriptor, addNSObjectSuperType = false)
 
     private fun getExternalClass(descriptor: ClassDescriptor, addNSObjectSuperType: Boolean): KirClass =
         externalClassesAndProtocolsCache.getOrPut(descriptor.original) {

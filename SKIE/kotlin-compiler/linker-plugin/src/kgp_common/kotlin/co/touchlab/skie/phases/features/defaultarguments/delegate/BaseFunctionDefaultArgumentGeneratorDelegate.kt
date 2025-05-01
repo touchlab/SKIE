@@ -31,10 +31,8 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
-abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
-    context: FrontendIrPhase.Context,
-    private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(context) {
+abstract class BaseFunctionDefaultArgumentGeneratorDelegate(context: FrontendIrPhase.Context, private val sharedCounter: SharedCounter) :
+    BaseDefaultArgumentGeneratorDelegate(context) {
 
     context(FrontendIrPhase.Context)
     override fun generate() {
@@ -57,10 +55,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     }
 
     context(FrontendIrPhase.Context)
-    private fun generateOverload(
-        function: SimpleFunctionDescriptor,
-        parameters: List<ValueParameterDescriptor>,
-    ) {
+    private fun generateOverload(function: SimpleFunctionDescriptor, parameters: List<ValueParameterDescriptor>) {
         val newFunction = generateOverloadWithUniqueName(function, parameters)
 
         registerOverload(newFunction, function)
@@ -72,48 +67,45 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     private fun generateOverloadWithUniqueName(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
-    ): FunctionDescriptor =
-        declarationBuilder.createFunction(
-            name = "${function.name.identifier}${uniqueNameSubstring}${sharedCounter.next()}",
-            namespace = declarationBuilder.getNamespace(function),
-            annotations = function.annotations,
-        ) {
-            val typeParameterMappingPairs = function.typeParameters.zip(function.typeParameters.copyIndexing(descriptor))
-            val typeParameterSubstitutor = TypeSubstitutor.create(
-                TypeConstructorSubstitution.createByParametersMap(
-                    typeParameterMappingPairs.associate { (from, into) ->
-                        from to TypeProjectionImpl(into.defaultType)
-                    },
-                ),
+    ): FunctionDescriptor = declarationBuilder.createFunction(
+        name = "${function.name.identifier}${uniqueNameSubstring}${sharedCounter.next()}",
+        namespace = declarationBuilder.getNamespace(function),
+        annotations = function.annotations,
+    ) {
+        val typeParameterMappingPairs = function.typeParameters.zip(function.typeParameters.copyIndexing(descriptor))
+        val typeParameterSubstitutor = TypeSubstitutor.create(
+            TypeConstructorSubstitution.createByParametersMap(
+                typeParameterMappingPairs.associate { (from, into) ->
+                    from to TypeProjectionImpl(into.defaultType)
+                },
+            ),
+        )
+
+        descriptor.configuration.overwriteBy(function.configuration)
+
+        dispatchReceiverParameter = function.dispatchReceiverParameter
+        extensionReceiverParameter = function.extensionReceiverParameter
+            ?.copy(descriptor)
+            ?.substitute(typeParameterSubstitutor)
+        typeParameters = typeParameterMappingPairs.map { it.second }
+        valueParameters = parameters.mapIndexed { index, parameter ->
+            parameter.copyWithoutDefaultValue(
+                newOwner = descriptor,
+                newIndex = index,
+                newType = typeParameterSubstitutor.safeSubstitute(parameter.type, Variance.INVARIANT),
             )
-
-            descriptor.configuration.overwriteBy(function.configuration)
-
-            dispatchReceiverParameter = function.dispatchReceiverParameter
-            extensionReceiverParameter = function.extensionReceiverParameter
-                ?.copy(descriptor)
-                ?.substitute(typeParameterSubstitutor)
-            typeParameters = typeParameterMappingPairs.map { it.second }
-            valueParameters = parameters.mapIndexed { index, parameter ->
-                parameter.copyWithoutDefaultValue(
-                    newOwner = descriptor,
-                    newIndex = index,
-                    newType = typeParameterSubstitutor.safeSubstitute(parameter.type, Variance.INVARIANT),
-                )
-            }
-            returnType = function.returnTypeOrNothing
-            isInline = function.isInline
-            isSuspend = function.isSuspend
-            modality = Modality.FINAL
-            body = { overloadIr ->
-                getOverloadBody(function, overloadIr)
-            }
         }
+        returnType = function.returnTypeOrNothing
+        isInline = function.isInline
+        isSuspend = function.isSuspend
+        modality = Modality.FINAL
+        body = { overloadIr ->
+            getOverloadBody(function, overloadIr)
+        }
+    }
 
     context(KotlinIrPhase.Context, DeclarationIrBuilder)
-    private fun getOverloadBody(
-        originalFunction: FunctionDescriptor, overloadIr: IrFunction,
-    ): IrBody {
+    private fun getOverloadBody(originalFunction: FunctionDescriptor, overloadIr: IrFunction): IrBody {
         val originalFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunction)
 
         return irBlockBody {

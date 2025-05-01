@@ -35,7 +35,9 @@ class ActualSkieBinaryTarget(
 
     override val task: TaskProvider<out KotlinNativeLink> = binary.linkTaskProvider
 
-    override val linkerConfiguration: Configuration = project.configurations.getByName(binary.compilation.compileDependencyConfigurationName)
+    override val linkerConfiguration: Configuration = project.configurations.getByName(
+        binary.compilation.compileDependencyConfigurationName,
+    )
 
     override val skieDirectories: Provider<SkieDirectories> =
         project.layout.buildDirectory

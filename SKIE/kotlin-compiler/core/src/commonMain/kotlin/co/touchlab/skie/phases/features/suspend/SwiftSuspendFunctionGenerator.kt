@@ -26,10 +26,7 @@ class SwiftSuspendFunctionGenerator {
     private val skieClassSuspendGenerator = SkieClassSuspendGenerator()
 
     context(SirPhase.Context)
-    fun generateSwiftBridgingFunction(
-        suspendKirFunction: KirSimpleFunction,
-        kotlinBridgingKirFunction: KirSimpleFunction,
-    ) {
+    fun generateSwiftBridgingFunction(suspendKirFunction: KirSimpleFunction, kotlinBridgingKirFunction: KirSimpleFunction) {
         val bridgeModel = SuspendFunctionBridgeModel(
             suspendKirFunction = suspendKirFunction,
             kotlinBridgingKirFunction = kotlinBridgingKirFunction,
@@ -172,10 +169,7 @@ private fun MutableList<String>.addSuspendHandlerParameter() {
     add("$0")
 }
 
-private fun TypeName.removingEscapingAttribute(): TypeName {
-    return when (this) {
-        is FunctionTypeName -> this.copy(attributes = this.attributes - AttributeSpec.ESCAPING)
-        else -> this
-    }
+private fun TypeName.removingEscapingAttribute(): TypeName = when (this) {
+    is FunctionTypeName -> this.copy(attributes = this.attributes - AttributeSpec.ESCAPING)
+    else -> this
 }
-

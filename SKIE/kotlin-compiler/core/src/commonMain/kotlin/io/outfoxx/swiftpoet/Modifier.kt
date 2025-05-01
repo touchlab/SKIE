@@ -16,45 +16,42 @@
 
 package io.outfoxx.swiftpoet
 
-enum class Modifier(
-  internal val keyword: String,
-  private vararg val targets: Target,
-) {
+enum class Modifier(internal val keyword: String, private vararg val targets: Target) {
 
-  OPEN("open", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
-  PUBLIC("public", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
-  PRIVATE("private", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
-  FILEPRIVATE("fileprivate", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
-  INTERNAL("internal", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
+    OPEN("open", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
+    PUBLIC("public", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
+    PRIVATE("private", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
+    FILEPRIVATE("fileprivate", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
+    INTERNAL("internal", Target.CLASS, Target.FUNCTION, Target.PROPERTY),
 
-  CLASS("class", Target.FUNCTION, Target.PROPERTY),
-  STATIC("static", Target.FUNCTION, Target.PROPERTY),
+    CLASS("class", Target.FUNCTION, Target.PROPERTY),
+    STATIC("static", Target.FUNCTION, Target.PROPERTY),
 
-  MUTATING("mutating", Target.FUNCTION, Target.PROPERTY),
-  NONMUTATING("nonmutating", Target.FUNCTION, Target.PROPERTY),
+    MUTATING("mutating", Target.FUNCTION, Target.PROPERTY),
+    NONMUTATING("nonmutating", Target.FUNCTION, Target.PROPERTY),
 
-  FINAL("final", Target.CLASS, Target.FUNCTION),
-  OVERRIDE("override", Target.FUNCTION, Target.PROPERTY),
+    FINAL("final", Target.CLASS, Target.FUNCTION),
+    OVERRIDE("override", Target.FUNCTION, Target.PROPERTY),
 
-  REQUIRED("required", Target.FUNCTION),
+    REQUIRED("required", Target.FUNCTION),
 
-  INOUT("inout", Target.PARAMETER),
+    INOUT("inout", Target.PARAMETER),
 
-  WEAK("weak", Target.PROPERTY),
-  UNOWNED("unowned", Target.PROPERTY),
+    WEAK("weak", Target.PROPERTY),
+    UNOWNED("unowned", Target.PROPERTY),
 
-  CONVENIENCE("convenience", Target.PROPERTY),
+    CONVENIENCE("convenience", Target.PROPERTY),
 
-  ;
+    ;
 
-  internal enum class Target {
-    CLASS,
-    PARAMETER,
-    FUNCTION,
-    PROPERTY,
-  }
+    internal enum class Target {
+        CLASS,
+        PARAMETER,
+        FUNCTION,
+        PROPERTY,
+    }
 
-  internal fun checkTarget(target: Target) {
-    require(targets.contains(target)) { "unexpected modifier $this for $target" }
-  }
+    internal fun checkTarget(target: Target) {
+        require(targets.contains(target)) { "unexpected modifier $this for $target" }
+    }
 }

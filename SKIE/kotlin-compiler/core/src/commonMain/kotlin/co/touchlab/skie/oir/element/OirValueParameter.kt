@@ -3,13 +3,7 @@ package co.touchlab.skie.oir.element
 import co.touchlab.skie.oir.type.OirType
 import co.touchlab.skie.sir.element.SirValueParameter
 
-class OirValueParameter(
-    val label: String,
-    val name: String,
-    var type: OirType,
-    val parent: OirFunction,
-    val index: Int,
-) : OirElement {
+class OirValueParameter(val label: String, val name: String, var type: OirType, val parent: OirFunction, val index: Int) : OirElement {
 
     // lateinit
     var originalSirValueParameter: SirValueParameter? = null

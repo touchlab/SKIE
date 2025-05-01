@@ -7,12 +7,7 @@ import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.KotlinType
 
-fun createValueParameter(
-    owner: FunctionDescriptor,
-    name: Name,
-    index: Int,
-    type: KotlinType,
-): ValueParameterDescriptor =
+fun createValueParameter(owner: FunctionDescriptor, name: Name, index: Int, type: KotlinType): ValueParameterDescriptor =
     ValueParameterDescriptorImpl(
         containingDeclaration = owner,
         original = null,

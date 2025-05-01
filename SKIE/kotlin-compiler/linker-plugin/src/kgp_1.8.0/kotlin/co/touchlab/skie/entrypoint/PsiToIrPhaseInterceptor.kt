@@ -6,8 +6,8 @@ import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.compilerinject.interceptor.SameTypePhaseInterceptor
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.ContextReflector
-import org.jetbrains.kotlin.backend.konan.psiToIrPhase
 import org.jetbrains.kotlin.backend.konan.Context as KonanContext
+import org.jetbrains.kotlin.backend.konan.psiToIrPhase
 
 internal class PsiToIrPhaseInterceptor : SameTypePhaseInterceptor<KonanContext, Unit> {
 

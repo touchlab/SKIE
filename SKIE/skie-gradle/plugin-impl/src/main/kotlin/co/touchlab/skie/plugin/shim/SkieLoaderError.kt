@@ -13,7 +13,7 @@ fun Project.reportSkieLoaderError(error: String) {
                     |Error: ${error.replace("\n", "\n|")}
                     |SKIE cannot not be used until this error is resolved.
                     |To proceed with the compilation, please remove or explicitly disable SKIE by adding 'skie { isEnabled = false }' to your Gradle configuration.
-                """.trimMargin()
+            """.trimMargin()
 
             error(errorMessage)
         }

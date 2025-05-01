@@ -15,25 +15,23 @@ import co.touchlab.skie.sir.element.toTypeParameterUsage
 object SkieSwiftFlowIteratorGenerator {
 
     context(SirPhase.Context)
-    fun generate(): SirClass {
-        return namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowIterator").run {
-            SirClass(
-                baseName = "SkieSwiftFlowIterator",
-                superTypes = listOf(
-                    sirBuiltins._Concurrency.AsyncIteratorProtocol.defaultType,
-                ),
-            ).apply {
-                val tParameter = SirTypeParameter("T")
-                val elementAlias = SirTypeAlias("Element") {
-                    tParameter.toTypeParameterUsage()
-                }
-
-                addIteratorProperty()
-                addInternalConstructor()
-                addNextFunction(elementAlias)
-                addCancelTaskFunction()
-                addDeinit()
+    fun generate(): SirClass = namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowIterator").run {
+        SirClass(
+            baseName = "SkieSwiftFlowIterator",
+            superTypes = listOf(
+                sirBuiltins._Concurrency.AsyncIteratorProtocol.defaultType,
+            ),
+        ).apply {
+            val tParameter = SirTypeParameter("T")
+            val elementAlias = SirTypeAlias("Element") {
+                tParameter.toTypeParameterUsage()
             }
+
+            addIteratorProperty()
+            addInternalConstructor()
+            addNextFunction(elementAlias)
+            addCancelTaskFunction()
+            addDeinit()
         }
     }
 

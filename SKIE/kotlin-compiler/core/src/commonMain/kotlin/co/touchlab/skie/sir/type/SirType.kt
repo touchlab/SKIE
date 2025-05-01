@@ -19,11 +19,9 @@ sealed class SirType {
      */
     abstract fun inlineTypeAliases(): SirType
 
-    fun normalizedEvaluatedType(): EvaluatedSirType =
-        inlineTypeAliases().evaluate()
+    fun normalizedEvaluatedType(): EvaluatedSirType = inlineTypeAliases().evaluate()
 
-    fun normalize(): SirType =
-        normalizedEvaluatedType().type
+    fun normalize(): SirType = normalizedEvaluatedType().type
 
     open fun asHashableType(): SirType? = null
 
@@ -33,22 +31,18 @@ sealed class SirType {
 
     abstract fun substituteTypeArguments(substitutions: Map<SirTypeParameter, SirType>): SirType
 
-    override fun toString(): String =
-        evaluate().swiftPoetTypeName.toString()
+    override fun toString(): String = evaluate().swiftPoetTypeName.toString()
 }
 
-fun SirType.toNullable(condition: Boolean = true): SirType =
-    if (condition) {
-        NullableSirType(this)
-    } else {
-        this
-    }
+fun SirType.toNullable(condition: Boolean = true): SirType = if (condition) {
+    NullableSirType(this)
+} else {
+    this
+}
 
-fun SirType.toExistential(): SirType =
-    ExistentialSirType(this)
+fun SirType.toExistential(): SirType = ExistentialSirType(this)
 
-fun SirType.toOpaque(): SirType =
-    OpaqueSirType(this)
+fun SirType.toOpaque(): SirType = OpaqueSirType(this)
 
 val SirType.visibilityConstraint: SirVisibility
     get() = this.normalizedEvaluatedType().visibilityConstraint

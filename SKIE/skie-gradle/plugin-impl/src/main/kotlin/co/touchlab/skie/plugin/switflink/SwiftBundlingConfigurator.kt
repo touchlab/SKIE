@@ -10,10 +10,10 @@ import co.touchlab.skie.plugin.util.registerSkieTask
 import co.touchlab.skie.plugin.util.writeToZip
 import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
 import co.touchlab.skie.util.file.isKlib
+import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Provider
-import java.io.File
 
 object SwiftBundlingConfigurator {
 

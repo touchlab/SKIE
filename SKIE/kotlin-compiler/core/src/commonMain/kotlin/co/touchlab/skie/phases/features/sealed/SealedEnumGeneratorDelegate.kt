@@ -21,27 +21,24 @@ import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.sir.element.copyTypeParametersFrom
 
 @MustBeExecutedAfterBridgingConfiguration
-class SealedEnumGeneratorDelegate(
-    override val context: SirPhase.Context,
-) : SealedGeneratorExtensionContainer {
+class SealedEnumGeneratorDelegate(override val context: SirPhase.Context) : SealedGeneratorExtensionContainer {
 
     context(SirPhase.Context)
-    fun generate(kirClass: KirClass): SirClass =
-        SirClass(
-            baseName = "Sealed",
-            kind = SirClass.Kind.Enum,
-            parent = namespaceProvider.getNamespaceExtension(kirClass),
-            isReplaced = true,
-            isHidden = true,
-        ).apply {
-            addConformanceToHashableIfPossible(kirClass)
+    fun generate(kirClass: KirClass): SirClass = SirClass(
+        baseName = "Sealed",
+        kind = SirClass.Kind.Enum,
+        parent = namespaceProvider.getNamespaceExtension(kirClass),
+        isReplaced = true,
+        isHidden = true,
+    ).apply {
+        addConformanceToHashableIfPossible(kirClass)
 
-            copyTypeParametersFrom(kirClass.originalSirClass)
+        copyTypeParametersFrom(kirClass.originalSirClass)
 
-            addSealedEnumCases(kirClass)
+        addSealedEnumCases(kirClass)
 
-            attributes.add("frozen")
-        }
+        attributes.add("frozen")
+    }
 
     context(SirPhase.Context)
     private fun SirClass.addConformanceToHashableIfPossible(kirClass: KirClass) {
@@ -65,10 +62,7 @@ class SealedEnumGeneratorDelegate(
         }
     }
 
-    private fun SirClass.addSealedEnumCase(
-        sealedSubclass: KirClass,
-        preferredNamesCollide: Boolean,
-    ) {
+    private fun SirClass.addSealedEnumCase(sealedSubclass: KirClass, preferredNamesCollide: Boolean) {
         val enum = this
 
         SirEnumCase(

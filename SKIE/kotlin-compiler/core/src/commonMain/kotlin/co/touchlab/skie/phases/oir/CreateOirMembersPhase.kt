@@ -23,9 +23,7 @@ import co.touchlab.skie.oir.element.OirSimpleFunction
 import co.touchlab.skie.oir.element.OirValueParameter
 import co.touchlab.skie.phases.SirPhase
 
-class CreateOirMembersPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+class CreateOirMembersPhase(context: SirPhase.Context) : SirPhase {
 
     private val kirProvider = context.kirProvider
     private val oirTypeTranslator = context.oirTypeTranslator
@@ -94,19 +92,20 @@ class CreateOirMembersPhase(
     }
 
     private fun getOirCallableDeclarationParent(kirCallableDeclaration: KirCallableDeclaration<*>): OirCallableDeclarationParent =
-        if (kirCallableDeclaration.origin == KirCallableDeclaration.Origin.Extension && kirCallableDeclaration.owner.kind != KirClass.Kind.File) {
+        if (kirCallableDeclaration.origin == KirCallableDeclaration.Origin.Extension &&
+            kirCallableDeclaration.owner.kind != KirClass.Kind.File
+        ) {
             getOrCreateExtension(kirCallableDeclaration.owner.oirClass)
         } else {
             kirCallableDeclaration.owner.oirClass
         }
 
-    private fun getOrCreateExtension(oirClass: OirClass): OirExtension =
-        extensionCache.getOrPut(oirClass) {
-            OirExtension(
-                classDeclaration = oirClass,
-                parent = oirClass.parent,
-            )
-        }
+    private fun getOrCreateExtension(oirClass: OirClass): OirExtension = extensionCache.getOrPut(oirClass) {
+        OirExtension(
+            classDeclaration = oirClass,
+            parent = oirClass.parent,
+        )
+    }
 
     private fun createValueParameters(function: KirFunction<*>, oirFunction: OirFunction) {
         val valueParameters = function.valueParameters

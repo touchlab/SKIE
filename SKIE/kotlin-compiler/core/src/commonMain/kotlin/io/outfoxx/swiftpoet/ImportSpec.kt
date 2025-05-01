@@ -18,76 +18,73 @@ package io.outfoxx.swiftpoet
 
 import io.outfoxx.swiftpoet.builder.BuilderWithDocs
 
-class ImportSpec internal constructor(
-  builder: Builder,
-) : AttributedSpec(builder.attributes.toImmutableList(), builder.tags), Comparable<ImportSpec> {
+class ImportSpec internal constructor(builder: Builder) :
+    AttributedSpec(builder.attributes.toImmutableList(), builder.tags),
+    Comparable<ImportSpec> {
 
-  val name = builder.name
-  val doc = builder.doc.build()
-  val guardTest = builder.guardTest.build()
+    val name = builder.name
+    val doc = builder.doc.build()
+    val guardTest = builder.guardTest.build()
 
-  private val importString = buildString {
-    append(name)
-  }
-
-  internal fun emit(out: CodeWriter): CodeWriter {
-
-    out.emitDoc(doc)
-
-    if (guardTest.isNotEmpty()) {
-      out.emit("#if ")
-      out.emitCode(guardTest)
-      out.emit("\n")
+    private val importString = buildString {
+        append(name)
     }
 
-    out.emitAttributes(attributes, suffix = " ")
-    out.emit("import $name")
+    internal fun emit(out: CodeWriter): CodeWriter {
+        out.emitDoc(doc)
 
-    if (guardTest.isNotEmpty()) {
-      out.emit("\n")
-      out.emit("#endif")
+        if (guardTest.isNotEmpty()) {
+            out.emit("#if ")
+            out.emitCode(guardTest)
+            out.emit("\n")
+        }
+
+        out.emitAttributes(attributes, suffix = " ")
+        out.emit("import $name")
+
+        if (guardTest.isNotEmpty()) {
+            out.emit("\n")
+            out.emit("#endif")
+        }
+
+        out.emit("\n")
+
+        return out
     }
 
-    out.emit("\n")
+    override fun toString() = importString
 
-    return out
-  }
+    override fun compareTo(other: ImportSpec) = importString.compareTo(other.importString)
 
-  override fun toString() = importString
+    class Builder internal constructor(internal val name: String) :
+        AttributedSpec.Builder<Builder>(),
+        BuilderWithDocs<Builder> {
 
-  override fun compareTo(other: ImportSpec) = importString.compareTo(other.importString)
+        internal val doc = CodeBlock.builder()
+        internal val guardTest = CodeBlock.builder()
 
-  class Builder internal constructor(
-    internal val name: String,
-  ) : AttributedSpec.Builder<Builder>(), BuilderWithDocs<Builder> {
+        override fun addDoc(format: String, vararg args: Any) = apply {
+            doc.add(format, *args)
+        }
 
-    internal val doc = CodeBlock.builder()
-    internal val guardTest = CodeBlock.builder()
+        override fun addDoc(block: CodeBlock) = apply {
+            doc.add(block)
+        }
 
-    override fun addDoc(format: String, vararg args: Any) = apply {
-      doc.add(format, *args)
+        fun addGuard(test: CodeBlock) = apply {
+            guardTest.add(test)
+        }
+
+        fun addGuard(format: String, vararg args: Any) = apply {
+            addGuard(CodeBlock.of(format, args))
+        }
+
+        fun build(): ImportSpec = ImportSpec(this)
     }
 
-    override fun addDoc(block: CodeBlock) = apply {
-      doc.add(block)
+    companion object {
+
+        @JvmStatic
+        fun builder(name: String) = Builder(name)
     }
-
-    fun addGuard(test: CodeBlock) = apply {
-      guardTest.add(test)
-    }
-
-    fun addGuard(format: String, vararg args: Any) = apply {
-      addGuard(CodeBlock.of(format, args))
-    }
-
-    fun build(): ImportSpec {
-      return ImportSpec(this)
-    }
-  }
-
-  companion object {
-
-    @JvmStatic
-    fun builder(name: String) = Builder(name)
-  }
 }

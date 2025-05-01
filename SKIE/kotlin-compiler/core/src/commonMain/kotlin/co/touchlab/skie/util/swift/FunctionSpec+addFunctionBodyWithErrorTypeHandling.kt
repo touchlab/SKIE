@@ -34,12 +34,11 @@ fun <T> T.addFunctionDeclarationBodyWithErrorTypeHandling(
     }
 }
 
-fun SirCallableDeclaration.findFirstSkieErrorType(): SkieErrorSirType? =
-    when (this) {
-        is SirConstructor -> findFirstSkieErrorType()
-        is SirSimpleFunction -> findFirstSkieErrorType()
-        is SirProperty -> findFirstSkieErrorType()
-    }
+fun SirCallableDeclaration.findFirstSkieErrorType(): SkieErrorSirType? = when (this) {
+    is SirConstructor -> findFirstSkieErrorType()
+    is SirSimpleFunction -> findFirstSkieErrorType()
+    is SirProperty -> findFirstSkieErrorType()
+}
 
 private fun SirConstructor.findFirstSkieErrorType(): SkieErrorSirType? =
     valueParameters.firstNotNullOfOrNull { it.type.normalize().findFirstSkieErrorType() }
@@ -47,24 +46,24 @@ private fun SirConstructor.findFirstSkieErrorType(): SkieErrorSirType? =
 private fun SirSimpleFunction.findFirstSkieErrorType(): SkieErrorSirType? =
     returnType.normalize().findFirstSkieErrorType() ?: valueParameters.firstNotNullOfOrNull { it.type.normalize().findFirstSkieErrorType() }
 
-private fun SirProperty.findFirstSkieErrorType(): SkieErrorSirType? =
-    type.normalize().findFirstSkieErrorType()
+private fun SirProperty.findFirstSkieErrorType(): SkieErrorSirType? = type.normalize().findFirstSkieErrorType()
 
-private fun SirType.findFirstSkieErrorType(): SkieErrorSirType? =
-    when (this) {
-        is SirDeclaredSirType -> typeArguments.firstNotNullOfOrNull { it.findFirstSkieErrorType() }
-        is LambdaSirType -> returnType.findFirstSkieErrorType() ?: valueParameterTypes.firstNotNullOfOrNull { it.findFirstSkieErrorType() }
-        is NullableSirType -> type.findFirstSkieErrorType()
-        is OpaqueSirType -> type.findFirstSkieErrorType()
-        is ExistentialSirType -> type.findFirstSkieErrorType()
-        is TupleSirType -> elements.firstNotNullOfOrNull { it.type.findFirstSkieErrorType() }
-        is TypeParameterUsageSirType -> null
-        is SpecialSirType -> null
-        is OirDeclaredSirType -> error("Evaluated types cannot contain OirDeclaredSirType. Was: $this")
-        is SkieErrorSirType -> this
-    }
+private fun SirType.findFirstSkieErrorType(): SkieErrorSirType? = when (this) {
+    is SirDeclaredSirType -> typeArguments.firstNotNullOfOrNull { it.findFirstSkieErrorType() }
+    is LambdaSirType -> returnType.findFirstSkieErrorType() ?: valueParameterTypes.firstNotNullOfOrNull { it.findFirstSkieErrorType() }
+    is NullableSirType -> type.findFirstSkieErrorType()
+    is OpaqueSirType -> type.findFirstSkieErrorType()
+    is ExistentialSirType -> type.findFirstSkieErrorType()
+    is TupleSirType -> elements.firstNotNullOfOrNull { it.type.findFirstSkieErrorType() }
+    is TypeParameterUsageSirType -> null
+    is SpecialSirType -> null
+    is OirDeclaredSirType -> error("Evaluated types cannot contain OirDeclaredSirType. Was: $this")
+    is SkieErrorSirType -> this
+}
 
-private fun <T> T.addSkieErrorTypeFunctionBody(errorType: SkieErrorSirType)
+private fun <T> T.addSkieErrorTypeFunctionBody(
+    errorType: SkieErrorSirType,
+)
     where T : SirElementWithFunctionBodyBuilder, T : SirElementWithAttributes {
     attributes.add("available(*, unavailable, message: \"${errorType.errorMessage}\")")
 

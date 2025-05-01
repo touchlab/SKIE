@@ -3,9 +3,7 @@ package co.touchlab.skie.phases.swift
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.phases.SirPhase
 
-class CopySwiftOutputFilesToFrameworkPhase(
-    context: SirPhase.Context,
-) : SirPhase {
+class CopySwiftOutputFilesToFrameworkPhase(context: SirPhase.Context) : SirPhase {
 
     private val framework = context.framework
     private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.frameworkName)

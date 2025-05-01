@@ -6,7 +6,10 @@ import co.touchlab.skie.kir.type.DeclaredKirType
 import co.touchlab.skie.kir.type.UnresolvedFlowKirType
 
 enum class FlowMappingStrategy {
-    Full, TypeArgumentsOnly, None;
+    Full,
+    TypeArgumentsOnly,
+    None,
+    ;
 
     private val incompatibleTypeFqNames = listOf(
         "kotlinx.coroutines.flow.Flow",
@@ -14,11 +17,10 @@ enum class FlowMappingStrategy {
         "platform.Foundation.NSDictionary",
     )
 
-    fun limitFlowMappingToTypeArguments(): FlowMappingStrategy =
-        when (this) {
-            Full, TypeArgumentsOnly -> TypeArgumentsOnly
-            None -> None
-        }
+    fun limitFlowMappingToTypeArguments(): FlowMappingStrategy = when (this) {
+        Full, TypeArgumentsOnly -> TypeArgumentsOnly
+        None -> None
+    }
 
     inline fun <T> KirClass.withFlowMappingForTypeArguments(action: FlowMappingStrategy.() -> T): T =
         flowMappingForTypeArgumentsOf(this).action()
@@ -35,9 +37,8 @@ enum class FlowMappingStrategy {
             is UnresolvedFlowKirType -> true
         }
 
-    private fun forTypeArgumentsOfCompatibleType(): FlowMappingStrategy =
-        when (this) {
-            Full, TypeArgumentsOnly -> Full
-            None -> None
-        }
+    private fun forTypeArgumentsOfCompatibleType(): FlowMappingStrategy = when (this) {
+        Full, TypeArgumentsOnly -> Full
+        None -> None
+    }
 }

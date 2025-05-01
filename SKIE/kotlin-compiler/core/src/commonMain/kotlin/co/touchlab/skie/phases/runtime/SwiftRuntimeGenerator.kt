@@ -33,12 +33,11 @@ object SwiftRuntimeGenerator : SirPhase {
         }
     }
 
-    private fun getSwiftRuntimeFiles(): List<Resource> =
-        Resource("co/touchlab/skie/runtime/index.txt")
-            .readText()
-            .lines()
-            .filter { it.isNotBlank() }
-            .map { Resource(it) }
+    private fun getSwiftRuntimeFiles(): List<Resource> = Resource("co/touchlab/skie/runtime/index.txt")
+        .readText()
+        .lines()
+        .filter { it.isNotBlank() }
+        .map { Resource(it) }
 
     private val Resource.swiftFileName: String
         get() = this.name.substringAfterLast("/").removeSuffix(".swift")
@@ -48,7 +47,6 @@ object SwiftRuntimeGenerator : SirPhase {
         private val resourceUri = this::class.java.classLoader.getResource(name)
             ?: throw IllegalArgumentException("Resource $name not found.")
 
-        fun readText(): String =
-            resourceUri.readText()
+        fun readText(): String = resourceUri.readText()
     }
 }

@@ -21,6 +21,6 @@ package io.outfoxx.swiftpoet
  */
 class ExternalTypeSpec(name: String) : AnyTypeSpec(name, emptyList(), emptyMap()) {
 
-  override fun emit(codeWriter: CodeWriter) {
-  }
+    override fun emit(codeWriter: CodeWriter) {
+    }
 }

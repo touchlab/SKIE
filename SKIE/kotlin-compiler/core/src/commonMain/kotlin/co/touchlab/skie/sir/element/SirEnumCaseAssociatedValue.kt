@@ -3,10 +3,7 @@ package co.touchlab.skie.sir.element
 import co.touchlab.skie.sir.element.util.sirEnumCaseAssociatedValueParent
 import co.touchlab.skie.sir.type.SirType
 
-class SirEnumCaseAssociatedValue(
-    var type: SirType,
-    parent: SirEnumCase,
-) : SirElement {
+class SirEnumCaseAssociatedValue(var type: SirType, parent: SirEnumCase) : SirElement {
 
     var parent: SirEnumCase by sirEnumCaseAssociatedValueParent(parent)
 
@@ -15,12 +12,9 @@ class SirEnumCaseAssociatedValue(
     companion object {
 
         context(SirEnumCase)
-        operator fun invoke(
-            type: SirType,
-        ): SirEnumCaseAssociatedValue =
-            SirEnumCaseAssociatedValue(
-                type = type,
-                parent = this@SirEnumCase,
-            )
+        operator fun invoke(type: SirType): SirEnumCaseAssociatedValue = SirEnumCaseAssociatedValue(
+            type = type,
+            parent = this@SirEnumCase,
+        )
     }
 }

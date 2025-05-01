@@ -24,9 +24,7 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 
-internal abstract class BaseCreateKirMembersPhase(
-    context: KirPhase.Context,
-) : KirPhase {
+internal abstract class BaseCreateKirMembersPhase(context: KirPhase.Context) : KirPhase {
 
     protected val descriptorProvider = context.descriptorProvider
     protected val mapper = context.mapper

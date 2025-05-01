@@ -2,13 +2,11 @@ package co.touchlab.skie.oir.type
 
 sealed class OirType {
 
-    fun render(): String =
-        render("", true)
+    fun render(): String = render("", true)
 
     abstract fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String
 
-    protected fun String.withAttrsAndName(attrsAndName: String) =
-        "${this.trim()} ${attrsAndName.trim()}".trim()
+    protected fun String.withAttrsAndName(attrsAndName: String) = "${this.trim()} ${attrsAndName.trim()}".trim()
 
     protected fun String.plusNonnullAttributeIfNeeded(needsNonnullAttribute: Boolean) =
         if (needsNonnullAttribute) objcNonnullAttribute.withAttrsAndName(this) else this
@@ -20,8 +18,7 @@ sealed class OirType {
         }
     }
 
-    override fun toString(): String =
-        render()
+    override fun toString(): String = render()
 
     companion object {
 
@@ -30,5 +27,3 @@ sealed class OirType {
         const val objcNullableResultAttribute = "_Nullable_result"
     }
 }
-
-

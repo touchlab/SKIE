@@ -9,7 +9,5 @@ interface KirCustomTypeMapper {
     val mappedClassId: ClassId
 
     context(KirTypeParameterScope)
-    fun mapType(
-        mappedSuperType: KotlinType,
-    ): NonNullReferenceKirType
+    fun mapType(mappedSuperType: KotlinType): NonNullReferenceKirType
 }

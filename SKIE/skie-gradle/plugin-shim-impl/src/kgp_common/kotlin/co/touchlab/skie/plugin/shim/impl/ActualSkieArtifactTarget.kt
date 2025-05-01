@@ -82,14 +82,14 @@ class ActualSkieArtifactTarget(
     }
 
     override val linkerConfiguration: Configuration = project.configurations.getByName(
-        lowerCamelCaseName(konanTarget.presetName, fullArtifactName, "linkLibrary")
+        lowerCamelCaseName(konanTarget.presetName, fullArtifactName, "linkLibrary"),
     )
 
     override fun addPluginArgument(pluginId: String, option: KotlinCompilerPluginOption) {
         task.configure {
             toolOptions.freeCompilerArgs.addAll(
                 "-P",
-                "plugin:${pluginId}:${option.key}=${option.value}",
+                "plugin:$pluginId:${option.key}=${option.value}",
             )
         }
     }
@@ -114,14 +114,13 @@ class ActualSkieArtifactTarget(
 
     companion object {
 
-        fun createFromArtifact(artifact: KotlinNativeArtifact, project: Project): List<SkieTarget> =
-            when (artifact) {
-                is KotlinNativeLibrary -> createFromArtifact(artifact, project)
-                is KotlinNativeFramework -> createFromArtifact(artifact, project)
-                is KotlinNativeFatFramework -> createFromArtifact(artifact, project)
-                is KotlinNativeXCFramework -> createFromArtifact(artifact, project)
-                else -> error("Unknown KotlinNativeArtifact type: $this")
-            }
+        fun createFromArtifact(artifact: KotlinNativeArtifact, project: Project): List<SkieTarget> = when (artifact) {
+            is KotlinNativeLibrary -> createFromArtifact(artifact, project)
+            is KotlinNativeFramework -> createFromArtifact(artifact, project)
+            is KotlinNativeFatFramework -> createFromArtifact(artifact, project)
+            is KotlinNativeXCFramework -> createFromArtifact(artifact, project)
+            else -> error("Unknown KotlinNativeArtifact type: $this")
+        }
 
         private fun createFromArtifact(artifact: KotlinNativeLibrary, project: Project): List<ActualSkieArtifactTarget> =
             if (artifact.target.family.isAppleFamily) {

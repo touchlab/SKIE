@@ -7,9 +7,7 @@ import io.outfoxx.swiftpoet.ProtocolTypeName
 import io.outfoxx.swiftpoet.SelfTypeName
 import io.outfoxx.swiftpoet.TypeName
 
-sealed class SpecialSirType(
-    private val typeName: TypeName,
-) : NonNullSirType() {
+sealed class SpecialSirType(private val typeName: TypeName) : NonNullSirType() {
 
     override val isHashable: Boolean = false
 
@@ -27,8 +25,7 @@ sealed class SpecialSirType(
 
     override fun evaluate(): EvaluatedSirType = evaluatedSirType
 
-    override fun inlineTypeAliases(): SirType =
-        this
+    override fun inlineTypeAliases(): SirType = this
 
     override fun substituteTypeParameters(substitutions: Map<SirTypeParameter, SirTypeParameter>): SirType = this
 

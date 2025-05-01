@@ -6,9 +6,7 @@ import org.jetbrains.kotlin.descriptors.resolveClassByFqName
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
 
-class ExtraDescriptorBuiltins(
-    private val exposedModules: Set<ModuleDescriptor>,
-) {
+class ExtraDescriptorBuiltins(private val exposedModules: Set<ModuleDescriptor>) {
 
     private val Foundation = getModule("<org.jetbrains.kotlin.native.platform.Foundation>")
 

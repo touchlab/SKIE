@@ -14,7 +14,6 @@ import co.touchlab.skie.oir.type.PointerOirType
 import co.touchlab.skie.oir.type.PrimitiveOirType
 import co.touchlab.skie.oir.type.SpecialReferenceOirType
 import co.touchlab.skie.oir.type.VoidOirType
-import org.jetbrains.kotlin.backend.konan.binaryRepresentationIsNullable
 import org.jetbrains.kotlin.backend.konan.objcexport.BlockPointerBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
@@ -29,10 +28,8 @@ import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
-class KirDeclarationTypeTranslator(
-    private val kirTypeTranslator: KirTypeTranslator,
-    kirBuiltins: KirBuiltins,
-) : KirTypeTranslatorUtilityScope() {
+class KirDeclarationTypeTranslator(private val kirTypeTranslator: KirTypeTranslator, kirBuiltins: KirBuiltins) :
+    KirTypeTranslatorUtilityScope() {
 
     private val nullableNSErrorType = kirBuiltins.NSError.defaultType.withNullabilityOf(true)
 
@@ -41,47 +38,41 @@ class KirDeclarationTypeTranslator(
         functionDescriptor: FunctionDescriptor,
         valueParameterDescriptor: ParameterDescriptor?,
         bridge: MethodBridgeValueParameter,
-    ): KirType =
-        when (bridge) {
-            is MethodBridgeValueParameter.Mapped -> mapType(valueParameterDescriptor!!.type, bridge.bridge)
-            MethodBridgeValueParameter.ErrorOutParameter -> {
-                PointerKirType(nullableNSErrorType, nullable = true)
-            }
-            is MethodBridgeValueParameter.SuspendCompletion -> {
-                mapSuspendCompletionType(functionDescriptor.returnType!!, useUnitCompletion = bridge.useUnitCompletion)
-            }
+    ): KirType = when (bridge) {
+        is MethodBridgeValueParameter.Mapped -> mapType(valueParameterDescriptor!!.type, bridge.bridge)
+        MethodBridgeValueParameter.ErrorOutParameter -> {
+            PointerKirType(nullableNSErrorType, nullable = true)
         }
+        is MethodBridgeValueParameter.SuspendCompletion -> {
+            mapSuspendCompletionType(functionDescriptor.returnType!!, useUnitCompletion = bridge.useUnitCompletion)
+        }
+    }
 
     context(KirTypeParameterScope)
-    internal fun mapReturnType(
-        descriptor: FunctionDescriptor,
-        returnBridge: MethodBridge.ReturnValue,
-    ): KirType =
-        when (returnBridge) {
-            MethodBridge.ReturnValue.Suspend,
-            MethodBridge.ReturnValue.Void,
-            -> VoidOirType.toKirType()
-            MethodBridge.ReturnValue.HashCode -> PrimitiveOirType.NSUInteger.toKirType()
-            is MethodBridge.ReturnValue.Mapped -> mapType(descriptor.returnType!!, returnBridge.bridge)
-            MethodBridge.ReturnValue.WithError.Success -> PrimitiveOirType.BOOL.toKirType()
-            is MethodBridge.ReturnValue.WithError.ZeroForError -> {
-                val successReturnType = mapReturnType(descriptor, returnBridge.successBridge)
+    internal fun mapReturnType(descriptor: FunctionDescriptor, returnBridge: MethodBridge.ReturnValue): KirType = when (returnBridge) {
+        MethodBridge.ReturnValue.Suspend,
+        MethodBridge.ReturnValue.Void,
+        -> VoidOirType.toKirType()
+        MethodBridge.ReturnValue.HashCode -> PrimitiveOirType.NSUInteger.toKirType()
+        is MethodBridge.ReturnValue.Mapped -> mapType(descriptor.returnType!!, returnBridge.bridge)
+        MethodBridge.ReturnValue.WithError.Success -> PrimitiveOirType.BOOL.toKirType()
+        is MethodBridge.ReturnValue.WithError.ZeroForError -> {
+            val successReturnType = mapReturnType(descriptor, returnBridge.successBridge)
 
-                successReturnType.makeNullableIfReferenceOrPointer()
-            }
-
-            MethodBridge.ReturnValue.Instance.InitResult,
-            MethodBridge.ReturnValue.Instance.FactoryResult,
-            -> SpecialReferenceOirType.InstanceType.toKirType()
+            successReturnType.makeNullableIfReferenceOrPointer()
         }
+
+        MethodBridge.ReturnValue.Instance.InitResult,
+        MethodBridge.ReturnValue.Instance.FactoryResult,
+        -> SpecialReferenceOirType.InstanceType.toKirType()
+    }
 
     context(KirTypeParameterScope)
-    private fun mapType(kotlinType: KotlinType, typeBridge: TypeBridge): KirType =
-        when (typeBridge) {
-            ReferenceBridge -> kirTypeTranslator.mapReferenceType(kotlinType)
-            is BlockPointerBridge -> mapFunctionType(kotlinType, typeBridge)
-            is ValueTypeBridge -> mapValueType(kotlinType, typeBridge)
-        }
+    private fun mapType(kotlinType: KotlinType, typeBridge: TypeBridge): KirType = when (typeBridge) {
+        ReferenceBridge -> kirTypeTranslator.mapReferenceType(kotlinType)
+        is BlockPointerBridge -> mapFunctionType(kotlinType, typeBridge)
+        is ValueTypeBridge -> mapValueType(kotlinType, typeBridge)
+    }
 
     context(KirTypeParameterScope)
     private fun mapSuspendCompletionType(kotlinType: KotlinType, useUnitCompletion: Boolean): BlockPointerKirType {
@@ -104,10 +95,7 @@ class KirDeclarationTypeTranslator(
     }
 
     context(KirTypeParameterScope)
-    private fun mapFunctionType(
-        kotlinType: KotlinType,
-        typeBridge: BlockPointerBridge,
-    ): KirType {
+    private fun mapFunctionType(kotlinType: KotlinType, typeBridge: BlockPointerBridge): KirType {
         val expectedDescriptor = kotlinType.builtIns.getFunction(typeBridge.numberOfParameters)
 
         // Somewhat similar to mapType:
@@ -121,26 +109,22 @@ class KirDeclarationTypeTranslator(
         return kirTypeTranslator.mapFunctionType(functionType, typeBridge.returnsVoid)
     }
 
-    private fun mapValueType(
-        kotlinType: KotlinType,
-        typeBridge: ValueTypeBridge,
-    ): KirType = typeBridge.objCValueType.mapToOir(kotlinType).toKirType()
+    private fun mapValueType(kotlinType: KotlinType, typeBridge: ValueTypeBridge): KirType =
+        typeBridge.objCValueType.mapToOir(kotlinType).toKirType()
 
-    private fun KirType.makeNullableIfReferenceOrPointer(): KirType =
-        when (this) {
-            is NullableReferenceKirType -> this
-            is NonNullReferenceKirType -> NullableReferenceKirType(this)
-            is PointerKirType -> this.copy(nullable = true)
-            is OirBasedKirType -> this.makeNullableIfReferenceOrPointer()
-        }
+    private fun KirType.makeNullableIfReferenceOrPointer(): KirType = when (this) {
+        is NullableReferenceKirType -> this
+        is NonNullReferenceKirType -> NullableReferenceKirType(this)
+        is PointerKirType -> this.copy(nullable = true)
+        is OirBasedKirType -> this.makeNullableIfReferenceOrPointer()
+    }
 
-    private fun OirBasedKirType.makeNullableIfReferenceOrPointer(): KirType =
-        when (val oirType = this.oirType) {
-            is PointerOirType -> oirType.copy(nullable = true).toKirType()
-            is PrimitiveOirType -> this
-            VoidOirType -> this
-            else -> error("Unsupported OirBasedKirType type: $this")
-        }
+    private fun OirBasedKirType.makeNullableIfReferenceOrPointer(): KirType = when (val oirType = this.oirType) {
+        is PointerOirType -> oirType.copy(nullable = true).toKirType()
+        is PrimitiveOirType -> this
+        VoidOirType -> this
+        else -> error("Unsupported OirBasedKirType type: $this")
+    }
 }
 
 internal expect fun ObjCValueType.mapToOir(kotlinType: KotlinType): OirType

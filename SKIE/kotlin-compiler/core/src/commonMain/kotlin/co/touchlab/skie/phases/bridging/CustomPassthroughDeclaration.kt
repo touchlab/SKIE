@@ -18,10 +18,7 @@ sealed interface CustomPassthroughDeclaration {
         sealed interface Setter {
             object MutableProperty : Setter
 
-            data class SimpleFunction(
-                val identifier: String,
-                val parameterLabel: String? = null,
-            ) : Setter
+            data class SimpleFunction(val identifier: String, val parameterLabel: String? = null) : Setter
         }
     }
 

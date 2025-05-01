@@ -14,12 +14,11 @@ object HardwareAnalytics {
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Hardware
 
-        override fun produce(): String =
-            Command("system_profiler", "SPHardwareDataType", "-detailLevel", "mini", "-json")
-                .execute()
-                .outputLines
-                .joinToString(System.lineSeparator())
-                .let { formatData(it) }
+        override fun produce(): String = Command("system_profiler", "SPHardwareDataType", "-detailLevel", "mini", "-json")
+            .execute()
+            .outputLines
+            .joinToString(System.lineSeparator())
+            .let { formatData(it) }
 
         @Suppress("UNCHECKED_CAST")
         private fun formatData(json: String): String {

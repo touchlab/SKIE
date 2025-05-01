@@ -6,12 +6,9 @@ import java.io.File
 
 object ExternalApiNotesParser {
 
-    fun parse(file: File): ApiNotes =
-        Engine(file).parse()
+    fun parse(file: File): ApiNotes = Engine(file).parse()
 
-    private class Engine(
-        private val file: File,
-    ) {
+    private class Engine(private val file: File) {
 
         private val lines = file.readLines()
 

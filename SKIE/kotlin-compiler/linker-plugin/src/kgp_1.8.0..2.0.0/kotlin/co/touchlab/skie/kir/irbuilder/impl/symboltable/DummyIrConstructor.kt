@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 
-
 actual class DummyIrConstructor actual constructor(override val symbol: IrConstructorSymbol) : IrConstructor() {
 
     actual override var isPrimary: Boolean by unsupported()

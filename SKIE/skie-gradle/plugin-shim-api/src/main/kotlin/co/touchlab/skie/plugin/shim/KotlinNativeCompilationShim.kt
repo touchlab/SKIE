@@ -1,12 +1,12 @@
 package co.touchlab.skie.plugin.shim
 
 import co.touchlab.skie.util.directory.SkieCompilationDirectory
+import java.io.File
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Named
 import org.gradle.api.Task
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
-import java.io.File
 
 interface KotlinNativeCompilationShim : Named {
 

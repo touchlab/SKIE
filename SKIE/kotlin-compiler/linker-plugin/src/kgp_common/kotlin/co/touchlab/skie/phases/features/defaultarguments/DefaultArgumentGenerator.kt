@@ -9,9 +9,7 @@ import co.touchlab.skie.phases.util.StatefulKirPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
 import co.touchlab.skie.util.SharedCounter
 
-class DefaultArgumentGenerator(
-    private val context: FrontendIrPhase.Context,
-) : FrontendIrPhase {
+class DefaultArgumentGenerator(private val context: FrontendIrPhase.Context) : FrontendIrPhase {
 
     private val sharedCounter = SharedCounter()
 

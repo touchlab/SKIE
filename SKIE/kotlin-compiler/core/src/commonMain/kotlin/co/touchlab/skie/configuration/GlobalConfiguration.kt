@@ -1,9 +1,7 @@
 package co.touchlab.skie.configuration
 
-class GlobalConfiguration(
-    enabledFlags: Set<SkieConfigurationFlag>,
-    private val supportedKeys: Set<ConfigurationKey<*>>,
-) : SkieConfiguration(null) {
+class GlobalConfiguration(enabledFlags: Set<SkieConfigurationFlag>, private val supportedKeys: Set<ConfigurationKey<*>>) :
+    SkieConfiguration(null) {
 
     private val mutableEnabledFlags = enabledFlags.toMutableSet()
 
@@ -12,8 +10,7 @@ class GlobalConfiguration(
     override val globalConfiguration: GlobalConfiguration
         get() = this
 
-    fun isFlagEnabled(flag: SkieConfigurationFlag): Boolean =
-        flag in enabledFlags
+    fun isFlagEnabled(flag: SkieConfigurationFlag): Boolean = flag in enabledFlags
 
     fun disableFlag(flag: SkieConfigurationFlag) {
         mutableEnabledFlags.remove(flag)
@@ -29,7 +26,10 @@ class GlobalConfiguration(
     operator fun <KEY, VALUE> get(configurationKey: KEY): VALUE where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Global =
         getUnsafe(configurationKey)
 
-    operator fun <KEY, VALUE> set(configurationKey: KEY, value: VALUE) where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Global {
+    operator fun <KEY, VALUE> set(
+        configurationKey: KEY,
+        value: VALUE,
+    ) where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.Global {
         setUnsafe(configurationKey, value)
     }
 
@@ -37,6 +37,5 @@ class GlobalConfiguration(
         resetUnsafe(configurationKey)
     }
 
-    override fun isKeySupported(key: ConfigurationKey<*>): Boolean =
-        key in supportedKeys
+    override fun isKeySupported(key: ConfigurationKey<*>): Boolean = key in supportedKeys
 }

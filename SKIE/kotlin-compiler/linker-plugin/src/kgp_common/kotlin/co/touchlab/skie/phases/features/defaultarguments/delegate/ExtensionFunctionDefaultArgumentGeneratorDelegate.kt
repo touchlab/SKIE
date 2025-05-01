@@ -5,15 +5,12 @@ import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.util.SharedCounter
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
-class ExtensionFunctionDefaultArgumentGeneratorDelegate(
-    context: FrontendIrPhase.Context,
-    sharedCounter: SharedCounter,
-) : BaseFunctionDefaultArgumentGeneratorDelegate(context, sharedCounter) {
+class ExtensionFunctionDefaultArgumentGeneratorDelegate(context: FrontendIrPhase.Context, sharedCounter: SharedCounter) :
+    BaseFunctionDefaultArgumentGeneratorDelegate(context, sharedCounter) {
 
-    override fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> =
-        this.exposedCategoryMembers
-            .filterIsInstance<SimpleFunctionDescriptor>()
-            .filter { it.isSupported }
+    override fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor> = this.exposedCategoryMembers
+        .filterIsInstance<SimpleFunctionDescriptor>()
+        .filter { it.isSupported }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
         get() = this.contextReceiverParameters.isEmpty()

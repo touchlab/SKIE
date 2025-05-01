@@ -53,40 +53,37 @@ fun SirSimpleFunction.resolveCollisionWithWarning(collisionReasonProvider: SirSi
     }
 
 context(SirPhase.Context)
-fun SirEnumCase.resolveCollisionWithWarning(collisionReasonProvider: SirEnumCase.() -> String?): Boolean =
-    resolveCollisionWithWarning(
-        collisionReasonProvider = collisionReasonProvider,
-        rename = { simpleName += "_" },
-        getName = { toReadableString() },
-        findKirElement = { parent.kirClassOrNull?.enumEntries?.get(index) },
-    )
+fun SirEnumCase.resolveCollisionWithWarning(collisionReasonProvider: SirEnumCase.() -> String?): Boolean = resolveCollisionWithWarning(
+    collisionReasonProvider = collisionReasonProvider,
+    rename = { simpleName += "_" },
+    getName = { toReadableString() },
+    findKirElement = { parent.kirClassOrNull?.enumEntries?.get(index) },
+)
 
 context(SirPhase.Context)
 private inline fun <T : SirCallableDeclaration> T.resolveCollisionWithWarning(
     collisionReasonProvider: T.() -> String?,
     rename: () -> Unit,
-): Boolean =
-    resolveCollisionWithWarning(
-        collisionReasonProvider = collisionReasonProvider,
-        rename = rename,
-        getName = { toReadableString() },
-        findKirElement = {
-            kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
-                ?: if (this is SirProperty) kirProvider.findEnumEntry(this) else null
-        },
-    )
+): Boolean = resolveCollisionWithWarning(
+    collisionReasonProvider = collisionReasonProvider,
+    rename = rename,
+    getName = { toReadableString() },
+    findKirElement = {
+        kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
+            ?: if (this is SirProperty) kirProvider.findEnumEntry(this) else null
+    },
+)
 
 context(SirPhase.Context)
 private inline fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(
     collisionReasonProvider: T.() -> String?,
     rename: () -> Unit,
-): Boolean =
-    resolveCollisionWithWarning(
-        collisionReasonProvider = collisionReasonProvider,
-        rename = rename,
-        getName = { toReadableString() },
-        findKirElement = { resolveAsKirClass() },
-    )
+): Boolean = resolveCollisionWithWarning(
+    collisionReasonProvider = collisionReasonProvider,
+    rename = rename,
+    getName = { toReadableString() },
+    findKirElement = { resolveAsKirClass() },
+)
 
 context(SirPhase.Context)
 private inline fun <T, K : KirElement> T.resolveCollisionWithWarning(
@@ -132,12 +129,7 @@ private val KirElement.shouldReportCollision: Boolean
     }
 
 context(SirPhase.Context)
-private fun reportCollision(
-    originalName: String,
-    newName: String,
-    collisionReason: String,
-    source: KirElement,
-) {
+private fun reportCollision(originalName: String, newName: String, collisionReason: String, source: KirElement) {
     kirReporter.warning(
         message = "'$originalName' was renamed to '$newName' because of a name collision with $collisionReason. " +
             "Consider resolving the conflict either by changing the name in Kotlin, or via the @ObjCName annotation. " +

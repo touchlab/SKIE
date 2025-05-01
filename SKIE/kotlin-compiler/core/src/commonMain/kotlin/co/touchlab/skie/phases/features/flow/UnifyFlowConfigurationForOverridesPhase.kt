@@ -9,9 +9,7 @@ import co.touchlab.skie.kir.util.getEntireOverrideHierarchy
 import co.touchlab.skie.kir.util.isBaseDeclaration
 import co.touchlab.skie.phases.KirPhase
 
-class UnifyFlowConfigurationForOverridesPhase(
-    context: KirPhase.Context,
-) : KirPhase {
+class UnifyFlowConfigurationForOverridesPhase(context: KirPhase.Context) : KirPhase {
 
     private val kirProvider = context.kirProvider
 
@@ -40,9 +38,7 @@ class UnifyFlowConfigurationForOverridesPhase(
         }
     }
 
-    private fun KirCallableDeclaration<*>.setFlowMappingStrategy(
-        newFlowMappingStrategy: FlowMappingStrategy,
-    ) {
+    private fun KirCallableDeclaration<*>.setFlowMappingStrategy(newFlowMappingStrategy: FlowMappingStrategy) {
         this.configuration.flowMappingStrategy = newFlowMappingStrategy
 
         if (this is KirFunction<*>) {

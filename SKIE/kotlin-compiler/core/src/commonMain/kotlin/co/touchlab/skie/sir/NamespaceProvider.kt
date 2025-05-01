@@ -12,11 +12,7 @@ import co.touchlab.skie.sir.element.SirSourceFile
 import co.touchlab.skie.sir.element.SirTypeAlias
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 
-class NamespaceProvider(
-    kirProvider: KirProvider,
-    private val sirProvider: SirProvider,
-    private val sirFileProvider: SirFileProvider,
-) {
+class NamespaceProvider(kirProvider: KirProvider, private val sirProvider: SirProvider, private val sirFileProvider: SirFileProvider) {
 
     private val skieDirectoryName = "Skie"
 
@@ -44,61 +40,56 @@ class NamespaceProvider(
             .flatten()
             .toSet()
 
-    fun getSkieNamespaceWrittenSourceFile(name: String): SirSourceFile =
-        sirFileProvider.getWrittenSourceFile(skieDirectoryName, name)
+    fun getSkieNamespaceWrittenSourceFile(name: String): SirSourceFile = sirFileProvider.getWrittenSourceFile(skieDirectoryName, name)
 
-    fun getSkieNamespaceFile(name: String): SirIrFile =
-        sirFileProvider.getIrFile(skieDirectoryName, name)
+    fun getSkieNamespaceFile(name: String): SirIrFile = sirFileProvider.getIrFile(skieDirectoryName, name)
 
     fun getNamespaceFile(kirClass: KirClass): SirIrFile =
         sirFileProvider.getIrFile(kirClass.module.moduleDirectoryName, kirClass.swiftFileName)
 
-    fun getNamespaceExtension(kirClass: KirClass): SirExtension =
-        sirProvider.getExtension(
-            classDeclaration = getNamespaceClass(kirClass),
-            parent = getNamespaceFile(kirClass),
+    fun getNamespaceExtension(kirClass: KirClass): SirExtension = sirProvider.getExtension(
+        classDeclaration = getNamespaceClass(kirClass),
+        parent = getNamespaceFile(kirClass),
+    )
+
+    fun getNamespaceClass(kirClass: KirClass): SirClass = namespaceClassCache.getOrPut(kirClass) {
+        SirClass(
+            baseName = kirClass.classNamespaceSimpleName,
+            parent = getNamespaceClass(kirClass.parent),
+            kind = SirClass.Kind.Enum,
+        )
+    }
+
+    private fun getNamespaceClass(classParent: KirClassParent): SirClass = when (classParent) {
+        is KirClass -> this.getNamespaceClass(classParent)
+        is KirModule -> getModuleNamespaceClass(classParent)
+    }
+
+    private fun getModuleNamespaceClass(module: KirModule): SirClass = moduleNamespaceCache.getOrPut(module) {
+        val sirClass = SirClass(
+            baseName = module.moduleNamespaceName,
+            parent = namespaceBaseClass,
+            kind = SirClass.Kind.Enum,
         )
 
-    fun getNamespaceClass(kirClass: KirClass): SirClass =
-        namespaceClassCache.getOrPut(kirClass) {
-            SirClass(
-                baseName = kirClass.classNamespaceSimpleName,
-                parent = getNamespaceClass(kirClass.parent),
-                kind = SirClass.Kind.Enum,
-            )
-        }
-
-    private fun getNamespaceClass(classParent: KirClassParent): SirClass =
-        when (classParent) {
-            is KirClass -> this.getNamespaceClass(classParent)
-            is KirModule -> getModuleNamespaceClass(classParent)
-        }
-
-    private fun getModuleNamespaceClass(module: KirModule): SirClass =
-        moduleNamespaceCache.getOrPut(module) {
-            val sirClass = SirClass(
-                baseName = module.moduleNamespaceName,
+        if (!module.shortModuleNamespaceNameCollides) {
+            SirTypeAlias(
+                baseName = module.fullModuleNamespaceName,
                 parent = namespaceBaseClass,
-                kind = SirClass.Kind.Enum,
-            )
-
-            if (!module.shortModuleNamespaceNameCollides) {
-                SirTypeAlias(
-                    baseName = module.fullModuleNamespaceName,
-                    parent = namespaceBaseClass,
-                ) {
-                    sirClass.defaultType
-                }
+            ) {
+                sirClass.defaultType
             }
-
-            sirClass
         }
+
+        sirClass
+    }
 
     private val KirModule.moduleNamespaceName: String
         get() {
             val shortModuleNamespaceName = this.shortModuleNamespaceName
 
-            val canUseShortName = !this.shortModuleNamespaceNameCollides && shortModuleNamespaceName != sirProvider.skieModule.name.toValidSwiftIdentifier()
+            val canUseShortName =
+                !this.shortModuleNamespaceNameCollides && shortModuleNamespaceName != sirProvider.skieModule.name.toValidSwiftIdentifier()
 
             return if (canUseShortName) shortModuleNamespaceName else this.fullModuleNamespaceName
         }
@@ -148,7 +139,6 @@ class NamespaceProvider(
         }
 }
 
-private fun String.changeNamingConventionToPascalCase(): String =
-    splitToSequence("_", "-")
-        .map { it.replaceFirstChar(Char::uppercase) }
-        .joinToString("")
+private fun String.changeNamingConventionToPascalCase(): String = splitToSequence("_", "-")
+    .map { it.replaceFirstChar(Char::uppercase) }
+    .joinToString("")

@@ -10,12 +10,11 @@ sealed class SpecialReferenceOirType(val name: String) : NonNullReferenceOirType
 
     object Protocol : SpecialReferenceOirType("Protocol") {
 
-        override fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String =
-            buildString {
-                append(name)
-                append(" *")
-                appendAttrsAndName(attrsAndName.plusNonnullAttributeIfNeeded(needsNonnullAttribute))
-            }
+        override fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String = buildString {
+            append(name)
+            append(" *")
+            appendAttrsAndName(attrsAndName.plusNonnullAttributeIfNeeded(needsNonnullAttribute))
+        }
     }
 
     override fun render(attrsAndName: String, needsNonnullAttribute: Boolean): String =

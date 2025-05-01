@@ -7,9 +7,9 @@ import co.touchlab.skie.compilerinject.interceptor.SameTypePhaseInterceptor
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.ObjCExportReflector
 import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
+import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportedInterface
 import org.jetbrains.kotlin.backend.konan.objectFilesPhase
-import org.jetbrains.kotlin.backend.konan.Context as KonanContext
 
 internal class ObjectFilesPhaseInterceptor : SameTypePhaseInterceptor<KonanContext, Unit> {
 

@@ -9,6 +9,8 @@ import co.touchlab.skie.plugin.shim.impl.util.appleTargets
 import co.touchlab.skie.plugin.shim.impl.util.kotlinMultiplatformExtension
 import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.plugin.util.withType
+import java.io.File
+import java.util.Properties
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.attributes.AttributeContainer
@@ -27,14 +29,10 @@ import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.HostManager
-import java.io.File
-import java.util.Properties
 
 // Constructed through reflection in SKIE Gradle Plugin.
 @Suppress("unused")
-class ActualKgpShim(
-    private val project: Project,
-) : KgpShim {
+class ActualKgpShim(private val project: Project) : KgpShim {
 
     override val launchScheduler = LaunchScheduler()
 
@@ -43,11 +41,9 @@ class ActualKgpShim(
     override fun getDistributionProperties(konanHome: String, propertyOverrides: Map<String, String>?): Properties =
         Distribution(konanHome = konanHome, propertyOverrides = propertyOverrides).properties
 
-    override fun getKonanHome(): File =
-        NativeCompilerDownloader(project).compilerDirectory
+    override fun getKonanHome(): File = NativeCompilerDownloader(project).compilerDirectory
 
-    override fun getKotlinPluginVersion(): String =
-        project.getKotlinPluginVersion()
+    override fun getKotlinPluginVersion(): String = project.getKotlinPluginVersion()
 
     override val skieTargets: NamedDomainObjectContainer<SkieTarget> = project.objects.domainObjectContainer(SkieTarget::class.java)
 
@@ -82,21 +78,16 @@ class ActualKgpShim(
 
     // Must be done eagerly because we need to go through all potential tasks even those that will not be executed.
     // This is to ensure the Link task configuration will be the same when executed separately or as part of the XCFramework task.
-    private fun getFrameworksUsedInXCFrameworks(): Set<Framework> =
-        project.tasks.withType<XCFrameworkTask>()
-            // Prevents concurrent modification exception.
-            .toList()
-            .flatMap { xcFrameworkTask ->
-                xcFrameworkTask.taskDependencies.getDependencies(xcFrameworkTask).filterIsInstance<KotlinNativeLink>().map { it.binary }
-            }
-            .filterIsInstance<Framework>()
-            .toSet()
+    private fun getFrameworksUsedInXCFrameworks(): Set<Framework> = project.tasks.withType<XCFrameworkTask>()
+        // Prevents concurrent modification exception.
+        .toList()
+        .flatMap { xcFrameworkTask ->
+            xcFrameworkTask.taskDependencies.getDependencies(xcFrameworkTask).filterIsInstance<KotlinNativeLink>().map { it.binary }
+        }
+        .filterIsInstance<Framework>()
+        .toSet()
 
-    private fun registerBinaryTarget(
-        target: KotlinNativeTarget,
-        binary: Framework,
-        frameworksUsedInXCFrameworks: Set<Framework>,
-    ) {
+    private fun registerBinaryTarget(target: KotlinNativeTarget, binary: Framework, frameworksUsedInXCFrameworks: Set<Framework>) {
         val compilationShimProvider = project.provider {
             kotlinNativeTargets
                 .flatMap { it.compilations }

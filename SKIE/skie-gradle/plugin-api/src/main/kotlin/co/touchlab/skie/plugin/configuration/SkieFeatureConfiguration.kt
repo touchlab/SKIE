@@ -5,9 +5,9 @@ package co.touchlab.skie.plugin.configuration
 import co.touchlab.skie.configuration.ConfigurationKey
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.util.takeIf
+import javax.inject.Inject
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import javax.inject.Inject
 
 abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFactory) {
 
@@ -190,10 +190,7 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
         groupConfiguration.action()
     }
 
-    class GroupConfiguration(
-        internal val targetFqNamePrefix: String,
-        internal val overridesAnnotations: Boolean,
-    ) {
+    class GroupConfiguration(internal val targetFqNamePrefix: String, internal val overridesAnnotations: Boolean) {
 
         internal val items = mutableMapOf<String, String?>()
 
@@ -202,12 +199,11 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
         }
     }
 
-    internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> =
-        setOfNotNull(
-            SkieConfigurationFlag.Feature_CoroutinesInterop takeIf coroutinesInterop,
-            SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries takeIf defaultArgumentsInExternalLibraries,
-            SkieConfigurationFlag.Feature_FlowCombineConvertor takeIf enableFlowCombineConvertorPreview,
-            SkieConfigurationFlag.Feature_FutureCombineExtension takeIf enableFutureCombineExtensionPreview,
-            SkieConfigurationFlag.Feature_SwiftUIObserving takeIf enableSwiftUIObservingPreview,
-        )
+    internal fun buildConfigurationFlags(): Set<SkieConfigurationFlag> = setOfNotNull(
+        SkieConfigurationFlag.Feature_CoroutinesInterop takeIf coroutinesInterop,
+        SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries takeIf defaultArgumentsInExternalLibraries,
+        SkieConfigurationFlag.Feature_FlowCombineConvertor takeIf enableFlowCombineConvertorPreview,
+        SkieConfigurationFlag.Feature_FutureCombineExtension takeIf enableFutureCombineExtensionPreview,
+        SkieConfigurationFlag.Feature_SwiftUIObserving takeIf enableSwiftUIObservingPreview,
+    )
 }

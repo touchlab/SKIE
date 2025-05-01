@@ -8,9 +8,6 @@ data class GradleSkieConfigurationData(
     override val groups: List<Group>,
 ) : UntypedSkieConfigurationData<SkieConfigurationFlag> {
 
-    data class Group(
-        override val target: String,
-        override val overridesAnnotations: Boolean,
-        override val items: Map<String, String?>,
-    ) : UntypedSkieConfigurationData.Group
+    data class Group(override val target: String, override val overridesAnnotations: Boolean, override val items: Map<String, String?>) :
+        UntypedSkieConfigurationData.Group
 }

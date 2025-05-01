@@ -6,9 +6,7 @@ import java.nio.file.Path
 import kotlin.io.path.nameWithoutExtension
 
 // Instantiate only in ObjectFileProvider
-class ObjectFileProvider(
-    private val skieBuildDirectory: SkieBuildDirectory,
-) {
+class ObjectFileProvider(private val skieBuildDirectory: SkieBuildDirectory) {
 
     private val compilableFilesCache = mutableMapOf<SirCompilableFile, ObjectFile>()
 
@@ -17,15 +15,15 @@ class ObjectFileProvider(
     val allObjectFiles: List<ObjectFile>
         get() = compilableFilesCache.values + additionalFilesCache.values
 
-    fun getOrCreate(compilableFile: SirCompilableFile): ObjectFile =
-        compilableFilesCache.getOrPut(compilableFile) {
-            val objectFilePath = skieBuildDirectory.swiftCompiler.objectFiles.objectFile(compilableFile.relativePath.nameWithoutExtension).toPath()
+    fun getOrCreate(compilableFile: SirCompilableFile): ObjectFile = compilableFilesCache.getOrPut(compilableFile) {
+        val objectFilePath = skieBuildDirectory.swiftCompiler.objectFiles.objectFile(
+            compilableFile.relativePath.nameWithoutExtension,
+        ).toPath()
 
-            ObjectFile(objectFilePath)
-        }
+        ObjectFile(objectFilePath)
+    }
 
-    fun getOrCreate(path: Path): ObjectFile =
-        additionalFilesCache.getOrPut(path.toAbsolutePath()) {
-            ObjectFile(path.toAbsolutePath())
-        }
+    fun getOrCreate(path: Path): ObjectFile = additionalFilesCache.getOrPut(path.toAbsolutePath()) {
+        ObjectFile(path.toAbsolutePath())
+    }
 }

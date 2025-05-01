@@ -28,10 +28,8 @@ import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 
-class ConstructorsDefaultArgumentGeneratorDelegate(
-    context: FrontendIrPhase.Context,
-    private val sharedCounter: SharedCounter,
-) : BaseDefaultArgumentGeneratorDelegate(context) {
+class ConstructorsDefaultArgumentGeneratorDelegate(context: FrontendIrPhase.Context, private val sharedCounter: SharedCounter) :
+    BaseDefaultArgumentGeneratorDelegate(context) {
 
     context(FrontendIrPhase.Context)
     override fun generate() {
@@ -122,13 +120,10 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
         return this.valueParameters.indexOfFirst { it.name.identifier == searchedIdentifier }
     }
 
-    private fun String.dropUniqueParameterMangling(): String =
-        this.split(uniqueNameSubstring).first()
+    private fun String.dropUniqueParameterMangling(): String = this.split(uniqueNameSubstring).first()
 
     context(KotlinIrPhase.Context, DeclarationIrBuilder)
-    private fun getOverloadBody(
-        originalConstructor: ClassConstructorDescriptor, overloadIr: IrConstructor,
-    ): IrBody {
+    private fun getOverloadBody(originalConstructor: ClassConstructorDescriptor, overloadIr: IrConstructor): IrBody {
         val originalConstructorSymbol = skieSymbolTable.descriptorExtension.referenceConstructor(originalConstructor)
 
         return irBlockBody {
@@ -160,7 +155,9 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     ) {
         context.doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsInitPhase) {
             val mangledValueParameterFromOverload = descriptorKirProvider.getValueParameter(mangledValueParameterDescriptorFromOverload)
-            val mangledValueParameterFromConstructor = descriptorKirProvider.getValueParameter(mangledValueParameterDescriptorFromConstructor)
+            val mangledValueParameterFromConstructor = descriptorKirProvider.getValueParameter(
+                mangledValueParameterDescriptorFromConstructor,
+            )
 
             doInPhase(DefaultArgumentGenerator.RemoveManglingOfOverloadsFinalizePhase) {
                 val sirMangledValueParameterFromOverload = mangledValueParameterFromOverload

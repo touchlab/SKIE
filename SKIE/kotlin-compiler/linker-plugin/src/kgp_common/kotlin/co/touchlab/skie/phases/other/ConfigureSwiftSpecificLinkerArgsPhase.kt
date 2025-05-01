@@ -5,9 +5,9 @@ import co.touchlab.skie.phases.configurables
 import co.touchlab.skie.phases.konanConfig
 import co.touchlab.skie.util.KotlinCompilerVersion
 import co.touchlab.skie.util.current
+import java.io.File
 import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.konan.target.platformName
-import java.io.File
 
 object ConfigureSwiftSpecificLinkerArgsPhase : LinkPhase {
 
@@ -26,7 +26,9 @@ object ConfigureSwiftSpecificLinkerArgsPhase : LinkPhase {
         ).flatMap { listOf("-L", it.absolutePath) }
 
         val otherLinkerFlags = listOf(
-            "-rpath", "/usr/lib/swift", "-dead_strip",
+            "-rpath",
+            "/usr/lib/swift",
+            "-dead_strip",
         )
 
         konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)

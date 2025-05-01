@@ -95,7 +95,9 @@ object SkieGradlePluginApplier {
     private fun Project.warnOnEmptyFrameworks() {
         gradle.taskGraph.whenReady {
             if (skieInternalExtension.targets.isEmpty()) {
-                logger.warn("w: No Apple frameworks configured in module ${this@warnOnEmptyFrameworks.path}. Make sure you applied SKIE plugin in the correct module.")
+                logger.warn(
+                    "w: No Apple frameworks configured in module ${this@warnOnEmptyFrameworks.path}. Make sure you applied SKIE plugin in the correct module.",
+                )
             }
         }
     }

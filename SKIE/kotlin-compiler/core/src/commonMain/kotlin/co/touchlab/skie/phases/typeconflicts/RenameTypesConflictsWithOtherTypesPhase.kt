@@ -57,8 +57,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
     private val SirFqName.depth: Int
         get() = 1 + (this.parent?.depth ?: 0)
 
-    private fun SirTypeDeclaration.getOirClassOrNull(): OirClass? =
-        (this as? SirClass)?.oirClassOrNull
+    private fun SirTypeDeclaration.getOirClassOrNull(): OirClass? = (this as? SirClass)?.oirClassOrNull
 
     context(SirPhase.Context)
     private fun buildUniqueSignatureSet(typeDeclarations: List<SirTypeDeclaration>) {

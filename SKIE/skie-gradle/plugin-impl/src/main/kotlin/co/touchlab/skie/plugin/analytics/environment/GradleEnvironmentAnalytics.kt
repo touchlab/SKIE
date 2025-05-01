@@ -1,9 +1,9 @@
 package co.touchlab.skie.plugin.analytics.environment
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.plugin.util.toPrettyJson
-import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.util.SystemProperty
 import io.cloudflight.ci.info.CI
 import org.gradle.api.provider.Provider
@@ -18,24 +18,20 @@ data class GradleEnvironmentAnalytics(
     val timestampInMs: Long,
 ) {
 
-    class Producer(
-        private val gradleVersion: Provider<String>,
-        private val kotlinPluginVersion: Provider<String>,
-    ) : AnalyticsProducer {
+    class Producer(private val gradleVersion: Provider<String>, private val kotlinPluginVersion: Provider<String>) : AnalyticsProducer {
 
         override val name: String = "gradle-environment"
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_GradleEnvironment
 
-        override fun produce(): String =
-            GradleEnvironmentAnalytics(
-                jvmVersion = Runtime.version().toString(),
-                skieVersion = BuildConfig.SKIE_VERSION,
-                gradleVersion = gradleVersion.get(),
-                kotlinVersion = kotlinPluginVersion.get(),
-                macOSVersion = SystemProperty.find("os.version") ?: "<unknown>",
-                ci = CI.server?.serverName,
-                timestampInMs = System.currentTimeMillis(),
-            ).toPrettyJson()
+        override fun produce(): String = GradleEnvironmentAnalytics(
+            jvmVersion = Runtime.version().toString(),
+            skieVersion = BuildConfig.SKIE_VERSION,
+            gradleVersion = gradleVersion.get(),
+            kotlinVersion = kotlinPluginVersion.get(),
+            macOSVersion = SystemProperty.find("os.version") ?: "<unknown>",
+            ci = CI.server?.serverName,
+            timestampInMs = System.currentTimeMillis(),
+        ).toPrettyJson()
     }
 }

@@ -7,14 +7,11 @@ import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.types.IrType
 
-fun IrBuilderWithScope.irFunctionExpression(
-    type: IrType,
-    origin: IrStatementOrigin,
-    function: IrSimpleFunction,
-): IrFunctionExpression = IrFunctionExpressionImpl(
-    startOffset = startOffset,
-    endOffset = endOffset,
-    type = type,
-    function = function,
-    origin = origin,
-)
+fun IrBuilderWithScope.irFunctionExpression(type: IrType, origin: IrStatementOrigin, function: IrSimpleFunction): IrFunctionExpression =
+    IrFunctionExpressionImpl(
+        startOffset = startOffset,
+        endOffset = endOffset,
+        type = type,
+        function = function,
+        origin = origin,
+    )

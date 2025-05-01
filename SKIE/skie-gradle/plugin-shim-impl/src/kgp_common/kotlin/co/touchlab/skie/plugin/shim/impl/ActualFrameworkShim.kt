@@ -7,9 +7,7 @@ import co.touchlab.skie.util.directory.FrameworkLayout
 import org.jetbrains.kotlin.gradle.tasks.FrameworkDescriptor
 import org.jetbrains.kotlin.konan.target.Architecture
 
-class ActualFrameworkShim(
-    framework: FrameworkDescriptor,
-) : FrameworkShim {
+class ActualFrameworkShim(framework: FrameworkDescriptor) : FrameworkShim {
 
     override val name: String = framework.name
 

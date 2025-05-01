@@ -11,10 +11,7 @@ import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
 
-class SirFileProvider(
-    private val skieModule: SirModule.Skie,
-    private val skieBuildDirectory: SkieBuildDirectory,
-) {
+class SirFileProvider(private val skieModule: SirModule.Skie, private val skieBuildDirectory: SkieBuildDirectory) {
 
     private val irFileByPathCache = mutableMapOf<String, SirIrFile>()
 
@@ -44,10 +41,9 @@ class SirFileProvider(
         }
     }
 
-    fun getIrFile(namespace: String, name: String): SirIrFile =
-        irFileByPathCache.getOrPut(relativePath(namespace, name).asCacheKey) {
-            SirIrFile(namespace, name, skieModule)
-        }
+    fun getIrFile(namespace: String, name: String): SirIrFile = irFileByPathCache.getOrPut(relativePath(namespace, name).asCacheKey) {
+        SirIrFile(namespace, name, skieModule)
+    }
 
     fun createCompilableFile(sourceFile: SirSourceFile): SirCompilableFile {
         val absolutePath = skieBuildDirectory.swift.generated.path.resolve(sourceFile.relativePath)
@@ -87,7 +83,7 @@ class SirFileProvider(
             module = skieModule,
             absolutePath = absolutePath,
             relativePath = relativePath,
-            originFile = null
+            originFile = null,
         )
     }
 
@@ -96,7 +92,6 @@ class SirFileProvider(
 
     companion object {
 
-        fun relativePath(namespace: String, name: String): Path =
-            Path.of("$namespace/$namespace.$name.swift")
+        fun relativePath(namespace: String, name: String): Path = Path.of("$namespace/$namespace.$name.swift")
     }
 }

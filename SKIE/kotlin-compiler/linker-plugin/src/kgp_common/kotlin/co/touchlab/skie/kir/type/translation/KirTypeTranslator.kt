@@ -30,10 +30,8 @@ import org.jetbrains.kotlin.types.isNullable
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 
 // Logic mostly copied from ObjCExportTranslatorImpl (including TODOs)
-class KirTypeTranslator(
-    private val descriptorKirProvider: DescriptorKirProvider,
-    private val customTypeMappers: KirCustomTypeMappers,
-) : KirTypeTranslatorUtilityScope() {
+class KirTypeTranslator(private val descriptorKirProvider: DescriptorKirProvider, private val customTypeMappers: KirCustomTypeMappers) :
+    KirTypeTranslatorUtilityScope() {
 
     context(KirTypeParameterScope)
     fun mapReferenceType(kotlinType: KotlinType): ReferenceKirType =
@@ -54,8 +52,9 @@ class KirTypeTranslator(
                 getTypeParameterUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
             }
 
-            if (genericTypeUsage != null)
+            if (genericTypeUsage != null) {
                 return genericTypeUsage
+            }
         }
 
         val classDescriptor = kotlinType.getErasedTypeClass()
@@ -132,10 +131,7 @@ class KirTypeTranslator(
         mapFunctionTypeIgnoringNullability(kotlinType, returnsVoid).withNullabilityOf(kotlinType)
 
     context(KirTypeParameterScope)
-    fun mapFunctionTypeIgnoringNullability(
-        functionType: KotlinType,
-        returnsVoid: Boolean,
-    ): NonNullReferenceKirType {
+    fun mapFunctionTypeIgnoringNullability(functionType: KotlinType, returnsVoid: Boolean): NonNullReferenceKirType {
         val parameterTypes = listOfNotNull(functionType.getReceiverTypeFromFunctionType()) +
             functionType.getValueParameterTypesFromFunctionType().map { it.type }
 

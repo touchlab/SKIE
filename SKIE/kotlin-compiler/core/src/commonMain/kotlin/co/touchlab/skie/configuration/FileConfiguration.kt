@@ -1,8 +1,6 @@
 package co.touchlab.skie.configuration
 
-class FileConfiguration(
-    parent: PackageConfiguration,
-) : SkieConfiguration(parent) {
+class FileConfiguration(parent: PackageConfiguration) : SkieConfiguration(parent) {
 
     fun <KEY, VALUE> has(configurationKey: KEY): Boolean where KEY : ConfigurationKey<VALUE>, KEY : ConfigurationScope.File =
         hasUnsafe(configurationKey)

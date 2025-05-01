@@ -19,9 +19,7 @@ import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.declaresOrInheritsDefaultValue
 
-abstract class BaseDefaultArgumentGeneratorDelegate(
-    val context: FrontendIrPhase.Context,
-) : DefaultArgumentGeneratorDelegate {
+abstract class BaseDefaultArgumentGeneratorDelegate(val context: FrontendIrPhase.Context) : DefaultArgumentGeneratorDelegate {
 
     protected val descriptorProvider: DescriptorProvider = context.descriptorProvider
 
@@ -48,9 +46,7 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
     private val FunctionDescriptor.defaultArgumentCount: Int
         get() = this.valueParameters.count { it.declaresOrInheritsDefaultValue() }
 
-    protected fun FunctionDescriptor.forEachDefaultArgumentOverload(
-        action: (overloadParameters: List<ValueParameterDescriptor>) -> Unit,
-    ) {
+    protected fun FunctionDescriptor.forEachDefaultArgumentOverload(action: (overloadParameters: List<ValueParameterDescriptor>) -> Unit) {
         val parametersWithDefaultValues = this.valueParameters.filter { it.declaresOrInheritsDefaultValue() }
 
         parametersWithDefaultValues.forEachSubset { omittedParameters ->
@@ -74,15 +70,14 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
         } while (subset.isNotEmpty())
     }
 
-    private fun <T> Iterable<T>.dropIndices(bitmap: Int): List<T> =
-        this.filterIndexed { index, _ ->
-            !bitmap.testBit(index)
-        }
+    private fun <T> Iterable<T>.dropIndices(bitmap: Int): List<T> = this.filterIndexed { index, _ ->
+        !bitmap.testBit(index)
+    }
 
-    private fun Int.testBit(n: Int): Boolean =
-        (this shr n) and 1 == 1
+    private fun Int.testBit(n: Int): Boolean = (this shr n) and 1 == 1
 
-    context(IrBuilderWithScope) protected fun IrFunctionAccessExpression.passArgumentsWithMatchingNames(from: IrFunction) {
+    context(IrBuilderWithScope)
+    protected fun IrFunctionAccessExpression.passArgumentsWithMatchingNames(from: IrFunction) {
         from.valueParameters.forEach { valueParameter: IrValueParameter ->
             val indexInCalledFunction = this.symbol.owner.indexOfValueParameterByName(valueParameter.name)
             check(indexInCalledFunction != -1) {
@@ -92,6 +87,5 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
         }
     }
 
-    protected open fun IrFunction.indexOfValueParameterByName(name: Name): Int =
-        this.valueParameters.indexOfFirst { it.name == name }
+    protected open fun IrFunction.indexOfValueParameterByName(name: Name): Int = this.valueParameters.indexOfFirst { it.name == name }
 }

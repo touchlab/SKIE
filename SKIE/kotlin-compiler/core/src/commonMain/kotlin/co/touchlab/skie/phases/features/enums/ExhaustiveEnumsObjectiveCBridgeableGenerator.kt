@@ -48,9 +48,7 @@ object ExhaustiveEnumsObjectiveCBridgeableGenerator {
         )
     }
 
-    private fun CodeBlock.Builder.addNonEmptyFromObjectiveCBody(
-        enumKirClass: KirClass,
-    ) {
+    private fun CodeBlock.Builder.addNonEmptyFromObjectiveCBody(enumKirClass: KirClass) {
         val enum = enumKirClass.enum
 
         if (enumKirClass.enumEntries.isNotEmpty()) {
@@ -66,11 +64,7 @@ object ExhaustiveEnumsObjectiveCBridgeableGenerator {
         }
     }
 
-    private fun CodeBlock.Builder.addFromObjectiveCBodyCase(
-        entry: KirEnumEntry,
-        enum: SirClass,
-        index: Int,
-    ) {
+    private fun CodeBlock.Builder.addFromObjectiveCBodyCase(entry: KirEnumEntry, enum: SirClass, index: Int) {
         val typeName = enum.defaultType.evaluate().swiftPoetTypeName
 
         val controlFlowCode = "source == %T.%N as %T"

@@ -20,5 +20,6 @@ object ConfigureInternalVisibilityForWrappedCallableDeclarationsPhase : SirPhase
     context(SirPhase.Context)
     private val SirCallableDeclaration.shouldBeInternalIfWrappedBySkie: Boolean
         // TODO Once SirCallableDeclaration origin is added check even for intermediate wrappers and configure those based on the Kir configuration as well.
-        get() = kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)?.configuration?.get(SkieVisibility) == SkieVisibility.Level.InternalIfWrapped
+        get() = kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)?.configuration?.get(SkieVisibility) ==
+            SkieVisibility.Level.InternalIfWrapped
 }

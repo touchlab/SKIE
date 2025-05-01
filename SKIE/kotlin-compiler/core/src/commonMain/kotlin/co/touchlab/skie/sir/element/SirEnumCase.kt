@@ -2,10 +2,7 @@ package co.touchlab.skie.sir.element
 
 import co.touchlab.skie.sir.element.util.sirEnumCaseParent
 
-class SirEnumCase(
-    var simpleName: String,
-    parent: SirClass,
-) : SirElement {
+class SirEnumCase(var simpleName: String, parent: SirClass) : SirElement {
 
     var parent: SirClass by sirEnumCaseParent(parent)
 
@@ -16,18 +13,14 @@ class SirEnumCase(
 
     override fun toString(): String = "${this::class.simpleName}: $simpleName"
 
-    fun toReadableString(): String =
-        "case " + parent.fqName.toString() + "." + simpleName
+    fun toReadableString(): String = "case " + parent.fqName.toString() + "." + simpleName
 
     companion object {
 
         context(SirClass)
-        operator fun invoke(
-            simpleName: String,
-        ): SirEnumCase =
-            SirEnumCase(
-                simpleName = simpleName,
-                parent = this@SirClass,
-            )
+        operator fun invoke(simpleName: String): SirEnumCase = SirEnumCase(
+            simpleName = simpleName,
+            parent = this@SirClass,
+        )
     }
 }

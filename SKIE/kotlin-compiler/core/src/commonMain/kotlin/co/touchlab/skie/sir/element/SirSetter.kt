@@ -10,7 +10,9 @@ class SirSetter(
     attributes: List<String> = emptyList(),
     modifiers: List<Modifier> = emptyList(),
     var parameterName: String = "value",
-) : SirElement, SirPropertyAccessor, SirElementWithModifiers {
+) : SirElement,
+    SirPropertyAccessor,
+    SirElementWithModifiers {
 
     override var property: SirProperty by sirPropertyAccessorParent(property)
 
@@ -29,12 +31,11 @@ class SirSetter(
             throws: Boolean = false,
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
-        ): SirSetter =
-            SirSetter(
-                property = this@SirProperty,
-                throws = throws,
-                attributes = attributes,
-                modifiers = modifiers,
-            )
+        ): SirSetter = SirSetter(
+            property = this@SirProperty,
+            throws = throws,
+            attributes = attributes,
+            modifiers = modifiers,
+        )
     }
 }

@@ -10,10 +10,7 @@ import co.touchlab.skie.sir.element.SirModule
 import co.touchlab.skie.util.Command
 import java.io.File
 
-class ExternalApiNotesProvider(
-    private val sdkPath: String,
-    private val sirProvider: SirProvider,
-) {
+class ExternalApiNotesProvider(private val sdkPath: String, private val sirProvider: SirProvider) {
 
     private val apiNotesModuleProvidersByModuleName: Map<String, Lazy<ModuleApiNotesProvider>> =
         getApiNotesFiles()
@@ -31,30 +28,25 @@ class ExternalApiNotesProvider(
         return apiNotesModuleProvidersByModuleName[module.name]?.value?.findApiNotesEntry(oirClass)
     }
 
-    private fun getApiNotesFiles(): List<File> =
-        Command(
-            "find",
-            sdkPath.removeSuffix("/") + '/',
-            "-type",
-            "f",
-            "-name",
-            "*.apinotes",
-        )
-            .execute()
-            .outputLines
-            .map { File(it) }
-            .filter { it.exists() && it.isFile }
+    private fun getApiNotesFiles(): List<File> = Command(
+        "find",
+        sdkPath.removeSuffix("/") + '/',
+        "-type",
+        "f",
+        "-name",
+        "*.apinotes",
+    )
+        .execute()
+        .outputLines
+        .map { File(it) }
+        .filter { it.exists() && it.isFile }
 
-    private class ModuleApiNotesProvider(
-        files: List<File>,
-        private val sirProvider: SirProvider,
-    ) {
+    private class ModuleApiNotesProvider(files: List<File>, private val sirProvider: SirProvider) {
 
         private val apiNotesEntriesByObjCName: Map<String, Lazy<ApiNotesEntry>> =
             files.flatMap { parseFile(it) }.toMap()
 
-        private fun parseFile(file: File): List<Pair<String, Lazy<ApiNotesEntry>>> =
-            ExternalApiNotesParser.parse(file).let(::parseApiNotes)
+        private fun parseFile(file: File): List<Pair<String, Lazy<ApiNotesEntry>>> = ExternalApiNotesParser.parse(file).let(::parseApiNotes)
 
         private fun parseApiNotes(apiNotes: ApiNotes): List<Pair<String, Lazy<ApiNotesEntry>>> {
             val module = sirProvider.getExternalModule(apiNotes.moduleName)
@@ -64,14 +56,13 @@ class ExternalApiNotesProvider(
             }
         }
 
-        private fun parseApiNotesType(module: SirModule, apiNotesType: ApiNotesType): ApiNotesEntry =
-            ApiNotesEntry(
-                module = module,
-                objCName = apiNotesType.objCFqName,
-                swiftName = apiNotesType.swiftFqName?.let { SirFqName(module, it) },
-                bridgeSwiftName = apiNotesType.bridgeFqName?.let { parseBridgeName(it, module) },
-                importAsNonGeneric = apiNotesType.importAsNonGeneric,
-            )
+        private fun parseApiNotesType(module: SirModule, apiNotesType: ApiNotesType): ApiNotesEntry = ApiNotesEntry(
+            module = module,
+            objCName = apiNotesType.objCFqName,
+            swiftName = apiNotesType.swiftFqName?.let { SirFqName(module, it) },
+            bridgeSwiftName = apiNotesType.bridgeFqName?.let { parseBridgeName(it, module) },
+            importAsNonGeneric = apiNotesType.importAsNonGeneric,
+        )
 
         private fun parseBridgeName(bridgeFqName: String, defaultModule: SirModule): SirFqName {
             val parts = bridgeFqName.split('.')
@@ -85,11 +76,9 @@ class ExternalApiNotesProvider(
             return SirFqName(module, className)
         }
 
-        fun getAllApiNotesEntries(): List<ApiNotesEntry> =
-            apiNotesEntriesByObjCName.values.map { it.value }
+        fun getAllApiNotesEntries(): List<ApiNotesEntry> = apiNotesEntriesByObjCName.values.map { it.value }
 
-        fun findApiNotesEntry(oirClass: OirClass): ApiNotesEntry? =
-            apiNotesEntriesByObjCName[oirClass.name]?.value
+        fun findApiNotesEntry(oirClass: OirClass): ApiNotesEntry? = apiNotesEntriesByObjCName[oirClass.name]?.value
     }
 
     data class ApiNotesEntry(

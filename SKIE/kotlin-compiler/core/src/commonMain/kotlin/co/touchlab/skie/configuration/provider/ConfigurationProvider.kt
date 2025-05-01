@@ -63,80 +63,75 @@ class ConfigurationProvider(
     private val allKeys = builtInKeys + pluginConfigurationKeys
 
     val globalConfiguration: GlobalConfiguration by lazy {
-        GlobalConfiguration(configurationData.enabledConfigurationFlags, allKeys).withLoadedKeyValueConfiguration(IdentifiedConfigurationTarget.Global)
+        GlobalConfiguration(
+            configurationData.enabledConfigurationFlags,
+            allKeys,
+        ).withLoadedKeyValueConfiguration(IdentifiedConfigurationTarget.Global)
     }
 
     private val cache = mutableMapOf<IdentifiedConfigurationTarget, SkieConfiguration>()
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.Module): ModuleConfiguration =
-        cache.getOrPut(target) {
-            ModuleConfiguration(globalConfiguration).withLoadedKeyValueConfiguration(target)
-        } as ModuleConfiguration
+    fun getConfiguration(target: IdentifiedConfigurationTarget.Module): ModuleConfiguration = cache.getOrPut(target) {
+        ModuleConfiguration(globalConfiguration).withLoadedKeyValueConfiguration(target)
+    } as ModuleConfiguration
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.Package): PackageConfiguration =
-        cache.getOrPut(target) {
-            val parent = getConfiguration(target.parent)
+    fun getConfiguration(target: IdentifiedConfigurationTarget.Package): PackageConfiguration = cache.getOrPut(target) {
+        val parent = getConfiguration(target.parent)
 
-            PackageConfiguration(parent).withLoadedKeyValueConfiguration(target)
-        } as PackageConfiguration
+        PackageConfiguration(parent).withLoadedKeyValueConfiguration(target)
+    } as PackageConfiguration
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.File): FileConfiguration =
-        cache.getOrPut(target) {
-            val parent = getConfiguration(target.parent)
+    fun getConfiguration(target: IdentifiedConfigurationTarget.File): FileConfiguration = cache.getOrPut(target) {
+        val parent = getConfiguration(target.parent)
 
-            FileConfiguration(parent).withLoadedKeyValueConfiguration(target)
-        } as FileConfiguration
+        FileConfiguration(parent).withLoadedKeyValueConfiguration(target)
+    } as FileConfiguration
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.Class): ClassConfiguration =
-        cache.getOrPut(target) {
-            val parent = getFileOrClassConfiguration(target.parent)
+    fun getConfiguration(target: IdentifiedConfigurationTarget.Class): ClassConfiguration = cache.getOrPut(target) {
+        val parent = getFileOrClassConfiguration(target.parent)
 
-            ClassConfiguration(parent).withLoadedKeyValueConfiguration(target)
-        } as ClassConfiguration
+        ClassConfiguration(parent).withLoadedKeyValueConfiguration(target)
+    } as ClassConfiguration
 
-    private fun getFileOrClassConfiguration(target: IdentifiedConfigurationTarget.FileOrClass): FileOrClassConfiguration =
-        when (target) {
-            is IdentifiedConfigurationTarget.File -> FileOrClassConfiguration.File(getConfiguration(target))
-            is IdentifiedConfigurationTarget.Class -> FileOrClassConfiguration.Class(getConfiguration(target))
-        }
+    private fun getFileOrClassConfiguration(target: IdentifiedConfigurationTarget.FileOrClass): FileOrClassConfiguration = when (target) {
+        is IdentifiedConfigurationTarget.File -> FileOrClassConfiguration.File(getConfiguration(target))
+        is IdentifiedConfigurationTarget.Class -> FileOrClassConfiguration.Class(getConfiguration(target))
+    }
 
     private fun getValueParameterParentConfiguration(
         target: IdentifiedConfigurationTarget.ValueParameterParent,
-    ): ValueParameterConfigurationParent =
-        when (target) {
-            is IdentifiedConfigurationTarget.Constructor -> ValueParameterConfigurationParent.CallableDeclaration(getConfiguration(target))
-            is IdentifiedConfigurationTarget.SimpleFunction -> ValueParameterConfigurationParent.CallableDeclaration(getConfiguration(target))
-            is IdentifiedConfigurationTarget.Property -> ValueParameterConfigurationParent.CallableDeclaration(getConfiguration(target))
-            is IdentifiedConfigurationTarget.Class -> ValueParameterConfigurationParent.Class(getConfiguration(target))
-        }
+    ): ValueParameterConfigurationParent = when (target) {
+        is IdentifiedConfigurationTarget.Constructor -> ValueParameterConfigurationParent.CallableDeclaration(getConfiguration(target))
+        is IdentifiedConfigurationTarget.SimpleFunction -> ValueParameterConfigurationParent.CallableDeclaration(
+            getConfiguration(target),
+        )
+        is IdentifiedConfigurationTarget.Property -> ValueParameterConfigurationParent.CallableDeclaration(getConfiguration(target))
+        is IdentifiedConfigurationTarget.Class -> ValueParameterConfigurationParent.Class(getConfiguration(target))
+    }
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.Constructor): ConstructorConfiguration =
-        cache.getOrPut(target) {
-            val parent = getFileOrClassConfiguration(target.parent)
+    fun getConfiguration(target: IdentifiedConfigurationTarget.Constructor): ConstructorConfiguration = cache.getOrPut(target) {
+        val parent = getFileOrClassConfiguration(target.parent)
 
-            ConstructorConfiguration(parent).withLoadedKeyValueConfiguration(target)
-        } as ConstructorConfiguration
+        ConstructorConfiguration(parent).withLoadedKeyValueConfiguration(target)
+    } as ConstructorConfiguration
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.SimpleFunction): SimpleFunctionConfiguration =
-        cache.getOrPut(target) {
-            val parent = getFileOrClassConfiguration(target.parent)
+    fun getConfiguration(target: IdentifiedConfigurationTarget.SimpleFunction): SimpleFunctionConfiguration = cache.getOrPut(target) {
+        val parent = getFileOrClassConfiguration(target.parent)
 
-            SimpleFunctionConfiguration(parent).withLoadedKeyValueConfiguration(target)
-        } as SimpleFunctionConfiguration
+        SimpleFunctionConfiguration(parent).withLoadedKeyValueConfiguration(target)
+    } as SimpleFunctionConfiguration
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.Property): PropertyConfiguration =
-        cache.getOrPut(target) {
-            val parent = getFileOrClassConfiguration(target.parent)
+    fun getConfiguration(target: IdentifiedConfigurationTarget.Property): PropertyConfiguration = cache.getOrPut(target) {
+        val parent = getFileOrClassConfiguration(target.parent)
 
-            PropertyConfiguration(parent).withLoadedKeyValueConfiguration(target)
-        } as PropertyConfiguration
+        PropertyConfiguration(parent).withLoadedKeyValueConfiguration(target)
+    } as PropertyConfiguration
 
-    fun getConfiguration(target: IdentifiedConfigurationTarget.ValueParameter): ValueParameterConfiguration =
-        cache.getOrPut(target) {
-            val parent = getValueParameterParentConfiguration(target.parent)
+    fun getConfiguration(target: IdentifiedConfigurationTarget.ValueParameter): ValueParameterConfiguration = cache.getOrPut(target) {
+        val parent = getValueParameterParentConfiguration(target.parent)
 
-            ValueParameterConfiguration(parent).withLoadedKeyValueConfiguration(target)
-        } as ValueParameterConfiguration
+        ValueParameterConfiguration(parent).withLoadedKeyValueConfiguration(target)
+    } as ValueParameterConfiguration
 
     private fun <T : SkieConfiguration> T.withLoadedKeyValueConfiguration(target: IdentifiedConfigurationTarget): T {
         if (target.belongsToSkieRuntime) {
@@ -176,6 +171,5 @@ class ConfigurationProvider(
     private fun ConfigurationKey<*>.findGroup(target: IdentifiedConfigurationTarget): Group? =
         configurationData.groups.lastOrNull { target.fqName.startsWith(it.target) && this.name in it.items }
 
-    private fun <T> ConfigurationKey<T>.getValue(group: Group): T =
-        group.items.getValue(this.name).let { this.deserialize(it) }
+    private fun <T> ConfigurationKey<T>.getValue(group: Group): T = group.items.getValue(this.name).let { this.deserialize(it) }
 }

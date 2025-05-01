@@ -8,6 +8,6 @@ fun SkieTarget.configureDebugPrefixMap() {
     }
 
     addFreeCompilerArgs(
-        "-Xdebug-prefix-map=${project.rootDir.absolutePath}=."
+        "-Xdebug-prefix-map=${project.rootDir.absolutePath}=.",
     )
 }

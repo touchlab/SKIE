@@ -21,7 +21,8 @@ abstract class Reporter<T> {
     }
 
     enum class Severity {
-        Error, Warning
+        Error,
+        Warning,
     }
 
     data class Report<T>(val message: String, val severity: Severity, val source: T?)

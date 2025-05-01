@@ -52,7 +52,7 @@ class AnalyticsCollector(
             {
                 "error": "${e.message}"
             }
-            """.trimIndent()
+        """.trimIndent()
     }
 
     private val AnalyticsProducer.isEnabled: Boolean

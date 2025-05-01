@@ -14,9 +14,7 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
-class DeserializedClassNamespace(
-    override val descriptor: DeserializedClassDescriptor,
-) : BaseDeserializedNamespace<ClassDescriptor>() {
+class DeserializedClassNamespace(override val descriptor: DeserializedClassDescriptor) : BaseDeserializedNamespace<ClassDescriptor>() {
 
     override val sourceElement: SourceElement = SourceElement { descriptor.findSourceFile() }
 
@@ -49,6 +47,5 @@ class DeserializedClassNamespace(
     }
 
     context(KotlinIrPhase.Context)
-    override fun generateNamespaceIr(): IrDeclarationContainer =
-        skieSymbolTable.descriptorExtension.referenceClass(descriptor).owner
+    override fun generateNamespaceIr(): IrDeclarationContainer = skieSymbolTable.descriptorExtension.referenceClass(descriptor).owner
 }

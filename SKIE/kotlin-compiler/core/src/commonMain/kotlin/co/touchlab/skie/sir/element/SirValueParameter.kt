@@ -11,7 +11,8 @@ class SirValueParameter(
     label: String? = null,
     var inout: Boolean = false,
     var defaultValue: String? = null,
-) : SirElement, SirElementWithAttributes {
+) : SirElement,
+    SirElementWithAttributes {
 
     var parent: SirFunction by sirValueParameterParent(parent)
 
@@ -49,15 +50,14 @@ class SirValueParameter(
             label: String? = null,
             inout: Boolean = false,
             defaultValue: String? = null,
-        ): SirValueParameter =
-            SirValueParameter(
-                name = name,
-                type = type,
-                parent = this@SirFunction,
-                attributes = attributes,
-                label = label,
-                inout = inout,
-                defaultValue = defaultValue,
-            )
+        ): SirValueParameter = SirValueParameter(
+            name = name,
+            type = type,
+            parent = this@SirFunction,
+            attributes = attributes,
+            label = label,
+            inout = inout,
+            defaultValue = defaultValue,
+        )
     }
 }

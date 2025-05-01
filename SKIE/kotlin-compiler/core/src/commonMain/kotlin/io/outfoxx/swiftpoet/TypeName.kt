@@ -37,48 +37,48 @@ import java.io.StringWriter
  */
 abstract class TypeName internal constructor() {
 
-  /** Lazily-initialized toString of this type name.  */
-  private val cachedString: String by lazy {
-    buildString {
-      val codeWriter = CodeWriter(this)
-      emit(codeWriter)
-    }
-  }
-
-  open val optional: Boolean = false
-
-  open fun makeOptional(): ParameterizedTypeName = wrapOptional()
-  open fun makeNonOptional(): TypeName = unwrapOptional()
-
-  open fun wrapOptional(): ParameterizedTypeName = OPTIONAL.parameterizedBy(this)
-  open fun unwrapOptional(): TypeName = this
-
-  open val implicit: Boolean = false
-
-  open fun makeImplicit(): ParameterizedTypeName = IMPLICIT.parameterizedBy(this)
-
-  open fun makeNonImplicit(): TypeName = this
-
-  open fun makeExistential(): ExistentialTypeName = ExistentialTypeName(this)
-  open fun makeOpaque(): OpaqueTypeName = OpaqueTypeName(this)
-
-  open val name: String
-    get() {
-      val out = StringWriter()
-      emit(CodeWriter(out))
-      return out.toString()
+    /** Lazily-initialized toString of this type name.  */
+    private val cachedString: String by lazy {
+        buildString {
+            val codeWriter = CodeWriter(this)
+            emit(codeWriter)
+        }
     }
 
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null) return false
-    if (javaClass != other.javaClass) return false
-    return toString() == other.toString()
-  }
+    open val optional: Boolean = false
 
-  override fun hashCode() = toString().hashCode()
+    open fun makeOptional(): ParameterizedTypeName = wrapOptional()
+    open fun makeNonOptional(): TypeName = unwrapOptional()
 
-  override fun toString() = cachedString
+    open fun wrapOptional(): ParameterizedTypeName = OPTIONAL.parameterizedBy(this)
+    open fun unwrapOptional(): TypeName = this
 
-  internal abstract fun emit(out: CodeWriter): CodeWriter
+    open val implicit: Boolean = false
+
+    open fun makeImplicit(): ParameterizedTypeName = IMPLICIT.parameterizedBy(this)
+
+    open fun makeNonImplicit(): TypeName = this
+
+    open fun makeExistential(): ExistentialTypeName = ExistentialTypeName(this)
+    open fun makeOpaque(): OpaqueTypeName = OpaqueTypeName(this)
+
+    open val name: String
+        get() {
+            val out = StringWriter()
+            emit(CodeWriter(out))
+            return out.toString()
+        }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        if (javaClass != other.javaClass) return false
+        return toString() == other.toString()
+    }
+
+    override fun hashCode() = toString().hashCode()
+
+    override fun toString() = cachedString
+
+    internal abstract fun emit(out: CodeWriter): CodeWriter
 }

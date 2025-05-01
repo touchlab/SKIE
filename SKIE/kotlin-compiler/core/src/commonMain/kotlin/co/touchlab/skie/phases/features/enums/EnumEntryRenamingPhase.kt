@@ -76,9 +76,7 @@ object EnumEntryRenamingPhase : SirPhase {
         }
     }
 
-    private class NameParser(
-        private val kotlinName: String,
-    ) {
+    private class NameParser(private val kotlinName: String) {
 
         private val words = mutableListOf<String>()
 

@@ -127,11 +127,7 @@ object ObjCBridgeableGenerator {
         }
     }
 
-    private fun SirClass.addFromObjectiveC(
-        bridgedType: SirType,
-        unwrapObjectiveCSource: Boolean,
-        body: CodeBlock.Builder.() -> Unit,
-    ) {
+    private fun SirClass.addFromObjectiveC(bridgedType: SirType, unwrapObjectiveCSource: Boolean, body: CodeBlock.Builder.() -> Unit) {
         SirSimpleFunction(
             identifier = "fromObjectiveC",
             returnType = SpecialSirType.Self,

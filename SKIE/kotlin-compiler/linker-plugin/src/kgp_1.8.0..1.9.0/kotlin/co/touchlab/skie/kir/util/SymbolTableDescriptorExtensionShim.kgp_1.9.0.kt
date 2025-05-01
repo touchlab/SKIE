@@ -15,15 +15,11 @@ import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.referenceFunction
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
-actual class SymbolTableDescriptorExtensionShim actual constructor(
-    private val symbolTable: ReferenceSymbolTable,
-) {
+actual class SymbolTableDescriptorExtensionShim actual constructor(private val symbolTable: ReferenceSymbolTable) {
 
-    actual fun referenceFunction(callable: CallableDescriptor): IrFunctionSymbol =
-        symbolTable.referenceFunction(callable)
+    actual fun referenceFunction(callable: CallableDescriptor): IrFunctionSymbol = symbolTable.referenceFunction(callable)
 
-    actual fun referenceProperty(descriptor: PropertyDescriptor): IrPropertySymbol =
-        symbolTable.referenceProperty(descriptor)
+    actual fun referenceProperty(descriptor: PropertyDescriptor): IrPropertySymbol = symbolTable.referenceProperty(descriptor)
 
     actual fun referenceSimpleFunction(descriptor: FunctionDescriptor): IrSimpleFunctionSymbol =
         symbolTable.referenceSimpleFunction(descriptor)
@@ -31,6 +27,5 @@ actual class SymbolTableDescriptorExtensionShim actual constructor(
     actual fun referenceConstructor(descriptor: ClassConstructorDescriptor): IrConstructorSymbol =
         symbolTable.referenceConstructor(descriptor)
 
-    actual fun referenceClass(descriptor: ClassDescriptor): IrClassSymbol =
-        symbolTable.referenceClass(descriptor)
+    actual fun referenceClass(descriptor: ClassDescriptor): IrClassSymbol = symbolTable.referenceClass(descriptor)
 }

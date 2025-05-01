@@ -3,7 +3,6 @@ import co.touchlab.skie.gradle.util.gradlePluginApi
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("skie.gradle.plugin")
@@ -27,7 +26,10 @@ skiePublishing {
 
 configurations.configureEach {
     attributes {
-        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(gradleApiVersionDimension().components.min().value))
+        attribute(
+            GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+            objects.named(gradleApiVersionDimension().components.min().value),
+        )
     }
 }
 

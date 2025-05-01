@@ -8,9 +8,8 @@ import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 
-internal class CreateKirConstructorsPhase(
-    context: KirPhase.Context,
-) : BaseCreateRegularKirFunctionPhase(context, supportsConstructors = true) {
+internal class CreateKirConstructorsPhase(context: KirPhase.Context) :
+    BaseCreateRegularKirFunctionPhase(context, supportsConstructors = true) {
 
     override fun visitConstructor(descriptor: ConstructorDescriptor, kirClass: KirClass) {
         val originalDescriptor = descriptor.original

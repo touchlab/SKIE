@@ -10,34 +10,20 @@ import co.touchlab.skie.kir.util.addOverrides
 import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
-internal class CreateKirPropertiesPhase(
-    context: KirPhase.Context,
-) : BaseCreateRegularKirMembersPhase(context, supportsProperties = true) {
+internal class CreateKirPropertiesPhase(context: KirPhase.Context) : BaseCreateRegularKirMembersPhase(context, supportsProperties = true) {
 
     private val propertyCache = mutableMapOf<PropertyDescriptor, KirProperty>()
 
-    override fun visitProperty(
-        descriptor: PropertyDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ) {
+    override fun visitProperty(descriptor: PropertyDescriptor, kirClass: KirClass, origin: Origin) {
         getOrCreateProperty(descriptor, kirClass, origin)
     }
 
-    private fun getOrCreateProperty(
-        descriptor: PropertyDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ): KirProperty =
+    private fun getOrCreateProperty(descriptor: PropertyDescriptor, kirClass: KirClass, origin: Origin): KirProperty =
         propertyCache.getOrPut(descriptor.original) {
             createProperty(descriptor, kirClass, origin)
         }
 
-    private fun createProperty(
-        descriptor: PropertyDescriptor,
-        kirClass: KirClass,
-        origin: Origin,
-    ): KirProperty {
+    private fun createProperty(descriptor: PropertyDescriptor, kirClass: KirClass, origin: Origin): KirProperty {
         val baseDescriptor = descriptor.baseProperty
         val originalDescriptor = descriptor.original
 

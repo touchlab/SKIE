@@ -18,13 +18,10 @@ package io.outfoxx.swiftpoet
 
 import kotlin.reflect.KClass
 
-abstract class AnyTypeSpec(
-  val name: String,
-  attributes: List<AttributeSpec>,
-  tags: Map<KClass<*>, Any>,
-) : AttributedSpec(attributes.toImmutableList(), tags) {
+abstract class AnyTypeSpec(val name: String, attributes: List<AttributeSpec>, tags: Map<KClass<*>, Any>) :
+    AttributedSpec(attributes.toImmutableList(), tags) {
 
-  open val typeSpecs: List<AnyTypeSpec> = listOf()
+    open val typeSpecs: List<AnyTypeSpec> = listOf()
 
-  internal abstract fun emit(codeWriter: CodeWriter)
+    internal abstract fun emit(codeWriter: CodeWriter)
 }

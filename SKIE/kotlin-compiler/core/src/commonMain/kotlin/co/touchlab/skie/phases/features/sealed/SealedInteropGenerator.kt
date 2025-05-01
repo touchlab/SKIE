@@ -7,9 +7,9 @@ import co.touchlab.skie.phases.util.MustBeExecutedAfterBridgingConfiguration
 import co.touchlab.skie.sir.element.isExported
 
 @MustBeExecutedAfterBridgingConfiguration
-class SealedInteropGenerator(
-    override val context: SirPhase.Context,
-) : SirPhase, SealedGeneratorExtensionContainer {
+class SealedInteropGenerator(override val context: SirPhase.Context) :
+    SirPhase,
+    SealedGeneratorExtensionContainer {
 
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(context)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(context)

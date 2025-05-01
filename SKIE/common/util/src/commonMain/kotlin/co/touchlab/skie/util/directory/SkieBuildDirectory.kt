@@ -6,9 +6,7 @@ import co.touchlab.skie.util.directory.structure.RootDirectory
 import co.touchlab.skie.util.directory.structure.TemporaryDirectory
 import java.io.File
 
-class SkieBuildDirectory(
-    rootDirectory: File,
-) : RootDirectory(rootDirectory) {
+class SkieBuildDirectory(rootDirectory: File) : RootDirectory(rootDirectory) {
 
     val analytics: Analytics = Analytics(this)
 
@@ -125,19 +123,19 @@ class SkieBuildDirectory(
                 directory.mkdirs()
             }
 
-            val swiftModule: File = directory.resolve("${moduleName}.swiftmodule")
+            val swiftModule: File = directory.resolve("$moduleName.swiftmodule")
 
-            val swiftInterface: File = directory.resolve("${moduleName}.swiftinterface")
+            val swiftInterface: File = directory.resolve("$moduleName.swiftinterface")
 
-            val privateSwiftInterface: File = directory.resolve("${moduleName}.private.swiftinterface")
+            val privateSwiftInterface: File = directory.resolve("$moduleName.private.swiftinterface")
 
-            val swiftDoc: File = directory.resolve("${moduleName}.swiftdoc")
+            val swiftDoc: File = directory.resolve("$moduleName.swiftdoc")
 
-            val abiJson: File = directory.resolve("${moduleName}.abi.json")
+            val abiJson: File = directory.resolve("$moduleName.abi.json")
 
-            val swiftSourceInfo: File = directory.resolve("${moduleName}.swiftsourceinfo")
+            val swiftSourceInfo: File = directory.resolve("$moduleName.swiftsourceinfo")
 
-            val swiftHeader: File = directory.resolve("${moduleName}-Swift.h")
+            val swiftHeader: File = directory.resolve("$moduleName-Swift.h")
         }
 
         class FakeObjCFrameworks(parent: Directory) : PermanentDirectory(parent, "fake-objc-frameworks") {

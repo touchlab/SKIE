@@ -17,91 +17,89 @@
 package io.outfoxx.swiftpoet
 
 class ParameterizedTypeName internal constructor(
-  private val enclosingType: TypeName?,
-  val rawType: DeclaredTypeName,
-  typeArguments: List<TypeName>,
+    private val enclosingType: TypeName?,
+    val rawType: DeclaredTypeName,
+    typeArguments: List<TypeName>,
 ) : TypeName() {
 
-  val typeArguments = typeArguments.toImmutableList()
+    val typeArguments = typeArguments.toImmutableList()
 
-  override val optional get() = rawType == OPTIONAL
-  override val implicit get() = rawType == IMPLICIT
+    override val optional get() = rawType == OPTIONAL
+    override val implicit get() = rawType == IMPLICIT
 
-  override fun makeOptional() =
-    if (optional)
-      this
-    else
-      wrapOptional()
-
-  override fun makeNonOptional() =
-    if (optional)
-      typeArguments[0].makeNonOptional()
-    else
-      this
-
-  override fun unwrapOptional() =
-    if (optional)
-      typeArguments[0]
-    else
-      this
-
-  override fun makeImplicit() =
-    if (implicit)
-      this
-    else
-      super.makeImplicit()
-
-  override fun makeNonImplicit() =
-    if (implicit)
-      typeArguments[0]
-    else
-      this
-
-  override fun emit(out: CodeWriter): CodeWriter {
-    when (rawType) {
-      OPTIONAL -> typeArguments[0].let {
-        if (it is FunctionTypeName) {
-          out.emitCode("(%T)?", it)
-        } else {
-          out.emitCode("%T?", it)
-        }
-      }
-      IMPLICIT -> out.emitCode("%T!", typeArguments[0])
-      ARRAY -> out.emitCode("[%T]", typeArguments[0])
-      DICTIONARY -> out.emitCode("[%T : %T]", typeArguments[0], typeArguments[1])
-      else -> {
-        if (enclosingType != null) {
-          enclosingType.emit(out)
-          out.emit("." + escapeKeywords(rawType.simpleName))
-        } else {
-          rawType.emit(out)
-        }
-        if (typeArguments.isNotEmpty()) {
-          out.emit("<")
-          typeArguments.forEachIndexed { index, parameter ->
-            if (index > 0) out.emit(", ")
-            parameter.emit(out)
-          }
-          out.emit(">")
-        }
-      }
+    override fun makeOptional() = if (optional) {
+        this
+    } else {
+        wrapOptional()
     }
-    return out
-  }
 
-  /**
-   * Returns a new [ParameterizedTypeName] instance for the specified `name` as nested inside this
-   * type, with the specified `typeArguments`.
-   */
-  fun nestedType(name: String, typeArguments: List<TypeName>) =
-    ParameterizedTypeName(this, rawType.nestedType(name), typeArguments)
+    override fun makeNonOptional() = if (optional) {
+        typeArguments[0].makeNonOptional()
+    } else {
+        this
+    }
 
-  companion object {
-    /** Returns a parameterized type, applying `typeArguments` to `rawType`.  */
-  }
+    override fun unwrapOptional() = if (optional) {
+        typeArguments[0]
+    } else {
+        this
+    }
+
+    override fun makeImplicit() = if (implicit) {
+        this
+    } else {
+        super.makeImplicit()
+    }
+
+    override fun makeNonImplicit() = if (implicit) {
+        typeArguments[0]
+    } else {
+        this
+    }
+
+    override fun emit(out: CodeWriter): CodeWriter {
+        when (rawType) {
+            OPTIONAL -> typeArguments[0].let {
+                if (it is FunctionTypeName) {
+                    out.emitCode("(%T)?", it)
+                } else {
+                    out.emitCode("%T?", it)
+                }
+            }
+            IMPLICIT -> out.emitCode("%T!", typeArguments[0])
+            ARRAY -> out.emitCode("[%T]", typeArguments[0])
+            DICTIONARY -> out.emitCode("[%T : %T]", typeArguments[0], typeArguments[1])
+            else -> {
+                if (enclosingType != null) {
+                    enclosingType.emit(out)
+                    out.emit("." + escapeKeywords(rawType.simpleName))
+                } else {
+                    rawType.emit(out)
+                }
+                if (typeArguments.isNotEmpty()) {
+                    out.emit("<")
+                    typeArguments.forEachIndexed { index, parameter ->
+                        if (index > 0) out.emit(", ")
+                        parameter.emit(out)
+                    }
+                    out.emit(">")
+                }
+            }
+        }
+        return out
+    }
+
+    /**
+     * Returns a new [ParameterizedTypeName] instance for the specified `name` as nested inside this
+     * type, with the specified `typeArguments`.
+     */
+    fun nestedType(name: String, typeArguments: List<TypeName>) = ParameterizedTypeName(this, rawType.nestedType(name), typeArguments)
+
+    companion object {
+        /** Returns a parameterized type, applying `typeArguments` to `rawType`.  */
+    }
 }
 
 fun DeclaredTypeName.parameterizedBy(vararg typeArguments: TypeName) = parameterizedBy(typeArguments.toList())
 
-fun DeclaredTypeName.parameterizedBy(typeArguments: List<TypeName>) =
-  ParameterizedTypeName(null, this, typeArguments)
+fun DeclaredTypeName.parameterizedBy(typeArguments: List<TypeName>) = ParameterizedTypeName(null, this, typeArguments)

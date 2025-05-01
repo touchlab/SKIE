@@ -14,7 +14,8 @@ class SirTypeAlias(
     override var isReplaced: Boolean = false,
     override var isHidden: Boolean = false,
     typeFactory: ((SirTypeAlias) -> SirType),
-) : SirTypeDeclaration, SirTypeParameterParent {
+) : SirTypeDeclaration,
+    SirTypeParameterParent {
 
     override var parent: SirDeclarationParent by sirDeclarationParent(parent)
 
@@ -56,11 +57,9 @@ class SirTypeAlias(
         type = type
     }
 
-    override fun toReadableString(): String =
-        "typealias $fqName"
+    override fun toReadableString(): String = "typealias $fqName"
 
-    override fun toType(typeArguments: List<SirType>): SirDeclaredSirType =
-        toFqNameType(typeArguments)
+    override fun toType(typeArguments: List<SirType>): SirDeclaredSirType = toFqNameType(typeArguments)
 
     override fun toString(): String = "${this::class.simpleName}: $fqName"
 
@@ -73,14 +72,13 @@ class SirTypeAlias(
             isReplaced: Boolean = false,
             isHidden: Boolean = false,
             typeFactory: ((SirTypeAlias) -> SirType),
-        ): SirTypeAlias =
-            SirTypeAlias(
-                baseName = baseName,
-                parent = this@SirDeclarationParent,
-                visibility = visibility,
-                isReplaced = isReplaced,
-                isHidden = isHidden,
-                typeFactory = typeFactory,
-            )
+        ): SirTypeAlias = SirTypeAlias(
+            baseName = baseName,
+            parent = this@SirDeclarationParent,
+            visibility = visibility,
+            isReplaced = isReplaced,
+            isHidden = isHidden,
+            typeFactory = typeFactory,
+        )
     }
 }

@@ -74,4 +74,3 @@ object VerifyModuleNamePhase : ClassExportPhase {
         }
     }
 }
-

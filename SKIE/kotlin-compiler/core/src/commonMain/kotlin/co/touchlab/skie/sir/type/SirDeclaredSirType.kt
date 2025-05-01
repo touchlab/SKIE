@@ -12,10 +12,8 @@ import co.touchlab.skie.sir.element.resolveAsKirClass
 import io.outfoxx.swiftpoet.ParameterizedTypeName
 import io.outfoxx.swiftpoet.parameterizedBy
 
-class SirDeclaredSirType(
-    private val declarationProvider: () -> SirTypeDeclaration,
-    val typeArguments: List<SirType> = emptyList(),
-) : DeclaredSirType() {
+class SirDeclaredSirType(private val declarationProvider: () -> SirTypeDeclaration, val typeArguments: List<SirType> = emptyList()) :
+    DeclaredSirType() {
 
     val declaration: SirTypeDeclaration
         get() = declarationProvider()
@@ -26,11 +24,9 @@ class SirDeclaredSirType(
     override val isReference: Boolean
         get() = declaration.isReference
 
-    override fun asHashableType(): SirType? =
-        this.takeIf { declaration.isHashable }
+    override fun asHashableType(): SirType? = this.takeIf { declaration.isHashable }
 
-    override fun asReferenceType(): SirType? =
-        this.takeIf { declaration.isReference }
+    override fun asReferenceType(): SirType? = this.takeIf { declaration.isReference }
 
     override fun evaluate(): EvaluatedSirType {
         val evaluatedTypeArguments = lazy { typeArguments.map { it.evaluate() } }
@@ -171,7 +167,5 @@ class SirDeclaredSirType(
         return result
     }
 
-    override fun toString(): String {
-        return "SirDeclaredSirType(declaration=$declaration, typeArguments=$typeArguments)"
-    }
+    override fun toString(): String = "SirDeclaredSirType(declaration=$declaration, typeArguments=$typeArguments)"
 }

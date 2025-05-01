@@ -26,16 +26,12 @@ import org.jetbrains.kotlin.utils.ResolvedDependency
 object ModulesAnalytics {
 
     @Serializable
-    data class Module(
-        val id: String,
-        val version: String?,
-        val type: Type,
-        val isExported: Boolean,
-        val statistics: Statistics?,
-    ) {
+    data class Module(val id: String, val version: String?, val type: Type, val isExported: Boolean, val statistics: Statistics?) {
 
         enum class Type {
-            BuiltIn, Library, Local,
+            BuiltIn,
+            Library,
+            Local,
         }
 
         @Serializable
@@ -48,10 +44,7 @@ object ModulesAnalytics {
         ) {
 
             @Serializable
-            data class Declarations(
-                val classes: Int,
-                val callableMembers: Int,
-            )
+            data class Declarations(val classes: Int, val callableMembers: Int)
         }
     }
 
@@ -65,14 +58,11 @@ object ModulesAnalytics {
 
         val irModuleFragments: List<IrModuleFragment?>
 
-        fun isExported(descriptorProvider: DescriptorProvider): Boolean =
-            irModuleFragments.any {
-                it?.descriptor in descriptorProvider.exposedModules
-            }
+        fun isExported(descriptorProvider: DescriptorProvider): Boolean = irModuleFragments.any {
+            it?.descriptor in descriptorProvider.exposedModules
+        }
 
-        data class BuiltIn(
-            override val irModuleFragments: List<IrModuleFragment?>,
-        ) : TypedModule {
+        data class BuiltIn(override val irModuleFragments: List<IrModuleFragment?>) : TypedModule {
 
             override val id: String = "stdlib".hashed()
 
@@ -90,10 +80,7 @@ object ModulesAnalytics {
             override val type: Module.Type = Module.Type.Library
         }
 
-        data class Local(
-            override val id: String,
-            val irModuleFragment: IrModuleFragment?,
-        ) : TypedModule {
+        data class Local(override val id: String, val irModuleFragment: IrModuleFragment?) : TypedModule {
 
             override val irModuleFragments: List<IrModuleFragment?> = listOf(irModuleFragment)
 
@@ -103,9 +90,7 @@ object ModulesAnalytics {
         }
     }
 
-    class Producer(
-        private val context: KotlinIrPhase.Context,
-    ) : AnalyticsProducer {
+    class Producer(private val context: KotlinIrPhase.Context) : AnalyticsProducer {
 
         private val descriptorProvider = context.descriptorProvider
 
@@ -121,34 +106,30 @@ object ModulesAnalytics {
                 .toPrettyJson()
         }
 
-        private fun getBuiltInModules(): List<TypedModule> =
-            descriptorProvider.buildInLibraries
-                .let { builtInLibraries ->
-                    TypedModule.BuiltIn(builtInLibraries.map { findModuleForKlib(it.libraryFile.absolutePath) })
-                }
-                .let { listOf(it) }
+        private fun getBuiltInModules(): List<TypedModule> = descriptorProvider.buildInLibraries
+            .let { builtInLibraries ->
+                TypedModule.BuiltIn(builtInLibraries.map { findModuleForKlib(it.libraryFile.absolutePath) })
+            }
+            .let { listOf(it) }
 
-        private fun getExternalLibraries(): List<TypedModule> =
-            descriptorProvider.externalDependencies
-                .map {
-                    TypedModule.Library(
-                        id = it.canonicalName.hashed(),
-                        version = it.selectedVersion.version,
-                        irModuleFragments = it.artifactPaths.map { artifactPath -> findModuleForKlib(artifactPath.path) },
-                    )
-                }
+        private fun getExternalLibraries(): List<TypedModule> = descriptorProvider.externalDependencies
+            .map {
+                TypedModule.Library(
+                    id = it.canonicalName.hashed(),
+                    version = it.selectedVersion.version,
+                    irModuleFragments = it.artifactPaths.map { artifactPath -> findModuleForKlib(artifactPath.path) },
+                )
+            }
 
-        private fun getLocalModules(): List<TypedModule> =
-            descriptorProvider.localLibraries
-                .map {
-                    TypedModule.Local(
-                        id = it.moduleName.hashed(),
-                        irModuleFragment = findModuleForKlib(it.libraryFile.absolutePath),
-                    )
-                }
+        private fun getLocalModules(): List<TypedModule> = descriptorProvider.localLibraries
+            .map {
+                TypedModule.Local(
+                    id = it.moduleName.hashed(),
+                    irModuleFragment = findModuleForKlib(it.libraryFile.absolutePath),
+                )
+            }
 
-        private fun findModuleForKlib(klib: String): IrModuleFragment? =
-            context.allModules[klib.removeSuffix(".klib")]
+        private fun findModuleForKlib(klib: String): IrModuleFragment? = context.allModules[klib.removeSuffix(".klib")]
 
         private fun TypedModule.toModuleWithStatistics(): Module {
             val hasUnknownModule = this.irModuleFragments.any { it == null }
@@ -193,23 +174,22 @@ object ModulesAnalytics {
         // Does not count classes and functions inside callable members towards declarations, however counts them towards numberOfIrElements
         private var isNestedInsideCallableMember = false
 
-        fun getStatistics(): Module.Statistics =
-            Module.Statistics(
-                exportedDeclarations = Module.Statistics.Declarations(
-                    classes = exportedClasses,
-                    callableMembers = exportedCallableMembers,
-                ),
-                exportableNonExportedDeclarations = Module.Statistics.Declarations(
-                    classes = exportableNonExportedClasses,
-                    callableMembers = exportableNonExportedCallableMembers,
-                ),
-                nonExportableDeclarations = Module.Statistics.Declarations(
-                    classes = nonExportableClasses,
-                    callableMembers = nonExportableCallableMembers,
-                ),
-                overriddenCallableMembers = overriddenCallableMembers,
-                numberOfIrElements = numberOfIrElements,
-            )
+        fun getStatistics(): Module.Statistics = Module.Statistics(
+            exportedDeclarations = Module.Statistics.Declarations(
+                classes = exportedClasses,
+                callableMembers = exportedCallableMembers,
+            ),
+            exportableNonExportedDeclarations = Module.Statistics.Declarations(
+                classes = exportableNonExportedClasses,
+                callableMembers = exportableNonExportedCallableMembers,
+            ),
+            nonExportableDeclarations = Module.Statistics.Declarations(
+                classes = nonExportableClasses,
+                callableMembers = nonExportableCallableMembers,
+            ),
+            overriddenCallableMembers = overriddenCallableMembers,
+            numberOfIrElements = numberOfIrElements,
+        )
 
         override fun visitElement(element: IrElement) {
             element.acceptChildrenVoid(this)

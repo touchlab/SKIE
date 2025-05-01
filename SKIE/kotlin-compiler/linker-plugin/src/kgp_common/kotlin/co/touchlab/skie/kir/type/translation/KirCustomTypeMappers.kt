@@ -18,10 +18,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
-class KirCustomTypeMappers(
-    private val kirBuiltins: DescriptorBasedKirBuiltins,
-    translator: Lazy<KirTypeTranslator>,
-) {
+class KirCustomTypeMappers(private val kirBuiltins: DescriptorBasedKirBuiltins, translator: Lazy<KirTypeTranslator>) {
 
     private val translator by translator
 
@@ -108,27 +105,18 @@ class KirCustomTypeMappers(
 
     private class TypeMappingMatch(val type: KotlinType, val descriptor: ClassDescriptor, val mapper: KirCustomTypeMapper)
 
-    private inner class Simple(
-        override val mappedClassId: ClassId,
-        private val kirClass: KirClass,
-    ) : KirCustomTypeMapper {
+    private inner class Simple(override val mappedClassId: ClassId, private val kirClass: KirClass) : KirCustomTypeMapper {
 
         context(KirTypeParameterScope)
-        override fun mapType(mappedSuperType: KotlinType): NonNullReferenceKirType =
-            kirClass.defaultType
+        override fun mapType(mappedSuperType: KotlinType): NonNullReferenceKirType = kirClass.defaultType
     }
 
-    private inner class Collection(
-        mappedClassFqName: FqName,
-        private val kirClass: KirClass,
-    ) : KirCustomTypeMapper {
+    private inner class Collection(mappedClassFqName: FqName, private val kirClass: KirClass) : KirCustomTypeMapper {
 
         override val mappedClassId = ClassId.topLevel(mappedClassFqName)
 
         context(KirTypeParameterScope)
-        override fun mapType(
-            mappedSuperType: KotlinType,
-        ): NonNullReferenceKirType {
+        override fun mapType(mappedSuperType: KotlinType): NonNullReferenceKirType {
             val typeArguments = mappedSuperType.arguments.map {
                 val argument = it.type
                 if (TypeUtils.isNullableType(argument)) {
@@ -149,9 +137,7 @@ class KirCustomTypeMappers(
             get() = StandardNames.getFunctionClassId(parameterCount)
 
         context(KirTypeParameterScope)
-        override fun mapType(
-            mappedSuperType: KotlinType,
-        ): NonNullReferenceKirType =
+        override fun mapType(mappedSuperType: KotlinType): NonNullReferenceKirType =
             translator.mapFunctionTypeIgnoringNullability(mappedSuperType, returnsVoid = false)
     }
 }

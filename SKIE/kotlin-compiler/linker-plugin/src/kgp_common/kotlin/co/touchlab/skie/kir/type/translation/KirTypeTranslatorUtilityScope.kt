@@ -16,16 +16,13 @@ abstract class KirTypeTranslatorUtilityScope {
     protected fun NonNullReferenceKirType.withNullabilityOf(kotlinType: KotlinType): ReferenceKirType =
         this.withNullabilityOf(kotlinType.binaryRepresentationIsNullable())
 
-    protected fun NonNullReferenceKirType.withNullabilityOf(nullable: Boolean): ReferenceKirType =
-        if (nullable) {
-            NullableReferenceKirType(this)
-        } else {
-            this
-        }
+    protected fun NonNullReferenceKirType.withNullabilityOf(nullable: Boolean): ReferenceKirType = if (nullable) {
+        NullableReferenceKirType(this)
+    } else {
+        this
+    }
 
-    protected fun OirType.toKirType(): KirType =
-        OirBasedKirType(this)
+    protected fun OirType.toKirType(): KirType = OirBasedKirType(this)
 
-    protected fun SpecialReferenceOirType.toKirType(): SpecialOirKirType =
-        SpecialOirKirType(this)
+    protected fun SpecialReferenceOirType.toKirType(): SpecialOirKirType = SpecialOirKirType(this)
 }

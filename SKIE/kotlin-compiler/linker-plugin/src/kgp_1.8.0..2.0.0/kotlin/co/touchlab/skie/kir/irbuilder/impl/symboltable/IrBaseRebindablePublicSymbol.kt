@@ -5,21 +5,18 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrBindableSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
-import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.symbols.impl.IrPublicSymbolBase
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl as KotlinIrTypeParameterPublicSymbolImpl
+import org.jetbrains.kotlin.ir.util.IdSignature
 
-actual fun IrTypeParameterPublicSymbolImpl(
-    signature: IdSignature,
-    descriptor: TypeParameterDescriptor,
-): IrTypeParameterSymbol {
-    return KotlinIrTypeParameterPublicSymbolImpl(signature, descriptor)
-}
+actual fun IrTypeParameterPublicSymbolImpl(signature: IdSignature, descriptor: TypeParameterDescriptor): IrTypeParameterSymbol =
+    KotlinIrTypeParameterPublicSymbolImpl(signature, descriptor)
 
 actual abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationDescriptor, Owner : IrSymbolOwner> actual constructor(
     signature: IdSignature,
     descriptor: Descriptor,
-) : IrBindableSymbol<Descriptor, Owner>, IrPublicSymbolBase<Descriptor>(signature, descriptor) {
+) : IrPublicSymbolBase<Descriptor>(signature, descriptor),
+    IrBindableSymbol<Descriptor, Owner> {
 
     private var _owner: Owner? = null
     actual override val owner: Owner

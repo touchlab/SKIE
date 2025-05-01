@@ -32,44 +32,41 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
         type: IrType,
-    ): IrFunctionExpression =
-        irFunctionExpression(
-            type = type,
-            origin = IrStatementOrigin.LAMBDA,
-            function = createOriginalFunctionCallLambdaFunction(bridgingFunction, originalFunctionDescriptor),
-        )
+    ): IrFunctionExpression = irFunctionExpression(
+        type = type,
+        origin = IrStatementOrigin.LAMBDA,
+        function = createOriginalFunctionCallLambdaFunction(bridgingFunction, originalFunctionDescriptor),
+    )
 
     context(KotlinIrPhase.Context, IrBlockBodyBuilder)
     private fun createOriginalFunctionCallLambdaFunction(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
-    ): IrSimpleFunction =
-        irSimpleFunction(
-            name = SpecialNames.ANONYMOUS,
-            visibility = DescriptorVisibilities.LOCAL,
-            returnType = irBuiltIns.anyType.makeNullable(),
-            origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
-            isSuspend = true,
-            body = { createOriginalFunctionCallLambdaFunctionBody(bridgingFunction, originalFunctionDescriptor) },
-        )
+    ): IrSimpleFunction = irSimpleFunction(
+        name = SpecialNames.ANONYMOUS,
+        visibility = DescriptorVisibilities.LOCAL,
+        returnType = irBuiltIns.anyType.makeNullable(),
+        origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
+        isSuspend = true,
+        body = { createOriginalFunctionCallLambdaFunctionBody(bridgingFunction, originalFunctionDescriptor) },
+    )
 
     context(KotlinIrPhase.Context, DeclarationIrBuilder)
     private fun createOriginalFunctionCallLambdaFunctionBody(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
-    ): IrBlockBody =
-        irBlockBody {
-            val originalFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunctionDescriptor)
+    ): IrBlockBody = irBlockBody {
+        val originalFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunctionDescriptor)
 
-            +irReturn(
-                irCall(originalFunctionSymbol).apply {
-                    setDispatchReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
-                    setExtensionReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
-                    setValueArgumentsForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
-                    setTypeArgumentsForDelegatingCall(bridgingFunction)
-                },
-            )
-        }
+        +irReturn(
+            irCall(originalFunctionSymbol).apply {
+                setDispatchReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
+                setExtensionReceiverForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
+                setValueArgumentsForDelegatingCall(bridgingFunction, originalFunctionDescriptor)
+                setTypeArgumentsForDelegatingCall(bridgingFunction)
+            },
+        )
+    }
 
     context(DeclarationIrBuilder)
     private fun IrCall.setDispatchReceiverForDelegatingCall(

@@ -8,9 +8,7 @@ import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-abstract class SkieConfiguration(
-    private var parent: SkieConfiguration?,
-) {
+abstract class SkieConfiguration(private var parent: SkieConfiguration?) {
 
     open val globalConfiguration: GlobalConfiguration
         get() = parent?.globalConfiguration ?: error("SkieConfiguration without parent must override globalConfiguration.")
@@ -41,8 +39,7 @@ abstract class SkieConfiguration(
         delegate.reset()
     }
 
-    fun <T> hasUnsafe(configurationKey: ConfigurationKey<T>): Boolean =
-        configurationKey in keyValueConfigurationStorage
+    fun <T> hasUnsafe(configurationKey: ConfigurationKey<T>): Boolean = configurationKey in keyValueConfigurationStorage
 
     @Suppress("UNCHECKED_CAST")
     fun <T> getUnsafe(configurationKey: ConfigurationKey<T>): T {
@@ -62,7 +59,9 @@ abstract class SkieConfiguration(
         if (isKeySupported(configurationKey)) {
             return configurationKey.defaultValue
         } else {
-            error("Configuration key '${configurationKey::class.qualifiedName}' was not registered in '${ConfigurationProvider::class.qualifiedName}' nor any SKIE plugin.")
+            error(
+                "Configuration key '${configurationKey::class.qualifiedName}' was not registered in '${ConfigurationProvider::class.qualifiedName}' nor any SKIE plugin.",
+            )
         }
     }
 
@@ -86,20 +85,16 @@ abstract class SkieConfiguration(
     private fun <T> SkieConfiguration.createValueProperty(
         defaultValueFactory: () -> T,
         isInheritable: Boolean,
-    ): PropertyDelegateProvider<Any?, Property<T>> =
-        PropertyDelegateProvider { _, property ->
-            val delegate = Property(defaultValueFactory, isInheritable)
+    ): PropertyDelegateProvider<Any?, Property<T>> = PropertyDelegateProvider { _, property ->
+        val delegate = Property(defaultValueFactory, isInheritable)
 
-            delegatesByName[property.name] = delegate
-            delegatesByProperty[property] = delegate
+        delegatesByName[property.name] = delegate
+        delegatesByProperty[property] = delegate
 
-            delegate
-        }
+        delegate
+    }
 
-    private inner class Property<T>(
-        defaultValueFactory: () -> T,
-        private val isInheritable: Boolean,
-    ) : ReadWriteProperty<Any?, T> {
+    private inner class Property<T>(defaultValueFactory: () -> T, private val isInheritable: Boolean) : ReadWriteProperty<Any?, T> {
 
         private val defaultValue: T by lazy(defaultValueFactory)
 

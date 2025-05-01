@@ -131,13 +131,11 @@ class DescriptorKirProvider(
         kirElementToDescriptorCache[kirEnumEntry] = classDescriptor.original
     }
 
-    fun getClass(classDescriptor: ClassDescriptor): KirClass =
-        findClass(classDescriptor)
-            ?: error("Class not found: $classDescriptor. This error usually means that the class is not exposed to Objective-C.")
+    fun getClass(classDescriptor: ClassDescriptor): KirClass = findClass(classDescriptor)
+        ?: error("Class not found: $classDescriptor. This error usually means that the class is not exposed to Objective-C.")
 
-    fun getClass(sourceFile: SourceFile): KirClass =
-        findClass(sourceFile)
-            ?: error("Class not found: $sourceFile. This error usually means that the class is not exposed to Objective-C.")
+    fun getClass(sourceFile: SourceFile): KirClass = findClass(sourceFile)
+        ?: error("Class not found: $sourceFile. This error usually means that the class is not exposed to Objective-C.")
 
     fun getCallableDeclarationDescriptor(callableDeclaration: KirCallableDeclaration<*>): CallableMemberDescriptor =
         kirToCallableDeclarationDescriptorCache[callableDeclaration] ?: error(
@@ -145,17 +143,18 @@ class DescriptorKirProvider(
                 "Descriptors must be registered for all instantiated CallableDeclarations.",
         )
 
-    fun getFunction(functionDescriptor: FunctionDescriptor): KirSimpleFunction =
-        findFunction(functionDescriptor)
-            ?: error("Function not found: $functionDescriptor. This error usually means that the function is not exposed to Objective-C.")
+    fun getFunction(functionDescriptor: FunctionDescriptor): KirSimpleFunction = findFunction(functionDescriptor)
+        ?: error("Function not found: $functionDescriptor. This error usually means that the function is not exposed to Objective-C.")
 
-    fun getConstructor(constructorDescriptor: ClassConstructorDescriptor): KirConstructor =
-        findConstructor(constructorDescriptor)
-            ?: error("Constructor not found: $constructorDescriptor. This error usually means that the constructor is not exposed to Objective-C.")
+    fun getConstructor(constructorDescriptor: ClassConstructorDescriptor): KirConstructor = findConstructor(constructorDescriptor)
+        ?: error(
+            "Constructor not found: $constructorDescriptor. This error usually means that the constructor is not exposed to Objective-C.",
+        )
 
-    fun getValueParameter(valueParameterDescriptor: ParameterDescriptor): KirValueParameter =
-        findValueParameter(valueParameterDescriptor)
-            ?: error("Value parameter not found: $valueParameterDescriptor. Descriptors must be registered for all exported instantiated ParameterDescriptor.")
+    fun getValueParameter(valueParameterDescriptor: ParameterDescriptor): KirValueParameter = findValueParameter(valueParameterDescriptor)
+        ?: error(
+            "Value parameter not found: $valueParameterDescriptor. Descriptors must be registered for all exported instantiated ParameterDescriptor.",
+        )
 
     fun getTypeParameterDescriptor(kirTypeParameter: KirTypeParameter): TypeParameterDescriptor =
         typeParameterToDescriptorsCache[kirTypeParameter] ?: error(
@@ -163,25 +162,19 @@ class DescriptorKirProvider(
                 "Descriptors must be registered for all instantiated TypeParameters.",
         )
 
-    fun getClassDescriptor(kirClass: KirClass): ClassDescriptor =
-        findClassDescriptor(kirClass)
-            ?: error("Class descriptor not found: $kirClass. Descriptors must be registered for all exported instantiated KirClass.")
+    fun getClassDescriptor(kirClass: KirClass): ClassDescriptor = findClassDescriptor(kirClass)
+        ?: error("Class descriptor not found: $kirClass. Descriptors must be registered for all exported instantiated KirClass.")
 
-    fun getClassSourceFile(kirClass: KirClass): SourceFile =
-        findSourceFile(kirClass)
-            ?: error("Source file not found: $kirClass. Source files must be registered for all exported instantiated KirClass.")
+    fun getClassSourceFile(kirClass: KirClass): SourceFile = findSourceFile(kirClass)
+        ?: error("Source file not found: $kirClass. Source files must be registered for all exported instantiated KirClass.")
 
-    fun findClassDescriptor(kirClass: KirClass): ClassDescriptor? =
-        kirToClassDescriptorCache[kirClass]
+    fun findClassDescriptor(kirClass: KirClass): ClassDescriptor? = kirToClassDescriptorCache[kirClass]
 
-    fun findSourceFile(kirClass: KirClass): SourceFile? =
-        kirToSourceFileCache[kirClass]
+    fun findSourceFile(kirClass: KirClass): SourceFile? = kirToSourceFileCache[kirClass]
 
-    fun findClass(classDescriptor: ClassDescriptor): KirClass? =
-        classDescriptorToKirCache[classDescriptor.original]
+    fun findClass(classDescriptor: ClassDescriptor): KirClass? = classDescriptorToKirCache[classDescriptor.original]
 
-    fun findClass(sourceFile: SourceFile): KirClass? =
-        sourceFileToKirCache[sourceFile]
+    fun findClass(sourceFile: SourceFile): KirClass? = sourceFileToKirCache[sourceFile]
 
     fun findFunction(functionDescriptor: FunctionDescriptor): KirSimpleFunction? =
         callableDeclarationDescriptorToKirCache[functionDescriptor] as? KirSimpleFunction
@@ -192,12 +185,9 @@ class DescriptorKirProvider(
     fun findValueParameter(parameterDescriptor: ParameterDescriptor): KirValueParameter? =
         kirToValueParameterDescriptorsCache[parameterDescriptor]
 
-    fun findDeclarationDescriptor(kirElement: KirElement): DeclarationDescriptor? =
-        kirElementToDescriptorCache[kirElement]
+    fun findDeclarationDescriptor(kirElement: KirElement): DeclarationDescriptor? = kirElementToDescriptorCache[kirElement]
 
-    fun getExternalClass(descriptor: ClassDescriptor): KirClass =
-        externalDescriptorKirProvider.getExternalClass(descriptor)
+    fun getExternalClass(descriptor: ClassDescriptor): KirClass = externalDescriptorKirProvider.getExternalClass(descriptor)
 
-    fun getExternalBuiltinClass(descriptor: ClassDescriptor): KirClass =
-        externalDescriptorKirProvider.getExternalBuiltinClass(descriptor)
+    fun getExternalBuiltinClass(descriptor: ClassDescriptor): KirClass = externalDescriptorKirProvider.getExternalBuiltinClass(descriptor)
 }

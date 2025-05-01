@@ -8,10 +8,7 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 
-fun TypeParameterDescriptor.copy(
-    newOwner: CallableDescriptor,
-    index: Int = this.index,
-): TypeParameterDescriptor =
+fun TypeParameterDescriptor.copy(newOwner: CallableDescriptor, index: Int = this.index): TypeParameterDescriptor =
     TypeParameterDescriptorImpl.createForFurtherModification(
         newOwner,
         this.annotations,

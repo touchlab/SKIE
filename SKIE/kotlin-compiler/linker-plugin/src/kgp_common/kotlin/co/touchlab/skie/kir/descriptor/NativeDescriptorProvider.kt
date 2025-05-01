@@ -69,7 +69,7 @@ internal class NativeDescriptorProvider(
 
     override val buildInLibraries: Set<KotlinLibrary> by lazy {
         resolvedLibraries.filter { it.isDefault }.toSet() +
-        // Kotlin 2.0 changed how is the stdlib handled and for some reason it's no longer marked as default
+            // Kotlin 2.0 changed how is the stdlib handled and for some reason it's no longer marked as default
             setOfNotNull(builtIns.any.module.konanLibrary)
     }
 
@@ -88,8 +88,7 @@ internal class NativeDescriptorProvider(
     override fun isFromLocalModule(declarationDescriptor: DeclarationDescriptor): Boolean =
         declarationDescriptor.module.konanLibrary in localLibraries
 
-    override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
-        callableMemberDescriptor.isExposed
+    override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean = callableMemberDescriptor.isExposed
 
     @get:JvmName("isExposedExtension")
     private val CallableMemberDescriptor.isExposed: Boolean

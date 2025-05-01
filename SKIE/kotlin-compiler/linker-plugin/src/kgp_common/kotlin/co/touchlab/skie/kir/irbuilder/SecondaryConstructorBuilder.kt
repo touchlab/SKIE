@@ -16,5 +16,8 @@ class SecondaryConstructorBuilder(val descriptor: ClassConstructorDescriptor) {
     var visibility: DescriptorVisibility = DescriptorVisibilities.PUBLIC
 
     // TODO Change to context(KotlinIrPhase.Context, DeclarationIrBuilder) once are context implemented properly
-    var body: (context(KotlinIrPhase.Context) DeclarationIrBuilder.(IrConstructor) -> IrBody)? = null
+    var body: (
+        context(KotlinIrPhase.Context)
+        DeclarationIrBuilder.(IrConstructor) -> IrBody
+    )? = null
 }

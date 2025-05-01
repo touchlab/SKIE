@@ -24,10 +24,8 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.source.PsiSourceFile
 
-class NewFileNamespace private constructor(
-    private val sourceFile: SourceFile,
-    private val context: Context,
-) : BaseNamespace<PackageFragmentDescriptor>() {
+class NewFileNamespace private constructor(private val sourceFile: SourceFile, private val context: Context) :
+    BaseNamespace<PackageFragmentDescriptor>() {
 
     private constructor(
         fileName: String,
@@ -63,10 +61,7 @@ class NewFileNamespace private constructor(
         return file
     }
 
-    class Factory(
-        private val moduleDescriptor: ModuleDescriptor,
-        mainIrModuleFragment: Lazy<IrModuleFragment>,
-    ) {
+    class Factory(private val moduleDescriptor: ModuleDescriptor, mainIrModuleFragment: Lazy<IrModuleFragment>) {
 
         private val namespaceContext = Context(moduleDescriptor, mainIrModuleFragment)
 
@@ -100,16 +95,15 @@ class NewFileNamespace private constructor(
             packagesByName[packageDescriptor.fqName] = packageDescriptor
         }
 
-        private fun createDummyPackageDescriptors(fqName: FqName): List<PackageFragmentDescriptor> =
-            fqName.asString()
-                .split(".")
-                .asSequence()
-                .map { it.toValidSwiftIdentifier() }
-                .scan(emptyList(), List<String>::plus)
-                .filter { it.isNotEmpty() }
-                .map { it.joinToString(".") }
-                .map { MutablePackageFragmentDescriptor(moduleDescriptor, FqName(it)) }
-                .toList()
+        private fun createDummyPackageDescriptors(fqName: FqName): List<PackageFragmentDescriptor> = fqName.asString()
+            .split(".")
+            .asSequence()
+            .map { it.toValidSwiftIdentifier() }
+            .scan(emptyList(), List<String>::plus)
+            .filter { it.isNotEmpty() }
+            .map { it.joinToString(".") }
+            .map { MutablePackageFragmentDescriptor(moduleDescriptor, FqName(it)) }
+            .toList()
     }
 
     private class Context(val moduleDescriptor: ModuleDescriptor, mainIrModuleFragment: Lazy<IrModuleFragment>) {

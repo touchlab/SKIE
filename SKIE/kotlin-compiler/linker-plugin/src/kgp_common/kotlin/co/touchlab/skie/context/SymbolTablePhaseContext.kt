@@ -5,10 +5,9 @@ import co.touchlab.skie.kir.util.SkieSymbolTable
 import co.touchlab.skie.phases.SymbolTablePhase
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
-class SymbolTablePhaseContext(
-    mainSkieContext: MainSkieContext,
-    symbolTable: SymbolTable,
-) : SymbolTablePhase.Context, ForegroundPhaseCompilerContext by mainSkieContext {
+class SymbolTablePhaseContext(mainSkieContext: MainSkieContext, symbolTable: SymbolTable) :
+    SymbolTablePhase.Context,
+    ForegroundPhaseCompilerContext by mainSkieContext {
 
     override val context: SymbolTablePhaseContext = this
 

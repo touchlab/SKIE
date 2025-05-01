@@ -3,10 +3,9 @@ package co.touchlab.skie.oir.element
 import java.nio.file.Path
 
 // Instantiate only in OirProvider
-class OirFile(
-    val name: String,
-    override val module: OirModule.Kotlin,
-) : OirElement, OirTopLevelDeclarationParent {
+class OirFile(val name: String, override val module: OirModule.Kotlin) :
+    OirElement,
+    OirTopLevelDeclarationParent {
 
     val imports: MutableList<String> = mutableListOf()
 
@@ -26,7 +25,6 @@ class OirFile(
 
     companion object {
 
-        fun relativePath(namespace: String, name: String): Path =
-            Path.of("$namespace/$namespace.$name.h")
+        fun relativePath(namespace: String, name: String): Path = Path.of("$namespace/$namespace.$name.h")
     }
 }

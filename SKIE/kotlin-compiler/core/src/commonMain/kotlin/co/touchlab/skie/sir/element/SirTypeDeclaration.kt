@@ -58,14 +58,11 @@ sealed interface SirTypeDeclaration : SirDeclarationWithVisibility {
 
     fun toType(typeArguments: List<SirType>): SirDeclaredSirType
 
-    fun toType(vararg typeArguments: SirType): SirDeclaredSirType =
-        toType(typeArguments.toList())
+    fun toType(vararg typeArguments: SirType): SirDeclaredSirType = toType(typeArguments.toList())
 
-    fun toFqNameType(typeArguments: List<SirType>): SirDeclaredSirType =
-        SirDeclaredSirType({ this }, typeArguments = typeArguments)
+    fun toFqNameType(typeArguments: List<SirType>): SirDeclaredSirType = SirDeclaredSirType({ this }, typeArguments = typeArguments)
 
-    fun toFqNameType(vararg typeArguments: SirType): SirDeclaredSirType =
-        toFqNameType(typeArguments.toList())
+    fun toFqNameType(vararg typeArguments: SirType): SirDeclaredSirType = toFqNameType(typeArguments.toList())
 
     fun toReadableString(): String
 }
@@ -76,19 +73,17 @@ fun SirTypeDeclaration.toTypeFromEnclosingTypeParameters(typeParameters: List<Si
 fun SirTypeDeclaration.toFqNameTypeFromEnclosingTypeParameters(typeParameters: List<SirTypeParameter>): DeclaredSirType =
     toFqNameType(typeParameters.map { it.toTypeParameterUsage() })
 
-fun SirTypeDeclaration.resolveAsSirClass(): SirClass? =
-    when (this) {
-        is SirClass -> this
-        is SirTypeAlias -> {
-            when (val type = type) {
-                is SirTypeDeclaration -> type.resolveAsSirClass()
-                else -> null
-            }
+fun SirTypeDeclaration.resolveAsSirClass(): SirClass? = when (this) {
+    is SirClass -> this
+    is SirTypeAlias -> {
+        when (val type = type) {
+            is SirTypeDeclaration -> type.resolveAsSirClass()
+            else -> null
         }
     }
+}
 
-fun SirTypeDeclaration.resolveAsKirClass(): KirClass? =
-    resolveAsSirClass()?.kirClassOrNull
+fun SirTypeDeclaration.resolveAsKirClass(): KirClass? = resolveAsSirClass()?.kirClassOrNull
 
 fun SirTypeDeclaration.getTypeParameter(name: String): SirTypeParameter =
     typeParameters.singleOrNull { it.name == name } ?: throw NoSuchElementException("$this does not contain type parameter $name")

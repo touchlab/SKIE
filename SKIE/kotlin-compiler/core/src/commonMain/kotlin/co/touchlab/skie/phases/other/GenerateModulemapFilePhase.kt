@@ -13,38 +13,37 @@ sealed class GenerateModulemapFilePhase(private val generateSwiftModule: Boolean
         framework.modulemapFile.writeText(content)
     }
 
-    private fun SirPhase.Context.getModulemapContent(): String =
-        StringBuilder().apply {
-            appendLine("// $GeneratedBySkieComment")
+    private fun SirPhase.Context.getModulemapContent(): String = StringBuilder().apply {
+        appendLine("// $GeneratedBySkieComment")
+        appendLine()
+        appendLine("framework module ${framework.frameworkName} {")
+        appendLine("    umbrella header \"${framework.frameworkName}.h\"")
+
+        if (SkieConfigurationFlag.Migration_WildcardExport.isEnabled) {
             appendLine()
-            appendLine("framework module ${framework.frameworkName} {")
-            appendLine("    umbrella header \"${framework.frameworkName}.h\"")
+            appendLine("    export *")
+            appendLine("    module * { export * }")
+        }
 
-            if (SkieConfigurationFlag.Migration_WildcardExport.isEnabled) {
+        sirProvider.allUsedExternalModules.let { externalModules ->
+            if (externalModules.isNotEmpty()) {
                 appendLine()
-                appendLine("    export *")
-                appendLine("    module * { export * }")
-            }
-
-            sirProvider.allUsedExternalModules.let { externalModules ->
-                if (externalModules.isNotEmpty()) {
-                    appendLine()
-                    externalModules.forEach {
-                        appendLine("    use ${it.name}")
-                    }
+                externalModules.forEach {
+                    appendLine("    use ${it.name}")
                 }
             }
+        }
 
+        appendLine("}")
+
+        if (generateSwiftModule && framework.swiftHeader.exists()) {
+            appendLine()
+            appendLine("module ${framework.frameworkName}.Swift {")
+            appendLine("    header \"${framework.swiftHeader.name}\"")
+            appendLine("    requires objc")
             appendLine("}")
-
-            if (generateSwiftModule && framework.swiftHeader.exists()) {
-                appendLine()
-                appendLine("module ${framework.frameworkName}.Swift {")
-                appendLine("    header \"${framework.swiftHeader.name}\"")
-                appendLine("    requires objc")
-                appendLine("}")
-            }
-        }.toString()
+        }
+    }.toString()
 
     object ForSwiftCompilation : GenerateModulemapFilePhase(generateSwiftModule = false)
 
