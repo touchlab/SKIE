@@ -55,10 +55,10 @@ fun Project.configureSkieRuntimeDependencySubstitution() {
                 all {
                     val requestedModule = requested as? ModuleComponentSelector ?: return@all
 
-                    if (requestedModule.moduleIdentifier.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) &&  requestedModule.module.contains("__kgp_")) {
-                        val baseTargetModuleId = requestedModule.toString().substringBefore("__kgp_")
+                    if (requestedModule.moduleIdentifier.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) && requestedModule.module.contains("__kgp_")) {
+                        val baseTargetModuleId = requestedModule.toString().removePrefix(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE).substringBefore("__kgp_")
 
-                        val updatedCoordinate = baseTargetModuleId + "__kgp_" + skieInternalExtension.kotlinVersion + ":" + BuildConfig.SKIE_VERSION
+                        val updatedCoordinate = "${BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE}-${skieInternalExtension.kotlinVersion}${baseTargetModuleId}:${BuildConfig.SKIE_VERSION}"
 
                         logger.debug("Replacing {} with {}", requested, updatedCoordinate)
                         useTarget(updatedCoordinate)

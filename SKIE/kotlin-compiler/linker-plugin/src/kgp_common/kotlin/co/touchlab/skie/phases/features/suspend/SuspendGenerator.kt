@@ -9,6 +9,7 @@ import co.touchlab.skie.phases.FrontendIrPhase
 import co.touchlab.skie.phases.descriptorProvider
 import co.touchlab.skie.phases.util.StatefulKirPhase
 import co.touchlab.skie.phases.util.StatefulSirPhase
+import co.touchlab.skie.util.isComposable
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 object SuspendGenerator : FrontendIrPhase {
@@ -36,7 +37,7 @@ object SuspendGenerator : FrontendIrPhase {
             .filter { it.configuration.isSuspendInteropEnabled }
 
     private val SimpleFunctionDescriptor.isSupported: Boolean
-        get() = this.isSuspend
+        get() = this.isSuspend && !this.isComposable
 
     object FlowMappingConfigurationPhase : StatefulKirPhase()
 

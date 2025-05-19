@@ -14,6 +14,7 @@ import co.touchlab.skie.phases.mapper
 import co.touchlab.skie.phases.skieSymbolTable
 import co.touchlab.skie.phases.util.doInPhase
 import co.touchlab.skie.util.SharedCounter
+import co.touchlab.skie.util.isComposable
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
@@ -40,6 +41,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     override fun generate() {
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
+            .filterNot { it.isComposable }
             .filter { it.hasDefaultArguments }
             .filter { mapper.isBaseMethod(it) }
             .forEach {
