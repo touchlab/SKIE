@@ -47,6 +47,8 @@ object SkieGradlePluginApplier {
             return
         }
 
+        checkKGPVersionCompatibility()
+
         kgpShim.initializeShim()
 
         warnOnEmptyFrameworks()
@@ -57,6 +59,24 @@ object SkieGradlePluginApplier {
 
         skieInternalExtension.targets.configureEach {
             configureSkie()
+        }
+    }
+
+    // TODO Remove once the issue with Kotlin 2.1.20 is resolved
+    private fun Project.checkKGPVersionCompatibility() {
+        val doesNotWorkWithOlderGradleVersions = project.kgpShim.getKotlinPluginVersion().startsWith("2.1.2")
+
+        if (doesNotWorkWithOlderGradleVersions) {
+            val gradleVersionParts = project.gradle.gradleVersion.split(".").mapNotNull { it.toIntOrNull() }
+
+            val majorVersion = gradleVersionParts.getOrNull(0) ?: 0
+            val minorVersion = gradleVersionParts.getOrNull(1) ?: 0
+
+            val gradleIsNotSupported = (majorVersion < 8) || (majorVersion == 8 && minorVersion < 8)
+
+            if (gradleIsNotSupported) {
+                error("SKIE for Kotlin 2.1.20 and newer does not currently support Gradle versions older than 8.8. Please upgrade your Gradle version to at least 8.8.")
+            }
         }
     }
 

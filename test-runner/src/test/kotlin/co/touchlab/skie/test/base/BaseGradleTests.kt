@@ -66,7 +66,8 @@ abstract class BaseGradleTests: TestUtilsTrait, GradleBuildFileBuilderTrait {
     }
 
     fun runGradle(
-        gradleVersion: String = "8.4",
+        // TODO Revert back to 8.4 once the issue with Kotlin 2.1.20 is resolved
+        gradleVersion: String = "8.8",
         vararg arguments: String = arrayOf("build"),
         assertResult: ((BuildResult) -> Unit)? = {
             assertEquals(TaskOutcome.SUCCESS, it.task(":build")?.outcome)
