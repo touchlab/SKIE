@@ -6,6 +6,8 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.allModules
 import co.touchlab.skie.phases.descriptorProvider
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
+import co.touchlab.skie.shim.IrVisitorVoid
+import co.touchlab.skie.shim.visitChildren
 import co.touchlab.skie.util.hash.hashed
 import co.touchlab.skie.util.toPrettyJson
 import kotlinx.serialization.Serializable
@@ -17,9 +19,6 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
@@ -157,7 +156,7 @@ object ModulesAnalytics {
                 val statisticsVisitor = StatisticsVisitor(descriptorProvider)
 
                 this.irModuleFragments.forEach {
-                    it?.acceptVoid(statisticsVisitor)
+                    it?.let { statisticsVisitor.visitModuleFragment(it) }
                 }
 
                 statisticsVisitor.getStatistics()
@@ -175,7 +174,7 @@ object ModulesAnalytics {
         }
     }
 
-    class StatisticsVisitor(private val descriptorProvider: DescriptorProvider) : IrElementVisitorVoid {
+    class StatisticsVisitor(private val descriptorProvider: DescriptorProvider) : IrVisitorVoid() {
 
         private var exportedClasses = 0
         private var exportedCallableMembers = 0
@@ -212,7 +211,7 @@ object ModulesAnalytics {
             )
 
         override fun visitElement(element: IrElement) {
-            element.acceptChildrenVoid(this)
+            this.visitChildren(element)
 
             numberOfIrElements++
         }

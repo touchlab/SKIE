@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.ir.backend.js.compile
+
 plugins {
     id("skie.compiler")
     id("skie.publishable")
@@ -12,6 +14,10 @@ skiePublishing {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xskip-metadata-version-check")
+        optIn.addAll("org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi")
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
