@@ -8,7 +8,6 @@ ktor = "2.3.10"
 nexusPublish = "2.0.0-rc-1"
 gradleDoctor = "0.8.1"
 coroutines = "1.7.0"
-coroutines-legacy = "1.6.4"
 # Update also gradle-wrapper.properties
 gradle = "8.7"
 shadow = "8.1.1"
@@ -36,7 +35,6 @@ kotlin-native-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-nati
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version = "0.53.0" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlinx-coroutines-core-legacy = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines-legacy" }
 kotlinx-coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
 kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.15.1" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }

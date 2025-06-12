@@ -7,15 +7,13 @@ enum class DarwinPlatformComponent(
     val sinceKotlinVersion: String? = null,
     val untilKotlinVersionExclusive: String? = null
 ) : Target.Component {
-//     iosArm32("ios_arm32", untilKotlinVersionExclusive = "2.0.0"),
     iosArm64("ios_arm64"),
     iosX64("ios_x64"),
     iosSimulatorArm64("ios_simulator_arm64"),
 
     watchosArm32("watchos_arm32"),
     watchosArm64("watchos_arm64"),
-    watchosDeviceArm64("watchos_device_arm64", sinceKotlinVersion = "1.8.20"),
-//     watchosX86("watchos_x86", untilKotlinVersionExclusive = "2.0.0"),
+    watchosDeviceArm64("watchos_device_arm64"),
     watchosX64("watchos_x64"),
     watchosSimulatorArm64("watchos_simulator_arm64"),
 

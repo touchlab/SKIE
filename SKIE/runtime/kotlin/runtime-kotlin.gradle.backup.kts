@@ -155,13 +155,7 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
                 "tokens" to mapOf(
                     "targetKotlinVersion" to kotlinToolingVersion.primaryVersion.toString(),
                     "targets" to supportedDarwinTargets.joinToString("\n") { "$it()" },
-                    // Runtime requires Coroutines but watchosDeviceArm64 is only supported since Coroutines 1.7.0 which require Kotlin 1.8.20
-                    // For this reason we must use an older version of Coroutines for Kotlin 1.8.0
-                    "dependencies" to if (kotlinToolingVersion.value == "1.8.0") {
-                        "implementation(libs.kotlinx.coroutines.core.legacy)"
-                    } else {
-                        "implementation(libs.kotlinx.coroutines.core)"
-                    }
+                    "dependencies" to "implementation(libs.kotlinx.coroutines.core)"
                 )
             )
         }
@@ -221,15 +215,9 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
             }
         }
 
-        // Runtime requires Coroutines but watchosDeviceArm64 is only supported since Coroutines 1.7.0 which require Kotlin 1.8.20
-        // For this reason we must use an older version of Coroutines for Kotlin 1.8.0
         dependencies {
             configuration(
-                if (kotlinToolingVersion.value == "1.8.0") {
-                    libs.kotlinx.coroutines.core.legacy
-                } else {
-                    libs.kotlinx.coroutines.core
-                }
+                libs.kotlinx.coroutines.core
             )
         }
 

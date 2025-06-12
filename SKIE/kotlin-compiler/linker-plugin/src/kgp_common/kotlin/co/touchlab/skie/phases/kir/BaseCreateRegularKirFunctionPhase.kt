@@ -7,7 +7,6 @@ import co.touchlab.skie.kir.element.KirFunction
 import co.touchlab.skie.kir.element.KirValueParameter
 import co.touchlab.skie.kir.type.translation.KirTypeParameterScope
 import co.touchlab.skie.phases.KirPhase
-import co.touchlab.skie.phases.kir.util.getKirValueParameterName
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridgeValueParameter
@@ -69,7 +68,7 @@ internal abstract class BaseCreateRegularKirFunctionPhase(
         val valueParameter = KirValueParameter(
             kotlinName = kotlinName,
             objCName = when (kind) {
-                is KirValueParameter.Kind.ValueParameter -> namer.getKirValueParameterName(parameterDescriptor!!)
+                is KirValueParameter.Kind.ValueParameter -> namer.getParameterName(parameterDescriptor!!)
                 else -> kotlinName
             }.toValidSwiftIdentifier(),
             parent = function,

@@ -2,7 +2,6 @@ package co.touchlab.skie.kir.irbuilder.util
 
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.irFactory
-import co.touchlab.skie.shim.createSimpleFunction
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.descriptors.Modality

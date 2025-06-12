@@ -4,7 +4,6 @@ import co.touchlab.skie.compilerinject.reflection.reflectedBy
 import co.touchlab.skie.compilerinject.reflection.reflectors.CompositePackageFragmentProviderReflector
 import co.touchlab.skie.compilerinject.reflection.reflectors.ModuleDescriptorImplReflector
 import co.touchlab.skie.phases.KotlinIrPhase
-import co.touchlab.skie.shim.createDummyIrFileEntry
 import co.touchlab.skie.util.swift.toValidSwiftIdentifier
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -54,7 +53,7 @@ class NewFileNamespace private constructor(
 
     context(KotlinIrPhase.Context)
     override fun generateNamespaceIr(): IrDeclarationContainer {
-        val fileEntry = createDummyIrFileEntry(sourceFile.nameOrError)
+        val fileEntry = DummyIrFileEntry(sourceFile.nameOrError)
 
         val file = IrFileImpl(fileEntry, descriptor, context.mainIrModuleFragment)
 

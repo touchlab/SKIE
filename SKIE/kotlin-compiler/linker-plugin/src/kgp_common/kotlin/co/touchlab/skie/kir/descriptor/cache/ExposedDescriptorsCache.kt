@@ -4,7 +4,6 @@ package co.touchlab.skie.kir.descriptor.cache
 
 import co.touchlab.skie.kir.descriptor.cache.ExposedDescriptorTypeVisitor.TypeParameterRootScope
 import co.touchlab.skie.kir.descriptor.cache.ExposedDescriptorTypeVisitor.TypeParameterScope
-import co.touchlab.skie.shim.createObjCExportNamerImpl
 import co.touchlab.skie.util.KotlinCompilerVersion
 import co.touchlab.skie.util.SafeRecursionEngine
 import co.touchlab.skie.util.current
@@ -12,6 +11,8 @@ import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.descriptors.getPackageFragments
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamerImpl
+import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportProblemCollector
 import org.jetbrains.kotlin.backend.konan.objcexport.needCompanionObjectProperty
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -54,7 +55,7 @@ internal class ExposedDescriptorsCache(
 
     private val safeRecursionEngine = SafeRecursionEngine(::exposeClassRecursively)
 
-    private val dummyNamer = createObjCExportNamerImpl(
+    private val dummyNamer = ObjCExportNamerImpl(
         configuration = object : ObjCExportNamer.Configuration {
             override val objcGenerics: Boolean = objcGenerics
             override val topLevelNamePrefix: String = ""
@@ -62,6 +63,7 @@ internal class ExposedDescriptorsCache(
         },
         builtIns = builtIns,
         mapper = mapper.kotlinMapper,
+        problemCollector = ObjCExportProblemCollector.SILENT,
         local = true,
     )
 
@@ -209,9 +211,7 @@ internal class ExposedDescriptorsCache(
         if (classDescriptor.kind.isEnumClass) {
             exposeClass("kotlin.Array", classDescriptor)
 
-            if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`1_9_0`) {
-                exposeClass("kotlin.List", classDescriptor)
-            }
+            exposeClass("kotlin.List", classDescriptor)
         }
     }
 

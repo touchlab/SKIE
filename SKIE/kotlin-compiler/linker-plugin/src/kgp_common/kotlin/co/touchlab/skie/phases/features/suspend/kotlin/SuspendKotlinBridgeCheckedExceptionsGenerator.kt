@@ -6,7 +6,6 @@ import co.touchlab.skie.phases.irBuiltIns
 import co.touchlab.skie.phases.irFactory
 import co.touchlab.skie.phases.pluginContext
 import co.touchlab.skie.phases.skieSymbolTable
-import co.touchlab.skie.shim.SUSPEND_WRAPPER_CHECKED_EXCEPTIONS
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -20,6 +19,7 @@ import org.jetbrains.kotlin.ir.builders.irExprBody
 import org.jetbrains.kotlin.ir.builders.irGetField
 import org.jetbrains.kotlin.ir.builders.irVararg
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationOriginImpl
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -145,4 +145,10 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
             is TypeAliasDescriptor -> classifier.expandedType.toIrSymbol()
             else -> skieSymbolTable.kotlinSymbolTable.referenceClassifier(classifier)
         }
+
+    companion object {
+
+        private val SUSPEND_WRAPPER_CHECKED_EXCEPTIONS: IrDeclarationOriginImpl =
+            IrDeclarationOriginImpl("SUSPEND_WRAPPER_CHECKED_EXCEPTIONS", true)
+    }
 }

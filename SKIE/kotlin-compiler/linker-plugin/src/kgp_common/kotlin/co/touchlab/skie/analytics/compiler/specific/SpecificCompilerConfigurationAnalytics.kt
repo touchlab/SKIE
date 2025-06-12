@@ -12,8 +12,11 @@ object SpecificCompilerConfigurationAnalytics {
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_CompilerConfiguration
 
-        override fun produce(): String = config.getSpecificCompilerConfigurationAnalytics()
+        override fun produce(): String = "{}"
+        // Add back if needed
+//             config.getSpecificCompilerConfigurationAnalytics()
     }
 }
 
-expect fun KonanConfig.getSpecificCompilerConfigurationAnalytics(): String
+// Add back if needed
+// expect fun KonanConfig.getSpecificCompilerConfigurationAnalytics(): String

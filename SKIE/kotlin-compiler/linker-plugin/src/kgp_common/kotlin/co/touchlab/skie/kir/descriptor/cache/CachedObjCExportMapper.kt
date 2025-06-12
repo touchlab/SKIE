@@ -2,8 +2,8 @@
 
 package co.touchlab.skie.kir.descriptor.cache
 
-import co.touchlab.skie.shim.isObjCObjectType
 import co.touchlab.skie.shim.ObjCExportMapperShim
+import org.jetbrains.kotlin.ir.objcinterop.isObjCObjectType
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import org.jetbrains.kotlin.backend.konan.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanFqNames

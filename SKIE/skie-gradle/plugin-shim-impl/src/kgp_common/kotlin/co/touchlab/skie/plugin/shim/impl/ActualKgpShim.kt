@@ -36,7 +36,7 @@ class ActualKgpShim(
     private val project: Project,
 ) : KgpShim {
 
-    override val launchScheduler = LaunchScheduler()
+    override val launchScheduler = LaunchSchedulerImpl()
 
     override val hostIsMac: Boolean = HostManager.hostIsMac
 

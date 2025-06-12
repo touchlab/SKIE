@@ -1,3 +1,5 @@
+@file:OptIn(ObsoleteDescriptorBasedAPI::class)
+
 package co.touchlab.skie.kir.irbuilder.impl.template
 
 import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
@@ -13,6 +15,7 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
@@ -72,8 +75,6 @@ class FunctionTemplate(
         val symbolFactory = { IrRebindableSimpleFunctionPublicSymbol(signature, descriptor) }
         val functionFactory = { symbol: IrSimpleFunctionSymbol ->
             DummyIrSimpleFunction(symbol).also {
-                // In 1.8.0 the symbol is already present before calling declareSimpleFunction and therefore is not IrRebindableSimpleFunctionPublicSymbol
-                // Starting from 1.9.0 the SymbolTable has additional check that requires that the symbol of created function is bounded in the factory.
                 if (symbol is IrRebindableSimpleFunctionPublicSymbol) {
                     symbol.bind(it)
                 }

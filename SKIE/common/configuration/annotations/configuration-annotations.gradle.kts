@@ -10,7 +10,7 @@ plugins {
 multiCompileRuntime {
     isPublishable = true
     targets.set(MultiCompileTarget.all)
-    rootKotlinVersion = MultiCompileTarget.kotlin_1_8_20
+    rootKotlinVersion = MultiCompileTarget.kotlin_2_0_0
     klibPath = { kotlinVersion, target ->
         if (target.platformType == KotlinPlatformType.jvm) {
             "build/libs/configuration-annotations-${kotlinVersion}-${target.name.lowercase()}-${version}.jar"

@@ -1,5 +1,6 @@
 package co.touchlab.skie.kir.util
 
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.util.IdSignatureComposer
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
@@ -12,5 +13,6 @@ class SkieSymbolTable(
     val signaturer: IdSignatureComposer
         get() = kotlinSymbolTable.signaturer!!
 
-    val descriptorExtension: SymbolTableDescriptorExtensionShim = SymbolTableDescriptorExtensionShim(kotlinSymbolTable)
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    val descriptorExtension = kotlinSymbolTable.descriptorExtension
 }

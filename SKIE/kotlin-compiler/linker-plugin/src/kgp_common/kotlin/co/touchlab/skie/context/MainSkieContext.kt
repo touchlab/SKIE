@@ -88,11 +88,7 @@ class MainSkieContext internal constructor(
             environment = kotlinTargetTriple.environment,
         ),
         bitcodeEmbeddingMode = konanConfig.configuration.getBitcodeEmbeddingMode(),
-        absoluteSwiftcPath = if (KotlinCompilerVersion.current >= KotlinCompilerVersion.`2_0_0`) {
-            configurables.absoluteTargetToolchain + "/bin/swiftc"
-        } else {
-            configurables.absoluteTargetToolchain + "/usr/bin/swiftc"
-        },
+        absoluteSwiftcPath = configurables.absoluteTargetToolchain + "/bin/swiftc",
         absoluteTargetSysRootPath = configurables.absoluteTargetSysRoot,
         osVersionMin = configurables.osVersionMin,
     )

@@ -13,10 +13,6 @@ data class MultiCompileTarget(
         get() = name.replaceFirstChar { it.uppercase() }
 
     companion object {
-        val kotlin_1_8_0 = KotlinToolingVersion("1.8.0")
-        val kotlin_1_8_20 = KotlinToolingVersion("1.8.20")
-        val kotlin_1_9_0 = KotlinToolingVersion("1.9.0")
-        val kotlin_1_9_20 = KotlinToolingVersion("1.9.20")
         val kotlin_2_0_0 = KotlinToolingVersion("2.0.0")
         val kotlin_2_1_0 = KotlinToolingVersion("2.1.0")
 
@@ -31,21 +27,12 @@ data class MultiCompileTarget(
             konanTargetName = "js",
             platformType = KotlinPlatformType.js,
             declaration = { kotlinVersion ->
-                if (kotlinVersion >= kotlin_1_9_0) {
                     """
                     js {
                         browser()
                         nodejs()
                     }
                     """.trimIndent()
-                } else {
-                    """
-                    js(BOTH) {
-                        browser()
-                        nodejs()
-                    }
-                    """.trimIndent()
-                }
             }
         )
 
@@ -66,13 +53,6 @@ data class MultiCompileTarget(
             konanTargetName = "android_native_x64",
         )
 
-        val iosArm32 = MultiCompileTarget(
-            name = "iosArm32",
-            konanTargetName = "ios_arm32",
-            declaration = { kotlinVersion ->
-                "iosArm32()".takeUnless { kotlinVersion >= kotlin_1_9_20 }
-            },
-        )
         val iosArm64 = MultiCompileTarget(
             name = "iosArm64",
             konanTargetName = "ios_arm64",
@@ -93,13 +73,6 @@ data class MultiCompileTarget(
         val watchosArm64 = MultiCompileTarget(
             name = "watchosArm64",
             konanTargetName = "watchos_arm64",
-        )
-        val watchosX86 = MultiCompileTarget(
-            name = "watchosX86",
-            konanTargetName = "watchos_x86",
-            declaration = { kotlinVersion ->
-                "watchosX86()".takeUnless { kotlinVersion >= kotlin_1_9_20 }
-            },
         )
         val watchosX64 = MultiCompileTarget(
             name = "watchosX64",
@@ -153,25 +126,8 @@ data class MultiCompileTarget(
             name = "mingwX64",
             konanTargetName = "mingw_x64",
         )
-        val mingwX86 = MultiCompileTarget(
-            name = "mingwX86",
-            konanTargetName = "mingw_x86",
-            declaration = { kotlinVersion ->
-                "mingwX86()".takeUnless { kotlinVersion >= kotlin_1_9_20 }
-            },
-        )
-
-        val wasm32 = MultiCompileTarget(
-            name = "wasm32",
-            konanTargetName = "wasm32",
-            platformType = KotlinPlatformType.wasm,
-            declaration = { kotlinVersion ->
-                "wasm32()".takeUnless { kotlinVersion >= kotlin_1_9_20 }
-            },
-        )
 
         val allIos = listOf(
-            iosArm32,
             iosArm64,
             iosX64,
             iosSimulatorArm64,
@@ -180,7 +136,6 @@ data class MultiCompileTarget(
         val allWatchos = listOf(
             watchosArm32,
             watchosArm64,
-            watchosX86,
             watchosX64,
             watchosSimulatorArm64,
             watchosDeviceArm64,
@@ -210,8 +165,6 @@ data class MultiCompileTarget(
             linuxArm32Hfp,
             linuxX64,
             mingwX64,
-            mingwX86,
-            wasm32,
         )
     }
 }

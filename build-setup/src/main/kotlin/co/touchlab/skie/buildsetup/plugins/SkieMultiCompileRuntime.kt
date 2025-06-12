@@ -1,6 +1,5 @@
 package co.touchlab.skie.buildsetup.plugins
 
-import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget.Companion.kotlin_1_9_0
 import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget.Companion.kotlin_2_1_0
 import co.touchlab.skie.buildsetup.tasks.BuildNestedGradle
 import co.touchlab.skie.gradle.KotlinCompilerVersion
@@ -203,14 +202,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                     when (target.platformType) {
                         KotlinPlatformType.common -> listOf("metadataMainClasses")
                         KotlinPlatformType.jvm, KotlinPlatformType.androidJvm -> listOf("${target.name}Jar")
-                        KotlinPlatformType.js -> if (kotlinVersion >= kotlin_1_9_0) {
-                            listOf("${target.name}Jar")
-                        } else {
-                            listOf(
-                                "${target.name}IrJar",
-                                "${target.name}LegacyJar",
-                            )
-                        }
+                        KotlinPlatformType.js -> listOf("${target.name}Jar")
 
                         KotlinPlatformType.native, KotlinPlatformType.wasm -> if (kotlinVersion >= kotlin_2_1_0) {
                             listOf("${target.name}Klib")

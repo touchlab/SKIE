@@ -25,7 +25,7 @@ abstract class SkieRuntimeKotlin : Plugin<Project> {
         apply<MultiDimensionTargetPlugin>()
 
         extensions.configure<MultiDimensionTargetExtension> {
-            dimensions(darwinPlatformDimension(), kotlinToolingVersionDimension(), filter = { it.isSupported }) { target ->
+            dimensions(darwinPlatformDimension(), kotlinToolingVersionDimension()) { target ->
                 configureTarget(target)
             }
 
@@ -42,10 +42,6 @@ abstract class SkieRuntimeKotlin : Plugin<Project> {
             }
         }
     }
-
-    private val Target.isSupported: Boolean
-        // Runtime requires Coroutines but watchosDeviceArm64 is only supported since Coroutines 1.7.0 which require Kotlin 1.8.20
-        get() = !(darwinPlatform == DarwinPlatformComponent.watchosDeviceArm64 && kotlinToolingVersion.primaryVersion == KotlinToolingVersion("1.8.0"))
 
     private fun KotlinMultiplatformExtension.configureTarget(target: Target): KotlinTarget {
         val preset = presets.getByName(target.darwinPlatform.name)

@@ -28,6 +28,7 @@ data class CommonCompilerConfigurationAnalytics(
     val allocationMode: String?,
     val unitSuspendFunctionObjCExport: String?,
     val objcExportSuspendFunctionLaunchThreadRestriction: String?,
+    val objcExportDisableSwiftMemberNameMangling: Boolean?,
 ) {
 
     class Producer(private val config: KonanConfig) : AnalyticsProducer {
@@ -54,6 +55,7 @@ data class CommonCompilerConfigurationAnalytics(
                 unitSuspendFunctionObjCExport = config.configuration.get(BinaryOptions.unitSuspendFunctionObjCExport)?.toString(),
                 objcExportSuspendFunctionLaunchThreadRestriction = config.configuration.get(BinaryOptions.objcExportSuspendFunctionLaunchThreadRestriction)
                     ?.toString(),
+                objcExportDisableSwiftMemberNameMangling = config.configuration.get(BinaryOptions.objcExportDisableSwiftMemberNameMangling),
             ).toPrettyJson()
     }
 }
