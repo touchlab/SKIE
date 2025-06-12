@@ -49,7 +49,11 @@ private fun Project.getKotlinNativeVersionPropertyName(): String =
 
 internal inline fun Project.withKotlinNativeCompilerEmbeddableDependency(kotlinVersion: KotlinToolingVersion, isTarget: Boolean, block: (Dependency) -> Unit) {
     val kotlinNativeCompilerEmbeddableFromHome: String? by project
-    val dependency = if (kotlinNativeCompilerEmbeddableFromHome.toBoolean()) {
+
+    val useKonanFromHome = (kotlinNativeCompilerEmbeddableFromHome?.uppercase() == "CI" && System.getenv("CI") != null) ||
+        kotlinNativeCompilerEmbeddableFromHome.toBoolean()
+
+    val dependency = if (useKonanFromHome) {
         if (isTarget) {
             project.dependencies.create(
                 files(
