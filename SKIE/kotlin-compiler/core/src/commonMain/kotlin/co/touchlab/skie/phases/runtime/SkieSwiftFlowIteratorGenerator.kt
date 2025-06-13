@@ -80,7 +80,11 @@ object SkieSwiftFlowIteratorGenerator {
                         |    let hasNext = try await skie(iterator).hasNext()
                         |
                         |    if hasNext.boolValue {
-                        |        return .some(iterator.next() as! Element)
+                        |        if let element = iterator.next() as? Element {
+                        |            return .some(element)
+                        |        } else {
+                        |            return nil
+                        |        }
                         |    } else {
                         |        return nil
                         |    }
