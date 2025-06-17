@@ -64,7 +64,12 @@ object SkieGradlePluginApplier {
 
     // TODO Remove once the issue with Kotlin 2.1.20 is resolved
     private fun Project.checkKGPVersionCompatibility() {
-        val doesNotWorkWithOlderGradleVersions = project.kgpShim.getKotlinPluginVersion().startsWith("2.1.2")
+        val kotlinVersionParts = project.kgpShim.getKotlinPluginVersion().split(".").mapNotNull { it.toIntOrNull() }
+        val majorVersion = kotlinVersionParts.getOrNull(0) ?: 0
+        val minorVersion = kotlinVersionParts.getOrNull(1) ?: 0
+        val patchVersion = kotlinVersionParts.getOrNull(2) ?: 0
+
+        val doesNotWorkWithOlderGradleVersions = majorVersion >= 2 && (minorVersion >= 2 || (minorVersion == 1 && patchVersion >= 20))
 
         if (doesNotWorkWithOlderGradleVersions) {
             val gradleVersionParts = project.gradle.gradleVersion.split(".").mapNotNull { it.toIntOrNull() }
