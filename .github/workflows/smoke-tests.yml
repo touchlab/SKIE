@@ -79,6 +79,7 @@ jobs:
   type-mapping-tests:
     name: Type Mapping Tests
     runs-on: self-hosted
+    needs: [acceptance-tests]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -108,7 +109,7 @@ jobs:
 
   external-libraries-tests:
     name: External Libraries Tests
-    needs: [acceptance-tests]
+    needs: [gradle-tests]
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -138,7 +139,7 @@ jobs:
   gradle-tests:
     name: Gradle Tests
     runs-on: self-hosted
-    needs: [external-libraries-tests]
+    needs: [acceptance-tests]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3

@@ -1,4 +1,4 @@
-name: Smoke Tests 1.8.0
+name: Smoke Tests 2.2.0
 
 on:
   workflow_dispatch:
@@ -53,7 +53,7 @@ jobs:
       - name: Run Acceptance Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:functional:kgp_1.8.0Test'
+          arguments: ':acceptance-tests:functional:kgp_2.2.0Test'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -74,7 +74,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.4.2
         id: run-tests
         with:
-          arguments: ':acceptance-tests:type-mapping:kgp_1.8.0Test'
+          arguments: ':acceptance-tests:type-mapping:kgp_2.2.0Test'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -95,7 +95,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:kgp_1.8.0Test'
+          arguments: ':acceptance-tests:libraries:kgp_2.2.0Test'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}

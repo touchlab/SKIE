@@ -1,9 +1,10 @@
-name: All Tests
+name: [Broken] All Tests
 
 on:
-  schedule:
-    # Every saturday at 2am EST
-    - cron: '0 7 * * SAT'
+# TODO Uncomment once fixed
+#  schedule:
+#     Every saturday at 2am EST
+#    - cron: '0 7 * * SAT'
   workflow_dispatch:
   workflow_call:
 
