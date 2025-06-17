@@ -39,6 +39,8 @@ sealed interface SkieTarget {
 
     fun addFreeCompilerArgs(vararg args: String)
 
+    fun addFreeCompilerArgsImmediately(vararg args: String)
+
     interface Binary : SkieTarget {
 
         val compilationProvider: Provider<KotlinNativeCompilationShim>

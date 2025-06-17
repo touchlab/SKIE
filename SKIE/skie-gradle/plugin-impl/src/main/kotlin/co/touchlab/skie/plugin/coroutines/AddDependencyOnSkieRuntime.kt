@@ -165,12 +165,12 @@ private fun SkieTarget.passRuntimeDependencyToCompiler(skieRuntimeDependency: Re
     }
 
     if (existingDependency == null) {
-        addFreeCompilerArgs(
+        addFreeCompilerArgsImmediately(
             "-Xexport-library=${runtimeArtifact.file.absolutePath}",
             "-library=${runtimeArtifact.file.absolutePath}",
         )
     } else {
-        addFreeCompilerArgs(
+        addFreeCompilerArgsImmediately(
             "-Xexport-library=${existingDependency.file.absolutePath}",
         )
     }

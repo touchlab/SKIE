@@ -112,6 +112,10 @@ class ActualSkieArtifactTarget(
         }
     }
 
+    override fun addFreeCompilerArgsImmediately(vararg args: String) {
+        task.get().toolOptions.freeCompilerArgs.addAll(*args)
+    }
+
     companion object {
 
         fun createFromArtifact(artifact: KotlinNativeArtifact, project: Project): List<SkieTarget> =

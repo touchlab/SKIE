@@ -21,7 +21,7 @@ fun SkieTarget.configureMinOsVersionIfNeeded() {
             val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(konanTarget.name)
 
             if (currentMinVersion == null || currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
-                addFreeCompilerArgs("$overrideKonanPropertiesKey=${name}.${konanTarget.name}=$minRequiredVersion")
+                addFreeCompilerArgsImmediately("$overrideKonanPropertiesKey=${name}.${konanTarget.name}=$minRequiredVersion")
             }
         }
 
