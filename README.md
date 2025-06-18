@@ -6,11 +6,16 @@ SKIE is a tool for Kotlin Multiplatform development that enhances the Swift API 
 
 See [the documentation website](https://skie.touchlab.co/intro) for more info.
 
-## Open Source Announcement
+## KMP resources for iOS devs
 
-Read our [open source announcement](https://touchlab.co/skie-is-open-source)!
+Touchlab has been helping teams adopt KMP since KMP was launched, and we've been dedicated to improving the iOS developer experience. Read more at the [KMP iOS resource hub](https://touchlab.co/iosdevex)
 
-## Testimonials
+## Find SKIE useful? ♥️
+Support us by
+1. Starring this repo ⭐
+2. Providing a [testimonial or logo](https://github.com/touchlab/SKIE/discussions/154) 🎉
+
+## Who's using SKIE?
 
 ![mapbox-logo-white-sm](https://github.com/touchlab/SKIE/assets/131001/b90aa2dc-0f23-46d4-89ff-db88121938a9)
 <blockquote>
