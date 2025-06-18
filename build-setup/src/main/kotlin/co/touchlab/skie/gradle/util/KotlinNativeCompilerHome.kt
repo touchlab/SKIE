@@ -36,12 +36,22 @@ fun Project.kotlinNativeCompilerHome(kotlinVersion: KotlinToolingVersion): File 
     downloader.downloadIfNeeded()
     val compilerDirectory = downloader.compilerDirectory
 
+    createProvisionOkFileIfNeeded(compilerDirectory)
+
     extra.set(KotlinNativeDownloaderProperties.main, null)
 
     restoreProperty(originalVersionProperty)
     restoreProperty(originalDownloadFromMavenProperty)
 
     return compilerDirectory
+}
+
+private fun createProvisionOkFileIfNeeded(compilerDirectory: File) {
+    val provisionOkFile = compilerDirectory.resolve("provisioned.ok")
+
+    if (!provisionOkFile.exists()) {
+        provisionOkFile.writeText("")
+    }
 }
 
 private fun Project.getKotlinNativeVersionPropertyName(): String =
