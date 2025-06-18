@@ -15,6 +15,7 @@ skiePublishing {
 
 kotlin {
     compilerOptions {
+        // TODO Remove once we compile SKIE with a newer compiler version
         freeCompilerArgs.addAll("-Xskip-metadata-version-check")
         optIn.addAll("org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi")
     }
