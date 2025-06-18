@@ -5,7 +5,6 @@ import co.touchlab.skie.test.util.KotlinTarget
 import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
 import co.touchlab.skie.test.util.coroutinesVersion
-import co.touchlab.skie.test.util.needsOldLinker
 import org.intellij.lang.annotations.Language
 
 class BuildGradleBuilder(
@@ -38,26 +37,6 @@ class BuildGradleBuilder(
     fun kotlinArtifacts(block: KotlinArtifactsExtensionScope.() -> Unit) {
         "kotlinArtifacts" {
             KotlinArtifactsExtensionScope().block()
-        }
-    }
-
-    fun workaroundFatFrameworkConfigurationIfNeeded(
-        kotlinVersion: KotlinVersion,
-    ) {
-        if (kotlinVersion.value.startsWith("1.8.")) {
-            imports.add("org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask")
-
-            appendLines("""
-                tasks.withType<FatFrameworkTask>().configureEach {
-                    if (name.startsWith("link")) {
-                        configurations.getByName(
-                            name.substringAfter("link").replaceFirstChar { it.lowercase() }
-                        ).attributes {
-                            attribute(Attribute.of("fat-framework", String::class.java), "true")
-                        }
-                    }
-                }
-            """.trimIndent())
         }
     }
 
@@ -166,9 +145,6 @@ class BuildGradleBuilder(
                     "framework(buildTypes = listOf(NativeBuildType.${buildConfiguration.name.uppercase()}))" {
                         +"isStatic = ${linkMode.isStatic}"
                         +"""freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=gradle_test")"""
-                        if (kotlinVersion.needsOldLinker) {
-                            +"""linkerOpts += "-ld64""""
-                        }
                         if (includeXcframework) {
                             +"xcframework.add(this)"
                         }
@@ -195,9 +171,6 @@ class BuildGradleBuilder(
                 "toolOptions" {
                     +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
                 }
-                if (kotlinVersion.needsOldLinker) {
-                    +"""linkerOptions += "-ld64""""
-                }
             }
         }
 
@@ -216,9 +189,6 @@ class BuildGradleBuilder(
                 "toolOptions" {
                     +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
                 }
-                if (kotlinVersion.needsOldLinker) {
-                    +"""linkerOptions += "-ld64""""
-                }
             }
         }
 
@@ -236,9 +206,6 @@ class BuildGradleBuilder(
                 +"isStatic = ${linkMode.isStatic}"
                 "toolOptions" {
                     +"""freeCompilerArgs.add("-Xbinary=bundleId=gradle_test")"""
-                }
-                if (kotlinVersion.needsOldLinker) {
-                    +"""linkerOptions += "-ld64""""
                 }
             }
         }

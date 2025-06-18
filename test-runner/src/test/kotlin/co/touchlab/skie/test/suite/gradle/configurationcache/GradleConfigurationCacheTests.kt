@@ -1,7 +1,6 @@
 package co.touchlab.skie.test.suite.gradle.configurationcache
 
 import co.touchlab.skie.test.annotation.MatrixTest
-import co.touchlab.skie.test.annotation.filter.OnlyConfigurationCache
 import co.touchlab.skie.test.annotation.filter.Smoke
 import co.touchlab.skie.test.annotation.type.GradleTests
 import co.touchlab.skie.test.base.BaseGradleTests
@@ -18,7 +17,6 @@ import kotlin.test.assertEquals
 @Suppress("ClassName")
 @Smoke
 @GradleTests
-@OnlyConfigurationCache
 class GradleConfigurationCacheTests: BaseGradleTests() {
 
     // We don't need to run the whole build to check configuration cache

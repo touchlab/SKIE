@@ -31,8 +31,6 @@ class KotlinBinaryDsl_XCFramework_SingleTargetTests: BaseGradleTests() {
 
                 registerNativeFrameworks(kotlinVersion, buildConfiguration, linkMode, includeXcframework = true)
             }
-
-            workaroundFatFrameworkConfigurationIfNeeded(kotlinVersion)
         }
 
         copyToCommonMain(Templates.basic)

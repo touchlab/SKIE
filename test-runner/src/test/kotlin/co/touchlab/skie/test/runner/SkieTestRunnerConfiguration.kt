@@ -2,6 +2,7 @@ package co.touchlab.skie.test.runner
 
 import co.touchlab.skie.test.util.*
 import org.slf4j.LoggerFactory
+import test_runner.BuildConfig
 
 object SkieTestRunnerConfiguration {
     private val logger = LoggerFactory.getLogger(SkieTestRunnerConfiguration::class.java)
@@ -12,8 +13,7 @@ object SkieTestRunnerConfiguration {
     val targets = list("matrix.targets", ::KotlinTargetOrPreset) ?: listOf(KotlinTarget.Preset.Root)
     val configurations = list<BuildConfiguration>("matrix.configurations")
     val linkModes = list<LinkMode>("matrix.linkModes")
-    // TODO Automatically derive from Build-setup
-    val kotlinVersions = list("matrix.kotlinVersions", ::KotlinVersion) ?: listOf("1.8.0", "1.8.20", "1.9.0", "1.9.20", "2.0.0", "2.0.20", "2.1.0", "2.1.10", "2.1.20").map(::KotlinVersion)
+    val kotlinVersions = list("matrix.kotlinVersions", ::KotlinVersion) ?: BuildConfig.PRIMARY_SUPPORTED_KOTLIN_VERSIONS.split(",").map(::KotlinVersion)
     val gradleVersions = list("matrix.gradleVersions", ::GradleVersion) ?: listOf("8.6").map(::GradleVersion)
 
     fun buildMatrixSource(): SkieTestMatrixSource {

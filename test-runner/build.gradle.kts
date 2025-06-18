@@ -1,8 +1,8 @@
 import co.touchlab.skie.PublishSkieToTempMavenTask
-import org.gradle.tooling.GradleConnector
 
 plugins {
     kotlin("jvm") version "1.9.22"
+    alias(libs.plugins.buildconfig)
 }
 
 dependencies {
@@ -63,3 +63,48 @@ testing {
         }
     }
 }
+
+buildConfig {
+    useKotlinOutput {
+        internalVisibility = false
+    }
+
+    val primarySupportedKotlinVersions = getPrimarySupportedKotlinVersions().joinToString(",")
+
+    buildConfigField("String", "PRIMARY_SUPPORTED_KOTLIN_VERSIONS", "\"${primarySupportedKotlinVersions}\"")
+}
+
+private fun getPrimarySupportedKotlinVersions(): List<String> {
+    val rawKotlinVersions = project.property("versionSupport.kotlinTooling") as String
+
+    val rawKotlinVersionsWithoutBrackets = removeBrackets(rawKotlinVersions)
+
+    return rawKotlinVersionsWithoutBrackets.split(",").map { extractPrimaryVersion(it.trim()) }
+}
+
+private fun removeBrackets(string: String): String {
+    val result = StringBuilder()
+
+    var isInBracket = false
+
+    string.forEach { char ->
+        when (char) {
+            '(' -> isInBracket = true
+            ')' -> isInBracket = false
+            else -> {
+                if (!isInBracket) {
+                    result.append(char)
+                }
+            }
+        }
+    }
+
+    return result.toString()
+}
+
+private fun extractPrimaryVersion(rawVersion: String): String =
+    if (rawVersion.contains("[")) {
+        rawVersion.substringAfter("[").substringBefore("]")
+    } else {
+        rawVersion
+    }

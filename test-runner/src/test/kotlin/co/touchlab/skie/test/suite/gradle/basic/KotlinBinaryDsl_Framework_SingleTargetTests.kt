@@ -29,8 +29,6 @@ class KotlinBinaryDsl_Framework_SingleTargetTests: BaseGradleTests() {
 
                 registerNativeFrameworks(kotlinVersion, buildConfiguration, linkMode)
             }
-
-            workaroundFatFrameworkConfigurationIfNeeded(kotlinVersion)
         }
 
         copyToCommonMain(Templates.basic)
