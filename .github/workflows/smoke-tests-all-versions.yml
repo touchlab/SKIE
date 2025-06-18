@@ -19,6 +19,7 @@ jobs:
     name: Acceptance Tests
     runs-on: self-hosted
     strategy:
+      fail-fast: false
       matrix:
         version: [ "2.0.0", "2.0.20", "2.1.0", "2.1.20", "2.2.0" ]
     steps:
@@ -42,6 +43,7 @@ jobs:
     name: Type Mapping Tests
     runs-on: self-hosted
     strategy:
+      fail-fast: false
       matrix:
         version: [ "2.0.0", "2.0.20", "2.1.0", "2.1.20", "2.2.0" ]
     steps:
@@ -67,6 +69,7 @@ jobs:
     name: External Libraries Tests
     runs-on: self-hosted
     strategy:
+      fail-fast: false
       matrix:
         version: [ "2.0.0", "2.0.20", "2.1.0", "2.1.20", "2.2.0" ]
     steps:
