@@ -36,7 +36,7 @@ on:
           - macos_arm64
           - macos_x64
         required: true
-        default: ios_arm64
+        default: macos_arm64
         description:
           'The target to use for the type mapping tests.'
 
@@ -156,7 +156,9 @@ jobs:
             :test
             -PtestLevel=smoke
             -PtestType=gradle
-            "-Pmatrix.targets=${{ inputs.target || 'macosArm64' }}"
+#            TODO The targets cannot be selected at the moment due to a mismatch in the name used by Gradle and other kinds of tests
+#            "-Pmatrix.targets=${{ inputs.target || 'macosArm64' }}"
+            "-Pmatrix.targets=macosArm64"
             "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
             "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
           build-root-directory: test-runner
