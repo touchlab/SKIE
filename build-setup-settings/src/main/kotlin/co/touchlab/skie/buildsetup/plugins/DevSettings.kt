@@ -19,6 +19,7 @@ class DevSettings : Plugin<Settings> {
                 google {
                     content {
                         includeGroupByRegex("com\\.google(?:\\..+|\\Z)")
+                        includeGroupByRegex("androidx\\..*")
                     }
                 }
                 maven { url = URI("https://repo.gradle.org/gradle/libs-releases") }
