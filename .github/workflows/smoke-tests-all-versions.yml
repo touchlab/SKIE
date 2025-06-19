@@ -115,6 +115,7 @@ jobs:
   gradle-tests:
     name: Gradle Tests
     runs-on: self-hosted
+    needs: compute-selected-kotlin-versions
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
