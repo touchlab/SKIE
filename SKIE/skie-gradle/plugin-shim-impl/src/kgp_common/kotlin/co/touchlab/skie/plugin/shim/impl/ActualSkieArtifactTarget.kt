@@ -104,14 +104,6 @@ class ActualSkieArtifactTarget(
         }
     }
 
-    override fun addFreeCompilerArgs(vararg args: String) {
-        task.configure {
-            toolOptions.freeCompilerArgs.addAll(
-                *args,
-            )
-        }
-    }
-
     override fun addFreeCompilerArgsImmediately(vararg args: String) {
         task.get().toolOptions.freeCompilerArgs.addAll(*args)
     }

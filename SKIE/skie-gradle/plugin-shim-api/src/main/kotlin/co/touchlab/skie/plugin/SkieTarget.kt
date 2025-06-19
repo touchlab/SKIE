@@ -37,8 +37,8 @@ sealed interface SkieTarget {
 
     fun addToCompilerClasspath(fileCollection: FileCollection)
 
-    fun addFreeCompilerArgs(vararg args: String)
-
+    // This action must be performed without using the .configure block because it's already called from another .configure block
+    // and nesting the .configure blocks causes a crash in KGP 2.2.0 and newer
     fun addFreeCompilerArgsImmediately(vararg args: String)
 
     interface Binary : SkieTarget {

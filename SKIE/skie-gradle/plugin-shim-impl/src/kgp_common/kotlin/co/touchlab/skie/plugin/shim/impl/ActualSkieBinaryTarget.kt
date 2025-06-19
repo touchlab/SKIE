@@ -68,12 +68,6 @@ class ActualSkieBinaryTarget(
         }
     }
 
-    override fun addFreeCompilerArgs(vararg args: String) {
-        task.configure {
-            this.binary.freeCompilerArgs += args
-        }
-    }
-
     override fun addFreeCompilerArgsImmediately(vararg args: String) {
         task.get().binary.freeCompilerArgs += args
     }
