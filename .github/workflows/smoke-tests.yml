@@ -151,13 +151,13 @@ jobs:
       - name: Run Gradle Tests
         uses: gradle/gradle-build-action@v2.4.2
         id: run-tests
+#      TODO The targets cannot be selected at the moment due to a mismatch in the name used by Gradle and other kinds of tests
+#      "-Pmatrix.targets=${{ inputs.target || 'macosArm64' }}"
         with:
           arguments: >-
             :test
             -PtestLevel=smoke
             -PtestType=gradle
-#            TODO The targets cannot be selected at the moment due to a mismatch in the name used by Gradle and other kinds of tests
-#            "-Pmatrix.targets=${{ inputs.target || 'macosArm64' }}"
             "-Pmatrix.targets=macosArm64"
             "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
             "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
