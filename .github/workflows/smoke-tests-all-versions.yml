@@ -5,7 +5,14 @@ on:
 #     Every Saturday at 2am EST
     - cron: '0 7 * * SAT'
   workflow_dispatch:
-  workflow_call:
+    inputs:
+      versions:
+        description: 'Select Kotlin versions to test (comma-separated)'
+        required: true
+        default: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0'
+
+env:
+  ALL_KOTLIN_VERSIONS: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0'
 
 permissions:
   contents: read
@@ -15,13 +22,27 @@ concurrency:
   group: ci-smoke-tests-all
 
 jobs:
+  compute-selected-kotlin-versions:
+    name: Compute selected Kotlin versions
+    runs-on: self-hosted
+    outputs:
+      kotlin-versions: ${{ steps.compute-selected-kotlin-versions.outputs.kotlin-versions }}
+    steps:
+      - name: Compute selected Kotlin versions
+        id: compute-selected-kotlin-versions
+        run: |
+          INPUTS="${{ inputs.versions || env.ALL_KOTLIN_VERSIONS }}"
+          JSON_ARRAY=$(echo "$INPUTS" | awk -F',' '{ for(i=1;i<=NF;i++) printf "\"%s\"%s", $i, (i<NF?",":"") }' | sed 's/.*/[&]/')
+          echo "kotlin-versions=$JSON_ARRAY" >> $GITHUB_OUTPUT
+
   acceptance-tests:
     name: Acceptance Tests
     runs-on: self-hosted
+    needs: compute-selected-kotlin-versions
     strategy:
       fail-fast: false
       matrix:
-        version: [ "2.0.0", "2.0.20", "2.1.0", "2.1.20", "2.2.0" ]
+        version: ${{ fromJson(needs.compute-selected-kotlin-versions.outputs.kotlin-versions) }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -42,10 +63,11 @@ jobs:
   type-mapping-tests:
     name: Type Mapping Tests
     runs-on: self-hosted
+    needs: compute-selected-kotlin-versions
     strategy:
       fail-fast: false
       matrix:
-        version: [ "2.0.0", "2.0.20", "2.1.0", "2.1.20", "2.2.0" ]
+        version: ${{ fromJson(needs.compute-selected-kotlin-versions.outputs.kotlin-versions) }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -68,10 +90,11 @@ jobs:
   external-libraries-tests:
     name: External Libraries Tests
     runs-on: self-hosted
+    needs: compute-selected-kotlin-versions
     strategy:
       fail-fast: false
       matrix:
-        version: [ "2.0.0", "2.0.20", "2.1.0", "2.1.20", "2.2.0" ]
+        version: ${{ fromJson(needs.compute-selected-kotlin-versions.outputs.kotlin-versions) }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
