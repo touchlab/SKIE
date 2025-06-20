@@ -10,6 +10,22 @@ on:
         description: 'Select Kotlin versions to test (comma-separated)'
         required: true
         default: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0'
+      run_acceptance_tests:
+        description: 'Run Acceptance Tests'
+        type: boolean
+        default: true
+      run_type_mapping_tests:
+        description: 'Run Type Mapping Tests'
+        type: boolean
+        default: true
+      run_external_libraries_tests:
+        description: 'Run External Libraries Tests'
+        type: boolean
+        default: true
+      run_gradle_tests:
+        description: 'Run Gradle Tests'
+        type: boolean
+        default: true
 
 env:
   ALL_KOTLIN_VERSIONS: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0'
@@ -39,6 +55,7 @@ jobs:
     name: Acceptance Tests
     runs-on: self-hosted
     needs: compute-selected-kotlin-versions
+    if: github.event_name == 'schedule' || inputs.run_acceptance_tests == true
     strategy:
       fail-fast: false
       matrix:
@@ -64,6 +81,7 @@ jobs:
     name: Type Mapping Tests
     runs-on: self-hosted
     needs: compute-selected-kotlin-versions
+    if: github.event_name == 'schedule' || inputs.run_type_mapping_tests == true
     strategy:
       fail-fast: false
       matrix:
@@ -91,6 +109,7 @@ jobs:
     name: External Libraries Tests
     runs-on: self-hosted
     needs: compute-selected-kotlin-versions
+    if: github.event_name == 'schedule' || inputs.run_external_libraries_tests == true
     strategy:
       fail-fast: false
       matrix:
@@ -116,6 +135,7 @@ jobs:
     name: Gradle Tests
     runs-on: self-hosted
     needs: compute-selected-kotlin-versions
+    if: github.event_name == 'schedule' || inputs.run_gradle_tests == true
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
