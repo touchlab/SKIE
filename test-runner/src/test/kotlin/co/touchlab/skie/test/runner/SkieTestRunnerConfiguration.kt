@@ -14,6 +14,7 @@ object SkieTestRunnerConfiguration {
     val configurations = list<BuildConfiguration>("matrix.configurations")
     val linkModes = list<LinkMode>("matrix.linkModes")
     val kotlinVersions = list("matrix.kotlinVersions", ::KotlinVersion) ?: BuildConfig.PRIMARY_SUPPORTED_KOTLIN_VERSIONS.split(",").map(::KotlinVersion)
+    // TODO Not used yet - version can be changed in BaseGradleTests.runGradle
     val gradleVersions = list("matrix.gradleVersions", ::GradleVersion) ?: listOf("8.6").map(::GradleVersion)
 
     fun buildMatrixSource(): SkieTestMatrixSource {

@@ -9,7 +9,7 @@ object SwiftUnpackingConfigurator {
 
     fun configureCustomSwiftUnpacking(target: SkieTarget) {
         val unpackTask = target.registerSkieTargetBasedTask<UnpackSwiftSourcesTask>("unpackSwiftSources") {
-            val linkerKlibs = target.linkerConfiguration.fileCollection { true }.filter { it.isKlib || it.isDirectory }
+            val linkerKlibs = target.linkerConfiguration.incoming.files.filter { it.isKlib || it.isDirectory }
             inputs.files(linkerKlibs)
             dependencies.addAll(linkerKlibs)
 
