@@ -1,12 +1,7 @@
 import co.touchlab.skie.gradle.util.enquoted
-import co.touchlab.skie.gradle.version.gradleApiVersion
-import co.touchlab.skie.gradle.version.kotlinToolingVersion
-import co.touchlab.skie.gradle.version.target.ExpectActualBuildConfigGenerator
-import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.publish.dependencyCoordinate
 import co.touchlab.skie.gradle.publish.dependencyModule
 import co.touchlab.skie.gradle.util.gradlePluginApi
-import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
 plugins {
@@ -45,16 +40,8 @@ kotlin {
 }
 
 buildConfig {
-//     generator(
-//         ExpectActualBuildConfigGenerator(
-//             isActualImplementation = false,
-//             internalVisibility = false,
-//         ),
-//     )
-
     val shimImpl = project.provider { projects.gradle.gradlePluginShimImpl.dependencyProject }
     buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", shimImpl.map { it.dependencyCoordinate.enquoted() })
-//     buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", "")
     val kotlinToSkieKgpVersion = project.kotlinToolingVersionDimension().components
         .flatMap { versionComponent ->
             versionComponent.supportedVersions.map { version ->
@@ -66,12 +53,9 @@ buildConfig {
         }
 
     buildConfigField("co.touchlab.skie.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "mapOf($kotlinToSkieKgpVersion)")
-//     buildConfigField("co.touchlab.skie.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "")
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
-//     buildConfigField("String", "SKIE_VERSION", "")
     val kotlinPlugin = project.provider { projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject }
     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", kotlinPlugin.map { it.dependencyCoordinate.enquoted() })
-//     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", "")
     val configurationAnnotations = project.provider { projects.common.configuration.configurationAnnotations.dependencyProject }
     buildConfigField("String", "SKIE_CONFIGURATION_ANNOTATIONS_MODULE", configurationAnnotations.map { it.dependencyModule.enquoted() })
 
@@ -80,31 +64,5 @@ buildConfig {
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_GROUP", runtime.map { it.group.toString().enquoted() })
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_NAME", runtime.map { it.name.enquoted() })
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_VERSION", runtime.map { it.version.toString().enquoted() })
-//     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_MODULE", "")
-//     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATE", "")
-//     buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "")
     buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
 }
-
-// multiDimensionTarget.configureSourceSet { sourceSet ->
-//     if (!sourceSet.isTarget || compilation.isTest) {
-//         return@configureSourceSet
-//     }
-//
-//     buildConfig {
-//         this.sourceSets.named(kotlinSourceSet.name).configure {
-//             generator(ExpectActualBuildConfigGenerator(isActualImplementation = true, internalVisibility = false))
-//             className.set("BuildConfig")
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//         }
-//     }
-// }

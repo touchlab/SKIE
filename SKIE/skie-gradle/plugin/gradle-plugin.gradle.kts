@@ -3,7 +3,6 @@ import co.touchlab.skie.gradle.util.gradlePluginApi
 import co.touchlab.skie.gradle.version.gradleApiVersionDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("skie.gradle.plugin")
@@ -43,11 +42,6 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
         relocate("co.touchlab.skie.plugin.shim.impl", "co.touchlab.skie.plugin.shim.impl_$safeKotlinVersion")
         configurations = listOf(configuration)
         archiveClassifier = "kgp_$safeKotlinVersion"
-        dependencies {
-//             exclude("**/*.kotlin_metadata")
-//             exclude("**/*.kotlin_module")
-//             exclude("**/*.kotlin_builtins")
-        }
     }
 
     tasks.named("compileKotlin").configure {
@@ -67,31 +61,6 @@ dependencies {
     compileOnly(gradlePluginApi())
     compileOnly(kotlin("stdlib"))
 }
-
-// tasks.named("compileKotlin").configure {
-//     val gradleApiVersions = project.gradleApiVersionDimension()
-//     val kotlinToolingVersions = project.kotlinToolingVersionDimension()
-//
-//     gradleApiVersions.components.forEach { gradleApiVersion ->
-//         kotlinToolingVersions.components.forEach { kotlinToolingVersion ->
-//             val shimConfiguration = configurations.detachedConfiguration(
-//                 projects.gradle.gradlePluginShimImpl,
-//             ).apply {
-//                 attributes {
-//                     attribute(
-//                         KotlinCompilerVersion.attribute,
-//                         objects.named(KotlinCompilerVersion::class.java, kotlinToolingVersion.value),
-//                     )
-//                     attribute(
-//                         GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-//                         objects.named(GradlePluginApiVersion::class.java, gradleApiVersion.value),
-//                     )
-//                 }
-//             }
-//             dependsOn(shimConfiguration)
-//         }
-//     }
-// }
 
 @Suppress("UnstableApiUsage")
 gradlePlugin {

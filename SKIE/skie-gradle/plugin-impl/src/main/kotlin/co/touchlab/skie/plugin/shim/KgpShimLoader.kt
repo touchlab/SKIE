@@ -29,49 +29,7 @@ object KgpShimLoader {
     }
 
     private fun Project.loadKgpShim(kotlinVersion: String): KgpShim? {
-//         registerKotlinCompilerVersionAttribute(kotlinVersion)
-
-//         val skieGradleConfiguration = createSkieGradleShimImplConfiguration(kotlinVersion)
-
-//         val shimImplJar = skieGradleConfiguration.resolveOrRethrowFailure()
-
         return createShimInstance(kotlinVersion)
-    }
-
-    private fun Project.registerKotlinCompilerVersionAttribute(kotlinVersion: String) {
-        KotlinCompilerVersion.registerIn(project.dependencies, kotlinVersion)
-        KotlinCompilerVersion.registerIn(buildscript.dependencies, kotlinVersion)
-    }
-
-    private fun Project.createSkieGradleShimImplConfiguration(kotlinVersion: String): Configuration =
-        buildscript.configurations.detachedConfiguration(
-            buildscript.dependencies.create(BuildConfig.SKIE_GRADLE_SHIM_IMPL_COORDINATE),
-        ).apply {
-            this.isCanBeConsumed = false
-            this.isCanBeResolved = true
-
-            exclude(group = "org.jetbrains.kotlin")
-
-            attributes {
-                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-                attribute(KotlinCompilerVersion.attribute, objects.named(kotlinVersion))
-
-                if (GradleVersion.current() >= GradleVersion.version("7.0")) {
-                    attribute(
-                        GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-                        objects.named(GradleVersion.current().version),
-                    )
-                }
-            }
-        }
-
-    private fun Configuration.resolveOrRethrowFailure(): Set<File> {
-        this.resolvedConfiguration.rethrowFailure()
-
-        return this.resolve()
     }
 
     private fun Project.createShimInstance(kotlinVersion: String): KgpShim? {
