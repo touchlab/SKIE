@@ -30,15 +30,19 @@ interface KotlinCompilerVersion : Named {
         private val currentKotlinVersion = KotlinToolingVersion(currentKotlinVersion)
 
         override fun execute(details: MultipleCandidatesDetails<KotlinCompilerVersion>) {
-            val correctCandidate = details.candidateValues.lastOrNull {
-                KotlinToolingVersion(it.name) < currentKotlinVersion
-            }
+            val candidateVersions = details.candidateValues
+                .map { KotlinToolingVersion(it.name) to it }
+                .sortedBy { it.first }
+
+            val correctCandidate = candidateVersions
+                .lastOrNull { it.first <= currentKotlinVersion }
+                ?.second
 
             if (correctCandidate != null) {
                 details.closestMatch(correctCandidate)
             } else {
                 // This should've already been caught by SKIE Plugin Loader, but we'll let the user know just in case.
-                log.error("Could not find a Kotlin compiler version matching the current Kotlin version ($currentKotlinVersion)! Candidates: ${details.candidateValues.joinToString { it.name }}")
+                log.error("Could not find a Kotlin compiler version matching the current Kotlin version ($currentKotlinVersion)! Candidates: ${candidateVersions.joinToString { it.second.name }}")
             }
         }
 
