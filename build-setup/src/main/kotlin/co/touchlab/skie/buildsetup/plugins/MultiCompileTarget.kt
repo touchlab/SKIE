@@ -36,6 +36,23 @@ data class MultiCompileTarget(
             }
         )
 
+        val wasmJs = MultiCompileTarget(
+            name = "wasmJs",
+            konanTargetName = "wasmJs",
+            platformType = KotlinPlatformType.wasm,
+        )
+
+        val wasmWasi = MultiCompileTarget(
+            name = "wasmWasi",
+            konanTargetName = "wasmWasi",
+            platformType = KotlinPlatformType.wasm,
+        )
+
+        val allWasm = listOf(
+            wasmJs,
+            wasmWasi,
+        )
+
         val androidNativeArm32 = MultiCompileTarget(
             name = "androidNativeArm32",
             konanTargetName = "android_native_arm32",
@@ -154,7 +171,7 @@ data class MultiCompileTarget(
 
         val allDarwin = allIos + allWatchos + allTvos + allMacos
 
-        val all = allDarwin + listOf(
+        val all = allDarwin + allWasm + listOf(
             jvm,
             js,
             androidNativeArm32,

@@ -28,6 +28,9 @@ kotlin {
         nodejs()
     }
 
+    wasmJs()
+    wasmWasi()
+
     androidNativeArm32()
     androidNativeArm64()
     androidNativeX86()
