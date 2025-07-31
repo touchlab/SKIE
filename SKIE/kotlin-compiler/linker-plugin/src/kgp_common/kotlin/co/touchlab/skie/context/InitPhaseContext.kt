@@ -60,11 +60,5 @@ class InitPhaseContext(
 
     override val compilerShim: CompilerShim = ActualCompilerShim()
 
-    override val framework: FrameworkLayout = run {
-        val frameworkPath = compilerConfiguration.getNotNull(KonanConfigKeys.OUTPUT)
-
-        FrameworkLayout(frameworkPath)
-    }
-
     override val objectFileProvider: ObjectFileProvider = ObjectFileProvider(skieBuildDirectory)
 }

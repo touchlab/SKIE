@@ -19,9 +19,6 @@ object SwiftKotlinFrameworkCacheSetupPhase : SirPhase {
     private fun synchronizeDummyKotlinFramework(): Boolean {
         val dummyFramework = cacheableKotlinFramework
 
-        dummyFramework.headersDir.mkdirs()
-        dummyFramework.modulesDir.mkdirs()
-
         // Must use `or` to prevent short circuit optimization.
         return framework.kotlinHeader.copyFileToIfDifferent(dummyFramework.kotlinHeader) or
             framework.modulemapFile.copyFileToIfDifferent(dummyFramework.modulemapFile) or
@@ -43,4 +40,8 @@ object SwiftKotlinFrameworkCacheSetupPhase : SirPhase {
 }
 
 val SirPhase.Context.cacheableKotlinFramework: FrameworkLayout
-    get() = FrameworkLayout(skieBuildDirectory.cache.cacheableKotlinFramework.framework(framework.frameworkName))
+    get() = FrameworkLayout(
+        frameworkDirectory = skieBuildDirectory.cache.cacheableKotlinFramework.framework(framework.frameworkName),
+        isMacosFramework = swiftCompilerConfiguration.targetTriple.isMacos,
+        isSkieCache = true,
+    )

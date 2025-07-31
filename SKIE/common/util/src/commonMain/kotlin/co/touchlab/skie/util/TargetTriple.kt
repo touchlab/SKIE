@@ -7,6 +7,9 @@ data class TargetTriple(
     val environment: String?,
 ) {
 
+    val isMacos: Boolean
+        get() = os == "macos"
+
     override fun toString(): String {
         val envSuffix = environment?.let { "-$environment" } ?: ""
 

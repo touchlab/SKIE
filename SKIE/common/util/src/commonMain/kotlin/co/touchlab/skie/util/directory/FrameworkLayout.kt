@@ -5,20 +5,24 @@ import java.io.File
 
 class FrameworkLayout(
     val frameworkDirectory: File,
+    isMacosFramework: Boolean,
+    isSkieCache: Boolean = false,
 ) {
 
-    constructor(frameworkPath: String) : this(File(frameworkPath))
+    constructor(frameworkPath: String, isMacosFramework: Boolean) : this(File(frameworkPath), isMacosFramework)
 
     val frameworkName: String by lazy { frameworkDirectory.name.removeSuffix(".framework") }
 
     val parentDir: File by lazy { frameworkDirectory.parentFile }
 
-    val headersDir: File by lazy { frameworkDirectory.resolve("Headers") }
+    val frameworkContentDir = if (isMacosFramework && !isSkieCache) frameworkDirectory.resolve("Versions/A") else frameworkDirectory
+
+    val headersDir: File by lazy { frameworkContentDir.resolve("Headers").also { it.mkdirs() } }
     val kotlinHeader: File by lazy { headersDir.resolve("$frameworkName.h") }
     val apiNotes: File by lazy { headersDir.resolve("$frameworkName.apinotes") }
     val swiftHeader: File by lazy { headersDir.resolve("$frameworkName-Swift.h") }
 
-    val modulesDir: File by lazy { frameworkDirectory.resolve("Modules") }
+    val modulesDir: File by lazy { frameworkContentDir.resolve("Modules").also { it.mkdirs() } }
     val swiftModuleParent: File by lazy { modulesDir.resolve("$frameworkName.swiftmodule").also { it.mkdirs() } }
     val modulemapFile: File by lazy { modulesDir.resolve("module.modulemap") }
 

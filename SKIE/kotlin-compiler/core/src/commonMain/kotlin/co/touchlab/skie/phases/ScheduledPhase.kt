@@ -3,6 +3,7 @@ package co.touchlab.skie.phases
 import co.touchlab.skie.configuration.SwiftCompilerConfiguration
 import co.touchlab.skie.context.CommonSkieContext
 import co.touchlab.skie.phases.util.StatefulScheduledPhase
+import co.touchlab.skie.util.directory.FrameworkLayout
 
 interface ScheduledPhase<C : ScheduledPhase.Context> {
 
@@ -17,6 +18,8 @@ interface ScheduledPhase<C : ScheduledPhase.Context> {
         override val context: Context
 
         val swiftCompilerConfiguration: SwiftCompilerConfiguration
+
+        val framework: FrameworkLayout
 
         fun launch(action: suspend () -> Unit)
 

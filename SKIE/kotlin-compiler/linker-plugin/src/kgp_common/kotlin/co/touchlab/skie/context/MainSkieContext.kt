@@ -19,6 +19,7 @@ import co.touchlab.skie.util.DescriptorReporter
 import co.touchlab.skie.util.KotlinCompilerVersion
 import co.touchlab.skie.util.TargetTriple
 import co.touchlab.skie.util.current
+import co.touchlab.skie.util.directory.FrameworkLayout
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,6 +93,15 @@ class MainSkieContext internal constructor(
         absoluteTargetSysRootPath = configurables.absoluteTargetSysRoot,
         osVersionMin = configurables.osVersionMin,
     )
+
+    override val framework: FrameworkLayout = run {
+        val frameworkPath = konanConfig.configuration.getNotNull(KonanConfigKeys.OUTPUT)
+
+        FrameworkLayout(
+            frameworkPath = frameworkPath,
+            isMacosFramework = swiftCompilerConfiguration.targetTriple.isMacos,
+        )
+    }
 
     override fun launch(action: suspend () -> Unit) {
         val job = skieCoroutineScope.launch {

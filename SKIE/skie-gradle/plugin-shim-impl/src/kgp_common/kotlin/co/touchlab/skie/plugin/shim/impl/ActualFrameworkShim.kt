@@ -15,7 +15,7 @@ class ActualFrameworkShim(
 
     override val targetTriple: TargetTriple = framework.darwinTarget.targetTriple
 
-    override val layout: FrameworkLayout = FrameworkLayout(framework.file)
+    override val layout: FrameworkLayout = FrameworkLayout(framework.file, framework.darwinTarget.targetTriple.isMacos)
 
     override val architectureClangMacro: String =
         when (val architecture = framework.target.architecture) {
