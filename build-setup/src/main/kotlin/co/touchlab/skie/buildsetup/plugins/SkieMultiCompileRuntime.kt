@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 typealias PublishTaskNamesWithTasks = Map<Pair<String, List<String>>, TaskProvider<Task>>
 typealias SupportedTargetsWithDeclarations = List<Pair<MultiCompileTarget, String>>
 
-class SkieMultiCompileRuntime: Plugin<Project> {
+class SkieMultiCompileRuntime : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {
         val extension = extensions.create<MultiCompileRuntimeExtension>("multiCompileRuntime")
@@ -177,7 +177,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                 include(extension.sourceIncludes.get())
                 filter(
                     ReplaceTokens::class,
-                    "tokens" to tokens.get()
+                    "tokens" to tokens.get(),
                 )
             }
             into(layout.buildDirectory.dir("${this@registerCopyTask.name}_$name"))
@@ -201,10 +201,12 @@ class SkieMultiCompileRuntime: Plugin<Project> {
                 supportedTargetsWithDeclarations.flatMap { (target, _) ->
                     when (target.platformType) {
                         KotlinPlatformType.common -> listOf("metadataMainClasses")
-                        KotlinPlatformType.jvm, KotlinPlatformType.androidJvm -> listOf("${target.name}Jar")
-                        KotlinPlatformType.js -> listOf("${target.name}Jar")
-
-                        KotlinPlatformType.native, KotlinPlatformType.wasm -> if (kotlinVersion >= kotlin_2_1_0) {
+                        KotlinPlatformType.jvm,
+                        KotlinPlatformType.androidJvm,
+                        KotlinPlatformType.js,
+                        KotlinPlatformType.wasm,
+                            -> listOf("${target.name}Jar")
+                        KotlinPlatformType.native -> if (kotlinVersion >= kotlin_2_1_0) {
                             listOf("${target.name}Klib")
                         } else {
                             listOf("${target.name}MainKlibrary")
@@ -218,7 +220,7 @@ class SkieMultiCompileRuntime: Plugin<Project> {
     private fun Project.registerPublishTask(
         name: String,
         copyTask: TaskProvider<Copy>,
-        publishTaskNamesWithTasks: Map<Pair<String, List<String>>, TaskProvider<Task>>
+        publishTaskNamesWithTasks: Map<Pair<String, List<String>>, TaskProvider<Task>>,
     ) {
         publishTaskNamesWithTasks.forEach { (publishTaskNames, parentPublishTask) ->
             val (publishTaskName, publishTasks) = publishTaskNames
