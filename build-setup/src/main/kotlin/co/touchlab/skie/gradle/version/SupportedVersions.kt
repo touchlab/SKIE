@@ -1,14 +1,8 @@
 package co.touchlab.skie.gradle.version
 
-import co.touchlab.skie.gradle.util.stringListProperty
 import co.touchlab.skie.gradle.version.target.DimensionWithAliases
 import co.touchlab.skie.gradle.version.target.Target
 import org.gradle.api.Project
-
-fun Project.gradleApiVersionDimension(): Target.Dimension<GradleApiVersionComponent> {
-    val requestedIdentifiers = project.stringListProperty("versionSupport.gradleApi")
-    return ToolingVersions.Gradle.dimensionFrom(requestedIdentifiers)
-}
 
 /**
  * Supported format:
