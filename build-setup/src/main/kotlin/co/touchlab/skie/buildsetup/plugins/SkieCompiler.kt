@@ -5,7 +5,7 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimental
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.toIdentifier
-import co.touchlab.skie.gradle.util.generateKotlinCode
+import co.touchlab.skie.buildsetup.main.util.generateKotlinCode
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension

@@ -8,7 +8,7 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimental
 import co.touchlab.skie.buildsetup.plugins.extensions.DevAcceptanceTestsExtension
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
-import co.touchlab.skie.gradle.util.enquoted
+import co.touchlab.skie.buildsetup.main.util.enquoted
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import co.touchlab.skie.gradle.version.kotlinToolingVersion

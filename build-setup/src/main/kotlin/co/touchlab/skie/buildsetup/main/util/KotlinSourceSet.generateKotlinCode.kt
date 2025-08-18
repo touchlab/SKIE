@@ -1,4 +1,4 @@
-package co.touchlab.skie.gradle.util
+package co.touchlab.skie.buildsetup.main.util
 
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet

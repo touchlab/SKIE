@@ -10,9 +10,7 @@ data class MinGradleVersion(
 
 fun Project.minGradleVersion(): MinGradleVersion =
     MinGradleVersion(
-        gradle = property("versionSupport.gradle.minVersion")?.toString() ?: error("Missing property 'versionSupport.gradle.minVersion'"),
-        embeddedKotlin = property("versionSupport.gradle.embeddedKotlin")?.toString() ?: error("Missing property 'versionSupport.gradle.embeddedKotlin'"),
-        embeddedGroovy = property("versionSupport.gradle.embeddedGroovy")?.toString() ?: error("Missing property 'versionSupport.gradle.embeddedGroovy'"),
+        gradle = property("versionSupport.gradle.minVersion").toString(),
+        embeddedKotlin = property("versionSupport.gradle.embeddedKotlin").toString(),
+        embeddedGroovy = property("versionSupport.gradle.embeddedGroovy").toString(),
     )
-
-

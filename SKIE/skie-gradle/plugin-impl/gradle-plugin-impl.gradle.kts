@@ -1,7 +1,6 @@
-import co.touchlab.skie.gradle.util.enquoted
+import co.touchlab.skie.buildsetup.main.util.enquoted
 import co.touchlab.skie.gradle.publish.dependencyCoordinate
 import co.touchlab.skie.gradle.publish.dependencyModule
-import co.touchlab.skie.gradle.util.gradlePluginApi
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
 plugins {
