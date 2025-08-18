@@ -5,7 +5,7 @@
 
 @file:Suppress("FunctionName", "DuplicatedCode")
 
-package co.touchlab.skie.gradle
+package co.touchlab.skie.buildsetup.version
 
 import java.io.Serializable
 import java.util.Locale

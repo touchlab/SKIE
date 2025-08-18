@@ -1,6 +1,6 @@
 package co.touchlab.skie.gradle.version
 
-import co.touchlab.skie.gradle.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
 import co.touchlab.skie.gradle.version.target.ComparableDimension
 import co.touchlab.skie.gradle.version.target.Target
 

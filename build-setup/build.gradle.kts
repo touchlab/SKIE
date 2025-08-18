@@ -1,6 +1,14 @@
+import co.touchlab.skie.buildsetup.version.KotlinCompilerVersionEnumGenerator
+
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
+}
+
+buildscript {
+    dependencies {
+        classpath("co.touchlab.skie:build-setup-kotlin-tooling-version")
+    }
 }
 
 repositories {
@@ -10,8 +18,9 @@ repositories {
 
 sourceSets {
     main {
-        kotlin.srcDir("src/main/kotlin-compiler-attribute-local")
-        kotlin.srcDir("src/main/kotlin-shared-build-setup")
+        kotlin.srcDir("src/main/kotlin-compiler-attribute-build-setup")
+
+        KotlinCompilerVersionEnumGenerator.generate(project, "co.skie.buildsetup", true)
     }
 }
 
@@ -23,6 +32,8 @@ dependencies {
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
     implementation(libs.kotlinPoet)
+
+    api("co.touchlab.skie:build-setup-kotlin-tooling-version")
 }
 
 gradlePlugin {

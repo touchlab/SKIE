@@ -2,7 +2,7 @@ package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityGradleImplicitReceiver
-import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import co.touchlab.skie.gradle.version.minGradleVersion
@@ -25,7 +25,7 @@ abstract class SkieShim : Plugin<Project> {
             dimensions(kotlinToolingVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
+                        attribute(KotlinCompilerVersionAttribute.attribute, objects.named(target.kotlinToolingVersion.value))
                     }
                 }
             }

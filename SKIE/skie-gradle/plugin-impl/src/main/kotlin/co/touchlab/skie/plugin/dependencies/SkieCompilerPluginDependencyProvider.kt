@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.dependencies
 
-import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.skieInternalExtension
 import co.touchlab.skie.plugin.util.exclude
@@ -22,7 +22,7 @@ object SkieCompilerPluginDependencyProvider {
             isCanBeResolved = true
 
             attributes {
-                attribute(KotlinCompilerVersion.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
+                attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
             }
 
             exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")

@@ -1,9 +1,9 @@
-package co.touchlab.skie.buildsetup.main.util
+package co.touchlab.skie.buildsetup.util
 
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
-internal fun KotlinSourceSet.generateKotlinCode(fileName: String, code: String, project: Project) {
+fun KotlinSourceSet.generateKotlinCode(fileName: String, code: String, project: Project) {
     val generatedDirectory = project.layout.buildDirectory.dir("generated/sources/skie/$name").get().asFile
 
     generatedDirectory.mkdirs()

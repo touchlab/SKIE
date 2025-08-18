@@ -1,6 +1,4 @@
-package co.touchlab.skie.buildsetup.main.version
-
-import co.touchlab.skie.gradle.KotlinToolingVersion
+package co.touchlab.skie.buildsetup.version
 
 data class SupportedKotlinToolingVersion(
     val name: KotlinToolingVersion,

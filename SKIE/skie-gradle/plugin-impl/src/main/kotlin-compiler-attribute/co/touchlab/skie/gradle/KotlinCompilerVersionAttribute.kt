@@ -5,15 +5,16 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.AttributeDisambiguationRule
 import org.gradle.api.attributes.MultipleCandidatesDetails
+import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import javax.inject.Inject
 
-interface KotlinCompilerVersion : Named {
+interface KotlinCompilerVersionAttribute : Named {
 
     companion object {
 
-        val attribute: Attribute<KotlinCompilerVersion> = Attribute.of("co.touchlab.skie.kotlin.compiler.version", KotlinCompilerVersion::class.java)
+        val attribute: Attribute<KotlinCompilerVersionAttribute> = Attribute.of("co.touchlab.skie.kotlin.compiler.version", KotlinCompilerVersionAttribute::class.java)
 
         fun registerIn(dependencies: DependencyHandler, currentKotlinVersion: String) {
             dependencies.attributesSchema.attribute(attribute) {
@@ -24,12 +25,13 @@ interface KotlinCompilerVersion : Named {
         }
     }
 
+    // WIP use KotlinCompilerVersionEnum to get the correct version
     class DisambiguationRule @Inject constructor(
         currentKotlinVersion: String,
-    ) : AttributeDisambiguationRule<KotlinCompilerVersion> {
+    ) : AttributeDisambiguationRule<KotlinCompilerVersionAttribute> {
         private val currentKotlinVersion = KotlinToolingVersion(currentKotlinVersion)
 
-        override fun execute(details: MultipleCandidatesDetails<KotlinCompilerVersion>) {
+        override fun execute(details: MultipleCandidatesDetails<KotlinCompilerVersionAttribute>) {
             val candidateVersions = details.candidateValues
                 .map { KotlinToolingVersion(it.name) to it }
                 .sortedBy { it.first }

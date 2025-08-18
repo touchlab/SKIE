@@ -2,10 +2,10 @@ package co.touchlab.skie.buildsetup.plugins
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
-import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.KotlinToolingVersion
-import co.touchlab.skie.gradle.toIdentifier
-import co.touchlab.skie.buildsetup.main.util.generateKotlinCode
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
+import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.version.toIdentifier
+import co.touchlab.skie.buildsetup.util.generateKotlinCode
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -31,7 +31,7 @@ abstract class SkieCompiler : Plugin<Project> {
             dimensions(kotlinToolingVersionDimension()) { target ->
                 jvm(target.name) {
                     attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
+                        attribute(KotlinCompilerVersionAttribute.attribute, objects.named(target.kotlinToolingVersion.value))
                     }
 
                     this.compilations.all {

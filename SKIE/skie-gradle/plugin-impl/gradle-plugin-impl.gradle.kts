@@ -1,4 +1,4 @@
-import co.touchlab.skie.buildsetup.main.util.enquoted
+import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.gradle.publish.dependencyCoordinate
 import co.touchlab.skie.gradle.publish.dependencyModule
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -33,6 +33,7 @@ kotlin {
         }
 
         kotlin.srcDirs(
+            layout.projectDirectory.dir("src/main/kotlin-tooling-version-gradle"),
             layout.projectDirectory.dir("src/main/kotlin-compiler-attribute"),
         )
     }

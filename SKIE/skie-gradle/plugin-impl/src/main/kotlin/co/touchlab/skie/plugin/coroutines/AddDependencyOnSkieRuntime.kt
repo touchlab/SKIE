@@ -1,6 +1,6 @@
 package co.touchlab.skie.plugin.coroutines
 
-import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.kgpShim
@@ -109,7 +109,7 @@ private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(): Configuration {
     val skieRuntimeConfiguration = project.configurations.create(skieRuntimeConfigurationName) {
         attributes {
             project.kgpShim.addKmpAttributes(this, konanTarget)
-            attribute(KotlinCompilerVersion.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
+            attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
         }
     }
 

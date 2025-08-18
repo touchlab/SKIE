@@ -6,9 +6,9 @@ import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
 import co.touchlab.skie.buildsetup.plugins.extensions.DevAcceptanceTestsExtension
-import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
-import co.touchlab.skie.buildsetup.main.util.enquoted
+import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
@@ -101,7 +101,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
 
                     this.configure { target ->
                         (target as KotlinTarget).attributes {
-                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+                            attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
                         }
                     }
                 }
@@ -113,7 +113,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
 
                 val kotlinTarget = jvm(target.name) {
                     attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+                        attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
                     }
                 }
 
@@ -135,13 +135,13 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     testDependencies(project(":common:configuration:configuration-annotations"))
                     skieIosArm64KotlinRuntimeDependency(project(":runtime:runtime-kotlin")) {
                         attributes {
-                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+                            attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
                         }
                     }
 
                     exportedTestDependencies(project(":runtime:runtime-kotlin")) {
                         attributes {
-                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+                            attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
                         }
                     }
                 }
@@ -384,7 +384,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
             exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
 
             attributes {
-                attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
+                attribute(KotlinCompilerVersionAttribute.attribute, objects.named(target.kotlinToolingVersion.value))
                 attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
                 attributeProvider(KotlinNativeTarget.konanTargetAttribute, provider { konanTarget })
                 attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))

@@ -1,6 +1,5 @@
-package co.touchlab.skie.buildsetup.main.version
+package co.touchlab.skie.buildsetup.version
 
-import co.touchlab.skie.gradle.KotlinToolingVersion
 import org.gradle.api.Project
 
 object KotlinToolingVersionProvider {

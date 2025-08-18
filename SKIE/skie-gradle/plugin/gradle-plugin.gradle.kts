@@ -1,4 +1,4 @@
-import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle.util.gradlePluginApi
 import co.touchlab.skie.gradle.version.minGradleVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -34,7 +34,7 @@ kotlinToolingVersionDimension().components.forEach { kotlinToolingVersion ->
     val safeKotlinVersion = kotlinToolingVersion.value.replace('.', '_')
     val configuration = configurations.create("shim-relocation-kgp_$safeKotlinVersion") {
         attributes {
-            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
+            attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
         }
     }
 

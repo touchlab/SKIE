@@ -1,6 +1,6 @@
 package co.touchlab.skie.gradle.util
 
-import co.touchlab.skie.gradle.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.kotlin.dsl.extra

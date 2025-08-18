@@ -5,8 +5,8 @@ import co.touchlab.skie.buildsetup.plugins.util.MultiCompileRuntimeExtension
 import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget
 import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget.Companion.kotlin_2_1_0
 import co.touchlab.skie.buildsetup.tasks.BuildNestedGradle
-import co.touchlab.skie.gradle.KotlinCompilerVersion
-import co.touchlab.skie.gradle.KotlinToolingVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
+import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
@@ -94,7 +94,7 @@ class SkieMultiCompileRuntime : Plugin<Project> {
                                 ),
                             )
                             attribute(KotlinNativeTarget.konanTargetAttribute, target.konanTargetName)
-                            attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.name.toString()))
+                            attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.name.toString()))
                         }
                     }
 

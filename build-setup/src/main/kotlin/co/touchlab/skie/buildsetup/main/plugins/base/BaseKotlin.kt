@@ -1,6 +1,6 @@
 package co.touchlab.skie.buildsetup.main.plugins.base
 
-import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle.util.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -25,7 +25,7 @@ abstract class BaseKotlin : Plugin<Project> {
 
     private fun Project.configureJvmToolchain() {
         plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
-            KotlinCompilerVersion.Companion.registerIn(project.dependencies, pluginVersion)
+            KotlinCompilerVersionAttribute.Companion.registerIn(project.dependencies, pluginVersion)
 
             extensions.configure<KotlinMultiplatformExtension> {
                 jvmToolchain(libs.versions.java)

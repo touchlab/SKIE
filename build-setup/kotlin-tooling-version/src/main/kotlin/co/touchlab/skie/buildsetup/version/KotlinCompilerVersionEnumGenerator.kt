@@ -1,9 +1,7 @@
-package co.touchlab.skie.buildsetup.main.version
+package co.touchlab.skie.buildsetup.version
 
-import co.touchlab.skie.buildsetup.main.util.generateKotlinCode
-import co.touchlab.skie.gradle.KotlinToolingVersion
-import co.touchlab.skie.gradle.toIdentifier
-import co.touchlab.skie.buildsetup.main.util.enquoted
+import co.touchlab.skie.buildsetup.util.generateKotlinCode
+import co.touchlab.skie.buildsetup.util.enquoted
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.invoke

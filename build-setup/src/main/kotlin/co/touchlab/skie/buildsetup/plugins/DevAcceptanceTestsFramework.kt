@@ -4,7 +4,7 @@ import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceivers
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
-import co.touchlab.skie.gradle.KotlinCompilerVersion
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import co.touchlab.skie.gradle.util.libs
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
@@ -59,7 +59,7 @@ abstract class DevAcceptanceTestsFramework : Plugin<Project> {
             dimensions(kotlinToolingVersionDimension()) { target ->
                 val kotlinTarget = jvm(target.name) {
                     attributes {
-                        attribute(KotlinCompilerVersion.attribute, objects.named(target.kotlinToolingVersion.value))
+                        attribute(KotlinCompilerVersionAttribute.attribute, objects.named(target.kotlinToolingVersion.value))
                     }
                 }
 
