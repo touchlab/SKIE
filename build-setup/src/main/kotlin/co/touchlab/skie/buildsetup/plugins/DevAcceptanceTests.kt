@@ -2,7 +2,9 @@
 
 package co.touchlab.skie.buildsetup.plugins
 
-// import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
 import co.touchlab.skie.buildsetup.plugins.extensions.DevAcceptanceTestsExtension
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
@@ -64,10 +66,10 @@ class MultiDimensionalJvmCompilation(delegate: Delegate) : DecoratedExternalKotl
 abstract class DevAcceptanceTests : Plugin<Project> {
 
     override fun apply(project: Project) = with(project) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
         apply<MultiDimensionTargetPlugin>()
-        apply<OptInExperimentalCompilerApi>()
-        apply<DevBuildconfig>()
+        apply<UtilityOptInExperimentalCompilerApi>()
+        apply<UtilityBuildConfig>()
         apply<SerializationGradleSubplugin>()
 
         val devAcceptanceTests = project.extensions.create<DevAcceptanceTestsExtension>("devAcceptanceTests")
@@ -80,7 +82,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
             dependsOn(tasks.named("kgp_${latestKotlin.value}Test"))
         }
 
-        extensions.configure<KotlinMultiplatformExtension>() {
+        extensions.configure<KotlinMultiplatformExtension> {
             sourceSets.commonTest {
                 dependencies {
                     implementation(project(":acceptance-tests:acceptance-tests-framework"))
@@ -103,7 +105,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                         }
                     }
                 }
-                val _mainCompilation = _kotlinTarget.createCompilation {
+                _kotlinTarget.createCompilation {
                     compilationName = KotlinCompilation.MAIN_COMPILATION_NAME
                     compilationFactory = ExternalKotlinCompilationDescriptor.CompilationFactory(::MultiDimensionalJvmCompilation)
                     defaultSourceSet = sourceSets.maybeCreate(compilationName)

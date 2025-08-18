@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.base
 
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.util.libs
@@ -13,15 +13,19 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-// TODO: Rename to DevBase?
-abstract class SkieBase : Plugin<Project> {
+abstract class BaseKotlin : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         group = "co.touchlab.skie"
         version = System.getenv("RELEASE_VERSION").orEmpty().ifBlank { "1.0.0-SNAPSHOT" }
 
+        configureJvmToolchain()
+        configureJUnitTests()
+    }
+
+    private fun Project.configureJvmToolchain() {
         plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
-            KotlinCompilerVersion.registerIn(project.dependencies, pluginVersion)
+            KotlinCompilerVersion.Companion.registerIn(project.dependencies, pluginVersion)
 
             extensions.configure<KotlinMultiplatformExtension> {
                 jvmToolchain(libs.versions.java)
@@ -41,10 +45,11 @@ abstract class SkieBase : Plugin<Project> {
                 jvmToolchain(libs.versions.java)
             }
         }
+    }
 
+    private fun Project.configureJUnitTests() {
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
         }
-
     }
 }

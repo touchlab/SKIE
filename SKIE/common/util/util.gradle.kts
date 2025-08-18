@@ -1,7 +1,7 @@
 plugins {
     id("skie.common")
     id("skie.publishable")
-    id("dev.buildconfig")
+    id("utility.build-config")
 }
 
 skiePublishing {

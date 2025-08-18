@@ -1,5 +1,9 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceivers
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import co.touchlab.skie.gradle.util.libs
@@ -20,11 +24,11 @@ import org.gradle.language.jvm.tasks.ProcessResources
 abstract class DevAcceptanceTestsFramework : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
         apply<MultiDimensionTargetPlugin>()
-        apply<OptInExperimentalCompilerApi>()
-        apply<ExperimentalContextReceivers>()
-        apply<DevBuildconfig>()
+        apply<UtilityOptInExperimentalCompilerApi>()
+        apply<UtilityExperimentalContextReceivers>()
+        apply<UtilityBuildConfig>()
 
         extensions.configure<BuildConfigExtension> {
             generator(

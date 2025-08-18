@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.utility
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-abstract class ExperimentalContextReceivers : Plugin<Project> {
+abstract class UtilityExperimentalContextReceivers : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         plugins.withType<KotlinMultiplatformPluginWrapper> {

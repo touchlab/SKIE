@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.version.darwinPlatform
 import co.touchlab.skie.gradle.version.darwinPlatformDimension
@@ -23,7 +24,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 abstract class SkieRuntimeKotlin : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
         apply<MultiDimensionTargetPlugin>()
 
         extensions.configure<MultiDimensionTargetExtension> {

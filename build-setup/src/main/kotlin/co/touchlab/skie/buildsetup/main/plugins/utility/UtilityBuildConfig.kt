@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.utility
 
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 import com.github.gmazzo.gradle.plugins.BuildConfigPlugin
@@ -7,7 +7,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-abstract class DevBuildconfig : Plugin<Project> {
+abstract class UtilityBuildConfig : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         apply<BuildConfigPlugin>()

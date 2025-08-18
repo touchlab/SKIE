@@ -1,5 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
 import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.toIdentifier
 import co.touchlab.skie.gradle.util.generateKotlinCode
@@ -18,9 +20,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 abstract class SkieCompilerCore : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
         apply<KotlinMultiplatformPluginWrapper>()
-        apply<OptInExperimentalCompilerApi>()
+        apply<UtilityOptInExperimentalCompilerApi>()
 
         val primaryKotlinVersions = kotlinToolingVersionDimension().components.map { it.name }.distinct().sorted()
 

@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.utility
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-abstract class OptInExperimentalCompilerApi : Plugin<Project> {
+abstract class UtilityOptInExperimentalCompilerApi : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         val annotations = listOf(

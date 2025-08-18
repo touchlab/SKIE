@@ -1,10 +1,10 @@
 @file:Suppress("OPT_IN_USAGE")
 
-import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget
+import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
-    id("skie.runtime")
+    id("skie.configuration-annotations")
     id("skie.multicompile")
 }
 

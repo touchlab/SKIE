@@ -1,7 +1,6 @@
-import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget
+import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget
 
 plugins {
-    id("skie.base")
     id("skie.multicompile")
 }
 

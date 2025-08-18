@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.plugins.util
 
 import co.touchlab.skie.gradle.KotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -9,10 +9,12 @@ data class MultiCompileTarget(
     val platformType: KotlinPlatformType = KotlinPlatformType.native,
     val declaration: (kotlinVersion: KotlinToolingVersion) -> String? = { "$name()" },
 ) {
+
     val capitalizedName: String
         get() = name.replaceFirstChar { it.uppercase() }
 
     companion object {
+
         val kotlin_2_0_0 = KotlinToolingVersion("2.0.0")
         val kotlin_2_1_0 = KotlinToolingVersion("2.1.0")
 
@@ -27,13 +29,13 @@ data class MultiCompileTarget(
             konanTargetName = "js",
             platformType = KotlinPlatformType.js,
             declaration = { kotlinVersion ->
-                    """
+                """
                     js {
                         browser()
                         nodejs()
                     }
                     """.trimIndent()
-            }
+            },
         )
 
         val wasmJs = MultiCompileTarget(

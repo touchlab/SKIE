@@ -1,6 +1,9 @@
 package co.touchlab.skie.buildsetup.plugins
 
-import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget.Companion.kotlin_2_1_0
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.plugins.util.MultiCompileRuntimeExtension
+import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget
+import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget.Companion.kotlin_2_1_0
 import co.touchlab.skie.buildsetup.tasks.BuildNestedGradle
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.KotlinToolingVersion
@@ -14,6 +17,7 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.filter
@@ -30,6 +34,8 @@ typealias SupportedTargetsWithDeclarations = List<Pair<MultiCompileTarget, Strin
 class SkieMultiCompileRuntime : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {
+        apply<BaseKotlin>()
+
         val extension = extensions.create<MultiCompileRuntimeExtension>("multiCompileRuntime")
         afterEvaluate {
             val publishTaskNamesWithTasks: PublishTaskNamesWithTasks? = if (extension.isPublishable.get()) {
@@ -77,11 +83,16 @@ class SkieMultiCompileRuntime : Plugin<Project> {
                             attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
                             attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
                             attribute(KotlinPlatformType.attribute, target.platformType)
-                            attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(if (target.platformType == KotlinPlatformType.jvm) {
-                                TargetJvmEnvironment.STANDARD_JVM
-                            } else {
-                                "non-jvm"
-                            }))
+                            attribute(
+                                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+                                objects.named(
+                                    if (target.platformType == KotlinPlatformType.jvm) {
+                                        TargetJvmEnvironment.STANDARD_JVM
+                                    } else {
+                                        "non-jvm"
+                                    },
+                                ),
+                            )
                             attribute(KotlinNativeTarget.konanTargetAttribute, target.konanTargetName)
                             attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.name.toString()))
                         }

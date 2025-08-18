@@ -1,11 +1,11 @@
-package co.touchlab.skie.buildsetup.tasks
+package co.touchlab.skie.buildsetup.tests
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-abstract class ReformatPackagesInFunctionalTests : DefaultTask() {
+abstract class ReformatPackagesInFunctionalTestsTask : DefaultTask() {
 
     @InputDirectory
     lateinit var resourcesDirectory: File

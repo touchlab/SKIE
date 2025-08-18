@@ -8,8 +8,8 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.tooling.GradleConnector
 
-
-abstract class BuildNestedGradle: DefaultTask() {
+// WIP Remove
+abstract class BuildNestedGradle : DefaultTask() {
 
     @get:InputDirectory
     abstract val projectDir: DirectoryProperty

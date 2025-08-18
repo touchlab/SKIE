@@ -1,5 +1,6 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.skie
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -11,23 +12,22 @@ import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
-abstract class SkieRuntime : Plugin<Project> {
+abstract class SkieConfigurationAnnotations : Plugin<Project> {
+
+    override fun apply(target: Project): Unit = with(target) {
+        apply<BaseKotlin>()
+        apply<KotlinMultiplatformPluginWrapper>()
+
+        configureWeakStdlibDependency()
+    }
 
     /*
-     * We add dependency on stdlib as `compileOnly` as we don't want to override users'
+     * We add a dependency on stdlib as `compileOnly` as we don't want to override users'
      * stdlib version in their projects. We also can't use `MultiDimensionTargetExtension` here,
      * as it's not to be used with user-consumable dependencies.
      */
-    override fun apply(target: Project): Unit = with(target) {
-        apply<SkieBase>()
-        apply<KotlinMultiplatformPluginWrapper>()
-
+    private fun Project.configureWeakStdlibDependency() {
         extensions.configure<KotlinMultiplatformExtension> {
-            val commonMain by sourceSets.getting {
-                dependencies {
-                    compileOnly(kotlin("stdlib-common"))
-                }
-            }
         }
 
         afterEvaluate {

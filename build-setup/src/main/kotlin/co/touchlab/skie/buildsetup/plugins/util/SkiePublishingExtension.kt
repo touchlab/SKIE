@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.plugins.util
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property

@@ -1,5 +1,7 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.skie
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseRoot
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -7,9 +9,9 @@ import java.io.File
 
 abstract class SkieRoot : Plugin<Project> {
 
-    override fun apply(project: Project): Unit = with(project) {
-        apply<DevRoot>()
-        apply<SkieBase>()
+    override fun apply(target: Project): Unit = with(target) {
+        apply<BaseRoot>()
+        apply<BaseKotlin>()
 
         registerReplaceDataTask()
     }

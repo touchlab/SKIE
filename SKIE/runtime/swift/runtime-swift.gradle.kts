@@ -9,6 +9,7 @@ skiePublishing {
     publishSources = true
 }
 
+// WIP Move to plugin
 val createResourcesIndex by tasks.registering {
     val resourcesProvider = sourceSets.main.map { it.resources.files }
 

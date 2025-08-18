@@ -1,5 +1,7 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.gradle
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityGradleImplicitReceiver
 import co.touchlab.skie.gradle.util.libs
 import co.touchlab.skie.gradle.version.minGradleVersion
 import org.gradle.api.Plugin
@@ -12,11 +14,14 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 abstract class SkieGradle : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
+        apply<KotlinMultiplatformPluginWrapper>()
+        apply<UtilityGradleImplicitReceiver>()
 
-        project.apply<KotlinMultiplatformPluginWrapper>()
-        apply<DevGradleImplicitReceiver>()
+        configureKotlinJvm(project)
+    }
 
+    private fun Project.configureKotlinJvm(project: Project) {
         val minGradleVersion = project.minGradleVersion()
 
         val weakDependencies = listOf(

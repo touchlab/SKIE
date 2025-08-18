@@ -32,7 +32,7 @@ class MultiDimensionSourceSetDependencyConfigurer {
         do {
             var hasDoneWork = false
 
-            directDependencies.forEach { (sourceSetPair, dependencies) ->
+            directDependencies.forEach { (_, dependencies) ->
                 val transitiveDependencies = dependencies.flatMap { allDependencies(it) }.toSet()
                 val dependenciesToRemove = dependencies intersect transitiveDependencies
                 if (dependenciesToRemove.isNotEmpty()) {

@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.plugins.util
 
 import co.touchlab.skie.gradle.KotlinToolingVersion
 import org.gradle.api.artifacts.Configuration
@@ -16,6 +16,7 @@ abstract class MultiCompileRuntimeExtension @Inject constructor(
     objects: ObjectFactory,
     layout: ProjectLayout,
 ) {
+
     val isPublishable: Property<Boolean> = objects.property<Boolean>().convention(false)
     val targets: ListProperty<MultiCompileTarget> = objects.listProperty()
     val sourceDir: DirectoryProperty = objects.directoryProperty().convention(layout.projectDirectory.dir("impl"))
@@ -25,10 +26,11 @@ abstract class MultiCompileRuntimeExtension @Inject constructor(
             "build.gradle.kts",
             "gradle.properties",
             "settings.gradle.kts",
-        )
+        ),
     )
     val rootKotlinVersion: Property<KotlinToolingVersion?> = objects.property<KotlinToolingVersion?>()
     val dependencies: Property<(KotlinToolingVersion) -> String> = objects.property<(KotlinToolingVersion) -> String>().convention { "" }
-    val applyDependencies: Property<DependencyHandlerScope.(KotlinToolingVersion, Configuration) -> Unit> = objects.property<DependencyHandlerScope.(KotlinToolingVersion, Configuration) -> Unit>().convention { _, _ -> }
+    val applyDependencies: Property<DependencyHandlerScope.(KotlinToolingVersion, Configuration) -> Unit> =
+        objects.property<DependencyHandlerScope.(KotlinToolingVersion, Configuration) -> Unit>().convention { _, _ -> }
     val klibPath: Property<(KotlinToolingVersion, MultiCompileTarget) -> String> = objects.property()
 }

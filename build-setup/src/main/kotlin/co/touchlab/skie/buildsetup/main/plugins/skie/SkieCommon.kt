@@ -1,12 +1,11 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.main.plugins.skie
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.gradle.util.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
@@ -14,22 +13,26 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 class SkieCommon : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
         apply<KotlinMultiplatformPluginWrapper>()
 
+        configureKotlinJvm()
+    }
+
+    private fun Project.configureKotlinJvm() {
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(libs.versions.java)
 
             jvm()
 
             sourceSets {
-                val commonMain by getting {
+                commonMain {
                     dependencies {
                         compileOnly(kotlin("stdlib"))
                     }
                 }
 
-                val commonTest by getting {
+                commonTest {
                     dependencies {
                         implementation(kotlin("stdlib"))
                         implementation(libs.bundles.testing.jvm)

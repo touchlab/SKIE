@@ -9,7 +9,7 @@ plugins {
     // TODO: Remove
     id("skie.publishable")
 
-    id("dev.buildconfig")
+    id("utility.build-config")
 }
 
 skiePublishing {

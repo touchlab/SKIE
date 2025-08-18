@@ -1,7 +1,9 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.plugins.extensions.HasMavenPublishPlugin
 import co.touchlab.skie.buildsetup.plugins.extensions.HasSigningPlugin
+import co.touchlab.skie.buildsetup.plugins.util.SkiePublishingExtension
 import co.touchlab.skie.gradle.publish.mavenArtifactId
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,11 +21,10 @@ import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-@Suppress("UnstableApiUsage")
 abstract class SkiePublishable : Plugin<Project>, HasMavenPublishPlugin, HasSigningPlugin {
 
     override fun apply(target: Project): Unit = with(target) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
         apply<MavenPublishPlugin>()
         configureSigningIfNeeded()
 

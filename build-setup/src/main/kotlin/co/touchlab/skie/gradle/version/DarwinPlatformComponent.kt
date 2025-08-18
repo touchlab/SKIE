@@ -5,8 +5,9 @@ import co.touchlab.skie.gradle.version.target.Target
 enum class DarwinPlatformComponent(
     val kotlinNativeTarget: String,
     val sinceKotlinVersion: String? = null,
-    val untilKotlinVersionExclusive: String? = null
+    val untilKotlinVersionExclusive: String? = null,
 ) : Target.Component {
+
     iosArm64("ios_arm64"),
     iosX64("ios_x64"),
     iosSimulatorArm64("ios_simulator_arm64"),

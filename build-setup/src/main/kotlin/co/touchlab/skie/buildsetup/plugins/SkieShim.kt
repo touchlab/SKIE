@@ -1,5 +1,7 @@
 package co.touchlab.skie.buildsetup.plugins
 
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityGradleImplicitReceiver
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
@@ -15,9 +17,9 @@ import org.gradle.kotlin.dsl.named
 abstract class SkieShim : Plugin<Project> {
 
     override fun apply(project: Project) = with(project) {
-        apply<SkieBase>()
+        apply<BaseKotlin>()
         apply<MultiDimensionTargetPlugin>()
-        apply<DevGradleImplicitReceiver>()
+        apply<UtilityGradleImplicitReceiver>()
 
         extensions.configure<MultiDimensionTargetExtension> {
             dimensions(kotlinToolingVersionDimension()) { target ->
