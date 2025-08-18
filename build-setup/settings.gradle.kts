@@ -1,9 +1,9 @@
 rootProject.name = "build-setup"
 
 pluginManagement {
-    includeBuild("../build-setup-settings")
+    includeBuild("../build-setup-gradle-settings")
 }
 
 plugins {
-    id("dev.settings")
+    id("dev.gradle.settings")
 }

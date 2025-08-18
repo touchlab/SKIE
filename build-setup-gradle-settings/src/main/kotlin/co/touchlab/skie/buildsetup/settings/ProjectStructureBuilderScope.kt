@@ -1,4 +1,4 @@
-package co.touchlab.skie.gradle
+package co.touchlab.skie.buildsetup.settings
 
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
@@ -6,7 +6,7 @@ import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-class BuildSetupScope(
+class ProjectStructureBuilderScope(
     private val settings: Settings,
     private val path: List<String>,
     private val prefix: String?,
@@ -15,11 +15,11 @@ class BuildSetupScope(
     val module: ModuleDelegateProvider
         get() = ModuleDelegateProvider(isGroup = false, directoryNameOverride = null) { }
 
-    fun module(directoryNameOverride: String? = null, configure: BuildSetupScope.() -> Unit = { }): ModuleDelegateProvider {
+    fun module(directoryNameOverride: String? = null, configure: ProjectStructureBuilderScope.() -> Unit = { }): ModuleDelegateProvider {
         return ModuleDelegateProvider(isGroup = false, directoryNameOverride = directoryNameOverride, configure = configure)
     }
 
-    fun group(directoryNameOverride: String? = null, configure: BuildSetupScope.() -> Unit = { }): ModuleDelegateProvider {
+    fun group(directoryNameOverride: String? = null, configure: ProjectStructureBuilderScope.() -> Unit = { }): ModuleDelegateProvider {
         return ModuleDelegateProvider(isGroup = true, directoryNameOverride = directoryNameOverride, configure = configure)
     }
 
@@ -34,7 +34,7 @@ class BuildSetupScope(
             if (provider.directoryNameOverride != null) {
                 it.projectDir = it.projectDir.parentFile.resolve(provider.directoryNameOverride)
             }
-            provider.configure(BuildSetupScope(settings, modulePath, prefixedName.takeIf { provider.isGroup }))
+            provider.configure(ProjectStructureBuilderScope(settings, modulePath, prefixedName.takeIf { provider.isGroup }))
         }
     }
 
@@ -46,7 +46,7 @@ class BuildSetupScope(
     inner class ModuleDelegateProvider(
         internal val isGroup: Boolean,
         internal val directoryNameOverride: String?,
-        internal val configure: BuildSetupScope.() -> Unit,
+        internal val configure: ProjectStructureBuilderScope.() -> Unit,
     ) : PropertyDelegateProvider<Nothing?, ValueProperty<ProjectDescriptor>> {
 
         override fun provideDelegate(thisRef: Nothing?, property: KProperty<*>): ValueProperty<ProjectDescriptor> {

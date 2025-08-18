@@ -1,4 +1,5 @@
 import java.util.Properties
+import co.touchlab.skie.buildsetup.settings.projectStructure
 
 rootProject.name = "SKIE"
 
@@ -9,12 +10,12 @@ pluginManagement {
         google()
     }
 
-    includeBuild("../build-setup-settings")
+    includeBuild("../build-setup-gradle-settings")
     includeBuild("../build-setup")
 }
 
 plugins {
-    id("dev.settings")
+    id("dev.gradle.settings")
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
@@ -30,7 +31,7 @@ skieProperties.stringPropertyNames().forEach { propertyName ->
 }
 
 @Suppress("UNUSED_VARIABLE", "LocalVariableName")
-buildSetup {
+projectStructure {
     val common by module {
         val analytics by module
         val configuration by group {

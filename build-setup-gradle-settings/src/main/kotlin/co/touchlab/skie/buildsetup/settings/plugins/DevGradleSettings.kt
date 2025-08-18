@@ -1,11 +1,11 @@
-package co.touchlab.skie.buildsetup.plugins
+package co.touchlab.skie.buildsetup.settings.plugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.maven
 import java.net.URI
 
-class DevSettings : Plugin<Settings> {
+class DevGradleSettings : Plugin<Settings> {
 
     override fun apply(target: Settings) = with(target) {
         dependencyResolutionManagement {

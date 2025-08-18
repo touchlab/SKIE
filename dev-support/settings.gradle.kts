@@ -2,7 +2,7 @@ rootProject.name = "dev-support"
 
 pluginManagement {
     includeBuild("../build-setup")
-    includeBuild("../build-setup-settings")
+    includeBuild("../build-setup-gradle-settings")
 }
 
 includeBuild("../SKIE") {
@@ -20,7 +20,7 @@ includeBuild("../SKIE") {
 }
 
 plugins {
-    id("dev.settings")
+    id("dev.gradle.settings")
 }
 
 fun modules(vararg names: String) {
