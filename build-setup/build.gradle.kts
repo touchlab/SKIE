@@ -121,11 +121,6 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieRuntimeSwift"
     }
 
-    plugins.register("skie.server") {
-        id = "skie.server"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieServer"
-    }
-
     plugins.register("skie.shim") {
         id = "skie.shim"
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieShim"
