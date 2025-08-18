@@ -2,15 +2,13 @@
 
 package co.touchlab.skie.buildsetup.plugins
 
+// import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
 import co.touchlab.skie.buildsetup.plugins.extensions.DevAcceptanceTestsExtension
 import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import co.touchlab.skie.gradle.util.enquoted
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
-import co.touchlab.skie.gradle.version.AcceptanceTestsComponent
 import co.touchlab.skie.gradle.version.KotlinToolingVersionComponent
-import co.touchlab.skie.gradle.version.acceptanceTest
-import co.touchlab.skie.gradle.version.acceptanceTestsDimension
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import co.touchlab.skie.gradle.version.target.ExpectActualBuildConfigGenerator
@@ -23,7 +21,6 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
@@ -38,8 +35,6 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExternalKotlinTargetApi
-// import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -57,18 +52,14 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
 import java.io.File
 
-class MultiDimensionalJvmTarget(delegate: Delegate): DecoratedExternalKotlinTarget(delegate)/*, HasConfigurableKotlinCompilerOptions<KotlinJvmCompilerOptions>*/ {
+class MultiDimensionalJvmTarget(delegate: Delegate) : DecoratedExternalKotlinTarget(delegate) {
+
     @Suppress("UNCHECKED_CAST")
     override val compilations: NamedDomainObjectContainer<MultiDimensionalJvmCompilation>
         get() = super.compilations as NamedDomainObjectContainer<MultiDimensionalJvmCompilation>
-
-//     override val compilerOptions: KotlinJvmCompilerOptions
-//         get() = super.compilerOptions as KotlinJvmCompilerOptions
 }
 
-class MultiDimensionalJvmCompilation(delegate: Delegate): DecoratedExternalKotlinCompilation(delegate) {
-
-}
+class MultiDimensionalJvmCompilation(delegate: Delegate) : DecoratedExternalKotlinCompilation(delegate)
 
 abstract class DevAcceptanceTests : Plugin<Project> {
 
@@ -100,7 +91,6 @@ abstract class DevAcceptanceTests : Plugin<Project> {
 
         extensions.configure<MultiDimensionTargetExtension> {
             dimensions(kotlinToolingVersionDimension()) { target ->
-//                 val acceptanceTestType = target.acceptanceTest
                 val kotlinToolingVersion = target.kotlinToolingVersion
                 val _kotlinTarget = createExternalKotlinTarget {
                     this.targetName = "_" + target.name
@@ -141,7 +131,6 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 }
                 dependencies {
                     testDependencies(project(":common:configuration:configuration-annotations"))
-//                     testDependencies(project(":configuration_annotations_impl_2_0_0"))
                     skieIosArm64KotlinRuntimeDependency(project(":runtime:runtime-kotlin")) {
                         attributes {
                             attribute(KotlinCompilerVersion.attribute, objects.named(kotlinToolingVersion.value))
@@ -327,7 +316,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 val resolvedDependencies = provider { testDependencies.resolve() }
                 val exportedDependencies = provider { exportedTestDependencies.resolve() }
                 val skieIosArm64KotlinRuntimeKlib = provider {
-                    println(skieIosArm64KotlinRuntimeDependency.resolve().joinToString("\n") { "- ${it.absolutePath}"})
+                    println(skieIosArm64KotlinRuntimeDependency.resolve().joinToString("\n") { "- ${it.absolutePath}" })
                     skieIosArm64KotlinRuntimeDependency.resolve().single()
                 }
 
@@ -335,6 +324,7 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                     type = "String",
                     name = "TEST_RESOURCES",
                     value = kotlinTarget.compilations.named("test").flatMap {
+                        @Suppress("UnstableApiUsage")
                         tasks.named<ProcessResources>(it.processResourcesTaskName)
                     }.map {
                         it.destinationDir.absolutePath.enquoted()

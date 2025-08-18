@@ -1,5 +1,4 @@
 import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
     id("skie.base")

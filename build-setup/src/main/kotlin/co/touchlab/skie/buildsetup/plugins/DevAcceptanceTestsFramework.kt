@@ -4,7 +4,6 @@ import co.touchlab.skie.gradle.KotlinCompilerVersion
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import co.touchlab.skie.gradle.util.libs
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
-import co.touchlab.skie.gradle.version.ToolingVersions
 import co.touchlab.skie.gradle.version.kotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import co.touchlab.skie.gradle.version.target.ExpectActualBuildConfigGenerator
@@ -105,10 +104,8 @@ abstract class DevAcceptanceTestsFramework : Plugin<Project> {
                     testOnly(libs.bundles.testing.jvm)
                 }
 
-                if (kotlinVersion >= ToolingVersions.Kotlin.`1․8․20`) {
-                    dependencies {
-                        implementation(files(project.kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/trove4j.jar")))
-                    }
+                dependencies {
+                    implementation(files(project.kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/trove4j.jar")))
                 }
             }
         }

@@ -4,23 +4,9 @@ import co.touchlab.skie.gradle.KotlinToolingVersion
 import co.touchlab.skie.gradle.version.target.ComparableDimension
 import co.touchlab.skie.gradle.version.target.Target
 
-// WARN: WE'RE USING A "ONE DOT LEADER" (U+2024 ․) IN THE VERSION NAMES BECAUSE WE CAN'T USE A PERIOD (U+002E) IN A PROPERTY NAME.
-@Suppress("NonAsciiCharacters")
 object ToolingVersions {
 
-    object Kotlin : VersionContainer<KotlinToolingVersion>(KotlinToolingVersion::toString) {
-
-        val `1․5․31` by version()
-        val `1․6․21` by version()
-        val `1․7․10` by version()
-        val `1․8․0` by version()
-        val `1․8․10` by version()
-        val `1․8․20` by version()
-        val `1․9․0` by version()
-        val `1․9․20` by version()
-        val `2․0․0` by version()
-
-        fun version() = VersionProvider(::KotlinToolingVersion)
+    object Kotlin {
 
         /**
          * ```
@@ -31,7 +17,7 @@ object ToolingVersions {
          * 1.9.20[1.9.20-RC](1.9.20)
          * ```
          */
-        private val kotlinVersionRegex = "([^\\[(\\])]+)(?:\\[([^\\[(\\])]+)\\])?(?:\\(([^\\[(\\])]+)\\))?".toRegex()
+        private val kotlinVersionRegex = "([^\\[(\\])]+)(?:\\[([^\\[(\\])]+)])?(?:\\(([^\\[(\\])]+)\\))?".toRegex()
 
         fun dimensionFrom(requestedIdentifiers: List<String>): Target.Dimension<KotlinToolingVersionComponent> {
             val components = requestedIdentifiers

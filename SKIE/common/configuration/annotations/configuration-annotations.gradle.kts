@@ -1,3 +1,5 @@
+@file:Suppress("OPT_IN_USAGE")
+
 import co.touchlab.skie.buildsetup.plugins.MultiCompileTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 

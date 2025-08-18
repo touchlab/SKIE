@@ -35,11 +35,6 @@ class Target(
         val value: String
     }
 
-    data class ComponentsInDimension<COMPONENT : Component>(
-        val dimension: Dimension<out COMPONENT>,
-        val components: Set<COMPONENT>,
-    )
-
     data class ComponentInDimension<COMPONENT : Component>(
         val dimension: Dimension<COMPONENT>,
         val component: COMPONENT,
