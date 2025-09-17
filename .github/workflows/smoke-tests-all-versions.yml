@@ -9,7 +9,7 @@ on:
       versions:
         description: 'Select Kotlin versions to test (comma-separated)'
         required: true
-        default: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0'
+        default: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0,2.2.20'
       run_acceptance_tests:
         description: 'Run Acceptance Tests'
         type: boolean
@@ -28,7 +28,7 @@ on:
         default: true
 
 env:
-  ALL_KOTLIN_VERSIONS: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0'
+  ALL_KOTLIN_VERSIONS: '2.0.0,2.0.20,2.1.0,2.1.20,2.2.0,2.2.20'
 
 permissions:
   contents: read
