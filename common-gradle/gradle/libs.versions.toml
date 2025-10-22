@@ -1,5 +1,6 @@
 [versions]
-java = "11"
+jvmTarget = "11"
+jvmToolchain = "21"
 pluginPublish = "1.2.0"
 kotest = "5.8.0"
 buildconfig = "4.1.1"

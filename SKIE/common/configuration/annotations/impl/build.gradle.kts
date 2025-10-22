@@ -97,7 +97,7 @@ tasks.withType<KotlinNativeCompile>().configureEach {
 }
 
 kotlin {
-    val jvmVersion = libs.versions.java.get().toInt()
+    val jvmVersion = libs.versions.jvmTarget.get().toInt()
 
     jvmToolchain(jvmVersion)
     targets.all {

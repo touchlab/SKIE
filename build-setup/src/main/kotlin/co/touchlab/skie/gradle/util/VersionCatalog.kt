@@ -17,9 +17,10 @@ internal class VersionCatalogRoot(private val versionCatalog: VersionCatalog) {
         get() = VersionCatalogBundles(versionCatalog)
 }
 
-internal class VersionCatalogVersions(private val versionCatalog: VersionCatalog) {
+internal class VersionCatalogVersions(versionCatalog: VersionCatalog) {
 
-    val java = versionCatalog.findVersion("java").get().requiredVersion.toInt()
+    val jvmTarget = versionCatalog.findVersion("jvmTarget").get().requiredVersion.toInt()
+    val jvmToolchain = versionCatalog.findVersion("jvmToolchain").get().requiredVersion.toInt()
 }
 
 internal class VersionCatalogBundles(private val versionCatalog: VersionCatalog) {

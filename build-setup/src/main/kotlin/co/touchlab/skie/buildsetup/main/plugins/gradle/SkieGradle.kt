@@ -15,6 +15,7 @@ abstract class SkieGradle : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         apply<BaseKotlin>()
+        // WIP JVM only
         apply<KotlinMultiplatformPluginWrapper>()
         apply<UtilityGradleImplicitReceiver>()
 
@@ -31,8 +32,6 @@ abstract class SkieGradle : Plugin<Project> {
         )
 
         extensions.configure<KotlinMultiplatformExtension> {
-            jvmToolchain(libs.versions.java)
-
             jvm()
 
             sourceSets.commonMain {
