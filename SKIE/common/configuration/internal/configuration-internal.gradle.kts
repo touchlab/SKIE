@@ -8,12 +8,6 @@ skiePublishing {
     description = "Internal Configuration declarations for SKIE, used in Gradle plugin."
 }
 
-kotlin {
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api(projects.common.configuration.configurationApi)
-            }
-        }
-    }
+dependencies {
+    api(projects.common.configuration.configurationApi)
 }

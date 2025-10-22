@@ -13,14 +13,6 @@ buildConfig {
     useKotlinOutput {
         internalVisibility = false
     }
-    buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
-}
 
-kotlin {
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-            }
-        }
-    }
+    buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
 }
