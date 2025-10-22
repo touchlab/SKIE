@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.tests.tasks.plugins.tests
+package co.touchlab.skie.buildsetup.tests.plugins.tests
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
@@ -12,6 +12,7 @@ import co.touchlab.skie.gradle.util.implementation
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.apply
@@ -19,7 +20,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-abstract class TestsAcceptanceTestsFramework : org.gradle.api.Plugin<Project> {
+abstract class TestsAcceptanceTestsFramework : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         apply<BaseKotlin>()
