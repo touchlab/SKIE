@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.tests
+package co.touchlab.skie.buildsetup.tests.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
@@ -42,7 +42,7 @@ abstract class ReformatPackagesInFunctionalTestsTask : DefaultTask() {
         file.writeText(modifiedText)
     }
 
-    private fun File.correctPackageDeclaration(): String {
+    private fun java.io.File.correctPackageDeclaration(): String {
         val pathComponents = this.getRelativePathComponents(resourcesDirectory)
 
         val packageName = pathComponents.joinToString(".") { "`$it`" }
@@ -50,7 +50,7 @@ abstract class ReformatPackagesInFunctionalTestsTask : DefaultTask() {
         return "package $packageName"
     }
 
-    private fun File.getRelativePathComponents(base: File): List<String> {
+    private fun java.io.File.getRelativePathComponents(base: java.io.File): List<String> {
         require(this.toPath().startsWith(base.toPath()) && this != base) {
             "File $this must be located inside ${base}."
         }

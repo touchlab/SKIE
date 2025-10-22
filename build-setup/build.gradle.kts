@@ -66,9 +66,9 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.DevAcceptanceTests"
     }
 
-    plugins.register("dev.acceptance-tests-framework") {
-        id = "dev.acceptance-tests-framework"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevAcceptanceTestsFramework"
+    plugins.register("tests.acceptance-tests-framework") {
+        id = "tests.acceptance-tests-framework"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.tasks.plugins.tests.TestsAcceptanceTestsFramework"
     }
 
     plugins.register("utility.build-config") {
