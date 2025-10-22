@@ -1,26 +1,9 @@
-@file:Suppress("OPT_IN_USAGE")
+@file:OptIn(ExperimentalWasmDsl::class)
 
-import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     id("skie.configuration-annotations")
-    id("skie.multicompile")
-}
-
-multiCompileRuntime {
-    isPublishable = true
-    targets.set(MultiCompileTarget.all)
-    rootKotlinVersion = MultiCompileTarget.kotlin_2_0_0
-    klibPath = { kotlinVersion, target ->
-        if (target.platformType == KotlinPlatformType.jvm) {
-            "build/libs/configuration-annotations-${kotlinVersion}-${target.name.lowercase()}-${version}.jar"
-        } else if (kotlinVersion >= MultiCompileTarget.kotlin_2_1_0) {
-            "build/libs/configuration-annotations-${kotlinVersion}-${target.name}Main-${version}.klib"
-        } else {
-            "build/classes/kotlin/${target.name}/main/klib/configuration-annotations-${kotlinVersion}.klib"
-        }
-    }
 }
 
 kotlin {
@@ -59,8 +42,4 @@ kotlin {
     linuxX64()
 
     mingwX64()
-
-    sourceSets.commonMain {
-        kotlin.srcDirs("impl/src/commonMain/kotlin")
-    }
 }
