@@ -15,6 +15,9 @@ object KotlinToolingVersionProvider {
         return activeSupportedVersion
     }
 
+    fun getMinimumSupportedKotlinToolingVersion(project: Project): KotlinToolingVersion =
+        getSupportedKotlinToolingVersions(project).flatMap { it.supportedVersions }.min()
+
     /**
      * Supported format:
      * ```
