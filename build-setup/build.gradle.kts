@@ -91,6 +91,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion"
     }
 
+    plugins.register("utility.multi-kotlin-version-support") {
+        id = "utility.multi-kotlin-version-support"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport"
+    }
+
     plugins.register("utility.opt-in.experimental-compiler-api") {
         id = "utility.opt-in.experimental-compiler-api"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi"
@@ -106,9 +111,9 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCommon"
     }
 
-    plugins.register("skie.compiler") {
-        id = "skie.compiler"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieCompiler"
+    plugins.register("skie.compiler.linker") {
+        id = "skie.compiler.linker"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCompilerLinker"
     }
 
     plugins.register("skie.compiler.core") {
