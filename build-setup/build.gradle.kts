@@ -76,6 +76,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsFunctionalTests"
     }
 
+    plugins.register("tests.stdlib-tests") {
+        id = "tests.stdlib-tests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsStdlibTests"
+    }
+
     plugins.register("tests.type-mapping-tests") {
         id = "tests.type-mapping-tests"
         implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsTypeMappingTests"
