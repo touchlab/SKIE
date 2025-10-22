@@ -1,6 +1,5 @@
 [versions]
 java = "11"
-kotlin = "2.0.0"
 pluginPublish = "1.2.0"
 kotest = "5.8.0"
 buildconfig = "4.1.1"
@@ -13,25 +12,14 @@ gradle = "8.7"
 shadow = "8.1.1"
 
 [plugins]
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
-buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctor" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 
 [libraries]
-plugin-kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-plugin-kotlin-gradle-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
-plugin-kotlin-samWithReceiver = { module = "org.jetbrains.kotlin:kotlin-sam-with-receiver", version.ref = "kotlin" }
-plugin-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 plugin-buildconfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
-plugin-nexusPublish = { module = "io.github.gradle-nexus:publish-plugin", version.ref = "nexusPublish" }
 
-kotlin-native-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-native-compiler-embeddable", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version = "0.53.0" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -46,20 +34,13 @@ mixpanel = { module = "com.mixpanel:mixpanel-java", version = "1.5.3" }
 gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle" }
 slf4j = { module = "org.slf4j:slf4j-simple", version = "1.7.10" }
 
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest-jvm", version.ref = "kotest" }
-kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version = "1.12.5" }
 
 [bundles]
-kotest = [
-    "kotest-runner-junit5",
-    "kotest-assertions-core",
-    "kotest-framework-datatest",
-    "kotest-property",
-]
 testing-jvm = [
     "kotlin-test",
     "kotest-runner-junit5",

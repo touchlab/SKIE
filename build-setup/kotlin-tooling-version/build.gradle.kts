@@ -17,8 +17,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation(libs.plugin.kotlin.gradle)
-    implementation(libs.plugin.kotlin.gradle.api)
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin")
 }
 
 gradlePlugin {

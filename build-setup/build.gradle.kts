@@ -1,4 +1,5 @@
 import co.touchlab.skie.buildsetup.version.KotlinCompilerVersionEnumGenerator
+import co.touchlab.skie.buildsetup.version.KotlinToolingVersionProvider
 
 plugins {
     `kotlin-dsl`
@@ -25,10 +26,13 @@ sourceSets {
 }
 
 dependencies {
-    implementation(libs.plugin.kotlin.gradle)
-    implementation(libs.plugin.kotlin.gradle.api)
-    implementation(libs.plugin.kotlin.samWithReceiver)
-    implementation(libs.plugin.kotlin.serialization)
+    val activePrimaryKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion.toString()
+
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$activePrimaryKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$activePrimaryKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-sam-with-receiver:$activePrimaryKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-serialization:$activePrimaryKotlinVersion")
+
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
     implementation(libs.kotlinPoet)

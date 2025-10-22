@@ -4,10 +4,15 @@ import org.gradle.api.Project
 
 object KotlinToolingVersionProvider {
 
-    fun getActiveKotlinToolingVersion(project: Project): KotlinToolingVersion {
+    fun getActiveKotlinToolingVersion(project: Project): SupportedKotlinToolingVersion {
         val activeVersion = project.property("versionSupport.kotlinTooling.activeVersion").toString()
 
-        return KotlinToolingVersion(activeVersion)
+        val supportedVersions = getSupportedKotlinToolingVersions(project)
+
+        val activeSupportedVersion = supportedVersions.firstOrNull { it.name.toString() == activeVersion }
+            ?: error("Active Kotlin Tooling version '$activeVersion' is not listed in the supported versions - it must be a name of a supported version.")
+
+        return activeSupportedVersion
     }
 
     /**

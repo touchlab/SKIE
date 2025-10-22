@@ -6,7 +6,6 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
-// import org.jetbrains.kotlin.konan.CompilerVersion
 import java.io.File
 
 private sealed interface BackupProperty<out T> {

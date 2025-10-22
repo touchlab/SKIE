@@ -38,7 +38,7 @@ object KotlinCompilerVersionEnumGenerator {
         val kotlinVersionsEnum = getKotlinCompilerVersionEnumCode(
             packageName = packageName,
             makeEnumPublic = makeEnumPublic,
-            activeVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project),
+            activeVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name,
             supportedVersions = KotlinToolingVersionProvider.getSupportedKotlinToolingVersions(project),
         )
 

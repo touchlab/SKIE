@@ -25,7 +25,7 @@ abstract class BaseKotlin : Plugin<Project> {
 
     private fun Project.configureJvmToolchain() {
         plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
-            KotlinCompilerVersionAttribute.Companion.registerIn(project.dependencies, pluginVersion)
+            KotlinCompilerVersionAttribute.registerIn(project.dependencies, pluginVersion)
 
             extensions.configure<KotlinMultiplatformExtension> {
                 jvmToolchain(libs.versions.java)
