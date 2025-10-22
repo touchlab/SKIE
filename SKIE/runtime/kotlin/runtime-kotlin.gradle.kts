@@ -1,25 +1,26 @@
-import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget
-
 plugins {
-    id("skie.multicompile")
+    id("skie.runtime.kotlin")
 }
 
-multiCompileRuntime {
-    isPublishable = true
-    targets.set(MultiCompileTarget.allDarwin)
-    klibPath = { kotlinVersion, target ->
-        if (kotlinVersion >= MultiCompileTarget.kotlin_2_1_0) {
-            "build/libs/runtime-kotlin-${kotlinVersion}-${target.name}Main-${version}.klib"
-        } else {
-            "build/classes/kotlin/${target.name}/main/klib/runtime-kotlin-${kotlinVersion}.klib"
-        }
-    }
-    dependencies = { _ ->
-        "implementation(libs.kotlinx.coroutines.core)"
-    }
-    applyDependencies = { _, configuration ->
-        configuration(
-            libs.kotlinx.coroutines.core
-        )
-    }
+kotlin {
+    iosArm64()
+    iosX64()
+    iosSimulatorArm64()
+
+    watchosArm32()
+    watchosArm64()
+    watchosX64()
+    watchosSimulatorArm64()
+    watchosDeviceArm64()
+
+    tvosArm64()
+    tvosX64()
+    tvosSimulatorArm64()
+
+    macosX64()
+    macosArm64()
+}
+
+dependencies {
+    commonMainImplementation(libs.kotlinx.coroutines.core)
 }
