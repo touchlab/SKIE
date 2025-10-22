@@ -2,27 +2,27 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
+import co.touchlab.skie.buildsetup.version.KotlinCompilerVersionEnumGenerator
 import co.touchlab.skie.gradle.util.compileOnly
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-class SkieCommon : Plugin<Project> {
+abstract class SkieCompilerCore : Plugin<Project> {
 
-    override fun apply(target: Project): Unit = with(target) {
+    override fun apply(project: Project): Unit = with(project) {
         apply<BaseKotlin>()
         apply<UtilityMinimumTargetKotlinVersion>()
+        apply<UtilityOptInExperimentalCompilerApi>()
         apply<KotlinPluginWrapper>()
 
-        configureDependencies()
-    }
+        KotlinCompilerVersionEnumGenerator.generate(project, "co.touchlab.skie", true)
 
-    private fun Project.configureDependencies() {
-        dependencies {
-            compileOnly(kotlin("stdlib"))
+        project.dependencies {
+            compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
         }
     }
 }

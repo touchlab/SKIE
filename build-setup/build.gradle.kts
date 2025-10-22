@@ -20,10 +20,10 @@ repositories {
 sourceSets {
     main {
         kotlin.srcDir("src/main/kotlin-compiler-attribute-build-setup")
-
-        KotlinCompilerVersionEnumGenerator.generate(project, "co.skie.buildsetup", true)
     }
 }
+
+KotlinCompilerVersionEnumGenerator.generate(project, "co.touchlab.skie.buildsetup", true)
 
 dependencies {
     val activePrimaryKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion.toString()
@@ -86,6 +86,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityGradleImplicitReceiver"
     }
 
+    plugins.register("utility.minimum-target-kotlin-version") {
+        id = "utility.minimum-target-kotlin-version"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion"
+    }
+
     plugins.register("utility.opt-in.experimental-compiler-api") {
         id = "utility.opt-in.experimental-compiler-api"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi"
@@ -108,7 +113,7 @@ gradlePlugin {
 
     plugins.register("skie.compiler.core") {
         id = "skie.compiler.core"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieCompilerCore"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCompilerCore"
     }
 
     plugins.register("skie.publishable") {
