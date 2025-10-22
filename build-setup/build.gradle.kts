@@ -51,6 +51,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin"
     }
 
+    plugins.register("base.tests") {
+        id = "base.tests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.base.BaseTests"
+    }
+
     plugins.register("dev.root") {
         id = "dev.root"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevRoot"
@@ -69,6 +74,16 @@ gradlePlugin {
     plugins.register("tests.functional-tests") {
         id = "tests.functional-tests"
         implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsFunctionalTests"
+    }
+
+    plugins.register("tests.type-mapping-tests") {
+        id = "tests.type-mapping-tests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsTypeMappingTests"
+    }
+
+    plugins.register("tests.dependencies") {
+        id = "tests.dependencies"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsDependencies"
     }
 
     plugins.register("tests.acceptance-tests-framework") {

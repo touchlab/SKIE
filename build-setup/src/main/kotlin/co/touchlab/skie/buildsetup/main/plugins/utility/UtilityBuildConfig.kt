@@ -2,6 +2,7 @@ package co.touchlab.skie.buildsetup.main.plugins.utility
 
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 import com.github.gmazzo.gradle.plugins.BuildConfigPlugin
+import com.github.gmazzo.gradle.plugins.generators.BuildConfigKotlinGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -14,6 +15,8 @@ abstract class UtilityBuildConfig : Plugin<Project> {
 
         extensions.configure<BuildConfigExtension> {
             packageName(("${project.group}.${project.name}").replace("-", "_"))
+
+            generator.set(BuildConfigKotlinGenerator())
         }
     }
 }

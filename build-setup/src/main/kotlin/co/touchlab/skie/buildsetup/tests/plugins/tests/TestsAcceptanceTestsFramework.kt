@@ -12,6 +12,7 @@ import co.touchlab.skie.gradle.util.implementation
 import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import com.github.gmazzo.gradle.plugins.generators.BuildConfigKotlinGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -41,6 +42,8 @@ abstract class TestsAcceptanceTestsFramework : Plugin<Project> {
         val mainSourceSet = sourceSets.named("main")
 
         extensions.configure<BuildConfigExtension> {
+            generator.set(BuildConfigKotlinGenerator(internalVisibility = false))
+
             buildConfigField(
                 type = "String",
                 name = "KONAN_HOME",
