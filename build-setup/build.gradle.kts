@@ -31,147 +31,147 @@ dependencies {
 gradlePlugin {
     plugins.register("base.root") {
         id = "base.root"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.base.BaseRoot"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.base.BaseRootPlugin"
     }
 
     plugins.register("base.kotlin") {
         id = "base.kotlin"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin"
     }
 
     plugins.register("base.tests") {
         id = "base.tests"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.base.BaseTests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin"
     }
 
     plugins.register("dev.root") {
         id = "dev.root"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevRoot"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevRootPlugin"
     }
 
     plugins.register("dev.multiplatform") {
         id = "dev.multiplatform"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevMultiplatform"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevMultiplatformPlugin"
     }
 
     plugins.register("tests.functional-tests") {
         id = "tests.functional-tests"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsFunctionalTests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsFunctionalTestsPlugin"
     }
 
     plugins.register("tests.stdlib-tests") {
         id = "tests.stdlib-tests"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsStdlibTests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsStdlibTestsPlugin"
     }
 
     plugins.register("tests.type-mapping-tests") {
         id = "tests.type-mapping-tests"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsTypeMappingTests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsTypeMappingTestsPlugin"
     }
 
     plugins.register("tests.library-tests") {
         id = "tests.library-tests"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsLibraryTests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsLibraryTestsPlugin"
     }
 
     plugins.register("tests.dependencies") {
         id = "tests.dependencies"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsDependencies"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsDependenciesPlugin"
     }
 
     plugins.register("tests.acceptance-tests-framework") {
         id = "tests.acceptance-tests-framework"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsAcceptanceTestsFramework"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsAcceptanceTestsFrameworkPlugin"
     }
 
     plugins.register("utility.build-config") {
         id = "utility.build-config"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin"
     }
 
     plugins.register("utility.experimental.context-receivers") {
         id = "utility.experimental.context-receivers"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceivers"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceiversPlugin"
     }
 
     plugins.register("utility.gradle.implicit-receiver") {
         id = "utility.gradle.implicit-receiver"
-        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiverPlugin"
     }
 
     plugins.register("utility.gradle.minimum-target-kotlin-version") {
         id = "utility.gradle.minimum-target-kotlin-version"
-        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersion"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersionPlugin"
     }
 
     plugins.register("utility.minimum-target-kotlin-version") {
         id = "utility.minimum-target-kotlin-version"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin"
     }
 
     plugins.register("utility.multi-kotlin-version-support") {
         id = "utility.multi-kotlin-version-support"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin"
     }
 
     plugins.register("utility.opt-in.experimental-compiler-api") {
         id = "utility.opt-in.experimental-compiler-api"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin"
     }
 
     plugins.register("utility.skie-publishable") {
         id = "utility.skie-publishable"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilitySkiePublishable"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilitySkiePublishablePlugin"
     }
 
     plugins.register("skie.root") {
         id = "skie.root"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRoot"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRootPlugin"
     }
 
     plugins.register("skie.common") {
         id = "skie.common"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCommon"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCommonPlugin"
     }
 
     plugins.register("skie.compiler.linker") {
         id = "skie.compiler.linker"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCompilerLinker"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCompilerLinkerPlugin"
     }
 
     plugins.register("skie.compiler.core") {
         id = "skie.compiler.core"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCompilerCore"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCompilerCorePlugin"
     }
 
     plugins.register("skie.configuration-annotations") {
         id = "skie.configuration-annotations"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieConfigurationAnnotations"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieConfigurationAnnotationsPlugin"
     }
 
     plugins.register("skie.runtime.kotlin") {
         id = "skie.runtime.kotlin"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRuntimeKotlin"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRuntimeKotlinPlugin"
     }
 
     plugins.register("skie.runtime.swift") {
         id = "skie.runtime.swift"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRuntimeSwift"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRuntimeSwiftPlugin"
     }
 
     plugins.register("gradle.common") {
         id = "gradle.common"
-        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradleCommon"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradleCommonPlugin"
     }
 
     plugins.register("gradle.plugin") {
         id = "gradle.plugin"
-        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradlePlugin"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradlePluginPlugin"
     }
 
     plugins.register("gradle.shim") {
         id = "gradle.shim"
-        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradleShim"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradleShimPlugin"
     }
 }
 

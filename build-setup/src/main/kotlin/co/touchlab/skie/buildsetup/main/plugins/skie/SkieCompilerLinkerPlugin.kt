@@ -2,10 +2,10 @@
 
 package co.touchlab.skie.buildsetup.main.plugins.skie
 
-import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
@@ -18,13 +18,13 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-abstract class SkieCompilerLinker : Plugin<Project> {
+abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        apply<BaseKotlin>()
-        apply<UtilityMultiKotlinVersionSupport>()
-        apply<UtilityMinimumTargetKotlinVersion>()
-        apply<UtilityOptInExperimentalCompilerApi>()
+        apply<BaseKotlinPlugin>()
+        apply<UtilityMultiKotlinVersionSupportPlugin>()
+        apply<UtilityMinimumTargetKotlinVersionPlugin>()
+        apply<UtilityOptInExperimentalCompilerApiPlugin>()
         apply<KotlinPluginWrapper>()
 
         addDependencyOnCompiler()

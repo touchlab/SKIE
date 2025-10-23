@@ -1,9 +1,9 @@
 package co.touchlab.skie.buildsetup.gradle.plugins.gradle
 
-import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver
-import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersion
-import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport
+import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiverPlugin
+import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersionPlugin
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.gradlePluginApi
@@ -12,13 +12,13 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-abstract class GradleShim : org.gradle.api.Plugin<Project> {
+abstract class GradleShimPlugin : org.gradle.api.Plugin<Project> {
 
     override fun apply(project: Project) = with(project) {
-        apply<BaseKotlin>()
-        apply<UtilityGradleMinimumTargetKotlinVersion>()
-        apply<UtilityGradleImplicitReceiver>()
-        apply<UtilityMultiKotlinVersionSupport>()
+        apply<BaseKotlinPlugin>()
+        apply<UtilityGradleMinimumTargetKotlinVersionPlugin>()
+        apply<UtilityGradleImplicitReceiverPlugin>()
+        apply<UtilityMultiKotlinVersionSupportPlugin>()
         apply<KotlinPluginWrapper>()
 
         configureDependencies()

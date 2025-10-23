@@ -7,7 +7,7 @@ import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverGradleSubplugin
 
-abstract class UtilityGradleImplicitReceiver : Plugin<Project> {
+abstract class UtilityGradleImplicitReceiverPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.apply<SamWithReceiverGradleSubplugin>()

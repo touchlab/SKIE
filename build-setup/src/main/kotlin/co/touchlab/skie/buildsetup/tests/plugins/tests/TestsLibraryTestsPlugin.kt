@@ -3,7 +3,7 @@
 package co.touchlab.skie.buildsetup.tests.plugins.tests
 
 import co.touchlab.skie.buildsetup.tests.extensions.LibraryTestsExtension
-import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTests
+import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin
 import co.touchlab.skie.buildsetup.tests.tasks.CheckLibraryExpectedFailuresConsistencyTask
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.gradle.ExternalKotlinTargetApi
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
 
-abstract class TestsLibraryTests : Plugin<Project> {
+abstract class TestsLibraryTestsPlugin : Plugin<Project> {
 
     private val testInputProperties = listOf(
         "failedOnly",
@@ -47,7 +47,7 @@ abstract class TestsLibraryTests : Plugin<Project> {
     )
 
     override fun apply(project: Project) = with(project) {
-        apply<BaseTests>()
+        apply<BaseTestsPlugin>()
         apply<SerializationGradleSubplugin>()
 
         val activeKotlinVersionName = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name
@@ -72,7 +72,7 @@ abstract class TestsLibraryTests : Plugin<Project> {
         }
 
     private fun Project.getSkieIosArm64KotlinRuntimeDependencyConfiguration(): Configuration {
-        val skieIosArm64KotlinRuntimeDependency = BaseTests.maybeCreateTestDependencyConfiguration(
+        val skieIosArm64KotlinRuntimeDependency = BaseTestsPlugin.maybeCreateTestDependencyConfiguration(
             project = project,
             name = "SkieKotlinRuntimeDependency",
             konanTarget = KonanTarget.IOS_ARM64.name,

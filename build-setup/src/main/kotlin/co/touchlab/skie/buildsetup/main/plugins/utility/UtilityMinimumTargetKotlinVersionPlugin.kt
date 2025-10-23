@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion as GradleDslKotlinVersion
 
-abstract class UtilityMinimumTargetKotlinVersion : Plugin<Project> {
+abstract class UtilityMinimumTargetKotlinVersionPlugin : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         val minimumVersion = KotlinToolingVersionProvider.getMinimumSupportedKotlinToolingVersion(project)

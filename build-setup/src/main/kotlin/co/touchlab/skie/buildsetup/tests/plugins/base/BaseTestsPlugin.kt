@@ -2,9 +2,9 @@
 
 package co.touchlab.skie.buildsetup.tests.plugins.base
 
-import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import java.io.File
 
-abstract class BaseTests : Plugin<Project> {
+abstract class BaseTestsPlugin : Plugin<Project> {
 
     private val testInputProperties = listOf(
         "keepTemporaryFiles",
@@ -42,9 +42,9 @@ abstract class BaseTests : Plugin<Project> {
     )
 
     override fun apply(project: Project) = with(project) {
-        apply<BaseKotlin>()
-        apply<UtilityMinimumTargetKotlinVersion>()
-        apply<UtilityBuildConfig>()
+        apply<BaseKotlinPlugin>()
+        apply<UtilityMinimumTargetKotlinVersionPlugin>()
+        apply<UtilityBuildConfigPlugin>()
         apply<KotlinPluginWrapper>()
 
         val primaryKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion

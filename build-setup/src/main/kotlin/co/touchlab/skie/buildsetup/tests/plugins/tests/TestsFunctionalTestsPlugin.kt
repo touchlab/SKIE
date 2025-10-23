@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.buildsetup.tests.plugins.tests
 
-import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTests
+import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin
 import co.touchlab.skie.buildsetup.tests.tasks.ReformatPackagesInFunctionalTestsTask
 import co.touchlab.skie.buildsetup.util.enquoted
 import com.github.gmazzo.buildconfig.BuildConfigExtension
@@ -16,7 +16,7 @@ import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExternalKotlinTargetApi
 
-abstract class TestsFunctionalTests : Plugin<Project> {
+abstract class TestsFunctionalTestsPlugin : Plugin<Project> {
 
     private val testInputProperties = listOf(
         "failedOnly",
@@ -24,7 +24,7 @@ abstract class TestsFunctionalTests : Plugin<Project> {
     )
 
     override fun apply(project: Project) = with(project) {
-        apply<BaseTests>()
+        apply<BaseTestsPlugin>()
 
         configureBuildConfig()
         configureTestTask()

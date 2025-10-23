@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
-abstract class BaseKotlin : Plugin<Project> {
+abstract class BaseKotlinPlugin : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         group = "co.touchlab.skie"

@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-abstract class UtilityOptInExperimentalCompilerApi : Plugin<Project> {
+abstract class UtilityOptInExperimentalCompilerApiPlugin : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         val annotations = listOf(

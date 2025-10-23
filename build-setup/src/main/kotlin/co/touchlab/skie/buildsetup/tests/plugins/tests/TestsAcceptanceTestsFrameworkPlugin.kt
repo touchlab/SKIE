@@ -1,10 +1,10 @@
 package co.touchlab.skie.buildsetup.tests.plugins.tests
 
-import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceivers
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
+import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceiversPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import co.touchlab.skie.buildsetup.util.compileOnly
@@ -21,14 +21,14 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-abstract class TestsAcceptanceTestsFramework : Plugin<Project> {
+abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        apply<BaseKotlin>()
-        apply<UtilityMinimumTargetKotlinVersion>()
-        apply<UtilityOptInExperimentalCompilerApi>()
-        apply<UtilityExperimentalContextReceivers>()
-        apply<UtilityBuildConfig>()
+        apply<BaseKotlinPlugin>()
+        apply<UtilityMinimumTargetKotlinVersionPlugin>()
+        apply<UtilityOptInExperimentalCompilerApiPlugin>()
+        apply<UtilityExperimentalContextReceiversPlugin>()
+        apply<UtilityBuildConfigPlugin>()
         apply<KotlinPluginWrapper>()
 
         val activeKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion

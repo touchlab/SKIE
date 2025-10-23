@@ -17,7 +17,13 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
-abstract class UtilityMultiKotlinVersionSupport : Plugin<Project> {
+abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
+
+    // WIP
+// Source sets
+// kotlinExtension.sourceSets.maybeCreate(sourceSet.name + "__" + compilation.sourceSetNameSuffix)
+// } else {
+//     kotlinExtension.sourceSets.getByName(sourceSet.name + compilation.sourceSetNameSuffix)
 
     override fun apply(target: Project): Unit = with(target) {
         apply<KotlinPluginWrapper>()

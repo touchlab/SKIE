@@ -4,7 +4,6 @@ import co.touchlab.skie.buildsetup.main.extensions.SkiePublishingExtension
 import co.touchlab.skie.buildsetup.util.mavenArtifactId
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -20,7 +19,7 @@ import org.gradle.plugins.signing.SigningExtension
 import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
-abstract class UtilitySkiePublishable : Plugin<Project> {
+abstract class UtilitySkiePublishablePlugin : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         apply<MavenPublishPlugin>()
