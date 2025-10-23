@@ -1,7 +1,7 @@
 import co.touchlab.skie.buildsetup.util.enquoted
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import co.touchlab.skie.gradle.publish.dependencyCoordinate
 import co.touchlab.skie.gradle.publish.dependencyModule
-import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
 plugins {
     id("gradle.common")
@@ -43,10 +43,11 @@ dependencies {
 buildConfig {
     val shimImpl = project.provider { projects.gradle.gradlePluginShimImpl.dependencyProject }
     buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", shimImpl.map { it.dependencyCoordinate.enquoted() })
-    val kotlinToSkieKgpVersion = project.kotlinToolingVersionDimension().components
-        .flatMap { versionComponent ->
-            versionComponent.supportedVersions.map { version ->
-                version to versionComponent.name
+
+    val kotlinToSkieKgpVersion = KotlinToolingVersionProvider.getSupportedKotlinToolingVersions(project)
+        .flatMap { supportedVersion ->
+            supportedVersion.supportedVersions.map { version ->
+                version to supportedVersion.name
             }
         }
         .joinToString { (version, name) ->
