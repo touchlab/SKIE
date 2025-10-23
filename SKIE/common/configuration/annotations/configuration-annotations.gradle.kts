@@ -1,9 +1,15 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     id("skie.configuration-annotations")
+    id("utility.skie-publishable")
+}
+
+skiePublishing {
+    name = "SKIE Configuration Annotations"
+    description = "Annotations to configure SKIE behavior."
 }
 
 kotlin {

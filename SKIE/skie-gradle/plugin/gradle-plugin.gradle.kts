@@ -5,22 +5,23 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("gradle.plugin")
-    id("skie.publishable")
+    id("utility.skie-publishable")
 
     alias(libs.plugins.shadow)
 }
 
+skiePublishing {
+    name = "SKIE Gradle Plugin"
+    description = "Gradle plugin for configuring SKIE compiler plugin."
+}
+
+// WIP Move to plugin
 tasks.shadowJar {
     archiveClassifier.set("")
 
     dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib.*"))
     }
-}
-
-skiePublishing {
-    name = "SKIE Gradle Plugin"
-    description = "Gradle plugin for configuring SKIE compiler plugin."
 }
 
 configurations.configureEach {
@@ -60,12 +61,11 @@ dependencies {
     compileOnly(kotlin("stdlib"))
 }
 
-@Suppress("UnstableApiUsage")
 gradlePlugin {
     website = "https://skie.touchlab.co"
     vcsUrl = "https://github.com/touchlab/SKIE.git"
 
-    this.plugins {
+    plugins {
         create("co.touchlab.skie") {
             id = "co.touchlab.skie"
             displayName = "Swift and Kotlin, unified"

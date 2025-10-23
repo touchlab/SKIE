@@ -2,6 +2,7 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -13,5 +14,7 @@ abstract class SkieRuntimeKotlin : Plugin<Project> {
         apply<BaseKotlin>()
         apply<UtilityMinimumTargetKotlinVersion>()
         apply<KotlinMultiplatformPluginWrapper>()
+
+        UtilityMultiKotlinVersionSupport.configureKotlinToolingVersionAttributeForOutgoingVariants(project)
     }
 }

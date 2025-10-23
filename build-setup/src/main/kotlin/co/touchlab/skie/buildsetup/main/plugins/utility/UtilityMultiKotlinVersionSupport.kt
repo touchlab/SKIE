@@ -2,12 +2,14 @@
 
 package co.touchlab.skie.buildsetup.main.plugins.utility
 
-import co.touchlab.skie.buildsetup.util.version.VersionSourceSet
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.VersionSourceSet
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
@@ -23,6 +25,8 @@ abstract class UtilityMultiKotlinVersionSupport : Plugin<Project> {
         val versionSourceSets = getVersionSourceSets()
 
         configureActiveSourceSets(versionSourceSets)
+
+        configureKotlinToolingVersionAttributeForOutgoingVariants(project)
     }
 
     private fun Project.getVersionSourceSets(): List<VersionSourceSet> {
@@ -53,6 +57,21 @@ abstract class UtilityMultiKotlinVersionSupport : Plugin<Project> {
             activeSourceSets.forEach {
                 mainSourceSet.kotlin.srcDir(it.path.resolve("kotlin"))
                 mainSourceSet.resources.srcDir(it.path.resolve("resources"))
+            }
+        }
+    }
+
+    companion object {
+
+        fun configureKotlinToolingVersionAttributeForOutgoingVariants(project: Project) {
+            val activeKotlinVersionName = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name
+
+            project.configurations.configureEach {
+                if (name.endsWith("Elements")) {
+                    attributes {
+                        attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(activeKotlinVersionName.toString()))
+                    }
+                }
             }
         }
     }

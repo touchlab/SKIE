@@ -1,6 +1,6 @@
 plugins {
     id("skie.common")
-    id("skie.publishable")
+    id("utility.skie-publishable")
 
     kotlin("plugin.serialization")
 }

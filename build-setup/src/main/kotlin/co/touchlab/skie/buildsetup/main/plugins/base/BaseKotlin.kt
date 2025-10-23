@@ -2,19 +2,20 @@
 
 package co.touchlab.skie.buildsetup.main.plugins.base
 
-import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.buildsetup.util.libs
+import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
 import org.jetbrains.kotlin.gradle.plugin.DefaultKotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
@@ -30,11 +31,11 @@ abstract class BaseKotlin : Plugin<Project> {
         configureCompilerVersionAttribute()
         configureJvmToolchain()
         configureTargetJvm()
+        configureTargetJvmAttribute()
         configureJUnitTests()
     }
 
     private fun Project.configureCompilerVersionAttribute() {
-        // WIP
         plugins.withType<DefaultKotlinBasePlugin>().configureEach {
             KotlinCompilerVersionAttribute.registerIn(project.dependencies, pluginVersion)
         }
@@ -42,7 +43,7 @@ abstract class BaseKotlin : Plugin<Project> {
 
     private fun Project.configureJvmToolchain() {
         plugins.withType<KotlinBasePluginWrapper>().configureEach {
-            extensions.configure<KotlinTopLevelExtension> {
+            extensions.configure<KotlinBaseExtension> {
                 jvmToolchain(libs.versions.jvmToolchain)
             }
         }
@@ -77,6 +78,26 @@ abstract class BaseKotlin : Plugin<Project> {
 
         tasks.withType<JavaCompile>().configureEach {
             options.release.set(libs.versions.jvmTarget)
+        }
+    }
+
+    private fun Project.configureTargetJvmAttribute() {
+        plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
+            extensions.configure<KotlinMultiplatformExtension> {
+                targets.withType(KotlinJvmTarget::class).configureEach {
+                    configurations.named(apiElementsConfigurationName).configure {
+                        attributes {
+                            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, libs.versions.jvmTarget)
+                        }
+                    }
+
+                    configurations.named(runtimeElementsConfigurationName).configure {
+                        attributes {
+                            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, libs.versions.jvmTarget)
+                        }
+                    }
+                }
+            }
         }
     }
 

@@ -5,8 +5,7 @@ import co.touchlab.skie.buildsetup.util.dependencyCoordinate
 
 plugins {
     id("gradle.common")
-    // TODO: Remove
-    id("skie.publishable")
+    id("utility.skie-publishable")
 
     id("utility.build-config")
 }
@@ -41,7 +40,7 @@ dependencies {
 
 // WIP
 buildConfig {
-    val shimImpl = project.provider { projects.gradle.gradlePluginShimImpl.dependencyProject }
+    val shimImpl = project.provider { project(projects.gradle.gradlePluginShimImpl.path) }
     buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", shimImpl.map { it.dependencyCoordinate.enquoted() })
 
     val kotlinToSkieKgpVersion = KotlinToolingVersionProvider.getSupportedKotlinToolingVersions(project)
@@ -56,12 +55,12 @@ buildConfig {
 
     buildConfigField("co.touchlab.skie.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "mapOf($kotlinToSkieKgpVersion)")
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
-    val kotlinPlugin = project.provider { projects.kotlinCompiler.kotlinCompilerLinkerPlugin.dependencyProject }
+    val kotlinPlugin = project.provider { project(projects.kotlinCompiler.kotlinCompilerLinkerPlugin.path) }
     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", kotlinPlugin.map { it.dependencyCoordinate.enquoted() })
-    val configurationAnnotations = project.provider { projects.common.configuration.configurationAnnotations.dependencyProject }
+    val configurationAnnotations = project.provider { project(projects.common.configuration.configurationAnnotations.path) }
     buildConfigField("String", "SKIE_CONFIGURATION_ANNOTATIONS_MODULE", configurationAnnotations.map { it.dependencyModule.enquoted() })
 
-    val runtime = project.provider { projects.runtime.runtimeKotlin.dependencyProject }
+    val runtime = project.provider { project(projects.runtime.runtimeKotlin.path) }
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_MODULE", runtime.map { it.dependencyModule.enquoted() })
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_GROUP", runtime.map { it.group.toString().enquoted() })
     buildConfigField("String", "SKIE_KOTLIN_RUNTIME_NAME", runtime.map { it.name.enquoted() })

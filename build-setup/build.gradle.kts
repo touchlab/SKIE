@@ -119,6 +119,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi"
     }
 
+    plugins.register("utility.skie-publishable") {
+        id = "utility.skie-publishable"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilitySkiePublishable"
+    }
+
     plugins.register("skie.root") {
         id = "skie.root"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRoot"
@@ -137,11 +142,6 @@ gradlePlugin {
     plugins.register("skie.compiler.core") {
         id = "skie.compiler.core"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieCompilerCore"
-    }
-
-    plugins.register("skie.publishable") {
-        id = "skie.publishable"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkiePublishable"
     }
 
     plugins.register("skie.configuration-annotations") {

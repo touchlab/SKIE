@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     id("skie.compiler.linker")
-    id("skie.publishable")
+    id("utility.skie-publishable")
     id("utility.experimental.context-receivers")
 
     kotlin("plugin.serialization")

@@ -1,6 +1,6 @@
 plugins {
     id("skie.compiler.core")
-    id("skie.publishable")
+    id("utility.skie-publishable")
     id("utility.experimental.context-receivers")
 
     kotlin("plugin.serialization")

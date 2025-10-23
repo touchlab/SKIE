@@ -1,6 +1,6 @@
 plugins {
     id("gradle.common")
-    id("skie.publishable")
+    id("utility.skie-publishable")
 }
 
 skiePublishing {
