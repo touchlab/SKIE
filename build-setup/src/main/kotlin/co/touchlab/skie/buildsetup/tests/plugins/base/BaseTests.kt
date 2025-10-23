@@ -6,8 +6,8 @@ import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfig
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
 import co.touchlab.skie.buildsetup.util.enquoted
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import co.touchlab.skie.gradle.util.implementation
 import co.touchlab.skie.gradle.util.testImplementation

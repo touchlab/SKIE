@@ -1,15 +1,6 @@
-import co.touchlab.skie.buildsetup.version.KotlinCompilerVersionEnumGenerator
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersionProvider
-
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
-}
-
-buildscript {
-    dependencies {
-        classpath("co.touchlab.skie:build-setup-kotlin-tooling-version")
-    }
 }
 
 repositories {
@@ -19,25 +10,22 @@ repositories {
 
 sourceSets {
     main {
+        kotlin.srcDir("src/main/kotlin-tooling-version")
         kotlin.srcDir("src/main/kotlin-compiler-attribute-build-setup")
     }
 }
 
-KotlinCompilerVersionEnumGenerator.generate(project, "co.touchlab.skie.buildsetup", true)
-
 dependencies {
-    val activePrimaryKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion.toString()
+    val usedCompilerVersion = project.property("versionSupport.kotlin.usedCompiler.version").toString()
 
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$activePrimaryKotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$activePrimaryKotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-sam-with-receiver:$activePrimaryKotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-serialization:$activePrimaryKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$usedCompilerVersion")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$usedCompilerVersion")
+    implementation("org.jetbrains.kotlin:kotlin-sam-with-receiver:$usedCompilerVersion")
+    implementation("org.jetbrains.kotlin:kotlin-serialization:$usedCompilerVersion")
 
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
     implementation(libs.kotlinPoet)
-
-    api("co.touchlab.skie:build-setup-kotlin-tooling-version")
 }
 
 gradlePlugin {

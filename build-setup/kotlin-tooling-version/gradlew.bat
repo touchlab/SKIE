@@ -1,1 +1,0 @@
-../../common-gradle/gradlew.bat

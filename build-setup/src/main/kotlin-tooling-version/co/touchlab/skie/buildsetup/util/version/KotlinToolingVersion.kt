@@ -5,7 +5,7 @@
 
 @file:Suppress("FunctionName", "DuplicatedCode")
 
-package co.touchlab.skie.buildsetup.version
+package co.touchlab.skie.buildsetup.util.version
 
 import java.io.Serializable
 import java.util.Locale
@@ -47,7 +47,7 @@ class KotlinToolingVersion(
     }
 
     val maturity: Maturity = run {
-        val classifier = this.classifier?.toLowerCase(Locale.ROOT)
+        val classifier = this.classifier?.lowercase(Locale.ROOT)
         when {
             classifier == null || classifier.matches(Regex("""(release-)?\d+""")) -> Maturity.STABLE
             classifier == "snapshot" -> Maturity.SNAPSHOT
@@ -117,7 +117,7 @@ class KotlinToolingVersion(
         if (this.major != other.major) return false
         if (this.minor != other.minor) return false
         if (this.patch != other.patch) return false
-        if (this.classifier?.toLowerCase(Locale.ROOT) != other.classifier?.toLowerCase(Locale.ROOT)) return false
+        if (this.classifier?.lowercase(Locale.ROOT) != other.classifier?.lowercase(Locale.ROOT)) return false
         return true
     }
 

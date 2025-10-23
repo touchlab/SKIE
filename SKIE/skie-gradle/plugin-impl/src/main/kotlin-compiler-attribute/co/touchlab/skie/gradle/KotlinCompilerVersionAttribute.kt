@@ -5,7 +5,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.AttributeDisambiguationRule
 import org.gradle.api.attributes.MultipleCandidatesDetails
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import javax.inject.Inject

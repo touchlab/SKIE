@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.version
+package co.touchlab.skie.buildsetup.util.version
 
 import co.touchlab.skie.buildsetup.util.generateKotlinCode
 import co.touchlab.skie.buildsetup.util.enquoted

@@ -1,6 +1,6 @@
 package co.touchlab.skie.gradle.version
 
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.gradle.version.target.SourceSet
 import co.touchlab.skie.gradle.version.target.Target
 

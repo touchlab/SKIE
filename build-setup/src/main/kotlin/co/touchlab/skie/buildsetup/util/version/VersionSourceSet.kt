@@ -1,6 +1,5 @@
-package co.touchlab.skie.buildsetup.main.utils
+package co.touchlab.skie.buildsetup.util.version
 
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
 import java.nio.file.Path
 import kotlin.io.path.name
 

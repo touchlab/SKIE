@@ -1,6 +1,6 @@
 package co.touchlab.skie.buildsetup.plugins.util
 
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
@@ -28,7 +28,7 @@ abstract class MultiCompileRuntimeExtension @Inject constructor(
             "settings.gradle.kts",
         ),
     )
-    val rootKotlinVersion: Property<KotlinToolingVersion?> = objects.property<KotlinToolingVersion?>()
+    val rootKotlinVersion: Property<KotlinToolingVersion> = objects.property<KotlinToolingVersion>()
     val dependencies: Property<(KotlinToolingVersion) -> String> = objects.property<(KotlinToolingVersion) -> String>().convention { "" }
     val applyDependencies: Property<DependencyHandlerScope.(KotlinToolingVersion, Configuration) -> Unit> =
         objects.property<DependencyHandlerScope.(KotlinToolingVersion, Configuration) -> Unit>().convention { _, _ -> }

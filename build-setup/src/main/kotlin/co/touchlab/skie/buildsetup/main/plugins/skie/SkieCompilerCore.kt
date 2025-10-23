@@ -2,7 +2,7 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
-import co.touchlab.skie.buildsetup.version.KotlinCompilerVersionEnumGenerator
+import co.touchlab.skie.buildsetup.util.version.KotlinCompilerVersionEnumGenerator
 import co.touchlab.skie.gradle.util.compileOnly
 import org.gradle.api.Plugin
 import org.gradle.api.Project

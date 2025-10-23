@@ -6,7 +6,7 @@ import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget
 import co.touchlab.skie.buildsetup.plugins.util.MultiCompileTarget.Companion.kotlin_2_1_0
 import co.touchlab.skie.buildsetup.tasks.BuildNestedGradle
 import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin

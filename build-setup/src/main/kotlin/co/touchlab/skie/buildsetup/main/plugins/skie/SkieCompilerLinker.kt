@@ -5,7 +5,7 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import co.touchlab.skie.gradle.util.compileOnly
 import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
 import org.gradle.api.Plugin

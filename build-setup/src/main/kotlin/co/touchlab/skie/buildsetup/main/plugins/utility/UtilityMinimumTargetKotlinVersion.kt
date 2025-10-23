@@ -2,7 +2,7 @@
 
 package co.touchlab.skie.buildsetup.main.plugins.utility
 
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

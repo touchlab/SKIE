@@ -1,4 +1,4 @@
-package co.touchlab.skie.buildsetup.version
+package co.touchlab.skie.buildsetup.util.version
 
 import org.gradle.api.Project
 
