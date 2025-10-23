@@ -1,51 +1,56 @@
 [versions]
 jvmTarget = "11"
 jvmToolchain = "21"
-pluginPublish = "1.2.0"
-kotest = "5.8.0"
-buildconfig = "4.1.1"
-ktor = "2.3.10"
-nexusPublish = "2.0.0-rc-1"
+pluginPublish = "2.0.0"
+kotest = "5.9.1"
+buildconfig = "5.7.0"
+ktor = "3.3.1"
+nexusPublish = "2.0.0"
 gradleDoctor = "0.12.0"
+# Sets the minimum coroutines version for consumers
 coroutines = "1.7.0"
 # Update also gradle-wrapper.properties
 gradle = "9.1.0"
-shadow = "8.1.1"
+shadow = "9.2.2"
+serialization-json = "1.9.0"
+serialization-yaml = "0.99.0"
+kotlinPoet = "1.15.1"
+jgit = "7.4.0.202509020913-r"
+ci-info = "1.0.1"
+mixpanel = "1.5.4"
+slf4j = "2.0.17"
 
 [plugins]
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctor" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 
 [libraries]
 plugin-buildconfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
 
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.0" }
-kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version = "0.53.0" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization-json" }
+kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version.ref = "serialization-yaml" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
-kotlinPoet = { module = "com.squareup:kotlinpoet", version = "1.15.1" }
+# WIP Remove once removed from stdlib tests
+kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.9.0.202403050737-r" }
-ci-info = { module = "io.cloudflight.ci.info:ci-info", version = "1.0.1" }
-mixpanel = { module = "com.mixpanel:mixpanel-java", version = "1.5.3" }
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+ci-info = { module = "io.cloudflight.ci.info:ci-info", version.ref = "ci-info" }
+mixpanel = { module = "com.mixpanel:mixpanel-java", version.ref = "mixpanel" }
 gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle" }
-slf4j = { module = "org.slf4j:slf4j-simple", version = "1.7.10" }
+slf4j = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
-kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest-jvm", version.ref = "kotest" }
-mockk = { module = "io.mockk:mockk", version = "1.12.5" }
 
 [bundles]
 testing-jvm = [
     "kotlin-test",
     "kotest-runner-junit5",
     "kotest-assertions-core",
-    "kotest-framework-datatest",
-    "mockk"
 ]

@@ -12,7 +12,7 @@ import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
 import co.touchlab.skie.buildsetup.util.implementation
 import co.touchlab.skie.buildsetup.util.testImplementation
 import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
-import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration

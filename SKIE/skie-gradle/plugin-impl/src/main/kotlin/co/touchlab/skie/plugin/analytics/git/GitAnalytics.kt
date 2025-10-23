@@ -19,7 +19,7 @@ data class GitAnalytics(
 ) {
 
     class Producer(
-        private val gitRoot: Provider<File?>,
+        private val gitRoot: Provider<File>,
     ) : AnalyticsProducer {
 
         override val configurationFlag: SkieConfigurationFlag = SkieConfigurationFlag.Analytics_Git
@@ -27,7 +27,7 @@ data class GitAnalytics(
         override val name: String = "git"
 
         override fun produce(): String {
-            val git = gitRoot.get()?.let { Git.open(it) } ?: return """{ "error": "git not found" }"""
+            val git = gitRoot.orNull?.let { Git.open(it) } ?: return """{ "error": "git not found" }"""
 
             return GitAnalytics(
                 numberOfContributors = git.log().all().call().map { it.authorIdent.normalizedName }.distinct().size,
@@ -42,7 +42,7 @@ data class GitAnalytics(
 private val PersonIdent.normalizedName: String
     get() = Normalizer.normalize(name, Normalizer.Form.NFC)
 
-fun Project.getGitRoot(): Provider<File?> = provider {
+fun Project.getGitRoot(): Provider<File> = provider {
     projectDir.findGitRoot()
 }
 

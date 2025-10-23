@@ -91,7 +91,7 @@ abstract class UnpackSwiftSourcesTask : DefaultTask() {
         }
 
         fileSystemOperations.copy {
-            val source = if (klib.isKlib) {
+            val source: Any = if (klib.isKlib) {
                 archiveOperations.zipTree(klib)
             } else {
                 klib

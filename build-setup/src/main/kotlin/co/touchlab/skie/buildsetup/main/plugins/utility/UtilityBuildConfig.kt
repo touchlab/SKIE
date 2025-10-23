@@ -1,8 +1,8 @@
 package co.touchlab.skie.buildsetup.main.plugins.utility
 
-import com.github.gmazzo.gradle.plugins.BuildConfigExtension
-import com.github.gmazzo.gradle.plugins.BuildConfigPlugin
-import com.github.gmazzo.gradle.plugins.generators.BuildConfigKotlinGenerator
+import com.github.gmazzo.buildconfig.BuildConfigExtension
+import com.github.gmazzo.buildconfig.BuildConfigPlugin
+import com.github.gmazzo.buildconfig.generators.BuildConfigKotlinGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply

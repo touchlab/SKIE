@@ -8,7 +8,7 @@ import co.touchlab.skie.buildsetup.tests.tasks.CheckLibraryExpectedFailuresConsi
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
-import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task

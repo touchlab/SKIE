@@ -5,7 +5,7 @@ package co.touchlab.skie.buildsetup.tests.plugins.tests
 import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTests
 import co.touchlab.skie.buildsetup.tests.tasks.ReformatPackagesInFunctionalTestsTask
 import co.touchlab.skie.buildsetup.util.enquoted
-import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer

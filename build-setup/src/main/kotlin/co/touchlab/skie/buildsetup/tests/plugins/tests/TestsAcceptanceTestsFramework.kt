@@ -11,8 +11,8 @@ import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.implementation
 import co.touchlab.skie.buildsetup.util.kotlinNativeCompilerHome
 import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
-import com.github.gmazzo.gradle.plugins.BuildConfigExtension
-import com.github.gmazzo.gradle.plugins.generators.BuildConfigKotlinGenerator
+import com.github.gmazzo.buildconfig.BuildConfigExtension
+import com.github.gmazzo.buildconfig.generators.BuildConfigKotlinGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
