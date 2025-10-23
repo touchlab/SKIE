@@ -9,7 +9,7 @@ nexusPublish = "2.0.0-rc-1"
 gradleDoctor = "0.8.1"
 coroutines = "1.7.0"
 # Update also gradle-wrapper.properties
-gradle = "8.7"
+gradle = "8.14.3"
 shadow = "8.1.1"
 
 [plugins]

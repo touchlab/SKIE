@@ -16,7 +16,7 @@ pluginManagement {
 
 plugins {
     id("dev.gradle.settings")
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 val skieProperties = Properties()

@@ -9,10 +9,8 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asTypeName
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Input
-import org.gradle.internal.impldep.org.apache.commons.lang.ClassUtils
 
 class ExpectActualBuildConfigGenerator(
     @get:Input var topLevelConstants: Boolean = false,
@@ -25,8 +23,8 @@ class ExpectActualBuildConfigGenerator(
     private fun Iterable<BuildConfigField>.asPropertiesSpec() = map {
         val typeName = when (it.type.get()) {
             "String" -> String::class.asClassName()
-            else -> runCatching { ClassName.bestGuess(it.type.get()) }
-                .getOrElse { _ -> ClassUtils.getClass(it.type.get(), false).asTypeName() }
+            else -> ClassName.bestGuess(it.type.get())
+//                 .getOrElse { _ -> ClassUtils.getClass(it.type.get(), false).asTypeName() }
         }.copy(nullable = it.optional.get())
 
         return@map PropertySpec.builder(it.name, typeName, kModifiers)

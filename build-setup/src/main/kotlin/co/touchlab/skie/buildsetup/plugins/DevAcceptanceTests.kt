@@ -131,20 +131,20 @@ abstract class DevAcceptanceTests : Plugin<Project> {
                 val testDependencies = maybeCreateTestDependencyConfiguration(target, "AcceptanceTestDependencies").apply {
                     extendsFrom(exportedTestDependencies)
                 }
-                dependencies {
-                    testDependencies(project(":common:configuration:configuration-annotations"))
-                    skieIosArm64KotlinRuntimeDependency(project(":runtime:runtime-kotlin")) {
-                        attributes {
-                            attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
-                        }
-                    }
-
-                    exportedTestDependencies(project(":runtime:runtime-kotlin")) {
-                        attributes {
-                            attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
-                        }
-                    }
-                }
+//                 dependencies {
+//                     testDependencies(project(":common:configuration:configuration-annotations"))
+//                     skieIosArm64KotlinRuntimeDependency(project(":runtime:runtime-kotlin")) {
+//                         attributes {
+//                             attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
+//                         }
+//                     }
+//
+//                     exportedTestDependencies(project(":runtime:runtime-kotlin")) {
+//                         attributes {
+//                             attribute(KotlinCompilerVersionAttribute.attribute, objects.named(kotlinToolingVersion.value))
+//                         }
+//                     }
+//                 }
 
                 devAcceptanceTests.getTests(target).configureEach {
                     group = "verification"
