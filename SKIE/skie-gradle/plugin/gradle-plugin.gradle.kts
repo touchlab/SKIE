@@ -25,8 +25,10 @@ tasks.shadowJar {
 }
 
 configurations.configureEach {
-    attributes {
-        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(minGradleVersion().gradle))
+    if (isCanBeConsumed || isCanBeResolved) {
+        attributes {
+            attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(minGradleVersion().gradle))
+        }
     }
 }
 

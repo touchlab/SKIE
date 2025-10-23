@@ -6,10 +6,10 @@ kotest = "5.8.0"
 buildconfig = "4.1.1"
 ktor = "2.3.10"
 nexusPublish = "2.0.0-rc-1"
-gradleDoctor = "0.8.1"
+gradleDoctor = "0.12.0"
 coroutines = "1.7.0"
 # Update also gradle-wrapper.properties
-gradle = "8.14.3"
+gradle = "9.1.0"
 shadow = "8.1.1"
 
 [plugins]
