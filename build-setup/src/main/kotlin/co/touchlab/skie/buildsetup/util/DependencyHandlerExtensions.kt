@@ -1,4 +1,4 @@
-package co.touchlab.skie.gradle.util
+package co.touchlab.skie.buildsetup.util
 
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.dsl.DependencyHandler

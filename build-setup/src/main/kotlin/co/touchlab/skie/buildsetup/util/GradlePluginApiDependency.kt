@@ -1,6 +1,6 @@
-package co.touchlab.skie.gradle.util
+package co.touchlab.skie.buildsetup.util
 
-import co.touchlab.skie.gradle.version.minGradleVersion
+import co.touchlab.skie.buildsetup.util.version.minGradleVersion
 import org.gradle.api.Project
 
 fun Project.gradlePluginApi(): String =

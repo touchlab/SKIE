@@ -5,8 +5,8 @@ import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTa
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
-import co.touchlab.skie.gradle.util.compileOnly
-import co.touchlab.skie.gradle.version.minGradleVersion
+import co.touchlab.skie.buildsetup.util.compileOnly
+import co.touchlab.skie.buildsetup.util.gradlePluginApi
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
@@ -25,12 +25,10 @@ abstract class GradleShim : org.gradle.api.Plugin<Project> {
     }
 
     private fun Project.configureDependencies() {
-        val minGradleVersion = minGradleVersion()
-
         val primaryKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion
 
         dependencies {
-            compileOnly("dev.gradleplugins:gradle-api:${minGradleVersion.gradle}")
+            compileOnly(gradlePluginApi())
             compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$primaryKotlinVersion")
             compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:$primaryKotlinVersion")
         }

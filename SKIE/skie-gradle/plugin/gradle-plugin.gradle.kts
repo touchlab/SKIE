@@ -1,6 +1,5 @@
 import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
-import co.touchlab.skie.gradle.util.gradlePluginApi
-import co.touchlab.skie.gradle.version.minGradleVersion
+import co.touchlab.skie.buildsetup.util.version.minGradleVersion
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
@@ -58,7 +57,6 @@ dependencies {
     api(projects.gradle.gradlePluginApi)
     implementation(projects.gradle.gradlePluginImpl)
 
-    compileOnly(gradlePluginApi())
     compileOnly(kotlin("stdlib"))
 }
 

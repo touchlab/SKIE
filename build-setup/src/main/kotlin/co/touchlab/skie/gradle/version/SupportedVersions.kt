@@ -48,34 +48,3 @@ fun Project.kotlinToolingVersionDimension(): Target.Dimension<KotlinToolingVersi
 
     return ToolingVersions.Kotlin.dimensionFrom(separatedIdentifiers)
 }
-
-fun Project.darwinPlatformDimension(): Target.Dimension<DarwinPlatformComponent> {
-    return DimensionWithAliases(
-        name = null,
-        commonName = "darwin",
-        components = DarwinPlatformComponent.values().toSet(),
-        aliases = mapOf(
-            "ios" to setOf(
-                DarwinPlatformComponent.iosArm64,
-                DarwinPlatformComponent.iosX64,
-                DarwinPlatformComponent.iosSimulatorArm64,
-            ),
-            "watchos" to setOf(
-                DarwinPlatformComponent.watchosArm32,
-                DarwinPlatformComponent.watchosArm64,
-                DarwinPlatformComponent.watchosDeviceArm64,
-                DarwinPlatformComponent.watchosX64,
-                DarwinPlatformComponent.watchosSimulatorArm64,
-            ),
-            "tvos" to setOf(
-                DarwinPlatformComponent.tvosArm64,
-                DarwinPlatformComponent.tvosX64,
-                DarwinPlatformComponent.tvosSimulatorArm64,
-            ),
-            "macos" to setOf(
-                DarwinPlatformComponent.macosX64,
-                DarwinPlatformComponent.macosArm64,
-            ),
-        ),
-    )
-}

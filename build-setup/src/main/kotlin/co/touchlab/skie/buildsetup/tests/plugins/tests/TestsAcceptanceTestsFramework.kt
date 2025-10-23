@@ -7,10 +7,10 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotl
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
-import co.touchlab.skie.gradle.util.compileOnly
-import co.touchlab.skie.gradle.util.implementation
-import co.touchlab.skie.gradle.util.kotlinNativeCompilerHome
-import co.touchlab.skie.gradle.util.withKotlinNativeCompilerEmbeddableDependency
+import co.touchlab.skie.buildsetup.util.compileOnly
+import co.touchlab.skie.buildsetup.util.implementation
+import co.touchlab.skie.buildsetup.util.kotlinNativeCompilerHome
+import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 import com.github.gmazzo.gradle.plugins.generators.BuildConfigKotlinGenerator
 import org.gradle.api.Plugin
@@ -60,7 +60,7 @@ abstract class TestsAcceptanceTestsFramework : Plugin<Project> {
 
     private fun Project.configureDependencies(activeKotlinVersion: KotlinToolingVersion) {
         dependencies {
-            withKotlinNativeCompilerEmbeddableDependency(activeKotlinVersion, isTarget = true) { dependency ->
+            withKotlinNativeCompilerEmbeddableDependency(activeKotlinVersion) { dependency ->
                 compileOnly(dependency)
             }
 

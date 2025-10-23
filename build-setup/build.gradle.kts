@@ -144,11 +144,6 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkiePublishable"
     }
 
-    plugins.register("skie.multicompile") {
-        id = "skie.multicompile"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieMultiCompileRuntime"
-    }
-
     plugins.register("skie.configuration-annotations") {
         id = "skie.configuration-annotations"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieConfigurationAnnotations"

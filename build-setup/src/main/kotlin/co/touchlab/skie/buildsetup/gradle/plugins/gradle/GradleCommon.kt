@@ -3,8 +3,9 @@ package co.touchlab.skie.buildsetup.gradle.plugins.gradle
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersion
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
-import co.touchlab.skie.gradle.util.compileOnly
-import co.touchlab.skie.gradle.version.minGradleVersion
+import co.touchlab.skie.buildsetup.util.compileOnly
+import co.touchlab.skie.buildsetup.util.gradlePluginApi
+import co.touchlab.skie.buildsetup.util.version.minGradleVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -26,7 +27,7 @@ abstract class GradleCommon : Plugin<Project> {
         val minGradleVersion = minGradleVersion()
 
         dependencies {
-            compileOnly("dev.gradleplugins:gradle-api:${minGradleVersion.gradle}")
+            compileOnly(gradlePluginApi())
             compileOnly("org.codehaus.groovy:groovy-json:${minGradleVersion.embeddedGroovy}")
         }
     }

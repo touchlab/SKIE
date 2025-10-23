@@ -1,4 +1,4 @@
-package co.touchlab.skie.gradle.architecture
+package co.touchlab.skie.buildsetup.util
 
 import org.codehaus.groovy.runtime.ProcessGroovyMethods
 

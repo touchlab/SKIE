@@ -4,7 +4,7 @@ package co.touchlab.skie.buildsetup.gradle.plugins.utility
 
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
-import co.touchlab.skie.gradle.version.minGradleVersion
+import co.touchlab.skie.buildsetup.util.version.minGradleVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi

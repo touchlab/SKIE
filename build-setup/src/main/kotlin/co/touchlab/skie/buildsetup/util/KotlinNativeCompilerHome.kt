@@ -1,4 +1,4 @@
-package co.touchlab.skie.gradle.util
+package co.touchlab.skie.buildsetup.util
 
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import org.gradle.api.Project
@@ -56,22 +56,18 @@ private fun createProvisionOkFileIfNeeded(compilerDirectory: File) {
 private fun Project.getKotlinNativeVersionPropertyName(): String =
     if (KotlinNativeDownloaderProperties.main in properties) KotlinNativeDownloaderProperties.main else KotlinNativeDownloaderProperties.deprecated
 
-internal inline fun Project.withKotlinNativeCompilerEmbeddableDependency(kotlinVersion: KotlinToolingVersion, isTarget: Boolean, block: (Dependency) -> Unit) {
+internal inline fun Project.withKotlinNativeCompilerEmbeddableDependency(kotlinVersion: KotlinToolingVersion, block: (Dependency) -> Unit) {
     val kotlinNativeCompilerEmbeddableFromHome: String? by project
 
     val useKonanFromHome = (kotlinNativeCompilerEmbeddableFromHome?.uppercase() == "CI" && System.getenv("CI") != null) ||
         kotlinNativeCompilerEmbeddableFromHome.toBoolean()
 
     val dependency = if (useKonanFromHome) {
-        if (isTarget) {
-            project.dependencies.create(
-                files(
-                    kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/kotlin-native-compiler-embeddable.jar"),
-                ),
-            )
-        } else {
-            return
-        }
+        project.dependencies.create(
+            files(
+                kotlinNativeCompilerHome(kotlinVersion).resolve("konan/lib/kotlin-native-compiler-embeddable.jar"),
+            ),
+        )
     } else {
         project.dependencies.create("org.jetbrains.kotlin:kotlin-native-compiler-embeddable:$kotlinVersion")
     }
