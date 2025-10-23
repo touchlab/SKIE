@@ -4,7 +4,7 @@ import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.plugins.extensions.HasMavenPublishPlugin
 import co.touchlab.skie.buildsetup.plugins.extensions.HasSigningPlugin
 import co.touchlab.skie.buildsetup.plugins.util.SkiePublishingExtension
-import co.touchlab.skie.gradle.publish.mavenArtifactId
+import co.touchlab.skie.buildsetup.util.mavenArtifactId
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
