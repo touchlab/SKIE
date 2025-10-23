@@ -1,8 +1,8 @@
 package co.touchlab.skie.buildsetup.gradle.plugins.gradle
 
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver
+import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersion
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import co.touchlab.skie.gradle.util.compileOnly
@@ -16,8 +16,7 @@ abstract class GradleShim : org.gradle.api.Plugin<Project> {
 
     override fun apply(project: Project) = with(project) {
         apply<BaseKotlin>()
-        // WIP Gradle variant targeting min supported Kotlin version
-        apply<UtilityMinimumTargetKotlinVersion>()
+        apply<UtilityGradleMinimumTargetKotlinVersion>()
         apply<UtilityGradleImplicitReceiver>()
         apply<UtilityMultiKotlinVersionSupport>()
         apply<KotlinPluginWrapper>()

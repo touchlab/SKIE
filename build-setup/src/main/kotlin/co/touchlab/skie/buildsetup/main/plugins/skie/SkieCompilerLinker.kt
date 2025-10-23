@@ -3,6 +3,7 @@
 package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupport
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApi
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
@@ -22,6 +23,7 @@ abstract class SkieCompilerLinker : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         apply<BaseKotlin>()
         apply<UtilityMultiKotlinVersionSupport>()
+        apply<UtilityMinimumTargetKotlinVersion>()
         apply<UtilityOptInExperimentalCompilerApi>()
         apply<KotlinPluginWrapper>()
 

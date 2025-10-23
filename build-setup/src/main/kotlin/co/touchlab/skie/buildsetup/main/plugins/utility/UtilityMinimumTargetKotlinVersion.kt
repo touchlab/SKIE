@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.buildsetup.main.plugins.utility
 
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,22 +20,29 @@ abstract class UtilityMinimumTargetKotlinVersion : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         val minimumVersion = KotlinToolingVersionProvider.getMinimumSupportedKotlinToolingVersion(project)
 
-        val minimumKotlinVersion = GradleDslKotlinVersion.fromVersion("${minimumVersion.major}.${minimumVersion.minor}")
+        setMinimumTargetKotlinVersion(project, minimumVersion)
+    }
 
-        plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
-            extensions.configure<KotlinMultiplatformExtension> {
-                compilerOptions {
-                    apiVersion.set(minimumKotlinVersion)
-                    languageVersion.set(minimumKotlinVersion)
+    companion object {
+
+        fun setMinimumTargetKotlinVersion(project: Project, version: KotlinToolingVersion) {
+            val minimumKotlinVersion = GradleDslKotlinVersion.fromVersion("${version.major}.${version.minor}")
+
+            project.plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
+                project.extensions.configure<KotlinMultiplatformExtension> {
+                    compilerOptions {
+                        apiVersion.set(minimumKotlinVersion)
+                        languageVersion.set(minimumKotlinVersion)
+                    }
                 }
             }
-        }
 
-        plugins.withType<KotlinPluginWrapper>().configureEach {
-            extensions.configure<KotlinJvmProjectExtension> {
-                compilerOptions {
-                    apiVersion.set(minimumKotlinVersion)
-                    languageVersion.set(minimumKotlinVersion)
+            project.plugins.withType<KotlinPluginWrapper>().configureEach {
+                project.extensions.configure<KotlinJvmProjectExtension> {
+                    compilerOptions {
+                        apiVersion.set(minimumKotlinVersion)
+                        languageVersion.set(minimumKotlinVersion)
+                    }
                 }
             }
         }

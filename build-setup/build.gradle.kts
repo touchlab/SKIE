@@ -99,6 +99,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver"
     }
 
+    plugins.register("utility.gradle.minimum-target-kotlin-version") {
+        id = "utility.gradle.minimum-target-kotlin-version"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersion"
+    }
+
     plugins.register("utility.minimum-target-kotlin-version") {
         id = "utility.minimum-target-kotlin-version"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion"

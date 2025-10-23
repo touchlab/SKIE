@@ -1,8 +1,8 @@
 package co.touchlab.skie.buildsetup.gradle.plugins.gradle
 
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver
+import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersion
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
 import co.touchlab.skie.gradle.util.compileOnly
 import co.touchlab.skie.gradle.version.minGradleVersion
 import org.gradle.api.Plugin
@@ -15,8 +15,7 @@ abstract class GradleCommon : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         apply<BaseKotlin>()
-        // WIP Gradle variant targeting min supported Kotlin version
-        apply<UtilityMinimumTargetKotlinVersion>()
+        apply<UtilityGradleMinimumTargetKotlinVersion>()
         apply<UtilityGradleImplicitReceiver>()
         apply<KotlinPluginWrapper>()
 
