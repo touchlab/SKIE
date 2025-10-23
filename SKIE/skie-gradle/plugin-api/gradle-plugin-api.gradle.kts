@@ -1,5 +1,5 @@
 plugins {
-    id("skie.gradle")
+    id("gradle.common")
     id("skie.publishable")
 }
 
@@ -8,11 +8,7 @@ skiePublishing {
     description = "Public API for SKIE Gradle plugin."
 }
 
-kotlin {
-    sourceSets.commonMain {
-        dependencies {
-            api(projects.common.configuration.configurationDeclaration)
-            implementation(projects.common.configuration.configurationInternal)
-        }
-    }
+dependencies {
+    api(projects.common.configuration.configurationDeclaration)
+    implementation(projects.common.configuration.configurationInternal)
 }

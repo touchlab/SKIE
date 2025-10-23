@@ -4,7 +4,7 @@ import co.touchlab.skie.gradle.publish.dependencyModule
 import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 
 plugins {
-    id("skie.gradle")
+    id("gradle.common")
     // TODO: Remove
     id("skie.publishable")
 
@@ -17,21 +17,7 @@ skiePublishing {
 }
 
 kotlin {
-    sourceSets.commonMain {
-        dependencies {
-            api(projects.gradle.gradlePluginApi)
-            api(projects.gradle.gradlePluginShimApi)
-            implementation(projects.common.configuration.configurationDeclaration)
-            implementation(projects.gradle.gradleSubPluginApi)
-            implementation(projects.gradle.gradlePluginUtil)
-            implementation(projects.common.analytics)
-            implementation(projects.common.util)
-
-            implementation(libs.ci.info)
-            implementation(libs.jgit)
-            implementation(libs.mixpanel)
-        }
-
+    sourceSets.main.configure {
         kotlin.srcDirs(
             layout.projectDirectory.dir("src/main/kotlin-tooling-version-gradle"),
             layout.projectDirectory.dir("src/main/kotlin-compiler-attribute"),
@@ -39,6 +25,21 @@ kotlin {
     }
 }
 
+dependencies {
+    api(projects.gradle.gradlePluginApi)
+    api(projects.gradle.gradlePluginShimApi)
+    implementation(projects.common.configuration.configurationDeclaration)
+    implementation(projects.gradle.gradleSubPluginApi)
+    implementation(projects.gradle.gradlePluginUtil)
+    implementation(projects.common.analytics)
+    implementation(projects.common.util)
+
+    implementation(libs.ci.info)
+    implementation(libs.jgit)
+    implementation(libs.mixpanel)
+}
+
+// WIP
 buildConfig {
     val shimImpl = project.provider { projects.gradle.gradlePluginShimImpl.dependencyProject }
     buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", shimImpl.map { it.dependencyCoordinate.enquoted() })

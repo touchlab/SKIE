@@ -106,9 +106,9 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceivers"
     }
 
-    plugins.register("utility.gradle-implicit-receiver") {
-        id = "utility.gradle-implicit-receiver"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityGradleImplicitReceiver"
+    plugins.register("utility.gradle.implicit-receiver") {
+        id = "utility.gradle.implicit-receiver"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver"
     }
 
     plugins.register("utility.minimum-target-kotlin-version") {
@@ -176,14 +176,14 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieShim"
     }
 
-    plugins.register("skie.gradle") {
-        id = "skie.gradle"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.gradle.SkieGradle"
+    plugins.register("gradle.common") {
+        id = "gradle.common"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradleCommon"
     }
 
-    plugins.register("skie.gradle.plugin") {
-        id = "skie.gradle.plugin"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.gradle.SkieGradlePlugin"
+    plugins.register("gradle.plugin") {
+        id = "gradle.plugin"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradlePlugin"
     }
 }
 

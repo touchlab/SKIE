@@ -1,5 +1,5 @@
 plugins {
-    id("skie.gradle")
+    id("gradle.common")
     // TODO: Remove
     id("skie.publishable")
 }

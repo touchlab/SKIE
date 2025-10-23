@@ -5,7 +5,7 @@ import co.touchlab.skie.gradle.version.kotlinToolingVersionDimension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("skie.gradle.plugin")
+    id("gradle.plugin")
     id("skie.publishable")
 
     alias(libs.plugins.shadow)

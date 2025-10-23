@@ -1,5 +1,5 @@
 plugins {
-    id("skie.gradle")
+    id("gradle.common")
     id("skie.publishable")
 }
 
@@ -8,11 +8,7 @@ skiePublishing {
     description = "API for creating Sub-plugins for SKIE."
 }
 
-kotlin {
-    sourceSets.commonMain {
-        dependencies {
-            api(projects.gradle.gradlePluginApi)
-            api(projects.gradle.gradlePluginShimApi)
-        }
-    }
+dependencies {
+    api(projects.gradle.gradlePluginApi)
+    api(projects.gradle.gradlePluginShimApi)
 }
