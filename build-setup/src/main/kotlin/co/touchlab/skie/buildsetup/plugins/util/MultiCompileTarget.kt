@@ -1,6 +1,6 @@
 package co.touchlab.skie.buildsetup.plugins.util
 
-import co.touchlab.skie.buildsetup.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 data class MultiCompileTarget(

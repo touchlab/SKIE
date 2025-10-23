@@ -54,11 +54,6 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevMultiplatform"
     }
 
-    plugins.register("dev.acceptance-tests") {
-        id = "dev.acceptance-tests"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.DevAcceptanceTests"
-    }
-
     plugins.register("tests.functional-tests") {
         id = "tests.functional-tests"
         implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsFunctionalTests"
@@ -72,6 +67,11 @@ gradlePlugin {
     plugins.register("tests.type-mapping-tests") {
         id = "tests.type-mapping-tests"
         implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsTypeMappingTests"
+    }
+
+    plugins.register("tests.library-tests") {
+        id = "tests.library-tests"
+        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsLibraryTests"
     }
 
     plugins.register("tests.dependencies") {

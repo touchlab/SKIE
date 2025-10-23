@@ -37,6 +37,8 @@ abstract class BaseTests : Plugin<Project> {
 
     private val testInputProperties = listOf(
         "keepTemporaryFiles",
+        "KOTLIN_LINK_MODE",
+        "KOTLIN_BUILD_CONFIGURATION",
     )
 
     override fun apply(project: Project) = with(project) {
@@ -54,11 +56,11 @@ abstract class BaseTests : Plugin<Project> {
     }
 
     private fun Project.configureDependencies(primaryKotlinVersion: KotlinToolingVersion): Pair<Configuration, Configuration> {
-        val exportedTestDependencies = maybeCreateTestDependencyConfiguration("testExportedDependencies").apply {
+        val exportedTestDependencies = maybeCreateTestDependencyConfiguration(project, "testExportedDependencies").apply {
             isTransitive = false
         }
 
-        val testDependencies = maybeCreateTestDependencyConfiguration("testDependencies").apply {
+        val testDependencies = maybeCreateTestDependencyConfiguration(project, "testDependencies").apply {
             extendsFrom(exportedTestDependencies)
         }
 
@@ -69,7 +71,9 @@ abstract class BaseTests : Plugin<Project> {
         }
 
         dependencies {
+            testImplementation(project(":acceptance-tests:acceptance-tests-framework"))
             implementation(project(":common:util"))
+
             testDependencies(project(":common:configuration:configuration-annotations"))
             exportedTestDependencies(project(":runtime:runtime-kotlin"))
         }
@@ -130,28 +134,33 @@ abstract class BaseTests : Plugin<Project> {
         }
     }
 
-    private fun Project.maybeCreateTestDependencyConfiguration(
-        name: String,
-    ): Configuration =
-        configurations.maybeCreate(name).apply {
-            isCanBeConsumed = false
-            isCanBeResolved = true
-
-            exclude("org.jetbrains.kotlin", "kotlin-stdlib")
-            exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
-            exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
-            exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
-
-            attributes {
-                attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
-                attributeProvider(KotlinNativeTarget.konanTargetAttribute, provider { MacOsCpuArchitecture.getCurrent().konanTarget })
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
-            }
-        }
-
     private fun Project.testDirectory(kotlinToolingVersion: KotlinToolingVersion): Provider<Directory> =
         project.layout.buildDirectory.map { it.dir(kotlinToolingVersion.toString()) }
 
     private fun Collection<File>.toListString(): String =
         this.joinToString(", ") { it.absolutePath.enquoted() }
+
+    companion object {
+
+        fun maybeCreateTestDependencyConfiguration(
+            project: Project,
+            name: String,
+            konanTarget: String = MacOsCpuArchitecture.getCurrent().konanTarget,
+        ): Configuration =
+            project.configurations.maybeCreate(name).apply {
+                isCanBeConsumed = false
+                isCanBeResolved = true
+
+                exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+                exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+                exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+                exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+
+                attributes {
+                    attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+                    attributeProvider(KotlinNativeTarget.konanTargetAttribute, project.provider { konanTarget })
+                    attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
+                }
+            }
+    }
 }
