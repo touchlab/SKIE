@@ -2,6 +2,7 @@ package co.touchlab.skie.buildsetup.gradle.plugins.gradle
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlin
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiver
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersion
 import com.gradle.publish.PublishPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,8 +13,10 @@ abstract class GradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
         apply<BaseKotlin>()
-        apply<KotlinPluginWrapper>()
+        // WIP Gradle variant targeting min supported Kotlin version
+        apply<UtilityMinimumTargetKotlinVersion>()
         apply<UtilityGradleImplicitReceiver>()
+        apply<KotlinPluginWrapper>()
         apply<PublishPlugin>()
     }
 }

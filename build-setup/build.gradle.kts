@@ -171,11 +171,6 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.skie.SkieRuntimeSwift"
     }
 
-    plugins.register("skie.shim") {
-        id = "skie.shim"
-        implementationClass = "co.touchlab.skie.buildsetup.plugins.SkieShim"
-    }
-
     plugins.register("gradle.common") {
         id = "gradle.common"
         implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradleCommon"
@@ -184,6 +179,11 @@ gradlePlugin {
     plugins.register("gradle.plugin") {
         id = "gradle.plugin"
         implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradlePlugin"
+    }
+
+    plugins.register("gradle.shim") {
+        id = "gradle.shim"
+        implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.gradle.GradleShim"
     }
 }
 
