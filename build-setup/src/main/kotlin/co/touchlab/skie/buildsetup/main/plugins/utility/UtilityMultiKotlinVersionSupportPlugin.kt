@@ -67,16 +67,13 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         }
     }
 
-    companion object {
+    private fun configureKotlinToolingVersionAttributeForOutgoingVariants(project: Project) {
+        val activeKotlinVersionName = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name
 
-        fun configureKotlinToolingVersionAttributeForOutgoingVariants(project: Project) {
-            val activeKotlinVersionName = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name
-
-            project.configurations.configureEach {
-                if (name.endsWith("Elements")) {
-                    attributes {
-                        attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(activeKotlinVersionName.toString()))
-                    }
+        project.configurations.configureEach {
+            if (name.endsWith("Elements")) {
+                attributes {
+                    attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(activeKotlinVersionName.toString()))
                 }
             }
         }
