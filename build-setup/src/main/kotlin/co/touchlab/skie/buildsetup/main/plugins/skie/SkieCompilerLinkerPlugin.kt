@@ -6,7 +6,7 @@ import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
 import org.gradle.api.Plugin
@@ -35,9 +35,9 @@ abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
     }
 
     private fun Project.addDependencyOnCompiler() {
-        val primaryVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion
+        val primaryCompilerVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).compilerVersion
 
-        withKotlinNativeCompilerEmbeddableDependency(primaryVersion) { dependency ->
+        withKotlinNativeCompilerEmbeddableDependency(primaryCompilerVersion) { dependency ->
             val kotlinCompilerApiConfiguration = project.configurations.detachedConfiguration(dependency)
 
             dependencies {

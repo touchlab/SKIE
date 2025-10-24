@@ -7,7 +7,7 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
 import co.touchlab.skie.buildsetup.util.implementation
 import co.touchlab.skie.buildsetup.util.testImplementation
@@ -47,15 +47,15 @@ abstract class BaseTestsPlugin : Plugin<Project> {
         apply<UtilityBuildConfigPlugin>()
         apply<KotlinPluginWrapper>()
 
-        val primaryKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion
-        val testOutputDirectory = testDirectory(primaryKotlinVersion)
+        val primaryCompilerVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).compilerVersion
+        val testOutputDirectory = testBuildDirectory(primaryCompilerVersion)
 
-        val (testDependencies, exportedTestDependencies) = configureDependencies(primaryKotlinVersion)
+        val (testDependencies, exportedTestDependencies) = configureDependencies(primaryCompilerVersion)
         configureBuildConfig(testDependencies, exportedTestDependencies, testOutputDirectory)
         configureTestTask(testDependencies, exportedTestDependencies, testOutputDirectory)
     }
 
-    private fun Project.configureDependencies(primaryKotlinVersion: KotlinToolingVersion): Pair<Configuration, Configuration> {
+    private fun Project.configureDependencies(compilerVersion: KotlinToolingVersion): Pair<Configuration, Configuration> {
         val exportedTestDependencies = maybeCreateTestDependencyConfiguration(project, "testExportedDependencies").apply {
             isTransitive = false
         }
@@ -64,7 +64,7 @@ abstract class BaseTestsPlugin : Plugin<Project> {
             extendsFrom(exportedTestDependencies)
         }
 
-        withKotlinNativeCompilerEmbeddableDependency(primaryKotlinVersion) { dependency ->
+        withKotlinNativeCompilerEmbeddableDependency(compilerVersion) { dependency ->
             dependencies {
                 testImplementation(dependency)
             }
@@ -134,7 +134,7 @@ abstract class BaseTestsPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.testDirectory(kotlinToolingVersion: KotlinToolingVersion): Provider<Directory> =
+    private fun Project.testBuildDirectory(kotlinToolingVersion: KotlinToolingVersion): Provider<Directory> =
         project.layout.buildDirectory.map { it.dir(kotlinToolingVersion.toString()) }
 
     private fun Collection<File>.toListString(): String =

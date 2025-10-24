@@ -7,7 +7,7 @@ import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin
 import co.touchlab.skie.buildsetup.tests.tasks.CheckLibraryExpectedFailuresConsistencyTask
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -50,7 +50,7 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
         apply<BaseTestsPlugin>()
         apply<SerializationGradleSubplugin>()
 
-        val activeKotlinVersionName = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name
+        val activeKotlinVersionName = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).name
 
         val extension = registerExtension(activeKotlinVersionName)
 
@@ -138,10 +138,10 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
                 .sortedBy { it.name }
                 .mapNotNull { it.resolve("expected-failures").takeIf { file -> file.exists() } }
 
-            val supportedVersions = KotlinToolingVersionProvider.getSupportedKotlinToolingVersions(project)
+            val supportedVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project)
 
             this.expectedFailuresFiles.from(expectedFailuresFiles)
-            this.supportedKotlinToolingVersions.set(supportedVersions)
+            this.supportedKotlinVersions.set(supportedVersions)
         }
 
     private fun Project.configureTests(

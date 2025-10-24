@@ -3,7 +3,7 @@ package co.touchlab.skie.buildsetup.util.version
 import java.nio.file.Path
 import kotlin.io.path.name
 
-sealed interface VersionSourceSet {
+sealed interface KotlinVersionSet {
 
     val path: Path
 
@@ -11,7 +11,7 @@ sealed interface VersionSourceSet {
 
     fun isValid(version: kotlin.collections.List<KotlinToolingVersion>): Boolean
 
-    data class Exact(override val path: Path, val version: KotlinToolingVersion) : VersionSourceSet {
+    data class Exact(override val path: Path, val version: KotlinToolingVersion) : KotlinVersionSet {
 
         override fun isActive(version: KotlinToolingVersion): Boolean =
             this.version == version
@@ -20,7 +20,7 @@ sealed interface VersionSourceSet {
             this.version in version
     }
 
-    data class Range(override val path: Path, val from: KotlinToolingVersion, val to: KotlinToolingVersion) : VersionSourceSet {
+    data class Range(override val path: Path, val from: KotlinToolingVersion, val to: KotlinToolingVersion) : KotlinVersionSet {
 
         override fun isActive(version: KotlinToolingVersion): Boolean =
             version in from..to
@@ -29,7 +29,7 @@ sealed interface VersionSourceSet {
             from in version && to in version
     }
 
-    data class Min(override val path: Path, val from: KotlinToolingVersion) : VersionSourceSet {
+    data class Min(override val path: Path, val from: KotlinToolingVersion) : KotlinVersionSet {
 
         override fun isActive(version: KotlinToolingVersion): Boolean =
             version >= from
@@ -38,7 +38,7 @@ sealed interface VersionSourceSet {
             from in version
     }
 
-    data class Max(override val path: Path, val to: KotlinToolingVersion) : VersionSourceSet {
+    data class Max(override val path: Path, val to: KotlinToolingVersion) : KotlinVersionSet {
 
         override fun isActive(version: KotlinToolingVersion): Boolean =
             version <= to
@@ -47,7 +47,7 @@ sealed interface VersionSourceSet {
             to in version
     }
 
-    data class List(override val path: Path, val versions: kotlin.collections.List<KotlinToolingVersion>) : VersionSourceSet {
+    data class List(override val path: Path, val versions: kotlin.collections.List<KotlinToolingVersion>) : KotlinVersionSet {
 
         override fun isActive(version: KotlinToolingVersion): Boolean =
             version in versions
@@ -63,7 +63,7 @@ sealed interface VersionSourceSet {
         // 2.0.10.. - min
         // ..2.0.10 - max
         // 2.0.10,2.0.20 - list
-        fun from(path: Path): VersionSourceSet = when {
+        fun from(path: Path): KotlinVersionSet = when {
             path.name.contains("..") -> {
                 val parts = path.name.split("..")
 

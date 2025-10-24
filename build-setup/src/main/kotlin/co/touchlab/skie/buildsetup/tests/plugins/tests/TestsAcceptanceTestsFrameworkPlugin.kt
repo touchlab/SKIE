@@ -6,7 +6,7 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalConte
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.implementation
 import co.touchlab.skie.buildsetup.util.kotlinNativeCompilerHome
@@ -31,13 +31,13 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
         apply<UtilityBuildConfigPlugin>()
         apply<KotlinPluginWrapper>()
 
-        val activeKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion
+        val primaryCompilerVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).compilerVersion
 
-        configureBuildConfig(activeKotlinVersion)
-        configureDependencies(activeKotlinVersion)
+        configureBuildConfig(primaryCompilerVersion)
+        configureDependencies(primaryCompilerVersion)
     }
 
-    private fun Project.configureBuildConfig(activeKotlinVersion: KotlinToolingVersion) {
+    private fun Project.configureBuildConfig(primaryCompilerVersion: KotlinToolingVersion) {
         val sourceSets = extensions.getByName("sourceSets") as SourceSetContainer
         val mainSourceSet = sourceSets.named("main")
 
@@ -47,7 +47,7 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
             buildConfigField(
                 type = "String",
                 name = "KONAN_HOME",
-                value = "\"${project.kotlinNativeCompilerHome(activeKotlinVersion).path}\"",
+                value = "\"${project.kotlinNativeCompilerHome(primaryCompilerVersion).path}\"",
             )
 
             buildConfigField(
@@ -58,13 +58,13 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.configureDependencies(activeKotlinVersion: KotlinToolingVersion) {
+    private fun Project.configureDependencies(primaryCompilerVersion: KotlinToolingVersion) {
         dependencies {
-            withKotlinNativeCompilerEmbeddableDependency(activeKotlinVersion) { dependency ->
+            withKotlinNativeCompilerEmbeddableDependency(primaryCompilerVersion) { dependency ->
                 compileOnly(dependency)
             }
 
-            val trove4j = project.kotlinNativeCompilerHome(activeKotlinVersion).resolve("konan/lib/trove4j.jar")
+            val trove4j = project.kotlinNativeCompilerHome(primaryCompilerVersion).resolve("konan/lib/trove4j.jar")
 
             implementation(files(trove4j))
         }

@@ -38,8 +38,8 @@ object KotlinCompilerVersionEnumGenerator {
         val kotlinVersionsEnum = getKotlinCompilerVersionEnumCode(
             packageName = packageName,
             makeEnumPublic = makeEnumPublic,
-            activeVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name,
-            supportedVersions = KotlinToolingVersionProvider.getSupportedKotlinToolingVersions(project),
+            activeVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).name,
+            supportedVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project),
         )
 
         generateKotlinCode("KotlinCompilerVersion.kt", kotlinVersionsEnum, project)
@@ -49,7 +49,7 @@ object KotlinCompilerVersionEnumGenerator {
         packageName: String,
         makeEnumPublic: Boolean,
         activeVersion: KotlinToolingVersion,
-        supportedVersions: List<SupportedKotlinToolingVersion>,
+        supportedVersions: List<SupportedKotlinVersion>,
     ): String =
         StringBuilder().apply {
             appendLine(
@@ -58,7 +58,7 @@ object KotlinCompilerVersionEnumGenerator {
                     |
                     |${if (!makeEnumPublic) "internal " else ""}enum class KotlinCompilerVersion(
                     |   val versionName: String,
-                    |   val primaryVersion: String,
+                    |   val compilerVersion: String,
                     |   val otherSupportedVersions: List<String>,
                     |) {
                     |
@@ -67,11 +67,11 @@ object KotlinCompilerVersionEnumGenerator {
 
             supportedVersions.forEach { version ->
                 val name = version.name.toString().enquoted()
-                val primaryVersion = version.primaryVersion.toString().enquoted()
+                val compilerVersion = version.compilerVersion.toString().enquoted()
                 val otherSupportedVersions = "listOf(" + version.otherSupportedVersions.joinToString { it.toString().enquoted() } + ")"
 
                 appendLine(
-                    "    ${version.name.toIdentifier()}($name, $primaryVersion, $otherSupportedVersions),"
+                    "    ${version.name.toIdentifier()}($name, $compilerVersion, $otherSupportedVersions),"
                 )
             }
 
@@ -81,7 +81,7 @@ object KotlinCompilerVersionEnumGenerator {
                 """
                     |
                     |    val supportedVersions: List<String> =
-                    |        listOf(primaryVersion) + otherSupportedVersions
+                    |        listOf(compilerVersion) + otherSupportedVersions
                     |
                     |    companion object {
                     |

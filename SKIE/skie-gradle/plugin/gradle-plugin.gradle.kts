@@ -1,4 +1,4 @@
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.buildsetup.util.version.minGradleVersion
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -32,7 +32,7 @@ configurations.configureEach {
     }
 }
 
-KotlinToolingVersionProvider.getSupportedKotlinToolingVersions(project).forEach { supportedVersion ->
+SupportedKotlinVersionProvider.getSupportedKotlinVersions(project).forEach { supportedVersion ->
     val safeKotlinVersion = supportedVersion.name.toString().replace('.', '_')
     val configuration = configurations.create("shim-relocation-kgp_$safeKotlinVersion") {
         attributes {

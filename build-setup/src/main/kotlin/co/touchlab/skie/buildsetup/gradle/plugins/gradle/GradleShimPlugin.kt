@@ -4,7 +4,7 @@ import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitR
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.gradlePluginApi
 import org.gradle.api.Project
@@ -25,12 +25,12 @@ abstract class GradleShimPlugin : org.gradle.api.Plugin<Project> {
     }
 
     private fun Project.configureDependencies() {
-        val primaryKotlinVersion = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).primaryVersion
+        val primaryCompilerVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).compilerVersion
 
         dependencies {
             compileOnly(gradlePluginApi())
-            compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$primaryKotlinVersion")
-            compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:$primaryKotlinVersion")
+            compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$primaryCompilerVersion")
+            compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:$primaryCompilerVersion")
         }
     }
 }

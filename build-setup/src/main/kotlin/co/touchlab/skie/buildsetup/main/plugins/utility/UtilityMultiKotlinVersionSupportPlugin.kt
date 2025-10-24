@@ -2,8 +2,8 @@
 
 package co.touchlab.skie.buildsetup.main.plugins.utility
 
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersionProvider
-import co.touchlab.skie.buildsetup.util.version.VersionSourceSet
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
+import co.touchlab.skie.buildsetup.util.version.KotlinVersionSet
 import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -32,30 +32,30 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
 
         configureActiveSourceSets(versionSourceSets)
 
-        configureKotlinToolingVersionAttributeForOutgoingVariants(project)
+        configureKotlinCompilerVersionAttributeForOutgoingVariants(project)
     }
 
-    private fun Project.getVersionSourceSets(): List<VersionSourceSet> {
-        val versionSourceSets = layout.projectDirectory.dir("src").asFile.toPath()
+    private fun Project.getVersionSourceSets(): List<KotlinVersionSet> {
+        val kotlinVersionSets = layout.projectDirectory.dir("src").asFile.toPath()
             .listDirectoryEntries()
             .filter { it.isDirectory() }
             .filter { it.name.startsWith("..") || it.name.first().isDigit() }
-            .map { VersionSourceSet.from(it) }
+            .map { KotlinVersionSet.from(it) }
 
-        val supportedVersionNames = KotlinToolingVersionProvider.getSupportedKotlinToolingVersions(project).map { it.name }
-        val invalidSourceSets = versionSourceSets.filterNot { it.isValid(supportedVersionNames) }
+        val supportedVersionNames = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project).map { it.name }
+        val invalidSourceSets = kotlinVersionSets.filterNot { it.isValid(supportedVersionNames) }
         check(invalidSourceSets.isEmpty()) {
             "The following version source sets are invalid because they reference unsupported versions: " +
                 invalidSourceSets.joinToString { it.path.name }
         }
 
-        return versionSourceSets
+        return kotlinVersionSets
     }
 
-    private fun Project.configureActiveSourceSets(versionSourceSets: List<VersionSourceSet>) {
-        val activeVersionName = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name
+    private fun Project.configureActiveSourceSets(kotlinVersionSets: List<KotlinVersionSet>) {
+        val activeVersionName = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).name
 
-        val activeSourceSets = versionSourceSets.filter { it.isActive(activeVersionName) }
+        val activeSourceSets = kotlinVersionSets.filter { it.isActive(activeVersionName) }
 
         extensions.configure<KotlinJvmProjectExtension> {
             val mainSourceSet = sourceSets.getByName("main")
@@ -67,8 +67,8 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         }
     }
 
-    private fun configureKotlinToolingVersionAttributeForOutgoingVariants(project: Project) {
-        val activeKotlinVersionName = KotlinToolingVersionProvider.getActiveKotlinToolingVersion(project).name
+    private fun configureKotlinCompilerVersionAttributeForOutgoingVariants(project: Project) {
+        val activeKotlinVersionName = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).name
 
         project.configurations.configureEach {
             if (name.endsWith("Elements")) {

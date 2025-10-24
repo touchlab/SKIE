@@ -1,6 +1,6 @@
 package co.touchlab.skie.buildsetup.tests.tasks
 
-import co.touchlab.skie.buildsetup.util.version.SupportedKotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersion
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.SetProperty
@@ -15,7 +15,7 @@ abstract class CheckLibraryExpectedFailuresConsistencyTask : DefaultTask() {
     abstract val expectedFailuresFiles: ConfigurableFileCollection
 
     @get:Input
-    abstract val supportedKotlinToolingVersions: SetProperty<SupportedKotlinToolingVersion>
+    abstract val supportedKotlinVersions: SetProperty<SupportedKotlinVersion>
 
     init {
         group = "verification"
@@ -25,11 +25,11 @@ abstract class CheckLibraryExpectedFailuresConsistencyTask : DefaultTask() {
     fun execute() {
         val errors = mutableListOf<String>()
 
-        val supportedKotlinToolingVersions = supportedKotlinToolingVersions.get()
+        val supportedKotlinVersions = this@CheckLibraryExpectedFailuresConsistencyTask.supportedKotlinVersions.get()
         val parsedExpectedFailuresFiles = expectedFailuresFiles.files.map { parseExpectedFailuresFile(it) }
 
         validateSections(parsedExpectedFailuresFiles, errors)
-        validateSupportedKotlinToolingVersions(parsedExpectedFailuresFiles, supportedKotlinToolingVersions, errors)
+        validateSupportedKotlinVersions(parsedExpectedFailuresFiles, supportedKotlinVersions, errors)
 
         if (errors.isNotEmpty()) {
             val fullError = errors.joinToString("\n\n")
@@ -92,12 +92,12 @@ abstract class CheckLibraryExpectedFailuresConsistencyTask : DefaultTask() {
         }
     }
 
-    private fun validateSupportedKotlinToolingVersions(
+    private fun validateSupportedKotlinVersions(
         expectedFailuresFiles: List<ExpectedFailuresFile>,
-        supportedKotlinToolingVersions: Set<SupportedKotlinToolingVersion>,
+        supportedKotlinVersions: Set<SupportedKotlinVersion>,
         errors: MutableList<String>,
     ) {
-        val supportedVersions = supportedKotlinToolingVersions.map { it.name.toString() }
+        val supportedVersions = supportedKotlinVersions.map { it.name.toString() }
 
         val unsupportedVersions = expectedFailuresFiles.filter { it.name !in supportedVersions }
 
