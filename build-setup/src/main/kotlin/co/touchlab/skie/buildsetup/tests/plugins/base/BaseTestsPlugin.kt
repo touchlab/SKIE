@@ -145,7 +145,7 @@ abstract class BaseTestsPlugin : Plugin<Project> {
         fun maybeCreateTestDependencyConfiguration(
             project: Project,
             name: String,
-            konanTarget: String = MacOsCpuArchitecture.getCurrent().konanTarget,
+            konanTarget: Provider<String> = MacOsCpuArchitecture.getCurrent(project).map { it.konanTarget },
         ): Configuration =
             project.configurations.maybeCreate(name).apply {
                 isCanBeConsumed = false
@@ -158,7 +158,7 @@ abstract class BaseTestsPlugin : Plugin<Project> {
 
                 attributes {
                     attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
-                    attributeProvider(KotlinNativeTarget.konanTargetAttribute, project.provider { konanTarget })
+                    attributeProvider(KotlinNativeTarget.konanTargetAttribute, konanTarget)
                     attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, KotlinUsages.KOTLIN_API))
                 }
             }

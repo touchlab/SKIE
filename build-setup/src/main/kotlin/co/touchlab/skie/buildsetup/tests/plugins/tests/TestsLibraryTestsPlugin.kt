@@ -75,7 +75,7 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
         val skieIosArm64KotlinRuntimeDependency = BaseTestsPlugin.maybeCreateTestDependencyConfiguration(
             project = project,
             name = "SkieKotlinRuntimeDependency",
-            konanTarget = KonanTarget.IOS_ARM64.name,
+            konanTarget = provider { KonanTarget.IOS_ARM64.name },
         ).apply {
             isTransitive = false
         }
