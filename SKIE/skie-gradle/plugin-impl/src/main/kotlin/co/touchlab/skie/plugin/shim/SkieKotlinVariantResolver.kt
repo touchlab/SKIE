@@ -1,6 +1,7 @@
 package co.touchlab.skie.plugin.shim
 
 import co.touchlab.skie.gradle_plugin_impl.BuildConfig
+import co.touchlab.skie.plugin.KotlinCompilerVersion
 import org.gradle.api.Project
 
 object SkieKotlinVariantResolver {
@@ -61,10 +62,10 @@ object SkieKotlinVariantResolver {
     }
 
     private fun Project.getValidSkieKotlinVersion(kotlinVersion: String): String? {
-        val skieVersion = BuildConfig.KOTLIN_TO_SKIE_VERSION[kotlinVersion]
+        val skieVersion = KotlinCompilerVersion.entries.find { kotlinVersion in it.supportedVersions }?.name
 
         if (skieVersion == null) {
-            val supportedKotlinVersions = BuildConfig.KOTLIN_TO_SKIE_VERSION.keys.sorted()
+            val supportedKotlinVersions = KotlinCompilerVersion.entries.flatMap { it.supportedVersions }.sorted()
 
             reportSkieLoaderError(
                 """

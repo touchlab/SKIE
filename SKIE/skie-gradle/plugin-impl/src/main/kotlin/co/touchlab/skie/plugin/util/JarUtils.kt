@@ -9,7 +9,7 @@ import java.nio.file.FileSystems
 fun File.writeToZip(write: (FileSystem) -> Unit) {
     val fileUri = this.toURI()
 
-    // Solves an issues with spaces in the path
+    // Solves an issue with spaces in the path
     val uri = URI("jar:file", fileUri.userInfo, fileUri.host, fileUri.port, fileUri.path, fileUri.query, fileUri.fragment)
 
     val fileSystem = try {

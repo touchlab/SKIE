@@ -1,7 +1,7 @@
-import co.touchlab.skie.buildsetup.util.enquoted
-import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
-import co.touchlab.skie.buildsetup.util.dependencyModule
 import co.touchlab.skie.buildsetup.util.dependencyCoordinate
+import co.touchlab.skie.buildsetup.util.enquoted
+import co.touchlab.skie.buildsetup.util.version.KotlinCompilerVersionEnumGenerator
+import co.touchlab.skie.buildsetup.util.version.KotlinVersionAttribute
 
 plugins {
     id("gradle.common")
@@ -16,11 +16,15 @@ skiePublishing {
 }
 
 kotlin {
-    sourceSets.main.configure {
-        kotlin.srcDirs(
-            layout.projectDirectory.dir("src/main/kotlin-tooling-version-gradle"),
-            layout.projectDirectory.dir("src/main/kotlin-compiler-attribute"),
-        )
+    sourceSets {
+        main {
+            KotlinCompilerVersionEnumGenerator.generate(
+                kotlinSourceSet = this,
+                packageName = "co.touchlab.skie.plugin",
+                makeEnumPublic = true,
+                activeVersion = null,
+            )
+        }
     }
 }
 
@@ -38,32 +42,16 @@ dependencies {
     implementation(libs.mixpanel)
 }
 
-// WIP
 buildConfig {
-    val shimImpl = project.provider { project(projects.gradle.gradlePluginShimImpl.path) }
-    buildConfigField("String", "SKIE_GRADLE_SHIM_IMPL_COORDINATE", shimImpl.map { it.dependencyCoordinate.enquoted() })
-
-    val kotlinToSkieKgpVersion = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project)
-        .flatMap { supportedVersion ->
-            supportedVersion.supportedVersions.map { version ->
-                version to supportedVersion.name
-            }
-        }
-        .joinToString { (version, name) ->
-            "${version.toString().enquoted()} to ${name.toString().enquoted()}"
-        }
-
-    buildConfigField("co.touchlab.skie.util.StringMap", "KOTLIN_TO_SKIE_VERSION", "mapOf($kotlinToSkieKgpVersion)")
     buildConfigField("String", "SKIE_VERSION", "\"${project.version}\"")
+
+    buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
+
+    buildConfigField("String", "SKIE_KOTLIN_VERSION_ATTRIBUTE_NAME", KotlinVersionAttribute.attributeName.enquoted())
+
     val kotlinPlugin = project.provider { project(projects.kotlinCompiler.kotlinCompilerLinkerPlugin.path) }
     buildConfigField("String", "SKIE_KOTLIN_PLUGIN_COORDINATE", kotlinPlugin.map { it.dependencyCoordinate.enquoted() })
-    val configurationAnnotations = project.provider { project(projects.common.configuration.configurationAnnotations.path) }
-    buildConfigField("String", "SKIE_CONFIGURATION_ANNOTATIONS_MODULE", configurationAnnotations.map { it.dependencyModule.enquoted() })
 
     val runtime = project.provider { project(projects.runtime.runtimeKotlin.path) }
-    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_MODULE", runtime.map { it.dependencyModule.enquoted() })
-    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_GROUP", runtime.map { it.group.toString().enquoted() })
-    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_NAME", runtime.map { it.name.enquoted() })
-    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_VERSION", runtime.map { it.version.toString().enquoted() })
-    buildConfigField("String", "MIXPANEL_PROJECT_TOKEN", "\"a4c9352b6713103c0f8621757a35b8c9\"")
+    buildConfigField("String", "SKIE_KOTLIN_RUNTIME_COORDINATE", runtime.map { it.dependencyCoordinate.enquoted() })
 }

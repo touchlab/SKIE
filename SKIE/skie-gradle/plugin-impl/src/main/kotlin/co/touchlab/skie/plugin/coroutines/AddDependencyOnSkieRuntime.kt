@@ -1,11 +1,8 @@
 package co.touchlab.skie.plugin.coroutines
 
-import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
 import co.touchlab.skie.gradle_plugin_impl.BuildConfig
 import co.touchlab.skie.plugin.SkieTarget
 import co.touchlab.skie.plugin.kgpShim
-import co.touchlab.skie.plugin.skieInternalExtension
-import co.touchlab.skie.plugin.util.named
 import co.touchlab.skie.util.file.isKlib
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -14,37 +11,11 @@ import org.gradle.api.artifacts.ResolvedConfiguration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 
-fun Project.configureSkieConfigurationAnnotationsDependencySubstitution() {
-    val configurationAnnotationsRegex = "${Regex.escape(BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE)}(?:-[0-9]+\\.[0-9]+\\.[0-9]+)?(-.+)?".toRegex()
-    skieInternalExtension.targets.configureEach {
-        linkerConfiguration.apply {
-            if (state != Configuration.State.UNRESOLVED) {
-                return@configureEach
-            }
-
-            resolutionStrategy {
-                dependencySubstitution {
-                    all {
-                        val requestedModule = requested as? ModuleComponentSelector ?: return@all
-                        val match = configurationAnnotationsRegex.matchEntire(requestedModule.moduleIdentifier.toString())
-                        if (match != null) {
-                            val suffix = match.groupValues[1]
-
-                            val updatedCoordinate = BuildConfig.SKIE_CONFIGURATION_ANNOTATIONS_MODULE + "-" + skieInternalExtension.kotlinVersion + suffix + ":" + BuildConfig.SKIE_VERSION
-
-                            logger.debug("Replacing {} with {}", requested, updatedCoordinate)
-                            useTarget(updatedCoordinate)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 // Workaround for dependency pollution caused by SKIE prior 0.7.0 where SKIE added the runtime to published configurations.
 // As a result, some libraries have dependencies on the runtime potentially with the wrong version of Kotlin.
 fun Project.configureSkieRuntimeDependencySubstitution() {
+    val skieKotlinRuntimeModuleIdentifier = BuildConfig.SKIE_KOTLIN_RUNTIME_COORDINATE.substringBeforeLast(':')
+
     configurations.configureEach {
         if (state != Configuration.State.UNRESOLVED) {
             return@configureEach
@@ -55,10 +26,12 @@ fun Project.configureSkieRuntimeDependencySubstitution() {
                 all {
                     val requestedModule = requested as? ModuleComponentSelector ?: return@all
 
-                    if (requestedModule.moduleIdentifier.toString().startsWith(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE) && requestedModule.module.contains("__kgp_")) {
-                        val baseTargetModuleId = requestedModule.toString().removePrefix(BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE).substringBefore("__kgp_")
+                    if (requestedModule.moduleIdentifier.toString()
+                            .startsWith(skieKotlinRuntimeModuleIdentifier) && requestedModule.module.contains("__kgp_")
+                    ) {
+                        val baseTargetModuleId = requestedModule.toString().removePrefix(skieKotlinRuntimeModuleIdentifier).substringBefore("__kgp_")
 
-                        val updatedCoordinate = "${BuildConfig.SKIE_KOTLIN_RUNTIME_MODULE}-${skieInternalExtension.kotlinVersion}${baseTargetModuleId}:${BuildConfig.SKIE_VERSION}"
+                        val updatedCoordinate = "${skieKotlinRuntimeModuleIdentifier}${baseTargetModuleId}:${BuildConfig.SKIE_VERSION}"
 
                         logger.debug("Replacing {} with {}", requested, updatedCoordinate)
                         useTarget(updatedCoordinate)
@@ -109,16 +82,10 @@ private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(): Configuration {
     val skieRuntimeConfiguration = project.configurations.create(skieRuntimeConfigurationName) {
         attributes {
             project.kgpShim.addKmpAttributes(this, konanTarget)
-            attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
         }
     }
 
-    val runtimeCoordinate = listOf(
-        BuildConfig.SKIE_KOTLIN_RUNTIME_GROUP,
-        "${BuildConfig.SKIE_KOTLIN_RUNTIME_NAME}-${project.skieInternalExtension.kotlinVersion}",
-        BuildConfig.SKIE_KOTLIN_RUNTIME_VERSION,
-    ).joinToString(":")
-    project.dependencies.add(skieRuntimeConfigurationName, runtimeCoordinate)
+    project.dependencies.add(skieRuntimeConfigurationName, BuildConfig.SKIE_KOTLIN_RUNTIME_COORDINATE)
 
     return skieRuntimeConfiguration
 }

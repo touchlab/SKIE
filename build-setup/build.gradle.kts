@@ -8,13 +8,6 @@ repositories {
     gradlePluginPortal()
 }
 
-sourceSets {
-    main {
-        kotlin.srcDir("src/main/kotlin-tooling-version")
-        kotlin.srcDir("src/main/kotlin-compiler-attribute-build-setup")
-    }
-}
-
 dependencies {
     implementation(libs.plugin.kotlin.gradle.plugin)
     implementation(libs.plugin.kotlin.gradle.plugin.api)

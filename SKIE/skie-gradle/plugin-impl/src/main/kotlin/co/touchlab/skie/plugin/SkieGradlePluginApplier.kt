@@ -6,7 +6,6 @@ import co.touchlab.skie.plugin.configuration.SkieExtension
 import co.touchlab.skie.plugin.configuration.createExtension
 import co.touchlab.skie.plugin.coroutines.addDependencyOnSkieRuntime
 import co.touchlab.skie.plugin.coroutines.configureMinOsVersionIfNeeded
-import co.touchlab.skie.plugin.coroutines.configureSkieConfigurationAnnotationsDependencySubstitution
 import co.touchlab.skie.plugin.coroutines.configureSkieRuntimeDependencySubstitution
 import co.touchlab.skie.plugin.defaultarguments.disableCachingIfNeeded
 import co.touchlab.skie.plugin.dependencies.SkieCompilerPluginDependencyProvider
@@ -16,6 +15,7 @@ import co.touchlab.skie.plugin.relativepaths.configureDebugPrefixMap
 import co.touchlab.skie.plugin.subplugin.SkieSubPluginManager
 import co.touchlab.skie.plugin.switflink.SwiftBundlingConfigurator
 import co.touchlab.skie.plugin.switflink.SwiftUnpackingConfigurator
+import co.touchlab.skie.plugin.util.KotlinVersionAttribute
 import co.touchlab.skie.plugin.util.toKotlinCompilerPluginOption
 import co.touchlab.skie.util.plugin.SkiePlugin
 import org.gradle.api.Project
@@ -38,8 +38,9 @@ object SkieGradlePluginApplier {
     private fun Project.configureSkieGradlePlugin() {
         SkieSubPluginManager.configureDependenciesForSubPlugins(project)
 
-        configureSkieConfigurationAnnotationsDependencySubstitution()
         configureSkieRuntimeDependencySubstitution()
+
+        KotlinVersionAttribute.registerIn(dependencies)
     }
 
     private fun Project.configureSkieCompilerPlugin() {

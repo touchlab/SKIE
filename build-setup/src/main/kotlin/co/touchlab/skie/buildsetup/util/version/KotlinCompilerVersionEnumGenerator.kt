@@ -10,12 +10,12 @@ object KotlinCompilerVersionEnumGenerator {
         kotlinSourceSet: KotlinSourceSet,
         packageName: String,
         makeEnumPublic: Boolean,
-        activeVersion: SupportedKotlinVersion,
+        activeVersion: SupportedKotlinVersion?,
     ) {
         val kotlinVersionsEnum = getKotlinCompilerVersionEnumCode(
             packageName = packageName,
             makeEnumPublic = makeEnumPublic,
-            activeVersion = activeVersion.name,
+            activeVersion = activeVersion?.name,
             supportedVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(kotlinSourceSet.project),
         )
 
@@ -25,7 +25,7 @@ object KotlinCompilerVersionEnumGenerator {
     private fun getKotlinCompilerVersionEnumCode(
         packageName: String,
         makeEnumPublic: Boolean,
-        activeVersion: KotlinToolingVersion,
+        activeVersion: KotlinToolingVersion?,
         supportedVersions: List<SupportedKotlinVersion>,
     ): String =
         StringBuilder().apply {
@@ -59,11 +59,23 @@ object KotlinCompilerVersionEnumGenerator {
                     |
                     |    val supportedVersions: List<String> =
                     |        listOf(compilerVersion) + otherSupportedVersions
+                """.trimMargin(),
+            )
+
+            if (activeVersion != null) {
+                appendLine(
+                    """
                     |
                     |    companion object {
                     |
                     |        val current: KotlinCompilerVersion = KotlinCompilerVersion.${activeVersion.toIdentifier()}
                     |    }
+                """.trimMargin(),
+                )
+            }
+
+            appendLine(
+                """
                     |}
                 """.trimMargin(),
             )

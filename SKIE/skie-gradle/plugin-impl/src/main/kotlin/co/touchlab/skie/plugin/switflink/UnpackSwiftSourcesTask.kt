@@ -67,7 +67,7 @@ abstract class UnpackSwiftSourcesTask : DefaultTask() {
         temporaryDirectory.deleteEmptyDirectoriesRecursively()
         temporaryDirectory.mkdirs()
 
-        // These files are compiled by the Swift compiler which only checks timestamps when evaluating incremental builds.
+        // These files are compiled by the Swift compiler, which only checks timestamps when evaluating incremental builds.
         temporaryDirectory.syncDirectoryContentIfDifferent(output.get())
     }
 

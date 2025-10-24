@@ -8,7 +8,7 @@ import co.touchlab.skie.buildsetup.util.version.KotlinVersionSet
 import co.touchlab.skie.buildsetup.util.version.MultiKotlinVersionSupportCompilation
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersion
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
-import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
+import co.touchlab.skie.buildsetup.util.version.KotlinVersionAttribute
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -114,7 +114,7 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         project.configurations.configureEach {
             if (name == configurationName) {
                 attributes {
-                    attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(supportedKotlinVersion.name.toString()))
+                    attribute(KotlinVersionAttribute.attribute, project.objects.named(supportedKotlinVersion.name.toString()))
                 }
             }
         }
@@ -206,7 +206,7 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
             elementsConfiguration.configure {
                 attributes {
                     addAllLater(configurations[referenceConfigurationName].attributes)
-                    attribute(KotlinCompilerVersionAttribute.attribute, project.objects.named(supportedKotlinVersion.name.toString()))
+                    attribute(KotlinVersionAttribute.attribute, project.objects.named(supportedKotlinVersion.name.toString()))
                 }
             }
         }

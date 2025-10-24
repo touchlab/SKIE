@@ -3,7 +3,8 @@
 package co.touchlab.skie.buildsetup.main.plugins.base
 
 import co.touchlab.skie.buildsetup.util.libs
-import co.touchlab.skie.gradle.KotlinCompilerVersionAttribute
+import co.touchlab.skie.buildsetup.util.version.KotlinVersionAttribute
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.java.TargetJvmVersion
@@ -37,7 +38,9 @@ abstract class BaseKotlinPlugin : Plugin<Project> {
 
     private fun Project.configureCompilerVersionAttribute() {
         plugins.withType<DefaultKotlinBasePlugin>().configureEach {
-            KotlinCompilerVersionAttribute.registerIn(project.dependencies, pluginVersion)
+            val supportedKotlinVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project)
+
+            KotlinVersionAttribute.registerIn(dependencies, supportedKotlinVersions)
         }
     }
 
