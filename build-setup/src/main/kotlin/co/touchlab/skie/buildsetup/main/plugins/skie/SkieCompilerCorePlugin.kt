@@ -2,7 +2,6 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
-import co.touchlab.skie.buildsetup.util.version.KotlinCompilerVersionEnumGenerator
 import co.touchlab.skie.buildsetup.util.compileOnly
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,8 +15,6 @@ abstract class SkieCompilerCorePlugin : Plugin<Project> {
         apply<BaseKotlinPlugin>()
         apply<UtilityMinimumTargetKotlinVersionPlugin>()
         apply<KotlinPluginWrapper>()
-
-        KotlinCompilerVersionEnumGenerator.generate(project, "co.touchlab.skie", true)
 
         project.dependencies {
             compileOnly("org.jetbrains.kotlin:kotlin-stdlib")

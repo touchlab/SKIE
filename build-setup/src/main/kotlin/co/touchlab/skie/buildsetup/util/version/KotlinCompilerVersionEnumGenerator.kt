@@ -1,48 +1,25 @@
 package co.touchlab.skie.buildsetup.util.version
 
-import co.touchlab.skie.buildsetup.util.generateKotlinCode
 import co.touchlab.skie.buildsetup.util.enquoted
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
+import co.touchlab.skie.buildsetup.util.generateKotlinCode
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 object KotlinCompilerVersionEnumGenerator {
 
-    fun generate(project: Project, packageName: String, makeEnumPublic: Boolean) {
-        project.plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
-            project.extensions.configure<KotlinMultiplatformExtension> {
-                sourceSets {
-                    commonMain {
-                        generateEnum(packageName, makeEnumPublic)
-                    }
-                }
-            }
-        }
-
-        project.plugins.withType<KotlinPluginWrapper>().configureEach {
-            project.extensions.configure<KotlinJvmProjectExtension> {
-                sourceSets.named("main").configure {
-                    generateEnum(packageName, makeEnumPublic)
-                }
-            }
-        }
-    }
-
-    private fun KotlinSourceSet.generateEnum(packageName: String, makeEnumPublic: Boolean) {
+    fun generate(
+        kotlinSourceSet: KotlinSourceSet,
+        packageName: String,
+        makeEnumPublic: Boolean,
+        activeVersion: SupportedKotlinVersion,
+    ) {
         val kotlinVersionsEnum = getKotlinCompilerVersionEnumCode(
             packageName = packageName,
             makeEnumPublic = makeEnumPublic,
-            activeVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).name,
-            supportedVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project),
+            activeVersion = activeVersion.name,
+            supportedVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(kotlinSourceSet.project),
         )
 
-        generateKotlinCode("KotlinCompilerVersion.kt", kotlinVersionsEnum, project)
+        kotlinSourceSet.generateKotlinCode("KotlinCompilerVersion.kt", kotlinVersionsEnum)
     }
 
     private fun getKotlinCompilerVersionEnumCode(
@@ -62,7 +39,7 @@ object KotlinCompilerVersionEnumGenerator {
                     |   val otherSupportedVersions: List<String>,
                     |) {
                     |
-                """.trimMargin()
+                """.trimMargin(),
             )
 
             supportedVersions.forEach { version ->
@@ -71,7 +48,7 @@ object KotlinCompilerVersionEnumGenerator {
                 val otherSupportedVersions = "listOf(" + version.otherSupportedVersions.joinToString { it.toString().enquoted() } + ")"
 
                 appendLine(
-                    "    ${version.name.toIdentifier()}($name, $compilerVersion, $otherSupportedVersions),"
+                    "    ${version.name.toIdentifier()}($name, $compilerVersion, $otherSupportedVersions),",
                 )
             }
 
@@ -88,7 +65,7 @@ object KotlinCompilerVersionEnumGenerator {
                     |        val current: KotlinCompilerVersion = KotlinCompilerVersion.${activeVersion.toIdentifier()}
                     |    }
                     |}
-                """.trimMargin()
+                """.trimMargin(),
             )
         }.toString()
 }

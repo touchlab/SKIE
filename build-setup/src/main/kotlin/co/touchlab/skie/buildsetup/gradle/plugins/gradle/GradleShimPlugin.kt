@@ -2,13 +2,13 @@ package co.touchlab.skie.buildsetup.gradle.plugins.gradle
 
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiverPlugin
 import co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleMinimumTargetKotlinVersionPlugin
+import co.touchlab.skie.buildsetup.main.extensions.MultiKotlinVersionSupportExtension
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
-import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
-import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.gradlePluginApi
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
@@ -25,12 +25,16 @@ abstract class GradleShimPlugin : org.gradle.api.Plugin<Project> {
     }
 
     private fun Project.configureDependencies() {
-        val primaryCompilerVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(project).compilerVersion
+        extensions.configure<MultiKotlinVersionSupportExtension> {
+            compilations.configureEach {
+                val compilerVersion = supportedKotlinVersion.compilerVersion
 
-        dependencies {
-            compileOnly(gradlePluginApi())
-            compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$primaryCompilerVersion")
-            compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:$primaryCompilerVersion")
+                dependencies {
+                    add(kotlinCompilation.compileOnlyConfigurationName, gradlePluginApi())
+                    add(kotlinCompilation.compileOnlyConfigurationName, "org.jetbrains.kotlin:kotlin-gradle-plugin-api:$compilerVersion")
+                    add(kotlinCompilation.compileOnlyConfigurationName, "org.jetbrains.kotlin:kotlin-gradle-plugin:$compilerVersion")
+                }
+            }
         }
     }
 }

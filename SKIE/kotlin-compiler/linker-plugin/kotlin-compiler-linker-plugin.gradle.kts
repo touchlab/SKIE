@@ -22,16 +22,16 @@ kotlin {
 }
 
 dependencies {
-    api(projects.kotlinCompiler.kotlinCompilerCore)
+    sharedApi(projects.kotlinCompiler.kotlinCompilerCore)
 
-    api(projects.common.analytics)
-    api(projects.common.configuration.configurationApi)
-    implementation(projects.common.configuration.configurationAnnotations)
-    implementation(projects.common.configuration.configurationInternal)
-    api(projects.common.configuration.configurationDeclaration)
-    api(projects.common.util)
+    sharedApi(projects.common.analytics)
+    sharedApi(projects.common.configuration.configurationApi)
+    sharedImplementation(projects.common.configuration.configurationAnnotations)
+    sharedImplementation(projects.common.configuration.configurationInternal)
+    sharedApi(projects.common.configuration.configurationDeclaration)
+    sharedApi(projects.common.util)
 
-    implementation(libs.kotlinx.coroutines.jvm)
+    sharedImplementation(libs.kotlinx.coroutines.jvm)
 
-    implementation(libs.kotlinx.serialization.json)
+    sharedImplementation(libs.kotlinx.serialization.json)
 }
