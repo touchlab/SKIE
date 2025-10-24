@@ -1,15 +1,16 @@
 package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
+import co.touchlab.skie.buildsetup.main.tasks.CreateResourcesIndexTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import java.io.File
 
 abstract class SkieRuntimeSwiftPlugin : Plugin<Project> {
 
@@ -28,36 +29,30 @@ abstract class SkieRuntimeSwiftPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.registerCreateResourcesIndexTask(): TaskProvider<Task> {
-        val sourceSets = extensions.getByName("sourceSets") as SourceSetContainer
+    private fun Project.registerCreateResourcesIndexTask(): TaskProvider<out Task> {
+        val taskProvider = tasks.register<CreateResourcesIndexTask>("createResourcesIndex") {
+        }
 
-        return tasks.register("createResourcesIndex") {
-            val mainSourceSet = sourceSets.named("main")
+        extensions.configure<SourceSetContainer> {
+            taskProvider.configure {
+                val mainSourceSet = named("main")
 
-            val resourcesProvider = mainSourceSet.map { it.resources.files }
+                val baseResourcesPaths = mainSourceSet.map { sourceSet -> sourceSet.resources.srcDirs.map { it.absolutePath } }
 
-            val outputFileProvider = mainSourceSet.map {
-                it.output.resourcesDir!!.resolve("co/touchlab/skie/runtime/index.txt")
-            }
+                val resourcesProvider = mainSourceSet.map { it.resources.files }
 
-            inputs.files(resourcesProvider)
-            outputs.file(outputFileProvider)
+                val outputFileProvider = mainSourceSet.map {
+                    it.output.resourcesDir!!.resolve("co/touchlab/skie/runtime/index.txt")
+                }
 
-            doLast {
-                val indexContent = resourcesProvider.get().joinToString("\n") { mainSourceSet.get().resourceName(it) }
+                this.baseResourcesPaths.set(baseResourcesPaths)
 
-                val outputFile = outputFileProvider.get()
-                outputFile.parentFile.mkdirs()
-                outputFile.writeText("$indexContent\n")
+                resources.setFrom(resourcesProvider)
+
+                outputFile.fileProvider(outputFileProvider)
             }
         }
-    }
 
-    private fun SourceSet.resourceName(file: File): String {
-        val baseResourcesPaths = this.resources.srcDirs
-
-        val baseResourcesFolder = baseResourcesPaths.first { file.startsWith(it) }
-
-        return file.relativeTo(baseResourcesFolder).path
+        return taskProvider
     }
 }
