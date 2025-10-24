@@ -16,12 +16,10 @@ sourceSets {
 }
 
 dependencies {
-    val usedCompilerVersion = project.property("versionSupport.kotlin.usedCompiler.version").toString()
-
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$usedCompilerVersion")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$usedCompilerVersion")
-    implementation("org.jetbrains.kotlin:kotlin-sam-with-receiver:$usedCompilerVersion")
-    implementation("org.jetbrains.kotlin:kotlin-serialization:$usedCompilerVersion")
+    implementation(libs.plugin.kotlin.gradle.plugin)
+    implementation(libs.plugin.kotlin.gradle.plugin.api)
+    implementation(libs.plugin.kotlin.sam.with.receiver)
+    implementation(libs.plugin.kotlin.serialization)
 
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)

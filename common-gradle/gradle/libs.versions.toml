@@ -1,6 +1,7 @@
 [versions]
 jvmTarget = "11"
 jvmToolchain = "21"
+kotlin = "2.2.20"
 pluginPublish = "2.0.0"
 kotest = "5.9.1"
 buildconfig = "5.7.0"
@@ -26,6 +27,10 @@ nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "ne
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 
 [libraries]
+plugin-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
+plugin-kotlin-sam-with-receiver = { module = "org.jetbrains.kotlin:kotlin-sam-with-receiver", version.ref = "kotlin" }
+plugin-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 plugin-buildconfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
 
