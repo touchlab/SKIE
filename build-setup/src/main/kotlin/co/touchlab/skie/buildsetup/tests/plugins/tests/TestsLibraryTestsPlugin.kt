@@ -96,19 +96,19 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
             buildConfigField(
                 type = "String",
                 name = "EXPECTED_FAILURES_PATH",
-                value = layout.projectDirectory.dir("${testVersionedResourcesPath(activeKotlinVersionName)}/expected-failures").asFile.absolutePath.enquoted(),
+                value = layout.projectDirectory.dir("${testVersionedResourcesPath(activeKotlinVersionName)}/expected-failures").asFile.absolutePath,
             )
 
             buildConfigField(
                 type = "String",
                 name = "LOCKFILE_PATH",
-                value = layout.projectDirectory.dir("${testVersionedResourcesPath(activeKotlinVersionName)}/libraries.lock").asFile.absolutePath.enquoted(),
+                value = layout.projectDirectory.dir("${testVersionedResourcesPath(activeKotlinVersionName)}/libraries.lock").asFile.absolutePath,
             )
 
             buildConfigField(
                 type = "String",
                 name = "LIBRARY_TESTS_DEPENDENCY_RESOLVER_PATH",
-                value = layout.projectDirectory.dir("library-tests-dependency-resolver").asFile.absolutePath.enquoted(),
+                value = layout.projectDirectory.dir("library-tests-dependency-resolver").asFile.absolutePath,
             )
 
             buildConfigField(

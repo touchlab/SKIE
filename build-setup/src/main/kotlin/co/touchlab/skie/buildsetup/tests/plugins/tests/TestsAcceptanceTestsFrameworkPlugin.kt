@@ -5,9 +5,9 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceiversPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
+import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
-import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.implementation
 import co.touchlab.skie.buildsetup.util.kotlinNativeCompilerHome
 import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
@@ -47,13 +47,13 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
             buildConfigField(
                 type = "String",
                 name = "KONAN_HOME",
-                value = "\"${project.kotlinNativeCompilerHome(primaryCompilerVersion).path}\"",
+                value = project.kotlinNativeCompilerHome(primaryCompilerVersion).path,
             )
 
             buildConfigField(
                 type = "String",
                 name = "RESOURCES",
-                value = mainSourceSet.map { "\"${it.output.resourcesDir!!.absolutePath}\"" },
+                value = mainSourceSet.map { it.output.resourcesDir!!.absolutePath.enquoted() },
             )
         }
     }
@@ -61,7 +61,7 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
     private fun Project.configureDependencies(primaryCompilerVersion: KotlinToolingVersion) {
         dependencies {
             withKotlinNativeCompilerEmbeddableDependency(primaryCompilerVersion) { dependency ->
-                compileOnly(dependency)
+                implementation(dependency)
             }
 
             val trove4j = project.kotlinNativeCompilerHome(primaryCompilerVersion).resolve("konan/lib/trove4j.jar")
