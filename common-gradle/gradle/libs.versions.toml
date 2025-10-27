@@ -15,7 +15,6 @@ gradle = "9.1.0"
 shadow = "9.2.2"
 serialization-json = "1.9.0"
 serialization-yaml = "0.99.0"
-kotlinPoet = "1.15.1"
 jgit = "7.4.0.202509020913-r"
 ci-info = "1.0.1"
 mixpanel = "1.5.4"
@@ -38,8 +37,6 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version.ref = "serialization-yaml" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
-# WIP Remove once removed from stdlib tests
-kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }

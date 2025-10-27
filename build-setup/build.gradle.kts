@@ -16,7 +16,6 @@ dependencies {
 
     implementation(libs.plugin.pluginPublish)
     implementation(libs.plugin.buildconfig)
-    implementation(libs.kotlinPoet)
 }
 
 gradlePlugin {

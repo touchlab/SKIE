@@ -68,7 +68,6 @@ projectStructure {
 
         val functional by module()
         val libraries by module()
-        val stdlib by module()
 
         val `type-mapping` by module {
             val `test-dependencies` by module {
