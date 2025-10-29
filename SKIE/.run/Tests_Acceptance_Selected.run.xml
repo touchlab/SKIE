@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tests/Acceptance/Selected" type="GradleRunConfiguration" factoryName="Gradle" folderName="Latest">
+  <configuration default="false" name="Tests/Acceptance/Selected" type="GradleRunConfiguration" factoryName="Gradle" folderName="Tests">
     <ExternalSystemSettings>
       <option name="env">
         <map>
@@ -15,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":acceptance-tests:functional:kgp_latestTest" />
+          <option value=":acceptance-tests:functional:test" />
         </list>
       </option>
       <option name="vmOptions" />

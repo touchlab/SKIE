@@ -1,10 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tests/Libraries/Selected Library" type="GradleRunConfiguration" factoryName="Gradle" folderName="Latest">
+  <configuration default="false" name="Tests/Libraries/Failed" type="GradleRunConfiguration" factoryName="Gradle" folderName="Tests">
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="libraryTest" value="" />
-          <entry key="onlyIndices" value="126" />
+          <entry key="failedOnly" value="" />
         </map>
       </option>
       <option name="executionName" />
@@ -16,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="libraries:kgp_latestTest" />
+          <option value=":acceptance-tests:libraries:test" />
         </list>
       </option>
       <option name="vmOptions" />

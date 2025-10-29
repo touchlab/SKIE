@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="2.2.0/Tests/Libraries/Compare" type="GradleRunConfiguration" factoryName="Gradle" folderName="2.2.0">
+  <configuration default="false" name="Tests/Libraries/All" type="GradleRunConfiguration" factoryName="Gradle" folderName="Tests">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests" />
@@ -10,9 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="pure:kgp_2.2.0Test" />
-          <option value="libraries:kgp_2.2.0Test" />
-          <option value="comparePureAndSkie__kgp_2.2.0" />
+          <option value=":acceptance-tests:libraries:test" />
         </list>
       </option>
       <option name="vmOptions" />

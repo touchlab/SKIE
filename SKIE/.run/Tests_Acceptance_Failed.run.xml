@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="2.1.20/Tests/Libraries/Failed" type="GradleRunConfiguration" factoryName="Gradle" folderName="2.1.20">
+  <configuration default="false" name="Tests/Acceptance/Failed" type="GradleRunConfiguration" factoryName="Gradle" folderName="Tests">
     <ExternalSystemSettings>
       <option name="env">
         <map>
@@ -7,7 +7,7 @@
         </map>
       </option>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/acceptance-tests" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -15,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="libraries:kgp_2.1.20Test" />
+          <option value=":acceptance-tests:functional:test" />
         </list>
       </option>
       <option name="vmOptions" />
