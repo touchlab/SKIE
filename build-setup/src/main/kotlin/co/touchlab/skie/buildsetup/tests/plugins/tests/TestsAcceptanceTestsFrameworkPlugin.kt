@@ -6,11 +6,11 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalConte
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
 import co.touchlab.skie.buildsetup.util.enquoted
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
-import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
+import co.touchlab.skie.buildsetup.util.getKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.buildsetup.util.implementation
 import co.touchlab.skie.buildsetup.util.kotlinNativeCompilerHome
-import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import com.github.gmazzo.buildconfig.generators.BuildConfigKotlinGenerator
 import org.gradle.api.Plugin
@@ -60,9 +60,7 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
 
     private fun Project.configureDependencies(primaryCompilerVersion: KotlinToolingVersion) {
         dependencies {
-            withKotlinNativeCompilerEmbeddableDependency(primaryCompilerVersion) { dependency ->
-                implementation(dependency)
-            }
+            implementation(getKotlinNativeCompilerEmbeddableDependency(primaryCompilerVersion))
 
             val trove4j = project.kotlinNativeCompilerHome(primaryCompilerVersion).resolve("konan/lib/trove4j.jar")
 

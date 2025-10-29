@@ -5,13 +5,13 @@ package co.touchlab.skie.buildsetup.tests.plugins.base
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
-import co.touchlab.skie.buildsetup.util.enquoted
-import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
-import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
+import co.touchlab.skie.buildsetup.util.enquoted
+import co.touchlab.skie.buildsetup.util.getKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.buildsetup.util.implementation
 import co.touchlab.skie.buildsetup.util.testImplementation
-import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -64,10 +64,8 @@ abstract class BaseTestsPlugin : Plugin<Project> {
             extendsFrom(exportedTestDependencies)
         }
 
-        withKotlinNativeCompilerEmbeddableDependency(compilerVersion) { dependency ->
-            dependencies {
-                testImplementation(dependency)
-            }
+        dependencies {
+            testImplementation(getKotlinNativeCompilerEmbeddableDependency(compilerVersion))
         }
 
         dependencies {

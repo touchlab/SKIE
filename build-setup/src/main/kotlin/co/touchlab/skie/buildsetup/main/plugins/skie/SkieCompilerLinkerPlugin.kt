@@ -8,8 +8,8 @@ import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotl
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
 import co.touchlab.skie.buildsetup.util.compileOnly
+import co.touchlab.skie.buildsetup.util.getKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.buildsetup.util.version.KotlinCompilerVersionEnumGenerator
-import co.touchlab.skie.buildsetup.util.withKotlinNativeCompilerEmbeddableDependency
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -38,16 +38,16 @@ abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
     private fun Project.addDependencyOnCompiler() {
         extensions.configure<MultiKotlinVersionSupportExtension> {
             compilations.configureEach {
-                withKotlinNativeCompilerEmbeddableDependency(supportedKotlinVersion.compilerVersion) { dependency ->
-                    val kotlinCompilerApiConfiguration = project.configurations.detachedConfiguration(dependency)
+                val compilerDependency = getKotlinNativeCompilerEmbeddableDependency(supportedKotlinVersion.compilerVersion)
 
-                    dependencies {
-                        add(kotlinCompilation.compileOnlyConfigurationName, dependency)
-                    }
+                val kotlinCompilerApiConfiguration = project.configurations.detachedConfiguration(compilerDependency)
 
-                    kotlinCompilation.compileTaskProvider.configure {
-                        (this as KotlinCompile).friendPaths.from(kotlinCompilerApiConfiguration)
-                    }
+                dependencies {
+                    add(kotlinCompilation.compileOnlyConfigurationName, compilerDependency)
+                }
+
+                kotlinCompilation.compileTaskProvider.configure {
+                    (this as KotlinCompile).friendPaths.from(kotlinCompilerApiConfiguration)
                 }
             }
         }
