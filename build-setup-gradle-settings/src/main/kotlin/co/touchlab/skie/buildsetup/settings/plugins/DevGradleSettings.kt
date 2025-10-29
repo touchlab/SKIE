@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package co.touchlab.skie.buildsetup.settings.plugins
 
 import org.gradle.api.Plugin
@@ -23,6 +25,7 @@ class DevGradleSettings : Plugin<Settings> {
                     }
                 }
                 maven { url = URI("https://repo.gradle.org/gradle/libs-releases") }
+                gradlePluginPortal()
             }
         }
 

@@ -3,12 +3,11 @@ plugins {
     `java-gradle-plugin`
 }
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-}
+group = "co.touchlab.skie"
 
 dependencies {
+    api(projects.shared)
+
     implementation(libs.plugin.kotlin.gradle.plugin)
     implementation(libs.plugin.kotlin.gradle.plugin.api)
     implementation(libs.plugin.kotlin.sam.with.receiver)
@@ -19,11 +18,6 @@ dependencies {
 }
 
 gradlePlugin {
-    plugins.register("base.root") {
-        id = "base.root"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.base.BaseRootPlugin"
-    }
-
     plugins.register("base.kotlin") {
         id = "base.kotlin"
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin"
@@ -34,24 +28,9 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin"
     }
 
-    plugins.register("dev.root") {
-        id = "dev.root"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevRootPlugin"
-    }
-
-    plugins.register("dev.multiplatform") {
-        id = "dev.multiplatform"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.dev.DevMultiplatformPlugin"
-    }
-
     plugins.register("tests.functional-tests") {
         id = "tests.functional-tests"
         implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsFunctionalTestsPlugin"
-    }
-
-    plugins.register("tests.stdlib-tests") {
-        id = "tests.stdlib-tests"
-        implementationClass = "co.touchlab.skie.buildsetup.tests.plugins.tests.TestsStdlibTestsPlugin"
     }
 
     plugins.register("tests.type-mapping-tests") {

@@ -2,9 +2,8 @@ import co.touchlab.skie.configuration.ClassInterop
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.ExperimentalFeatures
 import co.touchlab.skie.configuration.SealedInterop
-import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import java.util.Locale
+import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
 
 plugins {
     id("dev.multiplatform")
@@ -82,7 +81,7 @@ kotlin {
 
 tasks.register("dependenciesForExport") {
     doLast {
-        val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent().kotlinGradleName + "Api")
+        val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent(project).get().kotlinGradleName + "Api")
 
         val dependencies = configuration.incoming.resolutionResult.allComponents.map { it.toString() }
         val externalDependencies = dependencies.filterNot { it.startsWith("project :") }

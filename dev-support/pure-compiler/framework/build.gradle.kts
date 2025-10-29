@@ -1,6 +1,6 @@
+import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
-import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
 
 plugins {
     id("dev.multiplatform")
@@ -47,11 +47,16 @@ kotlin {
 }
 
 tasks.withType<KotlinNativeLink>().configureEach {
+    val provider = project.providers
+
     doLast {
-        if (binary.target.konanTarget.family != org.jetbrains.kotlin.konan.target.Family.OSX) { return@doLast }
+        if (binary.target.konanTarget.family != org.jetbrains.kotlin.konan.target.Family.OSX) {
+            return@doLast
+        }
         val frameworkDirectory = outputs.files.toList().first()
         val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
-        exec {
+
+        provider.exec {
             commandLine(
                 "zsh",
                 "-c",
@@ -63,7 +68,7 @@ tasks.withType<KotlinNativeLink>().configureEach {
 
 tasks.register("dependenciesForExport") {
     doLast {
-        val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent().kotlinGradleName + "Api")
+        val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent(project).get().kotlinGradleName + "Api")
 
         val dependencies = configuration.incoming.resolutionResult.allComponents.map { it.toString() }
         val externalDependencies = dependencies.filterNot { it.startsWith("project :") }

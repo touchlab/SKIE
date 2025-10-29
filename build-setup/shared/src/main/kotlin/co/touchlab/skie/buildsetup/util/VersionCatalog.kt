@@ -5,10 +5,14 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
 
-internal val Project.libs: VersionCatalogRoot
-    get() = this.extensions.getByType<VersionCatalogsExtension>().named("libs").let { VersionCatalogRoot(it) }
+val Project.libs: VersionCatalogRoot
+    get() = this.extensions.getByType<VersionCatalogsExtension>().named("libs").let {
+        VersionCatalogRoot(
+            it,
+        )
+    }
 
-internal class VersionCatalogRoot(private val versionCatalog: VersionCatalog) {
+class VersionCatalogRoot(private val versionCatalog: VersionCatalog) {
 
     val versions: VersionCatalogVersions
         get() = VersionCatalogVersions(versionCatalog)
@@ -17,13 +21,13 @@ internal class VersionCatalogRoot(private val versionCatalog: VersionCatalog) {
         get() = VersionCatalogBundles(versionCatalog)
 }
 
-internal class VersionCatalogVersions(versionCatalog: VersionCatalog) {
+class VersionCatalogVersions(versionCatalog: VersionCatalog) {
 
     val jvmTarget = versionCatalog.findVersion("jvmTarget").get().requiredVersion.toInt()
     val jvmToolchain = versionCatalog.findVersion("jvmToolchain").get().requiredVersion.toInt()
 }
 
-internal class VersionCatalogBundles(private val versionCatalog: VersionCatalog) {
+class VersionCatalogBundles(private val versionCatalog: VersionCatalog) {
 
     val testing = Testing()
 

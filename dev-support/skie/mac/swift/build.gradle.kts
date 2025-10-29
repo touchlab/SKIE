@@ -1,7 +1,6 @@
-import co.touchlab.skie.gradle.architecture.MacOsCpuArchitecture
-import org.gradle.configurationcache.extensions.capitalized
+import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
 
-val architecture = MacOsCpuArchitecture.getCurrent()
+val architecture = MacOsCpuArchitecture.getCurrent(project).get()
 
 val createSwiftMain by tasks.registering {
     val mainFile = layout.projectDirectory.file("main.swift")
@@ -35,6 +34,9 @@ val buildDebug by tasks.registering(Exec::class) {
 val buildRelease by tasks.registering(Exec::class) {
     configureBuild("release")
 }
+
+fun String.capitalized(): String =
+    replaceFirstChar { it.uppercase() }
 
 fun Exec.configureBuild(mode: String) {
     group = "build"

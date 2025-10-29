@@ -7,3 +7,5 @@ pluginManagement {
 plugins {
     id("dev.gradle.settings")
 }
+
+include(":shared")
