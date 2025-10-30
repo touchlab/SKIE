@@ -1,0 +1,211 @@
+package co.touchlab.skie.buildsetup.main.tasks
+
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersion
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
+import kotlin.io.path.createParentDirectories
+import kotlin.io.path.writeText
+
+abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
+
+    @get:Input
+    abstract val supportedVersions: ListProperty<SupportedKotlinVersion>
+
+    @get:OutputFile
+    abstract val outputPath: RegularFileProperty
+
+    init {
+        group = "other"
+        description = "Generates the primary smoke-tests workflow file."
+    }
+
+    @TaskAction
+    fun execute() {
+        val outputPath = outputPath.get().asFile.toPath()
+
+        outputPath.createParentDirectories()
+
+        val workflow = getSmokeTestsWorkflow(supportedVersions.get())
+
+        outputPath.writeText(workflow)
+    }
+
+    private fun getSmokeTestsWorkflow(versions: List<SupportedKotlinVersion>): String = $$"""
+        name: Smoke Tests
+
+        on:
+          push:
+            branches:
+              - '**'
+          pull_request_target:
+            branches:
+              - main
+          workflow_dispatch:
+            inputs:
+              linkage:
+                type: choice
+                options:
+                  - static
+                  - dynamic
+                required: true
+                default: static
+                description:
+                  'The linkage mode to use for the tests. "static" will produce static frameworks, "dynamic" will produce dynamic frameworks.'
+              configuration:
+                type: choice
+                options:
+                  - debug
+                  - release
+                required: true
+                default: debug
+                description:
+                  'The configuration to use for the tests. "release" will produce release builds, "debug" will produce debug builds (type mapping tests currently always use release).'
+              target:
+                type: choice
+                options:
+                  - ios_arm64
+                  - ios_x64
+                  - ios_simulator_arm64
+                  - macos_arm64
+                  - macos_x64
+                required: true
+                default: macos_arm64
+                description:
+                  'The target to use for the type mapping tests.'
+
+        permissions:
+          contents: read
+          checks: write
+
+        concurrency:
+          group: ci-smoke-tests-${{ github.ref }}
+
+        jobs:
+          acceptance-tests:
+            name: Acceptance Tests
+            runs-on: self-hosted
+            steps:
+              - name: Checkout Repo
+                uses: actions/checkout@v3
+                with:
+                  submodules: true
+                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+              - name: Prepare Worker
+                uses: ./.github/actions/prepare-worker
+              - name: Run Acceptance Tests
+                uses: gradle/gradle-build-action@v2.4.2
+                with:
+                  arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersion'
+                  build-root-directory: SKIE
+                env:
+                  KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+                  KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+              # Log size can be too large which causes significant performance issues
+              # - name: Publish Test Report
+              #   uses: mikepenz/action-junit-report@v3
+              #   if: ${{ failure() || success() }}
+              #   with:
+              #     check_name: "Smoke Test Reports - Functional Tests"
+              #     report_paths: 'SKIE/acceptance-tests/build/test-results/functional__*/TEST-*.xml'
+              #     require_tests: true
+
+          type-mapping-tests:
+            name: Type Mapping Tests
+            runs-on: self-hosted
+            needs: [acceptance-tests]
+            steps:
+              - name: Checkout Repo
+                uses: actions/checkout@v3
+                with:
+                  submodules: true
+                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+              - name: Prepare Worker
+                uses: ./.github/actions/prepare-worker
+              - name: Run Type Mapping Tests
+                uses: gradle/gradle-build-action@v2.4.2
+                id: run-tests
+                with:
+                  arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersion'
+                  build-root-directory: SKIE
+                env:
+                  KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+                  KOTLIN_TARGET: ${{ inputs.target }}
+                  KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+              # Log size can be too large which causes significant performance issues
+              # - name: Publish Test Report
+              #   uses: mikepenz/action-junit-report@v3
+              #   if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
+              #   with:
+              #     check_name: "Smoke Test Reports - Type Mapping Tests"
+              #     report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
+              #     require_tests: true
+
+          external-libraries-tests:
+            name: External Libraries Tests
+            needs: [gradle-tests]
+            runs-on: self-hosted
+            steps:
+              - name: Checkout Repo
+                uses: actions/checkout@v3
+                with:
+                  submodules: true
+                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+              - name: Prepare Worker
+                uses: ./.github/actions/prepare-worker
+              - name: Run External Libraries Tests
+                uses: gradle/gradle-build-action@v2.4.2
+                with:
+                  arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersion'
+                  build-root-directory: SKIE
+                env:
+                  KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+                  KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+              # Log size can be too large which causes significant performance issues
+              # - name: Publish Test Report
+              #   uses: mikepenz/action-junit-report@v3
+              #   if: ${{ failure() || success() }}
+              #   with:
+              #     check_name: "Smoke Test Reports - External Libraries Tests"
+              #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+              #     require_tests: true
+
+          gradle-tests:
+            name: Gradle Tests
+            runs-on: self-hosted
+            needs: [acceptance-tests]
+            steps:
+              - name: Checkout Repo
+                uses: actions/checkout@v3
+                with:
+                  submodules: true
+                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+              - name: Prepare Worker
+                uses: ./.github/actions/prepare-worker
+              - name: Run Gradle Tests
+                uses: gradle/gradle-build-action@v2.4.2
+                id: run-tests
+        #      TODO The targets cannot be selected at the moment due to a mismatch in the name used by Gradle and other kinds of tests
+        #      "-Pmatrix.targets=${{ inputs.target || 'macosArm64' }}"
+                with:
+                  arguments: >-
+                    :test
+                    -PtestLevel=smoke
+                    -PtestType=gradle
+                    "-Pmatrix.targets=macosArm64"
+                    "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
+                    "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
+                  build-root-directory: test-runner
+              - name: Publish Test Report
+                uses: mikepenz/action-junit-report@v4
+                if: ${{ failure() || success() }}
+                with:
+                  check_name: "Smoke Test Reports - Gradle Tests"
+                  report_paths: 'test-runner/build/test-results/test/TEST-*.xml'
+                  require_tests: true
+
+        """.trimIndent()
+}

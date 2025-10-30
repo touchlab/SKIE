@@ -2,7 +2,8 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseRootPlugin
-import co.touchlab.skie.buildsetup.main.tasks.GenerateAllVersionsSmokeTestsCIActionsTask
+import co.touchlab.skie.buildsetup.main.tasks.GenerateAllVersionsSmokeTestsCIActionTask
+import co.touchlab.skie.buildsetup.main.tasks.GeneratePrimarySmokeTestsCIActionTask
 import co.touchlab.skie.buildsetup.main.tasks.GenerateVersionedSmokeTestsCIActionsTask
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import org.gradle.api.Plugin
@@ -35,18 +36,28 @@ abstract class SkieRootPlugin : Plugin<Project> {
     }
 
     private fun Project.registerGenerateCIActionsTasks() {
-        val generateAllVersionsSmokeTestsCIActions = tasks.register<GenerateAllVersionsSmokeTestsCIActionsTask>("generateAllVersionsSmokeTestsCIActions") {
-            supportedVersions.set(SupportedKotlinVersionProvider.getSupportedKotlinVersions(project))
-            outputPath.set(rootDir.parentFile.resolve(".github/workflows/smoke-tests-all-versions.yml"))
+        val supportedKotlinVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project)
+
+        val workflowsDirectory = rootDir.parentFile.resolve(".github/workflows")
+
+        val generatePrimarySmokeTestsCIActions = tasks.register<GeneratePrimarySmokeTestsCIActionTask>("generatePrimarySmokeTestsCIAction") {
+            supportedVersions.set(supportedKotlinVersions)
+            outputPath.set(workflowsDirectory.resolve("smoke-tests.yml"))
+        }
+
+        val generateAllVersionsSmokeTestsCIAction = tasks.register<GenerateAllVersionsSmokeTestsCIActionTask>("generateAllVersionsSmokeTestsCIAction") {
+            supportedVersions.set(supportedKotlinVersions)
+            outputPath.set(workflowsDirectory.resolve("smoke-tests-all-versions.yml"))
         }
 
         val generateVersionedSmokeTestsCIActions = tasks.register<GenerateVersionedSmokeTestsCIActionsTask>("generateVersionedSmokeTestsCIActions") {
-            supportedVersions.set(SupportedKotlinVersionProvider.getSupportedKotlinVersions(project))
-            outputDirectory.set(rootDir.parentFile.resolve(".github/workflows"))
+            supportedVersions.set(supportedKotlinVersions)
+            outputDirectory.set(workflowsDirectory)
         }
 
         tasks.register("generateCIActions") {
-            dependsOn(generateAllVersionsSmokeTestsCIActions)
+            dependsOn(generatePrimarySmokeTestsCIActions)
+            dependsOn(generateAllVersionsSmokeTestsCIAction)
             dependsOn(generateVersionedSmokeTestsCIActions)
         }
     }

@@ -10,7 +10,7 @@ import org.gradle.api.tasks.TaskAction
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
 
-abstract class GenerateAllVersionsSmokeTestsCIActionsTask : DefaultTask() {
+abstract class GenerateAllVersionsSmokeTestsCIActionTask : DefaultTask() {
 
     @get:Input
     abstract val supportedVersions: ListProperty<SupportedKotlinVersion>
