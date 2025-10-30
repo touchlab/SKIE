@@ -62,7 +62,7 @@ abstract class GradlePluginPlugin : Plugin<Project> {
         }
 
         SupportedKotlinVersionProvider.getEnabledKotlinVersions(project).forEach { supportedVersion ->
-            val safeKotlinVersion = supportedVersion.name.toString().replace('.', '_')
+            val safeKotlinVersion = supportedVersion.safeName
 
             val shimConfiguration = configurations.create("shim-relocation-$safeKotlinVersion") {
                 attributes {

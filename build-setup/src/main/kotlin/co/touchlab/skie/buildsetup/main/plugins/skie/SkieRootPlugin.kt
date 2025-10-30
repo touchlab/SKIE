@@ -2,9 +2,12 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseRootPlugin
+import co.touchlab.skie.buildsetup.main.tasks.GenerateTestCIActionsTask
+import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.register
 import java.io.File
 
 abstract class SkieRootPlugin : Plugin<Project> {
@@ -14,6 +17,7 @@ abstract class SkieRootPlugin : Plugin<Project> {
         apply<BaseKotlinPlugin>()
 
         registerReplaceDataTask()
+        registerGenerateCIActionsTask()
     }
 
     private fun Project.registerReplaceDataTask() {
@@ -26,6 +30,13 @@ abstract class SkieRootPlugin : Plugin<Project> {
 
                 replaceData(replacementString)
             }
+        }
+    }
+
+    private fun Project.registerGenerateCIActionsTask() {
+        tasks.register<GenerateTestCIActionsTask>("generateCIActions") {
+            supportedVersions.set(SupportedKotlinVersionProvider.getSupportedKotlinVersions(project))
+            outputDirectory.set(rootDir.parentFile.resolve(".github/workflows"))
         }
     }
 }

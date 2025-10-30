@@ -10,6 +10,8 @@ data class SupportedKotlinVersion(
     val isEnabled: Boolean,
 ) : Serializable {
 
+    val safeName: String = name.toString().replace('.', '_')
+
     val supportedVersions: List<KotlinToolingVersion> =
         listOf(compilerVersion) + otherSupportedVersions
 }
