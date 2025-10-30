@@ -71,7 +71,7 @@ jobs:
       - name: Run Acceptance Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:functional:kgp_${{ matrix.version }}Test'
+          arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=${{ matrix.version }}'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: static
@@ -98,7 +98,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.4.2
         id: run-tests
         with:
-          arguments: ':acceptance-tests:type-mapping:kgp_${{ matrix.version }}Test'
+          arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=${{ matrix.version }}'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: static
@@ -125,7 +125,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:kgp_${{ matrix.version }}Test'
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ matrix.version }}'
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: static

@@ -2,7 +2,8 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseRootPlugin
-import co.touchlab.skie.buildsetup.main.tasks.GenerateTestCIActionsTask
+import co.touchlab.skie.buildsetup.main.tasks.GenerateAllVersionsSmokeTestsCIActionsTask
+import co.touchlab.skie.buildsetup.main.tasks.GenerateVersionedSmokeTestsCIActionsTask
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -17,7 +18,7 @@ abstract class SkieRootPlugin : Plugin<Project> {
         apply<BaseKotlinPlugin>()
 
         registerReplaceDataTask()
-        registerGenerateCIActionsTask()
+        registerGenerateCIActionsTasks()
     }
 
     private fun Project.registerReplaceDataTask() {
@@ -33,10 +34,20 @@ abstract class SkieRootPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.registerGenerateCIActionsTask() {
-        tasks.register<GenerateTestCIActionsTask>("generateCIActions") {
+    private fun Project.registerGenerateCIActionsTasks() {
+        val generateAllVersionsSmokeTestsCIActions = tasks.register<GenerateAllVersionsSmokeTestsCIActionsTask>("generateAllVersionsSmokeTestsCIActions") {
+            supportedVersions.set(SupportedKotlinVersionProvider.getSupportedKotlinVersions(project))
+            outputPath.set(rootDir.parentFile.resolve(".github/workflows/smoke-tests-all-versions.yml"))
+        }
+
+        val generateVersionedSmokeTestsCIActions = tasks.register<GenerateVersionedSmokeTestsCIActionsTask>("generateVersionedSmokeTestsCIActions") {
             supportedVersions.set(SupportedKotlinVersionProvider.getSupportedKotlinVersions(project))
             outputDirectory.set(rootDir.parentFile.resolve(".github/workflows"))
+        }
+
+        tasks.register("generateCIActions") {
+            dependsOn(generateAllVersionsSmokeTestsCIActions)
+            dependsOn(generateVersionedSmokeTestsCIActions)
         }
     }
 }

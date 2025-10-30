@@ -13,7 +13,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.writeText
 
-abstract class GenerateTestCIActionsTask : DefaultTask() {
+abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
 
     @get:Input
     abstract val supportedVersions: ListProperty<SupportedKotlinVersion>
@@ -23,7 +23,7 @@ abstract class GenerateTestCIActionsTask : DefaultTask() {
 
     init {
         group = "other"
-        description = "Generates the smoke-tests workflow files."
+        description = "Generates the versioned smoke-tests workflow files."
     }
 
     @TaskAction
@@ -146,5 +146,6 @@ abstract class GenerateTestCIActionsTask : DefaultTask() {
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
                   KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-    """.trimIndent()
+
+        """.trimIndent()
 }
