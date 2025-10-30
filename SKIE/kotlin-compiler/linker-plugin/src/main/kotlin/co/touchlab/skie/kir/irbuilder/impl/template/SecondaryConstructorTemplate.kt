@@ -1,5 +1,3 @@
-@file:OptIn(ObsoleteDescriptorBasedAPI::class)
-
 package co.touchlab.skie.kir.irbuilder.impl.template
 
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
@@ -17,7 +15,6 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol

@@ -1,5 +1,3 @@
-@file:OptIn(ObsoleteDescriptorBasedAPI::class)
-
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
 import co.touchlab.skie.configuration.provider.descriptor.configuration
@@ -22,7 +20,6 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irGet

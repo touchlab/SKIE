@@ -1,20 +1,16 @@
-@file:OptIn(ObsoleteDescriptorBasedAPI::class, UnsafeDuringIrConstructionAPI::class)
-
 package co.touchlab.skie.kir.irbuilder.impl.namespace
 
 import co.touchlab.skie.kir.irbuilder.UnsupportedDeclarationDescriptorException
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.skieSymbolTable
-import org.jetbrains.kotlin.descriptors.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.descriptors.findPackage
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
-import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.getPackageFragment
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment

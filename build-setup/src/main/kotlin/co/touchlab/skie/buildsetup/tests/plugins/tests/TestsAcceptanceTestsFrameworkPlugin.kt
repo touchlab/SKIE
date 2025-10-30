@@ -4,7 +4,7 @@ import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceiversPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInCompilerApiPlugin
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.getKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.buildsetup.util.implementation
@@ -26,7 +26,7 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
         apply<BaseKotlinPlugin>()
         apply<UtilityMinimumTargetKotlinVersionPlugin>()
-        apply<UtilityOptInExperimentalCompilerApiPlugin>()
+        apply<UtilityOptInCompilerApiPlugin>()
         apply<UtilityExperimentalContextReceiversPlugin>()
         apply<UtilityBuildConfigPlugin>()
         apply<KotlinPluginWrapper>()

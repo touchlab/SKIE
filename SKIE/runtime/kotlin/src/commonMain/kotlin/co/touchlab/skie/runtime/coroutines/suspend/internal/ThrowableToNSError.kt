@@ -15,8 +15,6 @@ internal fun Throwable.toNSError(): NSError {
         userInfo[NSLocalizedDescriptionKey] = message
     }
 
-    // Needed only in some compiler versions
-    @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(UnsafeNumber::class)
     return NSError(domain = "KotlinException", code = 0, userInfo = userInfo)
 }

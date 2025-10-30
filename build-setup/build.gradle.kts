@@ -85,9 +85,9 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin"
     }
 
-    plugins.register("utility.opt-in.experimental-compiler-api") {
-        id = "utility.opt-in.experimental-compiler-api"
-        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin"
+    plugins.register("utility.opt-in.compiler-api") {
+        id = "utility.opt-in.compiler-api"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInCompilerApiPlugin"
     }
 
     plugins.register("utility.skie-publishable") {

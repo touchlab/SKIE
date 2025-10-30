@@ -4,27 +4,28 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 
 abstract class UtilityExperimentalContextReceiversPlugin : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
-        plugins.withType<KotlinMultiplatformPluginWrapper> {
-            extensions.configure<KotlinMultiplatformExtension> {
+        plugins.withType<KotlinBasePluginWrapper>().configureEach {
+            extensions.configure<KotlinBaseExtension> {
                 sourceSets.configureEach {
                     languageSettings {
                         enableLanguageFeature("ContextReceivers")
                     }
                 }
-            }
-        }
 
-        plugins.withType<KotlinPluginWrapper> {
-            tasks.withType<KotlinCompilationTask<*>>().configureEach {
-                compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
+                if (this is HasConfigurableKotlinCompilerOptions<*>) {
+                    compilerOptions {
+                        freeCompilerArgs.addAll(
+                            "-Xwarning-level=CONTEXT_RECEIVERS_DEPRECATED:disabled",
+                        )
+                    }
+                }
             }
         }
     }

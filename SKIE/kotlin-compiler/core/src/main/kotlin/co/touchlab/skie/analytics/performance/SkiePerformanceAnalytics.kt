@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 import kotlin.time.toDuration
 
@@ -67,7 +66,6 @@ object SkiePerformanceAnalytics {
                 log(name, kind, block)
             }
 
-        @OptIn(ExperimentalTime::class)
         suspend inline fun <T> log(name: String, kind: Kind = Kind.Foreground, block: () -> T): T {
             val timedValue = measureTimedValue {
                 block()

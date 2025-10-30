@@ -1,5 +1,3 @@
-@file:OptIn(ExternalKotlinTargetApi::class, ExperimentalKotlinGradlePluginApi::class)
-
 package co.touchlab.skie.buildsetup.tests.plugins.tests
 
 import co.touchlab.skie.buildsetup.tests.extensions.LibraryTestsExtension
@@ -21,8 +19,6 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExternalKotlinTargetApi
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
 

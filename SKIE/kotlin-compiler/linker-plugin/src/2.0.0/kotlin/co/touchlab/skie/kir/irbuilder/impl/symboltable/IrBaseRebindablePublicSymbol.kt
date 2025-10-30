@@ -1,5 +1,3 @@
-@file:OptIn(UnsafeDuringIrConstructionAPI::class)
-
 package co.touchlab.skie.kir.irbuilder.impl.symboltable
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor

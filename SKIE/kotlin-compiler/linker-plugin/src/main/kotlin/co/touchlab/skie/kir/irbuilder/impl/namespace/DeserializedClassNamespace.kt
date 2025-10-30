@@ -1,5 +1,3 @@
-@file:OptIn(ObsoleteDescriptorBasedAPI::class, UnsafeDuringIrConstructionAPI::class)
-
 package co.touchlab.skie.kir.irbuilder.impl.namespace
 
 import co.touchlab.skie.compilerinject.reflection.reflectedBy
@@ -13,9 +11,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
-import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 class DeserializedClassNamespace(

@@ -1,5 +1,3 @@
-@file:OptIn(ObsoleteDescriptorBasedAPI::class, UnsafeDuringIrConstructionAPI::class)
-
 package co.touchlab.skie.kir.irbuilder.impl
 
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
@@ -24,7 +22,6 @@ import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.SymbolTablePhase
 import co.touchlab.skie.phases.moduleFragment
 import co.touchlab.skie.phases.skieSymbolTable
-import org.jetbrains.kotlin.descriptors.findPackage
 import org.jetbrains.kotlin.backend.common.serialization.findSourceFile
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerIr
@@ -38,11 +35,10 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.descriptors.findPackage
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
-import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
@@ -203,7 +199,6 @@ private fun SkieSymbolTable.referenceBoundTypeParameterContainer(classDescriptor
         descriptorExtension.referenceClass(classDescriptor).takeIf { it.isBound }?.owner,
     )
 
-@OptIn(ObsoleteDescriptorBasedAPI::class)
 private fun SkieSymbolTable.declarePrivateTypeParameterAsPublic(typeParameter: IrTypeParameter) {
     val signature = PublicIdSignatureComputer(KonanManglerIr).computeSignature(typeParameter)
 

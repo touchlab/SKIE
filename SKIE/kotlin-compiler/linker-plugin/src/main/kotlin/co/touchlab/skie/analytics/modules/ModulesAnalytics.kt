@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.utils.ResolvedDependency
 
-@OptIn(ObsoleteDescriptorBasedAPI::class)
 object ModulesAnalytics {
 
     @Serializable

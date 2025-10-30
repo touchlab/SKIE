@@ -12,6 +12,8 @@ skiePublishing {
 }
 
 dependencies {
+    compileOnly(kotlin("reflect"))
+
     api(projects.common.analytics)
     api(projects.common.configuration.configurationApi)
     api(projects.common.configuration.configurationDeclaration)

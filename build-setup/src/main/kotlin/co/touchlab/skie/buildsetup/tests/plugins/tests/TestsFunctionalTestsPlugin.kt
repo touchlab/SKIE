@@ -1,5 +1,3 @@
-@file:OptIn(ExternalKotlinTargetApi::class, ExperimentalKotlinGradlePluginApi::class)
-
 package co.touchlab.skie.buildsetup.tests.plugins.tests
 
 import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin
@@ -13,8 +11,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExternalKotlinTargetApi
 
 abstract class TestsFunctionalTestsPlugin : Plugin<Project> {
 

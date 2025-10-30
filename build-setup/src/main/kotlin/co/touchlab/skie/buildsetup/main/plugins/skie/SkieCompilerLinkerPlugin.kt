@@ -6,7 +6,7 @@ import co.touchlab.skie.buildsetup.main.extensions.MultiKotlinVersionSupportExte
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
-import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInExperimentalCompilerApiPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInCompilerApiPlugin
 import co.touchlab.skie.buildsetup.util.compileOnly
 import co.touchlab.skie.buildsetup.util.getKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.buildsetup.util.version.KotlinCompilerVersionEnumGenerator
@@ -24,7 +24,7 @@ abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
         apply<BaseKotlinPlugin>()
         apply<UtilityMultiKotlinVersionSupportPlugin>()
         apply<UtilityMinimumTargetKotlinVersionPlugin>()
-        apply<UtilityOptInExperimentalCompilerApiPlugin>()
+        apply<UtilityOptInCompilerApiPlugin>()
         apply<KotlinPluginWrapper>()
 
         addDependencyOnCompiler()
@@ -56,6 +56,7 @@ abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
     private fun Project.generateKotlinVersionEnum() {
         extensions.configure<MultiKotlinVersionSupportExtension> {
             compilations.configureEach {
+                // WIP This needs to be a task due to configuration cache
                 KotlinCompilerVersionEnumGenerator.generate(
                     kotlinSourceSet = kotlinCompilation.defaultSourceSet,
                     packageName = "co.touchlab.skie",

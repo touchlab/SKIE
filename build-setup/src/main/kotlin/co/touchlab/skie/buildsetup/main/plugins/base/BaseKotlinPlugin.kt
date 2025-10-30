@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
-
 package co.touchlab.skie.buildsetup.main.plugins.base
 
 import co.touchlab.skie.buildsetup.util.libs
@@ -13,7 +11,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension

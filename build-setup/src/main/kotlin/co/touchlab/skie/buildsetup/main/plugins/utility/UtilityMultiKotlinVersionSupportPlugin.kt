@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 @file:Suppress("UnstableApiUsage")
 
 package co.touchlab.skie.buildsetup.main.plugins.utility
@@ -19,7 +18,6 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper

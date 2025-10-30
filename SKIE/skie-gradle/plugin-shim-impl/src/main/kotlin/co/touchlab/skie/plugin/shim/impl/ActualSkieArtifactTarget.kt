@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package co.touchlab.skie.plugin.shim.impl
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag

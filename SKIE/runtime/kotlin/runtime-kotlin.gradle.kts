@@ -25,6 +25,10 @@ kotlin {
 
     macosX64()
     macosArm64()
+
+    sourceSets.configureEach {
+        languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
+    }
 }
 
 dependencies {

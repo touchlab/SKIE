@@ -8,14 +8,12 @@ import co.touchlab.skie.spi.SkiePluginLoader
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
     override val supportsK2: Boolean = false
 
-    @OptIn(ExperimentalTime::class)
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         val initContext: InitPhase.Context
 

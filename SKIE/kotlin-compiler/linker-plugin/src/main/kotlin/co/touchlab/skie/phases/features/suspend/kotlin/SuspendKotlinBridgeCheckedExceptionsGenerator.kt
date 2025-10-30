@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.findClassifierAcrossModuleDependencies
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irExprBody
 import org.jetbrains.kotlin.ir.builders.irGetField
@@ -138,7 +137,6 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
         }
 
     context(KotlinIrPhase.Context)
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun KotlinType.toIrSymbol(): IrClassifierSymbol =
         when (val classifier = this.constructor.declarationDescriptor) {
             null -> error("No declaration descriptor for type $this.")

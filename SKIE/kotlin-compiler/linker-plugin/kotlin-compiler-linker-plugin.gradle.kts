@@ -1,7 +1,3 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
-
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-
 plugins {
     id("skie.compiler.linker")
     id("utility.skie-publishable")
@@ -13,12 +9,6 @@ plugins {
 skiePublishing {
     name = "SKIE Kotlin compiler plugin"
     description = "Kotlin compiler plugin that improves Swift interface of a Kotlin Multiplatform framework."
-}
-
-kotlin {
-    compilerOptions {
-        optIn.addAll("org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi")
-    }
 }
 
 dependencies {

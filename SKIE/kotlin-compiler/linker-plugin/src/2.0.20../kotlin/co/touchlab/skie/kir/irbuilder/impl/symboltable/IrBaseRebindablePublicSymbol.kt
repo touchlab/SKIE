@@ -21,21 +21,13 @@ fun getIrTypeParameterPublicSymbolImpl(
     return IrTypeParameterSymbolImpl(descriptor, signature)
 }
 
-abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationDescriptor, Owner : IrSymbolOwner> constructor(
+abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationDescriptor, Owner : IrSymbolOwner>(
     override val signature: IdSignature,
-    descriptor: Descriptor,
+    override val descriptor: Descriptor,
 ) : IrBindableSymbol<Descriptor, Owner> {
 
-    private val _descriptor: Descriptor? = descriptor
-
     @ObsoleteDescriptorBasedAPI
-    @Suppress("UNCHECKED_CAST")
-    override val descriptor: Descriptor
-        get() = _descriptor ?: (owner as IrDeclaration).toIrBasedDescriptor() as Descriptor
-
-    @ObsoleteDescriptorBasedAPI
-    override val hasDescriptor: Boolean
-        get() = _descriptor != null
+    override val hasDescriptor: Boolean = true
 
     private var _owner: Owner? = null
     override val owner: Owner
@@ -44,10 +36,10 @@ abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationDescript
     override var privateSignature: IdSignature? = null
 
     init {
-        assert(descriptor == null || isOriginalDescriptor(descriptor)) {
-            "Substituted descriptor $descriptor for ${descriptor!!.original}"
+        assert(isOriginalDescriptor(descriptor)) {
+            "Substituted descriptor $descriptor for ${descriptor.original}"
         }
-        if (!isPublicApi && descriptor != null) {
+        if (!isPublicApi) {
             val containingDeclaration = descriptor.containingDeclaration
             assert(containingDeclaration == null || isOriginalDescriptor(containingDeclaration)) {
                 "Substituted containing declaration: $containingDeclaration\nfor descriptor: $descriptor"
@@ -76,7 +68,6 @@ abstract class IrBaseRebindablePublicSymbol<out Descriptor : DeclarationDescript
         return if (isPublicApi)
             "Unbound public symbol ${this::class.java.simpleName}: $signature"
         else
-            "Unbound private symbol " +
-                if (_descriptor != null) "${this::class.java.simpleName}: $_descriptor" else super.toString()
+            "Unbound private symbol ${this::class.java.simpleName}: $descriptor"
     }
 }
