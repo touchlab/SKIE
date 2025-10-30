@@ -5,6 +5,7 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.MavenPublishPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.apply
@@ -16,6 +17,7 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 import org.gradle.plugins.signing.SigningPlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
 abstract class UtilitySkiePublishablePlugin : Plugin<Project> {
 
@@ -28,6 +30,7 @@ abstract class UtilitySkiePublishablePlugin : Plugin<Project> {
         configureMavenPublishing()
         configureSigningIfNeeded()
         configureMetadata(extension)
+        configureKotlinJvmPublicationIfNeeded()
     }
 
     private fun Project.configureSmokeTestTmpRepository() {
@@ -116,6 +119,15 @@ abstract class UtilitySkiePublishablePlugin : Plugin<Project> {
                     developerConnection = "scm:git:ssh://github.com:touchlab/SKIE.git"
                     url = "https://github.com/touchlab/SKIE"
                 }
+            }
+        }
+    }
+
+    private fun Project.configureKotlinJvmPublicationIfNeeded() {
+        plugins.withType<KotlinPluginWrapper>().configureEach {
+            extensions.configure<JavaPluginExtension> {
+                withSourcesJar()
+                withJavadocJar()
             }
         }
     }
