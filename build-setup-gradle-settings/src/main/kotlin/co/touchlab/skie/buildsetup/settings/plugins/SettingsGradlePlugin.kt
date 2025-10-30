@@ -7,7 +7,7 @@ import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.maven
 import java.net.URI
 
-class DevGradleSettings : Plugin<Settings> {
+class SettingsGradlePlugin : Plugin<Settings> {
 
     override fun apply(target: Settings) = with(target) {
         dependencyResolutionManagement {

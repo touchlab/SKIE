@@ -5,7 +5,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.gradle.settings")
+    id("settings.gradle")
 }
 
 include(":shared")

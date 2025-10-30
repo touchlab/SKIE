@@ -13,8 +13,8 @@ tasks.register("cleanAll") {
 }
 
 gradlePlugin {
-    plugins.register("dev.gradle.settings") {
-        id = "dev.gradle.settings"
-        implementationClass = "co.touchlab.skie.buildsetup.settings.plugins.DevGradleSettings"
+    plugins.register("settings.gradle") {
+        id = "settings.gradle"
+        implementationClass = "co.touchlab.skie.buildsetup.settings.plugins.SettingsGradlePlugin"
     }
 }

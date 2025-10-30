@@ -1,66 +1,11 @@
-import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
-import co.touchlab.skie.buildsetup.util.version.minGradleVersion
-import co.touchlab.skie.buildsetup.util.version.KotlinVersionAttribute
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id("gradle.plugin")
     id("utility.skie-publishable")
-
-    alias(libs.plugins.shadow)
 }
 
 skiePublishing {
     name = "SKIE Gradle Plugin"
     description = "Gradle plugin for configuring SKIE compiler plugin."
-}
-
-// WIP Move to plugin
-tasks.shadowJar {
-    archiveClassifier.set("")
-
-    dependencies {
-        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib.*"))
-    }
-}
-
-configurations.configureEach {
-    if (isCanBeConsumed || isCanBeResolved) {
-        attributes {
-            attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(minGradleVersion().gradle))
-        }
-    }
-}
-
-SupportedKotlinVersionProvider.getSupportedKotlinVersions(project).forEach { supportedVersion ->
-    val safeKotlinVersion = supportedVersion.name.toString().replace('.', '_')
-    val configuration = configurations.create("shim-relocation-kgp_$safeKotlinVersion") {
-        attributes {
-            attribute(KotlinVersionAttribute.attribute, objects.named(supportedVersion.name.toString()))
-        }
-    }
-
-    val relocationTask = tasks.register<ShadowJar>("relocate-shim-kgp_$safeKotlinVersion") {
-        relocate("co.touchlab.skie.plugin.shim.impl", "co.touchlab.skie.plugin.shim.impl_$safeKotlinVersion")
-        configurations = listOf(configuration)
-        archiveClassifier = "kgp_$safeKotlinVersion"
-    }
-
-    tasks.named("compileKotlin").configure {
-        dependsOn(relocationTask)
-    }
-
-    dependencies {
-        configuration(projects.gradle.gradlePluginShimImpl)
-        runtimeOnly(relocationTask.map { it.outputs.files })
-    }
-}
-
-dependencies {
-    api(projects.gradle.gradlePluginApi)
-    implementation(projects.gradle.gradlePluginImpl)
-
-    compileOnly(kotlin("stdlib"))
 }
 
 gradlePlugin {
@@ -83,4 +28,11 @@ gradlePlugin {
             )
         }
     }
+}
+
+dependencies {
+    api(projects.gradle.gradlePluginApi)
+    implementation(projects.gradle.gradlePluginImpl)
+
+    compileOnly(kotlin("stdlib"))
 }

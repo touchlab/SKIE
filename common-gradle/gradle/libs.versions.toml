@@ -23,7 +23,6 @@ slf4j = "2.0.17"
 [plugins]
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctor" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 
 [libraries]
 plugin-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -32,6 +31,7 @@ plugin-kotlin-sam-with-receiver = { module = "org.jetbrains.kotlin:kotlin-sam-wi
 plugin-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 plugin-buildconfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
+plugin-shadow = { module = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization-json" }
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version.ref = "serialization-yaml" }

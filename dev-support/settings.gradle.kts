@@ -15,7 +15,7 @@ includeBuild("../SKIE") {
 }
 
 plugins {
-    id("dev.gradle.settings")
+    id("settings.gradle")
 }
 
 fun modules(vararg names: String) {

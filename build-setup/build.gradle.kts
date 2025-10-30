@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.plugin.kotlin.serialization)
 
     implementation(libs.plugin.pluginPublish)
+    implementation(libs.plugin.shadow)
     implementation(libs.plugin.buildconfig)
 }
 

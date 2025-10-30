@@ -15,14 +15,16 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.gradle.settings")
+    id("settings.gradle")
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 val skieProperties = Properties()
+
 file("skie.gradle.properties").inputStream().use {
     skieProperties.load(it)
 }
+
 skieProperties.stringPropertyNames().forEach { propertyName ->
     val propertyValue = skieProperties.getProperty(propertyName)
     if (propertyValue != null) {

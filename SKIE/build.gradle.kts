@@ -5,11 +5,11 @@ plugins {
 }
 
 nexusPublishing {
-    this.repositories {
+    repositories {
         sonatype()
     }
 
     transitionCheckOptions {
-        this.maxRetries = 120
+        maxRetries = 120
     }
 }
