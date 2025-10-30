@@ -8,11 +8,19 @@ object SupportedKotlinVersionProvider {
         val enabledKotlinVersions = getEnabledKotlinVersions(project)
 
         val activeSupportedVersion = enabledKotlinVersions.maxByOrNull { it.name }
-            ?: error("Primary Kotlin version cannot be determined as no supported versions are enabled. " +
-                "Check for mistakes in the `versionSupport.kotlin.enabledVersions` property.")
+            ?: error(
+                "Primary Kotlin version cannot be determined as no supported versions are enabled. " +
+                        "Check for mistakes in the `versionSupport.kotlin.enabledVersions` property.",
+            )
 
         return activeSupportedVersion
     }
+
+    fun getKlibCompilerVersion(project: Project): KotlinToolingVersion =
+        project.findProperty("versionSupport.kotlin.klibCompiler")
+            ?.toString()
+            ?.let(::KotlinToolingVersion)
+            ?: getMinimumSupportedKotlinVersion(project)
 
     fun getEnabledKotlinVersions(project: Project): List<SupportedKotlinVersion> {
         val enabledVersionNames = getParsedEnabledVersionNames(project)
