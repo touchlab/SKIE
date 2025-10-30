@@ -65,10 +65,13 @@ abstract class UtilityMinimumTargetKotlinVersionPlugin : Plugin<Project> {
     ): Provider<KotlinCompilerRunnerBuildService> {
         val trove4j = kotlinNativeCompilerHome.resolve("konan/lib/trove4j.jar")
 
-        val kotlinNativeCompilerConfiguration = project.configurations.detachedConfiguration(
+        val dependencies = listOfNotNull(
             getKotlinNativeCompilerEmbeddableDependency(klibCompilerVersion),
-            dependencies.create(files(trove4j)),
+            // Removed in Kotlin 2.2.0
+            trove4j.takeIf { it.exists() }?.let { dependencies.create(files(it)) },
         )
+
+        val kotlinNativeCompilerConfiguration = project.configurations.detachedConfiguration(*dependencies.toTypedArray())
 
         return gradle.sharedServices.registerIfAbsent(
             "kotlinCompilerRunner",

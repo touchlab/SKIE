@@ -64,7 +64,10 @@ abstract class TestsAcceptanceTestsFrameworkPlugin : Plugin<Project> {
 
             val trove4j = project.kotlinNativeCompilerHome(primaryCompilerVersion).resolve("konan/lib/trove4j.jar")
 
-            implementation(files(trove4j))
+            // Removed in Kotlin 2.2.0
+            if (trove4j.exists()) {
+                implementation(files(trove4j))
+            }
         }
     }
 }
