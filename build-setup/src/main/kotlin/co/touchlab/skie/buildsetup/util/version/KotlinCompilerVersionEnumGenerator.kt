@@ -37,6 +37,7 @@ object KotlinCompilerVersionEnumGenerator {
                     |   val versionName: String,
                     |   val compilerVersion: String,
                     |   val otherSupportedVersions: List<String>,
+                    |   val isEnabled: Boolean,
                     |) {
                     |
                 """.trimMargin(),
@@ -46,9 +47,10 @@ object KotlinCompilerVersionEnumGenerator {
                 val name = version.name.toString().enquoted()
                 val compilerVersion = version.compilerVersion.toString().enquoted()
                 val otherSupportedVersions = "listOf(" + version.otherSupportedVersions.joinToString { it.toString().enquoted() } + ")"
+                val isEnabled = version.isEnabled
 
                 appendLine(
-                    "    ${version.name.toIdentifier()}($name, $compilerVersion, $otherSupportedVersions),",
+                    "    ${version.name.toIdentifier()}($name, $compilerVersion, $otherSupportedVersions, $isEnabled),",
                 )
             }
 

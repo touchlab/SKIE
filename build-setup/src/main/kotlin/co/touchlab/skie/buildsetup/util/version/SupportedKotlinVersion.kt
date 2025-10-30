@@ -7,6 +7,7 @@ data class SupportedKotlinVersion(
     // Can be different from name to allow for testing code of the given target against a different compiler version without having to rename everything.
     val compilerVersion: KotlinToolingVersion,
     val otherSupportedVersions: List<KotlinToolingVersion>,
+    val isEnabled: Boolean,
 ) : Serializable {
 
     val supportedVersions: List<KotlinToolingVersion> =
