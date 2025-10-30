@@ -6,7 +6,7 @@ pluginPublish = "2.0.0"
 kotest = "5.9.1"
 buildconfig = "5.7.0"
 ktor = "3.3.1"
-nexusPublish = "2.0.0"
+mavenPublish = "0.34.0"
 gradleDoctor = "0.12.0"
 # Sets the minimum coroutines version for consumers
 coroutines = "1.7.0"
@@ -22,7 +22,6 @@ slf4j = "2.0.17"
 
 [plugins]
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctor" }
-nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
 
 [libraries]
 plugin-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -32,6 +31,7 @@ plugin-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serializat
 plugin-buildconfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
 plugin-shadow = { module = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
+plugin-mavenPublish = { module = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin", version.ref = "mavenPublish" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization-json" }
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version.ref = "serialization-yaml" }
