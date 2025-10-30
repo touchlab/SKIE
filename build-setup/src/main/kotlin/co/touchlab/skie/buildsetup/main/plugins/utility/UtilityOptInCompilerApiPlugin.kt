@@ -1,5 +1,7 @@
 package co.touchlab.skie.buildsetup.main.plugins.utility
 
+import co.touchlab.skie.buildsetup.main.extensions.MultiKotlinVersionSupportExtension
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -24,6 +26,18 @@ abstract class UtilityOptInCompilerApiPlugin : Plugin<Project> {
                     languageSettings {
                         annotations.forEach {
                             optIn(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        plugins.withType<UtilityMultiKotlinVersionSupportPlugin>().configureEach {
+            extensions.configure<MultiKotlinVersionSupportExtension> {
+                compilations.configureEach {
+                    if (supportedKotlinVersion.compilerVersion >= KotlinToolingVersion("2.2.0")) {
+                        kotlinCompilation.defaultSourceSet.languageSettings { compilations
+                            optIn("org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi")
                         }
                     }
                 }

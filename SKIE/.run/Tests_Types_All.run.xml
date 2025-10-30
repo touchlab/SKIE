@@ -3,7 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
-          <entry key="DISABLE_PARALLEL_TESTS" value="true" />
+          <entry key="DISABLE_PARALLEL_TESTS" value="false" />
         </map>
       </option>
       <option name="executionName" />
