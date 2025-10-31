@@ -1,6 +1,6 @@
+import co.touchlab.skie.buildsetup.main.tasks.GenerateKotlinVersionEnumTask
 import co.touchlab.skie.buildsetup.util.dependencyCoordinate
 import co.touchlab.skie.buildsetup.util.enquoted
-import co.touchlab.skie.buildsetup.util.version.KotlinCompilerVersionEnumGenerator
 import co.touchlab.skie.buildsetup.util.version.KotlinVersionAttribute
 
 plugins {
@@ -16,15 +16,13 @@ skiePublishing {
 }
 
 kotlin {
-    sourceSets {
-        main {
-            KotlinCompilerVersionEnumGenerator.generate(
-                kotlinSourceSet = this,
-                packageName = "co.touchlab.skie.plugin",
-                makeEnumPublic = true,
-                activeVersion = null,
-            )
-        }
+    target.compilations.named("main").configure {
+        GenerateKotlinVersionEnumTask.register(
+            kotlinCompilation = this,
+            packageName = "co.touchlab.skie.plugin",
+            makeEnumPublic = true,
+            activeVersion = null,
+        )
     }
 }
 
