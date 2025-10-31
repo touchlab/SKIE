@@ -64,7 +64,7 @@ object SkieKotlinVariantResolver {
     private fun Project.getValidSkieKotlinVersion(kotlinVersion: String): String? {
         val enabledVersions = KotlinCompilerVersion.entries.filter { it.isEnabled }
 
-        val skieVersion = enabledVersions.find { kotlinVersion in it.supportedVersions }?.name
+        val skieVersion = enabledVersions.find { kotlinVersion in it.supportedVersions }?.versionName
 
         if (skieVersion == null) {
             val supportedKotlinVersions = enabledVersions.flatMap { it.supportedVersions }.sorted()

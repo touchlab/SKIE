@@ -14,6 +14,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shad
 import com.gradle.publish.PublishPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.plugin.GradlePluginApiVersion
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
@@ -67,6 +69,8 @@ abstract class GradlePluginPlugin : Plugin<Project> {
             val shimConfiguration = configurations.create("shim-relocation-$safeKotlinVersion") {
                 attributes {
                     attribute(KotlinVersionAttribute.attribute, objects.named(supportedVersion.name.toString()))
+                    attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
+                    attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
                 }
             }
 

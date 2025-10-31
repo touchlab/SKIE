@@ -7,6 +7,9 @@ import co.touchlab.skie.plugin.util.exclude
 import co.touchlab.skie.plugin.util.named
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
 
 object SkieCompilerPluginDependencyProvider {
 
@@ -23,6 +26,8 @@ object SkieCompilerPluginDependencyProvider {
 
             attributes {
                 attribute(KotlinVersionAttribute.attribute, project.objects.named(project.skieInternalExtension.kotlinVersion))
+                attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
+                attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
             }
 
             exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
