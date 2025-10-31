@@ -12,6 +12,9 @@ import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
@@ -134,7 +137,7 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
             compilation.defaultSourceSet.resources.srcDir(mainSourceDirectory.resolve("resources"))
 
             configureKotlinCompilation(extension, activeKotlinVersionSets, compilation)
-            configureOutgoingVariants(compilationName, supportedKotlinVersion, compilation)
+            configureOutgoingVariants(compilation, supportedKotlinVersion)
 
             val multiKotlinVersionSupportCompilation = MultiKotlinVersionSupportCompilation(supportedKotlinVersion, compilation)
             extension.compilations.add(multiKotlinVersionSupportCompilation)
@@ -142,35 +145,93 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
     }
 
     private fun KotlinJvmProjectExtension.configureOutgoingVariants(
-        compilationName: String,
-        supportedKotlinVersion: SupportedKotlinVersion,
         compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
+        supportedKotlinVersion: SupportedKotlinVersion,
     ) {
-        val apiElements = registerElementsConfiguration(
-            compilationName = "${compilationName}ApiElements",
-            referenceConfigurationName = target.apiElementsConfigurationName,
-            supportedKotlinVersion = supportedKotlinVersion,
-        )
-
-        val runtimeElements = registerElementsConfiguration(
-            compilationName = "${compilationName}RuntimeElements",
-            referenceConfigurationName = target.runtimeElementsConfigurationName,
-            supportedKotlinVersion = supportedKotlinVersion,
-        )
-
-        val sourcesElements = registerElementsConfiguration(
-            compilationName = "${compilationName}SourcesElements",
-            referenceConfigurationName = target.sourcesElementsConfigurationName,
-            supportedKotlinVersion = supportedKotlinVersion,
-        )
-
-        val jarTask = project.tasks.register<Jar>("${compilationName}Jar") {
+        val jarTask = project.tasks.register<Jar>("${compilation.name}Jar") {
             archiveClassifier.set(supportedKotlinVersion.name.toString())
 
             from(compilation.output.allOutputs)
         }
 
-        val sourcesJarTask = project.tasks.register<Jar>("${compilationName}SourcesJar") {
+        project.tasks.named("assemble").configure {
+            dependsOn(jarTask)
+        }
+
+        configureApiElementsVariant(compilation, supportedKotlinVersion, jarTask)
+        configureRuntimeElementsVariant(compilation, supportedKotlinVersion, jarTask)
+        configureSourceElementsVariant(compilation, supportedKotlinVersion)
+    }
+
+    private fun KotlinJvmProjectExtension.configureApiElementsVariant(
+        compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
+        supportedKotlinVersion: SupportedKotlinVersion,
+        jarTask: TaskProvider<Jar>,
+    ) {
+        val apiElements = registerElementsConfiguration(
+            compilationName = "${compilation.name}ApiElements",
+            referenceConfigurationName = target.apiElementsConfigurationName,
+            supportedKotlinVersion = supportedKotlinVersion,
+        )
+
+        project.artifacts {
+            add(apiElements.name, jarTask)
+        }
+    }
+
+    private fun KotlinJvmProjectExtension.configureRuntimeElementsVariant(
+        compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
+        supportedKotlinVersion: SupportedKotlinVersion,
+        jarTask: TaskProvider<Jar>,
+    ) {
+        val runtimeElements = registerElementsConfiguration(
+            compilationName = "${compilation.name}RuntimeElements",
+            referenceConfigurationName = target.runtimeElementsConfigurationName,
+            supportedKotlinVersion = supportedKotlinVersion,
+        )
+
+        runtimeElements.configure {
+            outgoing {
+                artifact(jarTask)
+
+                variants.create("classes") {
+                    compilation.javaSourceSet.output.classesDirs.forEach {
+                        artifact(it) {
+                            type = ArtifactTypeDefinition.JVM_CLASS_DIRECTORY
+                        }
+                    }
+
+                    attributes {
+                        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.CLASSES))
+                    }
+                }
+
+                variants.create("resources") {
+                    compilation.javaSourceSet.output.resourcesDir?.let {
+                        artifact(it) {
+                            type = ArtifactTypeDefinition.JVM_RESOURCES_DIRECTORY
+                        }
+                    }
+
+                    attributes {
+                        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.RESOURCES))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun KotlinJvmProjectExtension.configureSourceElementsVariant(
+        compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
+        supportedKotlinVersion: SupportedKotlinVersion,
+    ) {
+        val sourcesElements = registerElementsConfiguration(
+            compilationName = "${compilation.name}SourcesElements",
+            referenceConfigurationName = target.sourcesElementsConfigurationName,
+            supportedKotlinVersion = supportedKotlinVersion,
+        )
+
+        val sourcesJarTask = project.tasks.register<Jar>("${compilation.name}SourcesJar") {
             archiveClassifier.set(supportedKotlinVersion.name.toString() + "-sources")
 
             from(compilation.defaultSourceSet.kotlin)
@@ -178,13 +239,10 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         }
 
         project.tasks.named("assemble").configure {
-            dependsOn(jarTask)
             dependsOn(sourcesJarTask)
         }
 
         project.artifacts {
-            add(apiElements.name, jarTask)
-            add(runtimeElements.name, jarTask)
             add(sourcesElements.name, sourcesJarTask)
         }
     }
