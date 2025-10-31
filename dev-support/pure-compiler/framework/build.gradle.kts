@@ -1,6 +1,6 @@
-import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
+import org.jetbrains.kotlin.konan.target.Family
 
 plugins {
     id("dev.multiplatform")
@@ -21,7 +21,7 @@ kotlin {
             framework {
                 isStatic = false
                 baseName = "Kotlin"
-                freeCompilerArgs = freeCompilerArgs + listOf("-Xbinary=bundleId=Kotlin")
+                freeCompilerArgs += listOf("-Xbinary=bundleId=Kotlin")
 
                 export(projects.devSupport.pureCompilerDependency)
 
@@ -49,32 +49,18 @@ kotlin {
 tasks.withType<KotlinNativeLink>().configureEach {
     val provider = project.providers
 
-    doLast {
-        if (binary.target.konanTarget.family != org.jetbrains.kotlin.konan.target.Family.OSX) {
-            return@doLast
-        }
-        val frameworkDirectory = outputs.files.toList().first()
-        val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
+    if (binary.target.konanTarget.family != Family.OSX) {
+        doLast {
+            val frameworkDirectory = outputs.files.toList().first()
+            val apiFile = frameworkDirectory.resolve("KotlinApi.swift")
 
-        provider.exec {
-            commandLine(
-                "zsh",
-                "-c",
-                "echo \"import Kotlin\\n:type lookup Kotlin\" | swift repl -F \"${frameworkDirectory.absolutePath}\" > \"${apiFile.absolutePath}\"",
-            )
-        }
-    }
-}
-
-tasks.register("dependenciesForExport") {
-    doLast {
-        val configuration = configurations.getByName(MacOsCpuArchitecture.getCurrent(project).get().kotlinGradleName + "Api")
-
-        val dependencies = configuration.incoming.resolutionResult.allComponents.map { it.toString() }
-        val externalDependencies = dependencies.filterNot { it.startsWith("project :") }
-
-        externalDependencies.forEach {
-            println("export(\"$it\")")
+            provider.exec {
+                commandLine(
+                    "zsh",
+                    "-c",
+                    "echo \"import Kotlin\\n:type lookup Kotlin\" | swift repl -F \"${frameworkDirectory.absolutePath}\" > \"${apiFile.absolutePath}\"",
+                )
+            }
         }
     }
 }
