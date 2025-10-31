@@ -33,6 +33,7 @@ plugin-pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-p
 plugin-shadow = { module = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
 plugin-mavenPublish = { module = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin", version.ref = "mavenPublish" }
 
+kotlin-klib-commonizer-api = { module = "org.jetbrains.kotlin:kotlin-klib-commonizer-api", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization-json" }
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version.ref = "serialization-yaml" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

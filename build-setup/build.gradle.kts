@@ -17,6 +17,8 @@ dependencies {
     implementation(libs.plugin.shadow)
     implementation(libs.plugin.buildconfig)
     implementation(libs.plugin.mavenPublish)
+
+    implementation(libs.kotlin.klib.commonizer.api)
 }
 
 gradlePlugin {
