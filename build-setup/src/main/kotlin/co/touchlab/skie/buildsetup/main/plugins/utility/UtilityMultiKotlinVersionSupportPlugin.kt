@@ -14,6 +14,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
@@ -158,15 +159,18 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
             dependsOn(jarTask)
         }
 
-        configureApiElementsVariant(compilation, supportedKotlinVersion, jarTask)
-        configureRuntimeElementsVariant(compilation, supportedKotlinVersion, jarTask)
-        configureSourceElementsVariant(compilation, supportedKotlinVersion)
+        val javaComponent = project.components["java"] as AdhocComponentWithVariants
+
+        configureApiElementsVariant(compilation, supportedKotlinVersion, jarTask, javaComponent)
+        configureRuntimeElementsVariant(compilation, supportedKotlinVersion, jarTask, javaComponent)
+        configureSourceElementsVariant(compilation, supportedKotlinVersion, javaComponent)
     }
 
     private fun KotlinJvmProjectExtension.configureApiElementsVariant(
         compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
         supportedKotlinVersion: SupportedKotlinVersion,
         jarTask: TaskProvider<Jar>,
+        javaComponent: AdhocComponentWithVariants,
     ) {
         val apiElements = registerElementsConfiguration(
             compilationName = "${compilation.name}ApiElements",
@@ -177,12 +181,16 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         project.artifacts {
             add(apiElements.name, jarTask)
         }
+
+        javaComponent.addVariantsFromConfiguration(apiElements.get()) {
+        }
     }
 
     private fun KotlinJvmProjectExtension.configureRuntimeElementsVariant(
         compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
         supportedKotlinVersion: SupportedKotlinVersion,
         jarTask: TaskProvider<Jar>,
+        javaComponent: AdhocComponentWithVariants,
     ) {
         val runtimeElements = registerElementsConfiguration(
             compilationName = "${compilation.name}RuntimeElements",
@@ -219,11 +227,18 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
                 }
             }
         }
+
+        javaComponent.addVariantsFromConfiguration(runtimeElements.get()) {
+            if (configurationVariant.name == "classes" || configurationVariant.name == "resources") {
+                skip()
+            }
+        }
     }
 
     private fun KotlinJvmProjectExtension.configureSourceElementsVariant(
         compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
         supportedKotlinVersion: SupportedKotlinVersion,
+        javaComponent: AdhocComponentWithVariants,
     ) {
         val sourcesElements = registerElementsConfiguration(
             compilationName = "${compilation.name}SourcesElements",
@@ -244,6 +259,9 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
 
         project.artifacts {
             add(sourcesElements.name, sourcesJarTask)
+        }
+
+        javaComponent.addVariantsFromConfiguration(sourcesElements.get()) {
         }
     }
 
