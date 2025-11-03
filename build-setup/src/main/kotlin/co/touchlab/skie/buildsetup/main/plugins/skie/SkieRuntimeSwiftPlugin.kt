@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.tasks.CreateResourcesIndexTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,6 +17,7 @@ abstract class SkieRuntimeSwiftPlugin : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         apply<BaseKotlinPlugin>()
+        apply<UtilityMinimumTargetKotlinVersionPlugin>()
         apply<KotlinPluginWrapper>()
 
         configureCreateResourcesIndexTask()

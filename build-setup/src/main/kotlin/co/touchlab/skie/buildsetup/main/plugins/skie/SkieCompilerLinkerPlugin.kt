@@ -29,10 +29,6 @@ abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
 
         addDependencyOnCompiler()
         generateKotlinVersionEnum()
-
-        project.dependencies {
-            compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
-        }
     }
 
     private fun Project.addDependencyOnCompiler() {
@@ -44,6 +40,7 @@ abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
 
                 dependencies {
                     add(kotlinCompilation.compileOnlyConfigurationName, compilerDependency)
+                    compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
                 }
 
                 kotlinCompilation.compileTaskProvider.configure {

@@ -178,8 +178,12 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
             supportedKotlinVersion = supportedKotlinVersion,
         )
 
-        project.artifacts {
-            add(apiElements.name, jarTask)
+        apiElements.configure {
+            extendsFrom(project.configurations[compilation.apiConfigurationName])
+
+            outgoing {
+                artifact(jarTask)
+            }
         }
 
         javaComponent.addVariantsFromConfiguration(apiElements.get()) {
@@ -199,6 +203,9 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         )
 
         runtimeElements.configure {
+            extendsFrom(project.configurations[compilation.implementationConfigurationName])
+            extendsFrom(project.configurations[compilation.runtimeOnlyConfigurationName])
+
             outgoing {
                 artifact(jarTask)
 
