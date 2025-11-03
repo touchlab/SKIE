@@ -40,7 +40,7 @@ abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : IrDeclara
     override fun generateIrBody() {
         val symbol = getSymbol()
 
-        val declarationIrBuilder = DeclarationIrBuilder(pluginContext, symbol, startOffset = 0, endOffset = 0)
+        val declarationIrBuilder = DeclarationIrBuilder(pluginContext.generatorContext, symbol, startOffset = 0, endOffset = 0)
 
         initializeBody(symbol.owner, declarationIrBuilder)
     }

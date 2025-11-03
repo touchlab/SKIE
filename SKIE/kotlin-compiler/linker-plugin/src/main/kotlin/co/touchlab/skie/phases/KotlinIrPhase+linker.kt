@@ -15,7 +15,7 @@ val KotlinIrPhase.Context.declarationBuilder: DeclarationBuilderImpl
 val KotlinIrPhase.Context.moduleFragment: IrModuleFragment
     get() = typedContext.moduleFragment
 
-val KotlinIrPhase.Context.pluginContext: IrPluginContext
+val KotlinIrPhase.Context.pluginContext: KotlinIrPhaseContext.CompatibleIrPluginContext
     get() = typedContext.pluginContext
 
 val KotlinIrPhase.Context.skieSymbolTable: SkieSymbolTable
@@ -28,7 +28,7 @@ val KotlinIrPhase.Context.irBuiltIns: IrBuiltIns
     get() = pluginContext.irBuiltIns
 
 val KotlinIrPhase.Context.irFactory: IrFactory
-    get() = IrFactoryImpl
+    get() = typedContext.pluginContext.symbolTable.irFactory
 
 private val KotlinIrPhase.Context.typedContext: KotlinIrPhaseContext
     get() = context as KotlinIrPhaseContext

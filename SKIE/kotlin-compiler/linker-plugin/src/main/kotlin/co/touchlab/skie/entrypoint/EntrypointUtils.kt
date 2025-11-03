@@ -8,6 +8,7 @@ import co.touchlab.skie.context.FrontendIrPhaseContext
 import co.touchlab.skie.context.InitPhaseContext
 import co.touchlab.skie.context.KirPhaseContext
 import co.touchlab.skie.context.KotlinIrPhaseContext
+import co.touchlab.skie.context.KotlinIrPhaseContext.CompatibleIrPluginContext
 import co.touchlab.skie.context.LinkPhaseContext
 import co.touchlab.skie.context.MainSkieContext
 import co.touchlab.skie.context.SirPhaseContext
@@ -75,7 +76,7 @@ internal object EntrypointUtils {
         }
     }
 
-    fun runKotlinIrPhases(mainSkieContext: MainSkieContext, moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+    fun runKotlinIrPhases(mainSkieContext: MainSkieContext, moduleFragment: IrModuleFragment, pluginContext: CompatibleIrPluginContext) {
         with(mainSkieContext) {
             skiePhaseScheduler.runKotlinIrPhases {
                 KotlinIrPhaseContext(

@@ -89,7 +89,7 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
         fieldSymbol: IrFieldSymbolImpl,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrExpressionBody =
-        DeclarationIrBuilder(pluginContext, fieldSymbol, 0, 0).run {
+        DeclarationIrBuilder(pluginContext.generatorContext, fieldSymbol, 0, 0).run {
             irExprBody(
                 irCall(irBuiltIns.arrayOf).apply {
                     val checkedExceptionClassReferences = createCheckedExceptionClassReferences(originalFunctionDescriptor)
