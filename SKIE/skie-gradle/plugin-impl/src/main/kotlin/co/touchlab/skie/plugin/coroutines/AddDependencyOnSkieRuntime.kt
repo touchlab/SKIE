@@ -49,6 +49,8 @@ fun SkieTarget.addDependencyOnSkieRuntime() {
 
     val skieRuntimeConfiguration = getOrCreateSkieRuntimeConfiguration()
 
+    addLinkerTaskInputs(skieRuntimeConfiguration)
+
     linkerConfiguration.incoming.afterResolve {
         registerSkieRuntime(skieRuntimeConfiguration)
     }

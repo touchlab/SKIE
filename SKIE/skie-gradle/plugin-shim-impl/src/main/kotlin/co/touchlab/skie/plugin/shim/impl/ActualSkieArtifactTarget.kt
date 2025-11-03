@@ -84,7 +84,7 @@ class ActualSkieArtifactTarget(
     }
 
     override val linkerConfiguration: Configuration = project.configurations.getByName(
-        lowerCamelCaseName(konanTarget.presetName, fullArtifactName, "linkLibrary")
+        lowerCamelCaseName(konanTarget.presetName, fullArtifactName, "linkLibrary"),
     )
 
     override fun addPluginArgument(pluginId: String, option: KotlinCompilerPluginOption) {
@@ -108,6 +108,12 @@ class ActualSkieArtifactTarget(
 
     override fun addFreeCompilerArgsImmediately(vararg args: String) {
         task.get().toolOptions.freeCompilerArgs.addAll(*args)
+    }
+
+    override fun addLinkerTaskInputs(configuration: Configuration) {
+        task.configure {
+            inputs.files(configuration)
+        }
     }
 
     companion object {

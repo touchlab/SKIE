@@ -41,6 +41,8 @@ sealed interface SkieTarget {
     // and nesting the .configure blocks causes a crash in KGP 2.2.0 and newer
     fun addFreeCompilerArgsImmediately(vararg args: String)
 
+    fun addLinkerTaskInputs(configuration: Configuration)
+
     interface Binary : SkieTarget {
 
         val compilationProvider: Provider<KotlinNativeCompilationShim>
