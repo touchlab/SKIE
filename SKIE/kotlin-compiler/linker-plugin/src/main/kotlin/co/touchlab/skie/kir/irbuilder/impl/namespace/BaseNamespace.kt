@@ -45,6 +45,7 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
 
     context(KotlinIrPhase.Context)
     override fun generateIrDeclarations() {
+        @Suppress("DEPRECATION")
         val generatorContext = GeneratorContext(
             Psi2IrConfiguration(),
             descriptor.module,
