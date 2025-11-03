@@ -1,15 +1,14 @@
 import co.touchlab.skie.PublishSkieToTempMavenTask
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.2.21"
     alias(libs.plugins.buildconfig)
 }
 
 dependencies {
     implementation(kotlin("test"))
     implementation(gradleTestKit())
-    implementation(libs.kotlinPoet)
-    implementation(libs.bundles.kotest)
+    implementation(libs.bundles.testing.jvm)
 }
 
 val smokeTestRepository = layout.buildDirectory.dir("smokeTestRepo")
@@ -75,11 +74,17 @@ buildConfig {
 }
 
 private fun getPrimarySupportedKotlinVersions(): List<String> {
-    val rawKotlinVersions = project.property("versionSupport.kotlinTooling") as String
+    val rawKotlinVersions = project.property("versionSupport.kotlin") as String
+
+    val enabledVersions = getEnabledVersions()
 
     val rawKotlinVersionsWithoutBrackets = removeBrackets(rawKotlinVersions)
 
-    return rawKotlinVersionsWithoutBrackets.split(",").map { extractPrimaryVersion(it.trim()) }
+    return rawKotlinVersionsWithoutBrackets
+        .split(",")
+        .map { extractPrimaryVersion(it.trim()) }
+        .filter { enabledVersions == null || it.first in enabledVersions }
+        .map { it.second }
 }
 
 private fun removeBrackets(string: String): String {
@@ -102,9 +107,17 @@ private fun removeBrackets(string: String): String {
     return result.toString()
 }
 
-private fun extractPrimaryVersion(rawVersion: String): String =
+private fun getEnabledVersions(): List<String>? =
+    project.findProperty("versionSupport.kotlin.enabledVersions")
+        ?.toString()
+        ?.split(",")
+        ?.map { it.trim() }
+        ?.filter { it.isNotBlank() }
+        ?.takeIf { it.isNotEmpty() }
+
+private fun extractPrimaryVersion(rawVersion: String): Pair<String, String> =
     if (rawVersion.contains("[")) {
-        rawVersion.substringAfter("[").substringBefore("]")
+        rawVersion.substringBefore("[") to rawVersion.substringAfter("[").substringBefore("]")
     } else {
-        rawVersion
+        rawVersion to rawVersion
     }

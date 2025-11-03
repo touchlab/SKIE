@@ -127,7 +127,6 @@ abstract class UtilitySkiePublishablePlugin : Plugin<Project> {
         plugins.withType<KotlinPluginWrapper>().configureEach {
             extensions.configure<JavaPluginExtension> {
                 withSourcesJar()
-                withJavadocJar()
             }
         }
     }

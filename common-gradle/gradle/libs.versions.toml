@@ -22,6 +22,7 @@ slf4j = "2.0.17"
 
 [plugins]
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctor" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 
 [libraries]
 plugin-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
