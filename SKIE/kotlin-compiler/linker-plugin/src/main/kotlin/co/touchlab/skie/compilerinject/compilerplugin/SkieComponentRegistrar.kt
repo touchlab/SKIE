@@ -2,7 +2,7 @@ package co.touchlab.skie.compilerinject.compilerplugin
 
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptorRegistrar
 import co.touchlab.skie.context.InitPhaseContext
-import co.touchlab.skie.entrypoint.SkieIrGenerationExtension
+import co.touchlab.skie.entrypoint.registerSkieIrGenerationExtensionIfNeeded
 import co.touchlab.skie.phases.InitPhase
 import co.touchlab.skie.spi.SkiePluginLoader
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -24,7 +24,7 @@ class SkieComponentRegistrar : CompilerPluginRegistrar() {
 
             configuration.initPhaseContext = initContext
 
-            IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
+            registerSkieIrGenerationExtensionIfNeeded(configuration)
 
             PhaseInterceptorRegistrar.setupPhaseInterceptors(configuration)
 

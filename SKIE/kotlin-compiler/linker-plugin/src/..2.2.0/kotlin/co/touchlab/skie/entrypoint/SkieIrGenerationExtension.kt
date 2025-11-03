@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
 import org.jetbrains.kotlin.backend.konan.serialization.KonanIrLinker
+import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar.ExtensionStorage
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
@@ -26,4 +27,8 @@ class SkieIrGenerationExtension(private val configuration: CompilerConfiguration
             ),
         )
     }
+}
+
+fun ExtensionStorage.registerSkieIrGenerationExtensionIfNeeded(configuration: CompilerConfiguration) {
+    IrGenerationExtension.registerExtension(SkieIrGenerationExtension(configuration))
 }
