@@ -15,10 +15,10 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.resolve.BindingContext
 
-class KotlinIrPhaseContext(
+class KotlinIrPhaseContext internal constructor(
     mainSkieContext: MainSkieContext,
     val moduleFragment: IrModuleFragment,
-    val pluginContext: CompatibleIrPluginContext,
+    internal val pluginContext: CompatibleIrPluginContext,
 ) : KotlinIrPhase.Context, ForegroundPhaseCompilerContext by mainSkieContext {
 
     override val context: KotlinIrPhaseContext = this
@@ -29,7 +29,7 @@ class KotlinIrPhaseContext(
 
     val skieSymbolTable: SkieSymbolTable = SkieSymbolTable(pluginContext.symbolTable)
 
-    class CompatibleIrPluginContext(
+    internal class CompatibleIrPluginContext(
         val symbolTable: SymbolTable,
         val irBuiltIns: IrBuiltIns,
         val linker: KonanIrLinker,
