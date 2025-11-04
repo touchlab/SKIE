@@ -4,6 +4,7 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.extensions.MultiKotlinVersionSupportExtension
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
+import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMergeServicesFilesPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMultiKotlinVersionSupportPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityOptInCompilerApiPlugin
@@ -25,6 +26,7 @@ abstract class SkieCompilerLinkerPlugin : Plugin<Project> {
         apply<UtilityMultiKotlinVersionSupportPlugin>()
         apply<UtilityMinimumTargetKotlinVersionPlugin>()
         apply<UtilityOptInCompilerApiPlugin>()
+        apply<UtilityMergeServicesFilesPlugin>()
         apply<KotlinPluginWrapper>()
 
         addDependencyOnCompiler()

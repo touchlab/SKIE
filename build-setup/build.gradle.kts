@@ -67,6 +67,11 @@ gradlePlugin {
         implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityExperimentalContextReceiversPlugin"
     }
 
+    plugins.register("utility.merge-services-files") {
+        id = "utility.merge-services-files"
+        implementationClass = "co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMergeServicesFilesPlugin"
+    }
+
     plugins.register("utility.gradle.implicit-receiver") {
         id = "utility.gradle.implicit-receiver"
         implementationClass = "co.touchlab.skie.buildsetup.gradle.plugins.utility.UtilityGradleImplicitReceiverPlugin"
