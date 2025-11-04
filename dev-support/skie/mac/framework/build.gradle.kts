@@ -77,27 +77,27 @@ kotlin {
     }
 }
 
-kotlinArtifacts {
-    Native.Framework("Kotlin") {
-        target = macosArm64
-        isStatic = true
-        toolOptions {
-            freeCompilerArgs.add("-Xbinary=bundleId=Kotlin")
-        }
-
-        exportedLibraries.forEach {
-            addModule(it)
-        }
-    }
-    Native.XCFramework("Kotlin") {
-        targets = setOf(macosArm64, macosX64)
-        isStatic = true
-        toolOptions {
-            freeCompilerArgs.add("-Xbinary=bundleId=Kotlin")
-        }
-
-        exportedLibraries.forEach {
-            addModule(it)
-        }
-    }
-}
+// kotlinArtifacts {
+//     Native.Framework("Kotlin") {
+//         target = macosArm64
+//         isStatic = true
+//         toolOptions {
+//             freeCompilerArgs.add("-Xbinary=bundleId=Kotlin")
+//         }
+//
+//         exportedLibraries.forEach {
+//             addModule(it)
+//         }
+//     }
+//     Native.XCFramework("Kotlin") {
+//         targets = setOf(macosArm64, macosX64)
+//         isStatic = true
+//         toolOptions {
+//             freeCompilerArgs.add("-Xbinary=bundleId=Kotlin")
+//         }
+//
+//         exportedLibraries.forEach {
+//             addModule(it)
+//         }
+//     }
+// }
