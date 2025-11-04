@@ -19,7 +19,8 @@ class SkieIrGenerationExtension(private val configuration: CompilerConfiguration
             mainSkieContext = configuration.mainSkieContext,
             moduleFragment = moduleFragment,
             pluginContext = KotlinIrPhaseContext.CompatibleIrPluginContext(
-                symbolTable = pluginContext.symbolTable as SymbolTable, pluginContext.irBuiltIns,
+                symbolTable = pluginContext.symbolTable as SymbolTable,
+                irBuiltIns = pluginContext.irBuiltIns,
                 bindingContext = pluginContext.bindingContext,
                 linker = ((pluginContext as? IrPluginContextImpl)?.linker as KonanIrLinker),
                 languageVersionSettings = pluginContext.languageVersionSettings,
