@@ -69,7 +69,7 @@ class ActualSkieBinaryTarget(
     }
 
     override fun addFreeCompilerArgsImmediately(vararg args: String) {
-        task.get().binary.freeCompilerArgs += args
+        task.get().toolOptions.freeCompilerArgs.addAll(*args)
     }
 
     override fun addLinkerTaskInputs(configuration: Configuration) {
