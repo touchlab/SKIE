@@ -100,3 +100,37 @@ jobs:
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+
+  gradle-tests:
+    name: Gradle Tests
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Gradle Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        id: run-tests
+#      TODO The targets cannot be selected at the moment due to a mismatch in the name used by Gradle and other kinds of tests
+#      "-Pmatrix.targets=${{ inputs.target || 'macosArm64' }}"
+        with:
+          arguments: >-
+            :test
+            -PtestLevel=smoke
+            -PtestType=gradle
+            "-Pmatrix.targets=macosArm64"
+            "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
+            "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
+            "-PversionSupport.kotlin.enabledVersion=2.0.0"
+          build-root-directory: test-runner
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: ${{ failure() || success() }}
+        with:
+          check_name: "Smoke Test Reports - Gradle Tests"
+          report_paths: 'test-runner/build/test-results/test/TEST-*.xml'
+          require_tests: true
