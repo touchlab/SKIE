@@ -192,6 +192,7 @@ abstract class GenerateAllVersionsSmokeTestsCIActionTask : DefaultTask() {
                     "-Pmatrix.targets=macosArm64"
                     "-Pmatrix.configurations=debug"
                     "-Pmatrix.linkModes=static"
+                    "-PversionSupport.kotlin.enabledVersions=${{ inputs.versions || env.ALL_KOTLIN_VERSIONS }}"
                   build-root-directory: test-runner
               - name: Publish Test Report
                 uses: mikepenz/action-junit-report@v4

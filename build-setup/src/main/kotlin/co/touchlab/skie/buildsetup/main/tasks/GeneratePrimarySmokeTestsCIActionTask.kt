@@ -198,6 +198,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                     "-Pmatrix.targets=macosArm64"
                     "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
                     "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
+                    "-PversionSupport.kotlin.enabledVersion"
                   build-root-directory: test-runner
               - name: Publish Test Report
                 uses: mikepenz/action-junit-report@v4
