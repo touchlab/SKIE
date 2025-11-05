@@ -76,15 +76,21 @@ buildConfig {
 private fun getPrimarySupportedKotlinVersions(): List<String> {
     val rawKotlinVersions = project.property("versionSupport.kotlin") as String
 
-    val enabledVersions = getEnabledVersions()
+    val enabledVersions = findParsedEnabledVersions()
 
     val rawKotlinVersionsWithoutBrackets = removeBrackets(rawKotlinVersions)
 
     return rawKotlinVersionsWithoutBrackets
         .split(",")
-        .map { extractPrimaryVersion(it.trim()) }
-        .filter { enabledVersions == null || it.first in enabledVersions }
-        .map { it.second }
+        .map { parseSupportedVersion(it) }
+        .mapNotNull { supportedVersion ->
+            if (enabledVersions == null) {
+                supportedVersion.compilerVersion ?: supportedVersion.name
+            } else {
+                enabledVersions.find { it.name == supportedVersion.name }
+                    ?.let { it.compilerVersion ?: supportedVersion.compilerVersion ?: supportedVersion.name }
+            }
+        }
 }
 
 private fun removeBrackets(string: String): String {
@@ -107,17 +113,27 @@ private fun removeBrackets(string: String): String {
     return result.toString()
 }
 
-private fun getEnabledVersions(): List<String>? =
+private fun parseSupportedVersion(rawVersion: String): SupportedVersion =
+    SupportedVersion(
+        name = rawVersion.substringBefore("[").trim(),
+        compilerVersion = rawVersion.substringAfter("[").substringBefore("]").trim(),
+    )
+
+private fun findParsedEnabledVersions(): List<SupportedVersion>? =
     project.findProperty("versionSupport.kotlin.enabledVersions")
         ?.toString()
         ?.split(",")
         ?.map { it.trim() }
         ?.filter { it.isNotBlank() }
+        ?.map { version ->
+            val name = version.substringBefore("[").trim()
+            val compilerVersion = version.takeIf { '[' in it }?.substringAfter("[")?.substringBefore("]")?.trim()
+
+            SupportedVersion(
+                name = name,
+                compilerVersion = compilerVersion,
+            )
+        }
         ?.takeIf { it.isNotEmpty() }
 
-private fun extractPrimaryVersion(rawVersion: String): Pair<String, String> =
-    if (rawVersion.contains("[")) {
-        rawVersion.substringBefore("[") to rawVersion.substringAfter("[").substringBefore("]")
-    } else {
-        rawVersion to rawVersion
-    }
+data class SupportedVersion(val name: String, val compilerVersion: String?)

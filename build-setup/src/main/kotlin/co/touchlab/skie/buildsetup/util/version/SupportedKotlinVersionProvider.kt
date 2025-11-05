@@ -48,9 +48,9 @@ object SupportedKotlinVersionProvider {
 
         val versions = splitVersions(supportedKotlinVersions)
 
-        val enabledVersionNames = findParsedEnabledVersionNames(project)
+        val enabledVersions = findParsedEnabledVersions(project)
 
-        return versions.map { parseVersion(it, enabledVersionNames) }
+        return versions.map { parseVersion(it, enabledVersions) }
     }
 
     private fun splitVersions(supportedKotlinVersions: String): List<String> {
@@ -87,7 +87,7 @@ object SupportedKotlinVersionProvider {
 
     private val kotlinVersionRegex = "([^\\[(\\])]+)(?:\\[([^\\[(\\])]+)])?(?:\\(([^\\[(\\])]+)\\))?".toRegex()
 
-    private fun parseVersion(version: String, enabledVersionNames: List<String>?): SupportedKotlinVersion {
+    private fun parseVersion(version: String, enabledVersions: List<EnabledVersion>?): SupportedKotlinVersion {
         val trimmedVersion = version.trim()
 
         val match = kotlinVersionRegex.matchEntire(trimmedVersion) ?: error("Invalid Kotlin version identifier: $trimmedVersion")
@@ -104,21 +104,34 @@ object SupportedKotlinVersionProvider {
 
         val otherSupportedVersions = otherSupportedVersionNames.map(::KotlinToolingVersion)
 
-        val compilerVersion = match.groups[2]?.value?.let(::KotlinToolingVersion) ?: name
+        val correspondingEnabledVersion = enabledVersions?.find { it.nameString == nameString }
+
+        val compilerVersion = correspondingEnabledVersion?.compilerVersion ?: match.groups[2]?.value?.let(::KotlinToolingVersion) ?: name
 
         return SupportedKotlinVersion(
             name = name,
             compilerVersion = compilerVersion,
             otherSupportedVersions = otherSupportedVersions,
-            isEnabled = enabledVersionNames?.let { nameString in it } ?: true,
+            isEnabled = enabledVersions == null || correspondingEnabledVersion != null,
         )
     }
 
-    private fun findParsedEnabledVersionNames(project: Project): List<String>? =
+    private fun findParsedEnabledVersions(project: Project): List<EnabledVersion>? =
         project.findProperty("versionSupport.kotlin.enabledVersions")
             ?.toString()
             ?.split(",")
             ?.map { it.trim() }
             ?.filter { it.isNotBlank() }
+            ?.map { version ->
+                val name = version.substringBefore("[").trim()
+                val compilerVersion = version.takeIf { '[' in it }?.substringAfter("[")?.substringBefore("]")?.trim()
+
+                EnabledVersion(
+                    nameString = name,
+                    compilerVersion = compilerVersion?.let { KotlinToolingVersion(it) },
+                )
+            }
             ?.takeIf { it.isNotEmpty() }
+
+    data class EnabledVersion(val nameString: String, val compilerVersion: KotlinToolingVersion?)
 }
