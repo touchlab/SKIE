@@ -160,6 +160,8 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
                 group = "verification"
                 description = test.description.get()
 
+                maxHeapSize = "12g"
+
                 testClassesDirs = mainTestTask.get().testClassesDirs
                 classpath = mainTestTask.get().classpath
             }
