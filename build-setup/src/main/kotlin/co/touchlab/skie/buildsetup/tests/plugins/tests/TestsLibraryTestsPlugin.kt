@@ -36,6 +36,7 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
         "skipKotlinCompilation",
         "skipSwiftCompilation",
         "updateLockfile",
+        "updateLockfileIncrementally",
         "includeFailedTestsInLockfile",
         "queryMavenCentral",
         "queryMavenCentral-fromPage",
