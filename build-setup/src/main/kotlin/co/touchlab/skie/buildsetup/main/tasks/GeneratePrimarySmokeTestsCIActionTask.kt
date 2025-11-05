@@ -99,7 +99,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run Acceptance Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersion'
+                  arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions'
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -129,7 +129,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                 uses: gradle/gradle-build-action@v2.4.2
                 id: run-tests
                 with:
-                  arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersion'
+                  arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions'
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -159,7 +159,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run External Libraries Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersion'
+                  arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions'
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -198,7 +198,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                     "-Pmatrix.targets=macosArm64"
                     "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
                     "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
-                    "-PversionSupport.kotlin.enabledVersion"
+                    "-PversionSupport.kotlin.enabledVersions"
                   build-root-directory: test-runner
               - name: Publish Test Report
                 uses: mikepenz/action-junit-report@v4
