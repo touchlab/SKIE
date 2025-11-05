@@ -4,6 +4,7 @@ import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityBuildConfigPlugin
 import co.touchlab.skie.buildsetup.main.plugins.utility.UtilityMinimumTargetKotlinVersionPlugin
 import co.touchlab.skie.buildsetup.util.MacOsCpuArchitecture
+import co.touchlab.skie.buildsetup.util.TestProperties
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.getKotlinNativeCompilerEmbeddableDependency
 import co.touchlab.skie.buildsetup.util.implementation
@@ -33,8 +34,13 @@ abstract class BaseTestsPlugin : Plugin<Project> {
 
     private val testInputProperties = listOf(
         "keepTemporaryFiles",
+        "debugDumpSwiftApi",
+        "KOTLIN_DEPENDENCIES",
+        "KOTLIN_EXPORTED_DEPENDENCIES",
         "KOTLIN_LINK_MODE",
         "KOTLIN_BUILD_CONFIGURATION",
+        "KOTLIN_TARGET",
+        "DISABLE_PARALLEL_TESTS",
     )
 
     override fun apply(project: Project) = with(project) {
@@ -115,7 +121,7 @@ abstract class BaseTestsPlugin : Plugin<Project> {
             )
 
             testInputProperties.forEach {
-                inputs.property(it, System.getenv(it)).optional(true)
+                inputs.property(it, provider { TestProperties[it] }).optional(true)
             }
 
             outputs.dir(testOutputDirectory)

@@ -3,6 +3,7 @@ package co.touchlab.skie.buildsetup.tests.plugins.tests
 import co.touchlab.skie.buildsetup.tests.extensions.LibraryTestsExtension
 import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin
 import co.touchlab.skie.buildsetup.tests.tasks.CheckLibraryExpectedFailuresConsistencyTask
+import co.touchlab.skie.buildsetup.util.TestProperties
 import co.touchlab.skie.buildsetup.util.enquoted
 import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
@@ -37,6 +38,8 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
         "updateLockfile",
         "includeFailedTestsInLockfile",
         "queryMavenCentral",
+        "queryMavenCentral-fromPage",
+        "queryMavenCentral-numberOfPages",
         "ignoreLockfile",
         "convertLibraryDependenciesToTests",
         "skipTestsInLockfile",
@@ -118,7 +121,7 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
     private fun Project.configureTestTask(skieIosArm64KotlinRuntimeDependency: Configuration) {
         tasks.named("test", Test::class.java).configure {
             testInputProperties.forEach {
-                inputs.property(it, System.getenv(it)).optional(true)
+                inputs.property(it, provider { TestProperties[it] }).optional(true)
             }
 
             dependsOn(

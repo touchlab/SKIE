@@ -2,6 +2,7 @@ package co.touchlab.skie.buildsetup.tests.plugins.tests
 
 import co.touchlab.skie.buildsetup.tests.plugins.base.BaseTestsPlugin
 import co.touchlab.skie.buildsetup.tests.tasks.ReformatPackagesInFunctionalTestsTask
+import co.touchlab.skie.buildsetup.util.TestProperties
 import co.touchlab.skie.buildsetup.util.enquoted
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.gradle.api.Plugin
@@ -43,7 +44,7 @@ abstract class TestsFunctionalTestsPlugin : Plugin<Project> {
     private fun Project.configureTestTask() {
         tasks.named("test", Test::class.java).configure {
             testInputProperties.forEach {
-                inputs.property(it, System.getenv(it)).optional(true)
+                inputs.property(it, provider { TestProperties[it] }).optional(true)
             }
         }
     }
