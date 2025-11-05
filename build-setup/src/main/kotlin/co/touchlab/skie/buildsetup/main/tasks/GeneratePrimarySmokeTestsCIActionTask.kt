@@ -1,19 +1,13 @@
 package co.touchlab.skie.buildsetup.main.tasks
 
-import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersion
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
 
 abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
-
-    @get:Input
-    abstract val supportedVersions: ListProperty<SupportedKotlinVersion>
 
     @get:OutputFile
     abstract val outputPath: RegularFileProperty
@@ -29,12 +23,12 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
 
         outputPath.createParentDirectories()
 
-        val workflow = getSmokeTestsWorkflow(supportedVersions.get())
+        val workflow = getSmokeTestsWorkflow()
 
         outputPath.writeText(workflow)
     }
 
-    private fun getSmokeTestsWorkflow(versions: List<SupportedKotlinVersion>): String = $$"""
+    private fun getSmokeTestsWorkflow(): String = $$"""
         name: Smoke Tests
 
         on:
@@ -46,6 +40,16 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - main
           workflow_dispatch:
             inputs:
+              kotlin_version_name:
+                type: string
+                required: false
+                description:
+                  'The name of the supported Kotlin version (SKIE flavor) to test. Latest supported version is used for all tests except Gradle tests if not specified. Gradle tests by default test all versions.'
+              compiler_version:
+                type: string
+                required: false
+                description:
+                  'The Kotlin compiler version used by the tests. Defaults to compiler version of the selected Kotlin version name if not specified. If specified, the Kotlin version name must be specified as well.'
               linkage:
                 type: choice
                 options:
@@ -99,7 +103,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run Acceptance Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions'
+                  arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format(''{0}[{1}]'', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}'
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -129,7 +133,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                 uses: gradle/gradle-build-action@v2.4.2
                 id: run-tests
                 with:
-                  arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions'
+                  arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format(''{0}[{1}]'', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}'
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -159,7 +163,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run External Libraries Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions'
+                  arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format(''{0}[{1}]'', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}'
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -198,7 +202,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                     "-Pmatrix.targets=macosArm64"
                     "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
                     "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
-                    "-PversionSupport.kotlin.enabledVersions"
+                    "-PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format(''{0}[{1}]'', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
                   build-root-directory: test-runner
               - name: Publish Test Report
                 uses: mikepenz/action-junit-report@v4

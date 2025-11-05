@@ -41,7 +41,6 @@ abstract class SkieRootPlugin : Plugin<Project> {
         val workflowsDirectory = rootDir.parentFile.resolve(".github/workflows")
 
         val generatePrimarySmokeTestsCIActions = tasks.register<GeneratePrimarySmokeTestsCIActionTask>("generatePrimarySmokeTestsCIAction") {
-            supportedVersions.set(supportedKotlinVersions)
             outputPath.set(workflowsDirectory.resolve("smoke-tests.yml"))
         }
 
