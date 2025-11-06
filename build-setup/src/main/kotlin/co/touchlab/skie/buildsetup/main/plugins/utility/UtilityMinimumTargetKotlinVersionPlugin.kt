@@ -120,12 +120,23 @@ abstract class UtilityMinimumTargetKotlinVersionPlugin : Plugin<Project> {
     }
 
     private fun Project.configureCompilerClasspathForKlibCompilation(klibCompilerVersion: KotlinToolingVersion) {
-        configurations.named { it !in listOf("kotlinCompilerClasspath", "kotlinBuildToolsApiClasspath") }.configureEach {
-            resolutionStrategy {
-                force("org.jetbrains.kotlin:kotlin-compiler-embeddable:$klibCompilerVersion")
-                force("org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$klibCompilerVersion")
+        configurations
+            .named {
+                it in listOf(
+                    "kotlinCompilerPluginClasspathJsMain",
+                    "kotlinCompilerPluginClasspathMetadataCommonMain",
+                    "kotlinCompilerPluginClasspathMetadataMain",
+                    "kotlinCompilerPluginClasspathMetadataWebMain",
+                    "kotlinCompilerPluginClasspathWasmJsMain",
+                    "kotlinCompilerPluginClasspathWasmWasiMain",
+                )
             }
-        }
+            .configureEach {
+                resolutionStrategy {
+                    force("org.jetbrains.kotlin:kotlin-compiler-embeddable:$klibCompilerVersion")
+                    force("org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$klibCompilerVersion")
+                }
+            }
     }
 
     private fun Project.configureMetadataCompiler(kotlinCompilerRunnerProvider: Provider<KotlinCompilerRunnerBuildService>) {
