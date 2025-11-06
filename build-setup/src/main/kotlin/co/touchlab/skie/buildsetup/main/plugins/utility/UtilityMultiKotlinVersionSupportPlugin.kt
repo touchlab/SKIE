@@ -3,6 +3,7 @@
 package co.touchlab.skie.buildsetup.main.plugins.utility
 
 import co.touchlab.skie.buildsetup.main.extensions.MultiKotlinVersionSupportExtension
+import co.touchlab.skie.buildsetup.main.tasks.MergeServicesFilesTask
 import co.touchlab.skie.buildsetup.util.version.KotlinVersionAttribute
 import co.touchlab.skie.buildsetup.util.version.KotlinVersionSet
 import co.touchlab.skie.buildsetup.util.version.MultiKotlinVersionSupportCompilation
@@ -16,12 +17,15 @@ import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
@@ -102,6 +106,7 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
             val mainCompilation = target.compilations.getByName("main")
 
             configureKotlinCompilation(extension, activeKotlinVersionSets, mainCompilation)
+            configureServicesFilesMergingForPrimaryKotlinCompilation(mainCompilation)
 
             setKotlinVersionAttribute(mainCompilation.target.apiElementsConfigurationName, primaryKotlinVersion)
             setKotlinVersionAttribute(mainCompilation.target.runtimeElementsConfigurationName, primaryKotlinVersion)
@@ -138,7 +143,8 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
             compilation.defaultSourceSet.resources.srcDir(mainSourceDirectory.resolve("resources"))
 
             configureKotlinCompilation(extension, activeKotlinVersionSets, compilation)
-            configureOutgoingVariants(compilation, supportedKotlinVersion)
+            val mergeServicesFilesTask = configureMergeServicesFilesTask(compilation)
+            configureOutgoingVariants(compilation, supportedKotlinVersion, mergeServicesFilesTask)
 
             val multiKotlinVersionSupportCompilation = MultiKotlinVersionSupportCompilation(supportedKotlinVersion, compilation)
             extension.compilations.add(multiKotlinVersionSupportCompilation)
@@ -148,6 +154,7 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
     private fun KotlinJvmProjectExtension.configureOutgoingVariants(
         compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
         supportedKotlinVersion: SupportedKotlinVersion,
+        mergeServicesFilesTask: TaskProvider<MergeServicesFilesTask>,
     ) {
         val jarTask = project.tasks.register<Jar>("${compilation.name}Jar") {
             archiveClassifier.set(supportedKotlinVersion.name.toString())
@@ -163,7 +170,7 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
 
         configureApiElementsVariant(compilation, supportedKotlinVersion, jarTask, javaComponent)
         configureRuntimeElementsVariant(compilation, supportedKotlinVersion, jarTask, javaComponent)
-        configureSourceElementsVariant(compilation, supportedKotlinVersion, javaComponent)
+        configureSourceElementsVariant(compilation, supportedKotlinVersion, javaComponent, mergeServicesFilesTask)
     }
 
     private fun KotlinJvmProjectExtension.configureApiElementsVariant(
@@ -246,6 +253,7 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
         supportedKotlinVersion: SupportedKotlinVersion,
         javaComponent: AdhocComponentWithVariants,
+        mergeServicesFilesTask: TaskProvider<MergeServicesFilesTask>,
     ) {
         val sourcesElements = registerElementsConfiguration(
             compilationName = "${compilation.name}SourcesElements",
@@ -258,6 +266,12 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
 
             from(compilation.defaultSourceSet.kotlin)
             from(compilation.defaultSourceSet.resources)
+
+            exclude("META-INF/services/**")
+
+            from(mergeServicesFilesTask.map { it.output }) {
+                into("META-INF/services")
+            }
         }
 
         project.tasks.named("assemble").configure {
@@ -309,6 +323,39 @@ abstract class UtilityMultiKotlinVersionSupportPlugin : Plugin<Project> {
         extendConfiguration(compilation.defaultSourceSet.implementationConfigurationName, extension.sharedImplementationConfigurationName)
         extendConfiguration(compilation.defaultSourceSet.compileOnlyConfigurationName, extension.sharedCompileOnlyConfigurationName)
         extendConfiguration(compilation.defaultSourceSet.runtimeOnlyConfigurationName, extension.sharedRuntimeOnlyConfigurationName)
+    }
+
+    private fun Project.configureMergeServicesFilesTask(
+        compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
+    ): TaskProvider<MergeServicesFilesTask> {
+        val outputDirectory = layout.buildDirectory.dir("merged-services-files/${compilation.processResourcesTaskName}")
+
+        val task = tasks.register<MergeServicesFilesTask>("mergeServicesFilesFor${compilation.processResourcesTaskName.capitalized()}") {
+            inputDirectories.from(compilation.defaultSourceSet.resources.sourceDirectories)
+            output.set(outputDirectory)
+        }
+
+        tasks.named<ProcessResources>(compilation.processResourcesTaskName).configure {
+            exclude("META-INF/services/**")
+            from(task.map { it.output }) {
+                into("META-INF/services")
+            }
+        }
+
+        return task
+    }
+
+    private fun Project.configureServicesFilesMergingForPrimaryKotlinCompilation(
+        compilation: KotlinWithJavaCompilation<*, KotlinJvmCompilerOptions>,
+    ) {
+        val mergeServicesFilesTask = configureMergeServicesFilesTask(compilation)
+
+        tasks.named { it == "sourcesJar" }.withType<Jar>().configureEach {
+            exclude("META-INF/services/**")
+            from(mergeServicesFilesTask.map { it.output }) {
+                into("META-INF/services")
+            }
+        }
     }
 
     private fun Project.extendConfiguration(name: String, by: String) {
