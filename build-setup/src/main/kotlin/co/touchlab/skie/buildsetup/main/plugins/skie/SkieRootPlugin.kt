@@ -2,7 +2,6 @@ package co.touchlab.skie.buildsetup.main.plugins.skie
 
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseKotlinPlugin
 import co.touchlab.skie.buildsetup.main.plugins.base.BaseRootPlugin
-import co.touchlab.skie.buildsetup.main.tasks.GenerateAllVersionsSmokeTestsCIActionTask
 import co.touchlab.skie.buildsetup.main.tasks.GeneratePrimarySmokeTestsCIActionTask
 import co.touchlab.skie.buildsetup.main.tasks.GenerateVersionedSmokeTestsCIActionsTask
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
@@ -48,11 +47,6 @@ abstract class SkieRootPlugin : Plugin<Project> {
             manualTriggerOutputPath.set(workflowsDirectory.resolve("smoke-tests-manual.yml"))
         }
 
-        val generateAllVersionsSmokeTestsCIAction = tasks.register<GenerateAllVersionsSmokeTestsCIActionTask>("generateAllVersionsSmokeTestsCIAction") {
-            supportedVersions.set(supportedKotlinVersions)
-            outputPath.set(workflowsDirectory.resolve("smoke-tests-all-versions.yml"))
-        }
-
         val generateVersionedSmokeTestsCIActions = tasks.register<GenerateVersionedSmokeTestsCIActionsTask>("generateVersionedSmokeTestsCIActions") {
             supportedVersions.set(supportedKotlinVersions)
             outputDirectory.set(workflowsDirectory)
@@ -60,7 +54,6 @@ abstract class SkieRootPlugin : Plugin<Project> {
 
         tasks.register("generateCIActions") {
             dependsOn(generatePrimarySmokeTestsCIActions)
-            dependsOn(generateAllVersionsSmokeTestsCIAction)
             dependsOn(generateVersionedSmokeTestsCIActions)
         }
     }
