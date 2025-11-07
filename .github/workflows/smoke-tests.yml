@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   acceptance-tests:
-    name: Acceptance Tests
+    name: Acceptance Tests (2.2.20)
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -47,7 +47,7 @@ jobs:
       #     require_tests: true
 
   type-mapping-tests:
-    name: Type Mapping Tests
+    name: Type Mapping Tests (2.2.20)
     runs-on: self-hosted
     needs: [acceptance-tests]
     steps:
@@ -113,7 +113,7 @@ jobs:
           require_tests: true
   
   external-libraries-tests-0-499:
-    name: External Libraries Tests 0-499
+    name: External Libraries Tests (2.2.20) 0-499
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -143,7 +143,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-500-999:
-    name: External Libraries Tests 500-999
+    name: External Libraries Tests (2.2.20) 500-999
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -173,7 +173,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-1000-1499:
-    name: External Libraries Tests 1000-1499
+    name: External Libraries Tests (2.2.20) 1000-1499
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -203,7 +203,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-1500-1999:
-    name: External Libraries Tests 1500-1999
+    name: External Libraries Tests (2.2.20) 1500-1999
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -233,7 +233,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-2000-2499:
-    name: External Libraries Tests 2000-2499
+    name: External Libraries Tests (2.2.20) 2000-2499
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -263,7 +263,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-2500-2999:
-    name: External Libraries Tests 2500-2999
+    name: External Libraries Tests (2.2.20) 2500-2999
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -293,7 +293,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-3000-3499:
-    name: External Libraries Tests 3000-3499
+    name: External Libraries Tests (2.2.20) 3000-3499
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -323,7 +323,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-3500-3999:
-    name: External Libraries Tests 3500-3999
+    name: External Libraries Tests (2.2.20) 3500-3999
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -353,7 +353,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-4000-4499:
-    name: External Libraries Tests 4000-4499
+    name: External Libraries Tests (2.2.20) 4000-4499
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -383,7 +383,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-4500-4999:
-    name: External Libraries Tests 4500-4999
+    name: External Libraries Tests (2.2.20) 4500-4999
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -413,7 +413,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-5000-5499:
-    name: External Libraries Tests 5000-5499
+    name: External Libraries Tests (2.2.20) 5000-5499
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -443,7 +443,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-5500-5999:
-    name: External Libraries Tests 5500-5999
+    name: External Libraries Tests (2.2.20) 5500-5999
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -473,7 +473,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-6000-6499:
-    name: External Libraries Tests 6000-6499
+    name: External Libraries Tests (2.2.20) 6000-6499
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -503,7 +503,7 @@ jobs:
       #     require_tests: true
   
   external-libraries-tests-6500-6925:
-    name: External Libraries Tests 6500-6925
+    name: External Libraries Tests (2.2.20) 6500-6925
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
