@@ -10,7 +10,10 @@ import kotlin.io.path.writeText
 abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
 
     @get:OutputFile
-    abstract val outputPath: RegularFileProperty
+    abstract val pushTriggerOutputPath: RegularFileProperty
+
+    @get:OutputFile
+    abstract val manualTriggerOutputPath: RegularFileProperty
 
     init {
         group = "other"
@@ -19,16 +22,31 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val outputPath = outputPath.get().asFile.toPath()
+        generatePushTriggerWorkflow()
+        generateManualTriggerWorkflow()
+    }
+
+    private fun generatePushTriggerWorkflow() {
+        val outputPath = this@GeneratePrimarySmokeTestsCIActionTask.pushTriggerOutputPath.get().asFile.toPath()
 
         outputPath.createParentDirectories()
 
-        val workflow = getSmokeTestsWorkflow()
+        val workflow = getSmokeTestsPushTriggerWorkflow()
 
         outputPath.writeText(workflow)
     }
 
-    private fun getSmokeTestsWorkflow(): String = $$"""
+    private fun generateManualTriggerWorkflow() {
+        val outputPath = this@GeneratePrimarySmokeTestsCIActionTask.manualTriggerOutputPath.get().asFile.toPath()
+
+        outputPath.createParentDirectories()
+
+        val workflow = getSmokeTestsManualTriggerWorkflow()
+
+        outputPath.writeText(workflow)
+    }
+
+    private fun getSmokeTestsPushTriggerWorkflow(): String = $$"""
         name: Smoke Tests
 
         on:
@@ -38,6 +56,16 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
           pull_request_target:
             branches:
               - main
+
+        concurrency:
+          group: ci-smoke-tests-${{ github.ref }}
+
+    """.trimIndent() + getSmokeTestsBaseWorkflow("")
+
+    private fun getSmokeTestsManualTriggerWorkflow(): String = """
+        name: Smoke Tests (Manual)
+
+        on:
           workflow_dispatch:
             inputs:
               kotlin_version_name:
@@ -81,12 +109,21 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                 description:
                   'The target to use for the type mapping tests.'
 
+        concurrency:
+          group: ci-smoke-tests-manual
+          cancel-in-progress: false
+
+    """.trimIndent() + getSmokeTestsBaseWorkflow(
+        enabledVersions = $$"=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+    )
+
+    private fun getSmokeTestsBaseWorkflow(
+        enabledVersions: String,
+    ): String = $$"""
+
         permissions:
           contents: read
           checks: write
-
-        concurrency:
-          group: ci-smoke-tests-${{ github.ref }}
 
         jobs:
           acceptance-tests:
@@ -103,7 +140,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run Acceptance Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ":acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+                  arguments: ":acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -133,7 +170,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                 uses: gradle/gradle-build-action@v2.4.2
                 id: run-tests
                 with:
-                  arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+                  arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -163,7 +200,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run External Libraries Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+                  arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -202,7 +239,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                     "-Pmatrix.targets=macosArm64"
                     "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
                     "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
-                    "-PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+                    "-PversionSupport.kotlin.enabledVersions$$enabledVersions"
                   build-root-directory: test-runner
               - name: Publish Test Report
                 uses: mikepenz/action-junit-report@v4

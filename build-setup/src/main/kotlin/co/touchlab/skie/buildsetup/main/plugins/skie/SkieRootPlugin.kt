@@ -41,7 +41,8 @@ abstract class SkieRootPlugin : Plugin<Project> {
         val workflowsDirectory = rootDir.parentFile.resolve(".github/workflows")
 
         val generatePrimarySmokeTestsCIActions = tasks.register<GeneratePrimarySmokeTestsCIActionTask>("generatePrimarySmokeTestsCIAction") {
-            outputPath.set(workflowsDirectory.resolve("smoke-tests.yml"))
+            pushTriggerOutputPath.set(workflowsDirectory.resolve("smoke-tests.yml"))
+            manualTriggerOutputPath.set(workflowsDirectory.resolve("smoke-tests-manual.yml"))
         }
 
         val generateAllVersionsSmokeTestsCIAction = tasks.register<GenerateAllVersionsSmokeTestsCIActionTask>("generateAllVersionsSmokeTestsCIAction") {
