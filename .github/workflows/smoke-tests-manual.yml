@@ -114,35 +114,6 @@ jobs:
       #     report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
       #     require_tests: true
 
-  external-libraries-tests:
-    name: External Libraries Tests
-    needs: [gradle-tests]
-    runs-on: self-hosted
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-      - name: Prepare Worker
-        uses: ./.github/actions/prepare-worker
-      - name: Run External Libraries Tests
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-          build-root-directory: SKIE
-        env:
-          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-      # Log size can be too large which causes significant performance issues
-      # - name: Publish Test Report
-      #   uses: mikepenz/action-junit-report@v3
-      #   if: ${{ failure() || success() }}
-      #   with:
-      #     check_name: "Smoke Test Reports - External Libraries Tests"
-      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-      #     require_tests: true
-
   gradle-tests:
     name: Gradle Tests
     runs-on: self-hosted
@@ -177,423 +148,423 @@ jobs:
           check_name: "Smoke Test Reports - Gradle Tests"
           report_paths: 'test-runner/build/test-results/test/TEST-*.xml'
           require_tests: true
-    
-    external-libraries-tests-0-499:
-      name: External Libraries Tests 0-499
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "0-499"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-500-999:
-      name: External Libraries Tests 500-999
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "500-999"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-1000-1499:
-      name: External Libraries Tests 1000-1499
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "1000-1499"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-1500-1999:
-      name: External Libraries Tests 1500-1999
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "1500-1999"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-2000-2499:
-      name: External Libraries Tests 2000-2499
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "2000-2499"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-2500-2999:
-      name: External Libraries Tests 2500-2999
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "2500-2999"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-3000-3499:
-      name: External Libraries Tests 3000-3499
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "3000-3499"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-3500-3999:
-      name: External Libraries Tests 3500-3999
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "3500-3999"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-4000-4499:
-      name: External Libraries Tests 4000-4499
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "4000-4499"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-4500-4999:
-      name: External Libraries Tests 4500-4999
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "4500-4999"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-5000-5499:
-      name: External Libraries Tests 5000-5499
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "5000-5499"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-5500-5999:
-      name: External Libraries Tests 5500-5999
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "5500-5999"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-6000-6499:
-      name: External Libraries Tests 6000-6499
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "6000-6499"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
-    
-    external-libraries-tests-6500-6925:
-      name: External Libraries Tests 6500-6925
-      needs: [gradle-tests]
-      runs-on: self-hosted
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-            token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-        - name: Prepare Worker
-          uses: ./.github/actions/prepare-worker
-        - name: Run External Libraries Tests
-          uses: gradle/gradle-build-action@v2.4.2
-          with:
-            arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
-            build-root-directory: SKIE
-          env:
-            KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-            KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-            onlyIndices: "6500-6925"
-        # Log size can be too large which causes significant performance issues
-        # - name: Publish Test Report
-        #   uses: mikepenz/action-junit-report@v3
-        #   if: ${{ failure() || success() }}
-        #   with:
-        #     check_name: "Smoke Test Reports - External Libraries Tests"
-        #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-        #     require_tests: true
+  
+  external-libraries-tests-0-499:
+    name: External Libraries Tests 0-499
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "0-499"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-500-999:
+    name: External Libraries Tests 500-999
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "500-999"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-1000-1499:
+    name: External Libraries Tests 1000-1499
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "1000-1499"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-1500-1999:
+    name: External Libraries Tests 1500-1999
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "1500-1999"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-2000-2499:
+    name: External Libraries Tests 2000-2499
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "2000-2499"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-2500-2999:
+    name: External Libraries Tests 2500-2999
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "2500-2999"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-3000-3499:
+    name: External Libraries Tests 3000-3499
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "3000-3499"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-3500-3999:
+    name: External Libraries Tests 3500-3999
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "3500-3999"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-4000-4499:
+    name: External Libraries Tests 4000-4499
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "4000-4499"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-4500-4999:
+    name: External Libraries Tests 4500-4999
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "4500-4999"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-5000-5499:
+    name: External Libraries Tests 5000-5499
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "5000-5499"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-5500-5999:
+    name: External Libraries Tests 5500-5999
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "5500-5999"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-6000-6499:
+    name: External Libraries Tests 6000-6499
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "6000-6499"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true
+  
+  external-libraries-tests-6500-6925:
+    name: External Libraries Tests 6500-6925
+    needs: [gradle-tests]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}"
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "6500-6925"
+      # Log size can be too large which causes significant performance issues
+      # - name: Publish Test Report
+      #   uses: mikepenz/action-junit-report@v3
+      #   if: ${{ failure() || success() }}
+      #   with:
+      #     check_name: "Smoke Test Reports - External Libraries Tests"
+      #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
+      #     require_tests: true

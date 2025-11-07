@@ -223,35 +223,6 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               #     report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
               #     require_tests: true
 
-          external-libraries-tests:
-            name: External Libraries Tests
-            needs: [gradle-tests]
-            runs-on: self-hosted
-            steps:
-              - name: Checkout Repo
-                uses: actions/checkout@v3
-                with:
-                  submodules: true
-                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-              - name: Prepare Worker
-                uses: ./.github/actions/prepare-worker
-              - name: Run External Libraries Tests
-                uses: gradle/gradle-build-action@v2.4.2
-                with:
-                  arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
-                  build-root-directory: SKIE
-                env:
-                  KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-                  KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-              # Log size can be too large which causes significant performance issues
-              # - name: Publish Test Report
-              #   uses: mikepenz/action-junit-report@v3
-              #   if: ${{ failure() || success() }}
-              #   with:
-              #     check_name: "Smoke Test Reports - External Libraries Tests"
-              #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
-              #     require_tests: true
-
           gradle-tests:
             name: Gradle Tests
             runs-on: self-hosted
@@ -289,7 +260,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
 
         """.trimIndent() +
         (0..(numberOfLibraryTests / libraryTestsBatchSize)).joinToString(System.lineSeparator()) {
-            getExternalLibrariesJob(it, numberOfLibraryTests, enabledVersions).prependIndent("    ")
+            getExternalLibrariesJob(it, numberOfLibraryTests, enabledVersions).prependIndent("  ")
         } + "\n"
 
     private fun getExternalLibrariesJob(
