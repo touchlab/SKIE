@@ -9,6 +9,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
 import kotlin.math.min
@@ -35,27 +36,25 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
     companion object {
 
         const val libraryTestsBatchSize: Int = 500
+
+        fun getNumberOfLibraryTests(kotlinVersionName: String, libraryTestResources: File): Int =
+            libraryTestResources.resolve(kotlinVersionName)
+                .resolve("libraries.lock")
+                .takeIf { it.exists() }
+                ?.readLines()
+                ?.count { it.trim().startsWith("\"index\": ") }
+                ?: 0
     }
 
     @TaskAction
     fun execute() {
         val kotlinVersionName = latestKotlinVersion.get().name.toString()
+        val testResources = libraryTestResources.get().asFile
 
-        val numberOfLibraryTests = getNumberOfLibraryTests(kotlinVersionName)
+        val numberOfLibraryTests = getNumberOfLibraryTests(kotlinVersionName, testResources)
 
         generatePushTriggerWorkflow(kotlinVersionName, numberOfLibraryTests)
         generateManualTriggerWorkflow(kotlinVersionName, numberOfLibraryTests)
-    }
-
-    private fun getNumberOfLibraryTests(kotlinVersionName: String): Int {
-        val testResources = libraryTestResources.get().asFile
-
-        return testResources.resolve(kotlinVersionName)
-            .resolve("libraries.lock")
-            .takeIf { it.exists() }
-            ?.readLines()
-            ?.count { it.trim().startsWith("\"index\": ") }
-            ?: 0
     }
 
     private fun generatePushTriggerWorkflow(latestVersionName: String, numberOfLibraryTests: Int) {

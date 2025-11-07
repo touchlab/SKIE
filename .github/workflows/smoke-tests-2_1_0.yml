@@ -51,7 +51,7 @@ permissions:
 
 jobs:
   acceptance-tests:
-    name: Acceptance Tests
+    name: Acceptance Tests 2.1.0[${{ inputs.compiler_version }}]
     runs-on: macos-14
     steps:
       - name: Checkout Repo
@@ -71,7 +71,7 @@ jobs:
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
 
   type-mapping-tests:
-    name: Type Mapping Tests
+    name: Type Mapping Tests 2.1.0[${{ inputs.compiler_version }}]
     runs-on: macos-14
     steps:
       - name: Checkout Repo
@@ -92,28 +92,8 @@ jobs:
           KOTLIN_TARGET: ${{ inputs.target }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
 
-  external-libraries-tests:
-    name: External Libraries Tests
-    runs-on: macos-14
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-      - name: Prepare Worker
-        uses: ./.github/actions/prepare-worker
-      - name: Run External Libraries Tests
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
-          build-root-directory: SKIE
-        env:
-          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-
   gradle-tests:
-    name: Gradle Tests
+    name: Gradle Tests 2.1.0[${{ inputs.compiler_version }}]
     runs-on: macos-14
     steps:
       - name: Checkout Repo
@@ -145,3 +125,171 @@ jobs:
           check_name: "Smoke Test Reports - Gradle Tests"
           report_paths: 'test-runner/build/test-results/test/TEST-*.xml'
           require_tests: true
+  
+  external-libraries-tests-0-499:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 0-499
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "0-499"
+  
+  external-libraries-tests-500-999:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 500-999
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "500-999"
+  
+  external-libraries-tests-1000-1499:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 1000-1499
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "1000-1499"
+  
+  external-libraries-tests-1500-1999:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 1500-1999
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "1500-1999"
+  
+  external-libraries-tests-2000-2499:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 2000-2499
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "2000-2499"
+  
+  external-libraries-tests-2500-2999:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 2500-2999
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "2500-2999"
+  
+  external-libraries-tests-3000-3499:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 3000-3499
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "3000-3499"
+  
+  external-libraries-tests-3500-3855:
+    name: External Libraries Tests (2.1.0[${{ inputs.compiler_version }}]) 3500-3855
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run External Libraries Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.1.0[${{ inputs.compiler_version }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+          onlyIndices: "3500-3855"

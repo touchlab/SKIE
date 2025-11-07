@@ -38,17 +38,19 @@ abstract class SkieRootPlugin : Plugin<Project> {
         val supportedKotlinVersions = SupportedKotlinVersionProvider.getSupportedKotlinVersions(project)
         val latestKotlinVersion = supportedKotlinVersions.maxBy { it.name }
 
+        val libraryTestResources = rootDir.resolve("acceptance-tests/libraries/src/test/resources/tests")
         val workflowsDirectory = rootDir.parentFile.resolve(".github/workflows")
 
         val generatePrimarySmokeTestsCIActions = tasks.register<GeneratePrimarySmokeTestsCIActionTask>("generatePrimarySmokeTestsCIAction") {
             this.latestKotlinVersion.set(latestKotlinVersion)
-            libraryTestResources.set(rootDir.resolve("acceptance-tests/libraries/src/test/resources/tests"))
+            this.libraryTestResources.set(libraryTestResources)
             pushTriggerOutputPath.set(workflowsDirectory.resolve("smoke-tests.yml"))
             manualTriggerOutputPath.set(workflowsDirectory.resolve("smoke-tests-manual.yml"))
         }
 
         val generateVersionedSmokeTestsCIActions = tasks.register<GenerateVersionedSmokeTestsCIActionsTask>("generateVersionedSmokeTestsCIActions") {
             supportedVersions.set(supportedKotlinVersions)
+            this.libraryTestResources.set(libraryTestResources)
             outputDirectory.set(workflowsDirectory)
         }
 
