@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: adopt
-          java-version: 11
+          java-version: 17
       # TODO Ensure all tests pass
       - name: Replace data
         uses: gradle/gradle-build-action@v2.4.2
