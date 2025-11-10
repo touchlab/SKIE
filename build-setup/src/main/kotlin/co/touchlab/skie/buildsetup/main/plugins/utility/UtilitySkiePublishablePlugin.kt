@@ -50,8 +50,7 @@ abstract class UtilitySkiePublishablePlugin : Plugin<Project> {
 
     private fun Project.configureMavenPublishing() {
         extensions.configure<MavenPublishBaseExtension> {
-            // WIP Change to true once this setup is tested
-            publishToMavenCentral(automaticRelease = false)
+            publishToMavenCentral(automaticRelease = true)
         }
     }
 
