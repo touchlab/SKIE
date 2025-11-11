@@ -44,6 +44,7 @@ abstract class TestsLibraryTestsPlugin : Plugin<Project> {
         "ignoreLockfile",
         "convertLibraryDependenciesToTests",
         "skipTestsInLockfile",
+        "onlyUnresolvedVersions",
     )
 
     override fun apply(project: Project) = with(project) {
