@@ -5,7 +5,7 @@ name: Smoke Tests 2.2.20 [self-hosted]
 on:  
   schedule:
     # Every Saturday at 2am EST
-    - cron: '0 7 * * SAT'    
+    - cron: '0 7 * * SAT'
   workflow_dispatch:
     inputs:
       compiler_version:
@@ -399,8 +399,8 @@ jobs:
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
           onlyIndices: "6000-6499"
   
-  external-libraries-tests-6500-6925:
-    name: External Libraries Tests (2.2.20[${{ inputs.compiler_version }}]) 6500-6925
+  external-libraries-tests-6500-6694:
+    name: External Libraries Tests (2.2.20[${{ inputs.compiler_version }}]) 6500-6694
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -418,4 +418,4 @@ jobs:
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-          onlyIndices: "6500-6925"
+          onlyIndices: "6500-6694"

@@ -502,8 +502,8 @@ jobs:
       #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
       #     require_tests: true
   
-  external-libraries-tests-6500-6925:
-    name: External Libraries Tests (2.2.20) 6500-6925
+  external-libraries-tests-6500-6694:
+    name: External Libraries Tests (2.2.20) 6500-6694
     needs: [gradle-tests]
     runs-on: self-hosted
     steps:
@@ -522,7 +522,7 @@ jobs:
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-          onlyIndices: "6500-6925"
+          onlyIndices: "6500-6694"
       # Log size can be too large which causes significant performance issues
       # - name: Publish Test Report
       #   uses: mikepenz/action-junit-report@v3

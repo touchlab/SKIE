@@ -1,7 +1,6 @@
 package co.touchlab.skie.buildsetup.main.tasks
 
-import co.touchlab.skie.buildsetup.main.tasks.GeneratePrimarySmokeTestsCIActionTask.Companion.getNumberOfLibraryTests
-import co.touchlab.skie.buildsetup.main.tasks.GeneratePrimarySmokeTestsCIActionTask.Companion.libraryTestsBatchSize
+import co.touchlab.skie.buildsetup.main.tasks.GeneratePrimarySmokeTestsCIActionTask.LibrariesTestBatch
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersion
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -16,7 +15,6 @@ import kotlin.io.path.deleteIfExists
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.writeText
-import kotlin.math.min
 
 abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
 
@@ -47,17 +45,17 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
             .forEach { it.deleteIfExists() }
 
         supportedVersions.get().forEach {
-            val numberOfLibraryTests = getNumberOfLibraryTests(it.name.toString(), testResources)
+            val librariesTestBatches = LibrariesTestBatch.allFrom(it.name.toString(), testResources)
 
-            val selfHostedWorkflow = getSmokeTestsWorkflow(it, numberOfLibraryTests, selfHosted = true)
-            val githubHostedWorkflow = getSmokeTestsWorkflow(it, numberOfLibraryTests, selfHosted = false)
+            val selfHostedWorkflow = getSmokeTestsWorkflow(it, librariesTestBatches, selfHosted = true)
+            val githubHostedWorkflow = getSmokeTestsWorkflow(it, librariesTestBatches, selfHosted = false)
 
             outputPath.resolve("smoke-tests-${it.safeName}-self-hosted.yml").writeText(selfHostedWorkflow)
             outputPath.resolve("smoke-tests-${it.safeName}-github.yml").writeText(githubHostedWorkflow)
         }
     }
 
-    private fun getSmokeTestsWorkflow(version: SupportedKotlinVersion, numberOfLibraryTests: Int, selfHosted: Boolean): String {
+    private fun getSmokeTestsWorkflow(version: SupportedKotlinVersion, librariesTestBatches: List<LibrariesTestBatch>, selfHosted: Boolean): String {
         val versionWithCompilerVersion = $$"$${version.name}[${{ inputs.compiler_version }}]"
 
         val runner = if (selfHosted) "self-hosted" else "macos-14"
@@ -204,41 +202,36 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                       require_tests: true
 
             """.trimIndent() +
-            (0..(numberOfLibraryTests / libraryTestsBatchSize)).joinToString(System.lineSeparator()) {
-                getExternalLibrariesJob(it, versionWithCompilerVersion, numberOfLibraryTests, runner).prependIndent("  ")
+            librariesTestBatches.joinToString(System.lineSeparator()) {
+                getExternalLibrariesJob(it, versionWithCompilerVersion, runner).prependIndent("  ")
             } + "\n"
     }
 
     private fun getExternalLibrariesJob(
-        index: Int,
+        testBatch: LibrariesTestBatch,
         versionName: String,
-        numberOfLibraryTests: Int,
         runner: String,
-    ): String {
-        val range = "${index * libraryTestsBatchSize}-${min((index + 1) * libraryTestsBatchSize - 1, numberOfLibraryTests - 1)}"
+    ): String = $$"""
 
-        return $$"""
-
-              external-libraries-tests-$$range:
-                name: External Libraries Tests ($${versionName}) $$range
-                runs-on: $$runner
-                steps:
-                  - name: Checkout Repo
-                    uses: actions/checkout@v3
-                    with:
-                      submodules: true
-                      token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-                  - name: Prepare Worker
-                    uses: ./.github/actions/prepare-worker
-                  - name: Run External Libraries Tests
-                    uses: gradle/gradle-build-action@v2.4.2
-                    with:
-                      arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=$${versionName}'
-                      build-root-directory: SKIE
-                    env:
-                      KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-                      KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-                      onlyIndices: "$$range"
-            """.trimIndent()
-    }
+          external-libraries-tests-$${testBatch.range}:
+            name: External Libraries Tests ($${versionName}) $${testBatch.range}
+            runs-on: $$runner
+            steps:
+              - name: Checkout Repo
+                uses: actions/checkout@v3
+                with:
+                  submodules: true
+                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+              - name: Prepare Worker
+                uses: ./.github/actions/prepare-worker
+              - name: Run External Libraries Tests
+                uses: gradle/gradle-build-action@v2.4.2
+                with:
+                  arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=$${versionName}'
+                  build-root-directory: SKIE
+                env:
+                  KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+                  KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+                  onlyIndices: "$${testBatch.range}"
+        """.trimIndent()
 }
