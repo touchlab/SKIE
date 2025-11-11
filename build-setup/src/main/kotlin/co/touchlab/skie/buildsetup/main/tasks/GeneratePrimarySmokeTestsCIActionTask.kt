@@ -180,41 +180,12 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               #     report_paths: 'SKIE/acceptance-tests/build/test-results/functional__*/TEST-*.xml'
               #     require_tests: true
 
-          type-mapping-tests:
-            name: Type Mapping Tests ($$versionName)
-            runs-on: self-hosted
-            needs: [acceptance-tests]
-            steps:
-              - name: Checkout Repo
-                uses: actions/checkout@v3
-                with:
-                  submodules: true
-                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-              - name: Prepare Worker
-                uses: ./.github/actions/prepare-worker
-              - name: Run Type Mapping Tests
-                uses: gradle/gradle-build-action@v2.4.2
-                id: run-tests
-                with:
-                  arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
-                  build-root-directory: SKIE
-                env:
-                  KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-                  KOTLIN_TARGET: ${{ inputs.target }}
-                  KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-              # Log size can be too large which causes significant performance issues
-              # - name: Publish Test Report
-              #   uses: mikepenz/action-junit-report@v3
-              #   if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
-              #   with:
-              #     check_name: "Smoke Test Reports - Type Mapping Tests"
-              #     report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
-              #     require_tests: true
-
           gradle-tests:
             name: Gradle Tests$${if (enabledVersions.isBlank()) "" else " ($versionName)"}
             runs-on: self-hosted
             needs: [acceptance-tests]
+            if: |
+              always()
             steps:
               - name: Checkout Repo
                 uses: actions/checkout@v3
@@ -246,6 +217,39 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                   report_paths: 'test-runner/build/test-results/test/TEST-*.xml'
                   require_tests: true
 
+          type-mapping-tests:
+            name: Type Mapping Tests ($$versionName)
+            runs-on: self-hosted
+            needs: [gradle-tests]
+            if: |
+              always()
+            steps:
+              - name: Checkout Repo
+                uses: actions/checkout@v3
+                with:
+                  submodules: true
+                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+              - name: Prepare Worker
+                uses: ./.github/actions/prepare-worker
+              - name: Run Type Mapping Tests
+                uses: gradle/gradle-build-action@v2.4.2
+                id: run-tests
+                with:
+                  arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
+                  build-root-directory: SKIE
+                env:
+                  KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+                  KOTLIN_TARGET: ${{ inputs.target }}
+                  KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+              # Log size can be too large which causes significant performance issues
+              # - name: Publish Test Report
+              #   uses: mikepenz/action-junit-report@v3
+              #   if: ${{ (failure() || success()) && steps.run-tests.outcome != 'skipped' }}
+              #   with:
+              #     check_name: "Smoke Test Reports - Type Mapping Tests"
+              #     report_paths: 'SKIE/acceptance-tests/build/test-results/type-mapping__*/TEST-*.xml'
+              #     require_tests: true
+
         """.trimIndent() +
         librariesTestBatches.joinToString(System.lineSeparator()) {
             getExternalLibrariesJob(it, versionName, enabledVersions).prependIndent("  ")
@@ -259,7 +263,9 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
 
           external-libraries-tests-$${testBatch.range}:
             name: External Libraries Tests ($$versionName) $${testBatch.range}
-            needs: [gradle-tests]
+            needs: [type-mapping-tests]
+            if: |
+              always()
             runs-on: self-hosted
             steps:
               - name: Checkout Repo
