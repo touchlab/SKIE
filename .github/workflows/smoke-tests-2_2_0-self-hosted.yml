@@ -5,9 +5,84 @@ name: Smoke Tests 2.2.0 [self-hosted]
 on:  
   schedule:
     # Every Saturday at 12am EST
-    - cron: '0 5 * * SAT'
+    - cron: '0 5 * * SAT'  
   workflow_dispatch:
     inputs:
+      invert_selection:
+        type: boolean
+        required: false
+        default: false
+        description: '🔄 INVERT SELECTION: When enabled, UNCHECKED boxes will run and CHECKED boxes will be skipped'
+      run_acceptance_tests:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run Acceptance Tests'
+      run_type_mapping_tests:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run Type Mapping Tests'
+      run_gradle_tests:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run Gradle Tests'
+      run_external_libraries_tests_0_499:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 0-499'
+      run_external_libraries_tests_500_999:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 500-999'
+      run_external_libraries_tests_1000_1499:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 1000-1499'
+      run_external_libraries_tests_1500_1999:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 1500-1999'
+      run_external_libraries_tests_2000_2499:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 2000-2499'
+      run_external_libraries_tests_2500_2999:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 2500-2999'
+      run_external_libraries_tests_3000_3499:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 3000-3499'
+      run_external_libraries_tests_3500_3999:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 3500-3999'
+      run_external_libraries_tests_4000_4499:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 4000-4499'
+      run_external_libraries_tests_4500_4999:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 4500-4999'
+      run_external_libraries_tests_5000_5348:
+        type: boolean
+        required: false
+        default: true
+        description: 'Run External Libraries Tests 5000-5348'
       compiler_version:
         type: string
         required: true
@@ -52,6 +127,8 @@ permissions:
 jobs:
   acceptance-tests:
     name: Acceptance Tests 2.2.0[${{ inputs.compiler_version || '2.2.0' }}]
+    if: |-
+      ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -70,30 +147,10 @@ jobs:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
 
-  type-mapping-tests:
-    name: Type Mapping Tests 2.2.0[${{ inputs.compiler_version || '2.2.0' }}]
-    runs-on: self-hosted
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-      - name: Prepare Worker
-        uses: ./.github/actions/prepare-worker
-      - name: Run Type Mapping Tests
-        uses: gradle/gradle-build-action@v2.4.2
-        id: run-tests
-        with:
-          arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=2.2.0[${{ inputs.compiler_version || '2.2.0' }}]'
-          build-root-directory: SKIE
-        env:
-          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-          KOTLIN_TARGET: ${{ inputs.target }}
-          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-
   gradle-tests:
     name: Gradle Tests 2.2.0[${{ inputs.compiler_version || '2.2.0' }}]
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -125,9 +182,35 @@ jobs:
           check_name: "Smoke Test Reports - Gradle Tests"
           report_paths: 'test-runner/build/test-results/test/TEST-*.xml'
           require_tests: true
+
+  type-mapping-tests:
+    name: Type Mapping Tests 2.2.0[${{ inputs.compiler_version || '2.2.0' }}]
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+      - name: Prepare Worker
+        uses: ./.github/actions/prepare-worker
+      - name: Run Type Mapping Tests
+        uses: gradle/gradle-build-action@v2.4.2
+        id: run-tests
+        with:
+          arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=2.2.0[${{ inputs.compiler_version || '2.2.0' }}]'
+          build-root-directory: SKIE
+        env:
+          KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+          KOTLIN_TARGET: ${{ inputs.target }}
+          KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
   
   external-libraries-tests-0-499:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 0-499
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_0_499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -149,6 +232,8 @@ jobs:
   
   external-libraries-tests-500-999:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 500-999
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_500_999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -170,6 +255,8 @@ jobs:
   
   external-libraries-tests-1000-1499:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 1000-1499
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1000_1499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -191,6 +278,8 @@ jobs:
   
   external-libraries-tests-1500-1999:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 1500-1999
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1500_1999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -212,6 +301,8 @@ jobs:
   
   external-libraries-tests-2000-2499:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 2000-2499
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2000_2499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -233,6 +324,8 @@ jobs:
   
   external-libraries-tests-2500-2999:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 2500-2999
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2500_2999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -254,6 +347,8 @@ jobs:
   
   external-libraries-tests-3000-3499:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 3000-3499
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3000_3499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -275,6 +370,8 @@ jobs:
   
   external-libraries-tests-3500-3999:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 3500-3999
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3500_3999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -296,6 +393,8 @@ jobs:
   
   external-libraries-tests-4000-4499:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 4000-4499
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4000_4499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -317,6 +416,8 @@ jobs:
   
   external-libraries-tests-4500-4999:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 4500-4999
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4500_4999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -338,6 +439,8 @@ jobs:
   
   external-libraries-tests-5000-5348:
     name: External Libraries Tests (2.2.0[${{ inputs.compiler_version || '2.2.0' }}]) 5000-5348
+    if: |
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_5000_5348 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo

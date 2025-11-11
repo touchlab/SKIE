@@ -79,10 +79,42 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                 ""
             } +
 
-            $$"""
+            """
 
               workflow_dispatch:
                 inputs:
+                  invert_selection:
+                    type: boolean
+                    required: false
+                    default: false
+                    description: '🔄 INVERT SELECTION: When enabled, UNCHECKED boxes will run and CHECKED boxes will be skipped'
+                  run_acceptance_tests:
+                    type: boolean
+                    required: false
+                    default: true
+                    description: 'Run Acceptance Tests'
+                  run_type_mapping_tests:
+                    type: boolean
+                    required: false
+                    default: true
+                    description: 'Run Type Mapping Tests'
+                  run_gradle_tests:
+                    type: boolean
+                    required: false
+                    default: true
+                    description: 'Run Gradle Tests'
+            """.trimIndent().prependIndent("  ") + System.lineSeparator() +
+            librariesTestBatches.joinToString(System.lineSeparator()) {
+                """
+                  run_external_libraries_tests_${it.rangeWithUnderscores}:
+                    type: boolean
+                    required: false
+                    default: true
+                    description: 'Run External Libraries Tests ${it.range}'
+                """.trimIndent()
+            }.prependIndent("      ") +
+            $$"""
+
                   compiler_version:
                     type: string
                     required: true
@@ -127,6 +159,8 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
             jobs:
               acceptance-tests:
                 name: Acceptance Tests $$versionWithCompilerVersion
+                if: |-
+                  ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
                 runs-on: $$runner
                 steps:
                   - name: Checkout Repo
@@ -145,30 +179,10 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                       KOTLIN_LINK_MODE: ${{ inputs.linkage }}
                       KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
 
-              type-mapping-tests:
-                name: Type Mapping Tests $$versionWithCompilerVersion
-                runs-on: $$runner
-                steps:
-                  - name: Checkout Repo
-                    uses: actions/checkout@v3
-                    with:
-                      submodules: true
-                      token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
-                  - name: Prepare Worker
-                    uses: ./.github/actions/prepare-worker
-                  - name: Run Type Mapping Tests
-                    uses: gradle/gradle-build-action@v2.4.2
-                    id: run-tests
-                    with:
-                      arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=$$versionWithCompilerVersion'
-                      build-root-directory: SKIE
-                    env:
-                      KOTLIN_LINK_MODE: ${{ inputs.linkage }}
-                      KOTLIN_TARGET: ${{ inputs.target }}
-                      KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-
               gradle-tests:
                 name: Gradle Tests $$versionWithCompilerVersion
+                if: |
+                  ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
                 runs-on: $$runner
                 steps:
                   - name: Checkout Repo
@@ -201,6 +215,30 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                       report_paths: 'test-runner/build/test-results/test/TEST-*.xml'
                       require_tests: true
 
+              type-mapping-tests:
+                name: Type Mapping Tests $$versionWithCompilerVersion
+                if: |
+                  ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
+                runs-on: $$runner
+                steps:
+                  - name: Checkout Repo
+                    uses: actions/checkout@v3
+                    with:
+                      submodules: true
+                      token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
+                  - name: Prepare Worker
+                    uses: ./.github/actions/prepare-worker
+                  - name: Run Type Mapping Tests
+                    uses: gradle/gradle-build-action@v2.4.2
+                    id: run-tests
+                    with:
+                      arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=$$versionWithCompilerVersion'
+                      build-root-directory: SKIE
+                    env:
+                      KOTLIN_LINK_MODE: ${{ inputs.linkage }}
+                      KOTLIN_TARGET: ${{ inputs.target }}
+                      KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
+
             """.trimIndent() +
             librariesTestBatches.joinToString(System.lineSeparator()) {
                 getExternalLibrariesJob(it, versionWithCompilerVersion, runner).prependIndent("  ")
@@ -215,6 +253,8 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
 
           external-libraries-tests-$${testBatch.range}:
             name: External Libraries Tests ($${versionName}) $${testBatch.range}
+            if: |
+              ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_$${testBatch.rangeWithUnderscores} || true))
             runs-on: $$runner
             steps:
               - name: Checkout Repo
