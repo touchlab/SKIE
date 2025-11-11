@@ -90,6 +90,39 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
         on:
           workflow_dispatch:
             inputs:
+              invert_selection:
+                type: boolean
+                required: false
+                default: false
+                description: '🔄 INVERT SELECTION: When enabled, UNCHECKED boxes will run and CHECKED boxes will be skipped'
+              run_acceptance_tests:
+                type: boolean
+                required: false
+                default: true
+                description: 'Run Acceptance Tests'
+              run_type_mapping_tests:
+                type: boolean
+                required: false
+                default: true
+                description: 'Run Type Mapping Tests'
+              run_gradle_tests:
+                type: boolean
+                required: false
+                default: true
+                description: 'Run Gradle Tests'
+
+        """.trimIndent() +
+        librariesTestBatches.joinToString(System.lineSeparator()) {
+            """
+              run_external_libraries_tests_${it.rangeWithUnderscores}:
+                type: boolean
+                required: false
+                default: true
+                description: 'Run External Libraries Tests ${it.range}'
+            """.trimIndent()
+        }.prependIndent("      ") +
+        """
+
               kotlin_version_name:
                 type: string
                 required: false
@@ -154,6 +187,8 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
         jobs:
           acceptance-tests:
             name: Acceptance Tests ($$versionName)
+            if: |-
+              ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
             runs-on: self-hosted
             steps:
               - name: Checkout Repo
@@ -185,7 +220,8 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             runs-on: self-hosted
             needs: [acceptance-tests]
             if: |
-              always()
+              always() &&
+              ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
             steps:
               - name: Checkout Repo
                 uses: actions/checkout@v3
@@ -222,7 +258,8 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             runs-on: self-hosted
             needs: [gradle-tests]
             if: |
-              always()
+              always() &&
+              ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
             steps:
               - name: Checkout Repo
                 uses: actions/checkout@v3
@@ -265,7 +302,8 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             name: External Libraries Tests ($$versionName) $${testBatch.range}
             needs: [type-mapping-tests]
             if: |
-              always()
+              always() &&
+              ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_$${testBatch.rangeWithUnderscores} || true))
             runs-on: self-hosted
             steps:
               - name: Checkout Repo
@@ -297,6 +335,8 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
     data class LibrariesTestBatch(
         val range: String,
     ) {
+
+        val rangeWithUnderscores: String = range.replace("-", "_")
 
         companion object {
 

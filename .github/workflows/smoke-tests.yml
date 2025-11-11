@@ -20,6 +20,8 @@ permissions:
 jobs:
   acceptance-tests:
     name: Acceptance Tests (2.2.20)
+    if: |-
+      ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -51,7 +53,8 @@ jobs:
     runs-on: self-hosted
     needs: [acceptance-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -88,7 +91,8 @@ jobs:
     runs-on: self-hosted
     needs: [gradle-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -120,7 +124,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 0-499
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_0_499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -152,7 +157,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 500-999
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_500_999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -184,7 +190,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 1000-1499
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1000_1499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -216,7 +223,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 1500-1999
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1500_1999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -248,7 +256,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 2000-2499
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2000_2499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -280,7 +289,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 2500-2999
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2500_2999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -312,7 +322,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 3000-3499
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3000_3499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -344,7 +355,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 3500-3999
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3500_3999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -376,7 +388,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 4000-4499
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4000_4499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -408,7 +421,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 4500-4999
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4500_4999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -440,7 +454,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 5000-5499
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_5000_5499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -472,7 +487,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 5500-5999
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_5500_5999 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -504,7 +520,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 6000-6499
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_6000_6499 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -536,7 +553,8 @@ jobs:
     name: External Libraries Tests (2.2.20) 6500-6694
     needs: [type-mapping-tests]
     if: |
-      always()
+      always() &&
+      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_6500_6694 || true))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
