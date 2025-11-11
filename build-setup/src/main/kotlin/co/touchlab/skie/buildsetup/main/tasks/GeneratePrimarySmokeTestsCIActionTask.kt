@@ -80,7 +80,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
         concurrency:
           group: ci-smoke-tests-${{ github.ref }}
 
-    """.trimIndent() + getSmokeTestsBaseWorkflow(librariesTestBatches, latestVersionName, "")
+    """.trimIndent() + getSmokeTestsBaseWorkflow(librariesTestBatches, latestVersionName)
 
     private fun getSmokeTestsManualTriggerWorkflow(latestVersionName: String, librariesTestBatches: List<LibrariesTestBatch>): String = """
         name: Smoke Tests (Manual)
@@ -101,7 +101,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                 type: string
                 required: false
                 description:
-                  'The name of the supported Kotlin version (SKIE flavor) to test. Latest supported version is used for all tests except Gradle tests if not specified. Gradle tests by default test all versions.'
+                  'The name of the supported Kotlin version (SKIE flavor) to test. Latest supported version is used for all tests if not specified.'
               compiler_version:
                 type: string
                 required: false
@@ -145,13 +145,11 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
     """.trimIndent() + getSmokeTestsBaseWorkflow(
         librariesTestBatches = librariesTestBatches,
         versionName = $$"${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '$$latestVersionName' }}",
-        enabledVersions = $$"=${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '' }}",
     )
 
     private fun getSmokeTestsBaseWorkflow(
         librariesTestBatches: List<LibrariesTestBatch>,
         versionName: String,
-        enabledVersions: String,
     ): String = $$"""
 
         permissions:
@@ -175,7 +173,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run Acceptance Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ":acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
+                  arguments: ":acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=$$versionName"
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -190,7 +188,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               #     require_tests: true
 
           gradle-tests:
-            name: Gradle Tests$${if (enabledVersions.isBlank()) "" else " ($versionName)"}
+            name: Gradle Tests ($$versionName)
             runs-on: self-hosted
             needs: [acceptance-tests]
             if: |
@@ -217,7 +215,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                     "-Pmatrix.targets=macosArm64"
                     "-Pmatrix.configurations=${{ inputs.configuration || 'debug' }}"
                     "-Pmatrix.linkModes=${{ inputs.linkage || 'static' }}"
-                    "-PversionSupport.kotlin.enabledVersions$$enabledVersions"
+                    "-PversionSupport.kotlin.enabledVersions=$$versionName"
                   build-root-directory: test-runner
               - name: Publish Test Report
                 uses: mikepenz/action-junit-report@v4
@@ -246,7 +244,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
                 uses: gradle/gradle-build-action@v2.4.2
                 id: run-tests
                 with:
-                  arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
+                  arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=$$versionName"
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -263,13 +261,12 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
 
         """.trimIndent() +
         librariesTestBatches.joinToString(System.lineSeparator()) {
-            getExternalLibrariesJob(it, versionName, enabledVersions).prependIndent("  ")
+            getExternalLibrariesJob(it, versionName).prependIndent("  ")
         } + "\n"
 
     private fun getExternalLibrariesJob(
         testBatch: LibrariesTestBatch,
         versionName: String,
-        enabledVersions: String,
     ): String = $$"""
 
           external-libraries-tests-$${testBatch.range}:
@@ -290,7 +287,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
               - name: Run External Libraries Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions$$enabledVersions"
+                  arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=$$versionName"
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
