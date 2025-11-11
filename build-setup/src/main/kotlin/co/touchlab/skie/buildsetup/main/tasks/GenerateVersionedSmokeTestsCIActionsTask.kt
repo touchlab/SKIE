@@ -56,7 +56,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
     }
 
     private fun getSmokeTestsWorkflow(version: SupportedKotlinVersion, librariesTestBatches: List<LibrariesTestBatch>, selfHosted: Boolean): String {
-        val versionWithCompilerVersion = $$"$${version.name}[${{ inputs.compiler_version }}]"
+        val versionWithCompilerVersion = $$"$${version.name}[${{ inputs.compiler_version || '$${version.name}' }}]"
 
         val runner = if (selfHosted) "self-hosted" else "macos-14"
 
