@@ -156,7 +156,7 @@ jobs:
       - name: Run Acceptance Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -215,7 +215,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.4.2
         id: run-tests
         with:
-          arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -238,7 +238,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -261,7 +261,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -284,7 +284,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -307,7 +307,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -330,7 +330,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -353,7 +353,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -376,7 +376,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -399,7 +399,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -422,7 +422,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -445,7 +445,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -468,7 +468,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -491,7 +491,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -514,7 +514,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -537,7 +537,7 @@ jobs:
       - name: Run External Libraries Tests
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]'
+          arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=2.2.20[${{ inputs.compiler_version || '2.2.20' }}]"
           build-root-directory: SKIE
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}

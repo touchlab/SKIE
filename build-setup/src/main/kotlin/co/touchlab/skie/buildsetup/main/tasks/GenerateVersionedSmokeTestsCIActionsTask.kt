@@ -173,7 +173,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                   - name: Run Acceptance Tests
                     uses: gradle/gradle-build-action@v2.4.2
                     with:
-                      arguments: ':acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=$$versionWithCompilerVersion'
+                      arguments: ":acceptance-tests:functional:test -PversionSupport.kotlin.enabledVersions=$$versionWithCompilerVersion"
                       build-root-directory: SKIE
                     env:
                       KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -232,7 +232,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                     uses: gradle/gradle-build-action@v2.4.2
                     id: run-tests
                     with:
-                      arguments: ':acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=$$versionWithCompilerVersion'
+                      arguments: ":acceptance-tests:type-mapping:test -PversionSupport.kotlin.enabledVersions=$$versionWithCompilerVersion"
                       build-root-directory: SKIE
                     env:
                       KOTLIN_LINK_MODE: ${{ inputs.linkage }}
@@ -267,7 +267,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
               - name: Run External Libraries Tests
                 uses: gradle/gradle-build-action@v2.4.2
                 with:
-                  arguments: ':acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=$${versionName}'
+                  arguments: ":acceptance-tests:libraries:test -PversionSupport.kotlin.enabledVersions=$${versionName}"
                   build-root-directory: SKIE
                 env:
                   KOTLIN_LINK_MODE: ${{ inputs.linkage }}
