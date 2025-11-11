@@ -79,42 +79,17 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                 ""
             } +
 
-            """
+            $$"""
 
               workflow_dispatch:
                 inputs:
-                  invert_selection:
-                    type: boolean
+                  suites:
+                    type: string
                     required: false
-                    default: false
-                    description: '🔄 INVERT SELECTION: When enabled, UNCHECKED boxes will run and CHECKED boxes will be skipped'
-                  run_acceptance_tests:
-                    type: boolean
-                    required: false
-                    default: true
-                    description: 'Run Acceptance Tests'
-                  run_type_mapping_tests:
-                    type: boolean
-                    required: false
-                    default: true
-                    description: 'Run Type Mapping Tests'
-                  run_gradle_tests:
-                    type: boolean
-                    required: false
-                    default: true
-                    description: 'Run Gradle Tests'
-            """.trimIndent().prependIndent("  ") + System.lineSeparator() +
-            librariesTestBatches.joinToString(System.lineSeparator()) {
-                """
-                  run_external_libraries_tests_${it.rangeWithUnderscores}:
-                    type: boolean
-                    required: false
-                    default: true
-                    description: 'Run External Libraries Tests ${it.range}'
-                """.trimIndent()
-            }.prependIndent("      ") +
-            $$"""
-
+                    default: 'acceptance,type-mapping,gradle,$${librariesTestBatches.joinToString(",") { "lib-${it.range}" }}'
+                    description: |
+                      Comma-separated test suites to run. Available: acceptance, type-mapping, gradle, $${librariesTestBatches.joinToString(", ") { "lib-${it.range}" }}
+                      Leave empty to run all. Use '!' prefix to exclude (e.g., '!lib-0-499').
                   compiler_version:
                     type: string
                     required: true
@@ -160,7 +135,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
               acceptance-tests:
                 name: Acceptance Tests $$versionWithCompilerVersion
                 if: |-
-                  ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
+                  (!inputs.suites || (contains(inputs.suites, 'acceptance') && !contains(inputs.suites, '!acceptance')))
                 runs-on: $$runner
                 steps:
                   - name: Checkout Repo
@@ -182,7 +157,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
               gradle-tests:
                 name: Gradle Tests $$versionWithCompilerVersion
                 if: |
-                  ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
+                  (!inputs.suites || (contains(inputs.suites, 'gradle') && !contains(inputs.suites, '!gradle')))
                 runs-on: $$runner
                 steps:
                   - name: Checkout Repo
@@ -218,7 +193,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
               type-mapping-tests:
                 name: Type Mapping Tests $$versionWithCompilerVersion
                 if: |
-                  ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
+                  (!inputs.suites || (contains(inputs.suites, 'type-mapping') && !contains(inputs.suites, '!type-mapping')))
                 runs-on: $$runner
                 steps:
                   - name: Checkout Repo
@@ -254,7 +229,7 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
           external-libraries-tests-$${testBatch.range}:
             name: External Libraries Tests ($${versionName}) $${testBatch.range}
             if: |
-              ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_$${testBatch.rangeWithUnderscores} || true))
+              (!inputs.suites || (contains(inputs.suites, 'lib-$${testBatch.range}') && !contains(inputs.suites, '!lib-$${testBatch.range}')))
             runs-on: $$runner
             steps:
               - name: Checkout Repo

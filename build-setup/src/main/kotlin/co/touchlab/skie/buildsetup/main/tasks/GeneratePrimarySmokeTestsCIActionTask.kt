@@ -90,39 +90,13 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
         on:
           workflow_dispatch:
             inputs:
-              invert_selection:
-                type: boolean
+              suites:
+                type: string
                 required: false
-                default: false
-                description: '🔄 INVERT SELECTION: When enabled, UNCHECKED boxes will run and CHECKED boxes will be skipped'
-              run_acceptance_tests:
-                type: boolean
-                required: false
-                default: true
-                description: 'Run Acceptance Tests'
-              run_type_mapping_tests:
-                type: boolean
-                required: false
-                default: true
-                description: 'Run Type Mapping Tests'
-              run_gradle_tests:
-                type: boolean
-                required: false
-                default: true
-                description: 'Run Gradle Tests'
-
-        """.trimIndent() +
-        librariesTestBatches.joinToString(System.lineSeparator()) {
-            """
-              run_external_libraries_tests_${it.rangeWithUnderscores}:
-                type: boolean
-                required: false
-                default: true
-                description: 'Run External Libraries Tests ${it.range}'
-            """.trimIndent()
-        }.prependIndent("      ") +
-        """
-
+                default: 'acceptance,type-mapping,gradle,${librariesTestBatches.joinToString(",") { "lib-${it.range}" }}'
+                description: |
+                  Comma-separated test suites to run. Available: acceptance, type-mapping, gradle, ${librariesTestBatches.joinToString(", ") { "lib-${it.range}" }}
+                  Leave empty to run all. Use '!' prefix to exclude (e.g., '!lib-0-499').
               kotlin_version_name:
                 type: string
                 required: false
@@ -188,7 +162,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
           acceptance-tests:
             name: Acceptance Tests ($$versionName)
             if: |-
-              ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
+              (!inputs.suites || (contains(inputs.suites, 'acceptance') && !contains(inputs.suites, '!acceptance')))
             runs-on: self-hosted
             steps:
               - name: Checkout Repo
@@ -221,7 +195,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             needs: [acceptance-tests]
             if: |
               always() &&
-              ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
+              (!inputs.suites || (contains(inputs.suites, 'gradle') && !contains(inputs.suites, '!gradle')))
             steps:
               - name: Checkout Repo
                 uses: actions/checkout@v3
@@ -259,7 +233,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             needs: [gradle-tests]
             if: |
               always() &&
-              ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
+              (!inputs.suites || (contains(inputs.suites, 'type-mapping') && !contains(inputs.suites, '!type-mapping')))
             steps:
               - name: Checkout Repo
                 uses: actions/checkout@v3
@@ -303,7 +277,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             needs: [type-mapping-tests]
             if: |
               always() &&
-              ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_$${testBatch.rangeWithUnderscores} || true))
+              (!inputs.suites || (contains(inputs.suites, 'lib-$${testBatch.range}') && !contains(inputs.suites, '!lib-$${testBatch.range}')))
             runs-on: self-hosted
             steps:
               - name: Checkout Repo
@@ -335,8 +309,6 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
     data class LibrariesTestBatch(
         val range: String,
     ) {
-
-        val rangeWithUnderscores: String = range.replace("-", "_")
 
         companion object {
 

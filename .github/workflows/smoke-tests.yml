@@ -21,7 +21,7 @@ jobs:
   acceptance-tests:
     name: Acceptance Tests (2.2.20)
     if: |-
-      ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
+      (!inputs.suites || (contains(inputs.suites, 'acceptance') && !contains(inputs.suites, '!acceptance')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -54,7 +54,7 @@ jobs:
     needs: [acceptance-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
+      (!inputs.suites || (contains(inputs.suites, 'gradle') && !contains(inputs.suites, '!gradle')))
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -92,7 +92,7 @@ jobs:
     needs: [gradle-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
+      (!inputs.suites || (contains(inputs.suites, 'type-mapping') && !contains(inputs.suites, '!type-mapping')))
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -125,7 +125,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_0_499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-0-499') && !contains(inputs.suites, '!lib-0-499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -158,7 +158,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_500_999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-500-999') && !contains(inputs.suites, '!lib-500-999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -191,7 +191,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1000_1499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-1000-1499') && !contains(inputs.suites, '!lib-1000-1499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -224,7 +224,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1500_1999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-1500-1999') && !contains(inputs.suites, '!lib-1500-1999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -257,7 +257,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2000_2499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-2000-2499') && !contains(inputs.suites, '!lib-2000-2499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -290,7 +290,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2500_2999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-2500-2999') && !contains(inputs.suites, '!lib-2500-2999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -323,7 +323,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3000_3499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-3000-3499') && !contains(inputs.suites, '!lib-3000-3499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -356,7 +356,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3500_3999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-3500-3999') && !contains(inputs.suites, '!lib-3500-3999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -389,7 +389,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4000_4499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-4000-4499') && !contains(inputs.suites, '!lib-4000-4499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -422,7 +422,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4500_4999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-4500-4999') && !contains(inputs.suites, '!lib-4500-4999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -455,7 +455,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_5000_5499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-5000-5499') && !contains(inputs.suites, '!lib-5000-5499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -488,7 +488,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_5500_5999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-5500-5999') && !contains(inputs.suites, '!lib-5500-5999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -521,7 +521,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_6000_6499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-6000-6499') && !contains(inputs.suites, '!lib-6000-6499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -554,7 +554,7 @@ jobs:
     needs: [type-mapping-tests]
     if: |
       always() &&
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_6500_6694 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-6500-6694') && !contains(inputs.suites, '!lib-6500-6694')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo

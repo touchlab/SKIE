@@ -5,99 +5,16 @@ name: Smoke Tests 2.2.20 [self-hosted]
 on:  
   schedule:
     # Every Saturday at 12am EST
-    - cron: '0 5 * * SAT'  
+    - cron: '0 5 * * SAT'
   workflow_dispatch:
     inputs:
-      invert_selection:
-        type: boolean
+      suites:
+        type: string
         required: false
-        default: false
-        description: '🔄 INVERT SELECTION: When enabled, UNCHECKED boxes will run and CHECKED boxes will be skipped'
-      run_acceptance_tests:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run Acceptance Tests'
-      run_type_mapping_tests:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run Type Mapping Tests'
-      run_gradle_tests:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run Gradle Tests'
-      run_external_libraries_tests_0_499:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 0-499'
-      run_external_libraries_tests_500_999:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 500-999'
-      run_external_libraries_tests_1000_1499:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 1000-1499'
-      run_external_libraries_tests_1500_1999:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 1500-1999'
-      run_external_libraries_tests_2000_2499:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 2000-2499'
-      run_external_libraries_tests_2500_2999:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 2500-2999'
-      run_external_libraries_tests_3000_3499:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 3000-3499'
-      run_external_libraries_tests_3500_3999:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 3500-3999'
-      run_external_libraries_tests_4000_4499:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 4000-4499'
-      run_external_libraries_tests_4500_4999:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 4500-4999'
-      run_external_libraries_tests_5000_5499:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 5000-5499'
-      run_external_libraries_tests_5500_5999:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 5500-5999'
-      run_external_libraries_tests_6000_6499:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 6000-6499'
-      run_external_libraries_tests_6500_6694:
-        type: boolean
-        required: false
-        default: true
-        description: 'Run External Libraries Tests 6500-6694'
+        default: 'acceptance,type-mapping,gradle,lib-0-499,lib-500-999,lib-1000-1499,lib-1500-1999,lib-2000-2499,lib-2500-2999,lib-3000-3499,lib-3500-3999,lib-4000-4499,lib-4500-4999,lib-5000-5499,lib-5500-5999,lib-6000-6499,lib-6500-6694'
+        description: |
+          Comma-separated test suites to run. Available: acceptance, type-mapping, gradle, lib-0-499, lib-500-999, lib-1000-1499, lib-1500-1999, lib-2000-2499, lib-2500-2999, lib-3000-3499, lib-3500-3999, lib-4000-4499, lib-4500-4999, lib-5000-5499, lib-5500-5999, lib-6000-6499, lib-6500-6694
+          Leave empty to run all. Use '!' prefix to exclude (e.g., '!lib-0-499').
       compiler_version:
         type: string
         required: true
@@ -143,7 +60,7 @@ jobs:
   acceptance-tests:
     name: Acceptance Tests 2.2.20[${{ inputs.compiler_version || '2.2.20' }}]
     if: |-
-      ((inputs.invert_selection || false) != (inputs.run_acceptance_tests || true))
+      (!inputs.suites || (contains(inputs.suites, 'acceptance') && !contains(inputs.suites, '!acceptance')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -165,7 +82,7 @@ jobs:
   gradle-tests:
     name: Gradle Tests 2.2.20[${{ inputs.compiler_version || '2.2.20' }}]
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_gradle_tests || true))
+      (!inputs.suites || (contains(inputs.suites, 'gradle') && !contains(inputs.suites, '!gradle')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -201,7 +118,7 @@ jobs:
   type-mapping-tests:
     name: Type Mapping Tests 2.2.20[${{ inputs.compiler_version || '2.2.20' }}]
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_type_mapping_tests || true))
+      (!inputs.suites || (contains(inputs.suites, 'type-mapping') && !contains(inputs.suites, '!type-mapping')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -225,7 +142,7 @@ jobs:
   external-libraries-tests-0-499:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 0-499
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_0_499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-0-499') && !contains(inputs.suites, '!lib-0-499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -248,7 +165,7 @@ jobs:
   external-libraries-tests-500-999:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 500-999
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_500_999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-500-999') && !contains(inputs.suites, '!lib-500-999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -271,7 +188,7 @@ jobs:
   external-libraries-tests-1000-1499:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 1000-1499
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1000_1499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-1000-1499') && !contains(inputs.suites, '!lib-1000-1499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -294,7 +211,7 @@ jobs:
   external-libraries-tests-1500-1999:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 1500-1999
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_1500_1999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-1500-1999') && !contains(inputs.suites, '!lib-1500-1999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -317,7 +234,7 @@ jobs:
   external-libraries-tests-2000-2499:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 2000-2499
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2000_2499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-2000-2499') && !contains(inputs.suites, '!lib-2000-2499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -340,7 +257,7 @@ jobs:
   external-libraries-tests-2500-2999:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 2500-2999
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_2500_2999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-2500-2999') && !contains(inputs.suites, '!lib-2500-2999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -363,7 +280,7 @@ jobs:
   external-libraries-tests-3000-3499:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 3000-3499
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3000_3499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-3000-3499') && !contains(inputs.suites, '!lib-3000-3499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -386,7 +303,7 @@ jobs:
   external-libraries-tests-3500-3999:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 3500-3999
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_3500_3999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-3500-3999') && !contains(inputs.suites, '!lib-3500-3999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -409,7 +326,7 @@ jobs:
   external-libraries-tests-4000-4499:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 4000-4499
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4000_4499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-4000-4499') && !contains(inputs.suites, '!lib-4000-4499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -432,7 +349,7 @@ jobs:
   external-libraries-tests-4500-4999:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 4500-4999
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_4500_4999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-4500-4999') && !contains(inputs.suites, '!lib-4500-4999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -455,7 +372,7 @@ jobs:
   external-libraries-tests-5000-5499:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 5000-5499
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_5000_5499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-5000-5499') && !contains(inputs.suites, '!lib-5000-5499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -478,7 +395,7 @@ jobs:
   external-libraries-tests-5500-5999:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 5500-5999
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_5500_5999 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-5500-5999') && !contains(inputs.suites, '!lib-5500-5999')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -501,7 +418,7 @@ jobs:
   external-libraries-tests-6000-6499:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 6000-6499
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_6000_6499 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-6000-6499') && !contains(inputs.suites, '!lib-6000-6499')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -524,7 +441,7 @@ jobs:
   external-libraries-tests-6500-6694:
     name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 6500-6694
     if: |
-      ((inputs.invert_selection || false) != (inputs.run_external_libraries_tests_6500_6694 || true))
+      (!inputs.suites || (contains(inputs.suites, 'lib-6500-6694') && !contains(inputs.suites, '!lib-6500-6694')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
