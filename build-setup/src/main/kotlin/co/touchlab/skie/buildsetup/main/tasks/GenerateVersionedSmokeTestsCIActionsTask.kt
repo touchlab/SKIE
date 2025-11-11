@@ -72,8 +72,8 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                 """
 
                   schedule:
-                    # Every Saturday at 2am EST
-                    - cron: '0 7 * * SAT'
+                    # Every Saturday at 12am EST
+                    - cron: '0 5 * * SAT'
                    """.trimIndent().prependIndent("  ")
             } else {
                 ""
