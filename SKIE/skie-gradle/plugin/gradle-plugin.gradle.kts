@@ -33,6 +33,4 @@ gradlePlugin {
 dependencies {
     api(projects.gradle.gradlePluginApi)
     implementation(projects.gradle.gradlePluginImpl)
-
-    compileOnly(kotlin("stdlib"))
 }

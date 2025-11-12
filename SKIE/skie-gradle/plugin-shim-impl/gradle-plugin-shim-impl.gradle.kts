@@ -10,6 +10,7 @@ skiePublishing {
 
 dependencies {
     // All dependencies should be `compileOnly` and instead brought in by `gradle-plugin-impl` to minimize the amount of runtime-loaded artifacts.
+    sharedCompileOnly(kotlin("stdlib"))
     sharedCompileOnly(projects.gradle.gradlePluginShimApi)
     sharedCompileOnly(projects.common.configuration.configurationDeclaration)
     sharedCompileOnly(projects.gradle.gradlePluginUtil)

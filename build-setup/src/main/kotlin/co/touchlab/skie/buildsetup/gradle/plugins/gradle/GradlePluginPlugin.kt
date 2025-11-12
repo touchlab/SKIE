@@ -59,7 +59,9 @@ abstract class GradlePluginPlugin : Plugin<Project> {
             archiveClassifier.set("")
 
             dependencies {
-                exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib.*"))
+                exclude {
+                    it.moduleGroup == "org.jetbrains.kotlin" && it.moduleName.startsWith("kotlin-stdlib")
+                }
             }
         }
 
@@ -77,7 +79,7 @@ abstract class GradlePluginPlugin : Plugin<Project> {
             val relocationTask = tasks.register<ShadowJar>("relocate-shim-$safeKotlinVersion") {
                 relocate("co.touchlab.skie.plugin.shim.impl", "co.touchlab.skie.plugin.shim.impl_$safeKotlinVersion")
                 configurations.set(listOf(shimConfiguration))
-                archiveClassifier.set(safeKotlinVersion)
+                archiveClassifier.set("shim-impl-$safeKotlinVersion")
             }
 
             tasks.named("compileKotlin").configure {
