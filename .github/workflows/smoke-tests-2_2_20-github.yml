@@ -8,9 +8,9 @@ on:
       suites:
         type: string
         required: false
-        default: 'acceptance,type-mapping,gradle,lib-0-499,lib-500-999,lib-1000-1499,lib-1500-1999,lib-2000-2499,lib-2500-2999,lib-3000-3499,lib-3500-3999,lib-4000-4499,lib-4500-4999,lib-5000-5499,lib-5500-5999,lib-6000-6499,lib-6500-6735'
+        default: 'acceptance,type-mapping,gradle,lib-0-499,lib-500-999,lib-1000-1499,lib-1500-1999,lib-2000-2499,lib-2500-2999,lib-3000-3499,lib-3500-3999,lib-4000-4499,lib-4500-4999,lib-5000-5499,lib-5500-5999,lib-6000-6499,lib-6500-6734'
         description: |
-          Comma-separated test suites to run. Available: acceptance, type-mapping, gradle, lib-0-499, lib-500-999, lib-1000-1499, lib-1500-1999, lib-2000-2499, lib-2500-2999, lib-3000-3499, lib-3500-3999, lib-4000-4499, lib-4500-4999, lib-5000-5499, lib-5500-5999, lib-6000-6499, lib-6500-6735
+          Comma-separated test suites to run. Available: acceptance, type-mapping, gradle, lib-0-499, lib-500-999, lib-1000-1499, lib-1500-1999, lib-2000-2499, lib-2500-2999, lib-3000-3499, lib-3500-3999, lib-4000-4499, lib-4500-4999, lib-5000-5499, lib-5500-5999, lib-6000-6499, lib-6500-6734
           Leave empty to run all. Use '!' prefix to exclude (e.g., '!lib-0-499').
       compiler_version:
         type: string
@@ -435,10 +435,10 @@ jobs:
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
           onlyIndices: "6000-6499"
   
-  external-libraries-tests-6500-6735:
-    name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 6500-6735
+  external-libraries-tests-6500-6734:
+    name: External Libraries Tests (2.2.20[${{ inputs.compiler_version || '2.2.20' }}]) 6500-6734
     if: |
-      (!inputs.suites || (contains(inputs.suites, 'lib-6500-6735') && !contains(inputs.suites, '!lib-6500-6735')))
+      (!inputs.suites || (contains(inputs.suites, 'lib-6500-6734') && !contains(inputs.suites, '!lib-6500-6734')))
     runs-on: macos-14
     steps:
       - name: Checkout Repo
@@ -456,4 +456,4 @@ jobs:
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-          onlyIndices: "6500-6735"
+          onlyIndices: "6500-6734"

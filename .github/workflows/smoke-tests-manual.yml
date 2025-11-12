@@ -8,9 +8,9 @@ on:
       suites:
         type: string
         required: false
-        default: 'acceptance,type-mapping,gradle,lib-0-499,lib-500-999,lib-1000-1499,lib-1500-1999,lib-2000-2499,lib-2500-2999,lib-3000-3499,lib-3500-3999,lib-4000-4499,lib-4500-4999,lib-5000-5499,lib-5500-5999,lib-6000-6499,lib-6500-6735'
+        default: 'acceptance,type-mapping,gradle,lib-0-499,lib-500-999,lib-1000-1499,lib-1500-1999,lib-2000-2499,lib-2500-2999,lib-3000-3499,lib-3500-3999,lib-4000-4499,lib-4500-4999,lib-5000-5499,lib-5500-5999,lib-6000-6499,lib-6500-6734'
         description: |
-          Comma-separated test suites to run. Available: acceptance, type-mapping, gradle, lib-0-499, lib-500-999, lib-1000-1499, lib-1500-1999, lib-2000-2499, lib-2500-2999, lib-3000-3499, lib-3500-3999, lib-4000-4499, lib-4500-4999, lib-5000-5499, lib-5500-5999, lib-6000-6499, lib-6500-6735
+          Comma-separated test suites to run. Available: acceptance, type-mapping, gradle, lib-0-499, lib-500-999, lib-1000-1499, lib-1500-1999, lib-2000-2499, lib-2500-2999, lib-3000-3499, lib-3500-3999, lib-4000-4499, lib-4500-4999, lib-5000-5499, lib-5500-5999, lib-6000-6499, lib-6500-6734
           Leave empty to run all. Use '!' prefix to exclude (e.g., '!lib-0-499').
       kotlin_version_name:
         type: string
@@ -97,7 +97,7 @@ jobs:
     runs-on: self-hosted
     needs: [acceptance-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'gradle') && !contains(inputs.suites, '!gradle')))
     steps:
       - name: Checkout Repo
@@ -135,7 +135,7 @@ jobs:
     runs-on: self-hosted
     needs: [gradle-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'type-mapping') && !contains(inputs.suites, '!type-mapping')))
     steps:
       - name: Checkout Repo
@@ -168,7 +168,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 0-499
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-0-499') && !contains(inputs.suites, '!lib-0-499')))
     runs-on: self-hosted
     steps:
@@ -201,7 +201,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 500-999
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-500-999') && !contains(inputs.suites, '!lib-500-999')))
     runs-on: self-hosted
     steps:
@@ -234,7 +234,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 1000-1499
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-1000-1499') && !contains(inputs.suites, '!lib-1000-1499')))
     runs-on: self-hosted
     steps:
@@ -267,7 +267,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 1500-1999
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-1500-1999') && !contains(inputs.suites, '!lib-1500-1999')))
     runs-on: self-hosted
     steps:
@@ -300,7 +300,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 2000-2499
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-2000-2499') && !contains(inputs.suites, '!lib-2000-2499')))
     runs-on: self-hosted
     steps:
@@ -333,7 +333,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 2500-2999
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-2500-2999') && !contains(inputs.suites, '!lib-2500-2999')))
     runs-on: self-hosted
     steps:
@@ -366,7 +366,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 3000-3499
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-3000-3499') && !contains(inputs.suites, '!lib-3000-3499')))
     runs-on: self-hosted
     steps:
@@ -399,7 +399,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 3500-3999
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-3500-3999') && !contains(inputs.suites, '!lib-3500-3999')))
     runs-on: self-hosted
     steps:
@@ -432,7 +432,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 4000-4499
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-4000-4499') && !contains(inputs.suites, '!lib-4000-4499')))
     runs-on: self-hosted
     steps:
@@ -465,7 +465,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 4500-4999
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-4500-4999') && !contains(inputs.suites, '!lib-4500-4999')))
     runs-on: self-hosted
     steps:
@@ -498,7 +498,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 5000-5499
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-5000-5499') && !contains(inputs.suites, '!lib-5000-5499')))
     runs-on: self-hosted
     steps:
@@ -531,7 +531,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 5500-5999
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-5500-5999') && !contains(inputs.suites, '!lib-5500-5999')))
     runs-on: self-hosted
     steps:
@@ -564,7 +564,7 @@ jobs:
     name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 6000-6499
     needs: [type-mapping-tests]
     if: |
-      always() &&
+      !cancelled() &&
       (!inputs.suites || (contains(inputs.suites, 'lib-6000-6499') && !contains(inputs.suites, '!lib-6000-6499')))
     runs-on: self-hosted
     steps:
@@ -593,12 +593,12 @@ jobs:
       #     report_paths: 'SKIE/acceptance-tests/build/test-results/libraries__*/TEST-*.xml'
       #     require_tests: true
   
-  external-libraries-tests-6500-6735:
-    name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 6500-6735
+  external-libraries-tests-6500-6734:
+    name: External Libraries Tests (${{ inputs.kotlin_version_name && (inputs.compiler_version && format('{0}[{1}]', inputs.kotlin_version_name, inputs.compiler_version) || inputs.kotlin_version_name) || '2.2.20' }}) 6500-6734
     needs: [type-mapping-tests]
     if: |
-      always() &&
-      (!inputs.suites || (contains(inputs.suites, 'lib-6500-6735') && !contains(inputs.suites, '!lib-6500-6735')))
+      !cancelled() &&
+      (!inputs.suites || (contains(inputs.suites, 'lib-6500-6734') && !contains(inputs.suites, '!lib-6500-6734')))
     runs-on: self-hosted
     steps:
       - name: Checkout Repo
@@ -616,7 +616,7 @@ jobs:
         env:
           KOTLIN_LINK_MODE: ${{ inputs.linkage }}
           KOTLIN_BUILD_CONFIGURATION: ${{ inputs.configuration }}
-          onlyIndices: "6500-6735"
+          onlyIndices: "6500-6734"
       # Log size can be too large which causes significant performance issues
       # - name: Publish Test Report
       #   uses: mikepenz/action-junit-report@v3

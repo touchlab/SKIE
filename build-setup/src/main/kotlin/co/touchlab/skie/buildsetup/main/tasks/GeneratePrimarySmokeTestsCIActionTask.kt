@@ -192,7 +192,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             runs-on: self-hosted
             needs: [acceptance-tests]
             if: |
-              always() &&
+              !cancelled() &&
               (!inputs.suites || (contains(inputs.suites, 'gradle') && !contains(inputs.suites, '!gradle')))
             steps:
               - name: Checkout Repo
@@ -230,7 +230,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             runs-on: self-hosted
             needs: [gradle-tests]
             if: |
-              always() &&
+              !cancelled() &&
               (!inputs.suites || (contains(inputs.suites, 'type-mapping') && !contains(inputs.suites, '!type-mapping')))
             steps:
               - name: Checkout Repo
@@ -273,7 +273,7 @@ abstract class GeneratePrimarySmokeTestsCIActionTask : DefaultTask() {
             name: External Libraries Tests ($$versionName) $${testBatch.range}
             needs: [type-mapping-tests]
             if: |
-              always() &&
+              !cancelled() &&
               (!inputs.suites || (contains(inputs.suites, 'lib-$${testBatch.range}') && !contains(inputs.suites, '!lib-$${testBatch.range}')))
             runs-on: self-hosted
             steps:
