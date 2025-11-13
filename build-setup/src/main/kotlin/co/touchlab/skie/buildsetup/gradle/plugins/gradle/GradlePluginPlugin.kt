@@ -12,6 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import com.gradle.publish.PublishPlugin
+import org.apache.tools.zip.ZipFile
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Category
@@ -58,6 +59,10 @@ abstract class GradlePluginPlugin : Plugin<Project> {
         tasks.shadowJar.configure {
             archiveClassifier.set("")
 
+            doLast {
+                verifyFatJarContent()
+            }
+
             dependencies {
                 exclude {
                     it.moduleGroup == "org.jetbrains.kotlin" && it.moduleName.startsWith("kotlin-stdlib")
@@ -89,6 +94,33 @@ abstract class GradlePluginPlugin : Plugin<Project> {
             dependencies {
                 shimConfiguration(project(":gradle:gradle-plugin-shim-impl"))
                 add("runtimeOnly", relocationTask.map { it.outputs.files })
+            }
+        }
+    }
+}
+
+private fun ShadowJar.verifyFatJarContent() {
+    val allowedFiles = listOf(
+        "about.html",
+        "LICENSE",
+        "vendors.json",
+    )
+
+    val allowedDirectories = listOf(
+        "co/touchlab/skie",
+        "META-INF",
+        "OSGI-INF",
+    ).map { "$it/" }
+
+    val jar = archiveFile.get().asFile
+
+    ZipFile(jar).use { zip ->
+        zip.entries.toList().filter { !it.isDirectory }.forEach { entry ->
+            val isAllowedFile = entry.name in allowedFiles
+            val isInAllowedDirectory = allowedDirectories.any { entry.name.startsWith(it) }
+
+            check(isAllowedFile || isInAllowedDirectory) {
+                "File ${entry.name} is not allowed in the fat jar."
             }
         }
     }
