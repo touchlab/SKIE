@@ -31,6 +31,26 @@ gradlePlugin {
 }
 
 dependencies {
+    // Do not forget to add correct relocations
     api(projects.gradle.gradlePluginApi)
     implementation(projects.gradle.gradlePluginImpl)
+}
+
+tasks.shadowJar.configure {
+    val packagesToRelocate = listOf(
+        "com.googlecode",
+        "com.mixpanel",
+        "io.cloudflight",
+        "kotlinx.serialization",
+        "org.apache",
+        "org.eclipse",
+        "org.intellij",
+        "org.jetbrains.annotations",
+        "org.json",
+        "org.slf4j",
+    )
+
+    packagesToRelocate.forEach {
+        relocate(it, "co.touchlab.skie.relocated.$it")
+    }
 }
