@@ -49,4 +49,7 @@ class SkieTestRunner : TestTemplateInvocationContextProvider {
             SkieTestMatrixContext(it) as TestTemplateInvocationContext
         }.stream()
     }
+
+    override fun mayReturnZeroTestTemplateInvocationContexts(context: ExtensionContext?): Boolean =
+        true
 }

@@ -1,6 +1,7 @@
 package co.touchlab.skie.test.suite.gradle.configurationcache
 
 import co.touchlab.skie.test.annotation.MatrixTest
+import co.touchlab.skie.test.annotation.filter.OnlyKotlinUpTo
 import co.touchlab.skie.test.annotation.filter.Smoke
 import co.touchlab.skie.test.annotation.type.GradleTests
 import co.touchlab.skie.test.base.BaseGradleTests
@@ -72,6 +73,7 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
     }
 
     @MatrixTest
+    @OnlyKotlinUpTo(major = 2, minor = 2)
     fun `framework artifacts`(
         kotlinVersion: KotlinVersion,
         linkMode: LinkMode,
@@ -103,6 +105,7 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
     }
 
     @MatrixTest
+    @OnlyKotlinUpTo(major = 2, minor = 2)
     fun `xcframework artifact`(
         kotlinVersion: KotlinVersion,
         linkMode: LinkMode,

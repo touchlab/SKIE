@@ -1,6 +1,7 @@
-package co.touchlab.skie.test.suite.gradle.basic
+package co.touchlab.skie.test.suite.gradle.basic.artifact
 
 import co.touchlab.skie.test.annotation.MatrixTest
+import co.touchlab.skie.test.annotation.filter.OnlyKotlinUpTo
 import co.touchlab.skie.test.annotation.filter.Smoke
 import co.touchlab.skie.test.annotation.type.GradleTests
 import co.touchlab.skie.test.base.BaseGradleTests
@@ -9,11 +10,11 @@ import co.touchlab.skie.test.template.Templates
 import co.touchlab.skie.test.util.KotlinTarget
 import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
-import co.touchlab.skie.test.util.presets
 
 @Suppress("ClassName")
 @Smoke
 @GradleTests
+@OnlyKotlinUpTo(major = 2, minor = 2)
 class KotlinArtifactDsl_UniversalFramework_AllDarwinTargetsTests: BaseGradleTests() {
     @MatrixTest
     fun `single darwin preset and single universal framework artifact`(

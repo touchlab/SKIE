@@ -1,4 +1,4 @@
-package co.touchlab.skie.test.suite.gradle.basic
+package co.touchlab.skie.test.suite.gradle.basic.binary
 
 import co.touchlab.skie.test.annotation.MatrixTest
 import co.touchlab.skie.test.annotation.filter.Smoke
