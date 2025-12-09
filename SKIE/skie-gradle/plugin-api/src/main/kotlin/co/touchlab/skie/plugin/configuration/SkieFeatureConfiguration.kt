@@ -158,7 +158,7 @@ abstract class SkieFeatureConfiguration @Inject constructor(objects: ObjectFacto
      *
      *     var body: some View {
      *         Text("Bound counter using Binding: \(boundCounter)")
-     *             .collect(flow: viewModel.counter, into: $counter)
+     *             .collect(flow: viewModel.counter, into: $boundCounter)
      *
      *         Text("Manually updated counter: \(manuallyUpdatedCounter)")
      *             .collect(flow: viewModel.counter) { latestValue in
