@@ -68,7 +68,7 @@ internal class NativeDescriptorProvider(
     }
 
     override val buildInLibraries: Set<KotlinLibrary> by lazy {
-        resolvedLibraries.filter { it.isDefault }.toSet() +
+        getDefaultLibraries(konanConfig) +
         // Kotlin 2.0 changed how is the stdlib handled and for some reason it's no longer marked as default
             setOfNotNull(builtIns.any.module.konanLibrary)
     }

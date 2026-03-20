@@ -5,7 +5,6 @@ package co.touchlab.skie.entrypoint
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
 import co.touchlab.skie.configuration.SkieConfigurationFlag
-import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.NativeGenerationState
 import org.jetbrains.kotlin.backend.konan.driver.phases.CodegenInput
 import org.jetbrains.kotlin.backend.konan.driver.phases.CodegenPhase
@@ -36,15 +35,15 @@ internal class CodegenPhaseInterceptor : PhaseInterceptor<NativeGenerationState,
             /*
              * This piece of code removes
              */
-            val existingMap = context.config.configuration.getMap(KonanConfigKeys.Companion.DEBUG_PREFIX_MAP)
-            context.config.configuration.put(KonanConfigKeys.Companion.DEBUG_PREFIX_MAP, emptyMap())
+            val existingMap = context.config.configuration.getMap(debugPrefixMapKey)
+            context.config.configuration.put(debugPrefixMapKey, emptyMap())
 
             // Touch the `debugInfo` to create it while the `DEBUG_PREFIX_MAP` is empty.
             @Suppress("UNUSED_VARIABLE")
             val debugInfo = context.debugInfo
 
             // Set the `DEBUG_PREFIX_MAP` back to original value so the .kt source files can get remapped correctly.
-            context.config.configuration.put(KonanConfigKeys.Companion.DEBUG_PREFIX_MAP, existingMap)
+            context.config.configuration.put(debugPrefixMapKey, existingMap)
         }
     }
 }
