@@ -28,6 +28,8 @@ internal class CreateKirConstructorsPhase(
             configuration = descriptorConfigurationProvider.getConfiguration(descriptor),
         )
 
+        constructor.documentation = descriptor.kirDocumentation
+
         descriptorKirProvider.registerCallableDeclaration(constructor, descriptor)
 
         kirClass.withTypeParameterScope {

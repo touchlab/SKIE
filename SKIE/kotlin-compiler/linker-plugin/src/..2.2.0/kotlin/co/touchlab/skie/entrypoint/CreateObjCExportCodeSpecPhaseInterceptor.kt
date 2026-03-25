@@ -4,7 +4,6 @@ package co.touchlab.skie.entrypoint
 
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
-import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
 import org.jetbrains.kotlin.backend.konan.driver.phases.CreateObjCExportCodeSpecPhase
 import org.jetbrains.kotlin.backend.konan.driver.phases.PsiToIrContext
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportCodeSpec
@@ -25,13 +24,6 @@ internal class CreateObjCExportCodeSpecPhaseInterceptor : PhaseInterceptor<PsiTo
             mainSkieContext = mainSkieContext,
             symbolTable = context.symbolTable!!,
         )
-
-        EntrypointUtils.runKirPhases(
-            mainSkieContext = mainSkieContext,
-            objCExportedInterfaceProvider = ObjCExportedInterfaceProvider(input),
-        )
-
-        EntrypointUtils.runSirPhases(mainSkieContext)
 
         return next(context, input)
     }

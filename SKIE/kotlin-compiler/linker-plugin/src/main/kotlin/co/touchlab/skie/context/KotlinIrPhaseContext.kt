@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.resolve.BindingContext
 
 class KotlinIrPhaseContext internal constructor(
-    mainSkieContext: MainSkieContext,
+    val mainSkieContext: MainSkieContext,
     val moduleFragment: IrModuleFragment,
     internal val pluginContext: CompatibleIrPluginContext,
 ) : KotlinIrPhase.Context, ForegroundPhaseCompilerContext by mainSkieContext {

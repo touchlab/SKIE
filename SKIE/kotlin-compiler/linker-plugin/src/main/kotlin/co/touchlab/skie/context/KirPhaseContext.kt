@@ -13,7 +13,7 @@ import co.touchlab.skie.phases.kotlinBuiltins
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
 class KirPhaseContext(
-    mainSkieContext: MainSkieContext,
+    val mainSkieContext: MainSkieContext,
     val objCExportedInterfaceProvider: ObjCExportedInterfaceProvider,
 ) : KirPhase.Context, ForegroundPhaseCompilerContext by mainSkieContext {
 

@@ -140,7 +140,7 @@ fun SirSimpleFunction.shallowCopy(
         isAsync = isAsync,
         throws = throws,
         deprecationLevel = deprecationLevel,
-    )
+    ).also { it.documentation = this.documentation }
 
 fun SirDeclarationParent.coerceModalityForSimpleFunctionOrProperty(modality: SirModality = SirModality.ModuleLimited): SirModality {
     return when (this) {
