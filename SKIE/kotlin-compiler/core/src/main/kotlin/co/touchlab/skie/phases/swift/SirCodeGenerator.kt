@@ -33,6 +33,7 @@ import co.touchlab.skie.util.GeneratedBySkieComment
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.AttributedSpec
 import io.outfoxx.swiftpoet.CodeBlock
+import io.outfoxx.swiftpoet.EnumerationCaseSpec
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
@@ -355,11 +356,17 @@ object SirCodeGenerator {
             .takeIf { it.isNotEmpty() }
             ?.let { TupleTypeName.of(it) }
 
-        if (associatedValues != null) {
-            addEnumCase(enumCase.simpleName, associatedValues)
+        val spec = if (associatedValues != null) {
+            EnumerationCaseSpec.builder(enumCase.simpleName, associatedValues)
         } else {
-            addEnumCase(enumCase.simpleName)
+            EnumerationCaseSpec.builder(enumCase.simpleName)
         }
+
+        if (enumCase.documentation.isNotBlank()) {
+            spec.addDoc(CodeBlock.of("%L", enumCase.documentation))
+        }
+
+        addEnumCase(spec.build())
     }
 
     private fun <T : BuilderWithMembers> T.generateFunction(function: SirSimpleFunction) {

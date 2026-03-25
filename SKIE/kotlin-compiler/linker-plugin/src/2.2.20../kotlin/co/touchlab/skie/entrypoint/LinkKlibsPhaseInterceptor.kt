@@ -51,6 +51,13 @@ internal class LinkKlibsPhaseInterceptor : PhaseInterceptor<LinkKlibsContext, Li
             ),
         )
 
+        EntrypointUtils.runKirPhases(
+            mainSkieContext = mainSkieContext,
+            objCExportedInterfaceProvider = mainSkieContext.objCExportedInterfaceProvider,
+        )
+
+        EntrypointUtils.runSirPhases(mainSkieContext)
+
         return phaseOutput
     }
 }

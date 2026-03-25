@@ -12,6 +12,8 @@ class KirEnumEntry(
     val hasUserDefinedName: Boolean,
 ) : KirElement {
 
+    var documentation: String = ""
+
     lateinit var oirEnumEntry: OirProperty
 
     val sirEnumEntry: SirProperty
