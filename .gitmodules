@@ -1,3 +1,0 @@
-[submodule "SKIE/acceptance-tests"]
-	path = SKIE/acceptance-tests
-	url = git@github.com:touchlab/SKIE-acceptance-tests.git
