@@ -1,0 +1,5 @@
+{
+    "disabledConfigurationFlags": [
+        "Feature_CoroutinesInterop"
+    ]
+}

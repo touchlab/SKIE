@@ -1,0 +1,564 @@
+## >= 1.8.0 --------------------------
+
+# Generated property collides with preprocessor macro from system headers
+> @property (readonly) int32_t SEEK_CUR __attribute__((swift_name("SEEK_CUR")));
+> #define SEEK_CUR
+[xcode-dependent] com.soywiz.korlibs.korim:korim-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> @property (readonly) int32_t SEEK_CUR __attribute__((swift_name("SEEK_CUR")));
+> #define SEEK_CUR
+[xcode-dependent] com.soywiz:korlibs-image-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) KotlinUiImageVector *NO __attribute__((swift_name("NO")));
+dev.carlsen.flagkit:flagkit-iosarm64
+# These libraries were added only in 2.1.20 test suite but the bug is present even before
+eu.acolombo.flagkit:flagkit-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (class, readonly) NSString *__FILE__ __attribute__((swift_name("__FILE__")));
+com.jakewharton.cite:cite-runtime-iosarm64
+
+> error: expected identifier
+> - (double)maxOrElseNil:(double)nil __attribute__((swift_name("maxOrElse(nil:)")));
+com.soywiz.korlibs.korma:korma-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> error: expected identifier
+> - (double)maxOrElseNil:(double)nil __attribute__((swift_name("maxOrElse(nil:)")));
+[skie-enabled] com.soywiz:korlibs-math-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) int32_t FALSE __attribute__((swift_name("FALSE")));
+com.soywiz.korlibs.luak:luak-iosarm64
+
+> error: expected selector for Objective-C method
+> - (KotlinExpression *)^Degree:(id)degree __attribute__((swift_name("^(degree:)")));
+eu.sirotin.kotunil:kotunil-iosarm64
+
+# Bug in Kotlin compiler (nil is not escaped even though it is not a valid identifier)
+> error: expected selector for Objective-C method
+> - (KotlinField *)nil __attribute__((swift_name("nil()")));
+org.chiachat:kbls-iosarm64
+
+# Same as above
+> error: expected identifier
+> - (double)maxOrElseNil:(double)nil __attribute__((swift_name("maxOrElse(nil:)")));
+com.soywiz.korge:korge-foundation-iosarm64
+
+# Same as above
+> error: expected member name or ';' after declaration specifiers
+> @property KotlinFormattingTuple *NULL __attribute__((swift_name("NULL")));
+ru.mobiledev:slf4k-api-1.7-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) KotlinTag *NULL __attribute__((swift_name("NULL")));
+it.krzeminski:snakeyaml-engine-kmp-iosarm64
+
+# Same as above
+# These libraries were added only in 2.2.20 test suite but the bug is present even before
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) NSString *NULL __attribute__((swift_name("NULL")));
+ai.koog:prompt-structure-iosarm64
+
+# Bug in Kotlin compiler (SKIE exposes extra classes due to transitive export for sealed subclasses)
+# org.ton:ton-kotlin libraries are not in 1.8.0 test suite but the bug is present even in 1.8.0
+> + (instancetype)nil __attribute__((swift_name("init()")));
+[skie-enabled] org.ton:ton-kotlin-block-iosarm64
+[skie-enabled] org.ton:ton-kotlin-contract-iosarm64
+[skie-enabled] org.ton:ton-kotlin-liteapi-iosarm64
+[skie-enabled] org.ton:ton-kotlin-liteclient-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> + (instancetype)nil __attribute__((swift_name("init()")));
+org.ton:ton-kotlin-block-tlb-iosarm64
+org.ton:ton-kotlin-liteapi-tl-iosarm64
+# These libraries were added only in 2.1.20 test suite but the bug is present even before
+[skie-enabled] org.ton.kotlin:ton-kotlin-block-tlb-iosarm64
+[skie-enabled] org.ton.kotlin:ton-kotlin-contract-iosarm64
+[skie-enabled] org.ton.kotlin:ton-kotlin-liteapi-tl-iosarm64
+[skie-enabled] org.ton.kotlin:ton-kotlin-liteclient-iosarm64
+
+# Bug in Kotlin compiler - it generates invalid header (however, Swift compiler for some reason rejects this header only with `-import-underlying-module` flag that SKIE has to use), see SKIE-281
+> <unknown>:0: error: duplicate definition of method '-[KotlinMockmp_runtimeVerificationBuilder threwBlock:]'
+[skie-enabled] org.kodein.mock:mockmp-test-helper-junit5-iosarm64
+[skie-enabled] org.kodein.mock:mockmp-test-helper-iosarm64
+
+# Same as above
+> <unknown>:0: error: duplicate definition of method '-[KotlinVerificationBuilder threwBlock:]'
+[skie-enabled] org.kodein.mock:mockmp-runtime-iosarm64
+
+# Same as above
+> <unknown>:0: error: duplicate definition of method '-[KotlinBlocBuilder reduceAndReducer:]'
+[skie-enabled] com.1gravity:bloc-core-iosarm64
+
+# Same as above
+> error: duplicate declaration of method 'mergeData:completionHandler:'
+[skie-enabled] uk.gibby:surrealdb-kotlin-driver-iosarm64
+
+# Same as above
+# This library were added only in 2.1.20 test suite but the bug is present even before
+> error: duplicate definition of method '-[KotlinUpdatableCompanion update:completionHandler:]'
+io.github.devngho:kt_kisopenapi-iosarm64
+
+# Same as above
+# This library were added only in 2.2.0 test suite but the bug is present even before
+> error: duplicate definition of method '-[KotlinTransmissionTestTestResult lastData]'
+com.trendyol:transmission-test-iosarm64
+
+# Invalid unicode character in generated header by the compiler
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+# Uses `pascal` in header which is a macro that resolves to nothing
+> error: expected selector for Objective-C method
+[xcode-dependent] com.splendo.kaluga:scientific-iosarm64
+
+## >= 1.8.0 \ 1.8.20 --------------------------
+
+# 1.8.20 has a different bug that occurs earlier in the compilation
+> error: expected member name or ';' after declaration specifiers
+> @property (class, readonly) KotlinAbcOpcode *typeof __attribute__((swift_name("typeof")));
+com.soywiz.korlibs.korge2:korge-swf-iosarm64
+
+## >= 2.0.20 --------------------------
+
+# Bug in Kotlin compiler - it generates invalid header (however, Swift compiler for some reason rejects this header only with `-import-underlying-module` flag that SKIE has to use), see SKIE-281
+# This library was renamed from korlibs-ffi in 2.0.20 test suite but the bug is present even before
+> error: duplicate definition of method '-[KotlinFFIStructure pointer]'
+[skie-enabled] com.soywiz:korlibs-ffi-legacy-iosarm64
+[skie-enabled] com.soywiz:korlibs-all-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) int32_t FALSE __attribute__((swift_name("FALSE")));
+at.asitplus:jsonpath-iosarm64
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'Asn1Element?' to return type 'Asn1Sequence?'
+at.asitplus.crypto:datatypes-iosarm64
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'DatatypesAsn1Element?' to return type 'DatatypesAsn1Sequence?'
+at.asitplus.crypto:datatypes-jws-iosarm64
+
+## >= 2.1.0 --------------------------
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'IndispensableAsn1Element?' to return type 'IndispensableAsn1Sequence?'
+at.asitplus.wallet:vck-aries-iosarm64
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'Indispensable_asn1Asn1Element?' to return type 'Indispensable_asn1Asn1Sequence?'
+# Older version of this library (used in older Kotlin flavors) has a different name for the type: 'Asn1Element' causing the error to be slightly different
+at.asitplus.signum:indispensable-iosarm64
+# Older version of this library (used in older Kotlin flavors) has a different name for the type: 'IndispensableAsn1Element' causing the error to be slightly different
+at.asitplus.signum:indispensable-josef-iosarm64
+
+> e: Compilation failed: Parent of this declaration is not a class: FUN MISSING_DECLARATION name:item visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+app.cash.paging:paging-runtime-composeui-iosarm64
+
+> e: java.lang.IllegalStateException: No file for app.cash.redwood.treehouse.lazylayout.compose/LazyColumn|LazyColumn(kotlin.collections.List<app.cash.redwood.treehouse.lazylayout.api.LazyListIntervalContent>;app.cash.redwood.LayoutModifier){}[0]
+app.cash.redwood:redwood-treehouse-lazylayout-compose-iosarm64
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
+br.com.devsrsouza.compose.icons:css-gg-iosarm64
+br.com.devsrsouza.compose.icons:erikflowers-weather-icons-iosarm64
+br.com.devsrsouza.compose.icons:feather-iosarm64
+br.com.devsrsouza.compose.icons:font-awesome-iosarm64
+br.com.devsrsouza.compose.icons:line-awesome-iosarm64
+br.com.devsrsouza.compose.icons:linea-iosarm64
+br.com.devsrsouza.compose.icons:octicons-iosarm64
+br.com.devsrsouza.compose.icons:simple-icons-iosarm64
+br.com.devsrsouza.compose.icons:tabler-icons-iosarm64
+br.com.devsrsouza.compose.icons:eva-icons-iosarm64
+
+> e: Compilation failed: Unexpected initializer: org.jetbrains.kotlin.ir.expressions.impl.IrCompositeImpl
+ca.gosyer:accompanist-flowlayout-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.ui/Modifier|null[0] (@ androidx.compose.ui/Modifier|null[0])
+ca.gosyer:accompanist-pager-indicators-iosarm64
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.foundation.gestures/ScrollableState|null[0] (@ androidx.compose.foundation.gestures/ScrollableState|null[0])
+ca.gosyer:accompanist-pager-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.animation.core/InfiniteRepeatableSpec|null[0] (@ androidx.compose.animation.core/InfiniteRepeatableSpec|null[0])
+ca.gosyer:accompanist-placeholder-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.foundation.gestures/FlingBehavior|null[0] (@ androidx.compose.foundation.gestures/FlingBehavior|null[0])
+ca.gosyer:accompanist-snapper-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.ui.graphics/Color|null[0] (@ androidx.compose.ui.graphics/Color|null[0])
+ca.gosyer:compose-material-dialogs-color-iosarm64
+ca.gosyer:compose-material-dialogs-datetime-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.ui.unit/Dp|null[0] (@ androidx.compose.ui.unit/Dp|null[0])
+ca.gosyer:compose-material-dialogs-core-iosarm64
+
+> e: java.lang.IllegalStateException: IrConstructorSymbolImpl is unbound. Signature: androidx.compose.runtime/Composable.<init>
+ca.gosyer:voyager-core-iosarm64
+cafe.adriel.voyager:voyager-core-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
+com.adamglin:phosphor-icon-iosarm64
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.painter/Painter|null[0] (@ androidx.compose.ui.graphics.painter/Painter|null[0])
+com.adeo.libres:libres-compose-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) KotlinModelParseRuleMatch *FALSE __attribute__((swift_name("FALSE")));
+com.atlassian.prosemirror:collab-iosarm64
+com.atlassian.prosemirror:history-iosarm64
+com.atlassian.prosemirror:state-iosarm64
+com.atlassian.prosemirror:test-builder-iosarm64
+com.atlassian.prosemirror:transform-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) KotlinParseRuleMatch *FALSE __attribute__((swift_name("FALSE")));
+com.atlassian.prosemirror:model-iosarm64
+
+> e: java.lang.IllegalStateException: no implementation for FUN MISSING_DECLARATION name:DerivedSetup visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+com.bumble.appyx:material3-iosarm64
+
+> e: java.lang.NullPointerException
+com.carlonzo.ukey2:ukey2-kmp-iosarm64
+
+> e: java.lang.IllegalStateException: no implementation for FUN MISSING_DECLARATION name:<get-current> visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+com.daftmobile.redukt:redukt-compose-iosarm64
+
+> e: Compilation failed: No file for com.episode6.redux.compose/collectAsState|collectAsState@com.episode6.redux.StoreFlow<0:0>(kotlin.coroutines.CoroutineContext;kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+com.episode6.redux:compose-iosarm64
+
+> e: java.lang.IllegalStateException: No file for com.fleeksoft.ksoup/Ksoup|null[0] (@ com.fleeksoft.ksoup/Ksoup|null[0])
+com.fleeksoft.ksoup.network:ksoup-network-iosarm64
+
+> e: java.lang.IllegalStateException: no implementation for FUN MISSING_DECLARATION name:item visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+com.huanshankeji:compose-multiplatform-common-iosarm64
+# Added in 2.1.20
+com.huanshankeji:compose-multiplatform-html-unified-common-iosarm64
+
+> e: java.lang.IllegalStateException: no implementation for FUN MISSING_DECLARATION name:Label visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+com.huanshankeji:compose-multiplatform-material2-iosarm64
+
+> e: Compilation failed: no implementation for FUN MISSING_DECLARATION name:DropdownMenu visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+> in com.huanshankeji.compose.material3.ext.DropdownMenuBoxScope
+com.huanshankeji:compose-multiplatform-material3-iosarm64
+# Added in 2.1.20
+com.huanshankeji:compose-multiplatform-html-unified-material3-iosarm64
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.ui/Modifier|null[0] (@ androidx.compose.ui/Modifier|null[0])
+com.mikepenz:multiplatform-markdown-renderer-iosarm64
+
+> e: java.lang.IllegalStateException: IrConstructorSymbolImpl is unbound. Signature: androidx.compose.runtime/Composable.<init>|<init>(){}[0]
+com.mikepenz:multiplatform-markdown-renderer-m2-iosarm64
+com.mikepenz:multiplatform-markdown-renderer-m3-iosarm64
+
+> e: java.lang.IllegalStateException: No file for com.moriatsushi.koject.compose/rememberInject|rememberInject(kotlin.Any?){0§<kotlin.Any>}[0]
+com.moriatsushi.koject:koject-compose-core-iosarm64
+
+> e: java.lang.AssertionError: Shouldn't be exposed: deserialized class ResultType
+com.slack.eithernet:eithernet-iosarm64
+
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.biometry.compose/BindBiometryAuthenticatorEffect|BindBiometryAuthenticatorEffect(dev.icerock.moko.biometry.BiometryAuthenticator){}[0]
+dev.icerock.moko:biometry-compose-iosarm64
+
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.compose/getViewModel|getViewModel(kotlin.Any;dev.icerock.moko.mvvm.compose.ViewModelFactory<0:0>){0§<dev.icerock.moko.mvvm.viewmodel.ViewModel>}[0]
+dev.icerock.moko:mvvm-compose-iosarm64
+
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.flow.compose/collectAsMutableState|collectAsMutableState@kotlinx.coroutines.flow.MutableStateFlow<0:0>(kotlin.coroutines.CoroutineContext){0§<kotlin.Any?>}[0]
+dev.icerock.moko:mvvm-flow-compose-iosarm64
+
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.livedata.compose/observeAsState|observeAsState@dev.icerock.moko.mvvm.livedata.LiveData<0:0>(){0§<kotlin.Any?>}[0]
+dev.icerock.moko:mvvm-livedata-compose-iosarm64
+
+> e: java.lang.IllegalStateException: no implementation for FUN MISSING_DECLARATION name:<get-thin> visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+eu.codlab:lookandfeel-iosarm64
+
+> e: java.lang.AssertionError: Number of arguments should not be less than number of parameters, but: parameters=1, args=0
+fun.adaptive:adaptive-lib-auth-iosarm64
+fun.adaptive:adaptive-lib-auto-iosarm64
+fun.adaptive:adaptive-lib-email-iosarm64
+fun.adaptive:adaptive-lib-graphics-iosarm64
+fun.adaptive:adaptive-lib-markdown-iosarm64
+fun.adaptive:adaptive-lib-sandbox-iosarm64
+fun.adaptive:adaptive-ui-iosarm64
+
+> e: Compilation failed: IrConstructorSymbolImpl is unbound. Signature: androidx.compose.runtime/Composable.<init>|<init>(){}[0]
+io.github.gentle-hilt:voyager-core-iosarm64
+
+> e: java.lang.IllegalStateException: IrConstructorSymbolImpl is unbound. Signature: androidx.compose.runtime/Composable.<init>
+io.github.jordond.voyager:voyager-core-iosarm64
+
+> e: java.lang.AssertionError: Shouldn't be exposed: deserialized class XmlChildrenName
+io.github.pdvrieze.xmlutil:serialization-iosarm64
+
+> e: java.lang.IllegalStateException: No file for kotlinx.serialization/KSerializer|null[0] (@ kotlinx.serialization/KSerializer|null[0])
+io.github.takahirom.roborazzi:roborazzi-core-iosarm64
+# Added in 2.1.20
+space.iseki.purlkt:purlkt-iosarm64
+
+> e: Compilation failed: No file for org.burnoutcrew.reorderable/ReorderableItem|ReorderableItem(org.burnoutcrew.reorderable.ReorderableState<*>;kotlin.Any?;androidx.compose.ui.Modifier;androidx.compose.ui.Modifier;kotlin.Boolean;kotlin.Int?;kotlin.Function2<androidx.compose.foundation.layout.BoxScope,kotlin.Boolean,kotlin.Unit>){}[0]
+io.github.yannickpulver.composereorderable:reorderable-iosarm64
+
+> e: java.lang.AssertionError: Shouldn't be exposed: deserialized class DisplayName
+io.kotest:kotest-framework-api-iosarm64
+
+> e: java.lang.AssertionError: Shouldn't be exposed: deserialized class Filter
+love.forte.simbot.quantcat:simbot-quantcat-common-iosarm64
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
+moe.tlaster.compose.icons:css-gg-iosarm64
+moe.tlaster.compose.icons:erikflowers-weather-icons-iosarm64
+moe.tlaster.compose.icons:eva-icons-iosarm64
+moe.tlaster.compose.icons:feather-iosarm64
+moe.tlaster.compose.icons:font-awesome-iosarm64
+moe.tlaster.compose.icons:line-awesome-iosarm64
+moe.tlaster.compose.icons:linea-iosarm64
+moe.tlaster.compose.icons:octicons-iosarm64
+moe.tlaster.compose.icons:simple-icons-iosarm64
+moe.tlaster.compose.icons:tabler-icons-iosarm64
+
+> e: java.lang.Error: Linking globals named 'OBJC_CLASS_$_KotlinFloat': symbol multiply defined!
+org.jetbrains.kotlin-wrappers:kotlin-css-iosarm64
+
+> e: java.lang.Error: Linking globals named 'OBJC_METACLASS_$_KotlinNumber': symbol multiply defined!
+org.kobjects.parserlib:examples-iosarm64
+org.kobjects.parsek:examples-iosarm64
+
+> e: java.lang.IllegalStateException: No file for kotlinx.coroutines.flow/MutableStateFlow|null[0] (@ kotlinx.coroutines.flow/MutableStateFlow|null[0])
+ru.astrainteractive.mobilex:moko-mvi-iosarm64
+ru.astrainteractive.mobilex:mvi-core-iosarm64
+ru.astrainteractive.mobilex:mvi-iosarm64
+ru.astrainteractive.mobilex:mvi-moko-iosarm64
+
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.resources/StringResource|null[0] (@ dev.icerock.moko.resources/StringResource|null[0])
+ru.astrainteractive.mobilex:uitext-mr-iosarm64
+
+> error: character <U+2236> not allowed in an identifier
+> - (id)P256_XMD∶SHA-256_SSWU_NU_Domain:(KotlinKotlinByteArray *)domain __attribute__((swift_name("P256_XMD∶SHA-256_SSWU_NU_(domain:)")));
+at.asitplus.signum:supreme-iosarm64
+
+> e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library:
+co.touchlab.skie:runtime-kotlin-1.8.0-iosarm64
+co.touchlab.skie:runtime-kotlin-1.8.20-iosarm64
+co.touchlab.skie:runtime-kotlin-1.9.0-iosarm64
+co.touchlab.skie:runtime-kotlin-1.9.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.0.0-iosarm64
+co.touchlab.skie:runtime-kotlin-2.0.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.1.0-iosarm64
+co.touchlab.skie:runtime-kotlin-2.1.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.2.0-iosarm64
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.0
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.20
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.0
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.20
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_2.0.0
+
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) uint32_t O_DSYNC __attribute__((swift_name("O_DSYNC")));
+[xcode-dependent] at.released.weh:host-iosarm64
+
+# Kotlin compiler bug - produces different message with SKIE and without
+> e: Compilation failed: Parent of this declaration is not a class: CONSTRUCTOR MISSING_DECLARATION visibility:public <> () returnType:kotlin.Nothing
+io.github.untactorder:toasterAtSnackBar-iosarm64
+
+# Bug in the Kotlin compiler
+> e: java.lang.IllegalStateException: no implementation for FUN MISSING_DECLARATION name:assistChipBorder visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+> in androidx.compose.material3.AssistChipDefaults
+io.github.qdsfdhvh:material3-iosarm64
+
+# Bug in the Kotlin compiler
+> Compilation failed: no implementation for FUN MISSING_DECLARATION name:Compose visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+> in com.bumble.appyx.navigation.node.ParentNode
+com.bumble.appyx:common-iosarm64
+
+# TODO[SKIE-553]: Invalid Swift is generated when suspend fun parameter is self
+> error: argument type 'Self' does not conform to expected type 'Cardinal_sdkDataOwnerWithType'
+com.icure:cardinal-dart-sdk-support-lib-iosarm64
+
+# TODO[SKIE-553]: Invalid Swift is generated when suspend fun parameter is self
+> error: argument type 'Self' does not conform to expected type 'DataOwnerWithType'
+com.icure:cardinal-sdk-iosarm64
+
+## <2.1.0, 2.2.0> --------------------------
+
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.media.compose/BindMediaPickerEffect|BindMediaPickerEffect(dev.icerock.moko.media.picker.ios.MediaPickerControllerProtocol){}[0]
+dev.icerock.moko:media-compose-iosarm64
+
+> e: java.lang.IllegalStateException: No file for kotlinx.serialization.internal/SerializerFactory|null[0] (@ kotlinx.serialization.internal/SerializerFactory|null[0])
+io.github.pavelannin:monadic-either-core-iosarm64
+io.github.pavelannin:monadic-lce-core-iosarm64
+io.github.pavelannin:monadic-lce-either-iosarm64
+io.github.pavelannin:monadic-optional-core-iosarm64
+io.github.pavelannin:monadic-optional-either-iosarm64
+
+> e: Compilation failed: No file for io.rsocket.kotlin.core/RSocketConnector|null[0] (@ io.rsocket.kotlin.core/RSocketConnector|null[0])
+io.rsocket.kotlin:rsocket-transport-ktor-client-iosarm64
+
+> e: java.lang.IllegalStateException: No file for kotlinx.datetime/Instant|null[0] (@ kotlinx.datetime/Instant|null[0])
+net.codinux.csv:kCSV-iosarm64
+
+## >= 2.1.20 --------------------------
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'Indispensable_asn1Asn1Element?' to return type 'Indispensable_asn1Asn1Sequence?'
+# Older version of this library (used in older Kotlin flavors) has a different name for the type: 'IndispensableAsn1Element' causing the error to be slightly different
+at.asitplus.wallet:vck-openid-iosarm64
+at.asitplus.wallet:openid-data-classes-iosarm64
+at.asitplus.wallet:vck-iosarm64
+# Added in 2.1.20
+at.asitplus.wallet:rqes-data-classes-iosarm64
+at.asitplus.wallet:vck-openid-ktor-iosarm64
+at.asitplus.wallet:vck-rqes-iosarm64
+# Added in 2.2.20
+at.asitplus.warden:supreme-client-iosarm64
+at.asitplus.warden:supreme-common-iosarm64
+
+> + (id<KotlinExpression>)nil __attribute__((swift_name("nil()")));
+> error: expected selector for Objective-C method
+com.dayanruben.maplibre-compose:maplibre-compose-expressions-iosarm64
+dev.sargunv.maplibre-compose:maplibre-compose-expressions-iosarm64
+
+> @property (class, readonly) NSString *__FILE__ __attribute__((swift_name("__FILE__")));
+> error: expected member name or ';' after declaration specifiers
+com.jakewharton.cite:cite-api-iosarm64
+
+# Kotlin Obj-C header is invalid, usually caused by some declaration name colliding with a builtin macro
+> error: expected ';' after method prototype
+io.github.sppzglou:all-in-one-kmm-iosarm64
+io.github.sppzglou:compose-booster-kmm-iosarm64
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.runtime.saveable/SaveableStateHolder|null[0] (@ androidx.compose.runtime.saveable/SaveableStateHolder|null[0])
+io.syncrasy.dynamic:core-navigation-iosarm64
+
+> @property (class, readonly) KotlinUnitAll *nil __attribute__((swift_name("nil")));
+> error: expected member name or ';' after declaration specifiers
+net.codinux.i18n:k-i18n-data-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+net.codinux.i18n:k-i18n-iosarm64
+
+> e: java.lang.IllegalStateException: No file for kotlinx.serialization.json/Json|null[0]
+com.eygraber:json-sugar-iosarm64
+
+> e: java.lang.IllegalStateException: no implementation for FUN MISSING_DECLARATION name:Label visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+> in com.huanshankeji.compose.material2.ext.ButtonScope
+com.huanshankeji:compose-multiplatform-html-unified-material2-iosarm64
+
+> @property (class, readonly) KotlinAxisType *- __attribute__((swift_name("-")));
+> - error: expected selector for Objective-C method
+space.kscience:plotly-kt-core-iosarm64
+
+> e: java.lang.IllegalStateException: No file for ru.alexgladkov.odyssey.compose.extensions/present|present@ru.alexgladkov.odyssey.compose.controllers.ModalController(ru.alexgladkov.odyssey.compose.navigation.modal_navigation.AlertConfiguration;kotlin.Function1<kotlin.String,kotlin.Unit>){}[0]
+io.github.alexgladkov:odyssey-compose-iosarm64
+
+> error: duplicate declaration of method 'featureId:'
+io.growthbook.sdk:GrowthBook-iosarm64
+
+> e: Compilation failed: Asked for symbol name for a private function FUN name:nGlobalInit visibility:private modality:FINAL <> () returnType:kotlin.Boolean [external]
+org.openani.mediamp:mediamp-mpv-iosarm64
+
+# TODO[SKIE-564]: SKIE should fail or warn when exposed members have the same name as the framework.
+> error: value of type 'CodeLanguage' has no member 'Skie'
+com.thebrownfoxx:karbon-14-iosarm64
+
+# We are replacing the runtime-kotlin in the Gradle plugin so this won't happen
+> e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library
+com.fresco-kitchenos:kitchenos-client-sdk-kos-core-iosarm64
+
+## <2.1.20, 2.2.0> --------------------------
+
+> @property (readonly) id<KotlinJsValue> NULL __attribute__((swift_name("NULL")));
+> error: property requires fields to be named
+app.zenmoney.jsbridge:jsbridge-iosarm64
+
+> e: java.lang.IllegalStateException: No file for kotlinx.serialization.internal/SerializerFactory|null[0]
+io.github.pavelannin:monadic-checkable-core-iosarm64
+io.github.pavelannin:monadic-identifiable-core-iosarm64
+io.github.pavelannin:monadic-lce-result-iosarm64
+io.github.pavelannin:monadic-refreshable-core-iosarm64
+io.github.pavelannin:monadic-result-core-iosarm64
+
+> ld: building for 'iOS', but linking in object file
+> built for 'iOS-simulator'
+io.maryk:maryk-rocksdb-iosarm64
+
+> e: Compilation failed: An interface expected but was Any
+space.kscience:kmath-core-iosarm64
+space.kscience:kmath-tensors-iosarm64
+
+> e: Compilation failed: Parent of this declaration is not a class: FUN MISSING_DECLARATION name:setContent visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+org.jetbrains.compose.ui:ui-test-uikitarm64
+
+## >= 2.2.0 --------------------------
+
+# Kotlin Obj-C header is invalid, usually caused by some declaration name colliding with a builtin macro
+> error: expected ';' after method prototype
+it.unibo.collektive:collektive-dsl-iosarm64
+it.unibo.collektive:collektive-stdlib-iosarm64
+it.unibo.collektive:collektive-test-tooling-iosarm64
+it.unibo.collektive:dsl-iosarm64
+it.unibo.collektive:stdlib-iosarm64
+it.unibo.collektive:test-tooling-iosarm64
+org.jetbrains.kotlinx:kotlinx-rpc-krpc-test-iosarm64
+
+# Same as above
+> error: expected ';' at end of declaration list
+com.wannaverse:countryselector-iosarm64
+
+# Same as above
+> error: expected selector for Objective-C method
+io.github.thanhdt-vietmap:vietmap-compose-expressions-iosarm64
+
+# Undefined Swift symbols
+> Undefined symbols
+> "type metadata accessor for RiveRuntime.RiveView", referenced from:
+dev.muazkadan:rive-cmp-iosarm64
+
+# Kotlin compiler bug
+> e: java.lang.Error: Linking globals named 'OBJC_CLASS_$_KotlinFloat': symbol multiply defined!
+io.github.windedge.viform:viform-core-iosarm64
+
+# Kotlin compiler bug
+> e: java.lang.IllegalStateException: No file for tech.kotlinlang.camera.analyser/IosImageAnalyser|null[0]
+tech.kotlinlang:camera.qr-iosarm64
+
+# Kotlin compiler bug
+# This library throws different errors in each version
+> e: Compilation failed: Function `kfun:com.river.core#collectAsReceiver#suspend__at__kotlinx.coroutines.flow.Flow<0:0>(kotlinx.coroutines.CoroutineScope;kotlin.coroutines.SuspendFunction1<com.river.core.ChannelReceiverContext<0:0>,kotlin.Unit>;kotlin.coroutines.Continuation<kotlin.Unit>){0§<kotlin.Any?>}kotlin.Any` is already defined.
+com.river-kt:core-iosarm64
+
+# Kotlin compiler bug triggered by SKIE
+# One function from a 3rd party library does not have a default value for one of it's default arguments when deserialized to IR (but has one in a descriptor)
+# The result is a crash when calling the function from the generated overload due to a check in the compiler verifying that a function provided values for all parameters without default arguments.
+# From the checker perspective, this parameter does not have default value even-though it does.
+# Does not happen with library cached enabled - must be fully turned off to reproduce. (plus requires flag for default arguments in external libraries)
+> Incomplete expression: call to FUN name:lazyStatic visibility:public modality:FINAL <T> (key:kotlin.Int, storage:dev.karmakrafts.lazystatic.LazyStaticStorage, block:kotlin.Function0<T of dev.karmakrafts.lazystatic.lazyStatic>) returnType:T of dev.karmakrafts.lazystatic.lazyStatic [inline] has no argument at index 0
+dev.karmakrafts.lazystatic:lazystatic-core-iosarm64
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+# This bug occurs in the rest of the family of this library but older versions of this specific library didn't have this problem
+> error: cannot convert return expression of type 'Indispensable_asn1Asn1Element?' to return type 'Indispensable_asn1Asn1Sequence?'
+at.asitplus.signum:indispensable-cosef-iosarm64
+
+> error: 'VNRecognizedPoint' is only available in iOS 14.0 or newer
+com.performancecoachlab.posedetection:posedetection-compose-iosarm64
+
+# Same as above
+> error: expected ';' after @class
+io.exoquery:exoquery-runtime-iosarm64
+io.exoquery:exoquery-controller-common-iosarm64
+io.exoquery:exoquery-native-iosarm64
+
+## 2.2.0 --------------------------
+
+# Bug in the Kotlin compiler
+> e: java.lang.IllegalStateException: Parent of this declaration is not a class: FUN MISSING_DECLARATION name:setContent visibility:public modality:FINAL <> () returnType:kotlin.Nothing
+com.atiurin:ultron-compose-iosarm64
+
+## --------------------------

@@ -1,0 +1,12 @@
+{
+    "enabledConfigurationFlags": [],
+    "groups": [
+        {
+            "target": "tests.configuration.limited_to_package.xxx.",
+            "overridesAnnotations": false,
+            "items": {
+                "SealedInterop.Case.Name": "X"
+            }
+        }
+    ]
+}

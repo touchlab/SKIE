@@ -1,0 +1,180 @@
+## >= 1.8.0 --------------------------
+
+# Generated property collides with preprocessor macro from system headers
+> @property (readonly) int32_t SEEK_CUR __attribute__((swift_name("SEEK_CUR")));
+> #define SEEK_CUR
+[xcode-dependent] com.soywiz.korlibs.korim:korim-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> @property (readonly) int32_t SEEK_CUR __attribute__((swift_name("SEEK_CUR")));
+> #define SEEK_CUR
+[xcode-dependent] com.soywiz:korlibs-image-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) KotlinUiImageVector *NO __attribute__((swift_name("NO")));
+dev.carlsen.flagkit:flagkit-iosarm64
+# These libraries were added only in 2.1.20 test suite but the bug is present even before
+eu.acolombo.flagkit:flagkit-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (class, readonly) NSString *__FILE__ __attribute__((swift_name("__FILE__")));
+com.jakewharton.cite:cite-runtime-iosarm64
+
+> error: expected identifier
+> - (double)maxOrElseNil:(double)nil __attribute__((swift_name("maxOrElse(nil:)")));
+com.soywiz.korlibs.korma:korma-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> error: expected identifier
+> - (double)maxOrElseNil:(double)nil __attribute__((swift_name("maxOrElse(nil:)")));
+[skie-enabled] com.soywiz:korlibs-math-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) int32_t FALSE __attribute__((swift_name("FALSE")));
+com.soywiz.korlibs.luak:luak-iosarm64
+
+> error: expected selector for Objective-C method
+> - (KotlinExpression *)^Degree:(id)degree __attribute__((swift_name("^(degree:)")));
+eu.sirotin.kotunil:kotunil-iosarm64
+
+# Bug in Kotlin compiler (nil is not escaped even though it is not a valid identifier)
+> error: expected selector for Objective-C method
+> - (KotlinField *)nil __attribute__((swift_name("nil()")));
+org.chiachat:kbls-iosarm64
+
+# Same as above
+> error: expected identifier
+> - (double)maxOrElseNil:(double)nil __attribute__((swift_name("maxOrElse(nil:)")));
+com.soywiz.korge:korge-foundation-iosarm64
+
+# Same as above
+> error: expected member name or ';' after declaration specifiers
+> @property KotlinFormattingTuple *NULL __attribute__((swift_name("NULL")));
+ru.mobiledev:slf4k-api-1.7-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) KotlinTag *NULL __attribute__((swift_name("NULL")));
+it.krzeminski:snakeyaml-engine-kmp-iosarm64
+
+# Same as above
+# These libraries were added only in 2.2.20 test suite but the bug is present even before
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) NSString *NULL __attribute__((swift_name("NULL")));
+ai.koog:prompt-structure-iosarm64
+
+# Bug in Kotlin compiler (SKIE exposes extra classes due to transitive export for sealed subclasses)
+# org.ton:ton-kotlin libraries are not in 1.8.0 test suite but the bug is present even in 1.8.0
+> + (instancetype)nil __attribute__((swift_name("init()")));
+[skie-enabled] org.ton:ton-kotlin-block-iosarm64
+[skie-enabled] org.ton:ton-kotlin-contract-iosarm64
+[skie-enabled] org.ton:ton-kotlin-liteapi-iosarm64
+[skie-enabled] org.ton:ton-kotlin-liteclient-iosarm64
+
+# Same as above
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+> + (instancetype)nil __attribute__((swift_name("init()")));
+org.ton:ton-kotlin-block-tlb-iosarm64
+org.ton:ton-kotlin-liteapi-tl-iosarm64
+# These libraries were added only in 2.1.20 test suite but the bug is present even before
+[skie-enabled] org.ton.kotlin:ton-kotlin-block-tlb-iosarm64
+[skie-enabled] org.ton.kotlin:ton-kotlin-contract-iosarm64
+[skie-enabled] org.ton.kotlin:ton-kotlin-liteapi-tl-iosarm64
+[skie-enabled] org.ton.kotlin:ton-kotlin-liteclient-iosarm64
+
+# Bug in Kotlin compiler - it generates invalid header (however, Swift compiler for some reason rejects this header only with `-import-underlying-module` flag that SKIE has to use), see SKIE-281
+> <unknown>:0: error: duplicate definition of method '-[KotlinMockmp_runtimeVerificationBuilder threwBlock:]'
+[skie-enabled] org.kodein.mock:mockmp-test-helper-junit5-iosarm64
+[skie-enabled] org.kodein.mock:mockmp-test-helper-iosarm64
+
+# Same as above
+> <unknown>:0: error: duplicate definition of method '-[KotlinVerificationBuilder threwBlock:]'
+[skie-enabled] org.kodein.mock:mockmp-runtime-iosarm64
+
+# Same as above
+> <unknown>:0: error: duplicate definition of method '-[KotlinBlocBuilder reduceAndReducer:]'
+[skie-enabled] com.1gravity:bloc-core-iosarm64
+
+# Same as above
+> error: duplicate declaration of method 'mergeData:completionHandler:'
+[skie-enabled] uk.gibby:surrealdb-kotlin-driver-iosarm64
+
+# Same as above
+# This library were added only in 2.1.20 test suite but the bug is present even before
+> error: duplicate definition of method '-[KotlinUpdatableCompanion update:completionHandler:]'
+io.github.devngho:kt_kisopenapi-iosarm64
+
+# Same as above
+# This library were added only in 2.2.0 test suite but the bug is present even before
+> error: duplicate definition of method '-[KotlinTransmissionTestTestResult lastData]'
+com.trendyol:transmission-test-iosarm64
+
+# Invalid unicode character in generated header by the compiler
+# These libraries were added only in 2.0.0 test suite but the bug is present even before
+# Uses `pascal` in header which is a macro that resolves to nothing
+> error: expected selector for Objective-C method
+[xcode-dependent] com.splendo.kaluga:scientific-iosarm64
+
+## >= 1.8.0 \ 1.8.20 --------------------------
+
+# 1.8.20 has a different bug that occurs earlier in the compilation
+> error: expected member name or ';' after declaration specifiers
+> @property (class, readonly) KotlinAbcOpcode *typeof __attribute__((swift_name("typeof")));
+com.soywiz.korlibs.korge2:korge-swf-iosarm64
+
+## 1.8.0 - 2.1.20 --------------------------
+
+> error: expected ';' after @class
+[skie-disabled] io.maryk.rocksdb:rocksdb-multiplatform-iosarm64
+[skie-disabled] io.realm.kotlin:cinterop-iosarm64
+[skie-disabled] io.realm.kotlin:library-base-iosarm64
+[skie-disabled] io.realm.kotlin:library-sync-iosarm64
+
+## >= 2.0.20 --------------------------
+
+# Bug in Kotlin compiler - it generates invalid header (however, Swift compiler for some reason rejects this header only with `-import-underlying-module` flag that SKIE has to use), see SKIE-281
+# This library was renamed from korlibs-ffi in 2.0.20 test suite but the bug is present even before
+> error: duplicate definition of method '-[KotlinFFIStructure pointer]'
+[skie-enabled] com.soywiz:korlibs-ffi-legacy-iosarm64
+[skie-enabled] com.soywiz:korlibs-all-iosarm64
+
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) int32_t FALSE __attribute__((swift_name("FALSE")));
+at.asitplus:jsonpath-iosarm64
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'Asn1Element?' to return type 'Asn1Sequence?'
+at.asitplus.crypto:datatypes-iosarm64
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'DatatypesAsn1Element?' to return type 'DatatypesAsn1Sequence?'
+at.asitplus.crypto:datatypes-jws-iosarm64
+
+## 2.0.20 --------------------------
+
+# Bug in Kotlin compiler - it generates invalid header (however, Swift compiler for some reason rejects this header only with `-import-underlying-module` flag that SKIE has to use), see SKIE-281
+> error: expected member name or ';' after declaration specifiers
+> @property (readonly) int32_t FALSE __attribute__((swift_name("FALSE")));
+at.asitplus:jsonpath4k-iosarm64
+
+# Same as above
+> error: expected ';' at end of declaration list
+> @property (class, readonly) KotlinMethod *_2022-blake3-aes-128-gcm __attribute__((swift_name("_2022-blake3-aes-128-gcm")));
+# Newer version of this library (used in newer Kotlin flavors) no longer has this problem
+io.github.tim06.xray-configuration:xray-configuration-iosarm64
+
+# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
+> error: cannot convert return expression of type 'Asn1Element?' to return type 'Asn1Sequence?'
+# Newer version of this library (used in newer Kotlin flavors) has a different name for the type: 'Indispensable_asn1Asn1Element' causing the error to be slightly different
+at.asitplus.signum:indispensable-iosarm64
+
+# Same as above
+> error: cannot convert return expression of type 'IndispensableAsn1Element?' to return type 'IndispensableAsn1Sequence?'
+at.asitplus.signum:indispensable-josef-iosarm64
+
+## --------------------------

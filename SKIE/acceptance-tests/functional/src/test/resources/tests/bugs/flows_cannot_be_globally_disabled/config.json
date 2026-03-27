@@ -1,0 +1,14 @@
+{
+    "enabledConfigurationFlags": [
+        "Feature_CoroutinesInterop"
+    ],
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "FlowInterop.Enabled": "false"
+            }
+        }
+    ]
+}

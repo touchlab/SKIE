@@ -1,0 +1,11 @@
+{
+    "groups": [
+        {
+            "target": "tests.visibility.global",
+            "overridesAnnotations": false,
+            "items": {
+                "SkieVisibility": "Private"
+            }
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "enabledConfigurationFlags": [],
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": true,
+            "items": {
+                "SealedInterop.Case.Name": "X"
+            }
+        },
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "SealedInterop.ElseName": "Other"
+            }
+        }
+    ]
+}

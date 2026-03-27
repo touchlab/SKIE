@@ -1,0 +1,12 @@
+{
+    "enabledConfigurationFlags": [],
+    "groups": [
+        {
+            "target": "tests.coroutines.flow.configuration",
+            "overridesAnnotations": false,
+            "items": {
+                "FlowInterop.Enabled": "false"
+            }
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "enabledConfigurationFlags": [
+        "Feature_CoroutinesInterop",
+        "Feature_FlowCombineConvertor",
+        "Feature_FutureCombineExtension",
+        "Feature_SwiftUIObserving",
+        "Debug_VerifyDescriptorProviderConsistency",
+        "Build_ConcurrentSkieCompilation",
+        "Build_ParallelSkieCompilation"
+    ],
+    "groups": [
+        {
+            "target": "",
+            "overridesAnnotations": false,
+            "items": {
+                "ExperimentalFeatures.Enabled": "true",
+                "DefaultArgumentInterop.Enabled": "true",
+                "TestConfigurationKeys.EnableVerifyFrameworkHeaderPhase": "false"
+            }
+        }
+    ]
+}
