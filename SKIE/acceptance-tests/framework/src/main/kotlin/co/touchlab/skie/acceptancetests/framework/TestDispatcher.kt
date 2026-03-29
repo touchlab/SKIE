@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
-import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun testDispatcher(): CoroutineDispatcher =
