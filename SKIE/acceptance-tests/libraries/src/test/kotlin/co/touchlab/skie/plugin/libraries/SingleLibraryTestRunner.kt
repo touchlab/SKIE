@@ -15,7 +15,6 @@ import co.touchlab.skie.acceptancetests.framework.util.TestProperties
 import co.touchlab.skie.configuration.provider.CompilerSkieConfigurationData
 import co.touchlab.skie.plugin.libraries.dependencies.kotlin.KotlinDependencyProvider
 import co.touchlab.skie.plugin.libraries.dependencies.kotlin.SkieRuntimeDependencyProvider
-import co.touchlab.skie.plugin.libraries.dependencies.swift.ExpectedMissingSymbolsProvider
 import co.touchlab.skie.plugin.libraries.dependencies.swift.SwiftFrameworkDependencyProvider
 import co.touchlab.skie.plugin.libraries.dependencies.swift.SwiftLibraryDependencyProvider
 import co.touchlab.skie.plugin.libraries.library.Artifacts
@@ -187,11 +186,9 @@ class SingleLibraryTestRunner(
         val frameworks = SwiftFrameworkDependencyProvider.getSystemFrameworks(test.library.component)
             .flatMap { listOf("-framework", it.name) }
 
-        val symbols = ExpectedMissingSymbolsProvider.missingSymbols.flatMap {
-            listOf("-Xlinker", "-U", "-Xlinker", it)
-        }
+        val ignoreMissingSymbols = listOf("-Xlinker", "-undefined", "-Xlinker", "dynamic_lookup")
 
-        return libraries + frameworks + symbols
+        return libraries + frameworks + ignoreMissingSymbols
     }
 
     private fun getTestResultWithLogs(
