@@ -548,18 +548,36 @@ com.freeletics.flowredux2:flowredux-iosarm64
 > was built for newer 'iOS' version (18.2) than being linked
 [xcode-dependent] com.sonatype.central.testing.amazon:kms-iosarm64
 
-# Kotlin compiler broke header generation for some libraries (crashes even without SKIE)
-> error: unknown type name 'id'
-com.addhen.kanalytics:kanalytics-viewer-iosarm64
-com.gyanoba.inspektor:inspektor-iosarm64
-com.iktwo:kodices-iosarm64
-io.github.bvantur:inspektify-ktor2-iosarm64
-io.github.bvantur:inspektify-ktor3-iosarm64
-
 # New bug in the Kotlin IR (crashes even without SKIE)
 > java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: kotlinx.coroutines/CancellationException|null[0].
 com.gu.kotlin:multiplatform-ophan-iosarm64
 io.github.tyczj:tweedle-iosarm64
 net.pearx.kpastebin:kpastebin-iosarm64
+
+## >= 2.3.20 --------------------------
+
+# Seems like something broke in Kotlin
+> e: java.lang.IllegalStateException: IrSimpleFunctionSymbolImpl is already bound. Signature: null. Owner: FUN FAKE_OVERRIDE name:forwardInvocation visibility:public modality:OPEN <> (<this>:platform.darwin.NSObject, anInvocation:platform.Foundation.NSInvocation?) returnType:kotlin.Unit [external,fake_override]
+com.github.anastr:speedometer-iosarm64
+com.github.terrakok:kmm-essentials-iosarm64
+com.hexascribe:chatbot-builder-iosarm64
+com.highcapable.betterandroid:compose-multiplatform-iosarm64
+com.thebluekernel.common:core-iosarm64
+com.thebluekernel.common:websocket-iosarm64
+dev.icerock.moko:maps-google-iosarm64
+dev.icerock.moko:maps-mapbox-iosarm64
+dev.icerock.moko:media-compose-iosarm64
+dev.icerock.moko:web3-iosarm64
+dev.icerock.moko:widgets-permissions-iosarm64
+eu.codlab.moko:permissions-iosarm64
+eu.codlab:kotlin-permissions-bluetooth-iosarm64
+icu.bughub.kit:Wechat-iosarm64
+io.dyte:mobile-core-bridge-iosarm64
+io.github.abhi165:noober-iosarm64
+io.github.ajacquierbret:kotlinphoenix-adapters-iosarm64
+io.github.ajacquierbret:kotlinphoenix-client-iosarm64
+io.github.ajacquierbret:kotlinphoenix-iosarm64
+io.github.alibek228k:permissions-iosarm64
+io.github.alibek228k:qbox-permissions-iosarm64
 
 ## --------------------------

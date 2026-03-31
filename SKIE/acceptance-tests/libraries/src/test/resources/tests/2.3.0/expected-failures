@@ -548,18 +548,19 @@ com.freeletics.flowredux2:flowredux-iosarm64
 > was built for newer 'iOS' version (18.2) than being linked
 [xcode-dependent] com.sonatype.central.testing.amazon:kms-iosarm64
 
-# Kotlin compiler broke header generation for some libraries (crashes even without SKIE)
-> error: unknown type name 'id'
-com.addhen.kanalytics:kanalytics-viewer-iosarm64
-com.gyanoba.inspektor:inspektor-iosarm64
-com.iktwo:kodices-iosarm64
-io.github.bvantur:inspektify-ktor2-iosarm64
-io.github.bvantur:inspektify-ktor3-iosarm64
-
 # New bug in the Kotlin IR (crashes even without SKIE)
 > java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: kotlinx.coroutines/CancellationException|null[0].
 com.gu.kotlin:multiplatform-ophan-iosarm64
 io.github.tyczj:tweedle-iosarm64
 net.pearx.kpastebin:kpastebin-iosarm64
+
+## >= 2.3.0 \ 2.3.20 --------------------------
+# Kotlin compiler broke header generation for some libraries (crashes even without SKIE)
+> error: unknown type name 'id'
+com.iktwo:kodices-iosarm64
+io.github.bvantur:inspektify-ktor2-iosarm64
+io.github.bvantur:inspektify-ktor3-iosarm64
+com.addhen.kanalytics:kanalytics-viewer-iosarm64
+com.gyanoba.inspektor:inspektor-iosarm64
 
 ## --------------------------
