@@ -515,10 +515,6 @@ io.exoquery:exoquery-native-iosarm64
 
 ## >= 2.2.20 --------------------------
 
-> cannot link directly with 'SwiftUICore' because product being built is not an allowed client of it
-dev.kotbase:couchbase-lite-ktx-iosarm64
-dev.kotbase:couchbase-lite-paging-iosarm64
-
 > error: type '__SzTsCode' has no member '主板A股'
 li.mercury.tushare:tushare-kmp-iosarm64
 
@@ -579,5 +575,12 @@ io.github.ajacquierbret:kotlinphoenix-client-iosarm64
 io.github.ajacquierbret:kotlinphoenix-iosarm64
 io.github.alibek228k:permissions-iosarm64
 io.github.alibek228k:qbox-permissions-iosarm64
+moe.tlaster:precompose-uikitarm64
+io.github.kevinnzou:webview-iosarm64
+io.github.pablichjenkov:component-iosarm64
+io.github.pablichjenkov:templato-components-iosarm64
+io.github.ariefannur:guyub-iosarm64
+io.github.colagom:kowet-iosarm64
+io.github.colagom:shared-iosarm64
 
 ## --------------------------

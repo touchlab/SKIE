@@ -515,10 +515,6 @@ io.exoquery:exoquery-native-iosarm64
 
 ## >= 2.2.20 --------------------------
 
-> cannot link directly with 'SwiftUICore' because product being built is not an allowed client of it
-dev.kotbase:couchbase-lite-ktx-iosarm64
-dev.kotbase:couchbase-lite-paging-iosarm64
-
 > error: type '__SzTsCode' has no member '主板A股'
 li.mercury.tushare:tushare-kmp-iosarm64
 
@@ -542,5 +538,11 @@ io.github.edricchan03.androidx.common:common-enums-iosarm64
 # TODO Fix
 > e: java.lang.IllegalStateException: No file for androidx.lifecycle/SavedStateHandle|null[0] (@ androidx.lifecycle/SavedStateHandle|null[0]) in module
 com.freeletics.flowredux2:flowredux-iosarm64
+
+## >= 2.2.20 < 2.3.20 --------------------------
+
+> cannot link directly with 'SwiftUICore' because product being built is not an allowed client of it
+dev.kotbase:couchbase-lite-ktx-iosarm64
+dev.kotbase:couchbase-lite-paging-iosarm64
 
 ## --------------------------
