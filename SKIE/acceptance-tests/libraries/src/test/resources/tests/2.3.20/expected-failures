@@ -582,5 +582,8 @@ io.github.pablichjenkov:templato-components-iosarm64
 io.github.ariefannur:guyub-iosarm64
 io.github.colagom:kowet-iosarm64
 io.github.colagom:shared-iosarm64
+com.apollographql.apollo3:apollo-runtime-kotlin-iosarm64
+com.charleex.notifikations:notifications-iosarm64
+com.darkrockstudios:mpfilepicker-iosarm64
 
 ## --------------------------
