@@ -155,7 +155,7 @@ fun SirProperty.shallowCopy(
         isMutable = isMutable,
         attributes = attributes,
         modifiers = modifiers,
-    )
+    ).also { it.documentation = this.documentation }
 
 val SirProperty.isOverriddenFromReadOnlyProperty: Boolean
     get() = overriddenDeclarations.any { it.setter == null || it.isOverriddenFromReadOnlyProperty }

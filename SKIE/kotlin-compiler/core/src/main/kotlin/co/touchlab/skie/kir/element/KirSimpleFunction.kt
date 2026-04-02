@@ -26,6 +26,8 @@ class KirSimpleFunction(
     override val modality: KirCallableDeclaration.Modality,
 ) : KirFunction<SirSimpleFunction>(), KirOverridableDeclaration<KirSimpleFunction, SirSimpleFunction> {
 
+    override var documentation: String = ""
+
     lateinit var oirSimpleFunction: OirSimpleFunction
 
     override val oirCallableDeclaration: OirCallableDeclaration

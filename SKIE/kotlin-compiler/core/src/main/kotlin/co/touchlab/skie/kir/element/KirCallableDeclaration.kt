@@ -33,6 +33,8 @@ sealed interface KirCallableDeclaration<S : SirCallableDeclaration> : KirElement
 
     val kotlinSignature: String
 
+    val documentation: String
+
     val module: KirModule
         get() = owner.module
 

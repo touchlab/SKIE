@@ -9,6 +9,7 @@ import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfiguratio
 import co.touchlab.skie.kir.KirProvider
 import co.touchlab.skie.kir.descriptor.DescriptorKirProvider
 import co.touchlab.skie.kir.descriptor.MutableDescriptorProvider
+import co.touchlab.skie.kir.descriptor.ObjCExportedInterfaceProvider
 import co.touchlab.skie.kir.descriptor.NativeDescriptorProvider
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.phases.BackgroundPhase
@@ -65,6 +66,10 @@ class MainSkieContext internal constructor(
     lateinit var kirProvider: KirProvider
 
     lateinit var descriptorKirProvider: DescriptorKirProvider
+
+    val kDocMap: MutableMap<String, String> = mutableMapOf()
+
+    lateinit var objCExportedInterfaceProvider: ObjCExportedInterfaceProvider
 
     private val kotlinTargetTriple = configurables.targetTriple
 
