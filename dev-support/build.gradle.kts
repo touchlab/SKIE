@@ -4,7 +4,8 @@ plugins {
 //     kotlin("multiplatform") version "2.2.20" apply false
 //     kotlin("multiplatform") version "2.2.21" apply false
 //     kotlin("multiplatform") version "2.3.0-RC" apply false
-    kotlin("multiplatform") version "2.3.20" apply false
+//     kotlin("multiplatform") version "2.3.20" apply false
+    kotlin("multiplatform") version "2.3.21" apply false
 }
 
 buildscript {
