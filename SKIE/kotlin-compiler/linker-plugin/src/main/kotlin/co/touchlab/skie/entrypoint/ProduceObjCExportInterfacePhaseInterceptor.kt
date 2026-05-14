@@ -21,12 +21,13 @@ internal class ProduceObjCExportInterfacePhaseInterceptor :
         input: FrontendPhaseOutput.Full,
         next: (PhaseContext, FrontendPhaseOutput.Full) -> ObjCExportedInterface,
     ): ObjCExportedInterface {
+        val konanConfig = context.konanConfig
         val mainSkieContext = EntrypointUtils.createMainSkieContext(
             initPhaseContext = context.config.configuration.initPhaseContext,
-            konanConfig = context.config,
+            konanConfig = konanConfig,
             frontendServices = input.frontendServices,
             mainModuleDescriptor = input.moduleDescriptor,
-            exportedDependencies = lazy { input.moduleDescriptor.getExportedDependencies(context.config) },
+            exportedDependencies = lazy { input.moduleDescriptor.getExportedDependencies(konanConfig) },
         )
 
         EntrypointUtils.runClassExportPhases(mainSkieContext)

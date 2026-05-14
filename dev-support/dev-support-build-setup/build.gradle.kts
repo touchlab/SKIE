@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    val kgpVersion = File("/Users/filip/Documents/work/Touchlab/projects/internal/SKIE/dev-support/build.gradle.kts")
+    val kgpVersion = rootDir.resolve("../build.gradle.kts")
         .readLines()
         .first { it.contains("kotlin(\"multiplatform\") version ") }
         .trim()
