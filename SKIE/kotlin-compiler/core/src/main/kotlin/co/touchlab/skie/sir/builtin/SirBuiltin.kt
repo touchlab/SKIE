@@ -199,6 +199,8 @@ class SirBuiltins(
                 // TODO: Declared as: `associatedtype ObjectWillChangePublisher : Publisher = ObservableObjectPublisher where Self.ObjectWillChangePublisher.Failure == Never`
                 SirTypeParameter("ObjectWillChangePublisher")
             }
+
+            val Animation by Struct()
         }
 
         class Skie(
