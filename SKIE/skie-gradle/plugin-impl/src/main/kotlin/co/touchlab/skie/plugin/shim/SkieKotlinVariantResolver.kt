@@ -100,7 +100,7 @@ object SkieKotlinVariantResolver {
     }
 
     private fun Project.findKotlinGradlePluginVersionFromOverrideProperty(): String? =
-        (findProperty("skie.kgpVersion") as? String)?.also {
+        providers.gradleProperty("skie.kgpVersion").orNull?.also {
             logger.debug("[SKIE] Found KGP version override: $it in project '${project.path}', skipping resolution.")
         }
 
