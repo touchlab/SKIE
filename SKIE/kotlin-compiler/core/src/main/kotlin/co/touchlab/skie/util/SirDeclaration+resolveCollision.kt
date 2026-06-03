@@ -17,13 +17,13 @@ import co.touchlab.skie.sir.element.SirTypeDeclaration
 import co.touchlab.skie.sir.element.kirClassOrNull
 import co.touchlab.skie.sir.element.resolveAsKirClass
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(collisionReasonProvider: T.() -> String?): Boolean =
     resolveCollisionWithWarning(collisionReasonProvider) {
         baseName += "_"
     }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 fun <T : SirCallableDeclaration> T.resolveCollisionWithWarning(collisionReasonProvider: T.() -> String?): Boolean =
     when (val declaration = this as SirCallableDeclaration) {
         is SirConstructor -> declaration.resolveCollisionWithWarning(collisionReasonProvider as SirConstructor.() -> String?)
@@ -31,7 +31,7 @@ fun <T : SirCallableDeclaration> T.resolveCollisionWithWarning(collisionReasonPr
         is SirProperty -> declaration.resolveCollisionWithWarning(collisionReasonProvider as SirProperty.() -> String?)
     }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 fun SirConstructor.resolveCollisionWithWarning(collisionReasonProvider: SirConstructor.() -> String?): Boolean =
     resolveCollisionWithWarning(collisionReasonProvider) {
         val lastValueParameter = valueParameters.lastOrNull()
@@ -40,19 +40,19 @@ fun SirConstructor.resolveCollisionWithWarning(collisionReasonProvider: SirConst
         lastValueParameter.label = lastValueParameter.labelOrName + "_"
     }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 fun SirProperty.resolveCollisionWithWarning(collisionReasonProvider: SirProperty.() -> String?): Boolean =
     resolveCollisionWithWarning(collisionReasonProvider) {
         identifier += "_"
     }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 fun SirSimpleFunction.resolveCollisionWithWarning(collisionReasonProvider: SirSimpleFunction.() -> String?): Boolean =
     resolveCollisionWithWarning(collisionReasonProvider) {
         identifier += "_"
     }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 fun SirEnumCase.resolveCollisionWithWarning(collisionReasonProvider: SirEnumCase.() -> String?): Boolean =
     resolveCollisionWithWarning(
         collisionReasonProvider = collisionReasonProvider,
@@ -61,7 +61,7 @@ fun SirEnumCase.resolveCollisionWithWarning(collisionReasonProvider: SirEnumCase
         findKirElement = { parent.kirClassOrNull?.enumEntries?.get(index) },
     )
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private inline fun <T : SirCallableDeclaration> T.resolveCollisionWithWarning(
     collisionReasonProvider: T.() -> String?,
     rename: () -> Unit,
@@ -71,12 +71,12 @@ private inline fun <T : SirCallableDeclaration> T.resolveCollisionWithWarning(
         rename = rename,
         getName = { toReadableString() },
         findKirElement = {
-            kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
-                ?: if (this is SirProperty) kirProvider.findEnumEntry(this) else null
+            context.kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
+                ?: if (this is SirProperty) context.kirProvider.findEnumEntry(this) else null
         },
     )
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private inline fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(
     collisionReasonProvider: T.() -> String?,
     rename: () -> Unit,
@@ -88,7 +88,7 @@ private inline fun <T : SirTypeDeclaration> T.resolveCollisionWithWarning(
         findKirElement = { resolveAsKirClass() },
     )
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private inline fun <T, K : KirElement> T.resolveCollisionWithWarning(
     collisionReasonProvider: T.() -> String?,
     rename: () -> Unit,
@@ -122,7 +122,7 @@ private inline fun <T> T.resolveCollision(collisionReasonProvider: T.() -> Strin
     } while (collisionReasonProvider() != null)
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private val KirElement.shouldReportCollision: Boolean
     get() = when (this) {
         is KirCallableDeclaration<*> -> !configuration[SuppressSkieWarning.NameCollision]
@@ -131,14 +131,14 @@ private val KirElement.shouldReportCollision: Boolean
         else -> true
     }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun reportCollision(
     originalName: String,
     newName: String,
     collisionReason: String,
     source: KirElement,
 ) {
-    kirReporter.warning(
+    context.kirReporter.warning(
         message = "'$originalName' was renamed to '$newName' because of a name collision with $collisionReason. " +
             "Consider resolving the conflict either by changing the name in Kotlin, or via the @ObjCName annotation. " +
             "You can also suppress this warning using the 'SuppressSkieWarning.NameCollision' configuration. " +

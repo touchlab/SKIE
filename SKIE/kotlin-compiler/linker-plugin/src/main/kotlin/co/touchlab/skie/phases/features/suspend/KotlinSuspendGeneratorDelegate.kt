@@ -46,7 +46,7 @@ class KotlinSuspendGeneratorDelegate(
 
     private val bodyGenerator = SuspendKotlinBridgeBodyGenerator(suspendHandlerDescriptor)
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     fun generateKotlinBridgingFunction(functionDescriptor: FunctionDescriptor): FunctionDescriptor {
         val bridgingFunctionDescriptor = createBridgingFunction(functionDescriptor)
 
@@ -56,7 +56,7 @@ class KotlinSuspendGeneratorDelegate(
         return bridgingFunctionDescriptor
     }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private fun FunctionDescriptor.changeSkieConfiguration(originalFunctionDescriptor: FunctionDescriptor) {
         this.configuration.useDefaultsForSkieRuntime = true
 
@@ -153,11 +153,11 @@ class KotlinSuspendGeneratorDelegate(
         }
     }
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     private fun configureFlowMappingForReceiver(
         dispatchReceiverParameter: ValueParameterDescriptor,
     ) {
-        val kirValueParameter = descriptorKirProvider.getValueParameter(dispatchReceiverParameter)
+        val kirValueParameter = context.descriptorKirProvider.getValueParameter(dispatchReceiverParameter)
 
         kirValueParameter.configuration.flowMappingStrategy = kirValueParameter.configuration.flowMappingStrategy.limitFlowMappingToTypeArguments()
     }

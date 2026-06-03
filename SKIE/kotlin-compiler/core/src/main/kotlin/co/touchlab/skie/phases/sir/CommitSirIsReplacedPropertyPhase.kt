@@ -19,9 +19,9 @@ import co.touchlab.skie.sir.element.applyToEntireOverrideHierarchy
  */
 object CommitSirIsReplacedPropertyPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allLocalDeclarations
+        context.sirProvider.allLocalDeclarations
             .filterIsInstance<SirDeclarationWithVisibility>()
             .filter { it.isReplaced }
             .forEach {

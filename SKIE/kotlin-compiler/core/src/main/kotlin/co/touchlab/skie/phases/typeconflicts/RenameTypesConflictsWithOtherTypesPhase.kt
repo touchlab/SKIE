@@ -14,9 +14,9 @@ import co.touchlab.skie.util.resolveCollisionWithWarning
 
 object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val sortedTypeDeclarations = sirProvider.allLocalTypeDeclarations.sortedWith(collisionResolutionPriorityComparator)
+        val sortedTypeDeclarations = context.sirProvider.allLocalTypeDeclarations.sortedWith(collisionResolutionPriorityComparator)
 
         buildUniqueSignatureSet(sortedTypeDeclarations)
     }
@@ -60,7 +60,7 @@ object RenameTypesConflictsWithOtherTypesPhase : SirPhase {
     private fun SirTypeDeclaration.getOirClassOrNull(): OirClass? =
         (this as? SirClass)?.oirClassOrNull
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun buildUniqueSignatureSet(typeDeclarations: List<SirTypeDeclaration>) {
         val existingFqNames = mutableSetOf<String>()
 

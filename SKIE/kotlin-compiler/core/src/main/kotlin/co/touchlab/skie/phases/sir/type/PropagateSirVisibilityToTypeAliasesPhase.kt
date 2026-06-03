@@ -7,9 +7,9 @@ import co.touchlab.skie.sir.type.visibilityConstraint
 
 object PropagateSirVisibilityToTypeAliasesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allLocalTypeAliases.forEach {
+        context.sirProvider.allLocalTypeAliases.forEach {
             updateVisibility(it)
         }
     }

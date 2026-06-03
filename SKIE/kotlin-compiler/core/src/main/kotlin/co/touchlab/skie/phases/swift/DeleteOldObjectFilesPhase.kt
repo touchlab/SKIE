@@ -5,11 +5,11 @@ import kotlin.io.path.nameWithoutExtension
 
 object DeleteOldObjectFilesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val objectFileNames = objectFileProvider.allObjectFiles.map { it.absolutePath.nameWithoutExtension }.toSet()
+        val objectFileNames = context.objectFileProvider.allObjectFiles.map { it.absolutePath.nameWithoutExtension }.toSet()
 
-        skieBuildDirectory.swiftCompiler.objectFiles.allFiles
+        context.skieBuildDirectory.swiftCompiler.objectFiles.allFiles
             .filterNot { it.nameWithoutExtension in objectFileNames }
             .forEach {
                 it.delete()

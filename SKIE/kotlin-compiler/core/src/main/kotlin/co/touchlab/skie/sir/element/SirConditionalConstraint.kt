@@ -17,14 +17,14 @@ class SirConditionalConstraint(
 
     companion object {
 
-        context(SirConditionalConstraintParent)
+        context(sirConditionalConstraintParent: SirConditionalConstraintParent)
         operator fun invoke(
             typeParameter: SirTypeParameter,
             bounds: List<SirTypeParameter.Bound> = emptyList(),
         ): SirConditionalConstraint =
             SirConditionalConstraint(
                 typeParameter = typeParameter,
-                parent = this@SirConditionalConstraintParent,
+                parent = sirConditionalConstraintParent,
                 bounds = bounds,
             )
     }

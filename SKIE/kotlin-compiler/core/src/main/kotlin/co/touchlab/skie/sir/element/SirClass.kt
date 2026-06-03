@@ -124,7 +124,7 @@ class SirClass(
 
     companion object {
 
-        context(SirDeclarationParent)
+        context(sirDeclarationParent: SirDeclarationParent)
         operator fun invoke(
             baseName: String,
             kind: Kind = Kind.Class,
@@ -141,7 +141,7 @@ class SirClass(
         ): SirClass =
             SirClass(
                 baseName = baseName,
-                parent = this@SirDeclarationParent,
+                parent = sirDeclarationParent,
                 kind = kind,
                 modality = modality,
                 visibility = visibility,

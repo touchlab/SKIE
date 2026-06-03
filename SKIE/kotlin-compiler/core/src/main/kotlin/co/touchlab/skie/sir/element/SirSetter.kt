@@ -24,14 +24,14 @@ class SirSetter(
 
     companion object {
 
-        context(SirProperty)
+        context(sirProperty: SirProperty)
         operator fun invoke(
             throws: Boolean = false,
             attributes: List<String> = emptyList(),
             modifiers: List<Modifier> = emptyList(),
         ): SirSetter =
             SirSetter(
-                property = this@SirProperty,
+                property = sirProperty,
                 throws = throws,
                 attributes = attributes,
                 modifiers = modifiers,

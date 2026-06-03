@@ -7,10 +7,10 @@ import co.touchlab.skie.util.directory.FrameworkLayout
 
 interface ScheduledPhase<C : ScheduledPhase.Context> {
 
-    context(C)
+    context(c: C)
     fun isActive(): Boolean = true
 
-    context(C)
+    context(c: C)
     suspend fun execute()
 
     interface Context : CommonSkieContext {

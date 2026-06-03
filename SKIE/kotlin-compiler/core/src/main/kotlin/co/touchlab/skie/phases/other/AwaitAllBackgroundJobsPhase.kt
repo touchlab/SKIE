@@ -4,8 +4,8 @@ import co.touchlab.skie.phases.LinkPhase
 
 object AwaitAllBackgroundJobsPhase : LinkPhase {
 
-    context(LinkPhase.Context)
+    context(context: LinkPhase.Context)
     override suspend fun execute() {
-        awaitAllBackgroundJobs()
+        context.awaitAllBackgroundJobs()
     }
 }

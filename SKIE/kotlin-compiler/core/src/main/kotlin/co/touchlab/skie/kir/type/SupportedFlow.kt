@@ -24,8 +24,8 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
     fun getCoroutinesKirClass(kirProvider: KirProvider): KirClass =
         kirProvider.getClassByFqName(coroutinesFlowFqName)
 
-    context(SirPhase.Context)
-    fun getCoroutinesKirClass(): KirClass = getCoroutinesKirClass(kirProvider)
+    context(context: SirPhase.Context)
+    fun getCoroutinesKirClass(): KirClass = getCoroutinesKirClass(context.kirProvider)
 
     sealed interface Variant {
 
@@ -42,14 +42,14 @@ enum class SupportedFlow(private val directParent: SupportedFlow?) {
 
         fun getSwiftClass(sirProvider: SirProvider): SirClass
 
-        context(SirPhase.Context)
-        fun getCoroutinesKirClass(): KirClass = getCoroutinesKirClass(kirProvider)
+        context(context: SirPhase.Context)
+        fun getCoroutinesKirClass(): KirClass = getCoroutinesKirClass(context.kirProvider)
 
-        context(SirPhase.Context)
-        fun getKotlinKirClass(): KirClass = getKotlinKirClass(kirProvider)
+        context(context: SirPhase.Context)
+        fun getKotlinKirClass(): KirClass = getKotlinKirClass(context.kirProvider)
 
-        context(SirPhase.Context)
-        fun getSwiftClass(): SirClass = getSwiftClass(sirProvider)
+        context(context: SirPhase.Context)
+        fun getSwiftClass(): SirClass = getSwiftClass(context.sirProvider)
 
         fun isCastableTo(variant: Variant): Boolean
 

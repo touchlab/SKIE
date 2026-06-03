@@ -15,7 +15,7 @@ class ConfigureExternalOirTypesBridgingPhase(
     private val sirProvider = context.sirProvider
     private val externalApiNotesProvider = context.externalApiNotesProvider
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         configureBridging()
 
@@ -62,9 +62,9 @@ class ConfigureExternalOirTypesBridgingPhase(
         // TODO We do not know if the type is hashable which is important for type mapping
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun loadAllPlatformApiNotesIfEnabled() {
-        if (SkieConfigurationFlag.Debug_LoadAllPlatformApiNotes.isEnabled) {
+        if (context.run { SkieConfigurationFlag.Debug_LoadAllPlatformApiNotes.isEnabled }) {
             externalApiNotesProvider.getAllApiNotesEntries()
         }
     }

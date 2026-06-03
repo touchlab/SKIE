@@ -10,34 +10,34 @@ sealed class ApiNotesGenerationPhase(
     private val exposeInternalMembers: Boolean,
 ) : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         val apiNotes = ApiNotesFactory(exposeInternalMembers).create()
 
         apiNotes.createApiNotesFile()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun ApiNotes.createApiNotesFile() {
         val content = this.createApiNotesFileContent()
 
         getApiNotesFile().writeTextIfDifferent(content)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     protected abstract fun getApiNotesFile(): File
 
     object ForSwiftCompilation : ApiNotesGenerationPhase(true) {
 
-        context(SirPhase.Context)
+        context(context: SirPhase.Context)
         override fun getApiNotesFile(): File =
-            skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(framework.frameworkName)
+            context.skieBuildDirectory.swiftCompiler.apiNotes.apiNotes(context.framework.frameworkName)
     }
 
     object ForFramework : ApiNotesGenerationPhase(false) {
 
-        context(SirPhase.Context)
+        context(context: SirPhase.Context)
         override fun getApiNotesFile(): File =
-            framework.apiNotes
+            context.framework.apiNotes
     }
 }

@@ -27,39 +27,39 @@ import org.jetbrains.kotlin.name.SpecialNames
 
 class SuspendKotlinBridgeHandlerLambdaGenerator {
 
-    context(KotlinIrPhase.Context, IrBlockBodyBuilder)
+    context(context: KotlinIrPhase.Context, irBlockBodyBuilder: IrBlockBodyBuilder)
     fun createOriginalFunctionCallLambda(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
         type: IrType,
     ): IrFunctionExpression =
-        irFunctionExpression(
+        irBlockBodyBuilder.irFunctionExpression(
             type = type,
             origin = IrStatementOrigin.LAMBDA,
             function = createOriginalFunctionCallLambdaFunction(bridgingFunction, originalFunctionDescriptor),
         )
 
-    context(KotlinIrPhase.Context, IrBlockBodyBuilder)
+    context(context: KotlinIrPhase.Context, irBlockBodyBuilder: IrBlockBodyBuilder)
     private fun createOriginalFunctionCallLambdaFunction(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrSimpleFunction =
-        irSimpleFunction(
+        irBlockBodyBuilder.irSimpleFunction(
             name = SpecialNames.ANONYMOUS,
             visibility = DescriptorVisibilities.LOCAL,
-            returnType = irBuiltIns.anyType.makeNullable(),
+            returnType = context.irBuiltIns.anyType.makeNullable(),
             origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
             isSuspend = true,
             body = { createOriginalFunctionCallLambdaFunctionBody(bridgingFunction, originalFunctionDescriptor) },
         )
 
-    context(KotlinIrPhase.Context, DeclarationIrBuilder)
+    context(context: KotlinIrPhase.Context, declarationIrBuilder: DeclarationIrBuilder)
     private fun createOriginalFunctionCallLambdaFunctionBody(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrBlockBody =
-        irBlockBody {
-            val originalFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunctionDescriptor)
+        declarationIrBuilder.irBlockBody {
+            val originalFunctionSymbol = context.skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunctionDescriptor)
 
             +irReturn(
                 irCall(originalFunctionSymbol).apply {
@@ -71,7 +71,7 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
             )
         }
 
-    context(DeclarationIrBuilder)
+    context(declarationIrBuilder: DeclarationIrBuilder)
     private fun IrCall.setDispatchReceiverForDelegatingCall(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
@@ -79,11 +79,11 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
         if (originalFunctionDescriptor.dispatchReceiverParameter != null) {
             val dispatchReceiverParameter = bridgingFunction.valueParameters.first()
 
-            dispatchReceiver = irGet(dispatchReceiverParameter)
+            dispatchReceiver = declarationIrBuilder.irGet(dispatchReceiverParameter)
         }
     }
 
-    context(DeclarationIrBuilder)
+    context(declarationIrBuilder: DeclarationIrBuilder)
     private fun IrCall.setExtensionReceiverForDelegatingCall(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
@@ -93,17 +93,17 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
 
             val extensionReceiverParameter = bridgingFunction.valueParameters[parameterIndex]
 
-            extensionReceiver = irGet(extensionReceiverParameter)
+            extensionReceiver = declarationIrBuilder.irGet(extensionReceiverParameter)
         }
     }
 
-    context(DeclarationIrBuilder)
+    context(declarationIrBuilder: DeclarationIrBuilder)
     private fun IrCall.setValueArgumentsForDelegatingCall(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ) {
         val valueParameters = bridgingFunction.filterRealValueParameters(originalFunctionDescriptor)
-        val valueArguments = valueParameters.map { irGet(it) }
+        val valueArguments = valueParameters.map { declarationIrBuilder.irGet(it) }
 
         valueArguments.forEachIndexed { index, argument ->
             putValueArgument(index, argument)

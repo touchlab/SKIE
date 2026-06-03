@@ -34,7 +34,7 @@ class SirExtension(
 
     companion object {
 
-        context(SirTopLevelDeclarationParent)
+        context(sirTopLevelDeclarationParent: SirTopLevelDeclarationParent)
         operator fun invoke(
             classDeclaration: SirClass,
             attributes: List<String> = emptyList(),
@@ -42,7 +42,7 @@ class SirExtension(
         ): SirExtension =
             SirExtension(
                 classDeclaration = classDeclaration,
-                parent = this@SirTopLevelDeclarationParent,
+                parent = sirTopLevelDeclarationParent,
                 superTypes = superTypes,
                 attributes = attributes,
             )

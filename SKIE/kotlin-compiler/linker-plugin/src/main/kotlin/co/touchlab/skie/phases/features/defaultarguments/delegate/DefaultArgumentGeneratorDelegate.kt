@@ -4,6 +4,6 @@ import co.touchlab.skie.phases.FrontendIrPhase
 
 interface DefaultArgumentGeneratorDelegate {
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     fun generate()
 }

@@ -13,16 +13,10 @@ abstract class UtilityExperimentalContextReceiversPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         plugins.withType<KotlinBasePluginWrapper>().configureEach {
             extensions.configure<KotlinBaseExtension> {
-                sourceSets.configureEach {
-                    languageSettings {
-                        enableLanguageFeature("ContextReceivers")
-                    }
-                }
-
                 if (this is HasConfigurableKotlinCompilerOptions<*>) {
                     compilerOptions {
                         freeCompilerArgs.addAll(
-                            "-Xwarning-level=CONTEXT_RECEIVERS_DEPRECATED:disabled",
+                            "-Xcontext-parameters",
                         )
                     }
                 }

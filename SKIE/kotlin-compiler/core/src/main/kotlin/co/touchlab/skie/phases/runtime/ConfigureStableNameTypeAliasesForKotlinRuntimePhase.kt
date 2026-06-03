@@ -8,16 +8,16 @@ import co.touchlab.skie.phases.SirPhase
 
 object ConfigureStableNameTypeAliasesForKotlinRuntimePhase : SirPhase {
 
-    context(SirPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
+    context(context: SirPhase.Context)
+    override fun isActive(): Boolean = with(context) { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         SupportedFlow.values().forEach {
             it.getCoroutinesKirClass().enableStableNameTypeAlias()
         }
 
-        kirProvider.getClassByFqName("kotlinx.coroutines.Runnable").enableStableNameTypeAlias()
+        context.kirProvider.getClassByFqName("kotlinx.coroutines.Runnable").enableStableNameTypeAlias()
     }
 
     private fun KirClass.enableStableNameTypeAlias() {

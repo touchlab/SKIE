@@ -35,7 +35,7 @@ class DeserializedPackageNamespace(
         descriptor.getMemberScope().addFunctionDescriptorToImpl(functionDescriptor)
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun generateNamespaceIr(): IrDeclarationContainer =
-        skieSymbolTable.kotlinSymbolTable.referenceFunction(existingMember).owner.getPackageFragment()
+        context.skieSymbolTable.kotlinSymbolTable.referenceFunction(existingMember).owner.getPackageFragment()
 }

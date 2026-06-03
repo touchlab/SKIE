@@ -10,9 +10,9 @@ import co.touchlab.skie.sir.element.maximumVisibility
 
 object PropagateSirVisibilityToFileClassesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allLocalClasses
+        context.sirProvider.allLocalClasses
             .filter { it.kirClassOrNull?.kind == KirClass.Kind.File }
             .forEach {
                 propagateVisibilityFromMembers(it)

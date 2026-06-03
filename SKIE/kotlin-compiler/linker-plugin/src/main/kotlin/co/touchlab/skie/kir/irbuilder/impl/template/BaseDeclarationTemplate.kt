@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.psi2ir.generators.SyntheticDeclarationsGenerator
 abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : IrDeclaration, S : IrBindableSymbol<D, IR>> :
     DeclarationTemplate<D> {
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun generateIrDeclaration(parent: IrDeclarationContainer, generatorContext: GeneratorContext) {
         createDeclarationStubsIfIrLazyClass(parent)
 
@@ -36,18 +36,18 @@ abstract class BaseDeclarationTemplate<D : DeclarationDescriptor, IR : IrDeclara
         parent.declarations
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun generateIrBody() {
         val symbol = getSymbol()
 
-        val declarationIrBuilder = DeclarationIrBuilder(pluginContext.generatorContext, symbol, startOffset = 0, endOffset = 0)
+        val declarationIrBuilder = DeclarationIrBuilder(context.pluginContext.generatorContext, symbol, startOffset = 0, endOffset = 0)
 
         initializeBody(symbol.owner, declarationIrBuilder)
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     protected abstract fun getSymbol(): S
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     protected abstract fun initializeBody(declaration: IR, declarationIrBuilder: DeclarationIrBuilder)
 }

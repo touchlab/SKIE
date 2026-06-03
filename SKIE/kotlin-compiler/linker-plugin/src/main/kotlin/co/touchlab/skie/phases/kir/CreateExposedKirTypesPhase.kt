@@ -54,7 +54,7 @@ class CreateExposedKirTypesPhase(
         ),
     )
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override suspend fun execute() {
         createRegularClasses()
         createFileClasses()
@@ -213,7 +213,7 @@ class CreateExposedKirTypesPhase(
 
     companion object {
 
-        context(DescriptorKirProvider)
+        context(descriptorKirProvider: DescriptorKirProvider)
         fun createTypeParameters(kirClass: KirClass, descriptor: ClassDescriptor, namer: ObjCExportNamer) {
             if (kirClass.kind != KirClass.Kind.Class) {
                 return
@@ -224,7 +224,7 @@ class CreateExposedKirTypesPhase(
             }
         }
 
-        context(DescriptorKirProvider)
+        context(descriptorKirProvider: DescriptorKirProvider)
         private fun createTypeParameter(
             kirClass: KirClass,
             typeParameterDescriptor: TypeParameterDescriptor,
@@ -241,7 +241,7 @@ class CreateExposedKirTypesPhase(
                 // Bounds are not supported.
             )
 
-            this@DescriptorKirProvider.registerTypeParameter(typeParameter, typeParameterDescriptor)
+            descriptorKirProvider.registerTypeParameter(typeParameter, typeParameterDescriptor)
         }
 
         fun getNestingLevel(classDescriptor: ClassDescriptor): Int =

@@ -8,9 +8,9 @@ import co.touchlab.skie.util.resolveCollisionWithWarning
 // TODO This does not work for nested classes
 object RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val topLevelDeclarations = sirProvider.allSkieGeneratedTopLevelDeclarations
+        val topLevelDeclarations = context.sirProvider.allSkieGeneratedTopLevelDeclarations
 
         val topLevelClasses = topLevelDeclarations.filterIsInstance<SirClass>()
         val reservedNames = topLevelClasses.map { it.simpleName }.toSet()
@@ -22,7 +22,7 @@ object RenameCallableDeclarationsConflictingWithTypeDeclarationsPhase : SirPhase
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirCallableDeclaration.renameIfConflictsWith(reservedNames: Set<String>) {
         this.resolveCollisionWithWarning {
             if (identifierAfterVisibilityChange in reservedNames) "a type name '$identifierAfterVisibilityChange'" else null

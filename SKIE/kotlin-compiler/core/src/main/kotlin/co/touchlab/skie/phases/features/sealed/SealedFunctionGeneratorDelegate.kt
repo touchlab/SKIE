@@ -24,7 +24,7 @@ class SealedFunctionGeneratorDelegate(
     override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generate(kirClass: KirClass, enum: SirClass) {
         val requiredFunction = generateRequiredOverload(kirClass, enum)
         generateOptionalOverload(kirClass, enum, requiredFunction)

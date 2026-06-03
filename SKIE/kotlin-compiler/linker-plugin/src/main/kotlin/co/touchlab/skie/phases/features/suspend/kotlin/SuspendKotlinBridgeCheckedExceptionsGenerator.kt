@@ -40,30 +40,30 @@ import org.jetbrains.kotlin.types.KotlinType
 
 class SuspendKotlinBridgeCheckedExceptionsGenerator {
 
-    context(KotlinIrPhase.Context, DeclarationIrBuilder)
+    context(context: KotlinIrPhase.Context, declarationIrBuilder: DeclarationIrBuilder)
     fun createGetCheckedExceptions(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrExpression {
         val field = createCheckedExceptionsField(bridgingFunction, originalFunctionDescriptor)
 
-        return irGetField(null, field)
+        return declarationIrBuilder.irGetField(null, field)
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     private fun createCheckedExceptionsField(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrField {
         val fieldSymbol = IrFieldSymbolImpl()
 
-        val field = irFactory.createField(
+        val field = context.irFactory.createField(
             startOffset = 0,
             endOffset = 0,
             origin = SUSPEND_WRAPPER_CHECKED_EXCEPTIONS,
             symbol = fieldSymbol,
             name = Name.identifier(bridgingFunction.nameForCheckedExceptionsField),
-            type = irBuiltIns.arrayClass.typeWith(irBuiltIns.kClassClass.typeWith(irBuiltIns.throwableType)),
+            type = context.irBuiltIns.arrayClass.typeWith(context.irBuiltIns.kClassClass.typeWith(context.irBuiltIns.throwableType)),
             visibility = DescriptorVisibilities.PRIVATE,
             isFinal = true,
             isExternal = false,
@@ -84,17 +84,17 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
     private val IrSimpleFunction.nameForCheckedExceptionsField: String
         get() = this.name.identifier + "__checkedExceptions"
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     private fun createCheckExceptionsFieldInitializer(
         fieldSymbol: IrFieldSymbolImpl,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrExpressionBody =
-        DeclarationIrBuilder(pluginContext.generatorContext, fieldSymbol, 0, 0).run {
+        DeclarationIrBuilder(context.pluginContext.generatorContext, fieldSymbol, 0, 0).run {
             irExprBody(
-                irCall(irBuiltIns.arrayOf).apply {
+                irCall(context.irBuiltIns.arrayOf).apply {
                     val checkedExceptionClassReferences = createCheckedExceptionClassReferences(originalFunctionDescriptor)
 
-                    val varargElementType = irBuiltIns.kClassClass.typeWith(irBuiltIns.throwableType)
+                    val varargElementType = context.irBuiltIns.kClassClass.typeWith(context.irBuiltIns.throwableType)
                     val vararg = irVararg(varargElementType, checkedExceptionClassReferences)
 
                     putTypeArgument(0, varargElementType)
@@ -103,7 +103,7 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
             )
         }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     private fun createCheckedExceptionClassReferences(
         originalFunctionDescriptor: FunctionDescriptor,
     ): List<IrClassReference> =
@@ -112,13 +112,13 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
                 IrClassReferenceImpl(
                     startOffset = 0,
                     endOffset = 0,
-                    type = irBuiltIns.kClassClass.typeWith(exceptionTypeSymbol.defaultType),
+                    type = context.irBuiltIns.kClassClass.typeWith(exceptionTypeSymbol.defaultType),
                     symbol = exceptionTypeSymbol,
                     classType = exceptionTypeSymbol.defaultType,
                 )
             }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     private val FunctionDescriptor.declaredThrownExceptions: List<IrClassifierSymbol>
         get() {
             val throwsAnnotation = this.annotations.findAnnotation(KonanFqNames.throws) ?: return emptyList()
@@ -129,19 +129,19 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
             return exceptionClasses.map { it.getClassifierSymbol(this.module) }
         }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     private fun KClassValue.getClassifierSymbol(module: ModuleDescriptor): IrClassifierSymbol =
         when (val value = this.value) {
             is Value.LocalClass -> value.type.toIrSymbol()
             is Value.NormalClass -> module.findClassifierAcrossModuleDependencies(value.classId)!!.defaultType.toIrSymbol()
         }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     private fun KotlinType.toIrSymbol(): IrClassifierSymbol =
         when (val classifier = this.constructor.declarationDescriptor) {
             null -> error("No declaration descriptor for type $this.")
             is TypeAliasDescriptor -> classifier.expandedType.toIrSymbol()
-            else -> skieSymbolTable.kotlinSymbolTable.referenceClassifier(classifier)
+            else -> context.skieSymbolTable.kotlinSymbolTable.referenceClassifier(classifier)
         }
 
     companion object {

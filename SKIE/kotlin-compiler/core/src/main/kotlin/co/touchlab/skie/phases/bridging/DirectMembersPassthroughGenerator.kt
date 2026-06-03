@@ -26,7 +26,7 @@ object DirectMembersPassthroughGenerator {
     private val SirSimpleFunction.isSupported: Boolean
         get() = this.name !in unsupportedFunctionNames
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generatePassthroughForMembers(
         targetBridge: SirClass,
         bridgedKirClass: KirClass,
@@ -38,7 +38,7 @@ object DirectMembersPassthroughGenerator {
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addPassthroughForMember(member: KirCallableDeclaration<*>, delegateAccessor: CodeBlock) {
         when (member) {
             is KirConstructor -> {
@@ -49,7 +49,7 @@ object DirectMembersPassthroughGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addPassthroughForFunction(function: KirSimpleFunction, delegateAccessor: CodeBlock) {
         function.forEachAssociatedExportedSirDeclaration {
             addPassthroughForFunction(it, delegateAccessor)
@@ -80,7 +80,7 @@ object DirectMembersPassthroughGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addPassthroughForProperty(property: KirProperty, delegateAccessor: CodeBlock) {
         property.forEachAssociatedExportedSirDeclaration {
             addPassthroughForProperty(it, delegateAccessor)

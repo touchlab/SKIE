@@ -12,9 +12,9 @@ import co.touchlab.skie.sir.type.SirType
 
 object PropagateSirVisibilityToClassesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val updaterProvider = TypeVisibilityUpdaterProvider(sirProvider.allLocalClasses)
+        val updaterProvider = TypeVisibilityUpdaterProvider(context.sirProvider.allLocalClasses)
 
         updaterProvider.allTypeVisibilityUpdaters.forEach {
             it.propagateVisibility()

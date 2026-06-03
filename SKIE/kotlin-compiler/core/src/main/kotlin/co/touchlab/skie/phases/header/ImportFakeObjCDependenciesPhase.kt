@@ -27,23 +27,23 @@ import co.touchlab.skie.sir.element.SirModule
  */
 object ImportFakeObjCDependenciesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         // TODO: Make sure this runs for both 'fake' and SDK modules once support for distinction between the two module types is added.
-        val fakeExternalModules = sirProvider.allUsedExternalModules.filter { it.name != "Foundation" }
+        val fakeExternalModules = context.sirProvider.allUsedExternalModules.filter { it.name != "Foundation" }
 
         if (fakeExternalModules.isEmpty()) {
             return
         }
 
-        val originalContent = framework.kotlinHeader.readText()
+        val originalContent = context.framework.kotlinHeader.readText()
 
         importFakeFrameworks(fakeExternalModules, originalContent)
 
         revertHeaderChange(originalContent)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun importFakeFrameworks(fakeExternalModules: List<SirModule.External>, originalHeader: String) {
         val fakeImports = fakeExternalModules.joinToString("\n") { module ->
             // TODO: Properly fix this for nested modules as part of work to add distinction between the fake and SDK modules.
@@ -54,13 +54,13 @@ object ImportFakeObjCDependenciesPhase : SirPhase {
 
         val updatedContent = originalHeader + "\n$fakeImports"
 
-        framework.kotlinHeader.writeText(updatedContent)
+        context.framework.kotlinHeader.writeText(updatedContent)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun revertHeaderChange(originalHeader: String) {
-        doInPhase(RevertPhase) {
-            framework.kotlinHeader.writeText(originalHeader)
+        context.doInPhase(RevertPhase) {
+            context.framework.kotlinHeader.writeText(originalHeader)
         }
     }
 

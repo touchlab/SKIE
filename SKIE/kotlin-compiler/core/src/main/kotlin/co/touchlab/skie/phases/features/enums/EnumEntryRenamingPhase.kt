@@ -32,9 +32,9 @@ object EnumEntryRenamingPhase : SirPhase {
         "useStoredAccessor",
     )
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinEnums
+        context.kirProvider.kotlinEnums
             .filter { it.isSupported }
             .forEach {
                 it.renameEnumEntries()
@@ -47,7 +47,7 @@ object EnumEntryRenamingPhase : SirPhase {
     private val KirEnumEntry.isSupported: Boolean
         get() = !this.hasUserDefinedName
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun KirClass.renameEnumEntries() {
         this.enumEntries
             .filter { it.isSupported }

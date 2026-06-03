@@ -7,18 +7,18 @@ import co.touchlab.skie.sir.element.toSirKind
 
 object CreateExternalSirTypesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.externalClassesAndProtocols.forEach {
+        context.oirProvider.externalClassesAndProtocols.forEach {
             createClass(it)
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createClass(oirClass: OirClass) {
         val sirClass = SirClass(
             baseName = oirClass.name,
-            parent = sirProvider.getModuleForExternalClass(oirClass).builtInFile,
+            parent = context.sirProvider.getModuleForExternalClass(oirClass).builtInFile,
             kind = oirClass.kind.toSirKind(),
             origin = SirClass.Origin.Oir(oirClass),
         )

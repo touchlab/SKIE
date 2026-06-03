@@ -6,7 +6,7 @@ import co.touchlab.skie.sir.type.SirDeclaredSirType
 
 object InitializeSirSuperTypesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         initializeSuperTypes()
 
@@ -14,16 +14,17 @@ object InitializeSirSuperTypesPhase : SirPhase {
         initializeSuperTypes()
     }
 
-    private fun SirPhase.Context.initializeSuperTypes() {
-        oirProvider.allClassesAndProtocols.forEach {
+    context(context: SirPhase.Context)
+    private fun initializeSuperTypes() {
+        context.oirProvider.allClassesAndProtocols.forEach {
             initializeSuperTypes(it)
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun initializeSuperTypes(oirClass: OirClass) {
         val sirSuperTypes = oirClass.superTypes
-            .map { sirTypeTranslator.mapType(it) }
+            .map { context.sirTypeTranslator.mapType(it) }
             .map { it.evaluate().type }
             .filterIsInstance<SirDeclaredSirType>()
             .takeIf { it.isNotEmpty() }
@@ -33,10 +34,10 @@ object InitializeSirSuperTypesPhase : SirPhase {
         oirClass.originalSirClass.superTypes.addAll(sirSuperTypes)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val OirClass.defaultSuperTypes: List<SirDeclaredSirType>
         get() = when (kind) {
-            OirClass.Kind.Class -> listOf(sirBuiltins.Swift.AnyObject.defaultType, sirBuiltins.Swift.Hashable.defaultType)
-            OirClass.Kind.Protocol -> listOf(sirBuiltins.Swift.AnyObject.defaultType)
+            OirClass.Kind.Class -> listOf(context.sirBuiltins.Swift.AnyObject.defaultType, context.sirBuiltins.Swift.Hashable.defaultType)
+            OirClass.Kind.Protocol -> listOf(context.sirBuiltins.Swift.AnyObject.defaultType)
         }
 }

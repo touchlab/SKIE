@@ -12,9 +12,9 @@ import co.touchlab.skie.sir.element.shallowCopy
 
 object CreateFakeObjCConstructorsPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.kotlinClasses.forEach {
+        context.oirProvider.kotlinClasses.forEach {
             it.addFakeObjCConstructors()
         }
     }

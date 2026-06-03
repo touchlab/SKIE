@@ -21,6 +21,6 @@ class SimpleFunctionConfiguration(
     }
 }
 
-context(CommonSkieContext)
+context(commonSkieContext: CommonSkieContext)
 val SimpleFunctionConfiguration.isSuspendInteropEnabled: Boolean
-    get() = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled && this[SuspendInterop.Enabled]
+    get() = commonSkieContext.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled } && this[SuspendInterop.Enabled]

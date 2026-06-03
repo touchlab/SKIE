@@ -30,7 +30,7 @@ import io.outfoxx.swiftpoet.CodeBlock
 
 object SupportedFlowRuntimeGenerator {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generate(skieSwiftFlowIterator: SirClass) {
         val skieSwiftFlowProtocol = generateSkieSwiftFlowProtocol(skieSwiftFlowIterator)
 
@@ -46,13 +46,13 @@ object SupportedFlowRuntimeGenerator {
         generateBridgeSubscriptionCountWorkaroundFunctions()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateSkieSwiftFlowProtocol(skieSwiftFlowIterator: SirClass): SkieSwiftFlowProtocol {
-        namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowProtocol").apply {
+        context.namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowProtocol").apply {
             val skieSwiftFlowProtocol = SirClass(
                 baseName = "SkieSwiftFlowProtocol",
                 kind = SirClass.Kind.Protocol,
-                superTypes = listOf(sirBuiltins._Concurrency.AsyncSequence.defaultType),
+                superTypes = listOf(context.sirBuiltins._Concurrency.AsyncSequence.defaultType),
             ).run {
                 val elementTypeParameter = SirTypeParameter(
                     name = "Element",
@@ -60,7 +60,7 @@ object SupportedFlowRuntimeGenerator {
                 )
 
                 SirConditionalConstraint(
-                    sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("AsyncIterator"),
+                    context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("AsyncIterator"),
                     bounds = listOf(
                         skieSwiftFlowIterator.toType(
                             elementTypeParameter.toTypeParameterUsage(),
@@ -71,7 +71,7 @@ object SupportedFlowRuntimeGenerator {
                 val delegateTypeParameter = SirTypeParameter(
                     name = "Delegate",
                     bounds = listOf(
-                        kirProvider.getClassByFqName("kotlinx.coroutines.flow.Flow").primarySirClass.defaultType.toConformanceBound(),
+                        context.kirProvider.getClassByFqName("kotlinx.coroutines.flow.Flow").primarySirClass.defaultType.toConformanceBound(),
                     ),
                 )
 
@@ -111,14 +111,14 @@ object SupportedFlowRuntimeGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateBridgeSubscriptionCountWorkaroundFunctions() {
         // If Flow-interop is disabled globally (or even just for `kotlinx.coroutines.core`),
         // `subscriptionCount` property falls back to Kotlin's `StateFlow` protocol.
         // These two functions make sure our Flow runtime code still compiles as expected.
-        namespaceProvider.getSkieNamespaceFile("bridgeSubscriptionCount").apply {
-            val skieSwiftStateFlowOfInt = sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftStateFlow"))
-                .toType(kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType)
+        context.namespaceProvider.getSkieNamespaceFile("bridgeSubscriptionCount").apply {
+            val skieSwiftStateFlowOfInt = context.sirProvider.getClassByFqName(SirFqName(context.sirProvider.skieModule, "SkieSwiftStateFlow"))
+                .toType(context.kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType)
 
             SirSimpleFunction(
                 identifier = "bridgeSubscriptionCount",
@@ -144,7 +144,7 @@ object SupportedFlowRuntimeGenerator {
                 SirValueParameter(
                     label = "_",
                     name = "subscriptionCount",
-                    type = kirProvider.getClassByFqName("kotlinx.coroutines.flow.StateFlow").primarySirClass.defaultType.toExistential(),
+                    type = context.kirProvider.getClassByFqName("kotlinx.coroutines.flow.StateFlow").primarySirClass.defaultType.toExistential(),
                 )
 
                 bodyBuilder.add {
@@ -154,24 +154,24 @@ object SupportedFlowRuntimeGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createSwiftFlowClass(
         flowVariant: SupportedFlow.Variant,
         skieSwiftFlowProtocol: SkieSwiftFlowProtocol,
     ): SirClass {
-        return namespaceProvider.getSkieNamespaceFile(flowVariant.swiftSimpleName).run {
+        return context.namespaceProvider.getSkieNamespaceFile(flowVariant.swiftSimpleName).run {
             SirClass(
                 baseName = flowVariant.swiftSimpleName,
                 superTypes = listOf(
                     skieSwiftFlowProtocol.self.defaultType,
-                    sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
+                    context.sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
                 ),
                 modality = SirModality.Final,
             )
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addSwiftFlowMembers(
         flowVariant: SupportedFlow.Variant,
         skieSwiftFlowIterator: SirClass,
@@ -234,7 +234,7 @@ object SupportedFlowRuntimeGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addPassthroughMembers(
         flowVariant: SupportedFlow.Variant,
         elementTypeAlias: SirTypeAlias,
@@ -246,11 +246,11 @@ object SupportedFlowRuntimeGenerator {
         )
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addObjCBridgeableImplementation(bridgedClass: SirClass) {
         ObjCBridgeableGenerator.addObjcBridgeableImplementation(
             target = this,
-            bridgedType = bridgedClass.toType(sirBuiltins.Swift.AnyObject.defaultType),
+            bridgedType = bridgedClass.toType(context.sirBuiltins.Swift.AnyObject.defaultType),
             bridgeToObjectiveC = {
                 addStatement("return ${bridgedClass.fqName}(delegate)")
             },
@@ -271,7 +271,7 @@ object SupportedFlowRuntimeGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SupportedFlow.passthroughDeclarations(elementType: SirType): List<CustomPassthroughDeclaration> {
         val directParents = when (this) {
             SupportedFlow.Flow -> emptyList()
@@ -289,7 +289,7 @@ object SupportedFlowRuntimeGenerator {
             SupportedFlow.SharedFlow -> listOf(
                 CustomPassthroughDeclaration.Property(
                     identifier = "replayCache",
-                    type = sirBuiltins.Swift.Array.toType(elementType),
+                    type = context.sirBuiltins.Swift.Array.toType(elementType),
                     transformGetter = {
                         CodeBlock.of("%L as! [%T]", it, elementType.evaluate().swiftPoetTypeName)
                     },
@@ -298,15 +298,15 @@ object SupportedFlowRuntimeGenerator {
             SupportedFlow.MutableSharedFlow -> listOf(
                 CustomPassthroughDeclaration.Property(
                     identifier = "subscriptionCount",
-                    type = sirProvider.getClassByFqName(SirFqName(sirProvider.skieModule, "SkieSwiftStateFlow"))
-                        .toType(kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType),
+                    type = context.sirProvider.getClassByFqName(SirFqName(context.sirProvider.skieModule, "SkieSwiftStateFlow"))
+                        .toType(context.kirBuiltins.nsNumberDeclarationsByFqName["kotlin.Int"]!!.originalSirClass.defaultType),
                     transformGetter = {
                         CodeBlock.of("bridgeSubscriptionCount(%L)", it)
                     },
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
                     identifier = "emit",
-                    returnType = sirBuiltins.Swift.Void.defaultType,
+                    returnType = context.sirBuiltins.Swift.Void.defaultType,
                     isAsync = true,
                     throws = true,
                     valueParameters = listOf(
@@ -318,7 +318,7 @@ object SupportedFlowRuntimeGenerator {
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
                     identifier = "tryEmit",
-                    returnType = sirBuiltins.Swift.Bool.defaultType,
+                    returnType = context.sirBuiltins.Swift.Bool.defaultType,
                     valueParameters = listOf(
                         CustomPassthroughDeclaration.SimpleFunction.ValueParameter(
                             name = "value",
@@ -328,7 +328,7 @@ object SupportedFlowRuntimeGenerator {
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
                     identifier = "resetReplayCache",
-                    returnType = sirBuiltins.Swift.Void.defaultType,
+                    returnType = context.sirBuiltins.Swift.Void.defaultType,
                 ),
             )
             SupportedFlow.StateFlow -> listOf(
@@ -353,7 +353,7 @@ object SupportedFlowRuntimeGenerator {
                 ),
                 CustomPassthroughDeclaration.SimpleFunction(
                     identifier = "compareAndSet",
-                    returnType = sirBuiltins.Swift.Bool.defaultType,
+                    returnType = context.sirBuiltins.Swift.Bool.defaultType,
                     valueParameters = listOf(
                         CustomPassthroughDeclaration.SimpleFunction.ValueParameter(
                             name = "expect",

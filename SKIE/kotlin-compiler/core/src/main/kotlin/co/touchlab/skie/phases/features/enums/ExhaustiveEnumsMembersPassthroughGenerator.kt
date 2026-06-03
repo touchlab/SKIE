@@ -8,7 +8,7 @@ import io.outfoxx.swiftpoet.CodeBlock
 
 object ExhaustiveEnumsMembersPassthroughGenerator {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generatePassthroughForMembers(enumKirClass: KirClass, bridgedEnum: SirClass) {
         DirectMembersPassthroughGenerator.generatePassthroughForMembers(
             targetBridge = bridgedEnum,

@@ -51,7 +51,7 @@ class NewFileNamespace private constructor(
         packageContent.add(declarationDescriptor)
     }
 
-    context(KotlinIrPhase.Context)
+    context(contextCtx: KotlinIrPhase.Context)
     override fun generateNamespaceIr(): IrDeclarationContainer {
         val fileEntry = DummyIrFileEntry(sourceFile.nameOrError)
 

@@ -8,9 +8,9 @@ import co.touchlab.skie.phases.SirPhase
 // (The nested name is then removed during SirClass instantiation because that uses only the simple name.)
 object FixNamesOfInaccessibleNestedClassesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinClasses.forEach(::fixNameOfInaccessibleNestedClass)
+        context.kirProvider.kotlinClasses.forEach(::fixNameOfInaccessibleNestedClass)
     }
 
     private fun fixNameOfInaccessibleNestedClass(kirClass: KirClass) {

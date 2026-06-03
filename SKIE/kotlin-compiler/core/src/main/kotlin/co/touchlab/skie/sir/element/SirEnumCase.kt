@@ -21,13 +21,13 @@ class SirEnumCase(
 
     companion object {
 
-        context(SirClass)
+        context(sirClass: SirClass)
         operator fun invoke(
             simpleName: String,
         ): SirEnumCase =
             SirEnumCase(
                 simpleName = simpleName,
-                parent = this@SirClass,
+                parent = sirClass,
             )
     }
 }

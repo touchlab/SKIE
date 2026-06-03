@@ -35,13 +35,13 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
     private val isInteropEnabledForExternalModules: Boolean =
         SkieConfigurationFlag.Feature_DefaultArgumentsInExternalLibraries in context.globalConfiguration.enabledFlags
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     protected val FunctionDescriptor.isInteropEnabled: Boolean
         get() = this.configuration[DefaultArgumentInterop.Enabled] &&
             this.satisfiesMaximumDefaultArgumentCount &&
             (descriptorProvider.isFromLocalModule(this) || isInteropEnabledForExternalModules)
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private val FunctionDescriptor.satisfiesMaximumDefaultArgumentCount: Boolean
         get() = this.defaultArgumentCount <= this.configuration[DefaultArgumentInterop.MaximumDefaultArgumentCount]
 
@@ -82,13 +82,13 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
     private fun Int.testBit(n: Int): Boolean =
         (this shr n) and 1 == 1
 
-    context(IrBuilderWithScope) protected fun IrFunctionAccessExpression.passArgumentsWithMatchingNames(from: IrFunction) {
+    context(irBuilderWithScope: IrBuilderWithScope) protected fun IrFunctionAccessExpression.passArgumentsWithMatchingNames(from: IrFunction) {
         from.valueParameters.forEach { valueParameter: IrValueParameter ->
             val indexInCalledFunction = this.symbol.owner.indexOfValueParameterByName(valueParameter.name)
             check(indexInCalledFunction != -1) {
                 "Could not find value parameter with name ${valueParameter.name} in ${this.symbol.owner} (from $from)\n\nThis dump:\n${this.dump()}\n\nFrom dump:\n${from.dump()}"
             }
-            putValueArgument(indexInCalledFunction, irGet(valueParameter))
+            putValueArgument(indexInCalledFunction, irBuilderWithScope.irGet(valueParameter))
         }
     }
 

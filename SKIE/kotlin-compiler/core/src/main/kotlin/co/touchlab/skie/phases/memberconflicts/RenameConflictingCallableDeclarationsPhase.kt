@@ -23,7 +23,7 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
     private val highestDistanceToInheritanceHierarchyRootCache = mutableMapOf<SirClass, Int>()
     private val containerFqNameCache = mutableMapOf<SirDeclarationParent, String>()
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         val sortedEnumCases = getSortedEnumCases()
         val sortedCallableDeclarations = getSortedCallableDeclarations()
@@ -34,15 +34,15 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
         uniqueSignatureSet.addCallableDeclarations(sortedCallableDeclarations)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun getSortedEnumCases(): List<SirEnumCase> =
-        sirProvider.allLocalEnums.flatMap { it.enumCases }
+        context.sirProvider.allLocalEnums.flatMap { it.enumCases }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun getSortedCallableDeclarations(): List<SirCallableDeclaration> {
         val comparator = getCollisionResolutionPriorityComparator()
 
-        return sirProvider.allLocalCallableDeclarations.sortedWith(comparator)
+        return context.sirProvider.allLocalCallableDeclarations.sortedWith(comparator)
     }
 
     /**
@@ -60,13 +60,13 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
      * container fqname including file
      * Kotlin signature if available
      */
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun getCollisionResolutionPriorityComparator(): Comparator<SirCallableDeclaration> =
         compareByDescending<SirCallableDeclaration> {
             it is SirConstructor && it.valueParameters.isEmpty()
         }
             .thenBy { declaration ->
-                (declaration as? SirProperty)?.let { kirProvider.findEnumEntry(it)?.index } ?: Int.MAX_VALUE
+                (declaration as? SirProperty)?.let { context.kirProvider.findEnumEntry(it)?.index } ?: Int.MAX_VALUE
             }
             .thenBy { it.isRemoved }
             .thenBy {
@@ -109,9 +109,9 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
             return 1 + (maxFromSuperTypes ?: 0)
         }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirCallableDeclaration.getKirDeclarationOrNull(): KirCallableDeclaration<*>? =
-        kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
+        context.kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
 
     @Suppress("RecursivePropertyAccessor")
     private val SirDeclarationParent.containerFqName: String
@@ -119,14 +119,14 @@ class RenameConflictingCallableDeclarationsPhase : SirPhase {
             (this.parent?.containerFqName ?: "") + this.toString()
         }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun UniqueSignatureSet.addEnumCases(enumCases: List<SirEnumCase>) {
         enumCases.forEach {
             this.add(it)
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun UniqueSignatureSet.addCallableDeclarations(callableDeclarations: List<SirCallableDeclaration>) {
         callableDeclarations.forEach {
             this.add(it)

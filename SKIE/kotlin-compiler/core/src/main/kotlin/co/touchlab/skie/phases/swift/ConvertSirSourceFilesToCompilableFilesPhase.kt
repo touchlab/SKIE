@@ -8,12 +8,12 @@ import java.io.File
 
 object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val cacheAwareFileGenerator = CacheAwareFileGenerator(skieBuildDirectory.swift.generated)
+        val cacheAwareFileGenerator = CacheAwareFileGenerator(context.skieBuildDirectory.swift.generated)
 
         with(cacheAwareFileGenerator) {
-            sirProvider.skieModuleFiles
+            context.sirProvider.skieModuleFiles
                 .filterIsInstance<SirSourceFile>()
                 .forEach {
                     it.convertToCompilableFile()
@@ -29,9 +29,9 @@ object ConvertSirSourceFilesToCompilableFilesPhase : SirPhase {
 
         private val generatedFiles = mutableSetOf<File>()
 
-        context(SirPhase.Context)
+        context(context: SirPhase.Context)
         fun SirSourceFile.convertToCompilableFile() {
-            val compilableFile = sirFileProvider.createCompilableFile(this)
+            val compilableFile = context.sirFileProvider.createCompilableFile(this)
 
             generatedFiles.add(compilableFile.absolutePath.toFile())
         }

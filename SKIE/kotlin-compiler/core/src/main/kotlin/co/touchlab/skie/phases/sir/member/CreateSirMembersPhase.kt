@@ -34,7 +34,7 @@ class CreateSirMembersPhase(
     private val kirProvider = context.kirProvider
     private val sirTypeTranslator = context.sirTypeTranslator
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         createAllMembers()
         createAllEnumEntries()

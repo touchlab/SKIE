@@ -4,8 +4,8 @@ import co.touchlab.skie.phases.KirPhase
 
 object InitializeKirMembersCachePhase : KirPhase {
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override suspend fun execute() {
-        kirProvider.initializeCallableDeclarationsCache()
+        context.kirProvider.initializeCallableDeclarationsCache()
     }
 }

@@ -13,9 +13,9 @@ import co.touchlab.skie.sir.element.shallowCopy
 // This fake function is not properly linked with the overrides and as a result this phase needs to run after all other phases that rename functions.
 object FixDuplicatedOverriddenFunctionsPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.kotlinClassesAndProtocols
+        context.oirProvider.kotlinClassesAndProtocols
             .flatMap { it.memberSimpleFunctions }
             .forEach {
                 fixDuplicates(it)

@@ -66,16 +66,16 @@ class SirSimpleFunction(
 
     companion object {
 
-        context(SirDeclarationParent)
+        context(sirDeclarationParent: SirDeclarationParent)
         operator fun invoke(
             identifier: String,
             returnType: SirType,
             visibility: SirVisibility = SirVisibility.Public,
-            modality: SirModality = coerceModalityForSimpleFunctionOrProperty(),
+            modality: SirModality = sirDeclarationParent.coerceModalityForSimpleFunctionOrProperty(),
             isAbstract: Boolean = false,
             isReplaced: Boolean = false,
             isHidden: Boolean = false,
-            scope: SirScope = coerceScope(SirScope.Member),
+            scope: SirScope = sirDeclarationParent.coerceScope(SirScope.Member),
             isFakeOverride: Boolean = false,
             isWrappedBySkie: Boolean = false,
             attributes: List<String> = emptyList(),
@@ -86,7 +86,7 @@ class SirSimpleFunction(
         ): SirSimpleFunction =
             SirSimpleFunction(
                 identifier = identifier,
-                parent = this@SirDeclarationParent,
+                parent = sirDeclarationParent,
                 returnType = returnType,
                 visibility = visibility,
                 modality = modality,

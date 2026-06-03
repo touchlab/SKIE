@@ -18,20 +18,20 @@ class CreateKotlinSirTypesPhase : SirPhase {
 
     private val kirToSirClasses = mutableMapOf<KirClass, SirClass>()
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinClasses.forEach {
+        context.kirProvider.kotlinClasses.forEach {
             getOrCreateClass(it)
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun getOrCreateClass(kirClass: KirClass): SirClass =
         kirToSirClasses.getOrPut(kirClass) {
             createClass(kirClass)
         }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createClass(kirClass: KirClass): SirClass {
         val sirClass = SirClass(
             baseName = kirClass.sirFqName.simpleName,
@@ -50,25 +50,25 @@ class CreateKotlinSirTypesPhase : SirPhase {
         return sirClass
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val KirClass.sirFqName: SirFqName
         get() {
             val firstComponent = this.swiftName.substringBefore(".")
             val secondComponent = this.swiftName.substringAfter(".").takeIf { it.isNotBlank() }
 
             val firstName = SirFqName(
-                module = sirProvider.kotlinModule,
+                module = context.sirProvider.kotlinModule,
                 simpleName = firstComponent,
             )
 
             return if (secondComponent != null) firstName.nested(secondComponent) else firstName
         }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val KirClass.sirParent: SirDeclarationParent
-        get() = sirFqName.parent?.simpleName?.let { findSirParentRecursively(this, it) } ?: sirProvider.kotlinModule.builtInFile
+        get() = sirFqName.parent?.simpleName?.let { findSirParentRecursively(this, it) } ?: context.sirProvider.kotlinModule.builtInFile
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun findSirParentRecursively(kirClass: KirClass, parentName: String): SirClass? =
         when (val parent = kirClass.parent) {
             is KirClass -> if (parent.swiftName == parentName) getOrCreateClass(parent) else findSirParentRecursively(parent, parentName)
@@ -77,13 +77,13 @@ class CreateKotlinSirTypesPhase : SirPhase {
 
     companion object {
 
-        context(SirPhase.Context)
+        context(context: SirPhase.Context)
         fun createTypeParameters(oirClass: OirClass, sirClass: SirClass) {
             oirClass.typeParameters.forEach { typeParameter ->
                 typeParameter.sirTypeParameter = SirTypeParameter(
                     name = typeParameter.name,
                     parent = sirClass,
-                    bounds = listOf(sirBuiltins.Swift.AnyObject.defaultType.toConformanceBound()),
+                    bounds = listOf(context.sirBuiltins.Swift.AnyObject.defaultType.toConformanceBound()),
                 )
             }
         }

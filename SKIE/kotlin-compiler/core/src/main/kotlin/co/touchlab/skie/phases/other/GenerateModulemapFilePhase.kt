@@ -6,11 +6,11 @@ import co.touchlab.skie.util.GeneratedBySkieComment
 
 sealed class GenerateModulemapFilePhase(private val generateSwiftModule: Boolean) : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val content = getModulemapContent()
+        val content = context.getModulemapContent()
 
-        framework.modulemapFile.writeText(content)
+        context.framework.modulemapFile.writeText(content)
     }
 
     private fun SirPhase.Context.getModulemapContent(): String =

@@ -35,11 +35,11 @@ class KirTypeTranslator(
     private val customTypeMappers: KirCustomTypeMappers,
 ) : KirTypeTranslatorUtilityScope() {
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     fun mapReferenceType(kotlinType: KotlinType): ReferenceKirType =
         mapReferenceTypeIgnoringNullability(kotlinType).withNullabilityOf(kotlinType)
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     fun mapReferenceTypeIgnoringNullability(kotlinType: KotlinType): NonNullReferenceKirType {
         mapTypeIfFlow(kotlinType)?.let {
             return it
@@ -51,7 +51,7 @@ class KirTypeTranslator(
 
         if (kotlinType.isTypeParameter()) {
             val genericTypeUsage = with(descriptorKirProvider) {
-                getTypeParameterUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
+                kirTypeParameterScope.getTypeParameterUsage(TypeUtils.getTypeParameterDescriptorOrNull(kotlinType))
             }
 
             if (genericTypeUsage != null)
@@ -85,7 +85,7 @@ class KirTypeTranslator(
         return kirClass.toType(typeArgs)
     }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     private fun mapTypeIfFlow(kotlinType: KotlinType): UnresolvedFlowKirType? {
         val supportedFlow = SupportedFlow.from(kotlinType) ?: return null
 
@@ -102,7 +102,7 @@ class KirTypeTranslator(
         }
     }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     private fun KirTypeTranslator.mapTypeArgument(typeProjection: TypeProjection): NonNullReferenceKirType =
         if (typeProjection.isStarProjection) {
             SpecialReferenceOirType.Id.toKirType() // TODO: use Kotlin upper bound.
@@ -127,11 +127,11 @@ class KirTypeTranslator(
         return SpecialReferenceOirType.Id.toKirType()
     }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     fun mapFunctionType(kotlinType: KotlinType, returnsVoid: Boolean): ReferenceKirType =
         mapFunctionTypeIgnoringNullability(kotlinType, returnsVoid).withNullabilityOf(kotlinType)
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     fun mapFunctionTypeIgnoringNullability(
         functionType: KotlinType,
         returnsVoid: Boolean,

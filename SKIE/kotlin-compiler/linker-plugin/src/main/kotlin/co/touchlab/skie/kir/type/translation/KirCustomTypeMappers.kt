@@ -51,7 +51,7 @@ class KirCustomTypeMappers(
         }
     }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     fun mapTypeIfApplicable(kotlinType: KotlinType): NonNullReferenceKirType? {
         val typeMappingMatches = (listOf(kotlinType) + kotlinType.supertypes()).mapNotNull { type ->
             (type.constructor.declarationDescriptor as? ClassDescriptor)?.let { descriptor ->
@@ -69,7 +69,7 @@ class KirCustomTypeMappers(
         }
 
         return mostSpecificMatches.firstOrNull()?.let {
-            withTypeParameterScopeFor(it.type) { it.mapper.mapType(it.type) } ?: SpecialOirKirType(SpecialReferenceOirType.Id)
+            kirTypeParameterScope.withTypeParameterScopeFor(it.type) { it.mapper.mapType(it.type) } ?: SpecialOirKirType(SpecialReferenceOirType.Id)
         }
     }
 
@@ -113,7 +113,7 @@ class KirCustomTypeMappers(
         private val kirClass: KirClass,
     ) : KirCustomTypeMapper {
 
-        context(KirTypeParameterScope)
+        context(kirTypeParameterScope: KirTypeParameterScope)
         override fun mapType(mappedSuperType: KotlinType): NonNullReferenceKirType =
             kirClass.defaultType
     }
@@ -125,7 +125,7 @@ class KirCustomTypeMappers(
 
         override val mappedClassId = ClassId.topLevel(mappedClassFqName)
 
-        context(KirTypeParameterScope)
+        context(kirTypeParameterScope: KirTypeParameterScope)
         override fun mapType(
             mappedSuperType: KotlinType,
         ): NonNullReferenceKirType {
@@ -148,7 +148,7 @@ class KirCustomTypeMappers(
         override val mappedClassId: ClassId
             get() = StandardNames.getFunctionClassId(parameterCount)
 
-        context(KirTypeParameterScope)
+        context(kirTypeParameterScope: KirTypeParameterScope)
         override fun mapType(
             mappedSuperType: KotlinType,
         ): NonNullReferenceKirType =

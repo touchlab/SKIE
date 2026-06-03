@@ -33,7 +33,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedClasses.forEach { classDescriptor ->
             classDescriptor.allSupportedConstructors.forEach {
@@ -48,13 +48,13 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassDescriptor.isSupported: Boolean
         get() = this.kind == ClassKind.CLASS
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private val ClassDescriptor.allSupportedConstructors: List<ClassConstructorDescriptor>
         get() = descriptorProvider.getExposedConstructors(this)
             .filter { it.isInteropEnabled }
             .filter { it.hasDefaultArguments }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private fun generateOverloads(constructor: ClassConstructorDescriptor, classDescriptor: ClassDescriptor) {
         constructor.forEachDefaultArgumentOverload { overloadParameters ->
             if (overloadParameters.isNotEmpty() || classDescriptor.generateOverloadWithNoParameters) {
@@ -70,14 +70,14 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private val ClassConstructorDescriptor.hasNoParametersIgnoringDefaultArguments: Boolean
         get() = this.valueParameters.count { !it.hasDefaultValue() } == 0
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private fun generateOverload(constructor: ClassConstructorDescriptor, parameters: List<ValueParameterDescriptor>) {
         val overload = generateOverloadWithUniqueName(constructor, parameters)
 
         registerOverload(overload, constructor)
     }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private fun generateOverloadWithUniqueName(
         constructor: ClassConstructorDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -125,13 +125,13 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     private fun String.dropUniqueParameterMangling(): String =
         this.split(uniqueNameSubstring).first()
 
-    context(KotlinIrPhase.Context, DeclarationIrBuilder)
+    context(context: KotlinIrPhase.Context, declarationIrBuilder: DeclarationIrBuilder)
     private fun getOverloadBody(
         originalConstructor: ClassConstructorDescriptor, overloadIr: IrConstructor,
     ): IrBody {
-        val originalConstructorSymbol = skieSymbolTable.descriptorExtension.referenceConstructor(originalConstructor)
+        val originalConstructorSymbol = context.skieSymbolTable.descriptorExtension.referenceConstructor(originalConstructor)
 
-        return irBlockBody {
+        return declarationIrBuilder.irBlockBody {
             +irDelegatingConstructorCall(originalConstructorSymbol.owner).apply {
                 passDispatchReceiverParameterIfPresent(overloadIr)
                 passArgumentsWithMatchingNames(overloadIr)
@@ -139,11 +139,11 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
         }
     }
 
-    context(IrBuilderWithScope)
+    context(irBuilderWithScope: IrBuilderWithScope)
     private fun IrDelegatingConstructorCall.passDispatchReceiverParameterIfPresent(from: IrFunction) {
         val dispatchReceiverParameter = from.dispatchReceiverParameter ?: return
 
-        this.dispatchReceiver = irGet(dispatchReceiverParameter)
+        this.dispatchReceiver = irBuilderWithScope.irGet(dispatchReceiverParameter)
     }
 
     private fun registerOverload(overloadDescriptor: ClassConstructorDescriptor, constructor: ClassConstructorDescriptor) {

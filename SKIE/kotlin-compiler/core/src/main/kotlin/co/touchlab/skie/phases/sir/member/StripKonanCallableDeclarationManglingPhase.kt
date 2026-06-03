@@ -10,9 +10,9 @@ import co.touchlab.skie.phases.SirPhase
 
 object StripKonanCallableDeclarationManglingPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinCallableDeclarations
+        context.kirProvider.kotlinCallableDeclarations
             .filter { it.isSupported }
             .forEach {
                 it.stripMangling()

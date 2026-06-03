@@ -11,15 +11,15 @@ interface DeclarationTemplate<D : DeclarationDescriptor> {
 
     val descriptor: D
 
-    context(MutableDescriptorProvider)
+    context(mutableDescriptorProvider: MutableDescriptorProvider)
     fun registerExposedDescriptor()
 
-    context(SymbolTablePhase.Context)
+    context(context: SymbolTablePhase.Context)
     fun declareSymbol()
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     fun generateIrDeclaration(parent: IrDeclarationContainer, generatorContext: GeneratorContext)
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     fun generateIrBody()
 }

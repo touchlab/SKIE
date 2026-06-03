@@ -23,26 +23,26 @@ import co.touchlab.skie.sir.getExtension
 
 object ExhaustiveEnumsGenerator : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinClasses
+        context.kirProvider.kotlinClasses
             .filter { it.isSupported }
             .forEach {
                 generate(it)
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val KirClass.isSupported: Boolean
         get() = this.originalSirClass.isExported &&
             this.kind == KirClass.Kind.Enum &&
             this.isEnumInteropEnabled
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val KirClass.isEnumInteropEnabled: Boolean
         get() = this.configuration[EnumInterop.Enabled]
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generate(kirClass: KirClass) {
         val skieClass = kirClass.generateBridge()
 
@@ -62,7 +62,7 @@ private fun KirClass.configureBridging(skieClass: SirClass) {
     originalSirClass.isReplaced = true
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun KirClass.generateBridge(): SirClass {
     val bridgedEnum = createBridgingEnum(this)
 
@@ -71,24 +71,24 @@ private fun KirClass.generateBridge(): SirClass {
     return bridgedEnum
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
     SirClass(
         baseName = enumKirClass.originalSirClass.baseName,
         parent = enumKirClass.originalSirClass.namespace?.let { namespace ->
-            sirProvider.getExtension(
+            context.sirProvider.getExtension(
                 classDeclaration = namespace.classDeclaration,
-                parent = namespaceProvider.getNamespaceFile(enumKirClass),
+                parent = context.namespaceProvider.getNamespaceFile(enumKirClass),
             )
-        } ?: namespaceProvider.getNamespaceFile(enumKirClass),
+        } ?: context.namespaceProvider.getNamespaceFile(enumKirClass),
         kind = SirClass.Kind.Enum,
     ).apply {
         addEnumCases(enumKirClass)
 
         superTypes += listOf(
-            sirBuiltins.Swift.Hashable.defaultType,
-            sirBuiltins.Swift.CaseIterable.defaultType,
-            sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
+            context.sirBuiltins.Swift.Hashable.defaultType,
+            context.sirBuiltins.Swift.CaseIterable.defaultType,
+            context.sirBuiltins.Swift._ObjectiveCBridgeable.defaultType,
         )
 
         attributes.add("frozen")
@@ -96,7 +96,7 @@ private fun createBridgingEnum(enumKirClass: KirClass): SirClass =
         ExhaustiveEnumsMembersPassthroughGenerator.generatePassthroughForMembers(enumKirClass, this)
         ExhaustiveEnumsObjectiveCBridgeableGenerator.addObjcBridgeableImplementation(enumKirClass, this)
 
-        doInPhase(ExhaustiveEnumsGenerator.NestedTypeDeclarationsPhase) {
+        context.doInPhase(ExhaustiveEnumsGenerator.NestedTypeDeclarationsPhase) {
             addNestedClassTypeAliases(enumKirClass)
             addCompanionObjectPropertyIfNeeded(enumKirClass)
         }
@@ -146,15 +146,15 @@ private fun SirClass.addCompanionObjectPropertyIfNeeded(enum: KirClass) {
     }
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun KirClass.addConversionExtensions(bridgedEnum: SirClass) {
-    namespaceProvider.getNamespaceFile(this).apply {
+    context.namespaceProvider.getNamespaceFile(this).apply {
         addToKotlinConversionExtension(originalSirClass, bridgedEnum)
         addToSwiftConversionExtension(originalSirClass, bridgedEnum)
     }
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun SirIrFile.addToKotlinConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
     this.getExtension(
         classDeclaration = bridgedEnum,
@@ -174,7 +174,7 @@ private fun SirExtension.addToKotlinConversionMethod(enum: SirClass) {
     }
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun SirIrFile.addToSwiftConversionExtension(enum: SirClass, bridgedEnum: SirClass) {
     this.getExtension(
         classDeclaration = enum,
@@ -194,7 +194,7 @@ private fun SirExtension.addToSwiftConversionMethod(bridgedEnum: SirClass) {
     }
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass: KirClass) {
     if (!kirClass.hasStableNameTypeAlias) {
         return
@@ -202,14 +202,14 @@ private fun createStableNameTypeAliasIfRequested(bridgedEnum: SirClass, kirClass
 
     val typeAlias = SirTypeAlias(
         baseName = "Enum",
-        parent = namespaceProvider.getNamespaceExtension(kirClass),
+        parent = context.namespaceProvider.getNamespaceExtension(kirClass),
         isReplaced = true,
         isHidden = true,
     ) {
         bridgedEnum.toFqNameType()
     }
 
-    if (SkieConfigurationFlag.Debug_UseStableTypeAliases.isEnabled) {
+    if (context.run { SkieConfigurationFlag.Debug_UseStableTypeAliases.isEnabled }) {
         bridgedEnum.internalTypeAlias = typeAlias
     }
 }

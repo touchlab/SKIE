@@ -18,7 +18,7 @@ internal abstract class BaseCreateRegularKirMembersPhase(
     private val supportsProperties: Boolean = false,
 ) : BaseCreateKirMembersPhase(context) {
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override suspend fun execute() {
         kirProvider.kotlinClasses.forEach(::createMembers)
     }

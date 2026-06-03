@@ -65,7 +65,7 @@ object SirCodeGenerator {
         return fileBuilder.build().toString()
     }
 
-    context(SirIrFile)
+    context(sirIrFile: SirIrFile)
     private fun FileSpec.Builder.generateCode() {
         generateGeneratedComment()
 
@@ -78,16 +78,16 @@ object SirCodeGenerator {
         addComment(GeneratedBySkieComment)
     }
 
-    context(SirIrFile)
+    context(sirIrFile: SirIrFile)
     private fun FileSpec.Builder.generateImports() {
-        imports.forEach {
+        sirIrFile.imports.forEach {
             addImport(it)
         }
     }
 
-    context(SirIrFile)
+    context(sirIrFile: SirIrFile)
     private fun FileSpec.Builder.generateDeclarations() {
-        declarations.forEach {
+        sirIrFile.declarations.forEach {
             generateDeclaration(it)
         }
     }

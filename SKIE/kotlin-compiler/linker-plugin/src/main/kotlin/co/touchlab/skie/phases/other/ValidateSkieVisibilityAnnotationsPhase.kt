@@ -9,25 +9,25 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 
 object ValidateSkieVisibilityAnnotationsPhase : ClassExportPhase {
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
-        descriptorProvider.allExposedMembers.forEach {
+        context.descriptorProvider.allExposedMembers.forEach {
             validate(it)
         }
 
-        descriptorProvider.exposedClasses.forEach {
+        context.descriptorProvider.exposedClasses.forEach {
             validate(it)
         }
     }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     private fun validate(declarationDescriptor: DeclarationDescriptor) {
         val visibilityAnnotations = declarationDescriptor.annotations.filter {
             it.fqName?.asString()?.startsWith(SkieVisibility::class.qualifiedName!!) == true
         }
 
         if (visibilityAnnotations.size > 1) {
-            descriptorReporter.warning(
+            context.descriptorReporter.warning(
                 "Multiple ${SkieVisibility::class.simpleName} annotations used simultaneously. This is not allowed and may result in undefined behavior. " +
                     "This warning might become an error in the future.",
                 declarationDescriptor,

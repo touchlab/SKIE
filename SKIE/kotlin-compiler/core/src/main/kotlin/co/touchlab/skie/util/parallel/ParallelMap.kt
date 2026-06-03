@@ -8,9 +8,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
-context(ScheduledPhase.Context)
+context(context: ScheduledPhase.Context)
 suspend fun <T, R> Collection<T>.parallelMap(optimalChunkSize: Int = 100, transform: suspend (T) -> R): List<R> {
-    if (SkieConfigurationFlag.Build_ParallelSkieCompilation.isDisabled) {
+    if (context.run { SkieConfigurationFlag.Build_ParallelSkieCompilation.isDisabled }) {
         return map { transform(it) }
     }
 

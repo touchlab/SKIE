@@ -32,7 +32,7 @@ class SirTypeParameter(
 
     companion object {
 
-        context(SirTypeParameterParent)
+        context(sirTypeParameterParent: SirTypeParameterParent)
         operator fun invoke(
             name: String,
             bounds: List<Bound> = emptyList(),
@@ -40,12 +40,12 @@ class SirTypeParameter(
         ): SirTypeParameter =
             SirTypeParameter(
                 name = name,
-                parent = this@SirTypeParameterParent,
+                parent = sirTypeParameterParent,
                 bounds = bounds,
                 isPrimaryAssociatedType = isPrimaryAssociatedType,
             )
 
-        context(SirTypeParameterParent)
+        context(sirTypeParameterParent: SirTypeParameterParent)
         operator fun invoke(
             name: String,
             vararg bounds: Bound,

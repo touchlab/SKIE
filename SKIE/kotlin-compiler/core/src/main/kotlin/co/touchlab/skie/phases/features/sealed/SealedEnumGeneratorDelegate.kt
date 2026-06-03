@@ -25,12 +25,12 @@ class SealedEnumGeneratorDelegate(
     override val context: SirPhase.Context,
 ) : SealedGeneratorExtensionContainer {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generate(kirClass: KirClass): SirClass =
         SirClass(
             baseName = "Sealed",
             kind = SirClass.Kind.Enum,
-            parent = namespaceProvider.getNamespaceExtension(kirClass),
+            parent = context.namespaceProvider.getNamespaceExtension(kirClass),
             isReplaced = true,
             isHidden = true,
         ).apply {
@@ -43,10 +43,10 @@ class SealedEnumGeneratorDelegate(
             attributes.add("frozen")
         }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addConformanceToHashableIfPossible(kirClass: KirClass) {
         if (kirClass.areAllExposedChildrenHashable && kirClass.areAllSuperTypesValid) {
-            this.superTypes.add(sirBuiltins.Swift.Hashable.defaultType)
+            this.superTypes.add(context.sirBuiltins.Swift.Hashable.defaultType)
         }
     }
 

@@ -48,7 +48,7 @@ class DeserializedClassNamespace(
         (descriptor.constructors as MutableCollection).add(constructorDescriptor)
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun generateNamespaceIr(): IrDeclarationContainer =
-        skieSymbolTable.descriptorExtension.referenceClass(descriptor).owner
+        context.skieSymbolTable.descriptorExtension.referenceClass(descriptor).owner
 }

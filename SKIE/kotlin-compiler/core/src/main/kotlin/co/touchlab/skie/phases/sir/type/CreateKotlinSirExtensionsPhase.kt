@@ -6,17 +6,17 @@ import co.touchlab.skie.sir.element.topLevelParent
 
 object CreateKotlinSirExtensionsPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.kotlinExtensions.forEach {
+        context.oirProvider.kotlinExtensions.forEach {
             createExtension(it)
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createExtension(oirExtension: OirExtension) {
         val sirClass = oirExtension.classDeclaration.originalSirClass
 
-        oirExtension.sirExtension = sirProvider.getExtension(sirClass, sirClass.topLevelParent)
+        oirExtension.sirExtension = context.sirProvider.getExtension(sirClass, sirClass.topLevelParent)
     }
 }

@@ -5,9 +5,9 @@ import co.touchlab.skie.phases.ClassExportPhase
 
 object VerifyNoBitcodeEmbeddingPhase : ClassExportPhase {
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
-        if (swiftCompilerConfiguration.bitcodeEmbeddingMode == SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full) {
+        if (context.swiftCompilerConfiguration.bitcodeEmbeddingMode == SwiftCompilerConfiguration.BitcodeEmbeddingMode.Full) {
             error(
                 "Bitcode embedding is not supported by SKIE. " +
                     "To disable bitcode embedding you likely need to remove `embedBitcode(BitcodeEmbeddingMode.BITCODE)` from the Gradle build script.",

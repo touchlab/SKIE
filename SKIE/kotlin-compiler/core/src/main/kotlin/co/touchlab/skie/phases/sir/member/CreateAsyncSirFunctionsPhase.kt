@@ -9,23 +9,23 @@ import co.touchlab.skie.sir.element.shallowCopy
 
 object CreateAsyncSirFunctionsPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinSimpleFunctions
+        context.kirProvider.kotlinSimpleFunctions
             .filter { it.isSuspend && it.configuration.isSuspendInteropEnabled }
             .forEach {
                 createAsyncFunction(it)
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createAsyncFunction(function: KirSimpleFunction) {
         val originalSirFunction = function.originalSirFunction
 
         val suspendCompletionParameter = function.valueParameters.single { it.kind is KirValueParameter.Kind.SuspendCompletion }
 
         function.bridgedSirFunction = originalSirFunction.shallowCopy(
-            returnType = sirTypeTranslator.mapSuspendCompletionType(suspendCompletionParameter.oirValueParameter.type),
+            returnType = context.sirTypeTranslator.mapSuspendCompletionType(suspendCompletionParameter.oirValueParameter.type),
             isAsync = true,
             throws = true,
         ).apply {

@@ -10,9 +10,9 @@ import co.touchlab.skie.sir.element.getAllDeclarationsRecursively
  */
 object NormalizeKotlinSirPrivateVisibilityPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.kotlinModule.getAllDeclarationsRecursively()
+        context.sirProvider.kotlinModule.getAllDeclarationsRecursively()
             .filterIsInstance<SirDeclarationWithVisibility>()
             .forEach {
                 normalizeVisibility(it)

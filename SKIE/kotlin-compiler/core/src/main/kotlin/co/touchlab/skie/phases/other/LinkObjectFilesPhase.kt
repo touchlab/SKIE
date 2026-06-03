@@ -4,10 +4,10 @@ import co.touchlab.skie.phases.LinkPhase
 
 object LinkObjectFilesPhase : LinkPhase {
 
-    context(LinkPhase.Context)
+    context(context: LinkPhase.Context)
     override suspend fun execute() {
-        val additionalObjectFiles = objectFileProvider.allObjectFiles.map { it.absolutePath }
+        val additionalObjectFiles = context.objectFileProvider.allObjectFiles.map { it.absolutePath }
 
-        link(additionalObjectFiles)
+        context.link(additionalObjectFiles)
     }
 }

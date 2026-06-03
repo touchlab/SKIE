@@ -66,7 +66,7 @@ class SirTypeAlias(
 
     companion object {
 
-        context(SirDeclarationParent)
+        context(sirDeclarationParent: SirDeclarationParent)
         operator fun invoke(
             baseName: String,
             visibility: SirVisibility = SirVisibility.Public,
@@ -76,7 +76,7 @@ class SirTypeAlias(
         ): SirTypeAlias =
             SirTypeAlias(
                 baseName = baseName,
-                parent = this@SirDeclarationParent,
+                parent = sirDeclarationParent,
                 visibility = visibility,
                 isReplaced = isReplaced,
                 isHidden = isHidden,

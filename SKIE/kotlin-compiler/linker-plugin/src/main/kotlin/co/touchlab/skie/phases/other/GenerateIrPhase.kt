@@ -5,8 +5,8 @@ import co.touchlab.skie.phases.declarationBuilder
 
 object GenerateIrPhase : KotlinIrPhase {
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override suspend fun execute() {
-        declarationBuilder.generateIr()
+        context.declarationBuilder.generateIr()
     }
 }

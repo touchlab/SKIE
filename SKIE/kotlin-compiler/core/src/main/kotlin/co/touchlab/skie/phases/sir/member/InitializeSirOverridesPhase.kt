@@ -7,9 +7,9 @@ import co.touchlab.skie.phases.SirPhase
 
 object InitializeSirOverridesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinOverridableDeclaration.forEach(::initializeOverrides)
+        context.kirProvider.kotlinOverridableDeclaration.forEach(::initializeOverrides)
     }
 
     private fun initializeOverrides(overridableDeclaration: KirOverridableDeclaration<*, *>) {

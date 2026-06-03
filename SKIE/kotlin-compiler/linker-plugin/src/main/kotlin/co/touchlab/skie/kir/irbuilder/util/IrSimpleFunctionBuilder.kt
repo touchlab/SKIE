@@ -2,6 +2,7 @@ package co.touchlab.skie.kir.irbuilder.util
 
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.irFactory
+import co.touchlab.skie.phases.pluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.descriptors.Modality
@@ -16,7 +17,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
-context(KotlinIrPhase.Context)
+context(context: KotlinIrPhase.Context)
 fun IrBuilderWithScope.irSimpleFunction(
     name: Name,
     visibility: DescriptorVisibility,
@@ -34,7 +35,7 @@ fun IrBuilderWithScope.irSimpleFunction(
     isFakeOverride: Boolean = origin == IrDeclarationOrigin.FAKE_OVERRIDE,
     body: DeclarationIrBuilder.() -> IrBody,
 ): IrSimpleFunction =
-    irFactory.createSimpleFunction(
+    context.irFactory.createSimpleFunction(
         startOffset = startOffset,
         endOffset = endOffset,
         origin = origin,
@@ -52,7 +53,7 @@ fun IrBuilderWithScope.irSimpleFunction(
         isExpect = isExpect,
         isFakeOverride = isFakeOverride,
     ).apply {
-        val irDeclarationBuilder = DeclarationIrBuilder(context, symbol, startOffset = startOffset, endOffset = endOffset)
+        val irDeclarationBuilder = DeclarationIrBuilder(context.pluginContext.generatorContext, symbol, startOffset = startOffset, endOffset = endOffset)
 
         this.body = irDeclarationBuilder.body()
 

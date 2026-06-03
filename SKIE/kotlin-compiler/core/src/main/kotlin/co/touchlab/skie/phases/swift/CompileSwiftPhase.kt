@@ -34,7 +34,7 @@ class CompileSwiftPhase(
         SkieConfigurationFlag.Build_NoClangModuleBreadcrumbsInStaticFramework in globalConfiguration.enabledFlags
     private val isRelativeSourcePathsInDebugSymbolsEnabled = SkieConfigurationFlag.Build_RelativeSourcePathsInDebugSymbols in globalConfiguration.enabledFlags
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         val compilableFiles = sirProvider.compilableFiles
 

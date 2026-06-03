@@ -11,27 +11,27 @@ sealed class DumpSwiftApiPhase : SirPhase {
 
     object BeforeApiNotes : DumpSwiftApiPhase() {
 
-        context(SirPhase.Context)
-        override fun isActive(): Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes.isEnabled
+        context(context: SirPhase.Context)
+        override fun isActive(): Boolean = with(context) { SkieConfigurationFlag.Debug_DumpSwiftApiBeforeApiNotes.isEnabled }
     }
 
     object AfterApiNotes : DumpSwiftApiPhase() {
 
-        context(SirPhase.Context)
-        override fun isActive(): Boolean = SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes.isEnabled
+        context(context: SirPhase.Context)
+        override fun isActive(): Boolean = with(context) { SkieConfigurationFlag.Debug_DumpSwiftApiAfterApiNotes.isEnabled }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val moduleName = framework.frameworkName
+        val moduleName = context.framework.frameworkName
         val apiFileBaseName = "${moduleName}_${this::class.simpleName}"
-        val apiFile = skieBuildDirectory.debug.dumps.apiFile(apiFileBaseName)
-        val logFile = skieBuildDirectory.debug.logs.apiFile(apiFileBaseName)
+        val apiFile = context.skieBuildDirectory.debug.dumps.apiFile(apiFileBaseName)
+        val logFile = context.skieBuildDirectory.debug.logs.apiFile(apiFileBaseName)
 
         val command = Command(
             "zsh",
             "-c",
-            """echo "import Kotlin\n:type lookup $moduleName" | swift repl -F "${framework.frameworkDirectory.parentFile.absolutePath}" > "${apiFile.absolutePath}"""",
+            """echo "import Kotlin\n:type lookup $moduleName" | swift repl -F "${context.framework.frameworkDirectory.parentFile.absolutePath}" > "${apiFile.absolutePath}"""",
         )
 
         try {

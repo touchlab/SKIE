@@ -12,18 +12,18 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 
 object VerifyDescriptorProviderConsistencyPhase : KirPhase {
 
-    context(KirPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Debug_VerifyDescriptorProviderConsistency.isEnabled
+    context(context: KirPhase.Context)
+    override fun isActive(): Boolean = context.run { SkieConfigurationFlag.Debug_VerifyDescriptorProviderConsistency.isEnabled }
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override suspend fun execute() {
-        val objCExportedInterface = objCExportedInterfaceProvider.objCExportedInterface
+        val objCExportedInterface = context.objCExportedInterfaceProvider.objCExportedInterface
 
         val errors = listOfNotNull(
-            descriptorProvider.exposedClasses.shouldMatchExposed(objCExportedInterface.generatedClasses) { fqNameUnsafe.asString() },
-            descriptorProvider.exposedCategoryMembers.shouldMatch(objCExportedInterface.categoryMembers.values.flatten().toSet()) { fqNameUnsafe.asString() },
-            descriptorProvider.exposedTopLevelMembers.shouldMatch(objCExportedInterface.topLevel.values.flatten().toSet()) { fqNameUnsafe.asString() },
-            descriptorProvider.exposedFiles.shouldMatch(objCExportedInterface.topLevel.keys) { name ?: "<Unknown file>" },
+            context.descriptorProvider.exposedClasses.shouldMatchExposed(objCExportedInterface.generatedClasses) { fqNameUnsafe.asString() },
+            context.descriptorProvider.exposedCategoryMembers.shouldMatch(objCExportedInterface.categoryMembers.values.flatten().toSet()) { fqNameUnsafe.asString() },
+            context.descriptorProvider.exposedTopLevelMembers.shouldMatch(objCExportedInterface.topLevel.values.flatten().toSet()) { fqNameUnsafe.asString() },
+            context.descriptorProvider.exposedFiles.shouldMatch(objCExportedInterface.topLevel.keys) { name ?: "<Unknown file>" },
         )
 
         if (errors.isNotEmpty()) {
@@ -34,11 +34,11 @@ object VerifyDescriptorProviderConsistencyPhase : KirPhase {
         }
     }
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     private fun Set<ClassDescriptor>.shouldMatchExposed(other: Set<ClassDescriptor>, fqName: ClassDescriptor.() -> String): String? {
         // The Kotlin compiler (incorrectly) includes non-exported classes in certain cases - for example, "internal" exceptions from Java.
         // SKIE intentionally excludes these classes, so the filter is needed before comparing the sets.
-        val exposedOther = other.filter { mapper.shouldBeExposed(it) }.toSet()
+        val exposedOther = other.filter { context.mapper.shouldBeExposed(it) }.toSet()
 
         return this.shouldMatch(exposedOther, fqName)
     }

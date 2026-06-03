@@ -1,7 +1,7 @@
 [versions]
 jvmTarget = "11"
 jvmToolchain = "21"
-kotlin = "2.2.20"
+kotlin = "2.3.20"
 pluginPublish = "2.0.0"
 kotest = "6.0.4"
 buildconfig = "5.7.0"

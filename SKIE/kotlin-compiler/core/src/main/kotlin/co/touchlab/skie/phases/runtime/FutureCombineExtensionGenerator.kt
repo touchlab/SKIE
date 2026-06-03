@@ -4,9 +4,9 @@ import co.touchlab.skie.phases.SirPhase
 
 object FutureCombineExtensionGenerator {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generate() {
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("Combine.Future+asyncInit").content = """
+        context.namespaceProvider.getSkieNamespaceWrittenSourceFile("Combine.Future+asyncInit").content = """
             import Combine
 
             extension Combine.Future where Failure == Swift.Error {

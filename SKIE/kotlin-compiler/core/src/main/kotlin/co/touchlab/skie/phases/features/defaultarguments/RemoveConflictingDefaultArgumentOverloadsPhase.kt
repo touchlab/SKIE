@@ -13,9 +13,9 @@ import co.touchlab.skie.sir.signature.SirHierarchyCache
 
 object RemoveConflictingDefaultArgumentOverloadsPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val allBaseFunctions = kirProvider.kotlinConstructors + kirProvider.kotlinSimpleFunctions.filter { it.isBaseDeclaration }
+        val allBaseFunctions = context.kirProvider.kotlinConstructors + context.kirProvider.kotlinSimpleFunctions.filter { it.isBaseDeclaration }
 
         val allDefaultArgumentOverloads = allBaseFunctions.flatMap { it.defaultArgumentsOverloads }.toSet()
 

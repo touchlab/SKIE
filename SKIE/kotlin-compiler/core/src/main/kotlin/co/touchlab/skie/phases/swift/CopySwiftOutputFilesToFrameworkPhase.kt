@@ -11,9 +11,9 @@ class CopySwiftOutputFilesToFrameworkPhase(
     private val swiftFrameworkHeader = context.skieBuildDirectory.swiftCompiler.moduleHeader(framework.frameworkName)
     private val targetTriple = context.swiftCompilerConfiguration.targetTriple
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        if (sirProvider.compilableFiles.isNotEmpty()) {
+        if (context.sirProvider.compilableFiles.isNotEmpty()) {
             copySwiftModuleFiles()
             copySwiftLibraryEvolutionFiles()
         } else {
@@ -41,9 +41,9 @@ class CopySwiftOutputFilesToFrameworkPhase(
         framework.swiftHeader.delete()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun copySwiftLibraryEvolutionFiles() {
-        if (SkieConfigurationFlag.Build_SwiftLibraryEvolution.isEnabled) {
+        if (with(context) { SkieConfigurationFlag.Build_SwiftLibraryEvolution.isEnabled }) {
             swiftFrameworkHeader.swiftInterface.copyTo(framework.swiftInterface(targetTriple), overwrite = true)
             swiftFrameworkHeader.privateSwiftInterface.copyTo(framework.privateSwiftInterface(targetTriple), overwrite = true)
         } else {

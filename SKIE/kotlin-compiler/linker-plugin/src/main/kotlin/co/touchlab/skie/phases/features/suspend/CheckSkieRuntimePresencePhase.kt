@@ -8,17 +8,17 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 
 object CheckSkieRuntimePresencePhase : ClassExportPhase {
 
-    context(ClassExportPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
+    context(context: ClassExportPhase.Context)
+    override fun isActive(): Boolean = context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
         val skieRuntimeClassFqName = SupportedFlow.allVariants.first().kotlinClassFqName
 
-        val isRuntimePresent = descriptorProvider.exposedClasses.any { it.fqNameUnsafe.toString() == skieRuntimeClassFqName }
+        val isRuntimePresent = context.descriptorProvider.exposedClasses.any { it.fqNameUnsafe.toString() == skieRuntimeClassFqName }
 
         if (!isRuntimePresent) {
-            SkieConfigurationFlag.Feature_CoroutinesInterop.disable()
+            context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.disable() }
         }
     }
 }

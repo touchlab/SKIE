@@ -22,7 +22,7 @@ class DefaultArgumentGenerator(
         ::ExtensionFunctionDefaultArgumentGeneratorDelegate,
     ).map { it(context, sharedCounter) }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     override suspend fun execute() {
         delegates.forEach {
             it.generate()
