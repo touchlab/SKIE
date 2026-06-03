@@ -19,7 +19,7 @@ import co.touchlab.skie.util.DescriptorReporter
 import co.touchlab.skie.util.KirReporter
 import co.touchlab.skie.util.directory.FrameworkLayout
 import co.touchlab.skie.util.directory.SkieDirectories
-import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
+import co.touchlab.skie.compat.KonanConfigKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
 class InitPhaseContext(

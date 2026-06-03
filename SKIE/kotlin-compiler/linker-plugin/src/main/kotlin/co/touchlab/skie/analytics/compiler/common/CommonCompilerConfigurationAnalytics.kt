@@ -7,8 +7,8 @@ import co.touchlab.skie.plugin.analytics.AnalyticsProducer
 import co.touchlab.skie.util.toPrettyJson
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.backend.konan.BinaryOptions
-import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
+import co.touchlab.skie.compat.KonanConfig
+import co.touchlab.skie.compat.KonanConfigKeys
 import org.jetbrains.kotlin.konan.target.HostManager
 
 @Serializable
