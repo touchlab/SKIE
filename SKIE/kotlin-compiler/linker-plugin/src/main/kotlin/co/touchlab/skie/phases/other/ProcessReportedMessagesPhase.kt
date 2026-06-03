@@ -3,12 +3,12 @@ package co.touchlab.skie.phases.other
 import co.touchlab.skie.phases.LinkPhase
 import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.descriptorReporter
+import co.touchlab.skie.compat.reportCompilerMessage
 import co.touchlab.skie.phases.konanConfig
 import co.touchlab.skie.util.Reporter
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageUtil
-import org.jetbrains.kotlin.cli.jvm.compiler.report
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
@@ -50,8 +50,8 @@ object ProcessReportedMessagesPhase : LinkPhase {
         }
 
         when (report.severity) {
-            Reporter.Severity.Error -> konanConfig.configuration.report(CompilerMessageSeverity.ERROR, message, location)
-            Reporter.Severity.Warning -> konanConfig.configuration.report(CompilerMessageSeverity.WARNING, message, location)
+            Reporter.Severity.Error -> konanConfig.configuration.reportCompilerMessage(CompilerMessageSeverity.ERROR, message, location)
+            Reporter.Severity.Warning -> konanConfig.configuration.reportCompilerMessage(CompilerMessageSeverity.WARNING, message, location)
         }
     }
 }

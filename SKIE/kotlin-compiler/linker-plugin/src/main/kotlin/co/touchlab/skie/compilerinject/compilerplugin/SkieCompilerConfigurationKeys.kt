@@ -8,11 +8,14 @@ import co.touchlab.skie.util.directory.SkieDirectories as SkieDirectoriesValue
 
 object SkieConfigurationKeys {
 
-    object InitPhaseContext : CompilerConfigurationKey<co.touchlab.skie.context.InitPhaseContext>("InitSkiePhaseContext")
+    val InitPhaseContext: CompilerConfigurationKey<co.touchlab.skie.context.InitPhaseContext> =
+        CompilerConfigurationKey<co.touchlab.skie.context.InitPhaseContext>("InitSkiePhaseContext")
 
-    object MainContext : CompilerConfigurationKey<MainSkieContext>("MainSkieContext")
+    val MainContext: CompilerConfigurationKey<MainSkieContext> =
+        CompilerConfigurationKey<MainSkieContext>("MainSkieContext")
 
-    object SkieDirectories : CompilerConfigurationKey<SkieDirectoriesValue>("SKIE directories")
+    val SkieDirectories: CompilerConfigurationKey<SkieDirectoriesValue> =
+        CompilerConfigurationKey<SkieDirectoriesValue>("SKIE directories")
 }
 
 var CompilerConfiguration.initPhaseContext: InitPhaseContext

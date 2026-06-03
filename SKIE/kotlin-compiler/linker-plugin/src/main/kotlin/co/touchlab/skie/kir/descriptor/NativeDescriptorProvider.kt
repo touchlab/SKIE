@@ -2,13 +2,11 @@
 
 package co.touchlab.skie.kir.descriptor
 
-import co.touchlab.skie.compilerinject.reflection.reflectedBy
-import co.touchlab.skie.compilerinject.reflection.reflectors.UserVisibleIrModulesSupportReflector
 import co.touchlab.skie.kir.descriptor.cache.CachedObjCExportMapper
 import co.touchlab.skie.kir.descriptor.cache.ExposedDescriptorsCache
 import org.jetbrains.kotlin.backend.konan.FrontendServices
-import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
+import co.touchlab.skie.compat.KonanConfig
+import co.touchlab.skie.compat.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.ir.konanLibrary
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -57,10 +55,7 @@ internal class NativeDescriptorProvider(
         get() = exposedDescriptorsCache.exposedTopLevelMembers
 
     override val externalDependencies: Set<ResolvedDependency> by lazy {
-        konanConfig.userVisibleIrModulesSupport
-            .reflectedBy<UserVisibleIrModulesSupportReflector>()
-            .externalDependencyModules
-            .toSet()
+        getExternalDependencies(konanConfig)
     }
 
     override val resolvedLibraries: List<KotlinLibrary> by lazy {
