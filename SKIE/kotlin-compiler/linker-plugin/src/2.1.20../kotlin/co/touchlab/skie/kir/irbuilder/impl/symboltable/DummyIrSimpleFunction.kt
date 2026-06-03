@@ -10,8 +10,8 @@ import org.jetbrains.kotlin.ir.declarations.IrFactory
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.MetadataSource
+import co.touchlab.skie.compat.SkieIrAnnotation
 import org.jetbrains.kotlin.ir.expressions.IrBody
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.IrType
@@ -38,7 +38,7 @@ class DummyIrSimpleFunction(
     override var returnType: IrType by unsupported()
     override val containerSource: DeserializedContainerSource? by unsupported()
     override var metadata: MetadataSource? by unsupported()
-    override var annotations: List<IrConstructorCall> by unsupported()
+    override var annotations: List<SkieIrAnnotation> by unsupported()
     override var overriddenSymbols: List<IrSimpleFunctionSymbol> by unsupported()
     override var modality: Modality by unsupported()
     override var isExternal: Boolean by unsupported()

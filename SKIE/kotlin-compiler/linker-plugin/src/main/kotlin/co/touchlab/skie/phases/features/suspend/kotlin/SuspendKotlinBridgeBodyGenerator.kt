@@ -1,5 +1,7 @@
 package co.touchlab.skie.phases.features.suspend.kotlin
 
+import co.touchlab.skie.compat.skiePutValueArgument
+import co.touchlab.skie.compat.skieValueParameters
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.skieSymbolTable
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
@@ -25,20 +27,20 @@ class SuspendKotlinBridgeBodyGenerator(
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrBody =
         irBlockBody {
-            val suspendHandlerParameter = bridgingFunction.valueParameters.last()
+            val suspendHandlerParameter = bridgingFunction.skieValueParameters.last()
             val checkedExceptions = exceptionFieldGenerator.createGetCheckedExceptions(bridgingFunction, originalFunctionDescriptor)
             val originalFunctionCallLambda = lambdaGenerator.createOriginalFunctionCallLambda(
                 bridgingFunction = bridgingFunction,
                 originalFunctionDescriptor = originalFunctionDescriptor,
-                type = suspendHandlerLaunchMethod.valueParameters.last().type,
+                type = suspendHandlerLaunchMethod.skieValueParameters.last().type,
             )
 
             +irReturn(
                 irCall(suspendHandlerLaunchMethod).apply {
                     dispatchReceiver = irGet(suspendHandlerParameter)
 
-                    putValueArgument(0, checkedExceptions)
-                    putValueArgument(1, originalFunctionCallLambda)
+                    skiePutValueArgument(0, checkedExceptions)
+                    skiePutValueArgument(1, originalFunctionCallLambda)
                 },
             )
         }

@@ -1,5 +1,7 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
+import co.touchlab.skie.compat.skieExtensionReceiver
+import co.touchlab.skie.compat.skieExtensionReceiverParameter
 import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.createFunction
@@ -122,7 +124,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             +irReturn(
                 irCall(originalFunctionSymbol).apply {
                     dispatchReceiver = overloadIr.dispatchReceiverParameter?.let { irGet(it) }
-                    extensionReceiver = overloadIr.extensionReceiverParameter?.let { irGet(it) }
+                    skieExtensionReceiver = overloadIr.skieExtensionReceiverParameter?.let { irGet(it) }
                     passArgumentsWithMatchingNames(overloadIr)
                 },
             )

@@ -1,5 +1,6 @@
 package co.touchlab.skie.phases.features.defaultarguments.delegate
 
+import co.touchlab.skie.compat.skieValueParameters
 import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.createSecondaryConstructor
@@ -119,7 +120,7 @@ class ConstructorsDefaultArgumentGeneratorDelegate(
     override fun IrFunction.indexOfValueParameterByName(name: Name): Int {
         val searchedIdentifier = name.identifier.dropUniqueParameterMangling()
 
-        return this.valueParameters.indexOfFirst { it.name.identifier == searchedIdentifier }
+        return this.skieValueParameters.indexOfFirst { it.name.identifier == searchedIdentifier }
     }
 
     private fun String.dropUniqueParameterMangling(): String =

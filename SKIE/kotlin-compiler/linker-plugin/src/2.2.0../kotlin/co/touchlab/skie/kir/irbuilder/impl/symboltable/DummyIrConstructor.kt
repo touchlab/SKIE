@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFactory
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.MetadataSource
+import co.touchlab.skie.compat.SkieIrAnnotation
 import org.jetbrains.kotlin.ir.expressions.IrBody
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.name.Name
@@ -34,7 +34,7 @@ class DummyIrConstructor(override val symbol: IrConstructorSymbol) : IrConstruct
     override var returnType: IrType by unsupported()
     override val containerSource: DeserializedContainerSource? by unsupported()
     override var metadata: MetadataSource? by unsupported()
-    override var annotations: List<IrConstructorCall> by unsupported()
+    override var annotations: List<SkieIrAnnotation> by unsupported()
     override var isExternal: Boolean by unsupported()
     override var typeParameters: List<IrTypeParameter> by unsupported()
     override var attributeOwnerId: IrElement by unsupported()
