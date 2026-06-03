@@ -26,8 +26,9 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.jetbrains.kotlin.backend.konan.FrontendServices
-import org.jetbrains.kotlin.backend.konan.KonanConfig
-import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
+import co.touchlab.skie.compat.KonanConfig
+import co.touchlab.skie.compat.KonanConfigKeys
+import co.touchlab.skie.compat.frameworkOutputPathConfigurationKey
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import java.util.Collections
 
@@ -90,7 +91,7 @@ class MainSkieContext internal constructor(
     )
 
     override val framework: FrameworkLayout = run {
-        val frameworkPath = konanConfig.configuration.getNotNull(KonanConfigKeys.OUTPUT)
+        val frameworkPath = konanConfig.configuration.getNotNull(frameworkOutputPathConfigurationKey)
 
         FrameworkLayout(
             frameworkPath = frameworkPath,
