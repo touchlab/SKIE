@@ -4,7 +4,7 @@ import co.touchlab.skie.configuration.provider.descriptor.DescriptorConfiguratio
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.phases.ForegroundPhase
 import co.touchlab.skie.util.DescriptorReporter
-import org.jetbrains.kotlin.backend.konan.KonanConfig
+import co.touchlab.skie.compat.KonanConfig
 
 interface ForegroundPhaseCompilerContext : ForegroundPhase.Context {
 

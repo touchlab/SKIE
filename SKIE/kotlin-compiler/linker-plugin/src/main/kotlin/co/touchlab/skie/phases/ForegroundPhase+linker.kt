@@ -6,7 +6,7 @@ import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.descriptor.ExtraDescriptorBuiltins
 import co.touchlab.skie.kir.descriptor.cache.CachedObjCExportMapper
 import co.touchlab.skie.util.DescriptorReporter
-import org.jetbrains.kotlin.backend.konan.KonanConfig
+import co.touchlab.skie.compat.KonanConfig
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.konan.target.AppleConfigurables
 

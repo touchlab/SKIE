@@ -2,7 +2,7 @@ package co.touchlab.skie.analytics.compiler.specific
 
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.plugin.analytics.AnalyticsProducer
-import org.jetbrains.kotlin.backend.konan.KonanConfig
+import co.touchlab.skie.compat.KonanConfig
 
 object SpecificCompilerConfigurationAnalytics {
 
