@@ -1,5 +1,9 @@
 package co.touchlab.skie.phases.features.suspend.kotlin
 
+import co.touchlab.skie.compat.skieExtensionReceiver
+import co.touchlab.skie.compat.skiePutTypeArgument
+import co.touchlab.skie.compat.skiePutValueArgument
+import co.touchlab.skie.compat.skieValueParameters
 import co.touchlab.skie.kir.irbuilder.util.irFunctionExpression
 import co.touchlab.skie.kir.irbuilder.util.irSimpleFunction
 import co.touchlab.skie.phases.KotlinIrPhase
@@ -77,7 +81,7 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
         originalFunctionDescriptor: FunctionDescriptor,
     ) {
         if (originalFunctionDescriptor.dispatchReceiverParameter != null) {
-            val dispatchReceiverParameter = bridgingFunction.valueParameters.first()
+            val dispatchReceiverParameter = bridgingFunction.skieValueParameters.first()
 
             dispatchReceiver = irGet(dispatchReceiverParameter)
         }
@@ -91,9 +95,9 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
         if (originalFunctionDescriptor.extensionReceiverParameter != null) {
             val parameterIndex = if (originalFunctionDescriptor.dispatchReceiverParameter != null) 1 else 0
 
-            val extensionReceiverParameter = bridgingFunction.valueParameters[parameterIndex]
+            val extensionReceiverParameter = bridgingFunction.skieValueParameters[parameterIndex]
 
-            extensionReceiver = irGet(extensionReceiverParameter)
+            skieExtensionReceiver = irGet(extensionReceiverParameter)
         }
     }
 
@@ -106,12 +110,12 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
         val valueArguments = valueParameters.map { irGet(it) }
 
         valueArguments.forEachIndexed { index, argument ->
-            putValueArgument(index, argument)
+            skiePutValueArgument(index, argument)
         }
     }
 
     private fun IrSimpleFunction.filterRealValueParameters(originalFunctionDescriptor: FunctionDescriptor): List<IrValueParameter> {
-        var result = this.valueParameters
+        var result = this.skieValueParameters
 
         if (originalFunctionDescriptor.dispatchReceiverParameter != null) {
             result = result.drop(1)
@@ -127,7 +131,7 @@ class SuspendKotlinBridgeHandlerLambdaGenerator {
 
     private fun IrCall.setTypeArgumentsForDelegatingCall(bridgeFunction: IrSimpleFunction) {
         bridgeFunction.typeParameters.take(this.symbol.owner.typeParameters.size).forEach {
-            putTypeArgument(it.index, it.defaultType)
+            skiePutTypeArgument(it.index, it.defaultType)
         }
     }
 }

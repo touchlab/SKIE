@@ -1,5 +1,7 @@
 package co.touchlab.skie.phases.features.suspend.kotlin
 
+import co.touchlab.skie.compat.skiePutTypeArgument
+import co.touchlab.skie.compat.skiePutValueArgument
 import co.touchlab.skie.kir.irbuilder.util.addChild
 import co.touchlab.skie.phases.KotlinIrPhase
 import co.touchlab.skie.phases.irBuiltIns
@@ -97,8 +99,8 @@ class SuspendKotlinBridgeCheckedExceptionsGenerator {
                     val varargElementType = irBuiltIns.kClassClass.typeWith(irBuiltIns.throwableType)
                     val vararg = irVararg(varargElementType, checkedExceptionClassReferences)
 
-                    putTypeArgument(0, varargElementType)
-                    putValueArgument(0, vararg)
+                    skiePutTypeArgument(0, varargElementType)
+                    skiePutValueArgument(0, vararg)
                 },
             )
         }

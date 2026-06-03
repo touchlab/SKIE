@@ -2,6 +2,8 @@ package co.touchlab.skie.phases.features.defaultarguments.delegate
 
 import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.SkieConfigurationFlag
+import co.touchlab.skie.compat.skiePutValueArgument
+import co.touchlab.skie.compat.skieValueParameters
 import co.touchlab.skie.configuration.provider.descriptor.configuration
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.kir.irbuilder.DeclarationBuilder
@@ -83,15 +85,15 @@ abstract class BaseDefaultArgumentGeneratorDelegate(
         (this shr n) and 1 == 1
 
     context(IrBuilderWithScope) protected fun IrFunctionAccessExpression.passArgumentsWithMatchingNames(from: IrFunction) {
-        from.valueParameters.forEach { valueParameter: IrValueParameter ->
+        from.skieValueParameters.forEach { valueParameter: IrValueParameter ->
             val indexInCalledFunction = this.symbol.owner.indexOfValueParameterByName(valueParameter.name)
             check(indexInCalledFunction != -1) {
                 "Could not find value parameter with name ${valueParameter.name} in ${this.symbol.owner} (from $from)\n\nThis dump:\n${this.dump()}\n\nFrom dump:\n${from.dump()}"
             }
-            putValueArgument(indexInCalledFunction, irGet(valueParameter))
+            skiePutValueArgument(indexInCalledFunction, irGet(valueParameter))
         }
     }
 
     protected open fun IrFunction.indexOfValueParameterByName(name: Name): Int =
-        this.valueParameters.indexOfFirst { it.name == name }
+        this.skieValueParameters.indexOfFirst { it.name == name }
 }

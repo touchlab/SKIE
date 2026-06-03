@@ -4,6 +4,7 @@ import co.touchlab.skie.context.KotlinIrPhaseContext
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.kir.util.SkieSymbolTable
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.declarations.IrFactory
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -29,6 +30,9 @@ val KotlinIrPhase.Context.irBuiltIns: IrBuiltIns
 
 val KotlinIrPhase.Context.irFactory: IrFactory
     get() = typedContext.pluginContext.symbolTable.irFactory
+
+internal val KotlinIrPhase.Context.compilerConfiguration: CompilerConfiguration
+    get() = typedContext.konanConfig.configuration
 
 private val KotlinIrPhase.Context.typedContext: KotlinIrPhaseContext
     get() = context as KotlinIrPhaseContext
