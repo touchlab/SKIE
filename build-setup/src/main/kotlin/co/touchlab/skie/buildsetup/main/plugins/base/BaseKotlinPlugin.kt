@@ -1,6 +1,7 @@
 package co.touchlab.skie.buildsetup.main.plugins.base
 
 import co.touchlab.skie.buildsetup.util.libs
+import co.touchlab.skie.buildsetup.util.version.KotlinToolingVersion
 import co.touchlab.skie.buildsetup.util.version.KotlinVersionAttribute
 import co.touchlab.skie.buildsetup.util.version.SupportedKotlinVersionProvider
 import org.gradle.api.Plugin
@@ -50,15 +51,15 @@ abstract class BaseKotlinPlugin : Plugin<Project> {
     }
 
     private fun Project.configureTargetJvm() {
+        val extraCompilerArgs = extraJvmCompilerArgs()
+
         plugins.withType<KotlinMultiplatformPluginWrapper>().configureEach {
             extensions.configure<KotlinMultiplatformExtension> {
                 targets.withType(KotlinJvmTarget::class).configureEach {
                     compilerOptions {
                         jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmTarget.toString()))
 
-                        freeCompilerArgs.addAll(
-                            "-Xjdk-release=${libs.versions.jvmTarget}",
-                        )
+                        freeCompilerArgs.addAll(extraCompilerArgs)
                     }
                 }
             }
@@ -69,15 +70,26 @@ abstract class BaseKotlinPlugin : Plugin<Project> {
                 compilerOptions {
                     jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmTarget.toString()))
 
-                    freeCompilerArgs.addAll(
-                        "-Xjdk-release=${libs.versions.jvmTarget}",
-                    )
+                    freeCompilerArgs.addAll(extraCompilerArgs)
                 }
             }
         }
 
         tasks.withType<JavaCompile>().configureEach {
             options.release.set(libs.versions.jvmTarget)
+        }
+    }
+
+    private fun Project.extraJvmCompilerArgs(): List<String> = buildList {
+        add("-Xjdk-release=${libs.versions.jvmTarget}")
+
+        // The project is compiled with the Kotlin compiler pinned in the version catalog (see `kotlin`), which can only
+        // read klib metadata up to one minor version ahead. Compiling against a newer Kotlin distribution (2.4.0+, used
+        // by the kotlin-native-compiler-embeddable on the main/test classpath) therefore needs the metadata version
+        // check relaxed.
+        val primaryCompilerVersion = SupportedKotlinVersionProvider.getPrimaryKotlinVersion(this@extraJvmCompilerArgs).compilerVersion
+        if (primaryCompilerVersion >= KotlinToolingVersion("2.4.0")) {
+            add("-Xskip-metadata-version-check")
         }
     }
 
