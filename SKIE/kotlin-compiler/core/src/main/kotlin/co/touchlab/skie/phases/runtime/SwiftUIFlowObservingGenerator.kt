@@ -83,6 +83,7 @@ object SwiftUIFlowObservingGenerator {
                         |
                         |- parameter flow: A SKIE-bridged Flow you with to collect.
                         |- parameter binding: A binding to a property where each new value will be set to.
+                        |- parameter animation: An optional animation to use when updating the binding with a new value.
                     """.trimMargin()
 
                     val flowTypeParameter = SirTypeParameter(
@@ -107,9 +108,23 @@ object SwiftUIFlowObservingGenerator {
                         )
                     )
 
+                    SirValueParameter(
+                        name = "animation",
+                        type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                        defaultValue = "nil",
+                    )
+
                     bodyBuilder.add {
                         addCode("collect(flow: flow) { newValue in%>")
-                        addStatement("binding.wrappedValue = newValue")
+                        addCode("""
+                            if let animation {
+                                SwiftUI.withAnimation(animation) {
+                                    binding.wrappedValue = newValue
+                                }
+                            } else {
+                                binding.wrappedValue = newValue
+                            }
+                        """.trimIndent())
                         addCode("%<}")
                     }
                 }
@@ -143,6 +158,7 @@ object SwiftUIFlowObservingGenerator {
                         |
                         |- parameter flow: A SKIE-bridged Flow you with to collect.
                         |- parameter binding: A binding to a property where each new value will be set to.
+                        |- parameter animation: An optional animation to use when updating the binding with a new value.
                         |- parameter transform: An async closure to transform any value emitted by the flow into a one expected by the binding.
                         |                       Returning `nil` from this closure will reject the value.
                     """.trimMargin()
@@ -170,6 +186,12 @@ object SwiftUIFlowObservingGenerator {
                     )
 
                     SirValueParameter(
+                        name = "animation",
+                        type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                        defaultValue = "nil",
+                    )
+
+                    SirValueParameter(
                         name = "transform",
                         type = LambdaSirType(
                             valueParameterTypes = listOf(
@@ -186,7 +208,15 @@ object SwiftUIFlowObservingGenerator {
                     bodyBuilder.add {
                         addCode("collect(flow: flow) { newValue in%>")
                         beginControlFlow("if", "let newTransformedValue = await transform(newValue)")
-                        addStatement("binding.wrappedValue = newTransformedValue")
+                        addCode("""
+                            if let animation {
+                                SwiftUI.withAnimation(animation) {
+                                    binding.wrappedValue = newTransformedValue
+                                }
+                            } else {
+                                binding.wrappedValue = newTransformedValue
+                            }
+                        """.trimIndent())
                         endControlFlow("if")
                         addCode("%<}")
                     }
