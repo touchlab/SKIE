@@ -16,5 +16,8 @@ class TestSkiePhasesRegistrar : SkiePluginRegistrar {
             add(VerifyTestPhasesAreExecutedPhase)
             add(VerifyFrameworkHeaderPhase)
         }
+        initPhaseContext.skiePhaseScheduler.kirPhases.modify {
+            add(VerifyExternalDependenciesAreReportedPhase)
+        }
     }
 }

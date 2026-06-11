@@ -16,6 +16,7 @@ class CompilerArgumentsProvider(
     val buildConfiguration: BuildConfiguration = TestDefaults.buildConfiguration ?: BuildConfiguration.Debug,
     val target: Target = TestDefaults.target ?: Target.current,
     val optIn: List<String> = emptyList(),
+    val externalDependencies: String? = null,
 ) {
 
     fun compile(
@@ -74,6 +75,8 @@ class CompilerArgumentsProvider(
 
             libraries = dependencies.toTypedArray()
             exportedLibraries = exportedDependencies.toTypedArray()
+
+            externalDependencies = this@CompilerArgumentsProvider.externalDependencies
 
             target = this@CompilerArgumentsProvider.target.kotlinName
 
