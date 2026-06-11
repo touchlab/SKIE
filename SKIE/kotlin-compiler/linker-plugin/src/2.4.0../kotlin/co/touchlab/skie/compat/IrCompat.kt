@@ -19,17 +19,24 @@ internal typealias SkieIrAnnotation = org.jetbrains.kotlin.ir.expressions.IrAnno
  * Kotlin 2.4.0 removed the dedicated value-parameter/receiver/argument accessors from the IR tree in favor of a single
  * positional `parameters`/`arguments` list keyed by [IrParameterKind]. These shims preserve the pre-2.4.0 semantics so
  * the shared `main` source set stays version-agnostic.
+ *
+ * Pre-2.4.0 `IrFunction.valueParameters` returned both [IrParameterKind.Regular] and [IrParameterKind.Context]
+ * parameters (in that positional order, context first), so [isSkieValueParameter] matches that to stay faithful even
+ * for functions that carry context parameters.
  */
+private val IrValueParameter.isSkieValueParameter: Boolean
+    get() = kind == IrParameterKind.Regular || kind == IrParameterKind.Context
+
 internal val IrFunction.skieValueParameters: List<IrValueParameter>
-    get() = parameters.filter { it.kind == IrParameterKind.Regular }
+    get() = parameters.filter { it.isSkieValueParameter }
 
 internal val IrFunction.skieExtensionReceiverParameter: IrValueParameter?
     get() = parameters.firstOrNull { it.kind == IrParameterKind.ExtensionReceiver }
 
 internal fun IrFunctionAccessExpression.skiePutValueArgument(index: Int, valueArgument: IrExpression?) {
-    val regularParameters = symbol.owner.parameters.filter { it.kind == IrParameterKind.Regular }
+    val valueParameters = symbol.owner.parameters.filter { it.isSkieValueParameter }
 
-    arguments[regularParameters[index].indexInParameters] = valueArgument
+    arguments[valueParameters[index].indexInParameters] = valueArgument
 }
 
 internal fun IrFunctionAccessExpression.skiePutTypeArgument(index: Int, type: IrType?) {
