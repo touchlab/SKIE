@@ -17,9 +17,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
       - name: Prepare Worker
         uses: ./.github/actions/prepare-worker
       # TODO Ensure all tests pass
