@@ -7,6 +7,9 @@ import co.touchlab.skie.kir.type.translation.KirDeclarationTypeTranslator
 import co.touchlab.skie.kir.type.translation.KirTypeTranslator
 import org.jetbrains.kotlin.backend.konan.objcexport.ObjCExportNamer
 
+val KirPhase.Context.kDocMap: Map<String, String>
+    get() = typedContext.mainSkieContext.kDocMap
+
 val KirPhase.Context.descriptorKirProvider: DescriptorKirProvider
     get() = typedContext.descriptorKirProvider
 

@@ -19,6 +19,7 @@ import co.touchlab.skie.phases.descriptorConfigurationProvider
 import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.descriptorProvider
 import co.touchlab.skie.phases.kirTypeTranslator
+import co.touchlab.skie.phases.kDocMap
 import co.touchlab.skie.phases.namer
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.descriptors.enumEntries
@@ -45,6 +46,7 @@ class CreateExposedKirTypesPhase(
     private val descriptorConfigurationProvider = context.descriptorConfigurationProvider
     private val globalConfiguration = context.globalConfiguration
     private val kirTypeTranslator = context.kirTypeTranslator
+    private val kDocMap: Map<String, String> = context.kDocMap
 
     private val descriptorsToClasses = mutableMapOf<ClassDescriptor, KirClass>()
 
@@ -106,6 +108,8 @@ class CreateExposedKirTypesPhase(
             configuration = descriptorConfigurationProvider.getConfiguration(descriptor),
         )
 
+        kirClass.documentation = descriptor.kirDocumentation
+
         descriptorKirProvider.registerClass(kirClass, descriptor)
 
         configureClassParent(kirClass)
@@ -135,6 +139,8 @@ class CreateExposedKirTypesPhase(
                 index = index,
                 hasUserDefinedName = classDescriptor.hasUserDefinedName,
             )
+
+            enumEntry.documentation = classDescriptor.kirDocumentation
 
             descriptorKirProvider.registerEnumEntry(enumEntry, classDescriptor)
         }
@@ -202,6 +208,9 @@ class CreateExposedKirTypesPhase(
             }
         }
     }
+
+    private val ClassDescriptor.kirDocumentation: String
+        get() = kDocMap[fqNameSafe.asString()] ?: ""
 
     private val ClassDescriptor.isExposed: Boolean
         get() = this in descriptorProvider.exposedClasses

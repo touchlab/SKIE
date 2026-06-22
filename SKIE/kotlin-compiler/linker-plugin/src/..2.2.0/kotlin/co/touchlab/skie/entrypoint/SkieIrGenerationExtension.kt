@@ -15,8 +15,10 @@ class SkieIrGenerationExtension(private val configuration: CompilerConfiguration
 
     @Suppress("DEPRECATION")
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+        val mainSkieContext = configuration.mainSkieContext
+
         EntrypointUtils.runKotlinIrPhases(
-            mainSkieContext = configuration.mainSkieContext,
+            mainSkieContext = mainSkieContext,
             moduleFragment = moduleFragment,
             pluginContext = KotlinIrPhaseContext.CompatibleIrPluginContext(
                 symbolTable = pluginContext.symbolTable as SymbolTable,
@@ -27,6 +29,13 @@ class SkieIrGenerationExtension(private val configuration: CompilerConfiguration
                 typeTranslator = pluginContext.typeTranslator,
             ),
         )
+
+        EntrypointUtils.runKirPhases(
+            mainSkieContext = mainSkieContext,
+            objCExportedInterfaceProvider = mainSkieContext.objCExportedInterfaceProvider,
+        )
+
+        EntrypointUtils.runSirPhases(mainSkieContext)
     }
 }
 

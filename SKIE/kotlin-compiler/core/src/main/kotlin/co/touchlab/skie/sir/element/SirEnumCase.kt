@@ -9,6 +9,8 @@ class SirEnumCase(
 
     var parent: SirClass by sirEnumCaseParent(parent)
 
+    var documentation: String = ""
+
     val associatedValues: MutableList<SirEnumCaseAssociatedValue> = mutableListOf()
 
     val index: Int

@@ -16,6 +16,8 @@ class KirConstructor(
     override val configuration: ConstructorConfiguration,
 ) : KirFunction<SirConstructor>() {
 
+    override var documentation: String = ""
+
     override val scope: KirScope = KirScope.Static
 
     override val isRefinedInSwift: Boolean = false

@@ -23,6 +23,8 @@ class KirProperty(
     override val modality: KirCallableDeclaration.Modality,
 ) : KirOverridableDeclaration<KirProperty, SirProperty> {
 
+    override var documentation: String = ""
+
     lateinit var oirProperty: OirProperty
 
     override val oirCallableDeclaration: OirCallableDeclaration

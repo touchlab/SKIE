@@ -53,6 +53,7 @@ import co.touchlab.skie.phases.other.DeleteSkieFrameworkContentPhase
 import co.touchlab.skie.phases.other.ExtraClassExportPhase
 import co.touchlab.skie.phases.other.FixDuplicatedOverriddenFunctionsPhase
 import co.touchlab.skie.phases.other.FixLibrariesShortNamePhase
+import co.touchlab.skie.phases.other.CollectKDocFromSourcesPhase
 import co.touchlab.skie.phases.other.GenerateIrPhase
 import co.touchlab.skie.phases.other.GenerateModulemapFilePhase
 import co.touchlab.skie.phases.other.LinkObjectFilesPhase
@@ -131,6 +132,7 @@ class LinkerPhaseScheduler : SkiePhaseScheduler {
         addAll(
             KotlinIrAnalyticsPhase,
             GenerateIrPhase,
+            CollectKDocFromSourcesPhase,
         )
     }
 

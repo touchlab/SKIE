@@ -12,17 +12,21 @@ import co.touchlab.skie.phases.descriptorConfigurationProvider
 import co.touchlab.skie.phases.descriptorKirProvider
 import co.touchlab.skie.phases.descriptorProvider
 import co.touchlab.skie.phases.kirDeclarationTypeTranslator
+import co.touchlab.skie.phases.kDocMap
 import co.touchlab.skie.phases.mapper
 import co.touchlab.skie.phases.namer
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
 import org.jetbrains.kotlin.backend.konan.serialization.KonanManglerDesc
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationLevelValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 internal abstract class BaseCreateKirMembersPhase(
     context: KirPhase.Context,
@@ -35,6 +39,7 @@ internal abstract class BaseCreateKirMembersPhase(
     protected val descriptorConfigurationProvider = context.descriptorConfigurationProvider
     protected val kirDeclarationTypeTranslator = context.kirDeclarationTypeTranslator
     protected val namer = context.namer
+    private val kDocMap: Map<String, String> = context.kDocMap
 
     protected val PropertyDescriptor.baseProperty: PropertyDescriptor
         get() = (getAllParents(this) + this.original).first { mapper.isBaseProperty(it) }
@@ -91,6 +96,11 @@ internal abstract class BaseCreateKirMembersPhase(
         get() = annotations.any { annotation ->
             annotation.annotationClass?.annotations?.any { it.fqName == KonanFqNames.refinesInSwift } == true
         }
+
+    protected val DeclarationDescriptor.kirDocumentation: String
+        get() = kDocMap[fqNameSafe.asString()]
+            ?: (this as? PropertyAccessorDescriptor)?.correspondingProperty?.let { kDocMap[it.fqNameSafe.asString()] }
+            ?: ""
 
     protected val MethodBridge.ReturnValue.errorHandlingStrategy: OirFunction.ErrorHandlingStrategy
         get() = when (this) {

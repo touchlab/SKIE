@@ -93,6 +93,8 @@ internal class CreateKirSimpleFunctionsPhase(
                 modality = descriptor.kirModality,
             )
 
+            function.documentation = descriptor.kirDocumentation
+
             descriptorKirProvider.registerCallableDeclaration(function, descriptor)
 
             getDirectParents(descriptor)

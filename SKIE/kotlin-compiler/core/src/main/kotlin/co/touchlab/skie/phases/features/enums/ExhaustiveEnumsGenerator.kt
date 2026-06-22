@@ -106,7 +106,9 @@ private fun SirClass.addEnumCases(enum: KirClass) {
     enum.enumEntries.forEach {
         SirEnumCase(
             simpleName = it.sirEnumEntry.name,
-        )
+        ).apply {
+            documentation = it.documentation
+        }
     }
 }
 

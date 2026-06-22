@@ -60,6 +60,7 @@ class CreateSirMembersPhase(
             visibility = constructor.visibility,
             isHidden = constructor.isHidden,
         ).apply {
+            documentation = constructor.documentation
             createValueParameters(constructor, constructor.swiftFunctionName)
         }
 
@@ -83,6 +84,7 @@ class CreateSirMembersPhase(
             isReplaced = function.isReplaced,
             isHidden = function.isHidden,
         ).apply {
+            documentation = function.documentation
             createValueParameters(function, swiftFunctionName)
         }
 
@@ -105,6 +107,7 @@ class CreateSirMembersPhase(
             isHidden = property.isHidden,
             isFakeOverride = property.isFakeOverride,
         ).apply {
+            documentation = property.documentation
             SirGetter(
                 throws = false,
             )
@@ -209,6 +212,7 @@ class CreateSirMembersPhase(
             scope = oirEnumEntry.scope.sirScope,
             deprecationLevel = oirEnumEntry.deprecationLevel,
         ).apply {
+            documentation = enumEntry.documentation
             SirGetter(
                 throws = false,
             )

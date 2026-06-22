@@ -63,6 +63,8 @@ internal class CreateKirPropertiesPhase(
                 modality = descriptor.kirModality,
             )
 
+            property.documentation = descriptor.kirDocumentation
+
             descriptorKirProvider.registerCallableDeclaration(property, descriptor)
 
             getDirectParents(descriptor)

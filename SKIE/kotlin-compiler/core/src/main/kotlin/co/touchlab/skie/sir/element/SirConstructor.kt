@@ -84,4 +84,4 @@ fun SirConstructor.shallowCopy(
         throws = throws,
         deprecationLevel = deprecationLevel,
         isWrappedBySkie = isWrappedBySkie,
-    )
+    ).also { it.documentation = this.documentation }

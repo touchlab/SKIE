@@ -24,6 +24,8 @@ class KirClass(
 
     lateinit var oirClass: OirClass
 
+    var documentation: String = ""
+
     override val classes: MutableList<KirClass> = mutableListOf()
 
     val kotlinIdentifier: String by lazy {
