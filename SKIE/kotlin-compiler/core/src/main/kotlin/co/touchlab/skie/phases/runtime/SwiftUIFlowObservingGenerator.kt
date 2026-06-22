@@ -32,7 +32,7 @@ object SwiftUIFlowObservingGenerator {
     private val availability = "available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)"
     private val maxFlowsOverload = 5
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generate() {
         generateCollectFlowModifiers()
         val skieSwiftFlowWithInitialValue = generateSkieSwiftFlowWithInitialValue()
@@ -45,18 +45,18 @@ object SwiftUIFlowObservingGenerator {
         generateSkieFlowDoesNotThrow()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateCollectFlowModifiers() {
-        namespaceProvider.getSkieNamespaceFile("SwiftUI.View+collect").apply {
+        context.namespaceProvider.getSkieNamespaceFile("SwiftUI.View+collect").apply {
             imports += "SwiftUI"
 
             SirExtension(
-                classDeclaration = sirBuiltins.SwiftUI.View,
+                classDeclaration = context.sirBuiltins.SwiftUI.View,
                 attributes = listOf(availability),
             ).apply {
                 SirSimpleFunction(
                     identifier = "collect",
-                    returnType = sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
+                    returnType = context.sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
                 ).apply {
                     documentation = """
                         |A view modifier used to collect a SKIE-bridged Flow into a SwiftUI Binding.
@@ -88,7 +88,7 @@ object SwiftUIFlowObservingGenerator {
                     val flowTypeParameter = SirTypeParameter(
                         name = "Flow",
                         bounds = listOf(
-                            sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
+                            context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
                         )
                     )
 
@@ -100,9 +100,9 @@ object SwiftUIFlowObservingGenerator {
                     SirValueParameter(
                         label = "into",
                         name = "binding",
-                        type = sirBuiltins.SwiftUI.Binding.toType(
+                        type = context.sirBuiltins.SwiftUI.Binding.toType(
                             flowTypeParameter.toTypeParameterUsage().typeParameter(
-                                sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
+                                context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
                             )
                         )
                     )
@@ -116,7 +116,7 @@ object SwiftUIFlowObservingGenerator {
 
                 SirSimpleFunction(
                     identifier = "collect",
-                    returnType = sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
+                    returnType = context.sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
                 ).apply {
                     documentation = """
                         |A view modifier used to collect a SKIE-bridged Flow into a SwiftUI Binding, transforming the value before assigning.
@@ -150,7 +150,7 @@ object SwiftUIFlowObservingGenerator {
                     val flowTypeParameter = SirTypeParameter(
                         name = "Flow",
                         bounds = listOf(
-                            sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
+                            context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
                         )
                     )
 
@@ -164,7 +164,7 @@ object SwiftUIFlowObservingGenerator {
                     SirValueParameter(
                         label = "into",
                         name = "binding",
-                        type = sirBuiltins.SwiftUI.Binding.toType(
+                        type = context.sirBuiltins.SwiftUI.Binding.toType(
                             uTypeParameter.toTypeParameterUsage()
                         ),
                     )
@@ -174,7 +174,7 @@ object SwiftUIFlowObservingGenerator {
                         type = LambdaSirType(
                             valueParameterTypes = listOf(
                                 flowTypeParameter.toTypeParameterUsage().typeParameter(
-                                    sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
+                                    context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
                                 )
                             ),
                             returnType = uTypeParameter.toTypeParameterUsage().toNullable(),
@@ -194,7 +194,7 @@ object SwiftUIFlowObservingGenerator {
 
                 SirSimpleFunction(
                     identifier = "collect",
-                    returnType = sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
+                    returnType = context.sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
                 ).apply {
                     documentation = """
                         |A view modifier used to collect a SKIE-bridged Flow and perform a closere with each received value.
@@ -230,7 +230,7 @@ object SwiftUIFlowObservingGenerator {
                     val flowTypeParameter = SirTypeParameter(
                         name = "Flow",
                         bounds = listOf(
-                            sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
+                            context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
                         )
                     )
 
@@ -244,10 +244,10 @@ object SwiftUIFlowObservingGenerator {
                         type = LambdaSirType(
                             valueParameterTypes = listOf(
                                 flowTypeParameter.toTypeParameterUsage().typeParameter(
-                                    sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
+                                    context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
                                 )
                             ),
-                            returnType = sirBuiltins.Swift.Void.defaultType,
+                            returnType = context.sirBuiltins.Swift.Void.defaultType,
                             isEscaping = true,
                             isAsync = true,
                         )
@@ -268,9 +268,9 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateSkieSwiftFlowWithInitialValue(): SkieSwiftFlowWithInitialValue {
-        namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowWithInitialValue").apply {
+        context.namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowWithInitialValue").apply {
             val skieSwiftFlowWithInitialValue = SirClass(
                 baseName = "SkieSwiftFlowWithInitialValue",
                 kind = SirClass.Kind.Protocol,
@@ -282,7 +282,7 @@ object SwiftUIFlowObservingGenerator {
                 val flowTypeParameter = SirTypeParameter(
                     name = "Flow",
                     bounds = listOf(
-                        sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
+                        context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
                     ),
                     isPrimaryAssociatedType = true,
                 )
@@ -291,7 +291,7 @@ object SwiftUIFlowObservingGenerator {
                     name = "Element",
                     bounds = listOf(
                         flowTypeParameter.toTypeParameterUsage().typeParameter(
-                            sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
+                            context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
                         ).toEqualityBound(),
                     )
                 )
@@ -356,7 +356,7 @@ object SwiftUIFlowObservingGenerator {
                 val flowTypeParameter = SirTypeParameter(
                     name = "Flow",
                     bounds = listOf(
-                        sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
+                        context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
                     )
                 )
 
@@ -370,7 +370,7 @@ object SwiftUIFlowObservingGenerator {
                 SirProperty(
                     identifier =  skieSwiftFlowWithInitialValue.initialValueProperty.identifier,
                     type = flowTypeParameter.toTypeParameterUsage().typeParameter(
-                        sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
+                        context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element"),
                     ),
                 ).apply {
                     addOverride(skieSwiftFlowWithInitialValue.initialValueProperty)
@@ -462,9 +462,9 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateSkieSwiftFlowObserver(): SirClass {
-        return namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowObserver").run {
+        return context.namespaceProvider.getSkieNamespaceFile("SkieSwiftFlowObserver").run {
             imports += "SwiftUI"
 
             SirClass(
@@ -472,13 +472,13 @@ object SwiftUIFlowObservingGenerator {
                 kind = SirClass.Kind.Actor,
                 visibility = SirVisibility.Internal,
                 superTypes = listOf(
-                    sirBuiltins.SwiftUI.ObservableObject.defaultType,
+                    context.sirBuiltins.SwiftUI.ObservableObject.defaultType,
                 )
             ).apply {
                 // TODO: Should be `private(set)`
                 SirProperty(
                     identifier = "values",
-                    type = sirBuiltins.Swift.Array.toType(
+                    type = context.sirBuiltins.Swift.Array.toType(
                         SpecialSirType.Any.toNullable(),
                     ),
                     attributes = listOf(
@@ -490,8 +490,8 @@ object SwiftUIFlowObservingGenerator {
 
                 SirProperty(
                     identifier = "flows",
-                    type = sirBuiltins.Swift.Array.toType(
-                        sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential(),
+                    type = context.sirBuiltins.Swift.Array.toType(
+                        context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential(),
                     ),
                     visibility = SirVisibility.Private,
                 )
@@ -501,8 +501,8 @@ object SwiftUIFlowObservingGenerator {
                 ).apply {
                     SirValueParameter(
                         name = "flows",
-                        type = sirBuiltins.Swift.Array.toType(
-                            sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential(),
+                        type = context.sirBuiltins.Swift.Array.toType(
+                            context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential(),
                         ),
                     )
 
@@ -514,7 +514,7 @@ object SwiftUIFlowObservingGenerator {
 
                 SirSimpleFunction(
                     identifier = "beginCollecting",
-                    returnType = sirBuiltins.Swift.Void.defaultType,
+                    returnType = context.sirBuiltins.Swift.Void.defaultType,
                     visibility = SirVisibility.Internal,
                     isAsync = true,
                 ).apply {
@@ -537,18 +537,18 @@ object SwiftUIFlowObservingGenerator {
 
                 SirSimpleFunction(
                     identifier = "collect",
-                    returnType = sirBuiltins.Swift.Void.defaultType,
+                    returnType = context.sirBuiltins.Swift.Void.defaultType,
                     visibility = SirVisibility.Private,
                     isAsync = true,
                 ).apply {
                     SirValueParameter(
                         name = "index",
-                        type = sirBuiltins.Swift.Int.defaultType,
+                        type = context.sirBuiltins.Swift.Int.defaultType,
                     )
 
                     SirValueParameter(
                         name = "flow",
-                        type = sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toOpaque(),
+                        type = context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toOpaque(),
                     )
 
                     bodyBuilder.add {
@@ -564,7 +564,7 @@ object SwiftUIFlowObservingGenerator {
 
                 SirSimpleFunction(
                     identifier = "set",
-                    returnType = sirBuiltins.Swift.Void.defaultType,
+                    returnType = context.sirBuiltins.Swift.Void.defaultType,
                     visibility = SirVisibility.Private,
                     attributes = listOf(
                         "_Concurrency.MainActor",
@@ -579,7 +579,7 @@ object SwiftUIFlowObservingGenerator {
                     SirValueParameter(
                         label = "for",
                         name = "index",
-                        type = sirBuiltins.Swift.Int.defaultType,
+                        type = context.sirBuiltins.Swift.Int.defaultType,
                     )
 
                     bodyBuilder.add {
@@ -590,9 +590,9 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateObserveSkieSwiftFlowsView(skieSwiftFlowObserver: SirClass) {
-        namespaceProvider.getSkieNamespaceFile("ObserveSkieSwiftFlows").apply {
+        context.namespaceProvider.getSkieNamespaceFile("ObserveSkieSwiftFlows").apply {
             imports += "SwiftUI"
 
             SirClass(
@@ -600,7 +600,7 @@ object SwiftUIFlowObservingGenerator {
                 kind = SirClass.Kind.Struct,
                 visibility = SirVisibility.Internal,
                 superTypes = listOf(
-                    sirBuiltins.SwiftUI.View.defaultType,
+                    context.sirBuiltins.SwiftUI.View.defaultType,
                 ),
                 attributes = listOf(
                     availability,
@@ -609,13 +609,13 @@ object SwiftUIFlowObservingGenerator {
                 val contentTypeParameter = SirTypeParameter(
                     name = "Content",
                     bounds = listOf(
-                        sirBuiltins.SwiftUI.View.defaultType.toConformanceBound(),
+                        context.sirBuiltins.SwiftUI.View.defaultType.toConformanceBound(),
                     )
                 )
 
                 val contentFactoryType = LambdaSirType(
                     valueParameterTypes = listOf(
-                        sirBuiltins.Swift.Array.toType(
+                        context.sirBuiltins.Swift.Array.toType(
                             SpecialSirType.Any.toNullable(),
                         )
                     ),
@@ -644,8 +644,8 @@ object SwiftUIFlowObservingGenerator {
                 ).apply {
                     SirValueParameter(
                         name = "flows",
-                        type = sirBuiltins.Swift.Array.toType(
-                            sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential(),
+                        type = context.sirBuiltins.Swift.Array.toType(
+                            context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential(),
                         )
                     )
 
@@ -668,7 +668,7 @@ object SwiftUIFlowObservingGenerator {
 
                 SirProperty(
                     identifier = "body",
-                    type = sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
+                    type = context.sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
                     visibility = SirVisibility.Internal,
                 ).apply {
                     SirGetter().apply {
@@ -684,9 +684,9 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateObservingSwiftUIView(): Observing {
-        return namespaceProvider.getSkieNamespaceFile("Observing").run {
+        return context.namespaceProvider.getSkieNamespaceFile("Observing").run {
             imports += "SwiftUI"
 
             SirClass(
@@ -694,7 +694,7 @@ object SwiftUIFlowObservingGenerator {
                 kind = SirClass.Kind.Struct,
                 visibility = SirVisibility.Public,
                 attributes = listOf(availability),
-                superTypes = listOf(sirBuiltins.SwiftUI.View.defaultType),
+                superTypes = listOf(context.sirBuiltins.SwiftUI.View.defaultType),
             ).run {
                 documentation = """
                     |This SwiftUI view allows observing SKIE-bridged flows.
@@ -752,12 +752,12 @@ object SwiftUIFlowObservingGenerator {
 
                 val initialContent = SirTypeParameter(
                     name = "InitialContent",
-                    bounds = listOf(sirBuiltins.SwiftUI.View.defaultType.toConformanceBound()),
+                    bounds = listOf(context.sirBuiltins.SwiftUI.View.defaultType.toConformanceBound()),
                 )
 
                 val content = SirTypeParameter(
                     name = "Content",
-                    bounds = listOf(sirBuiltins.SwiftUI.View.defaultType.toConformanceBound()),
+                    bounds = listOf(context.sirBuiltins.SwiftUI.View.defaultType.toConformanceBound()),
                 )
 
                 val initialContentFactoryType = LambdaSirType(
@@ -773,19 +773,19 @@ object SwiftUIFlowObservingGenerator {
                 )
 
                 val extractValuesType = LambdaSirType(
-                    valueParameterTypes = listOf(sirBuiltins.Swift.Array.toType(SpecialSirType.Any.toNullable())),
+                    valueParameterTypes = listOf(context.sirBuiltins.Swift.Array.toType(SpecialSirType.Any.toNullable())),
                     returnType = values.toTypeParameterUsage().toNullable(),
                     isEscaping = true,
                 )
 
                 SirProperty(
                     identifier = "flows",
-                    type = sirBuiltins.Swift.Array.toType(sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential()),
+                    type = context.sirBuiltins.Swift.Array.toType(context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential()),
                 )
 
                 SirProperty(
                     identifier = "flowIds",
-                    type = sirBuiltins.Swift.Array.toType(sirBuiltins.Swift.ObjectIdentifier.defaultType),
+                    type = context.sirBuiltins.Swift.Array.toType(context.sirBuiltins.Swift.ObjectIdentifier.defaultType),
                 )
 
                 SirProperty(
@@ -817,12 +817,12 @@ object SwiftUIFlowObservingGenerator {
 
                     SirValueParameter(
                         name = "flows",
-                        type = sirBuiltins.Swift.Array.toType(sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential()),
+                        type = context.sirBuiltins.Swift.Array.toType(context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toExistential()),
                     )
 
                     SirValueParameter(
                         name = "flowIds",
-                        type = sirBuiltins.Swift.Array.toType(sirBuiltins.Swift.ObjectIdentifier.defaultType),
+                        type = context.sirBuiltins.Swift.Array.toType(context.sirBuiltins.Swift.ObjectIdentifier.defaultType),
                     )
 
                     SirValueParameter(
@@ -854,7 +854,7 @@ object SwiftUIFlowObservingGenerator {
 
                     SirProperty(
                         identifier = "body",
-                        type = sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
+                        type = context.sirBuiltins.SwiftUI.View.defaultType.toOpaque(),
                     ).apply {
                         SirGetter().apply {
                             bodyBuilder.add {
@@ -884,10 +884,10 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateFlowObservingInitializers(observing: Observing) {
-        val asyncSequenceElementTypeParameter = sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element")
-        namespaceProvider.getSkieNamespaceFile("Observing+Flow").apply {
+        val asyncSequenceElementTypeParameter = context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element")
+        context.namespaceProvider.getSkieNamespaceFile("Observing+Flow").apply {
             imports += "SwiftUI"
 
             SirExtension(
@@ -911,7 +911,7 @@ object SwiftUIFlowObservingGenerator {
                             SirTypeParameter(
                                 name = "Flow$it",
                                 bounds = listOf(
-                                    sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
+                                    context.sirBuiltins.Skie.SkieSwiftFlowProtocol.defaultType.toConformanceBound(),
                                 ),
                             )
                         }
@@ -992,11 +992,11 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateStateFlowObservingInitializers(observing: Observing, skieSwiftFlowWithInitialValue: SkieSwiftFlowWithInitialValue) {
-        val asyncSequenceElementTypeParameter = sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element")
+        val asyncSequenceElementTypeParameter = context.sirBuiltins._Concurrency.AsyncSequence.getTypeParameter("Element")
 
-        namespaceProvider.getSkieNamespaceFile("Observing+StateFlow").apply {
+        context.namespaceProvider.getSkieNamespaceFile("Observing+StateFlow").apply {
             imports += "SwiftUI"
 
             SirExtension(
@@ -1008,7 +1008,7 @@ object SwiftUIFlowObservingGenerator {
                 SirConditionalConstraint(
                     typeParameter = observing.initialContentTypeParameter,
                     bounds = listOf(
-                        sirBuiltins.SwiftUI.EmptyView.defaultType.toEqualityBound(),
+                        context.sirBuiltins.SwiftUI.EmptyView.defaultType.toEqualityBound(),
                     )
                 )
 
@@ -1096,9 +1096,9 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateAssertingSkieSwiftFlowValueUnwrap() {
-        namespaceProvider.getSkieNamespaceFile("assertingSkieSwiftFlowValueUnwrap").apply {
+        context.namespaceProvider.getSkieNamespaceFile("assertingSkieSwiftFlowValueUnwrap").apply {
             val tParameter = SirTypeParameter(
                 name = "T",
                 parent = SirTypeParameterParent.None,
@@ -1132,22 +1132,22 @@ object SwiftUIFlowObservingGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateSkieFlowDoesNotThrow() {
-        namespaceProvider.getSkieNamespaceFile("skieFlowDoesNotThrow").apply {
+        context.namespaceProvider.getSkieNamespaceFile("skieFlowDoesNotThrow").apply {
             SirSimpleFunction(
                 identifier = "skieFlowDoesNotThrow",
-                returnType = sirBuiltins.Swift.Never.defaultType,
+                returnType = context.sirBuiltins.Swift.Never.defaultType,
                 visibility = SirVisibility.Internal,
             ).apply {
                 SirValueParameter(
                     name = "error",
-                    type = sirBuiltins.Swift.Error.defaultType,
+                    type = context.sirBuiltins.Swift.Error.defaultType,
                 )
 
                 SirValueParameter(
                     name = "function",
-                    type = sirBuiltins.Swift.StaticString.defaultType,
+                    type = context.sirBuiltins.Swift.StaticString.defaultType,
                     defaultValue = "#function",
                 )
 

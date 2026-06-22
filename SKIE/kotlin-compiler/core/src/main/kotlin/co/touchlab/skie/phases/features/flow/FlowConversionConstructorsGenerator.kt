@@ -24,12 +24,12 @@ class FlowConversionConstructorsGenerator(
     private val sirProvider = context.sirProvider
     private val sirBuiltins = context.sirBuiltins
 
-    context(SirPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
+    context(context: SirPhase.Context)
+    override fun isActive(): Boolean = context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val file = namespaceProvider.getSkieNamespaceFile("FlowConversions")
+        val file = context.namespaceProvider.getSkieNamespaceFile("FlowConversions")
 
         SupportedFlow.values().forEach {
             it.generateAllConversions(file)

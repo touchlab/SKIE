@@ -128,18 +128,18 @@ class DeclarationBuilderImpl(
         return declarationTemplate.descriptor
     }
 
-    context(SymbolTablePhase.Context)
+    context(context: SymbolTablePhase.Context)
     fun declareSymbols() {
         allNamespaces.forEach {
             it.registerSymbols()
         }
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     fun generateIr() {
-        this.mainIrModuleFragment = moduleFragment
+        this.mainIrModuleFragment = context.moduleFragment
 
-        fixPrivateTypeParametersSymbolsFromOldKLibs(skieSymbolTable)
+        fixPrivateTypeParametersSymbolsFromOldKLibs(context.skieSymbolTable)
 
         allNamespaces.forEach {
             it.generateIrDeclarations()

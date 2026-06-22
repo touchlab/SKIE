@@ -19,37 +19,37 @@ interface SkiePhaseScheduler {
 
     val linkPhases: SkiePhaseGroup<LinkPhase, LinkPhase.Context>
 
-    context(ScheduledPhase.Context)
+    context(context: ScheduledPhase.Context)
     fun runClassExportPhases(contextFactory: () -> ClassExportPhase.Context) {
         classExportPhases.run(contextFactory)
     }
 
-    context(ScheduledPhase.Context)
+    context(context: ScheduledPhase.Context)
     fun runFrontendIrPhases(contextFactory: () -> FrontendIrPhase.Context) {
         frontendIrPhases.run(contextFactory)
     }
 
-    context(ScheduledPhase.Context)
+    context(context: ScheduledPhase.Context)
     fun runSymbolTablePhases(contextFactory: () -> SymbolTablePhase.Context) {
         symbolTablePhases.run(contextFactory)
     }
 
-    context(ScheduledPhase.Context)
+    context(context: ScheduledPhase.Context)
     fun runKotlinIrPhases(contextFactory: () -> KotlinIrPhase.Context) {
         kotlinIrPhases.run(contextFactory)
     }
 
-    context(ScheduledPhase.Context)
+    context(context: ScheduledPhase.Context)
     fun runKirPhases(contextFactory: () -> KirPhase.Context) {
         kirPhases.run(contextFactory)
     }
 
-    context(ScheduledPhase.Context)
+    context(context: ScheduledPhase.Context)
     fun runSirPhases(contextFactory: () -> SirPhase.Context) {
         sirPhases.run(contextFactory)
     }
 
-    context(ScheduledPhase.Context)
+    context(context: ScheduledPhase.Context)
     fun runLinkPhases(contextFactory: () -> LinkPhase.Context) {
         linkPhases.run(contextFactory)
     }

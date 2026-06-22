@@ -31,9 +31,9 @@ class FixOirFunctionSignaturesForApiNotesPhase(
         context.oirProvider.getFile(context.oirProvider.skieModule, "TypeDefs")
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.kotlinClassesAndProtocols.forEach {
+        context.oirProvider.kotlinClassesAndProtocols.forEach {
             fixFunctionSignatures(it)
         }
     }

@@ -24,7 +24,7 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
     context: KirPhase.Context,
 ) : BaseCreateKirMembersPhase(context) {
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override fun isActive(): Boolean =
     // TODO Change back once we generate custom header
         // TODO Add tests for this flag and functionality
@@ -33,14 +33,14 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
 
     private val cache = mutableMapOf<FunctionDescriptor, KirProperty>()
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override suspend fun execute() {
         kirProvider.kotlinClasses.forEach {
             createDescriptionProperty(it)
         }
     }
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     private fun createDescriptionProperty(kirClass: KirClass) {
         if (kirClass in kirProvider.kirBuiltins.builtinClasses) {
             // TODO Implement accurate way to generate builtin members once needed
@@ -50,7 +50,7 @@ internal class CreateKirDescriptionAndHashPropertyPhase(
         val classDescriptor = descriptorKirProvider.findClassDescriptor(kirClass) ?: return
 
         classDescriptor.findSpecialFunction(OperatorNameConventions.TO_STRING)?.let {
-            getOrCreateProperty(it, kirClass, kirBuiltins.NSString.defaultType)
+            getOrCreateProperty(it, kirClass, kirProvider.kirBuiltins.NSString.defaultType)
         }
 
         classDescriptor.findSpecialFunction(OperatorNameConventions.HASH_CODE)?.let {

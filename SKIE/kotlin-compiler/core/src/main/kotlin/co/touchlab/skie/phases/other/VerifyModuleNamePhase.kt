@@ -67,10 +67,10 @@ object VerifyModuleNamePhase : ClassExportPhase {
         "framework",
     )
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
-        check(framework.frameworkName !in problematicKeywords) {
-            "The name '${framework.frameworkName}' is a reserved keyword in Swift and cannot be used as framework name with SKIE."
+        check(context.framework.frameworkName !in problematicKeywords) {
+            "The name '${context.framework.frameworkName}' is a reserved keyword in Swift and cannot be used as framework name with SKIE."
         }
     }
 }

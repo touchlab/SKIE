@@ -11,18 +11,18 @@ import co.touchlab.skie.sir.element.module
 // Must be the last phase that renames SirTypeDeclarations
 object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val conflictingModules = sirProvider.allExternalTypeDeclarations.map { it.module.name }
+        val conflictingModules = context.sirProvider.allExternalTypeDeclarations.map { it.module.name }
         val conflictingNames = conflictingModules.toMutableSet()
 
-        sirProvider.allLocalTypeDeclarations
+        context.sirProvider.allLocalTypeDeclarations
             .forEach {
                 it.renameConflictingType(conflictingNames)
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirTypeDeclaration.renameConflictingType(conflictingNames: MutableSet<String>) {
         registerReverseOperation(this)
 
@@ -33,11 +33,11 @@ object TemporarilyRenameTypesConflictingWithExternalModulesPhase : SirPhase {
         conflictingNames.add(this.fqName.toLocalString())
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun registerReverseOperation(sirTypeDeclaration: SirTypeDeclaration) {
         val originalBaseName = sirTypeDeclaration.baseName
 
-        doInPhase(RevertPhase) {
+        context.doInPhase(RevertPhase) {
             sirTypeDeclaration.baseName = originalBaseName
         }
     }

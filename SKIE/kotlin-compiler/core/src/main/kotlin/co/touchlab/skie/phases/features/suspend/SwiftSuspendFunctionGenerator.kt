@@ -25,7 +25,7 @@ class SwiftSuspendFunctionGenerator {
 
     private val skieClassSuspendGenerator = SkieClassSuspendGenerator()
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generateSwiftBridgingFunction(
         suspendKirFunction: KirSimpleFunction,
         kotlinBridgingKirFunction: KirSimpleFunction,
@@ -39,9 +39,9 @@ class SwiftSuspendFunctionGenerator {
             return
         }
 
-        val extension = sirProvider.getExtension(
+        val extension = context.sirProvider.getExtension(
             classDeclaration = bridgeModel.extensionTypeDeclarationForBridgingFunction,
-            parent = namespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
+            parent = context.namespaceProvider.getNamespaceFile(bridgeModel.suspendFunctionOwner),
         )
 
         bridgeModel.suspendKirFunction.bridgedSirFunction = extension.createSwiftBridgingFunction(bridgeModel)
@@ -49,7 +49,7 @@ class SwiftSuspendFunctionGenerator {
         hideOriginalFunction(bridgeModel)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun hideOriginalFunction(bridgeModel: SuspendFunctionBridgeModel) {
         bridgeModel.suspendKirFunctionAssociatedDeclarations.forEach {
             it.applyToEntireOverrideHierarchy {
@@ -60,7 +60,7 @@ class SwiftSuspendFunctionGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val SuspendFunctionBridgeModel.extensionTypeDeclarationForBridgingFunction: SirClass
         get() {
             return if (this.isFromGenericClass) {
@@ -71,7 +71,7 @@ class SwiftSuspendFunctionGenerator {
         }
 }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun SirExtension.createSwiftBridgingFunction(bridgeModel: SuspendFunctionBridgeModel): SirSimpleFunction =
     bridgeModel.originalFunction.shallowCopy(
         parent = this,
@@ -86,7 +86,7 @@ private fun SirExtension.createSwiftBridgingFunction(bridgeModel: SuspendFunctio
         addSwiftBridgingFunctionBody(bridgeModel)
     }
 
-context(SirPhase.Context)
+context(context: SirPhase.Context)
 private fun SirType.revertFlowMappingIfNeeded(): SirType {
     when (this) {
         is OirDeclaredSirType -> {

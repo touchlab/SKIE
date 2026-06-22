@@ -14,7 +14,7 @@ import io.outfoxx.swiftpoet.joinToCode
 
 object CustomMembersPassthroughGenerator {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generatePassthroughForDeclarations(
         targetBridge: SirClass,
         declarations: List<CustomPassthroughDeclaration>,
@@ -25,7 +25,7 @@ object CustomMembersPassthroughGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addPassthroughForDeclaration(declaration: CustomPassthroughDeclaration, delegateAccessor: CodeBlock) {
         when (declaration) {
             is CustomPassthroughDeclaration.SimpleFunction -> addPassthroughForFunction(declaration, delegateAccessor)
@@ -33,7 +33,7 @@ object CustomMembersPassthroughGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addPassthroughForFunction(function: CustomPassthroughDeclaration.SimpleFunction, delegateAccessor: CodeBlock) {
         SirSimpleFunction(
             identifier = function.identifier,
@@ -91,7 +91,7 @@ object CustomMembersPassthroughGenerator {
         )
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addPassthroughForProperty(property: CustomPassthroughDeclaration.Property, delegateAccessor: CodeBlock) {
         SirProperty(
             identifier = property.identifier,

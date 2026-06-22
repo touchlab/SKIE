@@ -139,19 +139,19 @@ class DescriptorConfigurationProvider(
         }
 }
 
-context(ForegroundPhase.Context)
+context(context: ForegroundPhase.Context)
 val ClassDescriptor.configuration: ClassConfiguration
-    get() = descriptorConfigurationProvider.getConfiguration(this)
+    get() = context.descriptorConfigurationProvider.getConfiguration(this)
 
-context(ForegroundPhase.Context)
+context(context: ForegroundPhase.Context)
 val SimpleFunctionDescriptor.configuration: SimpleFunctionConfiguration
-    get() = descriptorConfigurationProvider.getConfiguration(this)
+    get() = context.descriptorConfigurationProvider.getConfiguration(this)
 
-context(ForegroundPhase.Context)
+context(context: ForegroundPhase.Context)
 val ConstructorDescriptor.configuration: ConstructorConfiguration
-    get() = descriptorConfigurationProvider.getConfiguration(this)
+    get() = context.descriptorConfigurationProvider.getConfiguration(this)
 
-context(ForegroundPhase.Context)
+context(context: ForegroundPhase.Context)
 val FunctionDescriptor.configuration: FunctionConfiguration
     get() = when (this) {
         is SimpleFunctionDescriptor -> configuration

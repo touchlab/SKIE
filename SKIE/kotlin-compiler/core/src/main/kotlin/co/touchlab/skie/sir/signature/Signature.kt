@@ -338,7 +338,7 @@ sealed class Signature {
         private val SirFunction.signatureValueParameters: List<ValueParameter>
             get() = valueParameters.map { it.toSignatureParameter() }
 
-        context(SirHierarchyCache)
+        context(sirHierarchyCache: SirHierarchyCache)
         private val SirType.signatureType: Type
             get() {
                 val evaluatedType = this.evaluate()
@@ -354,7 +354,7 @@ sealed class Signature {
                         Type.Class(
                             sirClass = declaration,
                             typeArguments = typeWithoutTypeAliases.typeArguments.map { Type.TypeArgument(it) },
-                            sirHierarchyCache = this@SirHierarchyCache,
+                            sirHierarchyCache = sirHierarchyCache,
                         )
                     }
                     is NullableSirType -> Type.Optional(typeWithoutTypeAliases.type.signatureType)
@@ -369,14 +369,14 @@ sealed class Signature {
                 type = this.type.evaluate().canonicalName,
             )
 
-        context(SirHierarchyCache)
+        context(sirHierarchyCache: SirHierarchyCache)
         private val SirCallableDeclaration.receiver: Receiver
             get() {
                 val (sirClass, constraints) = when (val parent = parent) {
                     // TODO: Now that SirClass can have `conditionalConstraints`, should we put them here?
                     is SirClass -> parent.classDeclaration to emptySet()
                     is SirExtension -> parent.classDeclaration to parent.conditionalConstraints.map {
-                        Receiver.Constraint(it, this@SirHierarchyCache)
+                        Receiver.Constraint(it, sirHierarchyCache)
                     }.toSet()
                     else -> return Receiver.None
                 }
@@ -387,9 +387,9 @@ sealed class Signature {
                 }
             }
 
-        context(SirHierarchyCache)
+        context(sirHierarchyCache: SirHierarchyCache)
         private val SirClass.asReceiverType: Type.Class
-            get() = Type.Class(this, emptyList(), this@SirHierarchyCache)
+            get() = Type.Class(this, emptyList(), sirHierarchyCache)
 
         private val SirCallableDeclaration.signatureScope: Scope
             get() = when (this.scope) {

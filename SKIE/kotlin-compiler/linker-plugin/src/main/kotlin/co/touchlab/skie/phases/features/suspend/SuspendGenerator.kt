@@ -14,22 +14,22 @@ import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 
 object SuspendGenerator : FrontendIrPhase {
 
-    context(FrontendIrPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
+    context(context: FrontendIrPhase.Context)
+    override fun isActive(): Boolean = context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     override suspend fun execute() {
         val kotlinDelegate = KotlinSuspendGeneratorDelegate(context)
         val swiftDelegate = SwiftSuspendGeneratorDelegate(context)
 
-        descriptorProvider.allSupportedFunctions.forEach { function ->
+        context.descriptorProvider.allSupportedFunctions.forEach { function ->
             val kotlinBridgingFunction = kotlinDelegate.generateKotlinBridgingFunction(function)
 
             swiftDelegate.generateSwiftBridgingFunction(function, kotlinBridgingFunction)
         }
     }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private val DescriptorProvider.allSupportedFunctions: List<SimpleFunctionDescriptor>
         get() = this.allExposedMembers.filterIsInstance<SimpleFunctionDescriptor>()
             .filter { mapper.isBaseMethod(it) }

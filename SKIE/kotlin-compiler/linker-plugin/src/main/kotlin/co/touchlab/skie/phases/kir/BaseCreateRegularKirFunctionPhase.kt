@@ -27,7 +27,7 @@ internal abstract class BaseCreateRegularKirFunctionPhase(
     supportsSimpleFunctions = supportsSimpleFunctions,
 ) {
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     protected fun createValueParameters(
         function: KirFunction<*>,
         descriptor: FunctionDescriptor,
@@ -39,7 +39,7 @@ internal abstract class BaseCreateRegularKirFunctionPhase(
             }
     }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     private fun createValueParameter(
         parameterBridge: MethodBridgeValueParameter,
         parameterDescriptor: ParameterDescriptor?,

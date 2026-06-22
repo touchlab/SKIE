@@ -9,9 +9,9 @@ import org.jetbrains.kotlin.library.uniqueName
 // Fix for some libraries having ":" in their short name which resulted in invalid Obj-C header
 object FixLibrariesShortNamePhase : ClassExportPhase {
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
-        descriptorProvider.resolvedLibraries.forEach { library ->
+        context.descriptorProvider.resolvedLibraries.forEach { library ->
             if (library.shortName == null) {
                 library.manifestProperties.setProperty(
                     KLIB_PROPERTY_SHORT_NAME,

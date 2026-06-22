@@ -37,13 +37,13 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
     private val sharedCounter: SharedCounter,
 ) : BaseDefaultArgumentGeneratorDelegate(context) {
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     override fun generate() {
         descriptorProvider.allSupportedFunctions()
             .filter { it.isInteropEnabled }
             .filterNot { it.isComposable }
             .filter { it.hasDefaultArguments }
-            .filter { mapper.isBaseMethod(it) }
+            .filter { context.mapper.isBaseMethod(it) }
             .forEach {
                 generateOverloads(it)
             }
@@ -51,14 +51,14 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
 
     protected abstract fun DescriptorProvider.allSupportedFunctions(): List<SimpleFunctionDescriptor>
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private fun generateOverloads(function: SimpleFunctionDescriptor) {
         function.forEachDefaultArgumentOverload { overloadParameters ->
             generateOverload(function, overloadParameters)
         }
     }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private fun generateOverload(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -70,7 +70,7 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
         removeManglingOfOverload(newFunction, function)
     }
 
-    context(FrontendIrPhase.Context)
+    context(context: FrontendIrPhase.Context)
     private fun generateOverloadWithUniqueName(
         function: SimpleFunctionDescriptor,
         parameters: List<ValueParameterDescriptor>,
@@ -112,13 +112,13 @@ abstract class BaseFunctionDefaultArgumentGeneratorDelegate(
             }
         }
 
-    context(KotlinIrPhase.Context, DeclarationIrBuilder)
+    context(context: KotlinIrPhase.Context, declarationIrBuilder: DeclarationIrBuilder)
     private fun getOverloadBody(
         originalFunction: FunctionDescriptor, overloadIr: IrFunction,
     ): IrBody {
-        val originalFunctionSymbol = skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunction)
+        val originalFunctionSymbol = context.skieSymbolTable.descriptorExtension.referenceSimpleFunction(originalFunction)
 
-        return irBlockBody {
+        return declarationIrBuilder.irBlockBody {
             +irReturn(
                 irCall(originalFunctionSymbol).apply {
                     dispatchReceiver = overloadIr.dispatchReceiverParameter?.let { irGet(it) }

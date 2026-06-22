@@ -17,9 +17,9 @@ class FileScopeConvertorPhase(
     private val globalMembersDelegate = GlobalMembersConvertorDelegate(parentProvider)
     private val interfaceExtensionMembersDelegate = InterfaceExtensionMembersConvertorDelegate(parentProvider)
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinClasses
+        context.kirProvider.kotlinClasses
             .filter { it.kind == KirClass.Kind.File }
             .flatMap { it.callableDeclarations }
             .filter { it.isInteropEnabled }

@@ -38,7 +38,7 @@ class ExtraClassExportPhase(
     private val descriptorProvider = context.descriptorProvider
     private val mapper = context.mapper
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
         val previouslyVisitedClasses = mutableSetOf<ClassDescriptor>()
 
@@ -59,7 +59,7 @@ class ExtraClassExportPhase(
         } while (newlyDiscoveredClasses.isNotEmpty())
     }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     private fun getClassesForExport(previouslyVisitedClasses: Set<ClassDescriptor>): Set<ClassDescriptor> {
         val result = getClassesForExportFromFlowArguments(previouslyVisitedClasses) +
             getClassesForExportFromSealedHierarchies(previouslyVisitedClasses)
@@ -67,9 +67,9 @@ class ExtraClassExportPhase(
         return result.toSet()
     }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     private fun getClassesForExportFromFlowArguments(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
-        if (SkieConfigurationFlag.Feature_CoroutinesInterop.isDisabled) {
+        if (context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isDisabled }) {
             return emptyList()
         }
 
@@ -96,14 +96,14 @@ class ExtraClassExportPhase(
         declaredTypeParameters.flatMap { it.getAllFlowArgumentClasses() } +
             descriptorProvider.getAllExposedMembers(this).flatMap { it.getAllFlowArgumentClasses() }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     private fun getClassesForExportFromSealedHierarchies(previouslyVisitedClasses: Set<ClassDescriptor>): List<ClassDescriptor> {
         val newClasses = descriptorProvider.exposedClasses - previouslyVisitedClasses
 
         return newClasses.flatMap { it.getAllExportedSealedChildren() }
     }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     private fun ClassDescriptor.getAllExportedSealedChildren(): List<ClassDescriptor> {
         if (!this.configuration[SealedInterop.ExportEntireHierarchy]) {
             return emptyList()
@@ -114,11 +114,11 @@ class ExtraClassExportPhase(
         return topLevelSealedChildren + topLevelSealedChildren.getAllExportedSealedChildren()
     }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     private fun Collection<ClassDescriptor>.getAllExportedSealedChildren(): List<ClassDescriptor> =
         this.flatMap { it.getAllExportedSealedChildren() }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     private fun exportClasses(classes: Set<ClassDescriptor>, iteration: Int) {
         if (classes.isEmpty()) {
             return

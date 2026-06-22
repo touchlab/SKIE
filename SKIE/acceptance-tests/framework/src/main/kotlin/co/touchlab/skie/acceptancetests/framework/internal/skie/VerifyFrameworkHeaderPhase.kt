@@ -34,33 +34,33 @@ object VerifyFrameworkHeaderPhase : SirPhase {
 
     private const val className = "HeaderVerification"
 
-    context(SirPhase.Context)
-    override fun isActive(): Boolean = globalConfiguration[TestConfigurationKeys.EnableVerifyFrameworkHeaderPhase]
+    context(context: SirPhase.Context)
+    override fun isActive(): Boolean = context.globalConfiguration[TestConfigurationKeys.EnableVerifyFrameworkHeaderPhase]
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val headerValidationSwiftFilePath = globalConfiguration[TestConfigurationKeys.VerifyFrameworkHeaderPhaseSwiftFilePath]
+        val headerValidationSwiftFilePath = context.globalConfiguration[TestConfigurationKeys.VerifyFrameworkHeaderPhaseSwiftFilePath]
 
         val fileContent = generateFileContent()
 
         headerValidationSwiftFilePath.writeText(fileContent)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateFileContent(): String {
         // Not used outside of this file; therefore it's intentionally not included in SirProvider
         val sirModule = SirModule.Skie(className)
 
         val sirFile = SirIrFile(sirModule, Path("$className.swift"))
 
-        sirFile.imports.add(framework.frameworkName)
+        sirFile.imports.add(context.framework.frameworkName)
 
         sirFile.addVerificationFileBody()
 
         return SirCodeGenerator.generate(sirFile)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirIrFile.addVerificationFileBody() {
         SirClass(
             baseName = className,
@@ -70,9 +70,9 @@ object VerifyFrameworkHeaderPhase : SirPhase {
         }
     }
 
-    context(SirPhase.Context, SirClass)
+    context(context: SirPhase.Context, sirClass: SirClass)
     private fun addVerificationClassBody() {
-        sirProvider.allLocalCallableDeclarations
+        context.sirProvider.allLocalCallableDeclarations
             .filter { it.visibility.isAccessibleFromOtherModules }
             .filter { it.findFirstSkieErrorType() == null }
             .forEach {
@@ -80,7 +80,7 @@ object VerifyFrameworkHeaderPhase : SirPhase {
             }
     }
 
-    context(SirClass, SirPhase.Context)
+    context(sirClass: SirClass, context: SirPhase.Context)
     private fun addCallableDeclarationVerification(callableDeclaration: SirCallableDeclaration) {
         when (callableDeclaration) {
             is SirConstructor -> addConstructorVerification(callableDeclaration)
@@ -89,7 +89,7 @@ object VerifyFrameworkHeaderPhase : SirPhase {
         }
     }
 
-    context(SirClass)
+    context(sirClass: SirClass)
     private fun addConstructorVerification(constructor: SirConstructor) {
         SirSimpleFunction(
             identifier = constructor.getVerificationFunctionIdentifier(),
@@ -116,11 +116,11 @@ object VerifyFrameworkHeaderPhase : SirPhase {
         }
     }
 
-    context(SirClass)
+    context(sirClass: SirClass)
     private fun addSimpleFunctionVerification(function: SirSimpleFunction) {
         function.shallowCopy(
             identifier = function.getVerificationFunctionIdentifier(),
-            parent = this@SirClass,
+            parent = sirClass,
             visibility = SirVisibility.Public,
             isReplaced = false,
             isHidden = false,
@@ -151,7 +151,7 @@ object VerifyFrameworkHeaderPhase : SirPhase {
         }
     }
 
-    context(SirClass, SirPhase.Context)
+    context(sirClass: SirClass, context: SirPhase.Context)
     private fun addPropertyVerification(property: SirProperty) {
         property.getter?.let {
             addPropertyGetterVerification(it)
@@ -163,7 +163,7 @@ object VerifyFrameworkHeaderPhase : SirPhase {
         }
     }
 
-    context(SirClass)
+    context(sirClass: SirClass)
     private fun addPropertyGetterVerification(getter: SirGetter) {
         val property = getter.property
 
@@ -190,13 +190,13 @@ object VerifyFrameworkHeaderPhase : SirPhase {
         }
     }
 
-    context(SirClass, SirPhase.Context)
+    context(sirClass: SirClass, context: SirPhase.Context)
     private fun addPropertySetterVerification(setter: SirSetter) {
         val property = setter.property
 
         SirSimpleFunction(
             identifier = property.getVerificationFunctionIdentifier(),
-            returnType = sirBuiltins.Swift.Void.defaultType,
+            returnType = context.sirBuiltins.Swift.Void.defaultType,
             deprecationLevel = property.deprecationLevel,
             throws = setter.throws,
             attributes = setter.attributes + property.attributes,
@@ -251,10 +251,10 @@ object VerifyFrameworkHeaderPhase : SirPhase {
         }
     }
 
-    context(SirClass)
-    private fun nextIndex(): Int = declarations.size
+    context(sirClass: SirClass)
+    private fun nextIndex(): Int = sirClass.declarations.size
 
-    context(SirClass)
+    context(sirClass: SirClass)
     private fun SirCallableDeclaration.getVerificationFunctionIdentifier(): String =
         (((this.parent as? SirDeclarationNamespace)?.fqName?.toLocalString()?.let { "${it}__" } ?: "") +
             this.identifierAfterVisibilityChange +

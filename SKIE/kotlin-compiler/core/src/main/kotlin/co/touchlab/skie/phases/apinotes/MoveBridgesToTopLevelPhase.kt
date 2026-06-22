@@ -11,9 +11,9 @@ import co.touchlab.skie.sir.element.toTypeFromEnclosingTypeParameters
 // Needed due to a bug in Swift compiler that incorrectly resolves bridges nested in other declarations.
 object MoveBridgesToTopLevelPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinClasses
+        context.kirProvider.kotlinClasses
             .mapNotNull { it.bridgedSirClass }
             .forEach {
                 it.moveToTopLevel()

@@ -15,10 +15,10 @@ class UnifyFlowConfigurationForOverridesPhase(
 
     private val kirProvider = context.kirProvider
 
-    context(KirPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
+    context(context: KirPhase.Context)
+    override fun isActive(): Boolean = context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled }
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override suspend fun execute() {
         kirProvider.kotlinOverridableDeclaration
             .filter { it.isBaseDeclaration && it.overriddenBy.isNotEmpty() }

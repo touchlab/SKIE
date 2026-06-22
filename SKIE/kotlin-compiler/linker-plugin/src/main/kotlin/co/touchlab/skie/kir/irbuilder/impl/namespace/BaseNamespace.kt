@@ -18,43 +18,43 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
 
     private val templates = mutableListOf<DeclarationTemplate<*>>()
 
-    context(MutableDescriptorProvider)
+    context(mutableDescriptorProvider: MutableDescriptorProvider)
     override fun addTemplate(declarationTemplate: DeclarationTemplate<*>) {
         templates.add(declarationTemplate)
 
         registerDescriptorProvider(declarationTemplate)
     }
 
-    context(SymbolTablePhase.Context)
+    context(context: SymbolTablePhase.Context)
     override fun registerSymbols() {
         templates.forEach {
             it.declareSymbol()
         }
     }
 
-    context(MutableDescriptorProvider)
+    context(mutableDescriptorProvider: MutableDescriptorProvider)
     private fun registerDescriptorProvider(declarationTemplate: DeclarationTemplate<*>) {
         addDescriptorIntoDescriptorHierarchy(declarationTemplate.descriptor)
         addDescriptorIntoDescriptorProvider(declarationTemplate)
     }
 
-    context(MutableDescriptorProvider)
+    context(mutableDescriptorProvider: MutableDescriptorProvider)
     private fun addDescriptorIntoDescriptorProvider(declarationTemplate: DeclarationTemplate<*>) {
         declarationTemplate.registerExposedDescriptor()
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun generateIrDeclarations() {
         @Suppress("DEPRECATION")
         val generatorContext = GeneratorContext(
             Psi2IrConfiguration(),
             descriptor.module,
-            pluginContext.bindingContext,
-            pluginContext.languageVersionSettings,
-            skieSymbolTable.kotlinSymbolTable,
+            context.pluginContext.bindingContext,
+            context.pluginContext.languageVersionSettings,
+            context.skieSymbolTable.kotlinSymbolTable,
             GeneratorExtensions(),
-            pluginContext.typeTranslator,
-            pluginContext.irBuiltIns,
+            context.pluginContext.typeTranslator,
+            context.pluginContext.irBuiltIns,
             null,
         )
 
@@ -65,7 +65,7 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
         }
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun generateIrBodies() {
         templates.forEach {
             it.generateIrBody()
@@ -74,6 +74,6 @@ abstract class BaseNamespace<D : DeclarationDescriptor> : Namespace<D> {
 
     protected abstract fun addDescriptorIntoDescriptorHierarchy(declarationDescriptor: DeclarationDescriptor)
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     protected abstract fun generateNamespaceIr(): IrDeclarationContainer
 }

@@ -81,13 +81,13 @@ internal class TestRunner(
             ),
         )
 
-    context(TempFileSystem)
+    context(tempFileSystem: TempFileSystem)
     private fun withJvmInlineAnnotation(
         kotlinFiles: List<Path>,
     ): List<Path> {
         val packageRegex = Regex("package (.*)\\n")
 
-        val kotlinDirectory = createDirectory("kotlin")
+        val kotlinDirectory = tempFileSystem.createDirectory("kotlin")
 
         val jvmInlineFiles = kotlinFiles
             .mapNotNull { packageRegex.find(it.readText())?.groupValues?.getOrNull(1) }
@@ -106,43 +106,43 @@ internal class TestRunner(
         return kotlinFiles + jvmInlineFiles
     }
 
-    context(TempFileSystem, TestLogger)
+    context(tempFileSystem: TempFileSystem, testLogger: TestLogger)
     private fun compileKotlin(
         kotlinFiles: List<Path>,
         compilerArgumentsProvider: CompilerArgumentsProvider,
     ): IntermediateResult<Path> =
-        KotlinTestCompiler(this@TempFileSystem, this@TestLogger).compile(kotlinFiles, compilerArgumentsProvider)
+        KotlinTestCompiler(tempFileSystem, testLogger).compile(kotlinFiles, compilerArgumentsProvider)
 
-    context(TempFileSystem)
+    context(tempFileSystem: TempFileSystem)
     private fun generateConfiguration(
         baseConfiguration: CompilerSkieConfigurationData,
         configFiles: List<Path>,
     ): IntermediateResult<Path> =
-        PluginConfigurationGenerator(this@TempFileSystem).generate(baseConfiguration, configFiles)
+        PluginConfigurationGenerator(tempFileSystem).generate(baseConfiguration, configFiles)
 
-    context(TempFileSystem, TestLogger)
+    context(tempFileSystem: TempFileSystem, testLogger: TestLogger)
     private fun linkKotlin(
         klib: Path,
         skieConfigurationData: CompilerSkieConfigurationData,
         compilerArgumentsProvider: CompilerArgumentsProvider,
     ): IntermediateResult<Path> =
-        KotlinTestLinker(this@TempFileSystem, this@TestLogger).link(klib, skieConfigurationData, compilerArgumentsProvider)
+        KotlinTestLinker(tempFileSystem, testLogger).link(klib, skieConfigurationData, compilerArgumentsProvider)
 
-    context(TempFileSystem)
+    context(tempFileSystem: TempFileSystem)
     private fun enhanceSwiftCode(swiftCode: String): Path =
-        SwiftCodeEnhancer(this@TempFileSystem).enhance(swiftCode)
+        SwiftCodeEnhancer(tempFileSystem).enhance(swiftCode)
 
-    context(TempFileSystem, TestLogger)
+    context(tempFileSystem: TempFileSystem, testLogger: TestLogger)
     private fun compileSwift(
         kotlinFramework: Path,
         swiftFiles: List<Path>,
         compilerArgumentsProvider: CompilerArgumentsProvider,
     ): IntermediateResult<Path> =
-        SwiftTestCompiler(this@TempFileSystem, this@TestLogger, compilerArgumentsProvider.target).compile(kotlinFramework, swiftFiles)
+        SwiftTestCompiler(tempFileSystem, testLogger, compilerArgumentsProvider.target).compile(kotlinFramework, swiftFiles)
 
-    context(TestLogger)
+    context(testLogger: TestLogger)
     private fun runSwift(binary: Path): TestResult =
-        SwiftProgramRunner(this@TestLogger).runProgram(binary)
+        SwiftProgramRunner(testLogger).runProgram(binary)
 
     private fun writeResult(test: TestNode.Test, result: TestResultWithLogs) {
         val resultAsText = result.hasSucceededAsString(test)

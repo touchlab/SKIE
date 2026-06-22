@@ -33,7 +33,7 @@ class CreateOirMembersPhase(
 
     private val extensionCache = mutableMapOf<OirClass, OirExtension>()
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         createAllMembers()
         createAllEnumEntries()

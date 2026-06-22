@@ -5,9 +5,9 @@ import co.touchlab.skie.sir.element.SirIrFile
 
 object AddFoundationImportsPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.skieModuleFiles
+        context.sirProvider.skieModuleFiles
             .filterIsInstance<SirIrFile>()
             .forEach {
                 it.imports.add("Foundation")

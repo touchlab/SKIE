@@ -19,7 +19,7 @@ object ObjCBridgeableGenerator {
     /**
      * @param unwrapObjectiveCSource Whether to add `guard let` to crash on `nil` source in `fromObjectiveC`.
      */
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun addObjcBridgeableImplementation(
         target: SirClass,
         bridgedType: SirType,
@@ -38,20 +38,20 @@ object ObjCBridgeableGenerator {
     private val SirClass.toTypeWithGenericParameters: SirDeclaredSirType
         get() = this.toType(this.typeParameters.map { it.toTypeParameterUsage() })
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addObjectiveCTypeAlias(bridgedType: SirType) {
         SirTypeAlias(
-            baseName = sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first().name,
+            baseName = context.sirBuiltins.Swift._ObjectiveCBridgeable.typeParameters.first().name,
         ) {
             bridgedType
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addForceBridgeFromObjectiveC(bridgedType: SirType) {
         SirSimpleFunction(
             identifier = "_forceBridgeFromObjectiveC",
-            returnType = sirBuiltins.Swift.Void.defaultType,
+            returnType = context.sirBuiltins.Swift.Void.defaultType,
             scope = SirScope.Static,
         ).apply {
             SirValueParameter(
@@ -72,11 +72,11 @@ object ObjCBridgeableGenerator {
         }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun SirClass.addConditionallyBridgeFromObjectiveC(bridgedType: SirType) {
         SirSimpleFunction(
             identifier = "_conditionallyBridgeFromObjectiveC",
-            returnType = sirBuiltins.Swift.Bool.defaultType,
+            returnType = context.sirBuiltins.Swift.Bool.defaultType,
             scope = SirScope.Static,
         ).apply {
             SirValueParameter(

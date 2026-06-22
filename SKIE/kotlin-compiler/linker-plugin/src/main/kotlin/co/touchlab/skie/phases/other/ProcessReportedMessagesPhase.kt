@@ -16,28 +16,28 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 object ProcessReportedMessagesPhase : LinkPhase {
 
-    context(LinkPhase.Context)
+    context(context: LinkPhase.Context)
     override suspend fun execute() {
-        kirReporter.reportAll(descriptorKirProvider::findDeclarationDescriptor)
+        context.kirReporter.reportAll(context.descriptorKirProvider::findDeclarationDescriptor)
 
-        descriptorReporter.reportAll { it }
+        context.descriptorReporter.reportAll { it }
     }
 
-    context(LinkPhase.Context)
+    context(context: LinkPhase.Context)
     private fun <T> Reporter<T>.reportAll(findDeclarationDescriptor: (T) -> DeclarationDescriptor?) {
         this.reports.forEach {
             report(it, findDeclarationDescriptor)
         }
     }
 
-    context(LinkPhase.Context)
+    context(context: LinkPhase.Context)
     private fun <T> report(report: Reporter.Report<T>, findDeclarationDescriptor: (T) -> DeclarationDescriptor?) {
         val declarationDescriptor = report.source?.let { findDeclarationDescriptor(it) }
 
         report(report, declarationDescriptor)
     }
 
-    context(LinkPhase.Context)
+    context(context: LinkPhase.Context)
     private fun <T> report(report: Reporter.Report<T>, declaration: DeclarationDescriptor?) {
         val location = MessageUtil.psiElementToMessageLocation(declaration?.findPsi())?.let {
             CompilerMessageLocation.create(it.path, it.line, it.column, it.lineContent)
@@ -50,8 +50,8 @@ object ProcessReportedMessagesPhase : LinkPhase {
         }
 
         when (report.severity) {
-            Reporter.Severity.Error -> konanConfig.configuration.report(CompilerMessageSeverity.ERROR, message, location)
-            Reporter.Severity.Warning -> konanConfig.configuration.report(CompilerMessageSeverity.WARNING, message, location)
+            Reporter.Severity.Error -> context.konanConfig.configuration.report(CompilerMessageSeverity.ERROR, message, location)
+            Reporter.Severity.Warning -> context.konanConfig.configuration.report(CompilerMessageSeverity.WARNING, message, location)
         }
     }
 }

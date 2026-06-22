@@ -5,18 +5,18 @@ import co.touchlab.skie.sir.element.SirIrFile
 
 object ConvertSirIrFilesToSourceFilesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.skieModuleFiles
+        context.sirProvider.skieModuleFiles
             .filterIsInstance<SirIrFile>()
             .forEach {
                 convertFile(it)
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun convertFile(sirIrFile: SirIrFile) {
-        val sourceFile = sirFileProvider.getGeneratedSourceFile(sirIrFile)
+        val sourceFile = context.sirFileProvider.getGeneratedSourceFile(sirIrFile)
 
         sourceFile.content = SirCodeGenerator.generate(sirIrFile)
     }

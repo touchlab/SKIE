@@ -6,29 +6,29 @@ import co.touchlab.skie.util.GeneratedBySkieComment
 
 object SwiftRuntimeGenerator : SirPhase {
 
-    context(SirPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
+    context(context: SirPhase.Context)
+    override fun isActive(): Boolean = context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         getSwiftRuntimeFiles().forEach {
             val baseFileContent = it.readText()
 
-            namespaceProvider.getSkieNamespaceWrittenSourceFile(it.swiftFileName).content = "// $GeneratedBySkieComment\n\n$baseFileContent"
+            context.namespaceProvider.getSkieNamespaceWrittenSourceFile(it.swiftFileName).content = "// $GeneratedBySkieComment\n\n$baseFileContent"
         }
 
         val skieSwiftFlowIterator = SkieSwiftFlowIteratorGenerator.generate()
         SupportedFlowRuntimeGenerator.generate(skieSwiftFlowIterator)
 
-        if (SkieConfigurationFlag.Feature_FlowCombineConvertor.isEnabled) {
+        if (context.run { SkieConfigurationFlag.Feature_FlowCombineConvertor.isEnabled }) {
             FlowCombineConversionGenerator.generate()
         }
 
-        if (SkieConfigurationFlag.Feature_FutureCombineExtension.isEnabled) {
+        if (context.run { SkieConfigurationFlag.Feature_FutureCombineExtension.isEnabled }) {
             FutureCombineExtensionGenerator.generate()
         }
 
-        if (SkieConfigurationFlag.Feature_SwiftUIObserving.isEnabled) {
+        if (context.run { SkieConfigurationFlag.Feature_SwiftUIObserving.isEnabled }) {
             SwiftUIFlowObservingGenerator.generate()
         }
     }

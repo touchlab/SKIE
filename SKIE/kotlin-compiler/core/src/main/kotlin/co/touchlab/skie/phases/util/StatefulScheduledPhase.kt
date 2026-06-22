@@ -4,14 +4,14 @@ import co.touchlab.skie.phases.ScheduledPhase
 
 abstract class StatefulScheduledPhase<C : ScheduledPhase.Context> : ScheduledPhase<C> {
 
-    context(C)
+    context(c: C)
     override suspend fun execute() {
         // Cannot be in the init because the object instance is not available yet.
         check(this::class.objectInstance != null) {
             "StatefulScheduledPhase ${this::class.qualifiedName} must be an object."
         }
 
-        executeStatefulScheduledPhase(this, this@C)
+        c.executeStatefulScheduledPhase(this, c)
     }
 }
 

@@ -14,9 +14,9 @@ class SealedInteropGenerator(
     private val sealedEnumGeneratorDelegate = SealedEnumGeneratorDelegate(context)
     private val sealedFunctionGeneratorDelegate = SealedFunctionGeneratorDelegate(context)
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinClasses
+        context.kirProvider.kotlinClasses
             .filter { it.isSupported }
             .forEach {
                 generate(it)
@@ -31,7 +31,7 @@ class SealedInteropGenerator(
     private val KirClass.isSealedInteropEnabled: Boolean
         get() = this.configuration[SealedInterop.Enabled]
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generate(kirClass: KirClass) {
         val enum = sealedEnumGeneratorDelegate.generate(kirClass)
 

@@ -7,9 +7,9 @@ import co.touchlab.skie.phases.SirPhase
 
 object PropagateSirIsHiddenPropertyInMembersPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinOverridableDeclaration
+        context.kirProvider.kotlinOverridableDeclaration
             .filter { it.isBaseDeclaration && it.overriddenBy.isNotEmpty() }
             .forEach {
                 it.propagateIsHidden()

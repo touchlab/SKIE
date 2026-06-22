@@ -10,9 +10,9 @@ object RenameNonAsciiDeclarationPhase: SirPhase {
     private val firstCharAllowedChars: Set<Char> = (('a'..'z') + ('A' .. 'Z') + '_').toSet()
     private val nextCharAllowedChars: Set<Char> = firstCharAllowedChars + ('0' .. '9')
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.kotlinClassesAndProtocols
+        context.oirProvider.kotlinClassesAndProtocols
             .filterNot { isValidAsciiIdentifier(it.originalSirClass.baseName) }
             .forEach {
                 it.originalSirClass.baseName = it.name

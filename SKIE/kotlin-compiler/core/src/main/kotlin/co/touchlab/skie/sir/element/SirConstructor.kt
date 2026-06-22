@@ -38,7 +38,7 @@ class SirConstructor(
 
     companion object {
 
-        context(SirDeclarationNamespace)
+        context(sirDeclarationNamespace: SirDeclarationNamespace)
         operator fun invoke(
             visibility: SirVisibility = SirVisibility.Public,
             isHidden: Boolean = false,
@@ -50,7 +50,7 @@ class SirConstructor(
             isWrappedBySkie: Boolean = false,
         ): SirConstructor =
             SirConstructor(
-                parent = this@SirDeclarationNamespace,
+                parent = sirDeclarationNamespace,
                 visibility = visibility,
                 isHidden = isHidden,
                 attributes = attributes,

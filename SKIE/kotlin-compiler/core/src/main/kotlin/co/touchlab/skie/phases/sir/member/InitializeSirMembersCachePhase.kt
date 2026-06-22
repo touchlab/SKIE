@@ -4,8 +4,8 @@ import co.touchlab.skie.phases.SirPhase
 
 object InitializeSirMembersCachePhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.initializeSirCallableDeclarationsCache()
+        context.kirProvider.initializeSirCallableDeclarationsCache()
     }
 }

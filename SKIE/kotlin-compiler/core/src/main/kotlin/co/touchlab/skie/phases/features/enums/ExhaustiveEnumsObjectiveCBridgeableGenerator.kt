@@ -11,7 +11,7 @@ import io.outfoxx.swiftpoet.joinToCode
 
 object ExhaustiveEnumsObjectiveCBridgeableGenerator {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun addObjcBridgeableImplementation(enumKirClass: KirClass, bridgedEnum: SirClass) {
         ObjCBridgeableGenerator.addObjcBridgeableImplementation(
             target = bridgedEnum,

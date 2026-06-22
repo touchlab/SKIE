@@ -19,12 +19,12 @@ class SuspendKotlinBridgeBodyGenerator(
     private val exceptionFieldGenerator = SuspendKotlinBridgeCheckedExceptionsGenerator()
     private val lambdaGenerator = SuspendKotlinBridgeHandlerLambdaGenerator()
 
-    context(KotlinIrPhase.Context, DeclarationIrBuilder)
+    context(context: KotlinIrPhase.Context, declarationIrBuilder: DeclarationIrBuilder)
     fun createBody(
         bridgingFunction: IrSimpleFunction,
         originalFunctionDescriptor: FunctionDescriptor,
     ): IrBody =
-        irBlockBody {
+        declarationIrBuilder.irBlockBody {
             val suspendHandlerParameter = bridgingFunction.valueParameters.last()
             val checkedExceptions = exceptionFieldGenerator.createGetCheckedExceptions(bridgingFunction, originalFunctionDescriptor)
             val originalFunctionCallLambda = lambdaGenerator.createOriginalFunctionCallLambda(
@@ -43,10 +43,10 @@ class SuspendKotlinBridgeBodyGenerator(
             )
         }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     private val suspendHandlerLaunchMethod: IrSimpleFunction
         get() {
-            val suspendHandlerClass = skieSymbolTable.descriptorExtension.referenceClass(suspendHandlerDescriptor).owner
+            val suspendHandlerClass = context.skieSymbolTable.descriptorExtension.referenceClass(suspendHandlerDescriptor).owner
 
             return suspendHandlerClass.declarations
                 .filterIsInstance<IrSimpleFunction>()

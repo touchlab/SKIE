@@ -30,14 +30,14 @@ object KotlinGenerator {
         }
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.append(file: KotlinFile) {
         file.declarations.forEach {
             append(it)
         }
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.append(declaration: KotlinDeclaration) {
         +""
 
@@ -48,7 +48,7 @@ object KotlinGenerator {
         }
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.append(clazz: KotlinClass) {
         when (clazz.kind) {
             KotlinClass.Kind.Class -> append("class ")
@@ -70,14 +70,14 @@ object KotlinGenerator {
         +"}"
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.appendTypeParameters(clazz: KotlinClass) {
         when (clazz.typeParameters.size) {
             0 -> {}
             1 -> {
                 val typeParameter = clazz.typeParameters.single()
 
-                typeParameter.bounds.forEach { registerType(it) }
+                typeParameter.bounds.forEach { context.registerType(it) }
 
                 append("<${typeParameter.name}")
                 appendSingleBound(typeParameter)
@@ -88,7 +88,7 @@ object KotlinGenerator {
 
                 indented {
                     clazz.typeParameters.forEach { typeParameter ->
-                        typeParameter.bounds.forEach { registerType(it) }
+                        typeParameter.bounds.forEach { context.registerType(it) }
 
                         append(typeParameter.name)
                         appendSingleBound(typeParameter)
@@ -103,14 +103,14 @@ object KotlinGenerator {
         appendWhere(clazz)
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.appendSingleBound(typeParameter: KotlinTypeParameter) {
         if (typeParameter.bounds.size == 1) {
             append(" : ${typeParameter.bounds.single().toKotlinName()}")
         }
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.appendWhere(clazz: KotlinClass) {
         val typeParametersWithBounds = clazz.typeParameters
             .filter { it.bounds.size > 1 }
@@ -129,13 +129,13 @@ object KotlinGenerator {
         }
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.append(function: KotlinFunction) {
-        function.extensionReceiver?.let { registerType(it) }
+        function.extensionReceiver?.let { context.registerType(it) }
         function.valueParameters.forEach {
-            registerType(it.type)
+            context.registerType(it.type)
         }
-        registerType(function.returnType)
+        context.registerType(function.returnType)
 
         function.annotations.forEach {
             +it
@@ -152,9 +152,9 @@ object KotlinGenerator {
         +"}"
     }
 
-    context(Context)
+    context(context: Context)
     private fun SmartStringBuilder.append(property: KotlinProperty) {
-        registerType(property.type)
+        context.registerType(property.type)
 
         +"val ${property.name}: ${property.type.toKotlinName()} = ${property.initializer}"
     }

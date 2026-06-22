@@ -27,7 +27,7 @@ internal class CreateKirSimpleFunctionsPhase(
 //     private val needsDescriptionAndHashFunctions = SkieConfigurationFlag.Migration_AnyMethodsAsFunctions in context.globalConfiguration.enabledFlags
     private val needsDescriptionAndHashFunctions = true
 
-    context(KirPhase.Context)
+    context(context: KirPhase.Context)
     override suspend fun execute() {
         super.execute()
 

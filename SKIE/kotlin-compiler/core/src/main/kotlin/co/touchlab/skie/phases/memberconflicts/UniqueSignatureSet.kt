@@ -23,7 +23,7 @@ class UniqueSignatureSet {
 
     private val sirHierarchyCache = SirHierarchyCache()
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun add(callableDeclaration: SirCallableDeclaration) {
         if (callableDeclaration in alreadyAddedDeclarations) {
             return
@@ -46,7 +46,7 @@ class UniqueSignatureSet {
         group.addToCaches()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun add(enumCase: SirEnumCase) {
         if (enumCase in alreadyAddedEnumCase) {
             return
@@ -82,7 +82,7 @@ class UniqueSignatureSet {
 
         private val callableDeclarations = representative.getEntireOverrideHierarchy()
 
-        context(SirPhase.Context)
+        context(context: SirPhase.Context)
         fun resolveCollisionWithWarning(collisionReasonProvider: SirCallableDeclaration.() -> String?) {
             do {
                 var changed = false

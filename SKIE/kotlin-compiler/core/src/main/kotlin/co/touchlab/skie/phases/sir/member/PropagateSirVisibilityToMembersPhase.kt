@@ -10,9 +10,9 @@ import co.touchlab.skie.sir.type.visibilityConstraint
 
 object PropagateSirVisibilityToMembersPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allLocalCallableDeclarations.forEach {
+        context.sirProvider.allLocalCallableDeclarations.forEach {
             updateVisibility(it)
         }
     }

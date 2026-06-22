@@ -9,31 +9,31 @@ import co.touchlab.skie.sir.element.isExported
 
 object CreateStableNameTypeAliasesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val shouldGenerateFileForEachExportedClass: Boolean
-        get() = SkieConfigurationFlag.Debug_GenerateFileForEachExportedClass.isEnabled
+        get() = context.run { SkieConfigurationFlag.Debug_GenerateFileForEachExportedClass.isEnabled }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val useStableTypeAliases: Boolean
-        get() = SkieConfigurationFlag.Debug_UseStableTypeAliases.isEnabled
+        get() = context.run { SkieConfigurationFlag.Debug_UseStableTypeAliases.isEnabled }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.kotlinClasses
+        context.kirProvider.kotlinClasses
             .filter { it.hasStableNameTypeAlias || shouldGenerateFileForEachExportedClass }
             .forEach {
                 createTypeAlias(it)
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createTypeAlias(kirClass: KirClass) {
         val typeAlias = SirTypeAlias(
             baseName = "Kotlin",
             parent = if (shouldGenerateFileForEachExportedClass) {
-                namespaceProvider.getNamespaceExtension(kirClass)
+                context.namespaceProvider.getNamespaceExtension(kirClass)
             } else {
-                namespaceProvider.getNamespaceClass(kirClass)
+                context.namespaceProvider.getNamespaceClass(kirClass)
             },
             isReplaced = true,
             isHidden = true,

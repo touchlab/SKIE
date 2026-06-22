@@ -36,7 +36,7 @@ class KirDeclarationTypeTranslator(
 
     private val nullableNSErrorType = kirBuiltins.NSError.defaultType.withNullabilityOf(true)
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     internal fun mapValueParameterType(
         functionDescriptor: FunctionDescriptor,
         valueParameterDescriptor: ParameterDescriptor?,
@@ -52,7 +52,7 @@ class KirDeclarationTypeTranslator(
             }
         }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     internal fun mapReturnType(
         descriptor: FunctionDescriptor,
         returnBridge: MethodBridge.ReturnValue,
@@ -75,7 +75,7 @@ class KirDeclarationTypeTranslator(
             -> SpecialReferenceOirType.InstanceType.toKirType()
         }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     private fun mapType(kotlinType: KotlinType, typeBridge: TypeBridge): KirType =
         when (typeBridge) {
             ReferenceBridge -> kirTypeTranslator.mapReferenceType(kotlinType)
@@ -83,7 +83,7 @@ class KirDeclarationTypeTranslator(
             is ValueTypeBridge -> mapValueType(kotlinType, typeBridge)
         }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     private fun mapSuspendCompletionType(kotlinType: KotlinType, useUnitCompletion: Boolean): BlockPointerKirType {
         val resultType = if (useUnitCompletion) {
             null
@@ -103,7 +103,7 @@ class KirDeclarationTypeTranslator(
         )
     }
 
-    context(KirTypeParameterScope)
+    context(kirTypeParameterScope: KirTypeParameterScope)
     private fun mapFunctionType(
         kotlinType: KotlinType,
         typeBridge: BlockPointerBridge,

@@ -41,7 +41,7 @@ class SirValueParameter(
 
     companion object {
 
-        context(SirFunction)
+        context(sirFunction: SirFunction)
         operator fun invoke(
             name: String,
             type: SirType,
@@ -53,7 +53,7 @@ class SirValueParameter(
             SirValueParameter(
                 name = name,
                 type = type,
-                parent = this@SirFunction,
+                parent = sirFunction,
                 attributes = attributes,
                 label = label,
                 inout = inout,

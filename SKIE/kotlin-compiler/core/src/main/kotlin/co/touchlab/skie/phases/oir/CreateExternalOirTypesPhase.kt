@@ -7,20 +7,20 @@ import co.touchlab.skie.phases.SirPhase
 
 object CreateExternalOirTypesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        kirProvider.allExternalClasses.forEach {
+        context.kirProvider.allExternalClasses.forEach {
             createClass(it)
         }
 
-        oirProvider.initializeExternalClassCache()
+        context.oirProvider.initializeExternalClassCache()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createClass(kirClass: KirClass) {
         val oirClass = OirClass(
             name = kirClass.objCName,
-            parent = oirProvider.externalModule,
+            parent = context.oirProvider.externalModule,
             kind = kirClass.kind.toOirKind(),
             origin = OirClass.Origin.Kir(kirClass),
         )

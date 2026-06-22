@@ -14,13 +14,13 @@ class SirEnumCaseAssociatedValue(
 
     companion object {
 
-        context(SirEnumCase)
+        context(sirEnumCase: SirEnumCase)
         operator fun invoke(
             type: SirType,
         ): SirEnumCaseAssociatedValue =
             SirEnumCaseAssociatedValue(
                 type = type,
-                parent = this@SirEnumCase,
+                parent = sirEnumCase,
             )
     }
 }

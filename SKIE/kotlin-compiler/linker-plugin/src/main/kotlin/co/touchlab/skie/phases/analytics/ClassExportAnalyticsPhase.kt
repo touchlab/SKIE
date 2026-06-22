@@ -9,13 +9,13 @@ import co.touchlab.skie.phases.konanConfig
 
 object ClassExportAnalyticsPhase : ClassExportPhase {
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
-        analyticsCollector.collectAsync(
-            CommonCompilerConfigurationAnalytics.Producer(konanConfig),
-            SpecificCompilerConfigurationAnalytics.Producer(konanConfig),
-            SkieConfigurationAnalytics.Producer(skieConfigurationData),
-            CompilerEnvironmentAnalytics.Producer(konanConfig),
+        context.analyticsCollector.collectAsync(
+            CommonCompilerConfigurationAnalytics.Producer(context.konanConfig),
+            SpecificCompilerConfigurationAnalytics.Producer(context.konanConfig),
+            SkieConfigurationAnalytics.Producer(context.skieConfigurationData),
+            CompilerEnvironmentAnalytics.Producer(context.konanConfig),
         )
     }
 }

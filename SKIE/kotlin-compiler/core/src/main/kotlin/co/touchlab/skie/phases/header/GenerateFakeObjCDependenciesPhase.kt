@@ -8,9 +8,9 @@ import co.touchlab.skie.util.cache.writeTextIfDifferent
 
 object GenerateFakeObjCDependenciesPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        oirProvider.externalClassesAndProtocols
+        context.oirProvider.externalClassesAndProtocols
             .groupBy { it.originalSirClass.module }
             // TODO: Replace with two types of external modules (fake and SDK) and handle available SDK modules properly.
             .filterKeys { it is SirModule.External && !isKnownSdkModule(it.name) }
@@ -20,13 +20,13 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateFakeFramework(module: SirModule.External, classes: List<OirClass>) {
         generateModuleMap(module)
         generateHeader(module, classes)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateModuleMap(module: SirModule) {
         val moduleMapContent =
             """
@@ -35,10 +35,10 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
             }
         """.trimIndent()
 
-        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module.name).writeTextIfDifferent(moduleMapContent)
+        context.skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.moduleMap(module.name).writeTextIfDifferent(moduleMapContent)
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateHeader(module: SirModule, classes: List<OirClass>) {
         val foundationImport = "#import <Foundation/NSObject.h>"
 
@@ -48,7 +48,7 @@ object GenerateFakeObjCDependenciesPhase : SirPhase {
 
         val headerContent = "$foundationImport\n\n$declarations"
 
-        skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(module.name).writeTextIfDifferent(headerContent)
+        context.skieBuildDirectory.swiftCompiler.fakeObjCFrameworks.header(module.name).writeTextIfDifferent(headerContent)
     }
 }
 

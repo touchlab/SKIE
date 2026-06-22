@@ -8,9 +8,9 @@ import co.touchlab.skie.sir.element.SirVisibility
 
 object VerifySirVisibilityInAbstractMembersPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allLocalCallableDeclarations
+        context.sirProvider.allLocalCallableDeclarations
             .filterIsInstance<SirOverridableDeclaration<*>>()
             .filter { it.isAbstract }
             .forEach {
@@ -18,7 +18,7 @@ object VerifySirVisibilityInAbstractMembersPhase : SirPhase {
             }
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun updateVisibility(sirOverridableDeclaration: SirOverridableDeclaration<*>) {
         val ownerVisibility = sirOverridableDeclaration.memberOwner?.visibility ?: return
 
@@ -26,13 +26,13 @@ object VerifySirVisibilityInAbstractMembersPhase : SirPhase {
             return
         }
 
-        kirReporter.warning(
+        context.kirReporter.warning(
             "Abstract members should have at least the same SkieVisibility as parent otherwise the parent cannot be safely inherited from in Swift.",
             sirOverridableDeclaration.kirCallableDeclarationOrNull,
         )
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private val SirCallableDeclaration.kirCallableDeclarationOrNull: KirCallableDeclaration<*>?
-        get() = kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
+        get() = context.kirProvider.findCallableDeclaration<SirCallableDeclaration>(this)
 }

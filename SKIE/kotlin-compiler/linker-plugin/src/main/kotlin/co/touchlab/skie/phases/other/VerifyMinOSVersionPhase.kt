@@ -8,17 +8,17 @@ import co.touchlab.skie.util.version.isLowerVersionThan
 
 object VerifyMinOSVersionPhase : ClassExportPhase {
 
-    context(ClassExportPhase.Context)
-    override fun isActive(): Boolean = SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled
+    context(context: ClassExportPhase.Context)
+    override fun isActive(): Boolean = context.run { SkieConfigurationFlag.Feature_CoroutinesInterop.isEnabled }
 
-    context(ClassExportPhase.Context)
+    context(context: ClassExportPhase.Context)
     override suspend fun execute() {
-        val currentMinVersion = configurables.osVersionMin
-        val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(configurables.target.name)
+        val currentMinVersion = context.configurables.osVersionMin
+        val minRequiredVersion = getMinRequiredOsVersionForSwiftAsync(context.configurables.target.name)
 
         if (currentMinVersion.isLowerVersionThan(minRequiredVersion)) {
             error(
-                "Minimum OS version for ${configurables.target.name} must be at least $minRequiredVersion to support Swift Async. " +
+                "Minimum OS version for ${context.configurables.target.name} must be at least $minRequiredVersion to support Swift Async. " +
                     "However, the configured minimum OS version is only $currentMinVersion. " +
                     "This is most likely a bug in SKIE Gradle plugin which should have set the minimum required version automatically.",
             )

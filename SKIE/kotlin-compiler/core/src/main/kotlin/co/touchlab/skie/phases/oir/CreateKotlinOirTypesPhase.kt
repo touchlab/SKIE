@@ -13,7 +13,7 @@ class CreateKotlinOirTypesPhase(
     private val kirProvider = context.kirProvider
     private val oirProvider = context.oirProvider
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
         createClasses()
 

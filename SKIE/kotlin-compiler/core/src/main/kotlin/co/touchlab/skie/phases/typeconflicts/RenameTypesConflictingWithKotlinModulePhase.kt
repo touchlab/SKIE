@@ -5,11 +5,11 @@ import co.touchlab.skie.util.resolveCollisionWithWarning
 
 object RenameTypesConflictingWithKotlinModulePhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val moduleName = sirProvider.kotlinModule.name
+        val moduleName = context.sirProvider.kotlinModule.name
 
-        sirProvider.allLocalTypeDeclarations.forEach { type ->
+        context.sirProvider.allLocalTypeDeclarations.forEach { type ->
             type.resolveCollisionWithWarning {
                 if (type.simpleName == moduleName) "the framework name '$moduleName'" else null
             }

@@ -9,21 +9,21 @@ import java.io.File
 
 object ConfigureSwiftSpecificLinkerArgsPhase : LinkPhase {
 
-    context(LinkPhase.Context)
+    context(context: LinkPhase.Context)
     override suspend fun execute() {
         val swiftLibSearchPaths = listOf(
             File(
-                configurables.absoluteTargetToolchain,
-                "lib/swift/${configurables.platformName().lowercase()}",
+                context.configurables.absoluteTargetToolchain,
+                "lib/swift/${context.configurables.platformName().lowercase()}",
             ),
-            File(configurables.absoluteTargetSysRoot, "usr/lib/swift"),
+            File(context.configurables.absoluteTargetSysRoot, "usr/lib/swift"),
         ).flatMap { listOf("-L", it.absolutePath) }
 
         val otherLinkerFlags = listOf(
             "-rpath", "/usr/lib/swift", "-dead_strip",
         )
 
-        konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
-        konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
+        context.konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, swiftLibSearchPaths)
+        context.konanConfig.configuration.addAll(KonanConfigKeys.LINKER_ARGS, otherLinkerFlags)
     }
 }

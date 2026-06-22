@@ -144,15 +144,15 @@ class SirProvider(
         findModuleForKnownExternalClass(oirClass) ?: unknownModule
 }
 
-context(SirProvider)
-fun SirTopLevelDeclarationParent.getExtension(
-    classDeclaration: SirClass,
-): SirExtension =
-    getExtension(classDeclaration, this)
-
-context(SirPhase.Context)
+context(sirProvider: SirProvider)
 fun SirTopLevelDeclarationParent.getExtension(
     classDeclaration: SirClass,
 ): SirExtension =
     sirProvider.getExtension(classDeclaration, this)
+
+context(context: SirPhase.Context)
+fun SirTopLevelDeclarationParent.getExtension(
+    classDeclaration: SirClass,
+): SirExtension =
+    context.sirProvider.getExtension(classDeclaration, this)
 

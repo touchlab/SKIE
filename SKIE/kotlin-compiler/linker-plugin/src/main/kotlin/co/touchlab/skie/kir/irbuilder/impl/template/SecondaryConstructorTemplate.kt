@@ -54,14 +54,14 @@ class SecondaryConstructorTemplate(
         descriptor.returnType = namespace.descriptor.defaultType
     }
 
-    context(MutableDescriptorProvider)
+    context(mutableDescriptorProvider: MutableDescriptorProvider)
     override fun registerExposedDescriptor() {
-        this@MutableDescriptorProvider.exposeCallableMember(descriptor)
+        mutableDescriptorProvider.exposeCallableMember(descriptor)
     }
 
-    context(SymbolTablePhase.Context)
+    context(context: SymbolTablePhase.Context)
     override fun declareSymbol() {
-        val signature = skieSymbolTable.signaturer.composeSignature(descriptor)
+        val signature = context.skieSymbolTable.signaturer.composeSignature(descriptor)
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
         // IrRebindableConstructorPublicSymbol is used so that we can later bind it to the correct declaration which cannot be created before the symbol table is validated to not contain any unbound symbols.
@@ -74,17 +74,17 @@ class SecondaryConstructorTemplate(
             }
         }
 
-        val declaration = skieSymbolTable.kotlinSymbolTable.declareConstructor(signature, symbolFactory, functionFactory)
+        val declaration = context.skieSymbolTable.kotlinSymbolTable.declareConstructor(signature, symbolFactory, functionFactory)
         // But the symbol cannot be bounded otherwise DeclarationBuilder will not to generate the declaration (because it thinks it already exists).
         (declaration.symbol as? IrRebindableConstructorPublicSymbol)?.unbind()
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun getSymbol(): IrConstructorSymbol =
-        skieSymbolTable.descriptorExtension.referenceConstructor(descriptor)
+        context.skieSymbolTable.descriptorExtension.referenceConstructor(descriptor)
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun initializeBody(declaration: IrConstructor, declarationIrBuilder: DeclarationIrBuilder) {
-        declaration.body = irBodyBuilder(this@Context, declarationIrBuilder, declaration)
+        declaration.body = irBodyBuilder(context, declarationIrBuilder, declaration)
     }
 }

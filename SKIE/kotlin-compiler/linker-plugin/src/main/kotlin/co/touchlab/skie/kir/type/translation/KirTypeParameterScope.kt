@@ -14,7 +14,7 @@ interface KirTypeParameterScope {
 
     val parent: KirTypeParameterScope?
 
-    context(DescriptorKirProvider)
+    context(descriptorKirProvider: DescriptorKirProvider)
     fun getTypeParameterUsage(typeParameterDescriptor: TypeParameterDescriptor?): TypeParameterUsageKirType? =
         parent?.getTypeParameterUsage(typeParameterDescriptor)
 
@@ -49,7 +49,7 @@ class KirTypeParameterClassScope(
     private val typeParameters: List<KirTypeParameter>,
 ) : KirTypeParameterScope {
 
-    context(DescriptorKirProvider)
+    context(descriptorKirProvider: DescriptorKirProvider)
     override fun getTypeParameterUsage(typeParameterDescriptor: TypeParameterDescriptor?): TypeParameterUsageKirType? {
         if (typeParameterDescriptor == null) {
             return null
@@ -57,7 +57,7 @@ class KirTypeParameterClassScope(
 
         return typeParameters
             .firstOrNull {
-                val descriptor = getTypeParameterDescriptor(it)
+                val descriptor = descriptorKirProvider.getTypeParameterDescriptor(it)
 
                 descriptor == typeParameterDescriptor || (descriptor.isCapturedFromOuterDeclaration && descriptor.original == typeParameterDescriptor)
             }

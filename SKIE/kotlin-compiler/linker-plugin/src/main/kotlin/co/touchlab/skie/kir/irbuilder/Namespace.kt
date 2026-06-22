@@ -12,15 +12,15 @@ interface Namespace<D : DeclarationDescriptor> {
 
     val sourceElement: SourceElement
 
-    context(MutableDescriptorProvider)
+    context(mutableDescriptorProvider: MutableDescriptorProvider)
     fun addTemplate(declarationTemplate: DeclarationTemplate<*>)
 
-    context(SymbolTablePhase.Context)
+    context(context: SymbolTablePhase.Context)
     fun registerSymbols()
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     fun generateIrDeclarations()
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     fun generateIrBodies()
 }

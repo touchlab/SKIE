@@ -6,9 +6,9 @@ import co.touchlab.skie.util.collisionFreeIdentifier
 
 object RenameParametersNamedSelfPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allSkieGeneratedSimpleFunctions
+        context.sirProvider.allSkieGeneratedSimpleFunctions
             .forEach {
                 renameParametersNamedSelf(it)
             }

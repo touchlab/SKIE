@@ -58,14 +58,14 @@ class FunctionTemplate(
         descriptor.isSuspend = functionBuilder.isSuspend
     }
 
-    context(MutableDescriptorProvider)
+    context(mutableDescriptorProvider: MutableDescriptorProvider)
     override fun registerExposedDescriptor() {
-        this@MutableDescriptorProvider.exposeCallableMember(descriptor)
+        mutableDescriptorProvider.exposeCallableMember(descriptor)
     }
 
-    context(SymbolTablePhase.Context)
+    context(context: SymbolTablePhase.Context)
     override fun declareSymbol() {
-        val signature = skieSymbolTable.signaturer.composeSignature(descriptor)
+        val signature = context.skieSymbolTable.signaturer.composeSignature(descriptor)
             ?: throw IllegalArgumentException("Only exported declarations are currently supported. Check declaration visibility.")
 
         // IrRebindableSimpleFunctionPublicSymbol is used so that we can later bind it to the correct declaration which cannot be created before the symbol table is validated to not contain any unbound symbols.
@@ -78,17 +78,17 @@ class FunctionTemplate(
             }
         }
 
-        val declaration = skieSymbolTable.kotlinSymbolTable.declareSimpleFunction(signature, symbolFactory, functionFactory)
+        val declaration = context.skieSymbolTable.kotlinSymbolTable.declareSimpleFunction(signature, symbolFactory, functionFactory)
         // But the symbol cannot be bounded otherwise DeclarationBuilder will not to generate the declaration (because it thinks it already exists).
         (declaration.symbol as? IrRebindableSimpleFunctionPublicSymbol)?.unbind()
     }
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun getSymbol(): IrSimpleFunctionSymbol =
-        skieSymbolTable.descriptorExtension.referenceSimpleFunction(descriptor)
+        context.skieSymbolTable.descriptorExtension.referenceSimpleFunction(descriptor)
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override fun initializeBody(declaration: IrSimpleFunction, declarationIrBuilder: DeclarationIrBuilder) {
-        declaration.body = irBodyBuilder(this@Context, declarationIrBuilder, declaration)
+        declaration.body = irBodyBuilder(context, declarationIrBuilder, declaration)
     }
 }

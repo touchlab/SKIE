@@ -11,9 +11,9 @@ object RenameTypesConflictingWithKeywordsPhase : SirPhase {
         "Type",
     )
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        sirProvider.allLocalTypeDeclarations
+        context.sirProvider.allLocalTypeDeclarations
             .forEach { declaration ->
                 declaration.resolveCollisionWithWarning {
                     if (declaration.simpleName in problematicKeywords) "a reserved Swift keyword '${declaration.simpleName}'" else null

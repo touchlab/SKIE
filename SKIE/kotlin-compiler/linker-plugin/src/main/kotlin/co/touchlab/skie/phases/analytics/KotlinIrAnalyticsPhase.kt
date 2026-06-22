@@ -5,9 +5,9 @@ import co.touchlab.skie.phases.KotlinIrPhase
 
 object KotlinIrAnalyticsPhase : KotlinIrPhase {
 
-    context(KotlinIrPhase.Context)
+    context(context: KotlinIrPhase.Context)
     override suspend fun execute() {
-        analyticsCollector.collectSynchronously(
+        context.analyticsCollector.collectSynchronously(
             ModulesAnalytics.Producer(context),
         )
     }

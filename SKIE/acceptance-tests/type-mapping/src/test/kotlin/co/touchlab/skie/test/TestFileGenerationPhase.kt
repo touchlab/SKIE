@@ -23,12 +23,12 @@ import io.outfoxx.swiftpoet.parameterizedBy
 
 object TestFileGenerationPhase : SirPhase {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     override suspend fun execute() {
-        val kirClass = kirProvider.getClassByFqName("co.touchlab.skie.test.KotlinFile")
+        val kirClass = context.kirProvider.getClassByFqName("co.touchlab.skie.test.KotlinFile")
         val sirClass = kirClass.originalSirClass
 
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("TypeVerification").content = """
+        context.namespaceProvider.getSkieNamespaceWrittenSourceFile("TypeVerification").content = """
                 @resultBuilder
                 struct VerifyReturnType<ReturnType> {
                     let value: ReturnType
@@ -62,7 +62,7 @@ object TestFileGenerationPhase : SirPhase {
 
         val swiftFileBuilders = mutableListOf<FileSpec.Builder>()
 
-        FileSpec.builder(framework.frameworkName, "TypeVerification+verify")
+        FileSpec.builder(context.framework.frameworkName, "TypeVerification+verify")
             .also { swiftFileBuilders.add(it) }
             .apply {
                 val parameterCounts = kirClass.callableDeclarations
@@ -125,7 +125,7 @@ object TestFileGenerationPhase : SirPhase {
                 }
             }
 
-        FileSpec.builder(framework.frameworkName, "KotlinFile_access")
+        FileSpec.builder(context.framework.frameworkName, "KotlinFile_access")
             .also { swiftFileBuilders.add(it) }
             .apply {
                 addImport("Foundation")
@@ -232,7 +232,7 @@ object TestFileGenerationPhase : SirPhase {
         swiftFileBuilders.forEach { builder ->
             val file = builder.build()
 
-            namespaceProvider.getSkieNamespaceWrittenSourceFile(file.name).content = file.toString()
+            context.namespaceProvider.getSkieNamespaceWrittenSourceFile(file.name).content = file.toString()
         }
     }
 }

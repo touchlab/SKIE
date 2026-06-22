@@ -14,7 +14,7 @@ class SkieClassSuspendGenerator {
 
     private val skieClassCache = mutableMapOf<KirClass, SirClass>()
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun getOrCreateSuspendClass(suspendFunctionOwner: KirClass): SirClass =
         skieClassCache.getOrPut(suspendFunctionOwner) {
             val skieClass = createSkieClass(suspendFunctionOwner)
@@ -24,11 +24,11 @@ class SkieClassSuspendGenerator {
             skieClass
         }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun createSkieClass(suspendFunctionOwner: KirClass): SirClass =
         SirClass(
             baseName = "Suspend",
-            parent = namespaceProvider.getNamespaceExtension(suspendFunctionOwner),
+            parent = context.namespaceProvider.getNamespaceExtension(suspendFunctionOwner),
             isReplaced = true,
             isHidden = true,
             kind = SirClass.Kind.Struct,
@@ -38,12 +38,12 @@ class SkieClassSuspendGenerator {
             addSkieClassMembers(suspendFunctionOwner)
         }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateNamespaceProvider(suspendFunctionOwner: KirClass, skieClass: SirClass) {
         SirSimpleFunction(
             identifier = "skie",
-            parent = namespaceProvider.getNamespaceFile(suspendFunctionOwner),
-            returnType = sirBuiltins.Swift.Void.defaultType,
+            parent = context.namespaceProvider.getNamespaceFile(suspendFunctionOwner),
+            returnType = context.sirBuiltins.Swift.Void.defaultType,
         ).apply {
             copyTypeParametersFrom(skieClass)
 
@@ -87,7 +87,7 @@ private fun SirClass.addSkieClassConstructor(suspendFunctionOwner: KirClass) {
         SirValueParameter(
             label = "_",
             name = SkieClassSuspendGenerator.kotlinObjectVariableName,
-            type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(this@SirClass.typeParameters),
+            type = suspendFunctionOwner.originalSirClass.toTypeFromEnclosingTypeParameters(this@addSkieClassConstructor.typeParameters),
         )
 
         bodyBuilder.add {

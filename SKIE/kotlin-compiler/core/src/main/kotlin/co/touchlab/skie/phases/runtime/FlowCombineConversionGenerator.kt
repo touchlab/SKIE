@@ -4,7 +4,7 @@ import co.touchlab.skie.phases.SirPhase
 
 object FlowCombineConversionGenerator {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun generate() {
         generateSkieCombineSubscription()
 
@@ -15,9 +15,9 @@ object FlowCombineConversionGenerator {
         generatePublisherSinkExtension()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateSkieCombineSubscription() {
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieCombineSubscription").content = """
+        context.namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieCombineSubscription").content = """
                 import Combine
 
                 internal final actor SkieCombineSubscription<F: SkieSwiftFlowProtocol<S.Input>, S: Combine.Subscriber>: Combine.Subscription where S.Failure == _Concurrency.CancellationError {
@@ -121,9 +121,9 @@ object FlowCombineConversionGenerator {
             """.trimIndent()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateSkieFlowPublisher() {
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieFlowPublisher").content = """
+        context.namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieFlowPublisher").content = """
                 import Combine
 
                 internal struct SkieFlowPublisher<Output, F: SkieSwiftFlowProtocol<Output>>: Combine.Publisher {
@@ -141,9 +141,9 @@ object FlowCombineConversionGenerator {
             """.trimIndent()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generateToPublisherExtension() {
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieSwiftFlowProtocol+toPublisher").content = """
+        context.namespaceProvider.getSkieNamespaceWrittenSourceFile("SkieSwiftFlowProtocol+toPublisher").content = """
                 import Combine
 
                 extension SkieSwiftFlowProtocol {
@@ -159,9 +159,9 @@ object FlowCombineConversionGenerator {
             """.trimIndent()
     }
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun generatePublisherSinkExtension() {
-        namespaceProvider.getSkieNamespaceWrittenSourceFile("Combine.Publisher+sink").content = """
+        context.namespaceProvider.getSkieNamespaceWrittenSourceFile("Combine.Publisher+sink").content = """
             import Combine
 
             extension Combine.Publisher where Self.Failure == _Concurrency.CancellationError {

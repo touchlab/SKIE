@@ -16,15 +16,15 @@ class ApiNotesFactory(
     private val exposeInternalMembers: Boolean,
 ) {
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     fun create(): ApiNotes =
         ApiNotes(
-            moduleName = framework.frameworkName,
-            classes = oirProvider.kotlinClasses.map { it.toApiNote() },
-            protocols = oirProvider.kotlinProtocols.map { it.toApiNote() },
+            moduleName = context.framework.frameworkName,
+            classes = context.oirProvider.kotlinClasses.map { it.toApiNote() },
+            protocols = context.oirProvider.kotlinProtocols.map { it.toApiNote() },
         )
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun OirClass.toApiNote(): ApiNotesType =
         ApiNotesType(
             objCFqName = this.name,
@@ -36,7 +36,7 @@ class ApiNotesFactory(
             properties = this.callableDeclarationsIncludingExtensions.filterIsInstance<OirProperty>().filterNot { it.isFakeOverride }.map { it.toApiNote() },
         )
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun OirFunction.toApiNote(): ApiNotesMethod =
         ApiNotesMethod(
             objCSelector = this.selector,
@@ -52,14 +52,14 @@ class ApiNotesFactory(
             parameters = this.valueParameters.filter { it.originalSirValueParameter != null }.map { it.toApiNote() },
         )
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun OirValueParameter.toApiNote(): ApiNotesParameter =
         ApiNotesParameter(
             position = this.index,
             type = this.type.render(),
         )
 
-    context(SirPhase.Context)
+    context(context: SirPhase.Context)
     private fun OirProperty.toApiNote(): ApiNotesProperty =
         ApiNotesProperty(
             objCName = this.name,
