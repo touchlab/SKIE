@@ -100,8 +100,8 @@ sealed interface KotlinTarget: KotlinTargetOrPreset {
             override val sdk: String,
             override val frameworkTarget: String,
         ): Darwin {
-            X64("macosX64", "x86_64-apple-macos11.0", "macosx", "macos_x64"),
-            Arm64("macosArm64", "arm64-apple-macos11.0", "macosx", "macos_arm64");
+            X64("macosX64", "x86_64-apple-macos12.0", "macosx", "macos_x64"),
+            Arm64("macosArm64", "arm64-apple-macos12.0", "macosx", "macos_arm64");
 
             override fun toString(): String = id
 
