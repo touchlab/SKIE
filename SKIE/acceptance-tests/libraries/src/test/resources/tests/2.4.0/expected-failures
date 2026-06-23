@@ -169,13 +169,10 @@ app.cash.redwood:redwood-treehouse-lazylayout-compose-iosarm64
 > e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
 br.com.devsrsouza.compose.icons:css-gg-iosarm64
 br.com.devsrsouza.compose.icons:erikflowers-weather-icons-iosarm64
-br.com.devsrsouza.compose.icons:feather-iosarm64
-br.com.devsrsouza.compose.icons:font-awesome-iosarm64
 br.com.devsrsouza.compose.icons:line-awesome-iosarm64
 br.com.devsrsouza.compose.icons:linea-iosarm64
 br.com.devsrsouza.compose.icons:octicons-iosarm64
 br.com.devsrsouza.compose.icons:simple-icons-iosarm64
-br.com.devsrsouza.compose.icons:tabler-icons-iosarm64
 br.com.devsrsouza.compose.icons:eva-icons-iosarm64
 
 > e: Compilation failed: Unexpected initializer: org.jetbrains.kotlin.ir.expressions.impl.IrCompositeImpl
@@ -187,25 +184,15 @@ ca.gosyer:accompanist-pager-indicators-iosarm64
 > e: java.lang.IllegalStateException: No file for androidx.compose.foundation.gestures/ScrollableState|null[0] (@ androidx.compose.foundation.gestures/ScrollableState|null[0])
 ca.gosyer:accompanist-pager-iosarm64
 
-> e: Compilation failed: No file for androidx.compose.animation.core/InfiniteRepeatableSpec|null[0] (@ androidx.compose.animation.core/InfiniteRepeatableSpec|null[0])
-ca.gosyer:accompanist-placeholder-iosarm64
-
 > e: Compilation failed: No file for androidx.compose.foundation.gestures/FlingBehavior|null[0] (@ androidx.compose.foundation.gestures/FlingBehavior|null[0])
 ca.gosyer:accompanist-snapper-iosarm64
 
 > e: Compilation failed: No file for androidx.compose.ui.graphics/Color|null[0] (@ androidx.compose.ui.graphics/Color|null[0])
 ca.gosyer:compose-material-dialogs-color-iosarm64
-ca.gosyer:compose-material-dialogs-datetime-iosarm64
-
-> e: Compilation failed: No file for androidx.compose.ui.unit/Dp|null[0] (@ androidx.compose.ui.unit/Dp|null[0])
-ca.gosyer:compose-material-dialogs-core-iosarm64
 
 > e: java.lang.IllegalStateException: IrConstructorSymbolImpl is unbound. Signature: androidx.compose.runtime/Composable.<init>
 ca.gosyer:voyager-core-iosarm64
 cafe.adriel.voyager:voyager-core-iosarm64
-
-> e: Compilation failed: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
-com.adamglin:phosphor-icon-iosarm64
 
 > e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.painter/Painter|null[0] (@ androidx.compose.ui.graphics.painter/Painter|null[0])
 com.adeo.libres:libres-compose-iosarm64
@@ -267,9 +254,6 @@ com.slack.eithernet:eithernet-iosarm64
 > e: java.lang.IllegalStateException: No file for dev.icerock.moko.biometry.compose/BindBiometryAuthenticatorEffect|BindBiometryAuthenticatorEffect(dev.icerock.moko.biometry.BiometryAuthenticator){}[0]
 dev.icerock.moko:biometry-compose-iosarm64
 
-> e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.compose/getViewModel|getViewModel(kotlin.Any;dev.icerock.moko.mvvm.compose.ViewModelFactory<0:0>){0§<dev.icerock.moko.mvvm.viewmodel.ViewModel>}[0]
-dev.icerock.moko:mvvm-compose-iosarm64
-
 > e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.flow.compose/collectAsMutableState|collectAsMutableState@kotlinx.coroutines.flow.MutableStateFlow<0:0>(kotlin.coroutines.CoroutineContext){0§<kotlin.Any?>}[0]
 dev.icerock.moko:mvvm-flow-compose-iosarm64
 
@@ -298,7 +282,6 @@ io.github.jordond.voyager:voyager-core-iosarm64
 io.github.pdvrieze.xmlutil:serialization-iosarm64
 
 > e: java.lang.IllegalStateException: No file for kotlinx.serialization/KSerializer|null[0] (@ kotlinx.serialization/KSerializer|null[0])
-io.github.takahirom.roborazzi:roborazzi-core-iosarm64
 # Added in 2.1.20
 space.iseki.purlkt:purlkt-iosarm64
 
@@ -343,22 +326,6 @@ ru.astrainteractive.mobilex:uitext-mr-iosarm64
 > - (id)P256_XMD∶SHA-256_SSWU_NU_Domain:(KotlinKotlinByteArray *)domain __attribute__((swift_name("P256_XMD∶SHA-256_SSWU_NU_(domain:)")));
 at.asitplus.signum:supreme-iosarm64
 
-> e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library:
-co.touchlab.skie:runtime-kotlin-1.8.0-iosarm64
-co.touchlab.skie:runtime-kotlin-1.8.20-iosarm64
-co.touchlab.skie:runtime-kotlin-1.9.0-iosarm64
-co.touchlab.skie:runtime-kotlin-1.9.20-iosarm64
-co.touchlab.skie:runtime-kotlin-2.0.0-iosarm64
-co.touchlab.skie:runtime-kotlin-2.0.20-iosarm64
-co.touchlab.skie:runtime-kotlin-2.1.0-iosarm64
-co.touchlab.skie:runtime-kotlin-2.1.20-iosarm64
-co.touchlab.skie:runtime-kotlin-2.2.0-iosarm64
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.0
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.20
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.0
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.20
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_2.0.0
-
 > error: expected member name or ';' after declaration specifiers
 > @property (readonly) uint32_t O_DSYNC __attribute__((swift_name("O_DSYNC")));
 [xcode-dependent] at.released.weh:host-iosarm64
@@ -384,6 +351,46 @@ com.icure:cardinal-dart-sdk-support-lib-iosarm64
 # TODO[SKIE-553]: Invalid Swift is generated when suspend fun parameter is self
 > error: argument type 'Self' does not conform to expected type 'DataOwnerWithType'
 com.icure:cardinal-sdk-iosarm64
+
+## >= 2.1.0 < 2.4.0 --------------------------
+> e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library:
+co.touchlab.skie:runtime-kotlin-1.8.0-iosarm64
+co.touchlab.skie:runtime-kotlin-1.8.20-iosarm64
+co.touchlab.skie:runtime-kotlin-1.9.0-iosarm64
+co.touchlab.skie:runtime-kotlin-1.9.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.0.0-iosarm64
+co.touchlab.skie:runtime-kotlin-2.0.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.1.0-iosarm64
+co.touchlab.skie:runtime-kotlin-2.1.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.2.0-iosarm64
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.0
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.20
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.0
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.20
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_2.0.0
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
+br.com.devsrsouza.compose.icons:feather-iosarm64
+br.com.devsrsouza.compose.icons:font-awesome-iosarm64
+br.com.devsrsouza.compose.icons:tabler-icons-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.animation.core/InfiniteRepeatableSpec|null[0] (@ androidx.compose.animation.core/InfiniteRepeatableSpec|null[0])
+ca.gosyer:accompanist-placeholder-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.ui.graphics/Color|null[0] (@ androidx.compose.ui.graphics/Color|null[0])
+ca.gosyer:compose-material-dialogs-datetime-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.ui.unit/Dp|null[0] (@ androidx.compose.ui.unit/Dp|null[0])
+ca.gosyer:compose-material-dialogs-core-iosarm64
+
+> e: Compilation failed: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
+com.adamglin:phosphor-icon-iosarm64
+
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.compose/getViewModel|getViewModel(kotlin.Any;dev.icerock.moko.mvvm.compose.ViewModelFactory<0:0>){0§<dev.icerock.moko.mvvm.viewmodel.ViewModel>}[0]
+dev.icerock.moko:mvvm-compose-iosarm64
+
+> e: java.lang.IllegalStateException: No file for kotlinx.serialization/KSerializer|null[0] (@ kotlinx.serialization/KSerializer|null[0])
+io.github.takahirom.roborazzi:roborazzi-core-iosarm64
 
 ## >= 2.1.20 --------------------------
 
@@ -415,8 +422,6 @@ com.jakewharton.cite:cite-api-iosarm64
 io.github.sppzglou:all-in-one-kmm-iosarm64
 io.github.sppzglou:compose-booster-kmm-iosarm64
 
-> e: java.lang.IllegalStateException: No file for androidx.compose.runtime.saveable/SaveableStateHolder|null[0] (@ androidx.compose.runtime.saveable/SaveableStateHolder|null[0])
-io.syncrasy.dynamic:core-navigation-iosarm64
 
 > @property (class, readonly) KotlinUnitAll *nil __attribute__((swift_name("nil")));
 > error: expected member name or ';' after declaration specifiers
@@ -452,6 +457,11 @@ com.thebrownfoxx:karbon-14-iosarm64
 # We are replacing the runtime-kotlin in the Gradle plugin so this won't happen
 > e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library
 com.fresco-kitchenos:kitchenos-client-sdk-kos-core-iosarm64
+
+## >= 2.1.20 < 2.4.0 --------------------------
+
+> e: java.lang.IllegalStateException: No file for androidx.compose.runtime.saveable/SaveableStateHolder|null[0] (@ androidx.compose.runtime.saveable/SaveableStateHolder|null[0])
+io.syncrasy.dynamic:core-navigation-iosarm64
 
 ## >= 2.2.0 --------------------------
 
@@ -535,6 +545,9 @@ com.ricoh360.thetableclient:theta-ble-client-iosarm64
 > Missing: [kotlin.Enum, kotlin.Comparable, kotlin.Enum.Companion], Extra: []
 io.github.edricchan03.androidx.common:common-enums-iosarm64
 
+
+## >= 2.2.20 < 2.4.0 --------------------------
+
 # TODO Fix
 > e: java.lang.IllegalStateException: No file for androidx.lifecycle/SavedStateHandle|null[0] (@ androidx.lifecycle/SavedStateHandle|null[0]) in module
 com.freeletics.flowredux2:flowredux-iosarm64
@@ -585,5 +598,31 @@ io.github.colagom:shared-iosarm64
 com.apollographql.apollo3:apollo-runtime-kotlin-iosarm64
 com.charleex.notifikations:notifications-iosarm64
 com.darkrockstudios:mpfilepicker-iosarm64
+
+## >= 2.4.0 --------------------------
+
+> Caused by: java.lang.StackOverflowError
+at.asitplus.wallet:eprescription-iosarm64
+com.tencent.kuikly-open:compose-iosarm64
+
+> e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: io.ktor.utils.io.core/ByteReadPacket|null[0]. Owner: TYPEALIAS name:ByteReadPacket visibility:public expandedType:kotlinx.io.Source
+com.accesspaysuite.mobilesdk:sdk-iosarm64
+com.b1nd.dodam:dodam-design-system-iosarm64
+com.rightcom:rightpoll-iosarm64
+io.github.aniketdhakorkar:form-builder-ui-iosarm64
+me.matsumo:fankt-iosarm64
+
+> e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: kotlinx.datetime/Instant|null[0]. Owner: TYPEALIAS name:Instant visibility:public expandedType:kotlin.time.Instant
+io.github.kalist28:cupertino-adaptive-iosarm64
+io.github.mflisar.composedialogs:dialog-frequency-iosarm64
+io.github.mflisar.composedialogs:dialog-time-iosarm64
+io.github.mflisar.composepreferences:screen-time-iosarm64
+io.github.schott12521:cupertino-adaptive-iosarm64
+
+> e: Compilation failed: IrTypeAliasSymbolImpl is already bound. Signature: androidx.compose.material3/MenuAnchorType|null[0]. Owner: TYPEALIAS name:MenuAnchorType visibility:public expandedType:androidx.compose.material3.ExposedDropdownMenuAnchorType
+io.github.mflisar.composedebugdrawer:plugin-lumberjack-iosarm64
+
+> e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: androidx.compose.material3/MenuAnchorType|null[0]. Owner: TYPEALIAS name:MenuAnchorType visibility:public expandedType:androidx.compose.material3.ExposedDropdownMenuAnchorType
+io.github.mflisar.toolbox:app-iosarm64
 
 ## --------------------------

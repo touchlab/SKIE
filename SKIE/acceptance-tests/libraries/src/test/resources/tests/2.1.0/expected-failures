@@ -127,14 +127,6 @@ com.trendyol:transmission-test-iosarm64
 > @property (class, readonly) KotlinAbcOpcode *typeof __attribute__((swift_name("typeof")));
 com.soywiz.korlibs.korge2:korge-swf-iosarm64
 
-## 1.8.0 - 2.1.20 --------------------------
-
-> error: expected ';' after @class
-[skie-disabled] io.maryk.rocksdb:rocksdb-multiplatform-iosarm64
-[skie-disabled] io.realm.kotlin:cinterop-iosarm64
-[skie-disabled] io.realm.kotlin:library-base-iosarm64
-[skie-disabled] io.realm.kotlin:library-sync-iosarm64
-
 ## >= 2.0.20 --------------------------
 
 # Bug in Kotlin compiler - it generates invalid header (however, Swift compiler for some reason rejects this header only with `-import-underlying-module` flag that SKIE has to use), see SKIE-281
@@ -177,13 +169,10 @@ app.cash.redwood:redwood-treehouse-lazylayout-compose-iosarm64
 > e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
 br.com.devsrsouza.compose.icons:css-gg-iosarm64
 br.com.devsrsouza.compose.icons:erikflowers-weather-icons-iosarm64
-br.com.devsrsouza.compose.icons:feather-iosarm64
-br.com.devsrsouza.compose.icons:font-awesome-iosarm64
 br.com.devsrsouza.compose.icons:line-awesome-iosarm64
 br.com.devsrsouza.compose.icons:linea-iosarm64
 br.com.devsrsouza.compose.icons:octicons-iosarm64
 br.com.devsrsouza.compose.icons:simple-icons-iosarm64
-br.com.devsrsouza.compose.icons:tabler-icons-iosarm64
 br.com.devsrsouza.compose.icons:eva-icons-iosarm64
 
 > e: Compilation failed: Unexpected initializer: org.jetbrains.kotlin.ir.expressions.impl.IrCompositeImpl
@@ -195,25 +184,15 @@ ca.gosyer:accompanist-pager-indicators-iosarm64
 > e: java.lang.IllegalStateException: No file for androidx.compose.foundation.gestures/ScrollableState|null[0] (@ androidx.compose.foundation.gestures/ScrollableState|null[0])
 ca.gosyer:accompanist-pager-iosarm64
 
-> e: Compilation failed: No file for androidx.compose.animation.core/InfiniteRepeatableSpec|null[0] (@ androidx.compose.animation.core/InfiniteRepeatableSpec|null[0])
-ca.gosyer:accompanist-placeholder-iosarm64
-
 > e: Compilation failed: No file for androidx.compose.foundation.gestures/FlingBehavior|null[0] (@ androidx.compose.foundation.gestures/FlingBehavior|null[0])
 ca.gosyer:accompanist-snapper-iosarm64
 
 > e: Compilation failed: No file for androidx.compose.ui.graphics/Color|null[0] (@ androidx.compose.ui.graphics/Color|null[0])
 ca.gosyer:compose-material-dialogs-color-iosarm64
-ca.gosyer:compose-material-dialogs-datetime-iosarm64
-
-> e: Compilation failed: No file for androidx.compose.ui.unit/Dp|null[0] (@ androidx.compose.ui.unit/Dp|null[0])
-ca.gosyer:compose-material-dialogs-core-iosarm64
 
 > e: java.lang.IllegalStateException: IrConstructorSymbolImpl is unbound. Signature: androidx.compose.runtime/Composable.<init>
 ca.gosyer:voyager-core-iosarm64
 cafe.adriel.voyager:voyager-core-iosarm64
-
-> e: Compilation failed: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
-com.adamglin:phosphor-icon-iosarm64
 
 > e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.painter/Painter|null[0] (@ androidx.compose.ui.graphics.painter/Painter|null[0])
 com.adeo.libres:libres-compose-iosarm64
@@ -275,9 +254,6 @@ com.slack.eithernet:eithernet-iosarm64
 > e: java.lang.IllegalStateException: No file for dev.icerock.moko.biometry.compose/BindBiometryAuthenticatorEffect|BindBiometryAuthenticatorEffect(dev.icerock.moko.biometry.BiometryAuthenticator){}[0]
 dev.icerock.moko:biometry-compose-iosarm64
 
-> e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.compose/getViewModel|getViewModel(kotlin.Any;dev.icerock.moko.mvvm.compose.ViewModelFactory<0:0>){0§<dev.icerock.moko.mvvm.viewmodel.ViewModel>}[0]
-dev.icerock.moko:mvvm-compose-iosarm64
-
 > e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.flow.compose/collectAsMutableState|collectAsMutableState@kotlinx.coroutines.flow.MutableStateFlow<0:0>(kotlin.coroutines.CoroutineContext){0§<kotlin.Any?>}[0]
 dev.icerock.moko:mvvm-flow-compose-iosarm64
 
@@ -306,7 +282,6 @@ io.github.jordond.voyager:voyager-core-iosarm64
 io.github.pdvrieze.xmlutil:serialization-iosarm64
 
 > e: java.lang.IllegalStateException: No file for kotlinx.serialization/KSerializer|null[0] (@ kotlinx.serialization/KSerializer|null[0])
-io.github.takahirom.roborazzi:roborazzi-core-iosarm64
 # Added in 2.1.20
 space.iseki.purlkt:purlkt-iosarm64
 
@@ -351,22 +326,6 @@ ru.astrainteractive.mobilex:uitext-mr-iosarm64
 > - (id)P256_XMD∶SHA-256_SSWU_NU_Domain:(KotlinKotlinByteArray *)domain __attribute__((swift_name("P256_XMD∶SHA-256_SSWU_NU_(domain:)")));
 at.asitplus.signum:supreme-iosarm64
 
-> e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library:
-co.touchlab.skie:runtime-kotlin-1.8.0-iosarm64
-co.touchlab.skie:runtime-kotlin-1.8.20-iosarm64
-co.touchlab.skie:runtime-kotlin-1.9.0-iosarm64
-co.touchlab.skie:runtime-kotlin-1.9.20-iosarm64
-co.touchlab.skie:runtime-kotlin-2.0.0-iosarm64
-co.touchlab.skie:runtime-kotlin-2.0.20-iosarm64
-co.touchlab.skie:runtime-kotlin-2.1.0-iosarm64
-co.touchlab.skie:runtime-kotlin-2.1.20-iosarm64
-co.touchlab.skie:runtime-kotlin-2.2.0-iosarm64
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.0
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.20
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.0
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.20
-co.touchlab.skie:runtime-kotlin-iosarm64__kgp_2.0.0
-
 > error: expected member name or ';' after declaration specifiers
 > @property (readonly) uint32_t O_DSYNC __attribute__((swift_name("O_DSYNC")));
 [xcode-dependent] at.released.weh:host-iosarm64
@@ -393,65 +352,44 @@ com.icure:cardinal-dart-sdk-support-lib-iosarm64
 > error: argument type 'Self' does not conform to expected type 'DataOwnerWithType'
 com.icure:cardinal-sdk-iosarm64
 
-## <2.1.0, 2.2.0> --------------------------
+## >= 2.1.0 < 2.4.0 --------------------------
+> e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library:
+co.touchlab.skie:runtime-kotlin-1.8.0-iosarm64
+co.touchlab.skie:runtime-kotlin-1.8.20-iosarm64
+co.touchlab.skie:runtime-kotlin-1.9.0-iosarm64
+co.touchlab.skie:runtime-kotlin-1.9.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.0.0-iosarm64
+co.touchlab.skie:runtime-kotlin-2.0.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.1.0-iosarm64
+co.touchlab.skie:runtime-kotlin-2.1.20-iosarm64
+co.touchlab.skie:runtime-kotlin-2.2.0-iosarm64
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.0
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.8.20
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.0
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_1.9.20
+co.touchlab.skie:runtime-kotlin-iosarm64__kgp_2.0.0
 
-> e: java.lang.IllegalStateException: No file for dev.icerock.moko.media.compose/BindMediaPickerEffect|BindMediaPickerEffect(dev.icerock.moko.media.picker.ios.MediaPickerControllerProtocol){}[0]
-dev.icerock.moko:media-compose-iosarm64
+> e: java.lang.IllegalStateException: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
+br.com.devsrsouza.compose.icons:feather-iosarm64
+br.com.devsrsouza.compose.icons:font-awesome-iosarm64
+br.com.devsrsouza.compose.icons:tabler-icons-iosarm64
 
-> e: java.lang.IllegalStateException: No file for kotlinx.serialization.internal/SerializerFactory|null[0] (@ kotlinx.serialization.internal/SerializerFactory|null[0])
-io.github.pavelannin:monadic-either-core-iosarm64
-io.github.pavelannin:monadic-lce-core-iosarm64
-io.github.pavelannin:monadic-lce-either-iosarm64
-io.github.pavelannin:monadic-optional-core-iosarm64
-io.github.pavelannin:monadic-optional-either-iosarm64
+> e: Compilation failed: No file for androidx.compose.animation.core/InfiniteRepeatableSpec|null[0] (@ androidx.compose.animation.core/InfiniteRepeatableSpec|null[0])
+ca.gosyer:accompanist-placeholder-iosarm64
 
-> e: Compilation failed: No file for io.rsocket.kotlin.core/RSocketConnector|null[0] (@ io.rsocket.kotlin.core/RSocketConnector|null[0])
-io.rsocket.kotlin:rsocket-transport-ktor-client-iosarm64
+> e: Compilation failed: No file for androidx.compose.ui.graphics/Color|null[0] (@ androidx.compose.ui.graphics/Color|null[0])
+ca.gosyer:compose-material-dialogs-datetime-iosarm64
 
-> e: java.lang.IllegalStateException: No file for kotlinx.datetime/Instant|null[0] (@ kotlinx.datetime/Instant|null[0])
-net.codinux.csv:kCSV-iosarm64
+> e: Compilation failed: No file for androidx.compose.ui.unit/Dp|null[0] (@ androidx.compose.ui.unit/Dp|null[0])
+ca.gosyer:compose-material-dialogs-core-iosarm64
 
-## 2.1.0 - 2.1.20 --------------------------
+> e: Compilation failed: No file for androidx.compose.ui.graphics.vector/ImageVector|null[0] (@ androidx.compose.ui.graphics.vector/ImageVector|null[0])
+com.adamglin:phosphor-icon-iosarm64
 
-# Same as above
-> error: Invalid record (Producer: 'LLVM16.0.0git' Reader: 'LLVM 16.0.0git')
-com.river-kt:connector-ktor-network-iosarm64
+> e: java.lang.IllegalStateException: No file for dev.icerock.moko.mvvm.compose/getViewModel|getViewModel(kotlin.Any;dev.icerock.moko.mvvm.compose.ViewModelFactory<0:0>){0§<dev.icerock.moko.mvvm.viewmodel.ViewModel>}[0]
+dev.icerock.moko:mvvm-compose-iosarm64
 
-# Bug in the Kotlin compiler, no longer present in newer version of this library
-> e: java.lang.IllegalStateException: No file for androidx.compose.runtime/State|null[0] (@ androidx.compose.runtime/State|null[0])
-io.github.ltttttttttttt:LazyPeopleHttp-lib-iosarm64
-
-## 2.1.0 --------------------------
-
-# TODO[SKIE-551]: These should no longer be expected when a new header generation is done.
-# Newer version of these library (used in newer Kotlin flavors) have a different name for the type: 'Indispensable_asn1Asn1Element' causing the error to be slightly different
-> error: cannot convert return expression of type 'IndispensableAsn1Element?' to return type 'IndispensableAsn1Sequence?'
-at.asitplus.wallet:vck-openid-iosarm64
-at.asitplus.wallet:openid-data-classes-iosarm64
-at.asitplus.wallet:vck-iosarm64
-
-# Bug in the Kotlin compiler, no longer present in newer versions
-> e: Compilation failed: Exception during generating code for following declaration:
-> Inside: FILE fqName:androidx.compose.ui.layout fileName:/opt/buildAgent/work/ba60555d9dde92ae/compose/frameworks/support/compose/ui/ui/src/commonMain/kotlin/androidx/compose/ui/layout/SubcomposeLayout.kt
-app.cash.redwood:redwood-treehouse-lazylayout-composeui-iosarm64
-
-# Bug in the Kotlin compiler, no longer present in newer versions of the library
-> e: java.lang.IllegalStateException: No file for com.fleeksoft.ksoup/Ksoup|null[0] (@ com.fleeksoft.ksoup/Ksoup|null[0])
-com.fleeksoft.ksoup:ksoup-network-iosarm64
-com.fleeksoft.ksoup:ksoup-network-korlibs-iosarm64
-com.fleeksoft.ksoup:ksoup-network-ktor2-iosarm64
-
-# Bug in the Kotlin compiler, no longer present in newer versions
-> e: java.lang.IllegalStateException: CLASS CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[com.outsidesource.oskitkmp.router.IRouteTransition]
-com.outsidesource:oskit-compose-iosarm64
-com.outsidesource:oskit-kmp-iosarm64
-
-# Bug in the Kotlin compiler, newer versions produce a different error message
-> e: java.lang.IllegalStateException: Parent of this declaration is not a class: CONSTRUCTOR MISSING_DECLARATION visibility:public <> () returnType:kotlin.Nothing
-com.eygraber:compose-material3-navigation-iosarm64
-
-# Bug in the Kotlin compiler, newer versions produce a different error message
-> e: java.lang.AssertionError: kfun:com.river.core#collectAsReceiver#suspend__at__kotlinx.coroutines.flow.Flow<0:0>(kotlinx.coroutines.CoroutineScope;kotlin.coroutines.SuspendFunction1<com.river.core.ChannelReceiverContext<0:0>,kotlin.Unit>;kotlin.coroutines.Continuation<kotlin.Unit>){0§<kotlin.Any?>}kotlin.Any
-com.river-kt:core-iosarm64
+> e: java.lang.IllegalStateException: No file for kotlinx.serialization/KSerializer|null[0] (@ kotlinx.serialization/KSerializer|null[0])
+io.github.takahirom.roborazzi:roborazzi-core-iosarm64
 
 ## --------------------------
