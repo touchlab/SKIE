@@ -83,6 +83,7 @@ object SwiftUIFlowObservingGenerator {
                         |
                         |- parameter flow: A SKIE-bridged Flow you with to collect.
                         |- parameter binding: A binding to a property where each new value will be set to.
+                        |- parameter animation: An optional animation to use when updating the binding with a new value.
                     """.trimMargin()
 
                     val flowTypeParameter = SirTypeParameter(
@@ -107,9 +108,23 @@ object SwiftUIFlowObservingGenerator {
                         )
                     )
 
+                    SirValueParameter(
+                        name = "animation",
+                        type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                        defaultValue = "nil",
+                    )
+
                     bodyBuilder.add {
                         addCode("collect(flow: flow) { newValue in%>")
-                        addStatement("binding.wrappedValue = newValue")
+                        addCode("""
+                            if let animation {
+                                SwiftUI.withAnimation(animation) {
+                                    binding.wrappedValue = newValue
+                                }
+                            } else {
+                                binding.wrappedValue = newValue
+                            }
+                        """.trimIndent())
                         addCode("%<}")
                     }
                 }
@@ -143,6 +158,7 @@ object SwiftUIFlowObservingGenerator {
                         |
                         |- parameter flow: A SKIE-bridged Flow you with to collect.
                         |- parameter binding: A binding to a property where each new value will be set to.
+                        |- parameter animation: An optional animation to use when updating the binding with a new value.
                         |- parameter transform: An async closure to transform any value emitted by the flow into a one expected by the binding.
                         |                       Returning `nil` from this closure will reject the value.
                     """.trimMargin()
@@ -170,6 +186,12 @@ object SwiftUIFlowObservingGenerator {
                     )
 
                     SirValueParameter(
+                        name = "animation",
+                        type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                        defaultValue = "nil",
+                    )
+
+                    SirValueParameter(
                         name = "transform",
                         type = LambdaSirType(
                             valueParameterTypes = listOf(
@@ -186,7 +208,15 @@ object SwiftUIFlowObservingGenerator {
                     bodyBuilder.add {
                         addCode("collect(flow: flow) { newValue in%>")
                         beginControlFlow("if", "let newTransformedValue = await transform(newValue)")
-                        addStatement("binding.wrappedValue = newTransformedValue")
+                        addCode("""
+                            if let animation {
+                                SwiftUI.withAnimation(animation) {
+                                    binding.wrappedValue = newTransformedValue
+                                }
+                            } else {
+                                binding.wrappedValue = newTransformedValue
+                            }
+                        """.trimIndent())
                         endControlFlow("if")
                         addCode("%<}")
                     }
@@ -496,6 +526,12 @@ object SwiftUIFlowObservingGenerator {
                     visibility = SirVisibility.Private,
                 )
 
+                SirProperty(
+                    identifier = "animation",
+                    type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                    visibility = SirVisibility.Private,
+                )
+
                 SirConstructor(
                     visibility = SirVisibility.Internal,
                 ).apply {
@@ -506,8 +542,14 @@ object SwiftUIFlowObservingGenerator {
                         ),
                     )
 
+                    SirValueParameter(
+                        name = "animation",
+                        type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                    )
+
                     bodyBuilder.add {
                         addStatement("self.flows = flows")
+                        addStatement("self.animation = animation")
                         addStatement("self._values = SwiftUI.Published(initialValue: Swift.Array(repeating: nil, count: flows.count))")
                     }
                 }
@@ -583,7 +625,15 @@ object SwiftUIFlowObservingGenerator {
                     )
 
                     bodyBuilder.add {
-                        addStatement("values[index] = newValue")
+                        addCode("""
+                            if let animation {
+                                SwiftUI.withAnimation(animation) {
+                                    values[index] = newValue
+                                }
+                            } else {
+                                values[index] = newValue
+                            }
+                        """.trimIndent())
                     }
                 }
             }
@@ -650,6 +700,11 @@ object SwiftUIFlowObservingGenerator {
                     )
 
                     SirValueParameter(
+                        name = "animation",
+                        type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                    )
+
+                    SirValueParameter(
                         name = "content",
                         type = contentFactoryType.copy(isEscaping = true),
                         attributes = listOf(
@@ -660,7 +715,7 @@ object SwiftUIFlowObservingGenerator {
                     bodyBuilder.add {
                         addStatement("self.content = content")
                         addStatement(
-                            "self._observer = SwiftUI.StateObject(wrappedValue: %T(flows: flows))",
+                            "self._observer = SwiftUI.StateObject(wrappedValue: %T(flows: flows, animation: animation))",
                             skieSwiftFlowObserver.defaultType.evaluate().swiftPoetTypeName,
                         )
                     }
@@ -803,6 +858,11 @@ object SwiftUIFlowObservingGenerator {
                     type = extractValuesType.copy(isEscaping = false),
                 )
 
+                SirProperty(
+                    identifier = "animation",
+                    type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                )
+
                 SirConstructor(
                     attributes = listOf("_spi(SKIE)")
                 ).apply {
@@ -838,6 +898,12 @@ object SwiftUIFlowObservingGenerator {
                     )
 
                     SirValueParameter(
+                        name = "animation",
+                        type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                        defaultValue = "nil",
+                    )
+
+                    SirValueParameter(
                         name = "extractValues",
                         type = extractValuesType,
                     )
@@ -848,6 +914,7 @@ object SwiftUIFlowObservingGenerator {
                             self.flowIds = flowIds
                             self.initialContent = initialContent
                             self.content = content
+                            self.animation = animation
                             self.extractValues = extractValues
                         """.trimIndent())
                     }
@@ -859,7 +926,7 @@ object SwiftUIFlowObservingGenerator {
                         SirGetter().apply {
                             bodyBuilder.add {
                                 addCode("""
-                                    ObserveSkieSwiftFlows(flows: flows) { rawValues in
+                                    ObserveSkieSwiftFlows(flows: flows, animation: animation) { rawValues in
                                         if let values = extractValues(rawValues) {
                                             content(values)
                                         } else {
@@ -938,6 +1005,12 @@ object SwiftUIFlowObservingGenerator {
                         }
 
                         SirValueParameter(
+                            name = "animation",
+                            type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                            defaultValue = "nil",
+                        )
+
+                        SirValueParameter(
                             attributes = listOf("SwiftUI.ViewBuilder"),
                             name = "initialContent",
                             type = LambdaSirType(
@@ -967,7 +1040,8 @@ object SwiftUIFlowObservingGenerator {
                                 +"flows: [${flowValueParameters.joinToString { it.name }}],\n"
                                 +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name}.delegate)" }}],\n"
                                 +"initialContent: initialContent,\n"
-                                +"content: content\n"
+                                +"content: content,\n"
+                                +"animation: animation\n"
                             }
                             ") { values in" {
                                 flowValueParameters.forEachIndexed { index, parameter ->
@@ -1053,6 +1127,12 @@ object SwiftUIFlowObservingGenerator {
                         }
 
                         SirValueParameter(
+                            name = "animation",
+                            type = sirBuiltins.SwiftUI.Animation.defaultType.toNullable(),
+                            defaultValue = "nil",
+                        )
+
+                        SirValueParameter(
                             attributes = listOf("SwiftUI.ViewBuilder"),
                             name = "content",
                             type = LambdaSirType(
@@ -1072,7 +1152,8 @@ object SwiftUIFlowObservingGenerator {
                                 +"flows: [${flowValueParameters.joinToString { "${it.name}.flow" }}],\n"
                                 +"flowIds: [${flowValueParameters.joinToString { "Swift.ObjectIdentifier(${it.name}.flow.delegate)" }}],\n"
                                 +"initialContent: SwiftUI.EmptyView.init,\n"
-                                +"content: content\n"
+                                +"content: content,\n"
+                                +"animation: animation\n"
                             }
                             ") { values in" {
                                 flowValueParameters.forEachIndexed { index, parameter ->
