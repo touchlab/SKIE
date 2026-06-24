@@ -80,15 +80,29 @@ class ActualKgpShim(
 
     // Must be done eagerly because we need to go through all potential tasks even those that will not be executed.
     // This is to ensure the Link task configuration will be the same when executed separately or as part of the XCFramework task.
-    private fun getFrameworksUsedInXCFrameworks(): Set<Framework> =
-        project.tasks.withType<XCFrameworkTask>()
+    private fun getFrameworksUsedInXCFrameworks(): Set<Framework> {
+        val xcFrameworkTasks = project.tasks.withType<XCFrameworkTask>()
             // Prevents concurrent modification exception.
             .toList()
-            .flatMap { xcFrameworkTask ->
-                xcFrameworkTask.taskDependencies.getDependencies(xcFrameworkTask).filterIsInstance<KotlinNativeLink>().map { it.binary }
+        if (xcFrameworkTasks.isEmpty()) return emptySet()
+
+        // KGP's XCFrameworkTask.from(framework) registers linkTask.outputFile as an input file, so we match on
+        // input files instead of taskDependencies.getDependencies(), which Gradle forbids under configuration
+        // cache / isolated projects ("cannot access task dependencies directly").
+        val xcFrameworkInputPaths = xcFrameworkTasks
+            .flatMap { it.inputs.files.files }
+            .mapTo(HashSet()) { it.canonicalPath }
+
+        return project.tasks.withType<KotlinNativeLink>()
+            .toList()
+            .filter { linkTask ->
+                linkTask.binary is Framework &&
+                    linkTask.outputFile.get().canonicalPath in xcFrameworkInputPaths
             }
+            .map { it.binary }
             .filterIsInstance<Framework>()
             .toSet()
+    }
 
     private fun registerBinaryTarget(
         target: KotlinNativeTarget,
