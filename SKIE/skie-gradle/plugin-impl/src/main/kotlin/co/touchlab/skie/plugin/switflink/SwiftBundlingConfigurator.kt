@@ -11,7 +11,7 @@ import co.touchlab.skie.plugin.util.writeToZip
 import co.touchlab.skie.util.cache.syncDirectoryContentIfDifferent
 import co.touchlab.skie.util.file.isKlib
 import org.gradle.api.Project
-import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import java.io.File
 
@@ -38,12 +38,12 @@ object SwiftBundlingConfigurator {
 
         val baseName = lowerCamelCaseName("processSwiftSources", compilationPrefix, compilation.target.name)
 
-        val swiftSourceSet = createSwiftSourceSet(compilation)
+        val swiftSourceFiles = createSwiftSourceFiles(compilation)
 
         val isSwiftBundlingEnabledProperty = skieExtension.swiftBundling.enabled
 
         return registerSkieTask<ProcessSwiftSourcesTask>(baseName) {
-            inputs.files(swiftSourceSet)
+            inputs.files(swiftSourceFiles)
             output.set(compilation.skieCompilationDirectory.map { it.swift.bundled.directory })
 
             onlyIf {
@@ -52,20 +52,19 @@ object SwiftBundlingConfigurator {
         }
     }
 
-    private fun Project.createSwiftSourceSet(compilation: KotlinNativeCompilationShim): SourceDirectorySet {
-        val swiftSourceSetName = "${compilation.target.name}:${compilation.name} Swift sources"
+    private fun Project.createSwiftSourceFiles(compilation: KotlinNativeCompilationShim): FileCollection {
+        // A ConfigurableFileCollection populated with concrete directories is serializable by the
+        // Gradle configuration cache (it stores resolved paths, not the source set container or its
+        // actions). Using a SourceDirectorySet here instead captures a non-serializable
+        // DefaultSourceDirectorySet into the task graph and discards the configuration cache entry.
+        val swiftSourceFiles = objects.fileCollection()
 
-        val swiftSourceSet = objects.sourceDirectorySet(swiftSourceSetName, swiftSourceSetName).apply {
-            filter.include("**/*.swift")
+        compilation.allKotlinSourceSets.all {
+            swiftSourceFiles.from(layout.projectDirectory.dir(swiftSourceDirectory))
         }
 
-        compilation.allKotlinSourceSets.configureEach {
-            val swiftDirectory = project.layout.projectDirectory.dir(swiftSourceDirectory)
-
-            swiftSourceSet.srcDirs(swiftDirectory)
-        }
-
-        return swiftSourceSet
+        // Preserve the previous filter.include("**/*.swift") behavior for up-to-date checks.
+        return swiftSourceFiles.asFileTree.matching { include("**/*.swift") }
     }
 
     private fun KotlinNativeCompilationShim.configureCompileTask(processSwiftSourcesTaskProvider: Provider<ProcessSwiftSourcesTask>) {
