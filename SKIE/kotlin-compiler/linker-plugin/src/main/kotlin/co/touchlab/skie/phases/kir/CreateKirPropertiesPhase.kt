@@ -7,6 +7,7 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirProperty
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.addOverrides
+import co.touchlab.skie.kir.util.extractDocumentationOrNull
 import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 
@@ -62,6 +63,9 @@ internal class CreateKirPropertiesPhase(
                 configuration = descriptorConfigurationProvider.getConfiguration(originalDescriptor),
                 modality = descriptor.kirModality,
             )
+
+            // SKIE#166: carry the Kotlin KDoc onto the generated Swift declaration.
+            property.documentation = originalDescriptor.extractDocumentationOrNull()
 
             descriptorKirProvider.registerCallableDeclaration(property, descriptor)
 

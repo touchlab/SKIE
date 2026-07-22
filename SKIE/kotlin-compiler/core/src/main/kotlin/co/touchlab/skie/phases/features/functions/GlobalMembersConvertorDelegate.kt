@@ -40,6 +40,10 @@ class GlobalMembersConvertorDelegate(
                 addFunctionBody(sirFunction)
 
                 configureBridge(function, sirFunction, this)
+
+                // SKIE#166: the file-scope wrapper is what Swift users call, so it
+                // must carry the Kotlin KDoc (shallowCopy does not preserve it).
+                function.documentation?.let { documentation = it }
             }
         }
 
@@ -77,6 +81,10 @@ class GlobalMembersConvertorDelegate(
                 sirProperty.setter?.let {
                     addPropertySetter(it, sirProperty)
                 }
+
+                // SKIE#166: the file-scope wrapper is what Swift users see, so it
+                // must carry the Kotlin KDoc (shallowCopy does not preserve it).
+                property.documentation?.let { documentation = it }
 
                 property.bridgedSirProperty = this
             }

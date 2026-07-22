@@ -24,6 +24,9 @@ class KirClass(
 
     lateinit var oirClass: OirClass
 
+    // SKIE#166: KDoc of the Kotlin declaration, propagated to the generated Swift.
+    var documentation: String? = null
+
     override val classes: MutableList<KirClass> = mutableListOf()
 
     val kotlinIdentifier: String by lazy {

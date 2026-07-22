@@ -12,6 +12,7 @@ import co.touchlab.skie.kir.element.KirTypeParameter
 import co.touchlab.skie.kir.element.superClass
 import co.touchlab.skie.kir.type.DeclarationBackedKirType
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
+import co.touchlab.skie.kir.util.extractDocumentationOrNull
 import co.touchlab.skie.kir.util.hasArgumentValue
 import co.touchlab.skie.oir.element.OirTypeParameter
 import co.touchlab.skie.phases.KirPhase
@@ -105,6 +106,9 @@ class CreateExposedKirTypesPhase(
             nestingLevel = getNestingLevel(descriptor),
             configuration = descriptorConfigurationProvider.getConfiguration(descriptor),
         )
+
+        // SKIE#166: carry the Kotlin KDoc onto the generated Swift declaration.
+        kirClass.documentation = descriptor.extractDocumentationOrNull()
 
         descriptorKirProvider.registerClass(kirClass, descriptor)
 

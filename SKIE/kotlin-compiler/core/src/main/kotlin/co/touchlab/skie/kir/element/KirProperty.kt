@@ -25,6 +25,9 @@ class KirProperty(
 
     lateinit var oirProperty: OirProperty
 
+    // SKIE#166: KDoc of the Kotlin declaration, propagated to the generated Swift.
+    var documentation: String? = null
+
     override val oirCallableDeclaration: OirCallableDeclaration
         get() = oirProperty
 

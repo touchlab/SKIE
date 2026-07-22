@@ -84,6 +84,7 @@ class CreateSirMembersPhase(
             isHidden = function.isHidden,
         ).apply {
             createValueParameters(function, swiftFunctionName)
+            function.documentation?.let { documentation = it }
         }
 
         function.oirSimpleFunction.originalSirFunction = sirFunction
@@ -114,6 +115,8 @@ class CreateSirMembersPhase(
                     throws = false,
                 )
             }
+
+            property.documentation?.let { documentation = it }
         }
 
         oirProperty.originalSirProperty = sirProperty

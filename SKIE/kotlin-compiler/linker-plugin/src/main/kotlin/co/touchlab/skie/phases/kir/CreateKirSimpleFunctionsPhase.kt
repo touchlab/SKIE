@@ -8,6 +8,7 @@ import co.touchlab.skie.kir.element.KirClass
 import co.touchlab.skie.kir.element.KirSimpleFunction
 import co.touchlab.skie.kir.type.translation.withTypeParameterScope
 import co.touchlab.skie.kir.util.addOverrides
+import co.touchlab.skie.kir.util.extractDocumentationOrNull
 import co.touchlab.skie.phases.KirPhase
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
@@ -92,6 +93,9 @@ internal class CreateKirSimpleFunctionsPhase(
                 configuration = getFunctionConfiguration(descriptor),
                 modality = descriptor.kirModality,
             )
+
+            // SKIE#166: carry the Kotlin KDoc onto the generated Swift declaration.
+            function.documentation = originalDescriptor.extractDocumentationOrNull()
 
             descriptorKirProvider.registerCallableDeclaration(function, descriptor)
 
