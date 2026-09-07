@@ -7,6 +7,7 @@ import co.touchlab.skie.kir.descriptor.cache.ExposedDescriptorsCache
 import org.jetbrains.kotlin.backend.konan.FrontendServices
 import co.touchlab.skie.compat.KonanConfig
 import co.touchlab.skie.compat.KonanConfigKeys
+import co.touchlab.skie.compat.libraryFilePath
 import org.jetbrains.kotlin.backend.konan.ir.konanLibrary
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -72,7 +73,7 @@ internal class NativeDescriptorProvider(
         val externalLibrariesArtifacts = externalDependencies.flatMap { it.artifactPaths }.map { it.path }.toSet()
 
         resolvedLibraries
-            .filter { it.libraryFile.absolutePath in externalLibrariesArtifacts }
+            .filter { it.libraryFilePath in externalLibrariesArtifacts }
             .toSet() - buildInLibraries
     }
 

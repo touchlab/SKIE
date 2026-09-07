@@ -25,3 +25,8 @@ dependencies {
 
     sharedImplementation(libs.kotlinx.serialization.json)
 }
+
+// Kotlin 2.4.20 annotated the K1 API used by the linker plugin with `K1Deprecation`, a RequiresOptIn marker with error level.
+kotlin.sourceSets.configureEach {
+    languageSettings.optIn("org.jetbrains.kotlin.K1Deprecation")
+}

@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.context
 
+import co.touchlab.skie.compat.modulesStringKeyed
 import co.touchlab.skie.kir.irbuilder.impl.DeclarationBuilderImpl
 import co.touchlab.skie.kir.util.SkieSymbolTable
 import co.touchlab.skie.phases.KotlinIrPhase
@@ -23,7 +24,7 @@ class KotlinIrPhaseContext internal constructor(
 
     override val context: KotlinIrPhaseContext = this
 
-    val allModules: Map<String, IrModuleFragment> = pluginContext.linker.modules
+    val allModules: Map<String, IrModuleFragment> = pluginContext.linker.modulesStringKeyed
 
     val declarationBuilder: DeclarationBuilderImpl = mainSkieContext.declarationBuilder
 

@@ -1,5 +1,6 @@
 package co.touchlab.skie.analytics.modules
 
+import co.touchlab.skie.compat.libraryFilePath
 import co.touchlab.skie.configuration.SkieConfigurationFlag
 import co.touchlab.skie.kir.descriptor.DescriptorProvider
 import co.touchlab.skie.phases.KotlinIrPhase
@@ -122,7 +123,7 @@ object ModulesAnalytics {
         private fun getBuiltInModules(): List<TypedModule> =
             descriptorProvider.buildInLibraries
                 .let { builtInLibraries ->
-                    TypedModule.BuiltIn(builtInLibraries.map { findModuleForKlib(it.libraryFile.absolutePath) })
+                    TypedModule.BuiltIn(builtInLibraries.map { findModuleForKlib(it.libraryFilePath) })
                 }
                 .let { listOf(it) }
 
@@ -141,12 +142,13 @@ object ModulesAnalytics {
                 .map {
                     TypedModule.Local(
                         id = it.moduleName.hashed(),
-                        irModuleFragment = findModuleForKlib(it.libraryFile.absolutePath),
+                        irModuleFragment = findModuleForKlib(it.libraryFilePath),
                     )
                 }
 
         private fun findModuleForKlib(klib: String): IrModuleFragment? =
-            context.allModules[klib.removeSuffix(".klib")]
+            // Kotlin 2.4.20+ keys the modules map by the raw klib path, older versions by the klib path without `.klib`.
+            context.allModules[klib.removeSuffix(".klib")] ?: context.allModules[klib]
 
         private fun TypedModule.toModuleWithStatistics(): Module {
             val hasUnknownModule = this.irModuleFragments.any { it == null }

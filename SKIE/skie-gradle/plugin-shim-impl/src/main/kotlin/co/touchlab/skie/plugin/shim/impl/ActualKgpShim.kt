@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
-import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
@@ -131,7 +130,7 @@ class ActualKgpShim(
     }
 
     override fun resolvablePropertyString(properties: Properties, key: String, suffix: String?): String? =
-        properties.resolvablePropertyString(key, suffix)
+        properties.resolvablePropertyStringCompat(key, suffix)
 
     override fun addKmpAttributes(attributeContainer: AttributeContainer, konanTarget: KonanTargetShim) {
         attributeContainer.apply {
