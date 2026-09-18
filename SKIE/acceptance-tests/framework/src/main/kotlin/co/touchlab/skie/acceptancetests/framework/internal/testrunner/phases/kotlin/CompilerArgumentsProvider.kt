@@ -43,6 +43,10 @@ class CompilerArgumentsProvider(
             optIn = this@CompilerArgumentsProvider.optIn.toTypedArray()
 
             freeArgs += sourcePaths.map { it.absolutePathString() }
+            runCatching {
+                this.javaClass.getMethod("setAllowKotlinPackage", Boolean::class.javaPrimitiveType)
+                    .invoke(this, true)
+            }
             commonSources = commonSourcePaths.map { it.absolutePathString() }.toTypedArray()
 
             temporaryFilesDir = tempDirectory.absolutePathString()

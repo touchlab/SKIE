@@ -1,4 +1,4 @@
-## >= 1.8.0 --------------------------
+## >= 1.8.0 < 2.4.20 --------------------------
 
 # Generated property collides with preprocessor macro from system headers
 > @property (readonly) int32_t SEEK_CUR __attribute__((swift_name("SEEK_CUR")));
@@ -55,12 +55,6 @@ com.soywiz.korge:korge-foundation-iosarm64
 > error: expected member name or ';' after declaration specifiers
 > @property KotlinFormattingTuple *NULL __attribute__((swift_name("NULL")));
 ru.mobiledev:slf4k-api-1.7-iosarm64
-
-# Same as above
-# These libraries were added only in 2.0.0 test suite but the bug is present even before
-> error: expected member name or ';' after declaration specifiers
-> @property (readonly) KotlinTag *NULL __attribute__((swift_name("NULL")));
-it.krzeminski:snakeyaml-engine-kmp-iosarm64
 
 # Same as above
 # These libraries were added only in 2.2.20 test suite but the bug is present even before
@@ -552,16 +546,14 @@ io.github.edricchan03.androidx.common:common-enums-iosarm64
 > e: java.lang.IllegalStateException: No file for androidx.lifecycle/SavedStateHandle|null[0] (@ androidx.lifecycle/SavedStateHandle|null[0]) in module
 com.freeletics.flowredux2:flowredux-iosarm64
 
-## >= 2.3.0 --------------------------
+## >= 2.3.0 < 2.4.20 --------------------------
 
 > was built for newer 'iOS' version (18.2) than being linked
 [xcode-dependent] com.sonatype.central.testing.amazon:kms-iosarm64
 
 # New bug in the Kotlin IR (crashes even without SKIE)
 > java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: kotlinx.coroutines/CancellationException|null[0].
-com.gu.kotlin:multiplatform-ophan-iosarm64
 io.github.tyczj:tweedle-iosarm64
-net.pearx.kpastebin:kpastebin-iosarm64
 
 ## >= 2.3.20 --------------------------
 
@@ -599,30 +591,12 @@ com.apollographql.apollo3:apollo-runtime-kotlin-iosarm64
 com.charleex.notifikations:notifications-iosarm64
 com.darkrockstudios:mpfilepicker-iosarm64
 
-## >= 2.4.0 --------------------------
-
-> Caused by: java.lang.StackOverflowError
-at.asitplus.wallet:eprescription-iosarm64
-com.tencent.kuikly-open:compose-iosarm64
+## >= 2.4.0 < 2.4.20 --------------------------
 
 > e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: io.ktor.utils.io.core/ByteReadPacket|null[0]. Owner: TYPEALIAS name:ByteReadPacket visibility:public expandedType:kotlinx.io.Source
-com.accesspaysuite.mobilesdk:sdk-iosarm64
-com.b1nd.dodam:dodam-design-system-iosarm64
-com.rightcom:rightpoll-iosarm64
 io.github.aniketdhakorkar:form-builder-ui-iosarm64
-me.matsumo:fankt-iosarm64
 
 > e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: kotlinx.datetime/Instant|null[0]. Owner: TYPEALIAS name:Instant visibility:public expandedType:kotlin.time.Instant
-io.github.kalist28:cupertino-adaptive-iosarm64
-io.github.mflisar.composedialogs:dialog-frequency-iosarm64
-io.github.mflisar.composedialogs:dialog-time-iosarm64
-io.github.mflisar.composepreferences:screen-time-iosarm64
 io.github.schott12521:cupertino-adaptive-iosarm64
-
-> e: Compilation failed: IrTypeAliasSymbolImpl is already bound. Signature: androidx.compose.material3/MenuAnchorType|null[0]. Owner: TYPEALIAS name:MenuAnchorType visibility:public expandedType:androidx.compose.material3.ExposedDropdownMenuAnchorType
-io.github.mflisar.composedebugdrawer:plugin-lumberjack-iosarm64
-
-> e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: androidx.compose.material3/MenuAnchorType|null[0]. Owner: TYPEALIAS name:MenuAnchorType visibility:public expandedType:androidx.compose.material3.ExposedDropdownMenuAnchorType
-io.github.mflisar.toolbox:app-iosarm64
 
 ## --------------------------
