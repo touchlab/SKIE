@@ -551,10 +551,6 @@ com.freeletics.flowredux2:flowredux-iosarm64
 > was built for newer 'iOS' version (18.2) than being linked
 [xcode-dependent] com.sonatype.central.testing.amazon:kms-iosarm64
 
-# New bug in the Kotlin IR (crashes even without SKIE)
-> java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: kotlinx.coroutines/CancellationException|null[0].
-io.github.tyczj:tweedle-iosarm64
-
 ## >= 2.3.20 --------------------------
 
 # Seems like something broke in Kotlin
@@ -590,13 +586,5 @@ io.github.colagom:shared-iosarm64
 com.apollographql.apollo3:apollo-runtime-kotlin-iosarm64
 com.charleex.notifikations:notifications-iosarm64
 com.darkrockstudios:mpfilepicker-iosarm64
-
-## >= 2.4.0 < 2.4.20 --------------------------
-
-> e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: io.ktor.utils.io.core/ByteReadPacket|null[0]. Owner: TYPEALIAS name:ByteReadPacket visibility:public expandedType:kotlinx.io.Source
-io.github.aniketdhakorkar:form-builder-ui-iosarm64
-
-> e: java.lang.IllegalStateException: IrTypeAliasSymbolImpl is already bound. Signature: kotlinx.datetime/Instant|null[0]. Owner: TYPEALIAS name:Instant visibility:public expandedType:kotlin.time.Instant
-io.github.schott12521:cupertino-adaptive-iosarm64
 
 ## --------------------------
