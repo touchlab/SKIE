@@ -36,8 +36,6 @@ class CompilerArgumentsProvider(
             shortModuleName = "kotlin"
 
             multiPlatform = true
-            // `noendorsedlibs` was removed in Kotlin 2.4.20. It has been a no-op since Kotlin 2.4.0,
-            // when the dist stopped bundling endorsed libraries.
 
             libraries = dependencies.toTypedArray()
             optIn = this@CompilerArgumentsProvider.optIn.toTypedArray()

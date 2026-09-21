@@ -50,7 +50,5 @@ class DummyIrSimpleFunction(
     override var isSuspend: Boolean by unsupported()
     override var isTailrec: Boolean by unsupported()
     override var typeParameters: List<IrTypeParameter> by unsupported()
-    // Kotlin 2.4.20 added this abstract member to IrSimpleFunction (companion-extension support); never read on this
-    // short-lived symbol-table placeholder (see FunctionTemplate.declareSymbol).
     override var companionExtensionClass: IrClassSymbol? by unsupported()
 }
