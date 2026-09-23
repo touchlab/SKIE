@@ -10,8 +10,6 @@ internal class CommandResult(val exitCode: Int, val stdOut: String)
 
 internal fun List<String>.execute(logger: Logger = Logger.getLogger("String.execute")): CommandResult {
     val tempOutputFile = createTempFile("skie-test-runner", ".out").also { it.deleteOnExit() }
-    // `createTempFile` returns the K/N compiler's `org.jetbrains.kotlin.konan.file.File`, not `java.io.File`
-    // (the `javaFile()` extension it used to be convertible through was removed in Kotlin 2.4.20).
     val tempOutputPath = File(tempOutputFile.absolutePath)
     val process = ProcessBuilder(this)
         .redirectOutput(ProcessBuilder.Redirect.to(tempOutputPath))
