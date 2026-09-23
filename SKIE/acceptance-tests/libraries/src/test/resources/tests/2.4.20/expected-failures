@@ -1,4 +1,4 @@
-## >= 1.8.0 < 2.4.20 --------------------------
+## >= 1.8.0 --------------------------
 
 # Generated property collides with preprocessor macro from system headers
 > @property (readonly) int32_t SEEK_CUR __attribute__((swift_name("SEEK_CUR")));
@@ -346,7 +346,7 @@ com.icure:cardinal-dart-sdk-support-lib-iosarm64
 > error: argument type 'Self' does not conform to expected type 'DataOwnerWithType'
 com.icure:cardinal-sdk-iosarm64
 
-## >= 2.1.0 < 2.4.0 --------------------------
+## >= 2.1.0 --------------------------
 > e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library:
 co.touchlab.skie:runtime-kotlin-1.8.0-iosarm64
 co.touchlab.skie:runtime-kotlin-1.8.20-iosarm64
@@ -452,7 +452,7 @@ com.thebrownfoxx:karbon-14-iosarm64
 > e: KLIB resolver: The same 'unique_name=co.touchlab.skie:runtime-kotlin' found in more than one library
 com.fresco-kitchenos:kitchenos-client-sdk-kos-core-iosarm64
 
-## >= 2.1.20 < 2.4.0 --------------------------
+## >= 2.1.20 --------------------------
 
 > e: java.lang.IllegalStateException: No file for androidx.compose.runtime.saveable/SaveableStateHolder|null[0] (@ androidx.compose.runtime.saveable/SaveableStateHolder|null[0])
 io.syncrasy.dynamic:core-navigation-iosarm64
@@ -540,13 +540,13 @@ com.ricoh360.thetableclient:theta-ble-client-iosarm64
 io.github.edricchan03.androidx.common:common-enums-iosarm64
 
 
-## >= 2.2.20 < 2.4.0 --------------------------
+## >= 2.2.20 --------------------------
 
 # TODO Fix
 > e: java.lang.IllegalStateException: No file for androidx.lifecycle/SavedStateHandle|null[0] (@ androidx.lifecycle/SavedStateHandle|null[0]) in module
 com.freeletics.flowredux2:flowredux-iosarm64
 
-## >= 2.3.0 < 2.4.20 --------------------------
+## >= 2.3.0 --------------------------
 
 > was built for newer 'iOS' version (18.2) than being linked
 [xcode-dependent] com.sonatype.central.testing.amazon:kms-iosarm64

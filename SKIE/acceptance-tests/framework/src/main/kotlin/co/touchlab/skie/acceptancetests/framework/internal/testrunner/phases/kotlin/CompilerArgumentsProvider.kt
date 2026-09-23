@@ -36,11 +36,17 @@ class CompilerArgumentsProvider(
             shortModuleName = "kotlin"
 
             multiPlatform = true
+            // `noendorsedlibs` was removed from the compiler arguments in Kotlin 2.4.20. It had already been a
+            // no-op since Kotlin 2.4.0, when the distribution stopped bundling endorsed libraries, so dropping it
+            // is safe for every version we test against.
 
             libraries = dependencies.toTypedArray()
             optIn = this@CompilerArgumentsProvider.optIn.toTypedArray()
 
             freeArgs += sourcePaths.map { it.absolutePathString() }
+            // Tests declare `package kotlin`, which the compiler rejects unless `-allow-kotlin-package` is set.
+            // The flag is deprecated in every supported compiler version (2.0.21 lacks the property entirely),
+            // so it is set reflectively to keep this file compiling against all of them.
             runCatching {
                 this.javaClass.getMethod("setAllowKotlinPackage", Boolean::class.javaPrimitiveType)
                     .invoke(this, true)
@@ -72,6 +78,7 @@ class CompilerArgumentsProvider(
             bundleId = "Kotlin"
 
             multiPlatform = true
+            // `noendorsedlibs` removed in Kotlin 2.4.20, no-op since 2.4.0 (see `compile` above).
 
             pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.RESOURCES)
 
