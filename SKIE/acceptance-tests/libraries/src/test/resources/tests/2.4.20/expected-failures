@@ -1,4 +1,4 @@
-## >= 1.8.0 < 2.4.20 --------------------------
+## >= 1.8.0 (as of 2.4.20) --------------------------
 
 # Generated property collides with preprocessor macro from system headers
 > @property (readonly) int32_t SEEK_CUR __attribute__((swift_name("SEEK_CUR")));
@@ -546,7 +546,7 @@ io.github.edricchan03.androidx.common:common-enums-iosarm64
 > e: java.lang.IllegalStateException: No file for androidx.lifecycle/SavedStateHandle|null[0] (@ androidx.lifecycle/SavedStateHandle|null[0]) in module
 com.freeletics.flowredux2:flowredux-iosarm64
 
-## >= 2.3.0 < 2.4.20 --------------------------
+## >= 2.3.0 (as of 2.4.20) --------------------------
 
 > was built for newer 'iOS' version (18.2) than being linked
 [xcode-dependent] com.sonatype.central.testing.amazon:kms-iosarm64
