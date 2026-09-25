@@ -25,3 +25,7 @@ dependencies {
 
     sharedImplementation(libs.kotlinx.serialization.json)
 }
+
+kotlin.sourceSets.configureEach {
+    languageSettings.optIn("org.jetbrains.kotlin.K1Deprecation")
+}

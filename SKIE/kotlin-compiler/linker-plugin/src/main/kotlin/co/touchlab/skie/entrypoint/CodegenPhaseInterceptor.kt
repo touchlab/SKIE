@@ -2,6 +2,7 @@
 
 package co.touchlab.skie.entrypoint
 
+import co.touchlab.skie.compat.reportCompilerMessage
 import co.touchlab.skie.compilerinject.compilerplugin.mainSkieContext
 import co.touchlab.skie.compilerinject.interceptor.PhaseInterceptor
 import co.touchlab.skie.configuration.SkieConfigurationFlag
@@ -26,10 +27,11 @@ internal class CodegenPhaseInterceptor : PhaseInterceptor<NativeGenerationState,
 
     private fun workaroundRelativeDebugPrefixMapBug(context: NativeGenerationState) {
         if (context.hasDebugInfo()) {
-            context.context.messageCollector.report(
+            context.config.configuration.reportCompilerMessage(
                 severity = CompilerMessageSeverity.ERROR,
                 message = "NativeGenerationState.debugInfo was initialized before debug-prefix-map workaround was applied! " +
                     "Please disable the debug-prefix-map SKIE feature and report this issue to the SKIE GitHub at https://github.com/touchlab/SKIE",
+                location = null,
             )
         } else {
             /*

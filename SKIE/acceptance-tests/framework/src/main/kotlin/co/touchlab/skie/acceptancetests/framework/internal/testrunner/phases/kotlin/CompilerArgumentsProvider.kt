@@ -36,12 +36,17 @@ class CompilerArgumentsProvider(
             shortModuleName = "kotlin"
 
             multiPlatform = true
-            noendorsedlibs = true
-
             libraries = dependencies.toTypedArray()
             optIn = this@CompilerArgumentsProvider.optIn.toTypedArray()
 
             freeArgs += sourcePaths.map { it.absolutePathString() }
+            // Tests declare `package kotlin`, which the compiler rejects unless `-allow-kotlin-package` is set.
+            // The flag is deprecated in every supported compiler version (2.0.21 lacks the property entirely),
+            // so it is set reflectively to keep this file compiling against all of them.
+            runCatching {
+                this.javaClass.getMethod("setAllowKotlinPackage", Boolean::class.javaPrimitiveType)
+                    .invoke(this, true)
+            }
             commonSources = commonSourcePaths.map { it.absolutePathString() }.toTypedArray()
 
             temporaryFilesDir = tempDirectory.absolutePathString()
@@ -69,7 +74,6 @@ class CompilerArgumentsProvider(
             bundleId = "Kotlin"
 
             multiPlatform = true
-            noendorsedlibs = true
 
             pluginClasspaths = (pluginClasspaths ?: emptyArray()) + arrayOf(BuildConfig.RESOURCES)
 
