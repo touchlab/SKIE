@@ -92,11 +92,14 @@ private fun SkieTarget.getOrCreateSkieRuntimeConfiguration(): Configuration {
     return skieRuntimeConfiguration
 }
 
-private fun Configuration.getSkieRuntimeDependency(): ResolvedDependency =
-    resolvedConfiguration.firstLevelModuleDependencies
-        .single()
+private fun Configuration.getSkieRuntimeDependency(): ResolvedDependency {
+    val (runtimeGroup, runtimeModule) = BuildConfig.SKIE_KOTLIN_RUNTIME_COORDINATE.split(':')
+
+    return resolvedConfiguration.firstLevelModuleDependencies
+        .single { it.moduleGroup == runtimeGroup && it.moduleName == runtimeModule }
         .unwrapCommonKMPModule()
         .single()
+}
 
 private fun ResolvedDependency.getSkieRuntimeDirectDependencies(): List<ModuleIdentifier> =
     children.flatMap { it.unwrapCommonKMPModule() }.map { it.module.id.module }
