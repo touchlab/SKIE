@@ -140,9 +140,6 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                 steps:
                   - name: Checkout Repo
                     uses: actions/checkout@v3
-                    with:
-                      submodules: true
-                      token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
                   - name: Prepare Worker
                     uses: ./.github/actions/prepare-worker
                   - name: Run Acceptance Tests
@@ -162,9 +159,6 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                 steps:
                   - name: Checkout Repo
                     uses: actions/checkout@v3
-                    with:
-                      submodules: true
-                      token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
                   - name: Prepare Worker
                     uses: ./.github/actions/prepare-worker
                   - name: Run Gradle Tests
@@ -198,9 +192,6 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
                 steps:
                   - name: Checkout Repo
                     uses: actions/checkout@v3
-                    with:
-                      submodules: true
-                      token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
                   - name: Prepare Worker
                     uses: ./.github/actions/prepare-worker
                   - name: Run Type Mapping Tests
@@ -234,9 +225,6 @@ abstract class GenerateVersionedSmokeTestsCIActionsTask : DefaultTask() {
             steps:
               - name: Checkout Repo
                 uses: actions/checkout@v3
-                with:
-                  submodules: true
-                  token: ${{ secrets.ACCEPTANCE_TESTS_TOKEN }}
               - name: Prepare Worker
                 uses: ./.github/actions/prepare-worker
               - name: Run External Libraries Tests
