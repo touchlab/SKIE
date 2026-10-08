@@ -13,6 +13,7 @@ import co.touchlab.skie.util.file.isKlib
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.PathSensitivity
 import java.io.File
 
 object SwiftBundlingConfigurator {
@@ -73,7 +74,7 @@ object SwiftBundlingConfigurator {
         val compileTaskOutputFileProvider = compileTaskOutputFileProvider
 
         compileTaskProvider.configure {
-            inputs.files(processSwiftSourcesTaskOutput)
+            inputs.files(processSwiftSourcesTaskOutput).withPathSensitivity(PathSensitivity.RELATIVE)
 
             doLastOptimized {
                 copySwiftSourcesToKlib(compileTaskOutputFileProvider.get(), processSwiftSourcesTaskOutput)
