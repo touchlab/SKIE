@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
@@ -23,7 +22,7 @@ internal fun skieCreateGeneratorContext(
     bindingContext: BindingContext,
     languageVersionSettings: LanguageVersionSettings,
     symbolTable: SymbolTable,
-    typeTranslator: TypeTranslator,
+    typeTranslator: SkieTypeTranslator,
     irBuiltIns: IrBuiltIns,
 ): GeneratorContext =
     GeneratorContext(

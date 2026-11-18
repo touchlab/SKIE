@@ -71,7 +71,7 @@ class CompilerArgumentsProvider(
 
             temporaryFilesDir = tempDirectory.absolutePathString()
             outputName = outputFile.absolutePathString()
-            bundleId = "Kotlin"
+            binaryOptions = (binaryOptions ?: emptyArray()) + "bundleId=Kotlin"
 
             multiPlatform = true
 

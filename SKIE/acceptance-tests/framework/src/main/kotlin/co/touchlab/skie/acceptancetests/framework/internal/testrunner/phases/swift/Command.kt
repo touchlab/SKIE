@@ -1,7 +1,5 @@
 package co.touchlab.skie.acceptancetests.framework.internal.testrunner.phases.swift
 
-import org.jetbrains.kotlin.konan.file.createTempFile
-
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
@@ -9,8 +7,7 @@ import java.util.logging.Logger
 internal class CommandResult(val exitCode: Int, val stdOut: String)
 
 internal fun List<String>.execute(logger: Logger = Logger.getLogger("String.execute")): CommandResult {
-    val tempOutputFile = createTempFile("skie-test-runner", ".out").also { it.deleteOnExit() }
-    val tempOutputPath = File(tempOutputFile.absolutePath)
+    val tempOutputPath = File.createTempFile("skie-test-runner", ".out").also { it.deleteOnExit() }
     val process = ProcessBuilder(this)
         .redirectOutput(ProcessBuilder.Redirect.to(tempOutputPath))
         .redirectErrorStream(true)
