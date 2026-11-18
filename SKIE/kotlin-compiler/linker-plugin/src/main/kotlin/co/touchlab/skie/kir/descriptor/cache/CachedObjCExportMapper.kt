@@ -4,7 +4,8 @@ package co.touchlab.skie.kir.descriptor.cache
 
 import co.touchlab.skie.shim.ObjCExportMapperShim
 import org.jetbrains.kotlin.ir.objcinterop.isObjCObjectType
-import org.jetbrains.kotlin.backend.konan.FrontendServices
+import co.touchlab.skie.compat.SkieFrontendPhaseOutput
+import co.touchlab.skie.compat.skieCreateObjCExportMapper
 import co.touchlab.skie.compat.KonanConfig
 import org.jetbrains.kotlin.backend.konan.KonanFqNames
 import org.jetbrains.kotlin.backend.konan.objcexport.MethodBridge
@@ -26,10 +27,10 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 
 class CachedObjCExportMapper internal constructor(
     konanConfig: KonanConfig,
-    frontendServices: FrontendServices,
+    frontendPhaseOutput: SkieFrontendPhaseOutput,
 ) {
 
-    internal val kotlinMapper = ObjCExportMapper(frontendServices.deprecationResolver, unitSuspendFunctionExport = konanConfig.unitSuspendFunctionObjCExport)
+    internal val kotlinMapper = skieCreateObjCExportMapper(konanConfig, frontendPhaseOutput)
 
     private val isHiddenFromObjCCache = mutableMapOf<ClassDescriptor, Boolean>()
     private val shouldBeExposedMemberCache = mutableMapOf<CallableMemberDescriptor, Boolean>()

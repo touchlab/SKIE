@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.SourceFile
 import org.jetbrains.kotlin.descriptors.impl.MutablePackageFragmentDescriptor
@@ -72,7 +71,7 @@ class NewFileNamespace private constructor(
         private val packagesByName = mutableMapOf<FqName, PackageFragmentDescriptor>()
 
         init {
-            val syntheticPackageProvider = PackageFragmentProviderImpl(packagesByName.values)
+            val syntheticPackageProvider = SyntheticPackageFragmentProvider(packagesByName.values)
 
             val moduleDescriptor = moduleDescriptor.reflectedBy<ModuleDescriptorImplReflector>()
             val packageProvider = moduleDescriptor.packageFragmentProviderForModuleContent

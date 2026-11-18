@@ -4,11 +4,12 @@ package co.touchlab.skie.kir.descriptor
 
 import co.touchlab.skie.kir.descriptor.cache.CachedObjCExportMapper
 import co.touchlab.skie.kir.descriptor.cache.ExposedDescriptorsCache
-import org.jetbrains.kotlin.backend.konan.FrontendServices
+import co.touchlab.skie.compat.SkieFrontendPhaseOutput
 import co.touchlab.skie.compat.KonanConfig
 import co.touchlab.skie.compat.KonanConfigKeys
 import co.touchlab.skie.compat.libraryFilePath
-import org.jetbrains.kotlin.backend.konan.ir.konanLibrary
+import co.touchlab.skie.compat.skieKonanLibrary
+import co.touchlab.skie.compat.skieResolvedLibraries
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -26,10 +27,10 @@ import org.jetbrains.kotlin.utils.ResolvedDependency
 internal class NativeDescriptorProvider(
     override val exposedModules: Set<ModuleDescriptor>,
     private val konanConfig: KonanConfig,
-    frontendServices: FrontendServices,
+    frontendPhaseOutput: SkieFrontendPhaseOutput,
 ) : MutableDescriptorProvider {
 
-    override val mapper = CachedObjCExportMapper(konanConfig, frontendServices)
+    override val mapper = CachedObjCExportMapper(konanConfig, frontendPhaseOutput)
 
     override val builtIns: KotlinBuiltIns = exposedModules.first().builtIns
 
@@ -60,13 +61,13 @@ internal class NativeDescriptorProvider(
     }
 
     override val resolvedLibraries: List<KotlinLibrary> by lazy {
-        konanConfig.resolvedLibraries.getFullList()
+        konanConfig.skieResolvedLibraries
     }
 
     override val buildInLibraries: Set<KotlinLibrary> by lazy {
         getDefaultLibraries(konanConfig) +
         // Kotlin 2.0 changed how is the stdlib handled and for some reason it's no longer marked as default
-            setOfNotNull(builtIns.any.module.konanLibrary)
+            setOfNotNull(builtIns.any.module.skieKonanLibrary)
     }
 
     override val externalLibraries: Set<KotlinLibrary> by lazy {
@@ -82,7 +83,7 @@ internal class NativeDescriptorProvider(
     }
 
     override fun isFromLocalModule(declarationDescriptor: DeclarationDescriptor): Boolean =
-        declarationDescriptor.module.konanLibrary in localLibraries
+        declarationDescriptor.module.skieKonanLibrary in localLibraries
 
     override fun isExposed(callableMemberDescriptor: CallableMemberDescriptor): Boolean =
         callableMemberDescriptor.isExposed

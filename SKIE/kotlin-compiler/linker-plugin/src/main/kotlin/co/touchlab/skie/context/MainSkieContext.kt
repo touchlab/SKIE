@@ -26,7 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import org.jetbrains.kotlin.backend.konan.FrontendServices
+import co.touchlab.skie.compat.SkieFrontendPhaseOutput
 import co.touchlab.skie.compat.KonanConfig
 import co.touchlab.skie.compat.KonanConfigKeys
 import co.touchlab.skie.compat.frameworkOutputPathConfigurationKey
@@ -36,7 +36,7 @@ import java.util.Collections
 class MainSkieContext internal constructor(
     initPhaseContext: InitPhaseContext,
     override val konanConfig: KonanConfig,
-    frontendServices: FrontendServices,
+    frontendPhaseOutput: SkieFrontendPhaseOutput,
     val mainModuleDescriptor: ModuleDescriptor,
     exportedDependencies: Collection<ModuleDescriptor>,
 ) : ForegroundPhaseCompilerContext, BackgroundPhase.Context, CommonSkieContext by initPhaseContext {
@@ -55,7 +55,7 @@ class MainSkieContext internal constructor(
     override val descriptorProvider: MutableDescriptorProvider = NativeDescriptorProvider(
         exposedModules = setOf(mainModuleDescriptor) + exportedDependencies,
         konanConfig = konanConfig,
-        frontendServices = frontendServices,
+        frontendPhaseOutput = frontendPhaseOutput,
     )
 
     override val descriptorConfigurationProvider: DescriptorConfigurationProvider = DescriptorConfigurationProvider(initPhaseContext.configurationProvider)
