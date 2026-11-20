@@ -11,11 +11,11 @@ object SwiftUnpackingConfigurator {
         val unpackTask = target.registerSkieTargetBasedTask<UnpackSwiftSourcesTask>("unpackSwiftSources") {
             val linkerKlibs = target.linkerConfiguration.incoming.files.filter { it.isKlib || it.isDirectory }
             inputs.files(linkerKlibs)
-            dependencies.addAll(linkerKlibs)
+            dependencies.from(linkerKlibs)
 
             if (target is SkieTarget.Binary) {
                 val currentModuleKlib = target.compilationProvider.flatMap { it.compileTaskOutputFileProvider }
-                dependencies.add(currentModuleKlib)
+                dependencies.from(currentModuleKlib)
 
                 // Needed because the klib is a plain Java file
                 dependsOn(target.compilationProvider.flatMap { it.compileTaskProvider })

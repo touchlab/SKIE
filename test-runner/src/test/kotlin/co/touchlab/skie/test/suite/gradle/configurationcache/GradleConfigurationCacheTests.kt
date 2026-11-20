@@ -7,6 +7,7 @@ import co.touchlab.skie.test.annotation.type.GradleTests
 import co.touchlab.skie.test.base.BaseGradleTests
 import co.touchlab.skie.test.runner.BuildConfiguration
 import co.touchlab.skie.test.template.Templates
+import co.touchlab.skie.test.trait.gradle.BuildGradleBuilder
 import co.touchlab.skie.test.util.KotlinTarget
 import co.touchlab.skie.test.util.KotlinVersion
 import co.touchlab.skie.test.util.LinkMode
@@ -220,6 +221,80 @@ class GradleConfigurationCacheTests: BaseGradleTests() {
             "SKIE put its swift SourceDirectorySet on the configuration cache serialization path " +
                 "(SwiftBundlingConfigurator.createSwiftSourceSet). It must expose the swift sources as a " +
                 "serializable FileCollection instead.",
+        )
+    }
+
+    // Regression test for project-dependency Swift missing from the framework on a clean build.
+    // Project dependencies resolve to non-packed klib directories that only exist once the dependency
+    // is compiled. UnpackSwiftSourcesTask used to hold the `isDirectory`-filtered linker klibs in a
+    // ListProperty, whose value the configuration cache stored before the directories existed, which
+    // dropped every project-dependency klib. The framework's bundled Swift calls the library's bundled
+    // Swift, so the link only succeeds if the library's Swift was unpacked.
+    @MatrixTest
+    fun `framework link includes bundled Swift from project dependencies`(
+        kotlinVersion: KotlinVersion,
+    ) {
+        settingsFile.appendText("\ninclude(\":library\")\n")
+
+        val libraryBuildFile = BuildGradleBuilder(
+            kotlinVersion = kotlinVersion,
+            // The root project already puts both plugins on the classpath, so they can't be requested with a version.
+            plugins = listOf(
+                BuildGradleBuilder.Plugin(id = "org.jetbrains.kotlin.multiplatform", version = null),
+                BuildGradleBuilder.Plugin(id = "co.touchlab.skie", version = null),
+            ),
+        ).apply {
+            kotlin {
+                target(KotlinTarget.Native.Ios.Arm64)
+            }
+        }
+
+        testProjectDir.resolve("library/src/commonMain/kotlin").mkdirs()
+        testProjectDir.resolve("library/build.gradle.kts")(libraryBuildFile)
+
+        testProjectDir.resolve("library/src/commonMain/kotlin/Library.kt")("class Library\n")
+
+        testProjectDir.resolve("library/src/commonMain/swift").mkdirs()
+        testProjectDir.resolve("library/src/commonMain/swift/LibrarySwift.swift")(
+            """
+            public func libraryBundledSwiftFunction() {
+            }
+            """.trimIndent(),
+        )
+
+        rootBuildFile(kotlinVersion) {
+            kotlin {
+                target(KotlinTarget.Native.Ios.Arm64)
+
+                "sourceSets.commonMain" {
+                    "dependencies" {
+                        +"implementation(project(\":library\"))"
+                    }
+                }
+
+                registerNativeFrameworks(
+                    kotlinVersion = kotlinVersion,
+                    buildConfiguration = BuildConfiguration.Debug,
+                    linkMode = LinkMode.Dynamic,
+                )
+            }
+        }
+
+        copyToCommonMain(Templates.basic)
+
+        testProjectDir.resolve("src/commonMain/swift/FrameworkSwift.swift")(
+            """
+            public func frameworkBundledSwiftFunction() {
+                libraryBundledSwiftFunction()
+            }
+            """.trimIndent(),
+        )
+
+        runGradle(
+            arguments = arrayOf(":linkDebugFrameworkIosArm64"),
+            assertResult = { result ->
+                assertEquals(TaskOutcome.SUCCESS, result.task(":linkDebugFrameworkIosArm64")?.outcome)
+            },
         )
     }
 

@@ -7,14 +7,14 @@ import co.touchlab.skie.util.file.isKlib
 import co.touchlab.skie.util.file.isSwift
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.RelativePath
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -22,13 +22,18 @@ import javax.inject.Inject
 
 abstract class UnpackSwiftSourcesTask : DefaultTask() {
 
-    @get:Input
-    abstract val dependencies: ListProperty<File>
+    // Not a ListProperty<File>: the configuration cache stores a list property's resolved value, but stores a filtered
+    // file collection together with its filter, which then runs when the task executes. Project dependencies are klib
+    // directories that don't exist yet when a clean build stores the cache entry, so filtering them with `isDirectory`
+    // at that point would drop them.
+    // Inputs are tracked by `klibs`, `unpackedKlibSwiftFiles` and the linker klibs registered by SwiftUnpackingConfigurator.
+    @get:Internal
+    abstract val dependencies: ConfigurableFileCollection
 
     @get:InputFiles
     protected val klibs: FileCollection
         get() = objects.fileCollection().also { files ->
-            dependencies.get().filter { it.isKlib }.forEach {
+            dependencies.filter { it.isKlib }.forEach {
                 files.from(it)
             }
         }
@@ -36,7 +41,7 @@ abstract class UnpackSwiftSourcesTask : DefaultTask() {
     @get:InputFiles
     protected val unpackedKlibSwiftFiles: FileCollection
         get() = objects.fileCollection().also { files ->
-            dependencies.get().filter { it.isDirectory }.forEach {
+            dependencies.filter { it.isDirectory }.forEach {
                 files.from(
                     objects.fileTree().from(it).filter { it.isSwift }
                 )
@@ -82,7 +87,7 @@ abstract class UnpackSwiftSourcesTask : DefaultTask() {
             return uniqueName
         }
 
-        return dependencies.get().map { it to it.getUniqueName() }
+        return dependencies.map { it to it.getUniqueName() }
     }
 
     private fun unpackKlib(klib: File, uniqueName: String, temporaryDirectory: File) {
